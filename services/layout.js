@@ -1,4 +1,4 @@
-import layout from './../config/layout'
+import layout from './../config/layout';
 
 // --------------------------------------------------------------------
 
