@@ -93,6 +93,7 @@ const AuthService = {
       const response = await ApiService.get('auth/me');
       const { user, permissions } = response.data;
 
+      console.log(user, permissions);
       AuthStorage.setUser(user);
       AuthStorage.setPermissions(permissions);
 

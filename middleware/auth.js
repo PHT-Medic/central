@@ -1,7 +1,6 @@
-// import { AuthStorage } from './../services/authStorage';
+import { AuthStorage } from './../services/authStorage';
 
 export default function ({ store, route, redirect }) {
-  /*
   if (route.meta.some(m => m.requiresAuth) || route.matched.some(record => record.meta.requiresAuth)) {
     let user;
 
@@ -18,13 +17,11 @@ export default function ({ store, route, redirect }) {
         }
       }
 
-      redirect({ path: '/' });
+      redirect({ path: '/login' });
     }
   } else if (route.meta.some(m => m.requiresGuestState) || route.matched.some(record => record.meta.requiresGuestState)) {
     if (AuthStorage.getToken()) {
       redirect({ path: '/' });
     }
   }
-  */
-
-}
+};

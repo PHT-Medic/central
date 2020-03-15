@@ -30,7 +30,7 @@ export default {
       if (this.name !== '' && this.password !== '') {
         const success = await this.login({ name: this.name, password: this.password });
         if (success) {
-          this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
+          await this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
         }
       } else {
         this.triggerAuthError('Es muss ein Benutzername und ein Passwort angegeben werden.')

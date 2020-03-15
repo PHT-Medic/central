@@ -42,22 +42,23 @@ const AuthStorage = {
   // User permissions operations
 
   getPermissions () {
-    if (process.server) { return null }
-    const permissions = localStorage.getItem(userPermissionsKey)
-    if (permissions !== null) {
-      return JSON.parse(permissions)
+    if (process.server) { return [] }
+
+    const permissions = localStorage.getItem(userPermissionsKey);
+    if (permissions == null) {
+      return [];
     }
 
-    return null
+    return JSON.parse(permissions)
   },
   setPermissions (permissions) {
-    if (process.server) { return }
-    permissions = JSON.stringify(permissions)
+    if (process.server || !Array.isArray(permissions)) { return }
+    permissions = JSON.stringify(permissions);
     localStorage.setItem(userPermissionsKey, permissions)
   },
   dropPermissions () {
     if (process.server) { return }
-    localStorage.removeItem(userPermissionsKey)
+    localStorage.removeItem(userPermissionsKey);
   }
 }
 

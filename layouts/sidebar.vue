@@ -1,10 +1,10 @@
 <template>
   <div class="page-sidebar">
     <div class="sidebar-header">
-      <h3>PHT - Personal Health Train</h3>
+      PHT - Personal Health Train
     </div>
     <ul class="sidebar-menu">
-      <li v-for="(component,key) in sidebarComponents" :key="key">
+      <li v-for="(component,key) in components" :key="key">
         <div v-if="component.type === 'separator'" class="nav-separator">
           {{ component.name }}
         </div>
@@ -15,7 +15,9 @@
             </nuxt-link>
           </span>
           <span v-if="component.subcomponents">
-            <span class="sidebar-submenu-title">{{ component.name }}</span>
+            <span class="sidebar-submenu-title">
+              {{ component.name }}
+            </span>
             <ul class="list-unstyled sidebar-submenu-components">
               <li v-for="(subValue,subKey) in component.subcomponents" :key="subKey">
                 <nuxt-link :to="subValue.link" class="sidebar-menu-link">
@@ -31,6 +33,7 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
+import { LayoutService } from '../services/layout';
 
 export default {
   components: {},
@@ -38,10 +41,17 @@ export default {
     ...mapGetters('auth', [
       'loggedIn'
     ]),
+    ...mapGetters('layout', [
+      'sidebarComponents'
+    ]),
+    components: (vm) => {
+      const components = vm.sidebarComponents;
 
-    sidebarComponents: (vm) => {
-      let components = []
-
+      return LayoutService.reduceComponents({
+        components,
+        loggedIn: vm.loggedIn
+      });
+      /*
       if (vm.loggedIn) {
         components = [
           { name: 'Übersicht', type: 'link', value: '/dashboard', subcomponents: false, separator: 'Allgemein' },
@@ -90,6 +100,7 @@ export default {
       }
 
       return components
+       */
     }
   }
 }

@@ -49,7 +49,7 @@ export default {
   ],
 
   router: {
-    middleware: ['auth']
+    middleware: ['auth', 'layout']
   },
   /*
   ** Build configuration

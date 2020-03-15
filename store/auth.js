@@ -8,7 +8,7 @@ const state = () => ({
     refreshTokenPromise: null
   },
   user: AuthStorage.getUser(),
-  permissions: AuthStorage.getPermissions,
+  permissions: [],
   token: AuthStorage.getToken()
 });
 
