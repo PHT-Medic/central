@@ -1,16 +1,16 @@
-import Vue from 'vue';
-import Router from 'vue-router';
+import Vue from 'vue'
+import Router from 'vue-router'
 
-import routerGuard from "./RouterGuard";
-import register from '../../routes/regsitry';
+import register from '../../routes/regsitry'
+import routerGuard from './RouterGuard'
 
-Vue.use(Router);
+Vue.use(Router)
 
-let router = new Router({
-    mode: 'history',
-    routes: register
-});
+const router = new Router({
+  mode: 'history',
+  routes: register
+})
 
-routerGuard(router);
+routerGuard(router)
 
 export default router

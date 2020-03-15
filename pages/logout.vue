@@ -11,7 +11,10 @@ export default {
       'triggerAuthError'
     ]),
 
-    doLogout () { this.logout() }
+    doLogout () {
+      this.logout();
+      this.$nuxt.$router.push('login');
+    }
   }
 }
 </script>

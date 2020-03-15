@@ -1,13 +1,7 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { AuthStorage } from './../services/authStorage';
+import { AuthenticationError, AuthService } from './../services/auth';
 
-import router from '../router/RouterService'
-import { AuthStorage } from './AuthStorage'
-import { AuthenticationError, AuthService } from './AuthService'
-
-Vue.use(Vuex)
-
-const state = {
+const state = () => ({
   authentication: {
     inProgress: false,
     error: null,
@@ -15,7 +9,7 @@ const state = {
   },
   user: AuthStorage.getUser(),
   token: AuthStorage.getToken()
-}
+});
 
 const getters = {
   loggedIn: (state) => {
@@ -70,10 +64,6 @@ const actions = {
 
       commit('loginSuccess', { user, accessToken: token })
 
-      console.log(token)
-
-      await router.push(router.history.current.query.redirect || '/dashboard')
-
       return true
     } catch (e) {
       if (e instanceof AuthenticationError) {
@@ -90,8 +80,6 @@ const actions = {
   logout ({ commit }) {
     AuthService.logout()
     commit('logoutSuccess')
-
-    router.push('/login')
   },
 
   /**
@@ -109,17 +97,17 @@ const actions = {
 const mutations = {
   // Login mutations
   loginRequest (state) {
-    state.authentication.inProgress = true
+    state.authentication.inProgress = true;
 
     state.authentication.error = null
   },
   loginSuccess (state, { user, accessToken }) {
-    state.user = user
-    state.token = accessToken
-    state.authentication.inProgress = false
+    state.user = user;
+    state.token = accessToken;
+    state.authentication.inProgress = false;
   },
   loginError (state, { errorCode, errorMessage }) {
-    state.authentication.inProgress = false
+    state.authentication.inProgress = false;
 
     state.authentication.error = {
       code: errorCode,
@@ -129,20 +117,19 @@ const mutations = {
 
   // Logout mutations
   logoutSuccess (state) {
-    state.user = {}
-    state.token = ''
+    state.user = {};
+    state.token = '';
   },
 
   setUser (state, user) {
-    state.user = user
+    state.user = user;
   },
   setToken (state, token) {
-    state.token = token
+    state.token = token;
   }
 }
 
-export const auth = {
-  namespaced: true,
+export {
   state,
   getters,
   actions,

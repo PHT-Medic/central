@@ -1,6 +1,6 @@
 <script>
-import StationService from '../../modules/StationService'
-import MasterImageService from '../../modules/MasterImageService'
+import MasterImageService from '../../services/masterImage';
+import StationService from './../../services/station';
 
 export default {
   data () {

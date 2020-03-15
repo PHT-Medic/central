@@ -2,7 +2,9 @@
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
-  props: ['redirectUrl'],
+  meta: {
+    requiresGuestState: true
+  },
   data () {
     return {
       name: '',
@@ -22,11 +24,14 @@ export default {
       'triggerAuthError'
     ]),
 
-    handleSubmit (e) {
-      e.preventDefault()
+    async handleSubmit (e) {
+      e.preventDefault();
 
       if (this.name !== '' && this.password !== '') {
-        this.login({ name: this.name, password: this.password })
+        const success = await this.login({ name: this.name, password: this.password });
+        if (success) {
+          this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
+        }
       } else {
         this.triggerAuthError('Es muss ein Benutzername und ein Passwort angegeben werden.')
       }
@@ -39,8 +44,9 @@ export default {
     <h4 class="title">
       Login
     </h4>
-    <div v-if="authenticationErrorMessage !== ''" class="alert alert-danger alert-sm" v-html="authenticationErrorMessage" />
-
+    <div v-if="authenticationErrorMessage !== ''" class="alert alert-danger alert-sm">
+      {{ authenticationErrorMessage }}
+    </div>
     <form>
       <div class="form-group">
         <label for="name">Name</label>

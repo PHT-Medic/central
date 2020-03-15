@@ -2,6 +2,9 @@
 import { mapGetters } from 'vuex'
 
 export default {
+  meta: {
+    requiresAuth: true
+  },
   data: () => {
     return {
       age: 'Hi'
@@ -14,12 +17,6 @@ export default {
     ]),
 
     test () {
-      console.log(this.$route.params.redirectUrl)
-      console.log(this.$router.history.current.params)
-      console.log(this.$router.history.current.query)
-      console.log(this.authenticationErrorCode)
-
-      console.log(this.$store.state.auth)
       return 'Hi'
     }
   }
