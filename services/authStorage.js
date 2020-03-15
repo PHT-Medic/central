@@ -1,5 +1,7 @@
-const accessTokenKey = 'accessToken'
-const userKey = 'user'
+const accessTokenKey = 'accessToken';
+
+const userKey = 'user';
+const userPermissionsKey = 'userPermissions';
 
 const AuthStorage = {
   // Access Token operations
@@ -35,6 +37,27 @@ const AuthStorage = {
   dropUser () {
     if (process.server) { return }
     localStorage.removeItem(userKey)
+  },
+
+  // User permissions operations
+
+  getPermissions () {
+    if (process.server) { return null }
+    const permissions = localStorage.getItem(userPermissionsKey)
+    if (permissions !== null) {
+      return JSON.parse(permissions)
+    }
+
+    return null
+  },
+  setPermissions (permissions) {
+    if (process.server) { return }
+    permissions = JSON.stringify(permissions)
+    localStorage.setItem(userPermissionsKey, permissions)
+  },
+  dropPermissions () {
+    if (process.server) { return }
+    localStorage.removeItem(userPermissionsKey)
   }
 }
 

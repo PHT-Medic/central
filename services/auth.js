@@ -1,6 +1,8 @@
 import { ApiService } from './api';
 import { AuthStorage } from './authStorage';
 
+// --------------------------------------------------------------------
+
 class AuthenticationError extends Error {
   constructor (errorCode, message) {
     super(message);
@@ -11,6 +13,8 @@ class AuthenticationError extends Error {
   }
 }
 
+// --------------------------------------------------------------------
+
 const setRequestToken = (token) => {
   ApiService.setHeader('Authorization', 'Bearer ' + token);
 };
@@ -19,6 +23,8 @@ const unsetRequestToken = () => {
   ApiService.unsetHeader('Authorization');
 };
 
+// --------------------------------------------------------------------
+
 const AuthService = {
   checkRequestToken: () => {
     const token = AuthStorage.getToken();
@@ -26,6 +32,8 @@ const AuthService = {
       setRequestToken(token)
     }
   },
+
+  // --------------------------------------------------------------------
 
   /**
      *
@@ -52,7 +60,6 @@ const AuthService = {
       const response = await ApiService.customRequest(data);
 
       token = response.data.token;
-      console.log(token);
 
       AuthStorage.setToken(token);
 
@@ -64,6 +71,8 @@ const AuthService = {
     return token
   },
 
+  // --------------------------------------------------------------------
+
   /**
      * Logout the current user.
      *
@@ -72,26 +81,29 @@ const AuthService = {
   logout: () => {
     AuthStorage.dropToken();
     AuthStorage.dropUser();
+    AuthStorage.dropPermissions();
 
     unsetRequestToken()
   },
 
-  getMe: async () => {
-    const data = {
-      method: 'get',
-      url: 'auth/me'
-    };
+  // --------------------------------------------------------------------
 
+  getMe: async () => {
     try {
-      const response = await ApiService.customRequest(data);
-      const user = response.data;
+      const response = await ApiService.get('auth/me');
+      const { user, permissions } = response.data;
 
       AuthStorage.setUser(user);
-      return user
+      AuthStorage.setPermissions(permissions);
+
+      return {
+        user,
+        permissions
+      };
     } catch (e) {
-      throw new AuthenticationError(e.response.status, e.response.data.message)
+      return null;
     }
   }
-}
+};
 
 export { AuthService, AuthenticationError }

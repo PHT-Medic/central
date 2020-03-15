@@ -8,6 +8,7 @@ const state = () => ({
     refreshTokenPromise: null
   },
   user: AuthStorage.getUser(),
+  permissions: AuthStorage.getPermissions,
   token: AuthStorage.getToken()
 });
 
@@ -28,18 +29,19 @@ const getters = {
   authenticationErrorMessage: (state) => {
     return state.authentication.error ? state.authentication.error.message : ''
   }
-}
+};
 
 const actions = {
   async refreshMe ({ commit, dispatch }) {
-    const token = AuthStorage.getToken()
+    const token = AuthStorage.getToken();
     if (token) {
       try {
-        const user = await AuthService.getMe()
-        commit('setUser', user)
+        const { user, permissions } = await AuthService.getMe();
+        commit('setUser', user);
+        commit('setPermissions', permissions);
         return true
       } catch (e) {
-        dispatch('logout')
+        dispatch('logout');
         return false
       }
     }
@@ -57,12 +59,10 @@ const actions = {
     commit('loginRequest')
 
     try {
-      const token = await AuthService.login(name, password)
-      const user = await AuthService.getMe()
+      const token = await AuthService.login(name, password);
+      const { user, permissions } = await AuthService.getMe();
 
-      console.log(token)
-
-      commit('loginSuccess', { user, accessToken: token })
+      commit('loginSuccess', { user, accessToken: token, permissions });
 
       return true
     } catch (e) {
@@ -78,7 +78,7 @@ const actions = {
      * @param commit
      */
   logout ({ commit }) {
-    AuthService.logout()
+    AuthService.logout();
     commit('logoutSuccess')
   },
 
@@ -92,7 +92,7 @@ const actions = {
   triggerAuthError ({ commit }, message) {
     commit('loginError', { errorCode: 'internal', errorMessage: message })
   }
-}
+};
 
 const mutations = {
   // Login mutations
@@ -101,9 +101,10 @@ const mutations = {
 
     state.authentication.error = null
   },
-  loginSuccess (state, { user, accessToken }) {
+  loginSuccess (state, { user, accessToken, permissions }) {
     state.user = user;
     state.token = accessToken;
+    state.permissions = permissions;
     state.authentication.inProgress = false;
   },
   loginError (state, { errorCode, errorMessage }) {
@@ -115,19 +116,26 @@ const mutations = {
     }
   },
 
+  // --------------------------------------------------------------------
+
   // Logout mutations
   logoutSuccess (state) {
     state.user = {};
     state.token = '';
   },
 
+  // --------------------------------------------------------------------
+
   setUser (state, user) {
     state.user = user;
+  },
+  setPermissions (state, permissions) {
+    state.permissions = permissions;
   },
   setToken (state, token) {
     state.token = token;
   }
-}
+};
 
 export {
   state,
