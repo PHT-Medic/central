@@ -19,7 +19,8 @@
     "core-js": "^2.6.5",
     "eslint-loader": "^3.0.3",
     "vuex": "latest",
-    "axios": "^0.19.2"
+    "axios": "^0.19.2",
+    "@fortawesome/fontawesome-free": "^5.12.1"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^2.0.0",

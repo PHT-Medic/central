@@ -1,14 +1,12 @@
 <script>
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
-
+import pageHeader from './header';
 import pageSidebar from './sidebar';
 import pageFooter from './footer';
 
 export default {
   name: 'App',
   // eslint-disable-next-line vue/no-unused-components
-  components: { pageFooter, pageSidebar },
+  components: { pageFooter, pageSidebar, pageHeader },
   computed: {
 
   }
@@ -17,6 +15,7 @@ export default {
 
 <template>
   <div id="app">
+    <page-header></page-header>
     <div class="page-wrapper">
       <page-sidebar />
       <div class="page-content">

@@ -17,7 +17,7 @@ export default function ({ store, route, redirect }) {
         }
       }
 
-      redirect({ path: '/login' });
+      redirect({ path: '/' });
     }
   } else if (route.meta.some(m => m.requiresGuestState) || route.matched.some(record => record.meta.requiresGuestState)) {
     if (AuthStorage.getToken()) {

@@ -1,8 +1,5 @@
 <template>
   <div class="page-sidebar">
-    <div class="sidebar-header">
-      PHT - Personal Health Train
-    </div>
     <ul class="sidebar-menu">
       <li v-for="(component,key) in components" :key="key">
         <div v-if="component.type === 'separator'" class="nav-separator">

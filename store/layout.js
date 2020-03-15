@@ -19,16 +19,10 @@ const getters = {
     return state.sidebarId
   },
   sidebarComponents: (state, getters) => {
-    return state.sidebarComponents
+    return state.sidebarComponents;
   },
   navigationComponents: (state, getters) => {
-    return LayoutService.reduceComponents({
-      components: state.navigationComponents.map((component) => {
-        component.active = 'sidebarId' in component && component.sidebarId === state.sidebarId;
-        return component
-      }),
-      loggedIn: getters['auth/loggedIn']
-    })
+    return state.navigationComponents;
   }
 };
 

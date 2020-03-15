@@ -23,7 +23,17 @@ export default {
   ** Global CSS
   */
   css: [
+    '@fortawesome/fontawesome-free/css/all.css',
+    'bootstrap/dist/css/bootstrap.min.css',
+    'bootstrap-vue/dist/bootstrap-vue.css',
     '@/assets/css/root.css',
+    '@/assets/css/core/header.css',
+    '@/assets/css/core/navbar.css',
+    '@/assets/css/core/body.css',
+    '@/assets/css/core/sidebar.css',
+    '@/assets/css/core/footer.css',
+    '@/assets/css/root.css',
+    '@/assets/css/bootstrap-override.css'
   ],
   /*
   ** Plugins to load before mounting the App

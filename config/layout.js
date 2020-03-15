@@ -24,5 +24,12 @@ module.exports = {
       }
     ]
   },
-  navigation: []
+  navigation: [
+    {
+      name: 'Allgemein',
+      value: null,
+      icon: null,
+      sidebarId: 'default'
+    }
+  ]
 };
