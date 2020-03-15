@@ -4,19 +4,27 @@
             <h3>PHT - Personal Health Train</h3>
         </div>
         <ul class="sidebar-menu">
-            <li v-for="(value,key) in sidebarComponents" v-bind:key="key">
-                <div v-if="value.separator" class="nav-separator">{{value.separator}}</div>
-                <span v-if="!value.subcomponents">
-                     <router-link :to="value.link" v-html="value.name" class="sidebar-menu-link"></router-link>
-                </span>
-                <span v-if="value.subcomponents">
-                    <span class="sidebar-submenu-title" v-html="value.name"></span>
-                    <ul class="list-unstyled sidebar-submenu-components">
-                        <li v-for="(subValue,subKey) in value.subcomponents" v-bind:key="subKey">
-                            <router-link :to="subValue.link" v-html="subValue.name" class="sidebar-menu-link"></router-link>
-                        </li>
-                    </ul>
-                </span>
+            <li v-for="(component,key) in sidebarComponents" v-bind:key="key">
+                <div v-if="component.type === 'separator'" class="nav-separator">
+                    {{component.name}}
+                </div>
+                <div v-if="component.type === 'link'">
+                    <span v-if="!component.subcomponents">
+                         <router-link :to="component.value" class="sidebar-menu-link">
+                             <i v-if="component.icon" v-bind:class="component.icon"></i> {{component.name}}
+                         </router-link>
+                    </span>
+                    <span v-if="component.subcomponents">
+                        <span class="sidebar-submenu-title" v-html="component.name"></span>
+                        <ul class="list-unstyled sidebar-submenu-components">
+                            <li v-for="(subValue,subKey) in component.subcomponents" v-bind:key="subKey">
+                                <router-link :to="subValue.link" class="sidebar-menu-link">
+                                    <i v-if="component.icon" v-bind:class="component.icon"></i> {{subValue.name}}
+                                </router-link>
+                            </li>
+                        </ul>
+                    </span>
+                </div>
             </li>
         </ul>
     </div>
@@ -36,26 +44,30 @@
 
 				if(vm.loggedIn) {
 					components = [
-						{name: 'Dashboard', link: '/dashboard', subcomponents: false, separator: 'Allgemein'},
-						{name: 'Antrag', link: false, subcomponents: [
-								{name: 'Erstellen', link: '/train/proposal-add'},
-								{name: 'Liste', link: '/train/proposals'}
+						{name: 'Übersicht', type: 'link', value: '/dashboard', subcomponents: false, separator: 'Allgemein'},
+						{name: 'Erstellen', type: 'link', value: '/proposals/add', subcomponents: false, separator: false},
+						{name: 'Antrag', type: 'link', value: false, subcomponents: [
+								{name: 'Erstellen', type: 'link', value: '/train/proposal-add'},
+								{name: 'Liste', type: 'link', value: '/train/proposals'}
 							], separator: 'Zug'},
-						{name: 'Sendung', link: false, subcomponents: [
-								{name: 'Erstellen', link: '/train/consignment-add'},
-								{name: 'Liste (Status)', link: '/train/consignments'}
+						{name: 'Sendung', type: 'link', value: false, subcomponents: [
+								{name: 'Erstellen', type: 'link', value: '/train/consignment-add'},
+								{name: 'Liste (Status)', type: 'link', value: '/train/consignments'}
 							], separator: false},
-						{name: 'Zug', link: false, subcomponents: [
-								{name: 'Stationen', link: '/admin/train/stations'},
-								{name: 'Anträge', link: '/admin/train/proposals'}
+                        {name: 'Administration'},
+						{name: 'Zug', type: 'link', value: false, subcomponents: [
+								{name: 'Stationen', type: 'link', value: '/admin/train/stations'},
+								{name: 'Anträge', type: 'link', value: '/admin/train/proposals'}
 							], separator: 'Administration'},
-						{name: 'Benutzer', link: '/admin/users', subcomponents: false, separator: false},
-						{name: 'Profile', link: '/profile', subcomponents: false, separator: 'Sonstiges'},
-						{name: 'Logout', link: '/logout', subcomponents: false, separator: false},
+						{name: 'Benutzer', type: 'link', value: '/admin/users', subcomponents: false},
+
+                        {name: 'Sonstiges', type: 'separator'},
+						{name: 'Profile', type: 'link', value: '/profile', subcomponents: false, separator: 'Sonstiges'},
+						{name: 'Logout', type: 'link', value: '/logout', subcomponents: false},
 					];
                 } else {
 					components = [
-						{name: 'Login', link: '/login', subcomponents: false, separator: false}
+						{name: 'Login', type: 'link', value: '/login', subcomponents: false}
                     ];
                 }
 

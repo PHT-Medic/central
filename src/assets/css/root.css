@@ -218,7 +218,7 @@ sidebar
 }
 
 .page-sidebar ul li .sidebar-menu-link:hover,
-.page-sidebar ul li .sidebar-menu-link.router-link-exact-active {
+.page-sidebar ul li .sidebar-menu-link.router-link-active {
     color: #FF5B5B;
     background: #32333B;
 }
