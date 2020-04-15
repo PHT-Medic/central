@@ -36,6 +36,6 @@ const ApiService = {
   resetHeader () {
     axios.defaults.headers.common = {}
   }
-}
+};
 
-export { ApiService }
+export default ApiService;

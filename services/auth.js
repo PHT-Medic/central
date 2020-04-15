@@ -1,4 +1,4 @@
-import { ApiService } from './api';
+import ApiService from './api';
 import { AuthStorage } from './authStorage';
 
 // --------------------------------------------------------------------
@@ -65,7 +65,7 @@ const AuthService = {
 
       setRequestToken(token)
     } catch (e) {
-      throw new AuthenticationError(e.response.status, e.response.data.message)
+      throw new AuthenticationError(e.response.status, e.response.data.error.message)
     }
 
     return token

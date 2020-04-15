@@ -1,3 +1,7 @@
 .form-control {
     font-size: inherit;
 }
+
+.alert-sm {
+  padding: .4rem .7rem;
+}

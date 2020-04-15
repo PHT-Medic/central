@@ -15,7 +15,7 @@ export default {
 
 <template>
   <div id="app">
-    <page-header></page-header>
+    <page-header />
     <div class="page-wrapper">
       <page-sidebar />
       <div class="page-content">

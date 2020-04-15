@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   sidebars: {
     admin: [
       {
@@ -43,23 +43,18 @@ module.exports = {
         requireLoggedIn: true
       },
       {
-        name: 'Erstellen',
+        name: 'Antrag erstellen',
         type: 'link',
-        value: '/proposal/add',
+        value: '/proposals/add',
         icon: 'fas fa-plus',
         subcomponents: false,
         requireLoggedIn: true
       },
       {
-        name: 'Train',
-        type: 'separator',
-        requireLoggedIn: true
-      },
-      {
-        name: 'Erstellen',
+        name: 'Anträge',
         type: 'link',
-        value: '/train/add',
-        icon: 'fas fa-plus',
+        value: '/proposals',
+        icon: 'fas fa-bars',
         subcomponents: false,
         requireLoggedIn: true
       },

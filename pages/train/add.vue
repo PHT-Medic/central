@@ -10,7 +10,15 @@ export default {
     </h4>
     <form>
       <div class="form-group">
-        <label>Base Image</label>
+        <label>Typ</label>
+        <select class="form-control">
+          <option>--Bitte auswählen--</option>
+          <option value="discovery">Discovery</option>
+          <option value="discovery">Analyse</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Master Image</label>
         <select class="form-control">
           <option>--Bitte auswählen--</option>
         </select>

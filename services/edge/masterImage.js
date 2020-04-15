@@ -1,8 +1,8 @@
-import { ApiService } from './../services/api';
+import ApiService from '../api';
 
 const Service = {
   getMasterImages: async () => {
-    const response = await ApiService.get('master-images')
+    const response = await ApiService.get('master-images');
     return response.data
   }
 };

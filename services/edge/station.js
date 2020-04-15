@@ -1,4 +1,4 @@
-import { ApiService } from './api'
+import ApiService from '../api'
 
 const StationService = {
   getStations: async () => {

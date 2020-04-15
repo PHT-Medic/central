@@ -33,13 +33,19 @@ export default {
     '@/assets/css/core/sidebar.css',
     '@/assets/css/core/footer.css',
     '@/assets/css/root.css',
-    '@/assets/css/bootstrap-override.css'
+
+    '@/assets/css/form.css',
+
+    '@/assets/css/bootstrap-override.css',
+
+    'vue2-dropzone/dist/vue2Dropzone.min.css'
   ],
   /*
   ** Plugins to load before mounting the App
   */
   plugins: [
-    '@/plugins/app'
+    '@/plugins/app',
+    '@/plugins/vuelidate'
   ],
   /*
   ** Nuxt.js dev-modules

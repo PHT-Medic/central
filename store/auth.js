@@ -9,6 +9,7 @@ const state = () => ({
   },
   user: AuthStorage.getUser(),
   permissions: [],
+
   token: AuthStorage.getToken()
 });
 

@@ -23,6 +23,10 @@ Generics
     margin-bottom:10px;
 }
 
+.m-b-20 {
+  margin-bottom: 20px;
+}
+
 .m-t-5 {
     margin-top:5px;
 }
@@ -33,6 +37,14 @@ Generics
 
 .m-t-20 {
     margin-top:20px;
+}
+
+.m-l-10 {
+  margin-left: 10px;
+}
+
+.m-l-20 {
+  margin-left: 20px;
 }
 
 /*
@@ -52,8 +64,15 @@ h4.title:before,
 h5.title:before {
     content: "";
     width: 4px;
-    border-left: 4px solid #2776dc;
     padding-right: 4px;
+    background: #2776dc;
+    margin-right: 4px;
+    font-size: 1.2rem;
+}
+
+.title .sub-title {
+  font-size: .85rem;
+  color: #cc8181;
 }
 
 .form-horizontal .form-group {
@@ -122,6 +141,14 @@ Bootstrap Override
     font-size: 12px;
     line-height: 1.5;
     border-radius: 3px;
+}
+
+.btn-group-xs>.btn,
+.btn-xs {
+  padding: .05rem .5rem;
+  font-size: .75rem;
+  line-height: 1.5;
+  border-radius: .2rem;
 }
 
 .list-group > .list-group-item {
