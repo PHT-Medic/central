@@ -95,7 +95,6 @@
   </div>
 </template>
 <script>
-import vueDropzone from 'vue2-dropzone';
 import { FormWizard, TabContent } from 'vue-form-wizard';
 
 import 'vue-form-wizard/dist/vue-form-wizard.min.css';
@@ -105,7 +104,6 @@ import ProposalApiService from '../../../services/edge/proposal';
 
 export default {
   components: {
-    vueDropzone,
     FormWizard,
     TabContent
   },

@@ -75,6 +75,11 @@ export default {
               </a>
             </li>
             <li class="nav-item">
+              <nuxt-link :to="'/settings'" class="nav-link">
+                <i class="fa fa-cog" />
+              </nuxt-link>
+            </li>
+            <li class="nav-item">
               <nuxt-link :to="'/logout'" class="nav-link">
                 <i class="fa fa-power-off" />
               </nuxt-link>

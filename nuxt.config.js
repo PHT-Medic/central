@@ -1,5 +1,8 @@
 
 export default {
+  env: {
+    apiUrl: process.env.apiUrl || 'http://localhost:4001'
+  },
   mode: 'spa',
   /*
   ** Headers of the page
@@ -45,7 +48,9 @@ export default {
   */
   plugins: [
     '@/plugins/app',
-    '@/plugins/vuelidate'
+    '@/plugins/vuelidate',
+    '@/plugins/socket.client.js',
+    '@/plugins/dropzone.js'
   ],
   /*
   ** Nuxt.js dev-modules

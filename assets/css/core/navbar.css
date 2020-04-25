@@ -52,7 +52,8 @@
 .page-navbar .navbar-content > ul > li > a:active,
 .page-navbar .navbar-content > ul > li > a:focus,
 .page-navbar .navbar-content > ul  > li > a.active,
-.page-navbar .navbar-content > ul > li > .router-link-active {
+.page-navbar .navbar-content > ul > li > .router-link-active,
+.page-navbar .navbar-content > ul > li > .nuxt-link-active {
     color: #FF5B5B;
     background: #32333B;
     text-decoration: none;
