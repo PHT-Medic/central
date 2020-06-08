@@ -19,6 +19,10 @@ b, strong {
 /*
 Generics
  */
+.m-b-0 {
+    margin-bottom: 0px;
+}
+
 .m-b-10 {
     margin-bottom:10px;
 }
@@ -55,7 +59,6 @@ h3.title,
 h4.title,
 h5.title {
     font-weight: 700;
-    text-transform: uppercase;
     color: rgba(0,0,0,0.7);
 }
 h2.title:before,

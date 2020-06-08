@@ -5,3 +5,10 @@
 .alert-sm {
   padding: .4rem .7rem;
 }
+
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
+    color: #fff;
+    background-color: rgba(29, 33, 36, 0.5);
+    border-color: #171a1d;
+}

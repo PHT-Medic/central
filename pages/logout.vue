@@ -7,12 +7,12 @@ export default {
   },
   methods: {
     ...mapActions('auth', [
-      'logout',
+      'triggerLogout',
       'triggerAuthError'
     ]),
 
     doLogout () {
-      this.logout();
+      this.triggerLogout();
       this.$nuxt.$router.push('login');
     }
   }

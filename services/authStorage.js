@@ -1,65 +1,66 @@
+import StorageService from "./storage";
+
 const accessTokenKey = 'accessToken';
 
 const userKey = 'user';
-const userPermissionsKey = 'userPermissions';
+const permissionsKey = 'permissions';
+const abilitiesKey = 'abilities';
 
 const AuthStorage = {
-  // Access Token operations
+    // Access Token operations
 
-  getToken () {
-    return process.server ? null : localStorage.getItem(accessTokenKey)
-  },
-  setToken (token) {
-    if (process.server) { return }
-    localStorage.setItem(accessTokenKey, token)
-  },
-  dropToken () {
-    if (process.server) { return }
-    localStorage.removeItem(accessTokenKey)
-  },
+    getToken () {
+        return StorageService.get(accessTokenKey);
+    },
+    setToken (data) {
+        StorageService.set(accessTokenKey, data);
+    },
+    dropToken () {
+        StorageService.drop(accessTokenKey);
+    },
 
-  // User operations
+    // User operations
 
-  getUser () {
-    if (process.server) { return null; }
-    const user = localStorage.getItem(userKey)
-    if (user !== null) {
-      return JSON.parse(user)
+    getUser () {
+        StorageService.getJson(userKey);
+    },
+    setUser (data) {
+        StorageService.setJson(userKey,data);
+    },
+    dropUser () {
+        StorageService.dropJson(userKey);
+    },
+
+    // User permissions operations
+
+    getPermissions () {
+        let permissions = StorageService.getJson(permissionsKey);
+
+        return permissions ? permissions : [];
+    },
+    setPermissions (data) {
+        if (!Array.isArray(data)) { return }
+
+        StorageService.setJson(permissionsKey,data);
+    },
+    dropPermissions () {
+        StorageService.dropJson(permissionsKey);
+    },
+
+    getAbilities () {
+        let data = StorageService.getJson(abilitiesKey);
+
+        return data ? data : [];
+    },
+    setAbilities (data) {
+        if (!Array.isArray(data)) { return }
+
+        StorageService.setJson(abilitiesKey,data);
+    },
+    dropAbilities () {
+        StorageService.dropJson(abilitiesKey);
     }
-
-    return null
-  },
-  setUser (user) {
-    if (process.server) { return }
-    user = JSON.stringify(user)
-    localStorage.setItem(userKey, user)
-  },
-  dropUser () {
-    if (process.server) { return }
-    localStorage.removeItem(userKey)
-  },
-
-  // User permissions operations
-
-  getPermissions () {
-    if (process.server) { return [] }
-
-    const permissions = localStorage.getItem(userPermissionsKey);
-    if (permissions == null) {
-      return [];
-    }
-
-    return JSON.parse(permissions)
-  },
-  setPermissions (permissions) {
-    if (process.server || !Array.isArray(permissions)) { return }
-    permissions = JSON.stringify(permissions);
-    localStorage.setItem(userPermissionsKey, permissions)
-  },
-  dropPermissions () {
-    if (process.server) { return }
-    localStorage.removeItem(userPermissionsKey);
-  }
 }
 
 export { AuthStorage }
+export default AuthStorage;

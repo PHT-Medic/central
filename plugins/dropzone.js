@@ -1,4 +1,7 @@
 import Vue from 'vue'
-import vueDropzone from 'vue2-dropzone';
+import vueDropZone from 'vue2-dropzone';
 
-Vue.use(vueDropzone);
+export default ({ app, env }) => {
+    Vue.use(vueDropZone);
+};
+

@@ -1,0 +1,37 @@
+.panel-card {
+    /** background: rgba(59,59,59,0.1); **/
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
+    transition: all .3s ease-in-out;
+}
+
+.panel-card > .panel-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.panel-card > .panel-card-header h1,
+.panel-card > .panel-card-header h2,
+.panel-card > .panel-card-header h3,
+.panel-card > .panel-card-header h4,
+.panel-card > .panel-card-header h5,
+.panel-card > .panel-card-header h6 {
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.panel-card > .panel-card-header .title:before {
+    width: 0;
+    padding: 0;
+}
+
+.panel-card > .panel-card-header,
+.panel-card > .panel-card-body {
+    padding: 0.45rem;
+}
+
+.panel-card > .panel-card-body.body-dark {
+    background: #efefef;
+    color: #7F828B;
+}

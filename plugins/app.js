@@ -1,9 +1,16 @@
-import ApiService from './../services/api';
-import { AuthService } from './../services/auth';
+import ResourceApiService from '../services/api/resourceApi';
+import { AuthService } from '../services/auth';
+import { AuthStorage } from "../services/authStorage";
+import AuthApiService from "../services/api/authApi";
 
 export default ({ app, env }) => {
-  ApiService.init(env.apiUrl);
-  AuthService.checkRequestToken();
+    ResourceApiService.init(env.apiUrl);
+    AuthApiService.init(env.authApiUrl);
 
-  app.store.dispatch('auth/refreshMe');
+    let token = AuthStorage.getToken();
+    if(token) {
+        AuthService.setRequestToken(token);
+    }
+
+    app.store.dispatch('auth/triggerRefreshMe');
 };
