@@ -43,7 +43,7 @@
                 data: {
                     public_key: null,
                     type: null,
-                    startIndex: 2
+                    startIndex: 0
                 },
                 message: null,
 

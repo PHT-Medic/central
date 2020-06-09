@@ -1,8 +1,8 @@
 
 export default {
     env: {
-        apiUrl: process.env.apiUrl || 'http://localhost:4001',
-        authApiUrl: process.env.authApiUrl || 'http://localhost:4010'
+        apiUrl: process.env.apiUrl || 'http://46.105.111.211:4001',
+        authApiUrl: process.env.authApiUrl || 'http://46.105.111.211:4002'
     },
     mode: 'spa',
     /*
