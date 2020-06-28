@@ -4,7 +4,7 @@
 
     export default {
         meta: {
-            requiresAuth: true
+            requireLoggedIn: true
         },
         async asyncData (context) {
             try {
@@ -22,9 +22,7 @@
                 isBusy: false,
                 fields: [
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'stations_total', label: 'Stationen', thClass: 'text-center', tdClass: 'text-center' },
                     { key: 'title', label: 'Titel', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'master_image.name', label: 'Master Image', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'created_at', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
                     { key: 'updated_at', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }
@@ -49,8 +47,8 @@
         computed: {
             formattedItems() {
                 return this.items.map((item) => {
-                    item.created_at_formatted = momentHelper(item.created_at, 'YYYY-MM-DD HH:II:SS').fromNow(false);
-                    item.updated_at_formatted = momentHelper(item.updated_at, 'YYYY-MM-DD HH:II:SS').fromNow(false);
+                    item.created_at_formatted = momentHelper(item.createdAt, 'YYYY-MM-DD HH:II:SS').fromNow(false);
+                    item.updated_at_formatted = momentHelper(item.updatedAt, 'YYYY-MM-DD HH:II:SS').fromNow(false);
                     return item;
                 })
             }

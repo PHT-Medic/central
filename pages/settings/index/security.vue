@@ -1,5 +1,4 @@
 <script>
-    import UserService from "../../../services/user/user";
     import { mapActions, mapGetters } from "vuex";
     import AlertMessage from "../../../components/alert/AlertMessage";
     import UserPublicKeyEdge from "../../../services/edge/user/userPublicKeyEdge";
@@ -13,7 +12,7 @@
             AlertMessage
         },
         meta: {
-            requiresAuth: true
+            requireLoggedIn: true
         },
         computed: {
             ...mapGetters('auth', [

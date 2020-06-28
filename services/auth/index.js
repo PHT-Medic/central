@@ -1,17 +1,24 @@
+import ResourceApiService from '../api/resourceApi';
 import AuthApiService from "../api/authApi";
-import ResourceApiService from "../api/resourceApi";
-import { transformScopeToAbility } from "./helpers/permissionHelper";
+
+import AuthConfig, {AuthModeOauth2, AuthModeToken} from "../../config/auth";
+
+import { AuthStorage } from './storage';
+import Oauth2Provider from "./providers/LAP/oauth2Provider";
+import TokenProvider from "./providers/LAP/tokenProvider";
+import LdapProvider from "./providers/TPAP/ldapProvider";
+import {transformScopeToAbility} from "./helpers/permissionHelper";
 
 // --------------------------------------------------------------------
 
 class AuthenticationError extends Error {
-  constructor (errorCode, message) {
-    super(message);
+    constructor (errorCode, message) {
+        super(message);
 
-    this.name = this.constructor.name;
-    this.message = message;
-    this.errorCode = errorCode;
-  }
+        this.name = this.constructor.name;
+        this.message = message;
+        this.errorCode = errorCode;
+    };
 }
 
 // --------------------------------------------------------------------
@@ -24,6 +31,9 @@ const AuthService = {
     setRequestToken: (token) => {
         let key = 'Authorization';
         let value = 'Bearer ' + token;
+
+        console.log('Set authorization header...')
+
         ResourceApiService.setHeader(key, value);
         AuthApiService.setHeader(key, value)
     },
@@ -33,44 +43,97 @@ const AuthService = {
      */
     unsetRequestToken: () => {
         let key = 'Authorization';
+
+        console.log('Unset authorization header...')
+
         ResourceApiService.unsetHeader(key);
         AuthApiService.unsetHeader(key);
     },
 
     // --------------------------------------------------------------------
 
-  /**
+    /**
+     * Login with authentication provider.
      *
-     * @param name
-     * @param password
+     * @param data
+     * @param provider
      *
      * @returns access_token
      *
      * @throws AuthenticationError
      */
-    async login(name, password) {
-        const data = {
-            method: 'post',
-            url: 'token',
-            data: {
-                name,
-                password
-            }
-        };
-
-        let token;
-
-        try {
-            const response = await AuthApiService.customRequest(data);
-
-            token = response.data.token;
-
-            this.setRequestToken(token)
-        } catch (e) {
-             throw new AuthenticationError(e.response.status, e.response.data.error.message)
+    async login (data, provider) {
+        if(typeof provider === 'undefined' || !provider) {
+            return await this.loginWithLAP(data);
+        } else {
+            return await this.loginWithTPAP(provider,data);
         }
 
-        return token
+    },
+
+    /**
+     * Login with lAP.
+     *
+     * @param credentials
+     * @return {Promise<{accessToken: *, refreshToken: *}>}
+     */
+     async loginWithLAP(credentials) {
+        switch(AuthConfig.lapMode) {
+            case AuthModeToken:
+                let { token, ...tokenData } = await TokenProvider.attemptToken(credentials);
+
+                this.setRequestToken(token);
+
+                return {
+                    ...tokenData,
+                    token
+                }
+            case AuthModeOauth2:
+                let { accessToken, ...oauthData } = await Oauth2Provider.attemptAccessToken(credentials,'password');
+
+                this.setRequestToken(accessToken);
+
+                return {
+                    ...oauthData,
+                    accessToken
+                }
+        }
+    },
+
+    async loginWithTPAP(provider, credentials) {
+        switch (provider) {
+            case 'ldap':
+                return await LdapProvider.attempt(credentials);
+        }
+
+        throw new Error('TPAP Provider wird nicht unterstützt...');
+    },
+
+    // --------------------------------------------------------------------
+
+    async refreshAccessToken() {
+        let token = AuthStorage.getToken();
+
+        if(!token) {
+            throw new Error('Es existiert kein Refresh Token...');
+        }
+
+        if(AuthConfig.lapMode !== AuthModeOauth2) {
+            throw new Error('Der Access-Token kann nur in dem Oauth2 Mode genutzt werden.');
+        }
+
+        let { refreshToken } = token;
+
+        let { accessToken, ...oauthData } = await  Oauth2Provider.attemptAccessToken({
+            refresh_token: refreshToken,
+        },'refresh_token');
+
+        this.setRequestToken(accessToken);
+
+        return {
+            ...oauthData,
+            accessToken
+        }
     },
 
     // --------------------------------------------------------------------
@@ -81,20 +144,17 @@ const AuthService = {
      * @returns void
      */
     logout() {
-        this.unsetRequestToken();
+        AuthApiService.unmountInterceptor('auth');
+        ResourceApiService.unmountInterceptor('auth');
+
+        this.unsetRequestToken()
     },
 
     // --------------------------------------------------------------------
 
-    /**
-     * Get the current user.
-     *
-     * @throws Error
-     * @returns {Promise<{permissions, user}>}
-     */
     getMe: async () => {
         try {
-            const response = await AuthApiService.get('me');
+            const response = await AuthApiService.get(AuthConfig.selfUrl);
             const { user, permissions } = response.data;
 
             return {
@@ -122,5 +182,6 @@ const AuthService = {
     }
 };
 
-export { AuthService, AuthenticationError }
 export default AuthService;
+
+export { AuthenticationError }

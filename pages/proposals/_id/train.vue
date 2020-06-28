@@ -41,7 +41,7 @@
                         </h6>
                     </div>
                     <div class="panel-card-body">
-                        <train-builder :proposal="proposal" :proposal-stations-data="proposalStations" :train="train" />
+                        <train-builder :proposal="proposal" :proposal-stations="proposalStations" :train="train" />
                     </div>
                 </div>
             </div>

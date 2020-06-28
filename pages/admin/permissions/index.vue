@@ -2,14 +2,14 @@
     import UserEdge from "../../../services/edge/user/userEdge";
     import momentHelper from "../../../services/time/helpers/momentHelper";
 
-    import {adminSidebarId} from "../../../config/layout";
+    import {adminNavigationId} from "../../../config/layout";
     import PermissionEdge from "../../../services/edge/permission/permissionEdge";
 
     export default {
         meta: {
-            sidebarId: adminSidebarId,
-            requiresAuth: true,
-            requiresAbility: (can) => {
+            navigationId: adminNavigationId,
+            requireLoggedIn: true,
+            requireAbility: (can) => {
                 return can('add','permission') || can('edit','permission') || can('drop','user_permission')
             }
         },
@@ -31,8 +31,8 @@
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'description', label: 'Beschreibung', thClass: 'text-center', tdClass: 'text-center' },
-                    { key: 'created_at', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
-                    { key: 'updated_at', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
+                    { key: 'createdAt', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
+                    { key: 'updatedAt', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }
                 ],
                 items: []
@@ -41,8 +41,8 @@
         computed: {
             formattedItems() {
                 return this.items.map((item) => {
-                    item.created_at_formatted = momentHelper(item.created_at, 'YYYY-MM-DD HH:II:SS').fromNow(false);
-                    item.updated_at_formatted = momentHelper(item.updated_at, 'YYYY-MM-DD HH:II:SS').fromNow(false);
+                    item.created_at_formatted = momentHelper(item.createdAt, 'YYYY-MM-DD HH:II:SS').fromNow(false);
+                    item.updated_at_formatted = momentHelper(item.updatedAt, 'YYYY-MM-DD HH:II:SS').fromNow(false);
                     return item;
                 })
             }
@@ -82,6 +82,9 @@
                 </div>
                 <div class="m-t-10">
                     <b-table :items="formattedItems" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
+                        <template v-slot:cell(name)="data">
+                            {{data.item.namePretty}} <small>({{data.item.name}})</small>
+                        </template>
                         <template v-slot:cell(created_at)="data">
                             {{data.item.created_at_formatted}}
                         </template>

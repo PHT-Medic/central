@@ -9,7 +9,7 @@
     export default {
         components: {ProposalFormTitle},
         meta: {
-            requiresAuth: true
+            requireLoggedIn: true
         },
         data () {
             return {
@@ -18,7 +18,7 @@
                     requestedData: '',
                     stationIds: [],
                     masterImageId: '',
-                    riskId: '',
+                    risk: '',
                     riskComment: ''
                 },
 
@@ -62,7 +62,7 @@
                     required,
                     integer
                 },
-                riskId: {
+                risk: {
                     required,
                     alpha
                 },
@@ -91,15 +91,12 @@
                 this.formData = {
                     title: 'Das ist ein Beispiel Titel',
                     requestedData: 'Ich möchte alles und noch mehr...',
-                    stationIds: [],
+                    stationIds: this.stations.map((item) => item.id),
                     masterImageId: '',
-                    riskId: this.risks[0].id,
+                    risk: this.risks[0].id,
                     riskComment: 'Es wird schon nichts passieren.'
                 };
 
-                if (this.stations.length > 0) {
-                    this.formData.stationIds = [this.stations[0].id]
-                }
                 if (this.masterImages.length > 0) {
                     this.formData.masterImageId = this.masterImages[0].id
                 }
@@ -114,14 +111,7 @@
                 this.busy = true;
 
                 try {
-                    const proposal = await ProposalEdge.addProposal({
-                        title: this.formData.title,
-                        requested_data: this.formData.requestedData,
-                        risk_comment: this.formData.riskComment,
-                        risk: this.formData.riskId,
-                        master_image_id: this.formData.masterImageId,
-                        station_ids: this.formData.stationIds
-                    });
+                    const proposal = await ProposalEdge.addProposal(this.formData);
 
                     await this.$nuxt.$router.push('/proposals/' + proposal.id);
                 } catch (e) {
@@ -182,9 +172,9 @@
 
                             <hr>
 
-                            <div class="form-group" :class="{ 'form-group-error': $v.formData.riskId.$error }">
+                            <div class="form-group" :class="{ 'form-group-error': $v.formData.risk.$error }">
                                 <label>Risiko</label>
-                                <select v-model="$v.formData.riskId.$model" class="form-control">
+                                <select v-model="$v.formData.risk.$model" class="form-control">
                                     <option value="">
                                         --Auswählen--
                                     </option>
@@ -192,7 +182,7 @@
                                         {{ item.name }}
                                     </option>
                                 </select>
-                                <div v-if="!$v.formData.riskId.required" class="form-group-hint group-required">
+                                <div v-if="!$v.formData.risk.required" class="form-group-hint group-required">
                                     Bitte wählen Sie eine der Möglichkeiten aus, die am besten beschreibt, wie hoch das Risiko für die Krankenhäuser einzuschätzen ist.
                                 </div>
                             </div>

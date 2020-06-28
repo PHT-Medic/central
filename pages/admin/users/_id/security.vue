@@ -1,8 +1,9 @@
 <script>
     import NotImplemented from "../../../../components/NotImplemented";
-    import PermissionEdge from "../../../../services/edge/permission/permissionEdge";
     import AlertMessage from "../../../../components/alert/AlertMessage";
     import userPasswordFormMixin from "../../../../mixins/userPasswordFormMixin";
+    import UserPermissionListItem from "../../../../components/permission/UserPermissionListItem";
+    import UserPermissionList from "../../../../components/permission/UserPermissionList";
 
     export default {
         props: {
@@ -14,36 +15,38 @@
             userPasswordFormMixin
         ],
         components: {
+            UserPermissionList,
+            UserPermissionListItem,
             AlertMessage,
             NotImplemented
         },
-        async asyncData(context) {
-            let permissions = [];
-
-            try {
-                permissions = await PermissionEdge.getPermissions();
-            } catch (e) {
-                context.redirect('/admin/users');
-            }
-
-            return {
-                permissions
-            }
-        },
         data() {
             return {
-                permissions: []
+                permission: {
+                    items: [],
+                    busy:false
+                },
+                userPermission: {
+                    items: [],
+                    formattedItems: [],
+                    busy: false
+                },
+
+                message: null
             }
         },
         created() {
             this.userData = this.providedUser;
-        }
+        },
+        methods: {
+
+        },
     }
 </script>
 <template>
     <div>
         <div class="row">
-            <div class="col-5">
+            <div class="col-7">
                 <div class="panel-card">
                     <div class="panel-card-header">
                         <h6 class="title">
@@ -56,19 +59,11 @@
                             isError: false,
                             data: 'Aktivieren oder deaktivieren Sie Benutzer-Berechtigungen.'
                         }" />
-
-                        <b-list-group class="overflow-auto" style="height:500px;">
-                            <b-list-group-item v-for="(item,key) in permissions" class="flex-column align-items-start" :key="key">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1 font-weight-bold">{{item.name}}</h6>
-                                    <b-form-checkbox switch />
-                                </div>
-                            </b-list-group-item>
-                        </b-list-group>
+                        <user-permission-list :user-id="providedUser.id" />
                     </div>
                 </div>
             </div>
-            <div class="col-4">
+            <div class="col-5">
                 <div class="panel-card">
                     <div class="panel-card-header">
                         <h6 class="title">

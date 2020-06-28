@@ -2,13 +2,13 @@
     import UserEdge from "../../../services/edge/user/userEdge";
     import momentHelper from "../../../services/time/helpers/momentHelper";
 
-    import {adminSidebarId} from "../../../config/layout";
+    import {adminNavigationId} from "../../../config/layout";
 
     export default {
         meta: {
-            sidebarId: adminSidebarId,
-            requiresAuth: true,
-            requiresAbility(can) {
+            navigationId: adminNavigationId,
+            requireLoggedIn: true,
+            requireAbility(can) {
                 return can('add','user') || can('edit','user') || can('drop','user');
             }
         },

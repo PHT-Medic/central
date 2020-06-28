@@ -54,6 +54,7 @@ Generics
 /*
 General
  */
+h1.title,
 h2.title,
 h3.title,
 h4.title,
@@ -61,6 +62,8 @@ h5.title {
     font-weight: 700;
     color: rgba(0,0,0,0.7);
 }
+
+h1.title:before,
 h2.title:before,
 h3.title:before,
 h4.title:before,
@@ -70,11 +73,15 @@ h5.title:before {
     padding-right: 4px;
     background: #2776dc;
     margin-right: 4px;
-    font-size: 1.2rem;
+}
+
+.title.no-border:before {
+    width:0px;
+    padding-right: 0px;
 }
 
 .title .sub-title {
-  font-size: .85rem;
+  font-size: .65em;
   color: #cc8181;
 }
 
@@ -122,40 +129,6 @@ body
     min-height: 100vh;
     width: 100%;
     background: #fafafa;
-}
-
-/*
-Bootstrap Override
- */
-.btn-primary {
-    color: #fff;
-    background-color: #337ab7;
-    border-color: #2e6da4;
-}
-
-.btn-primary:hover {
-    color: #fff;
-    background-color: #286090;
-    border-color: #204d74;
-}
-
-.btn-group-sm>.btn, .btn-sm {
-    padding: 5px 10px;
-    font-size: 12px;
-    line-height: 1.5;
-    border-radius: 3px;
-}
-
-.btn-group-xs>.btn,
-.btn-xs {
-  padding: .05rem .5rem;
-  font-size: .75rem;
-  line-height: 1.5;
-  border-radius: .2rem;
-}
-
-.list-group > .list-group-item {
-    background: none;
 }
 
 /*

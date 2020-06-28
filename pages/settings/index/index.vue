@@ -5,7 +5,7 @@
 
     export default {
         meta: {
-            requiresAuth: true
+            requireLoggedIn: true
         },
         computed: {
             ...mapGetters('auth', [

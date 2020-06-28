@@ -1,26 +1,26 @@
-import {defaultSidebarId} from "../config/layout";
+import {defaultNavigationId} from "../config/layout";
 
 export default function ({ store, route }) {
-    let key = 'sidebarId';
-    let sidebarId = null;
+    let key = 'navigationId';
+    let navigationId = null;
 
     for(let i=0; i< route.meta.length; i++) {
         if (key in route.meta[i] && route.meta[i][key]) {
-            sidebarId = route.meta[i][key]
+            navigationId = route.meta[i][key]
         }
     }
 
-    if(!sidebarId) {
+    if(!navigationId) {
         for(let i=0; i< route.matched.length; i++) {
             if (key in route.matched[i] && route.matched[i][key]) {
-                sidebarId = route.matched[key]
+                navigationId = route.matched[key]
             }
         }
     }
 
-    sidebarId = sidebarId ?? defaultSidebarId;
+    navigationId = navigationId ?? defaultNavigationId;
 
-    if(sidebarId) {
-        store.dispatch('layout/selectSidebar', sidebarId)
+    if(navigationId) {
+        store.dispatch('layout/selectNavigation', navigationId)
     }
 }

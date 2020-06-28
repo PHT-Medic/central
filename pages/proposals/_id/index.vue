@@ -3,9 +3,11 @@
     import {alpha, integer, maxLength, minLength, required} from "vuelidate/lib/validators";
     import MasterImageService from "../../../services/edge/masterImage";
     import {ProposalStationStates} from "../../../services/edge/proposal/proposalStationEdge";
+    import ProposalEdge from "../../../services/edge/proposal/proposalEdge";
+    import AlertMessage from "../../../components/alert/AlertMessage";
 
     export default {
-        components: { ProposalEditor },
+        components: {AlertMessage, ProposalEditor },
         props: {
             proposal: {
                 type: Object,
@@ -25,14 +27,15 @@
                 proposalStationStates: ProposalStationStates,
 
                 formData: {
-                    masterImageId: this.proposal.master_image_id,
+                    masterImageId: this.proposal.masterImageId,
                     title: this.proposal.title,
-                    riskId: this.proposal.risk,
-                    riskComment: this.proposal.risk_comment
+                    risk: this.proposal.risk,
+                    riskComment: this.proposal.riskComment
                 },
 
+                message: null,
+
                 busy: false,
-                errorMessage: '',
 
                 stations: [],
                 stationsLoading: false,
@@ -58,7 +61,7 @@
                     minLength: minLength(5),
                     maxLength: maxLength(100)
                 },
-                riskId: {
+                risk: {
                     required,
                     alpha
                 },
@@ -77,31 +80,18 @@
             });
         },
         methods: {
-            submitDetails (e) {
+            async submitDetails (e) {
+                e.preventDefault();
+
                 try {
-                    /*
-                    const data = await ProposalService.editProposal(this.proposal.id, {
-                      title: e.title,
-                      requested_data: e.requestedData,
-                      risk_comment: e.riskComment,
-                      risk: e.riskId,
-                      master_image_id: e.masterImageId,
-                      station_ids: e.stationIds
-                    });
-                     */
+                    await ProposalEdge.editProposal(this.proposal.id, this.formData);
 
-                    this.$emit('set-proposal', {
-                        title: e.title,
-                        requested_data: e.requestedData,
-                        risk_comment: e.riskComment,
-                        risk_id: e.riskId,
-                        station_ids: e.stationIds,
-                        master_image_id: e.masterImageId
-                    });
-
-                    return this.proposal.id;
+                    this.$emit('set-proposal', this.formData);
                 } catch (e) {
-                    throw new Error(e.response.data.error.message);
+                    this.message = {
+                        isError: true,
+                        data: 'Der Antrag konnte nicht bearbeitet werden.'
+                    }
                 }
             }
         }
@@ -118,6 +108,8 @@
                         </h6>
                     </div>
                     <div class="panel-card-body">
+                        <alert-message :message="message" />
+
                         <div class="form-group" :class="{ 'form-group-error': $v.formData.title.$error }">
                             <label>Titel</label>
                             <input v-model="$v.formData.title.$model" type="text" class="form-control" placeholder="...">
@@ -154,9 +146,9 @@
 
                         <hr>
 
-                        <div class="form-group" :class="{ 'form-group-error': $v.formData.riskId.$error }">
+                        <div class="form-group" :class="{ 'form-group-error': $v.formData.risk.$error }">
                             <label>Risiko</label>
-                            <select v-model="$v.formData.riskId.$model" class="form-control">
+                            <select v-model="$v.formData.risk.$model" class="form-control">
                                 <option value="">
                                     --Auswählen--
                                 </option>
@@ -164,7 +156,7 @@
                                     {{ item.name }}
                                 </option>
                             </select>
-                            <div v-if="!$v.formData.riskId.required" class="form-group-hint group-required">
+                            <div v-if="!$v.formData.risk.required" class="form-group-hint group-required">
                                 Bitte wählen Sie eine der Möglichkeiten aus, die am besten beschreibt, wie hoch das Risiko für die Krankenhäuser einzuschätzen ist.
                             </div>
                         </div>
@@ -201,13 +193,11 @@
                         <h6 class="title">
                             Stationen: <span class="text-primary">{{proposalStations.length}}</span>
                         </h6>
-                        <!--
                         <div style="margin-left: auto;">
-                            <button type="button" class="btn btn-xs btn-success">
+                            <button type="button" class="btn btn-xs btn-success" :disabled="true">
                                 Hinzufügen
                             </button>
                         </div>
-                        -->
                     </div>
                     <div class="panel-card-body">
                         <div class="alert alert-primary alert-sm">
@@ -227,14 +217,11 @@
                                 <div>
                                     <div>
                                         <span class="font-weight-bold">Status:</span>
-                                        <!--
                                         <span :class="{
                                             'text-info': item.relation.status === proposalStationStates.ProposalStationStateOpen,
                                             'text-danger': item.relation.status === proposalStationStates.ProposalStationStateDeclined,
                                             'text-success': item.relation.status === proposalStationStates.ProposalStationStateAccepted,
                                         }" class="label">{{item.relation.status}}</span>
-                                        -->
-                                        <span class="label text-success">angenommen</span>
                                     </div>
                                     <div>
                                         <span class="font-weight-bold">Kommentar:</span>

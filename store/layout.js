@@ -1,53 +1,59 @@
-import { LayoutService } from './../services/layout';
-
-// --------------------------------------------------------------------
-
-const defaultSidebarId = 'default';
+import { LayoutService } from '../services/layout';
+import { defaultNavigationId } from "../config/layout";
 
 // --------------------------------------------------------------------
 
 const state = () => ({
-    sidebarId: defaultSidebarId,
-    sidebarComponents: [],
-    sidebarComponentsLoaded: false,
+    navigationComponents: LayoutService.getNavigation(),
+    navigation: LayoutService.getNavigationById(defaultNavigationId),
+    navigationId: defaultNavigationId,
 
-    navigationComponents: LayoutService.getNavigation()
+    sidebarComponents: [],
 });
 
 const getters = {
-    sidebarId: (state) => {
-        return state.sidebarId
+    navigationComponents: (state, getters) => {
+        return state.navigationComponents;
+    },
+    navigation: (state) => {
+        return state.navigation;
+    },
+    navigationId: (state) => {
+        return state.navigationId
     },
     sidebarComponents: (state, getters) => {
         return state.sidebarComponents;
     },
-    navigationComponents: (state, getters) => {
-        return state.navigationComponents;
-    }
+
 };
 
 const actions = {
-    selectSidebar ({ commit, state }, id) {
-        id = id === undefined ? defaultSidebarId : id;
+    selectNavigation ({ commit, state }, id) {
+        id = id === undefined ? defaultNavigationId : id;
 
-        if (state.sidebarId === id && state.sidebarComponentsLoaded) {
+        if (state.navigationId === id && state.sidebarComponents.length > 0) {
             return;
         }
 
-        const data = LayoutService.getSidebarById(id);
+        const navigation = LayoutService.getNavigationById(id);
+        commit('setNavigationId', id);
+        commit('setNavigation', navigation);
 
-        commit('setSidebarId', id);
-        commit('setSidebarComponents', data)
+        const sidebarComponents = LayoutService.getSidebarById(id);
+        commit('setSidebarComponents', sidebarComponents)
     }
 };
 
 const mutations = {
-    setSidebarId (state, id) {
-        state.sidebarId = id
+    setNavigationId (state, id) {
+        state.navigationId = id
     },
+    setNavigation (state, navigation) {
+        state.navigation = navigation;
+    },
+
     setSidebarComponents (state, menu) {
         state.sidebarComponents = menu;
-        state.sidebarComponentsLoaded = true
     }
 };
 

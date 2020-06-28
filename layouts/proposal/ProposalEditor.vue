@@ -197,9 +197,9 @@
 
                     <hr>
 
-                    <div v-if="this.with.includes('risk')" class="form-group" :class="{ 'form-group-error': $v.formData.riskId.$error }">
+                    <div v-if="this.with.includes('risk')" class="form-group" :class="{ 'form-group-error': $v.formData.risk.$error }">
                         <label>Risiko</label>
-                        <select v-model="$v.formData.riskId.$model" class="form-control">
+                        <select v-model="$v.formData.risk.$model" class="form-control">
                             <option value="">
                                 --Auswählen--
                             </option>
@@ -207,7 +207,7 @@
                                 {{ item.name }}
                             </option>
                         </select>
-                        <div v-if="!$v.formData.riskId.required" class="form-group-hint group-required">
+                        <div v-if="!$v.formData.risk.required" class="form-group-hint group-required">
                             Bitte wählen Sie eine der Möglichkeiten aus, die am besten beschreibt, wie hoch das Risiko für die Krankenhäuser einzuschätzen ist.
                         </div>
                     </div>

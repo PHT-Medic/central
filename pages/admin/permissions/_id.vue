@@ -1,11 +1,11 @@
 <script>
-    import {adminSidebarId} from "../../../config/layout";
+    import {adminNavigationId} from "../../../config/layout";
 
     export default {
         meta: {
-            sidebarId: adminSidebarId,
-            requiresAuth: true,
-            requiresAbility: (can) => {
+            navigationId: adminNavigationId,
+            requireLoggedIn: true,
+            requireAbility: (can) => {
                 return can('edit','permission')
             }
         }

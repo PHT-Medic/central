@@ -1,13 +1,14 @@
 <script>
-    import { FormWizard, TabContent } from 'vue-form-wizard';
+    import {FormWizard, TabContent} from 'vue-form-wizard';
     import 'vue-form-wizard/dist/vue-form-wizard.min.css';
 
-    import { integer, maxLength, minLength, required } from 'vuelidate/lib/validators';
+    import {integer, maxLength, minLength, required} from 'vuelidate/lib/validators';
     import MasterImageService from '../../services/edge/masterImage';
 
     import AlertMessage from "../../components/alert/AlertMessage";
     import {mapGetters} from "vuex";
     import UserPublicKeyEdge from "../../services/edge/user/userPublicKeyEdge";
+    import ProposalStationEdge from "../../services/edge/proposal/proposalStationEdge";
 
     const TrainTypes = {
         Analyse: 'analyse',
@@ -24,7 +25,7 @@
             proposal: {
                 type: Object
             },
-            proposalStationsData: {
+            proposalStations: {
                 type: Array,
                 default() {
                     return []
@@ -40,36 +41,45 @@
         },
         data() {
             return {
-                data: {
-                    public_key: null,
-                    type: null,
-                    startIndex: 0
+                wizard: {
+                    startIndex: 1 // todo: set to 0
                 },
                 message: null,
 
-                trainTypes: TrainTypes,
-                trainStations: [],
-                trainStationsLoading: false,
+                publicKey: null,
 
-                trainFiles: [],
-                trainFilesLoading: false,
+                trainTypes: TrainTypes,
+                trainStation: {
+                    items: [],
+                    busy: false
+                },
+
+                trainFile: {
+                    items: [],
+                    busy: false
+                },
 
                 /**
                  * Master Images
                  */
-                masterImages: [],
-                masterImagesLoading: false,
+                masterImage: {
+                    items: [],
+                    busy: false
+                },
 
                 /**
                  * Proposal Stations
                  */
-                proposalStations: [],
-                proposalStationsLoading: false,
+                proposalStation: {
+                    items: [],
+                    busy: false
+                },
 
                 /**
                  * Form
                  */
                 formData: {
+                    type: null,
                     masterImageId: '',
                     stationIds: [],
                     entryPointName: 'app.py',
@@ -112,79 +122,110 @@
 
             return validations;
         },
-        async created () {
-            if(!this.train || !this.canCreateAnalyseTrain()) {
+        created () {
+            if(!this.train) {
                 this.setIsDiscoveryTrain();
             }
 
-            try {
-                let {content} = await UserPublicKeyEdge.getKey();
-                this.data.public_key = content;
-            } catch (e) {
-
-            }
-
-            if(this.train) {
-                //todo: depending on proposal status go to status or disable specific one.
-
-                this.formData.masterImageId = this.train.master_image_id;
-                this.data.type = this.train.type;
-                this.trainStations = await this.getTrainStations();
-            } else {
-                this.formData.masterImageId = this.proposal.master_image_id;
-            }
-
-            if(this.proposalStationsData) {
-                this.proposalStations = this.proposalStationsData;
-            } else {
-                this.proposalStationsLoading = true;
-                this.proposalStations = await this.getProposalStations();
-                this.proposalStationsLoading = false;
-            }
-
-            this.setProposalStationsAsSelected();
-
-            this.masterImagesLoading = true;
-            this.masterImages = await MasterImageService.getMasterImages();
-            this.masterImagesLoading = false;
+            this.initWizard();
+            this.initForm();
         },
         computed: {
             ...mapGetters('auth', [
                 'loggedIn',
                 'user'
             ]),
-
             typeFormatted() {
-                return this.data.type ? this.data.type.charAt(0).toUpperCase() + this.data.type.slice(1) : null;
+                return this.formData.type ? this.formData.type.charAt(0).toUpperCase() + this.formData.type.slice(1) : null;
             },
 
+            //---------------------------------
             canCreateDiscoveryTrain: () => {
                 return true;
             },
             canCreateAnalyseTrain() {
-                return this.proposal.create_analyse_train;
+                return true;
             },
+
+            isDiscoveryTrain() {
+                return this.formData.type === TrainTypes.Discovery;
+            },
+            isAnalyseTrain() {
+                return this.formData.type === TrainTypes.Analyse;
+            },
+
+            //--------------------------------
             hashPercent() {
                 return this.hashStep.percentage.toFixed();
             }
         },
         methods: {
-            setProposalStationsAsSelected() {
-                let stationIds = [];
+            initWizard() {
+                if(this.train) {
+                    // todo: go to step 2.
+                }
+            },
+            async initForm() {
+                // Public Key
+                UserPublicKeyEdge.getKey().then((publicKey) => {
+                    this.publicKey = publicKey;
+                }).catch((e) => {
 
-                for(let i=0; i<this.proposalStations.length; i++) {
-                    stationIds.push(this.proposalStations[i].id);
+                });
+
+                // Proposal Stations
+                if(this.proposalStations) {
+                    this.proposalStation.items = this.proposalStations;
+                } else {
+                    await this.getProposalStations();
                 }
 
-                this.formData.stationIds = stationIds;
+                await this.getMasterImages();
+
+                if(this.train) {
+                    //todo: depending on proposal status go to status or disable specific one.
+                    this.formData.masterImageId = this.train.masterImageId;
+                    this.formData.stationIds = this.train.stationIds;
+                    this.formData.type = this.train.type;
+                } else {
+                    this.formData.masterImageId = this.proposal.masterImageId;
+                    this.formData.stationIds = this.proposalStation.items.map((item) => item.id);
+                }
             },
             //--------------------------------------------------
 
-            async getProposalStations() {
-                return [];
+            async getMasterImages() {
+                if(this.masterImage.busy) return;
+
+                this.masterImage.busy = true;
+
+                try {
+                    this.masterImage.items = await MasterImageService.getMasterImages();
+                } catch (e) {
+                    this.message = {
+                        isError: true,
+                        data: 'Die Master Images konnten nicht geladen werden.'
+                    }
+                }
+
+                this.masterImage.busy = false;
             },
-            async getTrainStations() {
-                return [];
+
+            async getProposalStations() {
+                if(this.proposalStation.busy) return;
+
+                this.proposalStation.busy = true;
+
+                try {
+                    this.proposalStation.items = await ProposalStationEdge.getStations();
+                } catch (e) {
+                    this.message = {
+                        isError: true,
+                        data: 'Die Master Images konnten nicht geladen werden.'
+                    }
+                }
+
+                this.masterImage.busy = false;
             },
             //--------------------------------------------------
 
@@ -216,8 +257,8 @@
              * @return {boolean}
              */
             proceedToWizardStepSettings(checkOnly) {
-                let trainType = this.data.type;
-                let publicKey = !!this.data.public_key;
+                let trainType = this.formData.type;
+                let publicKey = !!this.publicKey;
 
                 if(trainType && publicKey) {
                     return true;
@@ -298,17 +339,10 @@
             //--------------------------------------------------
 
             setIsDiscoveryTrain() {
-                this.data.type = TrainTypes.Discovery;
+                this.formData.type = TrainTypes.Discovery;
             },
-            isDiscoveryTrain() {
-                return this.data.type === TrainTypes.Discovery;
-            },
-
             setIsAnalyseTrain() {
-                this.data.type = TrainTypes.Analyse;
-            },
-            isAnalyseTrain() {
-                return this.data.type === TrainTypes.Analyse;
+                this.formData.type = TrainTypes.Analyse;
             },
 
             //----------------------------------------------------
@@ -371,26 +405,26 @@
                 @on-change="changedWizardStep"
                 ref="trainWizard"
                 color="#333"
-                :title="(data.type ? typeFormatted+'-' : '') + 'Zug'"
+                :title="(formData.type ? typeFormatted+'-' : '') + 'Zug'"
                 subtitle="Erstellen"
                 back-button-text="Zurück"
                 next-button-text="Weiter"
                 finish-button-text="Ende"
-                :start-index="data.startIndex"
+                :start-index="wizard.startIndex"
             >
                 <tab-content title="Type" :before-change="proceedToWizardStepSettings">
-                    <div v-if="!data.public_key" class="alert alert-info m-b-20">
+                    <div v-if="!publicKey" class="alert alert-info m-b-20">
                         Es muss ein PublicKey in den <nuxt-link :to="'/settings/security'"><i class="fa fa-cog"></i> Einstellungen</nuxt-link> hochgeladen werden.
                     </div>
 
                     <b-card no-body class="m-b-20">
                         <b-tabs pills card vertical>
-                            <b-tab title="Discovery" :active="isDiscoveryTrain()" :disabled="!canCreateDiscoveryTrain" @click="setIsDiscoveryTrain">
+                            <b-tab title="Discovery" :active="isDiscoveryTrain" :disabled="!canCreateDiscoveryTrain" @click="setIsDiscoveryTrain">
                                 <b-card-text>
                                     Starte einen Discovery Zug, um zu erfahren wie viele Daten augrund der angefoderten Parameter in den Krankenhäuser verfügbar sind.
                                 </b-card-text>
                             </b-tab>
-                            <b-tab title="Analyse" :active="isAnalyseTrain()" :disabled="!canCreateAnalyseTrain" @click="setIsAnalyseTrain">
+                            <b-tab title="Analyse" :active="isAnalyseTrain" :disabled="!canCreateAnalyseTrain" @click="setIsAnalyseTrain">
                                 <b-card-text>
                                     Starte einen Analyse auf Basis der zugrunde liegenden Ergebnisse des Discovery Zuges.
                                 </b-card-text>
@@ -401,11 +435,11 @@
                 <tab-content title="Einstellungen" :before-change="proceedToWizardStepHash">
                     <div class="form-group" :class="{ 'form-group-error': $v.formData.masterImageId.$error }">
                         <label>Master Image</label>
-                        <select v-model="$v.formData.masterImageId.$model" class="form-control" :disabled="masterImagesLoading">
+                        <select v-model="$v.formData.masterImageId.$model" class="form-control" :disabled="masterImage.busy">
                             <option value="">
                                 --Auswählen--
                             </option>
-                            <option v-for="(item,key) in masterImages" :key="key" :value="item.id">
+                            <option v-for="(item,key) in masterImage.items" :key="key" :value="item.id">
                                 {{ item.name }}
                             </option>
                         </select>
@@ -419,8 +453,8 @@
 
                     <div class="form-group" :class="{ 'form-group-error': $v.formData.stationIds.$anyError }">
                         <label>Krankenhäuser</label>
-                        <select v-model="$v.formData.stationIds.$model" class="form-control" multiple :disabled="proposalStationsLoading || trainStationsLoading">
-                            <option v-for="(item,key) in proposalStations" :key="key" :value="item.id" :selected="item.included">
+                        <select v-model="$v.formData.stationIds.$model" class="form-control" multiple :disabled="proposalStation.busy">
+                            <option v-for="(item,key) in proposalStation.items" :key="key" :value="item.id" :selected="item.included">
                                 {{ item.name }}
                             </option>
                         </select>

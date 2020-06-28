@@ -1,11 +1,11 @@
 <script>
-    import {adminSidebarId, defaultSidebarId} from "../../config/layout";
+    import {adminNavigationId, defaultNavigationId} from "../../config/layout";
     import UserEdge from "../../services/edge/user/userEdge";
 
     export default {
         meta: {
-            requiresAuth: true,
-            sidebarId: defaultSidebarId
+            requireLoggedIn: true,
+            navigationId: defaultNavigationId
         },
         async asyncData(context) {
             let user;

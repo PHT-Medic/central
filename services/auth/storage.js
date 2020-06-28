@@ -1,6 +1,6 @@
-import StorageService from "./storage";
+import StorageService from "../storage";
 
-const accessTokenKey = 'accessToken';
+const tokenKey = 'token';
 
 const userKey = 'user';
 const permissionsKey = 'permissions';
@@ -10,19 +10,19 @@ const AuthStorage = {
     // Access Token operations
 
     getToken () {
-        return StorageService.get(accessTokenKey);
+        return StorageService.getJson(tokenKey);
     },
     setToken (data) {
-        StorageService.set(accessTokenKey, data);
+        StorageService.setJson(tokenKey, data);
     },
     dropToken () {
-        StorageService.drop(accessTokenKey);
+        StorageService.dropJson(tokenKey);
     },
 
     // User operations
 
     getUser () {
-        StorageService.getJson(userKey);
+        return StorageService.getJson(userKey);
     },
     setUser (data) {
         StorageService.setJson(userKey,data);

@@ -4,33 +4,19 @@
 
     import AlertMessage from "../../../components/alert/AlertMessage";
     import NotImplemented from "../../../components/NotImplemented";
-    import {adminSidebarId} from "../../../config/layout";
-    import PermissionEdge from "../../../services/edge/permission/permissionEdge";
+    import {adminNavigationId} from "../../../config/layout";
 
     export default {
         meta: {
-            sidebarId: adminSidebarId,
-            requiresAuth: true,
-            requiresAbility: (can) => {
+            navigationId: adminNavigationId,
+            requireLoggedIn: true,
+            requireAbility: (can) => {
                 return can('add','user');
             }
         },
         components: {
             AlertMessage,
             NotImplemented
-        },
-        async asyncData(context) {
-            let permissions = [];
-
-            try {
-                permissions = await PermissionEdge.getPermissions();
-            } catch (e) {
-
-            }
-
-            return {
-                permissions
-            }
         },
         data() {
             return {
@@ -41,9 +27,7 @@
                 },
 
                 busy: false,
-                message: null,
-
-                permissions: []
+                message: null
             }
         },
         validations: {
@@ -99,7 +83,7 @@
         </h4>
 
         <div class="row">
-            <div class="col-8">
+            <div class="col">
                 <div class="panel-card m-b-20">
                     <div class="panel-card-header">
                         <h5 class="title">
@@ -172,37 +156,12 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="panel-card">
-                    <div class="panel-card-header">
-                        <h5 class="title">
-                            Gruppen <i class="fa fa-users"></i>
-                        </h5>
-                    </div>
-                    <div class="panel-card-body">
-                        <not-implemented />
-                    </div>
-                </div>
-            </div>
-            <div class="col-4">
-                <div class="panel-card">
-                    <div class="panel-card-header">
-                        <h5 class="title">
-                            Berechtigungen <i class="fa fa-user-secret"></i>
-                        </h5>
-                    </div>
-                    <div class="panel-card-body">
-                        <b-list-group class="overflow-auto" style="height:500px;">
-                            <b-list-group-item v-for="(item,key) in permissions" class="flex-column align-items-start" :key="key">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1 font-weight-bold">{{item.name}}</h6>
-                                    <b-form-checkbox switch />
-                                </div>
-                            </b-list-group-item>
-                        </b-list-group>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 </template>
+<style>
+    .list-group-item {
+        padding: .45rem .65rem;
+    }
+</style>

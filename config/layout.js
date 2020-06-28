@@ -1,12 +1,30 @@
-const adminSidebarId = 'admin';
-const defaultSidebarId = 'default';
+const adminNavigationId = 'admin';
+const defaultNavigationId = 'default';
 
 export {
-    adminSidebarId,
-    defaultSidebarId
+    adminNavigationId,
+    defaultNavigationId
 }
 
 export default {
+    navigation: [
+        {
+            name: 'Home',
+            value: null,
+            icon: 'fa fa-home',
+            navigationId: defaultNavigationId
+        },
+        {
+            name: 'Admin',
+            value: null,
+            icon: 'fas fa-cog',
+            navigationId: adminNavigationId,
+            requireLoggedIn: true,
+            requireAbility: (can) => {
+                return can('use','admin_ui');
+            }
+        }
+    ],
     sidebars: {
         admin: [
             {
@@ -25,7 +43,10 @@ export default {
             {
                 name: 'Benutzer',
                 type: 'separator',
-                requireLoggedIn: true
+                requireLoggedIn: true,
+                requireAbility: (can) => {
+                    return can('add','user') || can('drop','user') || can('edit','user') || can('add','user_permission') || can('drop','user_permission');
+                }
             },
             {
                 name: 'Benutzer',
@@ -33,7 +54,10 @@ export default {
                 value: '/admin/users',
                 icon: 'fas fa-user',
                 subcomponents: false,
-                requireLoggedIn: true
+                requireLoggedIn: true,
+                requireAbility: (can) => {
+                    return can('add','user') || can('drop','user') || can('edit','user') || can('add','user_permission') || can('drop','user_permission');
+                }
             },
             /*
             {
@@ -48,7 +72,10 @@ export default {
             {
                 name: 'Berechtingungen',
                 type: 'separator',
-                requireLoggedIn: true
+                requireLoggedIn: true,
+                requireAbility: (can) => {
+                    return can('add','permission') || can('drop','permission');
+                }
             },
             {
                 name: 'Berechtigungen',
@@ -56,7 +83,10 @@ export default {
                 value: '/admin/permissions',
                 icon: 'fas fa-key',
                 subcomponents: false,
-                requireLoggedIn: true
+                requireLoggedIn: true,
+                requireAbility: (can) => {
+                    return can('add','permission') || can('drop','permission');
+                }
             },
         ],
         default: [
@@ -116,19 +146,5 @@ export default {
                 requireLoggedOut: false
             }
         ]
-    },
-    navigation: [
-        {
-            name: 'Allgemein',
-            value: null,
-            icon: null,
-            sidebarId: defaultSidebarId
-        },
-        {
-            name: 'Admin',
-            value: null,
-            icon: null,
-            sidebarId: adminSidebarId
-        }
-    ]
+    }
 };

@@ -1,8 +1,8 @@
 
 export default {
     env: {
-        apiUrl: process.env.apiUrl || 'http://46.105.111.211:4001',
-        authApiUrl: process.env.authApiUrl || 'http://46.105.111.211:4002'
+        authApiUrl: process.env.authApiUrl,
+        resourceApiUrl: process.env.resourceApiUrl
     },
     mode: 'spa',
     /*
@@ -36,7 +36,6 @@ export default {
         '@/assets/css/core/body.css',
         '@/assets/css/core/sidebar.css',
         '@/assets/css/core/footer.css',
-        '@/assets/css/root.css',
         '@/assets/css/card.css',
 
         '@/assets/css/form.css',
@@ -49,6 +48,7 @@ export default {
     plugins: [
         '@/plugins/app',
         '@/plugins/vuelidate',
+        '@/plugins/vueScroll.js',
         '@/plugins/socket.client.js',
         '@/plugins/caslAbility.js',
         '@/plugins/casl.js',
@@ -82,6 +82,16 @@ export default {
         ** You can extend webpack config here
         */
         extend (config, ctx) {
+            config.module.rules.push(
+                {
+                    test: /\.(png|jpe?g|gif|svg|webp)$/,
+                    loader: 'url-loader',
+                    query: {
+                        limit: 1000, // 1kB
+                        name: 'img/[name].[hash:7].[ext]'
+                    }
+                }
+            )
         }
     }
 }

@@ -28,11 +28,18 @@
                 e.preventDefault();
 
                 if (this.name !== '' && this.password !== '') {
-                    const success = await this.triggerLogin({name: this.name, password: this.password});
-                    if (success) {
+                    try {
+                        await this.triggerLogin({
+                            provider: null,
+                            data: {
+                                name: this.name,
+                                password: this.password
+                            }
+                        });
+
                         await this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
-                    } else {
-                        this.triggerAuthError('Der Anmeldeserver ist nicht verfügbar...');
+                    } catch (e) {
+
                     }
                 } else {
                     this.triggerAuthError('Es muss ein Benutzername und ein Passwort angegeben werden.')
@@ -42,7 +49,8 @@
     }
 </script>
 <template>
-    <div class="text-left">
+    <div class="">
+
         <h4 class="title">
             Login
         </h4>

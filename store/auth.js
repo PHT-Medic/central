@@ -1,5 +1,8 @@
-import { AuthStorage } from '../services/authStorage';
-import AuthService, { AuthenticationError } from '../services/auth';
+import { AuthStorage } from '../services/auth/storage'
+import AuthService, { AuthenticationError } from './../services/auth'
+import AuthApiService from "../services/api/authApi";
+import ResourceApiService from "../services/api/resourceApi";
+import AuthConfig, {AuthModeOauth2} from "../config/auth";
 
 const state = () => ({
     authentication: {
@@ -7,22 +10,24 @@ const state = () => ({
         error: null,
         refreshTokenPromise: null
     },
-
     user: AuthStorage.getUser(),
 
     permissions: AuthStorage.getPermissions(),
     abilities: AuthStorage.getAbilities(),
 
-
     token: AuthStorage.getToken()
 });
 
 const getters = {
-    loggedIn: (state) => {
-        return !!state.token
-    },
     user: (state) => {
         return state.user
+    },
+    permissions: (state) => {
+        return state.permissions
+    },
+
+    loggedIn: (state) => {
+        return !!state.token
     },
 
     authenticating: (state) => {
@@ -58,63 +63,98 @@ const actions = {
                 commit('setAbilities', abilities);
                 return true
             } catch (e) {
-                dispatch('logout');
+                dispatch('triggerLogout');
                 return false
             }
         }
     },
-
-    //--------------------------------------------------------
+    // --------------------------------------------------------------------
 
     /**
      * Try to login the user with given credentials.
      *
      * @param commit
-     * @param name
-     * @param password
+     * @param dispatch
+     *
+     * @param data
+     * @param provider
      *
      * @return {Promise<boolean>}
      */
-    async triggerLogin ({ commit }, { name, password }) {
-        commit('loginRequest')
+    async triggerLogin ({ commit, dispatch }, { data, provider}) {
+        commit('loginRequest');
 
         try {
-            const token = await AuthService.login(name, password);
-            console.log(token);
-
-            const { user, permissions } = await AuthService.getMe();
-
-            let abilities = AuthService.transformPermissionsToAbilities(permissions);
+            const token = await AuthService.login(data, provider);
 
             commit('loginSuccess');
-
             commit('setToken', token);
-            commit('setUser', user);
-            commit('setPermissions', permissions);
-            commit('setAbilities', abilities);
 
-            return true
+            AuthApiService.mountInterceptor('auth');
+            ResourceApiService.mountInterceptor('auth');
+
+            dispatch('triggerRefreshMe');
         } catch (e) {
             if (e instanceof AuthenticationError) {
                 commit('loginError', { errorCode: e.errorCode, errorMessage: e.message })
             }
 
-            return false
+            throw new Error(e.message);
         }
     },
+
+    // --------------------------------------------------------------------
+
+    triggerRefreshToken ({ commit, state, dispatch }) {
+        if (!state.refreshTokenPromise) {
+            if(AuthConfig.lapMode !== AuthModeOauth2) {
+                throw new Error('Der Refresh Token kann nicht in diesem LAP Mode erstellt werden...');
+            }
+
+            try {
+                const p = AuthService.refreshAccessToken();
+                commit('setRefreshTokenPromise', p);
+
+                p.then(
+                    (token) => {
+                        commit('setRefreshTokenPromise', null);
+
+                        commit('loginSuccess');
+                        commit('setToken',token);
+                        dispatch('triggerRefreshMe');
+                    },
+                    () => {
+                        commit('refreshTokenPromise', null)
+                    }
+                )
+            } catch (e) {
+                commit('setRefreshTokenPromise', null);
+                dispatch('triggerAuthError', e.message);
+            }
+        }
+
+        return state.refreshTokenPromise
+    },
+
+    // --------------------------------------------------------------------
+
     /**
-     * Try to trigger user logout.
-     *
+     * Try to logout the user.
      * @param commit
      */
     triggerLogout ({ commit }) {
         AuthService.logout();
+
+        AuthApiService.unmountInterceptor('auth');
+        ResourceApiService.unmountInterceptor('auth');
 
         commit('unsetToken');
         commit('unsetUser');
         commit('unsetPermissions');
         commit('unsetAbilities');
     },
+
+    // --------------------------------------------------------------------
 
     /**
      * Trigger custom authentication error by
@@ -162,6 +202,12 @@ const mutations = {
 
     // --------------------------------------------------------------------
 
+    setRefreshTokenPromise (state, promise) {
+        state.refreshTokenPromise = promise;
+    },
+
+    // --------------------------------------------------------------------
+
     setUser (state, user) {
         state.user = user;
 
@@ -189,7 +235,7 @@ const mutations = {
         AuthStorage.setPermissions(permissions);
     },
     unsetPermissions(state) {
-        this.state.permissions = [];
+        state.permissions = [];
 
         AuthStorage.dropPermissions();
     },
@@ -200,7 +246,7 @@ const mutations = {
         AuthStorage.setAbilities(abilities);
     },
     unsetAbilities(state) {
-        this.state.abilities = [];
+        state.abilities = [];
 
         AuthStorage.dropAbilities();
     },
@@ -216,7 +262,7 @@ const mutations = {
 
         AuthStorage.dropToken();
     }
-};
+}
 
 export default {
     namespaced: true,

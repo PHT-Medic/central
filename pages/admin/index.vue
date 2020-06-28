@@ -1,37 +1,29 @@
 <script>
-    import {adminSidebarId} from "../../config/layout";
+    import {adminNavigationId} from "../../config/layout";
 
     export default {
         meta: {
-            sidebarId: adminSidebarId,
-            requiresAuth: true,
-            requiresAbility(can) {
-                return can('use','admin');
+            navigationId: adminNavigationId,
+            requireLoggedIn: true,
+            requireAbility(can) {
+                return can('use','admin_ui');
             }
         },
-        data() {
-            return {
-
-            }
-        },
-        created() {
-            console.log(this.$can('scale','shit'));
-        }
     }
 </script>
 <template>
     <div>
         <h4 class="title">
-            Admin <span class="sub-title">Dashboard</span>
+            Dashboard <span class="sub-title">Applikations-Verwaltung</span>
         </h4>
 
         <div class="panel-card">
             <div class="panel-card-body">
-                <can do="scale" on="shit">
-                    <div class="alert alert-sm alert-dark h5 font-weight-bold">
-                        Der Shit scaled <i class="fa fa-grin"></i>
-                    </div>
-                </can>
+                <div class="alert alert-sm alert-info">
+                    <h5>Herzlich Willkommen,</h5>
+                    auf dem Admin Dashboard des Central User-Interfaces.<br />
+                    Die auf der linken Seite befindlichen Menupunkte, dienen der graphischen Administration der Applikation.
+                </div>
             </div>
         </div>
     </div>

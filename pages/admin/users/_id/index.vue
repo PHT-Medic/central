@@ -1,6 +1,6 @@
 <script>
     import NotImplemented from "../../../../components/NotImplemented";
-    import {adminSidebarId} from "../../../../config/layout";
+    import {adminNavigationId} from "../../../../config/layout";
     import userGeneralFormMixin from "../../../../mixins/userGeneralFormMixin";
     import AlertMessage from "../../../../components/alert/AlertMessage";
 
@@ -11,7 +11,7 @@
             }
         },
         meta: {
-            sidebarId: adminSidebarId
+            navigationId: adminNavigationId
         },
         mixins: [
             userGeneralFormMixin

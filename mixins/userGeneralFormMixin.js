@@ -1,4 +1,4 @@
-import UserService from "../services/user/user";
+import UserService from "../services/user";
 import {mapActions, mapGetters} from "vuex";
 import {maxLength, minLength, required, email} from "vuelidate/lib/validators";
 

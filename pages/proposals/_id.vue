@@ -1,21 +1,22 @@
 <script>
     import ProposalEdge from '../../services/edge/proposal/proposalEdge';
-    import {adminSidebarId, defaultSidebarId} from "../../config/layout";
+    import {adminNavigationId, defaultNavigationId} from "../../config/layout";
     import ProposalStationEdge from "../../services/edge/proposal/proposalStationEdge";
 
     export default {
         meta: {
-            requiresAuth: true,
-            sidebarId: defaultSidebarId
+            requireLoggedIn: true,
+            navigationId: defaultNavigationId
         },
         async asyncData (context) {
             try {
-                const proposal = await ProposalEdge.getProposal({ id: context.params.id });
+                const proposal = await ProposalEdge.getProposal(context.params.id);
 
                 return {
                     proposal
                 };
             } catch (e) {
+                console.log(e);
                 await context.redirect('/proposals');
             }
         },
@@ -41,11 +42,12 @@
 
                 this.proposalStationsLoading = true;
 
-                this.proposalStations = await ProposalStationEdge.getOutProposalsStations(this.proposal.id);
+                this.proposalStations = await ProposalStationEdge.getStations(this.proposal.id);
 
                 this.proposalStationsLoading = false;
             },
             setProposal (data) {
+                console.log(data);
                 Object.assign(this.proposal, this.proposal, data);
             }
         }

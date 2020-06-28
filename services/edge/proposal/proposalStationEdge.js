@@ -12,7 +12,7 @@ const ProposalStationEdge = {
 
     //-------------------------------------------------------------
 
-    getOutProposalsStations: async (proposalId) => {
+    getStations: async (proposalId) => {
         const response = await ResourceApiService.get('proposals/'+proposalId+'/stations');
         return response.data;
     }
