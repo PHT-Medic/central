@@ -1,15 +1,19 @@
-import AuthPermissionModel from "../../domains/auth/permission/AuthPermissionModel";
+import PermissionModel from "../../domains/permission/PermissionModel";
 import {applyRequestFilter, onlyOneRow} from "../../db/helpers/queryHelper";
 import {matchedData, validationResult} from "express-validator";
+import PermissionResponseSchema from "../../domains/permission/PermissionResponseSchema";
 
 const getPermissions = async (req: any, res: any) => {
     let { filter } = req.query;
 
-    let query = AuthPermissionModel()._findAll();
+    let query = PermissionModel()._findAll();
 
     applyRequestFilter(query,filter,['id','name']);
 
     let result = await query;
+
+    let permissionResponseSchema = new PermissionResponseSchema();
+    result = permissionResponseSchema.applySchemaOnEntities(result);
 
     return res._respond({data: result});
 }
@@ -19,11 +23,14 @@ const getPermission = async (req: any, res: any) => {
     let result;
 
     try {
-        let query = AuthPermissionModel()._find({id});
+        let query = PermissionModel()._find({id}).orWhere({name: id});
         result = await onlyOneRow(query);
     } catch (e) {
         return res._failNotFound();
     }
+
+    let permissionResponseSchema = new PermissionResponseSchema();
+    result = permissionResponseSchema.applySchemaOnEntity(result);
 
     return res._respond({data: result});
 }
@@ -45,7 +52,7 @@ const addPermission = async (req: any, res: any) => {
     };
 
     try {
-        await AuthPermissionModel()._create(dbData);
+        await PermissionModel()._create(dbData);
 
         return res._respondCreated();
     } catch (e) {
@@ -62,7 +69,7 @@ const dropPermission = async (req: any, res: any) => {
     }
 
     try {
-        await AuthPermissionModel()._drop(id);
+        await PermissionModel()._drop(id);
 
         return res._respondDeleted();
     } catch (e) {

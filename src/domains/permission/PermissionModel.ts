@@ -1,9 +1,9 @@
 import Knex from 'knex';
-import { builder } from "../../../db";
+import { builder } from "../../db";
 
 //--------------------------------------------------------------------
 
-export const AuthPermissionModel = (knex?: Knex) => {
+export const PermissionModel = (knex?: Knex) => {
     const model = builder('auth_permissions', knex);
 
     return {
@@ -11,5 +11,5 @@ export const AuthPermissionModel = (knex?: Knex) => {
     }
 };
 
-export default AuthPermissionModel;
+export default PermissionModel;
 

@@ -1,9 +1,10 @@
-import TokenService from '../../services/auth/helpers/tokenHelper';
-
 //---------------------------------------------------------------------------------
 
-import AuthUserModel from "../../domains/auth/user/AuthUserModel";
-import AuthUserEntity from "../../domains/auth/user/AuthUserEntity";
+import UserModel from "../../domains/user/UserModel";
+import AuthUserEntity from "../../domains/user/AuthUserEntity";
+import TokenResponseSchema from "../../domains/token/TokenResponseSchema";
+
+import TokenProvider from "../../services/auth/providers/LAP/tokenProvider";
 
 //---------------------------------------------------------------------------------
 
@@ -13,20 +14,26 @@ const grantToken = async (req: any, res: any) => {
     let user: AuthUserEntity;
 
     try {
-        user = await AuthUserModel().verifyCredentials({name, password});
+        user = await UserModel().verifyCredentials({name, password});
     } catch (e) {
         return res._failValidationError({message: e.message});
     }
 
-    const {token, expiresIn} = await TokenService.createToken(user);
+    const tokenProvider = new TokenProvider();
+    const {token, expiresIn} = await tokenProvider.createToken(user);
 
     res.cookie('token',token,{maxAge: expiresIn});
 
+    let ob = {
+        token,
+        expires_in: expiresIn
+    };
+
+    let tokenResponseSchema = new TokenResponseSchema();
+    ob = tokenResponseSchema.applySchemaOnEntity(ob);
+
     return res._respond({
-        data: {
-            token: token,
-            expiresIn: expiresIn
-        }
+        data: ob
     });
 };
 

@@ -1,3 +1,22 @@
+let camelize = (str: string) => {
+    return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word: string, index: number) {
+        return index === 0 ? word.toLowerCase() : word.toUpperCase();
+    });
+}
+
+const prettifyName = (name: string) => {
+    let action: string, subject: string;
+
+    let parts = name.split('_');
+    action = parts.pop();
+    subject = parts.join('_');
+
+    let text = action+'_'+subject;
+    text = text.replace(/_/g, ' ');
+
+    return camelize(text);
+}
+
 /**
  * Transform name and scope of a db permission object to an ability.
  *
@@ -118,11 +137,13 @@ type AuthAbility = {
 
 export default {
     transformScopeToAbility,
-    transformScopeCondition: unserializeScopeCondition
+    transformScopeCondition: unserializeScopeCondition,
+    prettifyName
 };
 
 export {
     AuthAbility,
     transformScopeToAbility,
-    unserializeScopeCondition
+    unserializeScopeCondition,
+    prettifyName
 }

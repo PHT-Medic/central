@@ -18,6 +18,9 @@ export async function up(knex: Knex) : Promise<any> {
             table.string('name', 128);
             table.string('title', 256);
             table.text('description').defaultTo(null);
+            table.boolean('power_configurable').defaultTo(false);
+            table.boolean('power_inverse_configurable').defaultTo(false);
+            table.boolean('scope_configurable').defaultTo(false);
             table.date('created_at').defaultTo(knex.fn.now());
             table.date('updated_at').defaultTo(knex.fn.now());
 
@@ -25,11 +28,14 @@ export async function up(knex: Knex) : Promise<any> {
         })
 
         .createTable('auth_user_permissions', (table) => {
+            table.increments('id');
             table.integer('user_id').defaultTo(0);
             table.integer('permission_id').defaultTo(0);
-            table.integer('permission_power',3).defaultTo(999);
-            table.json('permission_scope').defaultTo(null);
-            table.boolean('inverse_permission').defaultTo(0);
+            table.boolean('enabled').defaultTo(1);
+            table.integer('power',3).defaultTo(999);
+            table.integer('power_inverse', 3).defaultTo(null);
+            table.json('scope').defaultTo(null);
+            table.json('condition').defaultTo(null);
             table.date('created_at').defaultTo(knex.fn.now());
             table.date('updated_at').defaultTo(knex.fn.now());
 

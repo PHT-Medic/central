@@ -1,7 +1,7 @@
 import { Application } from 'express';
 import routes from "../../config/routes";
 
-import responseMiddleware from "./middleware/responseMiddleware";
+import responseMiddleware from "../http/response/middleware/responseMiddleware";
 let { checkAuthenticated } = require('./middleware/authMiddleware');
 
 const registerRoutes = (router: Application) => {

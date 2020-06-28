@@ -1,11 +1,11 @@
 import Knex from 'knex';
-import { builder } from "../../../db";
+import { builder } from "../../db";
 import { AuthUserEntity } from './AuthUserEntity';
 
-import { hashPassword, verifyPassword } from "../../../services/auth/helpers/tokenHelper";
-import UserEntity from "../../user/UserEntity";
-import LoggerService from "../../../services/loggerService";
-import {onlyOneRow} from "../../../db/helpers/queryHelper";
+import { hashPassword, verifyPassword } from "../../services/auth/helpers/authHelper";
+import UserEntity from "./UserEntity";
+import LoggerService from "../../services/loggerService";
+import {onlyOneRow} from "../../db/helpers/queryHelper";
 
 //--------------------------------------------------------------------
 
@@ -16,14 +16,24 @@ type UserCredentials = {
 
 //--------------------------------------------------------------------
 
-export const AuthUserModel = (knex?: Knex) => {
+export const UserModel = (knex?: Knex) => {
     const model = builder('auth_users', knex);
 
+    /**
+     * Create single user.
+     *
+     * @param data
+     */
     const createUser = async (data: AuthUserEntity) => {
         data.password = await hashPassword(data.password);
         return model._create(data);
     };
 
+    /**
+     * Create multiple users.
+     *
+     * @param data
+     */
     const createUsers = async (data: AuthUserEntity[]) => {
         for(let i=0; i<data.length; i++) {
             data[i].password = await hashPassword(data[i].password);
@@ -32,6 +42,11 @@ export const AuthUserModel = (knex?: Knex) => {
         return model._create(data);
     }
 
+    /**
+     * Verifies user credentials.
+     *
+     * @param credentials
+     */
     const verifyCredentials = async (credentials: UserCredentials) : Promise<UserEntity> => {
         if(!credentials.name || !credentials.password) {
             throw new Error('Name und Passwort müssen angegeben sein...');
@@ -74,5 +89,5 @@ export const AuthUserModel = (knex?: Knex) => {
     }
 };
 
-export default AuthUserModel;
+export default UserModel;
 

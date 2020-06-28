@@ -1,4 +1,35 @@
-const AuthConfig = {
+import exp from "constants";
+
+const LAPOauth2 = 'lapOauth2';
+const LAPBasic = 'lapBasic';
+
+const AuthLAPMode = {
+    LAPOauth2,
+    LAPBasic
+}
+
+export {
+    AuthLAPMode,
+    LAPOauth2,
+    LAPBasic
+}
+
+const AuthConfig: any = {
+    lapMode: AuthLAPMode.LAPBasic,
+    lap: {
+        oauth2: {
+            defaultClientId: null,
+            defaultClientSecret: null,
+            url: 'token'
+        }
+    },
+
+    tpap: {
+        ldap: {
+            url: 'ldap'
+        },
+    },
+
     /**
      * Users created on 'npm run run-seed'.
      */

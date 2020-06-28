@@ -4,22 +4,22 @@ import Knex from "knex";
 
 import AuthConfig from "../../config/auth";
 
-import AuthUserModel from "../../domains/auth/user/AuthUserModel";
-import AuthPermissionModel from "../../domains/auth/permission/AuthPermissionModel";
-import AuthUserPermissionModel from "../../domains/auth/user/permission/AuthUserPermissionModel";
-import AuthUserEntity from "../../domains/auth/user/AuthUserEntity";
-import AuthPermissionEntity from "../../domains/auth/permission/AuthPermissionEntity";
+import UserModel from "../../domains/user/UserModel";
+import PermissionModel from "../../domains/permission/PermissionModel";
+import UserPermissionModel from "../../domains/user/permission/UserPermissionModel";
+import AuthUserEntity from "../../domains/user/AuthUserEntity";
+import PermissionEntity from "../../domains/permission/PermissionEntity";
 
 //----------------------------------------------
 
 const users: AuthUserEntity[] = AuthConfig.users;
 
-const permissions: AuthPermissionEntity[] = AuthConfig.permissions;
+const permissions: PermissionEntity[] = AuthConfig.permissions;
 
 //----------------------------------------------
 
 export async function seed(knex: Knex) : Promise<any> {
-    let userModel = AuthUserModel(knex);
+    let userModel = UserModel(knex);
 
     await knex(userModel._getTable()).del();
 
@@ -27,7 +27,7 @@ export async function seed(knex: Knex) : Promise<any> {
 
     //-------------------------------------------------
 
-    let permissionModel = AuthPermissionModel(knex);
+    let permissionModel = PermissionModel(knex);
 
     await knex(permissionModel._getTable()).del();
 
@@ -35,7 +35,7 @@ export async function seed(knex: Knex) : Promise<any> {
 
     //-------------------------------------------------
 
-    let userPermissionModel = AuthUserPermissionModel(knex);
+    let userPermissionModel = UserPermissionModel(knex);
 
     await knex(userPermissionModel._getTable()).del();
 

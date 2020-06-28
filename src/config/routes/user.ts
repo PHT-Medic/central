@@ -5,7 +5,7 @@ let router = Router();
 import { forceLoggedIn } from '../../services/router/middleware/authMiddleware';
 
 import UserController from "../../controllers/user/UserController";
-import UserPermissionController from "../../controllers/user/permission/UserPermissionController";
+import UserPermissionController, {getUserPermissions} from "../../controllers/user/permission/UserPermissionController";
 
 import {check} from "express-validator";
 
@@ -14,17 +14,40 @@ import {check} from "express-validator";
 /**
  * User Permission Routes
  */
-// Details Routes
-router.delete('/:userId/permissions/:permissionId', [forceLoggedIn], UserPermissionController.dropUserPermission);
-
-// Collection Routes
-router.post('/:userId/permissions', [
+router.delete('/:userId/relationships/permissions/:permissionId', [forceLoggedIn], UserPermissionController.dropUserPermission);
+router.post('/:userId/relationships/permissions', [
     forceLoggedIn,
     check('permission_id')
         .exists()
         .isInt()
 ],UserPermissionController.addUserPermission);
-router.get('/:userId/permissions', forceLoggedIn, UserPermissionController.getUserPermissions);
+
+// Relationship Self
+router.get('/:userId/relationships/permissions/:permissionId', [forceLoggedIn], (req: any, res: any) => {
+    return UserPermissionController.getUserPermission(req,res,'self', false);
+});
+router.get('/:userId/relationships/permissions', forceLoggedIn, (req: any, res: any) => {
+    return UserPermissionController.getUserPermissions(req,res,'self', false);
+});
+
+// Relationship Related
+router.get('/:userId/permissions/:permissionId', [forceLoggedIn], (req: any, res: any) => {
+    return UserPermissionController.getUserPermission(req,res,'related', false);
+});
+router.get('/:userId/permissions', forceLoggedIn, (req: any, res: any) => {
+    return UserPermissionController.getUserPermissions(req,res,'related', false);
+});
+
+/**
+ * User Ability Routes
+ */
+
+router.get('/:userId/abilities/:permissionId', [forceLoggedIn], (req: any, res: any) => {
+    return UserPermissionController.getUserPermission(req,res,'self', true);
+});
+router.get('/:userId/abilities', forceLoggedIn, (req: any, res: any) => {
+    return UserPermissionController.getUserPermissions(req,res,'self', true);
+});
 
 /**
  * User Routes
