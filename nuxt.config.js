@@ -49,6 +49,7 @@ export default {
         '@/plugins/app',
         '@/plugins/vuelidate',
         '@/plugins/vueScroll.js',
+        '@/plugins/vueFormWizard.js',
         '@/plugins/socket.client.js',
         '@/plugins/caslAbility.js',
         '@/plugins/casl.js',

@@ -1,4 +1,6 @@
 <script>
+    import 'vue-form-wizard/dist/vue-form-wizard.min.css';
+
 import pageHeader from './header';
 import pageSidebar from './sidebar';
 import pageFooter from './footer';
