@@ -36,7 +36,7 @@ const TrainStates = {
 const TrainEdge = {
     getTrains: async(proposalId) => {
         try {
-            let response = await ResourceApiService.get('trains');
+            let response = await ResourceApiService.get('trains?filter[proposal_id]='+proposalId);
 
             let data = response.data;
 

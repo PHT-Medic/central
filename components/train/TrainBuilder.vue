@@ -604,6 +604,11 @@
 
                 let files = this.formData.entryPointFiles;
 
+                if(files.length === 0) {
+                    this.formInfo.trainFilesSyncInProgress = false;
+                    return;
+                }
+
                 try {
                     await this._uploadTrainFiles(files);
                     this.$refs.entryPointFiles.value = '';
