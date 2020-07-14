@@ -14,7 +14,8 @@ const TrainEdgeMapping = {
     entryPointCommand: 'entrypoint_command',
     stationIds: 'station_ids',
     createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    updatedAt: 'updated_at',
+    result: 'result'
 };
 
 const TrainStateCreated = 'created';
@@ -32,6 +33,14 @@ const TrainStates = {
     TrainStateStopped,
     TrainStateFinished
 };
+
+const TrainTypeAnalyse = 'analyse';
+const TrainTypeDiscovery = 'discovery';
+
+const TrainTypes = {
+    TrainTypeAnalyse,
+    TrainTypeDiscovery
+}
 
 const TrainEdge = {
     getTrains: async(proposalId) => {
@@ -107,5 +116,6 @@ export default TrainEdge;
 
 export {
     TrainEdgeMapping,
-    TrainStates
+    TrainStates,
+    TrainTypes
 }

@@ -193,11 +193,13 @@
                         <h6 class="title">
                             Stationen: <span class="text-primary">{{proposalStations.length}}</span>
                         </h6>
+                        <!--
                         <div style="margin-left: auto;">
                             <button type="button" class="btn btn-xs btn-success" :disabled="true">
                                 Hinzufügen
                             </button>
                         </div>
+                        -->
                     </div>
                     <div class="panel-card-body">
                         <div class="alert alert-primary alert-sm">

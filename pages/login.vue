@@ -3,7 +3,7 @@
 
     export default {
         meta: {
-            requiresGuestState: true
+            requireGuestState: true
         },
         data () {
             return {

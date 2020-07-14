@@ -1,6 +1,6 @@
 <script>
     import TrainBuilder from "../../../components/train/TrainBuilder";
-    import TrainEdge, {TrainStates} from "../../../services/edge/train/trainEdge";
+    import TrainEdge, {TrainStates, TrainTypes} from "../../../services/edge/train/trainEdge";
 
     export default {
         components: {TrainBuilder},
@@ -31,6 +31,7 @@
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'type', label: 'Type', thClass: 'text-center', tdClass: 'text-center' },
                     { key: 'status', label: 'Status', thClass: 'text-left', tdClass: 'text-left' },
+                    { key: 'result', label: 'Ergebnis', thClass: 'text-left', tdClass: 'text-left'},
                     { key: 'actions', label: 'Aktionen', tdClass: 'text-left' },
                     { key: 'options', label: 'Optionen', tdClass: 'text-left' }
                 ],
@@ -93,7 +94,29 @@
 
             //------------------------------------
 
-            async doTrainAction(event, action, id) {
+            fakeTrainCompleted(index) {
+                setTimeout(function () {
+
+
+                    let result = null;
+
+                    switch (this.trains.items[index].type) {
+                        case TrainTypes.TrainTypeDiscovery:
+                            result = 'http://46.105.111.211:4000/discovery.zip';
+                            break;
+                        case TrainTypes.TrainTypeAnalyse:
+                            result = 'http://46.105.111.211:4000/analyse.zip';
+                            break;
+                    }
+
+                    this.trains.items[index].status = this.trainStates.TrainStateFinished;
+                    this.trains.items[index].result = result;
+
+                    this.$bvToast.toast('Der Zug konnte wurde erfolgreich ausgeführt.');
+                }.bind(this),5000);
+            },
+
+            async doTrainAction(event, id, action) {
                 event.preventDefault();
 
                 let index = this.trains.items.findIndex((item) => item.id === id);
@@ -104,11 +127,13 @@
                         case this.trainStates.TrainStateHashSigned:
 
                             try {
-                                await this._doTrainAction(action, id);
+                                await this._doTrainAction(id, action);
 
                                 switch (action) {
                                     case 'start':
                                         this.trains.items[index].status = this.trainStates.TrainStateRunning;
+
+                                        this.fakeTrainCompleted(index);
                                         break;
                                     case 'stop':
                                         this.trains.items[index].status = this.trainStates.TrainStateStopped;
@@ -256,12 +281,23 @@
                             </button>
                         </template>
 
+                        <template v-slot:cell(result)="data">
+                            <div v-if="!data.item.result" class="text-muted font-weight-bold">
+                                Es wurde noch kein Ergebnis generiert...
+                            </div>
+                            <div v-if="data.item.result">
+                                <a :href="data.item.result" target="_blank" class="btn btn-primary btn-xs">
+                                    <i class="fa fa-download"></i> Download
+                                </a>
+                            </div>
+                        </template>
+
                         <template v-slot:cell(actions)="data">
                             <button
                                 v-if="data.item.status === trainStates.TrainStateHashSigned"
                                 class="btn btn-outline-success btn-xs"
                                 type="button"
-                                @click="doTrainAction($event, 'start', data.item.id)"
+                                @click="doTrainAction($event, data.item.id, 'start')"
                             >
                                 <i class="fas fa-play" />
                             </button>
@@ -276,12 +312,14 @@
                         </template>
 
                         <template v-slot:cell(options)="data">
-                            <button class="btn btn-outline-primary btn-xs" type="button" @click="editTrain($event, data.item.id)">
-                                <i class="fas fa-cog" />
-                            </button>
-                            <button class="btn btn-outline-danger btn-xs" type="button" @click="dropTrain($event, data.item.id)">
-                                <i class="fas fa-trash-alt" />
-                            </button>
+                            <div v-if="[trainStates.TrainStateRunning, trainStates.TrainStateFinished, trainStates.TrainStateStopped].indexOf(data.item.status) === -1">
+                                <button class="btn btn-outline-primary btn-xs" type="button" @click="editTrain($event, data.item.id)">
+                                    <i class="fas fa-cog" />
+                                </button>
+                                <button class="btn btn-outline-danger btn-xs" type="button" @click="dropTrain($event, data.item.id)">
+                                    <i class="fas fa-trash-alt" />
+                                </button>
+                            </div>
                         </template>
 
                         <template v-slot:table-busy>

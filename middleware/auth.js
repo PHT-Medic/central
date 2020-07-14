@@ -63,8 +63,8 @@ export default function ({ app , route, redirect }) {
     }
 
     if (
-        route.meta.some(m => m.requiresGuestState) ||
-        route.matched.some(record => record.meta.requiresGuestState)
+        route.meta.some(m => m.requireGuestState) ||
+        route.matched.some(record => record.meta.requireGuestState)
     ) {
         if (AuthStorage.getToken()) {
             redirect({ path: '/' });
