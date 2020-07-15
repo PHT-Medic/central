@@ -1,4 +1,3 @@
-
 export default {
     env: {
         authApiUrl: process.env.authApiUrl,
