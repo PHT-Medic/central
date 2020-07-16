@@ -220,7 +220,7 @@
 
                             <div class="form-group" :class="{ 'form-group-error': $v.formData.stationIds.$anyError }">
                                 <label>Krankenhäuser</label>
-                                <select v-model="$v.formData.stationIds.$model" class="form-control" multiple :disabled="stationsLoading">
+                                <select v-model="$v.formData.stationIds.$model" class="form-control" style="height:100px;" multiple :disabled="stationsLoading">
                                     <option v-for="(item,key) in stations" :key="key" :value="item.id">
                                         {{ item.name }}
                                     </option>

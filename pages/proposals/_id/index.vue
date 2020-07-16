@@ -202,10 +202,6 @@
                         -->
                     </div>
                     <div class="panel-card-body">
-                        <div class="alert alert-primary alert-sm">
-                            Hier können Sie sehen von welchen Stationen, der Antrag bereits akzeptiert, verweigert oder zu Verbesserung angeregt wurde.
-                        </div>
-
                         <b-list-group class="overflow-auto" style="height:500px;">
                             <b-list-group-item v-for="(item,key) in proposalStations" class="flex-column align-items-start" :key="key">
                                 <div class="d-flex w-100 justify-content-between">
