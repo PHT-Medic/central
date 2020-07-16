@@ -751,7 +751,7 @@
                     </div>
                 </template>
                 <tab-content title="Type" :before-change="proceedToWizardStepSettings">
-                    <div v-if="!userPublicKey" class="alert alert-info m-b-20">
+                    <div v-if="!userPublicKey" class="alert alert-danger m-b-20">
                         Es muss ein PublicKey in den <nuxt-link :to="'/settings/security'"><i class="fa fa-cog"></i> Einstellungen</nuxt-link> hochgeladen werden.
                     </div>
 
