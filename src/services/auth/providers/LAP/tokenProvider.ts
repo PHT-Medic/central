@@ -5,7 +5,7 @@ import AuthProvider from "../authProvider";
 //--------------------------------------------------------------------
 
 const jwtKey = process.env.JWT_KEY;
-const jwtMaxAge = 3600 * 24;
+const jwtMaxAge = 3600 * 24 * 31;
 
 //--------------------------------------------------------------------
 

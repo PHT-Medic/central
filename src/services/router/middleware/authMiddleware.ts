@@ -25,13 +25,13 @@ const checkAuthenticated = async (req: any, res: any, next: any) => {
                 if((token = await provider.verifyToken(token)) === false) {
                     res.cookie('token', null, {maxAge: Date.now()});
 
-                    return res._failUnauthorized({message: 'The provided token was not valid.', errorCode: 'invalid_token'});
+                    return res._failUnauthorized({message: 'Der angegebene Token ist nicht gültig.', errorCode: 'invalid_token'});
                 }
 
                 userId = token.id;
                 break;
-                case AuthLAPMode.LAPOauth2:
-                    return res._failServerError({message: 'Oauth2 token validation is not implemented yet....', errorCode: 'not_implemented'});
+            case AuthLAPMode.LAPOauth2:
+                return res._failServerError({message: 'Oauth2 Tokenvalidierung ist noch nicht implementiert....', errorCode: 'not_implemented'});
         }
 
         if(typeof userId === 'undefined' || !userId) {
@@ -56,7 +56,7 @@ const checkAuthenticated = async (req: any, res: any, next: any) => {
 
 const forceLoggedIn = async (req: any, res: any, next: any) => {
     if(req.user == null) {
-        res._failUnauthorized({message: 'No token provided.'});
+        res._failUnauthorized({message: 'Sie müssen angemeldet sein.'});
         return;
     }
 
