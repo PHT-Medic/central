@@ -50,8 +50,8 @@ export default {
         '@/plugins/vueScroll.js',
         '@/plugins/vueFormWizard.js',
         '@/plugins/socket.client.js',
-        '@/plugins/caslAbility.js',
-        '@/plugins/casl.js',
+        '@/plugins/authAbility.js',
+        '@/plugins/auth.js',
     ],
     /*
     ** Nuxt.js dev-modules

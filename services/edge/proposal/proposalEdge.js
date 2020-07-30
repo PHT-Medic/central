@@ -17,13 +17,26 @@ const ProposalEdgeMapping = {
 
 const ProposalEdge = {
     addProposal: async (data) => {
-        data = formatToEdgeRequestObject(data,ProposalEdgeMapping);
-
         try {
+            data = formatToEdgeRequestObject(data,ProposalEdgeMapping);
+
             const response = await ResourceApiService.post('proposals', data);
             return response.data;
         } catch (e) {
             throw new Error('Der Antrag konnte nicht erstellt werden.');
+        }
+    },
+
+    //--------------------------------------------------------------------
+
+    getProposal: async (id) => {
+        try {
+            const response = await ResourceApiService.get('proposals/' + id);
+
+            return parseEdgeResponseObject(response.data,ProposalEdgeMapping);
+        } catch (e) {
+            console.log(e);
+            throw new Error('Der Antrag konnte nicht gefunden werden.');
         }
     },
 
@@ -43,19 +56,6 @@ const ProposalEdge = {
     editProposal: async (id, data) => {
         const response = await ResourceApiService.post('proposals/' + id, data);
         return response.data;
-    },
-
-    //--------------------------------------------------------------------
-
-    getProposal: async (id) => {
-        try {
-            const response = await ResourceApiService.get('proposals/' + id);
-
-            return parseEdgeResponseObject(response.data,ProposalEdgeMapping);
-        } catch (e) {
-            console.log(e);
-            throw new Error('Der Antrag konnte nicht gefunden werden.');
-        }
     },
 
     //--------------------------------------------------------------------

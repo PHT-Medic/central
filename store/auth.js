@@ -43,10 +43,11 @@ const getters = {
 
 const actions = {
     /**
-     * Try to trigger user logout.
+     * Try to trigger user refresh.
      *
      * @param commit
      * @param dispatch
+     *
      * @returns {Promise<boolean>}
      */
     async triggerRefreshMe ({ commit, dispatch }) {
