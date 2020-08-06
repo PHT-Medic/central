@@ -1,4 +1,4 @@
-import exp from "constants";
+import {randomBytes} from "crypto";
 
 const LAPOauth2 = 'lapOauth2';
 const LAPBasic = 'lapBasic';
@@ -14,9 +14,26 @@ export {
     LAPBasic
 }
 
+const JWTKeyTypePrivateKey = 'privateKey';
+const JWTKeyTypeSecret = 'secret';
+
+const JWTKeyType = {
+    JWTKeyTypePrivateKey,
+    JWTKeyTypeSecret
+};
+
+export {
+    JWTKeyType,
+    JWTKeyTypeSecret,
+    JWTKeyTypePrivateKey
+}
+
 const AuthConfig: any = {
     lapMode: AuthLAPMode.LAPBasic,
     lap: {
+        jwtMaxAge: process.env.JWT_MAX_AGE ?? 3600 * 24 * 31,
+        jwtKey: process.env.JWT_KEY ?? randomBytes(10).toString('hex'),
+        jwtKeyType: process.env.JWT_KEY_TYPE ?? JWTKeyTypeSecret,
         oauth2: {
             defaultClientId: null,
             defaultClientSecret: null,
