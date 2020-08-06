@@ -10,7 +10,9 @@ router.get('/',(req: any, res: any) => {
 
     console.log(d.getHours());
     return res._respond({
-        data: req.ability.can('scale','shit')
+        data: {
+            version: '1.0'
+        }
     })
     //return res._failNotFound();
 });
