@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import {abilitiesPlugin, Can} from "@casl/vue";
-import { ability } from "./caslAbility";
+import { ability } from "./authAbility";
 
 const getPermissionByName = (permissions, searchName) => {
     for(let i=0; i<permissions.length; i++) {
