@@ -1,7 +1,7 @@
 <script>
     import { mapActions, mapGetters } from "vuex";
     import AlertMessage from "../../../components/alert/AlertMessage";
-    import UserPublicKeyEdge from "../../../services/edge/user/userPublicKeyEdge";
+    import UserPublicKeyEdge from "../../../domains/user/userPublicKeyEdge";
     import userPasswordFormMixin from "../../../mixins/userPasswordFormMixin";
 
     export default {

@@ -1,5 +1,5 @@
-import AuthApiService from "../../api/authApi";
-import {formatToEdgeRequestObject, parseEdgeResponseObject} from "../helpers/edgeHelpers";
+import AuthApiService from "../../services/api/authApi";
+import {formatToEdgeRequestObject, parseEdgeResponseObject} from "../../services/edge/helpers/edgeHelpers";
 import {PermissionEdgeMapping} from "../permission/permissionEdge";
 
 const buildUrlPrefixUrl = (userId, type) => {

@@ -1,6 +1,6 @@
 <script>
     import {maxLength, minLength, required, email} from "vuelidate/lib/validators";
-    import UserEdge from "../../../services/edge/user/userEdge";
+    import UserEdge from "../../../domains/user/userEdge";
 
     import AlertMessage from "../../../components/alert/AlertMessage";
     import NotImplemented from "../../../components/NotImplemented";

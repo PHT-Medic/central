@@ -1,9 +1,9 @@
 <script>
     import ProposalEditor from '../../../layouts/proposal/ProposalEditor';
     import {alpha, integer, maxLength, minLength, required} from "vuelidate/lib/validators";
-    import MasterImageService from "../../../services/edge/masterImage";
-    import {ProposalStationStates} from "../../../services/edge/proposal/proposalStationEdge";
-    import ProposalEdge from "../../../services/edge/proposal/proposalEdge";
+    import MasterImageService from "../../../domains/masterImage";
+    import {ProposalStationStates} from "../../../domains/proposal/proposalStationEdge";
+    import ProposalEdge from "../../../domains/proposal/proposalEdge";
     import AlertMessage from "../../../components/alert/AlertMessage";
 
     export default {

@@ -1,4 +1,4 @@
-import ResourceApiService from '../api/resourceApi'
+import ResourceApiService from '../services/api/resourceApi'
 
 const StationService = {
     getStations: async () => {

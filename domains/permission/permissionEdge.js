@@ -1,5 +1,5 @@
-import AuthApiService from "../../api/authApi";
-import {parseEdgeResponseObject} from "../helpers/edgeHelpers";
+import AuthApiService from "../../services/api/authApi";
+import {parseEdgeResponseObject} from "../../services/edge/helpers/edgeHelpers";
 
 //----------------------------------------------------
 

@@ -1,6 +1,6 @@
-import AuthApiService from "../../api/authApi";
-import {formatToEdgeRequestObject, parseEdgeResponseObject, parseEdgeResponseObjects} from "../helpers/edgeHelpers";
-import ResourceApiService from "../../api/resourceApi";
+import AuthApiService from "../../services/api/authApi";
+import {formatToEdgeRequestObject, parseEdgeResponseObject, parseEdgeResponseObjects} from "../../services/edge/helpers/edgeHelpers";
+import ResourceApiService from "../../services/api/resourceApi";
 
 const TrainFileEdgeMapping = {
     id: 'id',

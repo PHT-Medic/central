@@ -1,7 +1,7 @@
 export default {
     env: {
-        authApiUrl: process.env.authApiUrl,
-        resourceApiUrl: process.env.resourceApiUrl
+        authApiUrl: process.env.authApiUrl || 'https://pht-ui.personalhealthtrain.de/auth/api/',
+        resourceApiUrl: process.env.resourceApiUrl || 'https://pht-ui.personalhealthtrain.de/resource/api/'
     },
     mode: 'spa',
     /*

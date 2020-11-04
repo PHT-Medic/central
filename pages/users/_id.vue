@@ -1,6 +1,6 @@
 <script>
     import {adminNavigationId, defaultNavigationId} from "../../config/layout";
-    import UserEdge from "../../services/edge/user/userEdge";
+    import UserEdge from "../../domains/user/userEdge";
 
     export default {
         meta: {

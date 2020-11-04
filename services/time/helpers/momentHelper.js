@@ -21,7 +21,6 @@ moment.locale('de', {
 });
 
 moment.locale('de');
-moment.utc();
 
 const momentHelper = moment;
 

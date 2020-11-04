@@ -1,9 +1,9 @@
 <script>
-    import UserEdge from "../../../services/edge/user/userEdge";
+    import UserEdge from "../../../domains/user/userEdge";
     import momentHelper from "../../../services/time/helpers/momentHelper";
 
     import {adminNavigationId} from "../../../config/layout";
-    import PermissionEdge from "../../../services/edge/permission/permissionEdge";
+    import PermissionEdge from "../../../domains/permission/permissionEdge";
 
     export default {
         meta: {

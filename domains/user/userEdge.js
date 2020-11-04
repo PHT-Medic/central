@@ -1,4 +1,4 @@
-import AuthApiService from "../../api/authApi";
+import AuthApiService from "../../services/api/authApi";
 
 const UserEdge = {
     getUsers: async() => {

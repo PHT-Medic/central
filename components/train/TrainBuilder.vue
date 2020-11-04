@@ -1,14 +1,14 @@
 <script>
     import {integer, maxLength, minLength, required} from 'vuelidate/lib/validators';
-    import MasterImageService from '../../services/edge/masterImage';
+    import MasterImageService from '../../domains/masterImage';
 
     import AlertMessage from "../../components/alert/AlertMessage";
     import {mapGetters} from "vuex";
-    import UserPublicKeyEdge from "../../services/edge/user/userPublicKeyEdge";
-    import ProposalStationEdge from "../../services/edge/proposal/proposalStationEdge";
-    import TrainEdge, {TrainStates} from "../../services/edge/train/trainEdge";
+    import UserPublicKeyEdge from "../../domains/user/userPublicKeyEdge";
+    import ProposalStationEdge from "../../domains/proposal/proposalStationEdge";
+    import TrainEdge, {TrainStates} from "../../domains/train/trainEdge";
     import {empty} from "../../.nuxt/utils";
-    import TrainFileEdge from "../../services/edge/train/trainFileEdge";
+    import TrainFileEdge from "../../domains/train/trainFileEdge";
 
     const TrainTypes = {
         Analyse: 'analyse',

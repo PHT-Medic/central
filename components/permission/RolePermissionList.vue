@@ -1,28 +1,25 @@
 <script>
     import UserPermissionListItem from "./UserPermissionListItem";
-    import PermissionEdge from "../../services/edge/permission/permissionEdge";
-    import UserPermissionEdge from "../../services/edge/user/userPermissionEdge";
+    import PermissionEdge from "../../domains/permission/permissionEdge";
+    import UserPermissionEdge from "../../domains/user/userPermissionEdge";
     import AlertMessage from "../alert/AlertMessage";
+
     export default {
         components: {
             AlertMessage,
             UserPermissionListItem
         },
         props: {
-            userId: {
+            roleIdProperty: {
                 type: Number
             },
-            userPermissions: {
+            rolePermissionsProperty: {
                 type: Array,
-                default() {
-                    return null;
-                }
+                default: undefined
             },
-            permissions: {
+            permissionsProperty: {
                 type: Array,
-                default() {
-                    return null;
-                }
+                default: undefined
             }
         },
         data() {
@@ -33,7 +30,7 @@
                     items: [],
                     busy:false
                 },
-                userPermission: {
+                rolePermission: {
                     items: [],
                     busy: false
                 },
@@ -46,16 +43,16 @@
         },
         methods: {
             async init() {
-                if(this.permissions === null || typeof this.permissions === 'undefined') {
+                if(this.permissionsProperty === null || typeof this.permissionsProperty === 'undefined') {
                     await this.getPermissions();
                 } else {
-                    this.permission.items = this.permissions;
+                    this.permission.items = this.permissionsProperty;
                 }
 
-                if(this.userPermissions === null || typeof this.permissions === 'undefined') {
+                if(this.rolePermissionsProperty === null || typeof this.permissionsProperty === 'undefined') {
                     await this.getUserPermissions();
                 } else {
-                    this.userPermission.items = this.userPermissions;
+                    this.rolePermission.items = this.rolePermissionsProperty;
                 }
             },
 
@@ -81,17 +78,17 @@
                 this.permission.busy = false;
             },
             async getUserPermissions() {
-                if(this.userPermission.busy) return ;
+                if(this.rolePermission.busy) return ;
 
                 this.message = null;
-                this.userPermission.busy = true;
+                this.rolePermission.busy = true;
 
                 let userPermissions = [];
 
                 try {
-                    userPermissions = await UserPermissionEdge.getUserPermissions(this.userId, 'self');
+                    userPermissions = await UserPermissionEdge.getUserPermissions(this.roleIdProperty, 'self');
 
-                    this.userPermission.items = userPermissions;
+                    this.rolePermission.items = userPermissions;
 
                 } catch (e) {
                     this.message = {
@@ -100,19 +97,19 @@
                     };
                 }
 
-                this.userPermission.busy = false;
+                this.rolePermission.busy = false;
             },
             changeUserPermission(data) {
                 switch (data.action) {
                     case 'add':
-                        this.userPermission.items.push(data.data);
+                        this.rolePermission.items.push(data.data);
                         break;
                     case 'edit':
-                        this.userPermission.items[data.index] = data.data;
+                        this.rolePermission.items[data.index] = data.data;
                         break;
                     case 'drop':
                         console.log(data.index);
-                        this.userPermission.items.splice(data.index, 1);
+                        this.rolePermission.items.splice(data.index, 1);
                         break;
                 }
             }
@@ -125,7 +122,7 @@
                         return q.length >= 2 ? permission.name.toLowerCase().indexOf(q) > -1 || permission.namePretty.toLowerCase().indexOf(q) > -1 : true;
                     })
                     .map((permission) => {
-                        let index = this.userPermission.items.findIndex((userPermission) => {
+                        let index = this.rolePermission.items.findIndex((userPermission) => {
                             return userPermission.permissionId === permission.id;
                         });
 
@@ -136,7 +133,7 @@
                         }
 
                         if(index > -1) {
-                            item.userPermission = this.userPermission.items[index];
+                            item.userPermission = this.rolePermission.items[index];
                         }
 
                         return item;
@@ -167,7 +164,7 @@
                     :index="item.index"
                     :permission="item.permission"
                     :referenced-user-permission="item.userPermission"
-                    :user-id="userId"
+                    :user-id="roleIdProperty"
                     @changeUserPermission="changeUserPermission"
                 />
             </b-list-group>

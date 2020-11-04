@@ -1,35 +1,33 @@
 <script>
-    import UserEdge from "../../../domains/user/userEdge";
     import {adminNavigationId} from "../../../config/layout";
+    import {getRole} from "@/domains/role/api.js";
 
     export default {
         meta: {
             navigationId: adminNavigationId,
             requireLoggedIn: true,
             requireAbility: (can) => {
-                return can('edit','user') || can('user_permission_add') || can('user_permission_drop')
+                return can('edit','role') || can('role_permission_add') || can('role_permission_drop')
             }
         },
         async asyncData(context) {
-            let user;
-
             try {
-                user = await UserEdge.getUser(context.params.id);
+                const role = await getRole(context.params.id);
 
                 return {
-                    user
+                    role
                 }
             } catch (e) {
-                await context.redirect('/admin/users');
+                return await context.redirect('/admin/roles');
             }
         },
         data() {
             return {
-                user: null,
+                role: null,
                 tabs: [
-                    { name: 'Allgemein', routeName: 'admin-users-id', icon: 'fas fa-bars', urlSuffix: '' },
-                    { name: 'Sicherheit', routeName: 'admin-users-id-security', icon: 'fas fa-user-secret', urlSuffix: 'security' },
-                    { name: 'Gruppen', routeName: 'admin-users-id-groups', icon: 'fas fa-users', urlSuffix: 'groups' }
+                    { name: 'Allgemein', routeName: 'admin-roles-id', icon: 'fas fa-bars', urlSuffix: '' },
+                    { name: 'Berechtigungen', routeName: 'admin-roles-id-permissions', icon: 'fas fa-user-secret', urlSuffix: 'permissions' },
+                    { name: 'Benutzer', routeName: 'admin-roles-id-users', icon: 'fa fa-users', urlSuffix: 'users' }
                 ]
             }
         }
@@ -38,7 +36,7 @@
 <template>
     <div>
         <h4 class="title">
-            {{user.name}} <span class="sub-title">Details</span>
+            {{role.name}} <span class="sub-title">Details</span>
         </h4>
 
         <div class="m-b-20 m-t-10">
@@ -49,7 +47,7 @@
                             v-for="(item,key) in tabs"
                             :key="key"
                             :disabled="item.active"
-                            :to="'/admin/users/' + user.id + '/' + item.urlSuffix"
+                            :to="'/admin/roles/' + role.id + '/' + item.urlSuffix"
                             exact
                             exact-active-class="active"
                         >
@@ -61,6 +59,6 @@
             </div>
         </div>
 
-        <nuxt-child :provided-user="user" />
+        <nuxt-child :role-property="role" />
     </div>
 </template>

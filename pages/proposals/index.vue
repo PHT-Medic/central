@@ -1,5 +1,5 @@
 <script>
-    import proposalService from '../../services/edge/proposal/proposalEdge';
+    import proposalService from '../../domains/proposal/proposalEdge';
     import momentHelper from "../../services/time/helpers/momentHelper";
 
     export default {

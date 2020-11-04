@@ -1,7 +1,7 @@
 <script>
     import {mapGetters} from "vuex";
     import AlertMessage from "../alert/AlertMessage";
-    import UserPermissionEdge from "../../services/edge/user/userPermissionEdge";
+    import UserPermissionEdge from "../../domains/user/userPermissionEdge";
 
     export default {
         components: {AlertMessage},

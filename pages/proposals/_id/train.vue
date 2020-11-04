@@ -1,6 +1,6 @@
 <script>
     import TrainBuilder from "../../../components/train/TrainBuilder";
-    import TrainEdge, {TrainStates, TrainTypes} from "../../../services/edge/train/trainEdge";
+    import TrainEdge, {TrainStates, TrainTypes} from "../../../domains/train/trainEdge";
 
     export default {
         components: {TrainBuilder},
@@ -133,7 +133,7 @@
                                     case 'start':
                                         this.trains.items[index].status = this.trainStates.TrainStateRunning;
 
-                                        this.fakeTrainCompleted(index);
+                                        //this.fakeTrainCompleted(index);
                                         break;
                                     case 'stop':
                                         this.trains.items[index].status = this.trainStates.TrainStateStopped;

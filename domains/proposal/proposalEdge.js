@@ -1,5 +1,5 @@
-import ResourceApiService from '../../api/resourceApi';
-import {formatToEdgeRequestObject, parseEdgeResponseObject, parseEdgeResponseObjects} from "../helpers/edgeHelpers";
+import ResourceApiService from '../../services/api/resourceApi';
+import {formatToEdgeRequestObject, parseEdgeResponseObject, parseEdgeResponseObjects} from "../../services/edge/helpers/edgeHelpers";
 
 const ProposalEdgeMapping = {
     id: 'id',

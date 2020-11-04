@@ -41,11 +41,12 @@ export default {
                 requireLoggedIn: true
             },
             {
-                name: 'Benutzer',
+                name: 'Benutzer & Gruppen',
                 type: 'separator',
                 requireLoggedIn: true,
                 requireAbility: (can) => {
-                    return can('add','user') || can('drop','user') || can('edit','user') || can('add','user_permission') || can('drop','user_permission');
+                    return can('add','user') || can('drop','user') || can('edit','user') ||
+                        can('add','role') || can('drop','role') || can('edit','role') || can('add','role_permission') || can('drop','role_permission');
                 }
             },
             {
@@ -56,19 +57,20 @@ export default {
                 subcomponents: false,
                 requireLoggedIn: true,
                 requireAbility: (can) => {
-                    return can('add','user') || can('drop','user') || can('edit','user') || can('add','user_permission') || can('drop','user_permission');
+                    return can('add','user') || can('drop','user') || can('edit','user');
                 }
             },
-            /*
             {
-                name: 'Gruppen',
+                name: 'Rollen',
                 type: 'link',
-                value: '/admin/groups',
+                value: '/admin/roles',
                 icon: 'fas fa-users',
                 subcomponents: false,
-                requireLoggedIn: true
+                requireLoggedIn: true,
+                requireAbility: (can) => {
+                    return can('add','role') || can('drop','role') || can('edit','role') || can('add','role_permission') || can('drop','role_permission');
+                }
             },
-             */
             {
                 name: 'Berechtingungen',
                 type: 'separator',

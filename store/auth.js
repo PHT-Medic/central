@@ -78,15 +78,14 @@ const actions = {
      * @param dispatch
      *
      * @param data
-     * @param provider
      *
      * @return {Promise<boolean>}
      */
-    async triggerLogin ({ commit, dispatch }, { data, provider}) {
+    async triggerLogin ({ commit, dispatch }, data) {
         commit('loginRequest');
 
         try {
-            const token = await AuthService.login(data, provider);
+            const token = await AuthService.login(data);
 
             commit('loginSuccess');
             commit('setToken', token);

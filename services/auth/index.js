@@ -6,7 +6,6 @@ import AuthConfig, {AuthModeOauth2, AuthModeToken} from "../../config/auth";
 import { AuthStorage } from './storage';
 import Oauth2Provider from "./providers/LAP/oauth2Provider";
 import TokenProvider from "./providers/LAP/tokenProvider";
-import LdapProvider from "./providers/TPAP/ldapProvider";
 import {transformScopeToAbility} from "./helpers/permissionHelper";
 
 // --------------------------------------------------------------------
@@ -55,29 +54,10 @@ const AuthService = {
     /**
      * Login with authentication provider.
      *
-     * @param data
-     * @param provider
-     *
-     * @returns access_token
-     *
-     * @throws AuthenticationError
-     */
-    async login (data, provider) {
-        if(typeof provider === 'undefined' || !provider) {
-            return await this.loginWithLAP(data);
-        } else {
-            return await this.loginWithTPAP(provider,data);
-        }
-
-    },
-
-    /**
-     * Login with lAP.
-     *
      * @param credentials
      * @return {Promise<{accessToken: *, refreshToken: *}>}
      */
-     async loginWithLAP(credentials) {
+     async login(credentials) {
         switch(AuthConfig.lapMode) {
             case AuthModeToken:
                 let { token, ...tokenData } = await TokenProvider.attemptToken(credentials);
@@ -98,15 +78,6 @@ const AuthService = {
                     accessToken
                 }
         }
-    },
-
-    async loginWithTPAP(provider, credentials) {
-        switch (provider) {
-            case 'ldap':
-                return await LdapProvider.attempt(credentials);
-        }
-
-        throw new Error('TPAP Provider wird nicht unterstützt...');
     },
 
     // --------------------------------------------------------------------

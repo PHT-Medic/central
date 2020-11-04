@@ -7,93 +7,121 @@
         },
         data () {
             return {
-                name: '',
-                password: ''
+                error: null,
+                credentials: {
+                    name: '',
+                    password: '',
+                    provider: 'keycloak'
+                },
+                providers: [
+                    {id: 'keycloak', name: 'Keycloak Authentication Provider (KAP)'},
+                    {id: 'default', name: 'Default Authentication Provider (DAP)'}
+                ]
             }
         },
         computed: {
             ...mapGetters('auth', [
-                'loggedIn',
-                'authenticationErrorCode',
-                'authenticationErrorMessage'
+                'loggedIn'
             ])
         },
         methods: {
             ...mapActions('auth', [
-                'triggerLogin',
-                'triggerAuthError'
+                'triggerLogin'
             ]),
 
-            async handleSubmit (e) {
-                e.preventDefault();
+            async handleSubmit () {
+                if (this.credentials.name === '' && this.credentials.password === '') {
+                    this.error = 'Es muss ein Benutzername und ein Passwort angegeben werden.';
+                    return;
+                }
 
-                if (this.name !== '' && this.password !== '') {
-                    try {
-                        await this.triggerLogin({
-                            provider: null,
-                            data: {
-                                name: this.name,
-                                password: this.password
-                            }
-                        });
+                this.error = null;
 
-                        await this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
-                    } catch (e) {
+                try {
+                    await this.triggerLogin(this.credentials);
 
-                    }
-                } else {
-                    this.triggerAuthError('Es muss ein Benutzername und ein Passwort angegeben werden.')
+                    await this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
+                } catch (e) {
+                    this.error = e.message;
                 }
             }
         }
     }
 </script>
 <template>
-    <div class="">
-
+    <div class="container">
         <h4 class="title">
             Login
         </h4>
-        <div v-if="authenticationErrorMessage !== ''" class="alert alert-danger alert-sm">
-            {{ authenticationErrorMessage }}
-        </div>
-        <form>
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input
-                    id="name"
-                    v-model="name"
-                    class="form-control"
-                    type="text"
-                    placeholder="Benutzername oder E-mail"
-                    required
-                    autofocus
-                >
-            </div>
-            <div class="form-group">
-                <label for="password">Passwort</label>
-                <input
-                    id="password"
-                    v-model="password"
-                    class="form-control"
-                    type="password"
-                    placeholder="Passwort"
-                    required
-                >
-            </div>
-            <div class="form-group">
-                <label for="localAuthenticationProvider">LAP <small>Local Authentication Provider</small></label>
-                <select
-                    id="localAuthenticationProvider"
-                    class="form-control">
-                    <option value="" selected="selected">PHT - Personal Health Train</option>
-                </select>
-            </div>
-            <div>
-                <button type="submit" class="btn btn-outline-primary btn-sm" @click="handleSubmit">
-                    Login
-                </button>
-            </div>
-        </form>
+
+        <hr />
+
+        <b-tabs content-class="mt-3">
+            <b-tab title="Local" active>
+                <transition name="slide-fade">
+                    <div v-if="error" class="alert alert-danger alert-sm">
+                        {{ error }}
+                    </div>
+                </transition>
+
+                <form @submit.prevent="handleSubmit">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input
+                            id="name"
+                            v-model="credentials.name"
+                            class="form-control"
+                            type="text"
+                            placeholder="Benutzername oder E-mail"
+                            required
+                            autofocus
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Passwort</label>
+                        <input
+                            id="password"
+                            v-model="credentials.password"
+                            class="form-control"
+                            type="password"
+                            placeholder="Passwort"
+                            required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="authenticationProvider">LAP <small>Local Authentication Provider</small></label>
+                        <select
+                            v-model="credentials.provider"
+                            id="authenticationProvider"
+                            class="form-control"
+                        >
+                            <option v-for="(item,key) in providers" :value="item.id" :key="key">{{ item.name }}</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-outline-primary btn-sm" @click.prevent="handleSubmit">
+                            Login
+                        </button>
+                    </div>
+                </form>
+            </b-tab>
+            <b-tab title="Station">
+
+            </b-tab>
+        </b-tabs>
     </div>
 </template>
+<style>
+.slide-fade-enter-active {
+    transition: all .6s ease;
+}
+.slide-fade-leave-active {
+    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+    /* .slide-fade-leave-active below version 2.1.8 */ {
+    transform: translateX(10px);
+    opacity: 0;
+}
+</style>

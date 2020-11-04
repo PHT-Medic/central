@@ -1,7 +1,7 @@
 <script>
-    import ProposalEdge from '../../services/edge/proposal/proposalEdge';
+    import ProposalEdge from '../../domains/proposal/proposalEdge';
     import {adminNavigationId, defaultNavigationId} from "../../config/layout";
-    import ProposalStationEdge from "../../services/edge/proposal/proposalStationEdge";
+    import ProposalStationEdge from "../../domains/proposal/proposalStationEdge";
 
     export default {
         meta: {

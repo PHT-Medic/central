@@ -1,9 +1,9 @@
 <script>
     import { required, minLength, maxLength, integer, alpha } from 'vuelidate/lib/validators';
 
-    import MasterImageService from '../../services/edge/masterImage';
-    import StationService from '../../services/edge/station';
-    import ProposalEdge from '../../services/edge/proposal/proposalEdge';
+    import MasterImageService from '../../domains/masterImage';
+    import StationService from '../../domains/station';
+    import ProposalEdge from '../../domains/proposal/proposalEdge';
     import ProposalFormTitle from "../../components/form/proposal/ProposalFormTitle";
 
     export default {
