@@ -313,7 +313,6 @@ export default class BaseStorage {
 
         const serializedCookie = serializeCookie(_key, _value, _options);
 
-        console.log(serializedCookie);
 
         if (process.client) {
             // Set in browser

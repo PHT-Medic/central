@@ -1,5 +1,7 @@
 import {Ability, AbilityBuilder} from "@casl/ability";
 
+import { camelCase } from 'change-case';
+
 import {scheduleJob, Job} from "node-schedule";
 
 import {mapOnAllApis} from "~/modules/api";
@@ -9,6 +11,7 @@ import {AuthAbilityOption, AuthAbstractTokenResponse, AuthAbstractUserInfoRespon
 import {AuthSchemeOauth2OptionsInterface} from "~/modules/auth/types";
 import {Context} from "@nuxt/types";
 import {useAuthScheme} from "~/modules/auth/schemes";
+import {AbilityRepresentation, parsePermissionNameToAbilityRepresentation} from "~/modules/auth/utils";
 
 
 // --------------------------------------------------------------------
@@ -41,6 +44,8 @@ class AuthModule {
     protected ability: Ability;
     protected abilityOptions : WeakMap<object, AuthAbilityOption>;
 
+    protected mePromise : Promise<AuthAbstractUserInfoResponse> | undefined;
+
     // --------------------------------------------------------------------
 
     constructor(ctx?: Context) {
@@ -49,16 +54,19 @@ class AuthModule {
 
         if(typeof ctx !== 'undefined') {
             this.registerContext(ctx);
+
+            this.subscribeStore();
+            this.initStore();
         }
     }
 
     // --------------------------------------------------------------------
+
     public registerContext(ctx: Context) {
         this.ctx = ctx;
-
-        this.subscribeStore();
-        this.initStore();
     }
+
+    // --------------------------------------------------------------------
 
     private initStore() {
         if(typeof this.ctx === 'undefined' || typeof this.ctx.store === 'undefined') return;
@@ -152,14 +160,40 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
+    public resolveMe() : Promise<AuthAbstractUserInfoResponse> {
+        if(typeof this.mePromise !== 'undefined') {
+            return this.mePromise;
+        }
+
+        if(typeof this.ctx === 'undefined') return new Promise<any>(((resolve) => resolve()));
+
+        const token = this.ctx.store.getters['auth/token'];
+        const provider = this.ctx.store.getters['auth/provider'];
+
+        if(!token || !provider) return new Promise<any>(((resolve) => resolve()));
+
+        this.mePromise = this.getUserInfo(provider).then((userInfoResponse: AuthAbstractUserInfoResponse) => {
+            if(typeof this.ctx === 'undefined') return new Promise<any>(((resolve) => resolve()));
+
+            const {permissions, ...user} = userInfoResponse;
+
+            this.ctx.store.dispatch('auth/triggerSetUser', user).then(r => r);
+            this.ctx.store.dispatch('auth/triggerSetPermissions', permissions).then(r => r);
+
+            return userInfoResponse;
+        });
+
+        return this.mePromise;
+    }
+
+    // --------------------------------------------------------------------
+
     public can(...args: any) {
         // @ts-ignore
         return this.ability.can(...args);
     }
 
     public setPermissions(permissions: {name: string, scopes: any}[]) {
-        console.log(permissions.length);
-
         if(permissions.length === 0) {
             this.ability.update([]);
             return;
@@ -169,14 +203,8 @@ class AuthModule {
 
         for(let i=0; i<permissions.length; i++) {
             let { name, scopes } : {name: string, scopes: any} = permissions[i];
-            let action: string | undefined, subject : string;
 
-            let parts: string[] = name.split('_');
-
-            action = parts.pop();
-            subject = parts.join('_');
-
-            if(typeof action === 'undefined') continue;
+            const ability : AbilityRepresentation = parsePermissionNameToAbilityRepresentation(name);
 
             if(typeof scopes !== 'undefined' && scopes !== null) {
                 for (let j = 0; j < scopes.length; j++) {
@@ -194,10 +222,10 @@ class AuthModule {
                         fields = undefined;
                     }
 
-                    can(action, subject, condition);
+                    can(ability.action, ability.subject, condition);
                 }
             } else {
-                can(action, subject);
+                can(ability.action, ability.subject);
             }
         }
 

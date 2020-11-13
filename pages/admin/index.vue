@@ -6,7 +6,7 @@
             navigationId: LayoutNavigationAdminId,
             requireLoggedIn: true,
             requireAbility(can) {
-                return can('use','admin_ui');
+                return can('use','adminUi');
             }
         },
     }

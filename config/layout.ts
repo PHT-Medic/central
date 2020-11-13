@@ -22,9 +22,7 @@ export const LayoutNavigation : LayoutNavigationComponentInterface[] = [
         name: 'Admin',
         icon: 'fas fa-cog',
         requireLoggedIn: true,
-        requireAbility: (can: any) => {
-            return can('use','admin_ui');
-        }
+        requirePermissions: ['admin_ui_use']
     }
 ];
 
@@ -46,10 +44,7 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             name: 'Benutzer & Gruppen',
             type: 'separator',
             requireLoggedIn: true,
-            requireAbility: (can: any) => {
-                return can('add','user') || can('drop','user') || can('edit','user') ||
-                    can('add','role') || can('drop','role') || can('edit','role') || can('add','role_permission') || can('drop','role_permission');
-            }
+            requirePermissions: ['user_add', 'user_drop', 'user_edit', 'role_add', 'role_drop', 'role_edit', 'role_permission_add', 'role_permission_drop']
         },
         {
             name: 'Benutzer',
@@ -57,9 +52,7 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             url: '/admin/users',
             icon: 'fas fa-user',
             requireLoggedIn: true,
-            requireAbility: (can: any) => {
-                return can('add','user') || can('drop','user') || can('edit','user');
-            }
+            requirePermissions: ['user_add', 'user_drop', 'user_edit']
         },
         {
             name: 'Rollen',
@@ -67,17 +60,13 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             url: '/admin/roles',
             icon: 'fas fa-users',
             requireLoggedIn: true,
-            requireAbility: (can: any) => {
-                return can('add','role') || can('drop','role') || can('edit','role') || can('add','role_permission') || can('drop','role_permission');
-            }
+            requirePermissions: ['role_add', 'role_drop', 'role_edit', 'role_permission_add', 'role_permission_drop']
         },
         {
             name: 'Berechtingungen',
             type: 'separator',
             requireLoggedIn: true,
-            requireAbility: (can: any) => {
-                return can('add','permission') || can('drop','permission');
-            }
+            requirePermissions: ['permission_add', 'permission_drop']
         },
         {
             name: 'Berechtigungen',
@@ -85,9 +74,7 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             url: '/admin/permissions',
             icon: 'fas fa-key',
             requireLoggedIn: true,
-            requireAbility: (can: any) => {
-                return can('add','permission') || can('drop','permission');
-            }
+            requirePermissions: ['permission_add', 'permission_drop']
         },
         {
             name: 'PHT',
@@ -100,9 +87,7 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             url: '/admin/stations',
             icon: 'fas fa-train',
             requireLoggedIn: true,
-            requireAbility: (can: any) => {
-                return can('add','station') || can('drop','station') || can('edit', 'station');
-            }
+            requirePermissions: ['station_add', 'station_drop', 'station_edit']
         },
     ],
     default: [

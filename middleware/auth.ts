@@ -1,31 +1,28 @@
 import {Context, Middleware} from "@nuxt/types";
+import {AuthAbstractUserInfoResponse} from "~/modules/auth/types";
+
+type MetaOrMatched = 'meta' | 'matched';
 
 const checkAbility = ({route, $auth} : Context) => {
     if(
-        route.meta.some((m: any) => m.hasOwnProperty('requireAbility') && m.requireAbility) ||
-        route.matched.some((m: any) => m.hasOwnProperty('requireAbility') && m.requireAbility)
+        route.meta.some((m: any) => m.hasOwnProperty('requireAbility') && typeof m.requireAbility === 'function') ||
+        route.matched.some((m: any) => m.hasOwnProperty('requireAbility') && typeof m.requireAbility === 'function')
     ) {
         let isAllowed = true;
 
-        let keys: string[] = ['meta','matched'];
-        for(let l=0; l<keys.length; l++) {
-            let key = keys[l];
-            // @ts-ignore
-            for(let i=0; i < route[key].length; i++) {
-                // @ts-ignore
-                let value = route[key][i].requireAbility ?? null;
 
-                if(!value) {
+        let keys: MetaOrMatched[] = ['meta','matched'];
+        for(let l=0; l<keys.length; l++) {
+            let key : MetaOrMatched = keys[l];
+            for(let i=0; i < route[key].length; i++) {
+                let value : any = typeof route[key][i].requireAbility === 'function' ? route[key][i].requireAbility : undefined;
+
+                if(typeof value === 'undefined') {
                     continue;
                 }
 
-                if(typeof value === 'function' && !value($auth.can.bind($auth))) {
-                    isAllowed = false;
-                    break;
-                }
-
-                if(typeof value === 'boolean' && !value) {
-                    isAllowed = false;
+                if(typeof value === 'function') {
+                    isAllowed = value($auth.can.bind($auth));
                     break;
                 }
             }
@@ -37,7 +34,9 @@ const checkAbility = ({route, $auth} : Context) => {
     }
 }
 
-const authMiddleware : Middleware = ({ route, redirect, $auth, store } : Context) => {
+const authMiddleware : Middleware = async ({ route, redirect, $auth, store } : Context) => {
+    await $auth.resolveMe();
+
     if (
         route.meta.some((m: any) => m.requireLoggedIn) ||
         route.matched.some((record: any) => record.meta.requireLoggedIn)

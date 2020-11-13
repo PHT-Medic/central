@@ -4,6 +4,9 @@ import {
     LayoutNavigationComponentInterface,
     LayoutSidebarComponentInterface
 } from "~/modules/layout/types";
+
+import { camelCase } from 'change-case';
+import {AbilityRepresentation, parsePermissionNameToAbilityRepresentation} from "~/modules/auth/utils";
 // --------------------------------------------------------------------
 
 const LayoutModule = {
@@ -47,11 +50,19 @@ const LayoutModule = {
                 return false
             }
 
-            if (
-                component.hasOwnProperty('requireAbility') &&
-                typeof component.requireAbility === 'function'
+            if(
+                component.hasOwnProperty('requirePermissions') &&
+                Array.isArray(component.requirePermissions)
             ) {
-                if(!component.requireAbility(can)) {
+                if(component.requirePermissions.length > 0) {
+                    for (let i = 0; i < component.requirePermissions.length; i++) {
+                        const ability: AbilityRepresentation = parsePermissionNameToAbilityRepresentation(component.requirePermissions[i]);
+
+                        if (can(ability.action, ability.subject)) {
+                            return true;
+                        }
+                    }
+
                     return false;
                 }
             }
