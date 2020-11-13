@@ -1,12 +1,12 @@
 <script>
-    import momentHelper from "../../../services/time/helpers/momentHelper";
+    import momentHelper from "../../../modules/time/moment";
 
-    import {adminNavigationId} from "../../../config/layout";
-    import {dropRole, getRoles} from "@/domains/role/api.js";
+    import {LayoutNavigationAdminId} from "../../../config/layout";
+    import {dropRole, getRoles} from "@/domains/role/api.ts";
 
     export default {
         meta: {
-            navigationId: adminNavigationId,
+            navigationId: LayoutNavigationAdminId,
             requireLoggedIn: true,
             requireAbility(can) {
                 return can('add','role') || can('edit','role') || can('drop','role');
@@ -39,8 +39,8 @@
         computed: {
             formattedItems() {
                 return this.items.map((item) => {
-                    item.created_at_formatted = momentHelper(item.created_at, 'YYYY-MM-DD HH:II:SS').fromNow(false);
-                    item.updated_at_formatted = momentHelper(item.updated_at, 'YYYY-MM-DD HH:II:SS').fromNow(false);
+                    item.created_at_formatted = momentHelper(item.created_at).fromNow(false);
+                    item.updated_at_formatted = momentHelper(item.updated_at).fromNow(false);
                     return item;
                 })
             }
@@ -87,7 +87,7 @@
     }
 </script>
 <template>
-    <div>
+    <div class="container">
         <h4 class="title">
             Rollen <span class="sub-title">Verwaltung</span>
         </h4>
@@ -103,7 +103,7 @@
                         </button>
                     </div>
                     <div style="margin-left: auto;">
-                        <nuxt-link to="/admin/users/add" type="button" class="btn btn-xs btn-success">
+                        <nuxt-link to="/admin/roles/add" type="button" class="btn btn-xs btn-success">
                             <i class="fa fa-plus"></i> Hinzufügen
                         </nuxt-link>
                     </div>
@@ -112,11 +112,11 @@
                     <b-table :items="formattedItems" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
                         <template v-slot:cell(options)="data">
                             <nuxt-link
-                                v-if="$can('edit','role') || $can('edit','role_permissions') || $can('drop','role_permissions')"
+                                v-if="$auth.can('edit','role') || $auth.can('edit','role_permissions') || $auth.can('drop','role_permissions')"
                                 class="btn btn-xs btn-outline-primary" :to="'/admin/roles/'+data.item.id">
                                 <i class="fa fa-bars"></i>
                             </nuxt-link>
-                            <button v-if="$can('drop','role')" @click="dropRole($event,data.item)" type="button" class="btn btn-xs btn-outline-danger" title="Löschen">
+                            <button v-if="$auth.can('drop','role')" @click="dropRole($event,data.item)" type="button" class="btn btn-xs btn-outline-danger" title="Löschen">
                                 <i class="fa fa-times"></i>
                             </button>
                         </template>

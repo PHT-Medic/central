@@ -1,14 +1,14 @@
 <script>
     import {maxLength, minLength, required, email} from "vuelidate/lib/validators";
-    import UserEdge from "../../../domains/user/userEdge";
 
     import AlertMessage from "../../../components/alert/AlertMessage";
     import NotImplemented from "../../../components/NotImplemented";
-    import {adminNavigationId} from "../../../config/layout";
+    import {LayoutNavigationAdminId} from "../../../config/layout";
+    import {addUser} from "@/domains/user/api.ts";
 
     export default {
         meta: {
-            navigationId: adminNavigationId,
+            navigationId: LayoutNavigationAdminId,
             requireLoggedIn: true,
             requireAbility: (can) => {
                 return can('add','user');
@@ -62,7 +62,7 @@
                 this.busy = true;
 
                 try {
-                    let response = await UserEdge.addUser(this.formData);
+                    let response = await addUser(this.formData);
                     await this.$nuxt.$router.push('/admin/users/' + response.id);
                 } catch (e) {
                     this.message = {
@@ -77,7 +77,7 @@
     }
 </script>
 <template>
-    <div>
+    <div class="container">
         <h4 class="title m-b-10">
             Benutzer <span class="sub-title">Hinzufügen</span>
         </h4>

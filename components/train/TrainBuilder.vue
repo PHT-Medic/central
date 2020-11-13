@@ -1,14 +1,15 @@
 <script>
     import {integer, maxLength, minLength, required} from 'vuelidate/lib/validators';
-    import MasterImageService from '../../domains/masterImage';
 
     import AlertMessage from "../../components/alert/AlertMessage";
     import {mapGetters} from "vuex";
-    import UserPublicKeyEdge from "../../domains/user/userPublicKeyEdge";
-    import ProposalStationEdge from "../../domains/proposal/proposalStationEdge";
-    import TrainEdge, {TrainStates} from "../../domains/train/trainEdge";
+    import {TrainStates} from "../../domains/train";
     import {empty} from "../../.nuxt/utils";
-    import TrainFileEdge from "../../domains/train/trainFileEdge";
+    import {getUserPublicKey} from "@/domains/user/publicKey/api.ts";
+    import {getMasterImages} from "@/domains/masterImage/api.ts";
+    import {getProposalStations} from "@/domains/proposal/station/api.ts";
+    import {addTrain, doTrainAction, editTrain, getTrain} from "@/domains/train/api.ts";
+    import {dropTrainFile, getTrainFiles, uploadTrainFiles} from "@/domains/train/file";
 
     const TrainTypes = {
         Analyse: 'analyse',
@@ -95,8 +96,8 @@
                     type: null,
                     masterImageId: '',
                     stationIds: [],
-                    entryPointName: 'entrypoint.py',
-                    entryPointFiles: [],
+                    entrypointName: 'entrypoint.py',
+                    entrypointFiles: [],
                     signedHash: ''
                 }
             }
@@ -119,7 +120,7 @@
                 }
             };
 
-            formData.entryPointName = {
+            formData.entrypointName = {
                 required,
                 minLength: minLength(5),
                 maxLength: maxLength(50)
@@ -141,7 +142,7 @@
                 this.busy = true;
 
                 try {
-                    this.train = await TrainEdge.getTrain(id);
+                    this.train = await getTrain(id);
                 } catch (e) {
                     this.busy = false;
                     this._closeBuilder();
@@ -159,7 +160,7 @@
                     data = Object.assign({}, data);
                     data.proposalId = this.proposal.id;
 
-                    let { id } = await TrainEdge.addTrain(data);
+                    let { id } = await addTrain(data);
 
                     this.busy = false;
                     await this._getTrain(id);
@@ -178,7 +179,7 @@
                 this.busy = true;
 
                 try {
-                    await TrainEdge.editTrain(this.train.id, data);
+                    await editTrain(this.train.id, data);
 
                     this.$emit('edit-train', {
                         id: this.train.id,
@@ -199,7 +200,7 @@
                 this.trainAction.busy = true;
 
                 try {
-                    this.trainAction.item = await TrainEdge.doTrainAction(this.train.id, action);
+                    this.trainAction.item = await doTrainAction(this.train.id, action);
 
                 } catch (e) {
                     await this.$bvModal.msgBoxOk(this.createAlertMessage(e.message), {
@@ -222,7 +223,7 @@
                 this.masterImage.busy = true;
 
                 try {
-                    this.masterImage.items = await MasterImageService.getMasterImages();
+                    this.masterImage.items = await getMasterImages();
                 } catch (e) {
                     console.log(e);
                 }
@@ -238,7 +239,7 @@
                 this.proposalStation.busy = true;
 
                 try {
-                    this.proposalStation.items = await ProposalStationEdge.getStations();
+                    this.proposalStation.items = await getProposalStations(this.proposal.id);
                 } catch (e) {
                     console.log(e);
                 }
@@ -255,7 +256,7 @@
 
                 try {
                     if(this.train) {
-                        this.trainFiles.items = await TrainFileEdge.getFiles(this.train.id);
+                        this.trainFiles.items = await getTrainFiles(this.train.id);
                     } else {
                         this.trainFiles.items = [];
                     }
@@ -272,7 +273,7 @@
                 this.trainFiles.busy = true;
 
                 try {
-                    await TrainFileEdge.dropFile(this.train.id, id);
+                    await dropTrainFile(this.train.id, id);
 
                     let index = this.trainFiles.items.findIndex((item) => item.id === id);
                     this.trainFiles.items.splice(index,1);
@@ -295,7 +296,7 @@
                 }
 
                 try {
-                    await TrainFileEdge.uploadFiles(this.train.id, formData);
+                    await uploadTrainFiles(this.train.id, formData);
                 } catch (e) {
                     throw new Error(e.message);
                 }
@@ -324,7 +325,7 @@
                         this.formData.type = train.type;
                         this.formData.masterImageId = train.masterImageId;
                         this.formData.stationIds = train.stationIds;
-                        this.formData.entryPointName = train.entryPointName;
+                        this.formData.entrypointName = train.entrypointName;
                         this.formData.signedHash = train.signedHash;
 
                         if(this.formData.signedHash) {
@@ -355,11 +356,9 @@
             },
             async initForm() {
                 // Public Key
-                UserPublicKeyEdge.getKey().then((publicKey) => {
+                getUserPublicKey().then((publicKey) => {
                     this.userPublicKey = publicKey;
-                }).catch((e) => {
-
-                });
+                }).catch(e => e);
 
                 // Proposal Stations
                 if(this.proposalStations) {
@@ -540,7 +539,7 @@
                         await this._editTrain({
                             masterImageId: this.formData.masterImageId,
                             stationIds: this.formData.stationIds,
-                            entryPointName: this.formData.entryPointName
+                            entrypointName: this.formData.entrypointName
                         });
 
                         this.$emit('edit-train', {
@@ -554,7 +553,7 @@
                             type: this.formData.type,
                             masterImageId: this.formData.masterImageId,
                             stationIds: this.formData.stationIds,
-                            entryPointName: this.formData.entryPointName,
+                            entrypointName: this.formData.entrypointName,
                         });
                     }
                 } catch (e) {
@@ -586,13 +585,13 @@
                 for(let i=0; i < event.target.files.length; i++) {
                     let file = event.target.files[i];
 
-                    this.formData.entryPointFiles.push(file);
+                    this.formData.entrypointFiles.push(file);
                 }
             },
             dropEntryPointFile(event, index) {
                 event.preventDefault();
 
-                this.formData.entryPointFiles.splice(index,1);
+                this.formData.entrypointFiles.splice(index,1);
             },
 
             //----------------------------------------------------
@@ -602,7 +601,7 @@
 
                 this.formInfo.trainFilesSyncInProgress = true;
 
-                let files = this.formData.entryPointFiles;
+                let files = this.formData.entrypointFiles;
 
                 if(files.length === 0) {
                     this.formInfo.trainFilesSyncInProgress = false;
@@ -611,8 +610,8 @@
 
                 try {
                     await this._uploadTrainFiles(files);
-                    this.$refs.entryPointFiles.value = '';
-                    this.formData.entryPointFiles = [];
+                    this.$refs.entrypointFiles.value = '';
+                    this.formData.entrypointFiles = [];
 
                     await this._getTrainFiles();
                 } catch (e) {
@@ -808,15 +807,15 @@
 
                     <div class="form-group">
                         <label>EntryPoint Name</label>
-                        <input v-model="$v.formData.entryPointName.$model" type="text" class="form-control" placeholder="..." :disbaled="!isTrainEditAble">
-                        <div v-if="!$v.formData.entryPointName.required" class="form-group-hint group-required">
+                        <input v-model="$v.formData.entrypointName.$model" type="text" class="form-control" placeholder="..." :disbaled="!isTrainEditAble">
+                        <div v-if="!$v.formData.entrypointName.required" class="form-group-hint group-required">
                             Bitte geben Sie einen Entrypoint Namen an.
                         </div>
-                        <div v-if="!$v.formData.entryPointName.minLength" class="form-group-hint">
-                            Der EntryPoint muss mindestens <strong>{{ $v.formData.entryPointName.$params.minLength.min }}</strong> Zeichen lang sein.
+                        <div v-if="!$v.formData.entrypointName.minLength" class="form-group-hint">
+                            Der EntryPoint muss mindestens <strong>{{ $v.formData.entrypointName.$params.minLength.min }}</strong> Zeichen lang sein.
                         </div>
-                        <div v-if="!$v.formData.entryPointName.minLength" class="form-group-hint">
-                            Der EntryPoint darf maximal <strong>{{ $v.formData.entryPointName.$params.minLength.min }}</strong> Zeichen lang sein.
+                        <div v-if="!$v.formData.entrypointName.minLength" class="form-group-hint">
+                            Der EntryPoint darf maximal <strong>{{ $v.formData.entrypointName.$params.minLength.min }}</strong> Zeichen lang sein.
                         </div>
                     </div>
 
@@ -825,11 +824,11 @@
                     <div class="form-group">
                         <label>EntryPoint Dateien</label>
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="files" ref="entryPointFiles" @change="checkEntrypointFiles" multiple :disbaled="!isTrainEditAble">
+                            <input type="file" class="custom-file-input" id="files" ref="entrypointFiles" @change="checkEntrypointFiles" multiple :disbaled="!isTrainEditAble">
                             <label class="custom-file-label" for="files">Dateien auswählen...</label>
                         </div>
 
-                        <div v-if="formData.entryPointFiles.length === 0 && trainFiles.items.length === 0" class="alert alert-warning alert-sm m-t-10">
+                        <div v-if="formData.entrypointFiles.length === 0 && trainFiles.items.length === 0" class="alert alert-warning alert-sm m-t-10">
                             Es muss ein Entrypoint bzw Dateien hochgeladen werden.
                         </div>
 
@@ -837,7 +836,7 @@
                             <button @click="dropTrainFile($event,item.id)" v-for="(item,key) in trainFiles.items" class="btn btn-dark btn-xs rounded" style="margin: 0 5px 5px 0;">
                                 {{item.name}}
                             </button>
-                            <button @click="dropEntryPointFile($event,key)" v-for="(item,key) in formData.entryPointFiles" class="btn btn-primary btn-xs rounded" style="margin: 0 5px 5px 0;">
+                            <button @click="dropEntryPointFile($event,key)" v-for="(item,key) in formData.entrypointFiles" class="btn btn-primary btn-xs rounded" style="margin: 0 5px 5px 0;">
                                 {{item.name}} ({{item.size}} Bytes)
                             </button>
                         </div>

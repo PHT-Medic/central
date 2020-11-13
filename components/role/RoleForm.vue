@@ -3,7 +3,7 @@ import {maxLength, minLength, required, email} from "vuelidate/lib/validators";
 
 import AlertMessage from "../alert/AlertMessage";
 import NotImplemented from "../NotImplemented";
-import {addRole, editRole} from "@/domains/role/api.js";
+import {addRole, editRole} from "@/domains/role/api.ts";
 
 export default {
     components: {

@@ -1,50 +1,37 @@
 <script>
     import { mapGetters, mapActions } from 'vuex'
-    import { LayoutService } from '../services/layout';
-
-
 
     export default {
         computed: {
-            ...mapGetters('layout', [
-                'navigationComponents',
-                'navigationId',
-            ]),
-            ...mapGetters('auth', [
-                'loggedIn',
-                'user'
-            ]),
-            components: (vm) => {
-                return LayoutService.reduceComponents({
-                    components: vm.navigationComponents,
-                    loggedIn: vm.loggedIn,
-                    can: vm.$can
-                }).map((component) => {
-                    component.active = 'navigationId' in component && component.navigationId === vm.navigationId;
-                    return component
-                });
+            navigationId(vm) {
+                return vm.$store.state.layout.navigationId;
+            },
+            components(vm) {
+                return vm.$store.state.layout.navigationComponents;
+            },
+            loggedIn(vm)  {
+                return vm.$store.getters['auth/loggedIn'];
+            },
+            user(vm)  {
+                return vm.$store.state.auth.user;
             }
         },
         methods: {
             ...mapActions('layout', [
                 'selectNavigation'
             ]),
-            checkAbility() {
-                return this.$can(...arguments);
-            },
-            componentClick ($event, $index) {
-                $event.preventDefault();
+            componentClick($index) {
+                const component = this.components[$index];
 
-                const component = this.navigationComponents[$index];
+                this.selectNavigation(component.id);
 
-                if (component.value === null) {
-                    if ('navigationId' in component) {
-                        this.selectNavigation(component.navigationId)
-                    }
-                } else {
-                    this.$router.push(component.value)
+                if (typeof component.url !== 'undefined') {
+                    this.$router.push(component.url)
                 }
             }
+        },
+        mounted() {
+            console.log(this.user);
         }
     }
 </script>
@@ -69,7 +56,7 @@
                 <b-collapse id="page-navbar" class="navbar-content navbar-collapse">
                     <ul class="navbar-nav navbar-links">
                         <li v-for="(component,key) in components" :key="key" class="nav-item">
-                            <a v-if="!component.value" href="javascript:void(0)" class="nav-link" :class="{'router-link-active': component.active}" @click="componentClick($event,key)">
+                            <a class="nav-link" :class="{'router-link-active': component.id === navigationId }" @click.prevent="componentClick(key)" href="javascript:void(0)" >
                                 <i v-if="component.icon" :class="component.icon" /> {{ component.name }}
                             </a>
                         </li>

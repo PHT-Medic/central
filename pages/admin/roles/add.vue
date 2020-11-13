@@ -1,12 +1,12 @@
 <script>
     import AlertMessage from "../../../components/alert/AlertMessage";
     import NotImplemented from "../../../components/NotImplemented";
-    import {adminNavigationId} from "../../../config/layout";
+    import {LayoutNavigationAdminId} from "../../../config/layout";
     import RoleForm from "@/components/role/RoleForm";
 
     export default {
         meta: {
-            navigationId: adminNavigationId,
+            navigationId: LayoutNavigationAdminId,
             requireLoggedIn: true,
             requireAbility: (can) => {
                 return can('add','role');
@@ -25,7 +25,7 @@
     }
 </script>
 <template>
-    <div>
+    <div class="container">
         <h4 class="title m-b-10">
             Rolle <span class="sub-title">Hinzufügen</span>
         </h4>

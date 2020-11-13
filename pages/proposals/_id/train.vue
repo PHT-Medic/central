@@ -1,8 +1,14 @@
 <script>
     import TrainBuilder from "../../../components/train/TrainBuilder";
-    import TrainEdge, {TrainStates, TrainTypes} from "../../../domains/train/trainEdge";
+    import {TrainStates, TrainTypes} from "../../../domains/train";
+    import {doTrainAction, dropTrain, getTrains} from "@/domains/train/api.ts";
 
     export default {
+        meta: {
+            requireAbility: (can) => {
+                return can('add', 'train') || can('edit','train') || can('drop', 'train')
+            }
+        },
         components: {TrainBuilder},
         props: {
             proposal: {
@@ -49,7 +55,7 @@
                 this.trains.busy = true;
 
                 try {
-                    this.trains.items = await TrainEdge.getTrains(this.proposal.id);
+                    this.trains.items = await getTrains(this.proposal.id);
                 } catch (e) {
                     console.log(e);
                 }
@@ -63,7 +69,7 @@
                 this.trainBusy = true;
 
                 try {
-                     await TrainEdge.dropTrain(id);
+                     await dropTrain(id);
 
                      let index = this.trains.items.findIndex((item) => item.id === id);
                      if(index > -1) {
@@ -81,7 +87,7 @@
                 this.trainBusy = true;
 
                 try {
-                    await TrainEdge.doTrainAction(id, action);
+                    await doTrainAction(id, action);
 
                 } catch (e) {
                     this.trainBusy = false;
@@ -96,8 +102,6 @@
 
             fakeTrainCompleted(index) {
                 setTimeout(function () {
-
-
                     let result = null;
 
                     switch (this.trains.items[index].type) {

@@ -1,8 +1,8 @@
 <script>
     import { mapActions, mapGetters } from "vuex";
     import AlertMessage from "../../../components/alert/AlertMessage";
-    import UserPublicKeyEdge from "../../../domains/user/userPublicKeyEdge";
     import userPasswordFormMixin from "../../../mixins/userPasswordFormMixin";
+    import {addUserKey, dropUserKey, getUserPublicKey} from "@/domains/user/publicKey/api.ts";
 
     export default {
         mixins: [
@@ -24,7 +24,7 @@
             let userPublicKey = null;
 
             try {
-                let response = await UserPublicKeyEdge.getKey();
+                let response = await getUserPublicKey();
                 userPublicKey = response.content;
             } catch (e) {
 
@@ -67,7 +67,7 @@
                 event.preventDefault();
 
                 try {
-                    await UserPublicKeyEdge.dropKey();
+                    await dropUserKey();
 
                     this.encryptionForm.publicKey = '';
                     this.encryptionForm.uploaded = false;
@@ -81,7 +81,7 @@
                 event.preventDefault();
 
                 try {
-                    await UserPublicKeyEdge.addKey(this.encryptionForm.publicKey);
+                    await addUserKey(this.encryptionForm.publicKey);
 
                     this.encryptionForm.uploaded = true;
                 } catch (e) {

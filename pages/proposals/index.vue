@@ -1,6 +1,6 @@
 <script>
-    import proposalService from '../../domains/proposal/proposalEdge';
-    import momentHelper from "../../services/time/helpers/momentHelper";
+    import momentHelper from "../../modules/time/moment";
+    import {dropProposal, getOutProposals} from "@/domains/proposal/api.ts";
 
     export default {
         meta: {
@@ -8,7 +8,7 @@
         },
         async asyncData (context) {
             try {
-                const items = await proposalService.getOutProposals();
+                const items = await getOutProposals();
 
                 return {
                     items
@@ -36,7 +36,7 @@
                 const confirmed = confirm('Den Antrag ' + proposal.title + ' (ID: ' + proposal.id + ') zurückziehen?');
                 if (confirmed) {
                     try {
-                        await proposalService.dropProposal(proposal.id);
+                        await dropProposal(proposal.id);
                         this.items.splice(index, 1);
                     } catch (e) {
 
@@ -77,13 +77,13 @@
                         </template>
 
                         <template v-slot:cell(options)="data">
-                            <nuxt-link :to="'/proposals/' + data.item.id " title="Ansicht" class="btn btn-outline-primary btn-xs">
+                            <nuxt-link v-if="$auth.can('edit','proposal')" :to="'/proposals/' + data.item.id " title="Ansicht" class="btn btn-outline-primary btn-xs">
                                 <i class="fa fa-bars" />
                             </nuxt-link>
-                            <nuxt-link :to="'/proposals/' + data.item.id + '/train'" title="Editieren" class="btn btn-outline-dark btn-xs">
+                            <nuxt-link v-if="$auth.can('add','train') || $auth.can('edit','train') || $auth.can('drop','train')" :to="'/proposals/' + data.item.id + '/train'" title="Zug Verwaltung" class="btn btn-outline-dark btn-xs">
                                 <i class="fa fa-train" />
                             </nuxt-link>
-                            <a class="btn btn-outline-danger btn-xs" title="Löschen" @click="dropProposal(data.index)">
+                            <a v-if="$auth.can('drop','proposal')" class="btn btn-outline-danger btn-xs" title="Löschen" @click="dropProposal(data.index)">
                                 <i class="fas fa-trash-alt" /></a>
                         </template>
 

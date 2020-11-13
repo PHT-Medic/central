@@ -3,6 +3,8 @@
     border-radius: 0.5rem;
     box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
     transition: all .3s ease-in-out;
+    border: 1px solid #e5e5e5;
+    background: #fff;
 }
 
 .panel-card > .panel-card-header {

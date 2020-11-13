@@ -1,9 +1,9 @@
 <script>
-    import {adminNavigationId} from "../../config/layout";
+    import {LayoutNavigationAdminId} from "../../config/layout";
 
     export default {
         meta: {
-            navigationId: adminNavigationId,
+            navigationId: LayoutNavigationAdminId,
             requireLoggedIn: true,
             requireAbility(can) {
                 return can('use','admin_ui');

@@ -2,8 +2,7 @@
     import NotImplemented from "../../../../components/NotImplemented";
     import AlertMessage from "../../../../components/alert/AlertMessage";
     import userPasswordFormMixin from "../../../../mixins/userPasswordFormMixin";
-    import UserPermissionListItem from "../../../../components/permission/UserPermissionListItem";
-    import UserPermissionList from "../../../../components/permission/RolePermissionList";
+    import RolePermissionList from "../../../../components/permission/RolePermissionList";
 
     export default {
         props: {
@@ -11,12 +10,8 @@
                 type: Object
             }
         },
-        mixins: [
-            userPasswordFormMixin
-        ],
         components: {
-            UserPermissionList,
-            UserPermissionListItem,
+            RolePermissionList,
             AlertMessage,
             NotImplemented
         }
@@ -36,7 +31,7 @@
                     isError: false,
                     data: 'Aktivieren oder deaktivieren Sie Rollen-Berechtigungen.'
                 }" />
-                <user-permission-list :role-id="roleProperty.id" />
+                <role-permission-list :role-id-property="roleProperty.id" />
             </div>
         </div>
     </div>

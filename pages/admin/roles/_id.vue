@@ -1,10 +1,10 @@
 <script>
-    import {adminNavigationId} from "../../../config/layout";
-    import {getRole} from "@/domains/role/api.js";
+    import {LayoutNavigationAdminId} from "../../../config/layout";
+    import {getRole} from "@/domains/role/api.ts";
 
     export default {
         meta: {
-            navigationId: adminNavigationId,
+            navigationId: LayoutNavigationAdminId,
             requireLoggedIn: true,
             requireAbility: (can) => {
                 return can('edit','role') || can('role_permission_add') || can('role_permission_drop')
@@ -34,7 +34,7 @@
     }
 </script>
 <template>
-    <div>
+    <div class="container">
         <h4 class="title">
             {{role.name}} <span class="sub-title">Details</span>
         </h4>

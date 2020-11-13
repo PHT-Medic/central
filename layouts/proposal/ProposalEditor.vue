@@ -1,8 +1,8 @@
 <script>
     import { alpha, integer, maxLength, minLength, required } from 'vuelidate/lib/validators';
-    import MasterImageService from '../../domains/masterImage';
-    import StationService from '../../domains/station';
     import ProposalFormTitle from "../../components/form/proposal/ProposalFormTitle";
+    import {getStations} from "@/domains/station/api.ts";
+    import {getMasterImages} from "@/domains/masterImage/api.ts";
 
     export default {
         name: 'ProposalEditor',
@@ -103,7 +103,8 @@
         created () {
             if (this.with.includes('stations')) {
                 this.stationsLoading = true;
-                StationService.getStations().then((result) => {
+
+                getStations().then((result) => {
                     this.stations = result;
                     this.stationsLoading = false
                 });
@@ -111,7 +112,7 @@
 
             if (this.with.includes('masterImage')) {
                 this.masterImagesLoading = true;
-                MasterImageService.getMasterImages().then((result) => {
+                getMasterImages().then((result) => {
                     this.masterImages = result;
                     this.masterImagesLoading = false
                 });

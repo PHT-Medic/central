@@ -1,13 +1,12 @@
 <script>
-    import UserEdge from "../../../domains/user/userEdge";
-    import momentHelper from "../../../services/time/helpers/momentHelper";
+    import momentHelper from "../../../modules/time/moment";
 
-    import {adminNavigationId} from "../../../config/layout";
-    import PermissionEdge from "../../../domains/permission/permissionEdge";
+    import {LayoutNavigationAdminId} from "../../../config/layout";
+    import {getPermissions} from "@/domains/permission/api.ts";
 
     export default {
         meta: {
-            navigationId: adminNavigationId,
+            navigationId: LayoutNavigationAdminId,
             requireLoggedIn: true,
             requireAbility: (can) => {
                 return can('add','permission') || can('edit','permission') || can('drop','user_permission')
@@ -15,7 +14,7 @@
         },
         async asyncData(context) {
             try {
-                const items = await PermissionEdge.getPermissions();
+                const items = await getPermissions();
 
                 return {
                     items
@@ -48,12 +47,10 @@
             }
         },
         methods: {
-            dropUser(event, permission) {
+            dropPermission(event, permission) {
                 event.preventDefault();
 
                 let l = this.$createElement;
-
-
 
                 this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-info m-b-0'}, [
                     l('p', null, [
@@ -71,7 +68,7 @@
     }
 </script>
 <template>
-    <div>
+    <div class="container">
         <h4 class="title">
             Berechtigungen <span class="sub-title">Verwaltung</span>
         </h4>

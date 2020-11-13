@@ -1,0 +1,38 @@
+import {AuthenticationError} from "../index";
+import {useApi} from "~/modules/api";
+import {ApiRequestConfig} from "~/modules/api/base";
+import {AuthAbstractTokenResponse} from "~/modules/auth/types";
+import AbstractAuthScheme from "~/modules/auth/schemes/abstract";
+
+class AuthJWTScheme extends AbstractAuthScheme {
+    async attemptToken(data: any): Promise<AuthAbstractTokenResponse> {
+        let postData: ApiRequestConfig = {
+            method: 'post',
+            url: this.options.endpoints.token,
+            data: data
+        };
+
+        try {
+            const response = await useApi(this.options.endpoints.api).request(postData);
+
+            let { token, expires_in } = response.data;
+
+            let currentTime = new Date();
+            let secondsToAdd = parseInt(expires_in);
+            currentTime.setSeconds(currentTime.getSeconds() + secondsToAdd);
+
+            return {
+                accessToken: token,
+                refreshToken: undefined,
+                meta: {
+                    expiresIn: expires_in,
+                    expireDate: currentTime.toUTCString()
+                }
+            };
+        } catch (e) {
+            throw new AuthenticationError(e.response.status, e.response.data.error.message)
+        }
+    }
+}
+
+export default AuthJWTScheme;

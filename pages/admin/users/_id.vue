@@ -1,10 +1,10 @@
 <script>
-    import UserEdge from "../../../domains/user/userEdge";
-    import {adminNavigationId} from "../../../config/layout";
+    import {LayoutNavigationAdminId} from "../../../config/layout";
+    import {getUser} from "@/domains/user/api.ts";
 
     export default {
         meta: {
-            navigationId: adminNavigationId,
+            navigationId: LayoutNavigationAdminId,
             requireLoggedIn: true,
             requireAbility: (can) => {
                 return can('edit','user') || can('user_permission_add') || can('user_permission_drop')
@@ -14,7 +14,7 @@
             let user;
 
             try {
-                user = await UserEdge.getUser(context.params.id);
+                user = await getUser(context.params.id);
 
                 return {
                     user
@@ -28,15 +28,21 @@
                 user: null,
                 tabs: [
                     { name: 'Allgemein', routeName: 'admin-users-id', icon: 'fas fa-bars', urlSuffix: '' },
-                    { name: 'Sicherheit', routeName: 'admin-users-id-security', icon: 'fas fa-user-secret', urlSuffix: 'security' },
                     { name: 'Gruppen', routeName: 'admin-users-id-groups', icon: 'fas fa-users', urlSuffix: 'groups' }
                 ]
+            }
+        },
+        methods: {
+            handleUserUpdated(e) {
+                for(let key in e) {
+                    this.user[key] = e[key];
+                }
             }
         }
     }
 </script>
 <template>
-    <div>
+    <div class="container">
         <h4 class="title">
             {{user.name}} <span class="sub-title">Details</span>
         </h4>
@@ -61,6 +67,6 @@
             </div>
         </div>
 
-        <nuxt-child :provided-user="user" />
+        <nuxt-child :user-property="user" @userUpdated="handleUserUpdated" />
     </div>
 </template>

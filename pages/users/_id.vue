@@ -1,17 +1,17 @@
 <script>
-    import {adminNavigationId, defaultNavigationId} from "../../config/layout";
-    import UserEdge from "../../domains/user/userEdge";
+    import {LayoutNavigationAdminId, LayoutNavigationDefaultId} from "../../config/layout";
+    import {getUser} from "@/domains/user/api.ts";
 
     export default {
         meta: {
             requireLoggedIn: true,
-            navigationId: defaultNavigationId
+            navigationId: LayoutNavigationDefaultId
         },
         async asyncData(context) {
             let user;
 
             try {
-                user = await UserEdge.getUser(context.params.id);
+                user = await getUser(context.params.id);
 
                 return {
                     user

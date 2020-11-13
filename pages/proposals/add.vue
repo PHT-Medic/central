@@ -1,15 +1,18 @@
 <script>
     import { required, minLength, maxLength, integer, alpha } from 'vuelidate/lib/validators';
 
-    import MasterImageService from '../../domains/masterImage';
-    import StationService from '../../domains/station';
-    import ProposalEdge from '../../domains/proposal/proposalEdge';
     import ProposalFormTitle from "../../components/form/proposal/ProposalFormTitle";
+    import {getStations} from "@/domains/station/api.ts";
+    import {getMasterImages} from "@/domains/masterImage/api.ts";
+    import {addProposal} from "@/domains/proposal/api.ts";
 
     export default {
         components: {ProposalFormTitle},
         meta: {
-            requireLoggedIn: true
+            requireLoggedIn: true,
+            requireAbility: (can) => {
+                return can('add', 'proposal');
+            }
         },
         data () {
             return {
@@ -75,13 +78,13 @@
         },
         created () {
             this.stationsLoading = true;
-            StationService.getStations().then((result) => {
+            getStations().then((result) => {
                 this.stations = result;
                 this.stationsLoading = false
             });
 
             this.masterImagesLoading = true;
-            MasterImageService.getMasterImages().then((result) => {
+            getMasterImages().then((result) => {
                 this.masterImages = result;
                 this.masterImagesLoading = false
             });
@@ -111,7 +114,7 @@
                 this.busy = true;
 
                 try {
-                    const proposal = await ProposalEdge.addProposal(this.formData);
+                    const proposal = await addProposal(this.formData);
 
                     await this.$nuxt.$router.push('/proposals/' + proposal.id);
                 } catch (e) {

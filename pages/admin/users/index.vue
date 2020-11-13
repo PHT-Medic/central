@@ -1,12 +1,12 @@
 <script>
-    import UserEdge from "../../../domains/user/userEdge";
-    import momentHelper from "../../../services/time/helpers/momentHelper";
+    import momentHelper from "../../../modules/time/moment";
 
-    import {adminNavigationId} from "../../../config/layout";
+    import {LayoutNavigationAdminId} from "../../../config/layout";
+    import {dropUser, getUsers} from "@/domains/user/api.ts";
 
     export default {
         meta: {
-            navigationId: adminNavigationId,
+            navigationId: LayoutNavigationAdminId,
             requireLoggedIn: true,
             requireAbility(can) {
                 return can('add','user') || can('edit','user') || can('drop','user');
@@ -14,13 +14,13 @@
         },
         async asyncData(context) {
             try {
-                const items = await UserEdge.getUsers();
+                const items = await getUsers();
 
                 return {
                     items
                 }
             } catch (e) {
-                await context.redirect('/admin');
+                return await context.redirect('/admin');
             }
         },
         data() {
@@ -47,8 +47,7 @@
             }
         },
         created() {
-            console.log(new Date().getTimezoneOffset())
-            console.log(new Date().toString())
+
         },
         methods: {
             async dropUser(event, user) {
@@ -76,7 +75,7 @@
                             });
 
                             if(index !== -1) {
-                                await UserEdge.dropUser(user.id);
+                                await dropUser(user.id);
 
                                 this.items.splice(index,1);
                             }
@@ -92,7 +91,7 @@
     }
 </script>
 <template>
-    <div>
+    <div class="container">
         <h4 class="title">
             Benutzer <span class="sub-title">Verwaltung</span>
         </h4>
@@ -117,11 +116,11 @@
                     <b-table :items="formattedItems" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
                         <template v-slot:cell(options)="data">
                             <nuxt-link
-                                v-if="$can('edit','user') || $can('edit','user_permissions') || $can('drop','user_permissions')"
+                                v-if="$auth.can('edit','user') || $auth.can('edit','user_permissions') || $auth.can('drop','user_permissions')"
                                 class="btn btn-xs btn-outline-primary" :to="'/admin/users/'+data.item.id">
                                 <i class="fa fa-bars"></i>
                             </nuxt-link>
-                            <button v-if="$can('drop','user')" @click="dropUser($event,data.item)" type="button" class="btn btn-xs btn-outline-danger" title="Löschen">
+                            <button v-if="$auth.can('drop','user')" @click="dropUser($event,data.item)" type="button" class="btn btn-xs btn-outline-danger" title="Löschen">
                                 <i class="fa fa-times"></i>
                             </button>
                         </template>

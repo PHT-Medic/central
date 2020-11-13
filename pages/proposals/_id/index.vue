@@ -1,12 +1,17 @@
 <script>
     import ProposalEditor from '../../../layouts/proposal/ProposalEditor';
     import {alpha, integer, maxLength, minLength, required} from "vuelidate/lib/validators";
-    import MasterImageService from "../../../domains/masterImage";
-    import {ProposalStationStates} from "../../../domains/proposal/proposalStationEdge";
-    import ProposalEdge from "../../../domains/proposal/proposalEdge";
+    import {ProposalStationStates} from "../../../domains/proposal/station";
     import AlertMessage from "../../../components/alert/AlertMessage";
+    import {getMasterImages} from "@/domains/masterImage/api.ts";
+    import {editProposal} from "@/domains/proposal/api.ts";
 
     export default {
+        meta: {
+            requireAbility: (can) => {
+                return can('edit', 'proposal') || can('drop', 'proposal')
+            }
+        },
         components: {AlertMessage, ProposalEditor },
         props: {
             proposal: {
@@ -74,7 +79,7 @@
         },
         created() {
             this.masterImagesLoading = true;
-            MasterImageService.getMasterImages().then((result) => {
+            getMasterImages().then((result) => {
                 this.masterImages = result;
                 this.masterImagesLoading = false
             });
@@ -84,7 +89,7 @@
                 e.preventDefault();
 
                 try {
-                    await ProposalEdge.editProposal(this.proposal.id, this.formData);
+                    await editProposal(this.proposal.id, this.formData);
 
                     this.$emit('set-proposal', this.formData);
                 } catch (e) {

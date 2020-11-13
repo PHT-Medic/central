@@ -1,6 +1,6 @@
-import UserService from "../services/user";
 import {mapActions, mapGetters} from "vuex";
 import {maxLength, minLength, required, sameAs} from "vuelidate/lib/validators";
+import {editUser} from "@/domains/user/api.ts";
 
 const userPasswordFormMixin = {
     computed: {
@@ -55,7 +55,7 @@ const userPasswordFormMixin = {
             try {
                 let {password, passwordRepeat} = this.userPasswordForm;
 
-                await UserService.setUserProperties(this.userData.id, {password, passwordRepeat});
+                await editUser(this.userData.id, {password, passwordRepeat});
 
                 this.userPasswordForm.message = {
                     isError: false,

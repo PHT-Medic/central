@@ -1,13 +1,14 @@
 <script>
-    import UserPermissionListItem from "./UserPermissionListItem";
-    import PermissionEdge from "../../domains/permission/permissionEdge";
-    import UserPermissionEdge from "../../domains/user/userPermissionEdge";
+    import Vue from 'vue';
+    import RolePermissionListItem from "./RolePermissionListItem";
     import AlertMessage from "../alert/AlertMessage";
+    import {getRolePermissions} from "@/domains/role/permission/api.ts";
+    import {getPermissions} from "@/domains/permission/api.ts";
 
     export default {
         components: {
             AlertMessage,
-            UserPermissionListItem
+            RolePermissionListItem
         },
         props: {
             roleIdProperty: {
@@ -30,6 +31,8 @@
                     items: [],
                     busy:false
                 },
+                rolePermissions: {},
+                rolePermissionsBusy: false,
                 rolePermission: {
                     items: [],
                     busy: false
@@ -44,19 +47,19 @@
         methods: {
             async init() {
                 if(this.permissionsProperty === null || typeof this.permissionsProperty === 'undefined') {
-                    await this.getPermissions();
+                    await this.loadPermissions();
                 } else {
                     this.permission.items = this.permissionsProperty;
                 }
 
                 if(this.rolePermissionsProperty === null || typeof this.permissionsProperty === 'undefined') {
-                    await this.getUserPermissions();
+                    await this.loadRolePermissions();
                 } else {
-                    this.rolePermission.items = this.rolePermissionsProperty;
+                    this.setRolePermissions(this.rolePermissionsProperty);
                 }
             },
 
-            async getPermissions() {
+            async loadPermissions() {
                 if(this.permission.busy) return;
 
                 this.message = null;
@@ -65,7 +68,7 @@
                 let permissions = [];
 
                 try {
-                    permissions = await PermissionEdge.getPermissions();
+                    permissions = await getPermissions();
 
                     this.permission.items = permissions;
                 } catch (e) {
@@ -77,19 +80,15 @@
 
                 this.permission.busy = false;
             },
-            async getUserPermissions() {
-                if(this.rolePermission.busy) return ;
+            async loadRolePermissions() {
+                if(this.rolePermissionsBusy) return ;
 
                 this.message = null;
-                this.rolePermission.busy = true;
-
-                let userPermissions = [];
+                this.rolePermissionsBusy = true;
 
                 try {
-                    userPermissions = await UserPermissionEdge.getUserPermissions(this.roleIdProperty, 'self');
-
-                    this.rolePermission.items = userPermissions;
-
+                    let rolePermissions = await getRolePermissions(this.roleIdProperty, 'self');
+                    this.setRolePermissions(rolePermissions);
                 } catch (e) {
                     this.message = {
                         data: e.message,
@@ -97,19 +96,23 @@
                     };
                 }
 
-                this.rolePermission.busy = false;
+                this.rolePermissionsBusy = false;
             },
-            changeUserPermission(data) {
+            setRolePermissions(rolePermissions) {
+                for(let i=0; i<rolePermissions.length; i++) {
+                    Vue.set(this.rolePermissions, rolePermissions[i].permissionId, rolePermissions[i]);
+                }
+            },
+            changeRolePermission(data) {
                 switch (data.action) {
                     case 'add':
-                        this.rolePermission.items.push(data.data);
+                        Vue.set(this.rolePermissions, data.data.permissionId, data.data);
                         break;
                     case 'edit':
-                        this.rolePermission.items[data.index] = data.data;
+                        this.rolePermissions[data.data.permissionId] = data.data;
                         break;
                     case 'drop':
-                        console.log(data.index);
-                        this.rolePermission.items.splice(data.index, 1);
+                        delete this.rolePermissions[data.data.permissionId];
                         break;
                 }
             }
@@ -120,23 +123,6 @@
                     .filter((permission) => {
                         let q = this.q.toLowerCase().trim();
                         return q.length >= 2 ? permission.name.toLowerCase().indexOf(q) > -1 || permission.namePretty.toLowerCase().indexOf(q) > -1 : true;
-                    })
-                    .map((permission) => {
-                        let index = this.rolePermission.items.findIndex((userPermission) => {
-                            return userPermission.permissionId === permission.id;
-                        });
-
-                        let item = {
-                            index,
-                            permission,
-                            userPermission: null
-                        }
-
-                        if(index > -1) {
-                            item.userPermission = this.rolePermission.items[index];
-                        }
-
-                        return item;
                     });
             }
         }
@@ -158,14 +144,13 @@
 
         <vue-scroll style="height:500px">
             <b-list-group>
-                <user-permission-list-item
+                <role-permission-list-item
                     v-for="(item,key) in items"
                     :key="key"
-                    :index="item.index"
-                    :permission="item.permission"
-                    :referenced-user-permission="item.userPermission"
-                    :user-id="roleIdProperty"
-                    @changeUserPermission="changeUserPermission"
+                    :permission-property="item"
+                    :role-permission-property="rolePermissions[item.id]"
+                    :role-id-property="roleIdProperty"
+                    @changeRolePermission="changeRolePermission"
                 />
             </b-list-group>
         </vue-scroll>

@@ -1,6 +1,6 @@
 <script>
     import NotImplemented from "../../../../components/NotImplemented";
-    import {adminNavigationId} from "../../../../config/layout";
+    import {LayoutNavigationAdminId} from "../../../../config/layout";
     import AlertMessage from "../../../../components/alert/AlertMessage";
     import RoleForm from "@/components/role/RoleForm";
 
@@ -11,7 +11,7 @@
             }
         },
         meta: {
-            navigationId: adminNavigationId
+            navigationId: LayoutNavigationAdminId
         },
         components: {
             RoleForm,
