@@ -1,42 +1,36 @@
-import {randomBytes} from "crypto";
+import env from "../env";
 
-const LAPOauth2 = 'lapOauth2';
-const LAPBasic = 'lapBasic';
+export type JwtProcedure = 'RSA' | 'HMAC';
+export type LapMode = 'lapOauth2' | 'lapBasic';
 
-const AuthLAPMode = {
-    LAPOauth2,
-    LAPBasic
-}
-
-export {
-    AuthLAPMode,
-    LAPOauth2,
-    LAPBasic
-}
-
-const JWTKeyTypePrivateKey = 'privateKey';
-const JWTKeyTypeSecret = 'secret';
-
-const JWTKeyType = {
-    JWTKeyTypePrivateKey,
-    JWTKeyTypeSecret
-};
-
-export {
-    JWTKeyType,
-    JWTKeyTypeSecret,
-    JWTKeyTypePrivateKey
-}
-
-const AuthConfig: any = {
-    lapMode: AuthLAPMode.LAPBasic,
+interface AuthConfigInterface {
+    lapMode: LapMode,
     lap: {
-        jwtMaxAge: process.env.JWT_MAX_AGE ?? 3600 * 24 * 31,
-        jwtKey: process.env.JWT_KEY ?? randomBytes(10).toString('hex'),
-        jwtKeyType: process.env.JWT_KEY_TYPE ?? JWTKeyTypeSecret,
+        jwtMaxAge: number,
+        jwtSecret: string,
+        jwtPrivateKey: string | undefined,
+        jwtPublicKey: string | undefined,
+        jwtProcedure: JwtProcedure,
         oauth2: {
-            defaultClientId: null,
-            defaultClientSecret: null,
+            defaultClientId: string | undefined,
+            defaultClientSecret: string | undefined,
+            url: string | undefined
+        } | undefined
+    },
+    [key: string]: any
+}
+
+const AuthConfig: AuthConfigInterface = {
+    lapMode: 'lapBasic',
+    lap: {
+        jwtMaxAge: 3600 * 24 * 31,
+        jwtSecret: env.jwtSecret,
+        jwtPrivateKey: env.jwtPrivateKey,
+        jwtPublicKey: env.jwtPublicKey,
+        jwtProcedure: <JwtProcedure> env.jwtProcedure,
+        oauth2: {
+            defaultClientId: undefined,
+            defaultClientSecret: undefined,
             url: 'token'
         }
     },
@@ -67,8 +61,12 @@ const AuthConfig: any = {
         {name: 'user_drop'},
         {name: 'user_edit'},
 
-        {name: 'user_permission_add'},
-        {name: 'user_permission_drop'},
+        {name: 'role_add'},
+        {name: 'role_drop'},
+        {name: 'role_edit'},
+
+        {name: 'role_permission_add'},
+        {name: 'role_permission_drop'}
     ]
 }
 

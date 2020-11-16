@@ -6,8 +6,7 @@ const environments = {
     development: {
         client: 'sqlite3',
         connection: {
-            timezone: 'Europe/Berlin',
-            filename: paths.writablePath + 'db.sqlite'
+            filename: paths.writablePath + '/db.sqlite'
         },
         seeds: {
             directory: './seeds'

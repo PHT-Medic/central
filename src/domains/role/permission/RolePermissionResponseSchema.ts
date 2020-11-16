@@ -3,13 +3,13 @@ import ResponseSchema, {
 } from "../../../services/http/response/schema";
 import {prettifyName} from "../../../services/auth/helpers/permissionHelper";
 
-class UserPermissionResponseSchema extends ResponseSchema {
+class RolePermissionResponseSchema extends ResponseSchema {
     constructor() {
         super();
 
         this.fields = {
             id: [],
-            user_id: [],
+            role_id: [],
             permission_id: [],
             enabled: [ResponseSchemaFieldToNull],
             power: [ResponseSchemaFieldToNull],
@@ -32,4 +32,4 @@ class UserPermissionResponseSchema extends ResponseSchema {
     }
 }
 
-export default UserPermissionResponseSchema;
+export default RolePermissionResponseSchema;

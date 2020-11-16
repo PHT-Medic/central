@@ -1,36 +1,34 @@
-import {onlyOneRow} from "../../../db/helpers/queryHelper";
-import UserModel from '../../../domains/user/UserModel';
-import AuthUserEntity from "../../../domains/user/AuthUserEntity";
-import UserEntity from "../../../domains/user/UserEntity";
-
-import AuthConfig, {AuthLAPMode} from "../../../config/auth";
-import AuthorizationService from "../../auth/authorizationService";
-import TokenProvider from "../../auth/providers/LAP/tokenProvider";
+import AuthConfig from "../../../config/auth";
+import {verifyToken} from "../../auth/helpers/tokenHelper";
+import {PermissionInterface} from "../../auth";
+import {getCustomRepository} from "typeorm";
+import {UserRepository} from "../../../domains/user/repository";
+import {User} from "../../../domains/user";
+import UserAbility from "../../auth/helpers/userAbility";
 
 const checkAuthenticated = async (req: any, res: any, next: any) => {
     let { authorization } = req.headers;
 
-    let userObject: UserEntity | null = null;
-    let userId: number | null | undefined;
+    let user : User | undefined;
+    let userId: number | undefined;
+    let userToken: string | undefined;
+    let userPermissions: PermissionInterface[] =  [];
 
     if(typeof authorization !== "undefined") {
-        let provider;
-
         let token = authorization.split(" ")[1];
 
         switch (AuthConfig.lapMode) {
-            case AuthLAPMode.LAPBasic:
-                provider = new TokenProvider();
-
-                if((token = await provider.verifyToken(token)) === false) {
+            case 'lapBasic':
+                if((token = await verifyToken(token)) === false) {
                     res.cookie('token', null, {maxAge: Date.now()});
 
                     return res._failUnauthorized({message: 'Der angegebene Token ist nicht gültig.', errorCode: 'invalid_token'});
                 }
 
+                userToken = token;
                 userId = token.id;
                 break;
-            case AuthLAPMode.LAPOauth2:
+            case 'lapOauth2':
                 return res._failServerError({message: 'Oauth2 Tokenvalidierung ist noch nicht implementiert....', errorCode: 'not_implemented'});
         }
 
@@ -38,24 +36,25 @@ const checkAuthenticated = async (req: any, res: any, next: any) => {
             return res._failUnauthorized({message: 'Es konnte kein Benutzer zu dem Token assoziert werden.'});
         }
 
-        let query = UserModel()._find({id: userId});
+        const userRepository = getCustomRepository<UserRepository>(UserRepository);
+        user = await userRepository.findOne(userId);
 
-        try {
-            let {password, ...user} = <AuthUserEntity> await onlyOneRow(query);
-            userObject = <UserEntity> user;
-
-        } catch (e) {
+        if(typeof user === 'undefined') {
             return res._failUnauthorized({message: 'Der Benutzer existiert nicht mehr.'});
         }
+
+        userPermissions = await userRepository.findPermissions(user.id);
     }
 
-    req.user = userObject;
-    req.ability = await AuthorizationService.defineAbilityFor(userId);
+    req.token = userToken;
+    req.user = user;
+    req.permissions = userPermissions;
+    req.ability = new UserAbility(userPermissions);
     next();
 };
 
 const forceLoggedIn = async (req: any, res: any, next: any) => {
-    if(req.user == null) {
+    if(typeof req.user === 'undefined') {
         res._failUnauthorized({message: 'Sie müssen angemeldet sein.'});
         return;
     }

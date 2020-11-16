@@ -1,8 +1,10 @@
 import {AuthAbility, transformScopeToAbility} from "./permissionHelper";
 import {Ability, AbilityBuilder} from "@casl/ability";
 import PermissionEntity from "../../../domains/permission/PermissionEntity";
+import {PermissionInterface} from "../index";
 
 interface UserAbilityPermissionInterface extends PermissionEntity {
+    condition: any;
     scope: any,
     power: number | null,
     power_inverse: number | null
@@ -12,7 +14,7 @@ class UserAbility {
     private readonly ability: any;
     private readonly abilities: any;
 
-    constructor(private permissions: UserAbilityPermissionInterface[]) {
+    constructor(private permissions: PermissionInterface[]) {
         this.abilities = UserAbility.transformPermissionsToAbilities(permissions);
 
         this.ability = this.defineAbility();
@@ -73,26 +75,6 @@ class UserAbility {
         return 0;
     }
 
-    getPowerInverse(name: string, strict: boolean | undefined) {
-        strict = strict ?? false;
-
-        if(strict) throw new Error('Sie haben keine gesetzte Inverse-Berechtigunspower.');
-
-        try {
-            let permission = this.get(name);
-
-            if(permission.hasOwnProperty('power_inverse') && permission.power_inverse !== null) {
-                return permission.power_inverse;
-            }
-        } catch (e) {
-            if(strict) {
-                throw new Error('Sie haben keine gesetzte Inverse-Berechtigunspower.');
-            }
-        }
-
-        return 0;
-    }
-
     //----------------------------------------------
     // Ability
     //----------------------------------------------
@@ -119,13 +101,13 @@ class UserAbility {
         return new Ability(rules);
     }
 
-    private static transformPermissionToAbility(permission: UserAbilityPermissionInterface) {
+    private static transformPermissionToAbility(permission: PermissionInterface) {
         let { name, scope } = permission;
 
         return transformScopeToAbility(name, scope);
     }
 
-    private static transformPermissionsToAbilities(permissions: UserAbilityPermissionInterface[]) {
+    private static transformPermissionsToAbilities(permissions: PermissionInterface[]) {
         let abilities: AuthAbility[] = [];
 
         for(let i=0; i<permissions.length; i++) {

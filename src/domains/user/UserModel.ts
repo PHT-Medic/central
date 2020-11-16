@@ -6,6 +6,9 @@ import { hashPassword, verifyPassword } from "../../services/auth/helpers/authHe
 import UserEntity from "./UserEntity";
 import LoggerService from "../../services/loggerService";
 import {onlyOneRow} from "../../db/helpers/queryHelper";
+import UserRoleModel from "./role/UserRoleModel";
+import RolePermissionModel from "../role/permission/RolePermissionModel";
+import UserRoleEntity from "./role/UserRoleEntity";
 
 //--------------------------------------------------------------------
 
@@ -17,16 +20,24 @@ type UserCredentials = {
 //--------------------------------------------------------------------
 
 export const UserModel = (knex?: Knex) => {
-    const model = builder('auth_users', knex);
+    const model = builder('auth_users', knex, {
+        'created_at': true,
+        'updated_at': true
+    });
 
     /**
      * Create single user.
      *
      * @param data
      */
-    const createUser = async (data: AuthUserEntity) => {
-        data.password = await hashPassword(data.password);
-        return model._create(data);
+    const create = async (data: AuthUserEntity) => {
+        if(data.hasOwnProperty('password')) {
+            data.password = await hashPassword(data.password);
+        }
+
+
+
+        return model.create(data);
     };
 
     /**
@@ -34,14 +45,36 @@ export const UserModel = (knex?: Knex) => {
      *
      * @param data
      */
-    const createUsers = async (data: AuthUserEntity[]) => {
+    const createMultiple = async (data: AuthUserEntity[]) => {
         for(let i=0; i<data.length; i++) {
-            data[i].password = await hashPassword(data[i].password);
+            if(data[i].hasOwnProperty('password')) {
+                data[i].password = await hashPassword(data[i].password);
+            }
         }
 
-        return model._create(data);
+        return model.create(data);
     }
 
+    /**
+     * Get user permissions.
+     *
+     * @param userId
+     */
+    const getPermissions = async (userId: number) => {
+        let result : UserRoleEntity[] = <UserRoleEntity[]> await UserRoleModel(knex).find({
+            user_id: userId
+        });
+
+        if(result && result.length > 0) {
+            let roleIds : number[] = result.map((item) => {
+                return item.role_id;
+            });
+
+            return await RolePermissionModel(knex).getPermissions(roleIds)
+        }
+
+        return [];
+    }
     /**
      * Verifies user credentials.
      *
@@ -54,7 +87,7 @@ export const UserModel = (knex?: Knex) => {
 
         let result;
         try {
-            let query = model._findOne()
+            let query = model.findOne()
                 .select('id')
                 .select('name')
                 .select('password')
@@ -62,8 +95,9 @@ export const UserModel = (knex?: Knex) => {
 
             result = <AuthUserEntity> await onlyOneRow(query);
         } catch (e) {
+            console.log(e);
             LoggerService.warn('user "' + credentials.name + '" does not exist...');
-            throw new Error('Name oder Passwort ist falsch...');
+            throw new Error('Die Zugagnsdaten sind nicht gültig...');
         }
 
         let {password, ...user} = result;
@@ -71,7 +105,7 @@ export const UserModel = (knex?: Knex) => {
         let passwordVerified = await verifyPassword(credentials.password, password);
         if(!passwordVerified) {
             LoggerService.warn('password for user "' + credentials.name + '" is wrong...');
-            throw new Error('Name oder Passwort ist falsch...')
+            throw new Error('Die Zugangsdaten sind nicht gültig...')
         }
 
         LoggerService.info('user "' + credentials.name + '" logged in...')
@@ -81,11 +115,12 @@ export const UserModel = (knex?: Knex) => {
 
     return {
         ...model,
-        createUser,
-        createUsers,
+        create,
+        createMultiple,
         verifyCredentials,
         hashPassword,
-        verifyPassword
+        verifyPassword,
+        getPermissions
     }
 };
 

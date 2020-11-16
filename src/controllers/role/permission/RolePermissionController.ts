@@ -1,9 +1,7 @@
-import UserPermissionModel, {findUserPermissionCallback} from "../../../domains/user/permission/UserPermissionModel";
+import RolePermissionModel from "../../../domains/role/permission/RolePermissionModel";
 import {applyRequestFilter, onlyOneRow} from "../../../db/helpers/queryHelper";
-import {matchedData, validationResult} from "express-validator";
-import LoggerService from "../../../services/loggerService";
-import {cat} from "shelljs";
-import UserPermissionResponseSchema from "../../../domains/user/permission/UserPermissionResponseSchema";
+import {check, matchedData, validationResult} from "express-validator";
+import RolePermissionResponseSchema from "../../../domains/role/permission/RolePermissionResponseSchema";
 import PermissionModel from "../../../domains/permission/PermissionModel";
 import PermissionResponseSchema from "../../../domains/permission/PermissionResponseSchema";
 
@@ -17,37 +15,33 @@ import PermissionResponseSchema from "../../../domains/permission/PermissionResp
  * @param type
  * @param asAbility
  */
-const getUserPermissions = async (req: any, res: any, type: string, asAbility: boolean) => {
-    let { userId } = req.params;
+const getRolePermissions = async (req: any, res: any, type: string, asAbility: boolean) => {
+    let { roleId } = req.params;
     let { filter } = req.query;
 
-    if(userId === 'me') {
-        userId = req.user.id;
-    }
-
-    let permissionTable = PermissionModel()._getTable();
-    let userPermissionTable = UserPermissionModel()._getTable();
+    let permissionTable = PermissionModel().getTable();
+    let rolePermissionTable = RolePermissionModel().getTable();
     let whereObject: any = {};
 
     switch (type) {
         case 'self':
             try {
-                let query = UserPermissionModel()._findAll();
-                query.select(userPermissionTable+'.*');
-                query.join(permissionTable,permissionTable+'.id', userPermissionTable+'.permission_id');
+                let query = RolePermissionModel().findAll();
+                query.select(rolePermissionTable+'.*');
+                query.join(permissionTable,permissionTable+'.id', rolePermissionTable+'.permission_id');
 
-                whereObject[userPermissionTable+'.user_id'] = userId;
+                whereObject[rolePermissionTable+'.role_id'] = roleId;
                 query.where(whereObject);
 
                 applyRequestFilter(query, filter, {
-                    user_id: userPermissionTable+'.user_id',
+                    role_id: rolePermissionTable+'.role_id',
                     permission_id: permissionTable+'.id',
                     name: permissionTable+'.name'
                 });
 
                 let items = await query;
 
-                let responseSchema = new UserPermissionResponseSchema();
+                let responseSchema = new RolePermissionResponseSchema();
                 items = responseSchema.applySchemaOnEntities(items);
 
                 return res._respond({data: items});
@@ -56,10 +50,10 @@ const getUserPermissions = async (req: any, res: any, type: string, asAbility: b
             }
         case 'related':
             try {
-                let query = PermissionModel()._findAll();
+                let query = PermissionModel().findAll();
 
                 query.select(permissionTable+'.*');
-                query.leftJoin(userPermissionTable,userPermissionTable+'.permission_id',permissionTable+'.id');
+                query.leftJoin(rolePermissionTable,rolePermissionTable+'.permission_id',permissionTable+'.id');
 
                 applyRequestFilter(query, filter, {
                     id: permissionTable+'.id',
@@ -67,7 +61,7 @@ const getUserPermissions = async (req: any, res: any, type: string, asAbility: b
                     permission_id: permissionTable+'.id',
                 });
 
-                whereObject[userPermissionTable+'.user_id'] = userId;
+                whereObject[rolePermissionTable+'.role_id'] = roleId;
 
                 let items = await query;
 
@@ -91,27 +85,23 @@ const getUserPermissions = async (req: any, res: any, type: string, asAbility: b
  * @param type
  * @param asAbility
  */
-const getUserPermission = async (req: any, res: any, type: string, asAbility: boolean) => {
-    let {userId, permissionId} = req.params;
+const getRolePermission = async (req: any, res: any, type: string, asAbility: boolean) => {
+    let {roleId, permissionId} = req.params;
 
-    if (userId === 'me') {
-        userId = req.user.id;
-    }
-
-    let permissionTable = PermissionModel()._getTable();
-    let userPermissionTable = UserPermissionModel()._getTable();
+    let permissionTable = PermissionModel().getTable();
+    let userPermissionTable = RolePermissionModel().getTable();
 
     switch (type) {
         case 'self':
             try {
-                let query = UserPermissionModel()._findOne({
+                let query = RolePermissionModel().findOne({
                     id: permissionId,
-                    user_id: userId
+                    role_id: roleId
                 });
 
                 let item = await query;
 
-                let responseSchema = new UserPermissionResponseSchema();
+                let responseSchema = new RolePermissionResponseSchema();
                 item = responseSchema.applySchemaOnEntity(item);
 
                 return res._respond({data: item});
@@ -120,13 +110,13 @@ const getUserPermission = async (req: any, res: any, type: string, asAbility: bo
             }
         case 'related':
             try {
-                let query = PermissionModel()._findOne();
+                let query = PermissionModel().findOne();
 
                 query.select(permissionTable+'.*');
                 query.leftJoin(userPermissionTable,userPermissionTable+'.permission_id',permissionTable+'.id');
 
                 let whereObject: any = {};
-                whereObject[userPermissionTable+'.user_id'] = userId;
+                whereObject[userPermissionTable+'.role_id'] = roleId;
                 whereObject[userPermissionTable+'.permission_id'] = permissionId;
 
                 let permission = await onlyOneRow(query);
@@ -150,27 +140,31 @@ const getUserPermission = async (req: any, res: any, type: string, asAbility: bo
  * @param req
  * @param res
  */
-const addUserPermission = async (req: any, res: any) => {
-    let { userId } = req.params;
+const addRolePermission = async (req: any, res: any) => {
+    let { roleId } = req.params;
 
-    if(!req.ability.can('add','user_permission')) {
+    await check('permission_id')
+        .exists()
+        .isInt().run(req);
+
+    if(!req.ability.can('add','role_permission')) {
         return res._failForbidden();
     }
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidation({validation});
+        return res._failExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
 
     let ob: object = {
         permission_id: data.permission_id,
-        user_id: userId
+        role_id: roleId
     };
 
     try {
-        let result = await UserPermissionModel()._create(ob);
+        let result = await RolePermissionModel().create(ob);
 
         return res._respondCreated({
             data: {
@@ -190,21 +184,15 @@ const addUserPermission = async (req: any, res: any) => {
  * @param req
  * @param res
  */
-const dropUserPermission = async (req: any, res: any) => {
-    let { userId, permissionId } = req.params;
+const dropRolePermission = async (req: any, res: any) => {
+    let { permissionId } = req.params;
 
-    if(!req.ability.can('drop','user_permission')) {
+    if(!req.ability.can('drop','role_permission')) {
         return res._failForbidden();
     }
 
-    if(parseInt(userId) === req.user.id) {
-        return res._failForbidden({
-            message: 'Die eigenen Berechtigungen können nicht gelöscht werden.'
-        });
-    }
-
     try {
-        await UserPermissionModel()._dropWhere({
+        await RolePermissionModel().dropWhere({
             id: permissionId
         });
 
@@ -217,15 +205,15 @@ const dropUserPermission = async (req: any, res: any) => {
 //---------------------------------------------------------------------------------
 
 export default {
-    getUserPermissions,
-    getUserPermission,
-    addUserPermission,
-    dropUserPermission
+    getRolePermissions,
+    getRolePermission,
+    addRolePermission,
+    dropRolePermission
 };
 
 export {
-    getUserPermissions,
-    getUserPermission,
-    addUserPermission,
-    dropUserPermission
+    getRolePermissions,
+    getRolePermission,
+    addRolePermission,
+    dropRolePermission
 }

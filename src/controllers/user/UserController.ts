@@ -1,24 +1,22 @@
-import {UserPermissionModel} from "../../domains/user/permission/UserPermissionModel";
 import {check, matchedData, validationResult} from "express-validator";
-import AuthUserEntity from "../../domains/user/AuthUserEntity";
-import UserModel from "../../domains/user/UserModel";
-import {applyRequestFilter} from "../../db/helpers/queryHelper";
 import LoggerService from "../../services/loggerService";
 import UserResponseSchema from "../../domains/user/UserResponseSchema";
 import {hashPassword} from "../../services/auth/helpers/authHelper";
-import {up} from "../../db/migrations/20200604153435_auth";
-import {cat} from "shelljs";
+import {getCustomRepository} from "typeorm";
+import {UserRepository} from "../../domains/user/repository";
+import {applyRequestFilterOnQuery} from "../../db/utils";
 
 //---------------------------------------------------------------------------------
 
 const getUsers = async (req: any, res: any) => {
     let { filter } = req.query;
 
-    let query = UserModel()._findAll();
+    const userRepository = getCustomRepository<UserRepository>(UserRepository);
+    const queryBuilder = userRepository.createQueryBuilder('user');
 
-    applyRequestFilter(query,filter,['id','name']);
+    applyRequestFilterOnQuery(queryBuilder, filter, ['id', 'name']);
 
-    let result = await query;
+    let result = await queryBuilder.getMany();
 
     let userResponseSchema = new UserResponseSchema();
 
@@ -31,11 +29,12 @@ const getUser = async (req: any, res: any) => {
     let { id } = req.params;
 
     try {
-        let query = UserModel()._findOne({
-            id
-        });
+        const userRepository = getCustomRepository<UserRepository>(UserRepository);
+        let result = await userRepository.findOne(id);
 
-        let result = await query;
+        if(typeof result === 'undefined') {
+            return res._failNotFound();
+        }
 
         let userResponseSchema = new UserResponseSchema();
 
@@ -48,12 +47,15 @@ const getUser = async (req: any, res: any) => {
 };
 
 const getMe = async (req: any, res: any) => {
-    let permissions = await UserPermissionModel().getPermissions(req.user.id);
+    let userResponseSchema = new UserResponseSchema();
+
+    const user = userResponseSchema.applySchemaOnEntity(req.user);
+    const permissions = req.permissions;
 
     return res._respond({
         data: {
-            user: req.user,
-            permissions: permissions
+            ...user,
+            permissions
         }
     });
 };
@@ -70,20 +72,21 @@ const addUser = async (req: any, res: any) => {
 
     const data = matchedData(req, {includeOptionals: false});
 
-    let ob: AuthUserEntity = {
+    const userRepository = getCustomRepository<UserRepository>(UserRepository);
+    const user = await userRepository.create({
         name: data.name,
         email: data.email,
-        password: data.password
-    };
+        password: await hashPassword(data.password)
+    })
 
     try {
-        let result = await UserModel().createUser(ob);
+        const result = await userRepository.save(user);
 
         LoggerService.info('user "' + data.name + '" created...');
 
         return res._respondCreated({
             data: {
-                id: result[0]
+                id: result.id
             }
         });
     } catch (e) {
@@ -117,39 +120,47 @@ const editUser = async (req: any, res: any) => {
     }
 
     const data = matchedData(req, {includeOptionals: false});
-    if(data) {
-        let updateData: any = {};
-
-        for(let key in data) {
-            if(!data.hasOwnProperty(key)) {
-                return;
-            }
-
-            switch (key) {
-                case 'password':
-                    updateData[key] = await hashPassword(data[key]);
-                    break;
-                case 'name':
-                case 'email':
-                    updateData[key] = data[key];
-                    break;
-            }
-        }
-
-        if(updateData) {
-            try {
-                await UserModel()._update(updateData, id);
-            } catch(e) {
-
-            }
-
-            return res._respondAccepted();
-        }
-
-        return res._failValidationError({message: 'Die Einstellungen konnten nicht aktualisiert werden.'});
+    if(!data) {
+        return res._respondAccepted();
     }
 
-    return res._respond();
+    let updateData: { [key: string] : any } = {};
+
+    for(let key in data) {
+        if(!data.hasOwnProperty(key)) {
+            return;
+        }
+
+        switch (key) {
+            case 'password':
+                updateData[key] = await hashPassword(data[key]);
+                break;
+            case 'name':
+            case 'email':
+                updateData[key] = data[key];
+                break;
+        }
+    }
+
+    if(updateData) {
+        const userRepository = getCustomRepository<UserRepository>(UserRepository);
+        const user = await userRepository.findOne(id);
+        if(typeof user !== 'undefined') {
+            userRepository.merge(user, updateData);
+
+            try {
+                const result = await userRepository.save(user);
+
+                return res._respondAccepted({
+                    data: result
+                });
+            } catch (e) {
+                return res._failValidationError({message: 'Die Einstellungen konnten nicht aktualisiert werden.'});
+            }
+        }
+
+        return res._failValidationError({message: 'Der Benutzer konnte nicht gefunden werden.'});
+    }
 }
 
 //---------------------------------------------------------------------------------
@@ -168,7 +179,8 @@ const dropUser = async (req: any, res: any) => {
     }
 
     try {
-        await UserModel()._drop(id);
+        const userRepository = getCustomRepository<UserRepository>(UserRepository);
+        await userRepository.delete(id);
 
         return res._respondDeleted();
     } catch(e) {

@@ -35,6 +35,13 @@ router.registerRoutes(expressApp);
 //--------------------------------------------------------------------
 // Start Server
 //--------------------------------------------------------------------
-httpServer.listen(process.env.PORT,() => {
-    console.log('Listening on port: '+ process.env.PORT);
+
+import 'reflect-metadata';
+
+import {Connection, createConnection} from "typeorm";
+
+createConnection().then((connection: Connection) => {
+    httpServer.listen(process.env.PORT, () => {
+        console.log('Listening on port: ' + process.env.PORT);
+    });
 });

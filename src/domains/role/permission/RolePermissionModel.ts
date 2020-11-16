@@ -6,41 +6,45 @@ import {UserAbilityPermissionInterface} from "../../../services/auth/helpers/use
 
 //--------------------------------------------------------------------
 
-const UserPermissionModel = (knex?: Knex) => {
-    const model = builder('auth_user_permissions', knex);
+const RolePermissionModel = (knex?: Knex) => {
+    const model = builder('auth_role_permissions', knex, {
+        created_at: true,
+        updated_at: true
+    });
 
     //--------------------------------------------------------------------
 
     /**
      * Receive user permissions.
      *
-     * @param userId
-     * @param whereQueryCallback
+     * @param roleId
      *
      * @return Promise<UserAbilityPermissionInterface[]>
      */
-    const getPermissions = async (userId: number, whereQueryCallback?: any) : Promise<UserAbilityPermissionInterface[]> => {
-        let permissionTable = PermissionModel()._getTable();
-        let userPermissionTable = UserPermissionModel()._getTable();
+    const getPermissions = async (roleId: number | number[]) : Promise<UserAbilityPermissionInterface[]> => {
+        let permissionTable = PermissionModel(knex).getTable();
+        let userPermissionTable = RolePermissionModel(knex).getTable();
 
         try {
-            let query = model._findAll();
+            let query = model.findAll();
 
-            let where: any = {};
-            where[userPermissionTable+'.user_id'] = userId;
-
-            if(typeof whereQueryCallback === 'function') {
-                where = {...where, ...whereQueryCallback(query)}
+            if(typeof roleId === 'number') {
+                query.where({
+                    role_id: roleId
+                });
+            } else {
+                if(roleId.length > 0) {
+                    query.whereIn('role_id', roleId);
+                }
             }
 
-             query = query
+             query
                  .select(permissionTable+'.*')
                  .select(userPermissionTable+'.condition')
                  .select(userPermissionTable+'.scope')
                  .select(userPermissionTable+'.power')
                  .select(userPermissionTable+'.power_inverse')
-                .where(where)
-                .leftJoin(permissionTable,permissionTable+'.id',userPermissionTable+'.permission_id');
+                 .leftJoin(permissionTable,permissionTable+'.id',userPermissionTable+'.permission_id');
 
             let result = await query;
 
@@ -61,17 +65,17 @@ const UserPermissionModel = (knex?: Knex) => {
     }
 };
 
-export default UserPermissionModel;
+export default RolePermissionModel;
 
 export {
-    UserPermissionModel,
+    RolePermissionModel,
     findUserPermissionCallback
 }
 
 //---------------------------------------------------
 const findUserPermissionCallback = (query: any, id: string | number) => {
-    let userPermissionTable = UserPermissionModel()._getTable();
-    let permissionTable = PermissionModel()._getTable();
+    let userPermissionTable = RolePermissionModel().getTable();
+    let permissionTable = PermissionModel().getTable();
 
     let keyOb: any = {};
 

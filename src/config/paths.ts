@@ -1,4 +1,6 @@
-const writablePath = __dirname + '/../../writable/';
+import path from 'path';
+
+const writablePath = path.resolve(__dirname + '../../../writable');
 
 export {
     writablePath

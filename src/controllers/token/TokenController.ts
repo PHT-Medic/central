@@ -1,28 +1,51 @@
 //---------------------------------------------------------------------------------
 
-import UserModel from "../../domains/user/UserModel";
-import AuthUserEntity from "../../domains/user/AuthUserEntity";
 import TokenResponseSchema from "../../domains/token/TokenResponseSchema";
 
-import TokenProvider from "../../services/auth/providers/LAP/tokenProvider";
+import {createToken} from "../../services/auth/helpers/tokenHelper";
+import { KeyCloakProvider } from "../../services/auth/providers/keycloak";
+import {getCustomRepository} from "typeorm";
+import {UserRepository} from "../../domains/user/repository";
 
 //---------------------------------------------------------------------------------
 
 const grantToken = async (req: any, res: any) => {
-    const {name, password} = req.body;
+    const {name, password, provider} = req.body;
 
-    let user: AuthUserEntity;
+    let payload : {[key: string] : any};
 
     try {
-        user = await UserModel().verifyCredentials({name, password});
+        switch (provider) {
+            case 'keycloak':
+                const keycloakProvider = new KeyCloakProvider();
+                const userProviderMapping = await keycloakProvider.loginWithPasswordGrant(name, password);
+
+                payload = {
+                    id: userProviderMapping.user_id
+                }
+                break;
+            case 'default':
+            default:
+                const userRepository = getCustomRepository<UserRepository>(UserRepository);
+                const localUser = await userRepository.findByCredentials(name, password);
+
+                payload = {
+                    id: localUser.id
+                }
+                break;
+        }
     } catch (e) {
         return res._failValidationError({message: e.message});
     }
 
-    const tokenProvider = new TokenProvider();
-    const {token, expiresIn} = await tokenProvider.createToken(user);
+    const {
+        token,
+        expiresIn
+    } = await createToken(payload);
 
-    res.cookie('token',token,{maxAge: expiresIn});
+    res.cookie('token',token, {
+        maxAge: expiresIn
+    });
 
     let ob = {
         token,
