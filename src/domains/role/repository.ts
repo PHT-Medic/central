@@ -15,7 +15,7 @@ export class RoleRepository extends Repository<Role> {
             queryBuilder.where("pivotTable.role_id = :id", {id: roleId});
         } else {
             if(roleId.length > 0) {
-                queryBuilder.where("pivotTable.role_id IN (:ids)", {ids: roleId});
+                queryBuilder.where("pivotTable.role_id IN (:...ids)", {ids: roleId});
             }
         }
 

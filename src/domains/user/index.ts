@@ -7,9 +7,12 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {Role} from "../role";
 import {Realm} from "../realm";
-import {UserAuthenticator} from "./authenticator";
+import {UserAccount} from "./account";
+import {UserRole} from "./role";
+import {Proposal} from "../pht/proposal";
+import {TrainFile} from "../pht/train/file";
+import {Train} from "../pht/train";
 
 @Entity()
 export class User {
@@ -32,14 +35,25 @@ export class User {
     @UpdateDateColumn()
     updated_at: string
 
-    @ManyToMany(() => Role, role => role.users)
-    @JoinTable()
-    roles: Role[];
+    @Column()
+    realm_id: string;
 
-    @ManyToOne(() => Realm, realm => realm.users, {nullable: true})
+    @ManyToOne(() => Realm, realm => realm.users, { onDelete: 'CASCADE' })
     @JoinColumn({name: 'realm_id'})
     realm: Realm;
 
-    @OneToMany(() => UserAuthenticator, userAuthenticator => userAuthenticator.authenticator)
-    userAuthenticators: UserAuthenticator[];
+    @OneToMany(() => UserRole, userRole => userRole.user)
+    userRoles: UserRole[];
+
+    @OneToMany(() => UserAccount, userAccount => userAccount.provider)
+    userAccounts: UserAccount[];
+
+    @OneToMany(() => Proposal, proposal => proposal.user)
+    proposals: Proposal[];
+
+    @OneToMany(() => Train, train => train.user)
+    trains: Train[];
+
+    @OneToMany(() => TrainFile, trainFile => trainFile.user)
+    trainFiles: TrainFile[];
 }

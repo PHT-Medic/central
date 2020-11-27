@@ -9,7 +9,7 @@ class RoleResponseSchema extends ResponseSchema {
         this.fields = {
             id: [],
             name: [],
-            keycloak_role_id: [],
+            provider_role_id: [],
             created_at: [],
             updated_at: []
         };

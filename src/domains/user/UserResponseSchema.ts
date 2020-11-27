@@ -1,4 +1,5 @@
 import ResponseSchema, {
+    ResponseSchemaFieldNullable,
     ResponseSchemaFieldRequired, ResponseSchemaFieldToNull
 } from "../../services/http/response/schema";
 
@@ -10,6 +11,8 @@ class UserResponseSchema extends ResponseSchema {
             id: [],
             name: [],
             email : [],
+            realm: [ResponseSchemaFieldToNull],
+            realm_id: [ResponseSchemaFieldToNull],
             created_at : [],
             updated_at : []
         };

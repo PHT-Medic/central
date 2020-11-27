@@ -1,9 +1,10 @@
-import RolePermissionModel from "../../../domains/role/permission/RolePermissionModel";
-import {applyRequestFilter, onlyOneRow} from "../../../db/helpers/queryHelper";
 import {check, matchedData, validationResult} from "express-validator";
 import RolePermissionResponseSchema from "../../../domains/role/permission/RolePermissionResponseSchema";
-import PermissionModel from "../../../domains/permission/PermissionModel";
 import PermissionResponseSchema from "../../../domains/permission/PermissionResponseSchema";
+import {getRepository} from "typeorm";
+import {RolePermission} from "../../../domains/role/permission";
+import {Permission} from "../../../domains/permission";
+import {applyRequestFilterOnQuery} from "../../../db/utils";
 
 //---------------------------------------------------------------------------------
 
@@ -19,27 +20,23 @@ const getRolePermissions = async (req: any, res: any, type: string, asAbility: b
     let { roleId } = req.params;
     let { filter } = req.query;
 
-    let permissionTable = PermissionModel().getTable();
-    let rolePermissionTable = RolePermissionModel().getTable();
-    let whereObject: any = {};
-
     switch (type) {
         case 'self':
             try {
-                let query = RolePermissionModel().findAll();
-                query.select(rolePermissionTable+'.*');
-                query.join(permissionTable,permissionTable+'.id', rolePermissionTable+'.permission_id');
+                const rolePermissionRepository = getRepository(RolePermission);
+                let query = await rolePermissionRepository.createQueryBuilder('rolePermission')
+                    .leftJoinAndSelect('rolePermission.permission', 'permission')
+                    .where({
+                        role_id: roleId
+                    });
 
-                whereObject[rolePermissionTable+'.role_id'] = roleId;
-                query.where(whereObject);
-
-                applyRequestFilter(query, filter, {
-                    role_id: rolePermissionTable+'.role_id',
-                    permission_id: permissionTable+'.id',
-                    name: permissionTable+'.name'
+                applyRequestFilterOnQuery(query, filter, {
+                    role_id: 'permission.role_id',
+                    permission_id: 'permission.id',
+                    name: 'permission.name'
                 });
 
-                let items = await query;
+                let items = await query.getMany();
 
                 let responseSchema = new RolePermissionResponseSchema();
                 items = responseSchema.applySchemaOnEntities(items);
@@ -50,20 +47,19 @@ const getRolePermissions = async (req: any, res: any, type: string, asAbility: b
             }
         case 'related':
             try {
-                let query = PermissionModel().findAll();
+                const permissionRepository = getRepository(Permission);
 
-                query.select(permissionTable+'.*');
-                query.leftJoin(rolePermissionTable,rolePermissionTable+'.permission_id',permissionTable+'.id');
+                let query = permissionRepository.createQueryBuilder('permission')
+                    .leftJoinAndSelect('permission.rolePermissions', 'rolePermissions')
+                    .where("rolePermissions.role_id = :roleId", {roleId});
 
-                applyRequestFilter(query, filter, {
-                    id: permissionTable+'.id',
-                    name: permissionTable+'.name',
-                    permission_id: permissionTable+'.id',
-                });
+                applyRequestFilterOnQuery(query, filter, {
+                    id: 'permission.id',
+                    name: 'permission.name',
+                    permission_id: 'permission.id',
+                })
 
-                whereObject[rolePermissionTable+'.role_id'] = roleId;
-
-                let items = await query;
+                let items = await query.getMany();
 
                 let responseSchema = new PermissionResponseSchema();
                 items = responseSchema.applySchemaOnEntities(items);
@@ -88,45 +84,37 @@ const getRolePermissions = async (req: any, res: any, type: string, asAbility: b
 const getRolePermission = async (req: any, res: any, type: string, asAbility: boolean) => {
     let {roleId, permissionId} = req.params;
 
-    let permissionTable = PermissionModel().getTable();
-    let userPermissionTable = RolePermissionModel().getTable();
-
     switch (type) {
         case 'self':
             try {
-                let query = RolePermissionModel().findOne({
-                    id: permissionId,
-                    role_id: roleId
-                });
-
-                let item = await query;
+                const rolePermissionRepository = getRepository(RolePermission);
+                let rolePermission = await rolePermissionRepository.findOne({
+                    role_id: roleId,
+                    permission_id: permissionId
+                })
 
                 let responseSchema = new RolePermissionResponseSchema();
-                item = responseSchema.applySchemaOnEntity(item);
+                rolePermission = responseSchema.applySchemaOnEntity(rolePermission);
 
-                return res._respond({data: item});
+                return res._respond({data: rolePermission});
             } catch (e) {
                 return res._failNotFound();
             }
         case 'related':
             try {
-                let query = PermissionModel().findOne();
+                const permissionRepository = getRepository(Permission);
 
-                query.select(permissionTable+'.*');
-                query.leftJoin(userPermissionTable,userPermissionTable+'.permission_id',permissionTable+'.id');
-
-                let whereObject: any = {};
-                whereObject[userPermissionTable+'.role_id'] = roleId;
-                whereObject[userPermissionTable+'.permission_id'] = permissionId;
-
-                let permission = await onlyOneRow(query);
+                let permission = permissionRepository.createQueryBuilder('permission')
+                    .leftJoinAndSelect('permission.rolePermissions', 'rolePermissions')
+                    .where("rolePermissions.role_id = :roleId", {roleId})
+                    .where("rolePermissions.permission_id = :permissionId", {permissionId})
+                    .getOne();
 
                 let responseSchema = new PermissionResponseSchema();
                 permission = responseSchema.applySchemaOnEntity(permission);
 
                 return res._respond({data: permission});
             } catch (e) {
-                console.log(e);
                 return res._failNotFound();
             }
     }
@@ -143,11 +131,17 @@ const getRolePermission = async (req: any, res: any, type: string, asAbility: bo
 const addRolePermission = async (req: any, res: any) => {
     let { roleId } = req.params;
 
+    roleId = parseInt(roleId);
+
+    if(typeof roleId !== "number") {
+        return res._failBadRequest({message: 'Die Rollen ID ist nicht gültig.'});
+    }
+
     await check('permission_id')
         .exists()
         .isInt().run(req);
 
-    if(!req.ability.can('add','role_permission')) {
+    if(!req.ability.can('add','rolePermission')) {
         return res._failForbidden();
     }
 
@@ -158,18 +152,17 @@ const addRolePermission = async (req: any, res: any) => {
 
     const data = matchedData(req, {includeOptionals: false});
 
-    let ob: object = {
+    const repository = getRepository(RolePermission);
+    let rolePermission = repository.create({
         permission_id: data.permission_id,
         role_id: roleId
-    };
+    });
 
     try {
-        let result = await RolePermissionModel().create(ob);
+        rolePermission = await repository.save(rolePermission);
 
         return res._respondCreated({
-            data: {
-                id: result[0]
-            }
+            data: rolePermission
         });
     } catch (e) {
         return res._failValidationError();
@@ -187,14 +180,13 @@ const addRolePermission = async (req: any, res: any) => {
 const dropRolePermission = async (req: any, res: any) => {
     let { permissionId } = req.params;
 
-    if(!req.ability.can('drop','role_permission')) {
+    if(!req.ability.can('drop','rolePermission')) {
         return res._failForbidden();
     }
 
     try {
-        await RolePermissionModel().dropWhere({
-            id: permissionId
-        });
+        const repository = getRepository(RolePermission);
+        await repository.delete(permissionId);
 
         return res._respondDeleted();
     } catch (e) {

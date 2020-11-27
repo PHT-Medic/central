@@ -1,20 +1,20 @@
 import {check, matchedData, validationResult} from "express-validator";
-import {applyRequestFilter} from "../../db/helpers/queryHelper";
-import LoggerService from "../../services/loggerService";
 import RoleResponseSchema from "../../domains/role/RoleResponseSchema";
-import RoleModel from "../../domains/role/RoleModel";
-import RoleEntity from "../../domains/role/RoleEntity";
+import {getRepository} from "typeorm";
+import {Role} from "../../domains/role";
+import {applyRequestFilterOnQuery} from "../../db/utils";
 
 //---------------------------------------------------------------------------------
 
 const getRoles = async (req: any, res: any) => {
     let { filter } = req.query;
 
-    let query = RoleModel().findAll();
+    const roleRepository = getRepository(Role);
+    const queryBuilder = roleRepository.createQueryBuilder('role');
 
-    applyRequestFilter(query,filter,['id','name']);
+    applyRequestFilterOnQuery(queryBuilder, filter, ['id', 'name']);
 
-    let result = await query;
+    let result = await queryBuilder.getMany();
 
     let userResponseSchema = new RoleResponseSchema();
 
@@ -27,11 +27,12 @@ const getRole = async (req: any, res: any) => {
     let { id } = req.params;
 
     try {
-        let query = RoleModel().findOne({
-            id
-        });
+        const roleRepository = getRepository(Role);
+        let result = await roleRepository.findOne(id);
 
-        let result = await query;
+        if(typeof result === 'undefined') {
+            return res._failNotFound();
+        }
 
         let responseSchema = new RoleResponseSchema();
 
@@ -48,8 +49,10 @@ const addRole = async (req: any, res: any) => {
         return res._failForbidden();
     }
 
-    await check('name').exists().notEmpty().isLength({min: 5, max: 30}).optional().run(req);
-    await check('keycloak_role_id').exists().notEmpty().isLength({min: 5, max: 100}).optional().run(req);
+    await check('name').exists().notEmpty().isLength({min: 3, max: 30}).run(req);
+    await check('provider_role_id').exists().notEmpty().isLength({min: 3, max: 100}).optional({
+        nullable: true
+    }).run(req);
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
@@ -58,19 +61,15 @@ const addRole = async (req: any, res: any) => {
 
     const data = matchedData(req, {includeOptionals: false});
 
-    let ob: RoleEntity = {
-        name: data.name,
-        keycloak_role_id: data.keycloak_role_id
-    };
+    const roleRepository = getRepository(Role);
+    let role = roleRepository.create(data);
 
     try {
-        let result = await RoleModel().create(ob);
-
-        LoggerService.info('role "' + data.name + '" created...');
+        await roleRepository.save(role);
 
         return res._respondCreated({
             data: {
-                id: result[0]
+                id: role.id
             }
         });
     } catch (e) {
@@ -85,45 +84,41 @@ const editRole = async (req: any, res: any) => {
         return res._failForbidden();
     }
 
-    await check('name').exists().notEmpty().isLength({min: 5, max: 30}).optional().run(req);
-    await check('keycloak_role_id').exists().notEmpty().isLength({min: 5, max: 100}).optional().run(req);
+    await check('name').exists().notEmpty().isLength({min: 3, max: 30}).optional().run(req);
+    await check('provider_role_id').exists().notEmpty().isLength({min: 3, max: 100}).optional({
+        nullable: true
+    }).run(req);
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
         return res._failExpressValidationError(validation);
     }
 
-    const data = matchedData(req, {includeOptionals: false});
-    if(data) {
-        let updateData: any = {};
-
-        for(let key in data) {
-            if(!data.hasOwnProperty(key)) {
-                return;
-            }
-
-            switch (key) {
-                case 'name':
-                case 'keycloak_role_id':
-                    updateData[key] = data[key];
-                    break;
-            }
-        }
-
-        if(updateData) {
-            try {
-                await RoleModel().update(updateData, id);
-            } catch(e) {
-
-            }
-
-            return res._respondAccepted();
-        }
-
-        return res._failValidationError({message: 'Die Einstellungen konnten nicht aktualisiert werden.'});
+    const data = matchedData(req, {includeOptionals: true});
+    if(!data) {
+        return res._respondAccepted();
     }
 
-    return res._respond();
+    console.log(data);
+
+    const roleRepository = getRepository(Role);
+    let role = await roleRepository.findOne(id);
+
+    if(typeof role === 'undefined') {
+        return res._failValidationError({message: 'Die Rolle konnte nicht gefunden werden.'});
+    }
+
+    role = roleRepository.merge(role, data);
+
+    try {
+        const result = await roleRepository.save(role);
+
+        return res._respondAccepted({
+            data: result
+        });
+    } catch (e) {
+        return res._failValidationError({message: 'Die Einstellungen konnten nicht aktualisiert werden.'});
+    }
 }
 
 //---------------------------------------------------------------------------------
@@ -136,7 +131,8 @@ const dropRole = async (req: any, res: any) => {
     }
 
     try {
-        await RoleModel().drop(id);
+        const roleRepository = getRepository(Role);
+        await roleRepository.delete(id);
 
         return res._respondDeleted();
     } catch(e) {

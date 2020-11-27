@@ -2,50 +2,70 @@ import { Router } from 'express';
 let router = Router();
 
 //---------------------------------------------------------------------------------
-import { forceLoggedIn } from '../../services/router/middleware/authMiddleware';
-
-import UserController from "../../controllers/user/UserController";
+import { forceLoggedIn } from '../../services/http/request/middleware/authMiddleware';
 
 import {check} from "express-validator";
+import {
+    addUserRouteHandler,
+    dropUserRouteHandler,
+    editUserRouteHandler,
+    getUserRouteHandler, getUsersRouteHandler
+} from "../../controllers/user/UserController";
+import {
+    addUserRoleRouteHandler, dropUserRoleRouteHandler,
+    getUserRoleRouteHandler,
+    getUserRolesRouteHandler
+} from "../../controllers/user/role/UserRoleController";
+import {
+    addUserPublicKeyRouteHandler, dropUserPublicKeyRouteHandler, editUserPublicKeyRouteHandler,
+    getUserPublicKeyRouteHandler
+} from "../../controllers/user/public-key/UserPublicKeyController";
 
 //--------------------------------------------------------------------------------
+
+/**
+ * User Roles Routes
+ */
+
+router.post('/:id/relationships/roles', [
+    forceLoggedIn
+],addUserRoleRouteHandler);
+
+
+// Relationship Self
+router.delete('/:id/relationships/roles/:relationId', [forceLoggedIn], (req: any, res: any) => {
+    return dropUserRoleRouteHandler(req, res, 'self');
+});
+router.get('/:id/relationships/roles/:relationId', [forceLoggedIn], (req: any, res: any) => {
+    return getUserRoleRouteHandler(req,res,'self');
+});
+router.get('/:id/relationships/roles', [forceLoggedIn], (req: any, res: any) => {
+    return getUserRolesRouteHandler(req,res,'self');
+});
+
+// Relationship Related
+router.delete('/:id/roles/:relationId', [forceLoggedIn], (req: any, res: any) => {
+    return dropUserRoleRouteHandler(req, res, 'related');
+});
+router.get('/:id/roles/:relationId', [forceLoggedIn], (req: any, res: any) => {
+    return getUserRoleRouteHandler(req,res,'related');
+});
+router.get('/:id/roles', [forceLoggedIn], (req: any, res: any) => {
+    return getUserRolesRouteHandler(req,res,'related');
+});
 
 /**
  * User Routes
  */
 // Details Routes
-router.get('/:id', [forceLoggedIn], UserController.getUser);
-router.post('/:id', [forceLoggedIn], UserController.editUser);
-router.delete('/:id', [forceLoggedIn], UserController.dropUser);
-
-// Collection Routes
-router.post('/', [
-    forceLoggedIn,
-    check('name')
-        .exists()
-        .isString()
-        .isLength({
-            min: 5,
-            max: 30
-        }),
-
-    check('email')
-        .exists()
-        .isEmail()
-        .normalizeEmail(),
-
-    check('password')
-        .exists()
-        .isString()
-        .isLength({
-            min: 5,
-            max: 255
-        })
-], UserController.addUser);
+router.get('/:id', [forceLoggedIn], getUserRouteHandler);
+router.post('/:id', [forceLoggedIn], editUserRouteHandler);
+router.delete('/:id', [forceLoggedIn], dropUserRouteHandler);
+router.post('/', [forceLoggedIn], addUserRouteHandler);
 
 router.get('/', [
     forceLoggedIn
-], UserController.getUsers);
+], getUsersRouteHandler);
 
 //---------------------------------------------------------------------------------
 

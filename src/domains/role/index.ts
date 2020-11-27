@@ -7,8 +7,8 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {User} from "../user";
 import {RolePermission} from "./permission";
+import {UserRole} from "../user/role";
 
 @Entity()
 export class Role {
@@ -20,7 +20,7 @@ export class Role {
     name: string;
 
     @Column({type: "varchar", length: 100, nullable: true, default: null})
-    keycloak_role_id: string;
+    provider_role_id: string;
 
     @CreateDateColumn()
     created_at: string;
@@ -28,10 +28,9 @@ export class Role {
     @UpdateDateColumn()
     updated_at: string
 
-    @ManyToMany(() => User, user => user.roles)
-    @JoinTable()
-    users: User[];
+    @OneToMany(() => UserRole, userRole => userRole.role)
+    userRoles: UserRole[]
 
     @OneToMany(() => RolePermission, rolePermission => rolePermission.role)
-    pivotPermissions: RolePermission[]
+    rolePermissions: RolePermission[]
 }

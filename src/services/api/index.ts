@@ -5,7 +5,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
  * @see https://medium.com/@enetoOlveda/how-to-use-axios-typescript-like-a-pro-7c882f71e34a
  */
 class ApiService {
-    private api: AxiosInstance;
+    protected api: AxiosInstance;
 
     /**
      * API Service

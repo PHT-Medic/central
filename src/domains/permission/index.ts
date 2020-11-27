@@ -17,5 +17,5 @@ export class Permission {
     updated_at: string;
 
     @OneToMany(() => RolePermission, rolePermission => rolePermission.permission)
-    pivotRoles: RolePermission[]
+    rolePermissions: RolePermission[]
 }

@@ -2,12 +2,24 @@ import { Router } from 'express';
 let router = Router();
 
 //---------------------------------------------------------------------------------
-import { forceLoggedIn } from '../../services/router/middleware/authMiddleware';
+import { forceLoggedIn } from '../../services/http/request/middleware/authMiddleware';
 
 import RoleController from "../../controllers/role/RoleController";
 import RolePermissionController from "../../controllers/role/permission/RolePermissionController";
+import {getRoleUsersRouteHandler} from "../../controllers/role/user/RoleUserController";
 
 //---------------------------------------------------------------------------------
+
+/**
+ * Role Ability Routes
+ */
+
+router.get('/:roleId/abilities/:permissionId', [forceLoggedIn], (req: any, res: any) => {
+    return RolePermissionController.getRolePermission(req,res,'self', true);
+});
+router.get('/:roleId/abilities', forceLoggedIn, (req: any, res: any) => {
+    return RolePermissionController.getRolePermissions(req,res,'self', true);
+});
 
 /**
  * User Permission Routes
@@ -21,7 +33,7 @@ router.post('/:roleId/relationships/permissions', [
 router.get('/:roleId/relationships/permissions/:permissionId', [forceLoggedIn], (req: any, res: any) => {
     return RolePermissionController.getRolePermission(req,res,'self', false);
 });
-router.get('/:roleId/relationships/permissions', forceLoggedIn, (req: any, res: any) => {
+router.get('/:roleId/relationships/permissions', [forceLoggedIn], (req: any, res: any) => {
     return RolePermissionController.getRolePermissions(req,res,'self', false);
 });
 
@@ -29,19 +41,20 @@ router.get('/:roleId/relationships/permissions', forceLoggedIn, (req: any, res: 
 router.get('/:roleId/permissions/:permissionId', [forceLoggedIn], (req: any, res: any) => {
     return RolePermissionController.getRolePermission(req,res,'related', false);
 });
-router.get('/:roleId/permissions', forceLoggedIn, (req: any, res: any) => {
+router.get('/:roleId/permissions', [forceLoggedIn], (req: any, res: any) => {
     return RolePermissionController.getRolePermissions(req,res,'related', false);
 });
 
 /**
- * User Ability Routes
+ * Role Users Routes
  */
-
-router.get('/:userId/abilities/:permissionId', [forceLoggedIn], (req: any, res: any) => {
-    return RolePermissionController.getRolePermission(req,res,'self', true);
+router.get('/:roleId/relationships/users', [forceLoggedIn], (req: any, res: any) => {
+    return getRoleUsersRouteHandler(req,res,'self');
 });
-router.get('/:userId/abilities', forceLoggedIn, (req: any, res: any) => {
-    return RolePermissionController.getRolePermissions(req,res,'self', true);
+
+// Relationship Related
+router.get('/:roleId/users', [forceLoggedIn], (req: any, res: any) => {
+    return getRoleUsersRouteHandler(req,res,'related');
 });
 
 /**

@@ -1,14 +1,6 @@
 import {AuthAbility, transformScopeToAbility} from "./permissionHelper";
 import {Ability, AbilityBuilder} from "@casl/ability";
-import PermissionEntity from "../../../domains/permission/PermissionEntity";
 import {PermissionInterface} from "../index";
-
-interface UserAbilityPermissionInterface extends PermissionEntity {
-    condition: any;
-    scope: any,
-    power: number | null,
-    power_inverse: number | null
-}
 
 class UserAbility {
     private readonly ability: any;
@@ -125,6 +117,3 @@ class UserAbility {
 }
 
 export default UserAbility;
-export {
-    UserAbilityPermissionInterface
-}

@@ -18,10 +18,10 @@ export class RolePermission {
     id!: number;
 
     @Column()
-    permission_id!: number;
+    permission_id: number;
 
-    @Column()
-    role_id!: number;
+    @Column({type: "number"})
+    role_id: number;
 
     @Column({type: 'int', default: 999})
     power: number;
@@ -38,11 +38,11 @@ export class RolePermission {
     @UpdateDateColumn()
     updated_at: string;
 
-    @ManyToOne(() => Role, role => role.pivotPermissions)
+    @ManyToOne(() => Role, role => role.rolePermissions, { onDelete: 'CASCADE' })
     @JoinColumn({name: 'role_id'})
     role: Role;
 
-    @ManyToOne(() => Permission, permission => permission.pivotRoles)
+    @ManyToOne(() => Permission, permission => permission.rolePermissions, { onDelete: 'CASCADE' })
     @JoinColumn({name: 'permission_id'})
     permission: Permission;
 }

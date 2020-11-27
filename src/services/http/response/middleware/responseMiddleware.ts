@@ -189,7 +189,7 @@ export default function responseMiddleware(request: any, response: any, next: an
 
     response._failForbidden = (message?: RespondErrorMessage) => {
         let defaultMessage = {
-            statusCode: 401,
+            statusCode: 403,
             message: 'Forbidden',
             code: 'forbidden'
         }
@@ -205,6 +205,19 @@ export default function responseMiddleware(request: any, response: any, next: an
             statusCode: 404,
             message: 'Not Found',
             code: 'not-found'
+        }
+
+        message = message || {};
+        message = Object.assign(defaultMessage, message);
+
+        return response._respondException(message);
+    };
+
+    response._failBadRequest = (message?: RespondErrorMessage) => {
+        let defaultMessage = {
+            statusCode: 400,
+            message: 'Bad Request',
+            code: 'bad-request'
         }
 
         message = message || {};

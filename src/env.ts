@@ -28,8 +28,11 @@ export interface Environment {
     jwtPublicKey: string | null,
     jwtSecret: string | null,
     jwtProcedure: string,
-    keyCloakApiUrl: string,
-    keyCloakClientId: string
+    localAuthenticator: string | null,
+    apiUrl: string,
+    webAppUrl: string,
+    trainBuilderSocketUrl: string,
+    vaultApiUrl: string
 }
 
 const env : Environment = {
@@ -39,8 +42,11 @@ const env : Environment = {
     jwtPublicKey: requireFromEnv('JWT_PUBLIC_KEY', null),
     jwtSecret: requireFromEnv('JWT_SECRET', randomBytes(10).toString('hex')),
     jwtProcedure: requireFromEnv('JWT_PROCEDURE', 'HMAC'),
-    keyCloakApiUrl: requireFromEnv('KEYCLOAK_API_URL'),
-    keyCloakClientId: requireFromEnv('KEYCLOAK_CLIENT_ID')
+    localAuthenticator: requireFromEnv('LOCAL_AUTHENTICATOR'),
+    apiUrl: requireFromEnv('API_URL'),
+    webAppUrl: requireFromEnv('WEB_APP_URL'),
+    trainBuilderSocketUrl: requireFromEnv('TRAIN_BUILDER_SOCKET_URL'),
+    vaultApiUrl: requireFromEnv('VAULT_API_URL')
 };
 
 export default env;

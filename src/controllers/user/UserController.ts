@@ -2,35 +2,55 @@ import {check, matchedData, validationResult} from "express-validator";
 import LoggerService from "../../services/loggerService";
 import UserResponseSchema from "../../domains/user/UserResponseSchema";
 import {hashPassword} from "../../services/auth/helpers/authHelper";
-import {getCustomRepository} from "typeorm";
+import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../domains/user/repository";
-import {applyRequestFilterOnQuery} from "../../db/utils";
+import {applyRequestFilterOnQuery, queryFindPermittedResourcesForRealm} from "../../db/utils";
+import {isPermittedToOperateOnRealmResource} from "../../services/auth/utils";
+import {Realm} from "../../domains/realm";
 
 //---------------------------------------------------------------------------------
 
-const getUsers = async (req: any, res: any) => {
+export async function getUsersRouteHandler(req: any, res: any) {
     let { filter } = req.query;
 
-    const userRepository = getCustomRepository<UserRepository>(UserRepository);
-    const queryBuilder = userRepository.createQueryBuilder('user');
+    try {
 
-    applyRequestFilterOnQuery(queryBuilder, filter, ['id', 'name']);
+        const userRepository = getCustomRepository<UserRepository>(UserRepository);
+        const queryBuilder = userRepository.createQueryBuilder('user')
+            .leftJoinAndSelect('user.realm', 'realm');
 
-    let result = await queryBuilder.getMany();
+        queryFindPermittedResourcesForRealm(queryBuilder, req.user.realm_id);
 
-    let userResponseSchema = new UserResponseSchema();
+        applyRequestFilterOnQuery(queryBuilder, filter, {
+            id: 'user.id',
+            name: 'user.name'
+        });
 
-    result = userResponseSchema.applySchemaOnEntities(result);
+        let result = await queryBuilder.getMany();
 
-    return res._respond({data: result});
-};
+        let userResponseSchema = new UserResponseSchema();
 
-const getUser = async (req: any, res: any) => {
+        result = userResponseSchema.applySchemaOnEntities(result);
+
+        return res._respond({data: result});
+    } catch (e) {
+        console.log(e);
+        return res._failServerError();
+    }
+}
+
+export async function getUserRouteHandler(req: any, res: any) {
     let { id } = req.params;
 
     try {
         const userRepository = getCustomRepository<UserRepository>(UserRepository);
-        let result = await userRepository.findOne(id);
+        const query = await userRepository.createQueryBuilder('user')
+            .leftJoinAndSelect('user.realm', 'realm')
+            .andWhere("user.id = :id", {id});
+
+        queryFindPermittedResourcesForRealm(query, req.user.realm_id);
+
+        let result = await query.getOne();
 
         if(typeof result === 'undefined') {
             return res._failNotFound();
@@ -44,9 +64,9 @@ const getUser = async (req: any, res: any) => {
     } catch (e) {
         return res._failNotFound();
     }
-};
+}
 
-const getMe = async (req: any, res: any) => {
+export async function getMeRouteHandler(req: any, res: any) {
     let userResponseSchema = new UserResponseSchema();
 
     const user = userResponseSchema.applySchemaOnEntity(req.user);
@@ -58,26 +78,37 @@ const getMe = async (req: any, res: any) => {
             permissions
         }
     });
-};
+}
 
-const addUser = async (req: any, res: any) => {
+export async function addUserRouteHandler(req: any, res: any) {
     if(!req.ability.can('add','user')) {
         return res._failForbidden();
     }
+
+    await check('email').exists().normalizeEmail().isEmail().optional({nullable: true}).run(req);
+    await check('name').exists().notEmpty().isLength({min: 5, max: 30}).run(req);
+    await check('password').exists().isLength({min: 5, max: 512}).optional({nullable: true}).run(req);
+    await check('realm_id').exists().notEmpty().custom((value: any) => {
+        return getRepository(Realm).findOne(value).then((realm: Realm | undefined) => {
+            if(typeof realm === 'undefined') {
+                throw new Error('Der Realm wurde nicht gefunden.')
+            }
+        })
+    }).run(req);
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
         return res._failExpressValidationError(validation);
     }
 
-    const data = matchedData(req, {includeOptionals: false});
+    const data = matchedData(req, {includeOptionals: true});
 
     const userRepository = getCustomRepository<UserRepository>(UserRepository);
-    const user = await userRepository.create({
-        name: data.name,
-        email: data.email,
-        password: await hashPassword(data.password)
-    })
+    const user = await userRepository.create(data);
+
+    if(typeof user.password !== 'undefined' && user.password !== null) {
+        user.password = await userRepository.hashPassword(user.password);
+    }
 
     try {
         const result = await userRepository.save(user);
@@ -94,25 +125,23 @@ const addUser = async (req: any, res: any) => {
     }
 }
 
-const editUser = async (req: any, res: any) => {
+export async function editUserRouteHandler(req: any, res: any) {
     let { id } = req.params;
 
     if(!req.ability.can('edit','user') && !req.user.id === id) {
         return res._failForbidden();
     }
 
-    await check('email').exists().normalizeEmail().isEmail().optional().run(req);
-    await check('publicKey').exists().notEmpty().optional().run(req);
-    await check('public_key').exists().notEmpty().optional().run(req);
+    await check('email').exists().normalizeEmail().isEmail().optional({nullable: true}).run(req);
     await check('name').exists().notEmpty().isLength({min: 5, max: 30}).optional().run(req);
     await check('password').exists().isLength({min: 5, max: 512})
         .custom((value, {req, location, path}) => {
-            if(value !== req.body.passwordRepeat) {
+            if(value !== req.body.password_repeat) {
                 throw new Error('Die Passwörter stimmen nicht überein.');
             } else {
                 return value;
             }
-        }).optional().run(req);
+        }).optional({nullable: true}).run(req);
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
@@ -124,48 +153,36 @@ const editUser = async (req: any, res: any) => {
         return res._respondAccepted();
     }
 
-    let updateData: { [key: string] : any } = {};
-
-    for(let key in data) {
-        if(!data.hasOwnProperty(key)) {
-            return;
-        }
-
-        switch (key) {
-            case 'password':
-                updateData[key] = await hashPassword(data[key]);
-                break;
-            case 'name':
-            case 'email':
-                updateData[key] = data[key];
-                break;
-        }
+    if(typeof data.password !== 'undefined') {
+        data.password = await hashPassword(data.password);
     }
 
-    if(updateData) {
-        const userRepository = getCustomRepository<UserRepository>(UserRepository);
-        const user = await userRepository.findOne(id);
-        if(typeof user !== 'undefined') {
-            userRepository.merge(user, updateData);
+    const userRepository = getCustomRepository<UserRepository>(UserRepository);
+    let user = await userRepository.findOne(id, {relations: ['realm']});
+    if(typeof user === 'undefined') {
+        return res._failNotFound();
+    }
 
-            try {
-                const result = await userRepository.save(user);
+    if(!isPermittedToOperateOnRealmResource(req.user, user)) {
+        return res._failForbidden();
+    }
 
-                return res._respondAccepted({
-                    data: result
-                });
-            } catch (e) {
-                return res._failValidationError({message: 'Die Einstellungen konnten nicht aktualisiert werden.'});
-            }
-        }
+    user = userRepository.merge(user, data);
 
-        return res._failValidationError({message: 'Der Benutzer konnte nicht gefunden werden.'});
+    try {
+        const result = await userRepository.save(user);
+
+        return res._respondAccepted({
+            data: result
+        });
+    } catch (e) {
+        return res._failValidationError({message: 'Die Benutzer Attribute konnten nicht aktualisiert werden.'});
     }
 }
 
 //---------------------------------------------------------------------------------
 
-const dropUser = async (req: any, res: any) => {
+export async function dropUserRouteHandler(req: any, res: any) {
     let {id} = req.params;
 
     if (!req.ability.can('drop', 'user')) {
@@ -180,6 +197,16 @@ const dropUser = async (req: any, res: any) => {
 
     try {
         const userRepository = getCustomRepository<UserRepository>(UserRepository);
+        const user = await userRepository.findOne(id);
+
+        if(typeof user === 'undefined') {
+            return res._failNotFound();
+        }
+
+        if(!isPermittedToOperateOnRealmResource(req.user, user)) {
+            return res._failForbidden();
+        }
+
         await userRepository.delete(id);
 
         return res._respondDeleted();
@@ -187,15 +214,4 @@ const dropUser = async (req: any, res: any) => {
         return res._failValidationError();
     }
 
-}
-
-//---------------------------------------------------------------------------------
-
-export default {
-    getUsers,
-    getUser,
-    getMe,
-    addUser,
-    editUser,
-    dropUser
 }

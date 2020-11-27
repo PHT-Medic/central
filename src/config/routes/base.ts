@@ -1,16 +1,12 @@
 import { Router } from 'express';
 let router = Router();
 
-import {forceLoggedIn} from "../../services/router/middleware/authMiddleware";
-import UserController from "../../controllers/user/UserController";
-import {KeyCloakProvider} from "../../services/auth/providers/keycloak";
-import UserRoleModel from "../../domains/user/role/UserRoleModel";
-import UserModel from "../../domains/user/UserModel";
-import UserProviderModel from "../../domains/user/provider/UserProviderModel";
-import RolePermissionModel from "../../domains/role/permission/RolePermissionModel";
-import RoleModel from "../../domains/role/RoleModel";
+import {forceLoggedIn} from "../../services/http/request/middleware/authMiddleware";
+import {getMeRouteHandler} from "../../controllers/user/UserController";
+import {getRepository} from "typeorm";
+import {UserAccount} from "../../domains/user/account";
 
-router.get('/me', [forceLoggedIn], UserController.getMe);
+router.get('/me', [forceLoggedIn], getMeRouteHandler);
 router.get('/',(req: any, res: any) => {
     return res._respond({
         data: {
@@ -20,7 +16,7 @@ router.get('/',(req: any, res: any) => {
 });
 
 router.get('/test', async (req,res) => {
-    res.json(await UserProviderModel().findAll());
+    res.json(await getRepository(UserAccount).find());
 });
 
 export default router;

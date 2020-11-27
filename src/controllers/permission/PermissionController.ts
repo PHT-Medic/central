@@ -1,16 +1,18 @@
-import PermissionModel from "../../domains/permission/PermissionModel";
-import {applyRequestFilter, onlyOneRow} from "../../db/helpers/queryHelper";
 import {matchedData, validationResult} from "express-validator";
 import PermissionResponseSchema from "../../domains/permission/PermissionResponseSchema";
+import {getRepository} from "typeorm";
+import {Permission} from "../../domains/permission";
+import {applyRequestFilterOnQuery} from "../../db/utils";
 
 const getPermissions = async (req: any, res: any) => {
     let { filter } = req.query;
 
-    let query = PermissionModel().findAll();
+    const repository = getRepository(Permission);
+    const queryBuilder = repository.createQueryBuilder('user');
 
-    applyRequestFilter(query,filter,['id','name']);
+    applyRequestFilterOnQuery(queryBuilder, filter, ['id', 'name']);
 
-    let result = await query;
+    let result = await queryBuilder.getMany();
 
     let permissionResponseSchema = new PermissionResponseSchema();
     result = permissionResponseSchema.applySchemaOnEntities(result);
@@ -23,16 +25,24 @@ const getPermission = async (req: any, res: any) => {
     let result;
 
     try {
-        let query = PermissionModel().find({id}).orWhere({name: id});
-        result = await onlyOneRow(query);
+        const repository = getRepository(Permission);
+        let result = await repository.createQueryBuilder('permission')
+            .where("id = :id", {id})
+            .orWhere("name Like :name", {name: id})
+            .getOne();
+
+        if(typeof result === 'undefined') {
+            return res._failNotFound();
+        }
+
+        let permissionResponseSchema = new PermissionResponseSchema();
+        result = permissionResponseSchema.applySchemaOnEntity(result);
+
+        return res._respond({data: result});
+
     } catch (e) {
         return res._failNotFound();
     }
-
-    let permissionResponseSchema = new PermissionResponseSchema();
-    result = permissionResponseSchema.applySchemaOnEntity(result);
-
-    return res._respond({data: result});
 }
 
 const addPermission = async (req: any, res: any) => {
@@ -47,16 +57,18 @@ const addPermission = async (req: any, res: any) => {
 
     const data = matchedData(req, {includeOptionals: false});
 
-    let dbData = {
+    const repository = getRepository(Permission);
+    let permission = repository.create({
         name: data.name
-    };
+    })
 
     try {
-        await PermissionModel().create(dbData);
+        await repository.save(permission);
 
-        return res._respondCreated();
+        return res._respondCreated({
+            data: permission
+        });
     } catch (e) {
-        console.log(e.message);
         return res._failValidationError();
     }
 };
@@ -69,7 +81,8 @@ const dropPermission = async (req: any, res: any) => {
     }
 
     try {
-        await PermissionModel().drop(id);
+        const repository = getRepository(Permission);
+        await repository.delete(id);
 
         return res._respondDeleted();
     } catch (e) {

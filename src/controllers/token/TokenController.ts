@@ -1,11 +1,13 @@
 //---------------------------------------------------------------------------------
 
 import TokenResponseSchema from "../../domains/token/TokenResponseSchema";
-
+import env from "../../env";
 import {createToken} from "../../services/auth/helpers/tokenHelper";
-import { KeyCloakProvider } from "../../services/auth/providers/keycloak";
-import {getCustomRepository} from "typeorm";
+import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../domains/user/repository";
+import {Provider} from "../../domains/provider";
+import {Oauth2PasswordProvider} from "../../services/auth/providers";
+import {Realm} from "../../domains/realm";
 
 //---------------------------------------------------------------------------------
 
@@ -15,24 +17,41 @@ const grantToken = async (req: any, res: any) => {
     let payload : {[key: string] : any};
 
     try {
-        switch (provider) {
-            case 'keycloak':
-                const keycloakProvider = new KeyCloakProvider();
-                const userProviderMapping = await keycloakProvider.loginWithPasswordGrant(name, password);
+        if(typeof provider === 'number') {
+            const providerRepository = getRepository(Provider);
+            const authenticator = await providerRepository.createQueryBuilder('provider')
+                .leftJoinAndSelect('provider.realm', 'realm')
+                .where("provider.id = :id", {id: provider})
+                .andWhere("provider.realm_id = :realmId", {realmId: 'master'})
+                .getOne();
+
+            if(typeof authenticator === 'undefined') {
+                return res._failValidationError({message: 'Die Konfigurationen für den alternativen lokalen Authenticator wurden nicht gefunden.'});
+            }
+
+            const oauth2Provider = new Oauth2PasswordProvider(authenticator);
+
+            try {
+                const loginToken = await oauth2Provider.getToken(name, password);
+                const userAccount = await oauth2Provider.loginWithToken(loginToken);
 
                 payload = {
-                    id: userProviderMapping.user_id
+                    id: userAccount.user_id
                 }
-                break;
-            case 'default':
-            default:
-                const userRepository = getCustomRepository<UserRepository>(UserRepository);
-                const localUser = await userRepository.findByCredentials(name, password);
+            } catch (e) {
+                return res._failValidationError({message: 'Die Zugangsdaten sind nicht gültig oder der lokale Authenticator ist nicht erreichbar.'});
+            }
+        } else {
+            const userRepository = getCustomRepository<UserRepository>(UserRepository);
+            const localUser = await userRepository.findByCredentials(name, password);
 
-                payload = {
-                    id: localUser.id
-                }
-                break;
+            if(typeof localUser === 'undefined') {
+                return res._failValidationError({message: 'Der Benutzer oder das Passwort ist falsch...'});
+            }
+
+            payload = {
+                id: localUser.id
+            }
         }
     } catch (e) {
         return res._failValidationError({message: e.message});

@@ -1,3 +1,5 @@
+import {AbilityRepresentation, parsePermissionNameToAbilityRepresentation} from "../utils";
+
 let camelize = (str: string) => {
     return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word: string, index: number) {
         return index === 0 ? word.toLowerCase() : word.toUpperCase();
@@ -28,15 +30,11 @@ const prettifyName = (name: string) => {
 const transformScopeToAbility = (name: string, jsonScope: string) : AuthAbility => {
     let parsedJson = JSON.parse(jsonScope);
 
-    let action: string, subject: string;
-
-    let parts = name.split('_');
-    action = parts.pop();
-    subject = parts.join('_');
+    const abilityRepresentation : AbilityRepresentation = parsePermissionNameToAbilityRepresentation(name);
 
     let ability: AuthAbility = {
-        action: action,
-        subject: subject,
+        action: abilityRepresentation.action,
+        subject: abilityRepresentation.subject,
         condition: {},
         fields: null
     };

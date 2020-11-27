@@ -1,0 +1,50 @@
+import {Router} from "express";
+import {forceLoggedIn} from "../../../services/http/request/middleware/authMiddleware";
+import {
+    addStationRouteHandler, dropStationRouteHandler, editStationRouteHandler,
+    getStationRouteHandler,
+    getStationsRouteHandler
+} from "../../../controllers/pht/station/StationController";
+import {
+    editStationProposalRouteHandler,
+    getStationProposalRouteHandler,
+    getStationProposalsRouteHandler
+} from "../../../controllers/pht/station/proposal/StationProposalController";
+
+export function setupPhtStationRoutes() {
+    const router = Router();
+
+    /**
+     * Station Proposal Routes
+     */
+    router.post('/:id/relationships/proposals/:relationId', [forceLoggedIn], (req: any, res: any) => {
+        return editStationProposalRouteHandler(req,res);
+    });
+
+    router.get('/:id/relationships/proposals/:relationId', [forceLoggedIn], (req: any, res: any) => {
+        return getStationProposalRouteHandler(req,res,'self');
+    });
+    router.get('/:id/relationships/proposals', [forceLoggedIn], (req: any, res: any) => {
+        return getStationProposalsRouteHandler(req,res,'self');
+    });
+
+    // Relationship Related
+    router.get('/:id/proposals/:relationId', [forceLoggedIn], (req: any, res: any) => {
+        return getStationProposalRouteHandler(req,res,'related');
+    });
+    router.get('/:id/proposals', [forceLoggedIn], (req: any, res: any) => {
+        return getStationProposalsRouteHandler(req,res,'related');
+    });
+
+    /**
+     * Station Routes
+     **/
+    // Station Routes
+    router.get('/:id', [forceLoggedIn], getStationRouteHandler);
+    router.post('/:id', [forceLoggedIn], editStationRouteHandler);
+    router.delete('/:id', [forceLoggedIn], dropStationRouteHandler);
+
+    router.post('/', [forceLoggedIn], addStationRouteHandler);
+    router.get('/', [forceLoggedIn], getStationsRouteHandler);
+    return router;
+}
