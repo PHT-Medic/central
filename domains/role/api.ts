@@ -1,4 +1,6 @@
 import {useApi} from "@/modules/api";
+import {changeRequestKeyCase} from "~/modules/api/utils";
+import {clearObjectProperties} from "~/modules/utils";
 
 export async function getRoles() {
     try {
@@ -32,7 +34,7 @@ export async function dropRole(roleId: number) {
 
 export async function addRole(data: {[key: string] : any}) {
     try {
-        let response = await useApi('auth').post('roles', data);
+        let response = await useApi('auth').post('roles', clearObjectProperties(changeRequestKeyCase(data)));
 
         return response.data;
     } catch (e) {
@@ -42,7 +44,7 @@ export async function addRole(data: {[key: string] : any}) {
 
 export async function editRole(id : number, data: {[key: string] : any}) {
     try {
-        let response = await useApi('auth').post('roles/'+id, data);
+        let response = await useApi('auth').post('roles/'+id, clearObjectProperties(changeRequestKeyCase(data)));
 
         return response.data;
     } catch (e) {

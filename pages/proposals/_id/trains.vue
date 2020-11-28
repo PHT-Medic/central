@@ -6,7 +6,10 @@
     export default {
         meta: {
             requireAbility: (can) => {
-                return can('add', 'train') || can('edit','train') || can('drop', 'train')
+                return can('add', 'train') || can('edit','train') || can('drop', 'train') ||
+                    can('read', 'trainResult') ||
+                    can('start', 'trainExecution') ||
+                    can('stop', 'trainExecution');
             }
         },
         components: {TrainBuilder},
@@ -26,12 +29,12 @@
         },
         data() {
             return {
-                trainReferenced: null,
-                trainBusy: false,
                 trainStates: TrainStates,
-                trains: {
+                train: {
+                    item: undefined,
+                    itemBusy: false,
                     items: [],
-                    busy: false
+                    itemsBusy: false
                 },
                 fields: [
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
@@ -46,144 +49,120 @@
             }
         },
         created() {
-            this._getTrains();
+            this.load();
         },
         methods: {
-            async _getTrains() {
-                if(this.trains.busy) return;
+            async load() {
+                if(this.train.itemsBusy) return;
 
-                this.trains.busy = true;
+                this.train.itemsBusy = true;
 
                 try {
-                    this.trains.items = await getTrains(this.proposal.id);
+                    this.train.items = await getTrains({
+                        filter: {
+                            proposalId: this.proposal.id
+                        }
+                    });
                 } catch (e) {
                     console.log(e);
                 }
 
-                this.trains.busy = false;
+                this.train.itemsBusy = false;
             },
 
-            async _dropTrain(id) {
-                if(this.trainBusy) return;
+            async drop(train) {
+                if(this.train.itemBusy) return;
 
-                this.trainBusy = true;
+                this.train.itemBusy = true;
 
                 try {
-                     await dropTrain(id);
+                     await dropTrain(train.id);
 
-                     let index = this.trains.items.findIndex((item) => item.id === id);
+                     let index = this.train.items.findIndex(item => item.id === train.id);
                      if(index > -1) {
-                         this.trains.items.splice(index,1);
+                         this.train.items.splice(index,1);
                      }
                 } catch (e) {
 
                 }
 
-                this.trainBusy = false;
-            },
-            async _doTrainAction(id, action) {
-                if(this.trainBusy) return;
-
-                this.trainBusy = true;
-
-                try {
-                    await doTrainAction(id, action);
-
-                } catch (e) {
-                    this.trainBusy = false;
-
-                    throw new Error(e.message);
-                }
-
-                this.trainBusy = false;
+                this.train.itemBusy = false;
             },
 
             //------------------------------------
 
-            fakeTrainCompleted(index) {
-                setTimeout(function () {
-                    let result = null;
+            fakeCompleted(index) {
+                let result = null;
 
-                    switch (this.trains.items[index].type) {
-                        case TrainTypes.TrainTypeDiscovery:
-                            result = 'http://46.105.111.211:4000/discovery.zip';
-                            break;
-                        case TrainTypes.TrainTypeAnalyse:
-                            result = 'http://46.105.111.211:4000/analyse.zip';
-                            break;
-                    }
+                switch (this.train.items[index].type) {
+                    case TrainTypes.TrainTypeDiscovery:
+                        result = 'http://46.105.111.211:4000/discovery.zip';
+                        break;
+                    case TrainTypes.TrainTypeAnalyse:
+                        result = 'http://46.105.111.211:4000/analyse.zip';
+                        break;
+                }
 
-                    this.trains.items[index].status = this.trainStates.TrainStateFinished;
-                    this.trains.items[index].result = result;
+                this.train.items[index].status = this.trainStates.TrainStateFinished;
+                this.train.items[index].result = result;
 
-                    this.$bvToast.toast('Der Zug konnte wurde erfolgreich ausgeführt.');
-                }.bind(this),5000);
+                this.$bvToast.toast('Der Zug konnte wurde erfolgreich ausgeführt.');
             },
 
-            async doTrainAction(event, id, action) {
-                event.preventDefault();
+            async doAction(train, action) {
+                if(this.train.itemsBusy) return;
 
-                let index = this.trains.items.findIndex((item) => item.id === id);
-                if(index > -1) {
-                    switch(this.trains.items[index].status) {
-                        case this.trainStates.TrainStateCreated:
-                        case this.trainStates.TrainStateHashGenerated:
-                        case this.trainStates.TrainStateHashSigned:
+                this.train.itemBusy = true;
 
-                            try {
-                                await this._doTrainAction(id, action);
+                switch(train.status) {
+                    case this.trainStates.TrainStateCreated:
+                    case this.trainStates.TrainStateHashGenerated:
+                    case this.trainStates.TrainStateHashSigned:
+                        try {
+                            await doTrainAction(train.id, action);
 
+                            let index = this.train.items.findIndex((item) => item.id === train.id);
+                            if(index > -1) {
                                 switch (action) {
                                     case 'start':
-                                        this.trains.items[index].status = this.trainStates.TrainStateRunning;
+                                        this.train.items[index].status = this.trainStates.TrainStateRunning;
 
                                         //this.fakeTrainCompleted(index);
                                         break;
                                     case 'stop':
-                                        this.trains.items[index].status = this.trainStates.TrainStateStopped;
-                                        break;
-                                }
-                            } catch (e) {
-                                switch (action) {
-                                    case 'start':
-                                        this.$bvToast.toast('Der Zug konnte nicht gestartet werden.');
-                                        break;
-                                    case 'stop':
-                                        this.$bvToast.toast('Der Zug konnte nicht gestoppt werden.');
+                                        this.train.items[index].status = this.trainStates.TrainStateStopped;
                                         break;
                                 }
                             }
-                            break;
-                    }
+                        } catch (e) {
+                            switch (action) {
+                                case 'start':
+                                    this.$bvToast.toast('Der Zug konnte nicht gestartet werden.');
+                                    break;
+                                case 'stop':
+                                    this.$bvToast.toast('Der Zug konnte nicht gestoppt werden.');
+                                    break;
+                            }
+                        }
+                        break;
                 }
-            },
-            async addTrain(event) {
-                event.preventDefault();
 
-                this.trainReferenced = null;
+
+                this.train.itemBusy = false;
+            },
+            async addTrain() {
+                this.train.item = undefined;
 
                 this.$bvModal.show(this.trainModalId);
             },
-            async dropTrain(event, id) {
-                event.preventDefault();
-
-                await this._dropTrain(id);
-            },
-            async editTrain(event, id) {
-                event.preventDefault();
-
-                let index = this.trains.items.findIndex((item) => item.id === id);
-                if(index > -1) {
-                    switch(this.trains.items[index].status) {
-                        case this.trainStates.TrainStateCreated:
-                        case this.trainStates.TrainStateHashGenerated:
-                        case this.trainStates.TrainStateHashSigned:
-                            this.trainReferenced = this.trains.items[index];
-                            this.$bvModal.show(this.trainModalId);
-                            break;
-                    }
-                } else {
-                    return this.addTrain(event);
+            async edit(train) {
+                switch(train.status) {
+                    case this.trainStates.TrainStateCreated:
+                    case this.trainStates.TrainStateHashGenerated:
+                    case this.trainStates.TrainStateHashSigned:
+                        this.train.item = train;
+                        this.$bvModal.show(this.trainModalId);
+                        break;
                 }
             },
             resetModal() {
@@ -192,11 +171,6 @@
 
             //------------------------------------
 
-            handleModalOk(event) {
-                event.preventDefault();
-
-                this.handleModalSubmit();
-            },
             handleModalSubmit() {
                 this.$nextTick(() => {
                     this.$bvModal.hide(this.trainModalId);
@@ -205,26 +179,33 @@
 
             //------------------------------------
 
-            editTrainEvent(event) {
-                if(!event) return;
-
-                let index = this.trains.items.findIndex((item) => item.id === event.id);
+            handleUpdated(train) {
+                let index = this.train.items.findIndex((item) => item.id === train.id);
                 if(index > - 1) {
-                    for(let key in event.data) {
-                        if(!event.data.hasOwnProperty(key)) continue;
-
-                        this.trains.items[index][key] = event.data[key];
-                    }
+                    this.train.items[index] = train;
                 }
             },
-            addTrainEvent(event) {
-                if(!event) return;
-
-                this.trains.items.push(event);
+            handleCreated(train) {
+                this.train.items.push(train);
             },
-            closeBuilderEvent(event) {
-                console.log('close builder');
+            handleClose() {
                 this.handleModalSubmit();
+            },
+
+            generateUrl(item) {
+                return this.$config.authApiUrl+'/public/train/'+item.id+'.tar';
+            }
+        },
+        computed: {
+            startTrainExecution() {
+                return this.$auth.can('start','trainExecution');
+            },
+            stopTrainExecution() {
+                return this.$auth.loadMe().then(() => {
+                    return this.$auth.can('stop','trainExecution');
+                }).catch(() => {
+                    return false;
+                })
             }
         }
     }
@@ -233,40 +214,35 @@
     <div>
         <b-modal
             :id="trainModalId"
-            @ok="handleModalOk"
+            @ok="handleModalSubmit"
             @hidden="resetModal"
             @show="resetModal"
             size="lg"
             button-size="xs"
-            :title="trainReferenced ? 'Zug bearbeiten' : 'Zug erstellen'"
+            :title-html="'<i class=\'fa fa-train\'></i> Zug ' + (train.item ? 'bearbeiten' : 'erstellen')"
             hide-footer
-            >
+        >
             <train-builder
-                v-on:edit-train="editTrainEvent"
-                v-on:add-train="addTrainEvent"
-                v-on:close-builder="closeBuilderEvent"
+                @updated="handleUpdated"
+                @created="handleCreated"
+                @close-builder="handleClose"
                 :proposal="proposal"
                 :proposal-stations="proposalStations"
-                :train-reference="trainReferenced"
+                :train-reference="train.item"
             />
         </b-modal>
         <div class="panel-card">
-            <div class="panel-card-header">
-                <h6 class="title">
-                    Züge
-                </h6>
-            </div>
             <div class="panel-card-body">
-                <button type="button" @click="addTrain" class="btn btn-primary m-b-10">
+                <button type="button" @click.prevent="addTrain" class="btn btn-primary m-b-10">
                     <i class="fa fa-train"></i> Zug Hinzufügen
                 </button>
 
-                <div class="alert alert-primary">
+                <div class="alert alert-primary alert-sm">
                     Dies ist eine Übersicht aller bisher erstellten Züge.
                 </div>
 
                 <div class="m-t-10">
-                    <b-table :items="trains.items" :fields="fields" :busy="trains.busy" head-variant="'dark'" sort-by="id" :sort-desc="true" outlined>
+                    <b-table :items="train.items" :fields="fields" :busy="train.busy" head-variant="'dark'" sort-by="id" :sort-desc="true" outlined>
                         <template v-slot:cell(status)="data">
                             <button v-if="data.item.status === trainStates.TrainStateCreated" class="btn btn-dark btn-xs" type="button">
                                 1. Konfiguriert
@@ -290,7 +266,7 @@
                                 Es wurde noch kein Ergebnis generiert...
                             </div>
                             <div v-if="data.item.result">
-                                <a :href="data.item.result" target="_blank" class="btn btn-primary btn-xs">
+                                <a :href="generateUrl(data.item)" target="_blank" class="btn btn-primary btn-xs" v-if="$auth.can('read','trainResult')">
                                     <i class="fa fa-download"></i> Download
                                 </a>
                             </div>
@@ -298,15 +274,15 @@
 
                         <template v-slot:cell(actions)="data">
                             <button
-                                v-if="data.item.status === trainStates.TrainStateHashSigned"
+                                v-if="data.item.status === trainStates.TrainStateHashSigned && startTrainExecution"
                                 class="btn btn-outline-success btn-xs"
                                 type="button"
-                                @click="doTrainAction($event, data.item.id, 'start')"
+                                @click.prevent="doAction(data.item, 'start')"
                             >
                                 <i class="fas fa-play" />
                             </button>
                             <button
-                                v-if="data.item.status === trainStates.TrainStateRunning"
+                                v-if="data.item.status === trainStates.TrainStateRunning && stopTrainExecution"
                                 class="btn btn-outline-danger btn-xs"
                                 type="button"
                                 :disabled="true"
@@ -317,10 +293,10 @@
 
                         <template v-slot:cell(options)="data">
                             <div v-if="[trainStates.TrainStateRunning, trainStates.TrainStateFinished, trainStates.TrainStateStopped].indexOf(data.item.status) === -1">
-                                <button class="btn btn-outline-primary btn-xs" type="button" @click="editTrain($event, data.item.id)">
+                                <button class="btn btn-outline-primary btn-xs" type="button" v-if="$auth.can('add', 'train')" @click.prevent="edit(data.item)">
                                     <i class="fas fa-cog" />
                                 </button>
-                                <button class="btn btn-outline-danger btn-xs" type="button" @click="dropTrain($event, data.item.id)">
+                                <button class="btn btn-outline-danger btn-xs" type="button" v-if="$auth.can('drop','train')" @click.prevent="drop(data.item)">
                                     <i class="fas fa-trash-alt" />
                                 </button>
                             </div>
@@ -333,6 +309,9 @@
                             </div>
                         </template>
                     </b-table>
+                    <div v-if="!train.items.busy && train.items.length === 0" class="alert alert-sm alert-warning">
+                        Es sind keine Züge vorhanden...
+                    </div>
                 </div>
             </div>
         </div>

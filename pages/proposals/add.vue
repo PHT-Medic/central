@@ -94,11 +94,13 @@
                 this.formData = {
                     title: 'Das ist ein Beispiel Titel',
                     requestedData: 'Ich möchte alles und noch mehr...',
-                    stationIds: this.stations.map((item) => item.id),
+                    stationIds: this.stations.map(item => item.id),
                     masterImageId: '',
                     risk: this.risks[0].id,
                     riskComment: 'Es wird schon nichts passieren.'
                 };
+
+                console.log(this.stations.map(item => item.id));
 
                 if (this.masterImages.length > 0) {
                     this.formData.masterImageId = this.masterImages[0].id
@@ -118,7 +120,7 @@
 
                     await this.$nuxt.$router.push('/proposals/' + proposal.id);
                 } catch (e) {
-                    this.errorMessage = e.response.data.error.message;
+                    this.errorMessage = e.message;
                 }
 
                 this.busy = false;
@@ -127,7 +129,7 @@
     }
 </script>
 <template>
-    <div class="text-left">
+    <div class="container">
         <div class="m-b-10">
             <h4 class="title">
                 Antrag <span class="sub-title">Erstellen</span>

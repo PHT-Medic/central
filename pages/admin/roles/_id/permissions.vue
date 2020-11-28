@@ -20,11 +20,6 @@
 <template>
     <div>
         <div class="panel-card">
-            <div class="panel-card-header">
-                <h6 class="title">
-                    Berechtigungen
-                </h6>
-            </div>
             <div class="panel-card-body">
                 <alert-message
                     :message="{

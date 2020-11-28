@@ -2,6 +2,20 @@
     font-size: inherit;
 }
 
+.custom-control {
+    line-height: 1.5rem;
+}
+
+.custom-control-label {
+    color: #909090;
+}
+
+.form-check-input {
+    position: absolute;
+    margin-top: .2rem;
+    margin-left: -1.25rem;
+}
+
 .alert-sm {
   padding: .4rem .7rem;
 }

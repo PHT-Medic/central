@@ -28,7 +28,7 @@
                 user: null,
                 tabs: [
                     { name: 'Allgemein', routeName: 'admin-users-id', icon: 'fas fa-bars', urlSuffix: '' },
-                    { name: 'Gruppen', routeName: 'admin-users-id-groups', icon: 'fas fa-users', urlSuffix: 'groups' }
+                    { name: 'Rollen', routeName: 'admin-users-id-groups', icon: 'fas fa-users', urlSuffix: 'roles' }
                 ]
             }
         },

@@ -1,7 +1,5 @@
 import {Ability, AbilityBuilder} from "@casl/ability";
 
-import { camelCase } from 'change-case';
-
 import {scheduleJob, Job} from "node-schedule";
 
 import {mapOnAllApis} from "~/modules/api";
@@ -44,6 +42,7 @@ class AuthModule {
     protected ability: Ability;
     protected abilityOptions : WeakMap<object, AuthAbilityOption>;
 
+    public me : AuthAbstractUserInfoResponse | undefined;
     protected mePromise : Promise<AuthAbstractUserInfoResponse> | undefined;
 
     // --------------------------------------------------------------------
@@ -75,32 +74,11 @@ class AuthModule {
             const key = this.storeKeys[i];
             const keyWellFormed = key.charAt(0).toLocaleUpperCase() + key.slice(1);
             const commitName = 'auth/set' +  keyWellFormed;
-            const actionName = 'auth/triggerSet' + keyWellFormed;
 
             const value = this.ctx.$authWarehouse.get(key);
 
-            switch (key) {
-                case 'permissions':
-                    if(typeof value === 'undefined') {
-                        const token = this.ctx.store.getters['auth/token'];
-                        const provider = this.ctx.store.getters['auth/provider'];
-
-                        if(token && provider) {
-                            this.getUserInfo(provider).then((user: AuthAbstractUserInfoResponse) => {
-                                if(typeof this.ctx === 'undefined' || typeof this.ctx.store === 'undefined') return;
-
-                                this.ctx.store.dispatch(actionName, user.permissions).then(r => r);
-                            }).catch(e => console.log(e));
-                        }
-                    } else {
-                        this.ctx.store.commit(commitName, value);
-                    }
-                    break;
-                default:
-                    if(typeof value !== 'undefined') {
-                        this.ctx.store.commit(commitName, value);
-                    }
-                    break;
+            if(typeof value !== 'undefined') {
+                this.ctx.store.commit(commitName, value);
             }
         }
     }
@@ -160,30 +138,43 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public resolveMe() : Promise<AuthAbstractUserInfoResponse> {
+    public loadMe() : Promise<AuthAbstractUserInfoResponse> {
         if(typeof this.mePromise !== 'undefined') {
             return this.mePromise;
+        }
+
+        if(typeof this.me !== 'undefined') {
+            return new Promise<AuthAbstractUserInfoResponse>((resolve => resolve(this.me)));
         }
 
         if(typeof this.ctx === 'undefined') return new Promise<any>(((resolve) => resolve()));
 
         const token = this.ctx.store.getters['auth/token'];
-        const provider = this.ctx.store.getters['auth/provider'];
 
-        if(!token || !provider) return new Promise<any>(((resolve) => resolve()));
+        if(!token) return new Promise<any>(((resolve) => resolve()));
 
-        this.mePromise = this.getUserInfo(provider).then((userInfoResponse: AuthAbstractUserInfoResponse) => {
-            if(typeof this.ctx === 'undefined') return new Promise<any>(((resolve) => resolve()));
-
-            const {permissions, ...user} = userInfoResponse;
-
-            this.ctx.store.dispatch('auth/triggerSetUser', user).then(r => r);
-            this.ctx.store.dispatch('auth/triggerSetPermissions', permissions).then(r => r);
+        this.mePromise = this.getUserInfo().then((userInfoResponse: AuthAbstractUserInfoResponse) => {
+            this.handleUserInfoResponse(userInfoResponse);
 
             return userInfoResponse;
         });
 
         return this.mePromise;
+    };
+
+    private handleUserInfoResponse(userInfo: AuthAbstractUserInfoResponse) {
+        if(typeof this.ctx === 'undefined') {
+            return;
+        }
+
+        const {permissions, ...user} = userInfo;
+
+        this.ctx.store.dispatch('auth/triggerSetUser', user).then(r => r);
+        this.ctx.store.dispatch('auth/triggerSetPermissions', permissions).then(r => r);
+
+        if(typeof this.me === 'undefined') {
+            this.me = userInfo;
+        }
     }
 
     // --------------------------------------------------------------------
@@ -254,8 +245,8 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public async attemptAccessTokenWith(name: string, data: any) : Promise<AuthAbstractTokenResponse> {
-        let provider = useAuthScheme(name);
+    public async attemptAccessTokenWith(data: any) : Promise<AuthAbstractTokenResponse> {
+        let provider = useAuthScheme('local');
         let tokenResponse : AuthAbstractTokenResponse;
 
         switch (provider.getOptions().scheme) {
@@ -277,8 +268,8 @@ class AuthModule {
         return tokenResponse;
     }
 
-    public async attemptRefreshTokenWith(name: string, token: string) : Promise<AuthAbstractTokenResponse> {
-        let provider = useAuthScheme(name);
+    public async attemptRefreshTokenWith(token: string) : Promise<AuthAbstractTokenResponse> {
+        let provider = useAuthScheme('local');
         let tokenResponse : AuthAbstractTokenResponse;
 
         switch (provider.getOptions().scheme) {
@@ -299,8 +290,8 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public async getUserInfo(name: string) {
-        return await useAuthScheme(name).getUserInfo();
+    public async getUserInfo() {
+        return await useAuthScheme('local').getUserInfo();
     }
 
 }

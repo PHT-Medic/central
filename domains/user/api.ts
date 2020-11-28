@@ -1,8 +1,9 @@
 import {useApi} from "~/modules/api";
+import {formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 
-export async function getUsers() {
+export async function getUsers(options?: RequestRecord) {
     try {
-        let response = await useApi('auth').get('users');
+        let response = await useApi('auth').get('users' + formatRequestRecord(options));
 
         return response.data;
     } catch (e) {

@@ -29,20 +29,11 @@
                 fields: [
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'created_at', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
-                    { key: 'updated_at', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
+                    { key: 'createdAt', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
+                    { key: 'updatedAt', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }
                 ],
                 items: []
-            }
-        },
-        computed: {
-            formattedItems() {
-                return this.items.map((item) => {
-                    item.created_at_formatted = momentHelper(item.created_at).fromNow(false);
-                    item.updated_at_formatted = momentHelper(item.updated_at).fromNow(false);
-                    return item;
-                })
             }
         },
         methods: {
@@ -109,10 +100,10 @@
                     </div>
                 </div>
                 <div class="m-t-10">
-                    <b-table :items="formattedItems" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
+                    <b-table :items="items" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
                         <template v-slot:cell(options)="data">
                             <nuxt-link
-                                v-if="$auth.can('edit','role') || $auth.can('edit','role_permissions') || $auth.can('drop','role_permissions')"
+                                v-if="$auth.can('edit','role') || $auth.can('add','rolePermission') || $auth.can('drop','rolePermission')"
                                 class="btn btn-xs btn-outline-primary" :to="'/admin/roles/'+data.item.id">
                                 <i class="fa fa-bars"></i>
                             </nuxt-link>
@@ -120,11 +111,11 @@
                                 <i class="fa fa-times"></i>
                             </button>
                         </template>
-                        <template v-slot:cell(created_at)="data">
-                            {{data.item.created_at_formatted}}
+                        <template v-slot:cell(createdAt)="data">
+                            <timeago :datetime="data.item.createdAt" />
                         </template>
-                        <template v-slot:cell(updated_at)="data">
-                            {{data.item.updated_at_formatted}}
+                        <template v-slot:cell(updatedAt)="data">
+                            <timeago :datetime="data.item.updatedAt" />
                         </template>
                         <template v-slot:table-busy>
                             <div class="text-center text-danger my-2">

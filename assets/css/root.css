@@ -1,3 +1,5 @@
+/* @import url('https://fonts.googleapis.com/css?family=Asap'); */
+
 html, body {
     margin: 0;
     padding: 0;
@@ -54,6 +56,12 @@ Generics
 /*
 General
  */
+.h1, .h2, .h3, .h4, .h5, .h6,
+h1, h2, h3, h4, h5, h6 {
+    font-family: Asap,sans-serif;
+    font-weight: 700;
+}
+
 h1.title,
 h2.title,
 h3.title,

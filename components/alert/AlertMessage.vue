@@ -10,7 +10,7 @@
     <div>
         <div
             v-if="message"
-            :class="{'alert-warning': message.isError, 'alert-primary': !message.isError}"
+            :class="{'alert-warning': message.isError, 'alert-info': !message.isError}"
             class="alert alert-sm">
             {{message.data}}
         </div>

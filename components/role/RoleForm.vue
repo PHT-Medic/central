@@ -13,18 +13,14 @@ export default {
     props: {
         roleProperty: {
             type: Object,
-            default: {
-                id: null,
-                name: '',
-                keycloakRoleId: ''
-            }
+            default: undefined
         }
     },
     data() {
         return {
             formData: {
                 name: '',
-                keycloakRoleId: ''
+                providerRoleId: ''
             },
 
             busy: false,
@@ -35,18 +31,18 @@ export default {
         formData: {
             name: {
                 required,
-                minLength: minLength(5),
+                minLength: minLength(3),
                 maxLength: maxLength(30)
             },
-            keycloakRoleId: {
-                minLength: minLength(5),
-                maxLength: maxLength(30)
+            providerRoleId: {
+                minLength: minLength(3),
+                maxLength: maxLength(100)
             }
         }
     },
     created() {
-        this.formData.name = this.roleProperty.name ?? '';
-        this.formData.keycloakRoleId = this.roleProperty.keycloak_role_id ?? '';
+        this.formData.name = this.roleProperty?.name ?? '';
+        this.formData.providerRoleId = this.roleProperty?.providerRoleId ?? '';
     },
     methods: {
         async handleSubmit (e) {
@@ -61,35 +57,25 @@ export default {
 
             try {
                 let response;
-                let formData = {
-                    name: this.formData.name,
-                    keycloak_role_id: this.formData.keycloakRoleId
-                }
 
                 if(this.isEditing) {
-                   response = await editRole(this.roleProperty.id, formData);
+                   response = await editRole(this.roleProperty.id, this.formData);
 
                    this.message = {
                        isError: false,
                        data: 'Die Rolle wurde erfolgreich editiert.'
                    }
 
-                   this.$emit('roleUpdated', {
-                       id: this.roleProperty.id,
-                       ...formData
-                   });
+                   this.$emit('updated', response);
                 } else {
-                    response = await addRole(formData);
+                    response = await addRole(this.formData);
 
                     this.message = {
                         isError: false,
                         data: 'Die Rolle wurde erfolgreich erstellt.'
                     }
 
-                    this.$emit('roleCreated', {
-                        id: response.id,
-                        ...formData
-                    });
+                    this.$emit('created', response);
                 }
 
 
@@ -105,7 +91,7 @@ export default {
     },
     computed: {
         isEditing() {
-            return typeof this.roleProperty.id === 'number';
+            return typeof this.roleProperty?.id === 'number';
         }
     }
 }
@@ -132,15 +118,15 @@ export default {
 
             <hr>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.formData.keycloakRoleId.$error }">
-                <label>Keycloak ID</label>
-                <input v-model="$v.formData.keycloakRoleId.$model" type="text" name="name" class="form-control" placeholder="Keycloak Role-Name...">
+            <div class="form-group" :class="{ 'form-group-error': $v.formData.providerRoleId.$error }">
+                <label>Provider Rollen ID</label>
+                <input v-model="$v.formData.providerRoleId.$model" type="text" name="name" class="form-control" placeholder="Keycloak Role-Name...">
 
-                <div v-if="!$v.formData.keycloakRoleId.minLength" class="form-group-hint group-required">
-                    Der Name muss mindestens <strong>{{ $v.formData.keycloakRoleId.$params.minLength.min }}</strong> Zeichen lang sein.
+                <div v-if="!$v.formData.providerRoleId.minLength" class="form-group-hint group-required">
+                    Der Name muss mindestens <strong>{{ $v.formData.providerRoleId.$params.minLength.min }}</strong> Zeichen lang sein.
                 </div>
-                <div v-if="!$v.formData.keycloakRoleId.maxLength" class="form-group-hint group-required">
-                    Der Name darf maximal <strong>{{ $v.formData.keycloakRoleId.$params.maxLength.max }}</strong> Zeichen lang sein.
+                <div v-if="!$v.formData.providerRoleId.maxLength" class="form-group-hint group-required">
+                    Der Name darf maximal <strong>{{ $v.formData.providerRoleId.$params.maxLength.max }}</strong> Zeichen lang sein.
                 </div>
             </div>
 

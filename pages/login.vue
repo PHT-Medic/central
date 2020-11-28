@@ -1,5 +1,6 @@
 <script>
     import { mapGetters, mapActions } from 'vuex'
+    import {getProviders} from "@/domains/provider/api.ts";
 
     export default {
         meta: {
@@ -7,27 +8,61 @@
         },
         data () {
             return {
+                provider: {
+                    items: [],
+                    busy: false
+                },
                 error: null,
                 credentials: {
                     name: '',
                     password: '',
-                    provider: 'keycloak'
-                },
-                providers: [
-                    {id: 'keycloak', name: 'Keycloak Authentication Provider (KAP)'},
-                    {id: 'default', name: 'Default Authentication Provider (DAP)'}
-                ]
+                    provider: ''
+                }
             }
         },
         computed: {
             ...mapGetters('auth', [
                 'loggedIn'
-            ])
+            ]),
+
+            providerItems() {
+                return this.provider.items.map((provider) => {
+                    provider.authorizeUrl = this.$config.authApiUrl + '/auth/providers/' + provider.id + '/uri';
+                    return provider;
+                });
+            },
+            masterRealmProviders() {
+                return this.providerItems.filter((provider) => {
+                    return provider.realm.id === 'master';
+                })
+            },
+            stationRealmsProviders() {
+                return this.providerItems.filter((provider) => {
+                    return provider.realm.id !== 'master';
+                })
+            }
+        },
+        created() {
+            this.loadProviders().then(r => r);
         },
         methods: {
             ...mapActions('auth', [
                 'triggerLogin'
             ]),
+
+            async loadProviders() {
+                this.provider.busy = true;
+
+                try {
+                    const providers = await getProviders();
+
+                    this.provider.busy = false;
+                    this.provider.items = providers;
+
+                } catch (e) {
+                    this.provider.busy = false;
+                }
+            },
 
             async handleSubmit () {
                 if (this.credentials.name === '' && this.credentials.password === '') {
@@ -38,7 +73,7 @@
                 this.error = null;
 
                 try {
-                    await this.triggerLogin({provider: 'local', data: this.credentials});
+                    await this.triggerLogin(this.credentials);
 
                     await this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
                 } catch (e) {
@@ -96,7 +131,8 @@
                             id="authenticationProvider"
                             class="form-control"
                         >
-                            <option v-for="(item,key) in providers" :value="item.id" :key="key">{{ item.name }}</option>
+                            <option value="">master-database</option>
+                            <option v-for="(item,key) in masterRealmProviders" :value="item.id" :key="key">{{ item.name }}</option>
                         </select>
                     </div>
 
@@ -108,7 +144,30 @@
                 </form>
             </b-tab>
             <b-tab title="Station">
-
+                <ul class="list-unstyled">
+                    <li v-for="(item,key) in stationRealmsProviders" :key="key">
+                        <div class="card-header">
+                            <div class="d-flex flex-wrap flex-row">
+                                <div>
+                                    <strong>Realm</strong> {{item.realm.name}}
+                                </div>
+                                <div class="ml-auto">
+                                    <a :href="item.authorizeUrl" type="button" class="btn btn-success btn-xs">
+                                        Login
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <template v-if="item.realm.description">
+                                {{item.realm.description}}
+                            </template>
+                            <template v-else>
+                                <i>keine Beschreibung vorhanden</i>
+                            </template>
+                        </div>
+                    </li>
+                </ul>
             </b-tab>
         </b-tabs>
     </div>

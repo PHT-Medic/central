@@ -1,48 +1,58 @@
 import {Context, Middleware} from "@nuxt/types";
-import {AuthAbstractUserInfoResponse} from "~/modules/auth/types";
 
 type MetaOrMatched = 'meta' | 'matched';
 
-const checkAbility = ({route, $auth} : Context) => {
+function checkAbility({route, $auth} : Context) {
     if(
         route.meta.some((m: any) => m.hasOwnProperty('requireAbility') && typeof m.requireAbility === 'function') ||
         route.matched.some((m: any) => m.hasOwnProperty('requireAbility') && typeof m.requireAbility === 'function')
     ) {
         let isAllowed = true;
 
+        const can : CallableFunction = $auth.can.bind($auth);
 
-        let keys: MetaOrMatched[] = ['meta','matched'];
+        const keys: MetaOrMatched[] = ['meta','matched'];
         for(let l=0; l<keys.length; l++) {
-            let key : MetaOrMatched = keys[l];
+            const key : MetaOrMatched = keys[l];
             for(let i=0; i < route[key].length; i++) {
-                let value : any = typeof route[key][i].requireAbility === 'function' ? route[key][i].requireAbility : undefined;
+                const value : any = typeof route[key][i].requireAbility === 'function' ? route[key][i].requireAbility : undefined;
 
                 if(typeof value === 'undefined') {
                     continue;
                 }
 
                 if(typeof value === 'function') {
-                    isAllowed = value($auth.can.bind($auth));
+                    isAllowed = value(can);
                     break;
                 }
             }
 
             if(!isAllowed) {
-                throw new Error('Die Route ist geschützt und für Sie nicht zugänglich.');
+                const parts = route.path.split('/');
+
+                parts.pop();
+
+                throw new Error(parts.join('/'));
             }
         }
     }
 }
 
 const authMiddleware : Middleware = async ({ route, redirect, $auth, store } : Context) => {
-    await $auth.resolveMe();
+    if (!route.path.includes('/logout')) {
+        try {
+            await $auth.loadMe();
+        } catch (e) {
+            return redirect('/logout');
+        }
+    }
 
     if (
         route.meta.some((m: any) => m.requireLoggedIn) ||
         route.matched.some((record: any) => record.meta.requireLoggedIn)
     ) {
         if (!store.getters['auth/loggedIn']) {
-            redirect({
+            return redirect({
                 path: '/login',
                 query: { redirect: route.fullPath }
             });
@@ -51,10 +61,8 @@ const authMiddleware : Middleware = async ({ route, redirect, $auth, store } : C
         try {
             checkAbility({route, $auth} as Context);
         } catch (e) {
-            redirect({ path: '/' });
+            return redirect({ path: e.message });
         }
-
-        return;
     }
 
     if (

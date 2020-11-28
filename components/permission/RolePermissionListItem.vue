@@ -26,7 +26,6 @@ export default {
         data() {
             return {
                 show: false,
-                enabled: false,
                 busy: false,
 
                 rolePermission: undefined,
@@ -55,16 +54,17 @@ export default {
             },
             hasExtendedOptions() {
                 return this.permissionProperty.powerConfigurable || this.permissionProperty.powerInverseConfigurable || this.permissionProperty.scopeConfigurable;
+            },
+            enabled() {
+                return !!this.rolePermission;
             }
         },
         watch: {
             rolePermissionProperty: function(newVal, oldVal) {
                 if(newVal === oldVal) return;
 
-                this.busy = true;
+                console.log(newVal);
                 this.rolePermission = newVal;
-                this.enabled = !!this.rolePermission;
-                this.busy = false;
             }
         },
         created() {
@@ -90,21 +90,14 @@ export default {
 
                 try {
                     await dropRolePermissionByRelationId(this.roleIdProperty, this.rolePermission.id);
-                    this.enabled = false;
                 } catch (e) {
                     await this.$bvToast.toast(e.message);
-                    this.enabled = true;
+                    this.busy = false;
+                    return;
                 }
 
-                this.$emit('changeRolePermission', {
-                    action: 'drop',
-                    data: {
-                        id: this.rolePermission.id,
-                        permissionId: this.rolePermission.permissionId
-                    }
-                });
+                this.$emit('deleted', this.rolePermission);
 
-                if(!this.enabled) this.rolePermission = null;
                 this.busy = false;
             },
             async createUserPermission() {
@@ -116,25 +109,16 @@ export default {
                 let formData = this.filterFormData();
 
                 try {
-                    let { id } = await addRolePermission(this.roleIdProperty,{
+                    const rolePermission = await addRolePermission(this.roleIdProperty,{
                         ...formData,
                         permissionId: this.permissionProperty.id
                     });
 
-                    this.rolePermission = await getRolePermission(
-                        this.roleIdProperty,
-                        id,
-                        'self'
-                    );
+                    this.$emit('created', rolePermission);
+
                 } catch (e) {
                     await this.$bvToast.toast(e.message);
-                    this.enabled = false;
                 }
-
-                this.$emit('changeRolePermission', {
-                    action: 'add',
-                    data: this.rolePermission
-                });
 
                 this.busy = false;
             },
@@ -145,22 +129,17 @@ export default {
                 let formData = this.filterFormData();
 
                 try {
-                    await editRolePermission(this.roleIdProperty, this.rolePermission.id, {
+                    const rolePermission = await editRolePermission(this.roleIdProperty, this.rolePermission.id, {
                         ...formData
                     });
 
+                    this.$emit('updated', rolePermission);
+
+                    this.busy = false;
                 } catch (e) {
                     await this.$bvToast.toast(e.message);
+                    this.busy = false;
                 }
-
-                this.rolePermission = Object.assign(this.rolePermission, formData);
-
-                this.$emit('changeRolePermission', {
-                    action: 'edit',
-                    data: this.rolePermission
-                });
-
-                this.busy = false;
             },
 
             //------------------------------------
@@ -173,10 +152,6 @@ export default {
                     this.formData.power = this.rolePermission ? this.rolePermission.power : this.max;
                 }
 
-                if(this.permissionProperty.powerInverseConfigurable) {
-                    this.formData.powerInverse = this.rolePermission ? this.rolePermission.powerInverse : this.inverseMax;
-                }
-
                 if(this.permissionProperty.scopeConfigurable) {
                     this.formData.scope = this.rolePermission ? this.rolePermission.scope : this.null;
                 }
@@ -184,17 +159,16 @@ export default {
             //------------------------------------
 
             toggleEnabled() {
+                console.log(this.busy);
                 if(this.busy) return;
-
-                this.enabled = !this.enabled;
 
                 if(this.hasExtendedOptions) {
                     this.showModal();
                 } else {
                     if(this.enabled) {
-                        this.createUserPermission();
-                    } else {
                         this.dropUserPermission();
+                    } else {
+                        this.createUserPermission();
                     }
                 }
             },
@@ -284,12 +258,12 @@ export default {
                         </button>
                     </div>
                     <h6
-                        :class="{'text-primary': rolePermission, 'text-muted': !rolePermission}"
+                        :class="{'text-primary': enabled, 'text-muted': !enabled}"
                         class="m-b-0 font-weight-bold d-inline"
                     >{{ permissionProperty.namePretty }} <small>({{ permissionProperty.name }})</small></h6>
                 </div>
                 <div>
-                    <b-form-checkbox v-model="enabled" :disabled="busy" @change="toggleEnabled" switch />
+                    <b-form-checkbox :checked="enabled" :disabled="busy" @change="toggleEnabled" switch />
                 </div>
             </div>
         </b-list-group-item>

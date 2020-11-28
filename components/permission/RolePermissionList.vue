@@ -52,7 +52,7 @@
                     this.permission.items = this.permissionsProperty;
                 }
 
-                if(this.rolePermissionsProperty === null || typeof this.permissionsProperty === 'undefined') {
+                if(this.rolePermissionsProperty === null || typeof this.rolePermissionsProperty === 'undefined') {
                     await this.loadRolePermissions();
                 } else {
                     this.setRolePermissions(this.rolePermissionsProperty);
@@ -103,18 +103,14 @@
                     Vue.set(this.rolePermissions, rolePermissions[i].permissionId, rolePermissions[i]);
                 }
             },
-            changeRolePermission(data) {
-                switch (data.action) {
-                    case 'add':
-                        Vue.set(this.rolePermissions, data.data.permissionId, data.data);
-                        break;
-                    case 'edit':
-                        this.rolePermissions[data.data.permissionId] = data.data;
-                        break;
-                    case 'drop':
-                        delete this.rolePermissions[data.data.permissionId];
-                        break;
-                }
+            handleRolePermissionCreated(data) {
+                Vue.set(this.rolePermissions, data.permissionId, data);
+            },
+            handleRolePermissionUpdated(data) {
+                Object.assign(this.rolePermissions[data.permissionId], data);
+            },
+            handleRolePermissionDeleted(data) {
+                Vue.set(this.rolePermissions, data.permissionId, undefined);
             }
         },
         computed: {
@@ -150,7 +146,9 @@
                     :permission-property="item"
                     :role-permission-property="rolePermissions[item.id]"
                     :role-id-property="roleIdProperty"
-                    @changeRolePermission="changeRolePermission"
+                    @created="handleRolePermissionCreated"
+                    @updated="handleRolePermissionUpdated"
+                    @deleted="handleRolePermissionDeleted"
                 />
             </b-list-group>
         </vue-scroll>

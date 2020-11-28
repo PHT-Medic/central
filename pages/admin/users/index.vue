@@ -12,44 +12,28 @@
                 return can('add','user') || can('edit','user') || can('drop','user');
             }
         },
-        async asyncData(context) {
-            try {
-                const items = await getUsers();
-
-                return {
-                    items
-                }
-            } catch (e) {
-                return await context.redirect('/admin');
-            }
-        },
         data() {
             return {
                 isBusy: false,
                 fields: [
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
+                    { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'email', label: 'Email', thClass: 'text-center', tdClass: 'text-center' },
-                    { key: 'created_at', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
-                    { key: 'updated_at', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
+                    { key: 'createdAt', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
+                    { key: 'updatedAt', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }
                 ],
                 items: []
             }
         },
-        computed: {
-            formattedItems() {
-                return this.items.map((item) => {
-                    item.created_at_formatted = momentHelper(item.updated_at, 'YYYY-MM-DD HH:II:SS').fromNow(false), //momentHelper(item.created_at, 'YYYY-MM-DD HH:II:SS').fromNow(false);
-                    item.updated_at_formatted = momentHelper(item.updated_at, 'YYYY-MM-DD HH:II:SS').fromNow(false);
-                    return item;
-                })
-            }
-        },
         created() {
-
+            this.loadUsers().then(r => r);
         },
         methods: {
+            async loadUsers() {
+                this.items = await getUsers();
+            },
             async dropUser(event, user) {
                 event.preventDefault();
 
@@ -102,7 +86,7 @@
                 </div>
                 <div class="d-flex flex-row">
                     <div>
-                        <button type="button" class="btn btn-xs btn-dark">
+                        <button type="button" class="btn btn-xs btn-dark" :disabled="isBusy" @click.prevent="loadUsers">
                             <i class="fas fa-sync"></i> Aktualisieren
                         </button>
                     </div>
@@ -113,7 +97,10 @@
                     </div>
                 </div>
                 <div class="m-t-10">
-                    <b-table :items="formattedItems" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
+                    <b-table :items="items" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
+                        <template v-slot:cell(realm)="data">
+                            <span class="badge-dark badge">{{data.item.realm.name}}</span>
+                        </template>
                         <template v-slot:cell(options)="data">
                             <nuxt-link
                                 v-if="$auth.can('edit','user') || $auth.can('edit','user_permissions') || $auth.can('drop','user_permissions')"
@@ -124,11 +111,11 @@
                                 <i class="fa fa-times"></i>
                             </button>
                         </template>
-                        <template v-slot:cell(created_at)="data">
-                            {{data.item.created_at_formatted}}
+                        <template v-slot:cell(createdAt)="data">
+                            <timeago :datetime="data.item.createdAt" />
                         </template>
-                        <template v-slot:cell(updated_at)="data">
-                            {{data.item.updated_at_formatted}}
+                        <template v-slot:cell(updatedAt)="data">
+                            <timeago :datetime="data.item.updatedAt" />
                         </template>
                         <template v-slot:table-busy>
                             <div class="text-center text-danger my-2">

@@ -5,6 +5,7 @@
     import NotImplemented from "../../../components/NotImplemented";
     import {LayoutNavigationAdminId} from "../../../config/layout";
     import {addUser} from "@/domains/user/api.ts";
+    import {getRealms} from "@/domains/realm/api.ts";
 
     export default {
         meta: {
@@ -22,12 +23,18 @@
             return {
                 formData: {
                     name: '',
+                    realmId: '',
                     email: '',
                     password: ''
                 },
 
                 busy: false,
-                message: null
+                message: null,
+
+                realm: {
+                    items: [],
+                    busy: false
+                }
             }
         },
         validations: {
@@ -38,7 +45,6 @@
                     maxLength: maxLength(30)
                 },
                 email: {
-                    required,
                     minLength: minLength(5),
                     maxLength: maxLength(255),
                     email
@@ -48,9 +54,24 @@
                     minLength: minLength(5),
                     maxLength: maxLength(100)
                 },
+                realmId: {
+                    required
+                }
             }
         },
+        created() {
+            this.loadRealms().then(r => r);
+        },
         methods: {
+            async loadRealms() {
+                try {
+                    this.realm.items = await getRealms();
+                    this.realm.busy = false;
+                }  catch (e) {
+                    await this.$bvToast.toast(e.message);
+                    this.realm.busy = false;
+                }
+            },
             async handleSubmit (e) {
                 e.preventDefault();
 
@@ -94,6 +115,22 @@
                         <alert-message :message="message" />
 
                         <div class="form-group">
+                            <div class="form-group" :class="{ 'form-group-error': $v.formData.realmId.$error }">
+                                <label>Realm</label>
+                                <select
+                                    v-model="$v.formData.realmId.$model"
+                                    class="form-control"
+                                    :disabled="realm.busy"
+                                >
+                                    <option value="">--- Bitte auswählen ---</option>
+                                    <option v-for="(item,key) in realm.items" :value="item.id" :key="key">{{ item.name }}</option>
+                                </select>
+
+                                <div v-if="!$v.formData.realmId.required && !$v.formData.realmId.$model" class="form-group-hint group-required">
+                                    Bitte geben Sie einen Realm an.
+                                </div>
+                            </div>
+
                             <div class="form-group" :class="{ 'form-group-error': $v.formData.name.$error }">
                                 <label>Name</label>
                                 <input v-model="$v.formData.name.$model" type="text" name="name" class="form-control" placeholder="Benutzer-Name...">
@@ -132,9 +169,6 @@
                                 <label>Email</label>
                                 <input v-model="$v.formData.email.$model" type="email" name="email" class="form-control" placeholder="Email-Addresse...">
 
-                                <div v-if="!$v.formData.email.required" class="form-group-hint group-required">
-                                    Es muss eine E-Mail Addresse anggeben werden.
-                                </div>
                                 <div v-if="!$v.formData.email.minLength" class="form-group-hint group-required">
                                     Die E-Mail Addresse muss mindestens <strong>{{ $v.formData.email.$params.minLength.min }}</strong> Zeichen lang sein.
                                 </div>

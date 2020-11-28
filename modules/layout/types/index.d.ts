@@ -4,7 +4,6 @@ export interface LayoutComponentInterface {
     icon?: string,
     environment?: 'development' | 'production' | 'testing',
     requireLoggedIn?: boolean,
-    requireAbility?: CallableFunction,
     requirePermissions?: string[],
     requireLoggedOut?: boolean
 }

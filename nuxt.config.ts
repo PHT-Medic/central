@@ -62,6 +62,7 @@ const config : NuxtConfig = {
         '@/plugins/vuelidate',
         '@/plugins/vueScroll',
         '@/plugins/vueFormWizard',
+        '@/plugins/vueTimeAgo',
         '@/plugins/socket.client',
         '@/plugins/vue'
 
@@ -72,8 +73,15 @@ const config : NuxtConfig = {
     buildModules: [
         // Doc: https://github.com/nuxt-community/eslint-module
         //'@nuxtjs/eslint-module'
-        '@nuxt/typescript-build'
+        '@nuxt/typescript-build',
+        '@nuxtjs/google-fonts'
     ],
+    googleFonts: {
+        families: {
+            'Asap': true,
+            'Nunito': true
+        }
+    },
     /*
     ** Nuxt.js modules
     */

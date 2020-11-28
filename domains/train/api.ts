@@ -1,11 +1,11 @@
 import {useApi} from "~/modules/api";
-import {changeRequestKeyCase, changeResponseKeyCase} from "~/modules/api/utils";
+import {changeRequestKeyCase, changeResponseKeyCase, formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 
-export async function getTrains(proposalId: number) {
+export async function getTrains(options?: RequestRecord) {
     try {
-        const response = await useApi('resource').get('trains?filter[proposal_id]=' + proposalId);
+        const response = await useApi('auth').get('pht/trains'+formatRequestRecord(options));
 
-        return changeResponseKeyCase(response.data);
+        return response.data;
     } catch (e) {
         throw new Error('Die Züge konnten nicht geladen werden.');
     }
@@ -13,9 +13,9 @@ export async function getTrains(proposalId: number) {
 
 export async function getTrain(id: number) {
     try {
-        const response = await useApi('resource').get('trains/'+id);
+        const response = await useApi('auth').get('pht/trains/'+id);
 
-        return changeResponseKeyCase(response.data);
+        return response.data;
     } catch (e) {
         throw new Error('Der Zug mit der ID ' + id + ' konnte nicht gefunden werden.');
     }
@@ -23,7 +23,7 @@ export async function getTrain(id: number) {
 
 export async function dropTrain(id: number) {
     try {
-        const response = await useApi('resource').delete('trains/'+id);
+        const response = await useApi('auth').delete('pht/trains/'+id);
 
         return changeResponseKeyCase(response.data);
     } catch (e) {
@@ -31,9 +31,9 @@ export async function dropTrain(id: number) {
     }
 }
 
-export async function editTrain(id: number, data: Record<string, any>) {
+export async function editApiTrain(id: number, data: Record<string, any>) {
     try {
-        const response = await useApi('resource').post('trains/'+id , changeRequestKeyCase(data));
+        const response = await useApi('auth').post('pht/trains/'+id , data);
 
         return changeResponseKeyCase(response.data);
     } catch (e) {
@@ -43,7 +43,7 @@ export async function editTrain(id: number, data: Record<string, any>) {
 
 export async function addTrain(data: Record<string, any>) {
     try {
-        let response = await useApi('resource').post('trains', changeRequestKeyCase(data));
+        let response = await useApi('auth').post('pht/trains', data);
 
         return changeResponseKeyCase(response.data);
     } catch (e) {
@@ -53,9 +53,9 @@ export async function addTrain(data: Record<string, any>) {
 
 export async function doTrainAction(id: number, action: string) {
     try {
-        let response = await useApi('resource').get('trains/' + id + '/action/' + action);
+        let response = await useApi('auth').get('pht/trains/' + id + '/action/' + action);
 
-        return changeResponseKeyCase(response.data);
+        return response.data;
     } catch (e) {
         throw new Error('Die Aktion konnte nicht auf den Zug angewendet werden.');
     }

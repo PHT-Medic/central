@@ -20,7 +20,7 @@
         },
         data() {
             return {
-                roleData: null
+                roleData: undefined
             }
         },
         created() {
@@ -45,7 +45,7 @@
                 </h6>
             </div>
             <div class="panel-card-body">
-                <role-form :role-property="roleData" @roleUpdated="handleRoleUpdated" />
+                <role-form :role-property="roleData" @updated="handleRoleUpdated" />
             </div>
         </div>
     </div>

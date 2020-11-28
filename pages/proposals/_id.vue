@@ -1,7 +1,7 @@
 <script>
     import { LayoutNavigationDefaultId } from "../../config/layout";
     import {getProposal} from "@/domains/proposal/api.ts";
-    import {getProposalStations} from "@/domains/proposal/station/api.ts";
+    import {getApiProposalStations} from "@/domains/proposal/station/api.ts";
 
     export default {
         meta: {
@@ -28,7 +28,8 @@
 
                 tabs: [
                     { name: 'Info', routeName: 'proposals-id', icon: 'fas fa-bars', urlSuffix: '' },
-                    { name: 'Zug', routeName: 'proposal-train-discovery', icon: 'fas fa-train', urlSuffix: '/train' }
+                    { name: 'Stationen', routeName: 'proposal-stations', icon: 'fas fa-university', urlSuffix: '/stations'},
+                    { name: 'Züge', routeName: 'proposal-trains', icon: 'fas fa-train', urlSuffix: '/trains' }
                 ]
             }
         },
@@ -41,18 +42,18 @@
 
                 this.proposalStationsLoading = true;
 
-                this.proposalStations = await getProposalStations(this.proposal.id);
+                this.proposalStations = await getApiProposalStations(this.proposal.id, 'self');
 
                 this.proposalStationsLoading = false;
             },
             setProposal (data) {
-                Object.assign(this.proposal, this.proposal, data);
+                Object.assign(this.proposal, data);
             }
         }
     }
 </script>
 <template>
-    <div class="text-left">
+    <div class="container">
         <h4 class="title m-b-20">
             Antrag #{{ proposal.id }} <span class="sub-title">{{ proposal.title }}</span>
         </h4>
@@ -80,6 +81,6 @@
                 </div>
             </div>
         </div>
-        <nuxt-child :proposal="proposal" :proposal-stations="proposalStations" @set-proposal="setProposal" />
+        <nuxt-child :proposal="proposal" :proposal-stations="proposalStations" @updated="setProposal" />
     </div>
 </template>

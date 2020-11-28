@@ -23,25 +23,24 @@
     }
 </script>
 <template>
-    <div class="text-left">
+    <div class="">
         <div class="hero-image m-b-20">
             <div class="hero-text">
-                <h1 class="title no-border text-light">
-                    PHT <span class="sub-title">Personal Health Train</span>
+                <h1 class="title no-border text-light mb-1">
+                    PHT <span class="sub-title">{{ user.realm.name }}</span>
                 </h1>
+                <p>
+                    <template v-if="user.realm.description">
+                        {{user.realm.description}}
+                    </template>
+                    <template v-else>
+                        keine Beschreibung vorhanden...
+                    </template>
+                </p>
             </div>
         </div>
         <h4 class="title">
             Dashboard
         </h4>
-        <div class="panel-card">
-            <div class="panel-card-body">
-                <div class="alert alert-sm alert-info">
-                    <h5>Herzlich Willkommen,</h5>
-                    auf dem Dashboard des Central User-Interfaces.<br />
-                    Hier können <b>Anträge</b> erstellt & verwaltet werden. Zudem können aus diesen Anträge sogenannte <b>Discovery- </b> & <b>Analyse-Züge</b> erstellt werden.
-                </div>
-            </div>
-        </div>
     </div>
 </template>

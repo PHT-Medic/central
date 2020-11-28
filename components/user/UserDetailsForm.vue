@@ -1,7 +1,8 @@
 <script>
 import {mapActions, mapGetters} from "vuex";
-import {email, maxLength, minLength, required} from "vuelidate/lib/validators";
+import {email, maxLength, minLength, required, numeric} from "vuelidate/lib/validators";
 import {editUser} from "@/domains/user/api.ts";
+import {getRealms} from "@/domains/realm/api.ts";
 
 export default {
     props: {
@@ -21,8 +22,13 @@ export default {
             userGeneralForm: {
                 name: '',
                 email: '',
+                realmId: '',
 
                 message: null,
+                busy: false,
+            },
+            realm: {
+                items: [],
                 busy: false
             }
         }
@@ -40,18 +46,34 @@ export default {
                 maxLength: maxLength(255),
                 email
             },
+            realmId: {
+                required
+            }
         }
     },
     created() {
+        console.log(this.userProperty);
         if(typeof this.userProperty !== 'undefined') {
             this.userGeneralForm.name = this.userProperty.name ?? '';
             this.userGeneralForm.email = this.userProperty.email ?? '';
+            this.userGeneralForm.realmId = this.userProperty.realmId ?? '';
         }
+
+        this.loadRealms();
     },
     methods: {
         ...mapActions('auth',[
             'triggerSetUserProperty'
         ]),
+        async loadRealms() {
+            try {
+                this.realm.items = await getRealms();
+                this.realm.busy = false;
+            }  catch (e) {
+                await this.$bvToast.toast(e.message);
+                this.realm.busy = false;
+            }
+        },
         whichFieldsAreModified(properties) {
             if(typeof this.userProperty === 'undefined') return;
 
@@ -129,6 +151,22 @@ export default {
                 :class="{'alert-warning': userGeneralForm.message.isError, 'alert-primary': !userGeneralForm.message.isError}"
                 class="alert alert-sm">
                 {{userGeneralForm.message.data}}
+            </div>
+
+            <div class="form-group" :class="{ 'form-group-error': $v.userGeneralForm.realmId.$error }">
+                <label>Realm</label>
+                <select
+                    v-model="$v.userGeneralForm.realmId.$model"
+                    class="form-control"
+                    :disabled="realm.busy"
+                >
+                    <option value="">--- Bitte auswählen ---</option>
+                    <option v-for="(item,key) in realm.items" :value="item.id" :key="key">{{ item.name }}</option>
+                </select>
+
+                <div v-if="!$v.userGeneralForm.realmId.required && !$v.userGeneralForm.realmId.$model" class="form-group-hint group-required">
+                    Bitte geben Sie einen Realm an.
+                </div>
             </div>
 
             <div class="form-group" :class="{ 'form-group-error': $v.userGeneralForm.name.$error }">

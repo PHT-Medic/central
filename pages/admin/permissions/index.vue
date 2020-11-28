@@ -37,15 +37,6 @@
                 items: []
             }
         },
-        computed: {
-            formattedItems() {
-                return this.items.map((item) => {
-                    item.created_at_formatted = momentHelper(item.createdAt, 'YYYY-MM-DD HH:II:SS').fromNow(false);
-                    item.updated_at_formatted = momentHelper(item.updatedAt, 'YYYY-MM-DD HH:II:SS').fromNow(false);
-                    return item;
-                })
-            }
-        },
         methods: {
             dropPermission(event, permission) {
                 event.preventDefault();
@@ -78,15 +69,15 @@
                     Dies ist eine Übersicht der Berechtigungen.
                 </div>
                 <div class="m-t-10">
-                    <b-table :items="formattedItems" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
+                    <b-table :items="items" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
                         <template v-slot:cell(name)="data">
                             {{data.item.namePretty}} <small>({{data.item.name}})</small>
                         </template>
-                        <template v-slot:cell(created_at)="data">
-                            {{data.item.created_at_formatted}}
+                        <template v-slot:cell(createdAt)="data">
+                            <timeago :datetime="data.item.createdAt" />
                         </template>
-                        <template v-slot:cell(updated_at)="data">
-                            {{data.item.updated_at_formatted}}
+                        <template v-slot:cell(updatedAt)="data">
+                            <timeago :datetime="data.item.updatedAt" />
                         </template>
                         <template v-slot:table-busy>
                             <div class="text-center text-danger my-2">

@@ -26,6 +26,22 @@ export const LayoutNavigation : LayoutNavigationComponentInterface[] = [
     }
 ];
 
+const RouteProposalsPermissions = [
+    'proposal_edit',
+    'proposal_drop',
+    'train_add',
+    'train_drop',
+    'train_result_read',
+    'train_execution_start',
+    'train_execution_stop'
+];
+
+const RouteAdminPHTStationsPermissions = [
+    'station_add',
+    'station_drop',
+    'station_edit'
+];
+
 export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]} = {
     admin: [
         {
@@ -39,6 +55,28 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             url: '/admin',
             icon: 'fas fa-tachometer-alt',
             requireLoggedIn: true
+        },
+        {
+            name: 'Realms & Provider',
+            type: 'separator',
+            requireLoggedIn: true,
+            requirePermissions: ['realm_add', 'realm_drop', 'realm_edit', 'provider_add', 'provider_drop', 'provider_edit']
+        },
+        {
+            name: 'Realms',
+            type: 'link',
+            url: '/admin/realms',
+            icon: 'fas fa-university',
+            requireLoggedIn: true,
+            requirePermissions: ['realm_add', 'realm_drop', 'realm_edit']
+        },
+        {
+            name: 'Providers',
+            type: 'link',
+            url: '/admin/providers',
+            icon: 'fas fa-sign-in-alt',
+            requireLoggedIn: true,
+            requirePermissions: ['provider_add', 'provider_drop', 'provider_edit']
         },
         {
             name: 'Benutzer & Gruppen',
@@ -79,7 +117,8 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
         {
             name: 'PHT',
             type: 'separator',
-            requireLoggedIn: true
+            requireLoggedIn: true,
+            requirePermissions: RouteAdminPHTStationsPermissions
         },
         {
             name: 'Stationen',
@@ -87,7 +126,7 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             url: '/admin/stations',
             icon: 'fas fa-train',
             requireLoggedIn: true,
-            requirePermissions: ['station_add', 'station_drop', 'station_edit']
+            requirePermissions: RouteAdminPHTStationsPermissions
         },
     ],
     default: [
@@ -106,21 +145,32 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
         {
             name: 'Antrag',
             type: 'separator',
-            requireLoggedIn: true
+            requireLoggedIn: true,
+            requirePermissions: [...RouteProposalsPermissions, 'proposal_add']
         },
         {
             name: 'Antrag erstellen',
             type: 'link',
             url: '/proposals/add',
             icon: 'fas fa-plus',
-            requireLoggedIn: true
+            requireLoggedIn: true,
+            requirePermissions: ['proposal_add']
         },
         {
-            name: 'Anträge',
+            name: 'Ausgehende Anträge',
             type: 'link',
             url: '/proposals',
-            icon: 'fas fa-bars',
-            requireLoggedIn: true
+            icon: 'fas fa-file-export',
+            requireLoggedIn: true,
+            requirePermissions: RouteProposalsPermissions
+        },
+        {
+            name: 'Eingehende Anträge',
+            type: 'link',
+            url: '/proposals/in',
+            icon: 'fas fa-file-import',
+            requireLoggedIn: true,
+            requirePermissions: ['proposal_approve']
         },
         {
             name: 'Sonstige',

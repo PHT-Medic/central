@@ -1,14 +1,16 @@
 <script>
-    import { mapActions, mapGetters } from "vuex";
-    import AlertMessage from "../../../components/alert/AlertMessage";
-    import userPasswordFormMixin from "../../../mixins/userPasswordFormMixin";
-    import {addUserKey, dropUserKey, getUserPublicKey} from "@/domains/user/publicKey/api.ts";
+import {mapActions, mapGetters} from "vuex";
+import AlertMessage from "../../../components/alert/AlertMessage";
+import userPasswordFormMixin from "../../../mixins/userPasswordFormMixin";
+import {addUserKey, dropUserKey, getUserPublicKey} from "@/domains/user/publicKey/api.ts";
+import UserPublicKeyForm from "@/components/user/UserPublicKeyForm";
 
-    export default {
+export default {
         mixins: [
             userPasswordFormMixin
         ],
         components: {
+            UserPublicKeyForm,
             AlertMessage
         },
         meta: {
@@ -18,96 +20,11 @@
             ...mapGetters('auth', [
                 'loggedIn',
                 'user'
-            ])
-        },
-        async asyncData() {
-            let userPublicKey = null;
-
-            try {
-                let response = await getUserPublicKey();
-                userPublicKey = response.content;
-            } catch (e) {
-
-            }
-
-            return {
-                temp: {
-                    publicKey: userPublicKey
-                }
-            }
+            ]),
         },
         created() {
             this.userData = this.user;
-
-            if(this.temp.publicKey) {
-                this.encryptionForm.publicKey = this.temp.publicKey;
-                this.encryptionForm.uploaded = true;
-            }
         },
-        data () {
-            return {
-                encryptionForm: {
-                    uploaded: false,
-                    publicKey: null,
-                    ready: true,
-
-                    error: null
-                },
-                temp: null
-            }
-        },
-        methods: {
-            ...mapActions('auth',[
-                'triggerSetUserProperty'
-            ]),
-
-            //--------------------------------------------------------------
-
-            async dropPublicKey(event) {
-                event.preventDefault();
-
-                try {
-                    await dropUserKey();
-
-                    this.encryptionForm.publicKey = '';
-                    this.encryptionForm.uploaded = false;
-                } catch (e) {
-                    this.encryptionForm.error = {
-                        message: e.message
-                    };
-                }
-            },
-            async uploadPublicKey(event) {
-                event.preventDefault();
-
-                try {
-                    await addUserKey(this.encryptionForm.publicKey);
-
-                    this.encryptionForm.uploaded = true;
-                } catch (e) {
-                    this.encryptionForm.error = {
-                        message: e.message
-                    };
-                }
-            },
-            async setFormPublicKey(event) {
-                event.preventDefault();
-
-                this.encryptionForm.ready = false;
-
-                let file = this.$refs.myFile.files[0];
-
-                let reader = new FileReader();
-                reader.readAsText(file, 'UTF-8');
-                reader.onload = (evt) => {
-                    this.encryptionForm.publicKey = evt.target.result;
-                    this.encryptionForm.ready = true;
-                };
-                reader.onerror = (evt) => {
-
-                };
-            }
-        }
     }
 </script>
 <template>
@@ -172,39 +89,7 @@
                         </h6>
                     </div>
                     <div class="panel-card-body">
-                        <div v-if="encryptionForm.error" class="alert-warning alert-sm">
-                            {{encryptionForm.error.message}}
-                        </div>
-                        <div v-if="encryptionForm.uploaded">
-                            <div class="well well-sm m-b-20" v-html="encryptionForm.publicKey"></div>
-                            <div class="form-group">
-                                <button @click="dropPublicKey" :disabled="!encryptionForm.ready" type="button" class="btn btn-xs btn-danger">
-                                    <i class="fa fa-times"></i> Löschen
-                                </button>
-                            </div>
-                        </div>
-                        <div v-if="!encryptionForm.uploaded">
-                            <div v-if="!encryptionForm.publicKey" class="alert-sm alert-danger m-b-20">
-                                Bitte laden Sie Ihren <b>Public Key</b> hoch. Dieser wird zu Erstellung des Zuges benötigt.
-                            </div>
-
-                            <form>
-                                <div class="form-group">
-                                    <div class="custom-file">
-                                        <input ref="myFile" @change="setFormPublicKey" type="file" class="custom-file-input" id="userPublicKey">
-                                        <label class="custom-file-label" for="userPublicKey">Public Key auswählen...</label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <textarea class="form-control" v-model="encryptionForm.publicKey" rows="8" />
-                                </div>
-                                <div class="form-group">
-                                    <button @click="uploadPublicKey" :disabled="!encryptionForm.ready" type="button" class="btn btn-xs btn-primary">
-                                        <i class="fa fa-plus"></i> Hochladen
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                        <user-public-key-form :user-property="user" />
                     </div>
                 </div>
             </div>

@@ -1,11 +1,11 @@
-const ProposalStationStateOpen : string = 'open';
-const ProposalStationStateAccepted : string = 'accepted';
-const ProposalStationStateDeclined : string = 'declined';
+export const ProposalStationStateOpen : string = 'open';
+export const ProposalStationStateApproved : string = 'approved';
+export const ProposalStationStateRejected : string = 'rejected';
 
 const ProposalStationStates = {
     ProposalStationStateOpen,
-    ProposalStationStateAccepted,
-    ProposalStationStateDeclined
+    ProposalStationStateApproved,
+    ProposalStationStateRejected
 }
 
 export {

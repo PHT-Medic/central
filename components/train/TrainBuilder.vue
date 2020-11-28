@@ -1,5 +1,7 @@
 <script>
-    import {integer, maxLength, minLength, required} from 'vuelidate/lib/validators';
+    import Vue from 'vue';
+
+    import {numeric, maxLength, minLength, required} from 'vuelidate/lib/validators';
 
     import AlertMessage from "../../components/alert/AlertMessage";
     import {mapGetters} from "vuex";
@@ -7,9 +9,9 @@
     import {empty} from "../../.nuxt/utils";
     import {getUserPublicKey} from "@/domains/user/publicKey/api.ts";
     import {getMasterImages} from "@/domains/masterImage/api.ts";
-    import {getProposalStations} from "@/domains/proposal/station/api.ts";
-    import {addTrain, doTrainAction, editTrain, getTrain} from "@/domains/train/api.ts";
-    import {dropTrainFile, getTrainFiles, uploadTrainFiles} from "@/domains/train/file";
+    import {getApiProposalStations} from "@/domains/proposal/station/api.ts";
+    import {addTrain, doTrainAction, editApiTrain, getTrain} from "@/domains/train/api.ts";
+    import {dropTrainFile, getApiTrainFiles, uploadTrainFiles} from "@/domains/train/file";
 
     const TrainTypes = {
         Analyse: 'analyse',
@@ -41,15 +43,13 @@
         data() {
             return {
                 busy: false,
-                train: null,
+                train: undefined,
 
                 trainTypes: TrainTypes,
                 trainStates: TrainStates,
 
-                trainAction: {
-                    item: null,
-                    busy: false
-                },
+                actionBusy: false,
+
                 trainStation: {
                     items: [],
                     busy: false
@@ -85,9 +85,9 @@
                  * Form
                  */
                 formInfo: {
-                    signedHashMessage: null,
-                    signedHashSaved: false,
-                    signedHashInProgress: false,
+                    hashSignedMessage: null,
+                    hashSignedSaved: false,
+                    hashSignedInProgress: false,
 
                     trainPushInProgress: false,
                     trainFilesSyncInProgress: false
@@ -98,7 +98,7 @@
                     stationIds: [],
                     entrypointName: 'entrypoint.py',
                     entrypointFiles: [],
-                    signedHash: ''
+                    hashSigned: ''
                 }
             }
         },
@@ -108,7 +108,7 @@
 
             formData.masterImageId = {
                 required,
-                integer
+                numeric
             };
 
             formData.stationIds = {
@@ -116,7 +116,7 @@
                 minLength: minLength(1),
                 $each: {
                     required,
-                    integer
+                    numeric
                 }
             };
 
@@ -131,26 +131,13 @@
             return validations;
         },
         created () {
-            this.initWizard();
             this.initForm();
+        },
+        mounted() {
+            this.initWizard();
         },
         methods: {
             // Rest & Socket Methods
-            async _getTrain(id) {
-                if(this.busy) return;
-
-                this.busy = true;
-
-                try {
-                    this.train = await getTrain(id);
-                } catch (e) {
-                    this.busy = false;
-                    this._closeBuilder();
-                }
-
-                this.busy = false;
-            },
-
             async _addTrain(data) {
                 if(this.busy) return;
 
@@ -160,12 +147,11 @@
                     data = Object.assign({}, data);
                     data.proposalId = this.proposal.id;
 
-                    let { id } = await addTrain(data);
+                    this.train = await addTrain(data);
 
                     this.busy = false;
-                    await this._getTrain(id);
 
-                    this.$emit('add-train', this.train);
+                    this.$emit('created', this.train);
                 } catch (e) {
                     this.busy = false;
 
@@ -173,18 +159,18 @@
                 }
             },
 
-            async _editTrain(data) {
+            async edit(data) {
                 if(this.busy) return;
 
                 this.busy = true;
 
                 try {
-                    await editTrain(this.train.id, data);
+                    const train = await editApiTrain(this.train.id, data);
+                    for(let key in train) {
+                        Vue.set(this.train, key, train[key]);
+                    }
 
-                    this.$emit('edit-train', {
-                        id: this.train.id,
-                        data
-                    });
+                    this.$emit('updated', {id: train.id, status: this.train.status, ...data});
                 } catch (e) {
                     this.busy = false;
 
@@ -195,24 +181,27 @@
             },
 
             async _doTrainAction(action) {
-                if(this.trainAction.busy) return;
+                if(this.actionBusy) return;
 
-                this.trainAction.busy = true;
+                this.actionBusy = true;
 
                 try {
-                    this.trainAction.item = await doTrainAction(this.train.id, action);
+                    const train = await doTrainAction(this.train.id, action);
+                    for(let key in train) {
+                        Vue.set(this.train, key, train[key]);
+                    }
+                    this.actionBusy = false;
 
+                    this.$emit('updated', this.train);
                 } catch (e) {
                     await this.$bvModal.msgBoxOk(this.createAlertMessage(e.message), {
                         buttonSize: 'sm',
                     });
 
-                    this.trainAction.busy = false;
+                    this.actionBusy = false;
 
                     throw new Error(e.message);
                 }
-
-                this.trainAction.busy = false;
             },
 
             //--------------------------------------------------
@@ -233,18 +222,18 @@
 
             //--------------------------------------------------
 
-            async _getProposalStations() {
+            async loadProposalStations() {
                 if(this.proposalStation.busy) return;
 
                 this.proposalStation.busy = true;
 
                 try {
-                    this.proposalStation.items = await getProposalStations(this.proposal.id);
+                    this.proposalStation.items = await getApiProposalStations(this.proposal.id, 'self')
                 } catch (e) {
                     console.log(e);
                 }
 
-                this.masterImage.busy = false;
+                this.proposalStation.busy = false;
             },
 
             //--------------------------------------------------
@@ -256,7 +245,7 @@
 
                 try {
                     if(this.train) {
-                        this.trainFiles.items = await getTrainFiles(this.train.id);
+                        this.trainFiles.items = await getApiTrainFiles(this.train.id);
                     } else {
                         this.trainFiles.items = [];
                     }
@@ -316,23 +305,9 @@
             },
 
             async initWizard() {
-                if(this.trainReference) {
-                    this.train = this.trainReference;
-
+                if(this.train) {
                     if(this.isTrainCreated) {
-                        let train = Object.assign({}, this.train);
-
-                        this.formData.type = train.type;
-                        this.formData.masterImageId = train.masterImageId;
-                        this.formData.stationIds = train.stationIds;
-                        this.formData.entrypointName = train.entrypointName;
-                        this.formData.signedHash = train.signedHash;
-
-                        if(this.formData.signedHash) {
-                            this.formInfo.signedHashSaved = true;
-                        }
-
-                        switch (train.status) {
+                        switch (this.train.status) {
                             case TrainStates.TrainStateCreated:
                                 this.wizard.startIndex = 1;
                                 //this.$refs.trainWizard.changeTab(0,1);
@@ -364,21 +339,28 @@
                 if(this.proposalStations) {
                     this.proposalStation.items = this.proposalStations;
                 } else {
-                    await this._getProposalStations();
+                    await this.loadProposalStations();
                 }
 
                 await this._getMasterImages();
 
-                await this._getTrainFiles();
+                if(this.trainReference) {
+                    this.train = this.trainReference;
 
-                if(this.train) {
-                    //todo: depending on proposal status go to status or disable specific one.
-                    this.formData.masterImageId = this.train.masterImageId;
-                    this.formData.stationIds = this.train.stationIds;
                     this.formData.type = this.train.type;
+                    this.formData.masterImageId = this.train.masterImageId;
+                    this.formData.stationIds = this.train.stations.map(station => station.id);
+                    this.formData.entrypointName = this.train.entrypointName;
+                    this.formData.hashSigned = this.train.hashSigned;
+
+                    if(this.formData.hashSigned) {
+                        this.formInfo.hashSignedSaved = true;
+                    }
+
+                    await this._getTrainFiles();
                 } else {
                     this.formData.masterImageId = this.proposal.masterImageId;
-                    this.formData.stationIds = this.proposalStation.items.map((item) => item.id);
+                    this.formData.stationIds = this.proposalStation.items.map((item) => item.station.id);
                 }
             },
 
@@ -392,6 +374,8 @@
 
 
             changedWizardStep(prevIndex, nextIndex) {
+                if(prevIndex > nextIndex) return;
+
                 switch(nextIndex) {
                     case 2:
                         this.startSummaryStep();
@@ -457,8 +441,8 @@
                 let isValid = !this.$v.formData.$invalid;
 
                 if(isValid) {
-                    this.formInfo.signedHashSaved = false;
-                    this.formInfo.signedHashInProgress = false;
+                    this.formInfo.hashSignedSaved = false;
+                    this.formInfo.hashSignedInProgress = false;
                     return true;
                 }
 
@@ -485,12 +469,12 @@
                     errorMessage = 'Es muss zunächst ein Hash generiert werden, der anschließend noch signiert werden muss.'
                 }
 
-                if(!this.formData.signedHash || empty(this.formData.signedHash)) {
+                if(!this.formData.hashSigned || empty(this.formData.hashSigned)) {
                     hashGenerated = false;
                     errorMessage = 'Es muss ein signierter Hash angegeben werden.';
                 }
 
-                if(!this.formInfo.signedHashSaved) {
+                if(!this.formInfo.hashSignedSaved) {
                     hashGenerated = false;
                     errorMessage = 'Der signierte Hash muss gespeichert werden.';
                 }
@@ -536,17 +520,10 @@
 
                 try {
                     if (this.isTrainCreated) {
-                        await this._editTrain({
+                        await this.edit({
                             masterImageId: this.formData.masterImageId,
                             stationIds: this.formData.stationIds,
                             entrypointName: this.formData.entrypointName
-                        });
-
-                        this.$emit('edit-train', {
-                            id: this.train.id,
-                            data: {
-                                status: this.trainStates.TrainStateCreated
-                            }
                         });
                     } else {
                         await this._addTrain({
@@ -630,33 +607,26 @@
             //----------------------------------------------------
 
             async saveSignedHash() {
-                if(this.formInfo.signedHashInProgress) return;
+                if(this.formInfo.hashSignedInProgress) return;
 
-                this.formInfo.signedHashInProgress = true;
-                this.formInfo.signedHashSaved = false;
-                this.formInfo.signedHashMessage = null;
+                this.formInfo.hashSignedInProgress = true;
+                this.formInfo.hashSignedSaved = false;
+                this.formInfo.hashSignedMessage = null;
 
                 try {
-                    await this._editTrain({
-                        signedHash: this.formData.signedHash
+                    await this.edit({
+                        hashSigned: this.formData.hashSigned
                     });
 
-                    this.$emit('edit-train', {
-                        id: this.train.id,
-                        data: {
-                            status: this.trainStates.TrainStateHashSigned
-                        }
-                    });
-
-                    this.formInfo.signedHashSaved = true;
+                    this.formInfo.hashSignedSaved = true;
                 } catch (e) {
-                    this.formInfo.signedHashMessage = {
+                    this.formInfo.hashSignedMessage = {
                         isError: true,
                         data: 'Der signierte Hash konnte nicht gespeichert werden.'
                     }
                 }
 
-                this.formInfo.signedHashInProgress = false;
+                this.formInfo.hashSignedInProgress = false;
             },
 
             //----------------------------------------------------
@@ -674,19 +644,6 @@
             async startHashStep() {
                 try {
                     await this._doTrainAction('generateHash');
-
-                    if(this.trainAction.item.hasOwnProperty('hash')) {
-                        this.train.hash = this.trainAction.item.hash;
-
-                        this.$emit('edit-train', {
-                            id: this.train.id,
-                            data: {
-                                status: this.trainStates.TrainStateHashGenerated
-                            }
-                        });
-                    } else {
-                        throw new Error();
-                    }
                 } catch (e) {
                     return this.$refs.trainWizard.prevTab();
                 }
@@ -791,8 +748,8 @@
                     <div class="form-group" :class="{ 'form-group-error': $v.formData.stationIds.$anyError }">
                         <label>Krankenhäuser</label>
                         <select v-model="$v.formData.stationIds.$model" class="form-control" multiple :disabled="proposalStation.busy || !isTrainEditAble">
-                            <option v-for="(item,key) in proposalStation.items" :key="key" :value="item.id" :selected="item.included">
-                                {{ item.name }}
+                            <option v-for="(item,key) in proposalStation.items" :key="key" :value="item.station.id">
+                                {{ item.station.name }}
                             </option>
                         </select>
                         <div v-if="!$v.formData.stationIds.required" class="form-group-hint group-required">
@@ -899,8 +856,8 @@
                                         </p>
                                     </div>
                                     <div>
-                                        <div :class="{'spinner-border': trainAction.busy}" style="font-size: 2rem;">
-                                            <i v-if="!trainAction.busy" class="fa fa-check text-success"></i>
+                                        <div :class="{'spinner-border': actionBusy}" style="font-size: 2rem;">
+                                            <i v-if="!actionBusy" class="fa fa-check text-success"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -917,8 +874,8 @@
                                         >4. Hash-Signierung</h6>
                                     </div>
                                     <div>
-                                        <div :class="{'spinner-border': formInfo.signedHashInProgress && !formInfo.signedHashSaved}" style="font-size: 2rem;">
-                                            <i v-if="!busy" :class="{'fa-check text-success': formInfo.signedHashSaved, 'fa-times text-danger': !formInfo.signedHashSaved}" class="fa "></i>
+                                        <div :class="{'spinner-border': formInfo.hashSignedInProgress && !formInfo.hashSignedSaved}" style="font-size: 2rem;">
+                                            <i v-if="!busy" :class="{'fa-check text-success': formInfo.hashSignedSaved, 'fa-times text-danger': !formInfo.hashSignedSaved}" class="fa "></i>
                                         </div>
                                     </div>
                                 </div>
@@ -929,11 +886,11 @@
                                     den resultierenden signierten Hash im nachfolgenden Feld ein.
                                 </div>
 
-                                <alert-message :message="formInfo.signedHashMessage"></alert-message>
+                                <alert-message :message="formInfo.hashSignedMessage"></alert-message>
 
                                 <div class="form-group">
                                     <label>Signierter Hash</label>
-                                    <input type="text" class="form-control" v-model="formData.signedHash" placeholder="Signierter Hash..." />
+                                    <input type="text" class="form-control" v-model="formData.hashSigned" placeholder="Signierter Hash..." />
                                 </div>
                                 <div>
                                     <button @click="saveSignedHash" type="button" class="btn btn-xs btn-primary">

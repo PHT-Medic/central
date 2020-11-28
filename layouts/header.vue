@@ -14,6 +14,9 @@
             },
             user(vm)  {
                 return vm.$store.state.auth.user;
+            },
+            infoText(vm) {
+                return vm.user ? vm.user.realm?.name ?? vm.user.realmId : 'Personal Health Train'
             }
         },
         methods: {
@@ -49,7 +52,7 @@
                 </div>
                 <div class="logo">
                     <span>P</span>H<span>T</span>
-                    <span class="info-text">Personal Health Train</span>
+                    <span class="info-text">{{ infoText }}</span>
                 </div>
             </div>
             <nav class="page-navbar navbar-expand-md">
@@ -64,7 +67,7 @@
                     <ul v-if="loggedIn && user" class="navbar-nav navbar-gadgets">
                         <li class="nav-item">
                             <nuxt-link class="nav-link user-link"  :to="'/users/'+user.id">
-                                <v-gravatar :email="user.email" />
+                                <v-gravatar :email="user.email ? user.email : ''" />
                                 <span>{{ user.name }}</span>
                             </nuxt-link>
                         </li>

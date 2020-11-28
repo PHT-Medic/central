@@ -19,7 +19,7 @@
         },
         methods: {
             handleRoleCreated(e) {
-                this.$nuxt.$router.push('/admin/roles/' + e.id).then(r => r);
+                this.$router.push('/admin/roles/' + e.id);
             }
         }
     }
@@ -39,7 +39,7 @@
                         </h5>
                     </div>
                     <div class="panel-card-body">
-                        <role-form @roleCreated="handleRoleCreated" />
+                        <role-form :role-property="undefined" @created="handleRoleCreated" />
                     </div>
                 </div>
             </div>

@@ -142,9 +142,7 @@ export const actions : ActionTree<AuthState, RootState> = {
             }
 
             try {
-                const { permissions, ...user } = await this.$auth.getUserInfo(
-                    state.provider
-                );
+                const { permissions, ...user } = await this.$auth.getUserInfo();
 
                 dispatch('triggerSetUser', user);
                 dispatch('triggerSetPermissions', permissions);
@@ -161,18 +159,15 @@ export const actions : ActionTree<AuthState, RootState> = {
      *
      * @return {Promise<boolean>}
      */
-    async triggerLogin ({ commit, dispatch }, params: {[key: string] : any}) {
+    async triggerLogin ({ commit, dispatch }, credentials: {[key: string] : any}) {
         commit('loginRequest');
 
-        const { provider, data } = params;
-
         try {
-            const token = await this.$auth.attemptAccessTokenWith(provider, data);
+            const token = await this.$auth.attemptAccessTokenWith(credentials);
 
             commit('loginSuccess');
 
             dispatch('triggerSetToken', token);
-            dispatch('triggerSetProvider', provider);
 
             await dispatch('triggerRefreshMe');
             this.dispatch('layout/update');
@@ -203,7 +198,6 @@ export const actions : ActionTree<AuthState, RootState> = {
 
             try {
                 const p = this.$auth.attemptRefreshTokenWith(
-                    state.provider,
                     state.token.refreshToken
                 );
 
