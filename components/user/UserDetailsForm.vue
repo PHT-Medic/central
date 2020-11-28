@@ -1,6 +1,5 @@
 <script>
-import {mapActions, mapGetters} from "vuex";
-import {email, maxLength, minLength, required, numeric} from "vuelidate/lib/validators";
+import {email, maxLength, minLength, required} from "vuelidate/lib/validators";
 import {editUser} from "@/domains/user/api.ts";
 import {getRealms} from "@/domains/realm/api.ts";
 
@@ -11,15 +10,9 @@ export default {
             default: undefined
         }
     },
-    computed: {
-        ...mapGetters('auth', [
-            'loggedIn',
-            'user'
-        ])
-    },
     data() {
         return {
-            userGeneralForm: {
+            form: {
                 name: '',
                 email: '',
                 realmId: '',
@@ -34,7 +27,7 @@ export default {
         }
     },
     validations: {
-        userGeneralForm: {
+        form: {
             name: {
                 required,
                 minLength: minLength(5),
@@ -54,17 +47,14 @@ export default {
     created() {
         console.log(this.userProperty);
         if(typeof this.userProperty !== 'undefined') {
-            this.userGeneralForm.name = this.userProperty.name ?? '';
-            this.userGeneralForm.email = this.userProperty.email ?? '';
-            this.userGeneralForm.realmId = this.userProperty.realmId ?? '';
+            this.form.name = this.userProperty.name ?? '';
+            this.form.email = this.userProperty.email ?? '';
+            this.form.realmId = this.userProperty.realmId ?? '';
         }
 
         this.loadRealms();
     },
     methods: {
-        ...mapActions('auth',[
-            'triggerSetUserProperty'
-        ]),
         async loadRealms() {
             try {
                 this.realm.items = await getRealms();
@@ -84,12 +74,8 @@ export default {
                     continue;
                 }
 
-                switch (property) {
-                    default:
-                        if(this.userProperty[property] !== properties[property]) {
-                            fields.push(property);
-                        }
-                        break;
+                if(this.userProperty[property] !== properties[property]) {
+                    fields.push(property);
                 }
             }
 
@@ -99,64 +85,64 @@ export default {
 
             return false;
         },
-        async submitGeneralForm() {
-            if(this.userGeneralForm.busy || typeof this.userProperty === 'undefined') {
+        async submit() {
+            if(this.form.busy || typeof this.userProperty === 'undefined') {
                 return;
             }
 
-            this.userGeneralForm.busy = true;
+            this.form.busy = true;
 
             try {
-                let {name, email} = this.userGeneralForm;
+                let {name, email} = this.form;
 
                 let fields = this.whichFieldsAreModified({name, email});
 
                 if(fields.length > 0) {
-                    await editUser(this.userProperty.id, {name, email});
+                    const user = await editUser(this.userProperty.id, {name, email});
 
-                    if(this.userProperty.id === this.user.id) {
-                        this.triggerSetUserProperty({property: 'name', value: name});
-                        this.triggerSetUserProperty({property: 'email', value: email})
+                    if(this.userProperty.id === this.$store.getters['auth/user'].id) {
+                        await this.$store.dispatch('auth/triggerSetUserProperty',{property: 'name', value: name});
+                        await this.$store.dispatch('auth/triggerSetUserProperty',{property: 'email', value: email})
                     }
 
-                    this.$emit('userUpdated', {name, email});
+                    this.$emit('updated', user);
 
-                    this.userGeneralForm.message = {
+                    this.form.message = {
                         isError: false,
                         data: 'Die Attribute wurden erfolgreich aktualisiert.'
                     }
                 } else {
-                    this.userGeneralForm.message = {
+                    this.form.message = {
                         isError: false,
                         data: 'Die Attribute wurden nicht geändert.'
                     }
                 }
             } catch (e) {
-                this.userGeneralForm.message = {
+                this.form.message = {
                     isError: true,
                     data: e.message
                 }
             }
 
-            this.userGeneralForm.busy = false;
+            this.form.busy = false;
         },
     }
 }
 </script>
 <template>
     <div>
-        <form @submit.prevent="submitGeneralForm">
+        <form @submit.prevent="submit">
             <div
-                v-if="userGeneralForm.message"
-                :class="{'alert-warning': userGeneralForm.message.isError, 'alert-primary': !userGeneralForm.message.isError}"
+                v-if="form.message"
+                :class="{'alert-warning': form.message.isError, 'alert-primary': !form.message.isError}"
                 class="alert alert-sm">
-                {{userGeneralForm.message.data}}
+                {{ form.message.data }}
             </div>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.userGeneralForm.realmId.$error }">
+            <div class="form-group" :class="{ 'form-group-error': $v.form.realmId.$error }">
                 <label>Realm</label>
                 <select
-                    v-model="$v.userGeneralForm.realmId.$model"
+                    v-model="$v.form.realmId.$model"
                     class="form-control"
                     :disabled="realm.busy"
                 >
@@ -164,42 +150,42 @@ export default {
                     <option v-for="(item,key) in realm.items" :value="item.id" :key="key">{{ item.name }}</option>
                 </select>
 
-                <div v-if="!$v.userGeneralForm.realmId.required && !$v.userGeneralForm.realmId.$model" class="form-group-hint group-required">
+                <div v-if="!$v.form.realmId.required && !$v.form.realmId.$model" class="form-group-hint group-required">
                     Bitte geben Sie einen Realm an.
                 </div>
             </div>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.userGeneralForm.name.$error }">
+            <div class="form-group" :class="{ 'form-group-error': $v.form.name.$error }">
                 <label>Name</label>
-                <input v-model="$v.userGeneralForm.name.$model" type="text" name="name" class="form-control" placeholder="Benutzer-Name...">
+                <input v-model="$v.form.name.$model" type="text" name="name" class="form-control" placeholder="Benutzer-Name...">
 
-                <div v-if="!$v.userGeneralForm.name.required" class="form-group-hint group-required">
+                <div v-if="!$v.form.name.required" class="form-group-hint group-required">
                     Bitte geben Sie einen Benutzernamen an.
                 </div>
-                <div v-if="!$v.userGeneralForm.name.minLength" class="form-group-hint group-required">
-                    Der Benutzername muss mindestens <strong>{{ $v.userGeneralForm.name.$params.minLength.min }}</strong> Zeichen lang sein.
+                <div v-if="!$v.form.name.minLength" class="form-group-hint group-required">
+                    Der Benutzername muss mindestens <strong>{{ $v.form.name.$params.minLength.min }}</strong> Zeichen lang sein.
                 </div>
-                <div v-if="!$v.userGeneralForm.name.maxLength" class="form-group-hint group-required">
-                    Der Benutzername darf maximal <strong>{{ $v.userGeneralForm.name.$params.maxLength.max }}</strong> Zeichen lang sein.
+                <div v-if="!$v.form.name.maxLength" class="form-group-hint group-required">
+                    Der Benutzername darf maximal <strong>{{ $v.form.name.$params.maxLength.max }}</strong> Zeichen lang sein.
                 </div>
             </div>
 
             <hr>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.userGeneralForm.email.$error }">
+            <div class="form-group" :class="{ 'form-group-error': $v.form.email.$error }">
                 <label>Email</label>
-                <input v-model="$v.userGeneralForm.email.$model" type="email" name="email" class="form-control" placeholder="Email-Addresse...">
+                <input v-model="$v.form.email.$model" type="email" name="email" class="form-control" placeholder="Email-Addresse...">
 
-                <div v-if="!$v.userGeneralForm.email.required" class="form-group-hint group-required">
+                <div v-if="!$v.form.email.required" class="form-group-hint group-required">
                     Es muss eine E-Mail Addresse anggeben werden.
                 </div>
-                <div v-if="!$v.userGeneralForm.email.minLength" class="form-group-hint group-required">
-                    Die E-Mail Addresse muss mindestens <strong>{{ $v.userGeneralForm.email.$params.minLength.min }}</strong> Zeichen lang sein.
+                <div v-if="!$v.form.email.minLength" class="form-group-hint group-required">
+                    Die E-Mail Addresse muss mindestens <strong>{{ $v.form.email.$params.minLength.min }}</strong> Zeichen lang sein.
                 </div>
-                <div v-if="!$v.userGeneralForm.email.maxLength" class="form-group-hint group-required">
-                    Die E-Mail Addresse darf maximal <strong>{{ $v.userGeneralForm.email.$params.maxLength.max }}</strong> Zeichen lang sein.
+                <div v-if="!$v.form.email.maxLength" class="form-group-hint group-required">
+                    Die E-Mail Addresse darf maximal <strong>{{ $v.form.email.$params.maxLength.max }}</strong> Zeichen lang sein.
                 </div>
-                <div v-if="!$v.userGeneralForm.email.email" class="form-group-hint group-required">
+                <div v-if="!$v.form.email.email" class="form-group-hint group-required">
                     Die E-Mail Addresse ist nicht gültig.
                 </div>
             </div>
@@ -207,7 +193,7 @@ export default {
             <hr>
 
             <div class="form-group">
-                <button :disabled="$v.userGeneralForm.$invalid || userGeneralForm.busy" @click.prevent="submitGeneralForm" type="submit" class="btn btn-primary btn-xs">
+                <button :disabled="$v.form.$invalid || form.busy" @click.prevent="submit" type="submit" class="btn btn-primary btn-xs">
                     <i class="fa fa-save"></i> Speichern
                 </button>
             </div>

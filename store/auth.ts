@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import {ActionTree, GetterTree, MutationTree} from "vuex";
 
 import {RootState} from "~/store/index";
@@ -328,8 +329,7 @@ export const mutations : MutationTree<AuthState> = {
     setUserProperty(state, {property, value}) {
         if(typeof state.user === 'undefined') return;
 
-        // @ts-ignore
-        state.user[property] = value;
+        Vue.set(state.user, property, value);
     },
 
     // --------------------------------------------------------------------
