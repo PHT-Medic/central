@@ -16,7 +16,7 @@ export default {
     computed: {
         statusText() {
             switch (this.status) {
-                case 'success':
+                case 'approved':
                     return 'angenommen';
                 case 'rejected':
                     return 'abgelehnt';
@@ -26,10 +26,10 @@ export default {
         },
         badgeClass() {
             switch (this.status) {
-                case 'success':
+                case 'approved':
                     return 'badge-success';
                 case 'rejected':
-                    return 'badge-warning';
+                    return 'badge-danger';
                 default:
                     return 'badge-info';
             }

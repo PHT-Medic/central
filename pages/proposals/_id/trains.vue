@@ -1,6 +1,6 @@
 <script>
     import TrainBuilder from "../../../components/train/TrainBuilder";
-    import {TrainStates, TrainTypes} from "../../../domains/train";
+    import {TrainStates, TrainResultStates, TrainTypes} from "../../../domains/train";
     import {doTrainAction, dropTrain, getTrains} from "@/domains/train/api.ts";
 
     export default {
@@ -30,6 +30,7 @@
         data() {
             return {
                 trainStates: TrainStates,
+                trainResultStates: TrainResultStates,
                 train: {
                     item: undefined,
                     itemBusy: false,
@@ -41,7 +42,7 @@
                     { key: 'type', label: 'Type', thClass: 'text-center', tdClass: 'text-center' },
                     { key: 'status', label: 'Status', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'result', label: 'Ergebnis', thClass: 'text-left', tdClass: 'text-left'},
-                    { key: 'actions', label: 'Aktionen', tdClass: 'text-left' },
+                    { key: 'actions', label: 'Aktionen', thClass: 'text-center', tdClass: 'text-center' },
                     { key: 'options', label: 'Optionen', tdClass: 'text-left' }
                 ],
                 trainModalId: 'train-modal',
@@ -180,8 +181,8 @@
             //------------------------------------
 
             handleUpdated(train) {
-                let index = this.train.items.findIndex((item) => item.id === train.id);
-                if(index > - 1) {
+                let index = this.train.items.findIndex(item => item.id === train.id);
+                if(index !== - 1) {
                     this.train.items[index] = train;
                 }
             },
@@ -192,8 +193,8 @@
                 this.handleModalSubmit();
             },
 
-            generateUrl(item) {
-                return this.$config.authApiUrl+'/public/train/'+item.id+'.tar';
+            downloadTrainResult(item) {
+                window.open(this.$config.authApiUrl+'pht/trains/'+item.id+'/download')
             }
         },
         computed: {
@@ -234,42 +235,59 @@
         <div class="panel-card">
             <div class="panel-card-body">
                 <button type="button" @click.prevent="addTrain" class="btn btn-primary m-b-10">
-                    <i class="fa fa-train"></i> Zug Hinzufügen
+                    <i class="fa fa-train"></i> Train add
                 </button>
 
                 <div class="alert alert-primary alert-sm">
-                    Dies ist eine Übersicht aller bisher erstellten Züge.
+                    This is an overview of all created trains, either by you or a person of your station.
                 </div>
 
                 <div class="m-t-10">
                     <b-table :items="train.items" :fields="fields" :busy="train.busy" head-variant="'dark'" sort-by="id" :sort-desc="true" outlined>
                         <template v-slot:cell(status)="data">
                             <button v-if="data.item.status === trainStates.TrainStateCreated" class="btn btn-dark btn-xs" type="button">
-                                1. Konfiguriert
+                                1. configured
                             </button>
                             <button v-else-if="data.item.status === trainStates.TrainStateHashGenerated" class="btn btn-info btn-xs" type="button">
-                                2. Hash generiert
+                                2. hash generated
                             </button>
                             <button v-else-if="data.item.status === trainStates.TrainStateHashSigned" class="btn btn-primary btn-xs" type="button">
-                                3. Hash signiert
+                                3. hash signed
                             </button>
                             <button v-else-if="data.item.status === trainStates.TrainStateRunning" class="btn btn-success btn-xs" type="button">
-                                4. Unterwegs
+                                4. running
                             </button>
                             <button v-else-if="data.item.status === trainStates.TrainStateFinished" class="btn btn-warning btn-xs" type="button">
-                                5. Beendet
+                                5. finished
                             </button>
                         </template>
 
                         <template v-slot:cell(result)="data">
-                            <div v-if="!data.item.result" class="text-muted font-weight-bold">
-                                Es wurde noch kein Ergebnis generiert...
-                            </div>
-                            <div v-if="data.item.result">
-                                <a :href="generateUrl(data.item)" target="_blank" class="btn btn-primary btn-xs" v-if="$auth.can('read','trainResult')">
-                                    <i class="fa fa-download"></i> Download
-                                </a>
-                            </div>
+                            <template v-if="data.item.result">
+                                <button v-if="data.item.result.status === trainResultStates.TrainResultStateOpen" :disabled="true" class="btn btn-dark btn-xs" type="button">
+                                    1. outstanding...
+                                </button>
+                                <button v-else-if="data.item.result.status === trainResultStates.TrainResultStateDownloading" :disabled="true" class="btn btn-info btn-xs" type="button">
+                                    2. train image downloading...
+                                </button>
+                                <button v-else-if="data.item.result.status === trainResultStates.TrainResultStateDownloaded" :disabled="true" class="btn btn-primary btn-xs" type="button">
+                                    3. train image downloaded.
+                                </button>
+                                <button v-else-if="data.item.result.status === trainResultStates.TrainResultStateExtracting" :disabled="true" class="btn btn-info btn-xs" type="button">
+                                    4. extracting train image files...
+                                </button>
+                                <button @click="downloadTrainResult(data.item)" v-else-if="data.item.result.status === trainResultStates.TrainResultStateFinished" :disabled="!$auth.can('read','trainResult')" class="btn btn-success btn-xs" type="button">
+                                    5. download
+                                </button>
+                                <button v-else :disabled="true" class="btn btn-danger btn-xs" type="button">
+                                    ?. failed
+                                </button>
+                            </template>
+                            <template v-else>
+                                <button :disabled="true" class="btn btn-secondary btn-xs" type="button">
+                                    none
+                                </button>
+                            </template>
                         </template>
 
                         <template v-slot:cell(actions)="data">

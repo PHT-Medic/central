@@ -21,7 +21,7 @@ export async function getApiTrainFile(trainId: number, fileId: number) {
     }
 }
 
-export async function dropTrainFile(trainId: number, fileId: number) {
+export async function dropApiTrainFile(trainId: number, fileId: number) {
     try {
         let response = await useApi('auth').delete('pht/trains/'+trainId+'/files/'+fileId);
 

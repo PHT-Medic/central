@@ -11,7 +11,7 @@ export async function getTrains(options?: RequestRecord) {
     }
 }
 
-export async function getTrain(id: number) {
+export async function getTrain(id: string) {
     try {
         const response = await useApi('auth').get('pht/trains/'+id);
 
@@ -21,7 +21,7 @@ export async function getTrain(id: number) {
     }
 }
 
-export async function dropTrain(id: number) {
+export async function dropTrain(id: string) {
     try {
         const response = await useApi('auth').delete('pht/trains/'+id);
 
@@ -51,7 +51,7 @@ export async function addTrain(data: Record<string, any>) {
     }
 }
 
-export async function doTrainAction(id: number, action: string) {
+export async function doTrainAction(id: string, action: string) {
     try {
         let response = await useApi('auth').get('pht/trains/' + id + '/action/' + action);
 

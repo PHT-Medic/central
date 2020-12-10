@@ -16,6 +16,7 @@ export default {
             form: {
                 password: '',
                 passwordRepeat: '',
+                passwordShow: false,
 
                 message: null,
                 busy: false
@@ -76,35 +77,41 @@ export default {
 
         <div class="form-group" :class="{ 'form-group-error': $v.form.password.$error }">
             <label>Passwort</label>
-            <input v-model="$v.form.password.$model" type="password" name="name" class="form-control" placeholder="Passwort...">
+            <input v-model="$v.form.password.$model" :type="form.passwordShow ? 'text' : 'password'"  name="name" class="form-control" placeholder="Passwort...">
 
             <div v-if="!$v.form.password.required" class="form-group-hint group-required">
-                Bitte geben Sie einen Benutzernamen an.
+                Bitte geben Sie ein Passwort an.
             </div>
             <div v-if="!$v.form.password.minLength" class="form-group-hint group-required">
-                Der Benutzername muss mindestens <strong>{{ $v.form.password.$params.minLength.min }}</strong> Zeichen lang sein.
+                Das Passwort muss mindestens <strong>{{ $v.form.password.$params.minLength.min }}</strong> Zeichen lang sein.
             </div>
             <div v-if="!$v.form.password.maxLength" class="form-group-hint group-required">
-                Der Benutzername darf maximal <strong>{{ $v.form.password.$params.maxLength.max }}</strong> Zeichen lang sein.
+                Das Passwort darf maximal <strong>{{ $v.form.password.$params.maxLength.max }}</strong> Zeichen lang sein.
             </div>
         </div>
 
         <div class="form-group" :class="{ 'form-group-error': $v.form.passwordRepeat.$error }">
             <label>Passwort wiederholen</label>
-            <input v-model="$v.form.passwordRepeat.$model" type="password" name="name" class="form-control" placeholder="Passwort wiederholen...">
+            <input v-model="$v.form.passwordRepeat.$model" :type="form.passwordShow ? 'text' : 'password'" name="name" class="form-control" placeholder="Passwort wiederholen...">
 
             <div v-if="!$v.form.passwordRepeat.required" class="form-group-hint group-required">
-                Bitte geben Sie einen Benutzernamen an.
+                Bitte geben Sie das Passwort erneut an.
             </div>
             <div v-if="!$v.form.passwordRepeat.minLength" class="form-group-hint group-required">
-                Der Benutzername muss mindestens <strong>{{ $v.form.passwordRepeat.$params.minLength.min }}</strong> Zeichen lang sein.
+                Das Password muss mindestens <strong>{{ $v.form.passwordRepeat.$params.minLength.min }}</strong> Zeichen lang sein.
             </div>
             <div v-if="!$v.form.passwordRepeat.maxLength" class="form-group-hint group-required">
-                Der Benutzername darf maximal <strong>{{ $v.form.passwordRepeat.$params.maxLength.max }}</strong> Zeichen lang sein.
+                Das Password darf maximal <strong>{{ $v.form.passwordRepeat.$params.maxLength.max }}</strong> Zeichen lang sein.
             </div>
             <div v-if="!$v.form.passwordRepeat.sameAsPassword" class="form-group-hint group-required">
                 Die Passwörter sind nicht identisch...
             </div>
+        </div>
+
+        <div class="form-group pl-1 mb-1">
+            <b-form-checkbox v-model="form.passwordShow" switch>
+                Passwort {{ form.passwordShow ? 'ausblenden' : 'anzeigen' }}
+            </b-form-checkbox>
         </div>
 
         <hr>

@@ -3,9 +3,10 @@ import {dropRealm, getRealms} from "@/domains/realm/api.ts";
 import {editApiStationProposal, getApiStationProposals} from "@/domains/station/proposal/api.ts";
 import {getStation, getStations} from "@/domains/station/api.ts";
 import ProposalInForm from "@/components/proposal/ProposalInForm";
+import ProposalStationStatus from "@/components/proposal/ProposalStationStatus";
 
 export default {
-    components: {ProposalInForm},
+    components: {ProposalStationStatus, ProposalInForm},
     meta: {
         requireLoggedIn: true,
         requireAbility(can) {
@@ -127,24 +128,14 @@ export default {
                         </template>
 
                         <template v-slot:cell(status)="data">
-                            <span
-                                class="badge"
-                                :class="{
-                                 'badge-warning': data.item.status === 'rejected',
-                                 'badge-success': data.item.status === 'approved',
-                                 'badge-info': data.item.status === 'open'
-                                }"
+                            <proposal-station-status
+                                :status="data.item.status"
+                                v-slot:default="slotProps"
                             >
-                                <template v-if="data.item.status === 'approved'">
-                                    angenommen
-                                </template>
-                                <template v-else-if="data.item.status === 'rejected'">
-                                    abgelehnt
-                                </template>
-                                <template v-else>
-                                    ausstehend
-                                </template>
-                            </span>
+                                <span class="badge" :class="slotProps.badgeClass">
+                                    {{slotProps.statusText}}
+                                </span>
+                            </proposal-station-status>
                         </template>
 
                         <template v-slot:cell(proposal_id)="data">

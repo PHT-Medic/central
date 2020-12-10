@@ -6,7 +6,7 @@
     import {getMasterImages} from "@/domains/masterImage/api.ts";
     import {editProposal} from "@/domains/proposal/api.ts";
     import {dropApiProposalStation} from "@/domains/proposal/station/api.ts";
-    import ProposalStationStatus from "@/components/proposal/ProposalStationStatus";
+
 
     export default {
         meta: {
@@ -14,7 +14,7 @@
                 return can('edit', 'proposal') || can('drop', 'proposal')
             }
         },
-        components: {ProposalStationStatus, AlertMessage, ProposalEditor },
+        components: { AlertMessage, ProposalEditor },
         props: {
             proposal: {
                 type: Object,

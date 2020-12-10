@@ -16,10 +16,9 @@ export default {
                 name: '',
                 email: '',
                 realmId: '',
-
-                message: null,
-                busy: false,
             },
+            message: null,
+            busy: false,
             realm: {
                 items: [],
                 busy: false
@@ -34,7 +33,6 @@ export default {
                 maxLength: maxLength(30)
             },
             email: {
-                required,
                 minLength: minLength(5),
                 maxLength: maxLength(255),
                 email
@@ -45,7 +43,6 @@ export default {
         }
     },
     created() {
-        console.log(this.userProperty);
         if(typeof this.userProperty !== 'undefined') {
             this.form.name = this.userProperty.name ?? '';
             this.form.email = this.userProperty.email ?? '';
@@ -64,67 +61,71 @@ export default {
                 this.realm.busy = false;
             }
         },
-        whichFieldsAreModified(properties) {
+        getModifiedFields() {
             if(typeof this.userProperty === 'undefined') return;
 
-            let fields = [];
+            let fields = {};
 
-            for(let property in properties) {
-                if(!properties.hasOwnProperty(property)){
+            for(let property in this.form) {
+                if(!this.form.hasOwnProperty(property)){
                     continue;
                 }
 
-                if(this.userProperty[property] !== properties[property]) {
-                    fields.push(property);
+                if(this.userProperty[property] !== this.form[property]) {
+                    fields[property] = this.form[property];
                 }
             }
 
-            if(fields.length > 0) {
-                return fields;
-            }
+            return fields;
+        },
+        async updateSessionUser(fields) {
+            if(this.userProperty.id !== this.$store.getters['auth/user'].id) return;
 
-            return false;
+            for(let key in fields) {
+                if(!fields.hasOwnProperty(key)) continue;
+                await this.$store.dispatch('auth/triggerSetUserProperty', {property: key, value: fields[key]});
+            }
         },
         async submit() {
-            if(this.form.busy || typeof this.userProperty === 'undefined') {
+            if(this.busy || typeof this.userProperty === 'undefined') {
                 return;
             }
 
-            this.form.busy = true;
+            this.busy = true;
 
             try {
-                let {name, email} = this.form;
+                let fields = this.getModifiedFields();
+                let fieldsCount = Object.keys(fields).length;
 
-                let fields = this.whichFieldsAreModified({name, email});
-
-                if(fields.length > 0) {
-                    const user = await editUser(this.userProperty.id, {name, email});
-
-                    if(this.userProperty.id === this.$store.getters['auth/user'].id) {
-                        await this.$store.dispatch('auth/triggerSetUserProperty',{property: 'name', value: name});
-                        await this.$store.dispatch('auth/triggerSetUserProperty',{property: 'email', value: email})
-                    }
+                if(fieldsCount > 0) {
+                    const user = await editUser(this.userProperty.id, fields);
 
                     this.$emit('updated', user);
 
-                    this.form.message = {
+                    this.message = {
                         isError: false,
                         data: 'Die Attribute wurden erfolgreich aktualisiert.'
                     }
+
+                    if(fields.hasOwnProperty('realmId')) {
+                        fields.realm = user.realm;
+                    }
+
+                    await this.updateSessionUser(fields);
                 } else {
-                    this.form.message = {
+                    this.message = {
                         isError: false,
                         data: 'Die Attribute wurden nicht geändert.'
                     }
                 }
             } catch (e) {
-                this.form.message = {
+                this.message = {
                     isError: true,
                     data: e.message
                 }
             }
 
-            this.form.busy = false;
+            this.busy = false;
         },
     }
 }
@@ -133,10 +134,10 @@ export default {
     <div>
         <form @submit.prevent="submit">
             <div
-                v-if="form.message"
-                :class="{'alert-warning': form.message.isError, 'alert-primary': !form.message.isError}"
+                v-if="message"
+                :class="{'alert-warning': message.isError, 'alert-primary': !message.isError}"
                 class="alert alert-sm">
-                {{ form.message.data }}
+                {{ message.data }}
             </div>
 
             <div class="form-group" :class="{ 'form-group-error': $v.form.realmId.$error }">
@@ -144,7 +145,7 @@ export default {
                 <select
                     v-model="$v.form.realmId.$model"
                     class="form-control"
-                    :disabled="realm.busy"
+                    :disabled="realm.busy || !$auth.can('edit','user')"
                 >
                     <option value="">--- Bitte auswählen ---</option>
                     <option v-for="(item,key) in realm.items" :value="item.id" :key="key">{{ item.name }}</option>
@@ -159,7 +160,7 @@ export default {
                 <label>Name</label>
                 <input v-model="$v.form.name.$model" type="text" name="name" class="form-control" placeholder="Benutzer-Name...">
 
-                <div v-if="!$v.form.name.required" class="form-group-hint group-required">
+                <div v-if="!$v.form.name.required && !$v.form.name.$model" class="form-group-hint group-required">
                     Bitte geben Sie einen Benutzernamen an.
                 </div>
                 <div v-if="!$v.form.name.minLength" class="form-group-hint group-required">
@@ -176,9 +177,6 @@ export default {
                 <label>Email</label>
                 <input v-model="$v.form.email.$model" type="email" name="email" class="form-control" placeholder="Email-Addresse...">
 
-                <div v-if="!$v.form.email.required" class="form-group-hint group-required">
-                    Es muss eine E-Mail Addresse anggeben werden.
-                </div>
                 <div v-if="!$v.form.email.minLength" class="form-group-hint group-required">
                     Die E-Mail Addresse muss mindestens <strong>{{ $v.form.email.$params.minLength.min }}</strong> Zeichen lang sein.
                 </div>
@@ -193,7 +191,7 @@ export default {
             <hr>
 
             <div class="form-group">
-                <button :disabled="$v.form.$invalid || form.busy" @click.prevent="submit" type="submit" class="btn btn-primary btn-xs">
+                <button :disabled="$v.form.$invalid || busy" @click.prevent="submit" type="submit" class="btn btn-primary btn-xs">
                     <i class="fa fa-save"></i> Speichern
                 </button>
             </div>

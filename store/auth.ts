@@ -138,10 +138,6 @@ export const actions : ActionTree<AuthState, RootState> = {
      */
     async triggerRefreshMe ({ state, dispatch }) {
         if (state.token) {
-            if(typeof state.provider === 'undefined') {
-                throw new Error('No provider specified to receive user info.');
-            }
-
             try {
                 const { permissions, ...user } = await this.$auth.getUserInfo();
 
@@ -275,8 +271,10 @@ export const actions : ActionTree<AuthState, RootState> = {
      * @param property
      * @param value
      */
-    triggerSetUserProperty ({ commit }, {property, value}) {
+    triggerSetUserProperty ({ commit, state }, {property, value}) {
         commit('setUserProperty', { property, value});
+        this.$authWarehouse.remove(AuthStoreKey.user);
+        this.$authWarehouse.set(AuthStoreKey.user, state.user);
     }
 };
 

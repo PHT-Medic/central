@@ -11,7 +11,7 @@
     import {getMasterImages} from "@/domains/masterImage/api.ts";
     import {getApiProposalStations} from "@/domains/proposal/station/api.ts";
     import {addTrain, doTrainAction, editApiTrain, getTrain} from "@/domains/train/api.ts";
-    import {dropTrainFile, getApiTrainFiles, uploadTrainFiles} from "@/domains/train/file";
+    import {dropApiTrainFile, getApiTrainFiles, uploadTrainFiles} from "@/domains/train/file";
 
     const TrainTypes = {
         Analyse: 'analyse',
@@ -262,7 +262,7 @@
                 this.trainFiles.busy = true;
 
                 try {
-                    await dropTrainFile(this.train.id, id);
+                    await dropApiTrainFile(this.train.id, id);
 
                     let index = this.trainFiles.items.findIndex((item) => item.id === id);
                     this.trainFiles.items.splice(index,1);
@@ -903,7 +903,7 @@
                 </tab-content>
                 <tab-content title="Ende">
                     <div class="alert alert-sm alert-success">
-                        Der Zug wurde erfolgreich erstellt und macht jetzt seine Reise ;) ...
+                        Der Zug wurde erfolgreich erstellt ...
                     </div>
                 </tab-content>
             </form-wizard>
