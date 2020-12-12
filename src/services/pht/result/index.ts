@@ -1,11 +1,17 @@
 import Docker from 'dockerode';
-
 import {schedule} from 'node-cron';
-
 import {downloadTrainImage, saveTrainImageDirectory} from "./image";
 import {getTrainRepositories, TrainRepository} from "./repository";
 import {getRepository, In} from "typeorm";
 import {TrainResult} from "../../../domains/pht/train/result";
+import {
+    TrainResultStateDownloaded,
+    TrainResultStateDownloading,
+    TrainResultStateExtracting,
+    TrainResultStateFailed,
+    TrainResultStateFinished,
+    TrainResultStateOpen
+} from "../../../domains/pht/train/result/states";
 import {Train} from "../../../domains/pht/train";
 import {TrainStateFinished} from "../../../domains/pht/train/states";
 
@@ -20,49 +26,126 @@ export function useDocker() : Docker {
     return dockerInstance;
 }
 
+async function runPHTTrainSyncer() {
+    let harborTrains;
+
+    try {
+        harborTrains = await getTrainRepositories();
+    } catch (e) {
+        return;
+    }
+
+    const harborTrainIds : string[] = harborTrains.map(trainRepository => trainRepository.trainId);
+
+    if(harborTrainIds.length === 0) {
+        return;
+    }
+
+    const repository = getRepository(Train);
+    const trains = await repository.createQueryBuilder('train')
+        .leftJoinAndSelect('train.result', 'result')
+        .where({
+            id: In(harborTrainIds)
+        })
+        .getMany();
+
+    if(trains.length === 0) return;
+
+    const resultRepository = getRepository(TrainResult);
+
+    const openTrainResults : Partial<TrainResult>[] = harborTrains
+        .filter((trainRepository: TrainRepository) => {
+            return trains.findIndex((train: Train) => train.id === trainRepository.trainId && !train.result) !== -1;
+        })
+        .map((trainRepository: TrainRepository) => {
+            return resultRepository.create({
+                train_id: trainRepository.trainId,
+                image: trainRepository.image
+            })
+        });
+
+    if(openTrainResults.length > 0) {
+        await resultRepository.save(openTrainResults);
+
+        await repository.update({
+            id: In(openTrainResults.map(result => result.train_id))
+        }, {status: TrainStateFinished});
+    }
+
+    console.log(openTrainResults);
+}
+
+async function runPHTTrainDownloader() {
+    const repository = getRepository(TrainResult);
+
+    let trainResults : TrainResult[] = await repository.find({
+        status: TrainResultStateOpen
+    });
+
+    if(trainResults.length === 0) return;
+
+    trainResults = trainResults.map((trainResult: TrainResult) => {
+        return {...trainResult, status: TrainResultStateDownloading}
+    });
+
+    await repository.save(trainResults);
+
+    console.log(trainResults);
+
+    for(let i=0; i<trainResults.length; i++) {
+        try {
+            await downloadTrainImage(trainResults[i]);
+            trainResults[i] = repository.merge(trainResults[i], {status: TrainResultStateDownloaded});
+        } catch (e) {
+            console.log(e);
+            trainResults[i] = repository.merge(trainResults[i], {status: TrainResultStateFailed});
+        }
+        await repository.save(trainResults[i]);
+    }
+
+    console.log(trainResults);
+}
+
+async function runPHTTrainExtractor() {
+    const repository = getRepository(TrainResult);
+
+    let trainResults : TrainResult[] = await repository.find({
+        status: TrainResultStateDownloaded
+    });
+
+    trainResults = trainResults.map((trainResult: TrainResult) => {
+        return {...trainResult, status: TrainResultStateExtracting}
+    });
+
+    if(trainResults.length === 0) return;
+
+    console.log(trainResults);
+
+    await repository.save(trainResults);
+
+    for(let i=0; i<trainResults.length; i++) {
+        try {
+            await saveTrainImageDirectory(trainResults[i]);
+            trainResults[i] = repository.merge(trainResults[i], {status: TrainResultStateFinished});
+
+        } catch (e) {
+            console.log(e);
+            trainResults[i] = repository.merge(trainResults[i], {status: TrainResultStateFailed});
+        }
+
+        await repository.save(trainResults[i]);
+    }
+
+    console.log(trainResults);
+}
+
 async function runPHTResultScheduler() {
     console.log('Check for trains...');
 
     try {
-        const harborTrains = await getTrainRepositories();
-        const harborTrainIds : number[] = harborTrains.map(trainRepository => trainRepository.trainId);
-
-        const repository = getRepository(TrainResult);
-
-        let trainResults : TrainResult[] = [];
-
-        if(harborTrainIds.length > 0) {
-            trainResults = await repository.find({
-                train_id: In(harborTrainIds)
-            });
-        }
-
-        const nonProceedTrains = harborTrains.filter((trainRepository: TrainRepository) => {
-            return trainResults.length === 0 || trainResults.findIndex((trainResult: TrainResult) => trainResult.train_id === trainRepository.trainId) === -1;
-        });
-
-        if(nonProceedTrains.length > 0) {
-            for(let i=0; i<nonProceedTrains.length; i++) {
-                await downloadTrainImage(nonProceedTrains[i]);
-                await saveTrainImageDirectory(nonProceedTrains[i]);
-            }
-
-            const entities : TrainResult[] = nonProceedTrains.map((trainRepository: TrainRepository) => {
-                return repository.create({
-                    train_id: trainRepository.trainId
-                })
-            });
-
-            await repository.save(entities);
-
-            const trainIds = nonProceedTrains.map(trainRepository => trainRepository.trainId);
-
-            await getRepository(Train).update({
-                id: In(trainIds)
-            },{
-                status: TrainStateFinished
-            })
-        }
+        await runPHTTrainSyncer();
+        await runPHTTrainDownloader();
+        await runPHTTrainExtractor();
     } catch (e) {
         console.log(e.message);
     }
@@ -70,4 +153,5 @@ async function runPHTResultScheduler() {
 
 export default function createPHTResultService() {
     schedule('* * * * *', runPHTResultScheduler);
+    runPHTResultScheduler();
 }

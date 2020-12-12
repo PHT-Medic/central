@@ -7,16 +7,18 @@ export async function createTrainBuilderMessage(train: Train, withPublicKey: boo
     let message: Record<string, any> = {
         type: train.type,
         train_id: train.id,
+        proposal_id: train.proposal_id,
         user_id: train.user_id,
+        user_public_key: undefined,
         user_signature: train.hash_signed,
         route: train.stations.map((station: Station) => {
             return station.id;
         }),
-        master_image: train.master_image,
+        master_image: train.master_image.external_tag_id,
         endpoint: {
-            name: 'default',
-            command: 'run',
-            files: train.files
+            name: 'default', // not necessary anymore
+            command: 'run', // executable: python | r
+            files: train.files // {name: 'test.py', content: 'xy', path: '/.../', isEntrypoint: boolean}
         }
     };
 
@@ -28,6 +30,8 @@ export async function createTrainBuilderMessage(train: Train, withPublicKey: boo
 
         message.user_public_key = publicKey.content;
     }
+
+    console.log(message);
 
     return message;
 }

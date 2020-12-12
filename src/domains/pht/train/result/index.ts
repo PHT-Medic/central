@@ -6,11 +6,12 @@ import {
     UpdateDateColumn
 } from "typeorm";
 import {Train} from "../index";
+import {TrainResultStateOpen} from "./states";
 
 @Entity()
 export class TrainResult {
-    @PrimaryGeneratedColumn({unsigned: true})
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @CreateDateColumn()
     created_at: string;
@@ -19,9 +20,15 @@ export class TrainResult {
     updated_at: string
 
     @Column()
-    train_id: number;
+    train_id: string;
 
-    @OneToOne(() => Train, train => train.result)
+    @Column({nullable: true, default: null})
+    image: string;
+
+    @Column({default: TrainResultStateOpen})
+    status: string;
+
+    @OneToOne(() => Train, train => train.result, {onDelete: "CASCADE"})
     @JoinColumn({name: 'train_id'})
     train: Train;
 }

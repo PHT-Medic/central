@@ -4,10 +4,9 @@ import {RoleRepository} from "../../domains/role/repository";
 import {Role} from "../../domains/role";
 import {Permission} from "../../domains/permission";
 import {RolePermission} from "../../domains/role/permission";
-import {Provider, AuthenticatorScheme} from "../../domains/provider";
-import env from "../../env";
 import {Realm} from "../../domains/realm";
 import {MasterImage} from "../../domains/pht/master-image";
+import {Station} from "../../domains/pht/station";
 
 //----------------------------------------------
 let roleNames = [
@@ -39,17 +38,6 @@ let rolePermissionMapping: {[key: number] : number[]} = {
 
 export default class CreateBase implements Seeder {
     public async run(factory: Factory, connection: Connection): Promise<any> {
-        const realmRepository = connection.getRepository(Realm);
-        let realms = [];
-        const realmsCount = 3;
-
-        for(let i=1; i<=realmsCount; i++) {
-            realms.push(realmRepository.create({
-                id: 'station_'+i,
-                name: 'Station '+i
-            }))
-        }
-
         //-------------------------------------------------
 
         const roleRepository = connection.getCustomRepository(RoleRepository);
@@ -78,11 +66,12 @@ export default class CreateBase implements Seeder {
 
         const rolePermissionRepository = connection.getRepository(RolePermission);
         let rolePermissions : RolePermission[] = [];
-        for(let i=0; i<roles.length; i++) {
-            for (let j = 0; j < permissions.length; j++) {
+        for(let roleIndex in rolePermissionMapping) {
+            for (let j = 0; j < rolePermissionMapping[roleIndex].length; j++) {
+                const permissionIndex = rolePermissionMapping[roleIndex][j];
                 rolePermissions.push(rolePermissionRepository.create({
-                    role_id: roles[i].id,
-                    permission_id: permissions[j].id
+                    role_id: roles[roleIndex].id,
+                    permission_id: permissions[permissionIndex].id
                 }))
             }
         }
@@ -103,5 +92,28 @@ export default class CreateBase implements Seeder {
         });
 
         await masterImageRepository.save(masterImages);
+
+        //-------------------------------------------------
+
+        const realms : Partial<Realm>[] = [
+            {id: 'station_1', name: 'Universität Leipzig'},
+            {id: 'station_2', name: 'Universität Achen'},
+            {id: 'station_3', name: 'Universität Tübingen'},
+        ];
+        const realmRepository = connection.getRepository(Realm);
+        await realmRepository.insert(realms);
+
+        //-------------------------------------------------
+
+        const stationRepository = connection.getRepository(Station);
+        const stations : Partial<Station>[] = [];
+        for (let i=0; i<realms.length; i++) {
+            stations.push({
+                realm_id: realms[i].id,
+                name: realms[i].name
+            });
+        }
+
+        await stationRepository.insert(stations);
     }
 }

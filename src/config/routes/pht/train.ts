@@ -12,9 +12,12 @@ import {
     dropTrainFileRouteHandler, getTrainFileRouteHandler, getTrainFilesRouteHandler,
     uploadTrainFilesRouteHandler
 } from "../../../controllers/pht/train/file/TrainFileController";
+import {getTrainResultRouteHandler} from "../../../controllers/pht/train/result/TrainResultController";
 
 export function setupPhtTrainRoutes() {
     const router = Router();
+
+    router.get('/:id/download', [], getTrainResultRouteHandler);
 
     router.delete('/:id/files/:fileId', [forceLoggedIn], dropTrainFileRouteHandler);
     router.get('/:id/files/:fileId', [forceLoggedIn], getTrainFileRouteHandler);

@@ -1,14 +1,30 @@
 import express, {Express, Response, Request, NextFunction, static as expressStatic } from "express";
-import expressFileUpload from 'express-fileupload';
 import cors from "cors";
+import fileUpload from "express-fileupload";
+
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import router from './../../services/router';
 import {getPublicDirPath} from "../../config/paths";
+import BusBoy from "busboy";
 
 export interface ExpressAppInterface extends Express{
 
 }
+
+function hasBody(req: any) {
+    const encoding = 'transfer-encoding' in req.headers,
+        length = 'content-length' in req.headers
+            && req.headers['content-length'] !== '0';
+    return encoding || length;
+}
+
+function mime(req: any) {
+    const str = req.headers['content-type'] || '';
+    return str.split(';')[0];
+}
+
+const RE_MIME = /^(?:multipart\/.+)|(?:application\/x-www-form-urlencoded)$/i;
 
 function createExpressApp() : ExpressAppInterface {
     const expressApp : Express = express();
@@ -21,7 +37,7 @@ function createExpressApp() : ExpressAppInterface {
     // Cookie parser
     expressApp.use(cookieParser());
 
-    expressApp.use(expressFileUpload());
+    //expressApp.use(fileUpload({uriDecodeFileNames: false, safeFileNames: false}));
 
     expressApp.use('/public', expressStatic(getPublicDirPath()))
 

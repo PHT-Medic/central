@@ -11,6 +11,7 @@ import {
 import {User} from "../user";
 import {Proposal} from "../pht/proposal";
 import {Train} from "../pht/train";
+import {Provider} from "../provider";
 
 @Entity()
 export class Realm {
@@ -33,8 +34,8 @@ export class Realm {
     @UpdateDateColumn()
     updated_at: string;
 
-    @OneToMany(() => User, user => user.realm)
-    users: User[];
+    @OneToMany(() => Provider, provider => provider.realm)
+    providers: Provider[];
 
     @OneToMany(() => Proposal, proposal => proposal.realm)
     proposals: Proposal[];

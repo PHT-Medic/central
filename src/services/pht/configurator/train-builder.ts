@@ -10,6 +10,7 @@ export function generateTrainHash(message: Record<string, any>, userToken: strin
                 data: message,
                 token: userToken,
             }, (data: any) => {
+                console.log(data);
                 if (
                     typeof data === 'object' &&
                     data.hasOwnProperty('success') &&
@@ -42,10 +43,12 @@ export function startTrain(message: Record<string, any>, userToken: string) : Pr
 
         try {
             return socket.emit('train', {
-                action: 'generateHash',
+                action: 'build',
                 data: message,
                 token: userToken,
             }, (data: any) => {
+                console.log(data);
+
                 let success = false;
 
                 if(typeof data === 'object') {
@@ -59,6 +62,7 @@ export function startTrain(message: Record<string, any>, userToken: string) : Pr
                 }
             });
         } catch (e) {
+            console.log(e);
             return reject(e);
         }
     }));

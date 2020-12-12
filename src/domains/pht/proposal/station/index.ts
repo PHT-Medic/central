@@ -9,13 +9,14 @@ import {
 } from "typeorm";
 import {Proposal} from "../index";
 import {Station} from "../../station";
+import {ProposalStationStateOpen} from "./states";
 
 @Entity()
 export class ProposalStation {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({unsigned: true})
     id: number;
 
-    @Column({default: 'open'})
+    @Column({default: ProposalStationStateOpen})
     status: string;
 
     @Column({type: "text", nullable: true})
@@ -30,14 +31,14 @@ export class ProposalStation {
     @Column()
     proposal_id: number;
 
-    @ManyToOne(() => Proposal, proposal => proposal.proposalStations)
+    @ManyToOne(() => Proposal, proposal => proposal.proposalStations, {onDelete: "CASCADE"})
     @JoinColumn({name: 'proposal_id'})
     proposal: Proposal;
 
     @Column()
     station_id: number;
 
-    @ManyToOne(() => Station, station => station.proposalStations)
+    @ManyToOne(() => Station, station => station.proposalStations, {onDelete: "CASCADE"})
     @JoinColumn({name: 'station_id'})
     station: Station;
 }

@@ -23,5 +23,6 @@ createConnection().then((connection: Connection) => {
         console.log('Listening on port: ' + process.env.PORT);
     });
 
-    //createPHTResultService();
+
+    createPHTResultService();
 });

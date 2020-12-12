@@ -11,27 +11,33 @@ export class TrainFile {
     @Column()
     name: string;
 
-    @Column({type: "text"})
-    content: string;
+    @Column()
+    hash: string;
+
+    @Column({nullable: true})
+    path: string;
+
+    @Column({nullable: true})
+    size: number;
 
     @Column()
     user_id: number;
 
-    @ManyToOne(() => User, user => user.trainFiles)
+    @ManyToOne(() => User,{onDelete: "CASCADE"})
     @JoinColumn({name: 'user_id'})
     user: User;
 
     @Column()
-    train_id: number;
+    train_id: string;
 
-    @ManyToOne(() => Train, train => train.files)
+    @ManyToOne(() => Train, train => train.files, {onDelete: "CASCADE"})
     @JoinColumn({name: 'train_id'})
     train: Train;
 
     @Column()
     realm_id: string;
 
-    @ManyToOne(() => Realm)
+    @ManyToOne(() => Realm, {onDelete: "SET NULL"})
     @JoinColumn({name: 'realm_id'})
     realm: Realm;
 }

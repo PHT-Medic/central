@@ -15,17 +15,18 @@ const checkAuthenticated = async (req: any, res: any, next: any) => {
     let userPermissions: PermissionInterface[] =  [];
 
     if(typeof authorization !== "undefined") {
-        let token = authorization.split(" ")[1];
+        const tokenStr = authorization.split(" ")[1];
+        let token : any;
 
         switch (AuthConfig.lapMode) {
             case 'lapBasic':
-                if((token = await verifyToken(token)) === false) {
+                if((token = await verifyToken(tokenStr)) === false) {
                     res.cookie('token', null, {maxAge: Date.now()});
 
                     return res._failUnauthorized({message: 'Der angegebene Token ist nicht gültig.', errorCode: 'invalid_token'});
                 }
 
-                userToken = token;
+                userToken = tokenStr;
                 userId = token.id;
                 break;
             case 'lapOauth2':

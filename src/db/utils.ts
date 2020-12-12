@@ -37,12 +37,13 @@ export function applyRequestFilterOnQuery(query: SelectQueryBuilder<any>, reques
         }
 
         if (typeof requestFilters[key] !== 'string') {
+            console.log(requestFilters[key]);
             delete requestFilters[key];
         }
 
-        requestFilters[key] = requestFilters[key].replace(',','').trim();
+        const stripped = requestFilters[key].replace(',','').trim();
 
-        if(requestFilters[key].length < 2) {
+        if(stripped.length === 0) {
             delete requestFilters[key];
         }
     }

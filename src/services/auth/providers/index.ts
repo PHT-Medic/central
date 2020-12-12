@@ -7,9 +7,7 @@ import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../domains/user/repository";
 import {buildQuery} from "../../api/utils";
 import env from "../../../env";
-import {User} from "../../../domains/user";
 import {Role} from "../../../domains/role";
-import {UserRole} from "../../../domains/user/role";
 
 export type LoginToken = {
     accessToken: string,

@@ -1,12 +1,14 @@
 import path from 'path';
 
-const writablePath = path.resolve(__dirname + '../../../writable');
-export {
-    writablePath
-}
+let writableDirPath : string | undefined;
 
-export default {
-    writablePath
+export function getWritableDirPath() {
+    if(typeof writableDirPath !== 'undefined') {
+        return writableDirPath;
+    }
+
+    writableDirPath = path.resolve(__dirname + '../../../writable');
+    return writableDirPath;
 }
 
 let publicDirPath : string | undefined;

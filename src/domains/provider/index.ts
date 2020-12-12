@@ -70,7 +70,7 @@ export class Provider {
     @Column()
     realm_id: string;
 
-    @ManyToOne(() => Realm, realm => realm.users, {nullable: true})
+    @ManyToOne(() => Realm, realm => realm.providers, {onDelete: "CASCADE"})
     @JoinColumn({name: 'realm_id'})
     realm: Realm;
 

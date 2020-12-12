@@ -128,11 +128,17 @@ export async function addUserRouteHandler(req: any, res: any) {
 export async function editUserRouteHandler(req: any, res: any) {
     let { id } = req.params;
 
+    id = parseInt(id);
+
+    if(Number.isNaN(id)) {
+        return res._failNotFound();
+    }
+
     if(!req.ability.can('edit','user') && !req.user.id === id) {
         return res._failForbidden();
     }
 
-    await check('email').exists().normalizeEmail().isEmail().optional({nullable: true}).run(req);
+    await check('email').exists().normalizeEmail({gmail_remove_dots: false}).isEmail().optional({nullable: true}).run(req);
     await check('name').exists().notEmpty().isLength({min: 5, max: 30}).optional().run(req);
     await check('password').exists().isLength({min: 5, max: 512})
         .custom((value, {req, location, path}) => {
@@ -142,6 +148,16 @@ export async function editUserRouteHandler(req: any, res: any) {
                 return value;
             }
         }).optional({nullable: true}).run(req);
+
+    if(req.ability.can('edit','user')) {
+        await check('realm_id').exists().optional().notEmpty().custom((value: any) => {
+            return getRepository(Realm).findOne(value).then((realm: Realm | undefined) => {
+                if (typeof realm === 'undefined') {
+                    throw new Error('Der Realm wurde nicht gefunden.')
+                }
+            })
+        }).run(req);
+    }
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
@@ -158,7 +174,7 @@ export async function editUserRouteHandler(req: any, res: any) {
     }
 
     const userRepository = getCustomRepository<UserRepository>(UserRepository);
-    let user = await userRepository.findOne(id, {relations: ['realm']});
+    let user = await userRepository.findOne(id);
     if(typeof user === 'undefined') {
         return res._failNotFound();
     }
@@ -170,7 +186,11 @@ export async function editUserRouteHandler(req: any, res: any) {
     user = userRepository.merge(user, data);
 
     try {
-        const result = await userRepository.save(user);
+        let result = await userRepository.save(user);
+
+        result.realm = await getRepository(Realm).findOne(user.realm_id);
+
+        console.log(result);
 
         return res._respondAccepted({
             data: result

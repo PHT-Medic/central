@@ -36,7 +36,7 @@ export class Station {
     @Column()
     realm_id: string;
 
-    @OneToOne(() => Realm)
+    @OneToOne(() => Realm, {onDelete: "CASCADE"})
     @JoinColumn({name: 'realm_id'})
     realm: Realm;
 

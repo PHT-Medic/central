@@ -46,7 +46,7 @@ export class Proposal {
     @Column()
     user_id: number;
 
-    @ManyToOne(() => User, user => user.proposals, { onDelete: 'CASCADE' })
+    @ManyToOne(() => User,{ onDelete: "SET NULL", nullable: true })
     @JoinColumn({name: 'user_id'})
     user: User;
 

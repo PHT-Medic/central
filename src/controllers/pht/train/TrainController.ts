@@ -19,9 +19,20 @@ import {createTrainBuilderMessage} from "../../../services/pht/configurator";
 export async function getTrainRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
-    const repository = getRepository(Train);
+    if (typeof id !== 'string') {
+        return res._failNotFound();
+    }
 
-    const entity = await repository.findOne(id);
+    const repository = getRepository(Train);
+    const query = repository.createQueryBuilder('train')
+        .leftJoinAndSelect('train.stations','stations')
+        .where({
+            id
+        });
+
+    queryFindPermittedResourcesForRealm(query, req.user.realm_id);
+
+    const entity = await query.getOne();
 
     if(typeof entity === 'undefined') {
         return res._failNotFound();
@@ -170,6 +181,10 @@ export async function addTrainRouteHandler(req: any, res: any) {
 export async function editTrainRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
+    if (typeof id !== 'string') {
+        return res._failNotFound();
+    }
+
     await runTrainValidations(req, true);
 
     await check('hash_signed')
@@ -224,9 +239,7 @@ export async function editTrainRouteHandler(req: any, res: any) {
 export async function dropTrainRouteHandler(req: any, res: any) {
     let { id } = req.params;
 
-    id = parseInt(id);
-
-    if(typeof id !== 'number' || Number.isNaN(id)) {
+    if (typeof id !== 'string') {
         return res._failNotFound();
     }
 
@@ -258,15 +271,13 @@ export async function dropTrainRouteHandler(req: any, res: any) {
 export async function doTrainActionRouteHandler(req: any, res: any) {
     let {id, action} = req.params;
 
-    id = parseInt(id);
-
-    if (typeof id !== 'number' || Number.isNaN(id)) {
+    if (typeof id !== 'string') {
         return res._failNotFound();
     }
 
     const repository = getRepository(Train);
 
-    let entity = await repository.findOne(id, {relations: ['stations']});
+    let entity = await repository.findOne(id, {relations: ['stations', 'master_image', 'files']});
 
     if (typeof entity === 'undefined') {
         return res._failNotFound();
@@ -287,6 +298,7 @@ export async function doTrainActionRouteHandler(req: any, res: any) {
         case 'generateHash':
             try {
                 let hash : string;
+
                 try {
                     hash = await generateTrainHash(message, req.token);
                 } catch (e) {
@@ -321,6 +333,7 @@ export async function doTrainActionRouteHandler(req: any, res: any) {
 
                 return res._respond({data: entity});
             } catch (e) {
+                console.log(e);
                 return res._failBadRequest({message: e.message});
             }
     }

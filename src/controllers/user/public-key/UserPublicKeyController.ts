@@ -41,6 +41,7 @@ export async function addUserPublicKeyRouteHandler(req: any, res: any) {
 
         return res._respond({data: entity});
     } catch (e) {
+        console.log(e);
         return res._failValidationError({message: 'Der Public Key konnte nicht gespeichert werden...'})
     }
 }

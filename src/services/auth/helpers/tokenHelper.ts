@@ -2,7 +2,7 @@ import fs from 'fs';
 import { sign, verify } from 'jsonwebtoken';
 
 import AuthConfig, {JwtProcedure} from "../../../config/auth";
-import {writablePath} from "../../../config/paths";
+import {getWritableDirPath} from "../../../config/paths";
 
 //--------------------------------------------------------------------
 
@@ -28,9 +28,8 @@ const data : {
 
 switch (data.procedure) {
     case 'RSA':
-        console.log(writablePath+'/'+AuthConfig.lap.jwtPrivateKey);
-        data.privateKey = fs.readFileSync(writablePath+'/'+AuthConfig.lap.jwtPrivateKey);
-        data.publicKey = fs.readFileSync(writablePath+'/'+AuthConfig.lap.jwtPublicKey);
+        data.privateKey = fs.readFileSync(getWritableDirPath()+'/'+AuthConfig.lap.jwtPrivateKey);
+        data.publicKey = fs.readFileSync(getWritableDirPath()+'/'+AuthConfig.lap.jwtPublicKey);
 
         data.options.algorithm = 'RS256';
 

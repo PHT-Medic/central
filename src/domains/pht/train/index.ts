@@ -19,8 +19,8 @@ import {Realm} from "../../realm";
 
 @Entity()
 export class Train {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column({type: "varchar", length: 10})
     type: string;
@@ -50,7 +50,7 @@ export class Train {
     @Column()
     user_id: number;
 
-    @ManyToOne(() => User, user => user.proposals, { onDelete: 'CASCADE' })
+    @ManyToOne(() => User,{ nullable: true, onDelete: "SET NULL" })
     @JoinColumn({name: 'user_id'})
     user: User;
 
@@ -63,7 +63,7 @@ export class Train {
     @Column()
     proposal_id: number;
 
-    @ManyToOne(() => Proposal, proposal => proposal.trains)
+    @ManyToOne(() => Proposal, proposal => proposal.trains, { onDelete: "CASCADE"})
     @JoinColumn({name: 'proposal_id'})
     proposal: Proposal;
 

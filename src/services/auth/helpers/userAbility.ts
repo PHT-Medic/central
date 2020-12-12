@@ -39,12 +39,12 @@ class UserAbility {
         }
     }
 
-    can() {
+    can(...args: any[]) {
         if(typeof this.ability === 'undefined') {
             return false;
         }
 
-        return this.ability.can(...arguments);
+        return this.ability.can(...args);
     }
 
     getPower(name: string, strict: boolean | undefined) {

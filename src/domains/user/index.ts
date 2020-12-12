@@ -10,9 +10,6 @@ import {
 import {Realm} from "../realm";
 import {UserAccount} from "./account";
 import {UserRole} from "./role";
-import {Proposal} from "../pht/proposal";
-import {TrainFile} from "../pht/train/file";
-import {Train} from "../pht/train";
 
 @Entity()
 export class User {
@@ -38,22 +35,13 @@ export class User {
     @Column()
     realm_id: string;
 
-    @ManyToOne(() => Realm, realm => realm.users, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Realm,{ onDelete: 'CASCADE' })
     @JoinColumn({name: 'realm_id'})
     realm: Realm;
 
     @OneToMany(() => UserRole, userRole => userRole.user)
     userRoles: UserRole[];
 
-    @OneToMany(() => UserAccount, userAccount => userAccount.provider)
+    @OneToMany(() => UserAccount, userAccount => userAccount.user)
     userAccounts: UserAccount[];
-
-    @OneToMany(() => Proposal, proposal => proposal.user)
-    proposals: Proposal[];
-
-    @OneToMany(() => Train, train => train.user)
-    trains: Train[];
-
-    @OneToMany(() => TrainFile, trainFile => trainFile.user)
-    trainFiles: TrainFile[];
 }

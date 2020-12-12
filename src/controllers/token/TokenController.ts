@@ -62,8 +62,20 @@ const grantToken = async (req: any, res: any) => {
         expiresIn
     } = await createToken(payload);
 
-    res.cookie('token',token, {
-        maxAge: expiresIn
+    const cookie = {
+        accessToken: token,
+        meta: {
+            expireDate: new Date(Date.now() + (1000 * expiresIn)).toString(),
+            expiresIn
+        }
+    };
+
+    res.cookie('auth_token', JSON.stringify(cookie), {
+        maxAge: Date.now() + 1000 * expiresIn
+    });
+
+    res.cookie('auth_provider','local',{
+        maxAge: Date.now() + 1000 * expiresIn
     });
 
     let ob = {
