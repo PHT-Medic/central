@@ -17,7 +17,7 @@ const config : NuxtConfig = {
     ** Headers of the page
     */
     head: {
-        title: process.env.npm_package_name || '',
+        title: 'PHT - Personal Health Train',
         meta: [
             { charset: 'utf-8' },
             { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -93,28 +93,8 @@ const config : NuxtConfig = {
     ],
 
     router: {
-        base: '/',
+        //base: '/',
         middleware: ['auth', 'layout']
-    },
-    /*
-    ** Build configuration
-    */
-    build: {
-        /*
-        ** You can extend webpack config here
-        */
-        extend (config, ctx) {
-            config?.module?.rules.push(
-                {
-                    test: /\.(png|jpe?g|gif|svg|webp)$/,
-                    loader: 'url-loader',
-                    query: {
-                        limit: 1000, // 1kB
-                        name: 'img/[name].[hash:7].[ext]'
-                    }
-                }
-            )
-        }
     }
 }
 

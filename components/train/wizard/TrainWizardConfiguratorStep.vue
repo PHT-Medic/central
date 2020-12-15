@@ -72,6 +72,10 @@ export default {
 
             try {
                 this.masterImage.items = await getMasterImages();
+                if(this.form.masterImageId === '' && this.masterImage.items.length > 0) {
+                    this.form.masterImageId = this.masterImage.items[0].id;
+                    this.setTrainMasterImage();
+                }
             } catch (e) {
 
             }
@@ -90,7 +94,11 @@ export default {
             this.proposalStation.busy = true;
 
             try {
-                this.proposalStation.items = await getApiProposalStations(proposalId, 'self')
+                this.proposalStation.items = await getApiProposalStations(proposalId, 'self');
+                if(this.form.stationIds.length === 0) {
+                    this.form.stationIds = this.proposalStation.items.map(item => item.station.id);
+                    this.setTrainStations();
+                }
             } catch (e) {
                 console.log(e);
             }

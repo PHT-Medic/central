@@ -1,12 +1,14 @@
 <script>
-import {LayoutNavigationDefaultId} from "@/config/layout.ts";
 import {runTrainBuilderTaskApi, dropTrain, getTrains} from "@/domains/train/api.ts";
 import {TrainStates, TrainConfiguratorStates, TrainResultStates} from "@/domains/train/index.ts";
 import TrainStatusButton from "@/components/train/button/TrainStatusButton";
 import TrainConfiguratorStatusButton from "@/components/train/button/TrainConfiguratorStatusButton";
+import TrainStartButton from "@/components/train/button/TrainStartButton";
+import TrainStopButton from "@/components/train/button/TrainStopButton";
+import AlertMessage from "@/components/alert/AlertMessage";
 
 export default {
-    components: {TrainConfiguratorStatusButton, TrainStatusButton},
+    components: {AlertMessage, TrainStopButton, TrainStartButton, TrainConfiguratorStatusButton, TrainStatusButton},
     props: {
         proposalId: {
             type: Number,
@@ -16,6 +18,7 @@ export default {
     data () {
         return {
             busy: false,
+            message: null,
             fields: [
                 { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'type', label: 'Type', thClass: 'text-center', tdClass: 'text-center' },
@@ -70,54 +73,50 @@ export default {
 
             this.actionBusy = false;
         },
-        async doAction(train) {
-            if (this.actionBusy) return;
 
-            this.actionBusy = true;
+        stop(id) {
 
-            switch (train.status) {
-                case this.trainConfiguratorStates.TrainConfiguratorStateHashSigned:
-                    try {
-                        await runTrainBuilderTaskApi(train.id, action);
-
-                        let index = this.items.findIndex(item => item.id === train.id);
-                        if (index > -1) {
-                            switch (action) {
-                                case 'start':
-                                    this.items[index].status = this.trainStates.TrainStateStarting;
-
-                                    //this.fakeTrainCompleted(index);
-                                    break;
-                                case 'stop':
-                                    this.items[index].status = this.trainStates.TrainStateStopped;
-                                    break;
-                            }
-                        }
-                    } catch (e) {
-                        switch (action) {
-                            case 'start':
-                                this.$bvToast.toast('The train could not be started...');
-                                break;
-                            case 'stop':
-                                this.$bvToast.toast('The train could not be stopped.');
-                                break;
-                        }
-                    }
-                    break;
-            }
-
-
-            this.actionBusy = false;
         },
+        start(id) {
+
+        },
+
         downloadResult() {
             window.open(this.$config.authApiUrl+'pht/trains/'+item.id+'/download')
         },
 
-        handleCreatedTrain(train) {
+        handleTrainCreated(train) {
             const index = this.items.findIndex(item => item.id === train.id);
             if(index === -1) {
                 this.items.unshift(train);
             }
+        },
+        handleTrainStarted(train) {
+            this.message = {
+                isError: false,
+                data: 'Train successfully started...'
+            };
+            const index = this.items.findIndex(item => item.id === train.id);
+            if(index !== -1) {
+                this.items[index].status = train.status;
+            }
+        },
+        handleTrainStopped(train) {
+            this.message = {
+                isError: false,
+                data: 'Train successfully stopped...'
+            };
+
+            const index = this.items.findIndex(item => item.id === train.id);
+            if(index !== -1) {
+                this.items[index].status = train.status;
+            }
+        },
+        handleTrainStopFailed(e) {
+            this.message = {
+                isError: true,
+                data: e.message
+            };
         }
     },
     computed: {
@@ -138,6 +137,7 @@ export default {
 </script>
 <template>
     <div class="container">
+        <alert-message :message="message" />
         <b-table :items="items" :fields="fields" :busy="busy" head-variant="'dark'" sort-by="id" :sort-desc="true" outlined>
             <template v-slot:cell(configurator_status)="data">
                 <train-configurator-status-button :status="data.item.configuratorStatus" />
@@ -175,22 +175,8 @@ export default {
             </template>
 
             <template v-slot:cell(actions)="data">
-                <button
-                    v-if="data.item.status === trainConfiguratorStates.TrainConfiguratorStateHashSigned && startTrainExecution"
-                    class="btn btn-outline-success btn-xs"
-                    type="button"
-                    @click.prevent="doAction(data.item, 'start')"
-                >
-                    <i class="fas fa-play" />
-                </button>
-                <button
-                    v-if="data.item.status === trainConfiguratorStates.TrainConfiguratorStateHashSigned && stopTrainExecution"
-                    class="btn btn-outline-danger btn-xs"
-                    type="button"
-                    :disabled="true"
-                >
-                    <i class="fas fa-pause" />
-                </button>
+                <train-start-button :train="data.item" @started="handleTrainStarted"/>
+                <train-stop-button :train="data.item" @stopped="handleTrainStopped" @stopFailed="handleTrainStopFailed" />
             </template>
 
             <template v-slot:cell(options)="data">

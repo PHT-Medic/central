@@ -66,6 +66,21 @@ export async function runTrainBuilderTaskApi(id: string, task: string, data: Rec
     }
 }
 
+export async function runTrainTask(id: string, task: string, data: Record<string,any> = {}) {
+    const actionData = {
+        task,
+        ...data
+    };
+
+    try {
+        let response = await useApi('auth').post('pht/trains/' + id + '/train-task', actionData);
+
+        return response.data;
+    } catch (e) {
+        throw new Error(e.response.data.error.message);
+    }
+}
+
 export async function generateTrainHashApi(id: string) {
     try {
         let response = await useApi('auth').post('pht/trains/' + id + '/hash-generate');
