@@ -6,12 +6,6 @@ import {AxiosError} from "axios";
 import {clearObjectProperties} from "~/modules/utils";
 
 export default (ctx: Context) => {
-    if (typeof ctx.$config.resourceApiUrl === 'string') {
-        const resourceApi = useApi('resource', {
-            baseURL: ctx.$config.resourceApiUrl
-        }, ctx);
-    }
-
     if (typeof ctx.$config.authApiUrl === 'string') {
         const authApi = useApi('auth', {
             baseURL: ctx.$config.authApiUrl

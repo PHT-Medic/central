@@ -1,15 +1,11 @@
-import {NuxtConfig} from "@nuxt/types";
-
-const config : NuxtConfig = {
+const config = {
     publicRuntimeConfig() {
         return {
-            authApiUrl: process.env.authApiUrl || 'https://pht-ui.personalhealthtrain.de/auth/api/',
-            resourceApiUrl: process.env.resourceApiUrl || 'https://pht-ui.personalhealthtrain.de/resource/api/'
+            authApiUrl: process.env.authApiUrl || 'https://pht-ui.personalhealthtrain.de/api/',
         }
     },
     env: {
-        authApiUrl: process.env.authApiUrl || 'https://pht-ui.personalhealthtrain.de/auth/api/',
-        resourceApiUrl: process.env.resourceApiUrl || 'https://pht-ui.personalhealthtrain.de/resource/api/'
+        authApiUrl: process.env.authApiUrl || 'https://pht-ui.personalhealthtrain.de/api/'
     },
     telemetry: false,
     ssr: true,
@@ -98,4 +94,4 @@ const config : NuxtConfig = {
     }
 }
 
-export default config;
+module.exports = config;
