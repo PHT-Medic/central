@@ -1,5 +1,5 @@
 <script>
-    import {dropProposal, getProposals} from "@/domains/proposal/api.ts";
+    import {dropProposal, getApiProposals} from "@/domains/proposal/api.ts";
     import {LayoutNavigationDefaultId} from "@/config/layout.ts";
 
     export default {
@@ -16,7 +16,7 @@
         },
         async asyncData (context) {
             try {
-                const items = await getProposals();
+                const items = await getApiProposals();
 
                 return {
                     items

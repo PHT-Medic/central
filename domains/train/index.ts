@@ -1,17 +1,33 @@
-const TrainStateCreated = 'created';
-const TrainStateHashGenerated = 'hash_generated';
-const TrainStateHashSigned = 'hash_signed';
-const TrainStateRunning = 'running';
+const TrainConfiguratorStateOpen = 'open';
+const TrainConfiguratorStateFilesUploaded = 'files_uploaded';
+const TrainConfiguratorStateHashGenerated = 'hash_generated';
+const TrainConfiguratorStateHashSigned = 'hash_signed';
+const TrainConfiguratorStateCompleted = 'finished';
+
+const TrainStateBuilding = 'building';
+const TrainStateBuilt = 'built';
+const TrainStateStarting = 'starting';
+const TrainStateStarted = 'started';
 const TrainStateStopped = 'stopped';
 const TrainStateFinished = 'finished';
+const TrainStateFailed = 'failed';
+
+const TrainConfiguratorStates = {
+    TrainConfiguratorStateOpen,
+    TrainConfiguratorStateFilesUploaded,
+    TrainConfiguratorStateHashGenerated,
+    TrainConfiguratorStateHashSigned,
+    TrainConfiguratorStateCompleted
+}
 
 const TrainStates = {
-    TrainStateCreated,
-    TrainStateHashGenerated,
-    TrainStateHashSigned,
-    TrainStateRunning,
+    TrainStateBuilding,
+    TrainStateBuilt,
+    TrainStateStarting,
+    TrainStateStarted,
     TrainStateStopped,
-    TrainStateFinished
+    TrainStateFinished,
+    TrainStateFailed
 };
 
 //-----------------------------------------------------------
@@ -48,5 +64,6 @@ const TrainTypes = {
 export {
     TrainStates,
     TrainResultStates,
-    TrainTypes
+    TrainTypes,
+    TrainConfiguratorStates
 }

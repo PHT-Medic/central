@@ -51,12 +51,27 @@ export async function addTrain(data: Record<string, any>) {
     }
 }
 
-export async function doTrainAction(id: string, action: string) {
+export async function runTrainBuilderTaskApi(id: string, task: string, data: Record<string,any> = {}) {
+    const actionData = {
+        task,
+        ...data
+    };
+
     try {
-        let response = await useApi('auth').get('pht/trains/' + id + '/action/' + action);
+        let response = await useApi('auth').post('pht/trains/' + id + '/train-builder-task', actionData);
 
         return response.data;
     } catch (e) {
         throw new Error('Die Aktion konnte nicht auf den Zug angewendet werden.');
+    }
+}
+
+export async function generateTrainHashApi(id: string) {
+    try {
+        let response = await useApi('auth').post('pht/trains/' + id + '/hash-generate');
+
+        return response.data;
+    } catch (e) {
+        throw new Error('Der hash konnte nicht generiert werden.');
     }
 }

@@ -16,6 +16,10 @@
     margin-left: -1.25rem;
 }
 
+.form-group label i {
+    font-size: .7rem;
+}
+
 .alert-sm {
   padding: .4rem .7rem;
 }

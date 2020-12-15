@@ -37,3 +37,39 @@
     background: #efefef;
     color: #7F828B;
 }
+
+
+.card.card-file {
+    padding: 0;
+    margin-bottom: 0.4rem;
+    height: 1.75rem;
+    line-height: 1.75rem;
+}
+
+.card.card-file .card-heading {
+    margin-left: 0.3rem;
+    font-size: 1em;
+    background: none;
+}
+
+.card.card-file .card-body {
+    max-height: 40px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: none;
+    padding: 0 0 0 10px;
+}
+
+.card.card-file .card-body .title {
+    font-size: .8125em;
+    font-weight: 600;
+}
+
+.card.card-file .card-footer {
+    background: none;
+    padding: 0;
+    margin-right: 0rem;
+    margin-left: auto;
+    border: none;
+}

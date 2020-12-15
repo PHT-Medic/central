@@ -54,6 +54,9 @@
 </script>
 <template>
     <div class="container">
+        <div class="text-center">
+            <h6 class="display-1"><i class="fa fa-file"></i></h6>
+        </div>
         <h4 class="title m-b-20">
             Antrag #{{ proposal.id }} <span class="sub-title">{{ proposal.title }}</span>
         </h4>

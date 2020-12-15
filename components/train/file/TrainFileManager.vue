@@ -1,7 +1,13 @@
 <script>
+import {required, minLength, maxLength } from 'vuelidate/lib/validators';
 import {getApiTrainFiles, dropApiTrainFile, uploadTrainFiles} from "@/domains/train/file/index.ts";
+import TrainFile from "@/components/train/file/TrainFile";
+import TrainFolder from "@/components/train/file/TrainFolder";
+import TrainFormFile from "@/components/train/file/TrainFormFile";
+import {editApiTrain} from "@/domains/train/api.ts";
 
 export default {
+    components: {TrainFormFile, TrainFolder, TrainFile},
     props: {
         train: {
             type: Object,
@@ -12,16 +18,36 @@ export default {
         return {
             items: [],
             busy: false,
+
+            selected: [],
+            selectAll: false,
+            directoryMode: true,
+
             actionBusy: false,
             formInfo: {
                 filesSyncing: false
             },
             form: {
+                entrypointFileId: undefined,
+                entrypointExecutable: '',
+                path: '',
                 files: []
-            }
+            },
+            executableOptions: [
+                {id: 'python', name: 'Python'},
+                {id: 'r', name: 'R'}
+            ]
         }
     },
     created() {
+        if(typeof this.train.entrypointExecutable !== 'undefined' && this.train.entrypointExecutable) {
+            this.form.entrypointExecutable = this.train.entrypointExecutable;
+        }
+
+        if(typeof this.train.entrypointFileId !== 'undefined') {
+            this.form.entrypointFileId = this.train.entrypointFileId;
+        }
+
         this.load().then(r => r);
     },
     methods: {
@@ -38,23 +64,6 @@ export default {
 
             this.busy = false;
         },
-        async drop(id) {
-            if(this.actionBusy) return;
-
-            const index = this.items.findIndex(item => item.id === id);
-            if(index === -1) return;
-
-            this.actionBusy = true;
-
-            try {
-                await dropApiTrainFile(this.train.id, id);
-                this.items.splice(index, 1);
-            } catch (e) {
-
-            }
-
-            this.actionBusy = false;
-        },
         async upload() {
             if(this.actionBusy) return;
 
@@ -65,12 +74,11 @@ export default {
             try {
                 let formData = new FormData();
                 for(let i=0; i<this.form.files.length; i++) {
+                    console.log(this.form.files[i]);
                     formData.append('files['+i+']', this.form.files[i]);
                 }
 
                 const files = await uploadTrainFiles(this.train.id, formData);
-
-                this.$refs.files.value = '';
                 this.form.files = [];
 
                 for(let i=0; i<files.length; i++) {
@@ -79,52 +87,290 @@ export default {
 
                 this.$emit('uploaded', files);
             } catch (e) {
+                console.log(e);
                 this.$emit('failed', e.message);
             }
 
             this.actionBusy = false;
         },
 
+        //----------------------------------------------------------------
+
+        async dropSelected() {
+            if(this.actionBusy) return;
+
+            if(this.selected.length === 0) return;
+
+            this.actionBusy = true;
+
+            try {
+                for(let i=0; i<this.selected.length; i++) {
+                    await dropApiTrainFile(this.train.id, this.selected[i]);
+
+                    const index = this.items.findIndex(file => file.id === this.selected[i]);
+                    if(index !== -1) {
+                        this.items.splice(index, 1);
+                    }
+
+                    this.$emit('deleted', this.selected[i]);
+                }
+            } catch (e) {
+
+            }
+
+            this.actionBusy = false;
+        },
+        selectAllFiles() {
+            if(this.selectAll) {
+                this.selected = this.items.map(file => file.id).filter(id => id !== this.form.entrypointFileId);
+            } else {
+                this.selected = [];
+            }
+        },
+        selectFile(event) {
+            const index = this.selected.findIndex(file => file === event.id);
+            if(index === -1) {
+                this.selected.push(event.id);
+            } else {
+                this.selected.splice(index, 1);
+            }
+        },
+
         checkFormFiles(event) {
             event.preventDefault();
 
             for(let i=0; i < event.target.files.length; i++) {
-                let file = event.target.files[i];
+                this.form.files.push(event.target.files[i]);
+            }
 
-                this.form.files.push(file);
+            this.$refs.files.value = '';
+        },
+        dropFormFile(event) {
+            const index = this.form.files.findIndex(file => file.path === event.path || file.webkitRelativePath === event.path);
+            if(index !== -1) {
+                this.form.files.splice(index, 1);
             }
         },
-        dropFormFile(key) {
-            this.form.files.splice(key, 1);
+        handleFileDeleted(id) {
+            const index = this.items.findIndex(file => file.id === id);
+            if(index !== -1) {
+                this.items.splice(index, 1);
+            }
+
+            this.$emit('deleted', id);
+        },
+
+        changeEntryPointFile(file) {
+            if(!this.form.entrypointFileId) {
+                this.form.entrypointFileId = file.id;
+            } else {
+                if(this.form.entrypointFileId === file.id) {
+                    this.form.entrypointFileId = undefined;
+                } else {
+                    this.form.entrypointFileId = file.id;
+                }
+            }
+
+            if(this.form.entrypointFileId) {
+                const index = this.selected.findIndex(file => file === this.form.entrypointFileId);
+                if(index !== -1) {
+                    this.selected.splice(index, 1);
+                }
+            }
+
+            this.$emit('setEntrypointFile', this.form.entrypointFileId);
+        },
+        changeEntryPointExecutable() {
+            this.$emit('setEntrypointExecutable', this.form.entrypointExecutable);
+        },
+
+        getParentPath(path) {
+            if(path === '/') return '';
+
+            let parts = path.split('/').filter(el => el !== '');
+            parts.pop();
+
+            return parts.join('/');
+        }
+    },
+    validations() {
+        return {
+            form: {
+                entrypointExecutable: {
+                    required
+                }
+            }
+        }
+    },
+    computed: {
+        paths() {
+            return this.form.path.split('/').filter(el => el !== '');
+        },
+        entrypointFileId() {
+            if(!this.form.entrypointFileId) {
+                return '';
+            }
+
+            const index = this.items.findIndex(file => file.id === this.form.entrypointFileId);
+            if(index === -1) {
+                return '';
+            }
+
+            return this.items[index].directory + '/' + this.items[index].name;
         }
     }
 }
 </script>
 <template>
-    <div class="form-group">
-        <label>EntryPoint Dateien</label>
-        <div class="custom-file">
-            <input type="file" webkitdirectory class="custom-file-input" id="files" ref="files" @change="checkFormFiles" multiple :disbaled="actionBusy">
-            <label class="custom-file-label" for="files">Dateien auswählen...</label>
-        </div>
+    <div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label>EntryPoint Executable</label>
+                    <select class="form-control" v-model="$v.form.entrypointExecutable.$model" @change="changeEntryPointExecutable">
+                        <option value="">--- Select an option ---</option>
+                        <option v-for="(option,key) in executableOptions" :key="key" :value="option.id">
+                            {{option.name}}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Entrypoint File</label>
+                    <input type="text" class="form-control" :value="entrypointFileId" :disabled="true" placeholder="Please toggle a file in the file list, to be selected as entrypoint file">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label>Directories / Files</label>
+                    <div class="custom-file">
+                        <input type="file" :webkitdirectory="directoryMode" class="custom-file-input" id="files" ref="files" @change="checkFormFiles" multiple :disbaled="actionBusy">
+                        <label class="custom-file-label" for="files">Select files...</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <b-form-checkbox switch v-model="directoryMode">Directory mode</b-form-checkbox>
+                </div>
 
-        <div v-if="form.files.length === 0 && items.length === 0" class="alert alert-warning alert-sm m-t-10">
-            Es muss ein Entrypoint bzw Dateien hochgeladen werden.
+            </div>
         </div>
+        <div class="row">
+            <div class="col">
+                <h6 class="title text-muted">Files
+                    <span style="font-size: 0.65rem">
+                                <span class="text-success">
+                                    <i class="fa fa-file"></i> uploaded
+                                </span>
+                            </span>
+                </h6>
 
-        <div class="flex flex-row flex-wrap m-t-10">
-            <button @click.prevent="drop(item.id)" v-for="(item,key) in items" :key="key" class="btn btn-dark btn-xs rounded" style="margin: 0 5px 5px 0;">
-                {{item.name}}
-            </button>
-            <button @click.prevent="dropFormFile(key)" v-for="(item,key) in form.files" :key="key" class="btn btn-primary btn-xs rounded" style="margin: 0 5px 5px 0;">
-                {{item.name}} ({{item.size}} Bytes)
-            </button>
-        </div>
 
-        <div class="form-group">
-            <button type="button" class="btn btn-xs btn-primary" :disabled="actionBusy || form.files.length === 0">
-                Hochladen
-            </button>
+                <div class="form-check">
+                    <input type="checkbox" v-model="selectAll" @change="selectAllFiles" class="form-check-input" id="selectAllFiles">
+                    <label for="selectAllFiles">Alle auswählen</label>
+                </div>
+
+                <div class="d-flex flex-column">
+                    <train-file
+                        class="mr-1"
+                        v-for="(file,key) in items"
+                        :key="key"
+                        :file="file"
+                        :files-selected="selected"
+                        :file-selected-id="form.entrypointFileId"
+                        @check="selectFile"
+                        @toggle="changeEntryPointFile"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="btn btn-warning btn-xs" :disabled="actionBusy || selected.length === 0" @click.prevent="dropSelected">
+                        Löschen
+                    </button>
+                </div>
+            </div>
+            <div class="col">
+                <div class="d-flex flex-row">
+                    <div>
+                        <h6 class="title text-muted">Files
+                            <span style="font-size: 0.65rem">
+                                <span class="text-info">
+                                    <i class="fa fa-file-upload"></i> not uploaded
+                                </span>
+                            </span>
+                        </h6>
+                    </div>
+                    <div class="ml-auto">
+                        <h6 class="title text-muted">Path:
+                            <span class="sub-title">
+                                <template v-for="(path, key) in paths">
+                                     {{path}} <span class="text-dark" :key="key">/</span>
+                                </template>
+                                <template v-if="paths.length === 0">
+                                    [root]
+                                </template>
+                            </span>
+                        </h6>
+                    </div>
+                </div>
+
+                <div v-if="form.files.length === 0" class="alert alert-info alert-sm m-t-10">
+                    You have not selected any files to upload...
+                </div>
+
+                <div class="d-flex flex-column">
+                    <train-form-file
+                        class="mr-1"
+                        v-for="(file,key) in form.files"
+                        :key="key"
+                        :file="file"
+                        @drop="dropFormFile"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="btn btn-xs btn-dark" :disabled="actionBusy || form.files.length === 0" @click.prevent="upload">
+                        Hochladen
+                    </button>
+                </div>
+
+            </div>
         </div>
     </div>
 </template>
+<style>
+.file-man-box {
+    padding: 8px;
+    border: 1px solid #e3eaef;
+    border-radius: 5px;
+    position: relative;
+}
+
+.file-man-box .file-close {
+    color: #f1556c;
+    line-height: 24px;
+    font-size: 24px;
+    right: 10px;
+    top: 10px;
+}
+
+.file-man-box .file-img-box {
+    text-align: center;
+}
+
+.file-man-box .file-img-box img {
+    height: 32px;
+}
+
+.file-man-box .file-img-box i {
+    font-size: 32px;
+}
+
+.file-man-box .file-download {
+    font-size: 32px;
+    color: #98a6ad;
+}
+
+.file-man-box .file-man-title {
+    padding-right: 25px;
+}
+</style>

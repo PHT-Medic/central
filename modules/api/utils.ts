@@ -94,10 +94,11 @@ export function formatRequestRecord(record?: RequestRecord) : string {
     }
 
     if(typeof record.sort !== 'undefined') {
-        let sort = [];
+        let sort : string[] = [];
 
         for(let key in record.sort) {
-            sort.push((record.sort[key] === 'desc' ? '-' : '') + key);
+            const direction : string = record.sort[key] === 'desc' ? '-' : '';
+            sort.push(direction + key);
         }
 
         output.sort = sort;
@@ -113,7 +114,7 @@ export function buildQuery(data?: any, expectQM?: boolean) {
     if (typeof (data) === 'string') return data;
 
     // Create a query array to hold the key/value pairs
-    let query = [];
+    let query : string[] = [];
 
     // Loop through the data object
     for (let key in data) {
@@ -132,14 +133,16 @@ export function buildQuery(data?: any, expectQM?: boolean) {
                         v = v.join(',');
                     }
 
-                    query.push(encodeURIComponent(key+'['+k+']') + '=' + encodeURIComponent(v));
+                    const qV : string = encodeURIComponent(key+'['+k+']')+ '=' + encodeURIComponent(v);
+                    query.push(qV);
                 }
 
                 continue;
             }
 
             // Encode each key and value, concatenate them into a string, and push them to the array
-            query.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+            const q : string = encodeURIComponent(key) + '=' + encodeURIComponent(value);
+            query.push(q);
         }
     }
 

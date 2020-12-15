@@ -250,9 +250,6 @@ class AuthModule {
         let tokenResponse : AuthAbstractTokenResponse;
 
         switch (provider.getOptions().scheme) {
-            case "JWT":
-                tokenResponse = await provider.attemptToken(data);
-                break;
             case "Oauth2":
                 data = {
                     ...data,
@@ -260,6 +257,9 @@ class AuthModule {
                 };
 
                 tokenResponse = await provider.attemptToken(data);
+            default:
+                tokenResponse = await provider.attemptToken(data);
+                break;
 
         }
 
@@ -270,11 +270,9 @@ class AuthModule {
 
     public async attemptRefreshTokenWith(token: string) : Promise<AuthAbstractTokenResponse> {
         let provider = useAuthScheme('local');
-        let tokenResponse : AuthAbstractTokenResponse;
+        let tokenResponse : AuthAbstractTokenResponse | undefined;
 
         switch (provider.getOptions().scheme) {
-            case "JWT":
-                throw new Error('Refresh Access with refreshToken is not supported by the provider.');
             case "Oauth2":
                 let data = {
                     refresh_token: token,
@@ -282,6 +280,10 @@ class AuthModule {
                 };
 
                 tokenResponse = await provider.attemptToken(data);
+                break;
+            default:
+                throw new Error('Refresh Access with refreshToken is not supported by the provider.');
+
         }
 
         this.setRequestToken(tokenResponse.accessToken);

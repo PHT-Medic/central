@@ -35,7 +35,7 @@ export async function editProposal(id: number, data: Record<string, any>) {
     return changeResponseKeyCase(response.data);
 }
 
-export async function getProposals() {
+export async function getApiProposals() {
     const response = await useApi('auth').get('pht/proposals');
     return changeResponseKeyCase(response.data);
 }

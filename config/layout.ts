@@ -124,7 +124,7 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             name: 'Stationen',
             type: 'link',
             url: '/admin/stations',
-            icon: 'fas fa-train',
+            icon: 'fas fa-city',
             requireLoggedIn: true,
             requirePermissions: RouteAdminPHTStationsPermissions
         },
@@ -143,13 +143,13 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             requireLoggedIn: true
         },
         {
-            name: 'Antrag',
+            name: 'Proposal',
             type: 'separator',
             requireLoggedIn: true,
             requirePermissions: [...RouteProposalsPermissions, 'proposal_add']
         },
         {
-            name: 'Antrag erstellen',
+            name: 'Add',
             type: 'link',
             url: '/proposals/add',
             icon: 'fas fa-plus',
@@ -157,7 +157,7 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             requirePermissions: ['proposal_add']
         },
         {
-            name: 'Ausgehende Anträge',
+            name: 'Outgoing',
             type: 'link',
             url: '/proposals',
             icon: 'fas fa-file-export',
@@ -165,7 +165,7 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             requirePermissions: RouteProposalsPermissions
         },
         {
-            name: 'Eingehende Anträge',
+            name: 'Incoming',
             type: 'link',
             url: '/proposals/in',
             icon: 'fas fa-file-import',
@@ -173,7 +173,29 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             requirePermissions: ['proposal_approve']
         },
         {
-            name: 'Sonstige',
+            name: 'Train',
+            type: 'separator',
+            requireLoggedIn: true,
+            requirePermissions: ['train_execution_start', 'train_execution_stop', 'train_edit', 'train_drop']
+        },
+        {
+            name: 'Add',
+            type: 'link',
+            url: '/trains/add',
+            icon: 'fa fa-plus',
+            requireLoggedIn: true,
+            requirePermissions: ['train_add']
+        },
+        {
+            name: 'List',
+            type: 'link',
+            url: '/trains',
+            icon: 'fas fa-train',
+            requireLoggedIn: true,
+            requirePermissions: ['train_execution_start', 'train_execution_stop', 'train_edit', 'train_drop']
+        },
+        {
+            name: 'Others',
             type: 'separator'
         },
         {
@@ -184,7 +206,7 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             requireLoggedOut: true
         },
         {
-            name: 'Einstellungen',
+            name: 'Settings',
             type: 'link',
             url: '/settings',
             icon: 'fas fa-cog',

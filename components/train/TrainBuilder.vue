@@ -10,8 +10,9 @@
     import {getUserPublicKey} from "@/domains/user/publicKey/api.ts";
     import {getMasterImages} from "@/domains/masterImage/api.ts";
     import {getApiProposalStations} from "@/domains/proposal/station/api.ts";
-    import {addTrain, doTrainAction, editApiTrain, getTrain} from "@/domains/train/api.ts";
+    import {addTrain, runTrainBuilderTaskApi, editApiTrain, getTrain} from "@/domains/train/api.ts";
     import {dropApiTrainFile, getApiTrainFiles, uploadTrainFiles} from "@/domains/train/file";
+    import TrainFileManager from "@/components/train/file/TrainFileManager";
 
     const TrainTypes = {
         Analyse: 'analyse',
@@ -20,6 +21,7 @@
 
     export default {
         components: {
+            TrainFileManager,
             AlertMessage
         },
         props: {
@@ -120,12 +122,6 @@
                 }
             };
 
-            formData.entrypointName = {
-                required,
-                minLength: minLength(5),
-                maxLength: maxLength(50)
-            };
-
             validations.formData = formData;
 
             return validations;
@@ -186,7 +182,7 @@
                 this.actionBusy = true;
 
                 try {
-                    const train = await doTrainAction(this.train.id, action);
+                    const train = await runTrainBuilderTaskApi(this.train.id, action);
                     for(let key in train) {
                         Vue.set(this.train, key, train[key]);
                     }
@@ -308,7 +304,7 @@
                 if(this.train) {
                     if(this.isTrainCreated) {
                         switch (this.train.status) {
-                            case TrainStates.TrainStateCreated:
+                            case TrainStates.TrainConfiguratorStateCreated:
                                 this.wizard.startIndex = 1;
                                 //this.$refs.trainWizard.changeTab(0,1);
                                 break;
@@ -416,7 +412,7 @@
 
                 return false;
             },
-            proceedToWizardStepSummary(checkOnly) {
+            proceedToWizardStepFiles(checkOnly) {
                 let isValid = !this.$v.formData.$invalid;
 
                 if(isValid) {
@@ -522,15 +518,13 @@
                     if (this.isTrainCreated) {
                         await this.edit({
                             masterImageId: this.formData.masterImageId,
-                            stationIds: this.formData.stationIds,
-                            entrypointName: this.formData.entrypointName
+                            stationIds: this.formData.stationIds
                         });
                     } else {
                         await this._addTrain({
                             type: this.formData.type,
                             masterImageId: this.formData.masterImageId,
-                            stationIds: this.formData.stationIds,
-                            entrypointName: this.formData.entrypointName,
+                            stationIds: this.formData.stationIds
                         });
                     }
                 } catch (e) {
@@ -540,68 +534,6 @@
                 }
 
                 this.trainPushInProgress = false;
-            },
-
-            //----------------------------------------------------
-
-            async dropTrainFile(event,id) {
-                event.preventDefault();
-
-                try {
-                    await this._dropTrainFile(id);
-                } catch (e) {
-
-                }
-            },
-
-            //----------------------------------------------------
-
-            checkEntrypointFiles(event) {
-                event.preventDefault();
-
-                for(let i=0; i < event.target.files.length; i++) {
-                    let file = event.target.files[i];
-
-                    this.formData.entrypointFiles.push(file);
-                }
-            },
-            dropEntryPointFile(event, index) {
-                event.preventDefault();
-
-                this.formData.entrypointFiles.splice(index,1);
-            },
-
-            //----------------------------------------------------
-
-            async pushFiles() {
-                if(this.formInfo.trainFilesSyncInProgress) return;
-
-                this.formInfo.trainFilesSyncInProgress = true;
-
-                let files = this.formData.entrypointFiles;
-
-                if(files.length === 0) {
-                    this.formInfo.trainFilesSyncInProgress = false;
-                    return;
-                }
-
-                try {
-                    await this._uploadTrainFiles(files);
-                    this.$refs.entrypointFiles.value = '';
-                    this.formData.entrypointFiles = [];
-
-                    await this._getTrainFiles();
-                } catch (e) {
-                    await this.$bvModal.msgBoxOk(this.createAlertMessage(e.message), {
-                        buttonSize: 'sm',
-                    });
-
-                    this.formInfo.trainFilesSyncInProgress = false;
-
-                    throw new Error(e.message);
-                }
-
-                this.formInfo.trainFilesSyncInProgress = false;
             },
 
             //----------------------------------------------------
@@ -635,7 +567,6 @@
                 if(this.isTrainEditAble) {
                     try {
                         await this.pushTrain();
-                        await this.pushFiles();
                     } catch (e) {
                         return this.$refs.trainWizard.prevTab();
                     }
@@ -677,7 +608,7 @@
                 return !!this.train;
             },
             isTrainEditAble() {
-                return !this.isTrainCreated || [TrainStates.TrainStateCreated, TrainStates.TrainStateHashSigned, TrainStates.TrainStateHashGenerated, TrainStates.TrainStateFinished].indexOf(this.train.status) > -1;
+                return !this.isTrainCreated || [TrainStates.TrainConfiguratorStateCreated, TrainStates.TrainStateHashSigned, TrainStates.TrainStateHashGenerated, TrainStates.TrainStateFinished].indexOf(this.train.status) > -1;
             }
         }
     }
@@ -726,7 +657,7 @@
                         </b-tabs>
                     </b-card>
                 </tab-content>
-                <tab-content title="Konfiuration" :before-change="proceedToWizardStepSummary">
+                <tab-content title="Konfiuration" :before-change="proceedToWizardStepFiles">
                     <div class="form-group" :class="{ 'form-group-error': $v.formData.masterImageId.$error }">
                         <label>Master Image</label>
                         <select v-model="$v.formData.masterImageId.$model" class="form-control" :disabled="masterImage.busy" :disbaled="!isTrainEditAble">
@@ -759,86 +690,10 @@
                             Es muss mindestens <strong>{{ $v.formData.stationIds.$params.minLength.min }}</strong> Krankenhaus/er ausgewählt werden.
                         </div>
                     </div>
-
-                    <hr>
-
-                    <div class="form-group">
-                        <label>EntryPoint Name</label>
-                        <input v-model="$v.formData.entrypointName.$model" type="text" class="form-control" placeholder="..." :disbaled="!isTrainEditAble">
-                        <div v-if="!$v.formData.entrypointName.required" class="form-group-hint group-required">
-                            Bitte geben Sie einen Entrypoint Namen an.
-                        </div>
-                        <div v-if="!$v.formData.entrypointName.minLength" class="form-group-hint">
-                            Der EntryPoint muss mindestens <strong>{{ $v.formData.entrypointName.$params.minLength.min }}</strong> Zeichen lang sein.
-                        </div>
-                        <div v-if="!$v.formData.entrypointName.minLength" class="form-group-hint">
-                            Der EntryPoint darf maximal <strong>{{ $v.formData.entrypointName.$params.minLength.min }}</strong> Zeichen lang sein.
-                        </div>
-                    </div>
-
-                    <hr>
-
-                    <div class="form-group">
-                        <label>EntryPoint Dateien</label>
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="files" ref="entrypointFiles" @change="checkEntrypointFiles" multiple :disbaled="!isTrainEditAble">
-                            <label class="custom-file-label" for="files">Dateien auswählen...</label>
-                        </div>
-
-                        <div v-if="formData.entrypointFiles.length === 0 && trainFiles.items.length === 0" class="alert alert-warning alert-sm m-t-10">
-                            Es muss ein Entrypoint bzw Dateien hochgeladen werden.
-                        </div>
-
-                        <div class="flex flex-row flex-wrap m-t-10">
-                            <button @click="dropTrainFile($event,item.id)" v-for="(item,key) in trainFiles.items" class="btn btn-dark btn-xs rounded" style="margin: 0 5px 5px 0;">
-                                {{item.name}}
-                            </button>
-                            <button @click="dropEntryPointFile($event,key)" v-for="(item,key) in formData.entrypointFiles" class="btn btn-primary btn-xs rounded" style="margin: 0 5px 5px 0;">
-                                {{item.name}} ({{item.size}} Bytes)
-                            </button>
-                        </div>
-                    </div>
                 </tab-content>
-                <tab-content title="Zusammenfassung" :before-change="proceedToWizardStepHash">
+                <tab-content title="Dateien" :before-change="proceedToWizardStepHash">
                     <div>
-                        <b-list-group>
-                            <b-list-group-item class="flex-column align-items-start list-group-item-sm">
-                                <div class="d-flex w-100 justify-content-between align-items-center">
-                                    <div class="align-items-center">
-                                        <h6
-                                            class="m-b-0 font-weight-bold d-inline"
-                                        >1. Allgemein <small>Übernehmen der Konifguration(en).</small></h6>
-                                        <p>
-                                            Die in dem vorherigen Schritt angegebenen Informationen werden gespeichert.
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <div :class="{'spinner-border': formInfo.trainPushInProgress}" style="font-size: 2rem;">
-                                            <i v-if="!formInfo.trainPushInProgress" class="fa fa-check text-success"></i>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </b-list-group-item>
-                            <b-list-group-item class="flex-column align-items-start list-group-item-sm">
-                                <div class="d-flex w-100 justify-content-between align-items-center">
-                                    <div class="align-items-center">
-                                        <h6
-                                            class="m-b-0 font-weight-bold d-inline"
-                                        >2. Upload <small>Upload der Entrypoint-Datei(en).</small></h6>
-                                        <p>
-                                            Die Dateien werden hochgeladen und dem Zug zugewiesen.
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <div :class="{'spinner-border': formInfo.trainFilesSyncInProgress}" style="font-size: 2rem;">
-                                            <i v-if="!formInfo.trainFilesSyncInProgress" class="fa fa-check text-success"></i>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </b-list-group-item>
-                        </b-list-group>
+                        <train-file-manager :train="train" />
                     </div>
                 </tab-content>
                 <tab-content title="Hash" :before-change="proceedToWizardStepFinish">

@@ -2,8 +2,8 @@ import {LayoutNavigationDefaultId} from "~/config/layout";
 import {Context, Middleware} from "@nuxt/types";
 
 const layoutMiddleware : Middleware = ({ store, route } : Context) => {
-    let key = 'navigationId';
-    let navigationId = null;
+    let key : string = 'navigationId';
+    let navigationId : any = null;
 
     for(let i=0; i< route.meta.length; i++) {
         if (key in route.meta[i] && route.meta[i][key]) {
