@@ -1,10 +1,9 @@
 import fs from 'fs';
-import tar from 'tar-stream';
+import tar, {Pack} from 'tar-stream';
 
 import { getWritableDirPath} from "../../../config/paths";
 import path from "path";
 import {useDocker} from "./index";
-import {streamToString} from "./utils";
 import {TrainResult} from "../../../domains/pht/train/result";
 
 const dockerOptions = {
@@ -37,71 +36,92 @@ export function getTrainResultFilePath(trainResultId: string) {
     return path.resolve(getTrainResultDirectoryPath()+'/'+trainResultId+'.tar');
 }
 
-export async function saveTrainImageDirectory(trainResult: TrainResult) {
+//-------------------------------------------------------
+
+async function ensureResultDirectory(directoryPath: string) {
     try {
-        const container = await useDocker().createContainer({
-            Image: trainResult.image
+        await fs.promises.stat(directoryPath);
+        await fs.promises.chmod(directoryPath, 0o775);
+    } catch (e) {
+        await fs.promises.mkdir(directoryPath, {
+            mode: 0o775
+        });
+    }
+}
+
+async function deleteExistingResultFile(filePath: string) {
+    if(fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+    }
+}
+
+function extractTarStreamToPacker(stream: NodeJS.ReadableStream, packer: Pack) {
+    return new Promise((resolve,reject) => {
+        const extract = tar.extract();
+
+        extract.on('entry', function (header, stream, callback) {
+            stream.pipe(packer.entry(header, callback))
         });
 
-        const trainPath : string = getTrainResultDirectoryPath();
+        extract.on('finish', () => {
+            resolve();
+        });
 
+        extract.on('error', () => {
+            reject();
+        })
+
+        stream.pipe(extract);
+    })
+
+}
+
+//------------------------------------------------------------
+
+export async function saveTrainImageResult(trainResult: TrainResult) {
+    const trainPath : string = getTrainResultDirectoryPath();
+
+    await ensureResultDirectory(trainPath);
+
+    const trainResultPath : string = getTrainResultFilePath(trainResult.id);
+
+    await deleteExistingResultFile(trainResultPath);
+
+    let destinationStream = fs.createWriteStream(trainResultPath, {
+        mode: 0o775
+    });
+
+    const pack = tar.pack();
+
+    pack.pipe(destinationStream);
+
+    const container = await useDocker().createContainer({
+        Image: trainResult.image
+    });
+
+    const directories: string[] = ['/opt/pht_results', '/opt/user_sym_key.key'];
+    for (let i = 0; i < directories.length; i++) {
         try {
-            await fs.promises.stat(trainPath);
-            await fs.promises.chmod(trainPath, 0o775);
+            const archiveStream: NodeJS.ReadableStream = await container.getArchive({
+                path: directories[i]
+            });
+
+            await extractTarStreamToPacker(archiveStream, pack);
         } catch (e) {
-            await fs.promises.mkdir(trainPath, {
-                mode: 0o775
-            });
+            console.error('Extracting Directory/File:' + directories[i] + ' of Container:' + container.id + ' failed...');
         }
-
-        const trainResultPath : string = getTrainResultFilePath(trainResult.id);
-
-        const pack = tar.pack();
-
-        const directories : string[] = ['/opt/pht_results', '/opt/user_sym_key.key'];
-        for(let i=0; i<directories.length; i++) {
-            const name: string | undefined = directories[i].split('/').pop();
-
-            try {
-                const archiveStream: NodeJS.ReadableStream = await container.getArchive({
-                    path: directories[i]
-                });
-
-                const archive = await streamToString(archiveStream);
-
-                if (typeof name === 'undefined') {
-                    continue;
-                }
-
-                pack.entry({name: name + '.tar'}, archive);
-            } catch (e) {
-                console.error('Extracting Directory/File:'+ directories[i] + ' of Container:'+container.id+' failed...');
-            }
-        }
-
-        await new Promise(((resolve, reject) => {
-            try {
-                if(fs.existsSync(trainResultPath)) {
-                    fs.unlinkSync(trainResultPath);
-                }
-            } catch (e) {
-
-            }
-
-            let destinationStream = fs.createWriteStream(trainResultPath, {
-                mode: 0o775
-            });
-
-            destinationStream.on('close', () => {
-                return fs.promises.access(trainResultPath, fs.constants.R_OK)
-                    .then(resolve)
-                    .catch(reject);
-            });
-
-            pack.pipe(destinationStream);
-            pack.finalize();
-        }))
-    } catch (e) {
-        throw new Error('Das Zug Image Verzeichnis konnte nicht extrahiert und gespeichert werden...');
     }
+
+    return await new Promise(((resolve, reject) => {
+        destinationStream.on('close', () => {
+            const exists : boolean = fs.existsSync(trainResultPath);
+            if(exists) {
+                resolve();
+            } else {
+                reject();
+            }
+        });
+
+        pack.finalize();
+    }));
 }

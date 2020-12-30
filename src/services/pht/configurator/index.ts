@@ -1,9 +1,29 @@
 import {Train} from "../../../domains/pht/train";
-import {getRepository} from "typeorm";
-import {UserPublicKey} from "../../../domains/user/public-key";
-import {Station} from "../../../domains/pht/station";
+import {v4} from "uuid";
+import {QueueMessage} from "../../message-queue/message";
 
-export async function createTrainBuilderMessage(train: Train, withPublicKey: boolean = true) : Promise<Record<string, any>> {
+export async function createTrainBuilderQueueMessage(train: Train) : Promise<QueueMessage> {
+    return  {
+        id: v4(),
+        type: undefined,
+        metadata: {
+            token: undefined
+        },
+        data: {
+            userId: train.user_id,
+            trainId: train.id,
+            proposalId: train.proposal_id,
+            stations: train.stations.map(station => station.id),
+            masterImage: train.master_image.external_tag_id,
+            entrypointExecutable: train.entrypoint_executable,
+            entrypointPath: train.entrypoint_file.directory + '/' + train.entrypoint_file.name,
+            sessionId: train.session_id,
+            hash: train.hash,
+            hashSigned: train.hash_signed,
+            query: train.query
+        }
+    }
+    /*
     let message: Record<string, any> = {
         type: train.type,
         train_id: train.id,
@@ -34,4 +54,5 @@ export async function createTrainBuilderMessage(train: Train, withPublicKey: boo
     console.log(message);
 
     return message;
+     */
 }

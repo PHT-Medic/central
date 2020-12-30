@@ -100,7 +100,11 @@ export default class CreateBase implements Seeder {
             'role_edit',
 
             'role_permission_add',
-            'role_permission_drop'
+            'role_permission_drop',
+
+            'station_add',
+            'station_drop',
+            'station_edit'
         ];
         const permissions : Permission[] = names.map((name: string) => {
             return permissionRepository.create({name});

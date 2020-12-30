@@ -1,5 +1,5 @@
 import {
-    Column,
+    Column, CreateDateColumn,
     Entity,
     JoinColumn,
     JoinTable,
@@ -7,7 +7,7 @@ import {
     ManyToOne,
     OneToMany,
     OneToOne,
-    PrimaryGeneratedColumn
+    PrimaryGeneratedColumn, UpdateDateColumn
 } from "typeorm";
 import {Proposal} from "../proposal";
 import {MasterImage} from "../master-image";
@@ -16,28 +16,42 @@ import {TrainResult} from "./result";
 import {TrainFile} from "./file";
 import {User} from "../../user";
 import {Realm} from "../../realm";
+import {TrainConfiguratorStateOpen} from "./states";
 
 @Entity()
 export class Train {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({type: "varchar", length: 10})
+    @Column({length: 10})
     type: string;
 
-    @Column({type: "varchar", nullable: true})
+    @Column({nullable: true})
+    query: string;
+
+    @Column({nullable: true})
     hash: string;
 
-    @Column({type: "varchar", nullable: true})
+    @Column({nullable: true})
     hash_signed: string
 
-    @Column({type: "varchar", nullable: true})
-    entrypoint_name: string;
+    @Column({nullable: true})
+    session_id: string;
 
-    @Column({type: "varchar", nullable: true})
-    entrypoint_command: string;
+    @Column({nullable: true})
+    entrypoint_file_id: number;
 
-    @Column({type: "varchar", default: null})
+    @OneToOne(() => TrainFile, {onDelete: 'SET NULL', nullable: true})
+    @JoinColumn({name: 'entrypoint_file_id'})
+    entrypoint_file: TrainFile;
+
+    @Column({nullable: true})
+    entrypoint_executable: string;
+
+    @Column({type: "varchar", default: TrainConfiguratorStateOpen})
+    configurator_status: string;
+
+    @Column({nullable: true, default: null})
     status: string;
 
     @Column()
@@ -71,10 +85,16 @@ export class Train {
     @JoinTable()
     stations: Station[]
 
-    @Column()
+    @Column({nullable: true})
     master_image_id: number;
 
-    @ManyToOne(() => MasterImage, masterImage => masterImage.trains, { onDelete: 'CASCADE' })
+    @ManyToOne(() => MasterImage, masterImage => masterImage.trains, { onDelete: 'CASCADE', nullable: true})
     @JoinColumn({name: 'master_image_id'})
     master_image: MasterImage;
+
+    @CreateDateColumn()
+    created_at: string;
+
+    @UpdateDateColumn()
+    updated_at: string;
 }

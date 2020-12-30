@@ -1,6 +1,13 @@
-export const TrainStateCreated = 'created';
-export const TrainStateHashGenerated = 'hash_generated';
-export const TrainStateHashSigned = 'hash_signed';
-export const TrainStateRunning = 'running';
+export const TrainConfiguratorStateOpen = 'open';
+export const TrainConfiguratorStateFilesUploaded = 'files_uploaded';
+export const TrainConfiguratorStateHashGenerated = 'hash_generated';
+export const TrainConfiguratorStateHashSigned = 'hash_signed';
+export const TrainConfiguratorStateFinished = 'finished';
+
+export const TrainStateBuilding = 'building';
+export const TrainStateBuilt = 'built';
+export const TrainStateStarting = 'starting';
+export const TrainStateStarted = 'started';
 export const TrainStateStopped = 'stopped';
 export const TrainStateFinished = 'finished';
+export const TrainStateFailed = 'failed';

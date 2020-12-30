@@ -17,12 +17,13 @@ const httpServer = createHttpServer({expressApp});
 
 import {Connection, createConnection} from "typeorm";
 import createPHTResultService from "./services/pht/result";
+import {consumePHTrainQueue} from "./services/pht/message-queue/consumer";
 
 createConnection().then((connection: Connection) => {
     httpServer.listen(process.env.PORT, () => {
         console.log('Listening on port: ' + process.env.PORT);
     });
 
-
+    consumePHTrainQueue().then(r => r);
     createPHTResultService();
 });

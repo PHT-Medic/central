@@ -2,17 +2,21 @@ import {Router} from "express";
 import {forceLoggedIn} from "../../../services/http/request/middleware/authMiddleware";
 
 import {
-    addTrainRouteHandler, doTrainActionRouteHandler,
-    dropTrainRouteHandler,
+    addTrainRouteHandler, dropTrainRouteHandler,
     editTrainRouteHandler,
     getTrainRouteHandler,
     getTrainsRouteHandler
 } from "../../../controllers/pht/train/TrainController";
 import {
-    dropTrainFileRouteHandler, getTrainFileRouteHandler, getTrainFilesRouteHandler,
-    uploadTrainFilesRouteHandler
+    dropTrainFileRouteHandler, getTrainFileRouteHandler, getTrainFilesRouteHandler
 } from "../../../controllers/pht/train/file/TrainFileController";
 import {getTrainResultRouteHandler} from "../../../controllers/pht/train/result/TrainResultController";
+import {uploadTrainFilesRouteHandler} from "../../../controllers/pht/train/file/TrainFileUploadController";
+import {getTrainFileStreamRouteHandler} from "../../../controllers/pht/train/file/TrainFileStreamController";
+import {
+    doTrainBuilderTaskRouteHandler, doTrainTaskRouteHandler,
+    generateTrainHashActionRouteHandler
+} from "../../../controllers/pht/train/TrainActionController";
 
 export function setupPhtTrainRoutes() {
     const router = Router();
@@ -23,12 +27,15 @@ export function setupPhtTrainRoutes() {
     router.get('/:id/files/:fileId', [forceLoggedIn], getTrainFileRouteHandler);
     router.post('/:id/files', [forceLoggedIn], uploadTrainFilesRouteHandler);
     router.get('/:id/files', [forceLoggedIn], getTrainFilesRouteHandler);
+    router.get('/:id/tar', [forceLoggedIn], getTrainFileStreamRouteHandler);
 
     /**
      * Train Routes
      **/
     // Station Routes
-    router.get('/:id/action/:action', [forceLoggedIn], doTrainActionRouteHandler);
+    router.post('/:id/hash-generate', [forceLoggedIn], generateTrainHashActionRouteHandler);
+    router.post('/:id/train-task', [forceLoggedIn], doTrainTaskRouteHandler);
+    router.post('/:id/train-builder-task', [forceLoggedIn], doTrainBuilderTaskRouteHandler);
     router.get('/:id', [forceLoggedIn], getTrainRouteHandler);
     router.post('/:id', [forceLoggedIn], editTrainRouteHandler);
     router.delete('/:id', [forceLoggedIn], dropTrainRouteHandler);

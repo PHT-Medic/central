@@ -7,14 +7,8 @@ import {Train} from "../../../domains/pht/train";
 import {MasterImage} from "../../../domains/pht/master-image";
 import {Proposal} from "../../../domains/pht/proposal";
 import {isTrainType} from "../../../domains/pht/train/types";
-import {
-    TrainStateCreated,
-    TrainStateHashGenerated,
-    TrainStateHashSigned,
-    TrainStateRunning
-} from "../../../domains/pht/train/states";
-import {generateTrainHash, startTrain} from "../../../services/pht/configurator/train-builder";
-import {createTrainBuilderMessage} from "../../../services/pht/configurator";
+import {TrainConfiguratorStateHashGenerated, TrainConfiguratorStateHashSigned} from "../../../domains/pht/train/states";
+import {TrainFile} from "../../../domains/pht/train/file";
 
 export async function getTrainRouteHandler(req: any, res: any) {
     const { id } = req.params;
@@ -72,30 +66,39 @@ export async function getTrainsRouteHandler(req: any, res: any) {
 }
 
 async function runTrainValidations(req: any, editMode: boolean = false) {
-    await check('entrypoint_name')
+    await check('entrypoint_executable')
         .exists()
         .notEmpty()
         .optional({nullable: true})
-        .isLength({min: 3, max: 255})
+        .isLength({min: 1, max: 100})
         .run(req);
-    await check('entrypoint_command')
+
+    await check('query')
         .exists()
         .notEmpty()
         .optional({nullable: true})
-        .isLength({min: 3, max: 255})
+        .isLength({min: 1, max: 4096})
+        .run(req);
+
+    await check('entrypoint_file_id')
+        .exists()
+        .optional()
+        .custom(value => {
+            return getRepository(TrainFile).findOne(value).then((res) => {
+                if(typeof res === 'undefined') throw new Error('The entrypoint file is not valid.');
+            }).catch(e => console.log(e));
+        })
+        .run(req);
 
     const masterImagePromise = check('master_image_id')
         .exists()
         .isInt()
+        .optional()
         .custom(value => {
             return getRepository(MasterImage).find(value).then((res) => {
-                if(typeof res === 'undefined') throw new Error('Das Master Image existiert nicht.');
+                if(typeof res === 'undefined') throw new Error('The master image is not valid.');
             })
         });
-
-    if(editMode) {
-        masterImagePromise.optional();
-    }
 
     await masterImagePromise.run(req);
 
@@ -105,11 +108,8 @@ async function runTrainValidations(req: any, editMode: boolean = false) {
             return getRepository(Station).find({id: In(value)}).then((res) => {
                 if(!res || res.length !== value.length) throw new Error('Die angegebenen Krankenhäuser sind nicht gültig');
             })
-        });
-
-    if(editMode) {
-        stationPromise.optional();
-    }
+        })
+        .optional();
 
     await stationPromise.run(req);
 }
@@ -165,7 +165,6 @@ export async function addTrainRouteHandler(req: any, res: any) {
             stations: station_ids.map((stationId: number) => {
                 return stationRepository.create({id: stationId});
             }),
-            status: TrainStateCreated,
             ...data
         });
 
@@ -204,6 +203,8 @@ export async function editTrainRouteHandler(req: any, res: any) {
         return res._respondAccepted();
     }
 
+    console.log(data);
+
     const repository = getRepository(Train);
     let train = await repository.findOne(id);
 
@@ -215,14 +216,22 @@ export async function editTrainRouteHandler(req: any, res: any) {
         return res._failForbidden();
     }
 
+    if(typeof data.station_ids !== "undefined") {
+        const stationRepository = getRepository(Station);
+
+        data.stations = data.station_ids.map((stationId: number) => {
+            return stationRepository.create({id: stationId});
+        })
+    }
+
     train = repository.merge(train, data);
 
     if(train.hash) {
-        train.status = TrainStateHashGenerated;
-    }
+        train.configurator_status = TrainConfiguratorStateHashGenerated;
 
-    if(train.hash_signed) {
-        train.status = TrainStateHashSigned;
+        if(train.hash_signed) {
+            train.configurator_status = TrainConfiguratorStateHashSigned;
+        }
     }
 
     try {
@@ -268,73 +277,3 @@ export async function dropTrainRouteHandler(req: any, res: any) {
     }
 }
 
-export async function doTrainActionRouteHandler(req: any, res: any) {
-    let {id, action} = req.params;
-
-    if (typeof id !== 'string') {
-        return res._failNotFound();
-    }
-
-    const repository = getRepository(Train);
-
-    let entity = await repository.findOne(id, {relations: ['stations', 'master_image', 'files']});
-
-    if (typeof entity === 'undefined') {
-        return res._failNotFound();
-    }
-
-    if (!isPermittedToOperateOnRealmResource(req.user, entity)) {
-        return res._failForbidden();
-    }
-
-    const allowedActions = ['start', 'stop', 'generateHash'];
-    if(allowedActions.indexOf(action) === -1) {
-        return res._failBadRequest();
-    }
-
-    const message : Record<string, any> = await createTrainBuilderMessage(entity);
-
-    switch (action) {
-        case 'generateHash':
-            try {
-                let hash : string;
-
-                try {
-                    hash = await generateTrainHash(message, req.token);
-                } catch (e) {
-                    hash = 'cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63';
-                }
-
-                entity = repository.merge(entity, {
-                    hash,
-                    status: TrainStateHashGenerated
-                });
-
-                await repository.save(entity);
-
-                return res._respond({data: entity});
-            } catch (e) {
-                console.log(e);
-                return res._failBadRequest({message: e.message});
-            }
-        case 'start':
-            if(!req.ability.can('start','trainExecution')) {
-                return res._failForbidden();
-            }
-
-            try {
-                await startTrain(message, req.token);
-
-                entity = repository.merge(entity, {
-                    status: TrainStateRunning
-                });
-
-                await repository.save(entity);
-
-                return res._respond({data: entity});
-            } catch (e) {
-                console.log(e);
-                return res._failBadRequest({message: e.message});
-            }
-    }
-}

@@ -1,7 +1,6 @@
 import {getRepository} from "typeorm";
 import {TrainResult} from "../../../../domains/pht/train/result";
 import {TrainResultStateFinished} from "../../../../domains/pht/train/result/states";
-import {isPermittedToOperateOnRealmResource} from "../../../../services/auth/utils";
 import fs from "fs";
 import {getTrainResultFilePath} from "../../../../services/pht/result/image";
 
@@ -38,5 +37,5 @@ export async function getTrainResultRouteHandler(req: any, res: any) {
         return res._failServerError({message: 'The result file could not be read...'});
     }
 
-    return res.download(trainResultFilePath);
+    return res.download(trainResultFilePath, entity.train_id+'.tar');
 }

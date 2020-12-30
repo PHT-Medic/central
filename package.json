@@ -9,6 +9,8 @@
         "@casl/ability": "^4.1.4",
         "@casl/vue": "^1.1.0",
         "@types/node-cron": "^2.0.3",
+        "@types/uuid": "^8.3.0",
+        "amqplib": "^0.6.0",
         "axios": "^0.19.2",
         "bcrypt": "^4.0.0",
         "body-parser": "^1.19.0",
@@ -37,9 +39,11 @@
         "tar-stream": "^2.1.4",
         "typeorm": "^0.2.29",
         "typeorm-seeding": "^1.6.1",
+        "uuid": "^8.3.2",
         "validator": "^13.0.0"
     },
     "devDependencies": {
+        "@types/amqplib": "^0.5.16",
         "@types/axios": "^0.14.0",
         "@types/bcrypt": "^3.0.0",
         "@types/busboy": "^0.2.3",

@@ -1,6 +1,6 @@
 import Docker from 'dockerode';
 import {schedule} from 'node-cron';
-import {downloadTrainImage, saveTrainImageDirectory} from "./image";
+import {downloadTrainImage, saveTrainImageResult} from "./image";
 import {getTrainRepositories, TrainRepository} from "./repository";
 import {getRepository, In} from "typeorm";
 import {TrainResult} from "../../../domains/pht/train/result";
@@ -110,7 +110,7 @@ async function runPHTTrainExtractor() {
     const repository = getRepository(TrainResult);
 
     let trainResults : TrainResult[] = await repository.find({
-        status: TrainResultStateDownloaded
+        status: In([TrainResultStateExtracting, TrainResultStateDownloaded])
     });
 
     trainResults = trainResults.map((trainResult: TrainResult) => {
@@ -125,11 +125,10 @@ async function runPHTTrainExtractor() {
 
     for(let i=0; i<trainResults.length; i++) {
         try {
-            await saveTrainImageDirectory(trainResults[i]);
+            await saveTrainImageResult(trainResults[i]);
             trainResults[i] = repository.merge(trainResults[i], {status: TrainResultStateFinished});
 
         } catch (e) {
-            console.log(e);
             trainResults[i] = repository.merge(trainResults[i], {status: TrainResultStateFailed});
         }
 

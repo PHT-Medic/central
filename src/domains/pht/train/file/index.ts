@@ -15,7 +15,7 @@ export class TrainFile {
     hash: string;
 
     @Column({nullable: true})
-    path: string;
+    directory: string;
 
     @Column({nullable: true})
     size: number;

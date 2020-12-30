@@ -7,28 +7,12 @@ import {RolePermission} from "../../domains/role/permission";
 import {Realm} from "../../domains/realm";
 import {MasterImage} from "../../domains/pht/master-image";
 import {Station} from "../../domains/pht/station";
+import {getPhtPermissions} from "../../config/pht";
 
 //----------------------------------------------
 let roleNames = [
     'StationAuthority', // 0
     'StationEmployee' // 1
-];
-
-let permissionNames = [
-    'proposal_add', // 0 : [0,1]
-    'proposal_drop', // 1 : [0,1]
-    'proposal_edit', // 2 : [0,1]
-    'proposal_approve', //3 : [0]
-    'train_approve', // 4 : [0]
-    'train_edit', // 5 : [0]
-    'train_add', // 6 : [0,1]
-    'train_execution_start', // 7 : [0,1]
-    'train_execution_stop', // 8 : [0,1]
-    'train_drop', // 9 : [0,1]
-    'train_result_read', // 10 : [0,1]
-    'station_add', // 11 : []
-    'station_drop', // 12 : []
-    'station_edit' // 13 : []
 ];
 
 let rolePermissionMapping: {[key: number] : number[]} = {
@@ -54,6 +38,7 @@ export default class CreateBase implements Seeder {
         //-------------------------------------------------
 
         const permissionRepository = connection.getRepository(Permission);
+        const permissionNames = getPhtPermissions();
         const permissions : Permission[] = permissionNames.map((name: string) => {
             return permissionRepository.create({
                 name
@@ -73,6 +58,16 @@ export default class CreateBase implements Seeder {
                     role_id: roles[roleIndex].id,
                     permission_id: permissions[permissionIndex].id
                 }))
+            }
+        }
+
+        const adminGroup = await roleRepository.findOne({name: 'admin'});
+        if(typeof adminGroup !== "undefined") {
+            for(let i=0; i<permissions.length; i++) {
+                rolePermissions.push(rolePermissionRepository.create({
+                    role_id: adminGroup.id,
+                    permission_id: permissions[i].id
+                }));
             }
         }
 

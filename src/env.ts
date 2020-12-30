@@ -32,7 +32,8 @@ export interface Environment {
     apiUrl: string,
     webAppUrl: string,
     trainBuilderSocketUrl: string,
-    vaultApiUrl: string
+    vaultApiUrl: string,
+    rabbitMqConnectionString: string
 }
 
 const env : Environment = {
@@ -46,7 +47,8 @@ const env : Environment = {
     apiUrl: requireFromEnv('API_URL'),
     webAppUrl: requireFromEnv('WEB_APP_URL'),
     trainBuilderSocketUrl: requireFromEnv('TRAIN_BUILDER_SOCKET_URL'),
-    vaultApiUrl: requireFromEnv('VAULT_API_URL')
+    vaultApiUrl: requireFromEnv('VAULT_API_URL'),
+    rabbitMqConnectionString: requireFromEnv('RABBITMQ_CONNECTION_STRING')
 };
 
 export default env;
