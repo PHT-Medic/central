@@ -1,5 +1,5 @@
 <script>
-    import { mapGetters, mapActions } from 'vuex'
+    import { mapActions } from 'vuex'
 
     export default {
         computed: {
@@ -32,9 +32,6 @@
                     this.$router.push(component.url)
                 }
             }
-        },
-        mounted() {
-            console.log(this.user);
         }
     }
 </script>

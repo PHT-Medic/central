@@ -74,28 +74,30 @@ class BaseApi {
     public mountAuthResponseInterceptor() {
         if(typeof this.ctx === 'undefined') return;
 
-        this.authResponseInterceptor = this.mountResponseInterceptor((data) => data, (error: ApiResponse) => {
+        this.authResponseInterceptor = this.mountResponseInterceptor((data) => data, (error: any) => {
             if(typeof this.ctx === 'undefined') return;
 
-            if (error.request.status === 401) {
-                // Refresh the access accessToken
-                try {
-                    this.ctx.store.dispatch('auth/triggerRefreshToken').then(() => {
-                        return axios({
-                            method: error.config.method,
-                            url: error.config.url,
-                            data: error.config.data
+            if(typeof error !== 'undefined' && error && typeof error.response !== 'undefined') {
+                if (error.response.status === 401) {
+                    // Refresh the access accessToken
+                    try {
+                        this.ctx.store.dispatch('auth/triggerRefreshToken').then(() => {
+                            return axios({
+                                method: error.config.method,
+                                url: error.config.url,
+                                data: error.config.data
+                            });
                         });
-                    });
-                } catch (e) {
-                    //this.ctx.store.dispatch('triggerSetLoginRequired', true).then(r => r);
-                    this.ctx.redirect('/logout');
+                    } catch (e) {
+                        //this.ctx.store.dispatch('triggerSetLoginRequired', true).then(r => r);
+                        this.ctx.redirect('/logout');
 
-                    throw error;
+                        throw error;
+                    }
                 }
-            }
 
-            throw error;
+                throw error;
+            }
         });
     }
 

@@ -3,7 +3,7 @@ import {Context, Middleware} from "@nuxt/types";
 
 const layoutMiddleware : Middleware = ({ store, route } : Context) => {
     let key : string = 'navigationId';
-    let navigationId : any = null;
+    let navigationId : string | undefined;
 
     for(let i=0; i< route.meta.length; i++) {
         if (key in route.meta[i] && route.meta[i][key]) {
@@ -11,7 +11,7 @@ const layoutMiddleware : Middleware = ({ store, route } : Context) => {
         }
     }
 
-    if(!navigationId) {
+    if(typeof navigationId === 'undefined') {
         for(let i=0; i< route.matched.length; i++) {
             if (key in route.matched[i]) {
                 // @ts-ignore
@@ -20,11 +20,11 @@ const layoutMiddleware : Middleware = ({ store, route } : Context) => {
         }
     }
 
-    navigationId = navigationId ?? LayoutNavigationDefaultId;
-
-    if(navigationId) {
-        store.dispatch('layout/selectNavigation', navigationId).then(r => r)
+    if(typeof navigationId === 'undefined') {
+        navigationId = LayoutNavigationDefaultId;
     }
+
+    return store.dispatch('layout/selectNavigation', navigationId).then(r => r)
 }
 
 export default layoutMiddleware;

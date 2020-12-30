@@ -30,7 +30,14 @@ class AuthJWTScheme extends AbstractAuthScheme {
                 }
             };
         } catch (e) {
-            throw new AuthenticationError(e.response.status, e.response.data.error.message)
+            const message : string = e.message;
+            let status : string = '500';
+
+            if(typeof e.response !== 'undefined' && e.response.status !== 'undefined') {
+                status = e.response.status;
+            }
+
+            throw new AuthenticationError(status, message);
         }
     }
 }

@@ -26,6 +26,7 @@ export default {
                 const train = await runTrainTask(this.train.id, 'start');
                 this.$emit('stopped', train);
             } catch (e) {
+                console.log(e);
                 this.$emit('stopFailed', e);
             }
         }

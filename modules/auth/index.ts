@@ -138,20 +138,20 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public loadMe() : Promise<AuthAbstractUserInfoResponse> {
+    public loadMe() : Promise<AuthAbstractUserInfoResponse|undefined> {
         if(typeof this.mePromise !== 'undefined') {
             return this.mePromise;
         }
 
         if(typeof this.me !== 'undefined') {
-            return new Promise<AuthAbstractUserInfoResponse>((resolve => resolve(this.me)));
+            return new Promise(((resolve) => resolve(undefined)));
         }
 
-        if(typeof this.ctx === 'undefined') return new Promise<any>(((resolve) => resolve()));
+        if(typeof this.ctx === 'undefined') return new Promise(((resolve, reject) => reject('Ctx not defined...')));
 
         const token = this.ctx.store.getters['auth/token'];
 
-        if(!token) return new Promise<any>(((resolve) => resolve()));
+        if(!token) return new Promise(((resolve) => resolve(undefined)));
 
         this.mePromise = this.getUserInfo().then((userInfoResponse: AuthAbstractUserInfoResponse) => {
             this.handleUserInfoResponse(userInfoResponse);

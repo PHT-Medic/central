@@ -82,15 +82,19 @@ export default {
 
             if(keys.length === 0) return;
 
-            const train = await editApiTrain(this.trainProperty.id, data);
+            try {
+                const train = await editApiTrain(this.trainProperty.id, data);
 
-            const updateData = {
-                status: train.status,
-                configuratorStatus: train.configuratorStatus,
-                ...data
-            };
+                const updateData = {
+                    status: train.status,
+                    configuratorStatus: train.configuratorStatus,
+                    ...data
+                };
 
-            this.$emit('updated', updateData);
+                this.$emit('updated', updateData);
+            } catch (e) {
+                throw e;
+            }
         },
         async buildTrain() {
             if(!this.wizard.initialized || this.busy) return;

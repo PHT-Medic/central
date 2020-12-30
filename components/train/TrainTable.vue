@@ -21,7 +21,8 @@ export default {
             message: null,
             fields: [
                 { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'type', label: 'Type', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'updatedAt', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'createdAt', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'configurator_status', label: 'Configurator Status', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'status', label: 'Status', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'result', label: 'Result', thClass: 'text-center', tdClass: 'text-center'},
@@ -81,7 +82,7 @@ export default {
 
         },
 
-        downloadResult() {
+        downloadResult(item) {
             window.open(this.$config.authApiUrl+'pht/trains/'+item.id+'/download')
         },
 
@@ -139,6 +140,13 @@ export default {
     <div class="container">
         <alert-message :message="message" />
         <b-table :items="items" :fields="fields" :busy="busy" head-variant="'dark'" sort-by="id" :sort-desc="true" outlined>
+            <template v-slot:cell(createdAt)="data">
+                <timeago :datetime="data.item.createdAt" />
+            </template>
+            <template v-slot:cell(updatedAt)="data">
+                <timeago :datetime="data.item.updatedAt" />
+            </template>
+
             <template v-slot:cell(configurator_status)="data">
                 <train-configurator-status-button :status="data.item.configuratorStatus" />
             </template>
@@ -182,7 +190,7 @@ export default {
             <template v-slot:cell(options)="data">
                 <div v-if="[trainStates.TrainStateStarting, trainStates.TrainStateFinished, trainStates.TrainStateStopped].indexOf(data.item.status) === -1">
                     <nuxt-link class="btn btn-dark btn-xs" type="button" v-if="canEdit" :to="'/trains/'+data.item.id+'/wizard'">
-                        <i class="fas fa-hat-wizard" /> Wizard
+                        <i class="fas fa-hat-wizard" />
                     </nuxt-link>
                     <button class="btn btn-danger btn-xs" type="button" v-if="canDrop" @click.prevent="drop(data.item)">
                         <i class="fas fa-trash-alt" />

@@ -31,7 +31,7 @@ abstract class AbstractAuthScheme implements AuthSchemeInterface {
 
     //--------------------------------------------------------------------
 
-    abstract async attemptToken(data: any): Promise<AuthAbstractTokenResponse>;
+    abstract attemptToken(data: any): Promise<AuthAbstractTokenResponse>;
 
     //--------------------------------------------------------------------
 
@@ -41,6 +41,7 @@ abstract class AbstractAuthScheme implements AuthSchemeInterface {
 
             return response.data;
         } catch (e) {
+            console.log(e);
             throw new Error('Der Endpunkt für Nutzer assozierte Informationen konnte nicht geladen werden.');
         }
     }

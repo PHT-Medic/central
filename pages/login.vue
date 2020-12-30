@@ -16,7 +16,7 @@
                 credentials: {
                     name: '',
                     password: '',
-                    provider: ''
+                    provider: 'master-database'
                 }
             }
         },
@@ -32,9 +32,10 @@
                 });
             },
             masterRealmProviders() {
-                return this.providerItems.filter((provider) => {
-                    return provider.realm.id === 'master';
-                })
+                return this.providerItems
+                    .filter((provider) => {
+                        return provider.realm.id === 'master';
+                    });
             },
             stationRealmsProviders() {
                 return this.providerItems.filter((provider) => {
@@ -58,7 +59,6 @@
 
                     this.provider.busy = false;
                     this.provider.items = providers;
-
                 } catch (e) {
                     this.provider.busy = false;
                 }
@@ -73,7 +73,13 @@
                 this.error = null;
 
                 try {
-                    await this.triggerLogin(this.credentials);
+                    let {name, password, provider} = this.credentials;
+
+                    if(provider === 'mater-database') {
+                        provider = '';
+                    }
+
+                    await this.triggerLogin({name, password, provider});
 
                     await this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
                 } catch (e) {
@@ -131,7 +137,7 @@
                             id="authenticationProvider"
                             class="form-control"
                         >
-                            <option value="">master-database</option>
+                            <option value="master-database">master-database</option>
                             <option v-for="(item,key) in masterRealmProviders" :value="item.id" :key="key">{{ item.name }}</option>
                         </select>
                     </div>

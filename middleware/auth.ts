@@ -43,6 +43,7 @@ const authMiddleware : Middleware = async ({ route, redirect, $auth, store } : C
         try {
             await $auth.loadMe();
         } catch (e) {
+            console.log(e);
             return redirect('/logout');
         }
     }

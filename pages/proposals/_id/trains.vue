@@ -31,7 +31,7 @@
                 this.$refs['trainForm'].show();
             },
             handleCreated(train) {
-                this.$refs['trainTable'].handleCreatedTrain(train);
+                this.$refs['trainTable'].handleTrainCreated(train);
                 this.$refs['trainForm'].hide();
             }
         }

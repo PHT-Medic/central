@@ -6,9 +6,19 @@ import {AxiosError} from "axios";
 import {clearObjectProperties} from "~/modules/utils";
 
 export default (ctx: Context) => {
-    if (typeof ctx.$config.authApiUrl === 'string') {
+    let apiUrl : string | undefined;
+
+    if(typeof process.env.authApiUrl === 'string') {
+        apiUrl = process.env.authApiUrl;
+    }
+
+    if(typeof ctx.$config.authApiUrl === 'string') {
+        apiUrl = ctx.$config.authApiUrl;
+    }
+
+    if (typeof apiUrl === 'string') {
         const authApi = useApi('auth', {
-            baseURL: ctx.$config.authApiUrl
+            baseURL: apiUrl
         }, ctx);
 
         authApi.mountRequestInterceptor((value: ApiRequestConfig) => {
@@ -40,5 +50,20 @@ export default (ctx: Context) => {
         }, (e: AxiosError) => {
             throw e;
         });
+
+        authApi.mountResponseInterceptor(r => r, (error => {
+            if(typeof error.response !== 'undefined') {
+                if(typeof error.response.data !== 'undefined') {
+                    if(typeof error.response.data.error.message === 'string') {
+                        error.message = error.response.data.error.message;
+                        throw error;
+                    }
+                }
+            }
+
+            error.message = 'A network or unknown error occurred...';
+
+            throw error;
+        }));
     }
 }
