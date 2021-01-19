@@ -35,6 +35,7 @@ export default {
                 id: null,
                 proposalId: null,
 
+                query: null,
                 masterImageId: null,
                 stationIds: [],
                 stations: [],
@@ -188,7 +189,11 @@ export default {
                 throw new Error('Train Stations have to be specified...');
             }
 
-            await this.updateTrain({masterImageId: this.form.masterImageId, stationIds: this.form.stationIds});
+            await this.updateTrain({
+                masterImageId: this.form.masterImageId,
+                stationIds: this.form.stationIds,
+                query: this.form.query
+            });
 
             return true;
         },
@@ -238,6 +243,9 @@ export default {
         },
         setMasterImage(id) {
             this.form.masterImageId = id;
+        },
+        setQuery(query) {
+            this.form.query = query;
         },
         setStationIds(stations) {
             this.form.stationIds = stations;
@@ -355,6 +363,7 @@ export default {
                         :train="form"
                         @setTrainMasterImage="setMasterImage"
                         @setTrainStations="setStationIds"
+                        @setTrainQuery="setQuery"
                     />
                 </tab-content>
 

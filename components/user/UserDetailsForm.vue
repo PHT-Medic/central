@@ -171,8 +171,6 @@ export default {
                 </div>
             </div>
 
-            <hr>
-
             <div class="form-group" :class="{ 'form-group-error': $v.form.email.$error }">
                 <label>Email</label>
                 <input v-model="$v.form.email.$model" type="email" name="email" class="form-control" placeholder="Email-Addresse...">
@@ -187,8 +185,6 @@ export default {
                     Die E-Mail Addresse ist nicht gültig.
                 </div>
             </div>
-
-            <hr>
 
             <div class="form-group">
                 <button :disabled="$v.form.$invalid || busy" @click.prevent="submit" type="submit" class="btn btn-primary btn-xs">

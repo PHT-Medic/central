@@ -28,7 +28,7 @@ class AuthenticationError extends Error {
 
 // --------------------------------------------------------------------
 class AuthModule {
-    protected ctx: Context | undefined;
+    protected ctx: Context;
 
     protected refreshTokenJob: undefined | Job;
 
@@ -47,22 +47,14 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    constructor(ctx?: Context) {
+    constructor(ctx: Context) {
+        this.ctx = ctx;
+
         this.ability = new Ability();
         this.abilityOptions = new WeakMap<object, AuthAbilityOption>();
 
-        if(typeof ctx !== 'undefined') {
-            this.registerContext(ctx);
-
-            this.subscribeStore();
-            this.initStore();
-        }
-    }
-
-    // --------------------------------------------------------------------
-
-    public registerContext(ctx: Context) {
-        this.ctx = ctx;
+        this.subscribeStore();
+        this.initStore();
     }
 
     // --------------------------------------------------------------------
@@ -144,13 +136,10 @@ class AuthModule {
         }
 
         if(typeof this.me !== 'undefined') {
-            return new Promise(((resolve) => resolve(undefined)));
+            return new Promise(((resolve) => resolve(this.me)));
         }
 
-        if(typeof this.ctx === 'undefined') return new Promise(((resolve, reject) => reject('Ctx not defined...')));
-
         const token = this.ctx.store.getters['auth/token'];
-
         if(!token) return new Promise(((resolve) => resolve(undefined)));
 
         this.mePromise = this.getUserInfo().then((userInfoResponse: AuthAbstractUserInfoResponse) => {

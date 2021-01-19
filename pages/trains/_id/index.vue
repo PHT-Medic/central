@@ -1,3 +1,11 @@
+<script>
+export default {
+    props: {
+        train: Object
+    }
+}
+</script>
+
 <template>
     <div>
 

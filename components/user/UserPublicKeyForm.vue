@@ -1,5 +1,5 @@
 <script>
-import {addUserKey, dropUserKey, editUserKey, getUserPublicKey} from "@/domains/user/publicKey/api.ts";
+import {addUserKeyRing, dropUserKeyRing, editUserKeyRing, getUserKeyRing} from "@/domains/user/publicKey/api.ts";
 import {maxLength, minLength, required} from "vuelidate/lib/validators";
 import AlertMessage from "@/components/alert/AlertMessage";
 
@@ -41,7 +41,7 @@ export default {
             this.busy = true;
 
             try {
-                this.item = await getUserPublicKey();
+                this.item = await getUserKeyRing();
                 this.form.content = this.item.content;
             } catch (e) {
 
@@ -58,23 +58,23 @@ export default {
 
             try {
                 if(typeof this.item !== 'undefined') {
-                    this.item = await editUserKey(this.item.id, {
+                    this.item = await editUserKeyRing(this.item.id, {
                         content: this.form.content
                     });
 
                     this.$emit('updated', this.item);
                     this.message = {
-                        data: 'Der Public Key wurde erfolgreich bearbeitet',
+                        data: 'The public key is now updated.',
                         isError: false
                     }
                 } else {
-                    this.item = await addUserKey({
+                    this.item = await addUserKeyRing({
                         content: this.form.content
                     });
 
                     this.$emit('created', this.item);
                     this.message = {
-                        data: 'Der Public Key wurde erfolgreich hochgeladen',
+                        data: 'The public key is now uploaded.',
                         isError: false
                     }
                 }
@@ -94,7 +94,7 @@ export default {
             this.busy = true;
 
             try {
-                await dropUserKey(this.item.id);
+                await dropUserKeyRing(this.item.id);
 
                 this.item = undefined;
                 this.form.content = '';
@@ -135,7 +135,7 @@ export default {
 <template>
     <div>
         <div v-if="!exists" class="alert-sm m-b-20" :class="{'alert-warning': fieldIsEmpty, 'alert-info': !fieldIsEmpty}">
-            Bitte laden Sie Ihren <b>Public Key</b> hoch. Dieser wird zu Erstellung des Zuges benötigt.
+            Please upload your <strong>public key</strong>. It will be used for the creation of a train.
         </div>
 
         <alert-message :message="message" />
@@ -159,10 +159,10 @@ export default {
             </div>
             <div class="form-group">
                 <button @click.prevent="submit" :disabled="form.busy || busy" type="button" class="btn btn-xs btn-primary">
-                    <i class="fa fa-save"></i> {{ exists ? 'Ändern' : 'Hochladen' }}
+                    <i class="fa fa-save"></i> {{ exists ? 'Change' : 'Upload' }}
                 </button>
                 <button v-if="exists" @click.prevent="drop" :disabled="form.busy || busy" type="button" class="btn btn-xs btn-danger">
-                    <i class="fa fa-times"></i> Löschen
+                    <i class="fa fa-times"></i> Delete
                 </button>
             </div>
         </form>

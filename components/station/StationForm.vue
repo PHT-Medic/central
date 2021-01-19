@@ -21,6 +21,7 @@ export default {
         return {
             formData: {
                 name: '',
+                publicKey: null,
                 realmId: ''
             },
 
@@ -42,6 +43,10 @@ export default {
             },
             realmId: {
                 required
+            },
+            publicKey: {
+                minLength: minLength(10),
+                maxLength: maxLength(2048)
             }
         }
     },
@@ -49,6 +54,7 @@ export default {
         if(typeof this.stationProperty !== 'undefined') {
             this.formData.name = this.stationProperty?.name ?? '';
             this.formData.realmId = this.stationProperty?.realmId ?? '';
+            this.formData.publicKey = this.stationProperty?.publicKey ?? '';
         }
 
         this.loadRealms()
@@ -156,6 +162,23 @@ export default {
                 </div>
                 <div v-if="!$v.formData.name.maxLength" class="form-group-hint group-required">
                     Der Name darf maximal <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> Zeichen lang sein.
+                </div>
+            </div>
+
+            <div class="form-group" :class="{ 'form-group-error': $v.formData.publicKey.$error }">
+                <label>PublicKey</label>
+                <textarea
+                    v-model="$v.formData.publicKey.$model"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Provide a public key for the station. The public key will also be passed to the Vault Key Storage for further usage."
+                ></textarea>
+
+                <div v-if="!$v.formData.publicKey.minLength" class="form-group-hint group-required">
+                    Der PublicKey muss mindestens <strong>{{ $v.formData.publicKey.$params.minLength.min }}</strong> Zeichen lang sein.
+                </div>
+                <div v-if="!$v.formData.publicKey.maxLength" class="form-group-hint group-required">
+                    Der PublicKey darf maximal <strong>{{ $v.formData.publicKey.$params.maxLength.max }}</strong> Zeichen lang sein.
                 </div>
             </div>
 

@@ -22,32 +22,11 @@ export default {
     }
 </script>
 <template>
-    <div>
-        <div class="row">
-            <div class="col-7">
-                <div class="panel-card m-b-20">
-                    <div class="panel-card-header">
-                        <h6 class="title">
-                            Passwort
-                        </h6>
-                    </div>
-                    <div class="panel-card-body">
-                        <user-password-form :user-property="user" />
-                    </div>
-                </div>
-            </div>
-            <div class="col-5">
-                <div class="panel-card">
-                    <div class="panel-card-header">
-                        <h6 class="title">
-                            Public Key
-                        </h6>
-                    </div>
-                    <div class="panel-card-body">
-                        <user-public-key-form :user-property="user" />
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="mb-2">
+        <h6 class="title">
+            Passwort
+        </h6>
+
+        <user-password-form :user-property="user" />
     </div>
 </template>

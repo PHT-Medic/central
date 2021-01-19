@@ -15,8 +15,8 @@ export const AuthStoreKey = {
 
 export interface AuthState {
     provider: string | undefined,
-    user: Object | undefined,
-    permissions: Object[],
+    user: Record<string, any> | undefined,
+    permissions: Record<string, any>[],
 
     token: AuthAbstractTokenResponse | undefined,
     tokenPromise: Promise<any> | undefined,
@@ -41,6 +41,9 @@ const state = () : AuthState => ({
 export const getters : GetterTree<AuthState, RootState> = {
     user: (state: AuthState) => {
         return state.user
+    },
+    userId: (state: AuthState) => {
+        return state.user ? state.user.id : undefined;
     },
     provider: (state: AuthState) => {
         return state.provider;
@@ -140,6 +143,8 @@ export const actions : ActionTree<AuthState, RootState> = {
         if (state.token) {
             try {
                 const { permissions, ...user } = await this.$auth.getUserInfo();
+
+                dispatch('triggerUnsetUser');
 
                 dispatch('triggerSetUser', user);
                 dispatch('triggerSetPermissions', permissions);

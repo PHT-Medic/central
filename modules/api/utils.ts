@@ -16,39 +16,60 @@ export function buildUrlRelationsSuffix(uriResourceName: string, uriResourceId: 
     return url;
 }
 
-export function changeKeyCase(stringCase: 'camelCase' | 'snakeCase', data: Record<string, any> | Record<string, any>[]) : Record<string, any> | Record<string, any>[] {
-    if(Array.isArray(data)) {
-        const res : Record<string, any>[] = [];
-        for(let i=0; i<data.length; i++) {
-            res.push(changeKeyCase(stringCase, data[i]));
-        }
-
-        return res;
+function changeArrayKeyCase(stringCase: 'camelCase' | 'snakeCase', data: any[]) {
+    const res : Record<string, any>[] = [];
+    for(let i=0; i<data.length; i++) {
+        res.push(changeKeyCase(stringCase, data[i]));
     }
 
-    const ob : Record<string, any> = {};
+    return res;
+}
 
-    for(let key in data) {
-        if(data.hasOwnProperty(key)) {
-            let caseKey : string;
-            switch (stringCase) {
-                case "camelCase":
-                    caseKey = camelCase(key);
-                    break;
-                case "snakeCase":
-                    caseKey = snakeCase(key);
-                    break;
+export function changeKeyCase(stringCase: 'camelCase' | 'snakeCase', data: any) : Record<string, any> | Record<string, any>[] {
+    const prototype = Object.prototype.toString.call(data);
+    switch (prototype) {
+        case '[object Array]':
+            data = changeArrayKeyCase(stringCase, data);
+            break;
+        case '[object Object]':
+            let ob : Record<string, any> = {};
+
+            for(let key in data) {
+                if(data.hasOwnProperty(key)) {
+                    let caseKey : string;
+                    switch (stringCase) {
+                        case "camelCase":
+                            caseKey = camelCase(key);
+                            break;
+                        case "snakeCase":
+                            caseKey = snakeCase(key);
+                            break;
+                    }
+
+                    if(data[key]) {
+                        const childPrototype = Object.prototype.toString.call(data[key]);
+                        switch (childPrototype) {
+                            case '[object Array]':
+                                ob[caseKey] = changeArrayKeyCase(stringCase, data[key]);
+                                break;
+                            case '[object Object]':
+                                ob[caseKey] = changeKeyCase(stringCase, data[key]);
+                                break;
+                            default:
+                                ob[caseKey] = data[key];
+                                break;
+                        }
+                    } else {
+                        ob[caseKey] = data[key];
+                    }
+                }
             }
 
-            if(data[key] && typeof data[key] === 'object' && !Array.isArray(data[key])) {
-                ob[caseKey] = changeKeyCase(stringCase, data[key]);
-            } else {
-                ob[caseKey] = data[key];
-            }
-        }
+            data = ob;
+            break;
     }
 
-    return ob;
+    return data;
 }
 
 export function changeResponseKeyCase(data: Record<string, any> | Record<string, any>[]) {

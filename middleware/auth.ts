@@ -1,4 +1,5 @@
 import {Context, Middleware} from "@nuxt/types";
+import AuthModule from "~/modules/auth";
 
 type MetaOrMatched = 'meta' | 'matched';
 
@@ -41,9 +42,8 @@ function checkAbility({route, $auth} : Context) {
 const authMiddleware : Middleware = async ({ route, redirect, $auth, store } : Context) => {
     if (!route.path.includes('/logout')) {
         try {
-            await $auth.loadMe();
+            await (<AuthModule> $auth).loadMe();
         } catch (e) {
-            console.log(e);
             return redirect('/logout');
         }
     }

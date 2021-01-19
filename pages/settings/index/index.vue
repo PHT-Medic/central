@@ -23,16 +23,12 @@
     <div>
         <div class="row">
             <div class="col-12">
-                <div class="panel-card m-b-20">
-                    <div class="panel-card-header">
-                        <h6 class="title">
-                            Allgemein
-                        </h6>
-                    </div>
-                    <div class="panel-card-body">
-                        <user-details-form :user-property="user"/>
-                    </div>
-                </div>
+                <h6 class="title">
+                    General
+                </h6>
+
+                <hr />
+                <user-details-form :user-property="user"/>
             </div>
             <div class="col-6">
 

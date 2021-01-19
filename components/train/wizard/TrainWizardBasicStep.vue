@@ -1,5 +1,5 @@
 <script>
-import {getUserPublicKey} from "@/domains/user/publicKey/api.ts";
+import {getUserKeyRing} from "@/domains/user/publicKey/api.ts";
 
 export default {
     props: {
@@ -41,7 +41,7 @@ export default {
             this.publicKey.busy = true;
 
             try {
-                this.publicKey = await getUserPublicKey();
+                this.publicKey = await getUserKeyRing();
             } catch (e) {
 
             }

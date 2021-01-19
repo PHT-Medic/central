@@ -1,9 +1,8 @@
 <template>
-    <div class="">
+    <div class="container">
         <div class="m-b-10">
             <h4 class="title">
-                User
-                <span class="sub-title">Einstellungen</span>
+                Settings
             </h4>
         </div>
 
@@ -34,8 +33,9 @@
         data () {
             return {
                 tabs: [
-                    { name: 'Allgemein', routeName: 'settings-id', icon: 'fas fa-bars', urlSuffix: '' },
-                    { name: 'Sicherheit', routeName: 'settings-id-security', icon: 'fas fa-user-secret', urlSuffix: 'security' },
+                    { name: 'Account', routeName: 'settings-id', icon: 'fas fa-bars', urlSuffix: '' },
+                    { name: 'Security', routeName: 'settings-id-security', icon: 'fa fa-lock', urlSuffix: 'security' },
+                    { name: 'Keys', routeName: 'settings-id-key-ring', icon: 'fa fa-key', urlSuffix: 'key-ring'}
                     //{ name: 'Benachrichtigungen', routeName: 'settings-id-notifications', icon: 'fa fa-bell', urlSuffix: 'notifications'}
                 ]
             }

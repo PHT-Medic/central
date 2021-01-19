@@ -7,7 +7,7 @@
     import {mapGetters} from "vuex";
     import {TrainStates} from "../../domains/train";
     import {empty} from "../../.nuxt/utils";
-    import {getUserPublicKey} from "@/domains/user/publicKey/api.ts";
+    import {getUserKeyRing} from "@/domains/user/publicKey/api.ts";
     import {getMasterImages} from "@/domains/masterImage/api.ts";
     import {getApiProposalStations} from "@/domains/proposal/station/api.ts";
     import {addTrain, runTrainBuilderTaskApi, editApiTrain, getTrain} from "@/domains/train/api.ts";
@@ -327,7 +327,7 @@
             },
             async initForm() {
                 // Public Key
-                getUserPublicKey().then((publicKey) => {
+                getUserKeyRing().then((publicKey) => {
                     this.userPublicKey = publicKey;
                 }).catch(e => e);
 

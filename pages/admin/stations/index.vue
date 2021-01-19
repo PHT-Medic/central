@@ -1,6 +1,6 @@
 <script>
 import {LayoutNavigationAdminId} from "../../../config/layout";
-import {getStations} from "@/domains/station/api.ts";
+import {dropStation, getStations} from "@/domains/station/api.ts";
 import StationForm from "@/components/station/StationForm";
 
 export default {
@@ -65,10 +65,10 @@ export default {
                 console.log(e);
             }
         },
-        drop(item) {
+        async drop(item) {
             let l = this.$createElement;
 
-            this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-info m-b-0'}, [
+            const procceed = await this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-info m-b-0'}, [
                 l('p', null, [
                     'Sind Sie sicher, dass Sie die Station ',
                     l('b', null, [item.name]),
@@ -78,7 +78,23 @@ export default {
                 size: 'sm',
                 buttonSize: 'xs',
                 cancelTitle: 'Abbrechen'
-            })
+            });
+
+            if(procceed) {
+                try {
+                    let index = this.items.findIndex((el) => {
+                        return el.id === item.id
+                    });
+
+                    if(index !== -1) {
+                        await dropStation(item.id);
+
+                        this.items.splice(index,1);
+                    }
+                } catch (e) {
+
+                }
+            }
         }
     }
 }
@@ -114,7 +130,7 @@ export default {
                             <button v-if="$auth.can('edit','station')" @click.prevent="edit(data.item.id)" type="button" class="btn btn-xs btn-primary" title="Löschen">
                                 <i class="fa fa-bars"></i>
                             </button>
-                            <button v-if="$auth.can('drop','station')" @click.prevent="drop(data.item.id)" type="button" class="btn btn-xs btn-outline-danger" title="Löschen">
+                            <button v-if="$auth.can('drop','station')" @click.prevent="drop(data.item)" type="button" class="btn btn-xs btn-outline-danger" title="Löschen">
                                 <i class="fa fa-times"></i>
                             </button>
                         </template>

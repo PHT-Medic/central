@@ -46,6 +46,7 @@ export default {
         <div class="text-center">
             <h6 class="display-1"><i class="fa fa-train"></i></h6>
         </div>
+
         <div class="d-flex flex-row align-items-baseline">
             <div>
                 <h4 class="title mb-0">

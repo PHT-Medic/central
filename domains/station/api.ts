@@ -1,7 +1,7 @@
 import {useApi} from "~/modules/api";
 import {formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 
-export async function getStations(options: RequestRecord) {
+export async function getStations(options?: RequestRecord) {
     try {
         const response = await useApi('auth').get('pht/stations' + formatRequestRecord(options));
 

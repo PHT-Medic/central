@@ -14,6 +14,7 @@ export default {
         return {
             form: {
                 masterImageId: '',
+                query: '',
                 stationIds: []
             },
             proposalStation: {
@@ -40,6 +41,9 @@ export default {
                         required,
                         numeric
                     }
+                },
+                query: {
+
                 }
             }
         }
@@ -59,6 +63,10 @@ export default {
         initTrain() {
             if(typeof this.train.stations !== 'undefined' && this.train.stations) {
                 this.form.stationIds = this.train.stations.map(station => station.id);
+            }
+
+            if(typeof this.train.masterImageId !== 'undefined' && this.train.masterImageId) {
+                this.form.masterImageId = this.train.masterImageId;
             }
 
             if(typeof this.train.masterImageId !== 'undefined' && this.train.masterImageId) {
@@ -111,6 +119,9 @@ export default {
         },
         setTrainStations() {
             this.$emit('setTrainStations', this.form.stationIds);
+        },
+        setQuery() {
+            this.$emit('setTrainQuery', this.form.query);
         }
     }
 }
@@ -150,7 +161,7 @@ export default {
         <div class="col">
             <div class="form-group">
                 <label>Fhir Query</label>
-                <textarea rows="8" class="form-control" placeholder="If you provide a query string, it must be a valid json formatted string..."></textarea>
+                <textarea rows="8" class="form-control" @change.prevent="setQuery" v-model="$v.form.query.$model" placeholder="If you provide a query string, it must be a valid json formatted string..."></textarea>
             </div>
         </div>
 
