@@ -2,7 +2,7 @@ import { Router } from 'express';
 let router = Router();
 
 //---------------------------------------------------------------------------------
-import { forceLoggedIn } from '../../services/http/request/middleware/authMiddleware';
+import { forceLoggedIn } from '../../modules/http/request/middleware/authMiddleware';
 
 import {check} from "express-validator";
 import {
@@ -10,16 +10,16 @@ import {
     dropUserRouteHandler,
     editUserRouteHandler,
     getUserRouteHandler, getUsersRouteHandler
-} from "../../controllers/user/UserController";
+} from "../../app/controllers/user/UserController";
 import {
     addUserRoleRouteHandler, dropUserRoleRouteHandler,
     getUserRoleRouteHandler,
     getUserRolesRouteHandler
-} from "../../controllers/user/role/UserRoleController";
+} from "../../app/controllers/user/role/UserRoleController";
 import {
-    addUserPublicKeyRouteHandler, dropUserPublicKeyRouteHandler, editUserPublicKeyRouteHandler,
-    getUserPublicKeyRouteHandler
-} from "../../controllers/user/public-key/UserPublicKeyController";
+    addUserKeyRouteHandler, dropUserKeyRouteHandler, editUserKeyRouteHandler,
+    getUserKeyRouteHandler
+} from "../../app/controllers/user/key/UserKeyController";
 
 //--------------------------------------------------------------------------------
 

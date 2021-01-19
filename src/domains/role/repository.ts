@@ -1,7 +1,7 @@
 import {EntityRepository, getRepository, Repository} from "typeorm";
 import {Role} from "./index";
 import {RolePermission} from "./permission";
-import {PermissionInterface} from "../../services/auth";
+import {PermissionInterface} from "../../modules/auth";
 
 @EntityRepository(Role)
 export class RoleRepository extends Repository<Role> {

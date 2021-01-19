@@ -1,7 +1,7 @@
 import ResponseSchema, {
     ResponseSchemaFieldRequired, ResponseSchemaFieldToNull
-} from "../../services/http/response/schema";
-import {prettifyName} from "../../services/auth/helpers/permissionHelper";
+} from "../../modules/http/response/schema";
+import {prettifyName} from "../../modules/auth/utils/permission";
 
 class AuthenticatorResponseSchema extends ResponseSchema {
     constructor() {

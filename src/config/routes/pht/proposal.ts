@@ -1,15 +1,15 @@
 import {Router} from "express";
-import {forceLoggedIn} from "../../../services/http/request/middleware/authMiddleware";
+import {forceLoggedIn} from "../../../modules/http/request/middleware/authMiddleware";
 import {
     addProposalRouteHandler,
     dropProposalRouteHandler,
     editProposalRouteHandler,
     getProposalRouteHandler, getProposalsRouteHandler
-} from "../../../controllers/pht/proposal/ProposalController";
+} from "../../../app/controllers/pht/proposal/ProposalController";
 import {
     addProposalStationRouteHandler,
     dropProposalStationRouteHandler, getProposalStationRouteHandler, getProposalStationsRouteHandler
-} from "../../../controllers/pht/proposal/station/ProposalStationController";
+} from "../../../app/controllers/pht/proposal/station/ProposalStationController";
 
 export function setupPhtProposalRoutes() {
     const router = Router();

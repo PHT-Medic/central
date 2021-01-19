@@ -32,7 +32,7 @@ export class User {
     @UpdateDateColumn()
     updated_at: string
 
-    @Column()
+    @Column({type: "varchar"})
     realm_id: string;
 
     @ManyToOne(() => Realm,{ onDelete: 'CASCADE' })

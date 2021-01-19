@@ -1,9 +1,9 @@
 import {Router} from "express";
-import {forceLoggedIn} from "../../../services/http/request/middleware/authMiddleware";
+import {forceLoggedIn} from "../../../modules/http/request/middleware/authMiddleware";
 import {
     getMasterImageRouteHandler,
     getMasterImagesRouteHandler
-} from "../../../controllers/pht/master-image/MasterImageController";
+} from "../../../app/controllers/pht/master-image/MasterImageController";
 
 export function setupPhtMasterImageRoutes() {
     const router = Router();

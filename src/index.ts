@@ -2,12 +2,16 @@ import 'reflect-metadata';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import createExpressApp from "./services/http/express";
-import createHttpServer from "./services/http/server";
+import env from './env';
+
+import createConfig from "./config";
+import createExpressApp from "./modules/http/express";
+import createHttpServer from "./modules/http/server";
 
 //--------------------------------------------------------------------
 // HTTP Server & Express App
 //--------------------------------------------------------------------
+const config = createConfig({env});
 const expressApp = createExpressApp();
 const httpServer = createHttpServer({expressApp});
 
@@ -16,14 +20,21 @@ const httpServer = createHttpServer({expressApp});
 //--------------------------------------------------------------------
 
 import {Connection, createConnection} from "typeorm";
-import createPHTResultService from "./services/pht/result";
-import {consumePHTrainQueue} from "./services/pht/message-queue/consumer";
+import createPHTResultService from "./modules/pht/result";
 
-createConnection().then((connection: Connection) => {
-    httpServer.listen(process.env.PORT, () => {
-        console.log('Listening on port: ' + process.env.PORT);
-    });
+function start() {
+    config.components.forEach(c => c.start());
+    config.aggregators.forEach(a => a.start());
 
-    consumePHTrainQueue().then(r => r);
+    httpServer.listen(env.port, signalStart);
+}
+
+function signalStart() {
+    console.table([['Port', env.port], ['Environment', env.env]]);
+}
+
+createConnection().then(() => {
+    start();
+
     createPHTResultService();
 });

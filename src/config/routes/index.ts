@@ -7,14 +7,14 @@ import roleRoutes from './role';
 import userRoutes from './user';
 import setupAuthRoutes from "./auth";
 import registerPhtRoutes from "./pht";
-import {setupUserPublicKeyRoutes} from "./user-public-key";
+import {setupUserKeyRingRoutes} from "./user-key-ring";
 
 const register = (router: Application) => {
 
     router.use('/permissions', permissionRoutes);
     router.use('/token', tokenRoutes);
     router.use('/users', userRoutes);
-    router.use('/user-public-keys', setupUserPublicKeyRoutes());
+    router.use('/user-key-rings', setupUserKeyRingRoutes());
     router.use('/roles', roleRoutes);
     router.use('/auth', setupAuthRoutes());
     router.use('/pht', registerPhtRoutes());

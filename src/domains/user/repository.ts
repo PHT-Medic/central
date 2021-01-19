@@ -1,8 +1,8 @@
 import {EntityRepository, getCustomRepository, getRepository, In, Repository} from "typeorm";
 import {User} from "./index";
-import {hashPassword, verifyPassword} from "../../services/auth/helpers/authHelper";
+import {hashPassword, verifyPassword} from "../../modules/auth/utils/password";
 import {RoleRepository} from "../role/repository";
-import {PermissionInterface} from "../../services/auth";
+import {PermissionInterface} from "../../modules/auth";
 import {Role} from "../role";
 import {UserRole} from "./role";
 

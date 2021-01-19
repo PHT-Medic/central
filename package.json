@@ -83,7 +83,8 @@
         "seed:config": "ts-node ./node_modules/typeorm-seeding/dist/cli.js config",
         "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
         "schema:drop": "ts-node ./node_modules/typeorm/cli.js schema:drop",
-        "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync"
+        "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync",
+        "reset": "npm run schema:drop && npm run schema:sync && npm run seed:run && npm run dev"
     },
     "_moduleAliases": {
         "@app": "src/app",

@@ -2,9 +2,9 @@ import { Router } from 'express';
 let router = Router();
 
 //---------------------------------------------------------------------------------
-import { forceLoggedIn } from '../../services/http/request/middleware/authMiddleware';
+import { forceLoggedIn } from '../../modules/http/request/middleware/authMiddleware';
 
-import TokenController from "../../controllers/token/TokenController";
+import TokenController from "../../app/controllers/token/TokenController";
 
 //---------------------------------------------------------------------------------
 

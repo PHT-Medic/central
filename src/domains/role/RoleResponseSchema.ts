@@ -1,6 +1,6 @@
 import ResponseSchema, {
     ResponseSchemaFieldRequired, ResponseSchemaFieldToNull
-} from "../../services/http/response/schema";
+} from "../../modules/http/response/schema";
 
 class RoleResponseSchema extends ResponseSchema {
     constructor() {

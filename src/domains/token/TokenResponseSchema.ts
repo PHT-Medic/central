@@ -1,6 +1,6 @@
 import ResponseSchema, {
     ResponseSchemaFieldRequired
-} from "../../services/http/response/schema";
+} from "../../modules/http/response/schema";
 
 class TokenResponseSchema extends ResponseSchema {
     constructor() {

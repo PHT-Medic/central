@@ -1,22 +1,22 @@
 import {Router} from "express";
-import {forceLoggedIn} from "../../../services/http/request/middleware/authMiddleware";
+import {forceLoggedIn} from "../../../modules/http/request/middleware/authMiddleware";
 
 import {
     addTrainRouteHandler, dropTrainRouteHandler,
     editTrainRouteHandler,
     getTrainRouteHandler,
     getTrainsRouteHandler
-} from "../../../controllers/pht/train/TrainController";
+} from "../../../app/controllers/pht/train/TrainController";
 import {
     dropTrainFileRouteHandler, getTrainFileRouteHandler, getTrainFilesRouteHandler
-} from "../../../controllers/pht/train/file/TrainFileController";
-import {getTrainResultRouteHandler} from "../../../controllers/pht/train/result/TrainResultController";
-import {uploadTrainFilesRouteHandler} from "../../../controllers/pht/train/file/TrainFileUploadController";
-import {getTrainFileStreamRouteHandler} from "../../../controllers/pht/train/file/TrainFileStreamController";
+} from "../../../app/controllers/pht/train/file/TrainFileController";
+import {getTrainResultRouteHandler} from "../../../app/controllers/pht/train/result/TrainResultController";
+import {uploadTrainFilesRouteHandler} from "../../../app/controllers/pht/train/file/TrainFileUploadController";
+import {getTrainFileStreamRouteHandler} from "../../../app/controllers/pht/train/file/TrainFileStreamController";
 import {
     doTrainBuilderTaskRouteHandler, doTrainTaskRouteHandler,
     generateTrainHashActionRouteHandler
-} from "../../../controllers/pht/train/TrainActionController";
+} from "../../../app/controllers/pht/train/TrainActionController";
 
 export function setupPhtTrainRoutes() {
     const router = Router();

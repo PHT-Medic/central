@@ -42,7 +42,8 @@ export default class CreateBase implements Seeder {
         const roleRepository = connection.getCustomRepository(RoleRepository);
 
         let adminRole = roleRepository.create({
-            name: 'admin'
+            name: 'admin',
+            provider_role_id: 'superadmin'
         });
 
         await roleRepository.save(adminRole);

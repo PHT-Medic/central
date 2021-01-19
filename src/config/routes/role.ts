@@ -2,11 +2,11 @@ import { Router } from 'express';
 let router = Router();
 
 //---------------------------------------------------------------------------------
-import { forceLoggedIn } from '../../services/http/request/middleware/authMiddleware';
+import { forceLoggedIn } from '../../modules/http/request/middleware/authMiddleware';
 
-import RoleController from "../../controllers/role/RoleController";
-import RolePermissionController from "../../controllers/role/permission/RolePermissionController";
-import {getRoleUsersRouteHandler} from "../../controllers/role/user/RoleUserController";
+import RoleController from "../../app/controllers/role/RoleController";
+import RolePermissionController from "../../app/controllers/role/permission/RolePermissionController";
+import {getRoleUsersRouteHandler} from "../../app/controllers/role/user/RoleUserController";
 
 //---------------------------------------------------------------------------------
 

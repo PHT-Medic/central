@@ -13,4 +13,4 @@ export {RolePermission} from '../domains/role/permission';
 export {User} from '../domains/user';
 export {UserAccount} from '../domains/user/account';
 export {UserRole} from '../domains/user/role';
-export {UserPublicKey} from '../domains/user/public-key';
+export {UserKeyRing} from '../domains/user/key-ring';

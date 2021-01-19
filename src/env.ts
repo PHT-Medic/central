@@ -24,31 +24,37 @@ export function requireFromEnv(key : string, alt?: string) {
 export interface Environment {
     env: string,
     port: number,
+
     jwtPrivateKey: string | null,
     jwtPublicKey: string | null,
     jwtSecret: string | null,
     jwtProcedure: string,
-    localAuthenticator: string | null,
+    jwtMaxAge: string,
+
+    rabbitMqConnectionString: string,
+    harborConnectionString: string,
+
     apiUrl: string,
     webAppUrl: string,
-    trainBuilderSocketUrl: string,
     vaultApiUrl: string,
-    rabbitMqConnectionString: string
 }
 
 const env : Environment = {
     env: requireFromEnv('NODE_ENV'),
     port: parseInt(requireFromEnv('PORT'), 10),
+
     jwtPrivateKey: requireFromEnv('JWT_PRIVATE_KEY', null),
     jwtPublicKey: requireFromEnv('JWT_PUBLIC_KEY', null),
     jwtSecret: requireFromEnv('JWT_SECRET', randomBytes(10).toString('hex')),
     jwtProcedure: requireFromEnv('JWT_PROCEDURE', 'HMAC'),
-    localAuthenticator: requireFromEnv('LOCAL_AUTHENTICATOR'),
+    jwtMaxAge: requireFromEnv('JWT_MAX_AGE', '3600'),
+
+    rabbitMqConnectionString: requireFromEnv('RABBITMQ_CONNECTION_STRING'),
+    harborConnectionString: requireFromEnv('HARBOR_CONNECTION_STRING'),
+
     apiUrl: requireFromEnv('API_URL'),
     webAppUrl: requireFromEnv('WEB_APP_URL'),
-    trainBuilderSocketUrl: requireFromEnv('TRAIN_BUILDER_SOCKET_URL'),
-    vaultApiUrl: requireFromEnv('VAULT_API_URL'),
-    rabbitMqConnectionString: requireFromEnv('RABBITMQ_CONNECTION_STRING')
+    vaultApiUrl: requireFromEnv('VAULT_API_URL')
 };
 
 export default env;

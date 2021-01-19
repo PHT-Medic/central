@@ -5,15 +5,15 @@ import {
     authorizeUrlRoute, dropProviderRoute, editProviderRoute,
     getProviderRoute,
     getProvidersRoute
-} from "../../controllers/auth/ProviderController";
+} from "../../app/controllers/auth/ProviderController";
 import {
     addRealmRoute,
     dropRealmRoute,
     editRealmRoute,
     getRealmRoute,
     getRealmsRoute
-} from "../../controllers/auth/RealmController";
-import {forceLoggedIn} from "../../services/http/request/middleware/authMiddleware";
+} from "../../app/controllers/auth/RealmController";
+import {forceLoggedIn} from "../../modules/http/request/middleware/authMiddleware";
 
 export default function setupAuthRoutes() {
     let router = Router();
