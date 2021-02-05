@@ -1,8 +1,8 @@
-import dotenv from "dotenv";
+import {config} from "dotenv";
 import {randomBytes} from "crypto";
 import path from "path";
 
-const envResult = dotenv.config({
+const envResult = config({
     path: path.resolve(__dirname, '../.env')
 });
 

@@ -17,10 +17,10 @@ export class RolePermission {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column({type: "int", unsigned: true})
     permission_id: number;
 
-    @Column({type: "number"})
+    @Column({type: "int", unsigned: true})
     role_id: number;
 
     @Column({type: 'int', default: 999})

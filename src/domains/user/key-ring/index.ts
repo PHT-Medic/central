@@ -20,7 +20,7 @@ export class UserKeyRing {
     @Column({type: "text", nullable: true})
     he_key: string;
 
-    @Column()
+    @Column({type: "int", unsigned: true})
     user_id: number;
 
     @OneToOne(() => User, {onDelete: "CASCADE"})

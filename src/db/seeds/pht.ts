@@ -77,7 +77,7 @@ export default class CreateBase implements Seeder {
 
 
         const masterImageRepository = connection.getRepository(MasterImage);
-        const masterImageNames : string[] = ['slim', 'buster', 'dl'];
+        const masterImageNames : string[] = ['slim', 'buster', 'dl', 'nfdemo', 'isicdemo'];
 
         const masterImages: MasterImage[] = masterImageNames.map((name: string) => {
             return masterImageRepository.create({

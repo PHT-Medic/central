@@ -20,7 +20,7 @@ export class TrainFile {
     @Column({nullable: true})
     size: number;
 
-    @Column()
+    @Column({type: "int", unsigned: true})
     user_id: number;
 
     @ManyToOne(() => User,{onDelete: "CASCADE"})
@@ -34,7 +34,7 @@ export class TrainFile {
     @JoinColumn({name: 'train_id'})
     train: Train;
 
-    @Column()
+    @Column({nullable: true})
     realm_id: string;
 
     @ManyToOne(() => Realm, {onDelete: "SET NULL"})

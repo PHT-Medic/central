@@ -43,7 +43,7 @@ export class Proposal {
     @JoinColumn({name: 'realm_id'})
     realm: Realm;
 
-    @Column()
+    @Column({type: "int", unsigned: true, nullable: true})
     user_id: number;
 
     @ManyToOne(() => User,{ onDelete: "SET NULL", nullable: true })

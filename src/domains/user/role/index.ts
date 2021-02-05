@@ -17,10 +17,10 @@ export class UserRole {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({type: "number"})
+    @Column({type: "int", unsigned: true})
     user_id: number;
 
-    @Column({type: "number"})
+    @Column({type: "int", unsigned: true})
     role_id: number;
 
     @CreateDateColumn()

@@ -1,0 +1,65 @@
+version: '3.1'
+services:
+    db:
+        container_name: db
+        image: mysql
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        networks:
+            - pht-backend
+        ports:
+            - '3306:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: start123
+        volumes:
+            - './docker/data/mysql:/var/lib/mysql'
+    adminer:
+        image: adminer
+        restart: always
+        depends_on:
+            -   db
+        links:
+            -   db
+        networks:
+            - pht-backend
+        ports:
+            - 8080:8080
+    app:
+        image: pht-server
+        build: .
+        networks:
+            - pht-backend
+        depends_on:
+            -   db
+        links:
+            -   db
+        ports:
+            - '3002:3000'
+        environment:
+            PORT: 3000
+            NODE_ENV: development
+
+            JWT_PROCEDURE: 'RSA'
+            JWT_PRIVATE_KEY: rsa.private
+            JWT_PUBLIC_KEY: rsa.public
+
+            API_URL: http://localhost:3002/
+            WEB_APP_URL: http://localhost:3000/
+            VAULT_API_URL: https://vault.pht.medic.uni-tuebingen.de/v1/
+            RABBITMQ_CONNECTION_STRING: amqp://pht:start123@193.196.20.19
+            HARBOR_CONNECTION_STRING: pht:PangerLenis32@https://harbor.personalhealthtrain.de/api/v2.0/
+
+            TYPEORM_CONNECTION:  mysql
+            TYPEORM_HOST:  db
+            TYPEORM_USERNAME: root
+            TYPEORM_PASSWORD: start123
+            TYPEORM_DATABASE: app
+            TYPEORM_PORT: 3306
+            TYPEORM_SYNCHRONIZE: 'false'
+            TYPEORM_LOGGING: 'true'
+            TYPEORM_ENTITIES: src/db/entities.ts
+            TYPEORM_SUBSCRIBERS: src/db/subscribers.ts
+            TYPEORM_SEEDING_SEEDS: src/db/seeds/**/*{.ts,.js}
+networks:
+    pht-backend:
+        driver: bridge

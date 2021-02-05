@@ -12,7 +12,7 @@
         "@types/uuid": "^8.3.0",
         "amqplib": "^0.6.0",
         "axios": "^0.19.2",
-        "bcrypt": "^4.0.0",
+        "bcrypt": "^5.0.0",
         "body-parser": "^1.19.0",
         "busboy": "^0.3.1",
         "change-case": "^4.1.1",
@@ -27,6 +27,7 @@
         "jsonwebtoken": "^8.5.1",
         "module-alias": "^2.2.2",
         "moment": "^2.29.1",
+        "mysql": "^2.18.1",
         "node-cron": "^2.0.3",
         "pino": "^6.3.2",
         "pino-pretty": "^4.0.0",
@@ -34,7 +35,6 @@
         "reflect-metadata": "^0.1.13",
         "socket.io": "^2.3.0",
         "socket.io-client": "^2.3.0",
-        "sqlite3": "^4.1.1",
         "tar": "^6.0.5",
         "tar-stream": "^2.1.4",
         "typeorm": "^0.2.29",
@@ -59,6 +59,7 @@
         "@types/jsonwebtoken": "^8.3.9",
         "@types/knex": "^0.16.1",
         "@types/moment": "^2.13.0",
+        "@types/mysql": "^2.15.17",
         "@types/node": "^13.11.0",
         "@types/pino": "^6.0.1",
         "@types/shelljs": "^0.8.7",
@@ -76,7 +77,6 @@
         "typescript": "^3.8.3"
     },
     "scripts": {
-        "serve": "nodemon ./dist/index.js",
         "dev": "ts-node src/index.ts",
         "dev-watch": "ts-node-dev --respawn --transpileOnly src/index.ts",
         "build": "tsc",
@@ -84,7 +84,8 @@
         "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
         "schema:drop": "ts-node ./node_modules/typeorm/cli.js schema:drop",
         "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync",
-        "reset": "npm run schema:drop && npm run schema:sync && npm run seed:run && npm run dev"
+        "setup": "ts-node src/setup.ts db",
+        "reset": "npm run schema:drop && npm run schema:sync && npm run seed:run"
     },
     "_moduleAliases": {
         "@app": "src/app",

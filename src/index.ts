@@ -19,22 +19,28 @@ const httpServer = createHttpServer({expressApp});
 // Start Server
 //--------------------------------------------------------------------
 
-import {Connection, createConnection} from "typeorm";
+import {createConnection} from "typeorm";
 import createPHTResultService from "./modules/pht/result";
 
 function start() {
-    config.components.forEach(c => c.start());
-    config.aggregators.forEach(a => a.start());
+    if(env.env === 'production') {
+        createPHTResultService();
+
+        config.components.forEach(c => c.start());
+        config.aggregators.forEach(a => a.start());
+    }
 
     httpServer.listen(env.port, signalStart);
 }
 
 function signalStart() {
-    console.table([['Port', env.port], ['Environment', env.env]]);
+    console.table([
+        ['Port', env.port],
+        ['Environment', env.env],
+        ['Micro-Services', env.env === 'production' ? 'TRUE' : 'FALSE']
+    ]);
 }
 
 createConnection().then(() => {
     start();
-
-    createPHTResultService();
 });

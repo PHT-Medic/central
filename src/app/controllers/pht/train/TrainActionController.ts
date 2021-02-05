@@ -1,13 +1,11 @@
 import {getRepository} from "typeorm";
 import {Train} from "../../../../domains/pht/train";
 import {isPermittedToOperateOnRealmResource} from "../../../../modules/auth/utils";
-import {PhtMainQueue} from "../../../../modules/message-queue/message";
 import {createTrainBuilderQueueMessage} from "../../../../modules/pht/configurator";
 import {
     TrainConfiguratorStateFinished,
     TrainConfiguratorStateHashGenerated,
-    TrainStateBuilding, TrainStateStarted,
-    TrainStateStarting
+    TrainStateBuilding, TrainStateStarted
 } from "../../../../domains/pht/train/states";
 import * as crypto from "crypto";
 import {getTrainFileFilePath} from "../../../../modules/pht/file";
@@ -29,24 +27,38 @@ export async function generateTrainHashActionRouteHandler(req: any, res: any) {
     let entity = await repository.findOne(id, {relations: ['files']});
 
     const hash = crypto.createHash('sha512');
+    // User Hash
     hash.update(Buffer.from(entity.user_id.toString(), 'utf-8'));
+
+    console.log('Hashing: UserId: '+entity.user_id);
 
     for(let i=0; i<entity.files.length; i++) {
         const filePath = getTrainFileFilePath(entity.files[i]);
 
         const fileContent = fs.readFileSync(filePath);
 
+        console.log('Hashing: File: ', entity.files[i].name, Buffer.from(fileContent).toString('utf-8').length);
+
+        // File Hash
         hash.update(fileContent);
     }
 
+    // Session Id hash
     const sessionId : Buffer = crypto.randomBytes(64);
+    console.log('Hashing: SessionId:', entity.session_id);
     hash.update(sessionId);
 
-    if(entity.query && entity.query !== '') {
-        hash.update(entity.query);
+    const query : Buffer | undefined = !!entity.query && entity.query !== '' ?
+        Buffer.from(entity.query, 'utf-8') :
+        undefined;
+
+    if(typeof query !== 'undefined') {
+        console.log('Hashing: Query', query.length, query.toString('hex'));
+        hash.update(query);
     }
 
     entity.session_id = sessionId.toString('hex');
+
     entity.hash = hash.digest('hex');
     entity.configurator_status = TrainConfiguratorStateHashGenerated;
 

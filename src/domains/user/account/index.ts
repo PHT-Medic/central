@@ -17,10 +17,10 @@ export class UserAccount {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
+    @Column({type: "int", unsigned: true})
     user_id!: number;
 
-    @Column()
+    @Column({type: "int", unsigned: true})
     provider_id!: number;
 
     @Column()

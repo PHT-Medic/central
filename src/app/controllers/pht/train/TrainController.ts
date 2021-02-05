@@ -9,6 +9,7 @@ import {Proposal} from "../../../../domains/pht/proposal";
 import {isTrainType} from "../../../../domains/pht/train/types";
 import {TrainConfiguratorStateHashGenerated, TrainConfiguratorStateHashSigned} from "../../../../domains/pht/train/states";
 import {TrainFile} from "../../../../domains/pht/train/file";
+import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 export async function getTrainRouteHandler(req: any, res: any) {
     const { id } = req.params;
@@ -40,12 +41,14 @@ export async function getTrainRouteHandler(req: any, res: any) {
 }
 
 export async function getTrainsRouteHandler(req: any, res: any) {
-    let { filter } = req.query;
+    let { filter, page } = req.query;
 
     const repository = getRepository(Train);
     const query = repository.createQueryBuilder('train')
         .leftJoinAndSelect('train.stations','stations')
-        .leftJoinAndSelect('train.result', 'result')
+        .leftJoinAndSelect('train.result', 'result');
+
+    query.orderBy('train.created_at', 'DESC');
 
     queryFindPermittedResourcesForRealm(query, req.user.realm_id);
 
@@ -56,13 +59,19 @@ export async function getTrainsRouteHandler(req: any, res: any) {
         realmId: 'train.realm_id'
     });
 
-    const entity = await query.getMany();
+    const pagination = applyRequestPagination(query, page, 50);
 
-    if(typeof entity === 'undefined') {
-        return res._failNotFound();
-    }
+    const [entities, total] = await query.getManyAndCount();
 
-    return res._respond({data: entity})
+    return res._respond({
+        data: {
+            data: entities,
+            meta: {
+                total,
+                ...pagination
+            }
+        }
+    });
 }
 
 async function runTrainValidations(req: any, editMode: boolean = false) {

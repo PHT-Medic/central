@@ -61,7 +61,7 @@ export class Train {
     @JoinColumn({name: 'realm_id'})
     realm: Realm;
 
-    @Column()
+    @Column({type: "int", unsigned: true, nullable: true})
     user_id: number;
 
     @ManyToOne(() => User,{ nullable: true, onDelete: "SET NULL" })
