@@ -13,6 +13,8 @@ RUN rm -rf ./node-modules
 RUN apk --no-cache add --virtual builds-deps build-base python && \
   npm install
 
+RUN touch .env
+
 COPY ./entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x ./entrypoint.sh

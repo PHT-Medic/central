@@ -33,10 +33,10 @@ export interface Environment {
 
     rabbitMqConnectionString: string,
     harborConnectionString: string,
+    vaultConnectionString: string,
 
     apiUrl: string,
     webAppUrl: string,
-    vaultApiUrl: string,
 }
 
 const env : Environment = {
@@ -51,10 +51,10 @@ const env : Environment = {
 
     rabbitMqConnectionString: requireFromEnv('RABBITMQ_CONNECTION_STRING'),
     harborConnectionString: requireFromEnv('HARBOR_CONNECTION_STRING'),
+    vaultConnectionString: requireFromEnv('VAULT_CONNECTION_STRING'),
 
     apiUrl: requireFromEnv('API_URL'),
-    webAppUrl: requireFromEnv('WEB_APP_URL'),
-    vaultApiUrl: requireFromEnv('VAULT_API_URL')
+    webAppUrl: requireFromEnv('WEB_APP_URL')
 };
 
 export default env;

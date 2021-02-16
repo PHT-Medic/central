@@ -20,7 +20,7 @@ let rolePermissionMapping: {[key: number] : number[]} = {
     1: [0,1,2,6,7,8,9,10]
 };
 
-export default class CreateBase implements Seeder {
+export default class CreatePHT implements Seeder {
     public async run(factory: Factory, connection: Connection): Promise<any> {
         //-------------------------------------------------
 

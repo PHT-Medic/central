@@ -24,32 +24,36 @@ services:
             - pht-backend
         ports:
             - 8080:8080
+    rabbitmq:
+        image: 'docker.io/bitnami/rabbitmq:3.8-debian-10'
+        environment:
+            - RABBITMQ_USERNAME=admin
+            - RABBITMQ_PASSWORD=start123
+        ports:
+            - '4369:4369'
+            - '5672:5672'
+            - '25672:25672'
+            - '15672:15672'
+        volumes:
+            - './docker/data/rabbitmq:/bitnami'
     app:
         image: pht-server
         build: .
         networks:
             - pht-backend
         depends_on:
-            -   db
+            -  db
+            -  rabbitmq
         links:
-            -   db
+            -  db
         ports:
             - '3002:3000'
         environment:
-            PORT: 3000
-            NODE_ENV: development
-
             JWT_PROCEDURE: 'RSA'
             JWT_PRIVATE_KEY: rsa.private
             JWT_PUBLIC_KEY: rsa.public
 
-            API_URL: http://localhost:3002/
-            WEB_APP_URL: http://localhost:3000/
-            VAULT_API_URL: https://vault.pht.medic.uni-tuebingen.de/v1/
-            RABBITMQ_CONNECTION_STRING: amqp://pht:start123@193.196.20.19
-            HARBOR_CONNECTION_STRING: pht:PangerLenis32@https://harbor.personalhealthtrain.de/api/v2.0/
-
-            TYPEORM_CONNECTION:  mysql
+            TYPEORM_CONNECTION: mysql
             TYPEORM_HOST:  db
             TYPEORM_USERNAME: root
             TYPEORM_PASSWORD: start123

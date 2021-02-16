@@ -1,12 +1,32 @@
 import ApiService, {ApiRequestConfig} from "../index";
+import env from "../../../env";
+
+export type VaultConnectionConfig = {
+    host: string,
+    token: string
+}
+
+export function parseVaultConnectionString(connectionString: string) : VaultConnectionConfig {
+    const parts : string[] = connectionString.split('@');
+    if(parts.length !== 2) {
+        throw new Error('Vault connection string must be in the following format: token@host');
+    }
+
+    return {
+        host: parts[1],
+        token: parts[0]
+    }
+}
 
 class VaultApi extends ApiService {
     constructor() {
+        const vaultConfig = parseVaultConnectionString(env.vaultConnectionString);
+
         const config : ApiRequestConfig = {
             withCredentials: true,
             timeout: 3000,
-            baseURL: 'https://vault.pht.medic.uni-tuebingen.de/v1/',
-            token: 's.jmMOV4W43R2zQ2WOuSQMwsV9',
+            baseURL: vaultConfig.host,
+            token: vaultConfig.token,
             headers: {
                 'X-Vault-Request': 'true',
                 'Content-Type': 'application/json'
