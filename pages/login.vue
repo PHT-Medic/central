@@ -27,7 +27,7 @@
 
             providerItems() {
                 return this.provider.items.map((provider) => {
-                    provider.authorizeUrl = this.$config.authApiUrl + '/auth/providers/' + provider.id + '/uri';
+                    provider.authorizeUrl = this.$config.apiUrl + '/auth/providers/' + provider.id + '/uri';
                     return provider;
                 });
             },

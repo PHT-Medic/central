@@ -6,9 +6,12 @@ import TrainConfiguratorStatusButton from "@/components/train/button/TrainConfig
 import TrainStartButton from "@/components/train/button/TrainStartButton";
 import TrainStopButton from "@/components/train/button/TrainStopButton";
 import AlertMessage from "@/components/alert/AlertMessage";
+import Pagination from "@/components/Pagination";
 
 export default {
-    components: {AlertMessage, TrainStopButton, TrainStartButton, TrainConfiguratorStatusButton, TrainStatusButton},
+    components: {
+        Pagination,
+        AlertMessage, TrainStopButton, TrainStartButton, TrainConfiguratorStatusButton, TrainStatusButton},
     props: {
         proposalId: {
             type: Number,
@@ -30,6 +33,11 @@ export default {
                 { key: 'options', label: 'Options', tdClass: 'text-left' }
             ],
             items: [],
+            meta: {
+                limit: 10,
+                offset: 0,
+                total: 0
+            },
 
             actionBusy: false,
 
@@ -44,17 +52,37 @@ export default {
     methods: {
         async load() {
             try {
-                let record = {};
+                let record = {
+                    page: {
+                        limit: this.meta.limit,
+                        offset: this.meta.offset
+                    }
+                };
 
                 if (typeof this.proposalId !== 'undefined') {
                     record.filter = {
                         proposalId: this.proposalId
                     }
                 }
-                this.items = await getTrains(record);
+
+                const response = await getTrains(record);
+
+                this.items = response.data;
+                const {total} = response.meta;
+
+                this.meta.total = total;
             } catch (e) {
 
             }
+        },
+        goTo(options, resolve, reject) {
+            if(options.offset === this.meta.offset) return;
+
+            this.meta.offset = options.offset;
+
+            this.load()
+                .then(resolve)
+                .catch(reject);
         },
         async drop(train) {
             if (this.actionBusy) return;
@@ -83,7 +111,7 @@ export default {
         },
 
         downloadResult(item) {
-            window.open(this.$config.authApiUrl+'pht/trains/'+item.id+'/download')
+            window.open(this.$config.apiUrl+'pht/trains/'+item.id+'/download')
         },
 
         handleTrainCreated(train) {
@@ -208,5 +236,7 @@ export default {
         <div v-if="!busy && items.length === 0" class="alert alert-sm alert-warning">
             Es sind keine Züge vorhanden...
         </div>
+
+        <pagination :total="meta.total" :offset="meta.offset" :limit="meta.limit" @to="goTo" />
     </div>
 </template>

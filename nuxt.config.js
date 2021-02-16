@@ -1,11 +1,11 @@
 const config = {
     publicRuntimeConfig() {
         return {
-            authApiUrl: process.env.authApiUrl || 'https://pht-ui.personalhealthtrain.de/api/',
+            apiUrl: process.env.API_URL || 'https://pht-ui.personalhealthtrain.de/api/',
         }
     },
     env: {
-        authApiUrl: process.env.authApiUrl || 'https://pht-ui.personalhealthtrain.de/api/'
+        apiUrl: process.env.API_URL || 'https://pht-ui.personalhealthtrain.de/api/'
     },
     telemetry: false,
     ssr: true,
@@ -20,7 +20,8 @@ const config = {
             { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
         ],
         link: [
-            { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+            //{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+            { rel: 'icon', type: 'image/x-icon', href: '/fav.png' }
         ]
     },
     /*

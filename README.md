@@ -1,22 +1,23 @@
-# app
+# PHT UI
+This repository contains the Frontend of the UI.
 
-> My stupendous Nuxt.js project
+## Installation
+This package requires docker to be installed on the host machine.
 
-## Build Setup
+## Configuration
+The following settings need to be added/modified in the environment section of the docker-compose file.
+```
+API_URL=<api url>
 
-``` bash
-# install dependencies
-$ npm install
-
-# serve with hot reload at localhost:3000
-$ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm run start
-
-# generate static project
-$ npm run generate
 ```
 
-For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
+## Start
+To run the Backend just execute the following command:
+ ```
+docker-compose up
+```
+
+## Credits
+If you have any questions, feel free to contact the author Peter Placzek of the project.
+The project was initial developed during this bachelor thesis, and he worked after that as employee
+on the project.
