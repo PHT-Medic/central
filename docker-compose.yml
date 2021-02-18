@@ -67,7 +67,7 @@ services:
             JWT_PUBLIC_KEY: writable/rsa.public
 
             #TYPEORM_CONNECTION: mysql
-            TYPEORM_CONNECTIO: sqlite
+            TYPEORM_CONNECTION: sqlite
             TYPEORM_HOST:  db
             TYPEORM_USERNAME: root
             TYPEORM_PASSWORD: start123
