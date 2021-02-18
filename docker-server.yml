@@ -3,16 +3,11 @@ services:
     server:
         image: pht-server
         build: .
-        depends_on:
-            - db
-            - rabbitmq
-        links:
-            - db
         ports:
             - '3002:3000'
         environment:
             NODE_ENV: production
-            PORT: 3004
+            PORT: 3000
 
             API_URL: http://localhost:3002/
             WEB_APP_URL: http://localhost:3000/
@@ -25,14 +20,18 @@ services:
             JWT_PRIVATE_KEY: rsa.private
             JWT_PUBLIC_KEY: rsa.public
 
-            TYPEORM_CONNECTION: mysql
-            TYPEORM_HOST: db
-            TYPEORM_USERNAME: root
-            TYPEORM_PASSWORD: start123
-            TYPEORM_DATABASE: app
-            TYPEORM_PORT: 3306
+            TYPEORM_CONNECTION: sqlite
+            TYPEORM_DATABASE: writable/db.sqlite
+            #TYPEORM_CONNECTION: mysql
+            #TYPEORM_HOST: db
+            #TYPEORM_USERNAME: root
+            #TYPEORM_PASSWORD: start123
+            #TYPEORM_DATABASE: app
+            #TYPEORM_PORT: 3306
             TYPEORM_SYNCHRONIZE: 'false'
             TYPEORM_LOGGING: 'true'
             TYPEORM_ENTITIES: src/db/entities.ts
             TYPEORM_SUBSCRIBERS: src/db/subscribers.ts
             TYPEORM_SEEDING_SEEDS: src/db/seeds/**/*{.ts,.js}
+        volumes:
+          - './docker/data/app:./usr/src/app/writable'

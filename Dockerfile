@@ -1,6 +1,7 @@
 FROM node:15-alpine
 
 RUN mkdir -p /usr/src/app
+RUN mkdir -p /usr/src/app/writable
 
 WORKDIR /usr/src/app
 
