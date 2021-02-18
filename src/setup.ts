@@ -33,7 +33,7 @@ function setup() {
             const dbms = requireFromEnv('TYPEORM_CONNECTION');
             console.log('setup '+dbms+' db...');
 
-            if(dbms === 'sqlite3') {
+            if(dbms === 'sqlite') {
                 return createDbSchema();
             }
 
