@@ -49,6 +49,16 @@ services:
         ports:
             - '3002:3000'
         environment:
+            NODE_ENV: production
+            PORT: 3004
+
+            API_URL: http://localhost:3002/
+            WEB_APP_URL: http://localhost:3000/
+
+            VAULT_CONNECTION_STRING: s.jmMOV4W43R2zQ2WOuSQMwsV9@https://vault.pht.medic.uni-tuebingen.de/v1/
+            RABBITMQ_CONNECTION_STRING: amqp://pht:start123@193.196.20.19
+            HARBOR_CONNECTION_STRING: pht:PangerLenis32@https://harbor.personalhealthtrain.de/api/v2.0/
+
             JWT_PROCEDURE: 'RSA'
             JWT_PRIVATE_KEY: rsa.private
             JWT_PUBLIC_KEY: rsa.public

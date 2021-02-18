@@ -34,12 +34,12 @@ function setup() {
             console.log('setup '+dbms+' db...');
 
             if(dbms === 'sqlite3') {
-                console.log('setup for sqlite3 not required...');
-                break;
+                return createDbSchema();
             }
 
             if(dbms !== 'mysql') {
                 console.log('setup for '+dbms+' is not supported...');
+                process.exit(0);
             }
 
             const connection = createMysqlConnection({
