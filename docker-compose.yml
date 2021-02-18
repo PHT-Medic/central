@@ -63,8 +63,8 @@ services:
             HARBOR_CONNECTION_STRING: pht:PangerLenis32@https://harbor.personalhealthtrain.de/api/v2.0/
 
             JWT_PROCEDURE: 'RSA'
-            JWT_PRIVATE_KEY: rsa.private
-            JWT_PUBLIC_KEY: rsa.public
+            JWT_PRIVATE_KEY: writable/rsa.private
+            JWT_PUBLIC_KEY: writable/rsa.public
 
             TYPEORM_CONNECTION: mysql
             TYPEORM_HOST:  db

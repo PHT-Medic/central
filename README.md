@@ -24,7 +24,8 @@ HARBOR_CONNECTION_STRING=<user>:<password>@<api url>
 ## Setup
 To setup the database and other parts of the backend, run the following command:
 ```
-docker-compose run app setup
+docker-compose run db -d
+docker-compose run app setup~~~~
 ```
 This will setup everything you need.
 
