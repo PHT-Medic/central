@@ -102,7 +102,7 @@ export function formatRequestRecord(record?: RequestRecord) : string {
 
     let output : {[key: string] : any} = {};
 
-    let keys : string[] = ['filter', 'sort', 'include'];
+    let keys : string[] = ['filter', 'sort', 'include', 'page'];
     for(let i=0; i<keys.length; i++) {
         if(record.hasOwnProperty(keys[i])) {
             // @ts-ignore
@@ -112,6 +112,10 @@ export function formatRequestRecord(record?: RequestRecord) : string {
 
     if(typeof record.filter !== 'undefined') {
         output.filter = record.filter;
+    }
+
+    if(typeof record.page !== 'undefined') {
+        output.page = record.page;
     }
 
     if(typeof record.sort !== 'undefined') {
