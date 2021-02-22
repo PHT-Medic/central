@@ -33,6 +33,7 @@ function setup() {
             const dbms = requireFromEnv('TYPEORM_CONNECTION');
             console.log('setup '+dbms+' db...');
 
+            // in case of sqlite no db must be created manually.
             if(dbms === 'sqlite') {
                 return createDbSchema();
             }
@@ -45,7 +46,8 @@ function setup() {
             const connection = createMysqlConnection({
                 host: requireFromEnv('TYPEORM_HOST'),
                 user: requireFromEnv('TYPEORM_USERNAME'),
-                password: requireFromEnv('TYPEORM_PASSWORD')
+                password: requireFromEnv('TYPEORM_PASSWORD'),
+                port: Number(requireFromEnv('TYPEORM_PORT', '3306'))
             });
 
             return connection.connect(function(err: MysqlError) {

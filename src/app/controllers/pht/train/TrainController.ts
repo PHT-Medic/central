@@ -59,7 +59,7 @@ export async function getTrainsRouteHandler(req: any, res: any) {
         realmId: 'train.realm_id'
     });
 
-    const pagination = applyRequestPagination(query, page, 50);
+    //const pagination = applyRequestPagination(query, page, 50);
 
     const [entities, total] = await query.getManyAndCount();
 
@@ -68,7 +68,7 @@ export async function getTrainsRouteHandler(req: any, res: any) {
             data: entities,
             meta: {
                 total,
-                ...pagination
+                //...pagination
             }
         }
     });

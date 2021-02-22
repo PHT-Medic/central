@@ -1,29 +1,14 @@
 version: '3.1'
 services:
-    #db:
-    #    container_name: db
-    #    image: mysql
-    #    command: --default-authentication-plugin=mysql_native_password
-    #    restart: always
-    #    networks:
-    #        - pht-backend
-    #    ports:
-    #        - '3306:3306'
-    #    environment:
-    #        MYSQL_ROOT_PASSWORD: start123
-    #    volumes:
-    #        - './docker/data/mysql:/var/lib/mysql'
-    #adminer:
-    #    image: adminer
-    #    restart: always
-    #    depends_on:
-    #        -   db
-    #    links:
-    #        -   db
-    #    networks:
-    #        - pht-backend
-    #    ports:
-    #        - 8080:8080
+    db:
+        image: mysql
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: start123
+            MYSQL_ROOT_HOST: '%'
+        volumes:
+            - pht_ui_db:/var/lib/mysql
     rabbitmq:
         image: 'docker.io/bitnami/rabbitmq:3.8-debian-10'
         environment:
@@ -36,21 +21,19 @@ services:
             - '15672:15672'
         networks:
             - pht-backend
+        volumes:
+            - pht_ui_rabbitmq:/bitnami
     server:
         image: pht-server
         build: .
-        networks:
-            - pht-backend
         depends_on:
-        #    -  db
+            -  db
             -  rabbitmq
-        #links:
-        #    -  db
         ports:
             - '3002:3000'
         restart: always
         volumes:
-            - './docker/data/server:/usr/src/app/writable'
+            - pht_ui_server:/usr/src/app/writable
         environment:
             NODE_ENV: production
             PORT: 3000
@@ -66,19 +49,23 @@ services:
             JWT_PRIVATE_KEY: writable/rsa.private
             JWT_PUBLIC_KEY: writable/rsa.public
 
-            #TYPEORM_CONNECTION: mysql
-            TYPEORM_CONNECTION: sqlite
-            TYPEORM_HOST:  db
+            TYPEORM_CONNECTION: mysql
+            #TYPEORM_CONNECTION: sqlite
+            TYPEORM_HOST: db
             TYPEORM_USERNAME: root
             TYPEORM_PASSWORD: start123
-            #TYPEORM_DATABASE: app
-            TYPEORM_DATABASE: writable/db.sqlite
+            TYPEORM_DATABASE: app
+            #TYPEORM_DATABASE: writable/db.sqlite
             TYPEORM_PORT: 3306
             TYPEORM_SYNCHRONIZE: 'false'
             TYPEORM_LOGGING: 'false'
             TYPEORM_ENTITIES: src/db/entities.ts
             TYPEORM_SUBSCRIBERS: src/db/subscribers.ts
             TYPEORM_SEEDING_SEEDS: src/db/seeds/**/*{.ts,.js}
-networks:
-    pht-backend:
-        driver: bridge
+volumes:
+    pht_ui_db:
+        external: true
+    pht_ui_rabbitmq:
+        external: true
+    pht_ui_server:
+        external: true
