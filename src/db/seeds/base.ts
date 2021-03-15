@@ -25,7 +25,7 @@ export default class CreateBase implements Seeder {
         const authenticatorRepository = connection.getRepository(Provider);
 
         let authenticator = authenticatorRepository.create({
-            name: 'master-keycloak',
+            name: 'keycloak',
             scheme: AuthenticatorScheme.OPENID,
             token_host: 'https://keycloak.personalhealthtrain.de/auth/realms/master/',
             token_path: 'protocol/openid-connect/token',

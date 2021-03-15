@@ -92,6 +92,7 @@ class VaultApi extends ApiService {
                 return;
             }
         } catch(e) {
+            console.log(e);
             throw Error('Unable to upload public key');
         }
 

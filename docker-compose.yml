@@ -19,8 +19,6 @@ services:
             - '5672:5672'
             - '25672:25672'
             - '15672:15672'
-        networks:
-            - pht-backend
         volumes:
             - pht_ui_rabbitmq:/bitnami
     server:
@@ -69,3 +67,7 @@ volumes:
         external: true
     pht_ui_server:
         external: true
+networks:
+    default:
+        external:
+            name: pht-network

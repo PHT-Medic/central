@@ -89,7 +89,8 @@ export async function editUserKeyRouteHandler(req: any, res: any) {
 
         return res._respondDeleted({data: entity});
     } catch (e) {
-        return res._failValidationError({message: 'The key ring was successfully updated.'})
+        console.log(e);
+        return res._failValidationError({message: 'The key ring could not be updated...'})
     }
 }
 
@@ -115,6 +116,6 @@ export async function dropUserKeyRouteHandler(req: any, res: any) {
 
         return res._respondDeleted({data: entity});
     } catch (e) {
-        return res._failValidationError({message: 'The key ring could not be deleted.'})
+        return res._failValidationError({message: 'The key ring could not be deleted...'})
     }
 }

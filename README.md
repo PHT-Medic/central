@@ -24,6 +24,7 @@ HARBOR_CONNECTION_STRING=<user>:<password>@<api url>
 ## Setup
 To setup the database and other parts of the backend, run the following command:
 ```
+$ docker network create --driver bridge pht-network
 $ docker volume create --name=pht_ui_db
 $ docker volume create --name=pht_ui_rabbitmq
 $ docker volume create --name=pht_ui_server

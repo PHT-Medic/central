@@ -2,6 +2,7 @@ import {Train} from "../../../domains/pht/train";
 import {createQueueMessageTemplate, QueueMessage} from "../../message-queue";
 import {getRepository} from "typeorm";
 import {UserKeyRing} from "../../../domains/user/key-ring";
+import {TrainFile} from "../../../domains/pht/train/file";
 
 export async function createTrainBuilderQueueMessage(train: Train) : Promise<QueueMessage> {
     let queueMessage = createQueueMessageTemplate();
@@ -14,11 +15,19 @@ export async function createTrainBuilderQueueMessage(train: Train) : Promise<Que
         user_id: train.user_id
     })
 
+    const filesRepository = getRepository(TrainFile);
+
+    const files = await filesRepository
+        .createQueryBuilder('file')
+        .where('file.train_id = :id', {id: train.id})
+        .getMany();
+
     queueMessage.data = {
         userId: train.user_id,
         trainId: train.id,
         proposalId: train.proposal_id,
         stations: train.stations.map(station => station.id),
+        files: files.map(file => file.directory + '/' + file.name),
         masterImage: train.master_image.external_tag_id,
         entrypointExecutable: train.entrypoint_executable,
         entrypointPath: train.entrypoint_file.directory + '/' + train.entrypoint_file.name,
