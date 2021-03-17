@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "ES2017",
+    "lib": [
+        "es2017",
+        "dom"
+    ],
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "node_modules/*"
+      ]
+    }
+  },
+  "paths": {
+    "@writable": [
+      "writable/*"
+    ]
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "compileOnSave": true
+}
