@@ -45,6 +45,10 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
         return res._failForbidden();
     }
 
+    if(!req.ability.can('edit', 'station')) {
+        return res._failForbidden();
+    }
+
     switch (validationData.task) {
         case 'createHarborProject':
             try {
