@@ -1,8 +1,10 @@
 <script>
     import { mapGetters, mapActions } from 'vuex'
     import {getProviders} from "@/domains/provider/api.ts";
+    import MedicineWorker from "@/components/svg/MedicineWorker";
 
     export default {
+        components: {MedicineWorker},
         meta: {
             requireGuestState: true
         },
@@ -96,10 +98,16 @@
             Login
         </h4>
 
-        <hr />
+        <div class="text-center">
+            <medicine-worker :width="400" height="auto" />
+        </div>
 
-        <b-tabs content-class="mt-3">
-            <b-tab title="Local" active>
+        <div class="row mt-3">
+            <div class="col-12 col-sm-6 mb-sm-0 mb-3">
+                <h6 class="title">
+                    Master Realm
+                </h6>
+
                 <transition name="slide-fade">
                     <div v-if="error" class="alert alert-danger alert-sm">
                         {{ error }}
@@ -114,19 +122,19 @@
                             v-model="credentials.name"
                             class="form-control"
                             type="text"
-                            placeholder="Benutzername oder E-mail"
+                            placeholder="username or e-mail"
                             required
                             autofocus
                         >
                     </div>
                     <div class="form-group">
-                        <label for="password">Passwort</label>
+                        <label for="password">Password</label>
                         <input
                             id="password"
                             v-model="credentials.password"
                             class="form-control"
                             type="password"
-                            placeholder="Passwort"
+                            placeholder="password"
                             required
                         >
                     </div>
@@ -137,7 +145,7 @@
                             id="authenticationProvider"
                             class="form-control"
                         >
-                            <option value="master-database">master-database</option>
+                            <option value="master-database">database</option>
                             <option v-for="(item,key) in masterRealmProviders" :value="item.id" :key="key">{{ item.name }}</option>
                         </select>
                     </div>
@@ -148,8 +156,11 @@
                         </button>
                     </div>
                 </form>
-            </b-tab>
-            <b-tab title="Station">
+            </div>
+            <div class="col-12 col-sm-6" title="Station">
+                <h6 class="title">
+                    Station Realms
+                </h6>
                 <ul class="list-unstyled">
                     <li v-for="(item,key) in stationRealmsProviders" :key="key">
                         <div class="card-header">
@@ -169,13 +180,16 @@
                                 {{item.realm.description}}
                             </template>
                             <template v-else>
-                                <i>keine Beschreibung vorhanden</i>
+                                <i>No description available...</i>
                             </template>
                         </div>
                     </li>
                 </ul>
-            </b-tab>
-        </b-tabs>
+                <div class="alert alert-sm alert-info">
+                    No authentication provider specified for any station.
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <style>

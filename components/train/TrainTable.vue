@@ -111,7 +111,7 @@ export default {
         },
 
         downloadResult(item) {
-            window.open(this.$config.apiUrl+'pht/trains/'+item.id+'/download')
+            window.open(this.$config.resultServiceApi+'train-results/'+item.id+'/download')
         },
 
         handleTrainCreated(train) {

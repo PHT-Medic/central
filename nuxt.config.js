@@ -2,10 +2,12 @@ const config = {
     publicRuntimeConfig() {
         return {
             apiUrl: process.env.API_URL || 'https://pht-ui.personalhealthtrain.de/api/',
+            resultServiceApi: process.env.RESULT_SERVICE_API || 'https://pht-ui.personalhealthtrain.de/vapi/'
         }
     },
     env: {
-        apiUrl: process.env.API_URL || 'https://pht-ui.personalhealthtrain.de/api/'
+        apiUrl: process.env.API_URL || 'https://pht-ui.personalhealthtrain.de/api/',
+        resultServiceApi: process.env.RESULT_SERVICE_API || 'https://pht-ui.personalhealthtrain.de/vapi/'
     },
     telemetry: false,
     ssr: true,
