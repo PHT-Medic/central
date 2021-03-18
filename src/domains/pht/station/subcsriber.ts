@@ -74,16 +74,16 @@ export class StationSubscriber implements EntitySubscriberInterface {
 
     afterInsert(event: InsertEvent<Station>) {
         ensureServiceData(event.entity)
-            .catch(e => console.log(e.response.data));
+            .catch(e => console.log(e));
     }
 
     afterUpdate(event: UpdateEvent<Station>): Promise<any> | void {
         ensureServiceData(event.entity, false)
-            .catch(e => console.log(e.response.data));
+            .catch(e => console.log(e));
     }
 
     beforeRemove(event: RemoveEvent<Station>) {
         removeServiceData(event.entity)
-            .catch(e => console.log(e.response.data));
+            .catch(e => console.log(e));
     }
 }
