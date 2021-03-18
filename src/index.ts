@@ -19,8 +19,6 @@ const httpServer = createHttpServer({expressApp});
 // Start Server
 //--------------------------------------------------------------------
 
-import {createConnection} from "typeorm";
-
 function start() {
     config.components.forEach(c => c.start());
     config.aggregators.forEach(a => a.start());
@@ -35,6 +33,4 @@ function signalStart() {
     ]);
 }
 
-createConnection().then(() => {
-    start();
-});
+start();

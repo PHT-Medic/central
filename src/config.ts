@@ -1,5 +1,4 @@
 import {Environment} from "./env";
-import {buildResultAggregator} from "./aggregators/result";
 import {buildResultComponent} from "./components/result-image";
 
 interface ConfigContext {
@@ -13,7 +12,6 @@ export type Config = {
 
 function createConfig({env} : ConfigContext) : Config {
     const aggregators : {start: () => void}[] = [
-        buildResultAggregator()
     ];
 
     const components : {start: () => void}[] = [

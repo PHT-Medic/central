@@ -1,14 +1,11 @@
 version: '3.1'
 services:
-    result-service:
-        image: result-service
+    rs:
+        image: pht-result-service
         build: .
         ports:
             - '3003:3000'
-        restart: always
-        volumes:
-            - src:/usr/src/app/src
-            - writable:/usr/src/app/writable
+        command: 'dev-watch'
         environment:
             NODE_ENV: development
             PORT: 3000
