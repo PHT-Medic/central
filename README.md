@@ -1,5 +1,5 @@
-# PHT API
-This repository contains the Backend of the UI, including the microservices handling different tasks.
+# PHT Result Service
+This repository contains the Result Service of the UI.
 It communicates with some services of the PHT and need therefore to be configured properly, like described 
 in the following sections.
 
@@ -9,15 +9,12 @@ This package requires docker to be installed on the host machine.
 ## Configuration
 The following settings need to be added to the environment section of the docker-compose file.
 ```
-PORT=<port>
-NODE_ENV=<development|production>
+PORT=3003
+NODE_ENV=development
 
-API_URL=http://localhost:<port>/
-WEB_APP_URL=http://localhost:<ui port>/
-
-VAULT_CONNECTION_STRING=<token>@<api url>
-RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
-HARBOR_CONNECTION_STRING=<user>:<password>@<api url>
+VAULT_CONNECTION_STRING=s.jmMOV4W43R2zQ2WOuSQMwsV9@https://vault.pht.medic.uni-tuebingen.de/v1/
+RABBITMQ_CONNECTION_STRING=amqp://pht:start123@193.196.20.19
+HARBOR_CONNECTION_STRING=pht:PangerLenis32@https://harbor.personalhealthtrain.de/api/v2.0/
 
 ```
 
@@ -25,11 +22,6 @@ HARBOR_CONNECTION_STRING=<user>:<password>@<api url>
 To setup the database and other parts of the backend, run the following command:
 ```
 $ docker network create --driver bridge pht-network
-$ docker volume create --name=pht_ui_db
-$ docker volume create --name=pht_ui_rabbitmq
-$ docker volume create --name=pht_ui_server
-$ docker-compose run db -d
-$ docker-compose run server setup
 ```
 This will setup everything you need.
 
