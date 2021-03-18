@@ -17,38 +17,42 @@ async function ensureServiceData(entity: Station, withHarbor: boolean = true) {
             });
     }
 
-    const projectName = 'station_'+entity.id
+    const projectName : string = 'station_'+entity.id
 
-    await useHarborApi()
-        .post('projects', {
-            project_name: projectName,
-            public: true
-        });
-
-    const result = await useHarborApi()
-        .get('projects?name='+projectName);
-
-    if(Array.isArray(result) && result.length === 1) {
-        const project = result[0];
-
-        const { project_id:projectId } = project;
-
-        const harborConfig = parseHarborConnectionString(env.harborConnectionString);
-
-        const webhook : Record<string, any> = {
-            enabled: true,
-            targets: [
-                {
-                    "auth_header": "Bearer "+harborConfig.token,
-                    "skip_cert_verify": true,
-                    "address": env.apiUrl+"service/harbor/hook"
-                }
-            ],
-            event_types: ["PUSH_ARTIFACT"]
-        }
-
+    try {
         await useHarborApi()
-            .post('projects/'+projectId+'/webhook/policies', webhook);
+            .post('projects', {
+                project_name: projectName,
+                public: true
+            });
+
+        const result = await useHarborApi()
+            .get('projects?name=' + projectName);
+
+        if (Array.isArray(result) && result.length === 1) {
+            const project = result[0];
+
+            const {project_id: projectId} = project;
+
+            const harborConfig = parseHarborConnectionString(env.harborConnectionString);
+
+            const webhook: Record<string, any> = {
+                enabled: true,
+                targets: [
+                    {
+                        "auth_header": "Bearer " + harborConfig.token,
+                        "skip_cert_verify": true,
+                        "address": env.apiUrl + "service/harbor/hook"
+                    }
+                ],
+                event_types: ["PUSH_ARTIFACT"]
+            }
+
+            await useHarborApi()
+                .post('projects/' + projectId + '/webhook/policies', webhook);
+        }
+    } catch (e) {
+        console.log('Harbor project could not be created...');
     }
 }
 

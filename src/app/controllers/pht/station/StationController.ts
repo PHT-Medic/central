@@ -37,7 +37,7 @@ export async function getStationsRouteHandler(req: any, res: any) {
 }
 
 export async function addStationRouteHandler(req: any, res: any) {
-    await check('public_key').isLength({min: 5, max: 2048}).exists().optional({nullable: true}).run(req);
+    await check('public_key').isLength({min: 5, max: 4096}).exists().optional({nullable: true}).run(req);
     await check('name').isLength({min: 5, max: 100}).exists().notEmpty().run(req);
     await check('realm_id').exists().notEmpty().run(req);
 
@@ -72,7 +72,7 @@ export async function editStationRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
     await check('name').isLength({min: 5, max: 2048}).exists().optional().run(req);
-    await check('public_key').isLength({min: 5, max: 100}).exists().notEmpty().optional({nullable: true}).run(req);
+    await check('public_key').isLength({min: 5, max: 4096}).exists().notEmpty().optional({nullable: true}).run(req);
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
