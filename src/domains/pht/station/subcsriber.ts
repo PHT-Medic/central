@@ -1,7 +1,8 @@
 import {EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent} from "typeorm";
 import {Station} from "./index";
-import {useHarborApi} from "../../../modules/api/provider/harbor";
+import {parseHarborConnectionString, useHarborApi} from "../../../modules/api/provider/harbor";
 import {useVaultApi} from "../../../modules/api/provider/vault";
+import env from "../../../env";
 
 async function ensureServiceData(entity: Station, withHarbor: boolean = true) {
     if(!!entity.public_key) {
@@ -16,11 +17,39 @@ async function ensureServiceData(entity: Station, withHarbor: boolean = true) {
             });
     }
 
+    const projectName = 'station_'+entity.id
+
     await useHarborApi()
         .post('projects', {
-            project_name: 'station_'+entity.id,
+            project_name: projectName,
             public: true
         });
+
+    const result = await useHarborApi()
+        .get('projects?name='+projectName);
+
+    if(Array.isArray(result) && result.length === 1) {
+        const project = result[0];
+
+        const { project_id:projectId } = project;
+
+        const harborConfig = parseHarborConnectionString(env.harborConnectionString);
+
+        const webhook : Record<string, any> = {
+            enabled: true,
+            targets: [
+                {
+                    "auth_header": "Bearer "+harborConfig.token,
+                    "skip_cert_verify": true,
+                    "address": env.apiUrl+"service/harbor/hook"
+                }
+            ],
+            event_types: ["PUSH_ARTIFACT"]
+        }
+
+        await useHarborApi()
+            .post('projects/'+projectId+'/webhook/policies', webhook);
+    }
 }
 
 async function removeServiceData(entity: Station) {
