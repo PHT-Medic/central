@@ -8,6 +8,7 @@ import userRoutes from './user';
 import setupAuthRoutes from "./auth";
 import registerPhtRoutes from "./pht";
 import {setupUserKeyRingRoutes} from "./user-key-ring";
+import setupServiceRoutes from "./service";
 
 const register = (router: Application) => {
 
@@ -18,6 +19,7 @@ const register = (router: Application) => {
     router.use('/roles', roleRoutes);
     router.use('/auth', setupAuthRoutes());
     router.use('/pht', registerPhtRoutes());
+    router.use('/service', setupServiceRoutes());
     router.use('/', baseRoutes);
 };
 

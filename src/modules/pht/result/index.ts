@@ -110,7 +110,7 @@ async function runPHTTrainExtractor() {
     const repository = getRepository(TrainResult);
 
     let trainResults : TrainResult[] = await repository.find({
-        status: In([TrainResultStateExtracting, TrainResultStateDownloaded])
+        status: In([TrainResultStateDownloaded])
     });
 
     trainResults = trainResults.map((trainResult: TrainResult) => {

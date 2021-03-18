@@ -11,3 +11,5 @@ fi
 if [ "$1" = 'setup' ]; then
     exec npm run setup
 fi
+
+exec npm run "$1"
