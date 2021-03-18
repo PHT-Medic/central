@@ -104,6 +104,7 @@ export async function editStationRouteHandler(req: any, res: any) {
             data: result
         });
     } catch (e) {
+        console.log(e);
         return res._failValidationError({message: 'Die Station konnte nicht aktualisiert werden.'});
     }
 }
