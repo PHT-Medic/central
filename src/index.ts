@@ -20,7 +20,6 @@ const httpServer = createHttpServer({expressApp});
 //--------------------------------------------------------------------
 
 import {createConnection} from "typeorm";
-import createPHTResultService from "./modules/pht/result";
 
 function start() {
     config.components.forEach(c => c.start());

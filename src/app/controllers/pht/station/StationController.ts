@@ -46,7 +46,11 @@ export async function addStationRouteHandler(req: any, res: any) {
         return res._failExpressValidationError({validation});
     }
 
-    const data = matchedData(req, {includeOptionals: false});
+    let data = matchedData(req, {includeOptionals: false});
+
+    if(data.public_key) {
+        data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
+    }
 
     try {
         const repository = getRepository(Station);
@@ -75,22 +79,26 @@ export async function editStationRouteHandler(req: any, res: any) {
         return res._failExpressValidationError(validation);
     }
 
-    const data = matchedData(req, {includeOptionals: false});
+    let data = matchedData(req, {includeOptionals: false});
     if(!data) {
         return res._respondAccepted();
     }
 
     const repository = getRepository(Station);
-    let role = await repository.findOne(id);
+    let station = await repository.findOne(id);
 
-    if(typeof role === 'undefined') {
+    if(typeof station === 'undefined') {
         return res._failValidationError({message: 'Die Station konnte nicht gefunden werden.'});
     }
 
-    role = repository.merge(role, data);
+    if(data.public_key && data.public_key !== station.public_key) {
+        data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
+    }
+
+    station = repository.merge(station, data);
 
     try {
-        const result = await repository.save(role);
+        const result = await repository.save(station);
 
         return res._respondAccepted({
             data: result
