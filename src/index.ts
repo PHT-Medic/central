@@ -23,12 +23,8 @@ import {createConnection} from "typeorm";
 import createPHTResultService from "./modules/pht/result";
 
 function start() {
-    if(env.env === 'production') {
-        createPHTResultService();
-
-        config.components.forEach(c => c.start());
-        config.aggregators.forEach(a => a.start());
-    }
+    config.components.forEach(c => c.start());
+    config.aggregators.forEach(a => a.start());
 
     httpServer.listen(env.port, signalStart);
 }
