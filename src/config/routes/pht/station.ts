@@ -10,6 +10,7 @@ import {
     getStationProposalRouteHandler,
     getStationProposalsRouteHandler
 } from "../../../app/controllers/pht/station/proposal/StationProposalController";
+import {doStationTaskRouteHandler} from "../../../app/controllers/pht/station/StationActionController";
 
 export function setupPhtStationRoutes() {
     const router = Router();
@@ -35,6 +36,8 @@ export function setupPhtStationRoutes() {
     router.get('/:id/proposals', [forceLoggedIn], (req: any, res: any) => {
         return getStationProposalsRouteHandler(req,res,'related');
     });
+
+    router.post('/:id/task', [forceLoggedIn], doStationTaskRouteHandler);
 
     /**
      * Station Routes
