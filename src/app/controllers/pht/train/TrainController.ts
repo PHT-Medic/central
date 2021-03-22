@@ -48,8 +48,6 @@ export async function getTrainsRouteHandler(req: any, res: any) {
         .leftJoinAndSelect('train.stations','stations')
         .leftJoinAndSelect('train.result', 'result');
 
-    query.orderBy('train.created_at', 'DESC');
-
     queryFindPermittedResourcesForRealm(query, req.user.realm_id);
 
     applyRequestFilterOnQuery(query, filter, {
@@ -60,6 +58,8 @@ export async function getTrainsRouteHandler(req: any, res: any) {
     });
 
     //const pagination = applyRequestPagination(query, page, 50);
+
+    query.orderBy('train.updated_at', 'DESC');
 
     const [entities, total] = await query.getManyAndCount();
 

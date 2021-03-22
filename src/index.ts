@@ -31,8 +31,7 @@ function start() {
 function signalStart() {
     console.table([
         ['Port', env.port],
-        ['Environment', env.env],
-        ['Micro-Services', env.env === 'production' ? 'TRUE' : 'FALSE']
+        ['Environment', env.env]
     ]);
 }
 

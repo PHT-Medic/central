@@ -37,7 +37,6 @@ export function applyRequestFilterOnQuery(query: SelectQueryBuilder<any>, reques
         }
 
         if (typeof requestFilters[key] !== 'string') {
-            console.log(requestFilters[key]);
             delete requestFilters[key];
         }
 

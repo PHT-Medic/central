@@ -93,7 +93,7 @@ export async function createToken(payload: object) {
 export async function verifyToken(token: string) : Promise<Record<string, any>> {
     const procedure = await getProcedureConfiguration();
 
-    return <Record<string, any>> verify(token, procedure.privateKey, {
+    return <Record<string, any>> verify(token, procedure.publicKey, {
         algorithms: [procedure.algorithm]
     });
 }

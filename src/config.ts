@@ -1,6 +1,7 @@
 import {Environment} from "./env";
 import {buildTrainBuilderAggregator} from "./aggregators/train-builder";
 import {buildTrainResultAggregator} from "./aggregators/train-result";
+import {buildHarborAggregator} from "./aggregators/harbor";
 
 interface ConfigContext {
     env: Environment
@@ -13,6 +14,7 @@ export type Config = {
 
 function createConfig({env} : ConfigContext) : Config {
     const aggregators : {start: () => void}[] = [
+        buildHarborAggregator(),
         buildTrainBuilderAggregator(),
         buildTrainResultAggregator()
     ];

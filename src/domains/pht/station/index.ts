@@ -24,7 +24,7 @@ export class Station {
     @Column()
     name: string;
 
-    @Column({nullable: true})
+    @Column({type: "text", nullable: true})
     public_key: string;
 
     @CreateDateColumn()
@@ -35,6 +35,21 @@ export class Station {
 
     @Column()
     realm_id: string;
+
+    @Column({nullable: true, default: null})
+    harbor_project_id: number | null;
+
+    @Column({nullable: true, default: null})
+    harbor_project_account_name: string | null;
+
+    @Column({type: "text", nullable: true, default: null})
+    harbor_project_account_token: string | null;
+
+    @Column({default: false})
+    harbor_project_webhook_exists: boolean;
+
+    @Column({default: false})
+    vault_public_key_saved: boolean;
 
     @OneToOne(() => Realm, {onDelete: "CASCADE"})
     @JoinColumn({name: 'realm_id'})

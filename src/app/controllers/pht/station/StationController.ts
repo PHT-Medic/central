@@ -2,7 +2,10 @@ import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
 import {Station} from "../../../../domains/pht/station";
 import {applyRequestFilterOnQuery} from "../../../../db/utils";
-import {Realm} from "../../../../domains/realm";
+import {dropHarborProject, ensureHarborProject} from "../../../../domains/harbor/project/api";
+import {removeStationPublicKeyFromVault, saveStationPublicKeyToVault} from "../../../../domains/vault/station/api";
+import {ensureHarborProjectWebHook} from "../../../../domains/harbor/project/web-hook/api";
+import {ensureHarborProjectRobotAccount} from "../../../../domains/harbor/project/robot-account/api";
 
 export async function getStationRouteHandler(req: any, res: any) {
     const { id } = req.params;
@@ -49,7 +52,11 @@ export async function addStationRouteHandler(req: any, res: any) {
     let data = matchedData(req, {includeOptionals: false});
 
     if(data.public_key) {
-        data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
+        const hexChecker = new RegExp("^[0-9a-fA-F]+$");
+
+        if(!hexChecker.test(data.public_key)) {
+            data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
+        }
     }
 
     try {
@@ -59,7 +66,39 @@ export async function addStationRouteHandler(req: any, res: any) {
 
         await repository.save(entity);
 
-        entity.realm = await getRepository(Realm).findOne(entity.realm_id);
+        try {
+            // Harbor project trigger
+            entity.harbor_project_id = await ensureHarborProject(entity);
+            await repository.update({id: entity.id}, {
+                harbor_project_id: entity.harbor_project_id
+            });
+
+            // Harbor project web-hook trigger
+            await ensureHarborProjectWebHook(entity);
+            entity.harbor_project_webhook_exists = true;
+            await repository.update({id: entity.id}, {
+                harbor_project_webhook_exists: true
+            });
+
+            // Harbor project robot account trigger
+            const { token, name } = await ensureHarborProjectRobotAccount(entity);
+            entity.harbor_project_account_name = name;
+            entity.harbor_project_account_token = token;
+
+            await repository.update({id: entity.id}, {
+                harbor_project_account_token: token,
+                harbor_project_account_name: name
+            });
+
+            // vault triggers
+            await saveStationPublicKeyToVault(entity);
+            entity.vault_public_key_saved = true;
+            await repository.update({id: entity.id}, {
+                vault_public_key_saved: true
+            });
+        } catch (e) {
+            console.log('the harbor or vault setup for the station could not be completed.');
+        }
 
         return res._respond({data: entity});
     } catch (e) {
@@ -71,7 +110,7 @@ export async function addStationRouteHandler(req: any, res: any) {
 export async function editStationRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
-    await check('name').isLength({min: 5, max: 2048}).exists().optional().run(req);
+    await check('name').isLength({min: 5, max: 100}).exists().optional().run(req);
     await check('public_key').isLength({min: 5, max: 4096}).exists().notEmpty().optional({nullable: true}).run(req);
 
     const validation = validationResult(req);
@@ -92,7 +131,11 @@ export async function editStationRouteHandler(req: any, res: any) {
     }
 
     if(data.public_key && data.public_key !== station.public_key) {
-        data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
+        const hexChecker = new RegExp("^[0-9a-fA-F]+$");
+
+        if(!hexChecker.test(data.public_key)) {
+            data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
+        }
     }
 
     station = repository.merge(station, data);
@@ -132,6 +175,9 @@ export async function dropStationRouteHandler(req: any, res: any) {
 
     try {
         await repository.remove(entity);
+
+        await dropHarborProject(entity);
+        await removeStationPublicKeyFromVault(entity);
 
         return res._respondDeleted({data: entity});
     } catch (e) {

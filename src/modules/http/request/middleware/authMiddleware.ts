@@ -44,6 +44,15 @@ async function parseAsUserToken(token: string) : Promise<{ user: User, permissio
 export async function checkAuthenticated(req: any, res: any, next: any) {
     let { authorization } = req.headers;
 
+    try {
+        let token : Record<string, any> | null | undefined = req.cookies?.auth_token ? JSON.parse(req.cookies?.auth_token) : undefined;
+
+        if(token) {
+            authorization = "Bearer " + token.accessToken;
+        }
+    } catch (e) {
+    }
+
     if(typeof authorization === "string") {
         const parts : string[] = authorization.split(" ");
 
@@ -74,7 +83,7 @@ export async function checkAuthenticated(req: any, res: any, next: any) {
 
             parsed = true;
         } catch (e) {
-            res.cookie('token', null, {maxAge: Date.now()});
+            res.cookie('auth_token', null, {maxAge: Date.now()});
             parseError = e.message;
         }
 

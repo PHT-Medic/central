@@ -38,10 +38,11 @@
         "sqlite3": "^5.0.2",
         "tar": "^6.0.5",
         "tar-stream": "^2.1.4",
-        "typeorm": "^0.2.29",
+        "typeorm": "^0.2.31",
         "typeorm-seeding": "^1.6.1",
         "uuid": "^8.3.2",
-        "validator": "^13.0.0"
+        "validator": "^13.0.0",
+        "winston": "^3.3.3"
     },
     "devDependencies": {
         "@types/amqplib": "^0.5.16",
@@ -68,13 +69,15 @@
         "@types/socket.io-client": "^1.4.32",
         "@types/tar": "^4.0.4",
         "@types/tar-stream": "^2.1.0",
+        "@types/winston": "^2.4.4",
         "faker": "^5.1.0",
         "fs-extra": "^9.0.0",
         "shelljs": "^0.8.3",
         "ts-node": "^8.8.2",
         "ts-node-dev": "^1.0.0-pre.44",
         "tslint": "^6.1.1",
-        "typescript": "^3.8.3"
+        "typescript": "^3.8.3",
+        "yup": "^0.32.9"
     },
     "scripts": {
         "dev": "ts-node src/index.ts",

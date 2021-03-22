@@ -7,6 +7,7 @@ import {
     TrainResultStateDownloading, TrainResultStateExtracted, TrainResultStateExtracting,
     TrainResultStateFailed
 } from "../domains/pht/train/result/states";
+import {MQ_UI_RS_EVENT_ROUTING_KEY} from "../config/rabbitmq";
 
 function createTrainBuilderAggregatorHandlers() {
     return {
@@ -73,7 +74,7 @@ export function buildTrainResultAggregator() {
     const handlers = createTrainBuilderAggregatorHandlers();
 
     function start() {
-        return consumeMessageQueue('ui.rs.event', ((async (channel, msg) => {
+        return consumeMessageQueue(MQ_UI_RS_EVENT_ROUTING_KEY, ((async (channel, msg) => {
             try {
                 await handleMessageQueueChannel(channel, handlers, msg);
                 await channel.ack(msg);

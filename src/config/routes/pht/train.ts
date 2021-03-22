@@ -10,7 +10,6 @@ import {
 import {
     dropTrainFileRouteHandler, getTrainFileRouteHandler, getTrainFilesRouteHandler
 } from "../../../app/controllers/pht/train/file/TrainFileController";
-import {getTrainResultRouteHandler} from "../../../app/controllers/pht/train/result/TrainResultController";
 import {uploadTrainFilesRouteHandler} from "../../../app/controllers/pht/train/file/TrainFileUploadController";
 import {getTrainFileStreamRouteHandler} from "../../../app/controllers/pht/train/file/TrainFileStreamController";
 import {
@@ -20,8 +19,6 @@ import {
 
 export function setupPhtTrainRoutes() {
     const router = Router();
-
-    router.get('/:id/download', [], getTrainResultRouteHandler);
 
     router.delete('/:id/files/:fileId', [forceLoggedIn], dropTrainFileRouteHandler);
     router.get('/:id/files/:fileId', [forceLoggedIn], getTrainFileRouteHandler);

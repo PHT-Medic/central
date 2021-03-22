@@ -36,33 +36,13 @@ services:
             - ./src:/usr/src/app/src
             - ./writable:/usr/src/app/writable
         environment:
-            NODE_ENV: production
             PORT: 3000
-
-            API_URL: http://localhost:3002/
-            WEB_APP_URL: http://localhost:3000/
-
-            VAULT_CONNECTION_STRING: s.jmMOV4W43R2zQ2WOuSQMwsV9@https://vault.pht.medic.uni-tuebingen.de/v1/
-            RABBITMQ_CONNECTION_STRING: amqp://admin:start123@rabbitmq
-            HARBOR_CONNECTION_STRING: pht:PangerLenis32@https://harbor.personalhealthtrain.de/api/v2.0/
-
-            JWT_PROCEDURE: 'RSA'
-            JWT_PRIVATE_KEY: writable/rsa.private
-            JWT_PUBLIC_KEY: writable/rsa.public
-
-            TYPEORM_CONNECTION: mysql
-            #TYPEORM_CONNECTION: sqlite
             TYPEORM_HOST: db
-            TYPEORM_USERNAME: root
-            TYPEORM_PASSWORD: start123
-            TYPEORM_DATABASE: app
-            #TYPEORM_DATABASE: writable/db.sqlite
-            TYPEORM_PORT: 3306
-            TYPEORM_SYNCHRONIZE: 'false'
-            TYPEORM_LOGGING: 'false'
-            TYPEORM_ENTITIES: src/db/entities.ts
-            TYPEORM_SUBSCRIBERS: src/db/subscribers.ts
-            TYPEORM_SEEDING_SEEDS: src/db/seeds/**/*{.ts,.js}
+            RABBITMQ_CONNECTION_STRING: amqp://admin:start123@rabbitmq
+        env_file:
+            -   .env
+
+
 volumes:
     pht_ui_db:
         external: true

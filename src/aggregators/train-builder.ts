@@ -2,6 +2,7 @@ import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../m
 import {getRepository} from "typeorm";
 import {Train} from "../domains/pht/train";
 import {TrainStateBuilt, TrainStateFailed} from "../domains/pht/train/states";
+import {MQ_UI_TB_EVENT_ROUTING_KEY} from "../config/rabbitmq";
 
 function createTrainBuilderAggregatorHandlers() {
     return {
@@ -30,7 +31,7 @@ export function buildTrainBuilderAggregator() {
     const handlers = createTrainBuilderAggregatorHandlers();
 
     function start() {
-        return consumeMessageQueue('ui.tb', ((async (channel, msg) => {
+        return consumeMessageQueue(MQ_UI_TB_EVENT_ROUTING_KEY, ((async (channel, msg) => {
             try {
                 await handleMessageQueueChannel(channel, handlers, msg);
                 await channel.ack(msg);

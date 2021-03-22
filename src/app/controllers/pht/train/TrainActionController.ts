@@ -1,19 +1,20 @@
 import {getRepository} from "typeorm";
 import {Train} from "../../../../domains/pht/train";
 import {isPermittedToOperateOnRealmResource} from "../../../../modules/auth/utils";
-import {createTrainBuilderQueueMessage} from "../../../../modules/pht/configurator";
+import {createTrainBuilderQueueMessage} from "../../../../domains/train-builder/queue";
 import {
     TrainConfiguratorStateFinished,
     TrainConfiguratorStateHashGenerated,
     TrainStateBuilding, TrainStateStarted
 } from "../../../../domains/pht/train/states";
 import * as crypto from "crypto";
-import {getTrainFileFilePath} from "../../../../modules/pht/file";
+import {getTrainFileFilePath} from "../../../../domains/pht/train/file/path";
 import * as fs from "fs";
 import {check, matchedData, validationResult} from "express-validator";
 import {useHarborApi} from "../../../../modules/api/provider/harbor";
 import {getPhtHarborLabelNextId} from "../../../../config/pht";
 import {publishQueueMessage, QueueMessage} from "../../../../modules/message-queue";
+import {MQ_TB_ROUTING_KEY} from "../../../../config/rabbitmq";
 
 export async function generateTrainHashActionRouteHandler(req: any, res: any) {
     let {id} = req.params;
@@ -80,7 +81,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
 
     await check('task')
         .exists()
-        .isIn(['start', 'stop'])
+        .isIn(['start', 'stop', 'build'])
         .run(req);
 
     const validation = validationResult(req);
@@ -162,8 +163,6 @@ export async function doTrainBuilderTaskRouteHandler(req: any, res: any) {
     let message: QueueMessage = await createTrainBuilderQueueMessage(entity);
     message.metadata.token = req.token;
 
-    console.log(message);
-
     switch (validationData.task) {
         case 'build':
             if (!req.ability.can('start', 'trainExecution')) {
@@ -178,7 +177,7 @@ export async function doTrainBuilderTaskRouteHandler(req: any, res: any) {
                     status: TrainStateBuilding
                 });
 
-                await publishQueueMessage('tb', message);
+                await publishQueueMessage(MQ_TB_ROUTING_KEY, message);
 
                 await repository.save(entity);
 

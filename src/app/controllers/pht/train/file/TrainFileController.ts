@@ -6,7 +6,7 @@ import {TrainFile} from "../../../../../domains/pht/train/file";
 import fs from "fs";
 import {getWritableDirPath} from "../../../../../config/paths";
 import {TrainConfiguratorStateOpen} from "../../../../../domains/pht/train/states";
-import {getTrainFileFilePath} from "../../../../../modules/pht/file";
+import {getTrainFileFilePath} from "../../../../../domains/pht/train/file/path";
 import {Train} from "../../../../../domains/pht/train";
 
 export async function getTrainFileRouteHandler(req: any, res: any) {

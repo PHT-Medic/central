@@ -71,11 +71,13 @@ const grantToken = async (req: any, res: any) => {
     };
 
     res.cookie('auth_token', JSON.stringify(cookie), {
-        maxAge: Date.now() + 1000 * expiresIn
+        maxAge: Date.now() + 1000 * expiresIn,
+        path: '/'
     });
 
     res.cookie('auth_provider','local',{
-        maxAge: Date.now() + 1000 * expiresIn
+        maxAge: Date.now() + 1000 * expiresIn,
+        path: '/'
     });
 
     let ob = {
@@ -94,7 +96,7 @@ const grantToken = async (req: any, res: any) => {
 //---------------------------------------------------------------------------------
 
 const revokeToken = async (req: any, res: any) => {
-    res.cookie('token', null, {maxAge: Date.now()});
+    res.cookie('auth_token', null, {maxAge: Date.now()});
     return res._respond();
 };
 

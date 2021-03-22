@@ -1,6 +1,6 @@
-import {TrainFile} from "../../../domains/pht/train/file";
+import {TrainFile} from "./index";
 import path from "path";
-import {getWritableDirPath} from "../../../config/paths";
+import {getWritableDirPath} from "../../../../config/paths";
 
 export function getTrainFileFilePath(file: TrainFile) {
     return getTrainFileDirectoryPath(file) + '/' + getTrainFileFileName(file);

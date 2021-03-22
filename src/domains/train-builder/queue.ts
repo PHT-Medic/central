@@ -1,8 +1,8 @@
-import {Train} from "../../../domains/pht/train";
-import {createQueueMessageTemplate, QueueMessage} from "../../message-queue";
+import {Train} from "../pht/train";
+import {createQueueMessageTemplate, QueueMessage} from "../../modules/message-queue";
 import {getRepository} from "typeorm";
-import {UserKeyRing} from "../../../domains/user/key-ring";
-import {TrainFile} from "../../../domains/pht/train/file";
+import {UserKeyRing} from "../user/key-ring";
+import {TrainFile} from "../pht/train/file";
 
 export async function createTrainBuilderQueueMessage(train: Train) : Promise<QueueMessage> {
     let queueMessage = createQueueMessageTemplate();
