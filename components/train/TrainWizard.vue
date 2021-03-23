@@ -1,7 +1,7 @@
 <script>
 import TrainWizardConfiguratorStep from "@/components/train/wizard/TrainWizardConfiguratorStep";
 import TrainFileManager from "@/components/train/file/TrainFileManager";
-import {runTrainBuilderTaskApi, editApiTrain} from "@/domains/train/api.ts";
+import {editApiTrain, runTrainTask} from "@/domains/train/api.ts";
 import TrainWizardHashStep from "@/components/train/wizard/TrainWizardHashStep";
 import TrainWizardFinalStep from "@/components/train/wizard/TrainWizardFinalStep";
 import {TrainConfiguratorStates, TrainStates} from "@/domains/train/index.ts";
@@ -103,7 +103,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runTrainBuilderTaskApi(this.trainProperty.id, 'build');
+                const train = await runTrainTask(this.trainProperty.id, 'build');
 
                 this.$emit('updated', {
                     status: train.status,
@@ -323,7 +323,7 @@ export default {
             return '';
         },
         isConfigured() {
-            return this.trainProperty.configuratorStatus === TrainStates.TrainStateFinished;
+            return this.trainProperty.configuratorStatus === TrainConfiguratorStates.TrainConfiguratorStateFinished;
         }
     }
 }

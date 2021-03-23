@@ -92,8 +92,6 @@ class AuthModule {
                         this.refreshTokenJob.cancel();
                     }
 
-                    let { expireDate } = token.meta;
-
                     let callback = () => {
                         if(typeof this.ctx !== 'undefined') {
                             try {
@@ -106,18 +104,22 @@ class AuthModule {
 
                     callback.bind(this);
 
-                    let expireDateInTime = (new Date(expireDate)).getTime();
-                    let currentTime = (new Date()).getTime();
-
-                    let timeoutMilliSeconds = expireDateInTime - currentTime;
-
-                    if(timeoutMilliSeconds < 0) {
-                        callback();
-                    }
-
                     this.setRequestToken(token.accessToken);
 
-                    this.refreshTokenJob = scheduleJob(new Date(expireDate), callback);
+                    if(typeof token.meta !== 'undefined') {
+                        let {expireDate} = token.meta;
+
+                        let expireDateInTime = (new Date(expireDate)).getTime();
+                        let currentTime = (new Date()).getTime();
+
+                        let timeoutMilliSeconds = expireDateInTime - currentTime;
+
+                        if (timeoutMilliSeconds < 0) {
+                            callback();
+                        }
+
+                        this.refreshTokenJob = scheduleJob(new Date(expireDate), callback);
+                    }
                     break;
                 case 'auth/unsetToken':
                     if(this.refreshTokenJob) {
@@ -142,11 +144,12 @@ class AuthModule {
         const token = this.ctx.store.getters['auth/token'];
         if(!token) return new Promise(((resolve) => resolve(undefined)));
 
-        this.mePromise = this.getUserInfo().then((userInfoResponse: AuthAbstractUserInfoResponse) => {
-            this.handleUserInfoResponse(userInfoResponse);
+        this.mePromise = this.getUserInfo(token.accessToken)
+            .then((userInfoResponse: AuthAbstractUserInfoResponse) => {
+                this.handleUserInfoResponse(userInfoResponse);
 
-            return userInfoResponse;
-        });
+                return userInfoResponse;
+            });
 
         return this.mePromise;
     };
@@ -281,8 +284,8 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public async getUserInfo() {
-        return await useAuthScheme('local').getUserInfo();
+    public async getUserInfo(token: string) {
+        return await useAuthScheme('local').getUserInfo(token);
     }
 
 }

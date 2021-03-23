@@ -2,9 +2,10 @@
     import { mapGetters, mapActions } from 'vuex'
     import {getProviders} from "@/domains/provider/api.ts";
     import MedicineWorker from "@/components/svg/MedicineWorker";
+    import Pagination from "@/components/Pagination";
 
     export default {
-        components: {MedicineWorker},
+        components: {Pagination, MedicineWorker},
         meta: {
             requireGuestState: true
         },
@@ -12,7 +13,12 @@
             return {
                 provider: {
                     items: [],
-                    busy: false
+                    busy: false,
+                    meta: {
+                        limit: 10,
+                        offset: 0,
+                        total: 0
+                    }
                 },
                 error: null,
                 credentials: {
@@ -57,13 +63,32 @@
                 this.provider.busy = true;
 
                 try {
-                    const providers = await getProviders();
+                    let record = {
+                        page: {
+                            limit: this.meta.limit,
+                            offset: this.meta.offset
+                        }
+                    };
 
-                    this.provider.busy = false;
-                    this.provider.items = providers;
+                    const response = await getProviders(record);
+
+                    this.provider.items = response.data;
+                    const {total} = response.meta;
+
+                    this.provider.meta.total = total;
                 } catch (e) {
-                    this.provider.busy = false;
                 }
+
+                this.provider.busy = false;
+            },
+            goTo(options, resolve, reject) {
+                if(options.offset === this.provider.meta.offset) return;
+
+                this.provider.meta.offset = options.offset;
+
+                this.loadProviders()
+                    .then(resolve)
+                    .catch(reject);
             },
 
             async handleSubmit () {
@@ -185,9 +210,10 @@
                         </div>
                     </li>
                 </ul>
-                <div class="alert alert-sm alert-info">
+                <div v-if="!provider.busy && provider.items.length === 0" class="alert alert-sm alert-info">
                     No authentication provider specified for any station.
                 </div>
+                <pagination :total="provider.meta.total" :offset="provider.meta.offset" :limit="provider.meta.limit" @to="goTo" />
             </div>
         </div>
     </div>

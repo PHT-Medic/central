@@ -24,14 +24,8 @@ export default {
 }
 </script>
 <template>
-    <div class="container">
-        <h5 class="title">
-            Train <span class="sub-title">add</span>
-        </h5>
-
-        <train-basic-form
-            :proposal-id="proposalId"
-            @created="handleCreated"
-        />
-    </div>
+    <train-basic-form
+        :proposal-id="proposalId"
+        @created="handleCreated"
+    />
 </template>

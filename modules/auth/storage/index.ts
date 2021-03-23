@@ -7,7 +7,9 @@ export class AuthStorage extends BaseStorage {
         options = options ?? {};
 
         const defaultOptions : StorageOptionsInterface = {
-            cookie: true,
+            cookie: {
+                path: '/'
+            },
             localStorage: true,
             sessionStorage: false,
             namespace: 'auth'

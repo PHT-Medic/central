@@ -1,15 +1,19 @@
 <script>
-import {LayoutNavigationAdminId} from "../../../config/layout";
-import {dropRealm, getRealms} from "@/domains/realm/api.ts";
-import RealmForm from "@/components/admin/realm/RealmForm";
+import {LayoutNavigationAdminId} from "@/config/layout";
+import ProviderForm from "@/components/admin/provider/ProviderForm";
+import {dropProvider, getProviders} from "@/domains/provider/api.ts";
+import Pagination from "@/components/Pagination";
 
 export default {
-    components: {RealmForm},
+    props: {
+        realm: Object
+    },
+    components: {Pagination, ProviderForm},
     meta: {
         navigationId: LayoutNavigationAdminId,
         requireLoggedIn: true,
         requireAbility(can) {
-            return can('add','realm') || can('edit','realm') || can('drop','realm');
+            return can('add','provider') || can('edit','provider') || can('drop','provider');
         }
     },
     data() {
@@ -18,12 +22,19 @@ export default {
             mode: 'add',
             isBusy: false,
             fields: [
+                { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'scheme', label: 'Scheme', thClass: 'text-left', tdClass: 'text-left'},
                 { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'updatedAt', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'createdAt', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'updatedAt', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'options', label: '', tdClass: 'text-left' }
             ],
-            items: []
+            items: [],
+            meta: {
+                limit: 10,
+                offset: 0,
+                total: 0
+            }
         }
     },
     created() {
@@ -46,12 +57,25 @@ export default {
             this.isBusy = true;
 
             try {
-                this.items = await getRealms();
-                this.isBusy = false;
+                let record = {
+                    page: {
+                        limit: this.meta.limit,
+                        offset: this.meta.offset
+                    },
+                    filter: {
+                        realmId: this.realm.id
+                    }
+                };
+
+                const response = await getProviders(record);
+                this.items = response.data;
+                const {total} = response.meta;
+
+                this.meta.total = total;
             } catch (e) {
-                this.isBusy = false;
-                throw e;
             }
+
+            this.isBusy = false;
         },
         async add() {
             this.mode = 'add';
@@ -71,7 +95,7 @@ export default {
             try {
                 let proceed = await this.$bvModal.msgBoxConfirm(l('div', {class: 'alert alert-info m-b-0'}, [
                     l('p', null, [
-                        'Sind Sie sicher, dass Sie den Realm ',
+                        'Sind Sie sicher, dass Sie den Provider ',
                         l('b', null, [user.name]),
                         ' löschen möchten?'
                     ])
@@ -88,7 +112,7 @@ export default {
                         });
 
                         if(index !== -1) {
-                            await dropRealm(user.id);
+                            await dropProvider(user.id);
 
                             this.items.splice(index,1);
                         }
@@ -105,34 +129,33 @@ export default {
 </script>
 <template>
     <div class="container">
-        <h1 class="title no-border mb-3">
-            Realm <span class="sub-title">Management</span>
-        </h1>
         <div class="d-flex flex-row">
             <div>
                 <button @click.prevent="load" type="button" class="btn btn-xs btn-dark">
-                    <i class="fas fa-sync"></i> Aktualisieren
+                    <i class="fas fa-sync"></i> Refresh
                 </button>
             </div>
             <div style="margin-left: auto;">
                 <button @click.prevent="add" type="button" class="btn btn-xs btn-success">
-                    <i class="fa fa-plus"></i> Hinzufügen
+                    <i class="fa fa-plus"></i> Add
                 </button>
             </div>
         </div>
         <div class="m-t-10">
             <b-table :items="items" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
+                <template v-slot:cell(realm)="data">
+                    <span class="badge-dark badge">{{data.item.realm.name}}</span>
+                </template>
                 <template v-slot:cell(options)="data">
-                    <nuxt-link
-                        :to="'/admin/realms/'+data.item.id"
-                        v-if="$auth.can('edit','realm')"
+                    <button
+                        v-if="$auth.can('edit','provider')"
                         @click.prevent="edit(data.item.id)"
                         class="btn btn-xs btn-outline-primary"
                     >
-                        <i class="fa fa-cogs"></i>
-                    </nuxt-link>
+                        <i class="fa fa-bars"></i>
+                    </button>
                     <button
-                        v-if="$auth.can('drop','realm') && data.item.dropAble"
+                        v-if="$auth.can('drop','provider')"
                         @click.prevent="drop(data.item)"
                         type="button"
                         class="btn btn-xs btn-outline-danger"
@@ -154,17 +177,18 @@ export default {
                     </div>
                 </template>
             </b-table>
+            <pagination :total="meta.total" :offset="meta.offset" :limit="meta.limit" @to="goTo" />
         </div>
         <b-modal
             size="lg"
             ref="form"
             button-size="sm"
-            title-html="<i class='fas fa-university'></i> Realm"
+            title-html="<i class='fas fa-sign-in-alt'></i> Provider"
             :no-close-on-backdrop="true"
             :no-close-on-esc="true"
             :hide-footer="true"
         >
-            <realm-form :mode-property="mode" :realm-property="item" @created="handleCreated" @updated="handleUpdated"/>
+            <provider-form :provider-property="item" :realm-id="realm.id" @created="handleCreated" @updated="handleUpdated"/>
         </b-modal>
     </div>
 </template>

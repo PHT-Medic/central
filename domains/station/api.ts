@@ -7,7 +7,7 @@ export async function getStations(options?: RequestRecord) {
 
         return response.data;
     } catch (e) {
-        throw new Error('Die Stationen konnten nicht geladen werden.');
+        throw new Error('The stations could not be loaded.');
     }
 }
 
@@ -17,7 +17,7 @@ export async function getStation(id: number) {
 
         return response.data;
     } catch (e) {
-        throw new Error('Die Station konnte nicht geladen werden.');
+        throw new Error('The station does not exists or could not be loaded.');
     }
 }
 
@@ -27,7 +27,7 @@ export async function addStation(data: Record<string, any>) {
 
         return response.data;
     } catch (e) {
-        throw new Error('Die Stationen konnte nicht erstellt werden.');
+        throw new Error('The station could not be created..');
     }
 }
 
@@ -37,7 +37,7 @@ export async function editStation(id: number, data: Record<string, any>) {
 
         return response.data;
     } catch (e) {
-        throw new Error('Die Stationen konnte nicht editiert werden.');
+        throw new Error('The station could not be edited.');
     }
 }
 
@@ -47,6 +47,16 @@ export async function dropStation(id: number) {
 
         return response.data;
     } catch (e) {
-        throw new Error('Die Stationen konnte nicht editiert werden.');
+        throw new Error('The station could not be dropped.');
+    }
+}
+
+export async function doStationTask(id: number, task: string, data: Record<string, any>) {
+    try {
+        const response = await useApi('auth').post('pht/stations/'+id + '/task', {task, ...data});
+
+        return response.data;
+    } catch (e) {
+        throw new Error('The station task could not be executed.');
     }
 }

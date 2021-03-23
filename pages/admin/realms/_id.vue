@@ -1,0 +1,93 @@
+<script>
+import {LayoutNavigationAdminId} from "@/config/layout";
+import {getRealm} from "@/domains/realm/api";
+import Vue from "vue";
+import MedicineWorker from "@/components/svg/MedicineWorker";
+import MedicineDoctors from "@/components/svg/MedicineDoctors";
+
+export default {
+    components: {MedicineDoctors, MedicineWorker},
+    meta: {
+        requireLoggedIn: true,
+        navigationId: LayoutNavigationAdminId
+    },
+    async asyncData(context) {
+        try {
+            const realm = await getRealm(context.params.id);
+
+            return {
+                realm
+            };
+        } catch (e) {
+            await context.redirect('/admin/realms');
+        }
+    },
+    data() {
+        return {
+            realm: undefined,
+            tabs: [
+                { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
+                { name: 'Station', icon: 'fa fa-city', urlSuffix: '/station'},
+                { name: 'Auth Providers', icon: 'fas fa-sign-in-alt', urlSuffix: '/auth-providers'}
+            ]
+        }
+    },
+    methods: {
+        updateRealm(realm) {
+            for(let key in realm) {
+                Vue.set(this.realm, key, realm[key]);
+            }
+        }
+    }
+}
+</script>
+<template>
+    <div class="container">
+        <div class="text-center">
+            <medicine-doctors width="50%" height="auto" />
+        </div>
+
+        <div class="d-flex flex-row align-items-baseline">
+            <div>
+                <h4 class="title mb-0">
+                    {{ realm.name }} <span class="sub-title">Manage and inspect realm</span>
+                </h4>
+            </div>
+            <div class="ml-auto" style="font-size: .8rem;"></div>
+        </div>
+
+        <div class="m-b-20 m-t-10">
+            <div class="panel-card">
+                <div class="panel-card-body">
+                    <div class="flex-wrap flex-row d-flex">
+                        <div>
+                            <b-nav pills>
+                                <b-nav-item
+                                    :to="'/admin/realms'"
+                                    exact
+                                    exact-active-class="active"
+                                >
+                                    <i class="fa fa-arrow-left" />
+                                </b-nav-item>
+
+                                <b-nav-item
+                                    v-for="(item,key) in tabs"
+                                    :key="key"
+                                    :disabled="item.active"
+                                    :to="'/admin/realms/' + realm.id + item.urlSuffix"
+                                    exact
+                                    exact-active-class="active"
+                                >
+                                    <i :class="item.icon" />
+                                    {{ item.name }}
+                                </b-nav-item>
+                            </b-nav>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <nuxt-child :realm="realm" @updated="updateRealm" />
+    </div>
+</template>

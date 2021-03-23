@@ -12,7 +12,7 @@ export interface AuthSchemeInterface {
 
     attemptToken(data: any) : Promise<AuthAbstractTokenResponse>;
 
-    getUserInfo(): Promise<AuthAbstractUserInfoResponse>;
+    getUserInfo(token: string): Promise<AuthAbstractUserInfoResponse>;
 }
 
 export interface AuthSchemeOptionsInterface {

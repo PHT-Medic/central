@@ -1,0 +1,221 @@
+<script>
+import {editApiStationProposal, getApiStationProposals} from "@/domains/station/proposal/api.ts";
+import {getStations} from "@/domains/station/api.ts";
+import ProposalInForm from "@/components/proposal/ProposalInForm";
+import ProposalStationStatus from "@/components/proposal/ProposalStationStatus";
+import Pagination from "@/components/Pagination";
+
+export default {
+    components: {Pagination, ProposalStationStatus, ProposalInForm},
+    meta: {
+        requireLoggedIn: true,
+        requireAbility(can) {
+            return can('approve','proposal');
+        }
+    },
+    data() {
+        return {
+            item: undefined,
+            itemBusy: false,
+            isBusy: false,
+            fields: [
+                { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'status', label: 'Status', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'proposal_id', label: 'Antrag Id', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'proposal_title', label: 'Antrag Titel', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'created_at', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'updated_at', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'options', label: '', tdClass: 'text-left' }
+            ],
+            items: [],
+            meta: {
+                limit: 10,
+                offset: 0,
+                total: 0
+            }
+        }
+    },
+    created() {
+        this.load();
+    },
+    computed: {
+      user() {
+          return this.$store.getters['auth/user'];
+      }
+    },
+    methods: {
+        handleCreated(e) {
+            this.$refs['form'].hide();
+
+            this.items.push(e);
+        },
+        handleUpdated(e) {
+            this.$refs['form'].hide();
+
+            const index = this.items.findIndex(item => item.id === e.id);
+
+            Object.assign(this.items[index], e);
+        },
+        async load() {
+            this.isBusy = true;
+
+            try {
+                const stations = await getStations({
+                    filter: {
+                        realmId: this.user.realmId
+                    }
+                });
+
+                if(stations.length === 1) {
+                    let record = {
+                        page: {
+                            limit: this.meta.limit,
+                            offset: this.meta.offset
+                        }
+                    };
+
+                    const response = await getApiStationProposals(stations[0].id, 'self', record);
+
+                    this.items = response.data;
+                    const {total} = response.meta;
+
+                    this.meta.total = total;
+                }
+            } catch (e) {
+
+            }
+
+            this.isBusy = false;
+        },
+        goTo(options, resolve, reject) {
+            if(options.offset === this.meta.offset) return;
+
+            this.meta.offset = options.offset;
+
+            this.load()
+                .then(resolve)
+                .catch(reject);
+        },
+        async updateApiItem(item, data) {
+            if(this.itemBusy) return;
+
+            this.itemBusy = true;
+
+            try {
+                item = await editApiStationProposal(item.proposal.id, item.id, data);
+
+                this.handleUpdated(item);
+            } catch (e) {
+                console.log(e);
+            }
+
+            this.itemBusy = false;
+        },
+        async approve(item) {
+            return await this.updateApiItem(item, {status: 'approved'})
+        },
+        async reject(item) {
+            return await this.updateApiItem(item, {status: 'rejected'})
+        },
+        async edit(item) {
+            this.item = item;
+
+            this.$refs['form'].show();
+        }
+    }
+}
+</script>
+<template>
+    <div>
+        <div class="alert alert-primary alert-sm">
+            Dies ist eine Übersicht aller Anträge von allen Stationen, die gerne einen Zug über Ihrere Station laufen lassen möchten...
+        </div>
+        <div class="d-flex flex-row">
+            <div>
+                <button @click.prevent="load" type="button" class="btn btn-xs btn-dark">
+                    <i class="fas fa-sync"></i> Aktualisieren
+                </button>
+            </div>
+        </div>
+        <div class="m-t-10">
+            <b-table :items="items" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
+                <template v-slot:cell(realm)="data">
+                    <span class="badge-dark badge">{{data.item.proposal.realmId}}</span>
+                </template>
+
+                <template v-slot:cell(status)="data">
+                    <proposal-station-status
+                        :status="data.item.status"
+                        v-slot:default="slotProps"
+                    >
+                        <span class="badge" :class="slotProps.badgeClass">
+                            {{slotProps.statusText}}
+                        </span>
+                    </proposal-station-status>
+                </template>
+
+                <template v-slot:cell(proposal_id)="data">
+                    {{data.item.proposal.id}}
+                </template>
+                <template v-slot:cell(proposal_title)="data">
+                    {{data.item.proposal.title}}
+                </template>
+                <template v-slot:cell(options)="data">
+                    <button
+                        v-if="$auth.can('approve','proposal') && (data.item.status === 'open' || data.item.status === 'rejected')"
+                        @click.prevent="approve(data.item)"
+                        class="btn btn-xs btn-primary"
+                    >
+                        <i class="fa fa-check"></i>
+                    </button>
+                    <button
+                        v-if="$auth.can('approve','proposal')"
+                        @click.prevent="edit(data.item)"
+                        type="button"
+                        class="btn btn-xs btn-secondary"
+                    >
+                        <i class="fa fa-comment"></i>
+                    </button>
+                    <button
+                        v-if="$auth.can('approve','proposal')  && (data.item.status === 'open' || data.item.status === 'approved')"
+                        @click.prevent="reject(data.item)"
+                        type="button"
+                        class="btn btn-xs btn-danger"
+                    >
+                        <i class="fa fa-times"></i>
+                    </button>
+                </template>
+                <template v-slot:cell(created_at)="data">
+                    <timeago :datetime="data.item.createdAt" />
+                </template>
+                <template v-slot:cell(updated_at)="data">
+                    <timeago :datetime="data.item.updatedAt" />
+                </template>
+                <template v-slot:table-busy>
+                    <div class="text-center text-danger my-2">
+                        <b-spinner class="align-middle" />
+                        <strong>Loading...</strong>
+                    </div>
+                </template>
+            </b-table>
+            <div class="alert alert-warning alert-sm" v-if="!isBusy && items.length === 0">
+                Es sind keine Anträge vorhanden...
+            </div>
+        </div>
+
+        <pagination :total="meta.total" :offset="meta.offset" :limit="meta.limit" @to="goTo" />
+
+        <b-modal
+            size="lg"
+            ref="form"
+            button-size="sm"
+            :title-html="'<i class=\'fas fa-file-import\'></i> Antrag' + (item ? ': '+item.proposal.title : '')"
+            :no-close-on-backdrop="true"
+            :no-close-on-esc="true"
+            :hide-footer="true"
+        >
+            <proposal-in-form :proposal-station-property="item" @updated="handleUpdated" />
+        </b-modal>
+    </div>
+</template>

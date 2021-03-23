@@ -21,3 +21,48 @@
     transform: translate(-50%, -50%);
     color: white;
 }
+
+
+/*
+Content
+*/
+
+.content-wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.content-wrapper > div:first-child {
+    padding-right: 1.5rem;
+}
+
+.content-sidebar {
+    width: 200px;
+    display: flex;
+    flex-shrink: 0;
+}
+
+.content-sidebar .nav {
+    width: 100%;
+}
+
+.content-container {
+    flex-grow: 3;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .content-wrapper {
+        flex-direction: column;
+    }
+
+    .content-wrapper > div:first-child {
+        padding-right: 0 !important;
+    }
+
+    .content-sidebar {
+        padding-bottom: 1.5rem;
+        width: 100% !important;
+    }
+}

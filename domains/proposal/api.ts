@@ -1,4 +1,4 @@
-import {changeResponseKeyCase} from "~/modules/api/utils";
+import {changeResponseKeyCase, formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 import {useApi} from "~/modules/api";
 
 export async function addProposal(data: Record<string, any>) {
@@ -35,7 +35,7 @@ export async function editProposal(id: number, data: Record<string, any>) {
     return changeResponseKeyCase(response.data);
 }
 
-export async function getApiProposals() {
-    const response = await useApi('auth').get('pht/proposals');
+export async function getApiProposals(record?: RequestRecord) {
+    const response = await useApi('auth').get('pht/proposals' + formatRequestRecord(record));
     return changeResponseKeyCase(response.data);
 }

@@ -16,6 +16,7 @@ export type LayoutSidebarComponentType = 'link' | 'separator';
 export interface LayoutSidebarComponentInterface extends LayoutComponentInterface {
     type: LayoutSidebarComponentType,
     components?: LayoutSidebarComponentInterface[],
+    rootLink?: boolean
 }
 
 export type LayoutComponent = LayoutNavigationComponentInterface | LayoutSidebarComponentInterface;

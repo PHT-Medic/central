@@ -1,11 +1,11 @@
-import {buildUrlRelationsSuffix} from "~/modules/api/utils";
+import {buildUrlRelationsSuffix, formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 import {useApi} from "~/modules/api";
 
-export async function getApiStationProposals(stationId: number, type: 'self' | 'related') {
+export async function getApiStationProposals(stationId: number, type: 'self' | 'related', record?: RequestRecord) {
     let url = buildUrlRelationsSuffix('stations', stationId, 'proposals', type);
 
     try {
-        const response = await useApi('auth').get('pht/'+url);
+        const response = await useApi('auth').get('pht/'+url+formatRequestRecord(record));
 
         return response.data;
     } catch (e) {

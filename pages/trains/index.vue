@@ -1,36 +1,54 @@
 <script>
-import {LayoutNavigationDefaultId} from "@/config/layout.ts";
-import TrainTable from "@/components/train/TrainTable";
-
+import TrainSvg from "@/components/svg/TrainSvg";
 export default {
-    components: {TrainTable},
-    meta: {
-            navigationId: LayoutNavigationDefaultId,
-            requireLoggedIn: true,
-            requireAbility: (can) => {
-                return can('add', 'train') || can('edit', 'train') || can('drop','read') ||
-                    can('read', 'trainResult') ||
-                    can('start', 'trainExecution') ||
-                    can('stop', 'trainExecution');
+    components: {TrainSvg},
+    data() {
+        return {
+            sidebar: {
+                hide: false,
+                items: [
+                    {
+                        name: 'Create',
+                        urlSuffix: '/add',
+                        icon: 'fa fa-plus'
+                    },
+                    {
+                        name: 'Overview',
+                        urlSuffix: '',
+                        icon: 'fa fa-bars'
+                    }
+                ]
             }
         }
     }
+}
 </script>
 <template>
-    <div class="container">
-        <h4 class="title">
-            Trains <span class="sub-title">An overview of all created trains by your station</span>
-        </h4>
+    <div>
+        <h1 class="title no-border mb-3">Train(s) <span class="sub-title">manage and create new trains</span></h1>
 
-        <div class="panel-card">
-            <div class="panel-card-body">
-                <div class="alert alert-primary alert-sm">
-                    This is an overview of all created trains, either by you or a person of your station.
+        <div class="content-wrapper">
+            <div class="content-sidebar flex-column">
+                <div class="text-center">
+                    <train-svg width="100%" />
                 </div>
 
-                <div class="m-t-10">
-                    <train-table />
-                </div>
+                <b-nav pills vertical>
+                    <b-nav-item
+                        v-for="(item,key) in sidebar.items"
+                        :key="key"
+                        :disabled="item.active"
+                        :to="'/trains' + item.urlSuffix"
+                        exact
+                        exact-active-class="active"
+                    >
+                        <i :class="item.icon" />
+                        {{ item.name }}
+                    </b-nav-item>
+                </b-nav>
+            </div>
+            <div class="content-container">
+                <nuxt-child />
             </div>
         </div>
     </div>

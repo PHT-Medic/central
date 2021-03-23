@@ -61,6 +61,7 @@ a:focus{
     border-radius: 3px;
 }
 
+.dropdown-xs>.btn,
 .btn-group-xs>.btn,
 .btn-xs {
     padding: .05rem .5rem;

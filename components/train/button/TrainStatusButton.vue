@@ -23,7 +23,7 @@ export default {
 </script>
 <template>
     <button class="btn btn-xs" :class="{
-        'btn-success': status === states.TrainStateBuilt || status === states.TrainStateStarted || status === states.TrainStateFinished,
+        'btn-success': status === states.TrainStateBuilt || status === states.TrainStateStarted || status === states.TrainStateFinished || states.TrainStateConfigured,
         'btn-danger': status === states.TrainStateFailed,
         'btn-info': status === states.TrainStateBuilding || status === states.TrainStateStarting,
         'btn-warning': status === states.TrainStateStopped,

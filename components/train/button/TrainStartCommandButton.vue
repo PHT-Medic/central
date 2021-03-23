@@ -19,22 +19,26 @@ export default {
         }
     },
     methods: {
-        async stop() {
+        async start() {
             if(this.busy) return;
+
+            this.busy = true;
 
             try {
                 const train = await runTrainTask(this.train.id, 'start');
-                this.$emit('stopped', train);
+                this.$emit('started', train);
             } catch (e) {
                 console.log(e);
-                this.$emit('stopFailed', e);
+                this.$emit('startFailed', e);
             }
+
+            this.busy = false;
         }
     },
     computed: {
         isDisplayed() {
-            return this.train.configuratorStatus === TrainConfiguratorStates.TrainConfiguratorStateCompleted &&
-                this.train.status === TrainStates.TrainStateStarted &&
+            return this.train.configuratorStatus === TrainConfiguratorStates.TrainConfiguratorStateFinished &&
+                this.train.status === TrainStates.TrainStateBuilt &&
                 this.canExecute;
         },
         canExecute() {
@@ -45,11 +49,12 @@ export default {
 </script>
 <template>
     <button
-        v-if="isDisplayed && hideIfNotAllowed && !busy"
-        class="btn btn-outline-danger btn-xs"
+        v-if="isDisplayed && hideIfNotAllowed"
+        :disabled="busy"
+        class="btn btn-outline-success btn-xs"
         type="button"
-        @click.prevent="stop()"
+        @click="start()"
     >
-        <i class="fas fa-pause" />
+        <i class="fas fa-play" />
     </button>
 </template>

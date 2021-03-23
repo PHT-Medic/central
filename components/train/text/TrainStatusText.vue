@@ -17,7 +17,10 @@ export default {
 </script>
 <template>
     <span>
-        <template v-if="status === states.TrainStateBuilding">
+        <template v-if="status === states.TrainStateConfigured">
+            configured...
+        </template>
+        <template v-else-if="status === states.TrainStateBuilding">
             building...
         </template>
         <template v-else-if="status === states.TrainStateBuilt">

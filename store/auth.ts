@@ -142,7 +142,7 @@ export const actions : ActionTree<AuthState, RootState> = {
     async triggerRefreshMe ({ state, dispatch }) {
         if (state.token) {
             try {
-                const { permissions, ...user } = await this.$auth.getUserInfo();
+                const { permissions, ...user } = await this.$auth.getUserInfo(state.token.accessToken);
 
                 dispatch('triggerUnsetUser');
 
@@ -234,6 +234,7 @@ export const actions : ActionTree<AuthState, RootState> = {
         try {
             await dispatch('triggerRefreshToken');
         } catch (e) {
+            console.log(e);
             dispatch('triggerSetLoginRequired', true);
         }
     },

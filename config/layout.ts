@@ -45,7 +45,7 @@ const RouteAdminPHTStationsPermissions = [
 export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]} = {
     admin: [
         {
-            name: 'Allgemein',
+            name: 'General',
             type: 'separator',
             requireLoggedIn: true
         },
@@ -54,13 +54,15 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             type: 'link',
             url: '/admin',
             icon: 'fas fa-tachometer-alt',
-            requireLoggedIn: true
+            requireLoggedIn: true,
+            rootLink: true
         },
         {
-            name: 'Realms & Provider',
-            type: 'separator',
-            requireLoggedIn: true,
-            requirePermissions: ['realm_add', 'realm_drop', 'realm_edit', 'provider_add', 'provider_drop', 'provider_edit']
+            name: 'Settings',
+            type: 'link',
+            url: '/admin/settings',
+            icon: 'fa fa-cog',
+            requireLoggedIn: true
         },
         {
             name: 'Realms',
@@ -68,24 +70,16 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             url: '/admin/realms',
             icon: 'fas fa-university',
             requireLoggedIn: true,
-            requirePermissions: ['realm_add', 'realm_drop', 'realm_edit']
+            requirePermissions: ['realm_add', 'realm_drop', 'realm_edit', 'provider_add', 'provider_drop', 'provider_edit','station_edit','station_drop','station_add']
         },
         {
-            name: 'Providers',
-            type: 'link',
-            url: '/admin/providers',
-            icon: 'fas fa-sign-in-alt',
-            requireLoggedIn: true,
-            requirePermissions: ['provider_add', 'provider_drop', 'provider_edit']
-        },
-        {
-            name: 'Benutzer & Gruppen',
+            name: 'Users & Roles',
             type: 'separator',
             requireLoggedIn: true,
             requirePermissions: ['user_add', 'user_drop', 'user_edit', 'role_add', 'role_drop', 'role_edit', 'role_permission_add', 'role_permission_drop']
         },
         {
-            name: 'Benutzer',
+            name: 'Users',
             type: 'link',
             url: '/admin/users',
             icon: 'fas fa-user',
@@ -93,7 +87,7 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             requirePermissions: ['user_add', 'user_drop', 'user_edit']
         },
         {
-            name: 'Rollen',
+            name: 'Roles',
             type: 'link',
             url: '/admin/roles',
             icon: 'fas fa-users',
@@ -101,19 +95,20 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             requirePermissions: ['role_add', 'role_drop', 'role_edit', 'role_permission_add', 'role_permission_drop']
         },
         {
-            name: 'Berechtingungen',
+            name: 'Permissions',
             type: 'separator',
             requireLoggedIn: true,
             requirePermissions: ['permission_add', 'permission_drop']
         },
         {
-            name: 'Berechtigungen',
+            name: 'Permissions',
             type: 'link',
             url: '/admin/permissions',
             icon: 'fas fa-key',
             requireLoggedIn: true,
             requirePermissions: ['permission_add', 'permission_drop']
         },
+        /*
         {
             name: 'PHT',
             type: 'separator',
@@ -128,10 +123,12 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             requireLoggedIn: true,
             requirePermissions: RouteAdminPHTStationsPermissions
         },
+
+         */
     ],
     default: [
         {
-            name: 'Allgemein',
+            name: 'General',
             type: 'separator',
             requireLoggedIn: true
         },
@@ -140,59 +137,24 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             type: 'link',
             url: '/',
             icon: 'fas fa-tachometer-alt',
-            requireLoggedIn: true
-        },
-        {
-            name: 'Proposal',
-            type: 'separator',
             requireLoggedIn: true,
-            requirePermissions: [...RouteProposalsPermissions, 'proposal_add']
+            rootLink: true
         },
         {
-            name: 'Add',
-            type: 'link',
-            url: '/proposals/add',
-            icon: 'fas fa-plus',
-            requireLoggedIn: true,
-            requirePermissions: ['proposal_add']
-        },
-        {
-            name: 'Outgoing',
+            name: 'Proposal(s)',
             type: 'link',
             url: '/proposals',
-            icon: 'fas fa-file-export',
+            icon: 'fas fa-file',
             requireLoggedIn: true,
-            requirePermissions: RouteProposalsPermissions
+            requirePermissions: [...RouteProposalsPermissions, 'proposal_add', 'proposal_approve']
         },
         {
-            name: 'Incoming',
-            type: 'link',
-            url: '/proposals/in',
-            icon: 'fas fa-file-import',
-            requireLoggedIn: true,
-            requirePermissions: ['proposal_approve']
-        },
-        {
-            name: 'Train',
-            type: 'separator',
-            requireLoggedIn: true,
-            requirePermissions: ['train_execution_start', 'train_execution_stop', 'train_edit', 'train_drop']
-        },
-        {
-            name: 'Add',
-            type: 'link',
-            url: '/trains/add',
-            icon: 'fa fa-plus',
-            requireLoggedIn: true,
-            requirePermissions: ['train_add']
-        },
-        {
-            name: 'List',
+            name: 'Train(s)',
             type: 'link',
             url: '/trains',
             icon: 'fas fa-train',
             requireLoggedIn: true,
-            requirePermissions: ['train_execution_start', 'train_execution_stop', 'train_edit', 'train_drop']
+            requirePermissions: ['train_execution_start', 'train_execution_stop', 'train_edit', 'train_drop', 'train_add']
         },
         {
             name: 'Others',

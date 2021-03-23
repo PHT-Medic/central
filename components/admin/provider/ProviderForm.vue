@@ -17,6 +17,10 @@ export default {
         providerProperty: {
             type: Object,
             default: {}
+        },
+        realmId: {
+            type: String | Number,
+            default: null
         }
     },
     data() {
@@ -105,6 +109,10 @@ export default {
     },
     created() {
         this.loadRealms();
+
+        if(this.realmId) {
+            this.formData.realmId = this.realmId;
+        }
 
         for(let key in this.formData) {
             if(this.providerProperty.hasOwnProperty(key)) {
@@ -198,7 +206,7 @@ export default {
                     </div>
                 </div>
 
-                <div class="form-group" :class="{ 'form-group-error': $v.formData.realmId.$error }">
+                <div v-if="!realmId" class="form-group" :class="{ 'form-group-error': $v.formData.realmId.$error }">
                     <label>Realm</label>
 
                     <select

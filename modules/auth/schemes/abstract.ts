@@ -35,13 +35,13 @@ abstract class AbstractAuthScheme implements AuthSchemeInterface {
 
     //--------------------------------------------------------------------
 
-    async getUserInfo(): Promise<AuthAbstractUserInfoResponse> {
+    async getUserInfo(token: string): Promise<AuthAbstractUserInfoResponse> {
         try {
+            useApi(this.options.endpoints.api).setAuthorizationBearerHeader(token);
             let response = await useApi(this.options.endpoints.api).get(this.options.endpoints.userInfo);
 
             return response.data;
         } catch (e) {
-            console.log(e);
             throw new Error('Der Endpunkt für Nutzer assozierte Informationen konnte nicht geladen werden.');
         }
     }

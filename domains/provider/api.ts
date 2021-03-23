@@ -1,9 +1,9 @@
 import {useApi} from "~/modules/api";
-import {changeRequestKeyCase, changeResponseKeyCase} from "~/modules/api/utils";
+import {changeRequestKeyCase, changeResponseKeyCase, formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 
-export async function getProviders() {
+export async function getProviders(record?: RequestRecord) {
     try {
-        let response = await useApi('auth').get('auth/providers');
+        let response = await useApi('auth').get('auth/providers' + formatRequestRecord(record));
 
         return changeResponseKeyCase(response.data);
     } catch (e) {

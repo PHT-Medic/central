@@ -16,16 +16,18 @@
             <li
                 v-for="(component,key) in components"
                 :key="key">
-                <div v-if="component.type === 'separator'" class="nav-separator">
-                    {{ component.name }}
-                </div>
-                <div v-if="component.type === 'link'">
-                    <div v-if="!component.components">
-                        <nuxt-link :to="component.url" class="sidebar-menu-link">
+                <template v-if="component.type === 'separator'" >
+                    <div class="nav-separator">
+                        {{ component.name }}
+                    </div>
+                </template>
+                <template v-if="component.type === 'link'">
+                    <template v-if="!component.components">
+                        <nuxt-link :to="component.url" class="sidebar-menu-link" :class="{'root-link': component.rootLink}">
                             <i v-if="component.icon" :class="component.icon" /> {{ component.name }}
                         </nuxt-link>
-                    </div>
-                    <div v-if="component.components">
+                    </template>
+                    <template v-if="component.components">
                         <div class="sidebar-submenu-title">
                             {{ component.name }}
                         </div>
@@ -36,8 +38,8 @@
                                 </nuxt-link>
                             </li>
                         </ul>
-                    </div>
-                </div>
+                    </template>
+                </template>
             </li>
         </ul>
     </div>

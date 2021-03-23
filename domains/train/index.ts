@@ -2,8 +2,9 @@ const TrainConfiguratorStateOpen = 'open';
 const TrainConfiguratorStateFilesUploaded = 'files_uploaded';
 const TrainConfiguratorStateHashGenerated = 'hash_generated';
 const TrainConfiguratorStateHashSigned = 'hash_signed';
-const TrainConfiguratorStateCompleted = 'finished';
+const TrainConfiguratorStateFinished = 'finished';
 
+const TrainStateConfigured = 'configured';
 const TrainStateBuilding = 'building';
 const TrainStateBuilt = 'built';
 const TrainStateStarting = 'starting';
@@ -17,10 +18,11 @@ const TrainConfiguratorStates = {
     TrainConfiguratorStateFilesUploaded,
     TrainConfiguratorStateHashGenerated,
     TrainConfiguratorStateHashSigned,
-    TrainConfiguratorStateCompleted
+    TrainConfiguratorStateFinished
 }
 
 const TrainStates = {
+    TrainStateConfigured,
     TrainStateBuilding,
     TrainStateBuilt,
     TrainStateStarting,

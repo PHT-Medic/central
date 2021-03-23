@@ -2,7 +2,7 @@ const config = {
     publicRuntimeConfig() {
         return {
             apiUrl: process.env.API_URL || 'https://pht-ui.personalhealthtrain.de/api/',
-            resultServiceApiUrl: process.env.RESULT_SERVICE_URL || 'https://pht-ui.personalhealthtrain.de/vapi/'
+            resultServiceApiUrl: process.env.RESULT_SERVICE_API_URL || 'https://pht-ui.personalhealthtrain.de/vapi/'
         }
     },
     env: {

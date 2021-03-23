@@ -1,17 +1,24 @@
 <script>
-import {runTrainBuilderTaskApi, dropTrain, getTrains} from "@/domains/train/api.ts";
+import {dropTrain, getTrains} from "@/domains/train/api.ts";
 import {TrainStates, TrainConfiguratorStates, TrainResultStates} from "@/domains/train/index.ts";
 import TrainStatusButton from "@/components/train/button/TrainStatusButton";
 import TrainConfiguratorStatusButton from "@/components/train/button/TrainConfiguratorStatusButton";
-import TrainStartButton from "@/components/train/button/TrainStartButton";
-import TrainStopButton from "@/components/train/button/TrainStopButton";
 import AlertMessage from "@/components/alert/AlertMessage";
 import Pagination from "@/components/Pagination";
+import TrainBuildCommandButton from "@/components/train/button/TrainBuildCommandButton";
+import TrainStartCommandButton from "@/components/train/button/TrainStartCommandButton";
+import TrainStopCommandButton from "@/components/train/button/TrainStopCommandButton";
 
 export default {
     components: {
+        TrainStopCommandButton,
+        TrainStartCommandButton,
+        TrainBuildCommandButton,
         Pagination,
-        AlertMessage, TrainStopButton, TrainStartButton, TrainConfiguratorStatusButton, TrainStatusButton},
+        AlertMessage,
+        TrainConfiguratorStatusButton,
+        TrainStatusButton
+    },
     props: {
         proposalId: {
             type: Number,
@@ -24,13 +31,12 @@ export default {
             message: null,
             fields: [
                 { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'updatedAt', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'createdAt', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'configurator_status', label: 'Configurator Status', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'status', label: 'Status', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'result', label: 'Result', thClass: 'text-center', tdClass: 'text-center'},
-                { key: 'actions', label: 'Actions', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'options', label: 'Options', tdClass: 'text-left' }
+                { key: 'updatedAt', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'createdAt', label: 'Created At', thClass: 'text-left', tdClass: 'text-left' },
+                //{ key: 'configurator_status', label: 'Configuration', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'status', label: 'Status', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'result', label: 'Result', thClass: 'text-left', tdClass: 'text-left'},
+                { key: 'options', label: '', tdClass: 'text-left' }
             ],
             items: [],
             meta: {
@@ -141,6 +147,12 @@ export default {
                 this.items[index].status = train.status;
             }
         },
+        handleTrainBuilt(train) {
+            const index = this.items.findIndex(item => item.id === train.id);
+            if(index !== -1) {
+                this.items[index].status = train.status;
+            }
+        },
         handleTrainStopFailed(e) {
             this.message = {
                 isError: true,
@@ -155,19 +167,24 @@ export default {
         canDrop() {
             return this.$auth.can('drop','train');
         },
-        startTrainExecution() {
+        canStartTrainExecution() {
             return this.$auth.can('start','trainExecution');
         },
-        stopTrainExecution() {
+        canStopTrainExecution() {
             return this.$auth.can('stop','trainExecution');
         }
     }
 }
 </script>
 <template>
-    <div class="container">
+    <div>
         <alert-message :message="message" />
         <b-table :items="items" :fields="fields" :busy="busy" head-variant="'dark'" sort-by="id" :sort-desc="true" outlined>
+            <template v-slot:cell(id)="data">
+                <nuxt-link :to="trainConfiguratorStates.TrainConfiguratorStateFinished === data.item.configuratorStatus ? '/trains/'+data.item.id+'/wizard' : '/trains/'+data.item.id+'/wizard'">
+                    <i v-if="trainConfiguratorStates.TrainConfiguratorStateFinished !== data.item.configuratorStatus" class="fa fa-cog text-warning mr-2" v-b-tooltip title="Configuration open"></i> {{data.item.id}}
+                </nuxt-link>
+            </template>
             <template v-slot:cell(createdAt)="data">
                 <timeago :datetime="data.item.createdAt" />
             </template>
@@ -197,7 +214,7 @@ export default {
                         4. extracting train image files...
                     </button>
                     <button @click="downloadResult(data.item)" v-else-if="data.item.result.status === trainResultStates.TrainResultStateFinished" :disabled="!$auth.can('read','trainResult')" class="btn btn-success btn-xs" type="button">
-                        5. download
+                        <i class="fas fa-file-times"></i>
                     </button>
                     <button v-else :disabled="true" class="btn btn-danger btn-xs" type="button">
                         ?. failed
@@ -210,20 +227,22 @@ export default {
                 </template>
             </template>
 
-            <template v-slot:cell(actions)="data">
-                <train-start-button :train="data.item" @started="handleTrainStarted"/>
-                <train-stop-button :train="data.item" @stopped="handleTrainStopped" @stopFailed="handleTrainStopFailed" />
-            </template>
-
             <template v-slot:cell(options)="data">
-                <div v-if="[trainStates.TrainStateStarting, trainStates.TrainStateFinished, trainStates.TrainStateStopped].indexOf(data.item.status) === -1">
-                    <nuxt-link class="btn btn-dark btn-xs" type="button" v-if="canEdit" :to="'/trains/'+data.item.id+'/wizard'">
-                        <i class="fas fa-hat-wizard" />
-                    </nuxt-link>
-                    <button class="btn btn-danger btn-xs" type="button" v-if="canDrop" @click.prevent="drop(data.item)">
-                        <i class="fas fa-trash-alt" />
-                    </button>
-                </div>
+                <train-start-command-button v-if="canStartTrainExecution" :train="data.item" @started="handleTrainStarted"/>
+                <train-stop-command-button v-if="canStopTrainExecution" :train="data.item" @stopped="handleTrainStopped" @stopFailed="handleTrainStopFailed" />
+                <train-build-command-button v-if="canEdit" :train="data.item" @built="handleTrainBuilt" />
+
+                <template v-if="[trainStates.TrainStateStarting, trainStates.TrainStateFinished, trainStates.TrainStateStopped].indexOf(data.item.status) === -1">
+                    <b-dropdown class="dropdown-xs" :no-caret="true">
+                        <template #button-content>
+                            <i class="fa fa-bars"></i>
+                        </template>
+                        <b-dropdown-item><i class="fa fa-file-download text-primary pl-1 pr-1"></i> Result</b-dropdown-item>
+                        <b-dropdown-item v-if="canEdit" :to="'/trains/'+data.item.id+'/wizard'"><i class="fas fa-hat-wizard" /> Wizard</b-dropdown-item>
+                        <b-dropdown-divider />
+                        <b-dropdown-item v-if="canDrop" @click.prevent="drop(data.item)"><i class="fas fa-trash-alt text-danger" /> Drop</b-dropdown-item>
+                    </b-dropdown>
+                </template>
             </template>
 
             <template v-slot:table-busy>

@@ -25,7 +25,7 @@ export default {
 <template>
     <button class="btn btn-xs" :class="{
         'btn-info': status === states.TrainConfiguratorStateFilesUploaded || status === states.TrainConfiguratorStateHashSigned || status === states.TrainConfiguratorStateHashGenerated,
-        'btn-success': status === states.TrainConfiguratorStateCompleted,
+        'btn-success': status === states.TrainConfiguratorStateFinished,
         'btn-dark': status === states.TrainConfiguratorStateOpen,
         'btn-secondary': !status
     }" @click.prevent="click">

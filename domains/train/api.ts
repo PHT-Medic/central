@@ -30,24 +30,13 @@ export async function addTrain(data: Record<string, any>) {
     return response;
 }
 
-export async function runTrainBuilderTaskApi(id: string, task: string, data: Record<string,any> = {}) {
-    const actionData = {
-        task,
-        ...data
-    };
-
-    const {data: response} = await useApi('auth').post('pht/trains/' + id + '/train-builder-task', actionData);
-
-    return response;
-}
-
 export async function runTrainTask(id: string, task: string, data: Record<string,any> = {}) {
     const actionData = {
         task,
         ...data
     };
 
-    const {data: response} = await useApi('auth').post('pht/trains/' + id + '/train-task', actionData);
+    const {data: response} = await useApi('auth').post('pht/trains/' + id + '/task', actionData);
 
     return response;
 }

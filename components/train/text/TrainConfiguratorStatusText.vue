@@ -29,7 +29,7 @@ export default {
         <template v-else-if="status === configurationStates.TrainConfiguratorStateHashSigned">
             hash signed
         </template>
-        <template v-else-if="status === configurationStates.TrainConfiguratorStateCompleted">
+        <template v-else-if="status === configurationStates.TrainConfiguratorStateFinished">
             completed
         </template>
         <template v-else>

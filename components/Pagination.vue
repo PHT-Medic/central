@@ -18,7 +18,7 @@ export default {
         totalPages() {
             if(this.limit === 0 || this.total === 0) return 1;
 
-            const pages = Math.floor(this.total / this.limit);
+            const pages = Math.ceil(this.total / this.limit);
             return pages >= 1 ? pages : 1;
         },
         currentPage() {
@@ -72,7 +72,7 @@ export default {
             <button :disabled="busy" class="page-link" @click.prevent="goTo(page)">{{page}}</button>
         </li>
         <li v-if="currentPage < totalPages" class="page-item">
-            <button :disabled="busy" class="page-link" @click.prevent="goTo(currentPage-1)"><i class="fa fa-chevron-right"></i></button>
+            <button :disabled="busy" class="page-link" @click.prevent="goTo(currentPage+1)"><i class="fa fa-chevron-right"></i></button>
         </li>
     </ul>
 </template>

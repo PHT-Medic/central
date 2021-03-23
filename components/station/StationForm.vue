@@ -15,6 +15,10 @@ export default {
         stationProperty: {
             type: Object,
             default: undefined
+        },
+        realmLocked: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -48,6 +52,11 @@ export default {
                 minLength: minLength(10),
                 maxLength: maxLength(2048)
             }
+        }
+    },
+    watch: {
+        publicKey(val) {
+            this.formData.publicKey = val;
         }
     },
     created() {
@@ -124,6 +133,9 @@ export default {
     computed: {
         isEditing() {
             return typeof this.stationProperty?.id === 'number';
+        },
+        publicKey() {
+            return this.stationProperty.publicKey;
         }
     }
 }
@@ -133,7 +145,7 @@ export default {
         <alert-message :message="message" />
 
         <div class="form-group">
-            <div class="form-group" :class="{ 'form-group-error': $v.formData.realmId.$error }">
+            <div v-if="!realmLocked" class="form-group" :class="{ 'form-group-error': $v.formData.realmId.$error }">
                 <label>Realm</label>
                 <select
                     v-model="$v.formData.realmId.$model"
@@ -146,22 +158,22 @@ export default {
                 </select>
 
                 <div v-if="!$v.formData.realmId.required && !$v.formData.realmId.$model" class="form-group-hint group-required">
-                    Bitte geben Sie einen Realm an.
+                    Please select a realm...
                 </div>
             </div>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.formData.name.$error }">
+            <div v-if="!realmLocked" class="form-group" :class="{ 'form-group-error': $v.formData.name.$error }">
                 <label>Name</label>
                 <input v-model="$v.formData.name.$model" type="text" name="name" class="form-control" placeholder="Name...">
 
                 <div v-if="!$v.formData.name.required" class="form-group-hint group-required">
-                    Bitte geben Sie einen Namen an.
+                    Please provide a name...
                 </div>
                 <div v-if="!$v.formData.name.minLength" class="form-group-hint group-required">
-                    Der Name muss mindestens <strong>{{ $v.formData.name.$params.minLength.min }}</strong> Zeichen lang sein.
+                    The minimum length for the public key is <strong>{{ $v.formData.name.$params.minLength.min }}</strong> letters long.
                 </div>
                 <div v-if="!$v.formData.name.maxLength" class="form-group-hint group-required">
-                    Der Name darf maximal <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> Zeichen lang sein.
+                    The maximum length for the name is <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> letters long.
                 </div>
             </div>
 
@@ -175,10 +187,10 @@ export default {
                 ></textarea>
 
                 <div v-if="!$v.formData.publicKey.minLength" class="form-group-hint group-required">
-                    Der PublicKey muss mindestens <strong>{{ $v.formData.publicKey.$params.minLength.min }}</strong> Zeichen lang sein.
+                    The minimum length for the public key is <strong>{{ $v.formData.publicKey.$params.minLength.min }}</strong> letters long.
                 </div>
                 <div v-if="!$v.formData.publicKey.maxLength" class="form-group-hint group-required">
-                    Der PublicKey darf maximal <strong>{{ $v.formData.publicKey.$params.maxLength.max }}</strong> Zeichen lang sein.
+                    The maximum length for the public key is <strong>{{ $v.formData.publicKey.$params.maxLength.max }}</strong> letters long.
                 </div>
             </div>
 
@@ -186,7 +198,7 @@ export default {
 
             <div class="form-group">
                 <button type="submit" class="btn btn-outline-primary btn-sm" :disabled="$v.$invalid || busy" @click="handleSubmit">
-                    {{ isEditing ? 'Aktualisieren' : 'Erstellen' }}
+                    {{ isEditing ? 'Update' : 'Create' }}
                 </button>
             </div>
         </div>

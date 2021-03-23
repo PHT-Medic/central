@@ -15,17 +15,17 @@ class AuthJWTScheme extends AbstractAuthScheme {
         try {
             const response = await useApi(this.options.endpoints.api).request(postData);
 
-            let { token, expires_in } = response.data;
+            let { token, expiresIn } = response.data;
 
             let currentTime = new Date();
-            let secondsToAdd = parseInt(expires_in);
+            let secondsToAdd = parseInt(expiresIn);
             currentTime.setSeconds(currentTime.getSeconds() + secondsToAdd);
 
             return {
                 accessToken: token,
                 refreshToken: undefined,
                 meta: {
-                    expiresIn: expires_in,
+                    expiresIn: expiresIn,
                     expireDate: currentTime.toUTCString()
                 }
             };
