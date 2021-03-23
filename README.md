@@ -7,8 +7,8 @@ This package requires docker to be installed on the host machine.
 ## Configuration
 The following settings need to be added/modified in the environment section of the docker-compose file.
 ```
-API_URL=<api url>
-
+API_URL=http://localhost:3002
+RESULT_SERVICE_API_URL=http://localhost:3003
 ```
 
 ## Start
