@@ -1,11 +1,13 @@
 import {getRepository, In} from "typeorm";
 import {Station} from "../../../../domains/pht/station";
-import {applyRequestFilterOnQuery, queryFindPermittedResourcesForRealm} from "../../../../db/utils";
+import {queryFindPermittedResourcesForRealm} from "../../../../db/utils";
 import {check, matchedData, validationResult} from "express-validator";
 import {Proposal} from "../../../../domains/pht/proposal";
 import {isPermittedToOperateOnRealmResource} from "../../../../modules/auth/utils";
 import {MasterImage} from "../../../../domains/pht/master-image";
 import {ProposalStation} from "../../../../domains/pht/proposal/station";
+import {applyRequestPagination} from "../../../../db/utils/pagination";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 
 export async function getProposalRouteHandler(req: any, res: any) {
     const { id } = req.params;
@@ -26,7 +28,7 @@ export async function getProposalRouteHandler(req: any, res: any) {
 }
 
 export async function getProposalsRouteHandler(req: any, res: any) {
-    let { filter } = req.query;
+    let { filter, page } = req.query;
 
     const repository = getRepository(Proposal);
     const query = repository.createQueryBuilder('proposal');
@@ -39,13 +41,19 @@ export async function getProposalsRouteHandler(req: any, res: any) {
         realmId: 'proposal.realm_id'
     });
 
-    const entity = await query.getMany();
+    const pagination = applyRequestPagination(query, page, 50);
 
-    if(typeof entity === 'undefined') {
-        return res._failNotFound();
-    }
+    const [entities, total] = await query.getManyAndCount();
 
-    return res._respond({data: entity})
+    return res._respond({
+        data: {
+            data: entities,
+            meta: {
+                total,
+                ...pagination
+            }
+        }
+    });
 }
 
 export async function addProposalRouteHandler(req: any, res: any) {

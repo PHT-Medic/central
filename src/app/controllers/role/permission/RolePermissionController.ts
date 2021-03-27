@@ -4,7 +4,7 @@ import PermissionResponseSchema from "../../../../domains/permission/PermissionR
 import {getRepository} from "typeorm";
 import {RolePermission} from "../../../../domains/role/permission";
 import {Permission} from "../../../../domains/permission";
-import {applyRequestFilterOnQuery} from "../../../../db/utils";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 
 //---------------------------------------------------------------------------------
 

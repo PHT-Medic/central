@@ -3,7 +3,7 @@ import {getRepository, In} from "typeorm";
 import {TrainResult} from "./index";
 
 import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/harbor";
-import {publishResultServiceResultCommand} from "../../../result-service/queue";
+import {createResultServiceResultCommand} from "../../../result-service/queue";
 
 export async function syncTrainResults(onlyUncovered: boolean = true) {
     const harborRepositories = await getHarborProjectRepositories(HARBOR_OUTGOING_PROJECT_NAME);
@@ -32,7 +32,7 @@ export async function syncTrainResults(onlyUncovered: boolean = true) {
                 await repository.save(dbData);
 
                 // send queue message
-                await publishResultServiceResultCommand('download', {
+                await createResultServiceResultCommand('download', {
                     projectName: harborRepositories[i].projectName,
                     repositoryName: harborRepositories[i].name,
                     repositoryFullName: harborRepositories[i].fullName,
@@ -63,7 +63,7 @@ export async function syncTrainResults(onlyUncovered: boolean = true) {
 
             // send queue message
             if(typeof trainResult !== 'undefined') {
-                await publishResultServiceResultCommand('download', {
+                await createResultServiceResultCommand('download', {
                     projectName: harborRepositories[i].projectName,
                     repositoryName: harborRepositories[i].name,
                     repositoryFullName: harborRepositories[i].fullName,

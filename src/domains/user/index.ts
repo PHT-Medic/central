@@ -23,7 +23,7 @@ export class User {
     @Column({type: 'varchar', length: 255, default: null, nullable: true})
     email: string;
 
-    @Column({type: 'varchar', length: 512, default: null, nullable: true})
+    @Column({type: 'varchar', length: 512, default: null, nullable: true, select: false})
     password: string;
 
     @CreateDateColumn()

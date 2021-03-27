@@ -1,4 +1,4 @@
-import {EntityRepository, getCustomRepository, getRepository, In, Repository} from "typeorm";
+import {Repository, EntityRepository, getCustomRepository, getRepository, In} from "typeorm";
 import {User} from "./index";
 import {hashPassword, verifyPassword} from "../../modules/auth/utils/password";
 import {RoleRepository} from "../role/repository";
@@ -80,6 +80,7 @@ export class UserRepository extends Repository<User> {
 
         try {
             user = await this.createQueryBuilder('user')
+                .addSelect('user.password')
                 .where("user.name LIKE :name", {name: name})
                 .getOne();
 

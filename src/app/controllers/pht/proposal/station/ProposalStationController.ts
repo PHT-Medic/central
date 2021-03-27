@@ -1,9 +1,10 @@
 import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
 import {ProposalStation} from "../../../../../domains/pht/proposal/station";
-import {applyRequestFilterOnQuery, queryFindPermittedResourcesForRealm} from "../../../../../db/utils";
+import {queryFindPermittedResourcesForRealm} from "../../../../../db/utils";
 import {Station} from "../../../../../domains/pht/station";
 import {isPermittedToOperateOnRealmResource} from "../../../../../modules/auth/utils";
+import {applyRequestFilterOnQuery} from "../../../../../db/utils/filter";
 
 
 export async function getProposalStationsRouteHandler(req: any, res: any, type: string) {

@@ -1,15 +1,21 @@
 import {getRepository, In} from "typeorm";
 import {Station} from "../../../../domains/pht/station";
-import {applyRequestFilterOnQuery, queryFindPermittedResourcesForRealm} from "../../../../db/utils";
+import {queryFindPermittedResourcesForRealm} from "../../../../db/utils";
 import {check, matchedData, validationResult} from "express-validator";
 import {isPermittedToOperateOnRealmResource} from "../../../../modules/auth/utils";
 import {Train} from "../../../../domains/pht/train";
 import {MasterImage} from "../../../../domains/pht/master-image";
 import {Proposal} from "../../../../domains/pht/proposal";
 import {isTrainType} from "../../../../domains/pht/train/types";
-import {TrainConfiguratorStateHashGenerated, TrainConfiguratorStateHashSigned} from "../../../../domains/pht/train/states";
+import {
+    TrainConfiguratorStateFinished,
+    TrainConfiguratorStateHashGenerated,
+    TrainConfiguratorStateHashSigned, TrainStateConfigured
+} from "../../../../domains/pht/train/states";
 import {TrainFile} from "../../../../domains/pht/train/file";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
+import {applyRequestIncludes} from "../../../../db/utils/include";
 
 export async function getTrainRouteHandler(req: any, res: any) {
     const { id } = req.params;
@@ -41,14 +47,18 @@ export async function getTrainRouteHandler(req: any, res: any) {
 }
 
 export async function getTrainsRouteHandler(req: any, res: any) {
-    let { filter, page } = req.query;
+    let { filter, page, include } = req.query;
 
     const repository = getRepository(Train);
-    const query = repository.createQueryBuilder('train')
-        .leftJoinAndSelect('train.stations','stations')
-        .leftJoinAndSelect('train.result', 'result');
+    const query = repository.createQueryBuilder('train');
 
     queryFindPermittedResourcesForRealm(query, req.user.realm_id);
+
+    applyRequestIncludes(query, 'train', include, {
+        stations: 'stations',
+        result: 'result',
+        user: 'user'
+    });
 
     applyRequestFilterOnQuery(query, filter, {
         id: 'train.id',
@@ -57,9 +67,11 @@ export async function getTrainsRouteHandler(req: any, res: any) {
         realmId: 'train.realm_id'
     });
 
-    //const pagination = applyRequestPagination(query, page, 50);
+    const pagination = applyRequestPagination(query, page, 50);
 
-    query.orderBy('train.updated_at', 'DESC');
+    query.orderBy({
+        'train.updated_at': "DESC"
+    });
 
     const [entities, total] = await query.getManyAndCount();
 
@@ -68,7 +80,7 @@ export async function getTrainsRouteHandler(req: any, res: any) {
             data: entities,
             meta: {
                 total,
-                //...pagination
+                ...pagination
             }
         }
     });
@@ -212,8 +224,6 @@ export async function editTrainRouteHandler(req: any, res: any) {
         return res._respondAccepted();
     }
 
-    console.log(data);
-
     const repository = getRepository(Train);
     let train = await repository.findOne(id);
 
@@ -241,6 +251,12 @@ export async function editTrainRouteHandler(req: any, res: any) {
         if(train.hash_signed) {
             train.configurator_status = TrainConfiguratorStateHashSigned;
         }
+    }
+
+    // check if all conditions are met
+    if(train.hash_signed && train.hash) {
+        train.configurator_status = TrainConfiguratorStateFinished;
+        train.status = TrainStateConfigured;
     }
 
     try {

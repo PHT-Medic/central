@@ -1,13 +1,14 @@
 import path from "path";
 import {getRepository} from "typeorm";
 import {isPermittedToOperateOnRealmResource} from "../../../../../modules/auth/utils";
-import {applyRequestFilterOnQuery, queryFindPermittedResourcesForRealm} from "../../../../../db/utils";
+import {queryFindPermittedResourcesForRealm} from "../../../../../db/utils";
 import {TrainFile} from "../../../../../domains/pht/train/file";
 import fs from "fs";
 import {getWritableDirPath} from "../../../../../config/paths";
 import {TrainConfiguratorStateOpen} from "../../../../../domains/pht/train/states";
 import {getTrainFileFilePath} from "../../../../../domains/pht/train/file/path";
 import {Train} from "../../../../../domains/pht/train";
+import {applyRequestFilterOnQuery} from "../../../../../db/utils/filter";
 
 export async function getTrainFileRouteHandler(req: any, res: any) {
     if(!req.ability.can('add','train') && !req.ability.can('edit','train')) {

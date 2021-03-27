@@ -6,13 +6,26 @@ import TokenResponseSchema from "../../../domains/token/TokenResponseSchema";
 import env from "../../../env";
 import {Realm} from "../../../domains/realm";
 import {check, matchedData, validationResult} from "express-validator";
+import {applyRequestPagination} from "../../../db/utils/pagination";
+import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
 
 export async function getProvidersRoute(req: any, res: any) {
+    const { page, filter } = req.query;
+
     const repository = getRepository(Provider);
 
-    let result = await repository.find({relations: ['realm']});
+    let query = repository.createQueryBuilder('provider').
+    leftJoinAndSelect('provider.realm', 'realm');
 
-    result = result.map((provider: Provider) => {
+    applyRequestFilterOnQuery(query, filter, {
+        realmId: 'provider.realm_id'
+    });
+
+    const pagination = applyRequestPagination(query, page, 50);
+
+    let [entities, total] = await query.getManyAndCount();
+
+    entities = entities.map((provider: Provider) => {
         if(!req.user || !req.ability.can('edit','realm')) {
             delete provider.client_secret;
         }
@@ -21,8 +34,14 @@ export async function getProvidersRoute(req: any, res: any) {
     });
 
     return res._respond({
-        data: result
-    })
+        data: {
+            data: entities,
+            meta: {
+                total,
+                ...pagination
+            }
+        }
+    });
 }
 
 //---------------------------------------------------------------------------------

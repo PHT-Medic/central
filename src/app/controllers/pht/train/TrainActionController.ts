@@ -1,20 +1,31 @@
 import {getRepository} from "typeorm";
 import {Train} from "../../../../domains/pht/train";
 import {isPermittedToOperateOnRealmResource} from "../../../../modules/auth/utils";
-import {createTrainBuilderQueueMessage} from "../../../../domains/train-builder/queue";
+import {createTrainBuilderQueueMessage, publishTrainBuilderQueueMessage} from "../../../../domains/train-builder/queue";
 import {
     TrainConfiguratorStateFinished,
     TrainConfiguratorStateHashGenerated,
-    TrainStateBuilding, TrainStateStarted
+    TrainStateBuilding,
+    TrainStateFinished,
+    TrainStateStarted,
+    TrainStateStarting,
+    TrainStateStopping
 } from "../../../../domains/pht/train/states";
 import * as crypto from "crypto";
 import {getTrainFileFilePath} from "../../../../domains/pht/train/file/path";
 import * as fs from "fs";
 import {check, matchedData, validationResult} from "express-validator";
-import {useHarborApi} from "../../../../modules/api/provider/harbor";
-import {getPhtHarborLabelNextId} from "../../../../config/pht";
-import {publishQueueMessage, QueueMessage} from "../../../../modules/message-queue";
-import {MQ_TB_ROUTING_KEY} from "../../../../config/rabbitmq";
+import {
+    createTrainRouterQueueMessageCommand,
+    MQ_TR_COMMAND_START_TRAIN,
+    MQ_TR_COMMAND_STOP_TRAIN,
+    publishTrainRouterQueueMessage
+} from "../../../../domains/train-router/queue";
+import {TrainResult} from "../../../../domains/pht/train/result";
+import {createResultServiceResultCommand} from "../../../../domains/result-service/queue";
+import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/harbor";
+import {TrainResultStateOpen} from "../../../../domains/pht/train/result/states";
+import {findHarborProjectRepository, HarborRepository} from "../../../../domains/harbor/project/repository/api";
 
 export async function generateTrainHashActionRouteHandler(req: any, res: any) {
     let {id} = req.params;
@@ -72,6 +83,12 @@ export async function generateTrainHashActionRouteHandler(req: any, res: any) {
     }
 }
 
+/**
+ * Execute a train command (start, stop, build).
+ *
+ * @param req
+ * @param res
+ */
 export async function doTrainTaskRouteHandler(req: any, res: any) {
     let {id} = req.params;
 
@@ -81,7 +98,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
 
     await check('task')
         .exists()
-        .isIn(['start', 'stop', 'build'])
+        .isIn(['start', 'stop', 'build','scanHarbor'])
         .run(req);
 
     const validation = validationResult(req);
@@ -104,32 +121,111 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
     }
 
     switch (validationData.task) {
-        case "start":
-            if(entity.status === TrainStateStarted) {
-                return res._failBadRequest({message: 'The train has already been started...'});
-            }
+        case "build":
+            if(entity.status === TrainStateStarted || entity.status === TrainStateFinished) {
+                return res._failBadRequest({message: 'The train can no longer be build...'});
+            } else {
 
-            try {
-                await useHarborApi().post('projects/pht_incoming/repositories/'+entity.id+'/artifacts/latest/labels',{
-                    id: getPhtHarborLabelNextId()
+                const queueMessage = await createTrainBuilderQueueMessage(entity, 'trainBuild', {
+                    token: req.token
                 });
-            } catch (e) {
-                return res._failServerError({message: 'Train could not be started...'})
+
+                await publishTrainBuilderQueueMessage(queueMessage);
+
+                entity = repository.merge(entity, {
+                    configurator_status: TrainConfiguratorStateFinished,
+                    status: TrainStateBuilding
+                });
+
+                await repository.save(entity);
+
+                return res._respond({data: entity});
+            }
+        case "start":
+            if(entity.status === TrainStateStarted  || entity.status === TrainStateFinished) {
+                return res._failBadRequest({message: 'The train has already been started...'});
+            } else {
+                const queueMessage = await createTrainRouterQueueMessageCommand(entity.id, MQ_TR_COMMAND_START_TRAIN, {
+                    token: req.token
+                });
+
+                await publishTrainRouterQueueMessage(queueMessage);
+
+                entity = repository.merge(entity, {
+                    status: TrainStateStarting
+                });
+
+                await repository.save(entity);
+
+                return res._respond({data: entity});
+            }
+        case "stop":
+            if(entity.status === TrainStateFinished) {
+                return res._failBadRequest({message: 'The train has already been terminated...'});
+            } else {
+                const queueMessage = await createTrainRouterQueueMessageCommand(entity.id, MQ_TR_COMMAND_STOP_TRAIN, {
+                    token: req.token
+                });
+
+                await publishTrainRouterQueueMessage(queueMessage);
+
+                entity = repository.merge(entity, {
+                    status: TrainStateStopping
+                });
+
+                await repository.save(entity);
+
+                return res._respond({data: entity});
+            }
+        case "scanHarbor":
+            const resultRepository = getRepository(TrainResult);
+
+            const harborRepository : HarborRepository | undefined = await findHarborProjectRepository(HARBOR_OUTGOING_PROJECT_NAME, entity.id);
+
+            if(typeof harborRepository === 'undefined') {
+                return res._failBadRequest({message: 'No Train exists in the terminated train repository.'})
             }
 
-            entity = repository.merge(entity, {
-                status: TrainStateStarted
+            let result = await resultRepository.findOne({train_id: harborRepository.name});
+
+            let trainResult : undefined | TrainResult;
+
+            if(typeof result === 'undefined') {
+                // create result
+                const dbData = resultRepository.create({
+                    image: harborRepository.fullName,
+                    train_id: harborRepository.name,
+                    status: TrainResultStateOpen
+                });
+
+                await resultRepository.save(dbData);
+
+                trainResult = dbData;
+
+                entity.result = trainResult;
+            } else {
+                result = resultRepository.merge(result, {status: TrainResultStateOpen});
+
+                await resultRepository.save(result);
+
+                trainResult = result;
+            }
+
+            // send queue message
+            await createResultServiceResultCommand('download', {
+                projectName: harborRepository.projectName,
+                repositoryName: harborRepository.name,
+                repositoryFullName: harborRepository.fullName,
+
+                trainId: harborRepository.name,
+                resultId: trainResult.id
             });
 
-            await repository.save(entity);
-
-            return res._respond({data: entity});
-        case "stop":
-            return res._failBadRequest({message: 'A train canno\'t be stopped yet.'})
+            return res._respond({data: trainResult});
     }
 }
 
-export async function doTrainBuilderTaskRouteHandler(req: any, res: any) {
+export async function doTrainResultTaskRouteHandler(req: any, res: any) {
     let {id} = req.params;
 
     if (typeof id !== 'string') {
@@ -138,7 +234,7 @@ export async function doTrainBuilderTaskRouteHandler(req: any, res: any) {
 
     await check('task')
         .exists()
-        .isIn(['build'])
+        .isIn(['reset'])
         .run(req);
 
     const validation = validationResult(req);
@@ -148,42 +244,33 @@ export async function doTrainBuilderTaskRouteHandler(req: any, res: any) {
 
     const validationData = matchedData(req, {includeOptionals: true});
 
-    const repository = getRepository(Train);
-
-    let entity = await repository.findOne(id, {relations: ['stations', 'master_image', 'entrypoint_file']});
-
-    if (typeof entity === 'undefined') {
-        return res._failNotFound();
-    }
-
-    if (!isPermittedToOperateOnRealmResource(req.user, entity)) {
-        return res._failForbidden();
-    }
-
-    let message: QueueMessage = await createTrainBuilderQueueMessage(entity);
-    message.metadata.token = req.token;
+    const repository = getRepository(TrainResult);
 
     switch (validationData.task) {
-        case 'build':
-            if (!req.ability.can('start', 'trainExecution')) {
+        case "reset":
+            let entity = await repository.findOne(id, {relations: ["train"]});
+
+            if (typeof entity === 'undefined') {
+                return res._failNotFound();
+            }
+
+            if (!isPermittedToOperateOnRealmResource(req.user, entity.train)) {
                 return res._failForbidden();
             }
 
-            try {
-                message.type = 'trainBuild';
+            await createResultServiceResultCommand('download', {
+                projectName: HARBOR_OUTGOING_PROJECT_NAME,
+                repositoryName: entity.train.id,
+                repositoryFullName: HARBOR_OUTGOING_PROJECT_NAME + '/' + entity.train.id,
 
-                entity = repository.merge(entity, {
-                    configurator_status: TrainConfiguratorStateFinished,
-                    status: TrainStateBuilding
-                });
+                trainId: entity.train.id,
+                resultId: entity.id
+            });
 
-                await publishQueueMessage(MQ_TB_ROUTING_KEY, message);
+            entity.status = TrainResultStateOpen;
 
-                await repository.save(entity);
+            await repository.save(entity);
 
-                return res._respond({data: entity});
-            } catch (e) {
-                return res._failBadRequest({message: e.message});
-            }
+            return res._respondAccepted({data: entity});
     }
 }

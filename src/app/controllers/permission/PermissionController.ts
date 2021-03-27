@@ -2,7 +2,7 @@ import {matchedData, validationResult} from "express-validator";
 import PermissionResponseSchema from "../../../domains/permission/PermissionResponseSchema";
 import {getRepository} from "typeorm";
 import {Permission} from "../../../domains/permission";
-import {applyRequestFilterOnQuery} from "../../../db/utils";
+import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
 
 const getPermissions = async (req: any, res: any) => {
     let { filter } = req.query;

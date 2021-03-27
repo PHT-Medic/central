@@ -4,9 +4,10 @@ import UserResponseSchema from "../../../domains/user/UserResponseSchema";
 import {hashPassword} from "../../../modules/auth/utils/password";
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../domains/user/repository";
-import {applyRequestFilterOnQuery, queryFindPermittedResourcesForRealm} from "../../../db/utils";
+import {queryFindPermittedResourcesForRealm} from "../../../db/utils";
 import {isPermittedToOperateOnRealmResource} from "../../../modules/auth/utils";
 import {Realm} from "../../../domains/realm";
+import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
 
 //---------------------------------------------------------------------------------
 

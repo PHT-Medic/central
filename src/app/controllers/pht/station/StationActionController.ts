@@ -21,6 +21,10 @@ import {
 export async function doStationTaskRouteHandler(req: any, res: any) {
     let {id} = req.params;
 
+    if(!req.ability.can('edit', 'station')) {
+        return res._failBadRequest();
+    }
+
     if (typeof id !== 'string') {
         return res._failNotFound();
     }
@@ -55,7 +59,22 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
 
     const repository = getRepository(Station);
 
-    const entity = await repository.findOne(id);
+    const query = repository.createQueryBuilder('station');
+
+    const addSelection : string[] = [
+        'public_key',
+        'harbor_project_account_name',
+        'harbor_project_account_token',
+        'harbor_project_id',
+        'harbor_project_webhook_exists',
+        'vault_public_key_saved'
+    ];
+
+    addSelection.map(selection => query.addSelect('station.'+selection));
+
+    query.where('id = :id', {id});
+
+    const entity = await query.getOne();
 
     if (typeof entity === 'undefined') {
         return res._failNotFound();

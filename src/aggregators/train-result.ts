@@ -1,11 +1,10 @@
 import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../modules/message-queue";
 import {getRepository} from "typeorm";
-import {Train} from "../domains/pht/train";
 import {TrainResult} from "../domains/pht/train/result";
 import {
     TrainResultStateDownloaded,
     TrainResultStateDownloading, TrainResultStateExtracted, TrainResultStateExtracting,
-    TrainResultStateFailed
+    TrainResultStateFailed, TrainResultStateFinished
 } from "../domains/pht/train/result/states";
 import {MQ_UI_RS_EVENT_ROUTING_KEY} from "../config/rabbitmq";
 
@@ -21,7 +20,7 @@ function createTrainBuilderAggregatorHandlers() {
             });
         },
         downloaded: async (message: QueueMessage) => {
-            const repository = getRepository(Train);
+            const repository = getRepository(TrainResult);
 
             await repository.update({
                 id: message.data.trainId
@@ -30,7 +29,7 @@ function createTrainBuilderAggregatorHandlers() {
             });
         },
         downloadingFailed: async (message: QueueMessage) => {
-            const repository = getRepository(Train);
+            const repository = getRepository(TrainResult);
 
             // todo: better status
             await repository.update({
@@ -54,7 +53,7 @@ function createTrainBuilderAggregatorHandlers() {
             await repository.update({
                 train_id: message.data.trainId
             }, {
-                status: TrainResultStateExtracted
+                status: TrainResultStateFinished // because TrainResultStateExtracted = finished
             });
         },
         extractingFailed: async (message: QueueMessage) => {

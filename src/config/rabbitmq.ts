@@ -18,8 +18,7 @@ export const MQ_RS_COMMAND_ROUTING_KEY = 'rs.command';
 /**
 Train Router (TR)
  */
-// Harbor (H)
-export const MQ_TR_H_ROUTING_KEY = 'tr';
+export const MQ_TR_ROUTING_KEY = 'tr';
 
 /**
  * Train Builder (TB)

@@ -1,11 +1,10 @@
 import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
 import {Station} from "../../../../domains/pht/station";
-import {applyRequestFilterOnQuery} from "../../../../db/utils";
-import {dropHarborProject, ensureHarborProject} from "../../../../domains/harbor/project/api";
-import {removeStationPublicKeyFromVault, saveStationPublicKeyToVault} from "../../../../domains/vault/station/api";
-import {ensureHarborProjectWebHook} from "../../../../domains/harbor/project/web-hook/api";
-import {ensureHarborProjectRobotAccount} from "../../../../domains/harbor/project/robot-account/api";
+import {dropHarborProject} from "../../../../domains/harbor/project/api";
+import {removeStationPublicKeyFromVault} from "../../../../domains/vault/station/api";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
+import {applyRequestFields} from "../../../../db/utils/select";
 
 export async function getStationRouteHandler(req: any, res: any) {
     const { id } = req.params;
@@ -40,6 +39,10 @@ export async function getStationsRouteHandler(req: any, res: any) {
 }
 
 export async function addStationRouteHandler(req: any, res: any) {
+    if(!req.ability.can('add', 'station')) {
+        return res._failBadRequest();
+    }
+
     await check('public_key').isLength({min: 5, max: 4096}).exists().optional({nullable: true}).run(req);
     await check('name').isLength({min: 5, max: 100}).exists().notEmpty().run(req);
     await check('realm_id').exists().notEmpty().run(req);
@@ -66,40 +69,6 @@ export async function addStationRouteHandler(req: any, res: any) {
 
         await repository.save(entity);
 
-        try {
-            // Harbor project trigger
-            entity.harbor_project_id = await ensureHarborProject(entity);
-            await repository.update({id: entity.id}, {
-                harbor_project_id: entity.harbor_project_id
-            });
-
-            // Harbor project web-hook trigger
-            await ensureHarborProjectWebHook(entity);
-            entity.harbor_project_webhook_exists = true;
-            await repository.update({id: entity.id}, {
-                harbor_project_webhook_exists: true
-            });
-
-            // Harbor project robot account trigger
-            const { token, name } = await ensureHarborProjectRobotAccount(entity);
-            entity.harbor_project_account_name = name;
-            entity.harbor_project_account_token = token;
-
-            await repository.update({id: entity.id}, {
-                harbor_project_account_token: token,
-                harbor_project_account_name: name
-            });
-
-            // vault triggers
-            await saveStationPublicKeyToVault(entity);
-            entity.vault_public_key_saved = true;
-            await repository.update({id: entity.id}, {
-                vault_public_key_saved: true
-            });
-        } catch (e) {
-            console.log('the harbor or vault setup for the station could not be completed.');
-        }
-
         return res._respond({data: entity});
     } catch (e) {
         console.log(e);
@@ -109,6 +78,10 @@ export async function addStationRouteHandler(req: any, res: any) {
 
 export async function editStationRouteHandler(req: any, res: any) {
     const { id } = req.params;
+
+    if(!req.ability.can('edit', 'station')) {
+        return res._failBadRequest();
+    }
 
     await check('name').isLength({min: 5, max: 100}).exists().optional().run(req);
     await check('public_key').isLength({min: 5, max: 4096}).exists().notEmpty().optional({nullable: true}).run(req);
@@ -124,7 +97,20 @@ export async function editStationRouteHandler(req: any, res: any) {
     }
 
     const repository = getRepository(Station);
-    let station = await repository.findOne(id);
+    const query = repository.createQueryBuilder('station');
+    const addSelection : string[] = [
+        'public_key',
+        'harbor_project_account_name',
+        'harbor_project_account_token',
+        'harbor_project_id',
+        'harbor_project_webhook_exists',
+        'vault_public_key_saved'
+    ];
+
+    addSelection.map(selection => query.addSelect('station.'+selection));
+    query.where("station.id = :id", {id});
+
+    let station = await query.getOne();
 
     if(typeof station === 'undefined') {
         return res._failValidationError({message: 'Die Station konnte nicht gefunden werden.'});

@@ -2,7 +2,7 @@ import {check, matchedData, validationResult} from "express-validator";
 import RoleResponseSchema from "../../../domains/role/RoleResponseSchema";
 import {getRepository} from "typeorm";
 import {Role} from "../../../domains/role";
-import {applyRequestFilterOnQuery} from "../../../db/utils";
+import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
 
 //---------------------------------------------------------------------------------
 

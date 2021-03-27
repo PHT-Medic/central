@@ -34,15 +34,15 @@ export function applyRequestPagination(query: SelectQueryBuilder<any>, rawReques
     }
 
     if (typeof pagination.limit !== 'undefined') {
-        query.limit(pagination.limit);
+        query.take(pagination.limit);
 
         if (typeof pagination.offset === 'undefined') {
-            query.offset(0);
+            query.skip(0);
         }
     }
 
     if (typeof pagination.offset !== 'undefined') {
-        query.offset(pagination.offset);
+        query.skip(pagination.offset);
     }
 
     return pagination;

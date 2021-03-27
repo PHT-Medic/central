@@ -29,7 +29,7 @@ function transformRequestFilters(rawFilters: unknown, allowedFilters: Record<str
     return filters;
 }
 
-function transformAllowedFields(rawFilters: string[] | Record<string, any>): Record<string, any> {
+export function transformAllowedFields(rawFilters: string[] | Record<string, any>): Record<string, any> {
     let filters: Record<string, any> = {};
 
     const allowedFiltersPrototype: string = Object.prototype.toString.call(rawFilters);
@@ -51,7 +51,7 @@ function transformAllowedFields(rawFilters: string[] | Record<string, any>): Rec
 
 export function applyRequestFilterOnQuery(query: SelectQueryBuilder<any>, rawRequestFilters: unknown, rawAllowedFields: string[] | Record<string, any>) {
     const allowedFields: Record<string, any> = transformAllowedFields(rawAllowedFields);
-    const requestFilters = <Record<string, any>>transformRequestFilters(rawRequestFilters, allowedFields);
+    const requestFilters : Record<string, any> = transformRequestFilters(rawRequestFilters, allowedFields);
 
     const requestedFilterLength: number = Object.keys(requestFilters).length;
     if (requestedFilterLength === 0) {

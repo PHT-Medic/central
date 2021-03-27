@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {Realm} from "../../../domains/realm";
+import {Realm} from "../../../../domains/realm";
 import {check, matchedData, validationResult} from "express-validator";
 
 export async function getRealmsRoute(req: any, res: any) {

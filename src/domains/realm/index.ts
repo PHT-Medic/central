@@ -5,10 +5,8 @@ import {
     Index,
     OneToMany,
     PrimaryColumn,
-    PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {User} from "../user";
 import {Proposal} from "../pht/proposal";
 import {Train} from "../pht/train";
 import {Provider} from "../provider";

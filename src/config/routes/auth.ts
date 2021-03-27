@@ -12,8 +12,10 @@ import {
     editRealmRoute,
     getRealmRoute,
     getRealmsRoute
-} from "../../app/controllers/auth/RealmController";
+} from "../../app/controllers/auth/realm/RealmController";
 import {forceLoggedIn} from "../../modules/http/request/middleware/authMiddleware";
+import {getStationProposalRouteHandler} from "../../app/controllers/pht/station/proposal/StationProposalController";
+import {getRealmStationRouteHandler} from "../../app/controllers/auth/realm/station/RealmStationController";
 
 export default function setupAuthRoutes() {
     let router = Router();
@@ -30,6 +32,9 @@ export default function setupAuthRoutes() {
 
     //----------------------------------------------------------
 
+    router.get('/realms/:id/station', [forceLoggedIn], (req: any, res: any) => {
+        return getRealmStationRouteHandler(req,res,'related');
+    });
 
     router.delete('/realms/:id', [forceLoggedIn], dropRealmRoute);
     router.post('/realms/:id', [forceLoggedIn], editRealmRoute);

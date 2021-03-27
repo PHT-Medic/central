@@ -1,8 +1,8 @@
 import {getRepository} from "typeorm";
-import {applyRequestFilterOnQuery} from "../../../../db/utils";
 import {UserRole} from "../../../../domains/user/role";
 import {Role} from "../../../../domains/role";
 import {check, matchedData, validationResult} from "express-validator";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 
 
 export async function getUserRolesRouteHandler(req: any, res: any, type: string) {

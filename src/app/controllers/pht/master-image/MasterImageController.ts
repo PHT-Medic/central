@@ -1,6 +1,6 @@
 import {getRepository} from "typeorm";
-import {applyRequestFilterOnQuery} from "../../../../db/utils";
 import {MasterImage} from "../../../../domains/pht/master-image";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 
 export async function getMasterImageRouteHandler(req: any, res: any) {
     const { id } = req.params;

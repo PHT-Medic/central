@@ -1,7 +1,7 @@
 import {getCustomRepository, getRepository} from "typeorm";
-import {applyRequestFilterOnQuery} from "../../../../db/utils";
 import {UserRole} from "../../../../domains/user/role";
 import {UserRepository} from "../../../../domains/user/repository";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 
 //---------------------------------------------------------------------------------
 

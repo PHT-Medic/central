@@ -3,6 +3,7 @@ import {setupPhtStationRoutes} from "./station";
 import {setupPhtMasterImageRoutes} from "./master-image";
 import {setupPhtProposalRoutes} from "./proposal";
 import {setupPhtTrainRoutes} from "./train";
+import {setupPhtTrainResultRoutes} from "./train-result";
 
 export default function setupPhtRoutes() {
     let router = Router();
@@ -11,6 +12,7 @@ export default function setupPhtRoutes() {
     router.use('/stations', setupPhtStationRoutes());
     router.use('/master-images', setupPhtMasterImageRoutes());
     router.use('/trains', setupPhtTrainRoutes());
+    router.use('/train-results', setupPhtTrainResultRoutes());
 
     return router;
 }

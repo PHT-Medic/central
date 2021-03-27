@@ -1,7 +1,7 @@
 import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
 import {ProposalStation} from "../../../../../domains/pht/proposal/station";
-import {applyRequestFilterOnQuery, queryFindPermittedResourcesForRealm} from "../../../../../db/utils";
+import {queryFindPermittedResourcesForRealm} from "../../../../../db/utils";
 import {Station} from "../../../../../domains/pht/station";
 import {isPermittedToOperateOnRealmResource} from "../../../../../modules/auth/utils";
 import {Proposal} from "../../../../../domains/pht/proposal";
@@ -10,11 +10,13 @@ import {
     ProposalStationStateOpen,
     ProposalStationStateRejected
 } from "../../../../../domains/pht/proposal/station/states";
+import {applyRequestPagination} from "../../../../../db/utils/pagination";
+import {applyRequestFilterOnQuery} from "../../../../../db/utils/filter";
 
 
 export async function getStationProposalsRouteHandler(req: any, res: any, type: string) {
     let { id } = req.params;
-    let { filter } = req.query;
+    let { filter, page } = req.query;
 
     switch (type) {
         case 'self':
@@ -34,9 +36,19 @@ export async function getStationProposalsRouteHandler(req: any, res: any, type: 
                     station_id: 'proposalStation.station_id'
                 });
 
-                let items = await query.getMany();
+                const pagination = applyRequestPagination(query, page, 50);
 
-                return res._respond({data: items});
+                const [entities, total] = await query.getManyAndCount();
+
+                return res._respond({
+                    data: {
+                        data: entities,
+                        meta: {
+                            total,
+                            ...pagination
+                        }
+                    }
+                });
             } catch (e) {
                 console.log(e);
                 return res._failServerError();
@@ -57,9 +69,19 @@ export async function getStationProposalsRouteHandler(req: any, res: any, type: 
                     name: 'station.name'
                 })
 
-                let items = await query.getMany();
+                const pagination = applyRequestPagination(query, page, 50);
 
-                return res._respond({data: items});
+                const [entities, total] = await query.getManyAndCount();
+
+                return res._respond({
+                    data: {
+                        data: entities,
+                        meta: {
+                            total,
+                            ...pagination
+                        }
+                    }
+                });
             } catch (e) {
                 return res._failServerError();
             }

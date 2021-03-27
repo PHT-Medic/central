@@ -13,13 +13,16 @@ import {
 import {uploadTrainFilesRouteHandler} from "../../../app/controllers/pht/train/file/TrainFileUploadController";
 import {getTrainFileStreamRouteHandler} from "../../../app/controllers/pht/train/file/TrainFileStreamController";
 import {
-    doTrainBuilderTaskRouteHandler, doTrainTaskRouteHandler,
+    doTrainTaskRouteHandler,
     generateTrainHashActionRouteHandler
 } from "../../../app/controllers/pht/train/TrainActionController";
 
 export function setupPhtTrainRoutes() {
     const router = Router();
 
+    /**
+     * Train File Routes
+     **/
     router.delete('/:id/files/:fileId', [forceLoggedIn], dropTrainFileRouteHandler);
     router.get('/:id/files/:fileId', [forceLoggedIn], getTrainFileRouteHandler);
     router.post('/:id/files', [forceLoggedIn], uploadTrainFilesRouteHandler);
@@ -31,8 +34,7 @@ export function setupPhtTrainRoutes() {
      **/
     // Station Routes
     router.post('/:id/hash-generate', [forceLoggedIn], generateTrainHashActionRouteHandler);
-    router.post('/:id/train-task', [forceLoggedIn], doTrainTaskRouteHandler);
-    router.post('/:id/train-builder-task', [forceLoggedIn], doTrainBuilderTaskRouteHandler);
+    router.post('/:id/task', [forceLoggedIn], doTrainTaskRouteHandler);
     router.get('/:id', [forceLoggedIn], getTrainRouteHandler);
     router.post('/:id', [forceLoggedIn], editTrainRouteHandler);
     router.delete('/:id', [forceLoggedIn], dropTrainRouteHandler);
