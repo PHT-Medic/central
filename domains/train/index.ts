@@ -9,6 +9,7 @@ const TrainStateBuilding = 'building';
 const TrainStateBuilt = 'built';
 const TrainStateStarting = 'starting';
 const TrainStateStarted = 'started';
+const TrainStateStopping = 'stopping';
 const TrainStateStopped = 'stopped';
 const TrainStateFinished = 'finished';
 const TrainStateFailed = 'failed';
@@ -27,6 +28,7 @@ const TrainStates = {
     TrainStateBuilt,
     TrainStateStarting,
     TrainStateStarted,
+    TrainStateStopping,
     TrainStateStopped,
     TrainStateFinished,
     TrainStateFailed

@@ -32,31 +32,29 @@
         </h1>
 
         <div class="row">
-            <div class="col">
+            <div class="col-lg-6 col-12">
                 <h5 class="text-center">Discover the PHT today!</h5>
                 <world-svg width="100%" />
                 <div class="text-center">
                     <p>The DIFUTURE implementation of the <strong>Personal Health Train (PHT)</strong> from Tübingen University as part of the PHT implementation network.</p>
                 </div>
             </div>
-            <div class="col">
+            <div class="col-lg-6 col-12">
                 <h6>Architecture</h6>
 
-                <div class="row">
-                    <div class="col">
-                        The Tübingen implementation of the PHT has several central services which are used to submit, control and execute trains.
-                        Our current implementation relies on the manual acceptance of each train before it can be executed at a hospital.
-                        Details regarding our implementation are described below.<br />
-                        <br />
-                        &bull; A manual review step of each executed train<br />
-                        &bull;  Use container technologies to adapt rapidly on the analytical requirements<br />
-                        &bull; A central architecture to submit and distribute trains to each station<br />
-                        <br />
-                        Code available at: <a href="https://gitlab.com/PersonalHealthTrain/implementations/germanmii/difuture" target="_blank">gitlab.com</a>
-                    </div>
-                    <div class="col">
-                        <img src="https://pht.medic.uni-tuebingen.de/wp-content/uploads/2021/01/Services-11.png" class="img-fluid"/>
-                    </div>
+                <div>
+                    The Tübingen implementation of the PHT has several central services which are used to submit, control and execute trains.
+                    Our current implementation relies on the manual acceptance of each train before it can be executed at a hospital.
+                    Details regarding our implementation are described below.<br />
+                    <br />
+                    &bull; A manual review step of each executed train<br />
+                    &bull;  Use container technologies to adapt rapidly on the analytical requirements<br />
+                    &bull; A central architecture to submit and distribute trains to each station<br />
+                    <br />
+                    Code available at: <a href="https://gitlab.com/PersonalHealthTrain/implementations/germanmii/difuture" target="_blank">gitlab.com</a>
+                </div>
+                <div class="text-center">
+                    <img src="https://pht.medic.uni-tuebingen.de/wp-content/uploads/2021/01/Services-11.png" class="img-fluid w-75"/>
                 </div>
             </div>
         </div>

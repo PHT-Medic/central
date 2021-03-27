@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import {doStationTask, dropStation, getStations} from "@/domains/station/api";
 import StationForm from "@/components/station/StationForm";
+import {getApiRealmStation} from "@/domains/realm/station/api";
 
 export default {
     components: {StationForm},
@@ -23,21 +24,30 @@ export default {
         }
     },
     async asyncData(ctx) {
-        const stations = await getStations({
-            filter: {
-                realmId: ctx.params.id
-            }
-        });
+        try {
+            const station = await getApiRealmStation(ctx.params.id, {
+                fields: {
+                    station: [
+                        'harbor_project_id',
+                        'harbor_project_account_name',
+                        'harbor_project_account_token',
+                        'harbor_project_webhook_exists',
+                        'vault_public_key_saved',
+                        'public_key'
+                    ]
+                }
+            });
 
-        if(stations.length === 1) {
             return {
-                station: stations[0]
+                station
+            }
+        } catch (e) {
+            return {
+                station: undefined
             }
         }
 
-        return {
-            station: undefined
-        }
+
     },
     methods: {
         handleCreated(station) {

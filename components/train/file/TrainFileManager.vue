@@ -224,6 +224,19 @@ export default {
 <template>
     <div>
         <div class="row">
+
+            <div class="col">
+                <div class="form-group">
+                    <label>Directories / Files</label>
+                    <div class="custom-file">
+                        <input type="file" :webkitdirectory="directoryMode" class="custom-file-input" id="files" ref="files" @change="checkFormFiles" multiple :disbaled="actionBusy">
+                        <label class="custom-file-label" for="files">Select files...</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <b-form-checkbox switch v-model="directoryMode">Directory mode</b-form-checkbox>
+                </div>
+            </div>
             <div class="col">
                 <div class="form-group">
                     <label>EntryPoint Executable</label>
@@ -239,55 +252,8 @@ export default {
                     <input type="text" class="form-control" :value="entrypointFileId" :disabled="true" placeholder="Please toggle a file in the file list, to be selected as entrypoint file">
                 </div>
             </div>
-            <div class="col">
-                <div class="form-group">
-                    <label>Directories / Files</label>
-                    <div class="custom-file">
-                        <input type="file" :webkitdirectory="directoryMode" class="custom-file-input" id="files" ref="files" @change="checkFormFiles" multiple :disbaled="actionBusy">
-                        <label class="custom-file-label" for="files">Select files...</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <b-form-checkbox switch v-model="directoryMode">Directory mode</b-form-checkbox>
-                </div>
-
-            </div>
         </div>
         <div class="row">
-            <div class="col">
-                <h6 class="title text-muted">Files
-                    <span style="font-size: 0.65rem">
-                                <span class="text-success">
-                                    <i class="fa fa-file"></i> uploaded
-                                </span>
-                            </span>
-                </h6>
-
-
-                <div class="form-check">
-                    <input type="checkbox" v-model="selectAll" @change="selectAllFiles" class="form-check-input" id="selectAllFiles">
-                    <label for="selectAllFiles">Alle auswählen</label>
-                </div>
-
-                <div class="d-flex flex-column">
-                    <train-file
-                        class="mr-1"
-                        v-for="(file,key) in items"
-                        :key="key"
-                        :file="file"
-                        :files-selected="selected"
-                        :file-selected-id="form.entrypointFileId"
-                        @check="selectFile"
-                        @toggle="changeEntryPointFile"
-                    />
-                </div>
-
-                <div class="form-group">
-                    <button type="button" class="btn btn-warning btn-xs" :disabled="actionBusy || selected.length === 0" @click.prevent="dropSelected">
-                        Löschen
-                    </button>
-                </div>
-            </div>
             <div class="col">
                 <div class="d-flex flex-row">
                     <div>
@@ -332,8 +298,43 @@ export default {
                         Hochladen
                     </button>
                 </div>
-
             </div>
+
+            <div class="col">
+                <h6 class="title text-muted">Files
+                    <span style="font-size: 0.65rem">
+                                <span class="text-success">
+                                    <i class="fa fa-file"></i> uploaded
+                                </span>
+                            </span>
+                </h6>
+
+
+                <div class="form-check">
+                    <input type="checkbox" v-model="selectAll" @change="selectAllFiles" class="form-check-input" id="selectAllFiles">
+                    <label for="selectAllFiles">Alle auswählen</label>
+                </div>
+
+                <div class="d-flex flex-column">
+                    <train-file
+                        class="mr-1"
+                        v-for="(file,key) in items"
+                        :key="key"
+                        :file="file"
+                        :files-selected="selected"
+                        :file-selected-id="form.entrypointFileId"
+                        @check="selectFile"
+                        @toggle="changeEntryPointFile"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="btn btn-warning btn-xs" :disabled="actionBusy || selected.length === 0" @click.prevent="dropSelected">
+                        Löschen
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>

@@ -65,8 +65,8 @@
                 try {
                     let record = {
                         page: {
-                            limit: this.meta.limit,
-                            offset: this.meta.offset
+                            limit: this.provider.meta.limit,
+                            offset: this.provider.meta.offset
                         }
                     };
 
@@ -77,6 +77,7 @@
 
                     this.provider.meta.total = total;
                 } catch (e) {
+                    console.log(e);
                 }
 
                 this.provider.busy = false;

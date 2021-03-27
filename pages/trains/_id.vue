@@ -27,7 +27,7 @@ export default {
             train: undefined,
             tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-                { name: 'Wizard', icon: 'fas fa-hat-wizard', urlSuffix: '/wizard'},
+                { name: 'Configuration', icon: 'fa fa-cog', urlSuffix: '/wizard'},
                 { name: 'Stations', icon: 'fa fa-city', urlSuffix: '/stations' }
             ]
         }
@@ -42,21 +42,11 @@ export default {
 }
 </script>
 <template>
-    <div class="container">
-        <div class="text-center">
-            <h6 class="display-1"><i class="fa fa-train"></i></h6>
-        </div>
-
-        <div class="d-flex flex-row align-items-baseline">
-            <div>
-                <h4 class="title mb-0">
-                    Train <span class="sub-title">{{ train.id }}</span>
-                </h4>
-            </div>
-            <div class="ml-auto" style="font-size: .8rem;">
-                <h6 class="h6">Status: <train-configurator-status-text :status="train.configuratorStatus" class="text-info" /></h6>
-            </div>
-        </div>
+    <div>
+        <h1 class="title no-border mb-3">
+            Train
+            <span class="sub-title">{{ train.id }} </span>
+        </h1>
 
         <div class="m-b-20 m-t-10">
             <div class="panel-card">
@@ -65,12 +55,21 @@ export default {
                         <div>
                             <b-nav pills>
                                 <b-nav-item
+                                    :to="'/trains'"
+                                    exact
+                                    exact-active-class="active"
+                                >
+                                    <i class="fa fa-arrow-left" />
+                                </b-nav-item>
+
+                                <b-nav-item
                                     v-for="(item,key) in tabs"
                                     :key="key"
                                     :disabled="item.active"
-                                    :to="'/trains/' + train.id + item.urlSuffix"
-                                    exact
+                                    :to="'/trains/'  +train.id + item.urlSuffix"
+                                    :active="$route.path.startsWith('/trains/'+train.id + item.urlSuffix) && item.urlSuffix.length !== 0"
                                     exact-active-class="active"
+                                    exact
                                 >
                                     <i :class="item.icon" />
                                     {{ item.name }}
@@ -82,6 +81,7 @@ export default {
                 </div>
             </div>
         </div>
+
         <nuxt-child :train="train" @updated="updateTrain" />
     </div>
 </template>

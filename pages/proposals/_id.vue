@@ -2,8 +2,10 @@
     import { LayoutNavigationDefaultId } from "../../config/layout";
     import {getProposal} from "@/domains/proposal/api.ts";
     import {getApiProposalStations} from "@/domains/proposal/station/api.ts";
+    import ProposalSvg from "@/components/svg/ProposalSvg";
 
     export default {
+        components: {ProposalSvg},
         meta: {
             requireLoggedIn: true,
             navigationId: LayoutNavigationDefaultId
@@ -26,11 +28,13 @@
                 proposalStations: [],
                 proposalStationsLoading: false,
 
-                tabs: [
-                    { name: 'Info', routeName: 'proposals-id', icon: 'fas fa-bars', urlSuffix: '' },
-                    { name: 'Stationen', routeName: 'proposal-stations', icon: 'fas fa-university', urlSuffix: '/stations'},
-                    { name: 'Züge', routeName: 'proposal-trains', icon: 'fas fa-train', urlSuffix: '/trains' }
-                ]
+                sidebar: {
+                    items: [
+                        { name: 'General', routeName: 'proposals-id', icon: 'fas fa-bars', urlSuffix: '' },
+                        { name: 'Trains', routeName: 'proposal-trains', icon: 'fas fa-train', urlSuffix: '/trains' }
+
+                    ]
+                }
             }
         },
         created() {
@@ -53,13 +57,9 @@
     }
 </script>
 <template>
-    <div class="container">
-        <div class="text-center">
-            <h6 class="display-1"><i class="fa fa-file"></i></h6>
-        </div>
-        <h4 class="title m-b-20">
-            Antrag #{{ proposal.id }} <span class="sub-title">{{ proposal.title }}</span>
-        </h4>
+    <div>
+        <h1 class="title no-border mb-3">{{ proposal.title }}</h1>
+
         <div class="m-b-20 m-t-10">
             <div class="panel-card">
                 <div class="panel-card-body">
@@ -67,12 +67,21 @@
                         <div>
                             <b-nav pills>
                                 <b-nav-item
-                                    v-for="(item,key) in tabs"
+                                    :to="'/proposals'"
+                                    exact
+                                    exact-active-class="active"
+                                >
+                                    <i class="fa fa-arrow-left" />
+                                </b-nav-item>
+
+                                <b-nav-item
+                                    v-for="(item,key) in sidebar.items"
                                     :key="key"
                                     :disabled="item.active"
                                     :to="'/proposals/' + proposal.id + item.urlSuffix"
-                                    exact
+                                    :active="$route.path.startsWith('/proposals/'+proposal.id + item.urlSuffix) && item.urlSuffix.length !== 0"
                                     exact-active-class="active"
+                                    exact
                                 >
                                     <i :class="item.icon" />
                                     {{ item.name }}
@@ -84,6 +93,7 @@
                 </div>
             </div>
         </div>
+
         <nuxt-child :proposal="proposal" :proposal-stations="proposalStations" @updated="setProposal" />
     </div>
 </template>

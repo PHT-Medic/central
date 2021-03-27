@@ -114,7 +114,7 @@
 
                 <template v-slot:cell(options)="data">
                     <nuxt-link v-if="canEdit" :to="'/proposals/' + data.item.id " title="Ansicht" class="btn btn-outline-primary btn-xs">
-                        <i class="fa fa-bars" />
+                        <i class="fa fa-arrow-right" />
                     </nuxt-link>
                     <nuxt-link v-if="canGoToTrainView" :to="'/proposals/' + data.item.id + '/trains'" title="Zug Verwaltung" class="btn btn-outline-dark btn-xs">
                         <i class="fa fa-train" />

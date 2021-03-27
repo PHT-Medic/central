@@ -141,7 +141,7 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             rootLink: true
         },
         {
-            name: 'Proposal(s)',
+            name: 'Proposals',
             type: 'link',
             url: '/proposals',
             icon: 'fas fa-file',
@@ -149,7 +149,7 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             requirePermissions: [...RouteProposalsPermissions, 'proposal_add', 'proposal_approve']
         },
         {
-            name: 'Train(s)',
+            name: 'Trains',
             type: 'link',
             url: '/trains',
             icon: 'fas fa-train',

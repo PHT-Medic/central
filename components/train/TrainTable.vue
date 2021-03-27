@@ -8,9 +8,11 @@ import Pagination from "@/components/Pagination";
 import TrainBuildCommandButton from "@/components/train/button/TrainBuildCommandButton";
 import TrainStartCommandButton from "@/components/train/button/TrainStartCommandButton";
 import TrainStopCommandButton from "@/components/train/button/TrainStopCommandButton";
+import TrainResultManagement from "@/components/train/result/TrainResultManagement";
 
 export default {
     components: {
+        TrainResultManagement,
         TrainStopCommandButton,
         TrainStartCommandButton,
         TrainBuildCommandButton,
@@ -23,6 +25,10 @@ export default {
         proposalId: {
             type: Number,
             default: undefined
+        },
+        trainAddTo: {
+            type: String,
+            default: '/trains/add'
         }
     },
     data () {
@@ -34,8 +40,9 @@ export default {
                 { key: 'updatedAt', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'createdAt', label: 'Created At', thClass: 'text-left', tdClass: 'text-left' },
                 //{ key: 'configurator_status', label: 'Configuration', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'user', label: 'User', thClass: 'text-center', tdClass: 'text-center'},
+                { key: 'result', label: 'Result', thClass: 'text-center', tdClass: 'text-center'},
                 { key: 'status', label: 'Status', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'result', label: 'Result', thClass: 'text-left', tdClass: 'text-left'},
                 { key: 'options', label: '', tdClass: 'text-left' }
             ],
             items: [],
@@ -47,22 +54,40 @@ export default {
 
             actionBusy: false,
 
+            train: undefined,
             trainStates: TrainStates,
             trainConfiguratorStates: TrainConfiguratorStates,
-            trainResultStates: TrainResultStates
+            trainResultStates: TrainResultStates,
+            trainResultStateTitles: {}
         }
     },
     created() {
+        this.trainResultStateTitles[TrainResultStates.TrainResultStateOpen] = 'Outstanding';
+        this.trainResultStateTitles[TrainResultStates.TrainResultStateDownloading] = 'Downloading...';
+        this.trainResultStateTitles[TrainResultStates.TrainResultStateDownloaded] = 'Downloaded...';
+        this.trainResultStateTitles[TrainResultStates.TrainResultStateExtracting] = 'Extracting...';
+        this.trainResultStateTitles[TrainResultStates.TrainResultStateExtracted] = 'Extracted';
+        this.trainResultStateTitles[TrainResultStates.TrainResultStateFinished] = 'Finished';
+        this.trainResultStateTitles[TrainResultStates.TrainResultStateFailed] = 'Failed';
         this.load();
     },
     methods: {
         async load() {
+            if(this.busy) return;
+
+            this.busy = true;
+
             try {
                 let record = {
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset
-                    }
+                    },
+                    include: [
+                        'result',
+                        //'stations',
+                        'user'
+                    ]
                 };
 
                 if (typeof this.proposalId !== 'undefined') {
@@ -80,6 +105,8 @@ export default {
             } catch (e) {
 
             }
+
+            this.busy = false;
         },
         goTo(options, resolve, reject) {
             if(options.offset === this.meta.offset) return;
@@ -109,15 +136,10 @@ export default {
             this.actionBusy = false;
         },
 
-        stop(id) {
+        manageTrainResult(train) {
+            this.train = train;
 
-        },
-        start(id) {
-
-        },
-
-        downloadResult(item) {
-            window.open(this.$config.resultServiceApiUrl+'train-results/'+item.result.id+'/download')
+            this.$refs['result'].show();
         },
 
         handleTrainCreated(train) {
@@ -178,7 +200,21 @@ export default {
 </script>
 <template>
     <div>
+        <div class="d-flex flex-row mb-2">
+            <div>
+                <button class="btn btn-primary btn-xs" @click.prevent="load" :disabled="busy">
+                    <i class="fa fa-sync"></i> refresh
+                </button>
+            </div>
+            <div style="margin-left: auto;">
+                <nuxt-link :to="trainAddTo" class="btn btn-primary btn-xs">
+                    <i class="fa fa-plus"></i> add
+                </nuxt-link>
+            </div>
+        </div>
+
         <alert-message :message="message" />
+
         <b-table :items="items" :fields="fields" :busy="busy" head-variant="'dark'" sort-by="id" :sort-desc="true" outlined>
             <template v-slot:cell(id)="data">
                 <nuxt-link :to="trainConfiguratorStates.TrainConfiguratorStateFinished === data.item.configuratorStatus ? '/trains/'+data.item.id+'/wizard' : '/trains/'+data.item.id+'/wizard'">
@@ -199,46 +235,60 @@ export default {
                 <train-status-button :status="data.item.status" />
             </template>
 
+            <template v-slot:cell(user)="data">
+                {{data.item.user.name}}
+            </template>
+
             <template v-slot:cell(result)="data">
-                <template v-if="data.item.result">
-                    <button v-if="data.item.result.status === trainResultStates.TrainResultStateOpen" :disabled="true" class="btn btn-dark btn-xs" type="button">
-                        1. outstanding...
-                    </button>
-                    <button v-else-if="data.item.result.status === trainResultStates.TrainResultStateDownloading" :disabled="true" class="btn btn-info btn-xs" type="button">
-                        2. train image downloading...
-                    </button>
-                    <button v-else-if="data.item.result.status === trainResultStates.TrainResultStateDownloaded" :disabled="true" class="btn btn-primary btn-xs" type="button">
-                        3. train image downloaded.
-                    </button>
-                    <button v-else-if="data.item.result.status === trainResultStates.TrainResultStateExtracting" :disabled="true" class="btn btn-info btn-xs" type="button">
-                        4. extracting train image files...
-                    </button>
-                    <button @click="downloadResult(data.item)" v-else-if="data.item.result.status === trainResultStates.TrainResultStateFinished" :disabled="!$auth.can('read','trainResult')" class="btn btn-success btn-xs" type="button">
-                        <i class="fas fa-file-times"></i>
-                    </button>
-                    <button v-else :disabled="true" class="btn btn-danger btn-xs" type="button">
-                        ?. failed
-                    </button>
-                </template>
-                <template v-else>
-                    <button :disabled="true" class="btn btn-secondary btn-xs" type="button">
-                        none
-                    </button>
-                </template>
+                <button
+                    class="btn btn-xs bg-transparent btn-outline-dark"
+                    :disabled="!$auth.can('read','trainResult')" @click.prevent="manageTrainResult(data.item)"
+                    :title="data.item.result ? trainResultStateTitles[data.item.result.status] : 'None'"
+                    v-b-tooltip
+                    >
+                    <template v-if="data.item.result">
+                        <span v-if="data.item.result.status === trainResultStates.TrainResultStateOpen" :disabled="true" class="text-dark">
+                            <i class="far fa-lightbulb"></i>
+                        </span>
+                        <span v-else-if="data.item.result.status === trainResultStates.TrainResultStateDownloading" :disabled="true" class="text-info">
+                            <i class="fa fa-download"></i>
+                        </span>
+                        <span v-else-if="data.item.result.status === trainResultStates.TrainResultStateDownloaded" :disabled="true" class="text-primary">
+                            <i class="fa fa-file-download"></i>
+                        </span>
+                        <span v-else-if="data.item.result.status === trainResultStates.TrainResultStateExtracting" :disabled="true" class="text-info">
+                            <i class="fa fa-file-export"></i>
+                        </span>
+                        <span v-else-if="data.item.result.status === trainResultStates.TrainResultStateExtracted" :disabled="true" class="text-success">
+                            <i class="fa fa-file-export"></i>
+                        </span>
+                        <span v-else-if="data.item.result.status === trainResultStates.TrainResultStateFinished" class="text-success">
+                            <i class="fa fa-save"></i>
+                        </span>
+                        <span v-else class="text-danger">
+                            <i class="fa fa-exclamation"></i>
+                        </span>
+                    </template>
+                    <template v-else>
+                        <span class="text-secondary">
+                            <i class="fa fa-question"></i>
+                        </span>
+                    </template>
+                </button>
             </template>
 
             <template v-slot:cell(options)="data">
-                <train-start-command-button v-if="canStartTrainExecution" :train="data.item" @started="handleTrainStarted"/>
-                <train-stop-command-button v-if="canStopTrainExecution" :train="data.item" @stopped="handleTrainStopped" @stopFailed="handleTrainStopFailed" />
-                <train-build-command-button v-if="canEdit" :train="data.item" @built="handleTrainBuilt" />
+                <train-start-command-button v-if="canStartTrainExecution" :train="data.item" @started="handleTrainStarted" v-b-tooltip title="Start"/>
+                <train-stop-command-button v-if="canStopTrainExecution" :train="data.item" @stopped="handleTrainStopped" @stopFailed="handleTrainStopFailed" v-b-tooltip title="Stop" />
+                <train-build-command-button v-if="canEdit && data.item.status !== trainStates.TrainStateBuilding && data.item.status !== trainStates.TrainStateBuilt" :train="data.item" @built="handleTrainBuilt" v-b-tooltip title="Build" />
 
-                <template v-if="[trainStates.TrainStateStarting, trainStates.TrainStateFinished, trainStates.TrainStateStopped].indexOf(data.item.status) === -1">
+                <template v-if="[trainStates.TrainStateStarting, trainStates.TrainStateBuilding, trainStates.TrainStateStopping].indexOf(data.item.status) === -1">
                     <b-dropdown class="dropdown-xs" :no-caret="true">
                         <template #button-content>
                             <i class="fa fa-bars"></i>
                         </template>
-                        <b-dropdown-item><i class="fa fa-file-download text-primary pl-1 pr-1"></i> Result</b-dropdown-item>
-                        <b-dropdown-item v-if="canEdit" :to="'/trains/'+data.item.id+'/wizard'"><i class="fas fa-hat-wizard" /> Wizard</b-dropdown-item>
+                        <b-dropdown-item @click.prevent="manageTrainResult(data.item)"><i class="fa fa-file text-primary pl-1 pr-1"></i> Result</b-dropdown-item>
+                        <b-dropdown-item v-if="canEdit" :to="'/trains/'+data.item.id+'/wizard'"><i class="fas fa-cog" /> Configuration</b-dropdown-item>
                         <b-dropdown-divider />
                         <b-dropdown-item v-if="canDrop" @click.prevent="drop(data.item)"><i class="fas fa-trash-alt text-danger" /> Drop</b-dropdown-item>
                     </b-dropdown>
@@ -257,5 +307,17 @@ export default {
         </div>
 
         <pagination :total="meta.total" :offset="meta.offset" :limit="meta.limit" @to="goTo" />
+
+        <b-modal
+            size="lg"
+            ref="result"
+            button-size="sm"
+            title-html="<i class='fas fa-file'></i> Train Result"
+            :no-close-on-backdrop="true"
+            :no-close-on-esc="true"
+            :hide-footer="true"
+        >
+            <train-result-management :train-property="train" />
+        </b-modal>
     </div>
 </template>

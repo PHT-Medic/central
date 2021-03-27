@@ -3,7 +3,9 @@ import { mapActions } from 'vuex'
 
 export default {
     created () {
-        this.doLogout()
+        this.doLogout();
+
+        setTimeout(this.doLogout,0);
     },
     methods: {
         ...mapActions('auth', [
@@ -11,15 +13,15 @@ export default {
             'triggerAuthError'
         ]),
 
-        doLogout () {
-            this.triggerLogout();
+        async doLogout () {
+            await this.triggerLogout();
 
             let query = {};
             if(this.$route.query && this.$route.query.hasOwnProperty('redirect')) {
                 query.redirect = this.$route.query.redirect;
             }
 
-            this.$router.push({path: '/login', query});
+            await this.$router.push({path: '/login', query});
         }
     }
 }

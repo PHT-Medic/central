@@ -54,7 +54,9 @@ export default {
             this.proposal.busy = true;
 
             try {
-                this.proposal.items = await getApiProposals();
+                // pagination handle multiple pages
+                const { data } = await getApiProposals();
+                this.proposal.items = data;
             } catch (e) {
 
             }

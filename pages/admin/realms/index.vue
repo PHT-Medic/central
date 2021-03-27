@@ -129,7 +129,7 @@ export default {
                         @click.prevent="edit(data.item.id)"
                         class="btn btn-xs btn-outline-primary"
                     >
-                        <i class="fa fa-cogs"></i>
+                        <i class="fa fa-arrow-right"></i>
                     </nuxt-link>
                     <button
                         v-if="$auth.can('drop','realm') && data.item.dropAble"
