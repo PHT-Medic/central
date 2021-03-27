@@ -6,16 +6,10 @@ services:
         ports:
             - '3003:3000'
         command: 'dev-watch'
+        env_file:
+            -   .env
         environment:
-            NODE_ENV: development
             PORT: 3000
-
-            API_URL: http://localhost:3002/
-            WEB_APP_URL: http://localhost:3000/
-
-            VAULT_CONNECTION_STRING: s.jmMOV4W43R2zQ2WOuSQMwsV9@https://vault.pht.medic.uni-tuebingen.de/v1/
-            RABBITMQ_CONNECTION_STRING: amqp://admin:start123@rabbitmq
-            HARBOR_CONNECTION_STRING: pht:PangerLenis32@https://harbor.personalhealthtrain.de/api/v2.0/
 networks:
     default:
         external:

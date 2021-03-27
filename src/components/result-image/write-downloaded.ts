@@ -2,11 +2,7 @@ import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../
 import {TrainResultStateDownloaded} from "../../domains/train/result/states";
 
 export async function writeDownloadedEvent(message: QueueMessage) {
-    const queueMessage : QueueMessage = createQueueMessageTemplate();
-
-    queueMessage.type = TrainResultStateDownloaded;
-
-    await publishQueueMessage('ui.rs.event', queueMessage);
+    await publishQueueMessage('ui.rs.event', createQueueMessageTemplate(TrainResultStateDownloaded, message.data, message.metadata));
 
     return message;
 }

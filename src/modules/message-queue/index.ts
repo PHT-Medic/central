@@ -71,15 +71,15 @@ export interface QueueMessage {
     [key: string]: any
 }
 
-export function createQueueMessageTemplate() : QueueMessage {
+export function createQueueMessageTemplate(
+    type?: string,
+    data: Record<string, any> = {},
+    metaData: Record<string, any> = {}
+) : QueueMessage {
     return {
         id: v4(),
-        type: undefined,
-        metadata: {
-
-        },
-        data: {
-
-        }
+        type,
+        metadata: metaData,
+        data
     }
 }

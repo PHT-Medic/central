@@ -1,8 +1,9 @@
 import {QueueMessage} from "../../modules/message-queue";
-import {saveTrainImageResult} from "../../modules/pht/result/image";
+import {dropHarborImage, saveAndExtractHarborImage} from "../../modules/pht/result/image";
 
 export async function extractImage(message: QueueMessage) {
-    await saveTrainImageResult(message.data.resultId, message.data.resultImage);
+    await saveAndExtractHarborImage(message.data.resultId, message.data.repositoryFullName);
+    await dropHarborImage(message.data.repositoryFullName);
 
     return message;
 }

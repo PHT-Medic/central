@@ -1,18 +1,13 @@
 import {useHarborApi} from "../../api/provider/harbor";
 
+
 export interface TrainRepository {
     id: number | string,
     name: string,
-    image: string,
-    trainId: string,
     artifactsCount: number,
     projectId: number,
     createdAt: string,
     updatedAt: string
-}
-
-export function getFullTrainRepositoryName(name: string) : string {
-    return 'harbor.personalhealthtrain.de/'+name;
 }
 
 export async function getTrainRepositories() : Promise<TrainRepository[]> {
@@ -25,8 +20,6 @@ export async function getTrainRepositories() : Promise<TrainRepository[]> {
             const train: TrainRepository = {
                 id: item.id,
                 name: item.name,
-                trainId,
-                image: getFullTrainRepositoryName(item.name),
                 projectId: item.project_id,
                 updatedAt: item.update_time,
                 createdAt: item.creation_time,
@@ -39,3 +32,4 @@ export async function getTrainRepositories() : Promise<TrainRepository[]> {
         throw new Error('Die Züge konnten nicht geladen werden...');
     }
 }
+

@@ -1,12 +1,8 @@
 import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../modules/message-queue";
-import {TrainResultStateExtracted, TrainResultStateExtracting} from "../../domains/train/result/states";
+import {TrainResultStateExtracted} from "../../domains/train/result/states";
 
 export async function writeExtractedEvent(message: QueueMessage) {
-    const queueMessage : QueueMessage = createQueueMessageTemplate();
-
-    queueMessage.type = TrainResultStateExtracted;
-
-    await publishQueueMessage('ui.rs.event', queueMessage);
+    await publishQueueMessage('ui.rs.event', createQueueMessageTemplate(TrainResultStateExtracted, message.data, message.metadata));
 
     return message;
 }
