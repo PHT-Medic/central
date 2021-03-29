@@ -7,23 +7,27 @@ import env from './env';
 import createConfig from "./config";
 import createExpressApp from "./modules/http/express";
 import createHttpServer from "./modules/http/server";
+import createApolloServer from "./modules/http/apollo";
 
-//--------------------------------------------------------------------
-// HTTP Server & Express App
-//--------------------------------------------------------------------
+/*
+HTTP Server & Express App
+*/
 const config = createConfig({env});
 const expressApp = createExpressApp();
 const httpServer = createHttpServer({expressApp});
+/* const apolloServer = createApolloServer({config, expressApp}); */
 
-//--------------------------------------------------------------------
-// Start Server
-//--------------------------------------------------------------------
+/*
+Start Server
+*/
 
 import {createConnection} from "typeorm";
 
 function start() {
     config.components.forEach(c => c.start());
     config.aggregators.forEach(a => a.start());
+
+    createApolloServer({config, expressApp});
 
     httpServer.listen(env.port, signalStart);
 }
@@ -35,6 +39,5 @@ function signalStart() {
     ]);
 }
 
-createConnection().then(() => {
-    start();
-});
+createConnection()
+    .then(start);

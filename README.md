@@ -1,5 +1,5 @@
-# PHT API
-This repository contains the Backend of the UI, including the microservices handling different tasks.
+# PHT - Web API 🚀
+This repository contains the Backend API of the Personal Health Train (PHT).
 It communicates with some services of the PHT and need therefore to be configured properly, like described 
 in the following sections.
 
@@ -25,9 +25,9 @@ HARBOR_CONNECTION_STRING=<user>:<password>@<api url>
 To setup the database and other parts of the backend, run the following command:
 ```
 $ docker network create --driver bridge pht-network
-$ docker volume create --name=pht_ui_db
-$ docker volume create --name=pht_ui_rabbitmq
-$ docker volume create --name=pht_ui_server
+$ docker volume create --name=pht_api
+$ docker volume create --name=pht_api_db
+$ docker volume create --name=pht_rabbitmq
 $ docker-compose run db -d
 $ docker-compose run server setup
 ```

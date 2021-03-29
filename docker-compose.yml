@@ -10,7 +10,7 @@ services:
         ports:
             - '3306:3306'
         volumes:
-            - pht_ui_db:/var/lib/mysql
+            - pht_api_db:/var/lib/mysql
     rabbitmq:
         image: 'docker.io/bitnami/rabbitmq:3.8-debian-10'
         environment:
@@ -22,7 +22,7 @@ services:
             - '25672:25672'
             - '15672:15672'
         volumes:
-            - pht_ui_rabbitmq:/bitnami
+            - pht_rabbitmq:/bitnami
     server:
         image: pht-server
         build: .
@@ -41,14 +41,12 @@ services:
             RABBITMQ_CONNECTION_STRING: amqp://admin:start123@rabbitmq
         env_file:
             -   .env
-
-
 volumes:
-    pht_ui_db:
+    pht_api_db:
         external: true
-    pht_ui_rabbitmq:
+    pht_rabbitmq:
         external: true
-    pht_ui_server:
+    pht_api:
         external: true
 networks:
     default:
