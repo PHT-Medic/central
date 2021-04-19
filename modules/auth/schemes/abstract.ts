@@ -45,7 +45,7 @@ abstract class AbstractAuthScheme implements AuthSchemeInterface {
                 apiUrl = process.env.INTERNAL_API_URL;
             }
 
-            console.log(apiUrl);
+            console.log(apiUrl + this.options.endpoints.userInfo);
 
             let response = await axios.get(this.options.endpoints.userInfo, {
                baseURL: apiUrl,
