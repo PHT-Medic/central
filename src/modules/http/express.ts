@@ -1,12 +1,21 @@
 import express, {Express, Response, Request, NextFunction, static as expressStatic } from "express";
 import cors from "cors";
-import fileUpload from "express-fileupload";
 
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import router from '../router';
-import {getPublicDirPath} from "../../config/paths";
-import BusBoy from "busboy";
+import {getPublicDirPath, getRootDirPath, getWritableDirPath} from "../../config/paths";
+import path from "path";
+import swaggerUi from 'swagger-ui-express';
+import env from "../../env";
+import {useLogger} from "../log";
+import {attachControllers} from "@decorators/express";
+import responseMiddleware from "./response/middleware/responseMiddleware";
+import {TokenController} from "../../app/controllers/token/TokenController";
+import {existsSync} from "fs";
+
+import {checkAuthenticated} from "./request/middleware/authMiddleware";
+import {generateSwaggerDocumentation} from "./swagger";
+import {UserController} from "../../app/controllers/user/UserController";
 
 export interface ExpressAppInterface extends Express{
 
@@ -26,7 +35,8 @@ function mime(req: any) {
 
 const RE_MIME = /^(?:multipart\/.+)|(?:application\/x-www-form-urlencoded)$/i;
 
-function createExpressApp() : ExpressAppInterface {
+async function createExpressApp() : Promise<ExpressAppInterface> {
+    useLogger().debug('setup express app...', {service: 'express'});
     const expressApp : Express = express();
     expressApp.use(cors());
 
@@ -51,7 +61,45 @@ function createExpressApp() : ExpressAppInterface {
 
     // Loading routes
 
-    router.registerRoutes(expressApp);
+    //router.registerRoutes(expressApp);
+
+    expressApp.use(responseMiddleware);
+    expressApp.use(checkAuthenticated);
+
+    //const controllerDir = path.join(getRootDirPath(), 'src', 'app', 'controllers');
+
+    //Server.loadServices(expressApp, ['**/*.ts'], controllerDir);
+
+    attachControllers(expressApp, [TokenController, UserController]);
+
+    let swaggerDocument : any;
+
+    if(env.swaggerDocumentation) {
+        useLogger().debug('craeting swagger documentation', {service: 'express'});
+
+        const swaggerDocumentPath: string = await generateSwaggerDocumentation();
+        swaggerDocument = require(path.join(swaggerDocumentPath, 'swagger.json'));
+    } else {
+        const swaggerDocumentPath: string = path.join(getWritableDirPath(), 'swagger.json');
+        if(existsSync(swaggerDocumentPath)) {
+            swaggerDocument = require(swaggerDocumentPath);
+        }
+    }
+
+    if(typeof swaggerDocument !== 'undefined') {
+        expressApp.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+            swaggerOptions: {
+                withCredentials: true,
+                plugins: [
+                    () => {
+                        return {
+                            components: {Topbar: (): any => null}
+                        }
+                    }
+                ]
+            }
+        }));
+    }
 
     return expressApp;
 }

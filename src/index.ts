@@ -8,36 +8,33 @@ import createConfig from "./config";
 import createExpressApp from "./modules/http/express";
 import createHttpServer from "./modules/http/server";
 import createApolloServer from "./modules/http/apollo";
-
-/*
-HTTP Server & Express App
-*/
-const config = createConfig({env});
-const expressApp = createExpressApp();
-const httpServer = createHttpServer({expressApp});
-/* const apolloServer = createApolloServer({config, expressApp}); */
-
-/*
-Start Server
-*/
-
 import {createConnection} from "typeorm";
+import {useLogger} from "./modules/log";
 
-function start() {
-    config.components.forEach(c => c.start());
-    config.aggregators.forEach(a => a.start());
+(async () => {
+    /*
+    HTTP Server & Express App
+    */
+    const config = createConfig({env});
+    const expressApp = await createExpressApp();
+    const httpServer = createHttpServer({expressApp});
 
-    createApolloServer({config, expressApp});
+    /*
+    Start Server
+    */
+    function start() {
+        config.components.forEach(c => c.start());
+        config.aggregators.forEach(a => a.start());
 
-    httpServer.listen(env.port, signalStart);
-}
+        createApolloServer({config, expressApp});
 
-function signalStart() {
-    console.table([
-        ['Port', env.port],
-        ['Environment', env.env]
-    ]);
-}
+        httpServer.listen(env.port, signalStart);
+    }
 
-createConnection()
-    .then(start);
+    function signalStart() {
+        useLogger().debug('Startup on 127.0.0.1:'+env.port+' ('+env.env+') completed.', {service: 'system'});
+    }
+
+    await createConnection();
+    start();
+})();

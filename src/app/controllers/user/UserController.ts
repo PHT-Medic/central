@@ -8,8 +8,56 @@ import {queryFindPermittedResourcesForRealm} from "../../../db/utils";
 import {isPermittedToOperateOnRealmResource} from "../../../modules/auth/utils";
 import {Realm} from "../../../domains/realm";
 import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
+import {Params, Controller, Get, Request, Response, Post, Body} from "@decorators/express";
+import {Example} from "typescript-swagger";
+import {User} from "../../../domains/user";
+import {forceLoggedIn, ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/authMiddleware";
 
 //---------------------------------------------------------------------------------
+
+@Controller("/users")
+export class UserController {
+    @Get("",[ForceLoggedInMiddleware])
+    @Example<Partial<User>[]>([
+        {name: 'admin', email: 'admin@example.com'},
+        {name: 'moderator', email: 'moderator@example.com'}
+        ])
+    async getUsers(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<User[]> {
+        return await getUsersRouteHandler(req, res) as User[];
+    }
+
+    @Get("/:id",[ForceLoggedInMiddleware])
+    @Example<Partial<User>>({name: 'admin', email: 'admin@example.com'})
+    async getUser(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<User|undefined> {
+        return await getUserRouteHandler(req, res) as User | undefined;
+    }
+
+    @Post("",[ForceLoggedInMiddleware])
+    @Example<Partial<User>>({name: 'admin', email: 'admin@example.com'})
+    async addUser(
+        @Body() user: Pick<User, 'name' | 'email' | 'password' | 'realm_id'>,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<User|undefined> {
+        return await addUserRouteHandler(req, res) as User | undefined;
+    }
+
+    @Get("/me",[ForceLoggedInMiddleware])
+    @Example<Partial<User>>({name: 'admin', email: 'admin@example.com'})
+    async getMe(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<User|undefined> {
+        return await getMeRouteHandler(req, res) as User | undefined;
+    }
+}
 
 export async function getUsersRouteHandler(req: any, res: any) {
     let { filter } = req.query;

@@ -1,32 +1,36 @@
 {
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "target": "ES2017",
-    "lib": [
-        "es2017",
-        "dom"
-    ],
-    "noImplicitAny": true,
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "outDir": "dist",
-    "baseUrl": ".",
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "target": "ES2017",
+        "lib": [
+            "es2017",
+            "dom"
+        ],
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "outDir": "dist",
+        "baseUrl": ".",
+        "skipLibCheck": true
+    },
     "paths": {
-      "*": [
-        "node_modules/*"
-      ]
-    }
-  },
-  "paths": {
-    "@writable": [
-      "writable/*"
-    ]
-  },
-  "include": [
-    "src/**/*"
-  ],
-  "compileOnSave": true
+        "express": ["src/@types/express", "node_modules/express"],
+        "@writable": [
+            "writable/*"
+        ]
+    },
+    "typeRoots": [
+        "./src/@types",
+        "./node_modules/@types"
+    ],
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules/**/*"
+    ],
+    "compileOnSave": true
 }

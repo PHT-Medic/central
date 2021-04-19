@@ -6,6 +6,8 @@ import {User} from "../../../../domains/user";
 import UserAbility from "../../../auth/utils/user-ability";
 import {parseHarborConnectionString} from "../../../api/provider/harbor";
 import env from "../../../../env";
+import {Middleware} from "@decorators/express";
+import {Request, Response, NextFunction} from "express";
 
 const harborConfig = parseHarborConnectionString(env.harborConnectionString);
 
@@ -95,11 +97,17 @@ export async function checkAuthenticated(req: any, res: any, next: any) {
     next();
 }
 
-export async function forceLoggedIn(req: any, res: any, next: any) {
+export function forceLoggedIn(req: any, res: any, next: any) {
     if(typeof req.userId === 'undefined' && typeof req.serviceId === 'undefined') {
         res._failUnauthorized({message: 'Sie müssen angemeldet sein.'});
         return;
     }
 
     next();
+}
+
+export class ForceLoggedInMiddleware implements Middleware {
+    public use(request: Request, response: Response, next: NextFunction) {
+        return forceLoggedIn(request, response, next);
+    }
 }

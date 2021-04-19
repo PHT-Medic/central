@@ -1,17 +1,43 @@
-//---------------------------------------------------------------------------------
-
 import TokenResponseSchema from "../../../domains/token/TokenResponseSchema";
-import env from "../../../env";
 import {createToken} from "../../../modules/auth/utils/token";
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../domains/user/repository";
 import {Provider} from "../../../domains/provider";
 import {Oauth2PasswordProvider} from "../../../modules/auth/providers";
-import {Realm} from "../../../domains/realm";
 
-//---------------------------------------------------------------------------------
+import {Response, Request, Controller, Post, Body, Delete} from "@decorators/express";
+import {Example, IsInt} from "typescript-swagger";
 
-const grantToken = async (req: any, res: any) => {
+
+type Token = {
+    /**
+    @IsInt
+     */
+    expires_in: number,
+    token: string
+}
+
+@Controller("/auth/token")
+export class TokenController {
+    @Post("")
+    @Example<Token>({expires_in: 3600, token: '20f81b13d51c65798f05'})
+    async addToken(
+        @Body() credentials: { name: string, password: string, provider?: string },
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Token>  {
+        return (await grantToken(req,res)) as Token;
+    }
+
+    @Delete("")
+    dropToken(
+        @Response() res: any
+    ) {
+        return res.sendStatus(200).end();
+    }
+}
+
+const grantToken = async (req: any, res: any) : Promise<any> => {
     const {name, password, provider} = req.body;
 
     let payload : {[key: string] : any};

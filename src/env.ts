@@ -11,7 +11,7 @@ if (envResult.error) {
     process.exit(1)
 }
 
-export function requireFromEnv(key : string, alt?: string) {
+export function requireFromEnv(key : string, alt?: any) {
     if (!process.env[key] && typeof alt === 'undefined') {
         console.error('[APP ERROR] Missing env variable:'+key)
 
@@ -24,6 +24,7 @@ export function requireFromEnv(key : string, alt?: string) {
 export interface Environment {
     env: string,
     port: number,
+    swaggerDocumentation: boolean | null
 
     jwtPrivateKey: string | null,
     jwtPublicKey: string | null,
@@ -42,6 +43,7 @@ export interface Environment {
 const env : Environment = {
     env: requireFromEnv('NODE_ENV'),
     port: parseInt(requireFromEnv('PORT'), 10),
+    swaggerDocumentation: requireFromEnv('SWAGGER_DOCUMENTATION', 'false') !== 'false',
 
     jwtPrivateKey: requireFromEnv('JWT_PRIVATE_KEY', null),
     jwtPublicKey: requireFromEnv('JWT_PUBLIC_KEY', null),

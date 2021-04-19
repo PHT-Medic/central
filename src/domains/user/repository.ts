@@ -1,4 +1,4 @@
-import {Repository, EntityRepository, getCustomRepository, getRepository, In} from "typeorm";
+import {Repository, EntityRepository, getCustomRepository, getRepository, In, ObjectLiteral} from "typeorm";
 import {User} from "./index";
 import {hashPassword, verifyPassword} from "../../modules/auth/utils/password";
 import {RoleRepository} from "../role/repository";
