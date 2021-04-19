@@ -5,9 +5,8 @@ import {
     AuthSchemeOptions
 } from "~/modules/auth/types";
 
-import axios from "axios";
-import {changeResponseKeyCase} from "~/modules/api/utils";
-import api from "~/plugins/api";
+import {AxiosRequestConfig} from "axios";
+import {useApi} from "~/modules/api";
 
 /**
  * Basic Auth Provider.
@@ -39,34 +38,21 @@ abstract class AbstractAuthScheme implements AuthSchemeInterface {
 
     async getUserInfo(token: string): Promise<AuthAbstractUserInfoResponse> {
         try {
-            let apiUrl : string | undefined = process.env.API_URL;
+            let requestConfig : AxiosRequestConfig = {
+                headers: {
+                    Authorization: 'Bearer ' + token
+                }
+            }
 
             if(process.server && typeof process.env.INTERNAL_API_URL !== 'undefined') {
-                apiUrl = process.env.INTERNAL_API_URL;
+                requestConfig.baseURL = process.env.INTERNAL_API_URL;
             }
 
-            console.log(apiUrl + this.options.endpoints.userInfo);
-
-            let response = await axios.get(this.options.endpoints.userInfo, {
-               baseURL: apiUrl,
-               headers: {
-                   Authorization: 'Bearer ' + token
-               }
-            });
-
-            const contentType: string = response.headers['Content-Type'] ?? 'application/json';
-            const isJsoN: boolean = contentType.includes('application/json');
-            if (isJsoN && response.data) {
-                response.data = changeResponseKeyCase(response.data);
-            }
-
-            /*
             useApi(this.options.endpoints.api)
                 .setAuthorizationBearerHeader(token);
 
             let response = await useApi(this.options.endpoints.api)
-                .get(this.options.endpoints.userInfo);
-            */
+                .get(this.options.endpoints.userInfo, requestConfig);
 
             return response.data;
         } catch (e) {
