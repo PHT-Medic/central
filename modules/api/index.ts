@@ -1,7 +1,7 @@
 import BaseApi, {ApiRequestConfig, createBaseApi} from "~/modules/api/base";
 import {Context} from "@nuxt/types";
 
-export type ApiType = 'base' | 'auth' | 'resource';
+export type ApiType = 'base' | 'auth' | 'resource' | string;
 
 let instances: { [key: string] : BaseApi } = {};
 

@@ -3,8 +3,6 @@ import { mapActions } from 'vuex'
 
 export default {
     created () {
-        this.doLogout();
-
         setTimeout(this.doLogout,0);
     },
     methods: {
