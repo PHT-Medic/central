@@ -40,7 +40,7 @@ abstract class AbstractAuthScheme implements AuthSchemeInterface {
         try {
             const apiUrl : string | undefined = process.env.DOCKER_API_URL || process.env.API_URL;
 
-            let response = await axios.get(this.options.endpoints.api, {
+            let response = await axios.get(this.options.endpoints.userInfo, {
                baseURL: apiUrl,
                headers: {
                    Authorization: 'Bearer ' + token
@@ -63,6 +63,7 @@ abstract class AbstractAuthScheme implements AuthSchemeInterface {
 
             return response.data;
         } catch (e) {
+            console.log(e);
             throw new Error('Der Endpunkt für Nutzer assozierte Informationen konnte nicht geladen werden.');
         }
     }
