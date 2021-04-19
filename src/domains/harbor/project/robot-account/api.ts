@@ -42,6 +42,7 @@ export async function ensureHarborProjectRobotAccount(station: Station) : Promis
         const {data} = await useHarborApi()
             .post('projects/' + station.harbor_project_id + '/robots', robot);
 
+        console.log(data);
         const { name } = data;
         let token : string | undefined;
 
