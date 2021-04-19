@@ -6,7 +6,7 @@ import {
 } from "~/modules/auth/types";
 
 import axios from "axios";
-import api from "~/plugins/api";
+import {changeResponseKeyCase} from "~/modules/api/utils";
 
 /**
  * Basic Auth Provider.
@@ -46,6 +46,13 @@ abstract class AbstractAuthScheme implements AuthSchemeInterface {
                    Authorization: 'Bearer ' + token
                }
             });
+
+            const contentType: string = response.headers['Content-Type'] ?? 'application/json';
+            const isJsoN: boolean = contentType.includes('application/json');
+            if (isJsoN && response.data) {
+                response.data = changeResponseKeyCase(response.data);
+            }
+
             /*
             useApi(this.options.endpoints.api)
                 .setAuthorizationBearerHeader(token);
