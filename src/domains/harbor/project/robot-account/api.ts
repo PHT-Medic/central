@@ -33,6 +33,7 @@ export async function ensureHarborProjectRobotAccount(station: Station) : Promis
         expires_at: -1,
         access: [
             {resource: '/project/'+station.harbor_project_id+'/repository', action: 'push'},
+            {resource: '/project/'+station.harbor_project_id+'/repository', action: 'pull'},
             {resource: '/project/'+station.harbor_project_id+'/helm-chart', action: 'read'},
             {resource: '/project/'+station.harbor_project_id+'/helm-chart-version', action: 'create'}
         ]
