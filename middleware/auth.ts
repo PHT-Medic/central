@@ -54,7 +54,7 @@ const authMiddleware : Middleware = async ({ route, redirect, $auth, store } : C
     ) {
         if (!store.getters['auth/loggedIn']) {
             return redirect({
-                path: '/login',
+                path: '/logout',
                 query: { redirect: route.fullPath }
             });
         }
