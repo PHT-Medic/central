@@ -210,7 +210,7 @@ export async function editTrainRouteHandler(req: any, res: any) {
     await check('hash_signed')
         .exists()
         .notEmpty()
-        .isLength({min: 10, max: 4096})
+        .isLength({min: 10, max: 8096})
         .optional({nullable: true})
         .run(req);
 
@@ -266,6 +266,7 @@ export async function editTrainRouteHandler(req: any, res: any) {
             data: result
         });
     } catch (e) {
+        console.log(e);
         return res._failValidationError({message: 'Der Zug konnte nicht aktualisiert werden.'});
     }
 }
