@@ -7,6 +7,7 @@ import {
 
 import axios from "axios";
 import {changeResponseKeyCase} from "~/modules/api/utils";
+import api from "~/plugins/api";
 
 /**
  * Basic Auth Provider.
@@ -38,7 +39,13 @@ abstract class AbstractAuthScheme implements AuthSchemeInterface {
 
     async getUserInfo(token: string): Promise<AuthAbstractUserInfoResponse> {
         try {
-            const apiUrl : string | undefined = process.env.DOCKER_API_URL || process.env.API_URL;
+            let apiUrl : string | undefined = process.env.API_URL;
+
+            if(process.server && typeof process.env.INTERNAL_API_URL !== 'undefined') {
+                apiUrl = process.env.INTERNAL_API_URL;
+            }
+
+            console.log(apiUrl);
 
             let response = await axios.get(this.options.endpoints.userInfo, {
                baseURL: apiUrl,
