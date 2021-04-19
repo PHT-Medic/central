@@ -84,7 +84,7 @@
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
-        "dev-watch": "ts-node-dev --respawn --transpileOnly src/index.ts",
+        "dev-watch": "ts-node-dev src/index.ts --respawn --transpileOnly",
         "build": "tsc",
         "seed:config": "ts-node ./node_modules/typeorm-seeding/dist/cli.js config",
         "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",

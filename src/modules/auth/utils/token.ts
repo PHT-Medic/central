@@ -66,6 +66,8 @@ export function getProcedureConfiguration() : Promise<Procedure> {
                         ...procedure
                     });
                 }
+
+                break;
             // HMAC
             default:
                 procedure.privateKey = env.jwtSecret;

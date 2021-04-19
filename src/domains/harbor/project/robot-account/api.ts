@@ -42,7 +42,20 @@ export async function ensureHarborProjectRobotAccount(station: Station) : Promis
         const {data} = await useHarborApi()
             .post('projects/' + station.harbor_project_id + '/robots', robot);
 
-        const {name, token} = data;
+        const { name } = data;
+        let token : string | undefined;
+
+        if(data.hasOwnProperty('secret')) {
+            token = data.secret;
+        }
+
+        if(data.hasOwnProperty('token')) {
+            token = data.token;
+        }
+
+        if(typeof token === 'undefined') {
+            throw new Error('No robot account token generated.');
+        }
 
         return {
             name,
