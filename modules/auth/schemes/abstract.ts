@@ -5,7 +5,8 @@ import {
     AuthSchemeOptions
 } from "~/modules/auth/types";
 
-import {useApi} from "~/modules/api";
+import axios from "axios";
+import api from "~/plugins/api";
 
 /**
  * Basic Auth Provider.
@@ -37,12 +38,24 @@ abstract class AbstractAuthScheme implements AuthSchemeInterface {
 
     async getUserInfo(token: string): Promise<AuthAbstractUserInfoResponse> {
         try {
-            useApi(this.options.endpoints.api).setAuthorizationBearerHeader(token);
-            let response = await useApi(this.options.endpoints.api).get(this.options.endpoints.userInfo);
-            console.log(response);
+            const apiUrl : string | undefined = process.env.DOCKER_API_URL || process.env.API_URL;
+
+            let response = await axios.get(this.options.endpoints.api, {
+               baseURL: apiUrl,
+               headers: {
+                   Authorization: 'Bearer ' + token
+               }
+            });
+            /*
+            useApi(this.options.endpoints.api)
+                .setAuthorizationBearerHeader(token);
+
+            let response = await useApi(this.options.endpoints.api)
+                .get(this.options.endpoints.userInfo);
+            */
+
             return response.data;
         } catch (e) {
-            console.log(e);
             throw new Error('Der Endpunkt für Nutzer assozierte Informationen konnte nicht geladen werden.');
         }
     }
