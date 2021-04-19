@@ -8,3 +8,5 @@ services:
         environment:
             API_URL: http://localhost:3002
             RESULT_SERVICE_API_URL: http://localhost:3003
+        env_file:
+            -   .env
