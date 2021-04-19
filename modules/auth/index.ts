@@ -112,8 +112,6 @@ class AuthModule {
 
                         let timeoutMilliSeconds = expireDateInTime - currentTime;
 
-                        console.log(timeoutMilliSeconds);
-
                         if (timeoutMilliSeconds < 0) {
                             callback();
                         }
@@ -151,7 +149,8 @@ class AuthModule {
                 this.handleUserInfoResponse(userInfoResponse);
 
                 return userInfoResponse;
-            });
+            })
+            .catch((e) => {console.log(e); throw e});
 
         return this.mePromise;
     };
