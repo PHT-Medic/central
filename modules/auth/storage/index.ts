@@ -10,7 +10,7 @@ export class AuthStorage extends BaseStorage {
             cookie: {
                 path: '/'
             },
-            localStorage: true,
+            localStorage: false,
             sessionStorage: false,
             namespace: 'auth'
         }

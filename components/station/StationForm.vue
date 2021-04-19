@@ -50,7 +50,7 @@ export default {
             },
             publicKey: {
                 minLength: minLength(10),
-                maxLength: maxLength(2048)
+                maxLength: maxLength(4096)
             }
         }
     },
