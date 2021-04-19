@@ -234,8 +234,9 @@ export const actions : ActionTree<AuthState, RootState> = {
         try {
             await dispatch('triggerRefreshToken');
         } catch (e) {
-            console.log(e);
             dispatch('triggerSetLoginRequired', true);
+
+            throw e;
         }
     },
 

@@ -42,7 +42,7 @@ function checkAbility({route, $auth} : Context) {
 const authMiddleware : Middleware = async ({ route, redirect, $auth, store } : Context) => {
     if (!route.path.includes('/logout')) {
         try {
-            await (<AuthModule> $auth).loadMe();
+            await (<AuthModule> $auth).resolveMe();
         } catch (e) {
             return redirect('/logout');
         }

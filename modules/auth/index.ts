@@ -94,11 +94,9 @@ class AuthModule {
 
                     let callback = () => {
                         if(typeof this.ctx !== 'undefined') {
-                            try {
-                                this.ctx.store.dispatch('auth/triggerTokenExpired').then((r: any) => r);
-                            } catch (e) {
-                                this.ctx.redirect('/logout');
-                            }
+                            this.ctx.store.dispatch('auth/triggerTokenExpired')
+                                .then((r: any) => r)
+                                .catch(e => this.ctx.redirect('/logout'));
                         }
                     };
 
@@ -113,6 +111,8 @@ class AuthModule {
                         let currentTime = (new Date()).getTime();
 
                         let timeoutMilliSeconds = expireDateInTime - currentTime;
+
+                        console.log(timeoutMilliSeconds);
 
                         if (timeoutMilliSeconds < 0) {
                             callback();
@@ -132,7 +132,7 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public loadMe() : Promise<AuthAbstractUserInfoResponse|undefined> {
+    public resolveMe() : Promise<AuthAbstractUserInfoResponse|undefined> {
         if(typeof this.mePromise !== 'undefined') {
             return this.mePromise;
         }
@@ -141,11 +141,13 @@ class AuthModule {
             return new Promise(((resolve) => resolve(this.me)));
         }
 
-        const token = this.ctx.store.getters['auth/token'];
+        const token : AuthAbstractTokenResponse | undefined = this.ctx.store.getters['auth/token'];
         if(!token) return new Promise(((resolve) => resolve(undefined)));
 
         this.mePromise = this.getUserInfo(token.accessToken)
             .then((userInfoResponse: AuthAbstractUserInfoResponse) => {
+                this.me = userInfoResponse;
+
                 this.handleUserInfoResponse(userInfoResponse);
 
                 return userInfoResponse;
@@ -163,10 +165,6 @@ class AuthModule {
 
         this.ctx.store.dispatch('auth/triggerSetUser', user).then(r => r);
         this.ctx.store.dispatch('auth/triggerSetPermissions', permissions).then(r => r);
-
-        if(typeof this.me === 'undefined') {
-            this.me = userInfo;
-        }
     }
 
     // --------------------------------------------------------------------
