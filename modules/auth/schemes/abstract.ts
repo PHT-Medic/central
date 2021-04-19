@@ -39,7 +39,7 @@ abstract class AbstractAuthScheme implements AuthSchemeInterface {
         try {
             useApi(this.options.endpoints.api).setAuthorizationBearerHeader(token);
             let response = await useApi(this.options.endpoints.api).get(this.options.endpoints.userInfo);
-
+            console.log(response);
             return response.data;
         } catch (e) {
             console.log(e);

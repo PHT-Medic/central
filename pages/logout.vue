@@ -3,7 +3,9 @@ import { mapActions } from 'vuex'
 
 export default {
     created () {
-        setTimeout(this.doLogout,0);
+        this.doLogout();
+
+        //setTimeout(this.doLogout,0);
     },
     methods: {
         ...mapActions('auth', [
