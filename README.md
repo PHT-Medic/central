@@ -13,6 +13,7 @@ PORT=<port>
 NODE_ENV=<development|production>
 
 API_URL=http://localhost:<port>/
+INTERNAL_API_URL=http://localhost:<port>/
 WEB_APP_URL=http://localhost:<ui port>/
 
 VAULT_CONNECTION_STRING=<token>@<api url>

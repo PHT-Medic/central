@@ -40,7 +40,7 @@ export async function ensureHarborProjectWebHook(entity: Station) {
             {
                 auth_header: "Bearer " + harborConfig.token,
                 skip_cert_verify: true,
-                address: env.apiUrl + "service/harbor/hook",
+                address: env.internalApiUrl + "service/harbor/hook",
                 type: "http"
             }
         ],
