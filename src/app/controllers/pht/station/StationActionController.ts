@@ -108,7 +108,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
                 }
 
                 if(!entity.harbor_project_account_token) {
-                    const robotAccount = await findHarborProjectRobotAccount(entity.harbor_project_id, entity.harbor_project_account_name);
+                    const robotAccount = await findHarborProjectRobotAccount(entity.id);
 
                     if(typeof robotAccount !== 'undefined') {
                         entity.harbor_project_account_name = robotAccount.name;
@@ -179,10 +179,10 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
 
         case 'ensureHarborProjectAccount':
             try {
-                const { token, name } = await ensureHarborProjectRobotAccount(entity);
+                const { secret, name } = await ensureHarborProjectRobotAccount(entity.id);
 
                 entity.harbor_project_account_name = name;
-                entity.harbor_project_account_token = token;
+                entity.harbor_project_account_token = secret;
 
                 await repository.save(entity);
 
@@ -194,7 +194,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
         case 'dropHarborProjectAccount':
             try {
                 if(entity.harbor_project_id) {
-                    await dropHarborProjectRobotAccount(entity);
+                    await dropHarborProjectRobotAccount(entity.id);
                 }
 
                 entity.harbor_project_account_name = null;
