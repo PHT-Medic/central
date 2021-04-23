@@ -32,6 +32,28 @@ export async function findHarborProjectRobotAccount(stationId: string | number) 
     return undefined;
 }
 
+/**
+ * Update harbor project robot account.
+ * If no "record.secret" provided, a new secret is generated.
+ *
+ * @param robotId
+ * @param record
+ */
+export async function patchHarborProjectRobotAccount(robotId: string | number, record: Record<string, any> = {}) : Promise<Pick<HarborRobotAccount, 'secret'>> {
+    let robot : Record<string, any> = {
+        ...record
+    };
+
+    const { data } : {data: HarborRobotAccount} = await useHarborApi()
+        .patch('robots/'+robotId, robot);
+
+    if(typeof record.secret !== 'undefined') {
+        data.secret = record.secret;
+    }
+
+    return data as HarborRobotAccount;
+}
+
 export async function ensureHarborProjectRobotAccount(stationId: string |number, iteration: number = 0) : Promise<HarborRobotAccount> {
     const name : string = createHarborProjectNameByStationId(stationId);
     const robot: Record<string, any> = {
