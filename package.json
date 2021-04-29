@@ -7,11 +7,7 @@
     "main": "dist/index.js",
     "dependencies": {
         "@casl/ability": "^4.1.4",
-        "@casl/vue": "^1.1.0",
         "@decorators/express": "^2.4.0",
-        "@types/node-cron": "^2.0.3",
-        "@types/swagger-ui-express": "^4.1.2",
-        "@types/uuid": "^8.3.0",
         "amqplib": "^0.6.0",
         "apollo-server-express": "^2.22.1",
         "axios": "^0.21.1",
@@ -52,6 +48,9 @@
         "winston": "^3.3.3"
     },
     "devDependencies": {
+        "@types/node-cron": "^2.0.3",
+        "@types/swagger-ui-express": "^4.1.2",
+        "@types/uuid": "^8.3.0",
         "@types/amqplib": "^0.5.16",
         "@types/axios": "^0.14.0",
         "@types/bcrypt": "^3.0.0",

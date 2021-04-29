@@ -6,7 +6,7 @@ import {Provider} from "../../../domains/provider";
 import {Oauth2PasswordProvider} from "../../../modules/auth/providers";
 
 import {Response, Request, Controller, Post, Body, Delete} from "@decorators/express";
-import {Example, IsInt} from "typescript-swagger";
+import {Example, IsInt} from "typescript-swagger/src/index";
 
 
 type Token = {

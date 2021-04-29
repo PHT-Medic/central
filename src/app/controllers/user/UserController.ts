@@ -9,7 +9,7 @@ import {isPermittedToOperateOnRealmResource} from "../../../modules/auth/utils";
 import {Realm} from "../../../domains/realm";
 import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
 import {Params, Controller, Get, Request, Response, Post, Body} from "@decorators/express";
-import {Example} from "typescript-swagger";
+import {Example} from "typescript-swagger/src/index";
 import {User} from "../../../domains/user";
 import {forceLoggedIn, ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/authMiddleware";
 
