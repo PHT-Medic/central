@@ -8,54 +8,137 @@ import {queryFindPermittedResourcesForRealm} from "../../../db/utils";
 import {isPermittedToOperateOnRealmResource} from "../../../modules/auth/utils";
 import {Realm} from "../../../domains/realm";
 import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
-import {Params, Controller, Get, Request, Response, Post, Body} from "@decorators/express";
+import {Params, Controller, Get, Request, Response, Post, Body, Delete} from "@decorators/express";
 import {Example} from "typescript-swagger/src/index";
 import {User} from "../../../domains/user";
-import {forceLoggedIn, ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/authMiddleware";
+import {dropUserRoleRouteHandler, getUserRoleRouteHandler, getUserRolesRouteHandler} from "./role/UserRoleController";
+import {UserRole} from "../../../domains/user/role";
+import {Role} from "../../../domains/role";
+import {Tags} from "../../../../../../../../tada5hi/forks/typescript-rest-swagger";
 
 //---------------------------------------------------------------------------------
 
+type PartialUser = Partial<User>;
+
+@Tags('user')
 @Controller("/users")
 export class UserController {
     @Get("",[ForceLoggedInMiddleware])
-    @Example<Partial<User>[]>([
+    @Example<PartialUser[]>([
         {name: 'admin', email: 'admin@example.com'},
         {name: 'moderator', email: 'moderator@example.com'}
         ])
     async getUsers(
         @Request() req: any,
         @Response() res: any
-    ): Promise<User[]> {
-        return await getUsersRouteHandler(req, res) as User[];
+    ): Promise<Array<PartialUser>> {
+        return await getUsersRouteHandler(req, res) as Array<PartialUser>;
+    }
+
+    @Get("/me",[ForceLoggedInMiddleware])
+    @Example<PartialUser>({name: 'admin', email: 'admin@example.com'})
+    async getMe(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialUser|undefined> {
+        return await getMeRouteHandler(req, res) as PartialUser | undefined;
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
-    @Example<Partial<User>>({name: 'admin', email: 'admin@example.com'})
+    @Example<PartialUser>({name: 'admin', email: 'admin@example.com'})
     async getUser(
         @Params('id') id: string,
         @Request() req: any,
         @Response() res: any
-    ): Promise<User|undefined> {
-        return await getUserRouteHandler(req, res) as User | undefined;
+    ): Promise<PartialUser|undefined> {
+        return await getUserRouteHandler(req, res) as PartialUser | undefined;
     }
 
     @Post("",[ForceLoggedInMiddleware])
-    @Example<Partial<User>>({name: 'admin', email: 'admin@example.com'})
+    @Example<PartialUser>({name: 'admin', email: 'admin@example.com', realm_id: 'master'})
     async addUser(
-        @Body() user: Pick<User, 'name' | 'email' | 'password' | 'realm_id'>,
+        @Body() user: NonNullable<User>/* Pick<User, 'name' | 'email' | 'password' | 'realm_id'> */,
         @Request() req: any,
         @Response() res: any
-    ): Promise<User|undefined> {
-        return await addUserRouteHandler(req, res) as User | undefined;
+    ): Promise<PartialUser|undefined> {
+        return await addUserRouteHandler(req, res) as PartialUser | undefined;
     }
 
-    @Get("/me",[ForceLoggedInMiddleware])
-    @Example<Partial<User>>({name: 'admin', email: 'admin@example.com'})
-    async getMe(
+    //-------------------------------------------------------------------------
+    // Relations (self)
+    //-------------------------------------------------------------------------
+
+    @Delete("/:id/relationships/roles/:relationId",[ForceLoggedInMiddleware])
+    @Example<Partial<UserRole>>(
+        {role_id: 1, user_id: 1}
+    )
+    async dropUserSelfRole(
         @Request() req: any,
         @Response() res: any
-    ): Promise<User|undefined> {
-        return await getMeRouteHandler(req, res) as User | undefined;
+    ): Promise<UserRole> {
+        return await dropUserRoleRouteHandler(req, res, 'self') as UserRole;
+    }
+
+    @Get("/:id/relationships/roles/:relationId",[ForceLoggedInMiddleware])
+    @Example<Partial<UserRole>>(
+        {role_id: 1, user_id: 1}
+    )
+    async getUserSelfRole(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<UserRole> {
+        return await getUserRoleRouteHandler(req, res, 'self') as UserRole;
+    }
+
+    @Get("/:id/relationships/roles",[ForceLoggedInMiddleware])
+    @Example<Array<Partial<UserRole>>>([
+        {role_id: 1, user_id: 1},
+        {role_id: 1, user_id: 2}
+    ])
+    async getUserSelfRoles(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Array<UserRole>> {
+        return await getUserRolesRouteHandler(req, res, 'self') as Array<UserRole>;
+    }
+
+    //-------------------------------------------------------------------------
+    // Relations (related)
+    //-------------------------------------------------------------------------
+
+    @Delete("/:id/roles/:relationId",[ForceLoggedInMiddleware])
+    @Example<Partial<Role>>(
+        {name: 'admin'}
+    )
+    async dropUserRole(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Role> {
+        return await dropUserRoleRouteHandler(req, res, 'related') as Role;
+    }
+
+    @Get("/:id/roles/:relationId",[ForceLoggedInMiddleware])
+    @Example<Partial<Role>>(
+        {name: 'admin'}
+    )
+    async getUserRole(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Role> {
+        return await getUserRoleRouteHandler(req, res, 'related') as Role;
+    }
+
+    @Get("/:id/roles",[ForceLoggedInMiddleware])
+    @Example<Array<Partial<Role>>>([
+        {name: 'admin'},
+        {name: 'moderator'}
+    ])
+    async getUserRoles(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Array<Role>> {
+        return await getUserRolesRouteHandler(req, res, 'related') as Array<Role>;
     }
 }
 

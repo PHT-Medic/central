@@ -12,7 +12,7 @@ export const swaggerConfig : SwaggerConfig = {
     host: url.host,
     name: 'API - Documentation',
     description: packageJson.description,
-    basePath: '',
+    basePath: '/',
     version: packageJson.version,
     outputDirectory: getWritableDirPath(),
     entryFile: path.join(getRootDirPath(), 'src', 'app', 'controllers', '**', '*.ts'),
@@ -21,8 +21,7 @@ export const swaggerConfig : SwaggerConfig = {
         bearerHeader: {
             name: 'Bearer',
             type: 'apiKey',
-            in: 'header',
-            tokenUrl: url.host+'/auth/token'
+            in: 'header'
         }
     },
     consumes: ['application/json'],

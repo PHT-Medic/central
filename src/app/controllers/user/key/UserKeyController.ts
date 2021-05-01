@@ -2,6 +2,49 @@ import {getRepository} from "typeorm";
 import {UserKeyRing} from "../../../../domains/user/key-ring";
 import {check, matchedData, validationResult} from "express-validator";
 import {useVaultApi} from "../../../../modules/api/provider/vault";
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {Tags} from "typescript-swagger";
+
+@Tags('user')
+@Controller("/user-key-rings")
+export class UserKeyController {
+    @Get("", [ForceLoggedInMiddleware])
+    async getKeyRing(
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<UserKeyRing> {
+        return getUserKeyRouteHandler(req, res);
+    }
+
+    @Post("", [ForceLoggedInMiddleware])
+    async addKeyRing(
+        @Request() req: any,
+        @Response() res: any,
+        @Body() keyRing: Pick<UserKeyRing, 'public_key' | 'he_key'>,
+    ) : Promise<UserKeyRing> {
+        return addUserKeyRouteHandler(req, res);
+    }
+
+    @Delete("/:id", [ForceLoggedInMiddleware])
+    async dropKeyRing(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<UserKeyRing> {
+        return dropUserKeyRouteHandler(req, res);
+    }
+
+    @Post("/:id", [ForceLoggedInMiddleware])
+    async editKeyRing(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any,
+        @Body() keyRing: Pick<UserKeyRing, 'public_key' | 'he_key'>
+    ) : Promise<UserKeyRing> {
+        return editUserKeyRouteHandler(req, res);
+    }
+}
 
 export async function getUserKeyRouteHandler(req: any, res: any) {
     const repository = getRepository(UserKeyRing);

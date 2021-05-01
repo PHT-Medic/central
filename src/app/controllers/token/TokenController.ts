@@ -7,6 +7,7 @@ import {Oauth2PasswordProvider} from "../../../modules/auth/providers";
 
 import {Response, Request, Controller, Post, Body, Delete} from "@decorators/express";
 import {Example, IsInt} from "typescript-swagger/src/index";
+import {Tags} from "../../../../../../../../tada5hi/forks/typescript-rest-swagger";
 
 
 type Token = {
@@ -17,6 +18,7 @@ type Token = {
     token: string
 }
 
+@Tags('auth')
 @Controller("/auth/token")
 export class TokenController {
     @Post("")

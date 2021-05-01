@@ -16,6 +16,7 @@ import {existsSync} from "fs";
 import {checkAuthenticated} from "./request/middleware/authMiddleware";
 import {generateSwaggerDocumentation} from "./swagger";
 import {UserController} from "../../app/controllers/user/UserController";
+import {UserKeyController} from "../../app/controllers/user/key/UserKeyController";
 
 export interface ExpressAppInterface extends Express{
 
@@ -70,7 +71,7 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
 
     //Server.loadServices(expressApp, ['**/*.ts'], controllerDir);
 
-    attachControllers(expressApp, [TokenController, UserController]);
+    attachControllers(expressApp, [TokenController, UserController, UserKeyController]);
 
     let swaggerDocument : any;
 
