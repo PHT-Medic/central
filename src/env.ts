@@ -37,6 +37,7 @@ export interface Environment {
     vaultConnectionString: string,
 
     apiUrl: string,
+    internalApiUrl: string,
     webAppUrl: string,
 }
 
@@ -56,6 +57,7 @@ const env : Environment = {
     vaultConnectionString: requireFromEnv('VAULT_CONNECTION_STRING'),
 
     apiUrl: requireFromEnv('API_URL'),
+    internalApiUrl: requireFromEnv('INTERNAL_API_URL', requireFromEnv('API_URL')),
     webAppUrl: requireFromEnv('WEB_APP_URL')
 };
 

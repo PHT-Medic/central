@@ -16,6 +16,8 @@ export async function findVaultStationPublicKey(stationId: number | string) : Pr
             content: data.data.data.rsa_station_public_key
         }
     } catch (e) {
+        console.log(e);
+
         if(e.response.status === 404) {
             return undefined;
         }

@@ -1,18 +1,21 @@
-import {Station} from "../../../pht/station";
 import {useHarborApi} from "../../../../modules/api/provider/harbor";
+import {createHarborProjectNameByStationId} from "../api";
 
 //------------------------------------------------------------------------
 
 export type HarborRobotAccount = {
     id?: string,
     name: string,
-    token: string | null
+    secret?: string | null,
+    creation_time: string,
+    expires_at: number
 }
 
-export async function findHarborProjectRobotAccount(projectId: number, projectAccountName: string) : Promise<HarborRobotAccount|undefined> {
-    const {data} = await useHarborApi().get('projects/'+projectId+'/robots?name='+projectAccountName+'&page_size=1');
+export async function findHarborProjectRobotAccount(stationId: string | number) : Promise<HarborRobotAccount|undefined> {
+    const name : string = createHarborProjectNameByStationId(stationId);
+    const {data} = await useHarborApi().get('robots?q=name%3D'+name+'&page_size=1');
 
-    const accounts = Array.isArray(data) ? data.filter(account => account.name === projectAccountName) : [];
+    const accounts = Array.isArray(data) ? data.filter(account => account.name === 'robot$'+name) : [];
 
     if(
         accounts.length === 1
@@ -20,59 +23,88 @@ export async function findHarborProjectRobotAccount(projectId: number, projectAc
         return {
             id: accounts[0].id,
             name: accounts[0].name,
-            token: null
+            creation_time: accounts[0].creation_time,
+            expires_at: accounts[0].expires_at,
+            secret: null
         }
     }
 
     return undefined;
 }
 
-export async function ensureHarborProjectRobotAccount(station: Station) : Promise<HarborRobotAccount> {
+/**
+ * Update harbor project robot account.
+ * If no "record.secret" provided, a new secret is generated.
+ *
+ * @param robotId
+ * @param record
+ */
+export async function patchHarborProjectRobotAccount(robotId: string | number, record: Record<string, any> = {}) : Promise<Pick<HarborRobotAccount, 'secret'>> {
+    let robot : Record<string, any> = {
+        ...record
+    };
+
+    const { data } : {data: HarborRobotAccount} = await useHarborApi()
+        .patch('robots/'+robotId, robot);
+
+    if(typeof record.secret !== 'undefined') {
+        data.secret = record.secret;
+    }
+
+    return data as HarborRobotAccount;
+}
+
+export async function ensureHarborProjectRobotAccount(stationId: string |number, iteration: number = 0) : Promise<HarborRobotAccount> {
+    const name : string = createHarborProjectNameByStationId(stationId);
     const robot: Record<string, any> = {
-        name: "station"+station.id,
-        expires_at: -1,
-        access: [
-            {resource: '/project/'+station.harbor_project_id+'/repository', action: 'push'},
-            {resource: '/project/'+station.harbor_project_id+'/helm-chart', action: 'read'},
-            {resource: '/project/'+station.harbor_project_id+'/helm-chart-version', action: 'create'}
+        name,
+        duration: -1,
+        level: "system",
+        disable: false,
+        permissions: [
+            {
+                access: [
+                    {resource: 'artifact', action: 'delete'},
+                    {resource: 'artifact-label', action: 'create'},
+                    {resource: 'helm-chart', action: 'read'},
+                    {resource: 'helm-chart-version', action: 'create'},
+                    {resource: 'helm-chart-version', action: 'delete'},
+                    {resource: 'repository', action: 'push'},
+                    {resource: 'repository', action: 'pull'},
+                    {resource: 'scan', action: 'create'},
+                    {resource: 'tag', action: 'create'},
+                    {resource: 'tag', action: 'delete'}
+
+                ],
+                kind: 'project',
+                namespace: name
+            }
         ]
     };
 
     try {
-        const {data} = await useHarborApi()
-            .post('projects/' + station.harbor_project_id + '/robots', robot);
+        const { data } : {data: HarborRobotAccount} = await useHarborApi()
+            .post('robots', robot);
 
-        const {name, token} = data;
-
-        return {
-            name,
-            token
-        };
+        return data;
     } catch (e) {
-        if(e.response.status === 409) {
-            try {
-                await dropHarborProjectRobotAccount(station);
-                return await ensureHarborProjectRobotAccount(station);
-            } catch (e) {
-                throw e;
+        if(iteration === 0) {
+            if (e.response.status >= 400 && e.response.status < 500) {
+                iteration++;
+                await dropHarborProjectRobotAccount(stationId);
+                await ensureHarborProjectRobotAccount(stationId, iteration);
             }
         }
-
-        console.log(e.response.status);
 
         throw e;
     }
 }
 
-export async function dropHarborProjectRobotAccount(station: Station) : Promise<void> {
-    if(!station.harbor_project_id) return;
-
-    const accountName : string = station.harbor_project_account_name ?? "robot$station"+station.id;
-
-    const robotAccount = await findHarborProjectRobotAccount(station.harbor_project_id, accountName);
+export async function dropHarborProjectRobotAccount(stationId: string | number) : Promise<void> {
+    const robotAccount = await findHarborProjectRobotAccount(stationId);
 
     if(typeof robotAccount !== 'undefined') {
         await useHarborApi()
-            .delete('projects/'+station.harbor_project_id+'/robots/'+robotAccount.id)
+            .delete('robots/'+robotAccount.id);
     }
 }

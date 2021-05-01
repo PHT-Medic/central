@@ -26,13 +26,13 @@ export class Train {
     @Column({length: 10})
     type: string;
 
-    @Column({nullable: true})
+    @Column({nullable: true, type: "text"})
     query: string;
 
-    @Column({nullable: true})
+    @Column({nullable: true, type: "text"})
     hash: string;
 
-    @Column({nullable: true})
+    @Column({nullable: true, type: "text"})
     hash_signed: string
 
     @Column({nullable: true})

@@ -6,8 +6,12 @@ type HarborProject = {
     id: number
 }
 
+export function createHarborProjectNameByStationId(stationId: string | number) {
+    return 'station_'+stationId;
+}
+
 export async function findHarborProject(entity: Station) : Promise<HarborProject | undefined> {
-    const projectName: string = 'station_' + entity.id;
+    const projectName: string = createHarborProjectNameByStationId(entity.id);
 
     const {data} = await useHarborApi()
         .get('projects?name=' + projectName);
@@ -27,7 +31,7 @@ export async function findHarborProject(entity: Station) : Promise<HarborProject
 }
 
 export async function ensureHarborProject(entity: Station) : Promise<number> {
-    const projectName: string = 'station_' + entity.id;
+    const projectName: string = createHarborProjectNameByStationId(entity.id);
 
     try {
         await useHarborApi()
@@ -63,7 +67,7 @@ export async function dropHarborProject(entity: Station) : Promise<void> {
             throw e;
         }
     } else {
-        const name: string = 'station_' + entity.id;
+        const name: string = createHarborProjectNameByStationId(entity.id);
         const {data} = await useHarborApi().get('projects?name=' + name + '&page_size=1');
 
         if (
