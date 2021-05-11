@@ -8,11 +8,10 @@ import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {Train} from "../../../../domains/pht/train";
 import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
 import {isTrainStationState} from "../../../../domains/pht/train/station/states";
-import {applyRequestIncludes} from "../../../../db/utils/include";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 export async function getTrainStationsRouteHandler(req: any, res: any) {
-    let { filter, page, include } = req.query;
+    let { filter, page } = req.query;
 
     try {
         const repository = getRepository(TrainStation);
@@ -21,12 +20,6 @@ export async function getTrainStationsRouteHandler(req: any, res: any) {
             .leftJoinAndSelect('trainStation.station', 'station');
 
         onlyRealmPermittedQueryResources(query, req.user.realm_id, ['train.realm_id', 'station.realm_id']);
-
-        applyRequestIncludes(query, 'train', include, {
-            trainStations: 'train_stations',
-            result: 'result',
-            user: 'user'
-        });
 
         applyRequestFilterOnQuery(query, filter, {
             trainId: 'trainStation.train_id',
@@ -62,7 +55,10 @@ export async function getTrainStationRouteHandler(req: any, res: any) {
             return res._failNotFound();
         }
 
-        if(!isRealmPermittedForResource(req.user, entity.train) && !isRealmPermittedForResource(req.user, entity.station)) {
+        if(
+            !isRealmPermittedForResource(req.user, entity.train) &&
+            !isRealmPermittedForResource(req.user, entity.station)
+        ) {
             return res._failForbidden();
         }
 

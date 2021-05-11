@@ -7,6 +7,7 @@ import {
     OneToOne,
     PrimaryGeneratedColumn, UpdateDateColumn
 } from "typeorm";
+
 import {ProposalStation} from "../proposal/station";
 import {Realm} from "../../realm";
 import {TrainStation} from "../train/station";
@@ -53,9 +54,9 @@ export class Station {
     @JoinColumn({name: 'realm_id'})
     realm: Realm;
 
-    @OneToMany(() => TrainStation, train => train.station)
-    train_stations: Array<TrainStation>
+    @OneToMany(() => TrainStation, trainStation => trainStation.station)
+    train_stations: Array<TrainStation>;
 
     @OneToMany(() => ProposalStation, proposalStation => proposalStation.station)
-    proposal_stations: Array<ProposalStation>
+    proposal_stations: Array<ProposalStation>;
 }
