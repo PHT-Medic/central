@@ -61,5 +61,5 @@ export class Proposal {
     master_image: MasterImage;
 
     @OneToMany(() => ProposalStation, proposalStation => proposalStation.proposal)
-    proposalStations: ProposalStation[]
+    proposal_stations: ProposalStation[]
 }

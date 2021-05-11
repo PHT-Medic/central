@@ -1,9 +1,9 @@
 import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
 import {ProposalStation} from "../../../../../domains/pht/proposal/station";
-import {queryFindPermittedResourcesForRealm} from "../../../../../db/utils";
+import {onlyRealmPermittedQueryResources} from "../../../../../db/utils";
 import {Station} from "../../../../../domains/pht/station";
-import {isPermittedToOperateOnRealmResource} from "../../../../../modules/auth/utils";
+import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
 import {applyRequestFilterOnQuery} from "../../../../../db/utils/filter";
 
 
@@ -21,7 +21,7 @@ export async function getProposalStationsRouteHandler(req: any, res: any, type: 
                         proposal_id: id
                     });
 
-                queryFindPermittedResourcesForRealm(query, req.user.realm_id);
+                onlyRealmPermittedQueryResources(query, req.user.realm_id);
 
                 applyRequestFilterOnQuery(query, filter, {
                     proposal_id: 'proposalStation.proposal_id',
@@ -39,7 +39,7 @@ export async function getProposalStationsRouteHandler(req: any, res: any, type: 
                 const repository = getRepository(Station);
 
                 let query = repository.createQueryBuilder('station')
-                    .leftJoinAndSelect('station.proposalStations', 'proposalStation')
+                    .leftJoinAndSelect('station.proposal_stations', 'proposalStation')
                     .where("proposalStation.proposal_id = :proposalId", {proposalId: id});
 
                 applyRequestFilterOnQuery(query, filter, {
@@ -74,7 +74,7 @@ export async function getProposalStationRouteHandler(req: any, res: any, type: s
                     return res._failNotFound();
                 }
 
-                if(!isPermittedToOperateOnRealmResource(req.user, entities)) {
+                if(!isRealmPermittedForResource(req.user, entities)) {
                     return res._failForbidden();
                 }
 
@@ -83,7 +83,7 @@ export async function getProposalStationRouteHandler(req: any, res: any, type: s
                 repository = getRepository(Station);
 
                 let entity = repository.createQueryBuilder('station')
-                    .leftJoinAndSelect('station.proposalStations', 'proposalStation')
+                    .leftJoinAndSelect('station.proposal_stations', 'proposalStation')
                     .where("proposalStation.proposal_id = :proposalId", {proposalId: id})
                     .where("proposalStation.station_id = :stationId", {stationId: relationId})
                     .getOne();
@@ -168,7 +168,7 @@ export async function dropProposalStationRouteHandler(req: any, res: any, type: 
         return res._failNotFound();
     }
 
-    if(!isPermittedToOperateOnRealmResource(req.user, entity.station)) {
+    if(!isRealmPermittedForResource(req.user, entity.station)) {
         return res._failForbidden();
     }
 

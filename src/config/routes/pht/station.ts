@@ -9,7 +9,7 @@ import {
     editStationProposalRouteHandler,
     getStationProposalRouteHandler,
     getStationProposalsRouteHandler
-} from "../../../app/controllers/pht/station/proposal/StationProposalController";
+} from "../../../app/controllers/pht/station/proposal/StationProposalRelationController";
 import {doStationTaskRouteHandler} from "../../../app/controllers/pht/station/StationActionController";
 
 export function setupPhtStationRoutes() {

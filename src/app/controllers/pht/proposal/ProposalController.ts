@@ -1,9 +1,9 @@
 import {getRepository, In} from "typeorm";
 import {Station} from "../../../../domains/pht/station";
-import {queryFindPermittedResourcesForRealm} from "../../../../db/utils";
+import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
 import {check, matchedData, validationResult} from "express-validator";
 import {Proposal} from "../../../../domains/pht/proposal";
-import {isPermittedToOperateOnRealmResource} from "../../../../modules/auth/utils";
+import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {MasterImage} from "../../../../domains/pht/master-image";
 import {ProposalStation} from "../../../../domains/pht/proposal/station";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
@@ -20,7 +20,7 @@ export async function getProposalRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isPermittedToOperateOnRealmResource(req.user, entity)) {
+    if(!isRealmPermittedForResource(req.user, entity)) {
         return res._failForbidden();
     }
 
@@ -33,7 +33,7 @@ export async function getProposalsRouteHandler(req: any, res: any) {
     const repository = getRepository(Proposal);
     const query = repository.createQueryBuilder('proposal');
 
-    queryFindPermittedResourcesForRealm(query, req.user.realm_id);
+    onlyRealmPermittedQueryResources(query, req.user.realm_id);
 
     applyRequestFilterOnQuery(query, filter, {
         id: 'proposal.id',
@@ -184,7 +184,7 @@ export async function editProposalRouteHandler(req: any, res: any) {
         return res._failValidationError({message: 'Der Antrag konnte nicht gefunden werden.'});
     }
 
-    if(!isPermittedToOperateOnRealmResource(req.user, proposal)) {
+    if(!isRealmPermittedForResource(req.user, proposal)) {
         return res._failForbidden();
     }
 
@@ -222,7 +222,7 @@ export async function dropProposalRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isPermittedToOperateOnRealmResource(req.user, entity)) {
+    if(!isRealmPermittedForResource(req.user, entity)) {
         return res._failForbidden();
     }
 

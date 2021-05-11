@@ -14,7 +14,7 @@ import {
     getRealmsRoute
 } from "../../app/controllers/auth/realm/RealmController";
 import {forceLoggedIn} from "../../modules/http/request/middleware/authMiddleware";
-import {getStationProposalRouteHandler} from "../../app/controllers/pht/station/proposal/StationProposalController";
+import {getStationProposalRouteHandler} from "../../app/controllers/pht/station/proposal/StationProposalRelationController";
 import {getRealmStationRouteHandler} from "../../app/controllers/auth/realm/station/RealmStationController";
 
 export default function setupAuthRoutes() {

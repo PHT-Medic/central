@@ -1,7 +1,7 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 import {Station} from "../../../../domains/pht/station";
-import {isPermittedToOperateOnRealmResource} from "../../../../modules/auth/utils";
+import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {
     findVaultStationPublicKey,
     removeStationPublicKeyFromVault,
@@ -80,7 +80,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if (!isPermittedToOperateOnRealmResource(req.user, entity)) {
+    if (!isRealmPermittedForResource(req.user, entity)) {
         return res._failForbidden();
     }
 

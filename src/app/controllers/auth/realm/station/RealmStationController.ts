@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {isPermittedToOperateOnRealmResource} from "../../../../../modules/auth/utils";
+import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
 import {Station} from "../../../../../domains/pht/station";
 import {applyRequestFields} from "../../../../../db/utils/select";
 
@@ -14,7 +14,7 @@ export async function getRealmStationRouteHandler(req: any, res: any, type: stri
             case 'related':
                 repository = getRepository(Station);
 
-                if(!isPermittedToOperateOnRealmResource(req.user, {realm_id: id})) {
+                if(!isRealmPermittedForResource(req.user, {realm_id: id})) {
                     return res._failForbidden();
                 }
 

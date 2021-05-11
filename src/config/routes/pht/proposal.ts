@@ -9,7 +9,7 @@ import {
 import {
     addProposalStationRouteHandler,
     dropProposalStationRouteHandler, getProposalStationRouteHandler, getProposalStationsRouteHandler
-} from "../../../app/controllers/pht/proposal/station/ProposalStationController";
+} from "../../../app/controllers/pht/proposal/station/ProposalStationRelationController";
 
 export function setupPhtProposalRoutes() {
     const router = Router();

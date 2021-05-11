@@ -1,22 +1,14 @@
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from "typeorm";
-import {Proposal} from "../index";
+import {Column, CreateDateColumn, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {Proposal} from "../../proposal";
 import {Station} from "../../station";
-import {ProposalStationStateOpen} from "./states";
+import {Train} from "../index";
+import {TrainStationStateOpen} from "./states";
 
-@Entity()
-export class ProposalStation {
+export class TrainStation {
     @PrimaryGeneratedColumn({unsigned: true})
     id: number;
 
-    @Column({default: ProposalStationStateOpen})
+    @Column({default: TrainStationStateOpen})
     status: string;
 
     @Column({type: "text", nullable: true})
@@ -29,11 +21,11 @@ export class ProposalStation {
     updated_at: string
 
     @Column()
-    proposal_id: number;
+    train_id: string;
 
     @ManyToOne(() => Proposal, proposal => proposal.proposal_stations, {onDelete: "CASCADE"})
     @JoinColumn({name: 'proposal_id'})
-    proposal: Proposal;
+    train: Train;
 
     @Column()
     station_id: number;

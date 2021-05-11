@@ -1,9 +1,9 @@
 import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
 import {ProposalStation} from "../../../../../domains/pht/proposal/station";
-import {queryFindPermittedResourcesForRealm} from "../../../../../db/utils";
+import {onlyRealmPermittedQueryResources} from "../../../../../db/utils";
 import {Station} from "../../../../../domains/pht/station";
-import {isPermittedToOperateOnRealmResource} from "../../../../../modules/auth/utils";
+import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
 import {Proposal} from "../../../../../domains/pht/proposal";
 import {
     ProposalStationStateApproved,
@@ -29,7 +29,7 @@ export async function getStationProposalsRouteHandler(req: any, res: any, type: 
                         station_id: id
                     });
 
-                queryFindPermittedResourcesForRealm(query, req.user.realm_id, 'station.realm_id');
+                onlyRealmPermittedQueryResources(query, req.user.realm_id, 'station.realm_id');
 
                 applyRequestFilterOnQuery(query, filter, {
                     proposal_id: 'proposalStation.proposal_id',
@@ -62,7 +62,7 @@ export async function getStationProposalsRouteHandler(req: any, res: any, type: 
                     .leftJoinAndSelect('proposalStation.station', 'station')
                     .where("proposalStation.station_id = :stationId", {stationId: id});
 
-                queryFindPermittedResourcesForRealm(query, req.user.realm_id, 'station.realm_id');
+                onlyRealmPermittedQueryResources(query, req.user.realm_id, 'station.realm_id');
 
                 applyRequestFilterOnQuery(query, filter, {
                     id: 'station.id',
@@ -106,7 +106,7 @@ export async function getStationProposalRouteHandler(req: any, res: any, type: s
                     return res._failNotFound();
                 }
 
-                if(!isPermittedToOperateOnRealmResource(req.user, entities)) {
+                if(!isRealmPermittedForResource(req.user, entities)) {
                     return res._failForbidden();
                 }
 
@@ -124,7 +124,7 @@ export async function getStationProposalRouteHandler(req: any, res: any, type: s
                     return res._failNotFound();
                 }
 
-                if(!isPermittedToOperateOnRealmResource(req.user, entity)) {
+                if(!isRealmPermittedForResource(req.user, entity)) {
                     return res._failForbidden();
                 }
 
@@ -179,7 +179,7 @@ export async function editStationProposalRouteHandler(req: any, res: any) {
         return res._failValidationError({message: 'Der eingehende Antrag konnte nicht gefunden werden.'});
     }
 
-    if(!isPermittedToOperateOnRealmResource(req.user, stationProposal.station)) {
+    if(!isRealmPermittedForResource(req.user, stationProposal.station)) {
         return res._failForbidden();
     }
 

@@ -67,8 +67,6 @@ export function applyRequestFilterOnQuery(query: SelectQueryBuilder<any>, rawReq
 
             run++;
 
-            console.log(allowedFields[key]);
-
             if (requestFilters[key].includes(',')) {
                 let ids = requestFilters[key].split(',');
                 qb[run === 1 ? 'where' : 'andWhere'](allowedFields[key] + " IN (:ids)", {ids});

@@ -1,6 +1,6 @@
 import {getRepository} from "typeorm";
 import {Train} from "../../../../domains/pht/train";
-import {isPermittedToOperateOnRealmResource} from "../../../../modules/auth/utils";
+import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {createTrainBuilderQueueMessage, publishTrainBuilderQueueMessage} from "../../../../domains/train-builder/queue";
 import {
     TrainConfiguratorStateFinished,
@@ -110,13 +110,13 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
 
     const repository = getRepository(Train);
 
-    let entity = await repository.findOne(id, {relations: ['stations', 'master_image', 'entrypoint_file']});
+    let entity = await repository.findOne(id, {relations: ['train_stations', 'master_image', 'entrypoint_file']});
 
     if (typeof entity === 'undefined') {
         return res._failNotFound();
     }
 
-    if (!isPermittedToOperateOnRealmResource(req.user, entity)) {
+    if (!isRealmPermittedForResource(req.user, entity)) {
         return res._failForbidden();
     }
 
@@ -254,7 +254,7 @@ export async function doTrainResultTaskRouteHandler(req: any, res: any) {
                 return res._failNotFound();
             }
 
-            if (!isPermittedToOperateOnRealmResource(req.user, entity.train)) {
+            if (!isRealmPermittedForResource(req.user, entity.train)) {
                 return res._failForbidden();
             }
 
