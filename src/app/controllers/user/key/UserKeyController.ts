@@ -4,9 +4,9 @@ import {check, matchedData, validationResult} from "express-validator";
 import {useVaultApi} from "../../../../modules/api/provider/vault";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
-import {Tags} from "typescript-swagger";
+import {SwaggerTags} from "typescript-swagger";
 
-@Tags('user')
+@SwaggerTags('user')
 @Controller("/user-key-rings")
 export class UserKeyController {
     @Get("", [ForceLoggedInMiddleware])

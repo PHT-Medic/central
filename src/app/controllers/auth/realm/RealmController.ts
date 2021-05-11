@@ -1,6 +1,71 @@
 import {getRepository} from "typeorm";
 import {Realm} from "../../../../domains/realm";
 import {check, matchedData, validationResult} from "express-validator";
+import {SwaggerTags, ResponseDescription} from "typescript-swagger";
+import {Controller, Get, Post, Delete, Request, Response, Params, Body} from "@decorators/express";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {Provider} from "../../../../domains/provider";
+import {Station} from "../../../../domains/pht/station";
+import {getRealmStationRouteHandler} from "./station/RealmStationController";
+
+@SwaggerTags('auth')
+@Controller("/auth/realms")
+export class RealmController {
+    @Get("", [])
+    async getMany(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Array<Realm>> {
+        return await getRealmsRoute(req, res);
+    }
+
+    @Post("", [ForceLoggedInMiddleware])
+    async add(
+        @Body() user: NonNullable<Provider>,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Realm> {
+        return await addRealmRoute(req, res);
+    }
+
+    @Get("/:id", [])
+    async get(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Realm> {
+        return await getRealmRoute(req, res);
+    }
+
+    @Post("/:id", [ForceLoggedInMiddleware])
+    async edit(
+        @Params('id') id: string,
+        @Body() user: NonNullable<Realm>,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Realm> {
+        return await editRealmRoute(req, res);
+    }
+
+    @Delete("/:id", [ForceLoggedInMiddleware])
+    async drop(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Realm> {
+        return await dropRealmRoute(req, res);
+    }
+
+    @Get("/realms/:id/station")
+    @ResponseDescription<{error: {message: string, code: string}}>(403, 'Not Authorized', {error: {message: 'forbidden', code: 'forbidden'}})
+    async getRealmStation(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Station|undefined> {
+        return await getRealmStationRouteHandler(req, res, 'related');
+    }
+}
 
 export async function getRealmsRoute(req: any, res: any) {
     const realmRepository = getRepository(Realm);

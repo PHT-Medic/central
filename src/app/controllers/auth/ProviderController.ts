@@ -8,6 +8,59 @@ import {Realm} from "../../../domains/realm";
 import {check, matchedData, validationResult} from "express-validator";
 import {applyRequestPagination} from "../../../db/utils/pagination";
 import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
+import {Controller, Get, Post, Delete, Params, Request, Response, Body} from "@decorators/express";
+import {ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/authMiddleware";
+import {SwaggerTags} from "typescript-swagger";
+
+@SwaggerTags('auth')
+@Controller("/auth/providers")
+export class ProviderController {
+    @Get("", [])
+    async getProviders(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Array<Provider>> {
+        return await getProvidersRoute(req, res);
+    }
+
+    @Post("", [ForceLoggedInMiddleware])
+    async addProvider(
+        @Body() user: NonNullable<Provider>,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Provider> {
+        return await addProviderRoute(req, res);
+    }
+
+    @Get("/:id", [])
+    async getProvider(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Provider> {
+        return await getProviderRoute(req, res);
+    }
+
+    @Post("/:id", [ForceLoggedInMiddleware])
+    async editProvider(
+        @Params('id') id: string,
+        @Body() user: NonNullable<Provider>,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Provider> {
+        // todo: implement edit
+        return await editProviderRoute(req, res);
+    }
+
+    @Delete("/:id", [ForceLoggedInMiddleware])
+    async dropProvider(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Provider> {
+        return await dropProviderRoute(req, res);
+    }
+}
 
 export async function getProvidersRoute(req: any, res: any) {
     const { page, filter } = req.query;

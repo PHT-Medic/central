@@ -10,13 +10,16 @@ import env from "../../env";
 import {useLogger} from "../log";
 import {attachControllers} from "@decorators/express";
 import responseMiddleware from "./response/middleware/responseMiddleware";
-import {TokenController} from "../../app/controllers/token/TokenController";
+import {TokenController} from "../../app/controllers/auth/token/TokenController";
 import {existsSync} from "fs";
 
 import {checkAuthenticated} from "./request/middleware/authMiddleware";
 import {generateSwaggerDocumentation} from "./swagger";
 import {UserController} from "../../app/controllers/user/UserController";
 import {UserKeyController} from "../../app/controllers/user/key/UserKeyController";
+import {PermissionController} from "../../app/controllers/permission/PermissionController";
+import {ProviderController} from "../../app/controllers/auth/ProviderController";
+import {RealmController} from "../../app/controllers/auth/realm/RealmController";
 
 export interface ExpressAppInterface extends Express{
 
@@ -71,7 +74,16 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
 
     //Server.loadServices(expressApp, ['**/*.ts'], controllerDir);
 
-    attachControllers(expressApp, [TokenController, UserController, UserKeyController]);
+    attachControllers(expressApp, [
+        // Auth Controllers
+        TokenController,
+        RealmController,
+        ProviderController,
+
+        PermissionController,
+        UserController,
+        UserKeyController
+    ]);
 
     let swaggerDocument : any;
 

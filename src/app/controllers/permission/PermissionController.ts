@@ -3,6 +3,59 @@ import PermissionResponseSchema from "../../../domains/permission/PermissionResp
 import {getRepository} from "typeorm";
 import {Permission} from "../../../domains/permission";
 import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {SwaggerTags} from "typescript-swagger";
+import {ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/authMiddleware";
+
+@SwaggerTags("permission")
+@Controller("/permissions")
+export class PermissionController {
+    @Get("", [ForceLoggedInMiddleware])
+    async getPermissions(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Array<Permission>> {
+        return await getPermissions(req, res);
+    }
+
+    @Post("", [ForceLoggedInMiddleware])
+    async addPermission(
+        @Body() user: NonNullable<Permission>/* Pick<User, 'name' | 'email' | 'password' | 'realm_id'> */,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Permission> {
+        return await addPermission(req, res);
+    }
+
+    @Get("/:id", [ForceLoggedInMiddleware])
+    async getPermission(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Permission> {
+        return await getPermission(req, res);
+    }
+
+    @Post("/:id", [ForceLoggedInMiddleware])
+    async editPermission(
+        @Params('id') id: string,
+        @Body() user: NonNullable<Permission>/* Pick<User, 'name' | 'email' | 'password' | 'realm_id'> */,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Permission> {
+        // todo: implement edit
+        return (await editPermission(req, res)) as unknown as Promise<Permission>;
+    }
+
+    @Delete("/:id", [ForceLoggedInMiddleware])
+    async dropPermission(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Permission> {
+        return await dropPermission(req, res);
+    }
+}
 
 const getPermissions = async (req: any, res: any) => {
     let { filter } = req.query;

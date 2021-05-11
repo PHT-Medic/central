@@ -10,7 +10,7 @@ const url = new URL(env.apiUrl);
 export const swaggerConfig : SwaggerConfig = {
     yaml: true,
     host: url.host,
-    name: 'API - Documentation',
+    name: 'PHT - API Documentation',
     description: packageJson.description,
     basePath: '/',
     version: packageJson.version,
@@ -23,6 +23,12 @@ export const swaggerConfig : SwaggerConfig = {
             type: 'apiKey',
             in: 'header'
         }
+    },
+    decoratorConfig: {
+        useBuildIn: true,
+        useLibrary: [
+            "@decorators/express"
+        ]
     },
     consumes: ['application/json'],
     produces: ['application/json']

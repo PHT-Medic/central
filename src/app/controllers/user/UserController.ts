@@ -9,23 +9,22 @@ import {isPermittedToOperateOnRealmResource} from "../../../modules/auth/utils";
 import {Realm} from "../../../domains/realm";
 import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
 import {Params, Controller, Get, Request, Response, Post, Body, Delete} from "@decorators/express";
-import {Example} from "typescript-swagger/src/index";
+import {ResponseExample, SwaggerTags} from "typescript-swagger/src/index";
 import {User} from "../../../domains/user";
 import {ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/authMiddleware";
 import {dropUserRoleRouteHandler, getUserRoleRouteHandler, getUserRolesRouteHandler} from "./role/UserRoleController";
 import {UserRole} from "../../../domains/user/role";
 import {Role} from "../../../domains/role";
-import {Tags} from "../../../../../../../../tada5hi/forks/typescript-rest-swagger";
 
 //---------------------------------------------------------------------------------
 
 type PartialUser = Partial<User>;
 
-@Tags('user')
+@SwaggerTags('user')
 @Controller("/users")
 export class UserController {
     @Get("",[ForceLoggedInMiddleware])
-    @Example<PartialUser[]>([
+    @ResponseExample<PartialUser[]>([
         {name: 'admin', email: 'admin@example.com'},
         {name: 'moderator', email: 'moderator@example.com'}
         ])
@@ -36,8 +35,9 @@ export class UserController {
         return await getUsersRouteHandler(req, res) as Array<PartialUser>;
     }
 
+
     @Get("/me",[ForceLoggedInMiddleware])
-    @Example<PartialUser>({name: 'admin', email: 'admin@example.com'})
+    @ResponseExample<PartialUser>({name: 'admin', email: 'admin@example.com'})
     async getMe(
         @Request() req: any,
         @Response() res: any
@@ -46,7 +46,7 @@ export class UserController {
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
-    @Example<PartialUser>({name: 'admin', email: 'admin@example.com'})
+    @ResponseExample<PartialUser>({name: 'admin', email: 'admin@example.com'})
     async getUser(
         @Params('id') id: string,
         @Request() req: any,
@@ -56,7 +56,7 @@ export class UserController {
     }
 
     @Post("",[ForceLoggedInMiddleware])
-    @Example<PartialUser>({name: 'admin', email: 'admin@example.com', realm_id: 'master'})
+    @ResponseExample<PartialUser>({name: 'admin', email: 'admin@example.com', realm_id: 'master'})
     async addUser(
         @Body() user: NonNullable<User>/* Pick<User, 'name' | 'email' | 'password' | 'realm_id'> */,
         @Request() req: any,
@@ -70,7 +70,7 @@ export class UserController {
     //-------------------------------------------------------------------------
 
     @Delete("/:id/relationships/roles/:relationId",[ForceLoggedInMiddleware])
-    @Example<Partial<UserRole>>(
+    @ResponseExample<Partial<UserRole>>(
         {role_id: 1, user_id: 1}
     )
     async dropUserSelfRole(
@@ -81,7 +81,7 @@ export class UserController {
     }
 
     @Get("/:id/relationships/roles/:relationId",[ForceLoggedInMiddleware])
-    @Example<Partial<UserRole>>(
+    @ResponseExample<Partial<UserRole>>(
         {role_id: 1, user_id: 1}
     )
     async getUserSelfRole(
@@ -92,7 +92,7 @@ export class UserController {
     }
 
     @Get("/:id/relationships/roles",[ForceLoggedInMiddleware])
-    @Example<Array<Partial<UserRole>>>([
+    @ResponseExample<Array<Partial<UserRole>>>([
         {role_id: 1, user_id: 1},
         {role_id: 1, user_id: 2}
     ])
@@ -108,7 +108,7 @@ export class UserController {
     //-------------------------------------------------------------------------
 
     @Delete("/:id/roles/:relationId",[ForceLoggedInMiddleware])
-    @Example<Partial<Role>>(
+    @ResponseExample<Partial<Role>>(
         {name: 'admin'}
     )
     async dropUserRole(
@@ -119,7 +119,7 @@ export class UserController {
     }
 
     @Get("/:id/roles/:relationId",[ForceLoggedInMiddleware])
-    @Example<Partial<Role>>(
+    @ResponseExample<Partial<Role>>(
         {name: 'admin'}
     )
     async getUserRole(
@@ -130,7 +130,7 @@ export class UserController {
     }
 
     @Get("/:id/roles",[ForceLoggedInMiddleware])
-    @Example<Array<Partial<Role>>>([
+    @ResponseExample<Array<Partial<Role>>>([
         {name: 'admin'},
         {name: 'moderator'}
     ])

@@ -42,6 +42,7 @@ export async function getRealmStationRouteHandler(req: any, res: any, type: stri
                 return res._respond({data: entity});
         }
     } catch (e) {
+        console.log(e);
         return res._failServerError();
     }
 }

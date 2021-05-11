@@ -1,13 +1,12 @@
-import TokenResponseSchema from "../../../domains/token/TokenResponseSchema";
-import {createToken} from "../../../modules/auth/utils/token";
+import TokenResponseSchema from "../../../../domains/token/TokenResponseSchema";
+import {createToken} from "../../../../modules/auth/utils/token";
 import {getCustomRepository, getRepository} from "typeorm";
-import {UserRepository} from "../../../domains/user/repository";
-import {Provider} from "../../../domains/provider";
-import {Oauth2PasswordProvider} from "../../../modules/auth/providers";
+import {UserRepository} from "../../../../domains/user/repository";
+import {Provider} from "../../../../domains/provider";
+import {Oauth2PasswordProvider} from "../../../../modules/auth/providers";
 
 import {Response, Request, Controller, Post, Body, Delete} from "@decorators/express";
-import {Example, IsInt} from "typescript-swagger/src/index";
-import {Tags} from "../../../../../../../../tada5hi/forks/typescript-rest-swagger";
+import {ResponseExample, SwaggerTags} from "typescript-swagger";
 
 
 type Token = {
@@ -18,11 +17,15 @@ type Token = {
     token: string
 }
 
-@Tags('auth')
+interface Anselm {
+    keck: string
+}
+
+@SwaggerTags('auth')
 @Controller("/auth/token")
 export class TokenController {
     @Post("")
-    @Example<Token>({expires_in: 3600, token: '20f81b13d51c65798f05'})
+    @ResponseExample<Token>({expires_in: 3600, token: '20f81b13d51c65798f05'})
     async addToken(
         @Body() credentials: { name: string, password: string, provider?: string },
         @Request() req: any,

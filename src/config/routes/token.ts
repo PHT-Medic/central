@@ -4,7 +4,7 @@ let router = Router();
 //---------------------------------------------------------------------------------
 import { forceLoggedIn } from '../../modules/http/request/middleware/authMiddleware';
 
-import TokenController from "../../app/controllers/token/TokenController";
+import TokenController from "../../app/controllers/auth/token/TokenController";
 
 //---------------------------------------------------------------------------------
 
