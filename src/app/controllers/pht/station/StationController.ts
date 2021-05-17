@@ -5,6 +5,7 @@ import {dropHarborProject} from "../../../../domains/harbor/project/api";
 import {removeStationPublicKeyFromVault} from "../../../../domains/vault/station/api";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {applyRequestFields} from "../../../../db/utils/select";
+import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 export async function getStationRouteHandler(req: any, res: any) {
     const { id } = req.params;
@@ -21,7 +22,7 @@ export async function getStationRouteHandler(req: any, res: any) {
 }
 
 export async function getStationsRouteHandler(req: any, res: any) {
-    let { filter } = req.query;
+    let { filter, page } = req.query;
 
     const repository = getRepository(Station);
     const query = repository.createQueryBuilder('station')
@@ -33,9 +34,19 @@ export async function getStationsRouteHandler(req: any, res: any) {
         realmId: 'station.realm_id'
     });
 
-    const entity = await query.getMany();
+    const pagination = applyRequestPagination(query, page, 50);
 
-    return res._respond({data: entity})
+    const [entities, total] = await query.getManyAndCount();
+
+    return res._respond({
+        data: {
+            data: entities,
+            meta: {
+                total,
+                ...pagination
+            }
+        }
+    });
 }
 
 export async function addStationRouteHandler(req: any, res: any) {

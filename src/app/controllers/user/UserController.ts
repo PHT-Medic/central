@@ -187,13 +187,13 @@ export async function editUserRouteHandler(req: any, res: any) {
     user = userRepository.merge(user, data);
 
     try {
-        let result = await userRepository.save(user);
+        const result = await userRepository.save(user);
 
-        result.realm = await getRepository(Realm).findOne(user.realm_id);
+        if(typeof result.realm_id !== 'undefined') {
+            result.realm = await getRepository(Realm).findOne(result.realm_id);
+        }
 
-        console.log(result);
-
-        return res._respondAccepted({
+        return res._respond({
             data: result
         });
     } catch (e) {

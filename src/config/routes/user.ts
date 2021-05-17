@@ -4,7 +4,6 @@ let router = Router();
 //---------------------------------------------------------------------------------
 import { forceLoggedIn } from '../../modules/http/request/middleware/authMiddleware';
 
-import {check} from "express-validator";
 import {
     addUserRouteHandler,
     dropUserRouteHandler,
@@ -16,10 +15,11 @@ import {
     getUserRoleRouteHandler,
     getUserRolesRouteHandler
 } from "../../app/controllers/user/role/UserRoleController";
-import {
-    addUserKeyRouteHandler, dropUserKeyRouteHandler, editUserKeyRouteHandler,
-    getUserKeyRouteHandler
-} from "../../app/controllers/user/key/UserKeyController";
+import {getUserStationRouteHandler} from "../../app/controllers/user/station/UserStationController";
+
+//--------------------------------------------------------------------------------
+
+router.get('/:id/station', [forceLoggedIn], getUserStationRouteHandler);
 
 //--------------------------------------------------------------------------------
 

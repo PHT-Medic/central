@@ -7,7 +7,7 @@ export function onlyRealmPermittedQueryResources<T>(query: SelectQueryBuilder<T>
         if(Array.isArray(queryField)) {
 
             for(let i=0; i<queryField.length; i++) {
-                qb.orWhere(queryField+' = :realm'+i, {['realm'+i]: realm});
+                qb.orWhere(queryField[i]+' = :realm'+i, {['realm'+i]: realm});
             }
         } else {
             qb.where(queryField+' = :realm', {realm});

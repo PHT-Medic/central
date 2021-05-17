@@ -1,5 +1,4 @@
 import {getRepository, In} from "typeorm";
-import {Station} from "../../../../domains/pht/station";
 import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
 import {check, matchedData, validationResult} from "express-validator";
 import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
@@ -16,7 +15,6 @@ import {TrainFile} from "../../../../domains/pht/train/file";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {applyRequestIncludes} from "../../../../db/utils/include";
-import {TrainStation} from "../../../../domains/pht/train/station";
 
 export async function getTrainRouteHandler(req: any, res: any) {
     const { id } = req.params;
@@ -28,6 +26,7 @@ export async function getTrainRouteHandler(req: any, res: any) {
     const repository = getRepository(Train);
     const query = repository.createQueryBuilder('train')
         .leftJoinAndSelect('train.train_stations','trainStations')
+        .leftJoinAndSelect('trainStations.station', 'station')
         .where({
             id
         });
@@ -53,7 +52,7 @@ export async function getTrainsRouteHandler(req: any, res: any) {
     const repository = getRepository(Train);
     const query = repository.createQueryBuilder('train');
 
-    onlyRealmPermittedQueryResources(query, req.user.realm_id);
+    onlyRealmPermittedQueryResources(query, req.user.realm_id, 'train.realm_id');
 
     applyRequestIncludes(query, 'train', include, {
         trainStations: 'train_stations',
@@ -123,17 +122,6 @@ async function runTrainValidations(req: any) {
         });
 
     await masterImagePromise.run(req);
-
-    const stationPromise = check('station_ids')
-        .isArray()
-        .custom((value: any[]) => {
-            return getRepository(Station).find({id: In(value)}).then((res) => {
-                if(!res || res.length !== value.length) throw new Error('Die angegebenen Krankenhäuser sind nicht gültig');
-            })
-        })
-        .optional();
-
-    await stationPromise.run(req);
 }
 
 export async function addTrainRouteHandler(req: any, res: any) {
@@ -188,19 +176,6 @@ export async function addTrainRouteHandler(req: any, res: any) {
 
         await repository.save(entity);
 
-        const trainStationRepository = getRepository(TrainStation);
-        const trainStations : Array<TrainStation> = [];
-        station_ids.map((stationID: any) => {
-             const trainStation : TrainStation = trainStationRepository.create({
-                 train_id: entity.id,
-                 station_id: stationID
-             });
-
-             trainStations.push(trainStation);
-        });
-
-        await trainStationRepository.insert(trainStations);
-
         return res._respond({data: entity});
     } catch (e) {
         console.log(e);
@@ -243,17 +218,6 @@ export async function editTrainRouteHandler(req: any, res: any) {
 
     if(!isRealmPermittedForResource(req.user, train)) {
         return res._failForbidden();
-    }
-
-    if(typeof data.station_ids !== "undefined") {
-        const trainStationRepository = getRepository(TrainStation);
-
-        data.train_stations = data.station_ids.map((stationId: number) => {
-            return trainStationRepository.create({
-                station_id: stationId,
-                train_id: train.id
-            });
-        })
     }
 
     train = repository.merge(train, data);

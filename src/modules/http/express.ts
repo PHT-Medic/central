@@ -1,12 +1,10 @@
 import express, {Express, Response, Request, NextFunction, static as expressStatic } from "express";
 import cors from "cors";
-import fileUpload from "express-fileupload";
 
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import router from '../router';
 import {getPublicDirPath} from "../../config/paths";
-import BusBoy from "busboy";
 
 export interface ExpressAppInterface extends Express{
 

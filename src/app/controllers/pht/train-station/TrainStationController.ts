@@ -40,6 +40,7 @@ export async function getTrainStationsRouteHandler(req: any, res: any) {
             }
         });
     } catch (e) {
+        console.log(e);
         return res._failServerError();
     }
 }
@@ -79,6 +80,12 @@ export async function addTrainStationRouteHandler(req: any, res: any) {
         .isString()
         .run(req);
 
+    await check('position')
+        .exists()
+        .isInt()
+        .optional({nullable: true})
+        .run(req);
+
     if(!req.ability.can('edit','train')) {
         return res._failForbidden();
     }
@@ -102,6 +109,7 @@ export async function addTrainStationRouteHandler(req: any, res: any) {
     }
 
     const repository = getRepository(TrainStation);
+
     let entity = repository.create(data);
 
     try {
@@ -122,18 +130,44 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
         return res._failBadRequest({message: 'the train-station id is not valid.'});
     }
 
-    await check('status')
-        .optional()
-        .custom(value => isTrainStationState(value))
-        .run(req);
+    const repository = getRepository(TrainStation);
+    let trainStation = await repository.findOne(id, {relations: ['station', 'train']});
 
-    await check('comment')
-        .optional({nullable: true})
-        .isString()
-        .run(req);
+    if(typeof trainStation === 'undefined') {
+        return res._failNotFound();
+    }
 
-    if(!req.ability.can('edit','train')) {
+    const isAuthorityOfStation = isRealmPermittedForResource(req.user, trainStation.station);
+    const isAuthorizedForStation = req.ability.can('approve','train');
+
+    const isAuthorityOfRealm = isRealmPermittedForResource(req.user, trainStation.train);
+    const isAuthorizedForRealm = req.ability.can('edit','train');
+
+    if(
+        !(isAuthorityOfStation && isAuthorizedForStation) &&
+        !(isAuthorityOfRealm && isAuthorizedForRealm)
+    ) {
         return res._failForbidden();
+    }
+
+    if(isAuthorityOfStation) {
+        await check('status')
+            .optional()
+            .custom(value => isTrainStationState(value))
+            .run(req);
+
+        await check('comment')
+            .optional({nullable: true})
+            .isString()
+            .run(req);
+    }
+
+    if(isAuthorityOfRealm) {
+        await check('position')
+            .exists()
+            .isInt()
+            .optional({nullable: true})
+            .run(req);
     }
 
     const validation = validationResult(req);
@@ -142,21 +176,6 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
     }
 
     const data = matchedData(req, {includeOptionals: false});
-
-    const repository = getRepository(TrainStation);
-    let trainStation = await repository.findOne(id, {relations: ['station', 'train']});
-
-    if(typeof trainStation === 'undefined') {
-        return res._failNotFound();
-    }
-
-    if(!isRealmPermittedForResource(req.user, trainStation.station)) {
-        if(!isRealmPermittedForResource(req.user, trainStation.train)) {
-            return res._failForbidden({message: 'You are not allowed as train owner to manipulate the station approval process.'});
-        }
-
-        return res._failForbidden();
-    }
 
     trainStation = repository.merge(trainStation, data);
 
@@ -174,7 +193,7 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
 export async function dropTrainStationRouteHandler(req: any, res: any) {
     let { id } = req.params;
 
-    if(!req.ability.can('edit','train')) {
+    if(!req.ability.can('edit', 'train') && !req.ability.can('approve', 'train')) {
         return res._failForbidden();
     }
 

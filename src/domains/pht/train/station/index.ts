@@ -13,14 +13,17 @@ import {TrainStationStateOpen} from "./states";
 
 @Entity()
 export class TrainStation {
-    @PrimaryGeneratedColumn({unsigned: true})
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column({default: TrainStationStateOpen})
     status: string;
 
     @Column({type: "text", nullable: true})
     comment: string;
+
+    @Column({type: "int", unsigned: true, nullable: true})
+    position: number;
 
     @CreateDateColumn()
     created_at: string;
