@@ -67,14 +67,12 @@ export function applyRequestFilterOnQuery(query: SelectQueryBuilder<any>, rawReq
 
             run++;
 
-            console.log(allowedFields[key]);
-
             if (requestFilters[key].includes(',')) {
                 let ids = requestFilters[key].split(',');
                 qb[run === 1 ? 'where' : 'andWhere'](allowedFields[key] + " IN (:ids)", {ids});
             } else {
                 let parameters: Record<string, any> = {};
-                const paramKey = 'filter-' + allowedFields[key];
+                const paramKey = 'filter-' + allowedFields[key] + '-' + run;
                 if (requestFilters[key].charAt(0) === '~') {
                     requestFilters[key] = requestFilters[key].slice(1);
                     parameters[paramKey] = `${requestFilters[key]}%`;

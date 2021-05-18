@@ -1,8 +1,7 @@
 import {getRepository, In} from "typeorm";
-import {Station} from "../../../../domains/pht/station";
-import {queryFindPermittedResourcesForRealm} from "../../../../db/utils";
+import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
 import {check, matchedData, validationResult} from "express-validator";
-import {isPermittedToOperateOnRealmResource} from "../../../../modules/auth/utils";
+import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {Train} from "../../../../domains/pht/train";
 import {MasterImage} from "../../../../domains/pht/master-image";
 import {Proposal} from "../../../../domains/pht/proposal";
@@ -26,12 +25,13 @@ export async function getTrainRouteHandler(req: any, res: any) {
 
     const repository = getRepository(Train);
     const query = repository.createQueryBuilder('train')
-        .leftJoinAndSelect('train.stations','stations')
+        .leftJoinAndSelect('train.train_stations','trainStations')
+        .leftJoinAndSelect('trainStations.station', 'station')
         .where({
             id
         });
 
-    queryFindPermittedResourcesForRealm(query, req.user.realm_id);
+    onlyRealmPermittedQueryResources(query, req.user.realm_id);
 
     const entity = await query.getOne();
 
@@ -39,7 +39,7 @@ export async function getTrainRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isPermittedToOperateOnRealmResource(req.user, entity)) {
+    if(!isRealmPermittedForResource(req.user, entity)) {
         return res._failForbidden();
     }
 
@@ -52,10 +52,10 @@ export async function getTrainsRouteHandler(req: any, res: any) {
     const repository = getRepository(Train);
     const query = repository.createQueryBuilder('train');
 
-    queryFindPermittedResourcesForRealm(query, req.user.realm_id);
+    onlyRealmPermittedQueryResources(query, req.user.realm_id, 'train.realm_id');
 
     applyRequestIncludes(query, 'train', include, {
-        stations: 'stations',
+        trainStations: 'train_stations',
         result: 'result',
         user: 'user'
     });
@@ -86,7 +86,7 @@ export async function getTrainsRouteHandler(req: any, res: any) {
     });
 }
 
-async function runTrainValidations(req: any, editMode: boolean = false) {
+async function runTrainValidations(req: any) {
     await check('entrypoint_executable')
         .exists()
         .notEmpty()
@@ -122,17 +122,6 @@ async function runTrainValidations(req: any, editMode: boolean = false) {
         });
 
     await masterImagePromise.run(req);
-
-    const stationPromise = check('station_ids')
-        .isArray()
-        .custom((value: any[]) => {
-            return getRepository(Station).find({id: In(value)}).then((res) => {
-                if(!res || res.length !== value.length) throw new Error('Die angegebenen Krankenhäuser sind nicht gültig');
-            })
-        })
-        .optional();
-
-    await stationPromise.run(req);
 }
 
 export async function addTrainRouteHandler(req: any, res: any) {
@@ -178,14 +167,10 @@ export async function addTrainRouteHandler(req: any, res: any) {
 
     try {
         const repository = getRepository(Train);
-        const stationRepository = getRepository(Station);
 
         let entity = repository.create({
             realm_id: req.user.realm_id,
             user_id: req.user.id,
-            stations: station_ids.map((stationId: number) => {
-                return stationRepository.create({id: stationId});
-            }),
             ...data
         });
 
@@ -205,7 +190,7 @@ export async function editTrainRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    await runTrainValidations(req, true);
+    await runTrainValidations(req);
 
     await check('hash_signed')
         .exists()
@@ -231,16 +216,8 @@ export async function editTrainRouteHandler(req: any, res: any) {
         return res._failValidationError({message: 'Der Zug konnte nicht gefunden werden.'});
     }
 
-    if(!isPermittedToOperateOnRealmResource(req.user, train)) {
+    if(!isRealmPermittedForResource(req.user, train)) {
         return res._failForbidden();
-    }
-
-    if(typeof data.station_ids !== "undefined") {
-        const stationRepository = getRepository(Station);
-
-        data.stations = data.station_ids.map((stationId: number) => {
-            return stationRepository.create({id: stationId});
-        })
     }
 
     train = repository.merge(train, data);
@@ -290,7 +267,7 @@ export async function dropTrainRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isPermittedToOperateOnRealmResource(req.user, entity)) {
+    if(!isRealmPermittedForResource(req.user, entity)) {
         return res._failForbidden();
     }
 

@@ -2,22 +2,12 @@ import {compare, hash} from "bcrypt";
 
 //--------------------------------------------------------------------
 
-const hashPassword = async (password: string) => {
+export async function hashPassword(password: string) {
     return hash(password,10);
-};
+}
 
-const verifyPassword = async (password: string, hash: string) => {
+export async function verifyPassword(password: string, hash: string) {
     return compare(password, hash);
-};
+}
 
 //--------------------------------------------------------------------
-
-export {
-    hashPassword,
-    verifyPassword
-}
-
-export default {
-    hashPassword,
-    verifyPassword
-}

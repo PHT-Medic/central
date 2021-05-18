@@ -1,10 +1,8 @@
-import path from "path";
 import {getRepository} from "typeorm";
-import {isPermittedToOperateOnRealmResource} from "../../../../../modules/auth/utils";
-import {queryFindPermittedResourcesForRealm} from "../../../../../db/utils";
+import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
+import {onlyRealmPermittedQueryResources} from "../../../../../db/utils";
 import {TrainFile} from "../../../../../domains/pht/train/file";
 import fs from "fs";
-import {getWritableDirPath} from "../../../../../config/paths";
 import {TrainConfiguratorStateOpen} from "../../../../../domains/pht/train/states";
 import {getTrainFileFilePath} from "../../../../../domains/pht/train/file/path";
 import {Train} from "../../../../../domains/pht/train";
@@ -27,7 +25,7 @@ export async function getTrainFileRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isPermittedToOperateOnRealmResource(req.user, entity)) {
+    if(!isRealmPermittedForResource(req.user, entity)) {
         return res._failForbidden();
     }
 
@@ -42,7 +40,7 @@ export async function getTrainFilesRouteHandler(req: any, res: any) {
     const query = repository.createQueryBuilder('trainFile')
         .where("trainFile.train_id = :trainId", {trainId: id});
 
-    queryFindPermittedResourcesForRealm(query, req.user.realm_id);
+    onlyRealmPermittedQueryResources(query, req.user.realm_id);
 
     applyRequestFilterOnQuery(query, filter, {
         id: 'trainFile.id',
@@ -78,7 +76,7 @@ export async function dropTrainFileRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isPermittedToOperateOnRealmResource(req.user, entity)) {
+    if(!isRealmPermittedForResource(req.user, entity)) {
         return res._failForbidden();
     }
 

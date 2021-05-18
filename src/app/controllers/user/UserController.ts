@@ -4,8 +4,8 @@ import UserResponseSchema from "../../../domains/user/UserResponseSchema";
 import {hashPassword} from "../../../modules/auth/utils/password";
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../domains/user/repository";
-import {queryFindPermittedResourcesForRealm} from "../../../db/utils";
-import {isPermittedToOperateOnRealmResource} from "../../../modules/auth/utils";
+import {onlyRealmPermittedQueryResources} from "../../../db/utils";
+import {isRealmPermittedForResource} from "../../../modules/auth/utils";
 import {Realm} from "../../../domains/realm";
 import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
 import {Params, Controller, Get, Request, Response, Post, Body, Delete} from "@decorators/express";
@@ -151,7 +151,7 @@ export async function getUsersRouteHandler(req: any, res: any) {
         const queryBuilder = userRepository.createQueryBuilder('user')
             .leftJoinAndSelect('user.realm', 'realm');
 
-        queryFindPermittedResourcesForRealm(queryBuilder, req.user.realm_id);
+        onlyRealmPermittedQueryResources(queryBuilder, req.user.realm_id);
 
         applyRequestFilterOnQuery(queryBuilder, filter, {
             id: 'user.id',
@@ -180,7 +180,7 @@ export async function getUserRouteHandler(req: any, res: any) {
             .leftJoinAndSelect('user.realm', 'realm')
             .andWhere("user.id = :id", {id});
 
-        queryFindPermittedResourcesForRealm(query, req.user.realm_id);
+        onlyRealmPermittedQueryResources(query, req.user.realm_id);
 
         let result = await query.getOne();
 
@@ -311,20 +311,20 @@ export async function editUserRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isPermittedToOperateOnRealmResource(req.user, user)) {
+    if(!isRealmPermittedForResource(req.user, user)) {
         return res._failForbidden();
     }
 
     user = userRepository.merge(user, data);
 
     try {
-        let result = await userRepository.save(user);
+        const result = await userRepository.save(user);
 
-        result.realm = await getRepository(Realm).findOne(user.realm_id);
+        if(typeof result.realm_id !== 'undefined') {
+            result.realm = await getRepository(Realm).findOne(result.realm_id);
+        }
 
-        console.log(result);
-
-        return res._respondAccepted({
+        return res._respond({
             data: result
         });
     } catch (e) {
@@ -355,7 +355,7 @@ export async function dropUserRouteHandler(req: any, res: any) {
             return res._failNotFound();
         }
 
-        if(!isPermittedToOperateOnRealmResource(req.user, user)) {
+        if(!isRealmPermittedForResource(req.user, user)) {
             return res._failForbidden();
         }
 

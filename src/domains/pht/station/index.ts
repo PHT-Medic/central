@@ -3,15 +3,14 @@ import {
     Entity,
     Generated,
     JoinColumn,
-    ManyToMany,
-    ManyToOne,
     OneToMany,
     OneToOne,
     PrimaryGeneratedColumn, UpdateDateColumn
 } from "typeorm";
-import {Train} from "../train";
+
 import {ProposalStation} from "../proposal/station";
 import {Realm} from "../../realm";
+import {TrainStation} from "../train/station";
 
 @Entity()
 export class Station {
@@ -55,9 +54,9 @@ export class Station {
     @JoinColumn({name: 'realm_id'})
     realm: Realm;
 
-    @ManyToMany(() => Train, train => train.stations)
-    trains: Train[]
+    @OneToMany(() => TrainStation, trainStation => trainStation.station)
+    train_stations: Array<TrainStation>;
 
     @OneToMany(() => ProposalStation, proposalStation => proposalStation.station)
-    proposalStations: ProposalStation[]
+    proposal_stations: Array<ProposalStation>;
 }

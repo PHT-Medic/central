@@ -3,7 +3,7 @@ import cors from "cors";
 
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import {getPublicDirPath, getRootDirPath, getWritableDirPath} from "../../config/paths";
+import {getPublicDirPath, getWritableDirPath} from "../../config/paths";
 import path from "path";
 import swaggerUi from 'swagger-ui-express';
 import env from "../../env";
@@ -20,6 +20,7 @@ import {UserKeyController} from "../../app/controllers/user/key/UserKeyControlle
 import {PermissionController} from "../../app/controllers/permission/PermissionController";
 import {ProviderController} from "../../app/controllers/auth/ProviderController";
 import {RealmController} from "../../app/controllers/auth/realm/RealmController";
+
 
 export interface ExpressAppInterface extends Express{
 
@@ -69,10 +70,6 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
 
     expressApp.use(responseMiddleware);
     expressApp.use(checkAuthenticated);
-
-    //const controllerDir = path.join(getRootDirPath(), 'src', 'app', 'controllers');
-
-    //Server.loadServices(expressApp, ['**/*.ts'], controllerDir);
 
     attachControllers(expressApp, [
         // Auth Controllers

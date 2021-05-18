@@ -3,7 +3,7 @@ import {
     CreateDateColumn,
     Entity,
     JoinColumn,
-    ManyToOne, OneToMany, OneToOne,
+    ManyToOne, OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
@@ -61,5 +61,5 @@ export class Proposal {
     master_image: MasterImage;
 
     @OneToMany(() => ProposalStation, proposalStation => proposalStation.proposal)
-    proposalStations: ProposalStation[]
+    proposal_stations: Array<ProposalStation>;
 }

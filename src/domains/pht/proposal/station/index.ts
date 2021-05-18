@@ -31,14 +31,14 @@ export class ProposalStation {
     @Column()
     proposal_id: number;
 
-    @ManyToOne(() => Proposal, proposal => proposal.proposalStations, {onDelete: "CASCADE"})
+    @ManyToOne(() => Proposal, proposal => proposal.proposal_stations, {onDelete: "CASCADE"})
     @JoinColumn({name: 'proposal_id'})
     proposal: Proposal;
 
     @Column()
     station_id: number;
 
-    @ManyToOne(() => Station, station => station.proposalStations, {onDelete: "CASCADE"})
+    @ManyToOne(() => Station, station => station.proposal_stations, {onDelete: "CASCADE"})
     @JoinColumn({name: 'station_id'})
     station: Station;
 }

@@ -21,7 +21,8 @@ export function parsePermissionNameToAbilityRepresentation(name: string) : Abili
     }
 }
 
-export function isPermittedToOperateOnRealmResource(sessionUser: User | undefined, resource: {[key: string] : any}) {
+
+export function isRealmPermittedForResource(sessionUser: User | undefined, resource: {[key: string] : any}) {
     if(typeof sessionUser === 'undefined') {
         return false;
     }

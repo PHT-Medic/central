@@ -2,8 +2,6 @@ import {
     Column, CreateDateColumn,
     Entity,
     JoinColumn,
-    JoinTable,
-    ManyToMany,
     ManyToOne,
     OneToMany,
     OneToOne,
@@ -11,12 +9,12 @@ import {
 } from "typeorm";
 import {Proposal} from "../proposal";
 import {MasterImage} from "../master-image";
-import {Station} from "../station";
 import {TrainResult} from "./result";
 import {TrainFile} from "./file";
 import {User} from "../../user";
 import {Realm} from "../../realm";
 import {TrainConfiguratorStateOpen} from "./states";
+import {TrainStation} from "./station";
 
 @Entity()
 export class Train {
@@ -81,9 +79,8 @@ export class Train {
     @JoinColumn({name: 'proposal_id'})
     proposal: Proposal;
 
-    @ManyToMany(() => Station, station => station.trains)
-    @JoinTable()
-    stations: Station[]
+    @OneToMany(() => TrainStation, trainStation => trainStation.train)
+    train_stations: Array<TrainStation>;
 
     @Column({nullable: true})
     master_image_id: number;
