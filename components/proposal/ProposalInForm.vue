@@ -2,28 +2,8 @@
 import {maxLength, minLength, required, email} from "vuelidate/lib/validators";
 
 import AlertMessage from "@/components/alert/AlertMessage";
-import {
-    ProposalStationStateApproved,
-    ProposalStationStateOpen,
-    ProposalStationStateRejected
-} from "@/domains/proposal/station";
-import {editApiStationProposal} from "@/domains/station/proposal/api.ts";
-
-const states = [
-    {
-        id: ProposalStationStateOpen,
-        name: 'Offen'
-    },
-    {
-        id: ProposalStationStateApproved,
-        name: 'Annehmen'
-    },
-    {
-        id: ProposalStationStateRejected,
-        name: 'Ablehnen'
-    }
-];
-
+import {ProposalStationStatusOptions} from "@/domains/proposal/station";
+import {editApiProposalStation} from "@/domains/proposal/station/api";
 
 export default {
     components: {AlertMessage},
@@ -40,9 +20,11 @@ export default {
                 status: ''
             },
 
-            status: {
-                items: states
-            },
+            statusOptions: [
+                ProposalStationStatusOptions.ProposalStationStatusOpen,
+                ProposalStationStatusOptions.ProposalStationStatusApproved,
+                ProposalStationStatusOptions.ProposalStationStatusRejected
+            ],
 
             busy: false,
             message: null
@@ -51,7 +33,6 @@ export default {
     validations: {
         formData: {
             comment: {
-                required,
                 minLength: minLength(5),
                 maxLength: maxLength(2048)
             },
@@ -65,6 +46,9 @@ export default {
         this.formData.comment = this.proposalStationProperty.comment ?? '';
     },
     methods: {
+        initProposalStationOptions() {
+
+        },
         async handleSubmit () {
             if (this.busy || this.$v.$invalid) {
                 return;
@@ -75,11 +59,11 @@ export default {
 
             try {
                 if(this.isEditing) {
-                    const stationProposal = await editApiStationProposal(this.proposalStationProperty.proposal.id, this.proposalStationProperty.id, this.formData);
+                    const stationProposal = await editApiProposalStation(this.proposalStationProperty.proposal.id, this.formData);
 
                     this.message = {
                         isError: false,
-                        data: 'Der Antrag wurde erfolgreich editiert.'
+                        data: 'The proposal was successfully updated.'
                     }
 
                     this.$emit('updated', stationProposal);
@@ -105,26 +89,29 @@ export default {
     <div>
         <alert-message :message="message" />
 
+        <div class="alert alert-info alert-sm">
+            You have to approve the proposal, so the proposal owner can target you as a station for the train route.
+        </div>
+
         <div>
             <div class="form-group" :class="{ 'form-group-error': $v.formData.comment.$error }">
-                <label>Kommentar</label>
+                <label>Comment</label>
                 <textarea
                     rows="10"
                     v-model="$v.formData.comment.$model"
                     type="text" name="name"
                     class="form-control"
-                    placeholder="Schreiben Sie ein Kommentar, warum Sie den Antrag annehmen oder ablehnen..."
-                >
-                </textarea>
+                    placeholder="Write a comment why you want to approve or either reject the proposal."
+                />
 
                 <div v-if="!$v.formData.comment.required && !$v.formData.comment.$model" class="form-group-hint group-required">
-                    Bitte geben Sie einen Kommentar an.
+                    Please write a comment.
                 </div>
                 <div v-if="!$v.formData.comment.minLength" class="form-group-hint group-required">
-                    Der Kommentar muss mindestens <strong>{{ $v.formData.comment.$params.minLength.min }}</strong> Zeichen lang sein.
+                    The length of the comment must be greater than <strong>{{ $v.formData.comment.$params.minLength.min }}</strong> characters.
                 </div>
                 <div v-if="!$v.formData.comment.maxLength" class="form-group-hint group-required">
-                    Der Kommentar darf maximal <strong>{{ $v.formData.comment.$params.maxLength.max }}</strong> Zeichen lang sein.
+                    The length of the comment must be less than <strong>{{ $v.formData.comment.$params.maxLength.max }}</strong> characters.
                 </div>
             </div>
 
@@ -134,12 +121,12 @@ export default {
                     v-model="$v.formData.status.$model"
                     class="form-control"
                 >
-                    <option value="">--- Bitte auswählen ---</option>
-                    <option v-for="(item,key) in status.items" :value="item.id" :key="key">{{ item.name }}</option>
+                    <option value="">--- Please select ---</option>
+                    <option v-for="(item,key) in statusOptions" :value="item" :key="key">{{ item }}</option>
                 </select>
 
                 <div v-if="!$v.formData.status.required && !$v.formData.status.$model" class="form-group-hint group-required">
-                    Bitte geben Sie einen Status an.
+                    Provide a status.
                 </div>
             </div>
 

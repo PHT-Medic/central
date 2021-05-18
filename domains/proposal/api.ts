@@ -11,9 +11,9 @@ export async function addProposal(data: Record<string, any>) {
     }
 }
 
-export async function getProposal(id: number) {
+export async function getProposal(id: number, requestRecord?: RequestRecord) {
     try {
-        const response = await useApi('auth').get('pht/proposals/' + id);
+        const response = await useApi('auth').get('pht/proposals/' + id + formatRequestRecord(requestRecord));
 
         return changeResponseKeyCase(response.data);
     } catch (e) {

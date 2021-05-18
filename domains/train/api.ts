@@ -18,7 +18,7 @@ export async function dropTrain(id: string) {
     return response;
 }
 
-export async function editApiTrain(id: number, data: Record<string, any>) {
+export async function editTrain(id: number, data: Record<string, any>) {
     const {data: response} = await useApi('auth').post('pht/trains/'+id , data);
 
     return response;

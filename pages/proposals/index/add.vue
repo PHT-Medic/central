@@ -78,8 +78,8 @@
         },
         created () {
             this.stationsLoading = true;
-            getStations().then((result) => {
-                this.stations = result;
+            getStations().then((response) => {
+                this.stations = response.data;
                 this.stationsLoading = false
             });
 

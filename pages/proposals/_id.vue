@@ -1,21 +1,50 @@
 <script>
-    import { LayoutNavigationDefaultId } from "../../config/layout";
+    import { LayoutNavigationDefaultId } from "@/config/layout";
     import {getProposal} from "@/domains/proposal/api.ts";
-    import {getApiProposalStations} from "@/domains/proposal/station/api.ts";
+    import {getApiProposalStation, getApiProposalStations} from "@/domains/proposal/station/api.ts";
     import ProposalSvg from "@/components/svg/ProposalSvg";
+    import {getApiRealmStation} from "@/domains/realm/station/api";
+    import ProposalStationAction from "@/components/proposal/ProposalStationAction";
 
     export default {
-        components: {ProposalSvg},
+        components: {ProposalStationAction, ProposalSvg},
         meta: {
             requireLoggedIn: true,
             navigationId: LayoutNavigationDefaultId
         },
         async asyncData (context) {
             try {
-                const proposal = await getProposal(context.params.id);
+                const proposal = await getProposal(context.params.id, {
+                    include: ['masterImage', 'user']
+                });
+
+                const {realmId} = context.store.getters['auth/user'];
+
+                let visitorStation = null;
+                let visitorProposalStation = null;
+
+                if(proposal.realmId !== realmId) {
+                    try {
+                        visitorStation = await getApiRealmStation(realmId);
+                        const response = await getApiProposalStations({
+                            filter: {
+                                proposalId: proposal.id,
+                                stationId: visitorStation.id
+                            }
+                        });
+
+                        if(response.meta.total > 0 ) {
+                            visitorProposalStation = response.data[0];
+                        }
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
 
                 return {
-                    proposal
+                    proposal,
+                    visitorStation,
+                    visitorProposalStation
                 };
             } catch (e) {
                 await context.redirect('/proposals');
@@ -25,33 +54,61 @@
             return {
                 proposal: null,
 
+                visitorStation: null,
+                visitorProposalStation: null,
+
                 proposalStations: [],
                 proposalStationsLoading: false,
 
                 sidebar: {
-                    items: [
-                        { name: 'General', routeName: 'proposals-id', icon: 'fas fa-bars', urlSuffix: '' },
-                        { name: 'Trains', routeName: 'proposal-trains', icon: 'fas fa-train', urlSuffix: '/trains' }
-
-                    ]
+                    items: []
                 }
             }
         },
         created() {
-            this.getProposalStations();
+            this.fillSidebar();
+            console.log(this.$route);
+        },
+        computed: {
+            isProposalOwner() {
+                return this.$store.getters['auth/user'].realmId === this.proposal.realmId;
+            },
+            isStationAuthority() {
+                return !!this.visitorStation;
+            },
+            backLink() {
+                if(typeof this.$route.query.refPath === 'string') {
+                    return this.$route.query.refPath;
+                }
+
+                return '/proposals';
+            }
         },
         methods: {
-            async getProposalStations() {
-                if(this.proposalStationsLoading) return;
+            fillSidebar() {
+                const items = [
+                    { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
 
-                this.proposalStationsLoading = true;
+                ];
 
-                this.proposalStations = await getApiProposalStations(this.proposal.id, 'self');
+                if(this.isProposalOwner || this.isStationAuthority) {
+                    items.push({ name: 'Trains', icon: 'fas fa-train', urlSuffix: '/trains' });
+                }
 
-                this.proposalStationsLoading = false;
+                if(this.isProposalOwner) {
+                    items.push({ name: 'Settings', icon: 'fa fa-cog', urlSuffix: '/settings' });
+                }
+
+                this.sidebar.items = items;
             },
-            setProposal (data) {
+
+            handleUpdated (data) {
                 Object.assign(this.proposal, data);
+            },
+            handleProposalStationUpdated(item) {
+                if(typeof this.visitorProposalStation !== 'undefined' && this.visitorProposalStation.id === item.id) {
+                    this.visitorProposalStation.status = item.status;
+                }
             }
         }
     }
@@ -63,11 +120,11 @@
         <div class="m-b-20 m-t-10">
             <div class="panel-card">
                 <div class="panel-card-body">
-                    <div class="flex-wrap flex-row d-flex">
+                    <div class="flex-wrap flex-row d-flex align-items-center">
                         <div>
                             <b-nav pills>
                                 <b-nav-item
-                                    :to="'/proposals'"
+                                    :to="backLink"
                                     exact
                                     exact-active-class="active"
                                 >
@@ -89,11 +146,16 @@
                             </b-nav>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
 
-        <nuxt-child :proposal="proposal" :proposal-stations="proposalStations" @updated="setProposal" />
+        <nuxt-child
+            :proposal="proposal"
+            :visitor-station="visitorStation"
+            @updated="handleUpdated"
+            @proposalStationUpdated="handleProposalStationUpdated"
+            :visitor-proposal-station="visitorProposalStation"
+        />
     </div>
 </template>

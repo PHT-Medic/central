@@ -17,7 +17,7 @@ export default {
 
             this.busy = true;
 
-            let title = 'Vault';
+            let title = 'Harbor';
             let message = 'Succeeded...';
             let variant = 'success';
 

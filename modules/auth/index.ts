@@ -10,6 +10,7 @@ import {AuthSchemeOauth2OptionsInterface} from "~/modules/auth/types";
 import {Context} from "@nuxt/types";
 import {useAuthScheme} from "~/modules/auth/schemes";
 import {AbilityRepresentation, parsePermissionNameToAbilityRepresentation} from "~/modules/auth/utils";
+import store from "~/plugins/store";
 
 
 // --------------------------------------------------------------------
@@ -55,9 +56,15 @@ class AuthModule {
 
         this.subscribeStore();
         this.initStore();
+        this.initFromStore();
     }
 
     // --------------------------------------------------------------------
+
+    private initFromStore() {
+        const permissions = this.ctx.store.getters['auth/permissions'];
+        this.setPermissions(permissions);
+    }
 
     private initStore() {
         if(typeof this.ctx === 'undefined' || typeof this.ctx.store === 'undefined') return;
@@ -135,35 +142,33 @@ class AuthModule {
             return this.mePromise;
         }
 
-        if(typeof this.me !== 'undefined') {
-            return new Promise(((resolve) => resolve(this.me)));
-        }
-
         const token : AuthAbstractTokenResponse | undefined = this.ctx.store.getters['auth/token'];
         if(!token) return new Promise(((resolve) => resolve(undefined)));
 
+        const resolved = this.ctx.store.getters['auth/permissionsResolved'];
+        if(typeof resolved !== 'undefined' && resolved) {
+            const userInfo : AuthAbstractUserInfoResponse = {
+                permissions: this.ctx.store.getters['auth/permissions'],
+                ...this.ctx.store.getters['auth/user']
+            };
+
+            return new Promise(((resolve) => resolve(userInfo)));
+        }
+
         this.mePromise = this.getUserInfo(token.accessToken)
-            .then((userInfoResponse: AuthAbstractUserInfoResponse) => {
-                this.me = userInfoResponse;
-
-                this.handleUserInfoResponse(userInfoResponse);
-
-                return userInfoResponse;
-            })
-            .catch((e) => {console.log(e); throw e});
+            .then(this.handleUserInfoResponse.bind(this));
 
         return this.mePromise;
     };
 
-    private handleUserInfoResponse(userInfo: AuthAbstractUserInfoResponse) {
-        if(typeof this.ctx === 'undefined') {
-            return;
-        }
-
+    private async handleUserInfoResponse(userInfo: AuthAbstractUserInfoResponse) : Promise<AuthAbstractUserInfoResponse> {
         const {permissions, ...user} = userInfo;
 
-        this.ctx.store.dispatch('auth/triggerSetUser', user).then(r => r);
-        this.ctx.store.dispatch('auth/triggerSetPermissions', permissions).then(r => r);
+        await this.ctx.store.commit('auth/setPermissionsResolved', true);
+        await this.ctx.store.dispatch('auth/triggerSetUser', user);
+        await this.ctx.store.dispatch('auth/triggerSetPermissions', permissions);
+
+        return user;
     }
 
     // --------------------------------------------------------------------
@@ -186,9 +191,9 @@ class AuthModule {
 
             const ability : AbilityRepresentation = parsePermissionNameToAbilityRepresentation(name);
 
-            if(typeof scopes !== 'undefined' && scopes !== null) {
+            if(!!scopes) {
                 for (let j = 0; j < scopes.length; j++) {
-                    let {power, fields, condition}: {
+                    let {fields, condition}: {
                         power?: number | null,
                         fields?: string[] | null,
                         condition?: any

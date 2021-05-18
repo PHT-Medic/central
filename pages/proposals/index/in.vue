@@ -1,12 +1,14 @@
 <script>
-import {editApiStationProposal, getApiStationProposals} from "@/domains/station/proposal/api.ts";
-import {getStations} from "@/domains/station/api.ts";
 import ProposalInForm from "@/components/proposal/ProposalInForm";
 import ProposalStationStatus from "@/components/proposal/ProposalStationStatus";
 import Pagination from "@/components/Pagination";
+import {ProposalStationStatusOptions} from "@/domains/proposal/station";
+import {getApiRealmStation} from "@/domains/realm/station/api";
+import ProposalStationAction from "@/components/proposal/ProposalStationAction";
+import {dropApiProposalStation, getApiProposalStations} from "@/domains/proposal/station/api";
 
 export default {
-    components: {Pagination, ProposalStationStatus, ProposalInForm},
+    components: {ProposalStationAction, Pagination, ProposalStationStatus, ProposalInForm},
     meta: {
         requireLoggedIn: true,
         requireAbility(can) {
@@ -17,13 +19,12 @@ export default {
         return {
             item: undefined,
             itemBusy: false,
-            isBusy: false,
+            busy: false,
             fields: [
-                { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'proposal_id', label: 'Id', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'proposal_title', label: 'Title', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'status', label: 'Status', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'proposal_id', label: 'Antrag Id', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'proposal_title', label: 'Antrag Titel', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'created_at', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'updated_at', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'options', label: '', tdClass: 'text-left' }
@@ -33,7 +34,9 @@ export default {
                 limit: 10,
                 offset: 0,
                 total: 0
-            }
+            },
+
+            statusOptions: ProposalStationStatusOptions
         }
     },
     created() {
@@ -58,35 +61,33 @@ export default {
             Object.assign(this.items[index], e);
         },
         async load() {
-            this.isBusy = true;
+            this.busy = true;
 
             try {
-                const stations = await getStations({
+                const station = await getApiRealmStation(this.user.realmId);
+
+                let record = {
+                    page: {
+                        limit: this.meta.limit,
+                        offset: this.meta.offset
+                    },
                     filter: {
-                        realmId: this.user.realmId
+                        stationId: station.id
                     }
-                });
+                };
 
-                if(stations.length === 1) {
-                    let record = {
-                        page: {
-                            limit: this.meta.limit,
-                            offset: this.meta.offset
-                        }
-                    };
+                const response = await getApiProposalStations(record);
 
-                    const response = await getApiStationProposals(stations[0].id, 'self', record);
+                this.items = response.data;
+                const {total} = response.meta;
 
-                    this.items = response.data;
-                    const {total} = response.meta;
+                this.meta.total = total;
 
-                    this.meta.total = total;
-                }
             } catch (e) {
 
             }
 
-            this.isBusy = false;
+            this.busy = false;
         },
         goTo(options, resolve, reject) {
             if(options.offset === this.meta.offset) return;
@@ -103,7 +104,7 @@ export default {
             this.itemBusy = true;
 
             try {
-                item = await editApiStationProposal(item.proposal.id, item.id, data);
+                item = await dropApiProposalStation(item.id, data);
 
                 this.handleUpdated(item);
             } catch (e) {
@@ -129,17 +130,17 @@ export default {
 <template>
     <div>
         <div class="alert alert-primary alert-sm">
-            Dies ist eine Übersicht aller Anträge von allen Stationen, die gerne einen Zug über Ihrere Station laufen lassen möchten...
+            This is an overview of all proposals from other stations, that want to run one or many trains for different proposes over your station.
         </div>
         <div class="d-flex flex-row">
             <div>
                 <button @click.prevent="load" type="button" class="btn btn-xs btn-dark">
-                    <i class="fas fa-sync"></i> Aktualisieren
+                    <i class="fas fa-sync"></i> Refresh
                 </button>
             </div>
         </div>
         <div class="m-t-10">
-            <b-table :items="items" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
+            <b-table :items="items" :fields="fields" :busy="busy" head-variant="'dark'" outlined>
                 <template v-slot:cell(realm)="data">
                     <span class="badge-dark badge">{{data.item.proposal.realmId}}</span>
                 </template>
@@ -149,7 +150,7 @@ export default {
                         :status="data.item.status"
                         v-slot:default="slotProps"
                     >
-                        <span class="badge" :class="slotProps.badgeClass">
+                        <span class="badge" :class="'badge-'+slotProps.classSuffix">
                             {{slotProps.statusText}}
                         </span>
                     </proposal-station-status>
@@ -162,29 +163,34 @@ export default {
                     {{data.item.proposal.title}}
                 </template>
                 <template v-slot:cell(options)="data">
-                    <button
-                        v-if="$auth.can('approve','proposal') && (data.item.status === 'open' || data.item.status === 'rejected')"
-                        @click.prevent="approve(data.item)"
-                        class="btn btn-xs btn-primary"
-                    >
-                        <i class="fa fa-check"></i>
-                    </button>
-                    <button
-                        v-if="$auth.can('approve','proposal')"
-                        @click.prevent="edit(data.item)"
-                        type="button"
-                        class="btn btn-xs btn-secondary"
-                    >
-                        <i class="fa fa-comment"></i>
-                    </button>
-                    <button
-                        v-if="$auth.can('approve','proposal')  && (data.item.status === 'open' || data.item.status === 'approved')"
-                        @click.prevent="reject(data.item)"
-                        type="button"
-                        class="btn btn-xs btn-danger"
-                    >
-                        <i class="fa fa-times"></i>
-                    </button>
+                    <nuxt-link class="btn btn-primary btn-xs" :to="'/proposals/'+data.item.proposalId+'?refPath=/proposals/in'">
+                        <i class="fa fa-arrow-right"></i>
+                    </nuxt-link>
+                    <template v-if="$auth.can('approve', 'proposal')">
+                        <b-dropdown class="dropdown-xs" :no-caret="true">
+                            <template #button-content>
+                                <i class="fa fa-bars"></i>
+                            </template>
+                            <b-dropdown-item @click.prevent="edit(data.item)"><i class="fa fa-comment-alt pl-1 pr-1"></i> comment</b-dropdown-item>
+                            <b-dropdown-divider />
+                            <proposal-station-action
+                                :proposal-station-id="data.item.id"
+                                :status="data.item.status"
+                                :with-icon="true"
+                                action-type="dropDownItem"
+                                action="approve"
+                                @done="handleUpdated"
+                            />
+                            <proposal-station-action
+                                :proposal-station-id="data.item.id"
+                                :status="data.item.status"
+                                :with-icon="true"
+                                action-type="dropDownItem"
+                                action="reject"
+                                @done="handleUpdated"
+                            />
+                        </b-dropdown>
+                    </template>
                 </template>
                 <template v-slot:cell(created_at)="data">
                     <timeago :datetime="data.item.createdAt" />
@@ -199,8 +205,8 @@ export default {
                     </div>
                 </template>
             </b-table>
-            <div class="alert alert-warning alert-sm" v-if="!isBusy && items.length === 0">
-                Es sind keine Anträge vorhanden...
+            <div class="alert alert-warning alert-sm" v-if="!busy && items.length === 0">
+                There are no proposals available.
             </div>
         </div>
 
@@ -210,7 +216,7 @@ export default {
             size="lg"
             ref="form"
             button-size="sm"
-            :title-html="'<i class=\'fas fa-file-import\'></i> Antrag' + (item ? ': '+item.proposal.title : '')"
+            :title-html="'<i class=\'fas fa-file-import\'></i> Proposal' + (item ? ': '+item.proposal.title : '')"
             :no-close-on-backdrop="true"
             :no-close-on-esc="true"
             :hide-footer="true"

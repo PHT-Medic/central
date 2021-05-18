@@ -66,3 +66,33 @@ Content
         width: 100% !important;
     }
 }
+
+.c-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.c-list .c-list-item {
+    background-color: #ececec;
+    border: 1px solid #dedede;
+
+    /* box-shadow: 0 4px 25px 0 rgba(0,0,0,.1); */
+    transition: all .3s ease-in-out;
+
+    border-radius: 4px;
+
+    padding: 0rem 0.25rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.c-list .c-list-content,
+.c-list .c-list-footer {
+    display: flex;
+    flex-direction: row;
+}
+
+.c-list .c-list-icon {
+    font-size: 1.5rem;
+    padding-right: 0.5rem;
+}

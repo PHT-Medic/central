@@ -1,13 +1,9 @@
-export const ProposalStationStateOpen : string = 'open';
-export const ProposalStationStateApproved : string = 'approved';
-export const ProposalStationStateRejected : string = 'rejected';
+export const ProposalStationStatusOpen : string = 'open';
+export const ProposalStationStatusApproved : string = 'approved';
+export const ProposalStationStatusRejected : string = 'rejected';
 
-const ProposalStationStates = {
-    ProposalStationStateOpen,
-    ProposalStationStateApproved,
-    ProposalStationStateRejected
-}
-
-export {
-    ProposalStationStates
+export const ProposalStationStatusOptions = {
+    ProposalStationStatusOpen,
+    ProposalStationStatusApproved,
+    ProposalStationStatusRejected
 }

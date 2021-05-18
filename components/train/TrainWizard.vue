@@ -1,7 +1,7 @@
 <script>
 import TrainWizardConfiguratorStep from "@/components/train/wizard/TrainWizardConfiguratorStep";
 import TrainFileManager from "@/components/train/file/TrainFileManager";
-import {editApiTrain, runTrainTask} from "@/domains/train/api.ts";
+import {editTrain, runTrainTask} from "@/domains/train/api.ts";
 import TrainWizardHashStep from "@/components/train/wizard/TrainWizardHashStep";
 import TrainWizardFinalStep from "@/components/train/wizard/TrainWizardFinalStep";
 import {TrainConfiguratorStates, TrainStates} from "@/domains/train/index.ts";
@@ -38,7 +38,6 @@ export default {
                 query: null,
                 masterImageId: null,
                 stationIds: [],
-                stations: [],
 
                 entrypointFileId: null,
                 entrypointExecutable: '',
@@ -46,6 +45,9 @@ export default {
 
                 hashSigned: '',
                 hash: null
+            },
+            trainStation: {
+                items: []
             },
             busy: false
         }
@@ -72,8 +74,8 @@ export default {
                 this.form[key] = this.trainProperty[key];
             }
 
-            if(typeof this.trainProperty.stations !== 'undefined') {
-                this.form.stationIds = this.trainProperty.stations.map(station => station.id);
+            if(typeof this.trainProperty.trainStations !== 'undefined') {
+                this.trainStation.items = this.trainProperty.trainStations;
             }
         },
         async updateTrain(data) {
@@ -84,7 +86,7 @@ export default {
             if(keys.length === 0) return;
 
             try {
-                const train = await editApiTrain(this.trainProperty.id, data);
+                const train = await editTrain(this.trainProperty.id, data);
 
                 const updateData = {
                     status: train.status,
@@ -150,7 +152,7 @@ export default {
         passWizardStep() {
             return new Promise((resolve, reject) => {
                 const step = this.wizard.steps[this.wizard.index];
-                let promise = undefined;
+                let promise;
 
                 switch (step) {
                     case 'configuration':
@@ -185,13 +187,12 @@ export default {
                 throw new Error('A master image must be selected...');
             }
 
-            if(this.form.stationIds.length === 0) {
+            if(this.trainStation.items.length === 0) {
                 throw new Error('Train Stations have to be specified...');
             }
 
             await this.updateTrain({
                 masterImageId: this.form.masterImageId,
-                stationIds: this.form.stationIds,
                 query: this.form.query
             });
 
@@ -247,8 +248,8 @@ export default {
         setQuery(query) {
             this.form.query = query;
         },
-        setStationIds(stations) {
-            this.form.stationIds = stations;
+        setStations(stations) {
+            this.trainStation.items = stations;
         },
         setEntrypointFileId(id) {
             this.form.entrypointFileId = id;
@@ -361,8 +362,9 @@ export default {
                 <tab-content title="Configuration" :before-change="passWizardStep">
                     <train-wizard-configurator-step
                         :train="form"
+                        :train-stations="trainStation.items"
                         @setTrainMasterImage="setMasterImage"
-                        @setTrainStations="setStationIds"
+                        @setTrainStations="setStations"
                         @setTrainQuery="setQuery"
                     />
                 </tab-content>

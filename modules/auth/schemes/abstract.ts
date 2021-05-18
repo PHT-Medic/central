@@ -48,9 +48,6 @@ abstract class AbstractAuthScheme implements AuthSchemeInterface {
                 requestConfig.baseURL = process.env.INTERNAL_API_URL;
             }
 
-            useApi(this.options.endpoints.api)
-                .setAuthorizationBearerHeader(token);
-
             let response = await useApi(this.options.endpoints.api)
                 .get(this.options.endpoints.userInfo, requestConfig);
 

@@ -4,7 +4,7 @@ import {getApiTrainFiles, dropApiTrainFile, uploadTrainFiles} from "@/domains/tr
 import TrainFile from "@/components/train/file/TrainFile";
 import TrainFolder from "@/components/train/file/TrainFolder";
 import TrainFormFile from "@/components/train/file/TrainFormFile";
-import {editApiTrain} from "@/domains/train/api.ts";
+import {editTrain} from "@/domains/train/api.ts";
 
 export default {
     components: {TrainFormFile, TrainFolder, TrainFile},

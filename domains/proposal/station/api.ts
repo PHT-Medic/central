@@ -1,56 +1,34 @@
 import {useApi} from "~/modules/api";
-import {buildUrlRelationsSuffix} from "~/modules/api/utils";
+import {formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 
-export async function getApiProposalStations(proposalId: number, type: 'self' | 'related') {
-    let url = buildUrlRelationsSuffix('proposals', proposalId, 'stations', type);
+export async function getApiProposalStations(data?: RequestRecord) {
+    const response = await useApi('auth').get('pht/proposal-stations'+formatRequestRecord(data));
 
-    try {
-        const response = await useApi('auth').get('pht/'+url);
-
-        return response.data;
-    } catch (e) {
-        throw new Error('Die Stationen konnten nicht geladen werden.');
-    }
+    return response.data;
 }
 
-export async function getApiProposalStation(proposalId: number, stationId: number, type: 'self' | 'related') {
-    let url = buildUrlRelationsSuffix('proposals', proposalId, 'stations', type);
+export async function getApiProposalStation(id: number | string) {
+    const response = await useApi('auth').get('pht/proposal-stations/'+id);
 
-    url += '/'+stationId;
-
-    try {
-        const response = await useApi('auth').get('pht/'+url);
-
-        return response.data;
-    } catch (e) {
-        throw new Error('Die Station für den Antrag existiert nicht.');
-    }
+    return response.data;
 }
 
 //----------------------------------------------------
 
-export async function addApiProposalStation(proposalId: number, data: Record<string, any>, type: 'self' | 'related') {
-    let url = buildUrlRelationsSuffix('proposals', proposalId, 'stations', type);
+export async function addApiProposalStation(data: Record<string, any>) {
+    const response = await useApi('auth').post('pht/proposal-stations', data);
 
-    try {
-        const response = await useApi('auth').post('pht/'+url, data);
-
-        return response.data;
-    } catch (e) {
-        throw new Error(e.response.data.error.message);
-    }
+    return response.data;
 }
 
-export async function dropApiProposalStation(proposalId: number, relationId: number, type: 'self' | 'related') {
-    let url = buildUrlRelationsSuffix('proposals', proposalId, 'stations', type);
+export async function editApiProposalStation(id: number | string, data: Record<string, any>) {
+    const response = await useApi('auth').post('pht/proposal-stations/'+id, data);
 
-    url += '/'+relationId;
+    return response.data;
+}
 
-    try {
-        const response = await useApi('auth').delete('pht/'+url);
+export async function dropApiProposalStation(id: number | string) {
+    const response = await useApi('auth').delete('pht/proposal-stations/'+id);
 
-        return response.data;
-    } catch (e) {
-        throw new Error(e.response.data.error.message);
-    }
+    return response.data;
 }

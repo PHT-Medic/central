@@ -21,7 +21,7 @@
                 </b-nav>
             </div>
             <div class="content-container">
-                <nuxt-child :proposal="proposal" />
+                <nuxt-child :proposal="proposal" :visitor-station="visitorStation" />
             </div>
         </div>
     </div>
@@ -31,18 +31,39 @@ import ProposalSvg from "@/components/svg/ProposalSvg";
 export default {
     components: {ProposalSvg},
     props: {
-        proposal: Object
+        proposal: Object,
+        visitorStation: {
+            type: Object,
+            default: undefined
+        }
     },
     data () {
         return {
             sidebar: {
-                items: [
-                    { name: 'Overview', routeName: 'settings-id', icon: 'fas fa-bars', urlSuffix: '' },
-                    { name: 'Add', routeName: 'settings-id-security', icon: 'fa fa-plus', urlSuffix: '/add' }
-                    //{ name: 'Benachrichtigungen', routeName: 'settings-id-notifications', icon: 'fa fa-bell', urlSuffix: 'notifications'}
-                ]
+                items: []
             }
         }
     },
+    created() {
+        this.fillSidebar();
+    },
+    computed: {
+        isOwner() {
+            return this.proposal.realmId === this.$store.getters['auth/userRealmId'];
+        }
+    },
+    methods: {
+        fillSidebar() {
+            let items = [
+                { name: 'Overview', routeName: 'settings-id', icon: 'fas fa-bars', urlSuffix: '' },
+            ];
+
+            if(this.isOwner) {
+                items.push({ name: 'Add', routeName: 'settings-id-security', icon: 'fa fa-plus', urlSuffix: '/add' });
+            }
+
+            this.sidebar.items = items;
+        }
+    }
 }
 </script>

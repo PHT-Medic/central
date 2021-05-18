@@ -16,7 +16,9 @@ export const AuthStoreKey = {
 export interface AuthState {
     provider: string | undefined,
     user: Record<string, any> | undefined,
+
     permissions: Record<string, any>[],
+    permissionsResolved: boolean,
 
     token: AuthAbstractTokenResponse | undefined,
     tokenPromise: Promise<any> | undefined,
@@ -28,7 +30,9 @@ export interface AuthState {
 const state = () : AuthState => ({
         provider: undefined,
         user: undefined,
+
         permissions: [],
+        permissionsResolved: false,
 
         token: undefined,
         tokenPromise: undefined,
@@ -45,11 +49,17 @@ export const getters : GetterTree<AuthState, RootState> = {
     userId: (state: AuthState) => {
         return state.user ? state.user.id : undefined;
     },
+    userRealmId: (state: AuthState) => {
+        return state.user ? state.user.realmId : undefined;
+    },
     provider: (state: AuthState) => {
         return state.provider;
     },
     permissions: (state: AuthState) => {
         return state.permissions
+    },
+    permissionsResolved: (state: AuthState) => {
+        return state.permissionsResolved;
     },
     permission: (state: AuthState) => (id: number | string) => {
         let items =  state.permissions.filter((item: Record<string, any>) => {
@@ -344,6 +354,10 @@ export const mutations : MutationTree<AuthState> = {
     },
     unsetPermissions(state) {
         state.permissions = [];
+    },
+
+    setPermissionsResolved(state, resolved) {
+        state.permissionsResolved = !!resolved;
     },
 
     // --------------------------------------------------------------------

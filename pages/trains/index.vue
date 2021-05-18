@@ -13,9 +13,14 @@ export default {
                         icon: 'fa fa-plus'
                     },
                     {
-                        name: 'Overview',
+                        name: 'Outgoing',
                         urlSuffix: '',
-                        icon: 'fa fa-bars'
+                        icon: 'fa fa-file-export'
+                    },
+                    {
+                        name: 'Incoming',
+                        urlSuffix: '/in',
+                        icon: 'fa fa-file-import'
                     }
                 ]
             }

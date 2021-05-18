@@ -59,7 +59,8 @@ export default {
             this.isBusy = true;
 
             try {
-                this.items = await getStations();
+                const response = await getStations();
+                this.items = response.data;
                 this.isBusy = false;
             } catch (e) {
                 console.log(e);
