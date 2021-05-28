@@ -8,10 +8,10 @@
                 return vm.$store.state.layout.sidebarComponents;
             },
             docsUrl() {
-                return this.$config.apiUrl + 'docs';
+                return this.$config.apiUrl + 'docs/';
             },
             statsUrl() {
-                return this.$config.apiUrl + 'stats';
+                return this.$config.apiUrl + 'stats/';
             }
         }
     }
