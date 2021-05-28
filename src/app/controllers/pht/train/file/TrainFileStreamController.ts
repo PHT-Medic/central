@@ -12,7 +12,7 @@ export async function getTrainFileStreamRouteHandler(req: any, res: any) {
     let {id} = req.params;
 
     if (typeof id !== 'string') {
-        return res._failNotFound();
+        return res._failNotFound({message: 'The given train id is not valid...'});
     }
 
     const repository = getRepository(Train);
@@ -20,7 +20,7 @@ export async function getTrainFileStreamRouteHandler(req: any, res: any) {
     const train = await repository.findOne(id);
 
     if (typeof train === 'undefined') {
-        return res._failNotFound();
+        return res._failNotFound({message: 'The requested train was not found...'});
     }
 
     if(!isRealmPermittedForResource(req.user, train)) {
@@ -41,7 +41,7 @@ export async function getTrainFileStreamRouteHandler(req: any, res: any) {
         }
 
         if(!isPermitted) {
-            return res._failForbidden();
+            return res._failForbidden({message: 'You are not allowed to inspect the train files.'});
         }
     }
 

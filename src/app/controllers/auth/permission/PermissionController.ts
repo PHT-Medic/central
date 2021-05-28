@@ -1,13 +1,14 @@
-import {matchedData, validationResult} from "express-validator";
-import PermissionResponseSchema from "../../../domains/permission/PermissionResponseSchema";
+import {check, matchedData, validationResult} from "express-validator";
+import PermissionResponseSchema from "../../../../domains/permission/PermissionResponseSchema";
 import {getRepository} from "typeorm";
-import {Permission} from "../../../domains/permission";
-import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
+import {Permission} from "../../../../domains/permission";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {SwaggerTags} from "typescript-swagger";
-import {ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {applyRequestPagination} from "../../../../db/utils/pagination";
 
-@SwaggerTags("permission")
+@SwaggerTags("auth")
 @Controller("/permissions")
 export class PermissionController {
     @Get("", [ForceLoggedInMiddleware])
@@ -58,24 +59,30 @@ export class PermissionController {
 }
 
 const getPermissions = async (req: any, res: any) => {
-    let { filter } = req.query;
+    let { filter, page } = req.query;
 
     const repository = getRepository(Permission);
-    const queryBuilder = repository.createQueryBuilder('user');
+    const query = repository.createQueryBuilder('permission');
 
-    applyRequestFilterOnQuery(queryBuilder, filter, ['id', 'name']);
+    applyRequestFilterOnQuery(query, filter, ['id', 'name']);
 
-    let result = await queryBuilder.getMany();
+    const pagination = applyRequestPagination(query, page, 50);
 
-    let permissionResponseSchema = new PermissionResponseSchema();
-    result = permissionResponseSchema.applySchemaOnEntities(result);
+    const [entities, total] = await query.getManyAndCount();
 
-    return res._respond({data: result});
+    return res._respond({
+        data: {
+            data: entities,
+            meta: {
+                total,
+                ...pagination
+            }
+        }
+    });
 }
 
 const getPermission = async (req: any, res: any) => {
     let id = req.params.id;
-    let result;
 
     try {
         const repository = getRepository(Permission);
@@ -102,6 +109,15 @@ const addPermission = async (req: any, res: any) => {
     if(!req.ability.can('add','permission')) {
         return res._failForbidden();
     }
+
+    await check('name')
+        .exists()
+        .isString()
+        .isLength({
+            min: 5,
+            max: 30
+        })
+        .run(req);
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
@@ -144,7 +160,16 @@ const dropPermission = async (req: any, res: any) => {
 }
 
 const editPermission = async (req: any, res: any) => {
-    //todo: implement
+    await check('name')
+        .exists()
+        .isString()
+        .isLength({
+            min: 5,
+            max: 30
+        })
+        .run(req);
+
+    return res._failServerError({message: 'Not implemented yet.'})
 }
 
 export default {

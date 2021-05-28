@@ -2,7 +2,7 @@ import { Router } from 'express';
 let router = Router();
 
 import {forceLoggedIn} from "../../modules/http/request/middleware/authMiddleware";
-import {getMeRouteHandler} from "../../app/controllers/user/UserController";
+import {getMeRouteHandler} from "../../app/controllers/auth/user/UserController";
 import {getRepository, In} from "typeorm";
 import {TrainResult} from "../../domains/pht/train/result";
 

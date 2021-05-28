@@ -8,19 +8,16 @@ import path from "path";
 import swaggerUi from 'swagger-ui-express';
 import env from "../../env";
 import {useLogger} from "../log";
-import {attachControllers} from "@decorators/express";
 import responseMiddleware from "./response/middleware/responseMiddleware";
-import {TokenController} from "../../app/controllers/auth/token/TokenController";
 import {existsSync} from "fs";
 
 import {checkAuthenticated} from "./request/middleware/authMiddleware";
 import {generateSwaggerDocumentation} from "./swagger";
-import {UserController} from "../../app/controllers/user/UserController";
-import {UserKeyController} from "../../app/controllers/user/key/UserKeyController";
-import {PermissionController} from "../../app/controllers/permission/PermissionController";
-import {ProviderController} from "../../app/controllers/auth/ProviderController";
-import {RealmController} from "../../app/controllers/auth/realm/RealmController";
+import {registerControllers} from "../../config/routing";
 
+
+import {getMiddleware} from 'swagger-stats';
+import exp from "constants";
 
 export interface ExpressAppInterface extends Express{
 
@@ -66,21 +63,8 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
 
     // Loading routes
 
-    //router.registerRoutes(expressApp);
-
     expressApp.use(responseMiddleware);
     expressApp.use(checkAuthenticated);
-
-    attachControllers(expressApp, [
-        // Auth Controllers
-        TokenController,
-        RealmController,
-        ProviderController,
-
-        PermissionController,
-        UserController,
-        UserKeyController
-    ]);
 
     let swaggerDocument : any;
 
@@ -109,7 +93,15 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
                 ]
             }
         }));
+
+        expressApp.use(getMiddleware({
+            uriPath: '/stats',
+            swaggerSpec: swaggerDocument,
+            name: 'stats'
+        }))
     }
+
+    registerControllers(expressApp);
 
     return expressApp;
 }

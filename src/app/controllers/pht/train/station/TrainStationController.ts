@@ -1,14 +1,74 @@
 import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
 
-import {TrainStation} from "../../../../domains/pht/train/station";
+import {TrainStation} from "../../../../../domains/pht/train/station";
 
-import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
-import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
-import {Train} from "../../../../domains/pht/train";
-import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
-import {isTrainStationState} from "../../../../domains/pht/train/station/states";
-import {applyRequestPagination} from "../../../../db/utils/pagination";
+import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
+import {applyRequestFilterOnQuery} from "../../../../../db/utils/filter";
+import {Train} from "../../../../../domains/pht/train";
+import {onlyRealmPermittedQueryResources} from "../../../../../db/utils";
+import {isTrainStationState, TrainStationStateApproved} from "../../../../../domains/pht/train/station/states";
+import {applyRequestPagination} from "../../../../../db/utils/pagination";
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/authMiddleware";
+import {ResponseExample, SwaggerTags} from "typescript-swagger";
+
+type PartialTrainStation = Partial<TrainStation>;
+const simpleExample = {train_id: 'xxx', station_id: 1, comment: 'Looks good to me', status: TrainStationStateApproved};
+
+@SwaggerTags('pht')
+@Controller("/train-stations")
+export class TrainStationController {
+    @Get("",[ForceLoggedInMiddleware])
+    @ResponseExample<Array<PartialTrainStation>>([simpleExample])
+    async getMany(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Array<PartialTrainStation>> {
+        return await getTrainStationsRouteHandler(req, res) as Array<PartialTrainStation>;
+    }
+
+    @Get("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrainStation>(simpleExample)
+    async getOne(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialTrainStation|undefined> {
+        return await getTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
+    }
+
+    @Post("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrainStation>(simpleExample)
+    async edit(
+        @Params('id') id: string,
+        @Body() data: TrainStation,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialTrainStation|undefined> {
+        return await editTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
+    }
+
+    @Post("",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrainStation>(simpleExample)
+    async add(
+        @Body() data: TrainStation,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialTrainStation|undefined> {
+        return await addTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
+    }
+
+    @Delete("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrainStation>(simpleExample)
+    async drop(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialTrainStation|undefined> {
+        return await dropTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
+    }
+}
 
 export async function getTrainStationsRouteHandler(req: any, res: any) {
     let { filter, page } = req.query;

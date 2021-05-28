@@ -13,8 +13,7 @@ import {
 import {uploadTrainFilesRouteHandler} from "../../../app/controllers/pht/train/file/TrainFileUploadController";
 import {getTrainFileStreamRouteHandler} from "../../../app/controllers/pht/train/file/TrainFileStreamController";
 import {
-    doTrainTaskRouteHandler,
-    generateTrainHashActionRouteHandler
+    doTrainTaskRouteHandler
 } from "../../../app/controllers/pht/train/TrainActionController";
 
 export function setupPhtTrainRoutes() {
@@ -33,7 +32,6 @@ export function setupPhtTrainRoutes() {
      * Train Routes
      **/
     // Station Routes
-    router.post('/:id/hash-generate', [forceLoggedIn], generateTrainHashActionRouteHandler);
     router.post('/:id/task', [forceLoggedIn], doTrainTaskRouteHandler);
     router.get('/:id', [forceLoggedIn], getTrainRouteHandler);
     router.post('/:id', [forceLoggedIn], editTrainRouteHandler);

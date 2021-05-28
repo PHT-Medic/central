@@ -4,9 +4,9 @@ let router = Router();
 //---------------------------------------------------------------------------------
 import { forceLoggedIn } from '../../modules/http/request/middleware/authMiddleware';
 
-import RoleController from "../../app/controllers/role/RoleController";
-import RolePermissionController from "../../app/controllers/role/permission/RolePermissionController";
-import {getRoleUsersRouteHandler} from "../../app/controllers/role/user/RoleUserController";
+import RoleController from "../../app/controllers/auth/role/RoleController";
+import RolePermissionController from "../../app/controllers/auth/role/permission/RolePermissionController";
+import {getRoleUsersRouteHandler} from "../../app/controllers/auth/role/user/RoleUserController";
 
 //---------------------------------------------------------------------------------
 

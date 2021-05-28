@@ -1,16 +1,16 @@
 import {getRepository} from "typeorm";
-import {UserKeyRing} from "../../../../domains/user/key-ring";
+import {UserKeyRing} from "../../../../../domains/user/key-ring";
 import {check, matchedData, validationResult} from "express-validator";
-import {useVaultApi} from "../../../../modules/api/provider/vault";
+import {useVaultApi} from "../../../../../modules/api/provider/vault";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/authMiddleware";
 import {SwaggerTags} from "typescript-swagger";
 
-@SwaggerTags('user')
+@SwaggerTags('user', 'pht')
 @Controller("/user-key-rings")
 export class UserKeyController {
     @Get("", [ForceLoggedInMiddleware])
-    async getKeyRing(
+    async get(
         @Request() req: any,
         @Response() res: any
     ) : Promise<UserKeyRing> {
@@ -18,7 +18,7 @@ export class UserKeyController {
     }
 
     @Post("", [ForceLoggedInMiddleware])
-    async addKeyRing(
+    async add(
         @Request() req: any,
         @Response() res: any,
         @Body() keyRing: Pick<UserKeyRing, 'public_key' | 'he_key'>,
@@ -26,23 +26,23 @@ export class UserKeyController {
         return addUserKeyRouteHandler(req, res);
     }
 
-    @Delete("/:id", [ForceLoggedInMiddleware])
-    async dropKeyRing(
-        @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any
-    ) : Promise<UserKeyRing> {
-        return dropUserKeyRouteHandler(req, res);
-    }
-
     @Post("/:id", [ForceLoggedInMiddleware])
-    async editKeyRing(
+    async edit(
         @Params('id') id: string,
         @Request() req: any,
         @Response() res: any,
         @Body() keyRing: Pick<UserKeyRing, 'public_key' | 'he_key'>
     ) : Promise<UserKeyRing> {
         return editUserKeyRouteHandler(req, res);
+    }
+
+    @Delete("/:id", [ForceLoggedInMiddleware])
+    async drop(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<UserKeyRing> {
+        return dropUserKeyRouteHandler(req, res);
     }
 }
 

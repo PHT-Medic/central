@@ -1,6 +1,7 @@
 import {Brackets, SelectQueryBuilder} from "typeorm";
+import {snakeCase} from 'change-case';
 
-function transformRequestFilters(rawFilters: unknown, allowedFilters: Record<string, any>): Record<string, any> {
+function transformRequestFilters(rawFilters: unknown, allowedFilters: Record<string, any>): Record<string, string> {
     let filters: Record<string, any> = {};
 
     const prototype: string = Object.prototype.toString.call(rawFilters);
@@ -10,39 +11,56 @@ function transformRequestFilters(rawFilters: unknown, allowedFilters: Record<str
 
     filters = <Record<string, any>>rawFilters;
 
+    let result : Record<string, any> = {};
+
     for (let key in filters) {
         if (!filters.hasOwnProperty(key)) {
             continue;
         }
 
         if (typeof filters[key] !== 'string') {
-            delete filters[key];
+            continue;
         }
 
         const stripped = filters[key].replace(',', '').trim();
 
-        if (stripped.length === 0 || !allowedFilters.hasOwnProperty(key)) {
-            delete filters[key];
+        if (stripped.length === 0) {
+            continue;
         }
+
+        const newKey : string = snakeCase(key);
+
+        if(!allowedFilters.hasOwnProperty(newKey)) {
+            continue;
+        }
+
+        result[newKey] = filters[key];
     }
 
-    return filters;
+    return result;
 }
 
-export function transformAllowedFields(rawFilters: string[] | Record<string, any>): Record<string, any> {
-    let filters: Record<string, any> = {};
+export function transformAllowedFields(rawFilters: string[] | Record<string, any>): Record<string, string> {
+    let filters: Record<string, string> = {};
 
     const allowedFiltersPrototype: string = Object.prototype.toString.call(rawFilters);
-
     switch (allowedFiltersPrototype) {
         case '[object Array]':
             const tempStrArr = <string[]>rawFilters;
             for (let i = 0; i < tempStrArr.length; i++) {
-                filters[tempStrArr[i]] = tempStrArr[i];
+                const newKey : string = snakeCase(tempStrArr[i]);
+                filters[newKey] = newKey;
             }
             break;
         case '[object Object]':
-            filters = rawFilters;
+            rawFilters = (rawFilters as Record<string, any>);
+            for(let key in rawFilters) {
+                if(!rawFilters.hasOwnProperty(key)) continue;
+
+                const newKey : string = snakeCase(key);
+
+                filters[newKey] = rawFilters[key];
+            }
             break;
     }
 
@@ -67,22 +85,58 @@ export function applyRequestFilterOnQuery(query: SelectQueryBuilder<any>, rawReq
 
             run++;
 
-            if (requestFilters[key].includes(',')) {
-                let ids = requestFilters[key].split(',');
-                qb[run === 1 ? 'where' : 'andWhere'](allowedFields[key] + " IN (:ids)", {ids});
-            } else {
-                let parameters: Record<string, any> = {};
-                const paramKey = 'filter-' + allowedFields[key] + '-' + run;
-                if (requestFilters[key].charAt(0) === '~') {
-                    requestFilters[key] = requestFilters[key].slice(1);
-                    parameters[paramKey] = `${requestFilters[key]}%`;
-                    qb[run === 1 ? 'where' : 'andWhere'](allowedFields[key] + " LIKE :" + paramKey, parameters);
+            let value : string = requestFilters[key];
+
+            const paramKey = 'filter-' + allowedFields[key] + '-' + run;
+            const whereKind : 'where' | 'andWhere' = run === 1 ? 'where' : 'andWhere';
+
+            let queryString : Array<string> = [
+                allowedFields[key]
+            ];
+
+            const isUnequalPrefix = value.charAt(0) === '!' && value.charAt(1) === '=';
+            if(isUnequalPrefix) value = value.slice(2);
+
+            const isLikeOperator = value.charAt(0) === '~';
+            if(isLikeOperator) value = value.slice(1);
+
+            const isInOperator = value.includes(',');
+
+            const isEqualOperator = !isLikeOperator && !isInOperator;
+
+            if(isEqualOperator) {
+                if(isUnequalPrefix) {
+                    queryString.push("!=");
                 } else {
-                    parameters[paramKey] = requestFilters[key];
-                    qb[run === 1 ? 'where' : 'andWhere'](allowedFields[key] + " = :" + paramKey, parameters);
+                    queryString.push("=");
+                }
+            } else {
+                if(isUnequalPrefix) {
+                    queryString.push('NOT');
                 }
 
+                if(isLikeOperator) {
+                    queryString.push('LIKE');
+                } else {
+                    queryString.push('IN');
+                }
             }
+
+            if(isLikeOperator) {
+                value += '%';
+            }
+
+            if(isInOperator) {
+                queryString.push('(:'+paramKey+')');
+            } else {
+                queryString.push(':'+paramKey);
+            }
+
+            qb[whereKind](queryString.join(" "), {[paramKey]: isInOperator ? value.split(',') : value});
+        }
+
+        if(run === 0) {
+            qb.where("true = true");
         }
 
         return qb;

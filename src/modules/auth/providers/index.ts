@@ -152,7 +152,7 @@ export class Oauth2AuthorizeProvider extends Oauth2Provider {
             response_type: 'code',
             grant_type: 'authorization_code',
             client_id: this.provider.client_id,
-            redirect_uri: env.apiUrl + '/auth/providers/'+this.provider.id+'/callback'
+            redirect_uri: env.apiUrl + '/providers/'+this.provider.id+'/authorize-callback'
         }
 
         if(this.provider.scope) {
@@ -171,7 +171,7 @@ export class Oauth2AuthorizeProvider extends Oauth2Provider {
         let params : {[key: string] : any} = {
             grant_type: 'authorization_code',
             client_id: this.provider.client_id,
-            redirect_uri: env.apiUrl + '/auth/providers/'+this.provider.id+'/callback'
+            redirect_uri: env.apiUrl + '/providers/'+this.provider.id+'/authorize-callback'
         }
 
         if(this.provider.scope) {

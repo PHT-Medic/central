@@ -1,4 +1,4 @@
-import {getRepository, In} from "typeorm";
+import {getRepository} from "typeorm";
 import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
 import {check, matchedData, validationResult} from "express-validator";
 import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
@@ -16,6 +16,103 @@ import {applyRequestPagination} from "../../../../db/utils/pagination";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {applyRequestIncludes} from "../../../../db/utils/include";
 
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {doTrainTaskRouteHandler} from "./TrainActionController";
+
+type PartialTrain = Partial<Train>;
+const simpleExample = {
+    user_id: 1,
+    proposal_id: 1,
+    hash: 'xxx',
+    hash_signed: 'xxx',
+    session_id: 'xxx',
+    // @ts-ignore
+    files: [],
+    status: TrainStateConfigured
+}
+
+enum TrainTask {
+    START = 'start',
+    STOP = 'stop',
+    BUILD = 'build',
+    SCAN_HARBOR = 'scanHarbor',
+    GENERATE_HASH = 'generateHash'
+}
+
+@SwaggerTags('pht')
+@Controller("/trains")
+export class TrainController {
+    @Get("",[ForceLoggedInMiddleware])
+    @ResponseExample<Array<PartialTrain>>([simpleExample])
+    async getMany(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Array<PartialTrain>> {
+        return await getTrainsRouteHandler(req, res) as Array<PartialTrain>;
+    }
+
+
+    @Get("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrain>(simpleExample)
+    async getOne(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialTrain|undefined> {
+        return await getTrainRouteHandler(req, res) as PartialTrain | undefined;
+    }
+
+    @Post("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrain>(simpleExample)
+    async edit(
+        @Params('id') id: string,
+        @Body() data: PartialTrain,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialTrain|undefined> {
+        return await editTrainRouteHandler(req, res) as PartialTrain | undefined;
+    }
+
+    @Post("",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrain>(simpleExample)
+    async add(
+        @Body() data: PartialTrain,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialTrain|undefined> {
+        return await addTrainRouteHandler(req, res) as PartialTrain | undefined;
+    }
+
+    @Post("/:id/task",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrain>(simpleExample)
+    async doTask(
+        @Params('id') id: string,
+        @Body() data: {
+            task: TrainTask
+        },
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialTrain|undefined> {
+        return await doTrainTaskRouteHandler(req, res) as PartialTrain | undefined;
+    }
+
+    @Delete("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrain>(simpleExample)
+    async drop(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialTrain|undefined> {
+        return await dropTrainRouteHandler(req, res) as PartialTrain | undefined;
+    }
+
+    // --------------------------------------------------------------------------
+
+
+}
+
 export async function getTrainRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
@@ -27,11 +124,9 @@ export async function getTrainRouteHandler(req: any, res: any) {
     const query = repository.createQueryBuilder('train')
         .leftJoinAndSelect('train.train_stations','trainStations')
         .leftJoinAndSelect('trainStations.station', 'station')
-        .where({
-            id
-        });
+        .where("train.id = :id", {id});
 
-    onlyRealmPermittedQueryResources(query, req.user.realm_id);
+    onlyRealmPermittedQueryResources(query, req.user.realm_id, 'train.realm_id');
 
     const entity = await query.getOne();
 
@@ -162,8 +257,6 @@ export async function addTrainRouteHandler(req: any, res: any) {
     const validationData = matchedData(req, {includeOptionals: true});
 
     let {station_ids, ...data} = validationData;
-
-    station_ids = station_ids ?? [];
 
     try {
         const repository = getRepository(Train);

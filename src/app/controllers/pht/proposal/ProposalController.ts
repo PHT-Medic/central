@@ -10,6 +10,67 @@ import {applyRequestPagination} from "../../../../db/utils/pagination";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {applyRequestIncludes} from "../../../../db/utils/include";
 
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ResponseExample, SwaggerTags} from "typescript-swagger";
+
+type PartialProposal = Partial<Proposal>;
+const simpleExample = {title: 'An example Proposal', risk: 'low', risk_comment: 'The risk is low', requested_data: 'all', realm_id: 'master'};
+
+@SwaggerTags('pht')
+@Controller("/proposals")
+export class ProposalController {
+    @Get("",[ForceLoggedInMiddleware])
+    @ResponseExample<Array<PartialProposal>>([simpleExample])
+    async getMany(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Array<PartialProposal>> {
+        return await getProposalsRouteHandler(req, res) as Array<PartialProposal>;
+    }
+
+    @Get("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposal>(simpleExample)
+    async getOne(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialProposal|undefined> {
+        return await getProposalRouteHandler(req, res) as PartialProposal | undefined;
+    }
+
+    @Post("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposal>(simpleExample)
+    async update(
+        @Params('id') id: string,
+        @Body() data: Proposal,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialProposal|undefined> {
+        return await editProposalRouteHandler(req, res) as PartialProposal | undefined;
+    }
+
+    @Post("",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposal>(simpleExample)
+    async add(
+        @Body() data: Proposal,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialProposal|undefined> {
+        return await addProposalRouteHandler(req, res) as PartialProposal | undefined;
+    }
+
+    @Delete("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposal>(simpleExample)
+    async drop(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialProposal|undefined> {
+        return await dropProposalRouteHandler(req, res) as PartialProposal | undefined;
+    }
+}
+
 export async function getProposalRouteHandler(req: any, res: any) {
     const { id } = req.params;
     const { include } = req.query;

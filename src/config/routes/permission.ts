@@ -4,7 +4,7 @@ let router = Router();
 //---------------------------------------------------------------------------------
 import { forceLoggedIn } from '../../modules/http/request/middleware/authMiddleware';
 
-import PermissionController from "../../app/controllers/permission/PermissionController";
+import PermissionController from "../../app/controllers/auth/permission/PermissionController";
 import {check} from "express-validator";
 
 //---------------------------------------------------------------------------------

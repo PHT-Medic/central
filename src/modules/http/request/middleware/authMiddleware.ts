@@ -21,10 +21,15 @@ function parseAsServiceToken(token: string) : {id: string} {
     throw new Error('Es konnte kein Dienst zu dem Token assoziert werden.');
 }
 
-async function parseAsUserToken(token: string) : Promise<{ user: User, permissions: PermissionInterface[] }> {
+async function parseAsUserToken(token: string) : Promise<{
+    user: User,
+    permissions: PermissionInterface[],
+    remoteAddress: string
+}> {
     const tokenInfo = await verifyToken(token);
 
     const userId: number | undefined = tokenInfo.id;
+    const remoteAddress : string = tokenInfo.remoteAddress;
 
     if(typeof userId !== 'number') {
         throw new Error('Es konnte kein Benutzer zu dem Token assoziert werden.');
@@ -39,6 +44,7 @@ async function parseAsUserToken(token: string) : Promise<{ user: User, permissio
 
     return {
         user,
+        remoteAddress,
         permissions: await userRepository.findPermissions(user.id)
     };
 }
@@ -76,7 +82,15 @@ export async function checkAuthenticated(req: any, res: any, next: any) {
         }
 
         try {
-            const {user, permissions} = await parseAsUserToken(req.token);
+            const {user, remoteAddress, permissions} = await parseAsUserToken(req.token);
+
+            const newAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+            // todo: whitelist for train builder other services and localhost.
+            if(remoteAddress !== newAddress) {
+                //return res._failUnauthorized({message: 'The ip address changed...', code: 'invalid_ip'});
+            }
+
             req.user = user;
             req.permissions = permissions;
             req.userId = req.user.id;

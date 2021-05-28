@@ -14,8 +14,10 @@ export async function getRealmStationRouteHandler(req: any, res: any, type: stri
             case 'related':
                 repository = getRepository(Station);
 
+                // todo: for now anyone can see realm - station association
+
                 if(!isRealmPermittedForResource(req.user, {realm_id: id})) {
-                    return res._failForbidden();
+                    // return res._failForbidden({message: 'You are not allowed to receive station informations.'});
                 }
 
                 let query = repository.createQueryBuilder('station')
@@ -42,7 +44,6 @@ export async function getRealmStationRouteHandler(req: any, res: any, type: stri
                 return res._respond({data: entity});
         }
     } catch (e) {
-        console.log(e);
         return res._failServerError();
     }
 }

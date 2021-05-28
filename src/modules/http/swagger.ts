@@ -10,7 +10,7 @@ const url = new URL(env.apiUrl);
 export const swaggerConfig : SwaggerConfig = {
     yaml: true,
     host: url.host,
-    name: 'PHT - API Documentation',
+    name: 'Central UI - API Documentation',
     description: packageJson.description,
     basePath: '/',
     version: packageJson.version,

@@ -4,8 +4,85 @@ import {Station} from "../../../../domains/pht/station";
 import {dropHarborProject} from "../../../../domains/harbor/project/api";
 import {removeStationPublicKeyFromVault} from "../../../../domains/vault/station/api";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
-import {applyRequestFields} from "../../../../db/utils/select";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
+
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {doTrainTaskRouteHandler} from "../train/TrainActionController";
+import {doStationTaskRouteHandler, StationTask} from "./StationActionController";
+
+type PartialStation = Partial<Station>;
+const stationExample = {name: 'University Tuebingen', realm_id: 'tuebingen', id: 1}
+
+@SwaggerTags('pht')
+@Controller("/stations")
+export class StationController {
+    @Get("",[ForceLoggedInMiddleware])
+    @ResponseExample<Array<PartialStation>>([
+        stationExample
+    ])
+    async getMany(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Array<PartialStation>> {
+        return await getStationsRouteHandler(req, res) as Array<PartialStation>;
+    }
+
+    @Post("",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async add(
+        @Body() data: PartialStation,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialStation|undefined> {
+        return await addStationRouteHandler(req, res) as PartialStation | undefined;
+    }
+
+    @Get("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async getOne(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialStation|undefined> {
+        return await getStationRouteHandler(req, res) as PartialStation | undefined;
+    }
+
+    @Post("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async edit(
+        @Params('id') id: string,
+        @Body() data: PartialStation,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialStation|undefined> {
+        return await editStationRouteHandler(req, res) as PartialStation | undefined;
+    }
+
+    @Post("/:id/task",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async doTask(
+        @Params('id') id: string,
+        @Body() data: {
+            task: StationTask
+        },
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialStation|undefined> {
+        return await doStationTaskRouteHandler(req, res) as PartialStation | undefined;
+    }
+
+    @Delete("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async drop(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialStation|undefined> {
+        return await dropStationRouteHandler(req, res) as PartialStation | undefined;
+    }
+}
 
 export async function getStationRouteHandler(req: any, res: any) {
     const { id } = req.params;

@@ -93,7 +93,7 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
 
     return busboy.on('finish', async () => {
         if (files.length === 0) {
-            return res._failBadRequest({message: 'No files provided'});
+            return res._failBadRequest({message: 'No train files provided'});
         }
 
         try {
@@ -107,7 +107,7 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
 
             return res._respond({data: files});
         } catch (e) {
-            return res._failValidationError({message: 'Der Zug Dateien konnten nicht hochgeladen werden...'})
+            return res._failValidationError({message: 'The train files could not be uploaded.'})
         }
     });
 }

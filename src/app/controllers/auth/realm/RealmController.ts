@@ -7,9 +7,11 @@ import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middlewa
 import {Provider} from "../../../../domains/provider";
 import {Station} from "../../../../domains/pht/station";
 import {getRealmStationRouteHandler} from "./station/RealmStationController";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
+import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 @SwaggerTags('auth')
-@Controller("/auth/realms")
+@Controller("/realms")
 export class RealmController {
     @Get("", [])
     async getMany(
@@ -26,6 +28,15 @@ export class RealmController {
         @Response() res: any
     ) : Promise<Realm> {
         return await addRealmRoute(req, res);
+    }
+
+    @Get("/:id/station", [])
+    async getStation(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Station> {
+        return await getRealmStationRouteHandler(req, res, 'related');
     }
 
     @Get("/:id", [])
@@ -55,26 +66,29 @@ export class RealmController {
     ) : Promise<Realm> {
         return await dropRealmRoute(req, res);
     }
-
-    @Get("/realms/:id/station")
-    @ResponseDescription<{error: {message: string, code: string}}>(403, 'Not Authorized', {error: {message: 'forbidden', code: 'forbidden'}})
-    async getRealmStation(
-        @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any
-    ) : Promise<Station|undefined> {
-        return await getRealmStationRouteHandler(req, res, 'related');
-    }
 }
 
 export async function getRealmsRoute(req: any, res: any) {
+    const {filter, page} = req.query;
     const realmRepository = getRepository(Realm);
 
-    const result = await realmRepository.find();
+    const query = realmRepository.createQueryBuilder('realm');
+
+    applyRequestFilterOnQuery(query, filter, ['id', 'name']);
+
+    const pagination = applyRequestPagination(query, page, 50);
+
+    const [entities, total] = await query.getManyAndCount();
 
     return res._respond({
-        data: result
-    })
+        data: {
+            data: entities,
+            meta: {
+                total,
+                ...pagination
+            }
+        }
+    });
 }
 
 export async function getRealmRoute(req: any, res: any) {
@@ -109,7 +123,7 @@ async function runValidation(req: any) {
 
 export async function addRealmRoute(req: any, res: any) {
     if(!req.ability.can('add','realm')) {
-        return res._failForbidden();
+        return res._failForbidden({message: 'You are not allowed to add a realm.'});
     }
 
     await runValidation(req);
@@ -145,7 +159,7 @@ export async function editRealmRoute(req: any, res: any) {
     const { id } = req.params;
 
     if(!req.ability.can('edit','realm')) {
-        return res._failForbidden();
+        return res._failForbidden({message: 'You are not allowed to edit a realm.'});
     }
 
     await runValidation(req);
@@ -186,7 +200,7 @@ export async function dropRealmRoute(req: any, res: any) {
     let {id} = req.params;
 
     if (!req.ability.can('drop', 'realm')) {
-        return res._failForbidden();
+        return res._failForbidden({message: 'You are not allowed to drop a realm.'});
     }
 
     const repository = getRepository(Realm);
@@ -198,7 +212,7 @@ export async function dropRealmRoute(req: any, res: any) {
     }
 
     if(!entity.drop_able) {
-        return res._failForbidden({message: 'Der Realm kann nicht gelöscht werden.'})
+        return res._failForbidden({message: 'The realm can not be deleted in general.'})
     }
 
     try {

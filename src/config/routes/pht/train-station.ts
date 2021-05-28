@@ -6,7 +6,7 @@ import {
     editTrainStationRouteHandler,
     getTrainStationRouteHandler,
     getTrainStationsRouteHandler
-} from "../../../app/controllers/pht/train-station/TrainStationController";
+} from "../../../app/controllers/pht/train/station/TrainStationController";
 
 export function setupPhtTrainStationRoutes() {
     const router = Router();

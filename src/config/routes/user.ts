@@ -9,13 +9,13 @@ import {
     dropUserRouteHandler,
     editUserRouteHandler,
     getUserRouteHandler, getUsersRouteHandler
-} from "../../app/controllers/user/UserController";
+} from "../../app/controllers/auth/user/UserController";
 import {
     addUserRoleRouteHandler, dropUserRoleRouteHandler,
     getUserRoleRouteHandler,
     getUserRolesRouteHandler
-} from "../../app/controllers/user/role/UserRoleController";
-import {getUserStationRouteHandler} from "../../app/controllers/user/station/UserStationController";
+} from "../../app/controllers/auth/user/role/UserRoleController";
+import {getUserStationRouteHandler} from "../../app/controllers/auth/user/station/UserStationController";
 
 //--------------------------------------------------------------------------------
 

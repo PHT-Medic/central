@@ -4,6 +4,7 @@ import {getRepository} from "typeorm";
 import {UserKeyRing} from "../user/key-ring";
 import {TrainFile} from "../pht/train/file";
 import {MQ_TB_ROUTING_KEY} from "../../config/rabbitmq";
+import {TrainStationStateApproved} from "../pht/train/station/states";
 
 export async function createTrainBuilderQueueMessage(train: Train, type: string | undefined, metaData: Record<string, any> = {}) : Promise<QueueMessage> {
     const keyRingRepository = getRepository(UserKeyRing);
@@ -21,7 +22,9 @@ export async function createTrainBuilderQueueMessage(train: Train, type: string 
         userId: train.user_id,
         trainId: train.id,
         proposalId: train.proposal_id,
-        stations: train.train_stations.map(trainStation => trainStation.station_id),
+        stations: train.train_stations
+            .filter(trainStation => trainStation.status === TrainStationStateApproved)
+            .map(trainStation => trainStation.station_id),
         files: files.map(file => file.directory + '/' + file.name),
         masterImage: train.master_image.external_tag_id,
         entrypointExecutable: train.entrypoint_executable,

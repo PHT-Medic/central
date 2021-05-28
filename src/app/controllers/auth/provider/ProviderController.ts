@@ -1,19 +1,20 @@
-import {Oauth2AuthorizeProvider} from "../../../modules/auth/providers";
-import {AuthenticatorScheme, Provider} from "../../../domains/provider";
+import {Oauth2AuthorizeProvider} from "../../../../modules/auth/providers";
+import {AuthenticatorScheme, Provider} from "../../../../domains/provider";
 import {getRepository} from "typeorm";
-import {createToken} from "../../../modules/auth/utils/token";
-import TokenResponseSchema from "../../../domains/token/TokenResponseSchema";
-import env from "../../../env";
-import {Realm} from "../../../domains/realm";
+import {createToken} from "../../../../modules/auth/utils/token";
+import TokenResponseSchema from "../../../../domains/token/TokenResponseSchema";
+import env from "../../../../env";
+import {Realm} from "../../../../domains/realm";
 import {check, matchedData, validationResult} from "express-validator";
-import {applyRequestPagination} from "../../../db/utils/pagination";
-import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
+import {applyRequestPagination} from "../../../../db/utils/pagination";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {Controller, Get, Post, Delete, Params, Request, Response, Body} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/authMiddleware";
-import {SwaggerTags} from "typescript-swagger";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {SwaggerHidden, SwaggerTags} from "typescript-swagger";
+import {applyRequestFields} from "../../../../db/utils/select";
 
 @SwaggerTags('auth')
-@Controller("/auth/providers")
+@Controller("/providers")
 export class ProviderController {
     @Get("", [])
     async getProviders(
@@ -21,15 +22,6 @@ export class ProviderController {
         @Response() res: any
     ): Promise<Array<Provider>> {
         return await getProvidersRoute(req, res);
-    }
-
-    @Post("", [ForceLoggedInMiddleware])
-    async addProvider(
-        @Body() user: NonNullable<Provider>,
-        @Request() req: any,
-        @Response() res: any
-    ) : Promise<Provider> {
-        return await addProviderRoute(req, res);
     }
 
     @Get("/:id", [])
@@ -60,10 +52,41 @@ export class ProviderController {
     ) : Promise<Provider> {
         return await dropProviderRoute(req, res);
     }
+
+    @Post("", [ForceLoggedInMiddleware])
+    async addProvider(
+        @Body() user: NonNullable<Provider>,
+        @Request() req: any,
+        @Response() res: any
+    ) : Promise<Provider> {
+        return await addProviderRoute(req, res);
+    }
+
+    // ------------------------------------------------------------
+
+    @Get('/:id/authorize-url')
+    @SwaggerHidden()
+    async getAuthorizeUrl(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ) {
+        return await authorizeUrlRoute(req, res);
+    }
+
+    @Get('/:id/authorize-callback')
+    @SwaggerHidden()
+    async getAuthorizeCallback(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ) {
+        return await authorizeCallbackRoute(req, res);
+    }
 }
 
 export async function getProvidersRoute(req: any, res: any) {
-    const { page, filter } = req.query;
+    const { page, filter, fields } = req.query;
 
     const repository = getRepository(Provider);
 
@@ -73,6 +96,10 @@ export async function getProvidersRoute(req: any, res: any) {
     applyRequestFilterOnQuery(query, filter, {
         realmId: 'provider.realm_id'
     });
+
+    applyRequestFields(query, 'provider', fields, [
+        'client_secret'
+    ]);
 
     const pagination = applyRequestPagination(query, page, 50);
 
@@ -100,11 +127,24 @@ export async function getProvidersRoute(req: any, res: any) {
 //---------------------------------------------------------------------------------
 
 export async function getProviderRoute(req: any, res: any) {
+    const { fields } = req.query;
     const { id } = req.params;
 
     const repository = getRepository(Provider);
 
-    let result = await repository.findOne(id, {relations: ['realm']});
+    const query = repository.createQueryBuilder('provider')
+        .leftJoinAndSelect('provider.realm', 'realm')
+        .where("provider.id = :id", {id});
+
+    applyRequestFields(query, 'provider', fields, [
+        'client_secret'
+    ]);
+
+    let result = await query.getOne();
+
+    if(typeof result == 'undefined') {
+        return res._failNotFound();
+    }
 
     return res._respond({
         data: result
@@ -238,6 +278,7 @@ export async function authorizeUrlRoute(req: any, res: any) {
 
     const repository = getRepository(Provider);
     let provider = await repository.createQueryBuilder('provider')
+        .addSelect('provider.client_secret')
         .leftJoinAndSelect('provider.realm', 'realm')
         .where('provider.id = :id', {id})
         .orWhere('provider.name Like :name', {name: id})
@@ -258,6 +299,7 @@ export async function authorizeCallbackRoute(req: any, res: any) {
 
     const repository = getRepository(Provider);
     let provider = await repository.createQueryBuilder('provider')
+        .addSelect('provider.client_secret')
         .leftJoinAndSelect('provider.realm', 'realm')
         .where('provider.id = :id', {id})
         .orWhere('provider.name Like :name', {name: id})

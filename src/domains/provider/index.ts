@@ -58,7 +58,7 @@ export class Provider {
     @Column({nullable: true, default: null})
     client_id: string;
 
-    @Column({nullable: true, default: null})
+    @Column({nullable: true, default: null, select: false})
     client_secret: string
 
     @CreateDateColumn()

@@ -17,12 +17,8 @@ type Token = {
     token: string
 }
 
-interface Anselm {
-    keck: string
-}
-
 @SwaggerTags('auth')
-@Controller("/auth/token")
+@Controller("/token")
 export class TokenController {
     @Post("")
     @ResponseExample<Token>({expires_in: 3600, token: '20f81b13d51c65798f05'})
@@ -35,14 +31,15 @@ export class TokenController {
     }
 
     @Delete("")
-    dropToken(
+    async dropToken(
+        @Request() req: any,
         @Response() res: any
-    ) {
-        return res.sendStatus(200).end();
+    ) : Promise<void> {
+        return await revokeToken(req, res);
     }
 }
 
-const grantToken = async (req: any, res: any) : Promise<any> => {
+async function grantToken(req: any, res: any) : Promise<any> {
     const {name, password, provider} = req.body;
 
     let payload : {[key: string] : any};
@@ -88,6 +85,8 @@ const grantToken = async (req: any, res: any) : Promise<any> => {
         return res._failValidationError({message: e.message});
     }
 
+    payload.remoteAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
     const {
         token,
         expiresIn
@@ -122,14 +121,14 @@ const grantToken = async (req: any, res: any) : Promise<any> => {
     return res._respond({
         data: ob
     });
-};
+}
 
 //---------------------------------------------------------------------------------
 
-const revokeToken = async (req: any, res: any) => {
+async function revokeToken(req: any, res: any) {
     res.cookie('auth_token', null, {maxAge: Date.now()});
     return res._respond();
-};
+}
 
 //---------------------------------------------------------------------------------
 

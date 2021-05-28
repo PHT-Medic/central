@@ -1,29 +1,86 @@
 import {check, matchedData, validationResult} from "express-validator";
-import RoleResponseSchema from "../../../domains/role/RoleResponseSchema";
 import {getRepository} from "typeorm";
-import {Role} from "../../../domains/role";
-import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
+import {Role} from "../../../../domains/role";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 
 //---------------------------------------------------------------------------------
 
-const getRoles = async (req: any, res: any) => {
-    let { filter } = req.query;
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {applyRequestPagination} from "../../../../db/utils/pagination";
+
+type PartialRole = Partial<Role>;
+const simpleExample = {name: 'admin'};
+
+@SwaggerTags('auth')
+@Controller("/roles")
+export class RoleController {
+    @Get("",[ForceLoggedInMiddleware])
+    @ResponseExample<Array<PartialRole>>([simpleExample])
+    async getMany(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Array<PartialRole>> {
+        return await getRoles(req, res) as Array<PartialRole>;
+    }
+
+    @Get("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialRole>(simpleExample)
+    async getOne(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialRole> {
+        return await getRole(req, res) as PartialRole;
+    }
+
+    @Post("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialRole>(simpleExample)
+    async edit(
+        @Params('id') id: string,
+        @Body() data: Pick<Role, 'name'>,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialRole> {
+        return await editRole(req, res) as PartialRole;
+    }
+
+    @Delete("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialRole>(simpleExample)
+    async drop(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialRole> {
+        return await dropRole(req, res) as PartialRole;
+    }
+}
+
+async function getRoles(req: any, res: any) {
+    let { filter, page } = req.query;
 
     const roleRepository = getRepository(Role);
-    const queryBuilder = roleRepository.createQueryBuilder('role');
+    const query = roleRepository.createQueryBuilder('role');
 
-    applyRequestFilterOnQuery(queryBuilder, filter, ['id', 'name']);
+    applyRequestFilterOnQuery(query, filter, ['id', 'name']);
 
-    let result = await queryBuilder.getMany();
+    const pagination = applyRequestPagination(query, page, 50);
 
-    let userResponseSchema = new RoleResponseSchema();
+    const [entities, total] = await query.getManyAndCount();
 
-    result = userResponseSchema.applySchemaOnEntities(result);
+    return res._respond({
+        data: {
+            data: entities,
+            meta: {
+                total,
+                ...pagination
+            }
+        }
+    });
+}
 
-    return res._respond({data: result});
-};
-
-const getRole = async (req: any, res: any) => {
+async function getRole(req: any, res: any) {
     let { id } = req.params;
 
     try {
@@ -34,17 +91,13 @@ const getRole = async (req: any, res: any) => {
             return res._failNotFound();
         }
 
-        let responseSchema = new RoleResponseSchema();
-
-        result = responseSchema.applySchemaOnEntity(result);
-
         return res._respond({data: result});
     } catch (e) {
         return res._failNotFound();
     }
-};
+}
 
-const addRole = async (req: any, res: any) => {
+async function addRole(req: any, res: any) {
     if(!req.ability.can('add','role')) {
         return res._failForbidden();
     }
@@ -77,7 +130,7 @@ const addRole = async (req: any, res: any) => {
     }
 }
 
-const editRole = async (req: any, res: any) => {
+async function editRole(req: any, res: any) {
     let { id } = req.params;
 
     if(!req.ability.can('edit','role')) {
@@ -123,7 +176,7 @@ const editRole = async (req: any, res: any) => {
 
 //---------------------------------------------------------------------------------
 
-const dropRole = async (req: any, res: any) => {
+async function dropRole(req: any, res: any) {
     let {id} = req.params;
 
     if (!req.ability.can('drop', 'role')) {

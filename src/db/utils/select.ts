@@ -1,4 +1,5 @@
 import {SelectQueryBuilder} from "typeorm";
+import {snakeCase} from "change-case";
 
 function transformRequestFields(raw: unknown, allowedFilters: Record<string, string[]>): Record<string, string[]> {
     const prototype: string = Object.prototype.toString.call(raw);
@@ -24,11 +25,12 @@ function transformRequestFields(raw: unknown, allowedFilters: Record<string, str
         let fields : string[] = prototype === '[object String]' ? domains[key].split(',') : domains[key];
 
         if (!allowedFilters.hasOwnProperty(key)) {
-            delete domains[key];
             continue;
         }
 
-        fields = fields.filter(x => allowedFilters[key].includes(x));
+        fields = fields
+            .map(field => snakeCase(field))
+            .filter(x => allowedFilters[key].includes(x));
 
         result[key] = fields;
     }
@@ -40,9 +42,13 @@ export function applyRequestFields(query: SelectQueryBuilder<any>, alias: string
     let allowed : Record<string, string[]> = {};
 
     if(Array.isArray(allowedFields)) {
-        allowed[alias] = allowedFields;
+        allowed[alias] = allowedFields.map(allowedField => snakeCase(allowedField));
     } else {
-        allowed = <Record<string, string[]>> allowedFields;
+        for(let key in allowedFields) {
+            if(!allowedFields.hasOwnProperty(key)) continue;
+
+            allowed[key] = allowedFields[key].map(allowedField => snakeCase(allowedField));
+        }
     }
 
     const domains: Record<string, string[]> = transformRequestFields(fields, allowed);

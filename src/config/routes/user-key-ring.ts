@@ -4,7 +4,7 @@ import {
     addUserKeyRouteHandler,
     dropUserKeyRouteHandler,
     editUserKeyRouteHandler, getUserKeyRouteHandler
-} from "../../app/controllers/user/key/UserKeyController";
+} from "../../app/controllers/auth/user/key/UserKeyController";
 
 export function setupUserKeyRingRoutes() {
     const router = Router();

@@ -16,6 +16,9 @@ import {
     MQ_TR_EVENT_TRAIN_PUSHED,
     publishTrainRouterQueueMessage
 } from "../../../../domains/train-router/queue";
+import {Body, Controller, Post, Request, Response} from "@decorators/express";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {SwaggerTags} from "typescript-swagger";
 
 let eventValidator : undefined | BaseSchema = undefined;
 function useHookEventDataValidator() : BaseSchema {
@@ -67,6 +70,18 @@ type HarborHookEvent = {
     [key: string]: any
 }
 
+@SwaggerTags('service')
+@Controller("/service/harbor")
+export class HarborController {
+    @Post("/hook", [ForceLoggedInMiddleware])
+    async post(
+        @Request() req: any,
+        @Response() res: any,
+        @Body() harborHook: HarborHook
+    ) {
+        return postHarborHookRouteHandler(req, res);
+    }
+}
 
 export async function postHarborHookRouteHandler(req: any, res: any) {
 

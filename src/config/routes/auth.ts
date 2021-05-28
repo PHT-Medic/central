@@ -5,7 +5,7 @@ import {
     authorizeUrlRoute, dropProviderRoute, editProviderRoute,
     getProviderRoute,
     getProvidersRoute
-} from "../../app/controllers/auth/ProviderController";
+} from "../../app/controllers/auth/provider/ProviderController";
 import {
     addRealmRoute,
     dropRealmRoute,
@@ -14,7 +14,6 @@ import {
     getRealmsRoute
 } from "../../app/controllers/auth/realm/RealmController";
 import {forceLoggedIn} from "../../modules/http/request/middleware/authMiddleware";
-import {getStationProposalRouteHandler} from "../../app/controllers/pht/station/proposal/StationProposalRelationController";
 import {getRealmStationRouteHandler} from "../../app/controllers/auth/realm/station/RealmStationController";
 
 export default function setupAuthRoutes() {

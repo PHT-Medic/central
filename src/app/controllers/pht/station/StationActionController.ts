@@ -18,6 +18,24 @@ import {
     findHarborProjectWebHook
 } from "../../../../domains/harbor/project/web-hook/api";
 
+export enum StationTask {
+    CHECK_HARBOR = 'checkHarbor',
+
+    ENSURE_HARBOR_PROJECT = 'ensureHarborProject',
+    DROP_HARBOR_PROJECT = 'dropHarborProject',
+
+    ENSURE_HARBOR_PROJECT_WEBHOOK = 'ensureHarborProjectWebHook',
+    DROP_HARBOR_PROJECT_WEBHOOK = 'dropHarborProjectWebHook',
+
+    ENSURE_HARBOR_PROJECT_ACCOUNT = 'ensureHarborProjectAccount',
+    DROP_HARBOR_PROJECT_ACCOUNT = 'dropHarborProjectAccount',
+
+    CHECK_VAULT = 'checkVault',
+
+    SAVE_VAULT_PUBLIC_KEY = 'saveVaultPublicKey',
+    DROP_VAULT_PUBLIC_KEY = 'dropVaultPublicKey'
+}
+
 export async function doStationTaskRouteHandler(req: any, res: any) {
     let {id} = req.params;
 

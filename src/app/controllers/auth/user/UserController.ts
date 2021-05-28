@@ -1,20 +1,20 @@
 import {check, matchedData, validationResult} from "express-validator";
-import LoggerService from "../../../modules/loggerService";
-import UserResponseSchema from "../../../domains/user/UserResponseSchema";
-import {hashPassword} from "../../../modules/auth/utils/password";
+import LoggerService from "../../../../modules/loggerService";
+import UserResponseSchema from "../../../../domains/user/UserResponseSchema";
+import {hashPassword} from "../../../../modules/auth/utils/password";
 import {getCustomRepository, getRepository} from "typeorm";
-import {UserRepository} from "../../../domains/user/repository";
-import {onlyRealmPermittedQueryResources} from "../../../db/utils";
-import {isRealmPermittedForResource} from "../../../modules/auth/utils";
-import {Realm} from "../../../domains/realm";
-import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
+import {UserRepository} from "../../../../domains/user/repository";
+import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
+import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
+import {Realm} from "../../../../domains/realm";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {Params, Controller, Get, Request, Response, Post, Body, Delete} from "@decorators/express";
-import {ResponseExample, SwaggerTags} from "typescript-swagger/src/index";
-import {User} from "../../../domains/user";
-import {ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/authMiddleware";
-import {dropUserRoleRouteHandler, getUserRoleRouteHandler, getUserRolesRouteHandler} from "./role/UserRoleController";
-import {UserRole} from "../../../domains/user/role";
-import {Role} from "../../../domains/role";
+import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {User} from "../../../../domains/user";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {Station} from "../../../../domains/pht/station";
+import {getUserStationRouteHandler} from "./station/UserStationController";
+import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 //---------------------------------------------------------------------------------
 
@@ -28,13 +28,22 @@ export class UserController {
         {name: 'admin', email: 'admin@example.com'},
         {name: 'moderator', email: 'moderator@example.com'}
         ])
-    async getUsers(
+    async getMany(
         @Request() req: any,
         @Response() res: any
     ): Promise<Array<PartialUser>> {
         return await getUsersRouteHandler(req, res) as Array<PartialUser>;
     }
 
+    @Post("",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialUser>({name: 'admin', email: 'admin@example.com', realm_id: 'master'})
+    async add(
+        @Body() user: NonNullable<User>/* Pick<User, 'name' | 'email' | 'password' | 'realm_id'> */,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialUser|undefined> {
+        return await addUserRouteHandler(req, res) as PartialUser | undefined;
+    }
 
     @Get("/me",[ForceLoggedInMiddleware])
     @ResponseExample<PartialUser>({name: 'admin', email: 'admin@example.com'})
@@ -47,7 +56,7 @@ export class UserController {
 
     @Get("/:id",[ForceLoggedInMiddleware])
     @ResponseExample<PartialUser>({name: 'admin', email: 'admin@example.com'})
-    async getUser(
+    async get(
         @Params('id') id: string,
         @Request() req: any,
         @Response() res: any
@@ -55,116 +64,66 @@ export class UserController {
         return await getUserRouteHandler(req, res) as PartialUser | undefined;
     }
 
-    @Post("",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialUser>({name: 'admin', email: 'admin@example.com', realm_id: 'master'})
-    async addUser(
-        @Body() user: NonNullable<User>/* Pick<User, 'name' | 'email' | 'password' | 'realm_id'> */,
+    @Get("/:id/station", [])
+    async getStation(
+        @Params("id") id: number,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Station> {
+        return await getUserStationRouteHandler(req, res) as Station;
+    }
+
+    @Post("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialUser>({name: 'admin', email: 'admin@example.com'})
+    async edit(
+        @Params('id') id: string,
+        @Body() user: PartialUser,
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialUser|undefined> {
-        return await addUserRouteHandler(req, res) as PartialUser | undefined;
+        return await editUserRouteHandler(req, res) as PartialUser | undefined;
     }
 
-    //-------------------------------------------------------------------------
-    // Relations (self)
-    //-------------------------------------------------------------------------
-
-    @Delete("/:id/relationships/roles/:relationId",[ForceLoggedInMiddleware])
-    @ResponseExample<Partial<UserRole>>(
-        {role_id: 1, user_id: 1}
-    )
-    async dropUserSelfRole(
+    @Delete("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialUser>({name: 'admin', email: 'admin@example.com'})
+    async drop(
+        @Params('id') id: string,
         @Request() req: any,
         @Response() res: any
-    ): Promise<UserRole> {
-        return await dropUserRoleRouteHandler(req, res, 'self') as UserRole;
-    }
-
-    @Get("/:id/relationships/roles/:relationId",[ForceLoggedInMiddleware])
-    @ResponseExample<Partial<UserRole>>(
-        {role_id: 1, user_id: 1}
-    )
-    async getUserSelfRole(
-        @Request() req: any,
-        @Response() res: any
-    ): Promise<UserRole> {
-        return await getUserRoleRouteHandler(req, res, 'self') as UserRole;
-    }
-
-    @Get("/:id/relationships/roles",[ForceLoggedInMiddleware])
-    @ResponseExample<Array<Partial<UserRole>>>([
-        {role_id: 1, user_id: 1},
-        {role_id: 1, user_id: 2}
-    ])
-    async getUserSelfRoles(
-        @Request() req: any,
-        @Response() res: any
-    ): Promise<Array<UserRole>> {
-        return await getUserRolesRouteHandler(req, res, 'self') as Array<UserRole>;
-    }
-
-    //-------------------------------------------------------------------------
-    // Relations (related)
-    //-------------------------------------------------------------------------
-
-    @Delete("/:id/roles/:relationId",[ForceLoggedInMiddleware])
-    @ResponseExample<Partial<Role>>(
-        {name: 'admin'}
-    )
-    async dropUserRole(
-        @Request() req: any,
-        @Response() res: any
-    ): Promise<Role> {
-        return await dropUserRoleRouteHandler(req, res, 'related') as Role;
-    }
-
-    @Get("/:id/roles/:relationId",[ForceLoggedInMiddleware])
-    @ResponseExample<Partial<Role>>(
-        {name: 'admin'}
-    )
-    async getUserRole(
-        @Request() req: any,
-        @Response() res: any
-    ): Promise<Role> {
-        return await getUserRoleRouteHandler(req, res, 'related') as Role;
-    }
-
-    @Get("/:id/roles",[ForceLoggedInMiddleware])
-    @ResponseExample<Array<Partial<Role>>>([
-        {name: 'admin'},
-        {name: 'moderator'}
-    ])
-    async getUserRoles(
-        @Request() req: any,
-        @Response() res: any
-    ): Promise<Array<Role>> {
-        return await getUserRolesRouteHandler(req, res, 'related') as Array<Role>;
+    ): Promise<PartialUser|undefined> {
+        return await dropUserRouteHandler(req, res) as PartialUser | undefined;
     }
 }
 
 export async function getUsersRouteHandler(req: any, res: any) {
-    let { filter } = req.query;
+    let { filter, page } = req.query;
 
     try {
 
         const userRepository = getCustomRepository<UserRepository>(UserRepository);
-        const queryBuilder = userRepository.createQueryBuilder('user')
+        const query = userRepository.createQueryBuilder('user')
             .leftJoinAndSelect('user.realm', 'realm');
 
-        onlyRealmPermittedQueryResources(queryBuilder, req.user.realm_id);
+        onlyRealmPermittedQueryResources(query, req.user.realm_id);
 
-        applyRequestFilterOnQuery(queryBuilder, filter, {
+        applyRequestFilterOnQuery(query, filter, {
             id: 'user.id',
             name: 'user.name'
         });
 
-        let result = await queryBuilder.getMany();
+        const pagination = applyRequestPagination(query, page, 50);
 
-        let userResponseSchema = new UserResponseSchema();
+        const [entities, total] = await query.getManyAndCount();
 
-        result = userResponseSchema.applySchemaOnEntities(result);
-
-        return res._respond({data: result});
+        return res._respond({
+            data: {
+                data: entities,
+                meta: {
+                    total,
+                    ...pagination
+                }
+            }
+        });
     } catch (e) {
         console.log(e);
         return res._failServerError();

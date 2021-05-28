@@ -4,12 +4,73 @@ import {ProposalStation} from "../../../../domains/pht/proposal/station";
 import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
 import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
-import {isProposalStationState} from "../../../../domains/pht/proposal/station/states";
+import {isProposalStationState, ProposalStationStateApproved} from "../../../../domains/pht/proposal/station/states";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
 
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ResponseExample, SwaggerTags} from "typescript-swagger";
+
+type PartialProposalStation = Partial<ProposalStation>;
+const simpleExample = {proposal_id: 1, station_id: 1, comment: 'Looks good to me', status: ProposalStationStateApproved};
+
+@SwaggerTags('pht')
+@Controller("/proposal-stations")
+export class ProposalStationController {
+    @Get("",[ForceLoggedInMiddleware])
+    @ResponseExample<Array<PartialProposalStation>>([simpleExample])
+    async getMany(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Array<PartialProposalStation>> {
+        return await getProposalStationsRouteHandler(req, res) as Array<PartialProposalStation>;
+    }
+
+    @Post("",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposalStation>(simpleExample)
+    async add(
+        @Body() data: Pick<ProposalStation, 'station_id' | 'proposal_id'>,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialProposalStation|undefined> {
+        return await addProposalStationRouteHandler(req, res) as PartialProposalStation | undefined;
+    }
+
+    @Get("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposalStation>(simpleExample)
+    async getOne(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialProposalStation|undefined> {
+        return await getProposalStationRouteHandler(req, res) as PartialProposalStation | undefined;
+    }
+
+    @Post("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposalStation>(simpleExample)
+    async edit(
+        @Params('id') id: string,
+        @Body() data: Pick<ProposalStation, 'station_id' | 'proposal_id' | 'comment'>,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialProposalStation|undefined> {
+        return await editProposalStationRouteHandler(req, res) as PartialProposalStation | undefined;
+    }
+
+    @Delete("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposalStation>(simpleExample)
+    async drop(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialProposalStation|undefined> {
+        return await dropProposalStationRouteHandler(req, res) as PartialProposalStation | undefined;
+    }
+}
 
 export async function getProposalStationsRouteHandler(req: any, res: any) {
     let { filter, page } = req.query;
+
     try {
         const repository = getRepository(ProposalStation);
         let query = await repository.createQueryBuilder('proposalStation')
