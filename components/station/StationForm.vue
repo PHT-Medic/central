@@ -71,7 +71,8 @@ export default {
     methods: {
         async loadRealms() {
             try {
-                this.realm.items = await getRealms();
+                const response = await getRealms();
+                this.realm.items = response.data;
                 this.realm.busy = false;
             }  catch (e) {
                 await this.$bvToast.toast(e.message);

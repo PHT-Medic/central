@@ -27,28 +27,12 @@
     <div>
         <div class="row">
             <div class="col-7">
-                <div class="panel-card">
-                    <div class="panel-card-header">
-                        <h6 class="title">
-                            Allgmein
-                        </h6>
-                    </div>
-                    <div class="panel-card-body">
-                        <user-details-form :user-property="userProperty" @updated="handleUserUpdated" />
-                    </div>
-                </div>
+                <h6>General</h6>
+                <user-details-form :user-property="userProperty" @updated="handleUserUpdated" />
             </div>
             <div class="col-5">
-                <div class="panel-card">
-                    <div class="panel-card-header">
-                        <h6 class="title">
-                            Passwort
-                        </h6>
-                    </div>
-                    <div class="panel-card-body">
-                        <user-password-form :user-property="userProperty" @updated="handleUserUpdated" />
-                    </div>
-                </div>
+                <h6>Password</h6>
+                <user-password-form :user-property="userProperty" @updated="handleUserUpdated" />
             </div>
         </div>
     </div>

@@ -1,9 +1,13 @@
 import {useApi} from "~/modules/api";
 import {changeRequestKeyCase, changeResponseKeyCase, formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 
+export function getProviderAuthorizeUri(id) {
+    return '/providers/'+id+'/authorize-url';
+}
+
 export async function getProviders(record?: RequestRecord) {
     try {
-        let response = await useApi('auth').get('auth/providers' + formatRequestRecord(record));
+        let response = await useApi('auth').get('providers' + formatRequestRecord(record));
 
         return changeResponseKeyCase(response.data);
     } catch (e) {
@@ -13,7 +17,7 @@ export async function getProviders(record?: RequestRecord) {
 
 export async function getProvider(id: number) {
     try {
-        let response = await useApi('auth').get('auth/providers/'+id);
+        let response = await useApi('auth').get('providers/'+id);
 
         return changeResponseKeyCase(response.data);
     } catch (e) {
@@ -23,7 +27,7 @@ export async function getProvider(id: number) {
 
 export async function dropProvider(id: number) {
     try {
-        let response = await useApi('auth').delete('auth/providers/'+id);
+        let response = await useApi('auth').delete('providers/'+id);
 
         return changeResponseKeyCase(response.data);
     } catch (e) {
@@ -33,7 +37,7 @@ export async function dropProvider(id: number) {
 
 export async function addProvider(data: {[key: string] : any}) {
     try {
-        let response = await useApi('auth').post('auth/providers',changeRequestKeyCase(data));
+        let response = await useApi('auth').post('providers',changeRequestKeyCase(data));
 
         return changeResponseKeyCase(response.data);
     } catch (e) {
@@ -43,7 +47,7 @@ export async function addProvider(data: {[key: string] : any}) {
 
 export async function editProvider(userId: number, data: {[key: string] : any}) {
     try {
-        let response = await useApi('auth').post('auth/providers/'+userId, changeRequestKeyCase(data));
+        let response = await useApi('auth').post('providers/'+userId, changeRequestKeyCase(data));
 
         return changeResponseKeyCase(response.data);
     } catch (e) {

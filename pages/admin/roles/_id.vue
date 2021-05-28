@@ -25,9 +25,9 @@
             return {
                 role: null,
                 tabs: [
-                    { name: 'Allgemein', routeName: 'admin-roles-id', icon: 'fas fa-bars', urlSuffix: '' },
-                    { name: 'Berechtigungen', routeName: 'admin-roles-id-permissions', icon: 'fas fa-user-secret', urlSuffix: 'permissions' },
-                    { name: 'Benutzer', routeName: 'admin-roles-id-users', icon: 'fa fa-users', urlSuffix: 'users' }
+                    { name: 'General', routeName: 'admin-roles-id', icon: 'fas fa-bars', urlSuffix: '' },
+                    { name: 'Permissions', routeName: 'admin-roles-id-permissions', icon: 'fas fa-user-secret', urlSuffix: 'permissions' },
+                    { name: 'Users', routeName: 'admin-roles-id-users', icon: 'fa fa-users', urlSuffix: 'users' }
                 ]
             }
         }
@@ -35,14 +35,22 @@
 </script>
 <template>
     <div class="container">
-        <h4 class="title">
+        <h1 class="title no-border mb-3">
             {{role.name}} <span class="sub-title">Details</span>
-        </h4>
+        </h1>
 
         <div class="m-b-20 m-t-10">
             <div class="panel-card">
                 <div class="panel-card-body">
+
                     <b-nav pills>
+                        <b-nav-item
+                            :to="'/admin/roles'"
+                            exact
+                            exact-active-class="active"
+                        >
+                            <i class="fa fa-arrow-left" />
+                        </b-nav-item>
                         <b-nav-item
                             v-for="(item,key) in tabs"
                             :key="key"

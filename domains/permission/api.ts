@@ -1,14 +1,7 @@
 import {useApi} from "~/modules/api";
-import {changeResponseKeyCase} from "~/modules/api/utils";
+import {formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 
-export async function getPermissions() {
-    try {
-        let response = await useApi('auth').get('permissions');
-
-        let data = response.data;
-
-        return changeResponseKeyCase(data);
-    } catch (e) {
-        throw new Error('Die Berechtigungen konnten nicht geladen werden.');
-    }
+export async function getPermissions(data?: RequestRecord) {
+    const response = await useApi('auth').get('permissions'+formatRequestRecord(data));
+    return response.data;
 }

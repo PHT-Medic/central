@@ -5,6 +5,7 @@ import {editTrainStation, getTrainStations} from "@/domains/train-station/api";
 import {TrainStationStatusOptions} from "@/domains/train-station";
 import TrainStationAction from "@/components/train/station/TrainStationAction";
 import TrainStationStatus from "@/components/train/station/TrainStationStatus";
+import {getTrainFilesDownloadUri} from "@/domains/train/file/api";
 
 export default {
     components: {
@@ -96,7 +97,7 @@ export default {
                 .catch(reject);
         },
         download(item) {
-            window.open(this.$config.apiUrl+'pht/trains/'+item.trainId+'/tar', '_blank')
+            window.open(this.$config.apiUrl+getTrainFilesDownloadUri(item.trainId), '_blank')
         },
         handleUpdated(item) {
             const index = this.items.findIndex(i => i.id === item.id);

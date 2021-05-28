@@ -1,10 +1,10 @@
 import {useApi} from "@/modules/api";
-import {changeRequestKeyCase} from "~/modules/api/utils";
+import {changeRequestKeyCase, formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 import {clearObjectProperties} from "~/modules/utils";
 
-export async function getRoles() {
+export async function getRoles(data?: RequestRecord) {
     try {
-        let response = await useApi('auth').get('roles');
+        let response = await useApi('auth').get('roles'+formatRequestRecord(data));
 
         return response.data;
     } catch (e) {

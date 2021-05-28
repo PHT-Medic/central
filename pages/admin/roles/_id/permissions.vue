@@ -1,8 +1,7 @@
 <script>
     import NotImplemented from "../../../../components/NotImplemented";
     import AlertMessage from "../../../../components/alert/AlertMessage";
-    import userPasswordFormMixin from "../../../../mixins/userPasswordFormMixin";
-    import RolePermissionList from "../../../../components/permission/RolePermissionList";
+    import RolePermissionList from "@/components/role/permission/RolePermissionList";
 
     export default {
         props: {
@@ -19,15 +18,6 @@
 </script>
 <template>
     <div>
-        <div class="panel-card">
-            <div class="panel-card-body">
-                <alert-message
-                    :message="{
-                    isError: false,
-                    data: 'Aktivieren oder deaktivieren Sie Rollen-Berechtigungen.'
-                }" />
-                <role-permission-list :role-id-property="roleProperty.id" />
-            </div>
-        </div>
+        <role-permission-list :role-id="roleProperty.id" />
     </div>
 </template>

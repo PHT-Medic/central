@@ -58,25 +58,12 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             rootLink: true
         },
         {
-            name: 'Settings',
-            type: 'link',
-            url: '/admin/settings',
-            icon: 'fa fa-cog',
-            requireLoggedIn: true
-        },
-        {
             name: 'Realms',
             type: 'link',
             url: '/admin/realms',
             icon: 'fas fa-university',
             requireLoggedIn: true,
             requirePermissions: ['realm_add', 'realm_drop', 'realm_edit', 'provider_add', 'provider_drop', 'provider_edit','station_edit','station_drop','station_add']
-        },
-        {
-            name: 'Users & Roles',
-            type: 'separator',
-            requireLoggedIn: true,
-            requirePermissions: ['user_add', 'user_drop', 'user_edit', 'role_add', 'role_drop', 'role_edit', 'role_permission_add', 'role_permission_drop']
         },
         {
             name: 'Users',
@@ -96,35 +83,12 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
         },
         {
             name: 'Permissions',
-            type: 'separator',
-            requireLoggedIn: true,
-            requirePermissions: ['permission_add', 'permission_drop']
-        },
-        {
-            name: 'Permissions',
             type: 'link',
             url: '/admin/permissions',
             icon: 'fas fa-key',
             requireLoggedIn: true,
             requirePermissions: ['permission_add', 'permission_drop']
-        },
-        /*
-        {
-            name: 'PHT',
-            type: 'separator',
-            requireLoggedIn: true,
-            requirePermissions: RouteAdminPHTStationsPermissions
-        },
-        {
-            name: 'Stationen',
-            type: 'link',
-            url: '/admin/stations',
-            icon: 'fas fa-city',
-            requireLoggedIn: true,
-            requirePermissions: RouteAdminPHTStationsPermissions
-        },
-
-         */
+        }
     ],
     default: [
         {

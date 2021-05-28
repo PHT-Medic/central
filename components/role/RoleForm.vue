@@ -63,7 +63,7 @@ export default {
 
                    this.message = {
                        isError: false,
-                       data: 'Die Rolle wurde erfolgreich editiert.'
+                       data: 'The role was successfully updated.'
                    }
 
                    this.$emit('updated', response);
@@ -72,7 +72,7 @@ export default {
 
                     this.message = {
                         isError: false,
-                        data: 'Die Rolle wurde erfolgreich erstellt.'
+                        data: 'The role was successfully created.'
                     }
 
                     this.$emit('created', response);
@@ -103,30 +103,30 @@ export default {
         <div class="form-group">
             <div class="form-group" :class="{ 'form-group-error': $v.formData.name.$error }">
                 <label>Name</label>
-                <input v-model="$v.formData.name.$model" type="text" name="name" class="form-control" placeholder="Rollen-Name...">
+                <input v-model="$v.formData.name.$model" type="text" name="name" class="form-control" placeholder="Name...">
 
                 <div v-if="!$v.formData.name.required" class="form-group-hint group-required">
-                    Bitte geben Sie einen Namen an.
+                    Enter a name
                 </div>
                 <div v-if="!$v.formData.name.minLength" class="form-group-hint group-required">
-                    Der Name muss mindestens <strong>{{ $v.formData.name.$params.minLength.min }}</strong> Zeichen lang sein.
+                    The length of the name mus be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters
                 </div>
                 <div v-if="!$v.formData.name.maxLength" class="form-group-hint group-required">
-                    Der Name darf maximal <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> Zeichen lang sein.
+                    The length of the name mus be greater than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
                 </div>
             </div>
 
             <hr>
 
             <div class="form-group" :class="{ 'form-group-error': $v.formData.providerRoleId.$error }">
-                <label>Provider Rollen ID</label>
-                <input v-model="$v.formData.providerRoleId.$model" type="text" name="name" class="form-control" placeholder="Keycloak Role-Name...">
+                <label>Provider Role-ID</label>
+                <input v-model="$v.formData.providerRoleId.$model" type="text" name="name" class="form-control" placeholder="Provider Role-ID...">
 
                 <div v-if="!$v.formData.providerRoleId.minLength" class="form-group-hint group-required">
-                    Der Name muss mindestens <strong>{{ $v.formData.providerRoleId.$params.minLength.min }}</strong> Zeichen lang sein.
+                    The length of the provide-role-id mus be greater than <strong>{{ $v.formData.providerRoleId.$params.minLength.min }}</strong> characters
                 </div>
                 <div v-if="!$v.formData.providerRoleId.maxLength" class="form-group-hint group-required">
-                    Der Name darf maximal <strong>{{ $v.formData.providerRoleId.$params.maxLength.max }}</strong> Zeichen lang sein.
+                    The length of the provider-role-id mus be greater than <strong>{{ $v.formData.providerRoleId.$params.maxLength.max }}</strong> characters
                 </div>
             </div>
 
@@ -134,7 +134,7 @@ export default {
 
             <div class="form-group">
                 <button type="submit" class="btn btn-outline-primary btn-sm" :disabled="$v.$invalid || busy" @click="handleSubmit">
-                    {{ isEditing ? 'Aktualisieren' : 'Erstellen' }}
+                    {{ isEditing ? 'Update' : 'Create' }}
                 </button>
             </div>
         </div>

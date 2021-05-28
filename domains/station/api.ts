@@ -3,7 +3,7 @@ import {formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 
 export async function getStations(options?: RequestRecord) {
     try {
-        const response = await useApi('auth').get('pht/stations' + formatRequestRecord(options));
+        const response = await useApi('auth').get('stations' + formatRequestRecord(options));
 
         return response.data;
     } catch (e) {
@@ -13,7 +13,7 @@ export async function getStations(options?: RequestRecord) {
 
 export async function getStation(id: number) {
     try {
-        const response = await useApi('auth').get('pht/stations/' + id);
+        const response = await useApi('auth').get('stations/' + id);
 
         return response.data;
     } catch (e) {
@@ -23,7 +23,7 @@ export async function getStation(id: number) {
 
 export async function addStation(data: Record<string, any>) {
     try {
-        const response = await useApi('auth').post('pht/stations', data);
+        const response = await useApi('auth').post('stations', data);
 
         return response.data;
     } catch (e) {
@@ -33,7 +33,7 @@ export async function addStation(data: Record<string, any>) {
 
 export async function editStation(id: number, data: Record<string, any>) {
     try {
-        const response = await useApi('auth').post('pht/stations/'+id, data);
+        const response = await useApi('auth').post('stations/'+id, data);
 
         return response.data;
     } catch (e) {
@@ -43,7 +43,7 @@ export async function editStation(id: number, data: Record<string, any>) {
 
 export async function dropStation(id: number) {
     try {
-        const response = await useApi('auth').delete('pht/stations/'+id);
+        const response = await useApi('auth').delete('stations/'+id);
 
         return response.data;
     } catch (e) {
@@ -53,7 +53,7 @@ export async function dropStation(id: number) {
 
 export async function doStationTask(id: number, task: string, data: Record<string, any>) {
     try {
-        const response = await useApi('auth').post('pht/stations/'+id + '/task', {task, ...data});
+        const response = await useApi('auth').post('stations/'+id + '/task', {task, ...data});
 
         return response.data;
     } catch (e) {

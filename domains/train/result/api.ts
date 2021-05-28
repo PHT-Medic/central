@@ -6,7 +6,7 @@ export async function runTrainResultTask(id: string, task: string, data: Record<
         ...data
     };
 
-    const {data: response} = await useApi('auth').post('pht/train-results/' + id + '/task', actionData);
+    const {data: response} = await useApi('auth').post('train-results/' + id + '/task', actionData);
 
     return response;
 }

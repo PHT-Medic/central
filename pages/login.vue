@@ -1,6 +1,6 @@
 <script>
     import { mapGetters, mapActions } from 'vuex'
-    import {getProviders} from "@/domains/provider/api.ts";
+    import {getProviderAuthorizeUri, getProviders} from "@/domains/provider/api.ts";
     import MedicineWorker from "@/components/svg/MedicineWorker";
     import Pagination from "@/components/Pagination";
 
@@ -35,7 +35,7 @@
 
             providerItems() {
                 return this.provider.items.map((provider) => {
-                    provider.authorizeUrl = this.$config.apiUrl + '/auth/providers/' + provider.id + '/uri';
+                    provider.authorizeUrl = getProviderAuthorizeUri(provider.id);
                     return provider;
                 });
             },
@@ -111,7 +111,6 @@
 
                     await this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
                 } catch (e) {
-                    console.log(e);
                     this.error = e.message;
                 }
             }
@@ -211,10 +210,10 @@
                         </div>
                     </li>
                 </ul>
-                <div v-if="!provider.busy && provider.items.length === 0" class="alert alert-sm alert-info">
+                <div v-if="!provider.busy && stationRealmsProviders.length === 0" class="alert alert-sm alert-info">
                     No authentication provider specified for any station.
                 </div>
-                <pagination :total="provider.meta.total" :offset="provider.meta.offset" :limit="provider.meta.limit" @to="goTo" />
+                <pagination v-if="stationRealmsProviders.length !== 0" :total="provider.meta.total" :offset="provider.meta.offset" :limit="provider.meta.limit" @to="goTo" />
             </div>
         </div>
     </div>

@@ -27,8 +27,8 @@
             return {
                 user: null,
                 tabs: [
-                    { name: 'Allgemein', routeName: 'admin-users-id', icon: 'fas fa-bars', urlSuffix: '' },
-                    { name: 'Rollen', routeName: 'admin-users-id-groups', icon: 'fas fa-users', urlSuffix: 'roles' }
+                    { name: 'General', routeName: 'admin-users-id', icon: 'fas fa-bars', urlSuffix: '' },
+                    { name: 'Roles', routeName: 'admin-users-id-groups', icon: 'fas fa-users', urlSuffix: 'roles' }
                 ]
             }
         },
@@ -43,9 +43,9 @@
 </script>
 <template>
     <div class="container">
-        <h4 class="title">
+        <h1 class="title no-border mb-3">
             {{user.name}} <span class="sub-title">Details</span>
-        </h4>
+        </h1>
 
         <div class="m-b-20 m-t-10">
             <div class="panel-card">

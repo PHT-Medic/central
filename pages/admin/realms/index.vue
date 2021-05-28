@@ -2,9 +2,10 @@
 import {LayoutNavigationAdminId} from "../../../config/layout";
 import {dropRealm, getRealms} from "@/domains/realm/api.ts";
 import RealmForm from "@/components/admin/realm/RealmForm";
+import RealmList from "@/components/realm/RealmList";
 
 export default {
-    components: {RealmForm},
+    components: {RealmList, RealmForm},
     meta: {
         navigationId: LayoutNavigationAdminId,
         requireLoggedIn: true,
@@ -108,53 +109,61 @@ export default {
         <h1 class="title no-border mb-3">
             Realm <span class="sub-title">Management</span>
         </h1>
-        <div class="d-flex flex-row">
-            <div>
-                <button @click.prevent="load" type="button" class="btn btn-xs btn-dark">
-                    <i class="fas fa-sync"></i> Aktualisieren
-                </button>
-            </div>
-            <div style="margin-left: auto;">
-                <button @click.prevent="add" type="button" class="btn btn-xs btn-success">
-                    <i class="fa fa-plus"></i> Hinzufügen
-                </button>
-            </div>
-        </div>
-        <div class="m-t-10">
-            <b-table :items="items" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
-                <template v-slot:cell(options)="data">
-                    <nuxt-link
-                        :to="'/admin/realms/'+data.item.id"
-                        v-if="$auth.can('edit','realm')"
-                        @click.prevent="edit(data.item.id)"
-                        class="btn btn-xs btn-outline-primary"
-                    >
-                        <i class="fa fa-arrow-right"></i>
-                    </nuxt-link>
-                    <button
-                        v-if="$auth.can('drop','realm') && data.item.dropAble"
-                        @click.prevent="drop(data.item)"
-                        type="button"
-                        class="btn btn-xs btn-outline-danger"
-                        title="Löschen"
-                    >
-                        <i class="fa fa-times"></i>
-                    </button>
-                </template>
-                <template v-slot:cell(createdAt)="data">
-                    <timeago :datetime="data.item.createdAt" />
-                </template>
-                <template v-slot:cell(updatedAt)="data">
-                    <timeago :datetime="data.item.updatedAt" />
-                </template>
-                <template v-slot:table-busy>
-                    <div class="text-center text-danger my-2">
-                        <b-spinner class="align-middle" />
-                        <strong>Loading...</strong>
+
+        <realm-list>
+            <template v-slot:header-title>
+                Slight overview of all realms.
+            </template>
+            <template v-slot:header-actions="props">
+                <div class="d-flex flex-row">
+                    <div>
+                        <button type="button" class="btn btn-xs btn-dark" :disabled="props.busy" @click.prevent="props.load">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
                     </div>
-                </template>
-            </b-table>
-        </div>
+                    <div class="ml-2">
+                        <button type="button" class="btn btn-xs btn-success"  @click.prevent="add">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            </template>
+            <template v-slot:items="props">
+                <b-table :items="props.items" :fields="fields" :busy="props.busy" head-variant="'dark'" outlined>
+                    <template v-slot:cell(options)="data">
+                        <nuxt-link
+                            :to="'/admin/realms/'+data.item.id"
+                            v-if="$auth.can('edit','realm')"
+                            @click.prevent="edit(data.item.id)"
+                            class="btn btn-xs btn-outline-primary"
+                        >
+                            <i class="fa fa-arrow-right"></i>
+                        </nuxt-link>
+                        <button
+                            v-if="$auth.can('drop','realm') && data.item.dropAble"
+                            @click.prevent="drop(data.item)"
+                            type="button"
+                            class="btn btn-xs btn-outline-danger"
+                            title="Löschen"
+                        >
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </template>
+                    <template v-slot:cell(createdAt)="data">
+                        <timeago :datetime="data.item.createdAt" />
+                    </template>
+                    <template v-slot:cell(updatedAt)="data">
+                        <timeago :datetime="data.item.updatedAt" />
+                    </template>
+                    <template v-slot:table-busy>
+                        <div class="text-center text-danger my-2">
+                            <b-spinner class="align-middle" />
+                            <strong>Loading...</strong>
+                        </div>
+                    </template>
+                </b-table>
+            </template>
+        </realm-list>
         <b-modal
             size="lg"
             ref="form"

@@ -38,15 +38,6 @@
 </script>
 <template>
     <div>
-        <div class="panel-card">
-            <div class="panel-card-header">
-                <h6 class="title">
-                    Allgmein
-                </h6>
-            </div>
-            <div class="panel-card-body">
-                <role-form :role-property="roleData" @updated="handleRoleUpdated" />
-            </div>
-        </div>
+        <role-form :role-property="roleData" @updated="handleRoleUpdated" />
     </div>
 </template>

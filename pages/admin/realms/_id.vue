@@ -43,18 +43,9 @@ export default {
 </script>
 <template>
     <div class="container">
-        <div class="text-center">
-            <medicine-doctors width="50%" height="auto" />
-        </div>
-
-        <div class="d-flex flex-row align-items-baseline">
-            <div>
-                <h4 class="title mb-0">
-                    {{ realm.name }} <span class="sub-title">Manage and inspect realm</span>
-                </h4>
-            </div>
-            <div class="ml-auto" style="font-size: .8rem;"></div>
-        </div>
+        <h1 class="title no-border mb-3">
+            {{realm.name}} <span class="sub-title">Details</span>
+        </h1>
 
         <div class="m-b-20 m-t-10">
             <div class="panel-card">

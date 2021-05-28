@@ -127,14 +127,16 @@ body
     display: flex;
     width: 100%;
     align-items: stretch;
-    margin-top:56px;
+    padding-top: 60px;
+    height: -moz-calc(100% - (34px));
+    height: -webkit-calc(100% - (34px));
+    height: calc(100% - (34px));
 }
 
 .page-content {
     padding: 15px 15px 40px;
     position:relative;
     overflow-x: hidden;
-    min-height: 100vh;
     width: 100%;
     background: #fafafa;
 }

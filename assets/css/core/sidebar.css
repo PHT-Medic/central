@@ -3,6 +3,8 @@
     background-color: rgb(64,67,78);
     color: #fff;
     transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
 }
 
 .page-sidebar .sidebar-header {
@@ -17,7 +19,6 @@
 
 .page-sidebar ul.sidebar-menu {
     padding: 0;
-    box-shadow: 0px -3px 0px rgba(0, 0, 0, 0.3) inset;
 }
 
 .page-sidebar ul p {

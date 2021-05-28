@@ -1,9 +1,13 @@
 import {useApi} from "~/modules/api";
 import {changeResponseKeyCase} from "~/modules/api/utils";
 
+export function getTrainFilesDownloadUri(trainId: number) {
+    return 'trains/'+trainId+'/files/download'
+}
+
 export async function getApiTrainFiles(trainId: number) {
     try {
-        const response = await useApi('auth').get('pht/trains/'+trainId+'/files');
+        const response = await useApi('auth').get('trains/'+trainId+'/files');
 
         return response.data;
     } catch (e) {
@@ -13,7 +17,7 @@ export async function getApiTrainFiles(trainId: number) {
 
 export async function getApiTrainFile(trainId: number, fileId: number) {
     try {
-        const response = await useApi('auth').get('pht/trains/'+trainId+'/files'+fileId);
+        const response = await useApi('auth').get('trains/'+trainId+'/files'+fileId);
 
         return changeResponseKeyCase(response.data);
     } catch (e) {
@@ -23,7 +27,7 @@ export async function getApiTrainFile(trainId: number, fileId: number) {
 
 export async function dropApiTrainFile(trainId: number, fileId: number) {
     try {
-        let response = await useApi('auth').delete('pht/trains/'+trainId+'/files/'+fileId);
+        let response = await useApi('auth').delete('trains/'+trainId+'/files/'+fileId);
 
         return changeResponseKeyCase(response.data);
     } catch (e) {
@@ -33,7 +37,7 @@ export async function dropApiTrainFile(trainId: number, fileId: number) {
 
 export async function uploadTrainFiles(trainId: number, formData: FormData) {
     try {
-        const response = await useApi('auth').post('pht/trains/'+trainId+'/files', formData, {
+        const response = await useApi('auth').post('trains/'+trainId+'/files', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }

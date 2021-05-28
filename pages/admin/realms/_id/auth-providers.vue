@@ -64,6 +64,9 @@ export default {
                     },
                     filter: {
                         realmId: this.realm.id
+                    },
+                    fields: {
+                        provider: ['clientSecret']
                     }
                 };
 

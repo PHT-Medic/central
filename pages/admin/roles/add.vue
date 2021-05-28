@@ -26,24 +26,11 @@
 </script>
 <template>
     <div class="container">
-        <h4 class="title m-b-10">
-            Rolle <span class="sub-title">Hinzufügen</span>
-        </h4>
+        <h1 class="title no-border mb-3">
+            Role <span class="sub-title">Add</span>
+        </h1>
 
-        <div class="row">
-            <div class="col">
-                <div class="panel-card m-b-20">
-                    <div class="panel-card-header">
-                        <h5 class="title">
-                            Allgemein <i class="fa fa-info"></i>
-                        </h5>
-                    </div>
-                    <div class="panel-card-body">
-                        <role-form :role-property="undefined" @created="handleRoleCreated" />
-                    </div>
-                </div>
-            </div>
-        </div>
+        <role-form :role-property="undefined" @created="handleRoleCreated" />
     </div>
 </template>
 <style>

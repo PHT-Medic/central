@@ -1,19 +1,15 @@
 import {useApi} from "~/modules/api";
-import {changeRequestKeyCase, changeResponseKeyCase} from "~/modules/api/utils";
+import {changeRequestKeyCase, changeResponseKeyCase, formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 
-export async function getRealms() {
-    try {
-        let response = await useApi('auth').get('auth/realms');
+export async function getRealms(data?: RequestRecord) {
+    let response = await useApi('auth').get('realms' + formatRequestRecord(data));
 
-        return changeResponseKeyCase(response.data);
-    } catch (e) {
-        throw new Error('Die Realms konnten nicht geladen werden.');
-    }
+    return response.data;
 }
 
 export async function getRealm(id: string) {
     try {
-        let response = await useApi('auth').get('auth/realms/'+id);
+        let response = await useApi('auth').get('realms/'+id);
 
         return changeResponseKeyCase(response.data);
     } catch (e) {
@@ -23,7 +19,7 @@ export async function getRealm(id: string) {
 
 export async function dropRealm(id: string) {
     try {
-        let response = await useApi('auth').delete('auth/realms/'+id);
+        let response = await useApi('auth').delete('realms/'+id);
 
         return changeResponseKeyCase(response.data);
     } catch (e) {
@@ -33,7 +29,7 @@ export async function dropRealm(id: string) {
 
 export async function addRealm(data: {[key: string] : any}) {
     try {
-        let response = await useApi('auth').post('auth/realms',changeRequestKeyCase(data));
+        let response = await useApi('auth').post('realms',changeRequestKeyCase(data));
 
         return changeResponseKeyCase(response.data);
     } catch (e) {
@@ -43,7 +39,7 @@ export async function addRealm(data: {[key: string] : any}) {
 
 export async function editRealm(realmId: string, data: {[key: string] : any}) {
     try {
-        let response = await useApi('auth').post('auth/realms/'+realmId, changeRequestKeyCase(data));
+        let response = await useApi('auth').post('realms/'+realmId, changeRequestKeyCase(data));
 
         return changeResponseKeyCase(response.data);
     } catch (e) {

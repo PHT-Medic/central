@@ -127,7 +127,8 @@ export default {
             this.realm.busy = true;
 
             try {
-                this.realm.items = await getRealms();
+                const response = await getRealms();
+                this.realm.items = response.data;
                 this.realm.busy = false;
             } catch (e) {
                 this.realm.busy = false;

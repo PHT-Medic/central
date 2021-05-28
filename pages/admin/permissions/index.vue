@@ -1,26 +1,14 @@
 <script>
-    import momentHelper from "../../../modules/time/moment";
-
-    import {LayoutNavigationAdminId} from "../../../config/layout";
-    import {getPermissions} from "@/domains/permission/api.ts";
+    import {LayoutNavigationAdminId} from "@/config/layout";
+    import PermissionList from "@/components/permission/PermissionList";
 
     export default {
+        components: {PermissionList},
         meta: {
             navigationId: LayoutNavigationAdminId,
             requireLoggedIn: true,
             requireAbility: (can) => {
                 return can('add','permission') || can('edit','permission') || can('drop','user_permission')
-            }
-        },
-        async asyncData(context) {
-            try {
-                const items = await getPermissions();
-
-                return {
-                    items
-                }
-            } catch (e) {
-                await context.redirect('/admin');
             }
         },
         data() {
@@ -29,65 +17,42 @@
                 fields: [
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'description', label: 'Beschreibung', thClass: 'text-center', tdClass: 'text-center' },
                     { key: 'createdAt', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
                     { key: 'updatedAt', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }
-                ],
-                items: []
+                ]
             }
         },
         methods: {
-            dropPermission(event, permission) {
-                event.preventDefault();
-
-                let l = this.$createElement;
-
-                this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-info m-b-0'}, [
-                    l('p', null, [
-                        'Sind Sie sicher, dass Sie die Berechtigung ',
-                        l('b', null, [permission.name]),
-                        ' löschen möchten?'
-                    ])
-                ]), {
-                    size: 'sm',
-                    buttonSize: 'xs',
-                    cancelTitle: 'Abbrechen'
-                })
-            }
         }
     }
 </script>
 <template>
     <div class="container">
-        <h4 class="title">
-            Berechtigungen <span class="sub-title">Verwaltung</span>
-        </h4>
-        <div class="panel-card">
-            <div class="panel-card-body">
-                <div class="alert alert-primary">
-                    Dies ist eine Übersicht der Berechtigungen.
-                </div>
-                <div class="m-t-10">
-                    <b-table :items="items" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
-                        <template v-slot:cell(name)="data">
-                            {{data.item.namePretty}} <small>({{data.item.name}})</small>
-                        </template>
-                        <template v-slot:cell(createdAt)="data">
-                            <timeago :datetime="data.item.createdAt" />
-                        </template>
-                        <template v-slot:cell(updatedAt)="data">
-                            <timeago :datetime="data.item.updatedAt" />
-                        </template>
-                        <template v-slot:table-busy>
-                            <div class="text-center text-danger my-2">
-                                <b-spinner class="align-middle" />
-                                <strong>Loading...</strong>
-                            </div>
-                        </template>
-                    </b-table>
-                </div>
-            </div>
-        </div>
+        <h1 class="title no-border mb-3">
+            Permissions <span class="sub-title">Management</span>
+        </h1>
+
+        <permission-list ref="roleList" :load-on-init="true">
+            <template v-slot:header-title>
+                This is a slight overview of all roles.
+            </template>
+            <template v-slot:items="props">
+                <b-table :items="props.items" :fields="fields" :busy="props.busy" head-variant="'dark'" outlined>
+                    <template v-slot:cell(createdAt)="data">
+                        <timeago :datetime="data.item.createdAt" />
+                    </template>
+                    <template v-slot:cell(updatedAt)="data">
+                        <timeago :datetime="data.item.updatedAt" />
+                    </template>
+                    <template v-slot:table-busy>
+                        <div class="text-center text-danger my-2">
+                            <b-spinner class="align-middle" />
+                            <strong>Loading...</strong>
+                        </div>
+                    </template>
+                </b-table>
+            </template>
+        </permission-list>
     </div>
 </template>

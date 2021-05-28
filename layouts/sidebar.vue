@@ -7,6 +7,12 @@
             components(vm) {
                 return vm.$store.state.layout.sidebarComponents;
             },
+            docsUrl() {
+                return this.$config.apiUrl + 'docs';
+            },
+            statsUrl() {
+                return this.$config.apiUrl + 'stats';
+            }
         }
     }
 </script>
@@ -42,6 +48,21 @@
                 </template>
             </li>
         </ul>
+
+        <div class="mt-auto">
+            <ul class="sidebar-menu">
+                <li>
+                    <a class="sidebar-menu-link" :href="docsUrl" target="_blank">
+                        <i class="fa fa-file"></i> API Docs
+                    </a>
+                </li>
+                <li>
+                    <a class="sidebar-menu-link" :href="statsUrl" target="_blank">
+                        <i class="fa fa-chart-bar"></i> Stats
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 

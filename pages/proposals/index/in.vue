@@ -130,7 +130,8 @@ export default {
 <template>
     <div>
         <div class="alert alert-primary alert-sm">
-            This is an overview of all proposals from other stations, that want to run one or many trains for different proposes over your station.
+            This is a slight overview of all incoming proposals from other stations. If you approve a proposal,
+            your station can be targeted by inherited trains from that proposal.
         </div>
         <div class="d-flex flex-row">
             <div>

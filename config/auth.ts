@@ -5,7 +5,7 @@ const AuthStrategies : { [key: string] : AuthSchemeOptions } = {
         scheme: "JWT",
         endpoints: {
             api: "auth",
-            userInfo: "me",
+            userInfo: "users/me",
             token: "token"
         }
     }
