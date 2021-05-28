@@ -1,4 +1,4 @@
-import {generateDocumentation, SwaggerConfig} from "typescript-swagger/src/index";
+import {generateDocumentation, SwaggerConfig} from "typescript-swagger";
 import {getRootDirPath, getWritableDirPath} from "../../config/paths";
 import path from "path";
 import env from "../../env";
