@@ -1,0 +1,46 @@
+# PHT - Web API 🚀
+This repository contains the Backend API of the Personal Health Train (PHT).
+It communicates with some services of the PHT and need therefore to be configured properly, like described 
+in the following sections.
+
+## Installation
+This package requires docker to be installed on the host machine.
+
+## Configuration
+The following settings need to be added to the environment section of the docker-compose file.
+```
+PORT=<port>
+NODE_ENV=<development|production>
+
+API_URL=http://localhost:<port>/
+INTERNAL_API_URL=http://localhost:<port>/
+WEB_APP_URL=http://localhost:<ui port>/
+
+VAULT_CONNECTION_STRING=<token>@<api url>
+RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
+HARBOR_CONNECTION_STRING=<user>:<password>@<api url>
+
+```
+
+## Setup
+To setup the database and other parts of the backend, run the following command:
+```
+$ docker network create --driver bridge pht-network
+$ docker volume create --name=pht_api
+$ docker volume create --name=pht_api_db
+$ docker volume create --name=pht_rabbitmq
+$ docker-compose run db -d
+$ docker-compose run server setup
+```
+This will setup everything you need.
+
+## Start
+To run the Backend just execute the following command:
+ ```
+$ docker-compose up
+```
+
+## Credits
+If you have any questions, feel free to contact the author Peter Placzek of the project.
+The project was initial developed during this bachelor thesis, and he worked after that as employee
+on the project.

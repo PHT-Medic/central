@@ -1,0 +1,260 @@
+import {getRepository} from "typeorm";
+import {check, matchedData, validationResult} from "express-validator";
+import {Station} from "../../../../domains/pht/station";
+import {dropHarborProject} from "../../../../domains/harbor/project/api";
+import {removeStationPublicKeyFromVault} from "../../../../domains/vault/station/api";
+import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
+import {applyRequestPagination} from "../../../../db/utils/pagination";
+
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {doTrainTaskRouteHandler} from "../train/TrainActionController";
+import {doStationTaskRouteHandler, StationTask} from "./StationActionController";
+
+type PartialStation = Partial<Station>;
+const stationExample = {name: 'University Tuebingen', realm_id: 'tuebingen', id: 1}
+
+@SwaggerTags('pht')
+@Controller("/stations")
+export class StationController {
+    @Get("",[ForceLoggedInMiddleware])
+    @ResponseExample<Array<PartialStation>>([
+        stationExample
+    ])
+    async getMany(
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Array<PartialStation>> {
+        return await getStationsRouteHandler(req, res) as Array<PartialStation>;
+    }
+
+    @Post("",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async add(
+        @Body() data: PartialStation,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialStation|undefined> {
+        return await addStationRouteHandler(req, res) as PartialStation | undefined;
+    }
+
+    @Get("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async getOne(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialStation|undefined> {
+        return await getStationRouteHandler(req, res) as PartialStation | undefined;
+    }
+
+    @Post("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async edit(
+        @Params('id') id: string,
+        @Body() data: PartialStation,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialStation|undefined> {
+        return await editStationRouteHandler(req, res) as PartialStation | undefined;
+    }
+
+    @Post("/:id/task",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async doTask(
+        @Params('id') id: string,
+        @Body() data: {
+            task: StationTask
+        },
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialStation|undefined> {
+        return await doStationTaskRouteHandler(req, res) as PartialStation | undefined;
+    }
+
+    @Delete("/:id",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async drop(
+        @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialStation|undefined> {
+        return await dropStationRouteHandler(req, res) as PartialStation | undefined;
+    }
+}
+
+export async function getStationRouteHandler(req: any, res: any) {
+    const { id } = req.params;
+
+    const repository = getRepository(Station);
+
+    const entity = await repository.findOne(id);
+
+    if(typeof entity === 'undefined') {
+        return res._failNotFound();
+    }
+
+    return res._respond({data: entity})
+}
+
+export async function getStationsRouteHandler(req: any, res: any) {
+    let { filter, page } = req.query;
+
+    const repository = getRepository(Station);
+    const query = repository.createQueryBuilder('station')
+        .leftJoinAndSelect('station.realm', 'realm');
+
+    applyRequestFilterOnQuery(query, filter, {
+        id: 'station.id',
+        name: 'station.name',
+        realmId: 'station.realm_id'
+    });
+
+    const pagination = applyRequestPagination(query, page, 50);
+
+    const [entities, total] = await query.getManyAndCount();
+
+    return res._respond({
+        data: {
+            data: entities,
+            meta: {
+                total,
+                ...pagination
+            }
+        }
+    });
+}
+
+export async function addStationRouteHandler(req: any, res: any) {
+    if(!req.ability.can('add', 'station')) {
+        return res._failBadRequest();
+    }
+
+    await check('public_key').isLength({min: 5, max: 4096}).exists().optional({nullable: true}).run(req);
+    await check('name').isLength({min: 5, max: 100}).exists().notEmpty().run(req);
+    await check('realm_id').exists().notEmpty().run(req);
+
+    const validation = validationResult(req);
+    if (!validation.isEmpty()) {
+        return res._failExpressValidationError({validation});
+    }
+
+    let data = matchedData(req, {includeOptionals: false});
+
+    if(data.public_key) {
+        const hexChecker = new RegExp("^[0-9a-fA-F]+$");
+
+        if(!hexChecker.test(data.public_key)) {
+            data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
+        }
+    }
+
+    try {
+        const repository = getRepository(Station);
+
+        let entity = repository.create(data);
+
+        await repository.save(entity);
+
+        return res._respond({data: entity});
+    } catch (e) {
+        console.log(e);
+        return res._failValidationError({message: 'Die Station konnte nicht erstellt werden...'})
+    }
+}
+
+export async function editStationRouteHandler(req: any, res: any) {
+    const { id } = req.params;
+
+    if(!req.ability.can('edit', 'station')) {
+        return res._failBadRequest();
+    }
+
+    await check('name').isLength({min: 5, max: 100}).exists().optional().run(req);
+    await check('public_key').isLength({min: 5, max: 4096}).exists().notEmpty().optional({nullable: true}).run(req);
+
+    const validation = validationResult(req);
+    if(!validation.isEmpty()) {
+        return res._failExpressValidationError(validation);
+    }
+
+    let data = matchedData(req, {includeOptionals: false});
+    if(!data) {
+        return res._respondAccepted();
+    }
+
+    const repository = getRepository(Station);
+    const query = repository.createQueryBuilder('station');
+    const addSelection : string[] = [
+        'public_key',
+        'harbor_project_account_name',
+        'harbor_project_account_token',
+        'harbor_project_id',
+        'harbor_project_webhook_exists',
+        'vault_public_key_saved'
+    ];
+
+    addSelection.map(selection => query.addSelect('station.'+selection));
+    query.where("station.id = :id", {id});
+
+    let station = await query.getOne();
+
+    if(typeof station === 'undefined') {
+        return res._failValidationError({message: 'Die Station konnte nicht gefunden werden.'});
+    }
+
+    if(data.public_key && data.public_key !== station.public_key) {
+        const hexChecker = new RegExp("^[0-9a-fA-F]+$");
+
+        if(!hexChecker.test(data.public_key)) {
+            data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
+        }
+    }
+
+    station = repository.merge(station, data);
+
+    try {
+        const result = await repository.save(station);
+
+        return res._respondAccepted({
+            data: result
+        });
+    } catch (e) {
+        console.log(e);
+        return res._failValidationError({message: 'Die Station konnte nicht aktualisiert werden.'});
+    }
+}
+
+export async function dropStationRouteHandler(req: any, res: any) {
+    let { id } = req.params;
+
+    id = parseInt(id);
+
+    if(typeof id !== 'number' || Number.isNaN(id)) {
+        return res._failNotFound();
+    }
+
+    if(!req.ability.can('drop', 'station')) {
+        return res._failBadRequest();
+    }
+
+    const repository = getRepository(Station);
+
+    const entity = await repository.findOne(id);
+
+    if(typeof entity === 'undefined') {
+        return res._failNotFound();
+    }
+
+    try {
+        await repository.remove(entity);
+
+        await dropHarborProject(entity);
+        await removeStationPublicKeyFromVault(entity);
+
+        return res._respondDeleted({data: entity});
+    } catch (e) {
+        return res._failValidationError({message: 'Die Station konnte nicht gelöscht werden...'})
+    }
+}
