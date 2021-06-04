@@ -1,5 +1,6 @@
 .nuxt
+docker
 dist
 node_modules
-docker
+writable
 .env

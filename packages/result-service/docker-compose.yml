@@ -1,0 +1,16 @@
+version: '3.1'
+services:
+    rs:
+        image: pht-result-service
+        build: .
+        ports:
+            - '3003:3000'
+        command: 'dev-watch'
+        env_file:
+            -   .env
+        environment:
+            PORT: 3000
+networks:
+    default:
+        external:
+            name: pht-network
