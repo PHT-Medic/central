@@ -1,0 +1,36 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "Node",
+        "skipLibCheck": true,
+        "lib": [
+            "ESNext",
+            "ESNext.AsyncIterable",
+            "DOM"
+        ],
+        "noImplicitAny": false,
+        "esModuleInterop": true,
+        "allowJs": true,
+        "sourceMap": true,
+        "strict": true,
+        "noEmit": true,
+        "baseUrl": ".",
+        "paths": {
+            "~/*": [
+                "./*"
+            ],
+            "@/*": [
+                "./*"
+            ]
+        },
+        "types": [
+            "@types/node",
+            "@nuxt/types",
+            "vue-router/types"
+        ]
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

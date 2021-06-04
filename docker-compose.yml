@@ -1,0 +1,16 @@
+version: '3.1'
+services:
+    app:
+        image: pht-app
+        build: .
+        ports:
+            - '3000:3000'
+        environment:
+            API_URL: http://localhost:3002
+            RESULT_SERVICE_API_URL: http://localhost:3003
+        env_file:
+            -   .env
+networks:
+    default:
+        external:
+            name: pht-network

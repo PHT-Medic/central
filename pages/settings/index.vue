@@ -1,0 +1,46 @@
+<template>
+    <div>
+        <h1 class="title no-border mb-3">Settings <span class="sub-title">manage your settings</span> </h1>
+
+        <div class="content-wrapper">
+            <div class="content-sidebar flex-column">
+                <div class="text-center">
+                    <train-svg width="100%" />
+                </div>
+
+                <b-nav pills vertical>
+                    <b-nav-item
+                        v-for="(item,key) in sidebar.items"
+                        :key="key"
+                        :disabled="item.active"
+                        :to="'/settings' + item.urlSuffix"
+                        exact
+                        exact-active-class="active"
+                    >
+                        <i :class="item.icon" />
+                        {{ item.name }}
+                    </b-nav-item>
+                </b-nav>
+            </div>
+            <div class="content-container">
+                <nuxt-child />
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+    export default {
+        data () {
+            return {
+                sidebar: {
+                    items: [
+                        { name: 'Account', routeName: 'settings-id', icon: 'fas fa-bars', urlSuffix: '' },
+                        { name: 'Security', routeName: 'settings-id-security', icon: 'fa fa-lock', urlSuffix: '/security' },
+                        { name: 'Keys', routeName: 'settings-id-key-ring', icon: 'fa fa-key', urlSuffix: '/key-ring'}
+                        //{ name: 'Benachrichtigungen', routeName: 'settings-id-notifications', icon: 'fa fa-bell', urlSuffix: 'notifications'}
+                    ]
+                }
+            }
+        },
+    }
+</script>

@@ -1,0 +1,43 @@
+<script>
+    import NotImplemented from "../../../../components/NotImplemented";
+    import {LayoutNavigationAdminId} from "../../../../config/layout";
+    import AlertMessage from "../../../../components/alert/AlertMessage";
+    import RoleForm from "@/components/role/RoleForm";
+
+    export default {
+        props: {
+            roleProperty: {
+                type: Object
+            }
+        },
+        meta: {
+            navigationId: LayoutNavigationAdminId
+        },
+        components: {
+            RoleForm,
+            NotImplemented,
+            AlertMessage
+        },
+        data() {
+            return {
+                roleData: undefined
+            }
+        },
+        created() {
+            this.roleData = this.roleProperty;
+        },
+        methods: {
+            handleRoleUpdated(e) {
+                const {id, ...data} = e;
+                for(let key in data) {
+                    this.roleData[key] = data[key];
+                }
+            }
+        }
+    }
+</script>
+<template>
+    <div>
+        <role-form :role-property="roleData" @updated="handleRoleUpdated" />
+    </div>
+</template>

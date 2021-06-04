@@ -1,0 +1,98 @@
+.hero-image {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://pht.medic.uni-tuebingen.de/wp-content/uploads/2019/10/PHT_header.png");
+
+    /* Set a specific height */
+    height: 250px;
+
+    /* Position and center the image to scale nicely on all screens */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+    border-radius: 4px;
+}
+
+/* Place text in the middle of the image */
+.hero-text {
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+}
+
+
+/*
+Content
+*/
+
+.content-wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.content-wrapper > div:first-child {
+    padding-right: 1.5rem;
+}
+
+.content-sidebar {
+    width: 200px;
+    display: flex;
+    flex-shrink: 0;
+}
+
+.content-sidebar .nav {
+    width: 100%;
+}
+
+.content-container {
+    flex-grow: 3;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .content-wrapper {
+        flex-direction: column;
+    }
+
+    .content-wrapper > div:first-child {
+        padding-right: 0 !important;
+    }
+
+    .content-sidebar {
+        padding-bottom: 1.5rem;
+        width: 100% !important;
+    }
+}
+
+.c-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.c-list .c-list-item {
+    background-color: #ececec;
+    border: 1px solid #dedede;
+
+    /* box-shadow: 0 4px 25px 0 rgba(0,0,0,.1); */
+    transition: all .3s ease-in-out;
+
+    border-radius: 4px;
+
+    padding: 0rem 0.25rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.c-list .c-list-content,
+.c-list .c-list-footer {
+    display: flex;
+    flex-direction: row;
+}
+
+.c-list .c-list-icon {
+    font-size: 1.5rem;
+    padding-right: 0.5rem;
+}
