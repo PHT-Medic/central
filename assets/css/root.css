@@ -173,16 +173,3 @@ Login
     text-align: center;
     color: #33414e;
 }
-
-/*
-weekly-tasks
- */
-.weekly-task-list img {
-    text-align: center;
-    display: block;
-    margin: 5px auto 10px;
-    border-radius: 50%;
-    width: 120px;
-    height: 120px;
-
-}
