@@ -18,19 +18,6 @@ HARBOR_CONNECTION_STRING=pht:PangerLenis32@https://harbor.personalhealthtrain.de
 
 ```
 
-## Setup
-To setup the database and other parts of the backend, run the following command:
-```
-$ docker network create --driver bridge pht-network
-```
-This will setup everything you need.
-
-## Start
-To run the result service just execute the following command:
- ```
-docker-compose up
-```
-
 ## Credits
 If you have any questions, feel free to contact the author Peter Placzek of the project.
 The project was initial developed during this bachelor thesis, and he worked after that as employee
