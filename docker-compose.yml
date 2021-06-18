@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.5'
 services:
     db:
         image: mysql
@@ -7,8 +7,6 @@ services:
         environment:
             MYSQL_ROOT_PASSWORD: start123
             MYSQL_ROOT_HOST: '%'
-        ports:
-            - '3306:3306'
         volumes:
             - pht-central-ui-db:/var/lib/mysql
     rabbitmq:
