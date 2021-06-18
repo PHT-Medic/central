@@ -1,6 +1,7 @@
-import {Station} from "../../../pht/station";
-import {parseHarborConnectionString, useHarborApi} from "../../../../modules/api/provider/harbor";
+import {Station} from "../../../station";
+import {useHarborApi} from "../../../../modules/api/service/harbor";
 import env from "../../../../env";
+import {BaseService} from "../../../service";
 
 const WEBHOOK_ID = 'UI';
 
@@ -29,18 +30,17 @@ export async function findHarborProjectWebHook(harborProjectId: number) : Promis
     return undefined;
 }
 
-export async function ensureHarborProjectWebHook(entity: Station) {
-    const harborConfig = parseHarborConnectionString(env.harborConnectionString);
-
+export async function ensureHarborProjectWebHook(entity: Station, clientSecret: string) {
     const webhook: Record<string, any> = {
         name: WEBHOOK_ID,
         enabled: true,
         project_id: entity.harbor_project_id,
         targets: [
             {
-                auth_header: "Bearer " + harborConfig.token,
+                auth_header: "Secret " + clientSecret,
                 skip_cert_verify: true,
-                address: env.internalApiUrl + "service/harbor/hook",
+                // todo: change this, if service not on same machine.
+                address: env.internalApiUrl + "services/"+BaseService.HARBOR+"/hook",
                 type: "http"
             }
         ],

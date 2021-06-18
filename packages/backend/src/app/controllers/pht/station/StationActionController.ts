@@ -1,6 +1,6 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
-import {Station} from "../../../../domains/pht/station";
+import {Station} from "../../../../domains/station";
 import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {
     findVaultStationPublicKey,
@@ -17,6 +17,7 @@ import {
     ensureHarborProjectWebHook,
     findHarborProjectWebHook
 } from "../../../../domains/harbor/project/web-hook/api";
+import {BaseService, Service} from "../../../../domains/service";
 
 export enum StationTask {
     CHECK_HARBOR = 'checkHarbor',
@@ -37,7 +38,7 @@ export enum StationTask {
 }
 
 export async function doStationTaskRouteHandler(req: any, res: any) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     if(!req.ability.can('edit', 'station')) {
         return res._failBadRequest();
@@ -49,23 +50,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
 
     await check('task')
         .exists()
-        .isIn([
-            'checkHarbor',
-
-            'ensureHarborProject',
-            'dropHarborProject',
-
-            'ensureHarborProjectWebHook',
-            'dropHarborProjectWebHook',
-
-            'ensureHarborProjectAccount',
-            'dropHarborProjectAccount',
-
-            'checkVault',
-
-            'saveVaultPublicKey',
-            'dropVaultPublicKey'
-        ])
+        .isIn(Object.values(StationTask))
         .run(req);
 
     const validation = validationResult(req);
@@ -107,7 +92,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
     }
 
     switch (validationData.task) {
-        case 'checkHarbor':
+        case StationTask.CHECK_HARBOR:
             try {
                 const project = await findHarborProject(entity);
 
@@ -143,7 +128,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
                 console.log(e);
                 return res._failBadRequest({message: e.message});
             }
-        case 'ensureHarborProject':
+        case StationTask.ENSURE_HARBOR_PROJECT:
             try {
                 const projectId : number = await ensureHarborProject(entity);
 
@@ -155,7 +140,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
             } catch (e) {
                 return res._failBadRequest({message: e.message});
             }
-        case 'dropHarborProject':
+        case StationTask.DROP_HARBOR_PROJECT:
             try {
                 await dropHarborProject(entity);
 
@@ -168,9 +153,16 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
                 return res._failBadRequest({message: e.message});
             }
 
-        case 'ensureHarborProjectWebHook':
+        case StationTask.ENSURE_HARBOR_PROJECT_WEBHOOK:
             try {
-                 await ensureHarborProjectWebHook(entity);
+                const serviceRepository = getRepository(Service);
+                const serviceEntity = await serviceRepository.findOne(BaseService.HARBOR, {relations: ['client']});
+
+                if(typeof serviceEntity.client.secret !== 'string') {
+                    return res._failBadRequest({message: 'No client credentials are available for harbor yet. Please generate it first.'});
+                }
+
+                await ensureHarborProjectWebHook(entity, serviceEntity.client.secret);
 
                 entity.harbor_project_webhook_exists = true;
 
@@ -180,7 +172,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
             } catch (e) {
                 return res._failBadRequest({message: e.message});
             }
-        case 'dropHarborProjectWebHook':
+        case StationTask.DROP_HARBOR_PROJECT_WEBHOOK:
             try {
                 if(entity.harbor_project_id) {
                     await dropHarborProjectWebHook(entity.harbor_project_id);
@@ -195,7 +187,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
                 return res._failBadRequest({message: e.message});
             }
 
-        case 'ensureHarborProjectAccount':
+        case StationTask.ENSURE_HARBOR_PROJECT_ACCOUNT:
             try {
                 const { secret, name } = await ensureHarborProjectRobotAccount(entity.id);
 
@@ -209,7 +201,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
                 console.log(e);
                 return res._failBadRequest({message: e.message});
             }
-        case 'dropHarborProjectAccount':
+        case StationTask.DROP_HARBOR_PROJECT_ACCOUNT:
             try {
                 if(entity.harbor_project_id) {
                     await dropHarborProjectRobotAccount(entity.id);
@@ -225,7 +217,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
                 return res._failBadRequest({message: e.message});
             }
 
-        case 'checkVault':
+        case StationTask.CHECK_VAULT:
             try {
                 const publicKey = await findVaultStationPublicKey(entity.id);
 
@@ -243,12 +235,9 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
 
                 return res._respondAccepted({data: entity});
             } catch (e) {
-                console.log(e);
-                console.log(e.response.data.errors);
                 return res._failBadRequest({message: e.message});
             }
-            break;
-        case 'saveVaultPublicKey':
+        case StationTask.SAVE_VAULT_PUBLIC_KEY:
             try {
                 await saveStationPublicKeyToVault(entity);
 
@@ -260,7 +249,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
             } catch (e) {
                 return res._failBadRequest({message: e.message});
             }
-        case 'dropVaultPublicKey':
+        case StationTask.DROP_VAULT_PUBLIC_KEY:
             try {
                 await removeStationPublicKeyFromVault(entity);
 

@@ -1,13 +1,13 @@
 import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../modules/message-queue";
-import {TrainStateFinished} from "../domains/pht/train/states";
+import {TrainStateFinished} from "../domains/train/states";
 import {
     HARBOR_MASTER_IMAGE_PROJECT_NAME,
     HARBOR_MASTER_IMAGE_REPOSITORY_NAME,
     HARBOR_OUTGOING_PROJECT_NAME
 } from "../config/harbor";
 import {getRepository} from "typeorm";
-import {Train} from "../domains/pht/train";
-import {MasterImage} from "../domains/pht/master-image";
+import {Train} from "../domains/train";
+import {MasterImage} from "../domains/master-image";
 import {useLogger} from "../modules/log";
 import {MQ_UI_H_EVENT_ROUTING_KEY} from "../config/rabbitmq";
 

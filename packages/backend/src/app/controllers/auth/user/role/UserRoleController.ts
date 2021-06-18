@@ -4,7 +4,7 @@ import {check, matchedData, validationResult} from "express-validator";
 import {applyRequestFilterOnQuery} from "../../../../../db/utils/filter";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {applyRequestPagination} from "../../../../../db/utils/pagination";
 

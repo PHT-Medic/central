@@ -6,7 +6,6 @@ import {
     JoinColumn,
     ManyToOne,
     OneToMany,
-    PrimaryColumn,
     PrimaryGeneratedColumn, UpdateDateColumn
 } from "typeorm";
 import {Realm} from "../realm";

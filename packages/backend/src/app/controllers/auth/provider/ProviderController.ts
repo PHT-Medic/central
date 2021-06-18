@@ -2,14 +2,13 @@ import {Oauth2AuthorizeProvider} from "../../../../modules/auth/providers";
 import {AuthenticatorScheme, Provider} from "../../../../domains/provider";
 import {getRepository} from "typeorm";
 import {createToken} from "../../../../modules/auth/utils/token";
-import TokenResponseSchema from "../../../../domains/token/TokenResponseSchema";
 import env from "../../../../env";
 import {Realm} from "../../../../domains/realm";
 import {check, matchedData, validationResult} from "express-validator";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {Controller, Get, Post, Delete, Params, Request, Response, Body} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {SwaggerHidden, SwaggerTags} from "typescript-swagger";
 import {applyRequestFields} from "../../../../db/utils/select";
 
@@ -20,7 +19,7 @@ export class ProviderController {
     async getProviders(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<Provider>> {
+    ): Promise<Provider[]> {
         return await getProvidersRoute(req, res);
     }
 
@@ -90,7 +89,7 @@ export async function getProvidersRoute(req: any, res: any) {
 
     const repository = getRepository(Provider);
 
-    let query = repository.createQueryBuilder('provider').
+    const query = repository.createQueryBuilder('provider').
     leftJoinAndSelect('provider.realm', 'realm');
 
     applyRequestFilterOnQuery(query, filter, {
@@ -103,6 +102,7 @@ export async function getProvidersRoute(req: any, res: any) {
 
     const pagination = applyRequestPagination(query, page, 50);
 
+    // tslint:disable-next-line:prefer-const
     let [entities, total] = await query.getManyAndCount();
 
     entities = entities.map((provider: Provider) => {
@@ -124,7 +124,7 @@ export async function getProvidersRoute(req: any, res: any) {
     });
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 export async function getProviderRoute(req: any, res: any) {
     const { fields } = req.query;
@@ -140,9 +140,9 @@ export async function getProviderRoute(req: any, res: any) {
         'client_secret'
     ]);
 
-    let result = await query.getOne();
+    const result = await query.getOne();
 
-    if(typeof result == 'undefined') {
+    if(typeof result === 'undefined') {
         return res._failNotFound();
     }
 
@@ -151,7 +151,7 @@ export async function getProviderRoute(req: any, res: any) {
     })
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 async function runValidation(req: any) {
     await check('name').exists().notEmpty().isString().isLength({min: 5, max: 30}).run(req);
@@ -173,7 +173,7 @@ async function runValidation(req: any) {
     }).run(req);
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 export async function addProviderRoute(req: any, res: any) {
     if(!req.ability.can('add','provider')) {
@@ -194,7 +194,7 @@ export async function addProviderRoute(req: any, res: any) {
 
     const providerRepository = getRepository(Provider);
 
-    let provider = providerRepository.create(data);
+    const provider = providerRepository.create(data);
 
     try {
         await providerRepository.save(provider);
@@ -209,7 +209,7 @@ export async function addProviderRoute(req: any, res: any) {
     }
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 export async function editProviderRoute(req: any, res: any) {
     const { id } = req.params;
@@ -252,10 +252,10 @@ export async function editProviderRoute(req: any, res: any) {
     }
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 export async function dropProviderRoute(req: any, res: any) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     if (!req.ability.can('drop', 'provider')) {
         return res._failForbidden();
@@ -271,13 +271,13 @@ export async function dropProviderRoute(req: any, res: any) {
     }
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 export async function authorizeUrlRoute(req: any, res: any) {
-    let { id } = req.params;
+    const { id } = req.params;
 
     const repository = getRepository(Provider);
-    let provider = await repository.createQueryBuilder('provider')
+    const provider = await repository.createQueryBuilder('provider')
         .addSelect('provider.client_secret')
         .leftJoinAndSelect('provider.realm', 'realm')
         .where('provider.id = :id', {id})
@@ -294,11 +294,11 @@ export async function authorizeUrlRoute(req: any, res: any) {
 }
 
 export async function authorizeCallbackRoute(req: any, res: any) {
-    let { id } = req.params;
-    let { code, state } = req.query;
+    const { id } = req.params;
+    const { code, state } = req.query;
 
     const repository = getRepository(Provider);
-    let provider = await repository.createQueryBuilder('provider')
+    const provider = await repository.createQueryBuilder('provider')
         .addSelect('provider.client_secret')
         .leftJoinAndSelect('provider.realm', 'realm')
         .where('provider.id = :id', {id})
@@ -327,13 +327,13 @@ export async function authorizeCallbackRoute(req: any, res: any) {
         const {
             token,
             expiresIn
-        } = await createToken(payload);
+        } = await createToken(payload, env.jwtMaxAge);
 
         const cookie = {
             accessToken: token,
             meta: {
                 expireDate: new Date(Date.now() + 1000 * expiresIn).toString(),
-                expiresIn: expiresIn
+                expiresIn
             }
         };
 
@@ -344,14 +344,6 @@ export async function authorizeCallbackRoute(req: any, res: any) {
         res.cookie('auth_provider','local',{
             maxAge: Date.now() + 1000 * expiresIn
         });
-
-        let ob = {
-            token,
-            expires_in: expiresIn
-        };
-
-        let tokenResponseSchema = new TokenResponseSchema();
-        ob = tokenResponseSchema.applySchemaOnEntity(ob);
 
         return res.redirect(env.webAppUrl);
     } catch (e) {

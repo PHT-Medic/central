@@ -1,16 +1,16 @@
 import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
 
-import {TrainStation} from "../../../../../domains/pht/train/station";
+import {TrainStation} from "../../../../../domains/train/station";
 
 import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
 import {applyRequestFilterOnQuery} from "../../../../../db/utils/filter";
-import {Train} from "../../../../../domains/pht/train";
+import {Train} from "../../../../../domains/train";
 import {onlyRealmPermittedQueryResources} from "../../../../../db/utils";
-import {isTrainStationState, TrainStationStateApproved} from "../../../../../domains/pht/train/station/states";
+import {isTrainStationState, TrainStationStateApproved} from "../../../../../domains/train/station/states";
 import {applyRequestPagination} from "../../../../../db/utils/pagination";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 
 type PartialTrainStation = Partial<TrainStation>;

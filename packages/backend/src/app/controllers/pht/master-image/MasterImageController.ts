@@ -1,9 +1,9 @@
 import {getRepository} from "typeorm";
-import {MasterImage} from "../../../../domains/pht/master-image";
+import {MasterImage} from "../../../../domains/master-image";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 
 @SwaggerTags('pht')

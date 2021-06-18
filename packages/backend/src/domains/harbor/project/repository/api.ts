@@ -1,4 +1,4 @@
-import {useHarborApi} from "../../../../modules/api/provider/harbor";
+import {useHarborApi} from "../../../../modules/api/service/harbor";
 
 export interface HarborRepository {
     id: number | string,

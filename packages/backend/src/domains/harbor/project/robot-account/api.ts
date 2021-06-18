@@ -1,4 +1,4 @@
-import {useHarborApi} from "../../../../modules/api/provider/harbor";
+import {useHarborApi} from "../../../../modules/api/service/harbor";
 import {createHarborProjectNameByStationId} from "../api";
 
 //------------------------------------------------------------------------

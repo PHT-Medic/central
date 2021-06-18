@@ -1,7 +1,7 @@
 import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../modules/message-queue";
 import {getRepository} from "typeorm";
-import {Train} from "../domains/pht/train";
-import {TrainStateBuilt, TrainStateFailed} from "../domains/pht/train/states";
+import {Train} from "../domains/train";
+import {TrainStateBuilt, TrainStateFailed} from "../domains/train/states";
 import {MQ_UI_TB_EVENT_ROUTING_KEY} from "../config/rabbitmq";
 
 function createTrainBuilderAggregatorHandlers() {

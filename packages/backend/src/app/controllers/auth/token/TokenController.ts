@@ -1,4 +1,3 @@
-import TokenResponseSchema from "../../../../domains/token/TokenResponseSchema";
 import {createToken} from "../../../../modules/auth/utils/token";
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../../domains/user/repository";
@@ -7,12 +6,11 @@ import {Oauth2PasswordProvider} from "../../../../modules/auth/providers";
 
 import {Response, Request, Controller, Post, Body, Delete} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import env from "../../../../env";
 
 
 type Token = {
-    /**
-    @IsInt
-     */
+    /* @IsInt */
     expires_in: number,
     token: string
 }
@@ -85,12 +83,12 @@ async function grantToken(req: any, res: any) : Promise<any> {
         return res._failValidationError({message: e.message});
     }
 
-    payload.remoteAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    payload.remoteAddress = req.ip;
 
     const {
         token,
         expiresIn
-    } = await createToken(payload);
+    } = await createToken(payload, env.jwtMaxAge);
 
     const cookie = {
         accessToken: token,
@@ -110,27 +108,24 @@ async function grantToken(req: any, res: any) : Promise<any> {
         path: '/'
     });
 
-    let ob = {
+    const ob = {
         token,
         expires_in: expiresIn
     };
-
-    let tokenResponseSchema = new TokenResponseSchema();
-    ob = tokenResponseSchema.applySchemaOnEntity(ob);
 
     return res._respond({
         data: ob
     });
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 async function revokeToken(req: any, res: any) {
-    res.cookie('auth_token', null, {maxAge: Date.now()});
+    res.cookie('auth_token', null, {maxAge: 0});
     return res._respond();
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 export default {
     grantToken,

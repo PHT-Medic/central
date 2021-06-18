@@ -1,17 +1,17 @@
 import {getRepository} from "typeorm";
 import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
 import {onlyRealmPermittedQueryResources} from "../../../../../db/utils";
-import {TrainFile} from "../../../../../domains/pht/train/file";
+import {TrainFile} from "../../../../../domains/train/file";
 import fs from "fs";
-import {TrainConfiguratorStateOpen} from "../../../../../domains/pht/train/states";
-import {getTrainFileFilePath} from "../../../../../domains/pht/train/file/path";
-import {Train} from "../../../../../domains/pht/train";
+import {TrainConfiguratorStateOpen} from "../../../../../domains/train/states";
+import {getTrainFileFilePath} from "../../../../../domains/train/file/path";
+import {Train} from "../../../../../domains/train";
 import {applyRequestFilterOnQuery} from "../../../../../db/utils/filter";
 
 import {Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from 'typescript-swagger';
 
-import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/auth";
 import {getTrainFileStreamRouteHandler} from "./TrainFileStreamController";
 import {uploadTrainFilesRouteHandler} from "./TrainFileUploadController";
 

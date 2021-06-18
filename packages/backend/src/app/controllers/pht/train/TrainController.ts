@@ -2,23 +2,23 @@ import {getRepository} from "typeorm";
 import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
 import {check, matchedData, validationResult} from "express-validator";
 import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
-import {Train} from "../../../../domains/pht/train";
-import {MasterImage} from "../../../../domains/pht/master-image";
-import {Proposal} from "../../../../domains/pht/proposal";
-import {isTrainType} from "../../../../domains/pht/train/types";
+import {Train} from "../../../../domains/train";
+import {MasterImage} from "../../../../domains/master-image";
+import {Proposal} from "../../../../domains/proposal";
+import {isTrainType} from "../../../../domains/train/types";
 import {
     TrainConfiguratorStateFinished,
     TrainConfiguratorStateHashGenerated,
     TrainConfiguratorStateHashSigned, TrainStateConfigured
-} from "../../../../domains/pht/train/states";
-import {TrainFile} from "../../../../domains/pht/train/file";
+} from "../../../../domains/train/states";
+import {TrainFile} from "../../../../domains/train/file";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {applyRequestIncludes} from "../../../../db/utils/include";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {doTrainTaskRouteHandler} from "./TrainActionController";
 
 type PartialTrain = Partial<Train>;

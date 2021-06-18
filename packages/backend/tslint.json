@@ -10,7 +10,10 @@
         "no-console": false,
         "no-trailing-whitespace": false,
         "no-empty-interface": false,
-        "variable-name": false
+        "variable-name": false,
+        "prefer-for-of": false,
+        "forin": false,
+        "max-classes-per-file": false
     },
     "rulesDirectory": []
 }

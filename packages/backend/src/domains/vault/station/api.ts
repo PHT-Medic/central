@@ -1,5 +1,5 @@
-import {Station} from "../../pht/station";
-import {useVaultApi} from "../../../modules/api/provider/vault";
+import {Station} from "../../station";
+import {useVaultApi} from "../../../modules/api/service/vault";
 
 export type VaultStationPublicKey = {
     path: string,

@@ -11,31 +11,16 @@ import {useLogger} from "../log";
 import responseMiddleware from "./response/middleware/responseMiddleware";
 import {existsSync} from "fs";
 
-import {checkAuthenticated} from "./request/middleware/authMiddleware";
+import {checkAuthenticated} from "./request/middleware/auth";
 import {generateSwaggerDocumentation} from "./swagger";
 import {registerControllers} from "../../config/routing";
 
 
 import {getMiddleware} from 'swagger-stats';
-import exp from "constants";
 
 export interface ExpressAppInterface extends Express{
 
 }
-
-function hasBody(req: any) {
-    const encoding = 'transfer-encoding' in req.headers,
-        length = 'content-length' in req.headers
-            && req.headers['content-length'] !== '0';
-    return encoding || length;
-}
-
-function mime(req: any) {
-    const str = req.headers['content-type'] || '';
-    return str.split(';')[0];
-}
-
-const RE_MIME = /^(?:multipart\/.+)|(?:application\/x-www-form-urlencoded)$/i;
 
 async function createExpressApp() : Promise<ExpressAppInterface> {
     useLogger().debug('setup express app...', {service: 'express'});
@@ -49,11 +34,11 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
     // Cookie parser
     expressApp.use(cookieParser());
 
-    //expressApp.use(fileUpload({uriDecodeFileNames: false, safeFileNames: false}));
+    // expressApp.use(fileUpload({uriDecodeFileNames: false, safeFileNames: false}));
 
     expressApp.use('/public', expressStatic(getPublicDirPath()))
 
-    expressApp.use(function (req: Request, res: Response, next: NextFunction) {
+    expressApp.use((req: Request, res: Response, next: NextFunction) => {
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
         res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,authorization');

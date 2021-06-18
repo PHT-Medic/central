@@ -1,10 +1,10 @@
-import {Train} from "../pht/train";
+import {Train} from "../train";
 import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../modules/message-queue";
 import {getRepository} from "typeorm";
 import {UserKeyRing} from "../user/key-ring";
-import {TrainFile} from "../pht/train/file";
+import {TrainFile} from "../train/file";
 import {MQ_TB_ROUTING_KEY} from "../../config/rabbitmq";
-import {TrainStationStateApproved} from "../pht/train/station/states";
+import {TrainStationStateApproved} from "../train/station/states";
 
 export async function createTrainBuilderQueueMessage(train: Train, type: string | undefined, metaData: Record<string, any> = {}) : Promise<QueueMessage> {
     const keyRingRepository = getRepository(UserKeyRing);

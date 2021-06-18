@@ -1,6 +1,6 @@
 import {Brackets, SelectQueryBuilder} from "typeorm";
 
-export function onlyRealmPermittedQueryResources<T>(query: SelectQueryBuilder<T>, realm: string, queryField: string | Array<string> = 'realm_id') {
+export function onlyRealmPermittedQueryResources<T>(query: SelectQueryBuilder<T>, realm: string, queryField: string | string[] = 'realm_id') {
     if(realm === 'master') return;
 
     return query.andWhere(new Brackets(qb => {

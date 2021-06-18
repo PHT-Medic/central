@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {Train} from "../../../../domains/pht/train";
+import {Train} from "../../../../domains/train";
 import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {createTrainBuilderQueueMessage, publishTrainBuilderQueueMessage} from "../../../../domains/train-builder/queue";
 import {
@@ -10,9 +10,9 @@ import {
     TrainStateStarted,
     TrainStateStarting,
     TrainStateStopping
-} from "../../../../domains/pht/train/states";
+} from "../../../../domains/train/states";
 import * as crypto from "crypto";
-import {getTrainFileFilePath} from "../../../../domains/pht/train/file/path";
+import {getTrainFileFilePath} from "../../../../domains/train/file/path";
 import * as fs from "fs";
 import {check, matchedData, validationResult} from "express-validator";
 import {
@@ -21,10 +21,10 @@ import {
     MQ_TR_COMMAND_STOP_TRAIN,
     publishTrainRouterQueueMessage
 } from "../../../../domains/train-router/queue";
-import {TrainResult} from "../../../../domains/pht/train/result";
+import {TrainResult} from "../../../../domains/train/result";
 import {createResultServiceResultCommand} from "../../../../domains/result-service/queue";
 import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/harbor";
-import {TrainResultStateOpen} from "../../../../domains/pht/train/result/states";
+import {TrainResultStateOpen} from "../../../../domains/train/result/states";
 import {findHarborProjectRepository, HarborRepository} from "../../../../domains/harbor/project/repository/api";
 
 /**
@@ -34,7 +34,7 @@ import {findHarborProjectRepository, HarborRepository} from "../../../../domains
  * @param res
  */
 export async function doTrainTaskRouteHandler(req: any, res: any) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     if (typeof id !== 'string') {
         return res._failNotFound();
@@ -72,9 +72,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                     return res._failBadRequest({message: 'The train can no longer be build...'});
                 } else {
 
-                    const queueMessage = await createTrainBuilderQueueMessage(entity, 'trainBuild', {
-                        token: req.token
-                    });
+                    const queueMessage = await createTrainBuilderQueueMessage(entity, 'trainBuild');
 
                     await publishTrainBuilderQueueMessage(queueMessage);
 
@@ -91,9 +89,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                 if (entity.status === TrainStateStarted || entity.status === TrainStateFinished) {
                     return res._failBadRequest({message: 'The train has already been started...'});
                 } else {
-                    const queueMessage = await createTrainRouterQueueMessageCommand(entity.id, MQ_TR_COMMAND_START_TRAIN, {
-                        token: req.token
-                    });
+                    const queueMessage = await createTrainRouterQueueMessageCommand(entity.id, MQ_TR_COMMAND_START_TRAIN);
 
                     await publishTrainRouterQueueMessage(queueMessage);
 
@@ -109,9 +105,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                 if (entity.status === TrainStateFinished) {
                     return res._failBadRequest({message: 'The train has already been terminated...'});
                 } else {
-                    const queueMessage = await createTrainRouterQueueMessageCommand(entity.id, MQ_TR_COMMAND_STOP_TRAIN, {
-                        token: req.token
-                    });
+                    const queueMessage = await createTrainRouterQueueMessageCommand(entity.id, MQ_TR_COMMAND_STOP_TRAIN);
 
                     await publishTrainRouterQueueMessage(queueMessage);
 

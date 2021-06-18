@@ -7,7 +7,7 @@ import {applyRequestPagination} from "../../../../../db/utils/pagination";
 //---------------------------------------------------------------------------------
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 
 type PartialPermissionController = Partial<RolePermission>;

@@ -7,7 +7,7 @@ import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 type PartialRole = Partial<Role>;

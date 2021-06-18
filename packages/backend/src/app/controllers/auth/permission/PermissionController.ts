@@ -1,11 +1,10 @@
 import {check, matchedData, validationResult} from "express-validator";
-import PermissionResponseSchema from "../../../../domains/permission/PermissionResponseSchema";
 import {getRepository} from "typeorm";
 import {Permission} from "../../../../domains/permission";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {SwaggerTags} from "typescript-swagger";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 @SwaggerTags("auth")
@@ -15,7 +14,7 @@ export class PermissionController {
     async getPermissions(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<Permission>> {
+    ): Promise<Permission[]> {
         return await getPermissions(req, res);
     }
 
@@ -59,7 +58,7 @@ export class PermissionController {
 }
 
 const getPermissions = async (req: any, res: any) => {
-    let { filter, page } = req.query;
+    const { filter, page } = req.query;
 
     const repository = getRepository(Permission);
     const query = repository.createQueryBuilder('permission');
@@ -82,11 +81,11 @@ const getPermissions = async (req: any, res: any) => {
 }
 
 const getPermission = async (req: any, res: any) => {
-    let id = req.params.id;
+    const id = req.params.id;
 
     try {
         const repository = getRepository(Permission);
-        let result = await repository.createQueryBuilder('permission')
+        const result = await repository.createQueryBuilder('permission')
             .where("id = :id", {id})
             .orWhere("name Like :name", {name: id})
             .getOne();
@@ -94,9 +93,6 @@ const getPermission = async (req: any, res: any) => {
         if(typeof result === 'undefined') {
             return res._failNotFound();
         }
-
-        let permissionResponseSchema = new PermissionResponseSchema();
-        result = permissionResponseSchema.applySchemaOnEntity(result);
 
         return res._respond({data: result});
 
@@ -127,7 +123,7 @@ const addPermission = async (req: any, res: any) => {
     const data = matchedData(req, {includeOptionals: false});
 
     const repository = getRepository(Permission);
-    let permission = repository.create({
+    const permission = repository.create({
         name: data.name
     })
 
@@ -143,7 +139,7 @@ const addPermission = async (req: any, res: any) => {
 };
 
 const dropPermission = async (req: any, res: any) => {
-    let { id } = req.params;
+    const { id } = req.params;
 
     if(!req.ability.can('drop','permission')) {
         return res._failForbidden();

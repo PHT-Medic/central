@@ -7,9 +7,9 @@ import env from './env';
 import createConfig from "./config";
 import createExpressApp from "./modules/http/express";
 import createHttpServer from "./modules/http/server";
-import createApolloServer from "./modules/http/apollo";
-import {createConnection} from "typeorm";
+import {createConnection, getConnectionOptions} from "typeorm";
 import {useLogger} from "./modules/log";
+import {createTypeOrmConnectionOptions} from "./db/connection";
 
 (async () => {
     /*
@@ -26,8 +26,6 @@ import {useLogger} from "./modules/log";
         config.components.forEach(c => c.start());
         config.aggregators.forEach(a => a.start());
 
-        createApolloServer({config, expressApp});
-
         httpServer.listen(env.port, signalStart);
     }
 
@@ -35,6 +33,7 @@ import {useLogger} from "./modules/log";
         useLogger().debug('Startup on 127.0.0.1:'+env.port+' ('+env.env+') completed.', {service: 'system'});
     }
 
-    await createConnection();
+    const connectionOptions = await createTypeOrmConnectionOptions();
+    await createConnection(connectionOptions);
     start();
 })();

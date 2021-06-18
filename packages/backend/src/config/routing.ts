@@ -13,10 +13,10 @@ import {StationController} from "../app/controllers/pht/station/StationControlle
 import {TrainController} from "../app/controllers/pht/train/TrainController";
 import {TrainFileController} from "../app/controllers/pht/train/file/TrainFileController";
 import {TrainStationController} from "../app/controllers/pht/train/station/TrainStationController";
-import {HarborController} from "../app/controllers/service/harbor/HarborController";
 import {UserRoleController} from "../app/controllers/auth/user/role/UserRoleController";
 import {RoleController} from "../app/controllers/auth/role/RoleController";
 import {RolePermissionController} from "../app/controllers/auth/role/permission/RolePermissionController";
+import {ServiceController} from "../app/controllers/service/ServiceController";
 
 export function registerControllers(router: Application) {
     attachControllers(router, [
@@ -24,6 +24,9 @@ export function registerControllers(router: Application) {
         TokenController,
         RealmController,
         ProviderController,
+
+        // Service
+        ServiceController,
 
         PermissionController,
         RoleController,
@@ -40,9 +43,6 @@ export function registerControllers(router: Application) {
         TrainController,
         TrainFileController,
         TrainStationController,
-
-        // Services
-        HarborController
     ]);
 
     return router;

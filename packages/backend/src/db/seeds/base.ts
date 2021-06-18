@@ -4,7 +4,7 @@ import {UserRepository} from "../../domains/user/repository";
 import {RoleRepository} from "../../domains/role/repository";
 import {Permission} from "../../domains/permission";
 import {RolePermission} from "../../domains/role/permission";
-import {Realm} from "../../domains/realm";
+import {MASTER_REALM_ID, Realm} from "../../domains/realm";
 import {Provider, AuthenticatorScheme} from "../../domains/provider";
 import {UserRole} from "../../domains/user/role";
 
@@ -12,19 +12,19 @@ export default class CreateBase implements Seeder {
     public async run(factory: Factory, connection: Connection) : Promise<any> {
         const realmRepository = connection.getRepository(Realm);
 
-        let masterRealm = realmRepository.create({
-            id: "master",
+        const masterRealm = realmRepository.create({
+            id: MASTER_REALM_ID,
             name: "Master",
             drop_able: false
         });
 
         await realmRepository.save(masterRealm);
 
-        //-------------------------------------------------
+        // -------------------------------------------------
 
         const authenticatorRepository = connection.getRepository(Provider);
 
-        let authenticator = authenticatorRepository.create({
+        const authenticator = authenticatorRepository.create({
             name: 'keycloak',
             scheme: AuthenticatorScheme.OPENID,
             token_host: 'https://keycloak.personalhealthtrain.de/auth/realms/master/',
@@ -37,22 +37,22 @@ export default class CreateBase implements Seeder {
 
         await authenticatorRepository.save(authenticator);
 
-        //-------------------------------------------------
+        // -------------------------------------------------
 
         const roleRepository = connection.getCustomRepository(RoleRepository);
 
-        let adminRole = roleRepository.create({
+        const adminRole = roleRepository.create({
             name: 'admin',
             provider_role_id: 'superadmin'
         });
 
         await roleRepository.save(adminRole);
 
-        //-------------------------------------------------
+        // -------------------------------------------------
 
         const userRepository = connection.getCustomRepository(UserRepository);
 
-        let adminUser = userRepository.create({
+        const adminUser = userRepository.create({
             name: 'admin',
             password: await userRepository.hashPassword('start123'),
             email: 'peter.placzek1996@gmail.com',
@@ -61,7 +61,7 @@ export default class CreateBase implements Seeder {
 
         await userRepository.save(adminUser);
 
-        //-------------------------------------------------
+        // -------------------------------------------------
 
         const userRoleRepository = getRepository(UserRole);
 
@@ -70,7 +70,7 @@ export default class CreateBase implements Seeder {
             user_id: adminUser.id
         });
 
-        //-------------------------------------------------
+        // -------------------------------------------------
 
         const permissionRepository = connection.getRepository(Permission);
         const names : string[] = [
@@ -113,10 +113,10 @@ export default class CreateBase implements Seeder {
 
         await permissionRepository.save(permissions);
 
-        //-------------------------------------------------
+        // -------------------------------------------------
 
         const rolePermissionRepository = connection.getRepository(RolePermission);
-        let rolePermissions : RolePermission[] = [];
+        const rolePermissions : RolePermission[] = [];
         for(let j=0; j<permissions.length; j++) {
             rolePermissions.push(rolePermissionRepository.create({
                 role_id: adminRole.id,

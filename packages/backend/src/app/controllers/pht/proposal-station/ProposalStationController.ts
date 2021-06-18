@@ -1,14 +1,14 @@
 import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
-import {ProposalStation} from "../../../../domains/pht/proposal/station";
+import {ProposalStation} from "../../../../domains/proposal/station";
 import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
 import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
-import {isProposalStationState, ProposalStationStateApproved} from "../../../../domains/pht/proposal/station/states";
+import {isProposalStationState, ProposalStationStateApproved} from "../../../../domains/proposal/station/states";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 
 type PartialProposalStation = Partial<ProposalStation>;

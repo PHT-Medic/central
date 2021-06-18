@@ -1,10 +1,10 @@
 import {getRepository} from "typeorm";
 import {UserKeyRing} from "../../../../../domains/user/key-ring";
 import {check, matchedData, validationResult} from "express-validator";
-import {useVaultApi} from "../../../../../modules/api/provider/vault";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/auth";
 import {SwaggerTags} from "typescript-swagger";
+import {removeUserPublicKeyFromVault, saveUserPublicKeyToVault} from "../../../../../domains/vault/user/api";
 
 @SwaggerTags('user', 'pht')
 @Controller("/user-key-rings")
@@ -85,10 +85,7 @@ export async function addUserKeyRouteHandler(req: any, res: any) {
 
         await repository.save(entity);
 
-        await useVaultApi().uploadUserPublicKey(req.user.id, {
-            heKey: entity.he_key,
-            publicKey: entity.public_key
-        });
+        await saveUserPublicKeyToVault(entity);
 
         return res._respond({data: entity});
     } catch (e) {
@@ -123,10 +120,7 @@ export async function editUserKeyRouteHandler(req: any, res: any) {
     entity = repository.merge(entity,data);
 
     try {
-        await useVaultApi().uploadUserPublicKey(req.user.id, {
-            publicKey: entity.public_key,
-            heKey: entity.he_key
-        });
+        await saveUserPublicKeyToVault(entity);
 
         await repository.save(entity);
 
@@ -152,8 +146,7 @@ export async function dropUserKeyRouteHandler(req: any, res: any) {
     }
 
     try {
-
-        await useVaultApi().dropUserPublicKey(req.user.id);
+        await removeUserPublicKeyFromVault(entity);
 
         await repository.remove(entity);
 

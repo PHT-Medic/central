@@ -1,6 +1,6 @@
 import {getRepository} from "typeorm";
 import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
-import {Station} from "../../../../../domains/pht/station";
+import {Station} from "../../../../../domains/station";
 import {applyRequestFields} from "../../../../../db/utils/select";
 
 export async function getRealmStationRouteHandler(req: any, res: any, type: string) {

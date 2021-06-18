@@ -3,9 +3,9 @@ import {Realm} from "../../../../domains/realm";
 import {check, matchedData, validationResult} from "express-validator";
 import {SwaggerTags, ResponseDescription} from "typescript-swagger";
 import {Controller, Get, Post, Delete, Request, Response, Params, Body} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {Provider} from "../../../../domains/provider";
-import {Station} from "../../../../domains/pht/station";
+import {Station} from "../../../../domains/station";
 import {getRealmStationRouteHandler} from "./station/RealmStationController";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
@@ -17,7 +17,7 @@ export class RealmController {
     async getMany(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<Realm>> {
+    ): Promise<Realm[]> {
         return await getRealmsRoute(req, res);
     }
 

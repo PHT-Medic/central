@@ -1,7 +1,7 @@
 import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../modules/message-queue";
 import {MQ_TR_ROUTING_KEY} from "../../config/rabbitmq";
 import env from "../../env";
-import {parseHarborConnectionString} from "../../modules/api/provider/harbor";
+import {parseHarborConnectionString} from "../../modules/api/service/harbor";
 
 const harborConfig = parseHarborConnectionString(env.harborConnectionString);
 

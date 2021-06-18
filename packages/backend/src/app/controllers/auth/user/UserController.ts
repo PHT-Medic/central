@@ -1,6 +1,4 @@
 import {check, matchedData, validationResult} from "express-validator";
-import LoggerService from "../../../../modules/loggerService";
-import UserResponseSchema from "../../../../domains/user/UserResponseSchema";
 import {hashPassword} from "../../../../modules/auth/utils/password";
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../../domains/user/repository";
@@ -11,12 +9,13 @@ import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {Params, Controller, Get, Request, Response, Post, Body, Delete} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {User} from "../../../../domains/user";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
-import {Station} from "../../../../domains/pht/station";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
+import {Station} from "../../../../domains/station";
 import {getUserStationRouteHandler} from "./station/UserStationController";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
+import {useLogger} from "../../../../modules/log";
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 type PartialUser = Partial<User>;
 
@@ -31,8 +30,8 @@ export class UserController {
     async getMany(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<PartialUser>> {
-        return await getUsersRouteHandler(req, res) as Array<PartialUser>;
+    ): Promise<PartialUser[]> {
+        return await getUsersRouteHandler(req, res) as PartialUser[];
     }
 
     @Post("",[ForceLoggedInMiddleware])
@@ -96,7 +95,7 @@ export class UserController {
 }
 
 export async function getUsersRouteHandler(req: any, res: any) {
-    let { filter, page } = req.query;
+    const { filter, page } = req.query;
 
     try {
 
@@ -131,7 +130,7 @@ export async function getUsersRouteHandler(req: any, res: any) {
 }
 
 export async function getUserRouteHandler(req: any, res: any) {
-    let { id } = req.params;
+    const { id } = req.params;
 
     try {
         const userRepository = getCustomRepository<UserRepository>(UserRepository);
@@ -141,15 +140,11 @@ export async function getUserRouteHandler(req: any, res: any) {
 
         onlyRealmPermittedQueryResources(query, req.user.realm_id);
 
-        let result = await query.getOne();
+        const result = await query.getOne();
 
         if(typeof result === 'undefined') {
             return res._failNotFound();
         }
-
-        let userResponseSchema = new UserResponseSchema();
-
-        result = userResponseSchema.applySchemaOnEntity(result);
 
         return res._respond({data: result});
     } catch (e) {
@@ -158,9 +153,8 @@ export async function getUserRouteHandler(req: any, res: any) {
 }
 
 export async function getMeRouteHandler(req: any, res: any) {
-    let userResponseSchema = new UserResponseSchema();
 
-    const user = userResponseSchema.applySchemaOnEntity(req.user);
+    const user = req.user;
     const permissions = req.permissions;
 
     return res._respond({
@@ -204,7 +198,7 @@ export async function addUserRouteHandler(req: any, res: any) {
     try {
         const result = await userRepository.save(user);
 
-        LoggerService.info('user "' + data.name + '" created...');
+        useLogger().info('user "' + data.name + '" created...');
 
         return res._respondCreated({
             data: {
@@ -219,6 +213,7 @@ export async function addUserRouteHandler(req: any, res: any) {
 export async function editUserRouteHandler(req: any, res: any) {
     let { id } = req.params;
 
+    // tslint:disable-next-line:radix
     id = parseInt(id);
 
     if(Number.isNaN(id)) {
@@ -232,8 +227,8 @@ export async function editUserRouteHandler(req: any, res: any) {
     await check('email').exists().normalizeEmail({gmail_remove_dots: false}).isEmail().optional({nullable: true}).run(req);
     await check('name').exists().notEmpty().isLength({min: 5, max: 30}).optional().run(req);
     await check('password').exists().isLength({min: 5, max: 512})
-        .custom((value, {req, location, path}) => {
-            if(value !== req.body.password_repeat) {
+        .custom((value, {req: request}) => {
+            if(value !== request.body.password_repeat) {
                 throw new Error('Die Passwörter stimmen nicht überein.');
             } else {
                 return value;
@@ -291,10 +286,10 @@ export async function editUserRouteHandler(req: any, res: any) {
     }
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 export async function dropUserRouteHandler(req: any, res: any) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     if (!req.ability.can('drop', 'user')) {
         return res._failForbidden();

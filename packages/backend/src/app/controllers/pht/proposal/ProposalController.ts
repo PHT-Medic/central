@@ -1,17 +1,17 @@
 import {getRepository, In} from "typeorm";
-import {Station} from "../../../../domains/pht/station";
+import {Station} from "../../../../domains/station";
 import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
 import {check, matchedData, validationResult} from "express-validator";
-import {Proposal} from "../../../../domains/pht/proposal";
+import {Proposal} from "../../../../domains/proposal";
 import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
-import {MasterImage} from "../../../../domains/pht/master-image";
-import {ProposalStation} from "../../../../domains/pht/proposal/station";
+import {MasterImage} from "../../../../domains/master-image";
+import {ProposalStation} from "../../../../domains/proposal/station";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {applyRequestIncludes} from "../../../../db/utils/include";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 
 type PartialProposal = Partial<Proposal>;

@@ -1,5 +1,3 @@
-import {type} from "os";
-
 const onlyOneRow = (db: Promise<any>) => {
     return db.then(data => {
         if(!data) {
@@ -24,7 +22,7 @@ const applyRequestFilter = (query: any, requestFilters: any, allowedFilters: str
     }
 
     return query.andWhere(function () {
-        for(let key in requestFilters) {
+        for(const key in requestFilters) {
             if(!requestFilters.hasOwnProperty(key)) {
                 return;
             }

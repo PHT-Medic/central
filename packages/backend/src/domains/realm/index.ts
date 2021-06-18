@@ -2,13 +2,13 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    Index,
-    OneToMany,
+    Index, JoinColumn,
+    OneToMany, OneToOne,
     PrimaryColumn,
     UpdateDateColumn
 } from "typeorm";
-import {Proposal} from "../pht/proposal";
-import {Train} from "../pht/train";
+import {Proposal} from "../proposal";
+import {Train} from "../train";
 import {Provider} from "../provider";
 
 @Entity()
@@ -21,7 +21,7 @@ export class Realm {
     name: string;
 
     @Column({type: "text", nullable: true, default: null})
-    description: string;
+    description: string | null;
 
     @Column({default: true})
     drop_able: boolean;
@@ -41,3 +41,5 @@ export class Realm {
     @OneToMany(() => Train, train => train.realm)
     trains: Train[];
 }
+
+export const MASTER_REALM_ID = 'master';

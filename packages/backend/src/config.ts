@@ -2,9 +2,8 @@ import {Environment} from "./env";
 import {buildTrainBuilderAggregator} from "./aggregators/train-builder";
 import {buildTrainResultAggregator} from "./aggregators/train-result";
 import {buildHarborAggregator} from "./aggregators/harbor";
-import {NonEmptyArray} from "type-graphql/dist/interfaces/NonEmptyArray";
-import {HelloWorldResolver} from "./app/graphql/resolvers/HelloWorldResolver";
-import {UserResolver} from "./app/graphql/resolvers/UserResolver";
+import {useVaultApi} from "./modules/api/service/vault";
+import {useHarborApi} from "./modules/api/service/harbor";
 
 interface ConfigContext {
     env: Environment
@@ -12,11 +11,7 @@ interface ConfigContext {
 
 export type Config = {
     aggregators: {start: () => void}[]
-    components: {start: () => void}[],
-    graphql: {
-        // tslint:disable-next-line:ban-types
-        resolvers: NonEmptyArray<Function> | NonEmptyArray<string>
-    }
+    components: {start: () => void}[]
 }
 
 function createConfig({env} : ConfigContext) : Config {
@@ -30,20 +25,12 @@ function createConfig({env} : ConfigContext) : Config {
 
     ];
 
-    const graphql : {
-        // tslint:disable-next-line:ban-types
-        resolvers: NonEmptyArray<Function> | NonEmptyArray<string>
-    } = {
-        resolvers: [
-            HelloWorldResolver,
-            UserResolver
-        ]
-    }
+    useVaultApi(env.vaultConnectionString);
+    useHarborApi(env.harborConnectionString);
 
     return {
         aggregators,
-        components,
-        graphql
+        components
     }
 }
 

@@ -1,15 +1,14 @@
 import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
-import {Station} from "../../../../domains/pht/station";
+import {Station} from "../../../../domains/station";
 import {dropHarborProject} from "../../../../domains/harbor/project/api";
 import {removeStationPublicKeyFromVault} from "../../../../domains/vault/station/api";
 import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
+import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {doTrainTaskRouteHandler} from "../train/TrainActionController";
 import {doStationTaskRouteHandler, StationTask} from "./StationActionController";
 
 type PartialStation = Partial<Station>;
@@ -19,14 +18,14 @@ const stationExample = {name: 'University Tuebingen', realm_id: 'tuebingen', id:
 @Controller("/stations")
 export class StationController {
     @Get("",[ForceLoggedInMiddleware])
-    @ResponseExample<Array<PartialStation>>([
+    @ResponseExample<PartialStation[]>([
         stationExample
     ])
     async getMany(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<PartialStation>> {
-        return await getStationsRouteHandler(req, res) as Array<PartialStation>;
+    ): Promise<PartialStation[]> {
+        return await getStationsRouteHandler(req, res) as PartialStation[];
     }
 
     @Post("",[ForceLoggedInMiddleware])
@@ -99,7 +98,7 @@ export async function getStationRouteHandler(req: any, res: any) {
 }
 
 export async function getStationsRouteHandler(req: any, res: any) {
-    let { filter, page } = req.query;
+    const { filter, page } = req.query;
 
     const repository = getRepository(Station);
     const query = repository.createQueryBuilder('station')
@@ -140,7 +139,7 @@ export async function addStationRouteHandler(req: any, res: any) {
         return res._failExpressValidationError({validation});
     }
 
-    let data = matchedData(req, {includeOptionals: false});
+    const data = matchedData(req, {includeOptionals: false});
 
     if(data.public_key) {
         const hexChecker = new RegExp("^[0-9a-fA-F]+$");
@@ -153,7 +152,7 @@ export async function addStationRouteHandler(req: any, res: any) {
     try {
         const repository = getRepository(Station);
 
-        let entity = repository.create(data);
+        const entity = repository.create(data);
 
         await repository.save(entity);
 
@@ -179,7 +178,7 @@ export async function editStationRouteHandler(req: any, res: any) {
         return res._failExpressValidationError(validation);
     }
 
-    let data = matchedData(req, {includeOptionals: false});
+    const data = matchedData(req, {includeOptionals: false});
     if(!data) {
         return res._respondAccepted();
     }
@@ -229,6 +228,7 @@ export async function editStationRouteHandler(req: any, res: any) {
 export async function dropStationRouteHandler(req: any, res: any) {
     let { id } = req.params;
 
+    // tslint:disable-next-line:radix
     id = parseInt(id);
 
     if(typeof id !== 'number' || Number.isNaN(id)) {

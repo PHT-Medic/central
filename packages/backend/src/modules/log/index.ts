@@ -16,13 +16,26 @@ Levels
 }
  */
 
+const includeNamespaceInMessage = format((info, opts) => {
+    if(typeof info.meta?.namespace === 'string') {
+        info.message = `${info.namespace}: ${info.message}`;
+    }
+
+    return info;
+});
+
 export function useLogger() : Logger {
     if(typeof logger !== 'undefined') {
         return logger;
     }
 
     logger = createLogger({
-        format: format.json(),
+        format: format.combine(
+            includeNamespaceInMessage(),
+            format.colorize(),
+            format.json(),
+            format.timestamp()
+        ),
         level: 'debug',
         transports: [
             new transports.Console({

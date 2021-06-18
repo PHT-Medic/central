@@ -11,7 +11,7 @@ export class UserRepository extends Repository<User> {
     async syncRoles(userId: number, roles: Role[]) {
         const userRoleRepository = getRepository(UserRole);
 
-        let userRoles = await userRoleRepository.createQueryBuilder('userRole')
+        const userRoles = await userRoleRepository.createQueryBuilder('userRole')
             .where("userRole.user_id = :userId", {userId})
             .getMany();
 
@@ -81,7 +81,7 @@ export class UserRepository extends Repository<User> {
         try {
             user = await this.createQueryBuilder('user')
                 .addSelect('user.password')
-                .where("user.name LIKE :name", {name: name})
+                .where("user.name LIKE :name", {name})
                 .getOne();
 
             if(typeof user === 'undefined') {

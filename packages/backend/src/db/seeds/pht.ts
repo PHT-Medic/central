@@ -5,28 +5,23 @@ import {Role} from "../../domains/role";
 import {Permission} from "../../domains/permission";
 import {RolePermission} from "../../domains/role/permission";
 import {Realm} from "../../domains/realm";
-import {MasterImage} from "../../domains/pht/master-image";
-import {Station} from "../../domains/pht/station";
+import {MasterImage} from "../../domains/master-image";
+import {Station} from "../../domains/station";
 import {getPhtPermissions} from "../../config/pht";
 
-//----------------------------------------------
-let roleNames = [
-    'StationAuthority', // 0
-    'StationEmployee' // 1
-];
-
-let rolePermissionMapping: {[key: number] : number[]} = {
-    0: [0,1,2,3,5,6,7,8,9,10],
-    1: [0,1,2,6,7,8,9,10]
-};
+// ----------------------------------------------
 
 export default class CreatePHT implements Seeder {
     public async run(factory: Factory, connection: Connection): Promise<any> {
-        //-------------------------------------------------
+        // -------------------------------------------------
+        const roleNames : string[] = [
+            'StationAuthority', // 0
+            'StationEmployee' // 1
+        ];
 
         const roleRepository = connection.getCustomRepository(RoleRepository);
 
-        let roles : Role[] = roleNames.map((role: string) => {
+        const roles : Role[] = roleNames.map((role: string) => {
             return roleRepository.create({
                 name: role,
                 provider_role_id: role
@@ -35,7 +30,7 @@ export default class CreatePHT implements Seeder {
 
         await roleRepository.save(roles);
 
-        //-------------------------------------------------
+        // -------------------------------------------------
 
         const permissionRepository = connection.getRepository(Permission);
         const permissionNames = getPhtPermissions();
@@ -47,11 +42,16 @@ export default class CreatePHT implements Seeder {
 
         await permissionRepository.save(permissions);
 
-        //-------------------------------------------------
+        // -------------------------------------------------
+
+        const rolePermissionMapping: {[key: number] : number[]} = {
+            0: [0,1,2,3,5,6,7,8,9,10],
+            1: [0,1,2,6,7,8,9,10]
+        };
 
         const rolePermissionRepository = connection.getRepository(RolePermission);
-        let rolePermissions : RolePermission[] = [];
-        for(let roleIndex in rolePermissionMapping) {
+        const rolePermissions : RolePermission[] = [];
+        for(const roleIndex in rolePermissionMapping) {
             for (let j = 0; j < rolePermissionMapping[roleIndex].length; j++) {
                 const permissionIndex = rolePermissionMapping[roleIndex][j];
                 rolePermissions.push(rolePermissionRepository.create({
@@ -73,32 +73,38 @@ export default class CreatePHT implements Seeder {
 
         await rolePermissionRepository.save(rolePermissions);
 
-        //-------------------------------------------------
+        // -------------------------------------------------
 
 
         const masterImageRepository = connection.getRepository(MasterImage);
-        const masterImageNames : string[] = ['slim', 'buster', 'dl', 'nfdemo', 'isicdemo'];
+        const masterImageNames : string[] = [
+            'slim',
+            'buster',
+            'dl',
+            'nfdemo',
+            'isicdemo'
+        ];
 
         const masterImages: MasterImage[] = masterImageNames.map((name: string) => {
             return masterImageRepository.create({
-                name: name,
+                name,
                 external_tag_id: name
             })
         });
 
         await masterImageRepository.save(masterImages);
 
-        //-------------------------------------------------
+        // -------------------------------------------------
 
         const realms : Partial<Realm>[] = [
-            {id: 'station_1', name: 'Universität Leipzig'},
-            {id: 'station_2', name: 'Universität Achen'},
-            {id: 'station_3', name: 'Universität Tübingen'},
+            {id: 'station_1', name: 'University Leipzig'},
+            {id: 'station_2', name: 'University Achen'},
+            {id: 'station_3', name: 'University Tuebingen'},
         ];
         const realmRepository = connection.getRepository(Realm);
         await realmRepository.insert(realms);
 
-        //-------------------------------------------------
+        // -------------------------------------------------
 
         const stationRepository = connection.getRepository(Station);
         const stations : Partial<Station>[] = [];

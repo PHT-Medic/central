@@ -1,5 +1,5 @@
-import {Station} from "../../pht/station";
-import {useHarborApi} from "../../../modules/api/provider/harbor";
+import {Station} from "../../station";
+import {useHarborApi} from "../../../modules/api/service/harbor";
 
 type HarborProject = {
     name: string,

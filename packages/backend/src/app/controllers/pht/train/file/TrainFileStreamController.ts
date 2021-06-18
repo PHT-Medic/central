@@ -1,12 +1,12 @@
 import {getRepository} from "typeorm";
-import {Train} from "../../../../../domains/pht/train";
+import {Train} from "../../../../../domains/train";
 import tar from "tar-stream";
 import path from "path";
 import {getWritableDirPath} from "../../../../../config/paths";
-import {TrainFile} from "../../../../../domains/pht/train/file";
+import {TrainFile} from "../../../../../domains/train/file";
 import fs from "fs";
 import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
-import {TrainStation} from "../../../../../domains/pht/train/station";
+import {TrainStation} from "../../../../../domains/train/station";
 
 export async function getTrainFileStreamRouteHandler(req: any, res: any) {
     let {id} = req.params;

@@ -1,5 +1,4 @@
 import {config} from "dotenv";
-import {randomBytes} from "crypto";
 import path from "path";
 
 const envResult = config({
@@ -26,11 +25,7 @@ export interface Environment {
     port: number,
     swaggerDocumentation: boolean | null
 
-    jwtPrivateKey: string | null,
-    jwtPublicKey: string | null,
-    jwtSecret: string | null,
-    jwtProcedure: string,
-    jwtMaxAge: string,
+    jwtMaxAge: number,
 
     rabbitMqConnectionString: string,
     harborConnectionString: string,
@@ -41,16 +36,15 @@ export interface Environment {
     webAppUrl: string,
 }
 
+// tslint:disable-next-line:radix
+const jwtMaxAge : number = parseInt(requireFromEnv('JWT_MAX_AGE', '3600'));
+
 const env : Environment = {
     env: requireFromEnv('NODE_ENV'),
     port: parseInt(requireFromEnv('PORT'), 10),
     swaggerDocumentation: requireFromEnv('SWAGGER_DOCUMENTATION', 'false') !== 'false',
 
-    jwtPrivateKey: requireFromEnv('JWT_PRIVATE_KEY', null),
-    jwtPublicKey: requireFromEnv('JWT_PUBLIC_KEY', null),
-    jwtSecret: requireFromEnv('JWT_SECRET', randomBytes(10).toString('hex')),
-    jwtProcedure: requireFromEnv('JWT_PROCEDURE', 'HMAC'),
-    jwtMaxAge: requireFromEnv('JWT_MAX_AGE', '3600'),
+    jwtMaxAge: Number.isNaN(jwtMaxAge) ? 3600 : jwtMaxAge,
 
     rabbitMqConnectionString: requireFromEnv('RABBITMQ_CONNECTION_STRING'),
     harborConnectionString: requireFromEnv('HARBOR_CONNECTION_STRING'),

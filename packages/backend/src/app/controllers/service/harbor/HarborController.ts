@@ -1,6 +1,6 @@
 import {getRepository} from "typeorm";
-import {Train} from "../../../../domains/pht/train";
-import {TrainResult} from "../../../../domains/pht/train/result";
+import {Train} from "../../../../domains/train";
+import {TrainResult} from "../../../../domains/train/result";
 import {createQueueMessageTemplate, publishQueueMessage} from "../../../../modules/message-queue";
 import {array, BaseSchema, object, string} from "yup";
 
@@ -16,11 +16,8 @@ import {
     MQ_TR_EVENT_TRAIN_PUSHED,
     publishTrainRouterQueueMessage
 } from "../../../../domains/train-router/queue";
-import {Body, Controller, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/authMiddleware";
-import {SwaggerTags} from "typescript-swagger";
 
-let eventValidator : undefined | BaseSchema = undefined;
+let eventValidator : undefined | BaseSchema;
 function useHookEventDataValidator() : BaseSchema {
     if(typeof eventValidator !== 'undefined') {
         return eventValidator;
@@ -48,7 +45,7 @@ function useHookEventDataValidator() : BaseSchema {
     return eventValidator;
 }
 
-type HarborHook = {
+export type HarborHook = {
     type: string,
     occur_at?: string,
     operator: string,
@@ -68,19 +65,6 @@ type HarborHookEvent = {
         resource_url: string
     }[],
     [key: string]: any
-}
-
-@SwaggerTags('service')
-@Controller("/service/harbor")
-export class HarborController {
-    @Post("/hook", [ForceLoggedInMiddleware])
-    async post(
-        @Request() req: any,
-        @Response() res: any,
-        @Body() harborHook: HarborHook
-    ) {
-        return postHarborHookRouteHandler(req, res);
-    }
 }
 
 export async function postHarborHookRouteHandler(req: any, res: any) {
@@ -104,7 +88,7 @@ export async function postHarborHookRouteHandler(req: any, res: any) {
 
             if (typeof train === 'undefined') {
                 useLogger().warn('hook could not proceeded, train: ' + hook.event_data.repository.name + ' does not exist.', {service: 'api-harbor-hook'})
-                //return res._failNotFound();
+                // return res._failNotFound();
                 return res._respondAccepted({});
             }
         }
