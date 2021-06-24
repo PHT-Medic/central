@@ -1,15 +1,27 @@
-import {Factory, Seeder} from "typeorm-seeding";
-import {Connection, getRepository} from "typeorm";
+import {Connection} from "typeorm";
+import {Seeder, Factory} from 'typeorm-seeding';
+
 import {UserRepository} from "../../domains/user/repository";
-import {RoleRepository} from "../../domains/role/repository";
 import {Permission} from "../../domains/permission";
 import {RolePermission} from "../../domains/role/permission";
 import {MASTER_REALM_ID, Realm} from "../../domains/realm";
 import {Provider, AuthenticatorScheme} from "../../domains/provider";
 import {UserRole} from "../../domains/user/role";
+import {RoleRepository} from "../../domains/role/repository";
 
 export default class CreateBase implements Seeder {
     public async run(factory: Factory, connection: Connection) : Promise<any> {
+        const repository = connection.getCustomRepository(RoleRepository);
+
+        const adminRole = repository.create({
+            name: 'admin',
+            provider_role_id: 'superadmin'
+        });
+
+        await repository.save(adminRole);
+
+        // -------------------------------------------------
+
         const realmRepository = connection.getRepository(Realm);
 
         const masterRealm = realmRepository.create({
@@ -39,17 +51,6 @@ export default class CreateBase implements Seeder {
 
         // -------------------------------------------------
 
-        const roleRepository = connection.getCustomRepository(RoleRepository);
-
-        const adminRole = roleRepository.create({
-            name: 'admin',
-            provider_role_id: 'superadmin'
-        });
-
-        await roleRepository.save(adminRole);
-
-        // -------------------------------------------------
-
         const userRepository = connection.getCustomRepository(UserRepository);
 
         const adminUser = userRepository.create({
@@ -63,7 +64,7 @@ export default class CreateBase implements Seeder {
 
         // -------------------------------------------------
 
-        const userRoleRepository = getRepository(UserRole);
+        const userRoleRepository = connection.getRepository(UserRole);
 
         await userRoleRepository.insert({
             role_id: adminRole.id,

@@ -1,4 +1,4 @@
-FROM node:15-alpine
+FROM node:16-alpine
 
 RUN mkdir -p /usr/src/app
 RUN mkdir -p /usr/src/app/writable
@@ -11,8 +11,8 @@ COPY . .
 
 RUN rm -rf ./node-modules
 
-RUN apk --no-cache add --virtual builds-deps build-base python && \
-  npm install
+RUN npm install &&\
+  npm run build
 
 RUN touch .env
 

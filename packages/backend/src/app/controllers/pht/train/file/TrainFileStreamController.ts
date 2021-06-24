@@ -9,7 +9,7 @@ import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
 import {TrainStation} from "../../../../../domains/train/station";
 
 export async function getTrainFileStreamRouteHandler(req: any, res: any) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     if (typeof id !== 'string') {
         return res._failNotFound({message: 'The given train id is not valid...'});

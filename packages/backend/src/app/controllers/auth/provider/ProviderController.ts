@@ -1,16 +1,18 @@
 import {Oauth2AuthorizeProvider} from "../../../../modules/auth/providers";
 import {AuthenticatorScheme, Provider} from "../../../../domains/provider";
 import {getRepository} from "typeorm";
+import {
+    applyRequestFilter,
+    applyRequestFields,
+    applyRequestPagination
+} from "typeorm-extension";
 import {createToken} from "../../../../modules/auth/utils/token";
 import env from "../../../../env";
 import {Realm} from "../../../../domains/realm";
 import {check, matchedData, validationResult} from "express-validator";
-import {applyRequestPagination} from "../../../../db/utils/pagination";
-import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {Controller, Get, Post, Delete, Params, Request, Response, Body} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {SwaggerHidden, SwaggerTags} from "typescript-swagger";
-import {applyRequestFields} from "../../../../db/utils/select";
 
 @SwaggerTags('auth')
 @Controller("/providers")
@@ -92,19 +94,29 @@ export async function getProvidersRoute(req: any, res: any) {
     const query = repository.createQueryBuilder('provider').
     leftJoinAndSelect('provider.realm', 'realm');
 
-    applyRequestFilterOnQuery(query, filter, {
+    applyRequestFilter(query, filter, {
         realmId: 'provider.realm_id'
     });
 
-    applyRequestFields(query, 'provider', fields, [
-        'client_secret'
-    ]);
+    applyRequestFields(
+        query,
+        fields,
+        {
+            provider: ['client_secret']
+        },
+        {
+            aliasMapping: {
+                provider: 'provider'
+            }
+        }
+    );
 
     const pagination = applyRequestPagination(query, page, 50);
 
     // tslint:disable-next-line:prefer-const
     let [entities, total] = await query.getManyAndCount();
 
+    // todo: allow realm owner view of client_secret
     entities = entities.map((provider: Provider) => {
         if(!req.user || !req.ability.can('edit','realm')) {
             delete provider.client_secret;
@@ -136,9 +148,21 @@ export async function getProviderRoute(req: any, res: any) {
         .leftJoinAndSelect('provider.realm', 'realm')
         .where("provider.id = :id", {id});
 
-    applyRequestFields(query, 'provider', fields, [
-        'client_secret'
-    ]);
+    // todo: allow realm owner view of client_secret
+    if(!req.user || !req.ability.can('edit','realm')) {
+        applyRequestFields(
+            query,
+            fields,
+            {
+                provider: ['client_secret']
+            },
+            {
+                aliasMapping: {
+                    provider: 'provider'
+                }
+            }
+        );
+    }
 
     const result = await query.getOne();
 

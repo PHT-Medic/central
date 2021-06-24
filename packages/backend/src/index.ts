@@ -7,9 +7,10 @@ import env from './env';
 import createConfig from "./config";
 import createExpressApp from "./modules/http/express";
 import createHttpServer from "./modules/http/server";
-import {createConnection, getConnectionOptions} from "typeorm";
 import {useLogger} from "./modules/log";
-import {createTypeOrmConnectionOptions} from "./db/connection";
+
+import {createConnection} from "typeorm";
+import {buildConnectionOptions} from "typeorm-extension";
 
 (async () => {
     /*
@@ -33,7 +34,10 @@ import {createTypeOrmConnectionOptions} from "./db/connection";
         useLogger().debug('Startup on 127.0.0.1:'+env.port+' ('+env.env+') completed.', {service: 'system'});
     }
 
-    const connectionOptions = await createTypeOrmConnectionOptions();
-    await createConnection(connectionOptions);
+    const connectionOptions = await buildConnectionOptions();
+    const connection = await createConnection(connectionOptions);
+    if(process.env.NODE_ENV === 'development') {
+        await connection.synchronize();
+    }
     start();
 })();

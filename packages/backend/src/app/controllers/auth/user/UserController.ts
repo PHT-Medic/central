@@ -1,18 +1,18 @@
 import {check, matchedData, validationResult} from "express-validator";
-import {hashPassword} from "../../../../modules/auth/utils/password";
 import {getCustomRepository, getRepository} from "typeorm";
-import {UserRepository} from "../../../../domains/user/repository";
-import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
-import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
-import {Realm} from "../../../../domains/realm";
-import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
+import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {Params, Controller, Get, Request, Response, Post, Body, Delete} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
+
+import {hashPassword} from "../../../../modules/auth/utils/password";
+import {UserRepository} from "../../../../domains/user/repository";
+import {onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
+import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
+import {Realm} from "../../../../domains/realm";
 import {User} from "../../../../domains/user";
 import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {Station} from "../../../../domains/station";
 import {getUserStationRouteHandler} from "./station/UserStationController";
-import {applyRequestPagination} from "../../../../db/utils/pagination";
 import {useLogger} from "../../../../modules/log";
 
 // ---------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ export async function getUsersRouteHandler(req: any, res: any) {
 
         onlyRealmPermittedQueryResources(query, req.user.realm_id);
 
-        applyRequestFilterOnQuery(query, filter, {
+        applyRequestFilter(query, filter, {
             id: 'user.id',
             name: 'user.name'
         });

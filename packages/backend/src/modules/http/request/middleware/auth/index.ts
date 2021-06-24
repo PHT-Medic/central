@@ -10,11 +10,15 @@ import {buildAuthPermissions} from "./permission";
 export async function checkAuthenticated(req: any, res: any, next: any) {
     let { authorization } = req.headers;
 
-    // todo: typing for req.cookies.auth_token;
-    if(typeof req.cookies?.auth_token !== 'undefined') {
-        const {accessToken} = JSON.parse(req.cookies?.auth_token);
+    try {
+        // todo: typing for req.cookies.auth_token;
+        if (typeof req.cookies?.auth_token !== 'undefined') {
+            const {accessToken} = JSON.parse(req.cookies?.auth_token);
 
-        authorization = "Bearer " + accessToken;
+            authorization = "Bearer " + accessToken;
+        }
+    } catch (e) {
+        // todo: handle unexpected position
     }
 
     if(typeof authorization === "string") {
@@ -63,8 +67,7 @@ export async function checkAuthenticated(req: any, res: any, next: any) {
             typeof clientType !== 'undefined' &&
             typeof clientEntity !== 'undefined'
         ) {
-            req.permissions = buildAuthPermissions(clientType, clientEntity.id);
-            req.ability = new UserAbility(req.permissions);
+            req.permissions = await buildAuthPermissions(clientType, clientEntity.id);
 
             switch (clientType) {
                 case "service":
@@ -78,6 +81,12 @@ export async function checkAuthenticated(req: any, res: any, next: any) {
             }
         }
     }
+
+    if(typeof req.permissions === 'undefined') {
+        req.permissions = [];
+    }
+
+    req.ability = new UserAbility(req.permissions);
 
     next();
 }

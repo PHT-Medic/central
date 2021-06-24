@@ -1,3 +1,4 @@
+export {AuthClient} from '../domains/client';
 export {Provider} from '../domains/provider';
 export {Permission} from '../domains/permission';
 export {MasterImage} from '../domains/master-image';
@@ -12,6 +13,7 @@ export {TrainStation} from '../domains/train/station';
 export {Realm} from '../domains/realm';
 export {Role} from '../domains/role';
 export {RolePermission} from '../domains/role/permission';
+export {Service} from '../domains/service';
 export {User} from '../domains/user';
 export {UserAccount} from '../domains/user/account';
 export {UserRole} from '../domains/user/role';

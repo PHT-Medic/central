@@ -1,4 +1,3 @@
-import {Factory, Seeder} from "typeorm-seeding";
 import {Connection} from "typeorm";
 import {RoleRepository} from "../../domains/role/repository";
 import {Role} from "../../domains/role";
@@ -8,6 +7,7 @@ import {Realm} from "../../domains/realm";
 import {MasterImage} from "../../domains/master-image";
 import {Station} from "../../domains/station";
 import {getPhtPermissions} from "../../config/pht";
+import {Factory, Seeder} from "typeorm-seeding";
 
 // ----------------------------------------------
 

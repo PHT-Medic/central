@@ -1,14 +1,13 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
+import {applyRequestPagination, applyRequestFilter} from "typeorm-extension";
 import {Role} from "../../../../domains/role";
-import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
-
-//---------------------------------------------------------------------------------
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
-import {applyRequestPagination} from "../../../../db/utils/pagination";
+
+// ---------------------------------------------------------------------------------
 
 type PartialRole = Partial<Role>;
 const simpleExample = {name: 'admin'};
@@ -17,12 +16,12 @@ const simpleExample = {name: 'admin'};
 @Controller("/roles")
 export class RoleController {
     @Get("",[ForceLoggedInMiddleware])
-    @ResponseExample<Array<PartialRole>>([simpleExample])
+    @ResponseExample<PartialRole[]>([simpleExample])
     async getMany(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<PartialRole>> {
-        return await getRoles(req, res) as Array<PartialRole>;
+    ): Promise<PartialRole[]> {
+        return await getRoles(req, res) as PartialRole[];
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
@@ -58,12 +57,12 @@ export class RoleController {
 }
 
 async function getRoles(req: any, res: any) {
-    let { filter, page } = req.query;
+    const { filter, page } = req.query;
 
     const roleRepository = getRepository(Role);
     const query = roleRepository.createQueryBuilder('role');
 
-    applyRequestFilterOnQuery(query, filter, ['id', 'name']);
+    applyRequestFilter(query, filter, ['id', 'name']);
 
     const pagination = applyRequestPagination(query, page, 50);
 
@@ -81,11 +80,11 @@ async function getRoles(req: any, res: any) {
 }
 
 async function getRole(req: any, res: any) {
-    let { id } = req.params;
+    const { id } = req.params;
 
     try {
         const roleRepository = getRepository(Role);
-        let result = await roleRepository.findOne(id);
+        const result = await roleRepository.findOne(id);
 
         if(typeof result === 'undefined') {
             return res._failNotFound();
@@ -115,7 +114,7 @@ async function addRole(req: any, res: any) {
     const data = matchedData(req, {includeOptionals: false});
 
     const roleRepository = getRepository(Role);
-    let role = roleRepository.create(data);
+    const role = roleRepository.create(data);
 
     try {
         await roleRepository.save(role);
@@ -131,7 +130,7 @@ async function addRole(req: any, res: any) {
 }
 
 async function editRole(req: any, res: any) {
-    let { id } = req.params;
+    const { id } = req.params;
 
     if(!req.ability.can('edit','role')) {
         return res._failForbidden();
@@ -174,10 +173,10 @@ async function editRole(req: any, res: any) {
     }
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 async function dropRole(req: any, res: any) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     if (!req.ability.can('drop', 'role')) {
         return res._failForbidden();
@@ -194,7 +193,7 @@ async function dropRole(req: any, res: any) {
 
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 export default {
     getRoles,

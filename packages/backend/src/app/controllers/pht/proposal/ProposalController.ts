@@ -1,14 +1,12 @@
 import {getRepository, In} from "typeorm";
+import {applyRequestFilter, applyRequestPagination, applyRequestIncludes} from "typeorm-extension";
 import {Station} from "../../../../domains/station";
-import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
+import {onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
 import {check, matchedData, validationResult} from "express-validator";
 import {Proposal} from "../../../../domains/proposal";
 import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {MasterImage} from "../../../../domains/master-image";
 import {ProposalStation} from "../../../../domains/proposal/station";
-import {applyRequestPagination} from "../../../../db/utils/pagination";
-import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
-import {applyRequestIncludes} from "../../../../db/utils/include";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
@@ -21,12 +19,12 @@ const simpleExample = {title: 'An example Proposal', risk: 'low', risk_comment: 
 @Controller("/proposals")
 export class ProposalController {
     @Get("",[ForceLoggedInMiddleware])
-    @ResponseExample<Array<PartialProposal>>([simpleExample])
+    @ResponseExample<PartialProposal[]>([simpleExample])
     async getMany(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<PartialProposal>> {
-        return await getProposalsRouteHandler(req, res) as Array<PartialProposal>;
+    ): Promise<PartialProposal[]> {
+        return await getProposalsRouteHandler(req, res) as PartialProposal[];
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
@@ -102,14 +100,14 @@ export async function getProposalRouteHandler(req: any, res: any) {
 }
 
 export async function getProposalsRouteHandler(req: any, res: any) {
-    let { filter, page } = req.query;
+    const { filter, page } = req.query;
 
     const repository = getRepository(Proposal);
     const query = repository.createQueryBuilder('proposal');
 
     onlyRealmPermittedQueryResources(query, req.user.realm_id);
 
-    applyRequestFilterOnQuery(query, filter, {
+    applyRequestFilter(query, filter, {
         id: 'proposal.id',
         name: 'proposal.name',
         realmId: 'proposal.realm_id'
@@ -155,16 +153,16 @@ export async function addProposalRouteHandler(req: any, res: any) {
         .exists()
         .isInt()
         .custom(value => {
-            return getRepository(MasterImage).find(value).then((res) => {
-                if(typeof res === 'undefined') throw new Error('Das Master Image existiert nicht.');
+            return getRepository(MasterImage).find(value).then((masterImageResult) => {
+                if(typeof masterImageResult === 'undefined') throw new Error('Das Master Image existiert nicht.');
             })
         })
         .run(req);
     await check('station_ids')
         .isArray()
         .custom((value: any[]) => {
-            return getRepository(Station).find({id: In(value)}).then((res) => {
-                if(!res || res.length !== value.length) throw new Error('Die angegebenen Krankenhäuser sind nicht gültig');
+            return getRepository(Station).find({id: In(value)}).then((stationResult) => {
+                if(!stationResult || stationResult.length !== value.length) throw new Error('Die angegebenen Krankenhäuser sind nicht gültig');
             })
         })
         .run(req);
@@ -180,7 +178,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
 
     try {
         const repository = getRepository(Proposal);
-        let entity = repository.create({
+        const entity = repository.create({
             realm_id: req.user.realm_id,
             user_id: req.user.id,
             ...data
@@ -235,8 +233,8 @@ export async function editProposalRouteHandler(req: any, res: any) {
         .isInt()
         .optional()
         .custom(value => {
-            return getRepository(MasterImage).find(value).then((res) => {
-                if(typeof res === 'undefined') throw new Error('Das Master Image existiert nicht.');
+            return getRepository(MasterImage).find(value).then((masterImageResult) => {
+                if(typeof masterImageResult === 'undefined') throw new Error('Das Master Image existiert nicht.');
             })
         })
         .run(req);
@@ -278,6 +276,7 @@ export async function editProposalRouteHandler(req: any, res: any) {
 export async function dropProposalRouteHandler(req: any, res: any) {
     let { id } = req.params;
 
+    // tslint:disable-next-line:radix
     id = parseInt(id);
 
     if(typeof id !== 'number' || Number.isNaN(id)) {

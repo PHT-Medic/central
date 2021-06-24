@@ -8,7 +8,6 @@ import {
 } from "typeorm";
 import {createAuthClientSecret} from "./utils";
 import {Service} from "../service";
-import {Realm} from "../realm";
 import {User} from "../user";
 
 export enum AuthClientType {

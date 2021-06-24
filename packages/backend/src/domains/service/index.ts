@@ -4,7 +4,7 @@ import {
     CreateDateColumn,
     Entity,
     getRepository,
-    JoinColumn,
+    JoinColumn, ManyToOne,
     OneToOne,
     PrimaryColumn,
     UpdateDateColumn
@@ -19,7 +19,7 @@ export enum BaseService {
     RESULT_SERVICE = 'RESULT_SERVICE'
 }
 
-@Entity()
+@Entity({synchronize: true})
 export class Service {
     @PrimaryColumn({type: "varchar", length: 50, unique: true})
     id: string;
@@ -30,25 +30,16 @@ export class Service {
     @UpdateDateColumn()
     updated_at: string;
 
-    @BeforeInsert()
-    createClient() {
-        if(typeof this.client === 'undefined') {
-            this.client = getRepository(AuthClient).create({
-                type: AuthClientType.SERVICE
-            });
-        }
-    }
-
-    @Column({type: "boolean"})
+    @Column({type: "boolean", default: false})
     client_synced: boolean;
 
-    @OneToOne(() => AuthClient, client => client.service)
+    @OneToOne(() => AuthClient, client => client.service, {nullable: true})
     client: AuthClient;
 
     @Column({default: MASTER_REALM_ID})
     realm_id: string;
 
-    @OneToOne(() => AuthClient, {onDelete: "CASCADE"})
+    @ManyToOne(() => Realm)
     @JoinColumn({name: 'realm_id'})
     realm: Realm;
 }

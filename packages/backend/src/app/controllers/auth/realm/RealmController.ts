@@ -1,14 +1,14 @@
 import {getRepository} from "typeorm";
-import {Realm} from "../../../../domains/realm";
+import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
-import {SwaggerTags, ResponseDescription} from "typescript-swagger";
+import {SwaggerTags} from "typescript-swagger";
 import {Controller, Get, Post, Delete, Request, Response, Params, Body} from "@decorators/express";
+
+import {Realm} from "../../../../domains/realm";
 import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {Provider} from "../../../../domains/provider";
 import {Station} from "../../../../domains/station";
 import {getRealmStationRouteHandler} from "./station/RealmStationController";
-import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
-import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 @SwaggerTags('auth')
 @Controller("/realms")
@@ -74,7 +74,7 @@ export async function getRealmsRoute(req: any, res: any) {
 
     const query = realmRepository.createQueryBuilder('realm');
 
-    applyRequestFilterOnQuery(query, filter, ['id', 'name']);
+    applyRequestFilter(query, filter, ['id', 'name']);
 
     const pagination = applyRequestPagination(query, page, 50);
 
@@ -111,7 +111,7 @@ export async function getRealmRoute(req: any, res: any) {
     })
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 async function runValidation(req: any) {
     await check('id').exists().notEmpty().isString().isLength({min: 5, max: 36}).run(req);
@@ -119,7 +119,7 @@ async function runValidation(req: any) {
     await check('description').exists().notEmpty().isString().isLength({min: 5, max: 100}).optional().run(req);
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 export async function addRealmRoute(req: any, res: any) {
     if(!req.ability.can('add','realm')) {
@@ -140,7 +140,7 @@ export async function addRealmRoute(req: any, res: any) {
 
     const realmRepository = getRepository(Realm);
 
-    let realm = realmRepository.create(data);
+    const realm = realmRepository.create(data);
 
     try {
         await realmRepository.save(realm);
@@ -153,7 +153,7 @@ export async function addRealmRoute(req: any, res: any) {
     }
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 export async function editRealmRoute(req: any, res: any) {
     const { id } = req.params;
@@ -194,10 +194,10 @@ export async function editRealmRoute(req: any, res: any) {
     }
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 export async function dropRealmRoute(req: any, res: any) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     if (!req.ability.can('drop', 'realm')) {
         return res._failForbidden({message: 'You are not allowed to drop a realm.'});

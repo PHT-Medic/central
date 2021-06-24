@@ -1,12 +1,11 @@
 import {getRepository} from "typeorm";
+import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {UserRole} from "../../../../../domains/user/role";
 import {check, matchedData, validationResult} from "express-validator";
-import {applyRequestFilterOnQuery} from "../../../../../db/utils/filter";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {applyRequestPagination} from "../../../../../db/utils/pagination";
 
 type PartialUserRole = Partial<UserRole>;
 const simpleExample = {role_id: 1, user_id: 1};
@@ -15,12 +14,12 @@ const simpleExample = {role_id: 1, user_id: 1};
 @Controller("/user-roles")
 export class UserRoleController {
     @Get("",[ForceLoggedInMiddleware])
-    @ResponseExample<Array<PartialUserRole>>([simpleExample])
+    @ResponseExample<PartialUserRole[]>([simpleExample])
     async getMany(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<PartialUserRole>> {
-        return await getUserRolesRouteHandler(req, res) as Array<PartialUserRole>;
+    ): Promise<PartialUserRole[]> {
+        return await getUserRolesRouteHandler(req, res) as PartialUserRole[];
     }
 
     @Post("",[ForceLoggedInMiddleware])
@@ -55,15 +54,15 @@ export class UserRoleController {
 }
 
 export async function getUserRolesRouteHandler(req: any, res: any) {
-    let { filter, page } = req.query;
+    const { filter, page } = req.query;
 
     try {
         const repository = getRepository(UserRole);
-        let query = await repository.createQueryBuilder('userRoles')
+        const query = await repository.createQueryBuilder('userRoles')
             .leftJoinAndSelect('userRoles.role', 'role')
             .leftJoinAndSelect('userRoles.user', 'user');
 
-        applyRequestFilterOnQuery(query, filter, {
+        applyRequestFilter(query, filter, {
             role_id: 'userRoles.role_id',
             user_id: 'userRoles.user_id',
             role_name: 'role.name',
@@ -89,10 +88,10 @@ export async function getUserRolesRouteHandler(req: any, res: any) {
 }
 
 export async function getUserRoleRouteHandler(req: any, res: any) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     const repository = getRepository(UserRole);
-    let entities = await repository.findOne(id)
+    const entities = await repository.findOne(id)
 
     if (typeof entities === 'undefined') {
         return res._failNotFound();
@@ -138,7 +137,7 @@ export async function addUserRoleRouteHandler(req: any, res: any) {
 }
 
 export async function dropUserRoleRouteHandler(req: any, res: any) {
-    let { id } = req.params;
+    const { id } = req.params;
 
     if(!req.ability.can('drop','userRole')) {
         return res._failForbidden();
@@ -146,7 +145,7 @@ export async function dropUserRoleRouteHandler(req: any, res: any) {
 
     const repository = getRepository(UserRole);
 
-    let entity : UserRole | undefined = await repository.findOne(id);
+    const entity : UserRole | undefined = await repository.findOne(id);
 
     if(typeof entity === 'undefined') {
         return res._failNotFound();

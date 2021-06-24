@@ -1,5 +1,6 @@
 import {getRepository} from "typeorm";
-import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
+import {applyRequestPagination, applyRequestIncludes, applyRequestFilter} from "typeorm-extension";
+import {onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
 import {check, matchedData, validationResult} from "express-validator";
 import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {Train} from "../../../../domains/train";
@@ -12,9 +13,6 @@ import {
     TrainConfiguratorStateHashSigned, TrainStateConfigured
 } from "../../../../domains/train/states";
 import {TrainFile} from "../../../../domains/train/file";
-import {applyRequestPagination} from "../../../../db/utils/pagination";
-import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
-import {applyRequestIncludes} from "../../../../db/utils/include";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
@@ -45,14 +43,13 @@ enum TrainTask {
 @Controller("/trains")
 export class TrainController {
     @Get("",[ForceLoggedInMiddleware])
-    @ResponseExample<Array<PartialTrain>>([simpleExample])
+    @ResponseExample<PartialTrain[]>([simpleExample])
     async getMany(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<PartialTrain>> {
-        return await getTrainsRouteHandler(req, res) as Array<PartialTrain>;
+    ): Promise<PartialTrain[]> {
+        return await getTrainsRouteHandler(req, res) as PartialTrain[];
     }
-
 
     @Get("/:id",[ForceLoggedInMiddleware])
     @ResponseExample<PartialTrain>(simpleExample)
@@ -142,7 +139,7 @@ export async function getTrainRouteHandler(req: any, res: any) {
 }
 
 export async function getTrainsRouteHandler(req: any, res: any) {
-    let { filter, page, include } = req.query;
+    const { filter, page, include } = req.query;
 
     const repository = getRepository(Train);
     const query = repository.createQueryBuilder('train');
@@ -155,7 +152,7 @@ export async function getTrainsRouteHandler(req: any, res: any) {
         user: 'user'
     });
 
-    applyRequestFilterOnQuery(query, filter, {
+    applyRequestFilter(query, filter, {
         id: 'train.id',
         name: 'train.name',
         proposalId: 'train.proposal_id',
@@ -228,8 +225,10 @@ export async function addTrainRouteHandler(req: any, res: any) {
         .exists()
         .isInt()
         .custom(value => {
-            return getRepository(Proposal).find(value).then((res) => {
-                if(typeof res === 'undefined') throw new Error('Der Antrag existiert nicht.');
+            return getRepository(Proposal).find(value).then((proposalResult) => {
+                if(typeof proposalResult === 'undefined') throw new Error('The referenced proposal does not exist.');
+
+                // todo: check if is request realm id is equal to proposal realm id.
             })
         })
         .run(req);
@@ -256,12 +255,13 @@ export async function addTrainRouteHandler(req: any, res: any) {
 
     const validationData = matchedData(req, {includeOptionals: true});
 
+    // tslint:disable-next-line:prefer-const
     let {station_ids, ...data} = validationData;
 
     try {
         const repository = getRepository(Train);
 
-        let entity = repository.create({
+        const entity = repository.create({
             realm_id: req.user.realm_id,
             user_id: req.user.id,
             ...data
@@ -271,8 +271,7 @@ export async function addTrainRouteHandler(req: any, res: any) {
 
         return res._respond({data: entity});
     } catch (e) {
-        console.log(e);
-        return res._failValidationError({message: 'Der Zug konnte nicht erstellt werden...'})
+        return res._failValidationError({message: 'The train could not be created.'})
     }
 }
 
@@ -306,7 +305,7 @@ export async function editTrainRouteHandler(req: any, res: any) {
     let train = await repository.findOne(id);
 
     if(typeof train === 'undefined') {
-        return res._failValidationError({message: 'Der Zug konnte nicht gefunden werden.'});
+        return res._failValidationError({message: 'The train could not be found.'});
     }
 
     if(!isRealmPermittedForResource(req.user, train)) {
@@ -337,12 +336,12 @@ export async function editTrainRouteHandler(req: any, res: any) {
         });
     } catch (e) {
         console.log(e);
-        return res._failValidationError({message: 'Der Zug konnte nicht aktualisiert werden.'});
+        return res._failValidationError({message: 'The train could not be updated.'});
     }
 }
 
 export async function dropTrainRouteHandler(req: any, res: any) {
-    let { id } = req.params;
+    const { id } = req.params;
 
     if (typeof id !== 'string') {
         return res._failNotFound();
@@ -369,7 +368,7 @@ export async function dropTrainRouteHandler(req: any, res: any) {
 
         return res._respondDeleted({data: entity});
     } catch (e) {
-        return res._failValidationError({message: 'Der Zug konnte nicht gelöscht werden...'})
+        return res._failValidationError({message: 'The train could not be deleted.'})
     }
 }
 

@@ -1,14 +1,13 @@
 import {getRepository} from "typeorm";
+import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 
 import {TrainStation} from "../../../../../domains/train/station";
 
 import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
-import {applyRequestFilterOnQuery} from "../../../../../db/utils/filter";
 import {Train} from "../../../../../domains/train";
-import {onlyRealmPermittedQueryResources} from "../../../../../db/utils";
+import {onlyRealmPermittedQueryResources} from "../../../../../domains/realm/db/utils";
 import {isTrainStationState, TrainStationStateApproved} from "../../../../../domains/train/station/states";
-import {applyRequestPagination} from "../../../../../db/utils/pagination";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
@@ -20,12 +19,12 @@ const simpleExample = {train_id: 'xxx', station_id: 1, comment: 'Looks good to m
 @Controller("/train-stations")
 export class TrainStationController {
     @Get("",[ForceLoggedInMiddleware])
-    @ResponseExample<Array<PartialTrainStation>>([simpleExample])
+    @ResponseExample<PartialTrainStation[]>([simpleExample])
     async getMany(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<PartialTrainStation>> {
-        return await getTrainStationsRouteHandler(req, res) as Array<PartialTrainStation>;
+    ): Promise<PartialTrainStation[]> {
+        return await getTrainStationsRouteHandler(req, res) as PartialTrainStation[];
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
@@ -71,17 +70,17 @@ export class TrainStationController {
 }
 
 export async function getTrainStationsRouteHandler(req: any, res: any) {
-    let { filter, page } = req.query;
+    const { filter, page } = req.query;
 
     try {
         const repository = getRepository(TrainStation);
-        let query = await repository.createQueryBuilder('trainStation')
+        const query = await repository.createQueryBuilder('trainStation')
             .leftJoinAndSelect('trainStation.train', 'train')
             .leftJoinAndSelect('trainStation.station', 'station');
 
         onlyRealmPermittedQueryResources(query, req.user.realm_id, ['train.realm_id', 'station.realm_id']);
 
-        applyRequestFilterOnQuery(query, filter, {
+        applyRequestFilter(query, filter, {
             trainId: 'trainStation.train_id',
             stationId: 'trainStation.station_id'
         });
@@ -106,11 +105,11 @@ export async function getTrainStationsRouteHandler(req: any, res: any) {
 }
 
 export async function getTrainStationRouteHandler(req: any, res: any) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     try {
         const repository = getRepository(TrainStation);
-        let entity = await repository.findOne(id, {relations: ['train', 'station']});
+        const entity = await repository.findOne(id, {relations: ['train', 'station']});
 
         if (typeof entity === 'undefined') {
             return res._failNotFound();
@@ -184,7 +183,7 @@ export async function addTrainStationRouteHandler(req: any, res: any) {
 }
 
 export async function editTrainStationRouteHandler(req: any, res: any) {
-    let { id } = req.params;
+    const { id } = req.params;
 
     if(typeof id !== "string") {
         return res._failBadRequest({message: 'the train-station id is not valid.'});
@@ -251,7 +250,7 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
 }
 
 export async function dropTrainStationRouteHandler(req: any, res: any) {
-    let { id } = req.params;
+    const { id } = req.params;
 
     if(!req.ability.can('edit', 'train') && !req.ability.can('approve', 'train')) {
         return res._failForbidden();
@@ -259,7 +258,7 @@ export async function dropTrainStationRouteHandler(req: any, res: any) {
 
     const repository = getRepository(TrainStation);
 
-    let entity : TrainStation | undefined = await repository.findOne(id, {relations: ['train', 'station']});
+    const entity : TrainStation | undefined = await repository.findOne(id, {relations: ['train', 'station']});
 
     if(typeof entity === 'undefined') {
         return res._failNotFound();

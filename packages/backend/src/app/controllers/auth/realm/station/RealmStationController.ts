@@ -1,11 +1,11 @@
 import {getRepository} from "typeorm";
+import {applyRequestFields} from "typeorm-extension";
 import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
 import {Station} from "../../../../../domains/station";
-import {applyRequestFields} from "../../../../../db/utils/select";
 
 export async function getRealmStationRouteHandler(req: any, res: any, type: string) {
-    let {id} = req.params;
-    let { fields } = req.query;
+    const {id} = req.params;
+    const { fields } = req.query;
 
     let repository;
 
@@ -20,12 +20,12 @@ export async function getRealmStationRouteHandler(req: any, res: any, type: stri
                     // return res._failForbidden({message: 'You are not allowed to receive station informations.'});
                 }
 
-                let query = repository.createQueryBuilder('station')
+                const query = repository.createQueryBuilder('station')
                     .where({
                         realm_id: id
                     });
 
-                applyRequestFields(query, 'station', fields, [
+                applyRequestFields(query, fields, [
                     'harbor_project_id',
                     'harbor_project_account_name',
                     'harbor_project_account_token',
@@ -34,7 +34,7 @@ export async function getRealmStationRouteHandler(req: any, res: any, type: stri
                     'public_key'
                 ]);
 
-                let entity = await query
+                const entity = await query
                     .getOne();
 
                 if (typeof entity === 'undefined') {

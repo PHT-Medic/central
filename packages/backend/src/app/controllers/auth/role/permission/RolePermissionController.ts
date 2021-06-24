@@ -1,10 +1,9 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
+import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {RolePermission} from "../../../../../domains/role/permission";
-import {applyRequestFilterOnQuery} from "../../../../../db/utils/filter";
-import {applyRequestPagination} from "../../../../../db/utils/pagination";
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/auth";
@@ -17,12 +16,12 @@ const simpleExample = {role_id: 1, permission_id: 1};
 @Controller("/role-permissions")
 export class RolePermissionController {
     @Get("",[ForceLoggedInMiddleware])
-    @ResponseExample<Array<PartialPermissionController>>([simpleExample])
+    @ResponseExample<PartialPermissionController[]>([simpleExample])
     async getMany(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<PartialPermissionController>> {
-        return await getRolePermissions(req, res) as Array<PartialPermissionController>;
+    ): Promise<PartialPermissionController[]> {
+        return await getRolePermissions(req, res) as PartialPermissionController[];
     }
 
     @Post("",[ForceLoggedInMiddleware])
@@ -63,14 +62,14 @@ export class RolePermissionController {
  * @param res
  */
 async function getRolePermissions(req: any, res: any) {
-    let { filter, page } = req.query;
+    const { filter, page } = req.query;
 
     try {
         const rolePermissionRepository = getRepository(RolePermission);
-        let query = rolePermissionRepository.createQueryBuilder('rolePermission')
+        const query = rolePermissionRepository.createQueryBuilder('rolePermission')
             .leftJoinAndSelect('rolePermission.permission', 'permission');
 
-        applyRequestFilterOnQuery(query, filter, {
+        applyRequestFilter(query, filter, {
             role_id: 'rolePermission.role_id',
             permission_id: 'rolePermission.permission_id',
             permission_name: 'permission.name'
@@ -95,7 +94,7 @@ async function getRolePermissions(req: any, res: any) {
     }
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 /**
  * Receive a specific permission of a specific user.
@@ -104,7 +103,7 @@ async function getRolePermissions(req: any, res: any) {
  * @param res
  */
 async function getRolePermission(req: any, res: any) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     try {
         const rolePermissionRepository = getRepository(RolePermission);
@@ -120,7 +119,7 @@ async function getRolePermission(req: any, res: any) {
     }
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 /**
  * Add an permission by id to a specific user.
@@ -163,7 +162,7 @@ const addRolePermission = async (req: any, res: any) => {
     }
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 /**
  * Drop an permission by id of a specific user.
@@ -172,7 +171,7 @@ const addRolePermission = async (req: any, res: any) => {
  * @param res
  */
 async function dropRolePermission(req: any, res: any) {
-    let { id } = req.params;
+    const { id } = req.params;
 
     if(!req.ability.can('drop','rolePermission')) {
         return res._failForbidden();
@@ -188,7 +187,7 @@ async function dropRolePermission(req: any, res: any) {
     }
 }
 
-//---------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------
 
 export default {
     getRolePermissions,

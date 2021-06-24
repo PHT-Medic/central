@@ -1,4 +1,4 @@
-import {EntityRepository, getRepository, Repository} from "typeorm";
+import {EntityRepository, Repository} from "typeorm";
 import {Role} from "./index";
 import {RolePermission} from "./permission";
 import {PermissionInterface} from "../../modules/auth";
@@ -6,7 +6,7 @@ import {PermissionInterface} from "../../modules/auth";
 @EntityRepository(Role)
 export class RoleRepository extends Repository<Role> {
     async getPermissions(roleId: number | number[]) : Promise<PermissionInterface[]> {
-        const pivotRepository = getRepository<RolePermission>(RolePermission);
+        const pivotRepository = this.manager.getRepository<RolePermission>(RolePermission);
 
         const queryBuilder = pivotRepository.createQueryBuilder('pivotTable');
         queryBuilder.leftJoinAndSelect('pivotTable.permission', 'permission', 'permission.id = pivotTable.permission_id');
@@ -21,7 +21,7 @@ export class RoleRepository extends Repository<Role> {
 
         const pivotEntities = await queryBuilder.getMany();
 
-        let items : PermissionInterface[] = [];
+        const items : PermissionInterface[] = [];
 
         for(let i=0; i<pivotEntities.length; i++) {
             items.push({

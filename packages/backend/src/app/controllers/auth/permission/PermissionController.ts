@@ -1,11 +1,11 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
-import {Permission} from "../../../../domains/permission";
-import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
-import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {SwaggerTags} from "typescript-swagger";
+
+import {Permission} from "../../../../domains/permission";
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
-import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 @SwaggerTags("auth")
 @Controller("/permissions")
@@ -63,7 +63,7 @@ const getPermissions = async (req: any, res: any) => {
     const repository = getRepository(Permission);
     const query = repository.createQueryBuilder('permission');
 
-    applyRequestFilterOnQuery(query, filter, ['id', 'name']);
+    applyRequestFilter(query, filter, ['id', 'name']);
 
     const pagination = applyRequestPagination(query, page, 50);
 

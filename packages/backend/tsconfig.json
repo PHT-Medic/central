@@ -4,9 +4,9 @@
         "emitDecoratorMetadata": true,
         "module": "commonjs",
         "esModuleInterop": true,
-        "target": "ES2017",
+        "target": "esnext",
         "lib": [
-            "es2017",
+            "ESNext",
             "dom"
         ],
         "noImplicitAny": true,

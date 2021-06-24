@@ -1,11 +1,10 @@
 import {getRepository} from "typeorm";
+import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {ProposalStation} from "../../../../domains/proposal/station";
-import {onlyRealmPermittedQueryResources} from "../../../../db/utils";
+import {onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
 import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
-import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
 import {isProposalStationState, ProposalStationStateApproved} from "../../../../domains/proposal/station/states";
-import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
@@ -18,12 +17,12 @@ const simpleExample = {proposal_id: 1, station_id: 1, comment: 'Looks good to me
 @Controller("/proposal-stations")
 export class ProposalStationController {
     @Get("",[ForceLoggedInMiddleware])
-    @ResponseExample<Array<PartialProposalStation>>([simpleExample])
+    @ResponseExample<PartialProposalStation[]>([simpleExample])
     async getMany(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<PartialProposalStation>> {
-        return await getProposalStationsRouteHandler(req, res) as Array<PartialProposalStation>;
+    ): Promise<PartialProposalStation[]> {
+        return await getProposalStationsRouteHandler(req, res) as PartialProposalStation[];
     }
 
     @Post("",[ForceLoggedInMiddleware])
@@ -69,11 +68,12 @@ export class ProposalStationController {
 }
 
 export async function getProposalStationsRouteHandler(req: any, res: any) {
+    // tslint:disable-next-line:prefer-const
     let { filter, page } = req.query;
 
     try {
         const repository = getRepository(ProposalStation);
-        let query = await repository.createQueryBuilder('proposalStation')
+        const query = await repository.createQueryBuilder('proposalStation')
             .leftJoinAndSelect('proposalStation.station', 'station')
             .leftJoinAndSelect('proposalStation.proposal', 'proposal');
 
@@ -82,7 +82,7 @@ export async function getProposalStationsRouteHandler(req: any, res: any) {
             'proposal.realm_id'
         ]);
 
-        applyRequestFilterOnQuery(query, filter, {
+        applyRequestFilter(query, filter, {
             proposalId: 'proposalStation.proposal_id',
             stationId: 'proposalStation.station_id'
         });
@@ -106,13 +106,13 @@ export async function getProposalStationsRouteHandler(req: any, res: any) {
 }
 
 export async function getProposalStationRouteHandler(req: any, res: any) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     let repository;
 
     try {
         repository = getRepository(ProposalStation);
-        let entity = await repository.findOne(id, {relations: ['station', 'proposal']})
+        const entity = await repository.findOne(id, {relations: ['station', 'proposal']})
 
         if (typeof entity === 'undefined') {
             return res._failNotFound();
@@ -165,7 +165,7 @@ export async function addProposalStationRouteHandler(req: any, res: any) {
 }
 
 export async function editProposalStationRouteHandler(req: any, res: any) {
-    let { id } = req.params;
+    const { id } = req.params;
 
     if(typeof id !== "string") {
         return res._failBadRequest({message: 'the proposal-station id is not valid.'});
@@ -203,10 +203,6 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
             .run(req);
     }
 
-    if(isAuthorityOfRealm) {
-
-    }
-
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
         return res._failExpressValidationError(validation);
@@ -228,7 +224,7 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
 }
 
 export async function dropProposalStationRouteHandler(req: any, res: any) {
-    let { id } = req.params;
+    const { id } = req.params;
 
     if(!req.ability.can('edit','proposal') && !req.ability.can('add','proposal')) {
         return res._failForbidden();
@@ -236,7 +232,7 @@ export async function dropProposalStationRouteHandler(req: any, res: any) {
 
     const repository = getRepository(ProposalStation);
 
-    let entity : ProposalStation | undefined = await repository.findOne(id, {relations: ['station']});
+    const entity : ProposalStation | undefined = await repository.findOne(id, {relations: ['station']});
 
     if(typeof entity === 'undefined') {
         return res._failNotFound();

@@ -1,10 +1,9 @@
 import {getRepository} from "typeorm";
+import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {Station} from "../../../../domains/station";
 import {dropHarborProject} from "../../../../domains/harbor/project/api";
 import {removeStationPublicKeyFromVault} from "../../../../domains/vault/station/api";
-import {applyRequestFilterOnQuery} from "../../../../db/utils/filter";
-import {applyRequestPagination} from "../../../../db/utils/pagination";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
@@ -104,7 +103,7 @@ export async function getStationsRouteHandler(req: any, res: any) {
     const query = repository.createQueryBuilder('station')
         .leftJoinAndSelect('station.realm', 'realm');
 
-    applyRequestFilterOnQuery(query, filter, {
+    applyRequestFilter(query, filter, {
         id: 'station.id',
         name: 'station.name',
         realmId: 'station.realm_id'

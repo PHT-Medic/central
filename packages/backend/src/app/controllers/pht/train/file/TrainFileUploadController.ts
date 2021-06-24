@@ -28,7 +28,7 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
     const busboy = new BusBoy({headers: req.headers, preservePath: true, highWaterMark: 128});
     req.pipe(busboy);
 
-    let files: TrainFile[] = [];
+    const files: TrainFile[] = [];
 
     const trainDirectoryPath = path.resolve(getWritableDirPath() + '/train-files');
 

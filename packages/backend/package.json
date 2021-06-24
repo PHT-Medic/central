@@ -5,13 +5,16 @@
     "version": "1.0.0",
     "description": "",
     "main": "dist/index.js",
+    "bin": {
+        "pht-ui": "dist/cli.js"
+    },
     "dependencies": {
         "@casl/ability": "^4.1.4",
         "@decorators/di": "^1.0.2",
         "@decorators/express": "^2.4.0",
         "amqplib": "^0.6.0",
         "axios": "^0.21.1",
-        "bcrypt": "^5.0.0",
+        "bcrypt": "^5.0.1",
         "body-parser": "^1.19.0",
         "busboy": "^0.3.1",
         "change-case": "^4.1.2",
@@ -32,9 +35,14 @@
         "tar-stream": "^2.1.4",
         "typeorm": "^0.2.31",
         "typeorm-seeding": "^1.6.1",
+        "typeorm-extension": "0.2.4",
         "typescript-swagger": "latest",
         "uuid": "^8.3.2",
-        "winston": "^3.3.3"
+        "winston": "^3.3.3",
+        "fs-extra": "^9.0.0",
+        "glob": "^7.1.7",
+        "yargs": "^17.0.1",
+        "yup": "^0.32.9"
     },
     "devDependencies": {
         "@types/amqplib": "^0.5.16",
@@ -62,29 +70,15 @@
         "@types/uuid": "^8.3.0",
         "@types/winston": "^2.4.4",
         "@types/yargs": "^17.0.0",
-        "fs-extra": "^9.0.0",
-        "glob": "^7.1.7",
+        "nodemon": "^2.0.7",
         "ts-node": "^8.8.2",
         "ts-node-dev": "^1.0.0-pre.44",
         "tslint": "^6.1.1",
-        "typescript": "^3.8.3",
-        "yargs": "^17.0.1",
-        "yup": "^0.32.9"
+        "typescript": "^3.8.3"
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
-        "dev-watch": "ts-node-dev src/index.ts --respawn --transpileOnly",
-        "build": "tsc",
-        "seed:config": "ts-node ./node_modules/typeorm-seeding/dist/cli.js config",
-        "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
-        "schema:drop": "ts-node ./node_modules/typeorm/cli.js schema:drop",
-        "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync",
-        "setup": "ts-node src/setup.ts db",
-        "reset": "npm run schema:drop && npm run schema:sync && npm run seed:run"
-    },
-    "_moduleAliases": {
-        "@app": "src/app",
-        "@controllers": "src/app/controllers",
-        "@services": "src/app/services"
+        "dev-watch": "nodemon --legacy-watch --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+        "build": "tsc"
     }
 }

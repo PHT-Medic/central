@@ -1,11 +1,10 @@
 import {SwaggerTags} from "typescript-swagger";
+import {applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
+
 import {Body, Controller, Get, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/auth";
 import {BaseService, Service} from "../../../domains/service";
 import {getRepository} from "typeorm";
-import {applyRequestFilterOnQuery} from "../../../db/utils/filter";
-import {applyRequestPagination} from "../../../db/utils/pagination";
-import {applyRequestIncludes} from "../../../db/utils/include";
 import {check, matchedData, validationResult} from "express-validator";
 import {saveServiceSecretToVault} from "../../../domains/vault/service/api";
 import {Station} from "../../../domains/station";
@@ -20,7 +19,7 @@ enum ServiceTask {
 @SwaggerTags('service')
 @Controller("/services")
 export class ServiceController {
-    @Get("", [])
+    @Get("", [ForceLoggedInMiddleware])
     async getMany(
         @Request() req: any,
         @Response() res: any
@@ -67,7 +66,7 @@ async function getManyRoute(req: any, res: any) {
 
     applyRequestIncludes(query, 'service', include, ['client']);
 
-    applyRequestFilterOnQuery(query, filter, ['id']);
+    applyRequestFilter(query, filter, ['id']);
 
     const pagination = applyRequestPagination(query, page, 50);
 

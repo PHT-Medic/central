@@ -1,8 +1,8 @@
 import express, {Express, Response, Request, NextFunction, static as expressStatic } from "express";
 import cors from "cors";
-
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+
 import {getPublicDirPath, getWritableDirPath} from "../../config/paths";
 import path from "path";
 import swaggerUi from 'swagger-ui-express';
@@ -17,6 +17,7 @@ import {registerControllers} from "../../config/routing";
 
 
 import {getMiddleware} from 'swagger-stats';
+import {setDefaultRequestKeyCase} from "typeorm-extension";
 
 export interface ExpressAppInterface extends Express{
 
@@ -86,6 +87,7 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
         }))
     }
 
+    setDefaultRequestKeyCase("snakeCase");
     registerControllers(expressApp);
 
     return expressApp;

@@ -1,12 +1,12 @@
 import {getRepository} from "typeorm";
+import {applyRequestFilter} from "typeorm-extension";
 import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
-import {onlyRealmPermittedQueryResources} from "../../../../../db/utils";
+import {onlyRealmPermittedQueryResources} from "../../../../../domains/realm/db/utils";
 import {TrainFile} from "../../../../../domains/train/file";
 import fs from "fs";
 import {TrainConfiguratorStateOpen} from "../../../../../domains/train/states";
 import {getTrainFileFilePath} from "../../../../../domains/train/file/path";
 import {Train} from "../../../../../domains/train";
-import {applyRequestFilterOnQuery} from "../../../../../db/utils/filter";
 
 import {Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from 'typescript-swagger';
@@ -26,13 +26,13 @@ const simpleExample : PartialTrainFile = {
 @Controller("/trains")
 export class TrainFileController {
     @Get("/:id/files",[ForceLoggedInMiddleware])
-    @ResponseExample<Array<PartialTrainFile>>([simpleExample])
+    @ResponseExample<PartialTrainFile[]>([simpleExample])
     async getMany(
         @Params('id') id: string,
         @Request() req: any,
         @Response() res: any
-    ): Promise<Array<PartialTrainFile>> {
-        return await getTrainFilesRouteHandler(req, res) as Array<PartialTrainFile>;
+    ): Promise<PartialTrainFile[]> {
+        return await getTrainFilesRouteHandler(req, res) as PartialTrainFile[];
     }
 
     @Get("/:id/files/download",[ForceLoggedInMiddleware])
@@ -68,7 +68,7 @@ export class TrainFileController {
     }
 
     @Post("/:id/files",[ForceLoggedInMiddleware])
-    @ResponseExample<Array<PartialTrainFile>>([
+    @ResponseExample<PartialTrainFile[]>([
         simpleExample
     ])
     async add(
@@ -106,7 +106,7 @@ export async function getTrainFileRouteHandler(req: any, res: any) {
 
 export async function getTrainFilesRouteHandler(req: any, res: any) {
     const { id } = req.params;
-    let { filter } = req.query;
+    const { filter } = req.query;
 
     const repository = getRepository(TrainFile);
     const query = repository.createQueryBuilder('trainFile')
@@ -114,7 +114,7 @@ export async function getTrainFilesRouteHandler(req: any, res: any) {
 
     onlyRealmPermittedQueryResources(query, req.user.realm_id);
 
-    applyRequestFilterOnQuery(query, filter, {
+    applyRequestFilter(query, filter, {
         id: 'trainFile.id',
         name: 'trainFile.name',
         realmId: 'train.realm_id'
@@ -130,7 +130,7 @@ export async function getTrainFilesRouteHandler(req: any, res: any) {
 }
 
 export async function dropTrainFileRouteHandler(req: any, res: any) {
-    let { fileId } = req.params;
+    const { fileId } = req.params;
 
     if(typeof fileId !== 'string' || !fileId.length) {
         return res._failNotFound();

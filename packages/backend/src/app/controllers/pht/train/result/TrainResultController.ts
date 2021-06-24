@@ -34,7 +34,7 @@ export class TrainResultController {
 }
 
 export async function doTrainResultTaskRouteHandler(req: any, res: any) {
-    let {id} = req.params;
+    const {id} = req.params;
 
     if (typeof id !== 'string') {
         return res._failNotFound();
@@ -56,7 +56,7 @@ export async function doTrainResultTaskRouteHandler(req: any, res: any) {
 
     switch (validationData.task) {
         case "reset":
-            let entity = await repository.findOne(id, {relations: ["train"]});
+            const entity = await repository.findOne(id, {relations: ["train"]});
 
             if (typeof entity === 'undefined') {
                 return res._failNotFound();
