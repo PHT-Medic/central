@@ -5,10 +5,11 @@ import env from "../../env";
 
 const packageJson = require('../../../package.json');
 const tsConfig = require('../../../tsconfig.json');
+const url = new URL(env.apiUrl);
 
 export const swaggerConfig : SwaggerConfig = {
     yaml: true,
-    host: env.apiUrl,
+    host: (url.host + url.pathname).split('/').shift(),
     name: 'Central UI - API Documentation',
     description: packageJson.description,
     basePath: '/',
