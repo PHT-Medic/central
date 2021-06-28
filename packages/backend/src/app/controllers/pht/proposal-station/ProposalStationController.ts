@@ -141,7 +141,7 @@ export async function addProposalStationRouteHandler(req: any, res: any) {
         .run(req);
 
     if(!req.ability.can('edit','proposal') && !req.ability.can('add', 'proposal')) {
-        return res._failForbidden();
+        return res._failForbidden({message: 'You are not allowed to add a proposal station.'});
     }
 
     const validation = validationResult(req);
@@ -189,7 +189,7 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
         !(isAuthorityOfStation && isAuthorizedForStation) &&
         !(isAuthorityOfRealm && isAuthorizedForRealm)
     ) {
-        return res._failForbidden({message: ''});
+        return res._failForbidden();
     }
 
     if(isAuthorityOfStation) {
@@ -228,19 +228,24 @@ export async function dropProposalStationRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
     if(!req.ability.can('edit','proposal') && !req.ability.can('add','proposal')) {
-        return res._failForbidden();
+        return res._failForbidden({message: 'You are not authorized to drop this proposal station.'});
     }
 
     const repository = getRepository(ProposalStation);
 
-    const entity : ProposalStation | undefined = await repository.findOne(id, {relations: ['station']});
+    const entity : ProposalStation | undefined = await repository.findOne(id, {
+        relations: ['station', 'proposal']
+    });
 
     if(typeof entity === 'undefined') {
         return res._failNotFound();
     }
 
-    if(!isRealmPermittedForResource(req.user, entity.station)) {
-        return res._failForbidden();
+    if(
+        !isRealmPermittedForResource(req.user, entity.station) &&
+        !isRealmPermittedForResource(req.user, entity.proposal)
+    ) {
+        return res._failForbidden({message: 'You are not authorized to drop this proposal station.'});
     }
 
     try {
