@@ -4,7 +4,7 @@ import TrainFileManager from "@/components/train/file/TrainFileManager";
 import {editTrain, runTrainTask} from "@/domains/train/api.ts";
 import TrainWizardHashStep from "@/components/train/wizard/TrainWizardHashStep";
 import TrainWizardFinalStep from "@/components/train/wizard/TrainWizardFinalStep";
-import {TrainConfiguratorStates, TrainStates} from "@/domains/train/index.ts";
+import {TrainConfiguratorStates} from "@/domains/train/index.ts";
 
 export default {
     components: {TrainWizardFinalStep, TrainWizardHashStep, TrainFileManager, TrainWizardConfiguratorStep},
@@ -346,9 +346,11 @@ export default {
                 :start-index="wizard.startIndex"
             >
                 <template slot="footer" slot-scope="props">
+                    <!--
                     <div v-if="canPassDefined && !wizard.valid" class="alert alert-warning alert-sm">
                         Error: {{wizardMessage}}
                     </div>
+                    -->
                     <div class="wizard-footer-left">
                         <wizard-button v-if="props.activeTabIndex > 0 && !props.isLastStep" @click.native="prevWizardStep" :style="props.fillButtonStyle">Back</wizard-button>
                     </div>
