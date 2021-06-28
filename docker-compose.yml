@@ -53,6 +53,10 @@ services:
             - ./packages/result-service/.env
         environment:
             PORT: 3000
+            RABBITMQ_CONNECTION_STRING: amqp://admin:start123@rabbitmq
+        volumes:
+            - ./packages/result-service/src:/usr/src/app/src
+            - ./packages/result-service/writable:/usr/src/app/writable
 volumes:
     pht-central-ui-db:
     pht-central-ui-rabbitmq:
