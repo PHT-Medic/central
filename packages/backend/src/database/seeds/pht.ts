@@ -97,8 +97,8 @@ export default class CreatePHT implements Seeder {
         // -------------------------------------------------
 
         const realms : Partial<Realm>[] = [
-            {id: 'station_1', name: 'University Leipzig'},
-            {id: 'station_2', name: 'University Achen'},
+            {id: 'station_1', name: 'University Augsburg'},
+            {id: 'station_2', name: 'University Munich'},
             {id: 'station_3', name: 'University Tuebingen'},
         ];
         const realmRepository = connection.getRepository(Realm);
