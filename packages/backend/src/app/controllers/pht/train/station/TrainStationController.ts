@@ -11,6 +11,7 @@ import {isTrainStationState, TrainStationStateApproved} from "../../../../../dom
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import env from "../../../../../env";
 
 type PartialTrainStation = Partial<TrainStation>;
 const simpleExample = {train_id: 'xxx', station_id: 1, comment: 'Looks good to me', status: TrainStationStateApproved};
@@ -170,6 +171,10 @@ export async function addTrainStationRouteHandler(req: any, res: any) {
     const repository = getRepository(TrainStation);
 
     let entity = repository.create(data);
+
+    if(env.demo) {
+        entity.status = TrainStationStateApproved;
+    }
 
     try {
         entity = await repository.save(entity);

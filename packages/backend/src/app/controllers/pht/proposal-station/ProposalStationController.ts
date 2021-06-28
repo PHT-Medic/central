@@ -101,6 +101,7 @@ export async function getProposalStationsRouteHandler(req: any, res: any) {
             }
         });
     } catch (e) {
+        console.log(e);
         return res._failServerError();
     }
 }

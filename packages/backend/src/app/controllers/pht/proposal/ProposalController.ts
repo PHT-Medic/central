@@ -11,6 +11,8 @@ import {ProposalStation} from "../../../../domains/proposal/station";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {ProposalStationStateApproved, ProposalStationStateOpen} from "../../../../domains/proposal/station/states";
+import env from "../../../../env";
 
 type PartialProposal = Partial<Proposal>;
 const simpleExample = {title: 'An example Proposal', risk: 'low', risk_comment: 'The risk is low', requested_data: 'all', realm_id: 'master'};
@@ -154,7 +156,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
         .isInt()
         .custom(value => {
             return getRepository(MasterImage).find(value).then((masterImageResult) => {
-                if(typeof masterImageResult === 'undefined') throw new Error('Das Master Image existiert nicht.');
+                if(typeof masterImageResult === 'undefined') throw new Error('The provided master image does not exist.');
             })
         })
         .run(req);
@@ -162,7 +164,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
         .isArray()
         .custom((value: any[]) => {
             return getRepository(Station).find({id: In(value)}).then((stationResult) => {
-                if(!stationResult || stationResult.length !== value.length) throw new Error('Die angegebenen Krankenhäuser sind nicht gültig');
+                if(!stationResult || stationResult.length !== value.length) throw new Error('The provided stations are not valid.');
             })
         })
         .run(req);
@@ -190,7 +192,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
             return proposalStationRepository.create({
                 proposal_id: entity.id,
                 station_id: stationId,
-                status: 'open'
+                status: env.demo ? ProposalStationStateApproved : ProposalStationStateOpen
             });
         });
 
@@ -198,7 +200,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
 
         return res._respond({data: entity});
     } catch (e) {
-        return res._failValidationError({message: 'Der Antrag konnte nicht erstellt werden...'})
+        return res._failValidationError({message: 'The proposal could not be created.'})
     }
 }
 
@@ -234,7 +236,7 @@ export async function editProposalRouteHandler(req: any, res: any) {
         .optional()
         .custom(value => {
             return getRepository(MasterImage).find(value).then((masterImageResult) => {
-                if(typeof masterImageResult === 'undefined') throw new Error('Das Master Image existiert nicht.');
+                if(typeof masterImageResult === 'undefined') throw new Error('The specified master image does not exist.');
             })
         })
         .run(req);
@@ -253,7 +255,7 @@ export async function editProposalRouteHandler(req: any, res: any) {
     let proposal = await repository.findOne(id);
 
     if(typeof proposal === 'undefined') {
-        return res._failValidationError({message: 'Der Antrag konnte nicht gefunden werden.'});
+        return res._failValidationError({message: 'The proposal could not be found.'});
     }
 
     if(!isRealmPermittedForResource(req.user, proposal)) {
@@ -269,7 +271,7 @@ export async function editProposalRouteHandler(req: any, res: any) {
             data: result
         });
     } catch (e) {
-        return res._failValidationError({message: 'Der Antrag konnte nicht aktualisiert werden.'});
+        return res._failValidationError({message: 'The proposal could not be updated.'});
     }
 }
 
@@ -304,6 +306,6 @@ export async function dropProposalRouteHandler(req: any, res: any) {
 
         return res._respondDeleted({data: entity});
     } catch (e) {
-        return res._failValidationError({message: 'Der Antrag konnte nicht gelöscht werden...'})
+        return res._failValidationError({message: 'The proposal could not be deleted.'})
     }
 }

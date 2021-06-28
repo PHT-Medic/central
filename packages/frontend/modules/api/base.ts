@@ -77,7 +77,6 @@ class BaseApi {
         this.authResponseInterceptor = this.mountResponseInterceptor((data) => data, (error: any) => {
             if(typeof this.ctx === 'undefined') return;
 
-            console.log(error.response.data);
             if(typeof error !== 'undefined' && error && typeof error.response !== 'undefined') {
                 if (error.response.status === 401) {
                     // Refresh the access accessToken

@@ -30,7 +30,7 @@ export async function findHarborProjectWebHook(harborProjectId: number) : Promis
     return undefined;
 }
 
-export async function ensureHarborProjectWebHook(entity: Station, clientSecret: string) {
+export async function ensureHarborProjectWebHook(entity: Pick<Station, 'harbor_project_id'>, clientSecret: string) {
     const webhook: Record<string, any> = {
         name: WEBHOOK_ID,
         enabled: true,

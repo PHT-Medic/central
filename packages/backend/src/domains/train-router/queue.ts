@@ -11,14 +11,14 @@ export const MQ_TR_COMMAND_STOP_TRAIN = 'stopTrain';
 
 export function createTrainRouterQueueMessageEvent(repositoryFullName: string, type: string, hookOperator : string = harborConfig.user, metaData: Record<string, any> = {}) : QueueMessage {
     return createQueueMessageTemplate(type, {
-        repositoryFullName: repositoryFullName,
+        repositoryFullName,
         operator: hookOperator
     }, metaData);
 }
 
 export function createTrainRouterQueueMessageCommand(trainId: string, command: string, metaData: Record<string, any> = {}) : QueueMessage {
     return createQueueMessageTemplate(command, {
-        trainId: trainId
+        trainId
     }, metaData);
 }
 

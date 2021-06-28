@@ -1,4 +1,4 @@
-import {getRepository} from "typeorm";
+import {getRepository, Not} from "typeorm";
 import {Train} from "../../../../domains/train";
 import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {createTrainBuilderQueueMessage, publishTrainBuilderQueueMessage} from "../../../../domains/train-builder/queue";
@@ -24,8 +24,11 @@ import {
 import {TrainResult} from "../../../../domains/train/result";
 import {createResultServiceResultCommand} from "../../../../domains/result-service/queue";
 import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/harbor";
-import {TrainResultStateOpen} from "../../../../domains/train/result/states";
+import {TrainResultStateFinished, TrainResultStateOpen} from "../../../../domains/train/result/states";
 import {findHarborProjectRepository, HarborRepository} from "../../../../domains/harbor/project/repository/api";
+import env from "../../../../env";
+import {TrainStation} from "../../../../domains/train/station";
+import {TrainStationStateApproved} from "../../../../domains/train/station/states";
 
 /**
  * Execute a train command (start, stop, build).
@@ -71,17 +74,41 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                 if (entity.status === TrainStateStarted || entity.status === TrainStateFinished) {
                     return res._failBadRequest({message: 'The train can no longer be build...'});
                 } else {
+                    if(!env.demo) {
+                        const trainStationRepository = getRepository(TrainStation);
+                        const trainStations = await trainStationRepository.find({
+                            train_id: entity.id,
+                            status: Not(TrainStationStateApproved)
+                        });
 
-                    const queueMessage = await createTrainBuilderQueueMessage(entity, 'trainBuild');
+                        if (trainStations.length > 0) {
+                            return res._failBadRequest({message: 'Not all stations have approved your train yet.'})
+                        }
 
-                    await publishTrainBuilderQueueMessage(queueMessage);
+                        const queueMessage = await createTrainBuilderQueueMessage(entity, 'trainBuild');
+
+                        await publishTrainBuilderQueueMessage(queueMessage);
+                    }
 
                     entity = repository.merge(entity, {
                         configurator_status: TrainConfiguratorStateFinished,
-                        status: TrainStateBuilding
+                        status: env.demo ? TrainStateFinished : TrainStateBuilding
                     });
 
                     await repository.save(entity);
+
+                    if(env.demo) {
+                        const trainResultRepository = getRepository(TrainResult);
+                        // tslint:disable-next-line:no-shadowed-variable
+                        const trainResult = trainResultRepository.create({
+                            download_id: 'DEMO',
+                            train_id: entity.id,
+                            status: TrainResultStateFinished
+                        });
+
+                        await trainResultRepository.save(trainResult);
+                        entity.result = trainResult;
+                    }
 
                     return res._respond({data: entity});
                 }

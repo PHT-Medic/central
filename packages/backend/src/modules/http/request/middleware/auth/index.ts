@@ -38,9 +38,12 @@ export async function checkAuthenticated(req: any, res: any, next: any) {
             case 'bearer':
                 try {
                     const {remoteAddress, type, entity} = await parseAuthorizationBearer(authorizationData);
-
-                    if(typeof remoteAddress !== 'undefined' && remoteAddress !== req.ip) {
-                        return res._failUnauthorized({message: 'The ip address has changed.', code: 'invalid_ip'});
+                    const allowedIps : string[] = ['::1', '::ffff:127.0.0.1'];
+                    if(allowedIps.indexOf(req.ip) === -1) {
+                        if (typeof remoteAddress !== 'undefined' && remoteAddress !== req.ip) {
+                            console.log(req.ip);
+                            return res._failUnauthorized({message: 'The ip address has changed.', code: 'invalid_ip'});
+                        }
                     }
 
                     clientType = type;

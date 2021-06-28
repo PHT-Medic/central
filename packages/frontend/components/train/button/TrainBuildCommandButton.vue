@@ -26,6 +26,7 @@ export default {
                 const train = await runTrainTask(this.train.id, 'build');
                 this.$emit('built', train);
             } catch (e) {
+                this.$bvToast.toast(e.message, {toaster: 'b-toaster-top-center', variant: 'danger'});
                 this.$emit('buildFailed', e);
             }
         }

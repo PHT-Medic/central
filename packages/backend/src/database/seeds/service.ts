@@ -31,9 +31,6 @@ export default class ServiceSeeder implements Seeder {
             });
         });
 
-        await clientRepository.insert(clients);
-
-        // todo: push client id & secret to vault for (Train Router + Train Builder)
-        // todo: refresh harbor webhooks with new secret.
+        await clientRepository.save(clients);
     }
 }

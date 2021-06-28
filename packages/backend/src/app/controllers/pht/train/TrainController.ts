@@ -227,7 +227,6 @@ export async function addTrainRouteHandler(req: any, res: any) {
         .custom(value => {
             return getRepository(Proposal).find(value).then((proposalResult) => {
                 if(typeof proposalResult === 'undefined') throw new Error('The referenced proposal does not exist.');
-
                 // todo: check if is request realm id is equal to proposal realm id.
             })
         })
@@ -239,7 +238,7 @@ export async function addTrainRouteHandler(req: any, res: any) {
         .isString()
         .custom(value => {
             if(!isTrainType(value)) {
-                throw new Error('Der Train Type ist nicht gültig.');
+                throw new Error('The train type is not valid');
             }
 
             return true;

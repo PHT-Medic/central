@@ -6,10 +6,8 @@ import {ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/
 import {BaseService, Service} from "../../../domains/service";
 import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
-import {saveServiceSecretToVault} from "../../../domains/vault/service/api";
-import {Station} from "../../../domains/station";
-import {ensureHarborProjectWebHook} from "../../../domains/harbor/project/web-hook/api";
 import {HarborHook, postHarborHookRouteHandler} from "./harbor/HarborController";
+import {createSelfServiceSyncQMCommand, publishSelfQM} from "../../../domains/service/queue";
 
 enum ServiceTask {
     SYNC_CLIENT = 'syncClient',
@@ -158,19 +156,12 @@ async function doTask(req: any, res: any) {
 }
 
 async function syncServiceClient(entity: Service) {
-    switch (entity.id) {
-        case BaseService.TRAIN_ROUTER:
-        case BaseService.TRAIN_BUILDER:
-        case BaseService.RESULT_SERVICE:
-            await saveServiceSecretToVault(entity);
-            break;
-        case BaseService.HARBOR:
-            const stationRepository = getRepository(Station);
-
-            const stations = await stationRepository.find();
-            const promises : Promise<any>[] = stations.map(station => ensureHarborProjectWebHook(station, entity.client.secret));
-
-            await Promise.all(promises);
-            break;
-    }
+    const queueMessage = createSelfServiceSyncQMCommand(
+        entity.id,
+        {
+            id: entity.client.id,
+            secret: entity.client.secret
+        }
+    );
+    await publishSelfQM(queueMessage);
 }

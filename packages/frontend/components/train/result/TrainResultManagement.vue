@@ -28,7 +28,9 @@ export default {
         download() {
             if(!this.train.result) return;
 
-            window.open(this.$config.resultServiceApiUrl+'train-results/'+this.train.result.id+'/download')
+            const resultId = typeof this.train.result.downloadId !== 'undefined' ? this.train.result.downloadId : this.train.result.id;
+
+            window.open(this.$config.resultServiceApiUrl+'train-results/'+resultId+'/download')
         },
         async reset() {
             if(this.busy || !this.result) return;

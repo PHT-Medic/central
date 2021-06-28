@@ -13,6 +13,9 @@ export class TrainResult {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Column({type: "varchar", length: 100, nullable: true})
+    download_id: string;
+
     @CreateDateColumn()
     created_at: string;
 

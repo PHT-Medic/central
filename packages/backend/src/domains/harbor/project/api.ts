@@ -42,8 +42,6 @@ export async function ensureHarborProject(entity: Station) : Promise<number> {
 
         return (await findHarborProject(entity)).id;
     } catch (e) {
-        console.log(e.response.status);
-
         if(e.response.status === 409) {
             return (await findHarborProject(entity)).id;
         }

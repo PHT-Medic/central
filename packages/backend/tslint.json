@@ -13,7 +13,8 @@
         "variable-name": false,
         "prefer-for-of": false,
         "forin": false,
-        "max-classes-per-file": false
+        "max-classes-per-file": false,
+        "ban-types": false
     },
     "rulesDirectory": []
 }

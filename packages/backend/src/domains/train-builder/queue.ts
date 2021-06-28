@@ -13,7 +13,7 @@ export async function createTrainBuilderQueueMessage(train: Train, type: string 
     })
 
     const filesRepository = getRepository(TrainFile);
-    const files = await filesRepository
+    const files : TrainFile[] = await filesRepository
         .createQueryBuilder('file')
         .where('file.train_id = :id', {id: train.id})
         .getMany();
@@ -25,7 +25,7 @@ export async function createTrainBuilderQueueMessage(train: Train, type: string 
         stations: train.train_stations
             .filter(trainStation => trainStation.status === TrainStationStateApproved)
             .map(trainStation => trainStation.station_id),
-        files: files.map(file => file.directory + '/' + file.name),
+        files: files.map((file: TrainFile) => file.directory + '/' + file.name),
         masterImage: train.master_image.external_tag_id,
         entrypointExecutable: train.entrypoint_executable,
         entrypointPath: train.entrypoint_file.directory + '/' + train.entrypoint_file.name,

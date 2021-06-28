@@ -34,6 +34,8 @@ export interface Environment {
     apiUrl: string,
     internalApiUrl: string,
     webAppUrl: string,
+
+    demo: boolean
 }
 
 // tslint:disable-next-line:radix
@@ -52,7 +54,9 @@ const env : Environment = {
 
     apiUrl: requireFromEnv('API_URL'),
     internalApiUrl: requireFromEnv('INTERNAL_API_URL', requireFromEnv('API_URL')),
-    webAppUrl: requireFromEnv('WEB_APP_URL')
+    webAppUrl: requireFromEnv('WEB_APP_URL'),
+
+    demo: requireFromEnv('DEMO', 'false') !== 'false'
 };
 
 export default env;

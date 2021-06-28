@@ -1,15 +1,14 @@
 import {
-    BeforeInsert,
     Column,
     CreateDateColumn,
     Entity,
-    getRepository,
     JoinColumn, ManyToOne,
     OneToOne,
     PrimaryColumn,
     UpdateDateColumn
 } from "typeorm";
-import {AuthClient, AuthClientType} from "../client";
+
+import {AuthClient} from "../client";
 import {MASTER_REALM_ID, Realm} from "../realm";
 
 export enum BaseService {

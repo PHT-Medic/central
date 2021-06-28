@@ -4,6 +4,7 @@ import {buildTrainResultAggregator} from "./aggregators/train-result";
 import {buildHarborAggregator} from "./aggregators/harbor";
 import {useVaultApi} from "./modules/api/service/vault";
 import {useHarborApi} from "./modules/api/service/harbor";
+import {buildServiceSecurityComponent} from "./components/service-security";
 
 interface ConfigContext {
     env: Environment
@@ -22,7 +23,7 @@ function createConfig({env} : ConfigContext) : Config {
     ];
 
     const components : {start: () => void}[] = [
-
+        buildServiceSecurityComponent()
     ];
 
     useVaultApi(env.vaultConnectionString);

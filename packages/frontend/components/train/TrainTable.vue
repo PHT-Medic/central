@@ -173,6 +173,7 @@ export default {
             const index = this.items.findIndex(item => item.id === train.id);
             if(index !== -1) {
                 this.items[index].status = train.status;
+                this.items[index].result = train.result;
             }
         },
         handleTrainStopFailed(e) {

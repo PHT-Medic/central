@@ -26,7 +26,7 @@ export default {
                 const train = await runTrainTask(this.train.id, 'stop');
                 this.$emit('stopped', train);
             } catch (e) {
-                console.log(e);
+                this.$bvToast.toast(e.message, {toaster: 'b-toaster-top-center', variant: 'danger'});
                 this.$emit('stopFailed', e);
             }
         }
