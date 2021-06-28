@@ -2,4 +2,4 @@
 */
 !.gitignore
 !train-results
-!train-results/demo.tar
+!train-results/DEMO.tar
