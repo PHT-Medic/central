@@ -4,8 +4,6 @@ services:
         image: mysql
         command: --default-authentication-plugin=mysql_native_password
         restart: always
-        ports:
-            - '3306:3306'
         environment:
             MYSQL_ROOT_PASSWORD: start123
             MYSQL_ROOT_HOST: '%'
@@ -16,11 +14,6 @@ services:
         environment:
             - RABBITMQ_USERNAME=admin
             - RABBITMQ_PASSWORD=start123
-        ports:
-            - '4369:4369'
-            - '5672:5672'
-            - '25672:25672'
-            - '15672:15672'
         volumes:
             - pht-central-ui-rabbitmq:/bitnami
     backend:
@@ -48,8 +41,6 @@ services:
             - '3000:3000'
         environment:
             PORT: 3000
-            API_URL: http://localhost:3002
-            RESULT_SERVICE_API_URL: http://localhost:3003
         env_file:
             - ./packages/frontend/.env
     result-service:
