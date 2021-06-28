@@ -28,9 +28,13 @@ export default {
         download() {
             if(!this.train.result) return;
 
-            const resultId = typeof this.train.result.downloadId !== 'undefined' ? this.train.result.downloadId : this.train.result.id;
+            let query = '';
 
-            window.open(this.$config.resultServiceApiUrl+'train-results/'+resultId+'/download')
+            if(typeof this.train.result.downloadId === 'string') {
+                query = '?downloadId='+this.train.result.downloadId;
+            }
+
+            window.open(this.$config.resultServiceApiUrl+'train-results/'+this.train.result.id+'/download' + query)
         },
         async reset() {
             if(this.busy || !this.result) return;
