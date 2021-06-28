@@ -14,7 +14,8 @@
         "prefer-for-of": false,
         "forin": false,
         "max-classes-per-file": false,
-        "ban-types": false
+        "ban-types": false,
+        "no-shadowed-variable": false
     },
     "rulesDirectory": []
 }

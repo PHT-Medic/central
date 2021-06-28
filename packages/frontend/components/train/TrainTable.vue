@@ -169,11 +169,15 @@ export default {
                 this.items[index].status = train.status;
             }
         },
-        handleTrainBuilt(train) {
+        handleTrainBuilding(train) {
             const index = this.items.findIndex(item => item.id === train.id);
             if(index !== -1) {
-                this.items[index].status = train.status;
-                this.items[index].result = train.result;
+                this.items[index].status = TrainStates.TrainStateBuilding;
+
+                setTimeout(() => {
+                    this.items[index].status = train.status;
+                    this.items[index].result = train.result;
+                }, 3000);
             }
         },
         handleTrainStopFailed(e) {
@@ -281,7 +285,7 @@ export default {
             <template v-slot:cell(options)="data">
                 <train-start-command-button v-if="canStartTrainExecution" :train="data.item" @started="handleTrainStarted" v-b-tooltip title="Start"/>
                 <train-stop-command-button v-if="canStopTrainExecution" :train="data.item" @stopped="handleTrainStopped" @stopFailed="handleTrainStopFailed" v-b-tooltip title="Stop" />
-                <train-build-command-button v-if="canEdit && data.item.status !== trainStates.TrainStateBuilding && data.item.status !== trainStates.TrainStateBuilt" :train="data.item" @built="handleTrainBuilt" v-b-tooltip title="Build" />
+                <train-build-command-button v-if="canEdit && data.item.status !== trainStates.TrainStateBuilding && data.item.status !== trainStates.TrainStateBuilt" :train="data.item" @built="handleTrainBuilding" v-b-tooltip title="Build" />
 
                 <template v-if="[trainStates.TrainStateStarting, trainStates.TrainStateBuilding, trainStates.TrainStateStopping].indexOf(data.item.status) === -1">
                     <b-dropdown class="dropdown-xs" :no-caret="true">
