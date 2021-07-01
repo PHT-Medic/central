@@ -49,17 +49,11 @@ export default (ctx: Context) => {
     });
 
     authApi.mountResponseInterceptor(r => r, (error => {
-        if (typeof error.response !== 'undefined') {
-            if (typeof error.response.data !== 'undefined') {
-                if (typeof error.response.data.error.message === 'string') {
-                    error.message = error.response.data.error.message;
-                    throw error;
-                }
-            }
+        if(typeof error?.response?.data?.message === 'string') {
+            error.message = error.response.data.message;
+            throw error;
         }
 
-        error.message = 'A network or unknown error occurred...';
-
-        throw error;
+        throw new Error('A network or unknown error occurred.');
     }));
 }

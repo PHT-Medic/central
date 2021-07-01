@@ -1,6 +1,6 @@
 import {Repository, EntityRepository, getCustomRepository, getRepository, In, ObjectLiteral} from "typeorm";
+import {hashPassword, verifyPassword} from "@typescript-auth/server";
 import {User} from "./index";
-import {hashPassword, verifyPassword} from "../../modules/auth/utils/password";
 import {RoleRepository} from "../role/repository";
 import {PermissionInterface} from "../../modules/auth";
 import {Role} from "../role";

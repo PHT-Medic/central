@@ -1,7 +1,7 @@
 import {User as DomainUser} from "../../domains/user";
-import UserAbility from "../../modules/auth/utils/user-ability";
 import {PermissionInterface} from "../../modules/auth";
 import {Result} from "express-validator";
+import {AbilityManager} from "@typescript-auth/core";
 
 type RespondMessage = {
     statusMessage?: string,
@@ -23,7 +23,7 @@ declare global {
             userId?: number,
             token?: string,
             permissions: PermissionInterface[],
-            ability: UserAbility
+            ability: AbilityManager
         }
 
         export interface Response {

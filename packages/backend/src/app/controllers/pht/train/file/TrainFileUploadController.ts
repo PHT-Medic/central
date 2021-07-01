@@ -5,7 +5,7 @@ import BusBoy from "busboy";
 import path from "path";
 import {getWritableDirPath} from "../../../../../config/paths";
 import fs from "fs";
-import {buildMulterFileHandler} from "../../../../../modules/http/busboy";
+import {buildMulterFileHandler} from "./busboy";
 import crypto from "crypto";
 import {TrainConfiguratorStateOpen} from "../../../../../domains/train/states";
 

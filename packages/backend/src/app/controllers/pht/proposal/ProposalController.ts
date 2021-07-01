@@ -1,18 +1,17 @@
 import {getRepository, In} from "typeorm";
 import {applyRequestFilter, applyRequestPagination, applyRequestIncludes} from "typeorm-extension";
 import {Station} from "../../../../domains/station";
-import {onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
+import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
 import {check, matchedData, validationResult} from "express-validator";
 import {Proposal} from "../../../../domains/proposal";
-import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {MasterImage} from "../../../../domains/master-image";
 import {ProposalStation} from "../../../../domains/proposal/station";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ProposalStationStateApproved, ProposalStationStateOpen} from "../../../../domains/proposal/station/states";
 import env from "../../../../env";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialProposal = Partial<Proposal>;
 const simpleExample = {title: 'An example Proposal', risk: 'low', risk_comment: 'The risk is low', requested_data: 'all', realm_id: 'master'};

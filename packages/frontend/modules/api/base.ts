@@ -1,6 +1,6 @@
 import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {Context} from "@nuxt/types";
-import {AuthAbstractTokenResponse} from "~/modules/auth/types";
+import {AuthStoreToken} from "~/store/auth";
 
 class BaseApi {
     private ctx: Context | undefined;
@@ -39,7 +39,7 @@ class BaseApi {
         this.ctx.store.subscribe((mutation: any, state: any) => {
             switch (mutation.type) {
                 case 'auth/setToken':
-                    let token = <AuthAbstractTokenResponse> mutation.payload;
+                    let token = <AuthStoreToken> mutation.payload;
                     this.setAuthorizationBearerHeader(token.accessToken);
                     break;
                 case 'auth/unsetToken':

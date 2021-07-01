@@ -96,16 +96,15 @@ export default {
             let l = this.$createElement;
 
             try {
-                let proceed = await this.$bvModal.msgBoxConfirm(l('div', {class: 'alert alert-info m-b-0'}, [
+                let proceed = await this.$bvModal.msgBoxConfirm(l('div', {class: 'alert alert-warning m-b-0'}, [
                     l('p', null, [
-                        'Sind Sie sicher, dass Sie den Provider ',
+                        'Are you sure you want to delete the authentication provider: ',
                         l('b', null, [user.name]),
-                        ' löschen möchten?'
+                        ' ?'
                     ])
                 ]), {
                     size: 'sm',
-                    buttonSize: 'xs',
-                    cancelTitle: 'Abbrechen'
+                    buttonSize: 'xs'
                 });
 
                 if(proceed) {
@@ -186,12 +185,17 @@ export default {
             size="lg"
             ref="form"
             button-size="sm"
-            title-html="<i class='fas fa-sign-in-alt'></i> Provider"
+            title-html="<i class='fas fa-sign-in-alt'></i> Authentication Provider"
             :no-close-on-backdrop="true"
             :no-close-on-esc="true"
             :hide-footer="true"
         >
-            <provider-form :provider-property="item" :realm-id="realm.id" @created="handleCreated" @updated="handleUpdated"/>
+            <provider-form
+                :provider="item"
+                :realm-id="realm.id"
+                @created="handleCreated"
+                @updated="handleUpdated"
+            />
         </b-modal>
     </div>
 </template>

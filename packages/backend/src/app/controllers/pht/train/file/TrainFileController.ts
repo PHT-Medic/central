@@ -1,7 +1,6 @@
 import {getRepository} from "typeorm";
 import {applyRequestFilter} from "typeorm-extension";
-import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
-import {onlyRealmPermittedQueryResources} from "../../../../../domains/realm/db/utils";
+import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../../domains/realm/db/utils";
 import {TrainFile} from "../../../../../domains/train/file";
 import fs from "fs";
 import {TrainConfiguratorStateOpen} from "../../../../../domains/train/states";
@@ -11,9 +10,9 @@ import {Train} from "../../../../../domains/train";
 import {Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from 'typescript-swagger';
 
-import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/auth";
 import {getTrainFileStreamRouteHandler} from "./TrainFileStreamController";
 import {uploadTrainFilesRouteHandler} from "./TrainFileUploadController";
+import {ForceLoggedInMiddleware} from "../../../../../config/http/middleware/auth";
 
 type PartialTrainFile = Partial<TrainFile>;
 const simpleExample : PartialTrainFile = {

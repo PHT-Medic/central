@@ -134,7 +134,7 @@ export default {
 
             <div class="form-group">
                 <button type="submit" class="btn btn-outline-primary btn-sm" :disabled="$v.$invalid || busy" @click.prevent="handleSubmit">
-                    {{ isEditing ? 'Aktualisieren' : 'Erstellen' }}
+                    {{ isEditing ? 'Update' : 'Create' }}
                 </button>
             </div>
         </div>

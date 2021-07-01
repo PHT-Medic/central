@@ -4,16 +4,14 @@ import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {Params, Controller, Get, Request, Response, Post, Body, Delete} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 
-import {hashPassword} from "../../../../modules/auth/utils/password";
 import {UserRepository} from "../../../../domains/user/repository";
-import {onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
-import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
+import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
 import {Realm} from "../../../../domains/realm";
 import {User} from "../../../../domains/user";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {Station} from "../../../../domains/station";
 import {getUserStationRouteHandler} from "./station/UserStationController";
 import {useLogger} from "../../../../modules/log";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 // ---------------------------------------------------------------------------------
 
@@ -124,7 +122,6 @@ export async function getUsersRouteHandler(req: any, res: any) {
             }
         });
     } catch (e) {
-        console.log(e);
         return res._failServerError();
     }
 }
@@ -153,9 +150,8 @@ export async function getUserRouteHandler(req: any, res: any) {
 }
 
 export async function getMeRouteHandler(req: any, res: any) {
-
     const user = req.user;
-    const permissions = req.permissions;
+    const permissions = req.ability.getPermissions();
 
     return res._respond({
         data: {
@@ -255,11 +251,12 @@ export async function editUserRouteHandler(req: any, res: any) {
         return res._respondAccepted();
     }
 
+    const userRepository = getCustomRepository<UserRepository>(UserRepository);
+
     if(typeof data.password !== 'undefined') {
-        data.password = await hashPassword(data.password);
+        data.password = await userRepository.hashPassword(data.password);
     }
 
-    const userRepository = getCustomRepository<UserRepository>(UserRepository);
     let user = await userRepository.findOne(id);
     if(typeof user === 'undefined') {
         return res._failNotFound();

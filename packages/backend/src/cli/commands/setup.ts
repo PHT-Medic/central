@@ -1,7 +1,8 @@
 import {Arguments, Argv, CommandModule} from "yargs";
 import {buildConnectionOptions, createDatabase, runSeeder} from "typeorm-extension";
 import {createConnection} from "typeorm";
-import {createSecurityKeyPair} from "../../modules/auth/security";
+import {createSecurityKeyPair} from "@typescript-auth/server";
+import {getWritableDirPath} from "../../config/paths";
 
 interface SetupArguments extends Arguments {
     auth: 'yes' | 'no',
@@ -41,7 +42,7 @@ export class SetupCommand implements CommandModule {
          * Setup auth module
          */
         if(args.auth === 'yes') {
-            await createSecurityKeyPair();
+            await createSecurityKeyPair({directory: getWritableDirPath()});
         }
 
         /**

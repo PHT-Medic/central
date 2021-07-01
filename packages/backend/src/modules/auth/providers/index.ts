@@ -91,7 +91,7 @@ export class Oauth2Provider {
                 }
             );
 
-            let loginToken : Partial<LoginToken> = {
+            const loginToken : Partial<LoginToken> = {
                 accessToken: response.data.access_token,
                 refreshToken: response.data.refresh_token,
                 expiresIn: getExpirationDate(response.data.expires_in).toISOString(),

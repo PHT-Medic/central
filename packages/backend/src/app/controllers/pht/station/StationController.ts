@@ -6,9 +6,9 @@ import {dropHarborProject} from "../../../../domains/harbor/project/api";
 import {removeStationPublicKeyFromVault} from "../../../../domains/vault/station/api";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {doStationTaskRouteHandler, StationTask} from "./StationActionController";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialStation = Partial<Station>;
 const stationExample = {name: 'University Tuebingen', realm_id: 'tuebingen', id: 1}

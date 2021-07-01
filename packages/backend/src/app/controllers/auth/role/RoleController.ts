@@ -5,7 +5,7 @@ import {Role} from "../../../../domains/role";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 // ---------------------------------------------------------------------------------
 

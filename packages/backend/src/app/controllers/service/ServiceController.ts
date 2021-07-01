@@ -2,12 +2,12 @@ import {SwaggerTags} from "typescript-swagger";
 import {applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
 
 import {Body, Controller, Get, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../modules/http/request/middleware/auth";
 import {BaseService, Service} from "../../../domains/service";
 import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
 import {HarborHook, postHarborHookRouteHandler} from "./harbor/HarborController";
 import {createSelfServiceSyncQMCommand, publishSelfQM} from "../../../domains/service/queue";
+import {ForceLoggedInMiddleware} from "../../../config/http/middleware/auth";
 
 enum ServiceTask {
     SYNC_CLIENT = 'syncClient',

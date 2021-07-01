@@ -6,13 +6,13 @@ import {
     applyRequestFields,
     applyRequestPagination
 } from "typeorm-extension";
-import {createToken} from "../../../../modules/auth/utils/token";
 import env from "../../../../env";
 import {Realm} from "../../../../domains/realm";
 import {check, matchedData, validationResult} from "express-validator";
 import {Controller, Get, Post, Delete, Params, Request, Response, Body} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {SwaggerHidden, SwaggerTags} from "typescript-swagger";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {createToken} from "@typescript-auth/server";
 
 @SwaggerTags('auth')
 @Controller("/providers")
@@ -348,24 +348,18 @@ export async function authorizeCallbackRoute(req: any, res: any) {
             id: userAccount.user_id
         }
 
-        const {
-            token,
-            expiresIn
-        } = await createToken(payload, env.jwtMaxAge);
+        const expiresIn : number = env.jwtMaxAge;
+
+        const token = await createToken(payload, expiresIn);
 
         const cookie = {
             accessToken: token,
-            meta: {
-                expireDate: new Date(Date.now() + 1000 * expiresIn).toString(),
-                expiresIn
-            }
+            expireDate: new Date(Date.now() + 1000 * expiresIn).toString(),
+            expiresIn,
+            tokenType: 'Bearer'
         };
 
         res.cookie('auth_token', JSON.stringify(cookie), {
-            maxAge: Date.now() + 1000 * expiresIn
-        });
-
-        res.cookie('auth_provider','local',{
             maxAge: Date.now() + 1000 * expiresIn
         });
 

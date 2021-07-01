@@ -5,7 +5,7 @@ import {SwaggerTags} from "typescript-swagger";
 
 import {Permission} from "../../../../domains/permission";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 @SwaggerTags("auth")
 @Controller("/permissions")

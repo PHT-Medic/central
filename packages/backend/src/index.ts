@@ -5,8 +5,8 @@ dotenv.config();
 import env from './env';
 
 import createConfig from "./config";
-import createExpressApp from "./modules/http/express";
-import createHttpServer from "./modules/http/server";
+import createExpressApp from "./config/http/express";
+import createHttpServer from "./config/http/server";
 import {useLogger} from "./modules/log";
 
 import {createConnection} from "typeorm";
@@ -41,3 +41,5 @@ import {buildConnectionOptions} from "typeorm-extension";
     }
     start();
 })();
+export {ForceLoggedInMiddleware} from "./config/http/middleware/auth";
+export {forceLoggedIn} from "./config/http/middleware/auth";

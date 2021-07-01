@@ -3,8 +3,7 @@ import {ActionTree, GetterTree, MutationTree} from "vuex";
 
 import {RootState} from "~/store/index";
 
-import { AuthenticationError } from '~/modules/auth'
-import {AuthAbstractTokenResponse} from "~/modules/auth/types";
+import {Oauth2TokenResponse} from "@typescript-auth/core";
 
 export const AuthStoreKey = {
     user: 'user',
@@ -13,14 +12,17 @@ export const AuthStoreKey = {
     provider: 'provider'
 }
 
+export type AuthStoreToken = Oauth2TokenResponse & {
+    expireDate: string
+}
+
 export interface AuthState {
-    provider: string | undefined,
     user: Record<string, any> | undefined,
 
     permissions: Record<string, any>[],
     permissionsResolved: boolean,
 
-    token: AuthAbstractTokenResponse | undefined,
+    token: AuthStoreToken | undefined,
     tokenPromise: Promise<any> | undefined,
 
     required: boolean,
@@ -28,18 +30,17 @@ export interface AuthState {
     error: undefined | { code: string, message: string },
 }
 const state = () : AuthState => ({
-        provider: undefined,
-        user: undefined,
+    user: undefined,
 
-        permissions: [],
-        permissionsResolved: false,
+    permissions: [],
+    permissionsResolved: false,
 
-        token: undefined,
-        tokenPromise: undefined,
+    token: undefined,
+    tokenPromise: undefined,
 
-        required: false,
-        inProgress: false,
-        error: undefined
+    required: false,
+    inProgress: false,
+    error: undefined
 });
 
 export const getters : GetterTree<AuthState, RootState> = {
@@ -51,9 +52,6 @@ export const getters : GetterTree<AuthState, RootState> = {
     },
     userRealmId: (state: AuthState) => {
         return state.user ? state.user.realmId : undefined;
-    },
-    provider: (state: AuthState) => {
-        return state.provider;
     },
     permissions: (state: AuthState) => {
         return state.permissions
@@ -85,18 +83,6 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     triggerSetLoginRequired({commit}, required: boolean) {
         commit('setLoginRequired', required);
-    },
-    // --------------------------------------------------------------------
-
-    triggerSetProvider({commit}, provider) {
-        this.$authWarehouse.set(AuthStoreKey.provider, provider);
-
-        commit('setProvider', provider);
-    },
-    triggerUnsetProvider({commit}) {
-        this.$authWarehouse.remove(AuthStoreKey.provider);
-
-        commit('unsetProvider');
     },
 
     // --------------------------------------------------------------------
@@ -150,9 +136,11 @@ export const actions : ActionTree<AuthState, RootState> = {
      * @returns {Promise<boolean>}
      */
     async triggerRefreshMe ({ state, dispatch }) {
-        if (state.token) {
+        const token = state.token;
+
+        if (token) {
             try {
-                const { permissions, ...user } = await this.$auth.getUserInfo(state.token.accessToken);
+                const { permissions, ...user } = await this.$auth.getUserInfo(token.accessToken);
 
                 dispatch('triggerUnsetUser');
 
@@ -171,24 +159,25 @@ export const actions : ActionTree<AuthState, RootState> = {
      *
      * @return {Promise<boolean>}
      */
-    async triggerLogin ({ commit, dispatch }, credentials: {[key: string] : any}) {
+    async triggerLogin ({ commit, dispatch }, {name, password}: {name: string, password: string}) {
         commit('loginRequest');
 
         try {
-            const token = await this.$auth.attemptAccessTokenWith(credentials);
+            const token = await this.$auth.getTokenWithPassword(name, password);
+
+            const extendedToken : AuthStoreToken = {
+                ...token,
+                expireDate: new Date(Date.now() + token.expiresIn * 1000).toString()
+            }
 
             commit('loginSuccess');
 
-            dispatch('triggerSetToken', token);
+            dispatch('triggerSetToken', extendedToken);
 
             await dispatch('triggerRefreshMe');
             this.dispatch('layout/update');
         } catch (e) {
             dispatch('triggerUnsetToken');
-
-            if (e instanceof AuthenticationError) {
-                commit('loginError', { errorCode: e.errorCode, errorMessage: e.message })
-            }
 
             throw e;
         }
@@ -198,9 +187,7 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     triggerRefreshToken ({ commit, state, dispatch }) {
         if(
-            typeof state.provider === 'undefined' ||
-            typeof state.token === 'undefined' ||
-            typeof state.token.refreshToken === 'undefined'
+            typeof state.token?.refreshToken !== 'string'
         ) {
             throw new Error('It is not possible to receive a new access token');
         }
@@ -209,9 +196,7 @@ export const actions : ActionTree<AuthState, RootState> = {
             commit('loginRequest');
 
             try {
-                const p = this.$auth.attemptRefreshTokenWith(
-                    state.token.refreshToken
-                );
+                const p = this.$auth.getTokenWithRefreshToken(state.token.refreshToken);
 
                 commit('setTokenPromise', p);
 
@@ -231,7 +216,7 @@ export const actions : ActionTree<AuthState, RootState> = {
                 commit('setTokenPromise', null);
                 dispatch('triggerAuthError', e.message);
 
-                throw new Error('An error occured on the token refresh request.');
+                throw new Error('An error occurred on the token refresh request.');
             }
         }
 
@@ -240,7 +225,7 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     // --------------------------------------------------------------------
 
-    async triggerTokenExpired({dispatch, commit}) {
+    async triggerTokenExpired({dispatch}) {
         try {
             await dispatch('triggerRefreshToken');
         } catch (e) {
@@ -256,7 +241,7 @@ export const actions : ActionTree<AuthState, RootState> = {
      * Try to logout the user.
      * @param commit
      */
-    triggerLogout ({ dispatch, rootState }) {
+    triggerLogout ({ dispatch }) {
         dispatch('triggerUnsetToken');
         dispatch('triggerUnsetUser');
         dispatch('triggerUnsetPermissions');
@@ -285,6 +270,7 @@ export const actions : ActionTree<AuthState, RootState> = {
      * Trigger user property change.
      *
      * @param commit
+     * @param state
      * @param property
      * @param value
      */
@@ -316,12 +302,6 @@ export const mutations : MutationTree<AuthState> = {
     },
     setLoginRequired (state, required) {
         state.required = required;
-    },
-
-    // --------------------------------------------------------------------
-
-    setProvider(state,provider) {
-        state.provider = provider;
     },
 
     // --------------------------------------------------------------------

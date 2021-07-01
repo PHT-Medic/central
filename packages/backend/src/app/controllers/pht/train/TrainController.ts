@@ -1,8 +1,7 @@
 import {getRepository} from "typeorm";
 import {applyRequestPagination, applyRequestIncludes, applyRequestFilter} from "typeorm-extension";
-import {onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
+import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
 import {check, matchedData, validationResult} from "express-validator";
-import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {Train} from "../../../../domains/train";
 import {MasterImage} from "../../../../domains/master-image";
 import {Proposal} from "../../../../domains/proposal";
@@ -16,8 +15,8 @@ import {TrainFile} from "../../../../domains/train/file";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {doTrainTaskRouteHandler} from "./TrainActionController";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialTrain = Partial<Train>;
 const simpleExample = {

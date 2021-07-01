@@ -5,8 +5,8 @@ import path from "path";
 import {getWritableDirPath} from "../../../../../config/paths";
 import {TrainFile} from "../../../../../domains/train/file";
 import fs from "fs";
-import {isRealmPermittedForResource} from "../../../../../modules/auth/utils";
 import {TrainStation} from "../../../../../domains/train/station";
+import {isRealmPermittedForResource} from "../../../../../domains/realm/db/utils";
 
 export async function getTrainFileStreamRouteHandler(req: any, res: any) {
     const {id} = req.params;

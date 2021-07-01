@@ -1,6 +1,5 @@
 import {getRepository, Not} from "typeorm";
 import {Train} from "../../../../domains/train";
-import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {createTrainBuilderQueueMessage, publishTrainBuilderQueueMessage} from "../../../../domains/train-builder/queue";
 import {
     TrainConfiguratorStateFinished,
@@ -29,6 +28,7 @@ import {findHarborProjectRepository, HarborRepository} from "../../../../domains
 import env from "../../../../env";
 import {TrainStation} from "../../../../domains/train/station";
 import {TrainStationStateApproved} from "../../../../domains/train/station/states";
+import {isRealmPermittedForResource} from "../../../../domains/realm/db/utils";
 
 /**
  * Execute a train command (start, stop, build).

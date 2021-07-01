@@ -1,7 +1,6 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 import {Station} from "../../../../domains/station";
-import {isRealmPermittedForResource} from "../../../../modules/auth/utils";
 import {
     findVaultStationPublicKey,
     removeStationPublicKeyFromVault,
@@ -18,6 +17,7 @@ import {
     findHarborProjectWebHook
 } from "../../../../domains/harbor/project/web-hook/api";
 import {BaseService, Service} from "../../../../domains/service";
+import {isRealmPermittedForResource} from "../../../../domains/realm/db/utils";
 
 export enum StationTask {
     CHECK_HARBOR = 'checkHarbor',

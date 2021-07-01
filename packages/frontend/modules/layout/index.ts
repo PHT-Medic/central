@@ -5,7 +5,6 @@ import {
     LayoutSidebarComponentInterface
 } from "~/modules/layout/types";
 
-import { camelCase } from 'change-case';
 import {AbilityRepresentation, parsePermissionNameToAbilityRepresentation} from "~/modules/auth/utils";
 // --------------------------------------------------------------------
 
@@ -13,13 +12,13 @@ const LayoutModule = {
     getNavigation: () : LayoutNavigationComponentInterface[] => {
         return LayoutNavigation;
     },
-    getNavigationById: (id: string) : LayoutNavigationComponentInterface => {
+    getNavigationById: (id: string) : LayoutNavigationComponentInterface | undefined => {
         let index = LayoutNavigation.findIndex((item) => {
             return item.id === id;
         });
 
         if(index === -1) {
-            throw new Error('Das Navigationselement konnte nicht gefunden werden.');
+            return undefined;
         }
 
         return LayoutNavigation[index];
@@ -56,6 +55,7 @@ const LayoutModule = {
             ) {
                 if(component.requirePermissions.length > 0) {
                     for (let i = 0; i < component.requirePermissions.length; i++) {
+                        // todo: fix this
                         const ability: AbilityRepresentation = parsePermissionNameToAbilityRepresentation(component.requirePermissions[i]);
 
                         if (can(ability.action, ability.subject)) {

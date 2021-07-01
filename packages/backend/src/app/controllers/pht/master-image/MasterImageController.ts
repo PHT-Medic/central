@@ -3,8 +3,8 @@ import {applyRequestFilter} from "typeorm-extension";
 import {MasterImage} from "../../../../domains/master-image";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 @SwaggerTags('pht')
 @Controller("/master-images")

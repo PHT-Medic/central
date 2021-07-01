@@ -6,8 +6,8 @@ import {RolePermission} from "../../../../../domains/role/permission";
 // ---------------------------------------------------------------------------------
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {ForceLoggedInMiddleware} from "../../../../../config/http/middleware/auth";
 
 type PartialPermissionController = Partial<RolePermission>;
 const simpleExample = {role_id: 1, permission_id: 1};

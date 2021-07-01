@@ -5,10 +5,10 @@ import {SwaggerTags} from "typescript-swagger";
 import {Controller, Get, Post, Delete, Request, Response, Params, Body} from "@decorators/express";
 
 import {Realm} from "../../../../domains/realm";
-import {ForceLoggedInMiddleware} from "../../../../modules/http/request/middleware/auth";
 import {Provider} from "../../../../domains/provider";
 import {Station} from "../../../../domains/station";
 import {getRealmStationRouteHandler} from "./station/RealmStationController";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 @SwaggerTags('auth')
 @Controller("/realms")

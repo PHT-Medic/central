@@ -12,7 +12,7 @@ import {
 
 export interface LayoutState {
     navigationComponents: LayoutNavigationComponentInterface[],
-    navigation: LayoutNavigationComponentInterface,
+    navigation: LayoutNavigationComponentInterface | undefined,
     navigationId: string,
 
     sidebarComponents: LayoutSidebarComponentInterface[]
@@ -51,6 +51,11 @@ export const actions : ActionTree<LayoutState, RootState> = {
         }
 
         const navigation = LayoutModule.getNavigationById(id);
+
+        if(typeof navigation === 'undefined') {
+            return;
+        }
+
         commit('setNavigationId', id);
         commit('setNavigation', navigation);
 

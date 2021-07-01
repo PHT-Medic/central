@@ -4,10 +4,6 @@
 
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
-                <div class="text-center">
-                    <train-svg width="100%" />
-                </div>
-
                 <b-nav pills vertical>
                     <b-nav-item
                         v-for="(item,key) in sidebar.items"
@@ -37,7 +33,6 @@
                         { name: 'Account', routeName: 'settings-id', icon: 'fas fa-bars', urlSuffix: '' },
                         { name: 'Security', routeName: 'settings-id-security', icon: 'fa fa-lock', urlSuffix: '/security' },
                         { name: 'Keys', routeName: 'settings-id-key-ring', icon: 'fa fa-key', urlSuffix: '/key-ring'}
-                        //{ name: 'Benachrichtigungen', routeName: 'settings-id-notifications', icon: 'fa fa-bell', urlSuffix: 'notifications'}
                     ]
                 }
             }

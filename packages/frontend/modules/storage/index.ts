@@ -36,7 +36,6 @@ export default class BaseStorage {
     set (key: string, value: any) {
         // Unset null, undefined
         if (isUnset(value)) {
-            console.log('Unset key:'+key)
             return this.remove(key)
         }
 

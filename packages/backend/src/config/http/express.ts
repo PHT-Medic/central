@@ -3,21 +3,25 @@ import cors from "cors";
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 
-import {getPublicDirPath, getWritableDirPath} from "../../config/paths";
+import {getPublicDirPath, getWritableDirPath} from "../paths";
 import path from "path";
 import swaggerUi from 'swagger-ui-express';
 import env from "../../env";
-import {useLogger} from "../log";
-import responseMiddleware from "./response/middleware/responseMiddleware";
+import {useLogger} from "../../modules/log";
+import responseMiddleware from "./middleware/response";
 import {existsSync} from "fs";
 
-import {checkAuthenticated} from "./request/middleware/auth";
 import {generateSwaggerDocumentation} from "./swagger";
-import {registerControllers} from "../../config/routing";
+import {registerControllers} from "../routing";
 
 
 import {getMiddleware} from 'swagger-stats';
 import {setDefaultRequestKeyCase} from "typeorm-extension";
+import {setupAuthMiddleware} from "@typescript-auth/server";
+import {AuthorizationHeaderValue} from "@typescript-auth/core";
+
+import {authenticateWithAuthorizationHeader, parseCookie} from "./auth/utils";
+import {errorMiddleware} from "./middleware/error";
 
 export interface ExpressAppInterface extends Express{
 
@@ -35,22 +39,16 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
     // Cookie parser
     expressApp.use(cookieParser());
 
-    // expressApp.use(fileUpload({uriDecodeFileNames: false, safeFileNames: false}));
-
     expressApp.use('/public', expressStatic(getPublicDirPath()))
-
-    expressApp.use((req: Request, res: Response, next: NextFunction) => {
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-        res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,authorization');
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
-        next();
-    });
 
     // Loading routes
 
     expressApp.use(responseMiddleware);
-    expressApp.use(checkAuthenticated);
+
+    expressApp.use(setupAuthMiddleware({
+        parseCookie: (request: Request) => parseCookie(request),
+        authenticateWithAuthorizationHeader: (request: Request, value: AuthorizationHeaderValue) => authenticateWithAuthorizationHeader(request, value)
+    }));
 
     let swaggerDocument : any;
 
@@ -89,6 +87,8 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
 
     setDefaultRequestKeyCase("snakeCase");
     registerControllers(expressApp);
+
+    expressApp.use(errorMiddleware);
 
     return expressApp;
 }

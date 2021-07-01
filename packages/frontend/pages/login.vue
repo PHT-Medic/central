@@ -3,6 +3,7 @@
     import {getProviderAuthorizeUri, getProviders} from "@/domains/provider/api.ts";
     import MedicineWorker from "@/components/svg/MedicineWorker";
     import Pagination from "@/components/Pagination";
+    import {maxLength, minLength, required} from "vuelidate/lib/validators";
 
     export default {
         components: {Pagination, MedicineWorker},
@@ -21,10 +22,23 @@
                     }
                 },
                 error: null,
-                credentials: {
+                formData: {
                     name: '',
-                    password: '',
-                    provider: 'master-database'
+                    password: ''
+                }
+            }
+        },
+        validations: {
+            formData: {
+                name: {
+                    required,
+                    minLength: minLength(3),
+                    maxLength: maxLength(255)
+                },
+                password: {
+                    required,
+                    minLength: minLength(3),
+                    maxLength: maxLength(255)
                 }
             }
         },
@@ -38,17 +52,6 @@
                     provider.authorizeUrl = getProviderAuthorizeUri(provider.id);
                     return provider;
                 });
-            },
-            masterRealmProviders() {
-                return this.providerItems
-                    .filter((provider) => {
-                        return provider.realm.id === 'master';
-                    });
-            },
-            stationRealmsProviders() {
-                return this.providerItems.filter((provider) => {
-                    return provider.realm.id !== 'master';
-                })
             }
         },
         created() {
@@ -67,6 +70,9 @@
                         page: {
                             limit: this.provider.meta.limit,
                             offset: this.provider.meta.offset
+                        },
+                        filter: {
+                            realmId: '!=master'
                         }
                     };
 
@@ -77,7 +83,7 @@
 
                     this.provider.meta.total = total;
                 } catch (e) {
-                    console.log(e);
+                    // don't handle ^^ :)
                 }
 
                 this.provider.busy = false;
@@ -93,21 +99,12 @@
             },
 
             async handleSubmit () {
-                if (this.credentials.name === '' && this.credentials.password === '') {
-                    this.error = 'Es muss ein Benutzername und ein Passwort angegeben werden.';
-                    return;
-                }
-
                 this.error = null;
 
                 try {
-                    let {name, password, provider} = this.credentials;
+                    let {name, password} = this.formData;
 
-                    if(provider === 'mater-database') {
-                        provider = '';
-                    }
-
-                    await this.triggerLogin({name, password, provider});
+                    await this.triggerLogin({name, password});
 
                     await this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
                 } catch (e) {
@@ -140,39 +137,49 @@
                 </transition>
 
                 <form @submit.prevent="handleSubmit">
-                    <div class="form-group">
+                    <div class="form-group" :class="{ 'form-group-error': $v.formData.name.$error }">
                         <label for="name">Name</label>
                         <input
                             id="name"
-                            v-model="credentials.name"
+                            v-model="$v.formData.name.$model"
                             class="form-control"
                             type="text"
                             placeholder="username or e-mail"
                             required
                             autofocus
                         >
+
+                        <div v-if="!$v.formData.name.required && !$v.formData.name.$model" class="form-group-hint group-required">
+                            Please enter a username or email address.
+                        </div>
+                        <div v-if="!$v.formData.name.minLength" class="form-group-hint group-required">
+                            The length of the name must be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters.
+                        </div>
+                        <div v-if="!$v.formData.name.maxLength" class="form-group-hint group-required">
+                            The length of the name must be less than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
+                        </div>
                     </div>
-                    <div class="form-group">
+
+                    <div class="form-group" :class="{ 'form-group-error': $v.formData.password.$error }">
                         <label for="password">Password</label>
                         <input
                             id="password"
-                            v-model="credentials.password"
+                            v-model="$v.formData.password.$model"
                             class="form-control"
                             type="password"
                             placeholder="password"
                             required
                         >
-                    </div>
-                    <div class="form-group">
-                        <label for="authenticationProvider">LAP <small>Local Authentication Provider</small></label>
-                        <select
-                            v-model="credentials.provider"
-                            id="authenticationProvider"
-                            class="form-control"
-                        >
-                            <option value="master-database">database</option>
-                            <option v-for="(item,key) in masterRealmProviders" :value="item.id" :key="key">{{ item.name }}</option>
-                        </select>
+
+                        <div v-if="!$v.formData.password.required && !$v.formData.password.$model" class="form-group-hint group-required">
+                            Please enter a password.
+                        </div>
+                        <div v-if="!$v.formData.password.minLength" class="form-group-hint group-required">
+                            The length of the password must be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters.
+                        </div>
+                        <div v-if="!$v.formData.password.maxLength" class="form-group-hint group-required">
+                            The length of the password must be less than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
+                        </div>
                     </div>
 
                     <div>
@@ -187,7 +194,7 @@
                     Station Realms
                 </h6>
                 <ul class="list-unstyled">
-                    <li v-for="(item,key) in stationRealmsProviders" :key="key">
+                    <li v-for="(item,key) in providerItems" :key="key">
                         <div class="card-header">
                             <div class="d-flex flex-wrap flex-row">
                                 <div>
@@ -210,10 +217,10 @@
                         </div>
                     </li>
                 </ul>
-                <div v-if="!provider.busy && stationRealmsProviders.length === 0" class="alert alert-sm alert-info">
-                    No authentication provider specified for any station.
+                <div v-if="!provider.busy && providerItems.length === 0" class="alert alert-sm alert-info">
+                    No authentication provider available for any station.
                 </div>
-                <pagination v-if="stationRealmsProviders.length !== 0" :total="provider.meta.total" :offset="provider.meta.offset" :limit="provider.meta.limit" @to="goTo" />
+                <pagination v-if="providerItems.length !== 0" :total="provider.meta.total" :offset="provider.meta.offset" :limit="provider.meta.limit" @to="goTo" />
             </div>
         </div>
     </div>

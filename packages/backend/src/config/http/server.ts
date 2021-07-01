@@ -1,6 +1,6 @@
 import http, {Server} from "http";
 import {ExpressAppInterface} from "./express";
-import {useLogger} from "../log";
+import {useLogger} from "../../modules/log";
 
 interface HttpServerContext {
     expressApp: ExpressAppInterface

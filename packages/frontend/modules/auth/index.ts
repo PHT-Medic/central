@@ -1,35 +1,23 @@
-import {Ability, AbilityBuilder} from "@casl/ability";
-
+import {Context} from "@nuxt/types";
+import {AbilityManager, OwnedPermission, Oauth2TokenResponse, Oauth2ClientProtocol} from "@typescript-auth/core";
 import {scheduleJob, Job} from "node-schedule";
 
 import {mapOnAllApis} from "~/modules/api";
 import BaseApi from "~/modules/api/base";
 
-import {AuthAbilityOption, AuthAbstractTokenResponse, AuthAbstractUserInfoResponse} from "~/modules/auth/types";
-import {AuthSchemeOauth2OptionsInterface} from "~/modules/auth/types";
-import {Context} from "@nuxt/types";
-import {useAuthScheme} from "~/modules/auth/schemes";
-import {AbilityRepresentation, parsePermissionNameToAbilityRepresentation} from "~/modules/auth/utils";
-import store from "~/plugins/store";
+import {AuthStoreToken} from "~/store/auth";
 
 
-// --------------------------------------------------------------------
-
-class AuthenticationError extends Error {
-    public errorCode: string;
-
-    constructor (errorCode: string, message: string) {
-        super(message);
-
-        this.name = this.constructor.name;
-        this.message = message;
-        this.errorCode = errorCode;
-    };
+export type AuthModuleOptions = {
+    tokenHost: string,
+    tokenPath: string,
+    userInfoPath: string
 }
 
-// --------------------------------------------------------------------
 class AuthModule {
     protected ctx: Context;
+
+    protected client: Oauth2ClientProtocol;
 
     protected refreshTokenJob: undefined | Job;
 
@@ -40,19 +28,25 @@ class AuthModule {
         'permissions'
     ];
 
-    protected ability: Ability;
-    protected abilityOptions : WeakMap<object, AuthAbilityOption>;
+    protected abilityManager!: AbilityManager;
 
-    public me : AuthAbstractUserInfoResponse | undefined;
-    protected mePromise : Promise<AuthAbstractUserInfoResponse> | undefined;
+    protected identifyPromise : Promise<Record<string, any>> | undefined;
 
     // --------------------------------------------------------------------
 
-    constructor(ctx: Context) {
+    constructor(ctx: Context, options: AuthModuleOptions) {
         this.ctx = ctx;
 
-        this.ability = new Ability();
-        this.abilityOptions = new WeakMap<object, AuthAbilityOption>();
+        this.client = new Oauth2ClientProtocol({
+            tokenHost: options.tokenHost,
+            tokenPath: options.tokenPath,
+            userInfoPath: options.userInfoPath,
+            clientId: 'user-interface',
+            // @ts-ignore
+            authorizeRedirectURL: undefined
+        })
+
+        this.abilityManager = new AbilityManager([]);
 
         this.subscribeStore();
         this.initStore();
@@ -85,7 +79,7 @@ class AuthModule {
     private subscribeStore() {
         if(typeof this.ctx === 'undefined') return;
 
-        this.ctx.store.subscribe((mutation: any, state: any) => {
+        this.ctx.store.subscribe((mutation: any) => {
             switch(mutation.type) {
                 case 'auth/setPermissions':
                     this.setPermissions(mutation.payload);
@@ -94,7 +88,7 @@ class AuthModule {
                     this.setPermissions([]);
                     break;
                 case 'auth/setToken':
-                    let token = <AuthAbstractTokenResponse> mutation.payload;
+                    let token = <AuthStoreToken> mutation.payload;
                     if(this.refreshTokenJob) {
                         this.refreshTokenJob.cancel();
                     }
@@ -103,7 +97,7 @@ class AuthModule {
                         if(typeof this.ctx !== 'undefined') {
                             this.ctx.store.dispatch('auth/triggerTokenExpired')
                                 .then((r: any) => r)
-                                .catch(e => this.ctx.redirect('/logout'));
+                                .catch(() => this.ctx.redirect('/logout'));
                         }
                     };
 
@@ -111,10 +105,8 @@ class AuthModule {
 
                     this.setRequestToken(token.accessToken);
 
-                    if(typeof token.meta !== 'undefined') {
-                        let {expireDate} = token.meta;
-
-                        let expireDateInTime = (new Date(expireDate)).getTime();
+                    if(typeof token.expireDate !== 'undefined') {
+                        let expireDateInTime = (new Date(token.expireDate)).getTime();
                         let currentTime = (new Date()).getTime();
 
                         let timeoutMilliSeconds = expireDateInTime - currentTime;
@@ -123,7 +115,7 @@ class AuthModule {
                             callback();
                         }
 
-                        this.refreshTokenJob = scheduleJob(new Date(expireDate), callback);
+                        this.refreshTokenJob = scheduleJob(new Date(token.expireDate), callback);
                     }
                     break;
                 case 'auth/unsetToken':
@@ -137,17 +129,17 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public resolveMe() : Promise<AuthAbstractUserInfoResponse|undefined> {
-        if(typeof this.mePromise !== 'undefined') {
-            return this.mePromise;
+    public resolveMe() : Promise<Record<string, any>|undefined> {
+        if(typeof this.identifyPromise !== 'undefined') {
+            return this.identifyPromise;
         }
 
-        const token : AuthAbstractTokenResponse | undefined = this.ctx.store.getters['auth/token'];
+        const token : AuthStoreToken | undefined = this.ctx.store.getters['auth/token'];
         if(!token) return new Promise(((resolve) => resolve(undefined)));
 
         const resolved = this.ctx.store.getters['auth/permissionsResolved'];
         if(typeof resolved !== 'undefined' && resolved) {
-            const userInfo : AuthAbstractUserInfoResponse = {
+            const userInfo : Record<string, any> = {
                 permissions: this.ctx.store.getters['auth/permissions'],
                 ...this.ctx.store.getters['auth/user']
             };
@@ -155,13 +147,13 @@ class AuthModule {
             return new Promise(((resolve) => resolve(userInfo)));
         }
 
-        this.mePromise = this.getUserInfo(token.accessToken)
+        this.identifyPromise = this.getUserInfo(token.accessToken)
             .then(this.handleUserInfoResponse.bind(this));
 
-        return this.mePromise;
+        return this.identifyPromise;
     };
 
-    private async handleUserInfoResponse(userInfo: AuthAbstractUserInfoResponse) : Promise<AuthAbstractUserInfoResponse> {
+    private async handleUserInfoResponse(userInfo: Record<string, any>) : Promise<Record<string, any>> {
         const {permissions, ...user} = userInfo;
 
         await this.ctx.store.commit('auth/setPermissionsResolved', true);
@@ -173,49 +165,12 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public can(...args: any) {
-        // @ts-ignore
-        return this.ability.can(...args);
+    public can(action: string, subject: any, field?: string) {
+        return this.abilityManager.can(action, subject, field);
     }
 
-    public setPermissions(permissions: {name: string, scopes: any}[]) {
-        if(permissions.length === 0) {
-            this.ability.update([]);
-            return;
-        }
-
-        let { can, rules } = new AbilityBuilder();
-
-        for(let i=0; i<permissions.length; i++) {
-            let { name, scopes } : {name: string, scopes: any} = permissions[i];
-
-            const ability : AbilityRepresentation = parsePermissionNameToAbilityRepresentation(name);
-
-            if(!!scopes) {
-                for (let j = 0; j < scopes.length; j++) {
-                    let {fields, condition}: {
-                        power?: number | null,
-                        fields?: string[] | null,
-                        condition?: any
-                    } = scopes[j];
-
-                    if (condition === null) {
-                        condition = undefined;
-                    }
-
-                    if (fields === null) {
-                        fields = undefined;
-                    }
-
-                    can(ability.action, ability.subject, condition);
-                }
-            } else {
-                can(ability.action, ability.subject);
-            }
-        }
-
-        // @ts-ignore
-        this.ability.update(rules);
+    public setPermissions(permissions: OwnedPermission<any>[]) {
+        this.abilityManager.setPermissions(permissions);
     }
 
     // --------------------------------------------------------------------
@@ -239,59 +194,46 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public async attemptAccessTokenWith(data: any) : Promise<AuthAbstractTokenResponse> {
-        let provider = useAuthScheme('local');
-        let tokenResponse : AuthAbstractTokenResponse;
+    /**
+     * Get access token with given credentials.
+     *
+     * @param username
+     * @param password
+     */
+    public async getTokenWithPassword(username: string, password: string) : Promise<Oauth2TokenResponse> {
+        const data = await this.client.getTokenWithPasswordGrant({
+            username,
+            password
+        })
 
-        switch (provider.getOptions().scheme) {
-            case "Oauth2":
-                data = {
-                    ...data,
-                    grant_type: (<AuthSchemeOauth2OptionsInterface> provider.getOptions()).grantType
-                };
+        this.setRequestToken(data.accessToken);
 
-                tokenResponse = await provider.attemptToken(data);
-            default:
-                tokenResponse = await provider.attemptToken(data);
-                break;
-
-        }
-
-        this.setRequestToken(tokenResponse.accessToken);
-
-        return tokenResponse;
+        return data;
     }
 
-    public async attemptRefreshTokenWith(token: string) : Promise<AuthAbstractTokenResponse> {
-        let provider = useAuthScheme('local');
-        let tokenResponse : AuthAbstractTokenResponse | undefined;
+    /**
+     * Refresh access token with a given refresh token.
+     *
+     * @param token
+     */
+    public async getTokenWithRefreshToken(token: string) : Promise<Oauth2TokenResponse> {
+        const data = await this.client.getTokenWithRefreshToken({
+            refresh_token: token
+        });
 
-        switch (provider.getOptions().scheme) {
-            case "Oauth2":
-                let data = {
-                    refresh_token: token,
-                    grant_type: 'refresh_token'
-                };
-
-                tokenResponse = await provider.attemptToken(data);
-                break;
-            default:
-                throw new Error('Refresh Access with refreshToken is not supported by the provider.');
-
-        }
-
-        this.setRequestToken(tokenResponse.accessToken);
-        return tokenResponse;
+        this.setRequestToken(data.accessToken);
+        return data;
     }
 
-    // --------------------------------------------------------------------
-
+    /**
+     * Get user info for a given token.
+     *
+     * @param token
+     */
     public async getUserInfo(token: string) {
-        return await useAuthScheme('local').getUserInfo(token);
+        return await this.client.getUserInfo(token);
     }
 
 }
 
 export default AuthModule;
-
-export { AuthenticationError }

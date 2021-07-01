@@ -2,8 +2,6 @@ import {Context} from "@nuxt/types";
 import {Inject} from "@nuxt/types/app";
 
 import AuthModule from "~/modules/auth";
-import AuthStrategies from "~/config/auth";
-import {registerAuthScheme} from "~/modules/auth/schemes";
 
 declare module 'vue/types/vue' {
     // this.$myInjectedFunction inside Vue components
@@ -27,12 +25,11 @@ declare module 'vuex/types/index' {
 }
 
 export default (context: Context, inject: Inject) => {
-    const strategies = AuthStrategies;
+    const auth = new AuthModule(context, {
+        tokenHost: context.$config.apiUrl,
+        tokenPath: 'token',
+        userInfoPath: 'users/me'
+    });
 
-    for(let key in strategies) {
-        registerAuthScheme(key, strategies[key]);
-    }
-
-    const auth = new AuthModule(context);
     inject('auth',auth);
 }

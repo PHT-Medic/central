@@ -4,8 +4,8 @@ import {UserRole} from "../../../../../domains/user/role";
 import {check, matchedData, validationResult} from "express-validator";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../../modules/http/request/middleware/auth";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {ForceLoggedInMiddleware} from "../../../../../config/http/middleware/auth";
 
 type PartialUserRole = Partial<UserRole>;
 const simpleExample = {role_id: 1, user_id: 1};

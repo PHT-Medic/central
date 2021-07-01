@@ -1,5 +1,6 @@
 import {Brackets, SelectQueryBuilder} from "typeorm";
 import {MASTER_REALM_ID} from "../index";
+import {User} from "../../user";
 
 export function onlyRealmPermittedQueryResources<T>(query: SelectQueryBuilder<T>, realm: string, queryField: string | string[] = 'realm_id') {
     if(realm === MASTER_REALM_ID) return;
@@ -17,3 +18,20 @@ export function onlyRealmPermittedQueryResources<T>(query: SelectQueryBuilder<T>
 }
 
 
+export function isRealmPermittedForResource(sessionUser: User | undefined, resource: { [key: string]: any }) {
+    if (typeof sessionUser === 'undefined') {
+        return false;
+    }
+
+    if (sessionUser.realm_id === 'master') {
+        return true;
+    }
+
+    const realmIdKey = 'realm_id';
+
+    if (!resource.hasOwnProperty(realmIdKey)) {
+        return false;
+    }
+
+    return resource[realmIdKey] === sessionUser.realm_id
+}
