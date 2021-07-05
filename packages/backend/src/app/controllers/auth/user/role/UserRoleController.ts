@@ -58,13 +58,13 @@ export async function getUserRolesRouteHandler(req: any, res: any) {
 
     try {
         const repository = getRepository(UserRole);
-        const query = await repository.createQueryBuilder('userRoles')
-            .leftJoinAndSelect('userRoles.role', 'role')
-            .leftJoinAndSelect('userRoles.user', 'user');
+        const query = await repository.createQueryBuilder('user_roles')
+            .leftJoinAndSelect('user_roles.role', 'role')
+            .leftJoinAndSelect('user_roles.user', 'user');
 
         applyRequestFilter(query, filter, {
-            role_id: 'userRoles.role_id',
-            user_id: 'userRoles.user_id',
+            role_id: 'user_roles.role_id',
+            user_id: 'user_roles.user_id',
             role_name: 'role.name',
             user_name: 'user.name'
         });

@@ -1,10 +1,10 @@
-import {Repository, EntityRepository, getCustomRepository, getRepository, In, ObjectLiteral} from "typeorm";
+import {Repository, EntityRepository, getCustomRepository, getRepository, In} from "typeorm";
 import {hashPassword, verifyPassword} from "@typescript-auth/server";
 import {User} from "./index";
 import {RoleRepository} from "../role/repository";
-import {PermissionInterface} from "../../modules/auth";
 import {Role} from "../role";
 import {UserRole} from "./role";
+import {OwnedPermission} from "@typescript-auth/core";
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
@@ -43,8 +43,8 @@ export class UserRepository extends Repository<User> {
      *
      * @param userId
      */
-    async findPermissions(userId: number) : Promise<PermissionInterface[]> {
-        const user = await this.findOne(userId, {relations: ['userRoles']});
+    async findPermissions(userId: number) : Promise<OwnedPermission<unknown>[]> {
+        const user = await this.findOne(userId, {relations: ['user_roles']});
         if(typeof user === 'undefined') {
             return [];
         }

@@ -3,7 +3,6 @@ import {attachControllers} from "@decorators/express";
 import {TokenController} from "../app/controllers/auth/token/TokenController";
 import {RealmController} from "../app/controllers/auth/realm/RealmController";
 import {ProviderController} from "../app/controllers/auth/provider/ProviderController";
-import {PermissionController} from "../app/controllers/auth/permission/PermissionController";
 import {UserController} from "../app/controllers/auth/user/UserController";
 import {UserKeyController} from "../app/controllers/auth/user/key/UserKeyController";
 import {MasterImageController} from "../app/controllers/pht/master-image/MasterImageController";
@@ -17,6 +16,7 @@ import {UserRoleController} from "../app/controllers/auth/user/role/UserRoleCont
 import {RoleController} from "../app/controllers/auth/role/RoleController";
 import {RolePermissionController} from "../app/controllers/auth/role/permission/RolePermissionController";
 import {ServiceController} from "../app/controllers/service/ServiceController";
+import {PermissionController} from "../app/controllers/auth/permission/PermissionController";
 
 export function registerControllers(router: Application) {
     attachControllers(router, [

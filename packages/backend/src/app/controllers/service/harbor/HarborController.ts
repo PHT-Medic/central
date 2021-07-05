@@ -8,9 +8,9 @@ import {
     HARBOR_INCOMING_PROJECT_NAME,
     HARBOR_MASTER_IMAGE_PROJECT_NAME, HARBOR_MASTER_IMAGE_REPOSITORY_NAME,
     HARBOR_OUTGOING_PROJECT_NAME
-} from "../../../../config/harbor";
+} from "../../../../config/services/harbor";
 import {useLogger} from "../../../../modules/log";
-import {MQ_RS_COMMAND_ROUTING_KEY, MQ_UI_H_EVENT_ROUTING_KEY} from "../../../../config/rabbitmq";
+import {MQ_RS_COMMAND_ROUTING_KEY, MQ_UI_H_EVENT_ROUTING_KEY} from "../../../../config/services/rabbitmq";
 import {
     createTrainRouterQueueMessageEvent,
     MQ_TR_EVENT_TRAIN_PUSHED,

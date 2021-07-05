@@ -16,7 +16,6 @@
                 isBusy: false,
                 fields: [
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'createdAt', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
                     { key: 'updatedAt', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }

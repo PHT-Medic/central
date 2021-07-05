@@ -22,7 +22,7 @@ import {
 } from "../../../../domains/train-router/queue";
 import {TrainResult} from "../../../../domains/train/result";
 import {createResultServiceResultCommand} from "../../../../domains/result-service/queue";
-import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/harbor";
+import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/services/harbor";
 import {TrainResultStateFinished, TrainResultStateOpen} from "../../../../domains/train/result/states";
 import {findHarborProjectRepository, HarborRepository} from "../../../../domains/harbor/project/repository/api";
 import env from "../../../../env";

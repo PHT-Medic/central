@@ -1,27 +1,20 @@
 import {Connection} from "typeorm";
 import {Seeder, Factory} from 'typeorm-seeding';
 
+import {getPermissions} from "../../config/permissions";
+
 import {UserRepository} from "../../domains/user/repository";
 import {Permission} from "../../domains/permission";
 import {RolePermission} from "../../domains/role/permission";
 import {MASTER_REALM_ID, Realm} from "../../domains/realm";
-import {Provider, AuthenticatorScheme} from "../../domains/provider";
 import {UserRole} from "../../domains/user/role";
 import {RoleRepository} from "../../domains/role/repository";
 
-export default class CreateBase implements Seeder {
+export default class CreateCore implements Seeder {
     public async run(factory: Factory, connection: Connection) : Promise<any> {
-        const repository = connection.getCustomRepository(RoleRepository);
-
-        const adminRole = repository.create({
-            name: 'admin',
-            provider_role_id: 'superadmin'
-        });
-
-        await repository.save(adminRole);
-
-        // -------------------------------------------------
-
+        /**
+         * Create default realm
+         */
         const realmRepository = connection.getRepository(Realm);
 
         const masterRealm = realmRepository.create({
@@ -34,25 +27,23 @@ export default class CreateBase implements Seeder {
 
         // -------------------------------------------------
 
-        const authenticatorRepository = connection.getRepository(Provider);
+        /**
+         * Create default role
+         */
+        const repository = connection.getCustomRepository(RoleRepository);
 
-        const authenticator = authenticatorRepository.create({
-            name: 'keycloak',
-            scheme: AuthenticatorScheme.OPENID,
-            token_host: 'https://keycloak.personalhealthtrain.de/auth/realms/master/',
-            token_path: 'protocol/openid-connect/token',
-            authorize_path: 'protocol/openid-connect/auth',
-            client_id: 'pht',
-            client_secret: '7fb6c3dd-8322-443d-956c-e1e8a73b0381',
-            realm: masterRealm
+        const adminRole = repository.create({
+            name: 'admin'
         });
 
-        await authenticatorRepository.save(authenticator);
+        await repository.save(adminRole);
 
         // -------------------------------------------------
 
+        /**
+         * Create default user
+         */
         const userRepository = connection.getCustomRepository(UserRepository);
-
         const adminUser = userRepository.create({
             name: 'admin',
             password: await userRepository.hashPassword('start123'),
@@ -64,8 +55,10 @@ export default class CreateBase implements Seeder {
 
         // -------------------------------------------------
 
+        /**
+         * Create default user - role association
+         */
         const userRoleRepository = connection.getRepository(UserRole);
-
         await userRoleRepository.insert({
             role_id: adminRole.id,
             user_id: adminUser.id
@@ -73,49 +66,22 @@ export default class CreateBase implements Seeder {
 
         // -------------------------------------------------
 
+        /**
+         * Create all permissions
+         */
         const permissionRepository = connection.getRepository(Permission);
-        const names : string[] = [
-            'admin_ui_use',
-
-            'realm_add',
-            'realm_drop',
-            'realm_edit',
-
-            'provider_add',
-            'provider_drop',
-            'provider_edit',
-
-            'permission_add',
-            'permission_drop',
-            'permission_edit',
-
-            'user_add',
-            'user_drop',
-            'user_edit',
-
-            'user_role_add',
-            'user_role_drop',
-            'user_role_edit',
-
-            'role_add',
-            'role_drop',
-            'role_edit',
-
-            'role_permission_add',
-            'role_permission_drop',
-
-            'station_add',
-            'station_drop',
-            'station_edit'
-        ];
-        const permissions : Permission[] = names.map((name: string) => {
-            return permissionRepository.create({name});
+        const ids : string[] = getPermissions();
+        const permissions : Permission[] = ids.map((id: string) => {
+            return permissionRepository.create({id});
         });
 
         await permissionRepository.save(permissions);
 
         // -------------------------------------------------
 
+        /**
+         * Assign all permissions to default role.
+         */
         const rolePermissionRepository = connection.getRepository(RolePermission);
         const rolePermissions : RolePermission[] = [];
         for(let j=0; j<permissions.length; j++) {

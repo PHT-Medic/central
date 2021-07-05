@@ -2,7 +2,7 @@ import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 import {TrainResult} from "../../../../../domains/train/result";
 import {createResultServiceResultCommand} from "../../../../../domains/result-service/queue";
-import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../../config/harbor";
+import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../../config/services/harbor";
 import {TrainResultStateFinished, TrainResultStateOpen} from "../../../../../domains/train/result/states";
 
 import {Body, Controller, Params, Post, Request, Response} from "@decorators/express";

@@ -23,7 +23,7 @@ export async function syncServiceSecurity(message: QueueMessage) {
             });
 
             await Promise.all(stations.map((station: Station) => {
-                return ensureHarborProjectWebHook(station, clientSecret);
+                return ensureHarborProjectWebHook(station, {id: clientId, secret: clientSecret});
             }));
             break;
     }

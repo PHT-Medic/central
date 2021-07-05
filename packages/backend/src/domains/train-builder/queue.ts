@@ -3,7 +3,7 @@ import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../
 import {getRepository} from "typeorm";
 import {UserKeyRing} from "../user/key-ring";
 import {TrainFile} from "../train/file";
-import {MQ_TB_ROUTING_KEY} from "../../config/rabbitmq";
+import {MQ_TB_ROUTING_KEY} from "../../config/services/rabbitmq";
 import {TrainStationStateApproved} from "../train/station/states";
 
 export async function createTrainBuilderQueueMessage(train: Train, type: string | undefined, metaData: Record<string, any> = {}) : Promise<QueueMessage> {

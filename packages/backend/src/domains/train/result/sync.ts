@@ -2,7 +2,7 @@ import {getHarborProjectRepositories} from "../../harbor/project/repository/api"
 import {getRepository, In} from "typeorm";
 import {TrainResult} from "./index";
 
-import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../config/harbor";
+import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../config/services/harbor";
 import {createResultServiceResultCommand} from "../../result-service/queue";
 
 export async function syncTrainResults(onlyUncovered: boolean = true) {

@@ -1,5 +1,5 @@
 import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../modules/message-queue";
-import {MQ_RS_COMMAND_ROUTING_KEY} from "../../config/rabbitmq";
+import {MQ_RS_COMMAND_ROUTING_KEY} from "../../config/services/rabbitmq";
 
 export async function createResultServiceResultCommand(command: string, data: Record<string,any>) {
     let queueMessage = createQueueMessageTemplate();

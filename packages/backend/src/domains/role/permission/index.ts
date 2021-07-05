@@ -17,8 +17,8 @@ export class RolePermission {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({type: "int", unsigned: true})
-    permission_id: number;
+    @Column({type: "varchar"})
+    permission_id: string;
 
     @Column({type: "int", unsigned: true})
     role_id: number;
@@ -38,11 +38,11 @@ export class RolePermission {
     @UpdateDateColumn()
     updated_at: string;
 
-    @ManyToOne(() => Role, role => role.rolePermissions, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Role, role => role.role_permissions, { onDelete: 'CASCADE' })
     @JoinColumn({name: 'role_id'})
     role: Role;
 
-    @ManyToOne(() => Permission, permission => permission.rolePermissions, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Permission, permission => permission.role_permissions, { onDelete: 'CASCADE' })
     @JoinColumn({name: 'permission_id'})
     permission: Permission;
 }

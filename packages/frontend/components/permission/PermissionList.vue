@@ -70,7 +70,7 @@ export default {
                         offset: this.meta.offset
                     },
                     filter: {
-                        name: this.q.length > 0 ? '~'+this.q : this.q
+                        id: this.q.length > 0 ? '~'+this.q : this.q
                     }
                 }
 
@@ -155,7 +155,7 @@ export default {
                             <i class="fa fa-group"></i>
                         </div>
                         <slot name="item-name">
-                            <span class="mb-0">{{item.name}}</span>
+                            <span class="mb-0">{{item.id}}</span>
                         </slot>
 
                         <div class="ml-auto">

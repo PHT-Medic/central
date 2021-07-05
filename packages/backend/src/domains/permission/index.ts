@@ -1,14 +1,16 @@
-import {Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {
+    CreateDateColumn,
+    Entity,
+    OneToMany,
+    PrimaryColumn,
+    UpdateDateColumn
+} from "typeorm";
 import {RolePermission} from "../role/permission";
 
 @Entity()
 export class Permission {
-    @PrimaryGeneratedColumn({unsigned: true})
-    id: number;
-
-    @Column({type: 'varchar', length: 30})
-    @Index({unique: true})
-    name: string;
+    @PrimaryColumn({type: "varchar", length: 100, generated: false})
+    id: string;
 
     @CreateDateColumn()
     created_at: string;
@@ -17,5 +19,5 @@ export class Permission {
     updated_at: string;
 
     @OneToMany(() => RolePermission, rolePermission => rolePermission.permission)
-    rolePermissions: RolePermission[]
+    role_permissions: RolePermission[]
 }

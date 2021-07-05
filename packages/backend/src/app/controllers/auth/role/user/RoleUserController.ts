@@ -42,8 +42,8 @@ export async function getRoleUsersRouteHandler(req: any, res: any, type: string)
                 const permissionRepository = getCustomRepository(UserRepository);
 
                 const query = permissionRepository.createQueryBuilder('user')
-                    .leftJoin('user.userRoles','userRoles')
-                    .where("userRoles.role_id = :roleId", {roleId});
+                    .leftJoin('user.user_roles','user_roles')
+                    .where("user_roles.role_id = :roleId", {roleId});
 
                 applyRequestFilter(query, filter, {
                     id: 'user.id',

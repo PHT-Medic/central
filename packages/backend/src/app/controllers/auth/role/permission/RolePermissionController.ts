@@ -10,7 +10,7 @@ import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../../config/http/middleware/auth";
 
 type PartialPermissionController = Partial<RolePermission>;
-const simpleExample = {role_id: 1, permission_id: 1};
+const simpleExample = {role_id: 1, permission_id: "user_add"};
 
 @SwaggerTags('auth')
 @Controller("/role-permissions")
@@ -71,8 +71,7 @@ async function getRolePermissions(req: any, res: any) {
 
         applyRequestFilter(query, filter, {
             role_id: 'rolePermission.role_id',
-            permission_id: 'rolePermission.permission_id',
-            permission_name: 'permission.name'
+            permission_id: 'rolePermission.permission_id'
         });
 
         const pagination = applyRequestPagination(query, page, 50);
@@ -135,7 +134,8 @@ const addRolePermission = async (req: any, res: any) => {
 
     await check('permission_id')
         .exists()
-        .isInt().run(req);
+        .isString()
+        .run(req);
 
     if(!req.ability.can('add','rolePermission')) {
         return res._failForbidden();
@@ -185,20 +185,4 @@ async function dropRolePermission(req: any, res: any) {
     } catch (e) {
         return res._failValidationError();
     }
-}
-
-// ---------------------------------------------------------------------------------
-
-export default {
-    getRolePermissions,
-    getRolePermission,
-    addRolePermission,
-    dropRolePermission
-};
-
-export {
-    getRolePermissions,
-    getRolePermission,
-    addRolePermission,
-    dropRolePermission
 }

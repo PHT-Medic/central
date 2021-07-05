@@ -29,8 +29,8 @@ export class Role {
     updated_at: string
 
     @OneToMany(() => UserRole, userRole => userRole.role)
-    userRoles: UserRole[]
+    user_roles: UserRole[]
 
     @OneToMany(() => RolePermission, rolePermission => rolePermission.role)
-    rolePermissions: RolePermission[]
+    role_permissions: RolePermission[]
 }

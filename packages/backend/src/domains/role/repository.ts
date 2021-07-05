@@ -1,11 +1,11 @@
 import {EntityRepository, Repository} from "typeorm";
 import {Role} from "./index";
 import {RolePermission} from "./permission";
-import {PermissionInterface} from "../../modules/auth";
+import {OwnedPermission} from "@typescript-auth/core";
 
 @EntityRepository(Role)
 export class RoleRepository extends Repository<Role> {
-    async getPermissions(roleId: number | number[]) : Promise<PermissionInterface[]> {
+    async getPermissions(roleId: number | number[]) : Promise<OwnedPermission<unknown>[]> {
         const pivotRepository = this.manager.getRepository<RolePermission>(RolePermission);
 
         const queryBuilder = pivotRepository.createQueryBuilder('pivotTable');
@@ -21,13 +21,12 @@ export class RoleRepository extends Repository<Role> {
 
         const pivotEntities = await queryBuilder.getMany();
 
-        const items : PermissionInterface[] = [];
+        const items : OwnedPermission<unknown>[] = [];
 
         for(let i=0; i<pivotEntities.length; i++) {
             items.push({
-                id: pivotEntities[i].permission.id,
-                name: pivotEntities[i].permission.name,
-                scope: pivotEntities[i].scope,
+                id: pivotEntities[i].permission_id,
+                negation: false,
                 condition: pivotEntities[i].condition,
                 power: pivotEntities[i].power
             })

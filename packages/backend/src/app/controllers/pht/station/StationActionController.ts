@@ -162,7 +162,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
                     return res._failBadRequest({message: 'No client credentials are available for harbor yet. Please generate it first.'});
                 }
 
-                await ensureHarborProjectWebHook(entity, serviceEntity.client.secret);
+                await ensureHarborProjectWebHook(entity, serviceEntity.client);
 
                 entity.harbor_project_webhook_exists = true;
 

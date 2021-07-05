@@ -41,14 +41,7 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
                 request.user = user;
                 request.userId = user.id;
 
-                // todo change this
-                request.ability = new AbilityManager(permissions.map(permission => {
-                    return {
-                        id: permission.name,
-                        negation: false,
-                        power: permission.power
-                    }
-                }));
+                request.ability = new AbilityManager(permissions);
                 break;
             case "Basic":
                 const clientRepository = getRepository(AuthClient);

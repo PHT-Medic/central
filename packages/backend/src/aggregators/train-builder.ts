@@ -2,7 +2,7 @@ import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../m
 import {getRepository} from "typeorm";
 import {Train} from "../domains/train";
 import {TrainStateBuilt, TrainStateFailed} from "../domains/train/states";
-import {MQ_UI_TB_EVENT_ROUTING_KEY} from "../config/rabbitmq";
+import {MQ_UI_TB_EVENT_ROUTING_KEY} from "../config/services/rabbitmq";
 
 function createTrainBuilderAggregatorHandlers() {
     return {

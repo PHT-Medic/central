@@ -5,7 +5,7 @@ import {
     QueueMessage
 } from "../../modules/message-queue";
 import {syncServiceSecurity} from "./sync";
-import {MQ_UI_SELF_COMMAND_ROUTING_KEY} from "../../config/rabbitmq";
+import {MQ_UI_SELF_COMMAND_ROUTING_KEY} from "../../config/services/rabbitmq";
 
 function createServiceSecurityComponentHandlers() : Record<string, QueChannelHandler> {
     return {

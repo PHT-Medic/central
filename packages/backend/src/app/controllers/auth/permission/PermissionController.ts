@@ -1,4 +1,3 @@
-import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {SwaggerTags} from "typescript-swagger";
@@ -18,15 +17,6 @@ export class PermissionController {
         return await getPermissions(req, res);
     }
 
-    @Post("", [ForceLoggedInMiddleware])
-    async addPermission(
-        @Body() user: NonNullable<Permission>/* Pick<User, 'name' | 'email' | 'password' | 'realm_id'> */,
-        @Request() req: any,
-        @Response() res: any
-    ) : Promise<Permission> {
-        return await addPermission(req, res);
-    }
-
     @Get("/:id", [ForceLoggedInMiddleware])
     async getPermission(
         @Params('id') id: string,
@@ -35,35 +25,15 @@ export class PermissionController {
     ): Promise<Permission> {
         return await getPermission(req, res);
     }
-
-    @Post("/:id", [ForceLoggedInMiddleware])
-    async editPermission(
-        @Params('id') id: string,
-        @Body() user: NonNullable<Permission>/* Pick<User, 'name' | 'email' | 'password' | 'realm_id'> */,
-        @Request() req: any,
-        @Response() res: any
-    ) : Promise<Permission> {
-        // todo: implement edit
-        return (await editPermission(req, res)) as unknown as Promise<Permission>;
-    }
-
-    @Delete("/:id", [ForceLoggedInMiddleware])
-    async dropPermission(
-        @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any
-    ) : Promise<Permission> {
-        return await dropPermission(req, res);
-    }
 }
 
-const getPermissions = async (req: any, res: any) => {
+async function getPermissions (req: any, res: any) {
     const { filter, page } = req.query;
 
     const repository = getRepository(Permission);
     const query = repository.createQueryBuilder('permission');
 
-    applyRequestFilter(query, filter, ['id', 'name']);
+    applyRequestFilter(query, filter, ['id']);
 
     const pagination = applyRequestPagination(query, page, 50);
 
@@ -80,14 +50,13 @@ const getPermissions = async (req: any, res: any) => {
     });
 }
 
-const getPermission = async (req: any, res: any) => {
+async function getPermission(req: any, res: any) {
     const id = req.params.id;
 
     try {
         const repository = getRepository(Permission);
         const result = await repository.createQueryBuilder('permission')
             .where("id = :id", {id})
-            .orWhere("name Like :name", {name: id})
             .getOne();
 
         if(typeof result === 'undefined') {
@@ -99,79 +68,4 @@ const getPermission = async (req: any, res: any) => {
     } catch (e) {
         return res._failNotFound();
     }
-}
-
-const addPermission = async (req: any, res: any) => {
-    if(!req.ability.can('add','permission')) {
-        return res._failForbidden();
-    }
-
-    await check('name')
-        .exists()
-        .isString()
-        .isLength({
-            min: 5,
-            max: 30
-        })
-        .run(req);
-
-    const validation = validationResult(req);
-    if(!validation.isEmpty()) {
-        return res._failExpressValidation({validation});
-    }
-
-    const data = matchedData(req, {includeOptionals: false});
-
-    const repository = getRepository(Permission);
-    const permission = repository.create({
-        name: data.name
-    })
-
-    try {
-        await repository.save(permission);
-
-        return res._respondCreated({
-            data: permission
-        });
-    } catch (e) {
-        return res._failValidationError();
-    }
-};
-
-const dropPermission = async (req: any, res: any) => {
-    const { id } = req.params;
-
-    if(!req.ability.can('drop','permission')) {
-        return res._failForbidden();
-    }
-
-    try {
-        const repository = getRepository(Permission);
-        await repository.delete(id);
-
-        return res._respondDeleted();
-    } catch (e) {
-        return res._failValidationError();
-    }
-}
-
-const editPermission = async (req: any, res: any) => {
-    await check('name')
-        .exists()
-        .isString()
-        .isLength({
-            min: 5,
-            max: 30
-        })
-        .run(req);
-
-    return res._failServerError({message: 'Not implemented yet.'})
-}
-
-export default {
-    getPermissions,
-    getPermission,
-    addPermission,
-    dropPermission,
-    editPermission
 }

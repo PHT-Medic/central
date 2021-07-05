@@ -29,7 +29,7 @@ export class UserRole {
     @UpdateDateColumn()
     updated_at: string;
 
-    @ManyToOne(() => Role, role => role.userRoles, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Role, role => role.user_roles, { onDelete: 'CASCADE' })
     @JoinColumn({name: 'role_id'})
     role: Role;
 
