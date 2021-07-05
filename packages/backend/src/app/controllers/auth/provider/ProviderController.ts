@@ -13,6 +13,7 @@ import {Controller, Get, Post, Delete, Params, Request, Response, Body} from "@d
 import {SwaggerHidden, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 import {createToken} from "@typescript-auth/server";
+import {getWritableDirPath} from "../../../../config/paths";
 
 @SwaggerTags('auth')
 @Controller("/providers")
@@ -302,10 +303,8 @@ export async function authorizeUrlRoute(req: any, res: any) {
 
     const repository = getRepository(Provider);
     const provider = await repository.createQueryBuilder('provider')
-        .addSelect('provider.client_secret')
         .leftJoinAndSelect('provider.realm', 'realm')
         .where('provider.id = :id', {id})
-        .orWhere('provider.name Like :name', {name: id})
         .getOne();
 
     if(typeof provider === 'undefined') {
@@ -326,7 +325,6 @@ export async function authorizeCallbackRoute(req: any, res: any) {
         .addSelect('provider.client_secret')
         .leftJoinAndSelect('provider.realm', 'realm')
         .where('provider.id = :id', {id})
-        .orWhere('provider.name Like :name', {name: id})
         .getOne();
 
     if(typeof provider === 'undefined') {
@@ -350,7 +348,7 @@ export async function authorizeCallbackRoute(req: any, res: any) {
 
         const expiresIn : number = env.jwtMaxAge;
 
-        const token = await createToken(payload, expiresIn);
+        const token = await createToken(payload, expiresIn, {directory: getWritableDirPath()});
 
         const cookie = {
             accessToken: token,
@@ -366,6 +364,6 @@ export async function authorizeCallbackRoute(req: any, res: any) {
         return res.redirect(env.webAppUrl);
     } catch (e) {
         console.log(e);
-        return res._failValidationError({message: 'Die Zugangsdaten sind nicht gültig oder der lokale Authenticator ist nicht erreichbar.'});
+        return res._failValidationError({message: 'The provider authorization did not succeed.'});
     }
 }

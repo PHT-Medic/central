@@ -19,9 +19,3 @@ export function getPhtPermissions() {
 export function getPhtRolePermissions() {
 
 }
-
-//----------------------------------------------------------
-
-export function getPhtHarborLabelNextId() {
-    return 2;
-}

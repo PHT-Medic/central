@@ -79,7 +79,7 @@ async function grantToken(req: any, res: any) : Promise<any> {
     }
 
     if(typeof userId === 'undefined') {
-        return res._failValidationError({message: 'The name or the password is wrong.'})
+        return res._failValidationError({message: 'The credentials are not valid.'})
     }
 
     const tokenPayload : {id: number, remoteAddress: string} = {

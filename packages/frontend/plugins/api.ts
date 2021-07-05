@@ -54,6 +54,6 @@ export default (ctx: Context) => {
             throw error;
         }
 
-        throw new Error('A network or unknown error occurred.');
+        throw new Error('A network error occurred.');
     }));
 }

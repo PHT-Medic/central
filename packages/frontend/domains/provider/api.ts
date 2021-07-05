@@ -2,7 +2,9 @@ import {useApi} from "~/modules/api";
 import {changeRequestKeyCase, changeResponseKeyCase, formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 
 export function getProviderAuthorizeUri(id) {
-    return '/providers/'+id+'/authorize-url';
+    const baseUrl : string = useApi('auth').config.baseURL ?? '';
+
+    return baseUrl+'providers/'+id+'/authorize-url';
 }
 
 export async function getProviders(record?: RequestRecord) {

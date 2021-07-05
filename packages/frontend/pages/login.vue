@@ -22,6 +22,7 @@
                     }
                 },
                 error: null,
+                busy: false,
                 formData: {
                     name: '',
                     password: ''
@@ -98,7 +99,10 @@
                     .catch(reject);
             },
 
-            async handleSubmit () {
+            async submit () {
+                if(this.busy) return;
+
+                this.busy = true;
                 this.error = null;
 
                 try {
@@ -110,13 +114,15 @@
                 } catch (e) {
                     this.error = e.message;
                 }
+
+                this.busy = false;
             }
         }
     }
 </script>
 <template>
     <div class="container">
-        <h4 class="title">
+        <h4>
             Login
         </h4>
 
@@ -136,7 +142,7 @@
                     </div>
                 </transition>
 
-                <form @submit.prevent="handleSubmit">
+                <form @submit.prevent="submit">
                     <div class="form-group" :class="{ 'form-group-error': $v.formData.name.$error }">
                         <label for="name">Name</label>
                         <input
@@ -183,7 +189,7 @@
                     </div>
 
                     <div>
-                        <button type="submit" class="btn btn-outline-primary btn-sm" @click.prevent="handleSubmit">
+                        <button type="submit" class="btn btn-primary btn-sm" @click.prevent="submit" :disabled="$v.formData.$invalid || busy">
                             Login
                         </button>
                     </div>
@@ -198,7 +204,7 @@
                         <div class="card-header">
                             <div class="d-flex flex-wrap flex-row">
                                 <div>
-                                    <strong>Realm</strong> {{item.realm.name}}
+                                    <strong>Realm</strong> {{item.realm.name}} - {{item.name}}
                                 </div>
                                 <div class="ml-auto">
                                     <a :href="item.authorizeUrl" type="button" class="btn btn-success btn-xs">
@@ -206,14 +212,6 @@
                                     </a>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <template v-if="item.realm.description">
-                                {{item.realm.description}}
-                            </template>
-                            <template v-else>
-                                <i>No description available...</i>
-                            </template>
                         </div>
                     </li>
                 </ul>

@@ -24,6 +24,10 @@ class BaseApi {
         }
     }
 
+    get config() : ApiRequestConfig {
+        return this.api.defaults;
+    }
+
     //---------------------------------------------------------------------------------
 
     public setContext(ctx: Context) {
