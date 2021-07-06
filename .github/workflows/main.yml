@@ -26,14 +26,17 @@ jobs:
                   node-version: ${{ matrix.node-version }}
                   cache: 'npm'
             - name: Install and Run backend package
+              working-directory: ./packages/backend
               run: |
                   npm ci
                   npm run build --if-present
             - name: Install and Run frontend package
+              working-directory: ./packages/frontend
               run: |
                   npm ci
                   npm run build --if-present
-            - name: Install and Run result service package
+            - name: Install and Run result-service package
+              working-directory: ./packages/result-service
               run: |
                   npm ci
                   npm run build --if-present
