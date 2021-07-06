@@ -22,7 +22,7 @@ export class RolePermission {
     power: number;
 
     @Column({type: 'json', nullable: true, default: null})
-    condition: Condition<any> | null;
+    condition: any | null;
 
     @Column({type: 'json', nullable: true, default: null})
     fields: string[] | null;

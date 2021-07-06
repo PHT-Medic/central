@@ -27,7 +27,6 @@ export class RoleController {
     @Post("",[ForceLoggedInMiddleware])
     @ResponseExample<PartialRole>(simpleExample)
     async add(
-        @Params('id') id: string,
         @Body() data: Pick<Role, 'name'>,
         @Request() req: any,
         @Response() res: any

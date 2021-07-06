@@ -13,7 +13,7 @@ To setup the database and other parts of the backend, run the following command:
 ```
 $ docker network create --driver bridge pht-network
 
-$ docker-compose run db -d
+$ docker-compose run -d db
 $ docker-compose run backend setup
 ```
 This will setup everything you need.
