@@ -3,11 +3,5 @@
     "author": "Peter Placzek",
     "license": "MIT",
     "version": "1.0.0",
-    "workspaces": {
-        "packages": [
-            "./packages/backend",
-            "./packages/frontend",
-            "./packages/result-service"
-        ]
-    }
+    "workspaces": ["./packages/*"]
 }
