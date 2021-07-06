@@ -1,3 +1,5 @@
+[![main](https://github.com/Tada5hi/pht-central-ui/actions/workflows/main.yml/badge.svg)](https://github.com/Tada5hi/pht-central-ui/actions/workflows/main.yml)
+
 # PHT - Central UI 🚀
 This repository contains all packages for the Central-UI of the Personal Health Train (PHT).
 
