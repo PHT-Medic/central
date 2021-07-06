@@ -1,7 +1,7 @@
 import {Connection, getRepository} from "typeorm";
 import {Factory, Seeder} from "typeorm-seeding";
 import {BaseService, Service} from "../../domains/service";
-import {AuthClient} from "../../domains/client";
+import {Client} from "../../domains/auth/client";
 
 export default class ServiceSeeder implements Seeder {
     public async run(factory: Factory, connection: Connection): Promise<any> {
@@ -23,7 +23,7 @@ export default class ServiceSeeder implements Seeder {
 
         await serviceRepository.save(services);
 
-        const clientRepository = getRepository(AuthClient);
+        const clientRepository = getRepository(Client);
         const clients = services.map(service => {
             return clientRepository.create({
                 name: service.id,

@@ -4,11 +4,14 @@ import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {Params, Controller, Get, Request, Response, Post, Body, Delete} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 
-import {UserRepository} from "../../../../domains/user/repository";
-import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
-import {Realm} from "../../../../domains/realm";
-import {User} from "../../../../domains/user";
-import {Station} from "../../../../domains/station";
+import {UserRepository} from "../../../../domains/auth/user/repository";
+import {
+    isPermittedForResourceRealm,
+    onlyRealmPermittedQueryResources
+} from "../../../../domains/auth/realm/db/utils";
+import {Realm} from "../../../../domains/auth/realm";
+import {User} from "../../../../domains/auth/user";
+import {Station} from "../../../../domains/pht/station";
 import {getUserStationRouteHandler} from "./station/UserStationController";
 import {useLogger} from "../../../../modules/log";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
@@ -163,16 +166,16 @@ export async function getMeRouteHandler(req: any, res: any) {
 
 export async function addUserRouteHandler(req: any, res: any) {
     if(!req.ability.can('add','user')) {
-        return res._failForbidden();
+        return res._failForbidden('You are not authorized to add a user.');
     }
 
     await check('email').exists().normalizeEmail().isEmail().optional({nullable: true}).run(req);
-    await check('name').exists().notEmpty().isLength({min: 5, max: 30}).run(req);
+    await check('name').exists().notEmpty().isLength({min: 5, max: 128}).run(req);
     await check('password').exists().isLength({min: 5, max: 512}).optional({nullable: true}).run(req);
     await check('realm_id').exists().notEmpty().custom((value: any) => {
         return getRepository(Realm).findOne(value).then((realm: Realm | undefined) => {
             if(typeof realm === 'undefined') {
-                throw new Error('Der Realm wurde nicht gefunden.')
+                throw new Error('The provided realm was not found.')
             }
         })
     }).run(req);
@@ -187,7 +190,11 @@ export async function addUserRouteHandler(req: any, res: any) {
     const userRepository = getCustomRepository<UserRepository>(UserRepository);
     const user = await userRepository.create(data);
 
-    if(typeof user.password !== 'undefined' && user.password !== null) {
+    if(!isPermittedForResourceRealm(req.realmId, user.realm_id)) {
+        return res._failForbidden({message: `You are not allowed to add users to the realm ${user.realm_id}`});
+    }
+
+    if(user.password) {
         user.password = await userRepository.hashPassword(user.password);
     }
 
@@ -213,29 +220,31 @@ export async function editUserRouteHandler(req: any, res: any) {
     id = parseInt(id);
 
     if(Number.isNaN(id)) {
-        return res._failNotFound();
+        return res._failNotFound({message: 'The user identifier is not valid.'});
     }
 
     if(!req.ability.can('edit','user') && !req.user.id === id) {
-        return res._failForbidden();
+        return res._failForbidden({message: 'You are not authorized to modify a user.'});
     }
 
+    await check('display_name').exists().notEmpty().isLength({min: 5, max: 128}).optional().run(req);
     await check('email').exists().normalizeEmail({gmail_remove_dots: false}).isEmail().optional({nullable: true}).run(req);
-    await check('name').exists().notEmpty().isLength({min: 5, max: 30}).optional().run(req);
     await check('password').exists().isLength({min: 5, max: 512})
         .custom((value, {req: request}) => {
             if(value !== request.body.password_repeat) {
-                throw new Error('Die Passwörter stimmen nicht überein.');
+                throw new Error('The provided passwords do not match.');
             } else {
                 return value;
             }
         }).optional({nullable: true}).run(req);
 
     if(req.ability.can('edit','user')) {
+        await check('name').exists().notEmpty().isLength({min: 5, max: 128}).optional().run(req);
+
         await check('realm_id').exists().optional().notEmpty().custom((value: any) => {
             return getRepository(Realm).findOne(value).then((realm: Realm | undefined) => {
                 if (typeof realm === 'undefined') {
-                    throw new Error('Der Realm wurde nicht gefunden.')
+                    throw new Error('The provided realm does not exist.')
                 }
             })
         }).run(req);
@@ -262,8 +271,14 @@ export async function editUserRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isRealmPermittedForResource(req.user, user)) {
-        return res._failForbidden();
+    if(!isPermittedForResourceRealm(req.realmId, user.realm_id)) {
+        return res._failForbidden({message: `You are not allowed to edit users of the realm ${user.realm_id}`});
+    }
+
+    if(typeof data.realm_id === 'string') {
+        if (!isPermittedForResourceRealm(req.realmId, data.realm_id)) {
+            return res._failForbidden({message: `You are not allowed to move users to the realm ${user.realm_id}`});
+        }
     }
 
     user = userRepository.merge(user, data);
@@ -279,7 +294,7 @@ export async function editUserRouteHandler(req: any, res: any) {
             data: result
         });
     } catch (e) {
-        return res._failValidationError({message: 'Die Benutzer Attribute konnten nicht aktualisiert werden.'});
+        return res._failValidationError({message: 'The user information could not be updated.'});
     }
 }
 
@@ -289,12 +304,12 @@ export async function dropUserRouteHandler(req: any, res: any) {
     const {id} = req.params;
 
     if (!req.ability.can('drop', 'user')) {
-        return res._failForbidden();
+        return res._failForbidden({message: 'You are not authorized to drop a user.'});
     }
 
     if(req.user.id === id) {
         return res._failValidationError({
-            message: 'Der eigene Benutzer kann nicht gelöscht werden.'
+            message: 'The own user can not be deleted.'
         })
     }
 
@@ -306,8 +321,8 @@ export async function dropUserRouteHandler(req: any, res: any) {
             return res._failNotFound();
         }
 
-        if(!isRealmPermittedForResource(req.user, user)) {
-            return res._failForbidden();
+        if(!isPermittedForResourceRealm(req.realmId, user.realm_id)) {
+            return res._failForbidden({message: `You are not authorized to drop a user fo the realm ${user.realm_id}`});
         }
 
         await userRepository.delete(id);

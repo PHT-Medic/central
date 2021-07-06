@@ -1,7 +1,7 @@
 import {getRepository} from "typeorm";
 import {applyRequestFields} from "typeorm-extension";
-import {Station} from "../../../../../domains/station";
-import {isRealmPermittedForResource} from "../../../../../domains/realm/db/utils";
+import {Station} from "../../../../../domains/pht/station";
+import {isRealmPermittedForResource} from "../../../../../domains/auth/realm/db/utils";
 
 export async function getRealmStationRouteHandler(req: any, res: any, type: string) {
     const {id} = req.params;

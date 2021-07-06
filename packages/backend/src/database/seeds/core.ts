@@ -3,12 +3,12 @@ import {Seeder, Factory} from 'typeorm-seeding';
 
 import {getPermissions} from "../../config/permissions";
 
-import {UserRepository} from "../../domains/user/repository";
-import {Permission} from "../../domains/permission";
-import {RolePermission} from "../../domains/role/permission";
-import {MASTER_REALM_ID, Realm} from "../../domains/realm";
-import {UserRole} from "../../domains/user/role";
-import {RoleRepository} from "../../domains/role/repository";
+import {UserRepository} from "../../domains/auth/user/repository";
+import {Permission} from "../../domains/auth/permission";
+import {RolePermission} from "../../domains/auth/role/permission";
+import {MASTER_REALM_ID, Realm} from "../../domains/auth/realm";
+import {UserRole} from "../../domains/auth/user/role";
+import {RoleRepository} from "../../domains/auth/role/repository";
 
 export default class CreateCore implements Seeder {
     public async run(factory: Factory, connection: Connection) : Promise<any> {

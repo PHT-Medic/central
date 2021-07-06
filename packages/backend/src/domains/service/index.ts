@@ -8,8 +8,8 @@ import {
     UpdateDateColumn
 } from "typeorm";
 
-import {AuthClient} from "../client";
-import {MASTER_REALM_ID, Realm} from "../realm";
+import {Client} from "../auth/client";
+import {MASTER_REALM_ID, Realm} from "../auth/realm";
 
 export enum BaseService {
     HARBOR = 'HARBOR',
@@ -18,7 +18,7 @@ export enum BaseService {
     RESULT_SERVICE = 'RESULT_SERVICE'
 }
 
-@Entity({synchronize: true})
+@Entity({name: 'services'})
 export class Service {
     @PrimaryColumn({type: "varchar", length: 50, unique: true})
     id: string;
@@ -32,8 +32,8 @@ export class Service {
     @Column({type: "boolean", default: false})
     client_synced: boolean;
 
-    @OneToOne(() => AuthClient, client => client.service, {nullable: true})
-    client: AuthClient;
+    @OneToOne(() => Client, client => client.service, {nullable: true})
+    client: Client;
 
     @Column({default: MASTER_REALM_ID})
     realm_id: string;

@@ -1,7 +1,7 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 import {applyRequestPagination, applyRequestFilter} from "typeorm-extension";
-import {Role} from "../../../../domains/role";
+import {Role} from "../../../../domains/auth/role";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
@@ -22,6 +22,17 @@ export class RoleController {
         @Response() res: any
     ): Promise<PartialRole[]> {
         return await getRoles(req, res) as PartialRole[];
+    }
+
+    @Post("",[ForceLoggedInMiddleware])
+    @ResponseExample<PartialRole>(simpleExample)
+    async add(
+        @Params('id') id: string,
+        @Body() data: Pick<Role, 'name'>,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<PartialRole> {
+        return await addRole(req, res) as PartialRole;
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
@@ -191,14 +202,4 @@ async function dropRole(req: any, res: any) {
         return res._failValidationError();
     }
 
-}
-
-// ---------------------------------------------------------------------------------
-
-export default {
-    getRoles,
-    getRole,
-    addRole,
-    editRole,
-    dropRole
 }

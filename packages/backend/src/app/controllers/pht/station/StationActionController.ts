@@ -1,23 +1,23 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
-import {Station} from "../../../../domains/station";
+import {Station} from "../../../../domains/pht/station";
 import {
     findVaultStationPublicKey,
     removeStationPublicKeyFromVault,
     saveStationPublicKeyToVault
-} from "../../../../domains/vault/station/api";
-import {ensureHarborProject, dropHarborProject, findHarborProject} from "../../../../domains/harbor/project/api";
+} from "../../../../domains/service/vault/station/api";
+import {ensureHarborProject, dropHarborProject, findHarborProject} from "../../../../domains/service/harbor/project/api";
 import {
     dropHarborProjectRobotAccount,
     ensureHarborProjectRobotAccount, findHarborProjectRobotAccount
-} from "../../../../domains/harbor/project/robot-account/api";
+} from "../../../../domains/service/harbor/project/robot-account/api";
 import {
     dropHarborProjectWebHook,
     ensureHarborProjectWebHook,
     findHarborProjectWebHook
-} from "../../../../domains/harbor/project/web-hook/api";
+} from "../../../../domains/service/harbor/project/web-hook/api";
 import {BaseService, Service} from "../../../../domains/service";
-import {isRealmPermittedForResource} from "../../../../domains/realm/db/utils";
+import {isRealmPermittedForResource} from "../../../../domains/auth/realm/db/utils";
 
 export enum StationTask {
     CHECK_HARBOR = 'checkHarbor',

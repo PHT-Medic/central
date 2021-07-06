@@ -1,17 +1,17 @@
 import {getRepository} from "typeorm";
 import {applyRequestPagination, applyRequestIncludes, applyRequestFilter} from "typeorm-extension";
-import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
+import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/auth/realm/db/utils";
 import {check, matchedData, validationResult} from "express-validator";
-import {Train} from "../../../../domains/train";
-import {MasterImage} from "../../../../domains/master-image";
-import {Proposal} from "../../../../domains/proposal";
-import {isTrainType} from "../../../../domains/train/types";
+import {Train} from "../../../../domains/pht/train";
+import {MasterImage} from "../../../../domains/pht/master-image";
+import {Proposal} from "../../../../domains/pht/proposal";
+import {isTrainType} from "../../../../domains/pht/train/types";
 import {
     TrainConfiguratorStateFinished,
     TrainConfiguratorStateHashGenerated,
     TrainConfiguratorStateHashSigned, TrainStateConfigured
-} from "../../../../domains/train/states";
-import {TrainFile} from "../../../../domains/train/file";
+} from "../../../../domains/pht/train/states";
+import {TrainFile} from "../../../../domains/pht/train/file";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";

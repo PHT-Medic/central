@@ -1,11 +1,11 @@
 import {getRepository} from "typeorm";
 import {applyRequestFilter} from "typeorm-extension";
-import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../../domains/realm/db/utils";
-import {TrainFile} from "../../../../../domains/train/file";
+import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../../domains/auth/realm/db/utils";
+import {TrainFile} from "../../../../../domains/pht/train/file";
 import fs from "fs";
-import {TrainConfiguratorStateOpen} from "../../../../../domains/train/states";
-import {getTrainFileFilePath} from "../../../../../domains/train/file/path";
-import {Train} from "../../../../../domains/train";
+import {TrainConfiguratorStateOpen} from "../../../../../domains/pht/train/states";
+import {getTrainFileFilePath} from "../../../../../domains/pht/train/file/path";
+import {Train} from "../../../../../domains/pht/train";
 
 import {Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from 'typescript-swagger';

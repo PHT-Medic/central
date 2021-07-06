@@ -1,7 +1,7 @@
 import {getCustomRepository, getRepository} from "typeorm";
 import {applyRequestFilter} from "typeorm-extension";
-import {UserRole} from "../../../../../domains/user/role";
-import {UserRepository} from "../../../../../domains/user/repository";
+import {UserRole} from "../../../../../domains/auth/user/role";
+import {UserRepository} from "../../../../../domains/auth/user/repository";
 
 // ---------------------------------------------------------------------------------
 

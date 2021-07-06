@@ -44,7 +44,7 @@
                     if(proceed) {
                         try {
                             await dropRole(role.id);
-                            this.$refs['userList'].dropArrayItem(role);
+                            this.$refs['roleList'].dropArrayItem(role);
                         } catch (e) {
 
                         }

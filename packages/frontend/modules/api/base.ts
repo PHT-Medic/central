@@ -44,7 +44,7 @@ class BaseApi {
             switch (mutation.type) {
                 case 'auth/setToken':
                     let token = <AuthStoreToken> mutation.payload;
-                    this.setAuthorizationBearerHeader(token.accessToken);
+                    this.setAuthorizationBearerHeader(token.access_token);
                     break;
                 case 'auth/unsetToken':
                     this.unsetAuthorizationBearerHeader();

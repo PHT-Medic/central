@@ -1,1 +1,1 @@
-import {AuthClientSubscriber} from "../domains/client/subscriber";
+import {AuthClientSubscriber} from "../domains/auth/client/subscriber";

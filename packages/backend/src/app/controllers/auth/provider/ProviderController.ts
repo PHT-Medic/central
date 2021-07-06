@@ -1,19 +1,12 @@
-import {Oauth2AuthorizeProvider} from "../../../../modules/auth/providers";
-import {AuthenticatorScheme, Provider} from "../../../../domains/provider";
+import {OAuth2Provider} from "../../../../domains/auth/oauth2-provider";
 import {getRepository} from "typeorm";
-import {
-    applyRequestFilter,
-    applyRequestFields,
-    applyRequestPagination
-} from "typeorm-extension";
-import env from "../../../../env";
-import {Realm} from "../../../../domains/realm";
+import {applyRequestFields, applyRequestFilter, applyRequestPagination} from "typeorm-extension";
+import {Realm} from "../../../../domains/auth/realm";
 import {check, matchedData, validationResult} from "express-validator";
-import {Controller, Get, Post, Delete, Params, Request, Response, Body} from "@decorators/express";
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {SwaggerHidden, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
-import {createToken} from "@typescript-auth/server";
-import {getWritableDirPath} from "../../../../config/paths";
+import {authorizeCallbackRoute, authorizeUrlRoute} from "./authorize";
 
 @SwaggerTags('auth')
 @Controller("/providers")
@@ -22,7 +15,7 @@ export class ProviderController {
     async getProviders(
         @Request() req: any,
         @Response() res: any
-    ): Promise<Provider[]> {
+    ): Promise<OAuth2Provider[]> {
         return await getProvidersRoute(req, res);
     }
 
@@ -31,17 +24,17 @@ export class ProviderController {
         @Params('id') id: string,
         @Request() req: any,
         @Response() res: any
-    ): Promise<Provider> {
+    ): Promise<OAuth2Provider> {
         return await getProviderRoute(req, res);
     }
 
     @Post("/:id", [ForceLoggedInMiddleware])
     async editProvider(
         @Params('id') id: string,
-        @Body() user: NonNullable<Provider>,
+        @Body() user: NonNullable<OAuth2Provider>,
         @Request() req: any,
         @Response() res: any
-    ) : Promise<Provider> {
+    ) : Promise<OAuth2Provider> {
         // todo: implement edit
         return await editProviderRoute(req, res);
     }
@@ -51,16 +44,16 @@ export class ProviderController {
         @Params('id') id: string,
         @Request() req: any,
         @Response() res: any
-    ) : Promise<Provider> {
+    ) : Promise<OAuth2Provider> {
         return await dropProviderRoute(req, res);
     }
 
     @Post("", [ForceLoggedInMiddleware])
     async addProvider(
-        @Body() user: NonNullable<Provider>,
+        @Body() user: NonNullable<OAuth2Provider>,
         @Request() req: any,
         @Response() res: any
-    ) : Promise<Provider> {
+    ) : Promise<OAuth2Provider> {
         return await addProviderRoute(req, res);
     }
 
@@ -90,7 +83,7 @@ export class ProviderController {
 export async function getProvidersRoute(req: any, res: any) {
     const { page, filter, fields } = req.query;
 
-    const repository = getRepository(Provider);
+    const repository = getRepository(OAuth2Provider);
 
     const query = repository.createQueryBuilder('provider').
     leftJoinAndSelect('provider.realm', 'realm');
@@ -118,7 +111,7 @@ export async function getProvidersRoute(req: any, res: any) {
     let [entities, total] = await query.getManyAndCount();
 
     // todo: allow realm owner view of client_secret
-    entities = entities.map((provider: Provider) => {
+    entities = entities.map((provider: OAuth2Provider) => {
         if(!req.user || !req.ability.can('edit','realm')) {
             delete provider.client_secret;
         }
@@ -143,7 +136,7 @@ export async function getProviderRoute(req: any, res: any) {
     const { fields } = req.query;
     const { id } = req.params;
 
-    const repository = getRepository(Provider);
+    const repository = getRepository(OAuth2Provider);
 
     const query = repository.createQueryBuilder('provider')
         .leftJoinAndSelect('provider.realm', 'realm')
@@ -180,7 +173,7 @@ export async function getProviderRoute(req: any, res: any) {
 
 async function runValidation(req: any) {
     await check('name').exists().notEmpty().isString().isLength({min: 5, max: 30}).run(req);
-    await check('scheme').exists().notEmpty().isIn([AuthenticatorScheme.OAUTH2, AuthenticatorScheme.OPENID]).run(req);
+    await check('open_id').exists().notEmpty().isBoolean().run(req);
     await check('token_host').exists().notEmpty().isString().isLength({min: 5, max: 512}).run(req);
     await check('token_path').exists().notEmpty().isString().isLength({min: 5, max: 256}).optional({nullable: true}).run(req);
     await check('token_revoke_path').exists().notEmpty().isString().isLength({min: 5, max: 256}).optional({nullable: true}).run(req);
@@ -217,7 +210,7 @@ export async function addProviderRoute(req: any, res: any) {
         return res._respondAccepted();
     }
 
-    const providerRepository = getRepository(Provider);
+    const providerRepository = getRepository(OAuth2Provider);
 
     const provider = providerRepository.create(data);
 
@@ -230,7 +223,7 @@ export async function addProviderRoute(req: any, res: any) {
             data: provider
         })
     } catch (e) {
-        return res._failValidationError({message: 'Der Provider konnte nicht erstellt werden.'});
+        return res._failValidationError({message: 'Der OAuth2Provider konnte nicht erstellt werden.'});
     }
 }
 
@@ -255,7 +248,7 @@ export async function editProviderRoute(req: any, res: any) {
         return res._respondAccepted();
     }
 
-    const providerRepository = getRepository(Provider);
+    const providerRepository = getRepository(OAuth2Provider);
 
     let provider = await providerRepository.findOne(id);
     if(typeof provider === 'undefined') {
@@ -273,7 +266,7 @@ export async function editProviderRoute(req: any, res: any) {
             data: provider
         })
     } catch (e) {
-        return res._failValidationError({message: 'Der Provider konnte nicht editiert werden.'});
+        return res._failValidationError({message: 'Der OAuth2Provider konnte nicht editiert werden.'});
     }
 }
 
@@ -287,83 +280,11 @@ export async function dropProviderRoute(req: any, res: any) {
     }
 
     try {
-        const userRepository = getRepository(Provider);
+        const userRepository = getRepository(OAuth2Provider);
         await userRepository.delete(id);
 
         return res._respondDeleted();
     } catch(e) {
         return res._failValidationError();
-    }
-}
-
-// ---------------------------------------------------------------------------------
-
-export async function authorizeUrlRoute(req: any, res: any) {
-    const { id } = req.params;
-
-    const repository = getRepository(Provider);
-    const provider = await repository.createQueryBuilder('provider')
-        .leftJoinAndSelect('provider.realm', 'realm')
-        .where('provider.id = :id', {id})
-        .getOne();
-
-    if(typeof provider === 'undefined') {
-        return res._failNotFound();
-    }
-
-    const oauth2AuthorizeProvider = new Oauth2AuthorizeProvider(provider);
-
-    return res.redirect(oauth2AuthorizeProvider.authorizeUrl());
-}
-
-export async function authorizeCallbackRoute(req: any, res: any) {
-    const { id } = req.params;
-    const { code, state } = req.query;
-
-    const repository = getRepository(Provider);
-    const provider = await repository.createQueryBuilder('provider')
-        .addSelect('provider.client_secret')
-        .leftJoinAndSelect('provider.realm', 'realm')
-        .where('provider.id = :id', {id})
-        .getOne();
-
-    if(typeof provider === 'undefined') {
-        return res._failNotFound();
-    }
-
-    const oauth2AuthorizeProvider = new Oauth2AuthorizeProvider(provider);
-
-    try {
-
-        const loginToken = await oauth2AuthorizeProvider.getToken({
-            code,
-            state
-        });
-
-        const userAccount = await oauth2AuthorizeProvider.loginWithToken(loginToken);
-
-        const payload = {
-            id: userAccount.user_id
-        }
-
-        const expiresIn : number = env.jwtMaxAge;
-
-        const token = await createToken(payload, expiresIn, {directory: getWritableDirPath()});
-
-        const cookie = {
-            accessToken: token,
-            expireDate: new Date(Date.now() + 1000 * expiresIn).toString(),
-            expiresIn,
-            tokenType: 'Bearer'
-        };
-
-        res.cookie('auth_token', JSON.stringify(cookie), {
-            maxAge: Date.now() + 1000 * expiresIn
-        });
-
-        return res.redirect(env.webAppUrl);
-    } catch (e) {
-        console.log(e);
-        return res._failValidationError({message: 'The provider authorization did not succeed.'});
     }
 }

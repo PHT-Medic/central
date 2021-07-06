@@ -22,7 +22,7 @@ export default {
             default: 'permission'
         },
         roleId: Number,
-        permissionId: Number
+        permissionId: String
     },
     data() {
         return {

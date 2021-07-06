@@ -1,11 +1,11 @@
 import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../modules/message-queue";
 import {getRepository} from "typeorm";
-import {TrainResult} from "../domains/train/result";
+import {TrainResult} from "../domains/pht/train/result";
 import {
     TrainResultStateDownloaded,
     TrainResultStateDownloading, TrainResultStateExtracted, TrainResultStateExtracting,
     TrainResultStateFailed, TrainResultStateFinished
-} from "../domains/train/result/states";
+} from "../domains/pht/train/result/states";
 import {MQ_UI_RS_EVENT_ROUTING_KEY} from "../config/services/rabbitmq";
 
 function createTrainBuilderAggregatorHandlers() {

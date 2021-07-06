@@ -1,7 +1,6 @@
-import {User as DomainUser} from "../../domains/user";
-import {PermissionInterface} from "../../modules/auth";
+import {User as DomainUser} from "../../domains/auth/user";
 import {Result} from "express-validator";
-import {AbilityManager} from "@typescript-auth/core";
+import {AbilityManager, OwnedPermission} from "@typescript-auth/core";
 
 type RespondMessage = {
     statusMessage?: string,
@@ -22,7 +21,7 @@ declare global {
             user?: DomainUser,
             userId?: number,
             token?: string,
-            permissions: PermissionInterface[],
+            permissions: OwnedPermission<unknown>[],
             ability: AbilityManager
         }
 

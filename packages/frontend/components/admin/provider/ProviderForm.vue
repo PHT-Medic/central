@@ -27,7 +27,7 @@ export default {
         return {
             formData: {
                 name: '',
-                scheme: '',
+                openId: false,
                 tokenHost: '',
                 tokenPath: '',
                 authorizeHost: '',
@@ -64,7 +64,7 @@ export default {
                 minLength: minLength(5),
                 maxLength: maxLength(30)
             },
-            scheme: {
+            openId: {
                 required
             },
             tokenHost: {
@@ -171,7 +171,7 @@ export default {
     },
     computed: {
         isEditing() {
-            return typeof this.provider.id === 'number';
+            return typeof this.provider.id !== 'undefined';
         }
     }
 }
@@ -215,19 +215,15 @@ export default {
                     </div>
                 </div>
 
-                <div class="form-group" :class="{ 'form-group-error': $v.formData.scheme.$error }">
-                    <label>Scheme</label>
+                <div class="form-group" :class="{ 'form-group-error': $v.formData.openId.$error }">
+                    <label>OpenID</label>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="openIdEnabled" v-model="$v.formData.openId.$model">
+                        <label class="form-check-label" for="openIdEnabled">Enabled?</label>
+                    </div>
 
-                    <select
-                        v-model="$v.formData.scheme.$model"
-                        class="form-control"
-                    >
-                        <option value="">-- Please select --</option>
-                        <option v-for="(item,key) in schemes" :value="item.id" :key="key">{{ item.name }}</option>
-                    </select>
-
-                    <div v-if="!$v.formData.scheme.required && !$v.formData.scheme.$model" class="form-group-hint group-required">
-                        Please select a scheme.
+                    <div class="alert alert-info alert-sm mt-1">
+                        If enabled the server will try to pull additional information from the authentication server.
                     </div>
                 </div>
             </div>

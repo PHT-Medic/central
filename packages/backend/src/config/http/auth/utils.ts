@@ -1,20 +1,21 @@
 import {AbilityManager, AuthorizationHeaderValue} from "@typescript-auth/core";
 import {verifyToken} from "@typescript-auth/server";
 import {getCustomRepository, getRepository} from "typeorm";
-import {UserRepository} from "../../../domains/user/repository";
-import {AuthClient} from "../../../domains/client";
+import {UserRepository} from "../../../domains/auth/user/repository";
+import {Client} from "../../../domains/auth/client";
 import {getWritableDirPath} from "../../paths";
 import {useLogger} from "../../../modules/log";
+import {TokenPayload} from "../../../domains/auth/token/type";
 
 export async function authenticateWithAuthorizationHeader(request: any, value: AuthorizationHeaderValue) : Promise<void> {
     try {
         switch (value.type) {
             case "Bearer":
-                const tokenPayload = await verifyToken(value.token, {
+                const tokenPayload : TokenPayload = await verifyToken(value.token, {
                     directory: getWritableDirPath()
                 });
 
-                const {id: userId, remoteAddress} = tokenPayload;
+                const {sub: userId, remoteAddress} = tokenPayload;
 
                 if(typeof userId === 'undefined' || typeof remoteAddress === 'undefined') {
                     return;
@@ -36,15 +37,16 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
                     return;
                 }
 
-                const permissions =  await userRepository.findPermissions(user.id);
+                const permissions =  await userRepository.getOwnedPermissions(user.id);
 
                 request.user = user;
                 request.userId = user.id;
+                request.realmId = user.realm_id;
 
                 request.ability = new AbilityManager(permissions);
                 break;
             case "Basic":
-                const clientRepository = getRepository(AuthClient);
+                const clientRepository = getRepository(Client);
                 const client = await clientRepository.findOne({
                     id: value.username,
                     secret: value.password
@@ -57,11 +59,15 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
 
                 request.service = client.service;
                 request.serviceId = client.service.id;
+                request.realmId = client.service.realm_id;
+
                 request.ability = new AbilityManager([]);
                 break;
         }
     } catch (e) {
         useLogger().error(e.message);
+
+        throw e;
     }
 }
 

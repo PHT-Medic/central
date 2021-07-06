@@ -1,9 +1,9 @@
 import {QueueMessage} from "../../modules/message-queue";
 import {BaseService} from "../../domains/service";
 import {getRepository, Not, IsNull} from "typeorm";
-import {saveServiceSecretToVault} from "../../domains/vault/service/api";
-import {Station} from "../../domains/station";
-import {ensureHarborProjectWebHook} from "../../domains/harbor/project/web-hook/api";
+import {saveServiceSecretToVault} from "../../domains/service/vault/service/api";
+import {Station} from "../../domains/pht/station";
+import {ensureHarborProjectWebHook} from "../../domains/service/harbor/project/web-hook/api";
 
 export async function syncServiceSecurity(message: QueueMessage) {
     const serviceId : number | string = message.data.id;

@@ -1,9 +1,9 @@
 import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
-import {Station} from "../../../../domains/station";
-import {dropHarborProject} from "../../../../domains/harbor/project/api";
-import {removeStationPublicKeyFromVault} from "../../../../domains/vault/station/api";
+import {Station} from "../../../../domains/pht/station";
+import {dropHarborProject} from "../../../../domains/service/harbor/project/api";
+import {removeStationPublicKeyFromVault} from "../../../../domains/service/vault/station/api";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";

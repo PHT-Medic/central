@@ -1,65 +1,36 @@
 import {getRepository} from "typeorm";
 import {applyRequestFilter} from "typeorm-extension";
-import {MasterImage} from "../../../../domains/master-image";
+import {MasterImage} from "../../../../domains/pht/master-image";
 
-import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {Controller, Get, Params, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+
+type PartialMasterImage = Partial<MasterImage>;
 
 @SwaggerTags('pht')
 @Controller("/master-images")
 export class MasterImageController {
     @Get("",[ForceLoggedInMiddleware])
-    @ResponseExample<MasterImage[]>([
+    @ResponseExample<PartialMasterImage[]>([
         {name: 'slim', external_tag_id: 'slim', id: 1, proposals: [], trains: []},
         {name: 'buster', external_tag_id: 'buster', id: 1, proposals: [], trains: []}
     ])
     async getMany(
         @Request() req: any,
         @Response() res: any
-    ): Promise<MasterImage[]> {
-        return await getMasterImagesRouteHandler(req, res) as MasterImage[];
+    ): Promise<PartialMasterImage[]> {
+        return await getMasterImagesRouteHandler(req, res) as PartialMasterImage[];
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
-    @ResponseExample<MasterImage>({name: 'slim', external_tag_id: 'slim', id: 1, proposals: [], trains: []})
+    @ResponseExample<PartialMasterImage>({name: 'slim', external_tag_id: 'slim', id: 1, proposals: [], trains: []})
     async getOne(
         @Params('id') id: string,
         @Request() req: any,
         @Response() res: any
-    ): Promise<MasterImage|undefined> {
-        return await getMasterImageRouteHandler(req, res) as MasterImage | undefined;
-    }
-
-    @Post("/:id",[ForceLoggedInMiddleware])
-    @ResponseExample<MasterImage>({name: 'slim', external_tag_id: 'slim', id: 1, proposals: [], trains: []})
-    async update(
-        @Params('id') id: string,
-        @Body() data: MasterImage,
-        @Request() req: any,
-        @Response() res: any
-    ): Promise<MasterImage|undefined> {
-        return res._failServerError({message: 'Not implemented yet'}) as  | undefined;
-    }
-
-    @Post("",[ForceLoggedInMiddleware])
-    @ResponseExample<MasterImage>({name: 'slim', external_tag_id: 'slim', id: 1, proposals: [], trains: []})
-    async add(
-        @Body() data: MasterImage,
-        @Request() req: any,
-        @Response() res: any
-    ): Promise<MasterImage|undefined> {
-        return res._failServerError({message: 'Not implemented yet'}) as  | undefined;
-    }
-
-    @Delete("/:id",[ForceLoggedInMiddleware])
-    @ResponseExample<MasterImage>({name: 'slim', external_tag_id: 'slim', id: 1, proposals: [], trains: []})
-    async drop(
-        @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any
-    ): Promise<MasterImage|undefined> {
-        return res._failServerError({message: 'Not implemented yet'}) as MasterImage;
+    ): Promise<PartialMasterImage|undefined> {
+        return await getMasterImageRouteHandler(req, res) as PartialMasterImage | undefined;
     }
 }
 

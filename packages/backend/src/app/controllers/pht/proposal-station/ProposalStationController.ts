@@ -1,9 +1,9 @@
 import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
-import {ProposalStation} from "../../../../domains/proposal/station";
-import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
-import {isProposalStationState, ProposalStationStateApproved} from "../../../../domains/proposal/station/states";
+import {ProposalStation} from "../../../../domains/pht/proposal/station";
+import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/auth/realm/db/utils";
+import {isProposalStationState, ProposalStationStateApproved} from "../../../../domains/pht/proposal/station/states";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";

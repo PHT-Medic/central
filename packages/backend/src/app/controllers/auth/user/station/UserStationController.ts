@@ -1,7 +1,7 @@
 import {getCustomRepository, getRepository} from "typeorm";
-import {UserRepository} from "../../../../../domains/user/repository";
-import {Station} from "../../../../../domains/station";
-import {isRealmPermittedForResource} from "../../../../../domains/realm/db/utils";
+import {UserRepository} from "../../../../../domains/auth/user/repository";
+import {Station} from "../../../../../domains/pht/station";
+import {isRealmPermittedForResource} from "../../../../../domains/auth/realm/db/utils";
 
 export async function getUserStationRouteHandler(req: any, res: any) {
     let { id } = req.params;

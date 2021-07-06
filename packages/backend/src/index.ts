@@ -41,5 +41,3 @@ import {buildConnectionOptions} from "typeorm-extension";
     }
     start();
 })();
-export {ForceLoggedInMiddleware} from "./config/http/middleware/auth";
-export {forceLoggedIn} from "./config/http/middleware/auth";

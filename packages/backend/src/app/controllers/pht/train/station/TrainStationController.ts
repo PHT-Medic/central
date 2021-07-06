@@ -2,11 +2,11 @@ import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 
-import {TrainStation} from "../../../../../domains/train/station";
+import {TrainStation} from "../../../../../domains/pht/train/station";
 
-import {Train} from "../../../../../domains/train";
-import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../../domains/realm/db/utils";
-import {isTrainStationState, TrainStationStateApproved} from "../../../../../domains/train/station/states";
+import {Train} from "../../../../../domains/pht/train";
+import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../../domains/auth/realm/db/utils";
+import {isTrainStationState, TrainStationStateApproved} from "../../../../../domains/pht/train/station/states";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import env from "../../../../../env";

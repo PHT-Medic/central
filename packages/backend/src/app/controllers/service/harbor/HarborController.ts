@@ -1,6 +1,6 @@
 import {getRepository} from "typeorm";
-import {Train} from "../../../../domains/train";
-import {TrainResult} from "../../../../domains/train/result";
+import {Train} from "../../../../domains/pht/train";
+import {TrainResult} from "../../../../domains/pht/train/result";
 import {createQueueMessageTemplate, publishQueueMessage} from "../../../../modules/message-queue";
 import {array, BaseSchema, object, string} from "yup";
 
@@ -15,7 +15,7 @@ import {
     createTrainRouterQueueMessageEvent,
     MQ_TR_EVENT_TRAIN_PUSHED,
     publishTrainRouterQueueMessage
-} from "../../../../domains/train-router/queue";
+} from "../../../../domains/service/train-router/queue";
 
 let eventValidator : undefined | BaseSchema;
 function useHookEventDataValidator() : BaseSchema {

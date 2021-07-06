@@ -1,7 +1,7 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
-import {RolePermission} from "../../../../../domains/role/permission";
+import {RolePermission} from "../../../../../domains/auth/role/permission";
 
 // ---------------------------------------------------------------------------------
 

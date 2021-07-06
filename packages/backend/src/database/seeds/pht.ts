@@ -1,10 +1,10 @@
 import {Connection} from "typeorm";
-import {RoleRepository} from "../../domains/role/repository";
-import {Role} from "../../domains/role";
-import {RolePermission} from "../../domains/role/permission";
-import {Realm} from "../../domains/realm";
-import {MasterImage} from "../../domains/master-image";
-import {Station} from "../../domains/station";
+import {RoleRepository} from "../../domains/auth/role/repository";
+import {Role} from "../../domains/auth/role";
+import {RolePermission} from "../../domains/auth/role/permission";
+import {Realm} from "../../domains/auth/realm";
+import {MasterImage} from "../../domains/pht/master-image";
+import {Station} from "../../domains/pht/station";
 import {Factory, Seeder} from "typeorm-seeding";
 import {getPHTStationRolePermissions, PHTStationRole} from "../../config/pht/permissions/station";
 

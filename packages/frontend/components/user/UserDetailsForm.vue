@@ -14,6 +14,7 @@ export default {
         return {
             form: {
                 name: '',
+                displayName: '',
                 email: '',
                 realmId: '',
             },
@@ -30,7 +31,12 @@ export default {
             name: {
                 required,
                 minLength: minLength(5),
-                maxLength: maxLength(30)
+                maxLength: maxLength(128)
+            },
+            displayName: {
+                required,
+                minLength: minLength(5),
+                maxLength: maxLength(128)
             },
             email: {
                 minLength: minLength(5),
@@ -45,6 +51,7 @@ export default {
     created() {
         if(typeof this.userProperty !== 'undefined') {
             this.form.name = this.userProperty.name ?? '';
+            this.form.displayName = this.userProperty.displayName ?? '';
             this.form.email = this.userProperty.email ?? '';
             this.form.realmId = this.userProperty.realmId ?? '';
         }
@@ -106,7 +113,7 @@ export default {
 
                     this.message = {
                         isError: false,
-                        data: 'Die Attribute wurden erfolgreich aktualisiert.'
+                        data: 'The user was successfully updated.'
                     }
 
                     if(fields.hasOwnProperty('realmId')) {
@@ -117,7 +124,7 @@ export default {
                 } else {
                     this.message = {
                         isError: false,
-                        data: 'Die Attribute wurden nicht geändert.'
+                        data: 'The user attributes were not updated.'
                     }
                 }
             } catch (e) {
@@ -128,7 +135,7 @@ export default {
             }
 
             this.busy = false;
-        },
+        }
     }
 }
 </script>
@@ -154,43 +161,58 @@ export default {
                 </select>
 
                 <div v-if="!$v.form.realmId.required && !$v.form.realmId.$model" class="form-group-hint group-required">
-                    Bitte geben Sie einen Realm an.
+                    Please select a realm.
                 </div>
             </div>
 
             <div class="form-group" :class="{ 'form-group-error': $v.form.name.$error }">
                 <label>Name</label>
-                <input v-model="$v.form.name.$model" type="text" name="name" class="form-control" placeholder="Benutzer-Name...">
+                <input v-model="$v.form.name.$model" :disabled="!$auth.can('edit','user')" type="text" name="name" class="form-control" placeholder="Benutzer-Name...">
 
                 <div v-if="!$v.form.name.required && !$v.form.name.$model" class="form-group-hint group-required">
-                    Bitte geben Sie einen Benutzernamen an.
+                    Please enter a name.
                 </div>
                 <div v-if="!$v.form.name.minLength" class="form-group-hint group-required">
-                    Der Benutzername muss mindestens <strong>{{ $v.form.name.$params.minLength.min }}</strong> Zeichen lang sein.
+                    The length of the name must be less than <strong>{{ $v.form.name.$params.minLength.min }}</strong> characters.
                 </div>
                 <div v-if="!$v.form.name.maxLength" class="form-group-hint group-required">
-                    Der Benutzername darf maximal <strong>{{ $v.form.name.$params.maxLength.max }}</strong> Zeichen lang sein.
+                    The length of the name must be greater than <strong>{{ $v.form.name.$params.maxLength.max }}</strong> characters.
+                </div>
+            </div>
+
+            <div class="form-group" :class="{ 'form-group-error': $v.form.displayName.$error }">
+                <label>Display Name</label>
+                <input v-model="$v.form.displayName.$model" type="text" name="displayName" class="form-control" placeholder="Display-Name...">
+
+                <div v-if="!$v.form.displayName.required && !$v.form.displayName.$model" class="form-group-hint group-required">
+                    Please enter a display name.
+                </div>
+                <div v-if="!$v.form.displayName.minLength" class="form-group-hint group-required">
+                    The length of the display name must be less than <strong>{{ $v.form.displayName.$params.minLength.min }}</strong> characters.
+                </div>
+                <div v-if="!$v.form.displayName.maxLength" class="form-group-hint group-required">
+                    The length of the display name must be greater than  <strong>{{ $v.form.displayName.$params.maxLength.max }}</strong> characters.
                 </div>
             </div>
 
             <div class="form-group" :class="{ 'form-group-error': $v.form.email.$error }">
                 <label>Email</label>
-                <input v-model="$v.form.email.$model" type="email" name="email" class="form-control" placeholder="Email-Addresse...">
+                <input v-model="$v.form.email.$model" type="email" name="email" class="form-control" placeholder="Email-Address...">
 
                 <div v-if="!$v.form.email.minLength" class="form-group-hint group-required">
-                    Die E-Mail Addresse muss mindestens <strong>{{ $v.form.email.$params.minLength.min }}</strong> Zeichen lang sein.
+                    The length of the e-mail address must be less than  <strong>{{ $v.form.email.$params.minLength.min }}</strong> characters.
                 </div>
                 <div v-if="!$v.form.email.maxLength" class="form-group-hint group-required">
-                    Die E-Mail Addresse darf maximal <strong>{{ $v.form.email.$params.maxLength.max }}</strong> Zeichen lang sein.
+                    The length of the e-mail address must be greater than  <strong>{{ $v.form.email.$params.maxLength.max }}</strong> characters.
                 </div>
                 <div v-if="!$v.form.email.email" class="form-group-hint group-required">
-                    Die E-Mail Addresse ist nicht gültig.
+                    The e-mail address is not valid.
                 </div>
             </div>
 
             <div class="form-group">
                 <button :disabled="$v.form.$invalid || busy" @click.prevent="submit" type="submit" class="btn btn-primary btn-xs">
-                    <i class="fa fa-save"></i> Speichern
+                    <i class="fa fa-save"></i> Save
                 </button>
             </div>
         </form>

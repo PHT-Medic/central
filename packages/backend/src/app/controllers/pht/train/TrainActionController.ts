@@ -1,6 +1,6 @@
 import {getRepository, Not} from "typeorm";
-import {Train} from "../../../../domains/train";
-import {createTrainBuilderQueueMessage, publishTrainBuilderQueueMessage} from "../../../../domains/train-builder/queue";
+import {Train} from "../../../../domains/pht/train";
+import {createTrainBuilderQueueMessage, publishTrainBuilderQueueMessage} from "../../../../domains/service/train-builder/queue";
 import {
     TrainConfiguratorStateFinished,
     TrainConfiguratorStateHashGenerated,
@@ -9,9 +9,9 @@ import {
     TrainStateStarted,
     TrainStateStarting,
     TrainStateStopping
-} from "../../../../domains/train/states";
+} from "../../../../domains/pht/train/states";
 import * as crypto from "crypto";
-import {getTrainFileFilePath} from "../../../../domains/train/file/path";
+import {getTrainFileFilePath} from "../../../../domains/pht/train/file/path";
 import * as fs from "fs";
 import {check, matchedData, validationResult} from "express-validator";
 import {
@@ -19,16 +19,16 @@ import {
     MQ_TR_COMMAND_START_TRAIN,
     MQ_TR_COMMAND_STOP_TRAIN,
     publishTrainRouterQueueMessage
-} from "../../../../domains/train-router/queue";
-import {TrainResult} from "../../../../domains/train/result";
-import {createResultServiceResultCommand} from "../../../../domains/result-service/queue";
+} from "../../../../domains/service/train-router/queue";
+import {TrainResult} from "../../../../domains/pht/train/result";
+import {createResultServiceResultCommand} from "../../../../domains/service/result-service/queue";
 import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/services/harbor";
-import {TrainResultStateFinished, TrainResultStateOpen} from "../../../../domains/train/result/states";
-import {findHarborProjectRepository, HarborRepository} from "../../../../domains/harbor/project/repository/api";
+import {TrainResultStateFinished, TrainResultStateOpen} from "../../../../domains/pht/train/result/states";
+import {findHarborProjectRepository, HarborRepository} from "../../../../domains/service/harbor/project/repository/api";
 import env from "../../../../env";
-import {TrainStation} from "../../../../domains/train/station";
-import {TrainStationStateApproved} from "../../../../domains/train/station/states";
-import {isRealmPermittedForResource} from "../../../../domains/realm/db/utils";
+import {TrainStation} from "../../../../domains/pht/train/station";
+import {TrainStationStateApproved} from "../../../../domains/pht/train/station/states";
+import {isRealmPermittedForResource} from "../../../../domains/auth/realm/db/utils";
 
 /**
  * Execute a train command (start, stop, build).

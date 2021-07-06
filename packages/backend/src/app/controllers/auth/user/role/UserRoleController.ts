@@ -1,6 +1,6 @@
 import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
-import {UserRole} from "../../../../../domains/user/role";
+import {UserRole} from "../../../../../domains/auth/user/role";
 import {check, matchedData, validationResult} from "express-validator";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";

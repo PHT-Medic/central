@@ -1,15 +1,15 @@
 import {getRepository, In} from "typeorm";
 import {applyRequestFilter, applyRequestPagination, applyRequestIncludes} from "typeorm-extension";
-import {Station} from "../../../../domains/station";
-import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/realm/db/utils";
+import {Station} from "../../../../domains/pht/station";
+import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/auth/realm/db/utils";
 import {check, matchedData, validationResult} from "express-validator";
-import {Proposal} from "../../../../domains/proposal";
-import {MasterImage} from "../../../../domains/master-image";
-import {ProposalStation} from "../../../../domains/proposal/station";
+import {Proposal} from "../../../../domains/pht/proposal";
+import {MasterImage} from "../../../../domains/pht/master-image";
+import {ProposalStation} from "../../../../domains/pht/proposal/station";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {ProposalStationStateApproved, ProposalStationStateOpen} from "../../../../domains/proposal/station/states";
+import {ProposalStationStateApproved, ProposalStationStateOpen} from "../../../../domains/pht/proposal/station/states";
 import env from "../../../../env";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 

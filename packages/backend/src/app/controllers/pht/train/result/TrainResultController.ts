@@ -1,14 +1,14 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
-import {TrainResult} from "../../../../../domains/train/result";
-import {createResultServiceResultCommand} from "../../../../../domains/result-service/queue";
+import {TrainResult} from "../../../../../domains/pht/train/result";
+import {createResultServiceResultCommand} from "../../../../../domains/service/result-service/queue";
 import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../../config/services/harbor";
-import {TrainResultStateFinished, TrainResultStateOpen} from "../../../../../domains/train/result/states";
+import {TrainResultStateFinished, TrainResultStateOpen} from "../../../../../domains/pht/train/result/states";
 
 import {Body, Controller, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../../config/http/middleware/auth";
-import {isRealmPermittedForResource} from "../../../../../domains/realm/db/utils";
+import {isRealmPermittedForResource} from "../../../../../domains/auth/realm/db/utils";
 
 enum TrainResultTask {
     RESET = 'reset'

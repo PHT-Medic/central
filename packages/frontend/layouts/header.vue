@@ -65,7 +65,7 @@
                         <li class="nav-item">
                             <nuxt-link class="nav-link user-link"  :to="'/users/'+user.id">
                                 <v-gravatar :email="user.email ? user.email : ''" />
-                                <span>{{ user.name }}</span>
+                                <span>{{ user.displayName ? user.displayName : user.name }}</span>
                             </nuxt-link>
                         </li>
                         <li class="nav-item">

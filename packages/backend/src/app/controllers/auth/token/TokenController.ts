@@ -1,14 +1,18 @@
 import {getCustomRepository, getRepository} from "typeorm";
-import {UserRepository} from "../../../../domains/user/repository";
-import {Provider} from "../../../../domains/provider";
-import {Oauth2PasswordProvider} from "../../../../modules/auth/providers";
+import {UserRepository} from "../../../../domains/auth/user/repository";
+import {OAuth2Provider} from "../../../../domains/auth/oauth2-provider";
 
 import {Response, Request, Controller, Post, Body, Delete} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import env from "../../../../env";
 import {createToken} from "@typescript-auth/server";
 import {getWritableDirPath} from "../../../../config/paths";
-import {MASTER_REALM_ID} from "../../../../domains/realm";
+import {MASTER_REALM_ID} from "../../../../domains/auth/realm";
+import {Oauth2ClientProtocol} from "@typescript-auth/core";
+import {Oauth2ProviderAccount} from "../../../../domains/auth/oauth2-provider/account";
+import {createOauth2ProviderAccountWithToken} from "../../../../domains/auth/oauth2-provider/account/utils";
+import {TokenPayload} from "../../../../domains/auth/token/type";
+import {buildTokenPayload} from "../../../../domains/auth/token";
 
 
 type Token = {
@@ -39,22 +43,25 @@ export class TokenController {
     }
 }
 
-async function grantTokenWithMasterProvider(username: string, password: string) : Promise<number | undefined> {
-    const providerRepository = getRepository(Provider);
+async function grantTokenWithMasterProvider(username: string, password: string) : Promise<Oauth2ProviderAccount | undefined> {
+    const providerRepository = getRepository(OAuth2Provider);
     const providers = await providerRepository.createQueryBuilder('provider')
         .leftJoinAndSelect('provider.realm', 'realm')
         .andWhere("provider.realm_id = :realmId", {realmId: MASTER_REALM_ID})
         .getMany();
 
     for(let i=0; i<providers.length; i++) {
-        const oauth2Provider = new Oauth2PasswordProvider(providers[i]);
+        const oauth2Client = new Oauth2ClientProtocol(providers[i]);
 
         try {
-            const loginToken = await oauth2Provider.getToken(username, password);
-            const userAccount = await oauth2Provider.loginWithToken(loginToken);
+            const tokenResponse = await oauth2Client.getTokenWithPasswordGrant({
+                username,
+                password
+            });
 
-            return userAccount.user_id;
+            return await createOauth2ProviderAccountWithToken(providers[i], tokenResponse);
         } catch (e) {
+            console.log(e);
             // don't handle error, maybe log it.
         }
     }
@@ -65,37 +72,46 @@ async function grantTokenWithMasterProvider(username: string, password: string) 
 async function grantToken(req: any, res: any) : Promise<any> {
     const {username, password} = req.body;
 
-    let userId : number | undefined;
+    try {
+        let userId: number | undefined;
 
-    // try database authentication
-    const userRepository = getCustomRepository<UserRepository>(UserRepository);
-    const user = await userRepository.findByCredentials(username, password);
-    if(typeof user !== 'undefined') {
-        userId = user.id;
-    }
+        // try database authentication
+        const userRepository = getCustomRepository<UserRepository>(UserRepository);
+        const user = await userRepository.verifyCredentials(username, password);
 
-    if(typeof userId === 'undefined') {
-        userId = await grantTokenWithMasterProvider(username, password);
-    }
-
-    if(typeof userId === 'undefined') {
-        return res._failValidationError({message: 'The credentials are not valid.'})
-    }
-
-    const tokenPayload : {id: number, remoteAddress: string} = {
-        id: userId,
-        remoteAddress: req.ip
-    };
-
-    const expiresIn : number = env.jwtMaxAge;
-    const token = await createToken(tokenPayload, expiresIn, {directory: getWritableDirPath()});
-
-    return res._respond({
-        data: {
-            access_token: token,
-            expires_in: expiresIn
+        if (typeof user !== 'undefined') {
+            userId = user.id;
         }
-    });
+
+        if (typeof userId === 'undefined') {
+            const userAccount = await grantTokenWithMasterProvider(username, password);
+            if(typeof userAccount !== 'undefined') {
+                userId = userAccount?.user_id ?? userAccount?.user?.id;
+            }
+        }
+
+        if (typeof userId === 'undefined') {
+            return res._failValidationError({message: 'The credentials are not valid.'})
+        }
+
+        const expiresIn: number = env.jwtMaxAge;
+
+        const tokenPayload: TokenPayload = buildTokenPayload({
+            sub: userId,
+            remoteAddress: req.ip
+        }, expiresIn);
+
+        const token = await createToken(tokenPayload, expiresIn, {directory: getWritableDirPath()});
+
+        return res._respond({
+            data: {
+                access_token: token,
+                expires_in: expiresIn
+            }
+        });
+    } catch (e) {
+        return res._failServerError();
+    }
 }
 
 // ---------------------------------------------------------------------------------

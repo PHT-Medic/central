@@ -4,9 +4,9 @@ import {check, matchedData, validationResult} from "express-validator";
 import {SwaggerTags} from "typescript-swagger";
 import {Controller, Get, Post, Delete, Request, Response, Params, Body} from "@decorators/express";
 
-import {Realm} from "../../../../domains/realm";
-import {Provider} from "../../../../domains/provider";
-import {Station} from "../../../../domains/station";
+import {Realm} from "../../../../domains/auth/realm";
+import {OAuth2Provider} from "../../../../domains/auth/oauth2-provider";
+import {Station} from "../../../../domains/pht/station";
 import {getRealmStationRouteHandler} from "./station/RealmStationController";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
@@ -23,7 +23,7 @@ export class RealmController {
 
     @Post("", [ForceLoggedInMiddleware])
     async add(
-        @Body() user: NonNullable<Provider>,
+        @Body() user: NonNullable<OAuth2Provider>,
         @Request() req: any,
         @Response() res: any
     ) : Promise<Realm> {

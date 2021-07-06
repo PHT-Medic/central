@@ -6,6 +6,7 @@ import {mapOnAllApis} from "~/modules/api";
 import BaseApi from "~/modules/api/base";
 
 import {AuthStoreToken} from "~/store/auth";
+import {changeResponseKeyCase} from "~/modules/api/utils";
 
 
 export type AuthModuleOptions = {
@@ -38,12 +39,11 @@ class AuthModule {
         this.ctx = ctx;
 
         this.client = new Oauth2ClientProtocol({
-            tokenHost: options.tokenHost,
-            tokenPath: options.tokenPath,
-            userInfoPath: options.userInfoPath,
-            clientId: 'user-interface',
-            // @ts-ignore
-            authorizeRedirectURL: undefined
+            token_host: options.tokenHost,
+            token_path: options.tokenPath,
+            user_info_path: options.userInfoPath,
+            client_id: 'user-interface',
+            redirect_uri: undefined
         })
 
         this.abilityManager = new AbilityManager([]);
@@ -103,10 +103,10 @@ class AuthModule {
 
                     callback.bind(this);
 
-                    this.setRequestToken(token.accessToken);
+                    this.setRequestToken(token.access_token);
 
-                    if(typeof token.expireDate !== 'undefined') {
-                        let expireDateInTime = (new Date(token.expireDate)).getTime();
+                    if(typeof token.expire_date !== 'undefined') {
+                        let expireDateInTime = (new Date(token.expire_date)).getTime();
                         let currentTime = (new Date()).getTime();
 
                         let timeoutMilliSeconds = expireDateInTime - currentTime;
@@ -115,7 +115,7 @@ class AuthModule {
                             callback();
                         }
 
-                        this.refreshTokenJob = scheduleJob(new Date(token.expireDate), callback);
+                        this.refreshTokenJob = scheduleJob(new Date(token.expire_date), callback);
                     }
                     break;
                 case 'auth/unsetToken':
@@ -147,7 +147,7 @@ class AuthModule {
             return new Promise(((resolve) => resolve(userInfo)));
         }
 
-        this.identifyPromise = this.getUserInfo(token.accessToken)
+        this.identifyPromise = this.getUserInfo(token.access_token)
             .then(this.handleUserInfoResponse.bind(this));
 
         return this.identifyPromise;
@@ -206,7 +206,7 @@ class AuthModule {
             password
         })
 
-        this.setRequestToken(data.accessToken);
+        this.setRequestToken(data.access_token);
 
         return data;
     }
@@ -221,7 +221,7 @@ class AuthModule {
             refresh_token: token
         });
 
-        this.setRequestToken(data.accessToken);
+        this.setRequestToken(data.access_token);
         return data;
     }
 
@@ -230,8 +230,11 @@ class AuthModule {
      *
      * @param token
      */
-    public async getUserInfo(token: string) {
-        return await this.client.getUserInfo(token);
+    public async getUserInfo(token: string) : Promise<Record<string, any>> {
+        const data = await this.client.getUserInfo(token);
+
+        // change key case, because all user objects are in that format.
+        return changeResponseKeyCase(data);
     }
 
 }

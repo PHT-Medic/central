@@ -12,8 +12,8 @@ type RespondErrorMessage = {
 }
 
 export default function responseMiddleware(request: any, response: any, next: any) {
-    let defaultErrorCode = 'service_error';
-    let defaultErrorMessage = 'Der Dienst ist in einen unerwarteten Zustand geraten, welcher ihn daran gehindert hat die Anfrage zu bearbeiten.';
+    const defaultErrorCode = 'service_error';
+    const defaultErrorMessage = 'The service encountered an unknown error, which prevented it from fulfilling the request.';
 
     response._respond = (message?: RespondMessage) => {
         if(message) {
@@ -51,7 +51,7 @@ export default function responseMiddleware(request: any, response: any, next: an
 
         response.status(message.statusCode);
 
-        let data: object = {
+        const data: object = {
             message: message.message,
             code: message.code
         };
@@ -61,10 +61,10 @@ export default function responseMiddleware(request: any, response: any, next: an
         return response.end();
     };
 
-    //--------------------------------------------------------------------
+    // --------------------------------------------------------------------
 
     response._respondDeleted = (message?: RespondMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 200,
             message: 'Deleted',
         }
@@ -76,7 +76,7 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._respondCreated = (message?: RespondMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 201,
             message: 'Created',
         }
@@ -88,7 +88,7 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._respondAccepted = (message?: RespondMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 202,
             message: 'Accepted',
         }
@@ -99,7 +99,7 @@ export default function responseMiddleware(request: any, response: any, next: an
         return response._respond(message);
     };
 
-    //--------------------------------------------------------------------
+    // --------------------------------------------------------------------
 
     response._fail = (message?: RespondErrorMessage) => {
         if(message) {
@@ -109,15 +109,15 @@ export default function responseMiddleware(request: any, response: any, next: an
         return response._respondException(message);
     };
 
-    //--------------------------------------------------------------------
+    // --------------------------------------------------------------------
 
     response._failExpressValidationError = (validation: any) => {
         if(validation.isEmpty()) {
             return response._respond();
         }
 
-        let errors = validation.errors;
-        let invalidParams: string[] = [];
+        const errors = validation.errors;
+        const invalidParams: string[] = [];
 
         for(let i=0; i < errors.length; i++) {
             if(invalidParams.indexOf(errors[i].param) === -1) {
@@ -137,7 +137,7 @@ export default function responseMiddleware(request: any, response: any, next: an
             message =  'Es ist ein unbekannter Validierungsfehler aufgetreten.';
         }
 
-        let result: RespondErrorMessage = {};
+        const result: RespondErrorMessage = {};
         result.message = message;
         result.statusCode = 400;
         result.code = 'invalid_request';
@@ -146,7 +146,7 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._failUnauthorized = (message?: RespondErrorMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 401,
             message: 'Unauhtorized',
             code: 'unauhthorized'
@@ -159,7 +159,7 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._failForbidden = (message?: RespondErrorMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 403,
             message: 'Forbidden',
             code: 'forbidden'
@@ -172,7 +172,7 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._failNotFound = (message?: RespondErrorMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 404,
             message: 'Not Found',
             code: 'not-found'
@@ -185,7 +185,7 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._failBadRequest = (message?: RespondErrorMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 400,
             message: 'Bad Request',
             code: 'bad-request'
@@ -198,7 +198,7 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._failValidationError = (message?: RespondErrorMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 400,
             message: 'Bad Request',
             code: 'bad-request'

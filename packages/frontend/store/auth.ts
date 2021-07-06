@@ -13,7 +13,7 @@ export const AuthStoreKey = {
 }
 
 export type AuthStoreToken = Oauth2TokenResponse & {
-    expireDate: string
+    expire_date: string
 }
 
 export interface AuthState {
@@ -140,7 +140,7 @@ export const actions : ActionTree<AuthState, RootState> = {
 
         if (token) {
             try {
-                const { permissions, ...user } = await this.$auth.getUserInfo(token.accessToken);
+                const { permissions, ...user } = await this.$auth.getUserInfo(token.access_token);
 
                 dispatch('triggerUnsetUser');
 
@@ -167,7 +167,7 @@ export const actions : ActionTree<AuthState, RootState> = {
 
             const extendedToken : AuthStoreToken = {
                 ...token,
-                expireDate: new Date(Date.now() + token.expiresIn * 1000).toString()
+                expire_date: new Date(Date.now() + token.expires_in * 1000).toString()
             }
 
             commit('loginSuccess');
@@ -187,7 +187,7 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     triggerRefreshToken ({ commit, state, dispatch }) {
         if(
-            typeof state.token?.refreshToken !== 'string'
+            typeof state.token?.refresh_token !== 'string'
         ) {
             throw new Error('It is not possible to receive a new access token');
         }
@@ -196,7 +196,7 @@ export const actions : ActionTree<AuthState, RootState> = {
             commit('loginRequest');
 
             try {
-                const p = this.$auth.getTokenWithRefreshToken(state.token.refreshToken);
+                const p = this.$auth.getTokenWithRefreshToken(state.token.refresh_token);
 
                 commit('setTokenPromise', p);
 
@@ -205,7 +205,12 @@ export const actions : ActionTree<AuthState, RootState> = {
                         commit('setTokenPromise', null);
                         commit('loginSuccess');
 
-                        dispatch('triggerSetToken', token);
+                        const extendedToken : AuthStoreToken = {
+                            ...token,
+                            expire_date: new Date(Date.now() + token.expires_in * 1000).toString()
+                        }
+
+                        dispatch('triggerSetToken', extendedToken);
                         dispatch('triggerRefreshMe');
                     },
                     () => {

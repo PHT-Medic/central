@@ -2,7 +2,7 @@ import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {SwaggerTags} from "typescript-swagger";
 
-import {Permission} from "../../../../domains/permission";
+import {Permission} from "../../../../domains/auth/permission";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
