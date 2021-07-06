@@ -5,9 +5,6 @@
     "version": "1.0.0",
     "description": "",
     "main": "dist/index.js",
-    "bin": {
-        "pht-ui": "dist/cli/index.js"
-    },
     "dependencies": {
         "@casl/ability": "^4.1.4",
         "@decorators/di": "^1.0.2",
