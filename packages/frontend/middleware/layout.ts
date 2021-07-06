@@ -5,9 +5,11 @@ const layoutMiddleware : Middleware = ({ store, route } : Context) => {
     let key : string = 'navigationId';
     let navigationId : string | undefined;
 
-    for(let i=0; i< route.meta.length; i++) {
-        if (key in route.meta[i] && route.meta[i][key]) {
-            navigationId = route.meta[i][key]
+    if(route.meta) {
+        for (let i = 0; i < route.meta.length; i++) {
+            if (key in route.meta[i] && route.meta[i][key]) {
+                navigationId = route.meta[i][key]
+            }
         }
     }
 

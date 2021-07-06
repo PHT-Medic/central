@@ -5,7 +5,7 @@ type MetaOrMatched = 'meta' | 'matched';
 
 function checkAbility({route, $auth} : Context) {
     if(
-        route.meta.some((m: any) => m.hasOwnProperty('requireAbility') && typeof m.requireAbility === 'function') ||
+        (route.meta && route.meta.some((m: any) => m.hasOwnProperty('requireAbility') && typeof m.requireAbility === 'function')) ||
         route.matched.some((m: any) => m.hasOwnProperty('requireAbility') && typeof m.requireAbility === 'function')
     ) {
         let isAllowed = true;
@@ -15,15 +15,20 @@ function checkAbility({route, $auth} : Context) {
         const keys: MetaOrMatched[] = ['meta','matched'];
         for(let l=0; l<keys.length; l++) {
             const key : MetaOrMatched = keys[l];
-            for(let i=0; i < route[key].length; i++) {
-                const value : any = typeof route[key][i].requireAbility === 'function' ? route[key][i].requireAbility : undefined;
 
-                if(typeof value === 'undefined') {
+            const value = route[key];
+
+            if(typeof value === 'undefined') continue;
+
+            for(let i=0; i < value.length; i++) {
+                const val : any = typeof value[i].requireAbility === 'function' ? value[i].requireAbility : undefined;
+
+                if(typeof val === 'undefined') {
                     continue;
                 }
 
-                if(typeof value === 'function') {
-                    isAllowed = value(can);
+                if(typeof val === 'function') {
+                    isAllowed = val(can);
                     break;
                 }
             }
@@ -49,7 +54,7 @@ const authMiddleware : Middleware = async ({ route, redirect, $auth, store } : C
     }
 
     if (
-        route.meta.some((m: any) => m.requireLoggedIn) ||
+        (route.meta && route.meta.some((m: any) => m.requireLoggedIn)) ||
         route.matched.some((record: any) => record.meta.requireLoggedIn)
     ) {
         if (!store.getters['auth/loggedIn']) {
@@ -67,7 +72,7 @@ const authMiddleware : Middleware = async ({ route, redirect, $auth, store } : C
     }
 
     if (
-        route.meta.some((m: any) => m.requireGuestState) ||
+        (route.meta && route.meta.some((m: any) => m.requireGuestState)) ||
         route.matched.some((record: any) => record.meta.requireGuestState)
     ) {
         if (store.getters['auth/loggedIn']) {
