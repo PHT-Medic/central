@@ -1,4 +1,4 @@
-import {useHarborApi} from "../../api/provider/harbor";
+import {useHarborApi} from "../../../modules/api/provider/harbor";
 
 
 export interface TrainRepository {

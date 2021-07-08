@@ -11,33 +11,6 @@ type RespondErrorMessage = {
     code?: string
 }
 
-/*
-declare namespace Express {
-    export interface Response {
-        status: any,
-        json: any,
-        end: any,
-        _respond: any,
-        _respondException: any,
-        _respondDeleted: any,
-        _respondCreated: any,
-        _respondAccepted: any,
-
-        _fail: any,
-        _failValidationError: any,
-        _failExpressValidationError: any,
-        _failUnauthorized: any,
-        _failForbidden: any,
-        _failNotFound: any,
-        _failServerError: any
-    }
-
-    export interface Request {
-
-    }
-}
- */
-
 export default function responseMiddleware(request: any, response: any, next: any) {
     let defaultErrorCode = 'service_error';
     let defaultErrorMessage = 'Der Dienst ist in einen unerwarteten Zustand geraten, welcher ihn daran gehindert hat die Anfrage zu bearbeiten.';

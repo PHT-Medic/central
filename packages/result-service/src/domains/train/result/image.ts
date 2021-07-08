@@ -6,9 +6,8 @@ import tar, {Pack} from 'tar-stream';
 
 import {useDocker} from "./index";
 import {getWritableDirPath} from "../../../config/paths";
-import {parseHarborConnectionString} from "../../api/provider/harbor";
+import {parseHarborConnectionString} from "../../../modules/api/provider/harbor";
 import env from "../../../env";
-import {ContainerInspectInfo} from "dockerode";
 
 const harborConfig = parseHarborConnectionString(env.harborConnectionString);
 const harborUrL = new URL(harborConfig.host);

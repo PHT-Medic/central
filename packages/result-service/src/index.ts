@@ -5,8 +5,8 @@ dotenv.config();
 import env from './env';
 
 import createConfig from "./config";
-import createExpressApp from "./modules/http/express";
-import createHttpServer from "./modules/http/server";
+import createExpressApp from "./config/http/express";
+import createHttpServer from "./config/http/server";
 
 //--------------------------------------------------------------------
 // HTTP Server & Express App

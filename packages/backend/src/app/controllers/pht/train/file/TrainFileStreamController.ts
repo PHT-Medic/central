@@ -67,7 +67,7 @@ export async function getTrainFileStreamRouteHandler(req: any, res: any) {
         for (let i = 0; i < files.length; i++) {
             const buffer: Buffer = fs.readFileSync(trainDirectoryPath + '/' + files[i].hash + '.file');
 
-            await new Promise((resolve, reject) => {
+            await new Promise((resolve: (data?: any) => void, reject) => {
                 pack.entry({name: files[i].directory + '/' + files[i].name, size: files[i].size}, buffer, (err) => {
                     if (err) reject();
 

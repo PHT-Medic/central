@@ -1,5 +1,5 @@
 import fs from "fs";
-import {getTrainResultFilePath} from "../../../../modules/pht/result/image";
+import {getTrainResultFilePath} from "../../../../domains/train/result/image";
 
 export async function getTrainResultRouteHandler(req: any, res: any) {
     const { downloadId } = req.query;
