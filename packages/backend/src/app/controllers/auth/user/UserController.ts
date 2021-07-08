@@ -277,7 +277,7 @@ export async function editUserRouteHandler(req: any, res: any) {
 
     if(typeof data.realm_id === 'string') {
         if (!isPermittedForResourceRealm(req.realmId, data.realm_id)) {
-            return res._failForbidden({message: `You are not allowed to move users to the realm ${user.realm_id}`});
+            return res._failForbidden({message: `You are not allowed to move users to the realm ${data.realm_id}`});
         }
     }
 

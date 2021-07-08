@@ -32,7 +32,7 @@ export class Service {
     @Column({type: "boolean", default: false})
     client_synced: boolean;
 
-    @OneToOne(() => Client, client => client.service, {nullable: true})
+    @OneToOne(() => Client, client => client.service, {nullable: true, cascade: ['update']})
     client: Client;
 
     @Column({default: MASTER_REALM_ID})

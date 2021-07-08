@@ -129,12 +129,12 @@ export default function responseMiddleware(request: any, response: any, next: an
 
         if(invalidParams) {
             if(invalidParams.length > 1) {
-                message = 'Die Parameter ' + invalidParams.join(', ') + ' sind nicht gültig.';
+                message = 'The parameters ' + invalidParams.join(', ') + ' are not valid.';
             } else {
-                message = 'Der Parameter ' + invalidParams[0] + ' ist nicht gültig.';
+                message = 'The parameter ' + invalidParams[0] + ' is not valid.';
             }
         } else {
-            message =  'Es ist ein unbekannter Validierungsfehler aufgetreten.';
+            message =  'An unknown validation error occurred.';
         }
 
         const result: RespondErrorMessage = {};

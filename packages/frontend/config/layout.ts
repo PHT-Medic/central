@@ -88,6 +88,14 @@ export const LayoutSidebars : {[key: string] : LayoutSidebarComponentInterface[]
             icon: 'fas fa-key',
             requireLoggedIn: true,
             requirePermissions: ['permission_add', 'permission_drop']
+        },
+        {
+            name: 'Services',
+            type: 'link',
+            url: '/admin/services',
+            icon: 'fas fa-concierge-bell',
+            requireLoggedIn: true,
+            requirePermissions: ['service_manage']
         }
     ],
     default: [

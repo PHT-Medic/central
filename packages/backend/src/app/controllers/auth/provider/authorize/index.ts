@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {Oauth2ClientProtocol, Oauth2TokenResponse} from "@typescript-auth/core";
+import {Oauth2Client, Oauth2TokenResponse} from "@typescript-auth/core";
 import {createToken} from "@typescript-auth/server";
 
 import env from "../../../../../env";
@@ -23,7 +23,7 @@ export async function authorizeUrlRoute(req: any, res: any) {
     }
 
     try {
-        const oauth2Client = new Oauth2ClientProtocol({
+        const oauth2Client = new Oauth2Client({
             client_id: provider.client_id,
             token_host: provider.token_host,
             authorize_host: provider.authorize_host,
@@ -54,7 +54,7 @@ export async function authorizeCallbackRoute(req: any, res: any) {
 
     try {
 
-        const oauth2Client = new Oauth2ClientProtocol({
+        const oauth2Client = new Oauth2Client({
             client_id: provider.client_id,
             client_secret: provider.client_secret,
 

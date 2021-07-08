@@ -3,7 +3,7 @@ import {getPHTPermissions} from "./pht/permissions";
 const permissions : string[] = [
     'admin_ui_use',
 
-    'manage_service',
+    'service_manage',
 
     'realm_add',
     'realm_drop',

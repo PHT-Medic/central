@@ -11,7 +11,7 @@ import {ForceLoggedInMiddleware} from "../../../config/http/middleware/auth";
 
 enum ServiceTask {
     SYNC_CLIENT = 'syncClient',
-    REFRESH_CLIENT_SECRET = 'refreshClient'
+    REFRESH_CLIENT_SECRET = 'refreshClientSecret'
 }
 
 @SwaggerTags('service')
@@ -62,7 +62,7 @@ async function getManyRoute(req: any, res: any) {
 
     const query = realmRepository.createQueryBuilder('service');
 
-    applyRequestIncludes(query, 'service', include, ['client']);
+    applyRequestIncludes(query, 'service', include, ['client', 'realm']);
 
     applyRequestFilter(query, filter, ['id']);
 
@@ -94,7 +94,7 @@ async function getRoute(req: any, res: any) {
         const query =  repository.createQueryBuilder('service')
             .where("id = :id", {id});
 
-        applyRequestIncludes(query, 'service', include, ['client']);
+        applyRequestIncludes(query, 'service', include, ['client', 'realm']);
 
         const entity = await query.getOne();
 
@@ -130,7 +130,7 @@ async function doTask(req: any, res: any) {
 
     try {
         const repository = getRepository(Service);
-        const entity = await repository.findOne(id, {relations: ['client']});
+        const entity = await repository.findOne(id, {relations: ['client', 'realm']});
 
         if(typeof entity === 'undefined') {
             return res._failNotFound();
@@ -139,12 +139,16 @@ async function doTask(req: any, res: any) {
         switch (validationData.task) {
             case ServiceTask.SYNC_CLIENT:
                 await syncServiceClient(entity);
+
+                entity.client_synced = true;
+
+                await repository.save(entity);
                 break;
             case ServiceTask.REFRESH_CLIENT_SECRET:
                 entity.client.refreshSecret();
+                entity.client_synced = false;
 
                 await repository.save(entity);
-                await syncServiceClient(entity);
                 break;
         }
 

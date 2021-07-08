@@ -8,7 +8,7 @@ import env from "../../../../env";
 import {createToken} from "@typescript-auth/server";
 import {getWritableDirPath} from "../../../../config/paths";
 import {MASTER_REALM_ID} from "../../../../domains/auth/realm";
-import {Oauth2ClientProtocol} from "@typescript-auth/core";
+import {Oauth2Client} from "@typescript-auth/core";
 import {Oauth2ProviderAccount} from "../../../../domains/auth/oauth2-provider/account";
 import {createOauth2ProviderAccountWithToken} from "../../../../domains/auth/oauth2-provider/account/utils";
 import {TokenPayload} from "../../../../domains/auth/token/type";
@@ -51,7 +51,7 @@ async function grantTokenWithMasterProvider(username: string, password: string) 
         .getMany();
 
     for(let i=0; i<providers.length; i++) {
-        const oauth2Client = new Oauth2ClientProtocol(providers[i]);
+        const oauth2Client = new Oauth2Client(providers[i]);
 
         try {
             const tokenResponse = await oauth2Client.getTokenWithPasswordGrant({

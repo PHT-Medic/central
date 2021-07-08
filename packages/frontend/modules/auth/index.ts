@@ -1,6 +1,5 @@
 import {Context} from "@nuxt/types";
-import {AbilityManager, OwnedPermission, Oauth2TokenResponse, Oauth2ClientProtocol} from "@typescript-auth/core";
-import {scheduleJob, Job} from "node-schedule";
+import {AbilityManager, OwnedPermission, Oauth2TokenResponse, Oauth2Client} from "@typescript-auth/core";
 
 import {mapOnAllApis} from "~/modules/api";
 import BaseApi from "~/modules/api/base";
@@ -18,9 +17,9 @@ export type AuthModuleOptions = {
 class AuthModule {
     protected ctx: Context;
 
-    protected client: Oauth2ClientProtocol;
+    protected client: Oauth2Client;
 
-    protected refreshTokenJob: undefined | Job;
+    protected refreshTokenJob: undefined | ReturnType<typeof setTimeout>;
 
     protected storeKeys : string[] = [
         'token',
@@ -38,12 +37,11 @@ class AuthModule {
     constructor(ctx: Context, options: AuthModuleOptions) {
         this.ctx = ctx;
 
-        this.client = new Oauth2ClientProtocol({
+        this.client = new Oauth2Client({
             token_host: options.tokenHost,
             token_path: options.tokenPath,
             user_info_path: options.userInfoPath,
-            client_id: 'user-interface',
-            redirect_uri: undefined
+            client_id: 'user-interface'
         })
 
         this.abilityManager = new AbilityManager([]);
@@ -90,7 +88,7 @@ class AuthModule {
                 case 'auth/setToken':
                     let token = <AuthStoreToken> mutation.payload;
                     if(this.refreshTokenJob) {
-                        this.refreshTokenJob.cancel();
+                        clearTimeout(this.refreshTokenJob);
                     }
 
                     let callback = () => {
@@ -115,12 +113,12 @@ class AuthModule {
                             callback();
                         }
 
-                        this.refreshTokenJob = scheduleJob(new Date(token.expire_date), callback);
+                        this.refreshTokenJob = setTimeout(callback, timeoutMilliSeconds);
                     }
                     break;
                 case 'auth/unsetToken':
                     if(this.refreshTokenJob) {
-                        this.refreshTokenJob.cancel();
+                        clearTimeout(this.refreshTokenJob);
                     }
                     break;
             }
