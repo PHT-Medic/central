@@ -3,8 +3,5 @@
     "author": "Peter Placzek",
     "license": "MIT",
     "version": "1.0.0",
-    "workspaces": ["./packages/*"],
-    "scripts": {
-        "install": "npm install --package-lock-only"
-    }
+    "workspaces": ["./packages/*"]
 }
