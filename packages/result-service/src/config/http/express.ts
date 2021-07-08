@@ -4,7 +4,7 @@ import cors from "cors";
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import {getPublicDirPath} from "../paths";
-import {registerRoutes} from "../routes";
+import {registerRoutes} from "./routes";
 
 export interface ExpressAppInterface extends Express{
 

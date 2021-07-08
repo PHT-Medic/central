@@ -12,7 +12,7 @@ import responseMiddleware from "./middleware/response";
 import {existsSync} from "fs";
 
 import {generateSwaggerDocumentation} from "./swagger";
-import {registerControllers} from "../routing";
+import {registerControllers} from "./routes";
 
 
 import {getMiddleware} from 'swagger-stats';
