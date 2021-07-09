@@ -148,8 +148,8 @@ export default function responseMiddleware(request: any, response: any, next: an
     response._failUnauthorized = (message?: RespondErrorMessage) => {
         const defaultMessage = {
             statusCode: 401,
-            message: 'Unauhtorized',
-            code: 'unauhthorized'
+            message: 'Unauthorized',
+            code: 'unauthorized'
         }
 
         message = message || {};
