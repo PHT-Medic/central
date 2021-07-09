@@ -9,7 +9,7 @@
         "@casl/ability": "^4.1.4",
         "@decorators/di": "^1.0.2",
         "@decorators/express": "^2.4.0",
-        "@typescript-auth/core": "^0.0.13",
+        "@typescript-auth/core": "^0.0.14",
         "@typescript-auth/server": "^0.0.14",
         "amqplib": "^0.8.0",
         "axios": "^0.21.1",

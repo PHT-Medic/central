@@ -1,4 +1,5 @@
 import {Context} from "@nuxt/types";
+import {Store} from 'vuex';
 import {AbilityManager, OwnedPermission, Oauth2TokenResponse, Oauth2Client} from "@typescript-auth/core";
 
 import {mapOnAllApis} from "~/modules/api";
@@ -69,7 +70,7 @@ class AuthModule {
             const value = this.ctx.$authWarehouse.get(key);
 
             if(typeof value !== 'undefined') {
-                this.ctx.store.commit(commitName, value);
+                (this.ctx.store as Store<any>).commit(commitName, value);
             }
         }
     }
@@ -77,7 +78,7 @@ class AuthModule {
     private subscribeStore() {
         if(typeof this.ctx === 'undefined') return;
 
-        this.ctx.store.subscribe((mutation: any) => {
+        (this.ctx.store as Store<any>).subscribe((mutation: any) => {
             switch(mutation.type) {
                 case 'auth/setPermissions':
                     this.setPermissions(mutation.payload);
