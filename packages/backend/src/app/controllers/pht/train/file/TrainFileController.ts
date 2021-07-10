@@ -111,7 +111,7 @@ export async function getTrainFilesRouteHandler(req: any, res: any) {
     const query = repository.createQueryBuilder('trainFile')
         .where("trainFile.train_id = :trainId", {trainId: id});
 
-    onlyRealmPermittedQueryResources(query, req.user.realm_id);
+    onlyRealmPermittedQueryResources(query, req.realmId);
 
     applyRequestFilter(query, filter, {
         id: 'trainFile.id',

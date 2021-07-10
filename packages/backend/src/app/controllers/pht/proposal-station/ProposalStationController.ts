@@ -76,7 +76,7 @@ export async function getProposalStationsRouteHandler(req: any, res: any) {
             .leftJoinAndSelect('proposalStation.station', 'station')
             .leftJoinAndSelect('proposalStation.proposal', 'proposal');
 
-        onlyRealmPermittedQueryResources(query, req.user.realm_id, [
+        onlyRealmPermittedQueryResources(query, req.realmId, [
             'station.realm_id',
             'proposal.realm_id'
         ]);

@@ -10,7 +10,7 @@
         "@decorators/di": "^1.0.2",
         "@decorators/express": "^2.4.0",
         "@typescript-auth/core": "^0.0.15",
-        "@typescript-auth/server": "^0.0.14",
+        "@typescript-auth/server": "^0.0.15",
         "amqplib": "^0.8.0",
         "axios": "^0.21.1",
         "bcrypt": "^5.0.1",

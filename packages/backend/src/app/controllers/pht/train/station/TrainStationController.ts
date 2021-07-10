@@ -78,7 +78,7 @@ export async function getTrainStationsRouteHandler(req: any, res: any) {
             .leftJoinAndSelect('trainStation.train', 'train')
             .leftJoinAndSelect('trainStation.station', 'station');
 
-        onlyRealmPermittedQueryResources(query, req.user.realm_id, ['train.realm_id', 'station.realm_id']);
+        onlyRealmPermittedQueryResources(query, req.realmId, ['train.realm_id', 'station.realm_id']);
 
         applyRequestFilter(query, filter, {
             trainId: 'trainStation.train_id',

@@ -1,6 +1,11 @@
 import {hasOwnProperty} from "typeorm-extension";
+import {UnauthorizedError} from "../error/unauthorized";
 
 export function errorMiddleware(error: Error, req: any, res: any, next: any) {
+    if(error instanceof UnauthorizedError) {
+        return res._failUnauthorized();
+    }
+
     const code : string | undefined =
         hasOwnProperty(error, 'code') && typeof error.code === 'string' ?
             error.code :

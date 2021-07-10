@@ -80,7 +80,7 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
                 size: fileHandler.getFileSize(),
                 user_id: req.user.id,
                 train_id: entity.id,
-                realm_id: req.user.realm_id,
+                realm_id: req.realmId,
             }));
         });
     });

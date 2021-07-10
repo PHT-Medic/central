@@ -106,7 +106,7 @@ export async function getProposalsRouteHandler(req: any, res: any) {
     const repository = getRepository(Proposal);
     const query = repository.createQueryBuilder('proposal');
 
-    onlyRealmPermittedQueryResources(query, req.user.realm_id);
+    onlyRealmPermittedQueryResources(query, req.realmId);
 
     applyRequestFilter(query, filter, {
         id: 'proposal.id',
@@ -180,7 +180,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
     try {
         const repository = getRepository(Proposal);
         const entity = repository.create({
-            realm_id: req.user.realm_id,
+            realm_id: req.realmId,
             user_id: req.user.id,
             ...data
         });

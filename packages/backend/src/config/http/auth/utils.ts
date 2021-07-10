@@ -6,6 +6,7 @@ import {Client} from "../../../domains/auth/client";
 import {getWritableDirPath} from "../../paths";
 import {useLogger} from "../../../modules/log";
 import {TokenPayload} from "../../../domains/auth/token/type";
+import {UnauthorizedError} from "../error/unauthorized";
 
 export async function authenticateWithAuthorizationHeader(request: any, value: AuthorizationHeaderValue) : Promise<void> {
     try {
@@ -33,8 +34,7 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
                 const user = await userRepository.findOne(userId, {relations: ['realm']});
 
                 if (typeof user === 'undefined') {
-                    // maybe check user status, to invalid authentication
-                    return;
+                    throw new UnauthorizedError();
                 }
 
                 const permissions =  await userRepository.getOwnedPermissions(user.id);
@@ -51,6 +51,10 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
                     id: value.username,
                     secret: value.password
                 }, {relations: ['service']});
+
+                if(typeof client === 'undefined') {
+                    throw new UnauthorizedError();
+                }
 
                 if(!client.service) {
                     // only allow services for now... ^^

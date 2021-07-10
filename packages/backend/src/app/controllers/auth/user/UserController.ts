@@ -104,7 +104,7 @@ export async function getUsersRouteHandler(req: any, res: any) {
         const query = userRepository.createQueryBuilder('user')
             .leftJoinAndSelect('user.realm', 'realm');
 
-        onlyRealmPermittedQueryResources(query, req.user.realm_id);
+        onlyRealmPermittedQueryResources(query, req.realmId);
 
         applyRequestFilter(query, filter, {
             id: 'user.id',
@@ -138,7 +138,7 @@ export async function getUserRouteHandler(req: any, res: any) {
             .leftJoinAndSelect('user.realm', 'realm')
             .andWhere("user.id = :id", {id});
 
-        onlyRealmPermittedQueryResources(query, req.user.realm_id);
+        onlyRealmPermittedQueryResources(query, req.realmId);
 
         const result = await query.getOne();
 

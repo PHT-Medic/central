@@ -122,7 +122,7 @@ export async function getTrainRouteHandler(req: any, res: any) {
         .leftJoinAndSelect('trainStations.station', 'station')
         .where("train.id = :id", {id});
 
-    onlyRealmPermittedQueryResources(query, req.user.realm_id, 'train.realm_id');
+    onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
 
     const entity = await query.getOne();
 
@@ -143,7 +143,7 @@ export async function getTrainsRouteHandler(req: any, res: any) {
     const repository = getRepository(Train);
     const query = repository.createQueryBuilder('train');
 
-    onlyRealmPermittedQueryResources(query, req.user.realm_id, 'train.realm_id');
+    onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
 
     applyRequestIncludes(query, 'train', include, {
         trainStations: 'train_stations',
@@ -260,7 +260,7 @@ export async function addTrainRouteHandler(req: any, res: any) {
         const repository = getRepository(Train);
 
         const entity = repository.create({
-            realm_id: req.user.realm_id,
+            realm_id: req.realmId,
             user_id: req.user.id,
             ...data
         });
