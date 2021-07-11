@@ -34,7 +34,7 @@
         "winston": "^3.3.3"
     },
     "devDependencies": {
-        "@types/amqplib": "^0.5.16",
+        "@types/amqplib": "^0.8.1",
         "@types/axios": "^0.14.0",
         "@types/bcrypt": "^3.0.0",
         "@types/busboy": "^0.2.3",
