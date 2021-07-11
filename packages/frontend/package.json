@@ -1,8 +1,13 @@
 {
-    "name": "app",
+    "name": "frontend-app",
+    "author": {
+        "name": "Peter Placzek",
+        "email": "tadashi@animesu.net",
+        "url": "https://tada5hi.net"
+    },
+    "license": "MIT",
     "version": "1.0.0",
-    "description": "Peter Placzek Bachelor Thesis",
-    "author": "Peter Placzek",
+    "description": "This package contains the Central UI frontend application of PHT. It was initially developed as part of my Bachelor Thesis.",
     "private": true,
     "scripts": {
         "dev": "nuxt",

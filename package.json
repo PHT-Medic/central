@@ -1,7 +1,12 @@
 {
     "name": "pht-central-ui",
-    "author": "Peter Placzek",
+    "author": {
+        "name": "Peter Placzek",
+        "email": "tadashi@animesu.net",
+        "url": "https://tada5hi.net"
+    },
     "license": "MIT",
     "version": "1.0.0",
+    "description": "This package contains all packages of the Central UI. It was initially developed as part of my Bachelor Thesis.",
     "workspaces": ["./packages/*"]
 }
