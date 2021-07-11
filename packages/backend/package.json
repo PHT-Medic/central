@@ -43,7 +43,7 @@
         "yup": "^0.32.9"
     },
     "devDependencies": {
-        "@types/amqplib": "^0.5.16",
+        "@types/amqplib": "^0.8.1",
         "@types/axios": "^0.14.0",
         "@types/busboy": "^0.2.3",
         "@types/change-case": "^2.3.1",

@@ -36,7 +36,7 @@
         "winston": "^3.3.3"
     },
     "devDependencies": {
-        "@types/amqplib": "^0.5.16",
+        "@types/amqplib": "^0.8.1",
         "@types/axios": "^0.14.0",
         "@types/change-case": "^2.3.1",
         "@types/cookie-parser": "^1.4.2",
