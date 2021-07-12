@@ -3,7 +3,6 @@ import {RoleRepository} from "../../domains/auth/role/repository";
 import {Role} from "../../domains/auth/role";
 import {RolePermission} from "../../domains/auth/role/permission";
 import {Realm} from "../../domains/auth/realm";
-import {MasterImage} from "../../domains/pht/master-image";
 import {Station} from "../../domains/pht/station";
 import {Factory, Seeder} from "typeorm-seeding";
 import {getPHTStationRolePermissions, PHTStationRole} from "../../config/pht/permissions/station";
@@ -49,29 +48,6 @@ export default class CreatePHT implements Seeder {
             .reduce((accumulator, entity) => [...accumulator, ...entity]);
 
         await rolePermissionRepository.save(rolePermissions);
-
-        // -------------------------------------------------
-
-        /**
-         * Create PHT master images
-         */
-        const masterImageRepository = connection.getRepository(MasterImage);
-        const masterImageNames : string[] = [
-            'slim',
-            'buster',
-            'dl',
-            'nfdemo',
-            'isicdemo'
-        ];
-
-        const masterImages: MasterImage[] = masterImageNames.map((name: string) => {
-            return masterImageRepository.create({
-                name,
-                external_tag_id: name
-            })
-        });
-
-        await masterImageRepository.save(masterImages);
 
         // -------------------------------------------------
 

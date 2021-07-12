@@ -7,12 +7,12 @@ export class MasterImage {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Index()
+    @Column({type: 'varchar'})
+    path: string;
+
     @Column({type: "varchar"})
     name: string;
-
-    @Index()
-    @Column({type: "varchar"})
-    external_tag_id: string;
 
     // ------------------------------------------------------------------
 

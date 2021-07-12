@@ -1,5 +1,5 @@
 <script>
-import {doServiceTask} from "@/domains/service/api.ts";
+import {doServiceClientTask} from "@/domains/service/api.ts";
 
 export default {
     props: {
@@ -21,7 +21,7 @@ export default {
             this.busy = true;
 
             try {
-                const service = await doServiceTask(this.serviceProperty.id, task);
+                const service = await doServiceClientTask(this.serviceProperty.id, task);
                 this.service = service;
                 this.$emit('updated', service);
             } catch (e) {

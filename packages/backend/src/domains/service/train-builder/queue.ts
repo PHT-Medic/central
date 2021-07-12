@@ -26,7 +26,7 @@ export async function createTrainBuilderQueueMessage(train: Train, type: string 
             .filter(trainStation => trainStation.status === TrainStationStateApproved)
             .map(trainStation => trainStation.station_id),
         files: files.map((file: TrainFile) => file.directory + '/' + file.name),
-        masterImage: train.master_image.external_tag_id,
+        masterImage: train.master_image.path,
         entrypointExecutable: train.entrypoint_executable,
         entrypointPath: train.entrypoint_file.directory + '/' + train.entrypoint_file.name,
         sessionId: train.session_id,

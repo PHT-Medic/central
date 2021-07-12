@@ -1,5 +1,6 @@
 {
     "name": "pht-central-ui",
+    "private": true,
     "author": {
         "name": "Peter Placzek",
         "email": "tadashi@animesu.net",

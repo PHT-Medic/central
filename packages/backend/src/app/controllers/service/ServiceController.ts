@@ -1,17 +1,20 @@
 import {SwaggerTags} from "typescript-swagger";
-import {applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
-
-import {Body, Controller, Get, Post, Request, Response} from "@decorators/express";
-import {BaseService, Service} from "../../../domains/service";
 import {getRepository} from "typeorm";
+import {applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
-import {HarborHook, postHarborHookRouteHandler} from "./harbor/HarborController";
+import {Body, Controller, Get, Post, Request, Response, Params} from "@decorators/express";
+
+import {BaseService, Service} from "../../../domains/service";
 import {createSelfServiceSyncQMCommand, publishSelfQM} from "../../../domains/service/queue";
 import {ForceLoggedInMiddleware} from "../../../config/http/middleware/auth";
 
-enum ServiceTask {
-    SYNC_CLIENT = 'syncClient',
-    REFRESH_CLIENT_SECRET = 'refreshClientSecret'
+import {HarborHook, postHarborHookRouteHandler} from "./harbor/hook";
+
+import {doHarborTask} from "./harbor/task";
+
+enum ServiceClientTask {
+    SYNC = 'sync',
+    REFRESH_SECRET = 'refreshSecret'
 }
 
 @SwaggerTags('service')
@@ -27,28 +30,42 @@ export class ServiceController {
 
     @Get("/:id", [ForceLoggedInMiddleware])
     async get(
+        @Params('id') id: string,
         @Request() req: any,
         @Response() res: any
     ): Promise<Service> {
         return await getRoute(req, res);
     }
 
-    @Post("/:id/task", [ForceLoggedInMiddleware])
-    async doTask(
-        @Body() data: {task: ServiceTask},
-        @Request() req: any,
-        @Response() res: any
-    ): Promise<Service> {
-        return await doTask(req, res);
-    }
+    // ------------------------------------------------------------
 
     @Post("/"+BaseService.HARBOR+'/hook', [ForceLoggedInMiddleware])
-    async post(
+    async handleHarborHook(
         @Request() req: any,
         @Response() res: any,
         @Body() harborHook: HarborHook
     ) {
         return postHarborHookRouteHandler(req, res);
+    }
+
+    @Post("/"+BaseService.HARBOR+'/task', [ForceLoggedInMiddleware])
+    async execHarborTask(
+        @Request() req: any,
+        @Response() res: any,
+        @Body() harborHook: HarborHook
+    ) {
+        return doHarborTask(req, res);
+    }
+
+    // ------------------------------------------------------------
+
+    @Post("/:id/client/task", [ForceLoggedInMiddleware])
+    async doTask(
+        @Body() data: {task: ServiceClientTask},
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Service> {
+        return await doClientTask(req, res);
     }
 }
 
@@ -92,7 +109,7 @@ async function getRoute(req: any, res: any) {
     try {
         const repository = getRepository(Service);
         const query =  repository.createQueryBuilder('service')
-            .where("id = :id", {id});
+            .where("service.id = :id", {id});
 
         applyRequestIncludes(query, 'service', include, ['client', 'realm']);
 
@@ -105,11 +122,11 @@ async function getRoute(req: any, res: any) {
         return res._respond({data: entity});
 
     } catch (e) {
-        return res._failNotFound();
+        return res._failServerError();
     }
 }
 
-async function doTask(req: any, res: any) {
+async function doClientTask(req: any, res: any) {
     const {id} = req.params;
 
     if(!req.ability.can('manage','service')) {
@@ -118,7 +135,7 @@ async function doTask(req: any, res: any) {
 
     await check('task')
         .exists()
-        .isIn(Object.values(ServiceTask))
+        .isIn(Object.values(ServiceClientTask))
         .run(req);
 
     const validation = validationResult(req);
@@ -137,14 +154,14 @@ async function doTask(req: any, res: any) {
         }
 
         switch (validationData.task) {
-            case ServiceTask.SYNC_CLIENT:
+            case ServiceClientTask.SYNC:
                 await syncServiceClient(entity);
 
                 entity.client_synced = true;
 
                 await repository.save(entity);
                 break;
-            case ServiceTask.REFRESH_CLIENT_SECRET:
+            case ServiceClientTask.REFRESH_SECRET:
                 entity.client.refreshSecret();
                 entity.client_synced = false;
 

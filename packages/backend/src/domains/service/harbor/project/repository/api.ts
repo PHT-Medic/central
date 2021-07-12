@@ -4,7 +4,7 @@ export interface HarborRepository {
     id: number | string,
     name: string,
     fullName: string,
-    artifactsCount?: number,
+    artifactCount?: number,
     projectId: number,
     projectName: string,
     createdAt?: string,
@@ -33,17 +33,18 @@ export async function findHarborProjectRepository(projectName: string, repositor
 
         updatedAt: item.update_time,
         createdAt: item.creation_time,
-        artifactsCount: item.artifact_count
+        artifactCount: item.artifact_count
     };
 }
 
 export async function getHarborProjectRepositories(projectName: string) : Promise<HarborRepository[]> {
-    const result = await useHarborApi().get('projects/'+projectName+'/repositories');
+    const result = await useHarborApi()
+        .get('projects/'+projectName+'/repositories');
 
     return result.data.map((item : Record<string, any>) => {
         const parts : string[] = item.name.split('/');
         const name : string = parts.pop();
-        const projectName : string = parts.pop();
+        const projectName : string = parts.join('/');
 
         return {
             id: item.id,
@@ -55,7 +56,7 @@ export async function getHarborProjectRepositories(projectName: string) : Promis
 
             updatedAt: item.update_time,
             createdAt: item.creation_time,
-            artifactsCount: item.artifact_count
-        }
+            artifactCount: item.artifact_count
+        } as HarborRepository;
     });
 }

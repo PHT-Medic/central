@@ -6,7 +6,7 @@ import {getWritableDirPath} from "../../../../../config/paths";
 import {TrainFile} from "../../../../../domains/pht/train/file";
 import fs from "fs";
 import {TrainStation} from "../../../../../domains/pht/train/station";
-import {isRealmPermittedForResource} from "../../../../../domains/auth/realm/db/utils";
+import {isPermittedForResourceRealm} from "../../../../../domains/auth/realm/db/utils";
 
 export async function getTrainFileStreamRouteHandler(req: any, res: any) {
     const {id} = req.params;
@@ -23,7 +23,7 @@ export async function getTrainFileStreamRouteHandler(req: any, res: any) {
         return res._failNotFound({message: 'The requested train was not found...'});
     }
 
-    if(!isRealmPermittedForResource(req.user, train)) {
+    if(!isPermittedForResourceRealm(req.realmId, train.realm_id)) {
         const proposalStations = await getRepository(TrainStation).find({
             where: {
                 train_id: train.id
@@ -34,7 +34,7 @@ export async function getTrainFileStreamRouteHandler(req: any, res: any) {
         let isPermitted = false;
 
         for(let i=0; i<proposalStations.length; i++) {
-            if(isRealmPermittedForResource(req.user, proposalStations[i].station)) {
+            if(isPermittedForResourceRealm(req.realmId, proposalStations[i].station.realm_id)) {
                 isPermitted = true;
                 break;
             }

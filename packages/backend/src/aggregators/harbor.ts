@@ -2,7 +2,6 @@ import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../m
 import {TrainStateFinished} from "../domains/pht/train/states";
 import {
     HARBOR_MASTER_IMAGE_PROJECT_NAME,
-    HARBOR_MASTER_IMAGE_REPOSITORY_NAME,
     HARBOR_OUTGOING_PROJECT_NAME
 } from "../config/services/harbor";
 import {getRepository} from "typeorm";
@@ -29,20 +28,18 @@ function createHarborAggregatorHandlers() {
         masterImagePushed: async (message: QueueMessage) => {
             useLogger().debug('masterImagePushed event received.', {service: 'aggregator-harbor'})
             const isLibraryProject : boolean = message.data.projectName === HARBOR_MASTER_IMAGE_PROJECT_NAME;
-            const isMaterRepository : boolean = message.data.repositoryName === HARBOR_MASTER_IMAGE_REPOSITORY_NAME;
 
-            // && isMasterRepository
-            if(isLibraryProject && isMaterRepository && message.data.artifactTag) {
+            if(isLibraryProject) {
                 const repository = getRepository(MasterImage);
 
                 const masterImage = await repository.findOne({
-                    external_tag_id: message.data.artifactTag
+                    path: message.data.repositoryFullName
                 });
 
                 if(typeof masterImage === 'undefined') {
                     await repository.insert({
-                        external_tag_id: message.data.artifactTag,
-                        name: message.data.artifactTag
+                        path: message.data.repositoryFullName,
+                        name: message.data.repositoryName
                     });
 
                     useLogger().debug('master image created.', {service: 'aggregator-harbor'})

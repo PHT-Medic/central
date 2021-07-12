@@ -1,11 +1,11 @@
 <script>
-import {LayoutNavigationAdminId} from "../../../config/layout";
+import {LayoutNavigationAdminId} from "~/config/layout";
 import StationForm from "@/components/station/StationForm";
 import {getServices} from "@/domains/service/api.ts";
-import ServiceDetails from "@/components/service/ServiceDetails";
+import ServiceClientDetails from "~/components/service/ServiceClientDetails";
 
 export default {
-    components: {ServiceDetails, StationForm},
+    components: {ServiceClientDetails, StationForm},
     meta: {
         navigationId: LayoutNavigationAdminId,
         requireLoggedIn: true,
@@ -98,6 +98,9 @@ export default {
                     <span class="badge-dark badge">{{data.item.realm.name}}</span>
                 </template>
                 <template v-slot:cell(options)="data">
+                    <nuxt-link class="btn btn-primary btn-xs" :to="'/admin/services/'+data.item.id">
+                        <i class="fa fa-arrow-right"></i>
+                    </nuxt-link>
                     <button v-if="$auth.can('manage','service')" @click.prevent="edit(data.item.id)" type="button" class="btn btn-xs btn-primary" title="Löschen">
                         <i class="fa fa-bars"></i>
                     </button>
@@ -126,7 +129,7 @@ export default {
             :no-close-on-esc="true"
             :hide-footer="true"
         >
-            <service-details :service-property="item" @updated="handleUpdated" @close="handleCloseCommand"/>
+            <service-client-details :service-property="item" @updated="handleUpdated" @close="handleCloseCommand"/>
         </b-modal>
     </div>
 </template>

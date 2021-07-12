@@ -13,8 +13,7 @@ type PartialMasterImage = Partial<MasterImage>;
 export class MasterImageController {
     @Get("",[ForceLoggedInMiddleware])
     @ResponseExample<PartialMasterImage[]>([
-        {name: 'slim', external_tag_id: 'slim', id: 1, proposals: [], trains: []},
-        {name: 'buster', external_tag_id: 'buster', id: 1, proposals: [], trains: []}
+        {name: 'slim', path: 'master/nf-core/hlaTyping', id: 1, proposals: [], trains: []}
     ])
     async getMany(
         @Request() req: any,
@@ -24,7 +23,7 @@ export class MasterImageController {
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialMasterImage>({name: 'slim', external_tag_id: 'slim', id: 1, proposals: [], trains: []})
+    @ResponseExample<PartialMasterImage>({name: 'slim', path: 'master/nf-core/hlaTyping', id: 1, proposals: [], trains: []})
     async getOne(
         @Params('id') id: string,
         @Request() req: any,

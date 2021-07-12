@@ -6,7 +6,7 @@ import {array, BaseSchema, object, string} from "yup";
 
 import {
     HARBOR_INCOMING_PROJECT_NAME,
-    HARBOR_MASTER_IMAGE_PROJECT_NAME, HARBOR_MASTER_IMAGE_REPOSITORY_NAME,
+    HARBOR_MASTER_IMAGE_PROJECT_NAME,
     HARBOR_OUTGOING_PROJECT_NAME
 } from "../../../../config/services/harbor";
 import {useLogger} from "../../../../modules/log";
@@ -78,9 +78,8 @@ export async function postHarborHookRouteHandler(req: any, res: any) {
         const hook : HarborHook = await useHookEventDataValidator().validate(req.body);
 
         const isLibraryProject : boolean = hook.event_data.repository.namespace === HARBOR_MASTER_IMAGE_PROJECT_NAME;
-        const isMaterRepository : boolean = hook.event_data.repository.name === HARBOR_MASTER_IMAGE_REPOSITORY_NAME;
 
-        if(!isLibraryProject || !isMaterRepository) {
+        if(!isLibraryProject) {
             /**
              * Process train project
              */
@@ -88,19 +87,18 @@ export async function postHarborHookRouteHandler(req: any, res: any) {
 
             if (typeof train === 'undefined') {
                 useLogger().warn('hook could not proceeded, train: ' + hook.event_data.repository.name + ' does not exist.', {service: 'api-harbor-hook'})
-                // return res._failNotFound();
-                return res._respondAccepted({});
+                return res._respondAccepted();
             }
         }
 
         // User Interface (UI)
-        await publishUiHarborEvent(hook);
+        await publishHarborEventToUserInterface(hook);
 
         // Result Service (RS)
-        await publishRsHarborEvent(hook);
+        await publishHarborEventToResultService(hook);
 
         // Train Router
-        await publishTrHarborEvent(hook);
+        await publishHarborEventToTrainRouter(hook);
 
         return res.status(200).end();
     } catch (e) {
@@ -110,7 +108,7 @@ export async function postHarborHookRouteHandler(req: any, res: any) {
     }
 }
 
-async function publishUiHarborEvent(hook: HarborHook) {
+async function publishHarborEventToUserInterface(hook: HarborHook) {
     let queueType : undefined | string;
 
     const isLibraryProject : boolean = hook.event_data.repository.namespace === HARBOR_MASTER_IMAGE_PROJECT_NAME;
@@ -151,7 +149,7 @@ async function publishUiHarborEvent(hook: HarborHook) {
  *
  * @param hook
  */
-async function publishRsHarborEvent(hook: HarborHook) {
+async function publishHarborEventToResultService(hook: HarborHook) {
     const isOutgoingProject : boolean = hook.event_data.repository.namespace === HARBOR_OUTGOING_PROJECT_NAME;
 
     // Result Service
@@ -206,7 +204,7 @@ async function publishRsHarborEvent(hook: HarborHook) {
  *
  * @param hook
  */
-async function publishTrHarborEvent(hook: HarborHook) {
+async function publishHarborEventToTrainRouter(hook: HarborHook) {
     const isOutgoingProject : boolean = hook.event_data.repository.namespace === HARBOR_OUTGOING_PROJECT_NAME;
     const isIncomingProject : boolean = hook.event_data.repository.namespace === HARBOR_INCOMING_PROJECT_NAME;
     const isLibraryProject : boolean = hook.event_data.repository.namespace === HARBOR_MASTER_IMAGE_PROJECT_NAME;
