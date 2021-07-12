@@ -96,9 +96,9 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
 export function parseCookie(request: any) : string | undefined {
     try {
         if (typeof request.cookies?.auth_token !== 'undefined') {
-            const {accessToken} = JSON.parse(request.cookies?.auth_token);
+            const {access_token} = JSON.parse(request.cookies?.auth_token);
 
-            return accessToken;
+            return access_token;
         }
     } catch (e) {
         // don't handle error, this is just fine :)
