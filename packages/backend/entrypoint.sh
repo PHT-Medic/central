@@ -16,4 +16,4 @@ if [ "$1" = "start" ]; then
     exec node dist/index.js
 fi
 
-exec node dist/cli/index.js "$@"
+exec ts-node src/cli/index.ts "$@"

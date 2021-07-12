@@ -19,4 +19,5 @@ EXPOSE 3000
 RUN npm install && \
   npm run build
 
-CMD ["npm", "run", "start"]
+ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]
+CMD ["start"]

@@ -8,6 +8,15 @@ import {useLogger} from "../../../modules/log";
 import {TokenPayload} from "../../../domains/auth/token/type";
 import {UnauthorizedError} from "../error/unauthorized";
 
+const ip4ToInt = (ip: string) =>
+    ip.split('.').reduce((int, oct) => (int << 8) + parseInt(oct, 10), 0) >>> 0;
+
+const isIp4InCidr = (ip: string, cidr: string) => {
+    const [range, bits = 32] = cidr.split('/');
+    const mask = ~(2 ** (32 - Number(bits)) - 1);
+    return (ip4ToInt(ip) & mask) === (ip4ToInt(range) & mask);
+};
+
 export async function authenticateWithAuthorizationHeader(request: any, value: AuthorizationHeaderValue) : Promise<void> {
     try {
         switch (value.type) {
@@ -16,18 +25,27 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
                     directory: getWritableDirPath()
                 });
 
-                const {sub: userId, remoteAddress} = tokenPayload;
+                const {sub: userId} = tokenPayload;
 
-                if(typeof userId === 'undefined' || typeof remoteAddress === 'undefined') {
+                if(typeof userId === 'undefined' || typeof tokenPayload.remoteAddress !== 'string') {
                     return;
                 }
 
-                const allowedIps : string[] = ['::1', '::ffff:127.0.0.1'];
-                if(allowedIps.indexOf(request.ip) === -1) {
-                    if (typeof remoteAddress !== 'undefined' && remoteAddress !== request.ip) {
-                        // maybe throw error to inform, that the ip address changed.
-                        return;
-                    }
+                // remove ipv6 space from embedded ipv4 address
+                const tokenAddress = tokenPayload.remoteAddress.replace('::ffff:', '');
+                const currentAddress : string = request.ip.replace('::ffff:', '');
+
+                if(
+                    // ipv4 + ipv6 local addresses
+                    ['::1', '127.0.0.1'].indexOf(currentAddress) === -1 &&
+                    tokenAddress !== currentAddress &&
+                    // allow private network addresses, maybe explicit whitelist possible frontend ip addresses instead.
+                    !isIp4InCidr(currentAddress, '10.0.0.0/8') &&
+                    !isIp4InCidr(currentAddress, '172.16.0.0/12') &&
+                    !isIp4InCidr(currentAddress, '192.168.0.0/16')
+                ) {
+                    console.log(tokenAddress, currentAddress);
+                    throw new UnauthorizedError();
                 }
 
                 const userRepository = getCustomRepository<UserRepository>(UserRepository);

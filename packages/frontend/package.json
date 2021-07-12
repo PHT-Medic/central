@@ -13,15 +13,13 @@
         "dev": "nuxt",
         "build": "nuxt build",
         "start": "nuxt start",
-        "generate": "nuxt generate",
-        "lint": "eslint --ext .js,.vue --ignore-path .gitignore ."
+        "generate": "nuxt generate"
     },
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^5.15.1",
         "@nuxt/types": "^2.14.5",
         "@nuxt/typescript-build": "^2.1.0",
         "@nuxtjs/dotenv": "^1.4.0",
-        "@nuxtjs/eslint-config": "^2.0.0",
         "@nuxtjs/eslint-module": "^3.0.1",
         "@nuxtjs/google-fonts": "^1.2.0",
         "@types/change-case": "^2.3.1",
@@ -35,9 +33,6 @@
         "bootstrap-vue": "^2.18.1",
         "change-case": "^4.1.1",
         "cookie": "^0.4.1",
-        "eslint": "^6.1.0",
-        "eslint-loader": "^3.0.4",
-        "eslint-plugin-nuxt": "^0.5.2",
         "moment": "^2.29.1",
         "nuxt": "^2.15.7",
         "typescript": "^4.3.5",
