@@ -1,7 +1,7 @@
 import {getRepository} from "typeorm";
 import {applyRequestFields} from "typeorm-extension";
 import {Station} from "../../../../../domains/pht/station";
-import {isRealmPermittedForResource} from "../../../../../domains/auth/realm/db/utils";
+import {isPermittedForResourceRealm} from "../../../../../domains/auth/realm/db/utils";
 
 export async function getRealmStationRouteHandler(req: any, res: any, type: string) {
     const {id} = req.params;
@@ -16,7 +16,7 @@ export async function getRealmStationRouteHandler(req: any, res: any, type: stri
 
                 // todo: for now anyone can see realm - station association
 
-                if(!isRealmPermittedForResource(req.user, {realm_id: id})) {
+                if(!isPermittedForResourceRealm(req.realmId, id)) {
                     // return res._failForbidden({message: 'You are not allowed to receive station informations.'});
                 }
 

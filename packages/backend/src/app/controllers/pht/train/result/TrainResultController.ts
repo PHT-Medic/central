@@ -8,7 +8,7 @@ import {TrainResultStateFinished, TrainResultStateOpen} from "../../../../../dom
 import {Body, Controller, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../../config/http/middleware/auth";
-import {isRealmPermittedForResource} from "../../../../../domains/auth/realm/db/utils";
+import {isPermittedForResourceRealm} from "../../../../../domains/auth/realm/db/utils";
 
 enum TrainResultTask {
     RESET = 'reset'
@@ -62,7 +62,7 @@ export async function doTrainResultTaskRouteHandler(req: any, res: any) {
                 return res._failNotFound();
             }
 
-            if (!isRealmPermittedForResource(req.user, entity.train)) {
+            if (!isPermittedForResourceRealm(req.realmId, entity.train.realm_id)) {
                 return res._failForbidden();
             }
 

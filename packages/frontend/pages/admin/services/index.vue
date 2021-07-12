@@ -32,27 +32,6 @@ export default {
         this.load();
     },
     methods: {
-        handleUpdated(e) {
-            const index = this.items.findIndex(item => item.id === e.id);
-
-            Object.assign(this.items[index], e);
-        },
-        handleCloseCommand() {
-            this.$refs['form'].hide();
-        },
-
-        async add() {
-            this.mode = 'add';
-            this.item = undefined;
-
-            this.$refs['form'].show();
-        },
-        async edit(id) {
-            this.mode = 'edit';
-            this.item = this.items.filter((item) => item.id === id)[0];
-
-            this.$refs['form'].show();
-        },
         async load() {
             this.busy = true;
 
@@ -101,9 +80,6 @@ export default {
                     <nuxt-link class="btn btn-primary btn-xs" :to="'/admin/services/'+data.item.id">
                         <i class="fa fa-arrow-right"></i>
                     </nuxt-link>
-                    <button v-if="$auth.can('manage','service')" @click.prevent="edit(data.item.id)" type="button" class="btn btn-xs btn-primary" title="Löschen">
-                        <i class="fa fa-bars"></i>
-                    </button>
                 </template>
                 <template v-slot:cell(createdAt)="data">
                     <timeago :datetime="data.item.createdAt" />
@@ -119,17 +95,5 @@ export default {
                 </template>
             </b-table>
         </div>
-
-        <b-modal
-            size="lg"
-            ref="form"
-            button-size="sm"
-            title-html="<i class='fas fa-concierge-bell'></i> Service"
-            :no-close-on-backdrop="true"
-            :no-close-on-esc="true"
-            :hide-footer="true"
-        >
-            <service-client-details :service-property="item" @updated="handleUpdated" @close="handleCloseCommand"/>
-        </b-modal>
     </div>
 </template>

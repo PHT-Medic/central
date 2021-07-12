@@ -1,7 +1,10 @@
 import {getRepository, In} from "typeorm";
 import {applyRequestFilter, applyRequestPagination, applyRequestIncludes} from "typeorm-extension";
 import {Station} from "../../../../domains/pht/station";
-import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/auth/realm/db/utils";
+import {
+    isPermittedForResourceRealm,
+    onlyRealmPermittedQueryResources
+} from "../../../../domains/auth/realm/db/utils";
 import {check, matchedData, validationResult} from "express-validator";
 import {Proposal} from "../../../../domains/pht/proposal";
 import {MasterImage} from "../../../../domains/pht/master-image";
@@ -257,7 +260,7 @@ export async function editProposalRouteHandler(req: any, res: any) {
         return res._failValidationError({message: 'The proposal could not be found.'});
     }
 
-    if(!isRealmPermittedForResource(req.user, proposal)) {
+    if(!isPermittedForResourceRealm(req.realmId, proposal.realm_id)) {
         return res._failForbidden();
     }
 
@@ -296,7 +299,7 @@ export async function dropProposalRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isRealmPermittedForResource(req.user, entity)) {
+    if(!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
         return res._failForbidden();
     }
 

@@ -1,6 +1,9 @@
 import {getRepository} from "typeorm";
 import {applyRequestFilter} from "typeorm-extension";
-import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../../domains/auth/realm/db/utils";
+import {
+    isPermittedForResourceRealm,
+    onlyRealmPermittedQueryResources
+} from "../../../../../domains/auth/realm/db/utils";
 import {TrainFile} from "../../../../../domains/pht/train/file";
 import fs from "fs";
 import {TrainConfiguratorStateOpen} from "../../../../../domains/pht/train/states";
@@ -96,7 +99,7 @@ export async function getTrainFileRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isRealmPermittedForResource(req.user, entity)) {
+    if(!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
         return res._failForbidden();
     }
 
@@ -147,7 +150,7 @@ export async function dropTrainFileRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isRealmPermittedForResource(req.user, entity)) {
+    if(!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
         return res._failForbidden();
     }
 

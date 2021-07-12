@@ -1,8 +1,8 @@
-import {Station} from "../../../../pht/station";
+import {buildAuthorizationHeaderValue} from "@typescript-auth/core";
+
 import {useHarborApi} from "../../../../../modules/api/service/harbor";
 import env from "../../../../../env";
 import {BaseService} from "../../../index";
-import {buildAuthorizationHeaderValue} from "@typescript-auth/core";
 import {Client} from "../../../../auth/client";
 
 const WEBHOOK_ID = 'UI';
@@ -13,9 +13,18 @@ export type HarborProjectPolicy = {
     projectId: number
 }
 
-export async function findHarborProjectWebHook(harborProjectId: number) : Promise<HarborProjectPolicy | undefined> {
+export async function findHarborProjectWebHook(
+    projectIdOrName: number | string,
+    isProjectName: boolean = false
+) : Promise<HarborProjectPolicy | undefined> {
+    const headers : Record<string, any> = {};
+
+    if(isProjectName) {
+        headers['X-Is-Resource-Name'] = true;
+    }
+
     const { data } = await useHarborApi()
-        .get('projects/' + harborProjectId + '/webhook/policies');
+        .get('projects/' + projectIdOrName + '/webhook/policies', headers);
 
     const policies = data.filter((policy: { name: string; }) => policy.name === WEBHOOK_ID);
 
@@ -32,11 +41,17 @@ export async function findHarborProjectWebHook(harborProjectId: number) : Promis
     return undefined;
 }
 
-export async function ensureHarborProjectWebHook(entity: Pick<Station, 'harbor_project_id'>, client: Pick<Client, 'id' | 'secret'>) {
+export async function ensureHarborProjectWebHook(projectIdOrName: number | string, client: Pick<Client, 'id' | 'secret'>, isProjectName: boolean = false) {
+    const headers : Record<string, any> = {};
+
+    if(isProjectName) {
+        headers['X-Is-Resource-Name'] = true;
+    }
+
     const webhook: Record<string, any> = {
         name: WEBHOOK_ID,
         enabled: true,
-        project_id: entity.harbor_project_id,
+        // project_id: entity.harbor_project_id,
         targets: [
             {
                 auth_header: buildAuthorizationHeaderValue({type: "Basic", username: client.id, password: client.secret}),
@@ -51,11 +66,13 @@ export async function ensureHarborProjectWebHook(entity: Pick<Station, 'harbor_p
 
     try {
         await useHarborApi()
-            .post('projects/' + entity.harbor_project_id + '/webhook/policies', webhook);
+            .post('projects/' + projectIdOrName + '/webhook/policies', webhook, headers);
     } catch (e) {
         if(e.response.status === 409) {
+            const existingWebhook = await findHarborProjectWebHook(projectIdOrName, isProjectName);
+
             await useHarborApi()
-                .put('projects/' + entity.harbor_project_id + '/webhook/policies', webhook);
+                .put('projects/' + projectIdOrName + '/webhook/policies/'+existingWebhook.id, webhook, headers);
 
             return;
         }
@@ -64,11 +81,17 @@ export async function ensureHarborProjectWebHook(entity: Pick<Station, 'harbor_p
     }
 }
 
-export async function dropHarborProjectWebHook(projectId: number) {
-    const webhook = await findHarborProjectWebHook(projectId);
+export async function dropHarborProjectWebHook(projectIdOrName: number | string, isProjectName: boolean = false) {
+    const headers : Record<string, any> = {};
+
+    if(isProjectName) {
+        headers['X-Is-Resource-Name'] = true;
+    }
+
+    const webhook = await findHarborProjectWebHook(projectIdOrName, isProjectName);
 
     if(typeof webhook !== 'undefined') {
         await useHarborApi()
-            .delete('projects/' + projectId+ '/webhook/policies/' + webhook.id);
+            .delete('projects/' + projectIdOrName+ '/webhook/policies/' + webhook.id, headers);
     }
 }

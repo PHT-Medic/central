@@ -1,12 +1,16 @@
 import {check, matchedData, validationResult} from 'express-validator';
 import {getRepository, In} from 'typeorm';
 import {HARBOR_MASTER_IMAGE_PROJECT_NAME} from "../../../../config/services/harbor";
+import {Client} from "../../../../domains/auth/client";
+import {BaseService} from "../../../../domains/service";
 
 import {getHarborProjectRepositories} from "../../../../domains/service/harbor/project/repository/api";
 import {MasterImage} from "../../../../domains/pht/master-image";
+import {ensureHarborProjectWebHook} from "../../../../domains/service/harbor/project/web-hook/api";
 
 enum HarborTask {
-    syncMasterImages = 'syncMasterImages'
+    REGISTER_WEBHOOK_FOR_MASTER_IMAGES = 'registerWebhookForMasterImages',
+    SYNC_MASTER_IMAGES = 'syncMasterImages'
 }
 
 export async function doHarborTask(req: any, res: any) {
@@ -27,7 +31,24 @@ export async function doHarborTask(req: any, res: any) {
     const validationData = matchedData(req, {includeOptionals: true});
 
     switch (validationData.task) {
-        case HarborTask.syncMasterImages:
+        case HarborTask.REGISTER_WEBHOOK_FOR_MASTER_IMAGES:
+            const clientRepository = await getRepository(Client);
+
+            const client = await clientRepository.findOne({
+                where: {
+                    service_id: BaseService.HARBOR
+                }
+            });
+
+            await ensureHarborProjectWebHook(HARBOR_MASTER_IMAGE_PROJECT_NAME, client, true);
+
+            return res._respondAccepted();
+        case HarborTask.SYNC_MASTER_IMAGES:
+            const meta : { created: number, deleted: number } = {
+                created: 0,
+                deleted: 0
+            };
+
             const repository = getRepository(MasterImage);
 
             const harborRepositories = await getHarborProjectRepositories(HARBOR_MASTER_IMAGE_PROJECT_NAME);
@@ -43,7 +64,11 @@ export async function doHarborTask(req: any, res: any) {
 
             const nonExistingHarborRepositories = harborRepositories.filter(harborRepository => !existingEntityPaths.includes(harborRepository.fullName));
             if(nonExistingHarborRepositories.length === 0) {
-                return res._respondAccepted();
+                return res._respond({
+                    data: {
+                        meta
+                    }
+                });
             }
 
             const entities : MasterImage[] = nonExistingHarborRepositories.map(harborRepository => {
@@ -55,6 +80,12 @@ export async function doHarborTask(req: any, res: any) {
 
             await repository.insert(entities);
 
-            return res._respondAccepted();
+            meta.created = entities.length;
+
+            return res._respond({
+                data: {
+                    meta
+                }
+            });
     }
 }

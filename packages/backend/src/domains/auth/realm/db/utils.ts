@@ -23,33 +23,10 @@ export function onlyRealmPermittedQueryResources<T>(query: SelectQueryBuilder<T>
  * @param realmId
  * @param resourceRealmId
  */
-export function isPermittedForResourceRealm(realmId: string | undefined, resourceRealmId: string | undefined) : boolean {
+export function isPermittedForResourceRealm(realmId?: string, resourceRealmId?: string) : boolean {
     if(typeof realmId === 'undefined') return false;
 
     if(realmId === MASTER_REALM_ID) return true;
 
     return realmId === resourceRealmId;
-}
-
-/**
- * @deprecated
- * @param sessionUser
- * @param resource
- */
-export function isRealmPermittedForResource(sessionUser: User | undefined, resource: { [key: string]: any }) {
-    if (typeof sessionUser === 'undefined') {
-        return false;
-    }
-
-    if (sessionUser.realm_id === 'master') {
-        return true;
-    }
-
-    const realmIdKey = 'realm_id';
-
-    if (!resource.hasOwnProperty(realmIdKey)) {
-        return false;
-    }
-
-    return resource[realmIdKey] === sessionUser.realm_id
 }

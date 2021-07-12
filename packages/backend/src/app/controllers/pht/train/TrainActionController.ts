@@ -28,7 +28,7 @@ import {findHarborProjectRepository, HarborRepository} from "../../../../domains
 import env from "../../../../env";
 import {TrainStation} from "../../../../domains/pht/train/station";
 import {TrainStationStateApproved} from "../../../../domains/pht/train/station/states";
-import {isRealmPermittedForResource} from "../../../../domains/auth/realm/db/utils";
+import {isPermittedForResourceRealm} from "../../../../domains/auth/realm/db/utils";
 
 /**
  * Execute a train command (start, stop, build).
@@ -63,7 +63,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if (!isRealmPermittedForResource(req.user, entity)) {
+    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
         return res._failForbidden();
     }
 

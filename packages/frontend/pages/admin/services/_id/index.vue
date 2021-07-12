@@ -17,7 +17,7 @@ export default {
         if(typeof template === 'undefined') {
             return createElement('div', {
                 class: 'alert alert-info alert-sm'
-            }, `You can not execute any task for the ${this.service.id} service.`);
+            }, `You can not execute any task for the ${this.service.id} service yet.`);
         } else {
             return createElement(template, {
                 props: { service: this.service},

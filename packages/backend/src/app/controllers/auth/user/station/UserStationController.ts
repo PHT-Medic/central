@@ -1,10 +1,10 @@
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../../../domains/auth/user/repository";
 import {Station} from "../../../../../domains/pht/station";
-import {isRealmPermittedForResource} from "../../../../../domains/auth/realm/db/utils";
+import {isPermittedForResourceRealm} from "../../../../../domains/auth/realm/db/utils";
 
 export async function getUserStationRouteHandler(req: any, res: any) {
-    let { id } = req.params;
+    const { id } = req.params;
 
     const userRepository = getCustomRepository<UserRepository>(UserRepository);
     const user = await userRepository.findOne(id, {relations: ['realm']});
@@ -13,7 +13,7 @@ export async function getUserStationRouteHandler(req: any, res: any) {
         return res._failNotFound({message: 'The requested user was not found...'})
     }
 
-    if(!isRealmPermittedForResource(req.user, user)) {
+    if(!isPermittedForResourceRealm(req.realmId, user.realm_id)) {
         // return res._failForbidden({});
     }
 

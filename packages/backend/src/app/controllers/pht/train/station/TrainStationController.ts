@@ -5,7 +5,10 @@ import {check, matchedData, validationResult} from "express-validator";
 import {TrainStation} from "../../../../../domains/pht/train/station";
 
 import {Train} from "../../../../../domains/pht/train";
-import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../../domains/auth/realm/db/utils";
+import {
+    isPermittedForResourceRealm,
+    onlyRealmPermittedQueryResources
+} from "../../../../../domains/auth/realm/db/utils";
 import {isTrainStationState, TrainStationStateApproved} from "../../../../../domains/pht/train/station/states";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
@@ -116,8 +119,8 @@ export async function getTrainStationRouteHandler(req: any, res: any) {
         }
 
         if(
-            !isRealmPermittedForResource(req.user, entity.train) &&
-            !isRealmPermittedForResource(req.user, entity.station)
+            !isPermittedForResourceRealm(req.realmId, entity.train.realm_id) &&
+            !isPermittedForResourceRealm(req.realmId, entity.station.realm_id)
         ) {
             return res._failForbidden();
         }
@@ -163,7 +166,7 @@ export async function addTrainStationRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isRealmPermittedForResource(req.user, train)) {
+    if(!isPermittedForResourceRealm(req.realmId, train.realm_id)) {
         return res._failForbidden();
     }
 
@@ -200,10 +203,10 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    const isAuthorityOfStation = isRealmPermittedForResource(req.user, trainStation.station);
+    const isAuthorityOfStation = isPermittedForResourceRealm(req.realmId, trainStation.station.realm_id);
     const isAuthorizedForStation = req.ability.can('approve','train');
 
-    const isAuthorityOfRealm = isRealmPermittedForResource(req.user, trainStation.train);
+    const isAuthorityOfRealm = isPermittedForResourceRealm(req.realmId, trainStation.train.realm_id);
     const isAuthorizedForRealm = req.ability.can('edit','train');
 
     if(
@@ -269,8 +272,8 @@ export async function dropTrainStationRouteHandler(req: any, res: any) {
     }
 
     if(
-        !isRealmPermittedForResource(req.user, entity.station) &&
-        !isRealmPermittedForResource(req.user, entity.train)
+        !isPermittedForResourceRealm(req.realmId, entity.station.realm_id) &&
+        !isPermittedForResourceRealm(req.realmId, entity.train.realm_id)
     ) {
         return res._failForbidden();
     }

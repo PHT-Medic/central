@@ -17,7 +17,7 @@ import {
     findHarborProjectWebHook
 } from "../../../../domains/service/harbor/project/web-hook/api";
 import {BaseService, Service} from "../../../../domains/service";
-import {isRealmPermittedForResource} from "../../../../domains/auth/realm/db/utils";
+import {isPermittedForResourceRealm} from "../../../../domains/auth/realm/db/utils";
 
 export enum StationTask {
     CHECK_HARBOR = 'checkHarbor',
@@ -83,7 +83,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if (!isRealmPermittedForResource(req.user, entity)) {
+    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
         return res._failForbidden();
     }
 
@@ -162,7 +162,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
                     return res._failBadRequest({message: 'No client credentials are available for harbor yet. Please generate it first.'});
                 }
 
-                await ensureHarborProjectWebHook(entity, serviceEntity.client);
+                await ensureHarborProjectWebHook(entity.harbor_project_id, serviceEntity.client);
 
                 entity.harbor_project_webhook_exists = true;
 

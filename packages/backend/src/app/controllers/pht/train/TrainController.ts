@@ -1,6 +1,9 @@
 import {getRepository} from "typeorm";
 import {applyRequestPagination, applyRequestIncludes, applyRequestFilter} from "typeorm-extension";
-import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/auth/realm/db/utils";
+import {
+    isPermittedForResourceRealm,
+    onlyRealmPermittedQueryResources
+} from "../../../../domains/auth/realm/db/utils";
 import {check, matchedData, validationResult} from "express-validator";
 import {Train} from "../../../../domains/pht/train";
 import {MasterImage} from "../../../../domains/pht/master-image";
@@ -130,7 +133,7 @@ export async function getTrainRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isRealmPermittedForResource(req.user, entity)) {
+    if(!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
         return res._failForbidden();
     }
 
@@ -306,7 +309,7 @@ export async function editTrainRouteHandler(req: any, res: any) {
         return res._failValidationError({message: 'The train could not be found.'});
     }
 
-    if(!isRealmPermittedForResource(req.user, train)) {
+    if(!isPermittedForResourceRealm(req.realmId, train.realm_id)) {
         return res._failForbidden();
     }
 
@@ -357,7 +360,7 @@ export async function dropTrainRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    if(!isRealmPermittedForResource(req.user, entity)) {
+    if(!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
         return res._failForbidden();
     }
 

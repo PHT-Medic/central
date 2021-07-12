@@ -2,7 +2,10 @@ import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {ProposalStation} from "../../../../domains/pht/proposal/station";
-import {isRealmPermittedForResource, onlyRealmPermittedQueryResources} from "../../../../domains/auth/realm/db/utils";
+import {
+    isPermittedForResourceRealm,
+    onlyRealmPermittedQueryResources
+} from "../../../../domains/auth/realm/db/utils";
 import {isProposalStationState, ProposalStationStateApproved} from "../../../../domains/pht/proposal/station/states";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
@@ -118,7 +121,10 @@ export async function getProposalStationRouteHandler(req: any, res: any) {
             return res._failNotFound();
         }
 
-        if(!isRealmPermittedForResource(req.user, entity.station) && !isRealmPermittedForResource(req.user, entity.proposal)) {
+        if(
+            !isPermittedForResourceRealm(req.realmId, entity.station.realm_id) &&
+            !isPermittedForResourceRealm(req.realmId, entity.proposal.realm_id)
+        ) {
             return res._failForbidden();
         }
 
@@ -178,10 +184,10 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    const isAuthorityOfStation = isRealmPermittedForResource(req.user, proposalStation.station);
+    const isAuthorityOfStation = isPermittedForResourceRealm(req.realmId, proposalStation.station.realm_id);
     const isAuthorizedForStation = req.ability.can('approve','proposal');
 
-    const isAuthorityOfRealm = isRealmPermittedForResource(req.user, proposalStation.proposal);
+    const isAuthorityOfRealm = isPermittedForResourceRealm(req.realmId, proposalStation.proposal.realm_id);
     const isAuthorizedForRealm = req.ability.can('edit','proposal');
 
     if(
@@ -241,8 +247,8 @@ export async function dropProposalStationRouteHandler(req: any, res: any) {
     }
 
     if(
-        !isRealmPermittedForResource(req.user, entity.station) &&
-        !isRealmPermittedForResource(req.user, entity.proposal)
+        !isPermittedForResourceRealm(req.realmId, entity.station.realm_id) &&
+        !isPermittedForResourceRealm(req.realmId, entity.proposal.realm_id)
     ) {
         return res._failForbidden({message: 'You are not authorized to drop this proposal station.'});
     }
