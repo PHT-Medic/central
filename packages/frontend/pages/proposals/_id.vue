@@ -1,10 +1,10 @@
 <script>
     import { LayoutNavigationDefaultId } from "@/config/layout";
     import {getProposal} from "@/domains/proposal/api.ts";
-    import {getApiProposalStation, getApiProposalStations} from "@/domains/proposal/station/api.ts";
+    import {getApiProposalStations} from "@/domains/proposal/station/api.ts";
     import ProposalSvg from "@/components/svg/ProposalSvg";
-    import {getApiRealmStation} from "@/domains/realm/station/api";
     import ProposalStationAction from "@/components/proposal/ProposalStationAction";
+    import {getStations} from "@/domains/station/api";
 
     export default {
         components: {ProposalStationAction, ProposalSvg},
@@ -25,16 +25,25 @@
 
                 if(proposal.realmId !== realmId) {
                     try {
-                        visitorStation = await getApiRealmStation(realmId);
-                        const response = await getApiProposalStations({
+                        const {data: stations} = await getStations({
                             filter: {
-                                proposalId: proposal.id,
-                                stationId: visitorStation.id
+                                realmId: proposal.realmId
                             }
                         });
 
-                        if(response.meta.total > 0 ) {
-                            visitorProposalStation = response.data[0];
+                        if(stations.length === 1) {
+                            visitorStation = stations[0];
+
+                            const response = await getApiProposalStations({
+                                filter: {
+                                    proposalId: proposal.id,
+                                    stationId: visitorStation.id
+                                }
+                            });
+
+                            if (response.meta.total > 0) {
+                                visitorProposalStation = response.data[0];
+                            }
                         }
                     } catch (e) {
                         console.log(e);

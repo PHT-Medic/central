@@ -1,8 +1,7 @@
 <script>
 import Vue from 'vue';
-import {doStationTask, dropStation, getStations} from "@/domains/station/api";
+import {getStations} from "@/domains/station/api";
 import StationForm from "@/components/station/StationForm";
-import {getApiRealmStation} from "@/domains/realm/station/api";
 
 export default {
     components: {StationForm},
@@ -25,7 +24,10 @@ export default {
     },
     async asyncData(ctx) {
         try {
-            const station = await getApiRealmStation(ctx.params.id, {
+            const {data: stations} = await getStations( {
+                filter: {
+                    realmId: ctx.params.id
+                },
                 fields: {
                     station: [
                         'harbor_project_id',
@@ -33,13 +35,19 @@ export default {
                         'harbor_project_account_token',
                         'harbor_project_webhook_exists',
                         'vault_public_key_saved',
-                        'public_key'
+                        'public_key',
+
+                        'secure_id'
                     ]
                 }
             });
 
+            if(stations.length !== 1) {
+                return undefined;
+            }
+
             return {
-                station
+                station: stations[0]
             }
         } catch (e) {
             return {
@@ -58,7 +66,7 @@ export default {
                 Vue.set(this.station, key, station[key]);
             }
         },
-        handleDeleted(station) {
+        handleDeleted() {
             this.station = undefined;
         }
     }

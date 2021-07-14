@@ -1,5 +1,5 @@
 <script>
-    import {dropProposal, getApiProposals} from "@/domains/proposal/api.ts";
+    import {dropProposal, getProposals} from "@/domains/proposal/api.ts";
     import {LayoutNavigationDefaultId} from "@/config/layout.ts";
     import Pagination from "@/components/Pagination";
 
@@ -44,14 +44,17 @@
                 this.isBusy = true;
 
                 try {
-                    let record = {
+                    const record = {
+                        filter: {
+                            realmId: this.$store.getters['auth/userRealmId']
+                        },
                         page: {
                             limit: this.meta.limit,
                             offset: this.meta.offset
                         }
                     };
 
-                    const response = await getApiProposals(record);
+                    const response = await getProposals(record);
 
                     this.items = response.data;
                     const {total} = response.meta;
@@ -72,16 +75,17 @@
                     .then(resolve)
                     .catch(reject);
             },
-            async dropProposal (index) {
-                const proposal = this.items[index];
-                const confirmed = confirm('Den Antrag ' + proposal.title + ' (ID: ' + proposal.id + ') zurückziehen?');
-                if (confirmed) {
-                    try {
-                        await dropProposal(proposal.id);
-                        this.items.splice(index, 1);
-                    } catch (e) {
+            async dropProposal (id) {
+                const index = this.items.findIndex(item => item.id === id);
+                if (index === -1) {
+                    return;
+                }
 
-                    }
+                try {
+                    await dropProposal(this.items[index].id);
+                    this.items.splice(index, 1);
+                } catch (e) {
+
                 }
             },
 
@@ -101,7 +105,7 @@
 <template>
     <div>
         <div class="alert alert-primary alert-sm">
-            In dieser Übersicht werden alle Anträge, die von Ihnen oder einer Person Ihrer Station/Realm beantragt wurde, angezeigt.
+            This is a slight overview of all proposals, which are created by you or one of your co workers.
         </div>
         <div class="m-t-10">
             <b-table :items="items" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
@@ -113,13 +117,13 @@
                 </template>
 
                 <template v-slot:cell(options)="data">
-                    <nuxt-link v-if="canEdit" :to="'/proposals/' + data.item.id " title="Ansicht" class="btn btn-outline-primary btn-xs">
+                    <nuxt-link v-if="canEdit" :to="'/proposals/' + data.item.id " title="View" class="btn btn-outline-primary btn-xs">
                         <i class="fa fa-arrow-right" />
                     </nuxt-link>
                     <nuxt-link v-if="canGoToTrainView" :to="'/proposals/' + data.item.id + '/trains'" title="Zug Verwaltung" class="btn btn-outline-dark btn-xs">
                         <i class="fa fa-train" />
                     </nuxt-link>
-                    <a v-if="canDrop" class="btn btn-outline-danger btn-xs" title="Löschen" @click="dropProposal(data.index)">
+                    <a v-if="canDrop" class="btn btn-outline-danger btn-xs" title="Delete" @click="dropProposal(data.item.id)">
                         <i class="fas fa-trash-alt" /></a>
                 </template>
 
@@ -131,7 +135,7 @@
                 </template>
             </b-table>
             <div class="alert alert-warning alert-sm" v-if="!isBusy && items.length === 0">
-                Es sind keine Anträge vorhanden...
+                There are no proposals available.
             </div>
 
             <pagination :total="meta.total" :offset="meta.offset" :limit="meta.limit" @to="goTo" />

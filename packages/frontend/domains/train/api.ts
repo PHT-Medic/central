@@ -30,7 +30,7 @@ export async function addTrain(data: Record<string, any>) {
     return response;
 }
 
-type TrainTaskType = 'build' | 'start' | 'stop' | 'scanHarbor' | 'generateHash';
+export type TrainTaskType = 'build' | 'start' | 'stop' | 'scanHarbor' | 'generateHash';
 export async function runTrainTask(id: string, task: TrainTaskType, data: Record<string,any> = {}) {
     const actionData = {
         task,

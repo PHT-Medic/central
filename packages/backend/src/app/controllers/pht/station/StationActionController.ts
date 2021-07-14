@@ -3,10 +3,10 @@ import {getRepository} from "typeorm";
 import {Station} from "../../../../domains/pht/station";
 import {
     findVaultStationPublicKey,
-    removeStationPublicKeyFromVault,
+    deleteStationPublicKeyFromVault,
     saveStationPublicKeyToVault
 } from "../../../../domains/service/vault/station/api";
-import {ensureHarborProject, dropHarborProject, findHarborProject} from "../../../../domains/service/harbor/project/api";
+import {ensureHarborProject, deleteHarborProject, findHarborProject} from "../../../../domains/service/harbor/project/api";
 import {
     dropHarborProjectRobotAccount,
     ensureHarborProjectRobotAccount, findHarborProjectRobotAccount
@@ -142,7 +142,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
             }
         case StationTask.DROP_HARBOR_PROJECT:
             try {
-                await dropHarborProject(entity);
+                await deleteHarborProject(entity);
 
                 entity.harbor_project_id = null;
 
@@ -239,7 +239,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
             }
         case StationTask.SAVE_VAULT_PUBLIC_KEY:
             try {
-                await saveStationPublicKeyToVault(entity);
+                await saveStationPublicKeyToVault(entity.secure_id, entity.public_key);
 
                 entity.vault_public_key_saved = true;
 
@@ -251,7 +251,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
             }
         case StationTask.DROP_VAULT_PUBLIC_KEY:
             try {
-                await removeStationPublicKeyFromVault(entity);
+                await deleteStationPublicKeyFromVault(entity.secure_id);
 
                 entity.vault_public_key_saved = false;
 

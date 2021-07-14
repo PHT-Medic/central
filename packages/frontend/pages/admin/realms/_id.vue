@@ -28,7 +28,7 @@ export default {
             tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
                 { name: 'Station', icon: 'fa fa-city', urlSuffix: '/station'},
-                { name: 'OAuth Providers', icon: 'fas fa-sign-in-alt', urlSuffix: '/oauth-providers'}
+                { name: 'Providers', icon: 'fas fa-boxes', urlSuffix: '/providers'}
             ]
         }
     },

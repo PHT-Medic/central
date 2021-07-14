@@ -1,7 +1,12 @@
 import {hasOwnProperty} from "typeorm-extension";
+import env from "../../../env";
 import {UnauthorizedError} from "../error/unauthorized";
 
 export function errorMiddleware(error: Error, req: any, res: any, next: any) {
+    if(env.env === 'development') {
+        console.log(error);
+    }
+
     if(error instanceof UnauthorizedError) {
         return res._failUnauthorized();
     }

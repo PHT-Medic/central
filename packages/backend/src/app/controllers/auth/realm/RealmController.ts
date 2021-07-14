@@ -6,8 +6,6 @@ import {Controller, Get, Post, Delete, Request, Response, Params, Body} from "@d
 
 import {Realm} from "../../../../domains/auth/realm";
 import {OAuth2Provider} from "../../../../domains/auth/oauth2-provider";
-import {Station} from "../../../../domains/pht/station";
-import {getRealmStationRouteHandler} from "./station/RealmStationController";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 @SwaggerTags('auth')
@@ -28,15 +26,6 @@ export class RealmController {
         @Response() res: any
     ) : Promise<Realm> {
         return await addRealmRoute(req, res);
-    }
-
-    @Get("/:id/station", [])
-    async getStation(
-        @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any
-    ) : Promise<Station> {
-        return await getRealmStationRouteHandler(req, res, 'related');
     }
 
     @Get("/:id", [])

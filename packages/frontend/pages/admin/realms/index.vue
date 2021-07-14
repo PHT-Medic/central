@@ -112,7 +112,7 @@ export default {
 
         <realm-list>
             <template v-slot:header-title>
-                Slight overview of all realms.
+                This is a slight overview of all realms.
             </template>
             <template v-slot:header-actions="props">
                 <div class="d-flex flex-row">

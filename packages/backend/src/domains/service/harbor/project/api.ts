@@ -50,7 +50,7 @@ export async function ensureHarborProject(entity: Station) : Promise<number> {
     }
 }
 
-export async function dropHarborProject(entity: Station) : Promise<void> {
+export async function deleteHarborProject(entity: Station) : Promise<void> {
     if(entity.harbor_project_id) {
         try {
             await useHarborApi()
@@ -59,7 +59,7 @@ export async function dropHarborProject(entity: Station) : Promise<void> {
             entity.harbor_project_id = null;
 
             if(e.response.status === 404) {
-                return await dropHarborProject(entity);
+                return await deleteHarborProject(entity);
             }
 
             throw e;

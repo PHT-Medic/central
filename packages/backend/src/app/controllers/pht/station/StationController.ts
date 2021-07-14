@@ -1,9 +1,12 @@
 import {getRepository} from "typeorm";
-import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
+import {applyRequestFields, applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {Station} from "../../../../domains/pht/station";
-import {dropHarborProject} from "../../../../domains/service/harbor/project/api";
-import {removeStationPublicKeyFromVault} from "../../../../domains/service/vault/station/api";
+import {deleteHarborProject} from "../../../../domains/service/harbor/project/api";
+import {
+    deleteStationPublicKeyFromVault,
+    saveStationPublicKeyToVault
+} from "../../../../domains/service/vault/station/api";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
@@ -84,10 +87,27 @@ export class StationController {
 
 export async function getStationRouteHandler(req: any, res: any) {
     const { id } = req.params;
+    const { fields } = req.query;
 
     const repository = getRepository(Station);
+    const query = repository.createQueryBuilder('station')
+        .where("station.id = :id", {id});
 
-    const entity = await repository.findOne(id);
+    if(req.ability.can('edit', 'station')) {
+        applyRequestFields(query, fields, {
+            station: [
+                'secure_id',
+                'public_key',
+                'harbor_project_account_name',
+                'harbor_project_account_token',
+                'harbor_project_id',
+                'harbor_project_webhook_exists',
+                'vault_public_key_saved'
+            ]
+        }, {aliasMapping: {station: 'station'}});
+    }
+
+    const entity = await query.getOne();
 
     if(typeof entity === 'undefined') {
         return res._failNotFound();
@@ -97,17 +117,32 @@ export async function getStationRouteHandler(req: any, res: any) {
 }
 
 export async function getStationsRouteHandler(req: any, res: any) {
-    const { filter, page } = req.query;
+    const { filter, page, fields, includes } = req.query;
 
     const repository = getRepository(Station);
-    const query = repository.createQueryBuilder('station')
-        .leftJoinAndSelect('station.realm', 'realm');
+    const query = repository.createQueryBuilder('station');
+
+    applyRequestIncludes(query, 'station', includes, ['realm']);
 
     applyRequestFilter(query, filter, {
         id: 'station.id',
         name: 'station.name',
         realmId: 'station.realm_id'
     });
+
+    if(req.ability.can('edit', 'station')) {
+        applyRequestFields(query, fields, {
+            station: [
+                'secure_id',
+                'public_key',
+                'harbor_project_account_name',
+                'harbor_project_account_token',
+                'harbor_project_id',
+                'harbor_project_webhook_exists',
+                'vault_public_key_saved'
+            ]
+        }, {aliasMapping: {station: 'station'}});
+    }
 
     const pagination = applyRequestPagination(query, page, 50);
 
@@ -129,8 +164,10 @@ export async function addStationRouteHandler(req: any, res: any) {
         return res._failBadRequest();
     }
 
-    await check('public_key').isLength({min: 5, max: 4096}).exists().optional({nullable: true}).run(req);
     await check('name').isLength({min: 5, max: 100}).exists().notEmpty().run(req);
+    await check('secure_id').isLength({min: 1, max: 100}).exists().matches(/^[a-zA-Z0-9-]*$/).run(req);
+    await check('public_key').isLength({min: 5, max: 4096}).exists().optional({nullable: true}).run(req);
+    await check('sync_public_key').isBoolean().optional().run(req);
     await check('realm_id').exists().notEmpty().run(req);
 
     const validation = validationResult(req);
@@ -148,6 +185,12 @@ export async function addStationRouteHandler(req: any, res: any) {
         }
     }
 
+    const syncPublicKey : boolean | undefined = data.sync_public_key;
+
+    if(typeof data.sync_public_key !== 'undefined') {
+        delete data.sync_public_key;
+    }
+
     try {
         const repository = getRepository(Station);
 
@@ -155,10 +198,20 @@ export async function addStationRouteHandler(req: any, res: any) {
 
         await repository.save(entity);
 
+        if(syncPublicKey) {
+            await saveStationPublicKeyToVault(entity.secure_id, entity.public_key);
+
+            await repository.update({
+                id: entity.id
+            }, {
+                vault_public_key_saved: true
+            })
+        }
+
         return res._respond({data: entity});
     } catch (e) {
         console.log(e);
-        return res._failValidationError({message: 'Die Station konnte nicht erstellt werden...'})
+        return res._failValidationError({message: 'The station could not be created.'})
     }
 }
 
@@ -170,7 +223,9 @@ export async function editStationRouteHandler(req: any, res: any) {
     }
 
     await check('name').isLength({min: 5, max: 100}).exists().optional().run(req);
+    await check('secure_id').isLength({min: 1, max: 100}).exists().matches(/^[a-zA-Z0-9-]*$/).optional().run(req);
     await check('public_key').isLength({min: 5, max: 4096}).exists().notEmpty().optional({nullable: true}).run(req);
+    await check('sync_public_key').isBoolean().optional().run(req);
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
@@ -183,23 +238,15 @@ export async function editStationRouteHandler(req: any, res: any) {
     }
 
     const repository = getRepository(Station);
-    const query = repository.createQueryBuilder('station');
-    const addSelection : string[] = [
-        'public_key',
-        'harbor_project_account_name',
-        'harbor_project_account_token',
-        'harbor_project_id',
-        'harbor_project_webhook_exists',
-        'vault_public_key_saved'
-    ];
-
-    addSelection.map(selection => query.addSelect('station.'+selection));
-    query.where("station.id = :id", {id});
+    const query = repository.createQueryBuilder('station')
+        .addSelect('station.secure_id')
+        .addSelect('station.public_key')
+        .where("station.id = :id", {id});
 
     let station = await query.getOne();
 
     if(typeof station === 'undefined') {
-        return res._failValidationError({message: 'Die Station konnte nicht gefunden werden.'});
+        return res._failValidationError({message: 'The requested station was not found.'});
     }
 
     if(data.public_key && data.public_key !== station.public_key) {
@@ -210,7 +257,32 @@ export async function editStationRouteHandler(req: any, res: any) {
         }
     }
 
+    const syncPublicKey : boolean | undefined = data.sync_public_key;
+    if(typeof data.sync_public_key !== 'undefined') {
+        delete data.sync_public_key;
+    }
+
+    // If public key changes, than the key is not saved to vault.
+    if(typeof data.public_key === 'string') {
+        if (data.public_key !== station.public_key) {
+            station.vault_public_key_saved = false;
+        }
+    }
+
+    if(typeof data.secure_id === 'string') {
+        // secure id changed -> remove vault project
+        if(data.secure_id !== station.secure_id) {
+            await deleteStationPublicKeyFromVault(station.secure_id);
+        }
+    }
+
     station = repository.merge(station, data);
+
+    if (syncPublicKey) {
+        await saveStationPublicKeyToVault(station.secure_id, station.public_key);
+
+        station.vault_public_key_saved = true;
+    }
 
     try {
         const result = await repository.save(station);
@@ -219,8 +291,7 @@ export async function editStationRouteHandler(req: any, res: any) {
             data: result
         });
     } catch (e) {
-        console.log(e);
-        return res._failValidationError({message: 'Die Station konnte nicht aktualisiert werden.'});
+        return res._failValidationError({message: 'The station could not be updated.'});
     }
 }
 
@@ -249,11 +320,11 @@ export async function dropStationRouteHandler(req: any, res: any) {
     try {
         await repository.remove(entity);
 
-        await dropHarborProject(entity);
-        await removeStationPublicKeyFromVault(entity);
+        await deleteHarborProject(entity);
+        await deleteStationPublicKeyFromVault(entity.secure_id);
 
         return res._respondDeleted({data: entity});
     } catch (e) {
-        return res._failValidationError({message: 'Die Station konnte nicht gelöscht werden...'})
+        return res._failValidationError({message: 'The station could not be deleted.'})
     }
 }

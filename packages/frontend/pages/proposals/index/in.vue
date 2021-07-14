@@ -3,9 +3,9 @@ import ProposalInForm from "@/components/proposal/ProposalInForm";
 import ProposalStationStatus from "@/components/proposal/ProposalStationStatus";
 import Pagination from "@/components/Pagination";
 import {ProposalStationStatusOptions} from "@/domains/proposal/station";
-import {getApiRealmStation} from "@/domains/realm/station/api";
 import ProposalStationAction from "@/components/proposal/ProposalStationAction";
 import {dropApiProposalStation, getApiProposalStations} from "@/domains/proposal/station/api";
+import {getStations} from "@/domains/station/api";
 
 export default {
     components: {ProposalStationAction, Pagination, ProposalStationStatus, ProposalInForm},
@@ -64,7 +64,15 @@ export default {
             this.busy = true;
 
             try {
-                const station = await getApiRealmStation(this.user.realmId);
+                const {data: stations} = await getStations({
+                    filter: {
+                        realmId: this.user.realmId
+                    }
+                });
+
+                if(stations.length !== 1) {
+                    return;
+                }
 
                 let record = {
                     page: {
@@ -72,7 +80,7 @@ export default {
                         offset: this.meta.offset
                     },
                     filter: {
-                        stationId: station.id
+                        stationId: stations[0].id
                     }
                 };
 

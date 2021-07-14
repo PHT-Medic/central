@@ -1,6 +1,6 @@
 <script>
 import {addTrain} from "@/domains/train/api.ts";
-import {getApiProposals} from "@/domains/proposal/api.ts";
+import {getProposals} from "@/domains/proposal/api.ts";
 import {required} from 'vuelidate/lib/validators';
 
 export default {
@@ -55,7 +55,7 @@ export default {
 
             try {
                 // pagination handle multiple pages
-                const { data } = await getApiProposals();
+                const { data } = await getProposals();
                 this.proposal.items = data;
             } catch (e) {
 

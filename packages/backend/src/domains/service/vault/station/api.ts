@@ -1,4 +1,3 @@
-import {Station} from "../../../pht/station";
 import {useVaultApi} from "../../../../modules/api/service/vault";
 
 export type VaultStationPublicKey = {
@@ -16,8 +15,6 @@ export async function findVaultStationPublicKey(stationId: number | string) : Pr
             content: data.data.data.rsa_station_public_key
         }
     } catch (e) {
-        console.log(e);
-
         if(e.response.status === 404) {
             return undefined;
         }
@@ -26,13 +23,13 @@ export async function findVaultStationPublicKey(stationId: number | string) : Pr
     }
 }
 
-export async function saveStationPublicKeyToVault(entity: Station) {
-    if (!entity.public_key) return;
+export async function saveStationPublicKeyToVault(id: string, publicKey?: string) {
+    if (!publicKey || !id) return;
 
     await useVaultApi()
-        .post('station_pks/' + entity.id, {
+        .post('station_pks/' + id, {
             data: {
-                rsa_station_public_key: entity.public_key
+                rsa_station_public_key: publicKey
             },
             options: {
                 "cas": 1
@@ -40,7 +37,7 @@ export async function saveStationPublicKeyToVault(entity: Station) {
         });
 }
 
-export async function removeStationPublicKeyFromVault(entity: Station) {
+export async function deleteStationPublicKeyFromVault(id: string) {
     await useVaultApi()
-        .delete('station_pks/' + entity.id);
+        .delete('station_pks/' + id);
 }

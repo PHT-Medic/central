@@ -1,12 +1,15 @@
 import {
+    BeforeInsert, BeforeUpdate,
     Column, CreateDateColumn,
     Entity,
-    Generated,
+    Generated, Index,
     JoinColumn,
     OneToMany,
     OneToOne,
     PrimaryGeneratedColumn, UpdateDateColumn
 } from "typeorm";
+
+import {v4} from "uuid";
 
 import {ProposalStation} from "../proposal/station";
 import {Realm} from "../../auth/realm";
@@ -17,10 +20,19 @@ export class Station {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Generated("uuid")
-    id_secure: string;
+    @Index()
+    @Column({type: "varchar", length: 100, select: false})
+    secure_id: string;
 
-    @Column()
+    @BeforeInsert()
+    @BeforeUpdate()
+    setIdSecure() {
+        if(typeof this.secure_id !== 'string') {
+            this.secure_id = v4();
+        }
+    }
+
+    @Column({type: "varchar", length: 128})
     name: string;
 
     @Column({type: "text", nullable: true, select: false})

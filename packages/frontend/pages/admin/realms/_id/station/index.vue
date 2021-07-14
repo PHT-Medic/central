@@ -11,20 +11,7 @@ export default {
     data() {
         return {
             busy: false,
-            data: {
-                realmId: undefined,
-                realm: undefined,
-                name: '',
-                publicKey: ''
-            }
         }
-    },
-    created() {
-        console.log(this.realm);
-
-        this.data.realmId = this.realm.id;
-        this.data.realm = this.realm;
-        this.data.name = this.realm.name;
     },
     methods: {
         async dropStation() {
@@ -34,9 +21,6 @@ export default {
 
             try {
                 await dropStation(this.station.id);
-
-                this.data.publicKey = '';
-                delete this.data.id;
 
                 this.$emit('deleted', this.station);
             } catch (e) {
@@ -61,7 +45,7 @@ export default {
             <div>
                 <h5>General</h5>
                 <p class="mb-2">
-                    The <strong>station: {{station.name}} (ID {{station.id}})</strong> is associated to the <strong>realm: {{realm.name}} (ID {{realm.id}})</strong>.
+                    If you remove the station association to the realm, the station will be deleted.
                 </p>
 
                 <button class="btn btn-danger btn-xs" @click.prevent="dropStation">
@@ -74,11 +58,13 @@ export default {
             </div>
         </template>
         <template v-else>
-            <div class="alert alert-info alert-sm">
-                No station is created for the realm <strong>{{realm.name}}</strong> yet.
-            </div>
+            <p class="mb-2">
+                No station is associated to the  <strong>{{realm.name}}</strong> realm yet.
+            </p>
 
-            <station-form  :station-property="data" @created="handleCreated" @updated="handleUpdated" :realm-locked="true"/>
+            <hr />
+
+            <station-form :station-property="{realmId: this.realm.id, name: this.realm.name}" @created="handleCreated" @updated="handleUpdated" :realm-locked="true"/>
         </template>
     </div>
 </template>

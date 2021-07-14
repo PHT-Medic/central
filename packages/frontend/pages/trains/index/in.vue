@@ -1,7 +1,7 @@
 <script>
 import {LayoutNavigationDefaultId} from "@/config/layout.ts";
 import StationTrainTable from "@/components/station/StationTrainTable";
-import {getApiRealmStation} from "@/domains/realm/station/api";
+import {getStations} from "@/domains/station/api";
 
 export default {
     components: {StationTrainTable},
@@ -14,9 +14,14 @@ export default {
     },
     async asyncData(ctx) {
         try {
-            const viewerStation = await getApiRealmStation(ctx.store.getters['auth/userRealmId']);
+            const {data: stations} = await getStations({
+                filter: {
+                    realmId: ctx.store.getters['auth/userRealmId']
+                }
+            });
+
             return {
-                viewerStation
+                viewerStation: stations.length === 1 ? stations[0] : null
             }
         } catch (e) {
             console.log(e);

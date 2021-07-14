@@ -109,10 +109,10 @@ export default {
                     Enter a name
                 </div>
                 <div v-if="!$v.formData.name.minLength" class="form-group-hint group-required">
-                    The length of the name mus be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters
+                    The length of the name must be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters
                 </div>
                 <div v-if="!$v.formData.name.maxLength" class="form-group-hint group-required">
-                    The length of the name mus be greater than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
+                    The length of the name must be greater than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
                 </div>
             </div>
 
@@ -123,10 +123,10 @@ export default {
                 <input v-model="$v.formData.providerRoleId.$model" type="text" name="name" class="form-control" placeholder="Provider Role-ID...">
 
                 <div v-if="!$v.formData.providerRoleId.minLength" class="form-group-hint group-required">
-                    The length of the provide-role-id mus be greater than <strong>{{ $v.formData.providerRoleId.$params.minLength.min }}</strong> characters
+                    The length of the provide-role-id must be greater than <strong>{{ $v.formData.providerRoleId.$params.minLength.min }}</strong> characters
                 </div>
                 <div v-if="!$v.formData.providerRoleId.maxLength" class="form-group-hint group-required">
-                    The length of the provider-role-id mus be greater than <strong>{{ $v.formData.providerRoleId.$params.maxLength.max }}</strong> characters
+                    The length of the provider-role-id must be greater than <strong>{{ $v.formData.providerRoleId.$params.maxLength.max }}</strong> characters
                 </div>
             </div>
 

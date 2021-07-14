@@ -31,7 +31,7 @@ export async function editProposal(id: number, data: Record<string, any>) {
     return response.data;
 }
 
-export async function getApiProposals(record?: RequestRecord) {
+export async function getProposals(record?: RequestRecord) {
     const response = await useApi('auth').get('proposals' + formatRequestRecord(record));
     return response.data;
 }

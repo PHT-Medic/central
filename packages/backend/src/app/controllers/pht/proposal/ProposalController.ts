@@ -93,7 +93,7 @@ export async function getProposalRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    // todo: permit resource to realm/staiton owner XAND receiving realm/station OR to all
+    // todo: permit resource to realm/station owner XAND receiving realm/station OR to all
     /*
     if(!isRealmPermittedForResource(req.user, entity)) {
         return res._failForbidden();
