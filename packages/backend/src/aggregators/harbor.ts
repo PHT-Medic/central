@@ -1,7 +1,6 @@
 import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../modules/message-queue";
-import {TrainStateBuilt, TrainStateFinished, TrainStateStarted} from "../domains/pht/train/states";
+import {TrainStateFinished, TrainStateStarted} from "../domains/pht/train/states";
 import {
-    HARBOR_INCOMING_PROJECT_NAME,
     HARBOR_MASTER_IMAGE_PROJECT_NAME,
     HARBOR_OUTGOING_PROJECT_NAME, HARBOR_SYSTEM_USER_NAME, isHarborStationProjectName
 } from "../config/services/harbor";
@@ -31,7 +30,7 @@ function createHarborAggregatorHandlers() {
             const isOutgoingProject : boolean = data.namespace === HARBOR_OUTGOING_PROJECT_NAME;
             if(isOutgoingProject) {
                 await repository.update({
-                    id: data.namespace
+                    id: data.repositoryName
                 }, {
                     status: TrainStateFinished
                 });
@@ -45,6 +44,7 @@ function createHarborAggregatorHandlers() {
                     data.operator === HARBOR_SYSTEM_USER_NAME &&
                     data.artifactTag === 'latest'
                 ) {
+                    // todo: check if station repository is starting repository?
                     await repository.update({
                         id: data.repositoryName
                     }, {
