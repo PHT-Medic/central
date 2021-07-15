@@ -1,10 +1,10 @@
+import {buildStationHarborProjectName} from "../../../../../config/services/harbor";
 import {
     dropHarborProjectAccount,
     ensureHarborProjectRobotAccount,
     findHarborRobotAccount,
     HarborRobotAccount
 } from "../../../../service/harbor/robot-account/api";
-import {buildStationHarborProjectName} from "../api";
 
 export async function findStationHarborProjectRobotAccount(id: string | number, withSecret: boolean = true): Promise<HarborRobotAccount | undefined> {
     const name: string = buildStationHarborProjectName(id);

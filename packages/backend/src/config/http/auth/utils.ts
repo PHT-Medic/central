@@ -70,9 +70,6 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
                     secret: value.password
                 }, {relations: ['service']});
 
-                console.log('Basic credentials: ' + value.username + ' : ' + value.password)
-                console.log('Basic client: ' + client);
-
                 if(typeof client === 'undefined') {
                     throw new UnauthorizedError();
                 }

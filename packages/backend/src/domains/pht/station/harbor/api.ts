@@ -1,13 +1,10 @@
+import {buildStationHarborProjectName} from "../../../../config/services/harbor";
 import {
     deleteHarborProject,
     ensureHarborProject,
     findHarborProject,
     HarborProject
 } from "../../../service/harbor/project/api";
-
-export function buildStationHarborProjectName(id: string | number) {
-    return 'station_' + id;
-}
 
 export async function findStationHarborProject(id: string | number): Promise<HarborProject | undefined> {
     const projectName: string = buildStationHarborProjectName(id);

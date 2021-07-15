@@ -1,13 +1,15 @@
 import {getRepository} from "typeorm";
+import {HarborQueueEventMessageData} from "../../../../aggregators/harbor";
 import {Train} from "../../../../domains/pht/train";
 import {TrainResult} from "../../../../domains/pht/train/result";
 import {createQueueMessageTemplate, publishQueueMessage} from "../../../../modules/message-queue";
 import {array, BaseSchema, object, string} from "yup";
 
 import {
+    buildStationHarborProjectName,
     HARBOR_INCOMING_PROJECT_NAME,
     HARBOR_MASTER_IMAGE_PROJECT_NAME,
-    HARBOR_OUTGOING_PROJECT_NAME
+    HARBOR_OUTGOING_PROJECT_NAME, isHarborStationProjectName
 } from "../../../../config/services/harbor";
 import {useLogger} from "../../../../modules/log";
 import {MQ_RS_COMMAND_ROUTING_KEY, MQ_UI_H_EVENT_ROUTING_KEY} from "../../../../config/services/rabbitmq";
@@ -68,13 +70,12 @@ type HarborHookEvent = {
 }
 
 export async function postHarborHookRouteHandler(req: any, res: any) {
-
+    console.log(req.body);
     useLogger().debug('hook received', {service: 'api-harbor-hook'})
 
     const repository = getRepository(Train);
 
     try {
-        console.log(req.body);
         const hook : HarborHook = await useHookEventDataValidator().validate(req.body);
 
         const isLibraryProject : boolean = hook.event_data.repository.namespace === HARBOR_MASTER_IMAGE_PROJECT_NAME;
@@ -111,16 +112,26 @@ export async function postHarborHookRouteHandler(req: any, res: any) {
 async function publishHarborEventToUserInterface(hook: HarborHook) {
     let queueType : undefined | string;
 
-    const isLibraryProject : boolean = hook.event_data.repository.namespace === HARBOR_MASTER_IMAGE_PROJECT_NAME;
 
-    switch (hook.type) {
-        case 'PUSH_ARTIFACT':
-            if(isLibraryProject) {
-                queueType = 'masterImagePushed';
-            } else {
-                queueType = 'trainPushed';
-            }
-            break;
+    if(hook.type !== 'PUSH_ARTIFACT') {
+        return;
+    }
+
+    const isLibraryProject : boolean = hook.event_data.repository.namespace === HARBOR_MASTER_IMAGE_PROJECT_NAME;
+    if(isLibraryProject) {
+        queueType = 'masterImagePushed';
+    }
+
+    const isStationProject : boolean = isHarborStationProjectName(hook.event_data.repository.namespace);
+    const isIncomingProject : boolean = hook.event_data.repository.namespace === HARBOR_INCOMING_PROJECT_NAME;
+    const isOutgoingProject : boolean = hook.event_data.repository.namespace === HARBOR_OUTGOING_PROJECT_NAME;
+
+    if(
+        isStationProject ||
+        isIncomingProject ||
+        isOutgoingProject
+    ) {
+        queueType = 'trainPushed';
     }
 
     if(typeof queueType !== 'undefined') {
@@ -132,13 +143,15 @@ async function publishHarborEventToUserInterface(hook: HarborHook) {
             }
         }
 
-        await publishQueueMessage(MQ_UI_H_EVENT_ROUTING_KEY, createQueueMessageTemplate(queueType, {
+        const data : HarborQueueEventMessageData = {
             operator: hook.operator,
-            projectName: hook.event_data.repository.namespace,
+            namespace: hook.event_data.repository.namespace,
             repositoryName: hook.event_data.repository.name,
             repositoryFullName: hook.event_data.repository.repo_full_name,
-            artifactTag: hook.event_data.resources[0]?.tag,
-        }));
+            artifactTag: hook.event_data.resources[0]?.tag
+        };
+
+        await publishQueueMessage(MQ_UI_H_EVENT_ROUTING_KEY, createQueueMessageTemplate(queueType, data));
 
         useLogger().debug('master-image/train event pushed to ui harbor aggregator.', {service: 'api-harbor-hook'});
     }
@@ -180,11 +193,13 @@ async function publishHarborEventToResultService(hook: HarborHook) {
                 trainResult = dbData;
             }
 
-            const queueData : Record<string, any> = {
-                projectName: hook.event_data.repository.namespace,
+            const queueData : HarborQueueEventMessageData & {trainId: string, resultId: string | number} = {
+                operator: hook.operator,
+                namespace: hook.event_data.repository.namespace,
                 repositoryName: hook.event_data.repository.name,
                 repositoryFullName: hook.event_data.repository.repo_full_name,
 
+                // additional information
                 trainId: hook.event_data.repository.name,
                 resultId: trainResult.id
             }

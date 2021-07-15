@@ -194,14 +194,10 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                 // User Hash
                 hash.update(Buffer.from(entity.user_id.toString(), 'utf-8'));
 
-                console.log('Hashing: UserId: ' + entity.user_id);
-
                 for (let i = 0; i < entity.files.length; i++) {
                     const filePath = getTrainFileFilePath(entity.files[i]);
 
                     const fileContent = fs.readFileSync(filePath);
-
-                    console.log('Hashing: File: ', entity.files[i].name, Buffer.from(fileContent).toString('utf-8').length);
 
                     // File Hash
                     hash.update(fileContent);
@@ -209,7 +205,6 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
 
                 // Session Id hash
                 const sessionId: Buffer = crypto.randomBytes(64);
-                console.log('Hashing: SessionId:', entity.session_id);
                 hash.update(sessionId);
 
                 const query: Buffer | undefined = !!entity.query && entity.query !== '' ?
@@ -217,7 +212,6 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                     undefined;
 
                 if (typeof query !== 'undefined') {
-                    console.log('Hashing: Query', query.length, query.toString('hex'));
                     hash.update(query);
                 }
 

@@ -122,7 +122,6 @@ export async function saveAndExtractHarborImage(id: string, repositoryFullName: 
         });
 
         const directories: string[] = ['/opt/pht_results', '/opt/train_config.json'];
-        //const directories: string[] = ['/home'];
         for (let i = 0; i < directories.length; i++) {
             try {
                 const archiveStream: NodeJS.ReadableStream = await container.getArchive({

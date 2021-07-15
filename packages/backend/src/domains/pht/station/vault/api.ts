@@ -37,7 +37,15 @@ export async function saveStationVaultPublicKey(id: string, publicKey?: string) 
         });
 }
 
-export async function deleteStationVaultPublicKey(id: string) {
-    await useVaultApi()
-        .delete('station_pks/' + id);
+export async function deleteStationVaultPublicKey(id: string) : Promise<void> {
+    try {
+        await useVaultApi()
+            .delete('station_pks/' + id);
+    } catch (e) {
+        if(e.response.status === 404) {
+            return;
+        }
+
+        throw e;
+    }
 }
