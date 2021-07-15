@@ -24,14 +24,6 @@ export class Station {
     @Column({type: "varchar", length: 100, select: false})
     secure_id: string;
 
-    @BeforeInsert()
-    @BeforeUpdate()
-    setIdSecure() {
-        if(typeof this.secure_id !== 'string') {
-            this.secure_id = v4();
-        }
-    }
-
     @Column({type: "varchar", length: 128})
     name: string;
 

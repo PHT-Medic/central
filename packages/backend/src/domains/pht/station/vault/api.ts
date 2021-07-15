@@ -5,7 +5,7 @@ export type VaultStationPublicKey = {
     content: string
 }
 
-export async function findVaultStationPublicKey(stationId: number | string) : Promise<VaultStationPublicKey|undefined> {
+export async function findStationVaultPublicKey(stationId: number | string) : Promise<VaultStationPublicKey|undefined> {
     try {
         const { data } = await useVaultApi()
             .get('station_pks/' + stationId);
@@ -23,7 +23,7 @@ export async function findVaultStationPublicKey(stationId: number | string) : Pr
     }
 }
 
-export async function saveStationPublicKeyToVault(id: string, publicKey?: string) {
+export async function saveStationVaultPublicKey(id: string, publicKey?: string) {
     if (!publicKey || !id) return;
 
     await useVaultApi()
@@ -37,7 +37,7 @@ export async function saveStationPublicKeyToVault(id: string, publicKey?: string
         });
 }
 
-export async function deleteStationPublicKeyFromVault(id: string) {
+export async function deleteStationVaultPublicKey(id: string) {
     await useVaultApi()
         .delete('station_pks/' + id);
 }

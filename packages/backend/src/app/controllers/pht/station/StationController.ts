@@ -2,11 +2,11 @@ import {getRepository} from "typeorm";
 import {applyRequestFields, applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {Station} from "../../../../domains/pht/station";
-import {deleteHarborProject} from "../../../../domains/service/harbor/project/api";
+import {deleteStationHarborProject} from "../../../../domains/pht/station/harbor/api";
 import {
-    deleteStationPublicKeyFromVault,
-    saveStationPublicKeyToVault
-} from "../../../../domains/service/vault/station/api";
+    deleteStationVaultPublicKey,
+    saveStationVaultPublicKey
+} from "../../../../domains/pht/station/vault/api";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
@@ -199,7 +199,7 @@ export async function addStationRouteHandler(req: any, res: any) {
         await repository.save(entity);
 
         if(syncPublicKey) {
-            await saveStationPublicKeyToVault(entity.secure_id, entity.public_key);
+            await saveStationVaultPublicKey(entity.secure_id, entity.public_key);
 
             await repository.update({
                 id: entity.id
@@ -272,14 +272,14 @@ export async function editStationRouteHandler(req: any, res: any) {
     if(typeof data.secure_id === 'string') {
         // secure id changed -> remove vault project
         if(data.secure_id !== station.secure_id) {
-            await deleteStationPublicKeyFromVault(station.secure_id);
+            await deleteStationVaultPublicKey(station.secure_id);
         }
     }
 
     station = repository.merge(station, data);
 
     if (syncPublicKey) {
-        await saveStationPublicKeyToVault(station.secure_id, station.public_key);
+        await saveStationVaultPublicKey(station.secure_id, station.public_key);
 
         station.vault_public_key_saved = true;
     }
@@ -320,8 +320,8 @@ export async function dropStationRouteHandler(req: any, res: any) {
     try {
         await repository.remove(entity);
 
-        await deleteHarborProject(entity);
-        await deleteStationPublicKeyFromVault(entity.secure_id);
+        await deleteStationHarborProject(entity.secure_id);
+        await deleteStationVaultPublicKey(entity.secure_id);
 
         return res._respondDeleted({data: entity});
     } catch (e) {

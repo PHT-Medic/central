@@ -1,18 +1,16 @@
-import {useHarborApi} from "../../../../../modules/api/service/harbor";
-import {createHarborProjectNameByStationId} from "../api";
+import {useHarborApi} from "../../../../modules/api/service/harbor";
 
-//------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
 export type HarborRobotAccount = {
     id?: string,
     name: string,
     secret?: string | null,
-    creation_time: string,
+    creationTime: string,
     expires_at: number
 }
 
-export async function findHarborProjectRobotAccount(stationId: string | number) : Promise<HarborRobotAccount|undefined> {
-    const name : string = createHarborProjectNameByStationId(stationId);
+export async function findHarborRobotAccount(name: string, withSecret: boolean = true) : Promise<HarborRobotAccount|undefined> {
     const {data} = await useHarborApi().get('robots?q=name%3D'+name+'&page_size=1');
 
     const accounts = Array.isArray(data) ? data.filter(account => account.name === 'robot$'+name) : [];
@@ -20,12 +18,19 @@ export async function findHarborProjectRobotAccount(stationId: string | number) 
     if(
         accounts.length === 1
     ) {
+        let secret : string | undefined;
+
+        if(withSecret) {
+            const patchedAccount = await patchHarborProjectRobotAccount(accounts[0].id);
+            secret = patchedAccount.secret;
+        }
+
         return {
             id: accounts[0].id,
             name: accounts[0].name,
-            creation_time: accounts[0].creation_time,
+            creationTime: accounts[0].creation_time,
             expires_at: accounts[0].expires_at,
-            secret: null
+            secret
         }
     }
 
@@ -40,7 +45,7 @@ export async function findHarborProjectRobotAccount(stationId: string | number) 
  * @param record
  */
 export async function patchHarborProjectRobotAccount(robotId: string | number, record: Record<string, any> = {}) : Promise<Pick<HarborRobotAccount, 'secret'>> {
-    let robot : Record<string, any> = {
+    const robot : Record<string, any> = {
         ...record
     };
 
@@ -54,10 +59,9 @@ export async function patchHarborProjectRobotAccount(robotId: string | number, r
     return data as HarborRobotAccount;
 }
 
-export async function ensureHarborProjectRobotAccount(stationId: string |number, iteration: number = 0) : Promise<HarborRobotAccount> {
-    const name : string = createHarborProjectNameByStationId(stationId);
+export async function ensureHarborProjectRobotAccount(robotName: string, projectName?: string) {
     const robot: Record<string, any> = {
-        name,
+        name: robotName,
         duration: -1,
         level: "system",
         disable: false,
@@ -77,34 +81,18 @@ export async function ensureHarborProjectRobotAccount(stationId: string |number,
 
                 ],
                 kind: 'project',
-                namespace: name
+                namespace: projectName ?? robotName
             }
         ]
     };
 
-    try {
-        const { data } : {data: HarborRobotAccount} = await useHarborApi()
-            .post('robots', robot);
+    const { data } : {data: HarborRobotAccount} = await useHarborApi()
+        .post('robots', robot);
 
-        return data;
-    } catch (e) {
-        if(iteration === 0) {
-            if (e.response.status >= 400 && e.response.status < 500) {
-                iteration++;
-                await dropHarborProjectRobotAccount(stationId);
-                await ensureHarborProjectRobotAccount(stationId, iteration);
-            }
-        }
-
-        throw e;
-    }
+    return data;
 }
 
-export async function dropHarborProjectRobotAccount(stationId: string | number) : Promise<void> {
-    const robotAccount = await findHarborProjectRobotAccount(stationId);
-
-    if(typeof robotAccount !== 'undefined') {
-        await useHarborApi()
-            .delete('robots/'+robotAccount.id);
-    }
+export async function dropHarborProjectAccount(robotId: string | number) : Promise<void> {
+    await useHarborApi()
+        .delete('robots/'+robotId);
 }

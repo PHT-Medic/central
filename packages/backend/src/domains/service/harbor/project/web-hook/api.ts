@@ -51,7 +51,6 @@ export async function ensureHarborProjectWebHook(projectIdOrName: number | strin
     const webhook: Record<string, any> = {
         name: WEBHOOK_ID,
         enabled: true,
-        // project_id: entity.harbor_project_id,
         targets: [
             {
                 auth_header: buildAuthorizationHeaderValue({type: "Basic", username: client.id, password: client.secret}),

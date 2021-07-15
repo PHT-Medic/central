@@ -117,13 +117,13 @@ export default {
 
                     <div class="mb-2">
                         <div class="form-group">
-                            <label>ID</label>
-                            <input type="text" class="form-control" :value="station.harborProjectId" :disabled="true" placeholder="Project ID" />
+                            <label>Name</label>
+                            <input type="text" class="form-control" :value="station.harborProjectId ? 'station_'+station.secureId : ''" :disabled="true" placeholder="Project ID" />
                         </div>
 
                         <div class="form-group">
-                            <label>Name</label>
-                            <input type="text" class="form-control" :value="station.harborProjectId ? 'station_'+station.id : ''" :disabled="true" placeholder="Project Name" />
+                            <label>Path</label>
+                            <input type="text" class="form-control" :value="station.harborProjectId ? '/harbor/projects/'+station.harborProjectId : ''" :disabled="true" placeholder="Project Path" />
                         </div>
                     </div>
 
