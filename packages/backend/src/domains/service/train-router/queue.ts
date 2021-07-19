@@ -1,26 +1,38 @@
 import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 import {MQ_TR_ROUTING_KEY} from "../../../config/services/rabbitmq";
-import env from "../../../env";
-import {parseHarborConnectionString} from "../../../modules/api/service/harbor";
 
-const harborConfig = parseHarborConnectionString(env.harborConnectionString);
+// -------------------------------------------
 
-export const MQ_TR_EVENT_TRAIN_PUSHED = 'trainPushed';
-export const MQ_TR_COMMAND_START_TRAIN = 'startTrain';
-export const MQ_TR_COMMAND_STOP_TRAIN = 'stopTrain';
-
-export function createTrainRouterQueueMessageEvent(repositoryFullName: string, type: string, hookOperator : string = harborConfig.user, metaData: Record<string, any> = {}) : QueueMessage {
-    return createQueueMessageTemplate(type, {
-        repositoryFullName,
-        operator: hookOperator
-    }, metaData);
+export type HarborTrainRouterEvent = 'trainPushed';
+export type HarborTrainRouterEventPayload = {
+    repositoryFullName: string,
+    operator: string
 }
 
-export function createTrainRouterQueueMessageCommand(trainId: string, command: string, metaData: Record<string, any> = {}) : QueueMessage {
-    return createQueueMessageTemplate(command, {
-        trainId
-    }, metaData);
+export function createTrainRouterQueueMessageEvent(
+    event: HarborTrainRouterEvent,
+    data: HarborTrainRouterEventPayload,
+    metaData: Record<string, any> = {}
+) : QueueMessage {
+    return createQueueMessageTemplate(event, data, metaData);
 }
+
+// -------------------------------------------
+
+export type HarborTrainRouterCommand = 'startTrain' | 'stopTrain';
+export type HarborTrainRouterCommandPayload = {
+    trainId: string
+};
+
+export function createTrainRouterQueueMessageCommand(
+    command: HarborTrainRouterCommand,
+    data: HarborTrainRouterCommandPayload,
+    metaData: Record<string, any> = {}
+) : QueueMessage {
+    return createQueueMessageTemplate(command, data, metaData);
+}
+
+// -------------------------------------------
 
 export async function publishTrainRouterQueueMessage(queueMessage: QueueMessage) {
     await publishQueueMessage(MQ_TR_ROUTING_KEY, queueMessage);

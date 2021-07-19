@@ -16,8 +16,6 @@ import * as fs from "fs";
 import {check, matchedData, validationResult} from "express-validator";
 import {
     createTrainRouterQueueMessageCommand,
-    MQ_TR_COMMAND_START_TRAIN,
-    MQ_TR_COMMAND_STOP_TRAIN,
     publishTrainRouterQueueMessage
 } from "../../../../domains/service/train-router/queue";
 import {TrainResult} from "../../../../domains/pht/train/result";
@@ -57,7 +55,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
 
     const repository = getRepository(Train);
 
-    let entity = await repository.findOne(id, {relations: ['train_stations', 'master_image', 'entrypoint_file', 'files']});
+    let entity = await repository.findOne(id, {relations: ['master_image', 'entrypoint_file', 'files']});
 
     if (typeof entity === 'undefined') {
         return res._failNotFound();
@@ -85,7 +83,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                             return res._failBadRequest({message: 'Not all stations have approved your train yet.'})
                         }
 
-                        const queueMessage = await createTrainBuilderQueueMessage(entity, 'trainBuild');
+                        const queueMessage = await createTrainBuilderQueueMessage('trainBuild', entity);
 
                         await publishTrainBuilderQueueMessage(queueMessage);
                     }
@@ -116,7 +114,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                 if (entity.status === TrainStateStarted || entity.status === TrainStateFinished) {
                     return res._failBadRequest({message: 'The train has already been started...'});
                 } else {
-                    const queueMessage = await createTrainRouterQueueMessageCommand(entity.id, MQ_TR_COMMAND_START_TRAIN);
+                    const queueMessage = await createTrainRouterQueueMessageCommand('startTrain', {trainId: entity.id});
 
                     await publishTrainRouterQueueMessage(queueMessage);
 
@@ -132,7 +130,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                 if (entity.status === TrainStateFinished) {
                     return res._failBadRequest({message: 'The train has already been terminated...'});
                 } else {
-                    const queueMessage = await createTrainRouterQueueMessageCommand(entity.id, MQ_TR_COMMAND_STOP_TRAIN);
+                    const queueMessage = await createTrainRouterQueueMessageCommand('stopTrain', {trainId: entity.id});
 
                     await publishTrainRouterQueueMessage(queueMessage);
 

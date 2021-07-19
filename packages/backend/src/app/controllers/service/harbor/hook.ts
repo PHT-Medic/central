@@ -6,7 +6,6 @@ import {createQueueMessageTemplate, publishQueueMessage} from "../../../../modul
 import {array, BaseSchema, object, string} from "yup";
 
 import {
-    buildStationHarborProjectName,
     HARBOR_INCOMING_PROJECT_NAME,
     HARBOR_MASTER_IMAGE_PROJECT_NAME,
     HARBOR_OUTGOING_PROJECT_NAME, isHarborStationProjectName
@@ -15,7 +14,6 @@ import {useLogger} from "../../../../modules/log";
 import {MQ_RS_COMMAND_ROUTING_KEY, MQ_UI_H_EVENT_ROUTING_KEY} from "../../../../config/services/rabbitmq";
 import {
     createTrainRouterQueueMessageEvent,
-    MQ_TR_EVENT_TRAIN_PUSHED,
     publishTrainRouterQueueMessage
 } from "../../../../domains/service/train-router/queue";
 
@@ -110,8 +108,7 @@ export async function postHarborHookRouteHandler(req: any, res: any) {
 }
 
 async function publishHarborEventToUserInterface(hook: HarborHook) {
-    let queueType : undefined | string;
-
+    let eventType : undefined | string;
 
     if(hook.type !== 'PUSH_ARTIFACT') {
         return;
@@ -119,7 +116,7 @@ async function publishHarborEventToUserInterface(hook: HarborHook) {
 
     const isLibraryProject : boolean = hook.event_data.repository.namespace === HARBOR_MASTER_IMAGE_PROJECT_NAME;
     if(isLibraryProject) {
-        queueType = 'masterImagePushed';
+        eventType = 'masterImagePushed';
     }
 
     const isStationProject : boolean = isHarborStationProjectName(hook.event_data.repository.namespace);
@@ -131,10 +128,10 @@ async function publishHarborEventToUserInterface(hook: HarborHook) {
         isIncomingProject ||
         isOutgoingProject
     ) {
-        queueType = 'trainPushed';
+        eventType = 'trainPushed';
     }
 
-    if(typeof queueType !== 'undefined') {
+    if(typeof eventType !== 'undefined') {
         if(isLibraryProject) {
             if (hook.event_data.resources.length === 0) {
                 useLogger().debug('artifact tag missing for master image.', {service: 'api-harbor-hook'});
@@ -151,7 +148,7 @@ async function publishHarborEventToUserInterface(hook: HarborHook) {
             artifactTag: hook.event_data.resources[0]?.tag
         };
 
-        await publishQueueMessage(MQ_UI_H_EVENT_ROUTING_KEY, createQueueMessageTemplate(queueType, data));
+        await publishQueueMessage(MQ_UI_H_EVENT_ROUTING_KEY, createQueueMessageTemplate(eventType, data));
 
         useLogger().debug('master-image/train event pushed to ui harbor aggregator.', {service: 'api-harbor-hook'});
     }
@@ -166,52 +163,52 @@ async function publishHarborEventToResultService(hook: HarborHook) {
     const isOutgoingProject : boolean = hook.event_data.repository.namespace === HARBOR_OUTGOING_PROJECT_NAME;
 
     // Result Service
-    if (isOutgoingProject) {
-        const resultRepository = getRepository(TrainResult);
-
-        let queueType : string | undefined;
-
-        switch (hook.type) {
-            case 'PUSH_ARTIFACT':
-                queueType = 'download';
-                break;
-        }
-
-        if(typeof queueType !== 'undefined') {
-            let trainResult = await resultRepository.findOne({
-                train_id: hook.event_data.repository.name
-            });
-
-            if(typeof trainResult === 'undefined') {
-                const dbData = resultRepository.create({
-                    train_id: hook.event_data.repository.name,
-                    image: hook.event_data.repository.repo_full_name
-                });
-
-                await resultRepository.save(dbData);
-
-                trainResult = dbData;
-            }
-
-            const queueData : HarborQueueEventMessageData & {trainId: string, resultId: string | number} = {
-                operator: hook.operator,
-                namespace: hook.event_data.repository.namespace,
-                repositoryName: hook.event_data.repository.name,
-                repositoryFullName: hook.event_data.repository.repo_full_name,
-
-                // additional information
-                trainId: hook.event_data.repository.name,
-                resultId: trainResult.id
-            }
-
-            await publishQueueMessage(
-                MQ_RS_COMMAND_ROUTING_KEY,
-                createQueueMessageTemplate('download', queueData)
-            );
-
-            useLogger().debug('train event pushed to result service aggregator.', {service: 'api-harbor-hook'})
-        }
+    if (!isOutgoingProject) {
+        return;
     }
+
+    const resultRepository = getRepository(TrainResult);
+
+    if(hook.type !== 'PUSH_ARTIFACT') {
+        return;
+    }
+
+    let trainResult = await resultRepository.findOne({
+        train_id: hook.event_data.repository.name
+    });
+
+    if(typeof trainResult === 'undefined') {
+        const dbData = resultRepository.create({
+            train_id: hook.event_data.repository.name,
+            image: hook.event_data.repository.repo_full_name
+        });
+
+        await resultRepository.save(dbData);
+
+        trainResult = dbData;
+    }
+
+    const queueData : HarborQueueEventMessageData & {
+        trainId: string,
+        resultId: string | number
+    } = {
+        operator: hook.operator,
+        namespace: hook.event_data.repository.namespace,
+        repositoryName: hook.event_data.repository.name,
+        repositoryFullName: hook.event_data.repository.repo_full_name,
+
+        // additional information
+        trainId: hook.event_data.repository.name,
+        resultId: trainResult.id
+    }
+
+    await publishQueueMessage(
+        MQ_RS_COMMAND_ROUTING_KEY,
+        createQueueMessageTemplate('download', queueData)
+    );
+
+    useLogger().debug('train event pushed to result service aggregator.', {service: 'api-harbor-hook'})
+
 }
 
 /**
@@ -220,27 +217,23 @@ async function publishHarborEventToResultService(hook: HarborHook) {
  * @param hook
  */
 async function publishHarborEventToTrainRouter(hook: HarborHook) {
-    const isOutgoingProject : boolean = hook.event_data.repository.namespace === HARBOR_OUTGOING_PROJECT_NAME;
-    const isIncomingProject : boolean = hook.event_data.repository.namespace === HARBOR_INCOMING_PROJECT_NAME;
-    const isLibraryProject : boolean = hook.event_data.repository.namespace === HARBOR_MASTER_IMAGE_PROJECT_NAME;
-
-    if (!isOutgoingProject && !isIncomingProject && !isLibraryProject) {
-        let type : undefined | string;
-
-        switch (hook.type) {
-            case 'PUSH_ARTIFACT':
-                type = MQ_TR_EVENT_TRAIN_PUSHED;
-                break;
-        }
-
-        if(typeof type !== 'undefined') {
-            await publishTrainRouterQueueMessage(createTrainRouterQueueMessageEvent(
-                hook.event_data.repository.repo_full_name,
-                type,
-                hook.operator
-            ));
-
-            useLogger().debug('train event pushed to train router aggregator.', {service: 'api-harbor-hook'})
-        }
+    // only pass station project events to train router.
+    if (!isHarborStationProjectName(hook.event_data.repository.namespace)) {
+        return;
     }
+
+    // only keep track of push events
+    if(hook.type !== 'PUSH_ARTIFACT') {
+        return;
+    }
+
+    await publishTrainRouterQueueMessage(createTrainRouterQueueMessageEvent(
+        'trainPushed',
+        {
+            repositoryFullName: hook.event_data.repository.repo_full_name,
+            operator: hook.operator
+        }
+    ));
+
+    useLogger().debug('train event pushed to train router aggregator.', {service: 'api-harbor-hook'})
 }

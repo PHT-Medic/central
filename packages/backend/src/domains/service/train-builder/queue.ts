@@ -4,13 +4,19 @@ import {getRepository} from "typeorm";
 import {UserKeyRing} from "../../auth/user/key-ring";
 import {TrainFile} from "../../pht/train/file";
 import {MQ_TB_ROUTING_KEY} from "../../../config/services/rabbitmq";
+import {TrainStation} from "../../pht/train/station";
 import {TrainStationStateApproved} from "../../pht/train/station/states";
 
-export async function createTrainBuilderQueueMessage(train: Train, type: string | undefined, metaData: Record<string, any> = {}) : Promise<QueueMessage> {
+export type TrainBuilderCommand = 'trainBuild';
+export async function createTrainBuilderQueueMessage(
+    type: TrainBuilderCommand,
+    train: Train,
+    metaData: Record<string, any> = {}
+) : Promise<QueueMessage> {
     const keyRingRepository = getRepository(UserKeyRing);
     const keyRing = await keyRingRepository.findOne({
         user_id: train.user_id
-    })
+    });
 
     const filesRepository = getRepository(TrainFile);
     const files : TrainFile[] = await filesRepository
@@ -18,13 +24,20 @@ export async function createTrainBuilderQueueMessage(train: Train, type: string 
         .where('file.train_id = :id', {id: train.id})
         .getMany();
 
+    const trainStationRepository = getRepository(TrainStation);
+    const trainStations = await trainStationRepository
+        .createQueryBuilder('trainStation')
+        .leftJoinAndSelect('trainStation.station', 'station')
+        .addSelect('station.secure_id')
+        .where("trainStation.train_id = :trainId", {trainId: train.id})
+        .andWhere("trainStation.status = :status", {status: TrainStationStateApproved})
+        .getMany();
+
     return createQueueMessageTemplate(type, {
         userId: train.user_id,
         trainId: train.id,
         proposalId: train.proposal_id,
-        stations: train.train_stations
-            .filter(trainStation => trainStation.status === TrainStationStateApproved)
-            .map(trainStation => trainStation.station_id),
+        stations: trainStations.map(trainStation => trainStation.station.secure_id),
         files: files.map((file: TrainFile) => file.directory + '/' + file.name),
         masterImage: train.master_image.path,
         entrypointExecutable: train.entrypoint_executable,
