@@ -119,6 +119,8 @@ export async function getProposalsRouteHandler(req: any, res: any) {
 
     const pagination = applyRequestPagination(query, page, 50);
 
+    query.orderBy("proposal.updated_at", "DESC");
+
     const [entities, total] = await query.getManyAndCount();
 
     return res._respond({

@@ -2,7 +2,7 @@ import {Arguments, Argv, CommandModule} from "yargs";
 import {buildConnectionOptions, runSeeder} from "typeorm-extension";
 import {createConnection} from "typeorm";
 
-interface RestArguments extends Arguments {
+interface ResetArguments extends Arguments {
 
 }
 
@@ -14,7 +14,7 @@ export class ResetCommand implements CommandModule {
         return args;
     }
 
-    async handler(args: RestArguments) {
+    async handler(args: ResetArguments) {
         const connectionOptions = await buildConnectionOptions();
 
         const connection = await createConnection(connectionOptions);

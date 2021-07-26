@@ -84,6 +84,7 @@ export async function doHarborTask(req: any, res: any) {
 
             return res._respond({
                 data: {
+                    created: entities,
                     meta
                 }
             });

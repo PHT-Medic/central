@@ -84,8 +84,8 @@
             });
 
             this.masterImagesLoading = true;
-            getMasterImages().then((result) => {
-                this.masterImages = result;
+            getMasterImages().then((data) => {
+                this.masterImages = data.data;
                 this.masterImagesLoading = false
             });
         },

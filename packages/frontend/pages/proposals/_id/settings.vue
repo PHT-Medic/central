@@ -1,5 +1,4 @@
 <script>
-    import ProposalEditor from '../../../layouts/proposal/ProposalEditor';
     import {alpha, maxLength, minLength, required} from "vuelidate/lib/validators";
     import AlertMessage from "../../../components/alert/AlertMessage";
     import {getMasterImages} from "@/domains/masterImage/api.ts";
@@ -12,7 +11,7 @@
                 return can('edit', 'proposal') || can('drop', 'proposal')
             }
         },
-        components: {AlertMessage, ProposalEditor },
+        components: {AlertMessage },
         props: {
             proposal: {
                 type: Object,
@@ -67,8 +66,8 @@
         },
         created() {
             this.masterImagesLoading = true;
-            getMasterImages().then((result) => {
-                this.masterImages = result;
+            getMasterImages().then((data) => {
+                this.masterImages = data.data;
                 this.masterImagesLoading = false
             });
         },

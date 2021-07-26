@@ -1,7 +1,10 @@
 <script>
 import {executeServiceTask} from "~/domains/service/api";
+import MasterImageList from "~/components/master-image/MasterImageList";
+import {dropMasterImage} from "~/domains/masterImage/api";
 
 export default {
+    components: {MasterImageList},
     props: {
         service: Object
     },
@@ -42,24 +45,48 @@ export default {
             }
         },
         async syncMasterImages() {
-            const {meta} = await this.executeTask('syncMasterImages');
+            const {meta, created} = await this.executeTask('syncMasterImages');
 
             this.syncMasterImagesMeta.executed = true;
 
             this.syncMasterImagesMeta.created = meta.created;
             this.syncMasterImagesMeta.deleted = meta.deleted;
+
+            created.map(item => this.$refs["master-image-list"].addArrayItem(item));
         },
         async registerWebhookForMasterImages() {
             await this.executeTask('registerWebhookForMasterImages');
+        },
+
+        async dropMasterImage(id) {
+            try {
+                await dropMasterImage(id);
+
+                this.$refs["master-image-list"].dropArrayItem(id);
+            } catch (e) {
+
+            }
         }
     }
 }
 </script>
 <template>
     <div>
-        <h6><i class="fas fa-sd-card"></i> Master Image(s)</h6>
+
 
         <div class="row">
+            <div class="col">
+                <master-image-list ref="master-image-list">
+                    <template slot="header-title">
+                        <h6><i class="fas fa-sd-card"></i> Master Image(s)</h6>
+                    </template>
+                    <template slot="item-actions" slot-scope="{ item }">
+                        <button type="button" class="btn btn-danger btn-xs" @click.prevent="dropMasterImage(item.id)">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </template>
+                </master-image-list>
+            </div>
             <div class="col">
                 <strong>Webhook</strong>
                 <p>
@@ -70,8 +97,9 @@ export default {
                 <button type="button" class="btn btn-xs btn-success" :disabled="busy" @click.prevent="registerWebhookForMasterImages">
                     <i class="fa fa-plus"></i> Register
                 </button>
-            </div>
-            <div class="col">
+
+                <hr />
+
                 <strong>Sync</strong>
                 <p>
                     To keep the master images between the harbor service and the UI in sync, you can check the image registry (harbor) for unregistered master images and sync them.

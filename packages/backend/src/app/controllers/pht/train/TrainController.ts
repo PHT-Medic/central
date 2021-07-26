@@ -163,9 +163,7 @@ export async function getTrainsRouteHandler(req: any, res: any) {
 
     const pagination = applyRequestPagination(query, page, 50);
 
-    query.orderBy({
-        'train.updated_at': "DESC"
-    });
+    query.orderBy("train.updated_at", "DESC");
 
     const [entities, total] = await query.getManyAndCount();
 

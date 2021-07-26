@@ -100,7 +100,8 @@ export default {
             this.masterImage.busy = true;
 
             try {
-                this.masterImage.items = await getMasterImages();
+                const response = await getMasterImages();
+                this.masterImage.items = response.data;
                 if(this.form.masterImageId === '' && this.masterImage.items.length > 0) {
                     this.form.masterImageId = this.masterImage.items[0].id;
                     this.setTrainMasterImage();
