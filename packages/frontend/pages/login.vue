@@ -200,7 +200,7 @@
                     Station Realms
                 </h6>
                 <ul class="list-unstyled">
-                    <li v-for="(item,key) in providerItems" :key="key">
+                    <li v-for="(item,key) in providerItems" :key="key" class="mb-1">
                         <div class="card-header">
                             <div class="d-flex flex-wrap flex-row">
                                 <div>

@@ -9,13 +9,18 @@ This package requires docker to be installed on the host machine.
 ## Configuration
 The following settings need to be added to the environment section of the docker-compose file.
 ```
-PORT=3003
+PORT=<port>
 NODE_ENV=development
 
-VAULT_CONNECTION_STRING=s.jmMOV4W43R2zQ2WOuSQMwsV9@https://vault.pht.medic.uni-tuebingen.de/v1/
-RABBITMQ_CONNECTION_STRING=amqp://pht:start123@193.196.20.19
-HARBOR_CONNECTION_STRING=pht:PangerLenis32@https://harbor.personalhealthtrain.de/api/v2.0/
+RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
+HARBOR_CONNECTION_STRING=<user>:<password>@<api url>
+```
 
+### Docker
+To use the rabbitMQ-instance provided with the `docker-compose.yml` file,
+change the following environment variables:
+```
+RABBITMQ_CONNECTION_STRING=amqp://admin:start123@rabbitmq
 ```
 
 ## Credits
