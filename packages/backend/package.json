@@ -34,7 +34,7 @@
         "tar": "^6.0.5",
         "tar-stream": "^2.1.4",
         "typeorm": "^0.2.34",
-        "typeorm-extension": "^0.2.6",
+        "typeorm-extension": "^0.2.7",
         "typeorm-seeding": "^1.6.1",
         "typescript-swagger": "^0.1.1",
         "uuid": "^8.3.2",
