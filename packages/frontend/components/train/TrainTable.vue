@@ -220,7 +220,7 @@ export default {
 
         <alert-message :message="message" />
 
-        <b-table :items="items" :fields="fields" :busy="busy" head-variant="'dark'" sort-by="id" :sort-desc="true" outlined>
+        <b-table :items="items" :fields="fields" :busy="busy" head-variant="'dark'" outlined>
             <template v-slot:cell(id)="data">
                 <nuxt-link :to="trainConfiguratorStates.TrainConfiguratorStateFinished === data.item.configuratorStatus ? '/trains/'+data.item.id+'/wizard' : '/trains/'+data.item.id+'/wizard'">
                     <i v-if="trainConfiguratorStates.TrainConfiguratorStateFinished !== data.item.configuratorStatus" class="fa fa-cog text-warning mr-2" v-b-tooltip title="Configuration open"></i> {{data.item.id}}
