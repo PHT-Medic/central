@@ -111,9 +111,10 @@ export default {
 </script>
 <template>
     <div>
-        <h6>&bull; <i class="fa fa-train"></i> Train ID: <span class="text-primary">{{train.id}}</span></h6>
-        <h6>&bull; <i class="far fa-lightbulb"></i> Train Status: <train-status-text :status="train.status" /></h6>
-        <h6 v-if="result">&bull; <i class="far fa-lightbulb"></i> Train Result Status: {{result.status}}</h6>
+        <h6>
+            <i class="far fa-lightbulb"></i> Status: {{result ? result.status : 'Not available'}}
+        </h6>
+
         <hr />
 
         <div class="row">

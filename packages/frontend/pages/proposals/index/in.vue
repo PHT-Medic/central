@@ -4,7 +4,7 @@ import ProposalStationStatus from "@/components/proposal/ProposalStationStatus";
 import Pagination from "@/components/Pagination";
 import {ProposalStationStatusOptions} from "@/domains/proposal/station";
 import ProposalStationAction from "@/components/proposal/ProposalStationAction";
-import {dropApiProposalStation, getApiProposalStations} from "@/domains/proposal/station/api";
+import {getApiProposalStations} from "@/domains/proposal/station/api";
 import {getStations} from "@/domains/station/api";
 
 export default {
@@ -36,11 +36,14 @@ export default {
                 total: 0
             },
 
-            statusOptions: ProposalStationStatusOptions
+            statusOptions: ProposalStationStatusOptions,
+
+            station: null
         }
     },
     created() {
-        this.load();
+        this.init()
+            .then(this.load);
     },
     computed: {
       user() {
@@ -60,27 +63,45 @@ export default {
 
             Object.assign(this.items[index], e);
         },
+
+
+        /**
+         * Get station of current user.
+         *
+         * @return {Promise<void>}
+         */
+        async init() {
+            const {data: stations} = await getStations({
+                filter: {
+                    realmId: this.user.realmId
+                }
+            });
+
+            if(stations.length !== 1) {
+                return;
+            }
+
+            this.station = stations[0];
+        },
+
+        /**
+         * Load proposals.
+         *
+         * @return {Promise<void>}
+         */
         async load() {
+            if(this.busy || !this.station) return;
+
             this.busy = true;
 
             try {
-                const {data: stations} = await getStations({
-                    filter: {
-                        realmId: this.user.realmId
-                    }
-                });
-
-                if(stations.length !== 1) {
-                    return;
-                }
-
                 let record = {
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset
                     },
                     filter: {
-                        stationId: stations[0].id
+                        stationId: this.station.id
                     }
                 };
 
@@ -106,27 +127,7 @@ export default {
                 .then(resolve)
                 .catch(reject);
         },
-        async updateApiItem(item, data) {
-            if(this.itemBusy) return;
 
-            this.itemBusy = true;
-
-            try {
-                item = await dropApiProposalStation(item.id, data);
-
-                this.handleUpdated(item);
-            } catch (e) {
-                console.log(e);
-            }
-
-            this.itemBusy = false;
-        },
-        async approve(item) {
-            return await this.updateApiItem(item, {status: 'approved'})
-        },
-        async reject(item) {
-            return await this.updateApiItem(item, {status: 'rejected'})
-        },
         async edit(item) {
             this.item = item;
 

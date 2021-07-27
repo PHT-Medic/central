@@ -1,12 +1,16 @@
 import Vue from 'vue'
-import vueTimeago from 'vue-timeago';
+import {createTimeago} from 'vue-timeago';
 
-Vue.use(vueTimeago, {
-    name: 'Timeago', // Component name, `Timeago` by default
-    locale: 'en', // Default locale
-    // We use `date-fns` under the hood
-    // So you can use all locales from it
-    locales: {
-        //de: require('date-fns/locale/de')
-    }
+const Component = createTimeago({
+    locale: 'en'
 });
+
+const $timeago = {
+    locale: 'en'
+};
+
+Vue.prototype.$timeago = Vue.observable ? Vue.observable($timeago) : new Vue({
+    data: $timeago
+});
+
+Vue.component('timeago', Component);
