@@ -27,7 +27,7 @@
         "express": "^4.17.1",
         "module-alias": "^2.2.2",
         "reflect-metadata": "^0.1.13",
-        "tar": "^6.0.5",
+        "tar": "^6.1.2",
         "tar-stream": "^2.1.4",
         "typeorm": "^0.2.34",
         "typeorm-seeding": "^1.6.1",
