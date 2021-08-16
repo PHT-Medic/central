@@ -1,19 +1,24 @@
 import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
+import {DispatcherTrainEventType, emitDispatcherTrainEvent} from "../../../../domains/pht/train/queue";
 
-import {TrainStation} from "../../../../../domains/pht/train/station";
+import {TrainStation} from "../../../../domains/pht/train/station";
 
-import {Train} from "../../../../../domains/pht/train";
+import {Train} from "../../../../domains/pht/train";
 import {
     isPermittedForResourceRealm,
     onlyRealmPermittedQueryResources
-} from "../../../../../domains/auth/realm/db/utils";
-import {isTrainStationState, TrainStationStateApproved} from "../../../../../domains/pht/train/station/states";
+} from "../../../../domains/auth/realm/db/utils";
+import {
+    isTrainStationState,
+    TrainStationState,
+    TrainStationStateApproved
+} from "../../../../domains/pht/train/station/states";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import env from "../../../../../env";
-import {ForceLoggedInMiddleware} from "../../../../../config/http/middleware/auth";
+import env from "../../../../env";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialTrainStation = Partial<TrainStation>;
 const simpleExample = {train_id: 'xxx', station_id: 1, comment: 'Looks good to me', status: TrainStationStateApproved};
@@ -181,6 +186,13 @@ export async function addTrainStationRouteHandler(req: any, res: any) {
     try {
         entity = await repository.save(entity);
 
+        await emitDispatcherTrainEvent( {
+            event: 'assigned',
+            id: entity.train_id,
+            operatorStationId: entity.station_id,
+            operatorRealmId: req.realmId
+        });
+
         return res._respondCreated({
             data: entity
         });
@@ -247,6 +259,18 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
 
     try {
         trainStation = await repository.save(trainStation);
+
+        if(
+            trainStation.status &&
+            ['approved', 'rejected'].indexOf(trainStation.status as TrainStationState) !== -1
+        ) {
+            await emitDispatcherTrainEvent({
+                event: trainStation.status as DispatcherTrainEventType,
+                id: trainStation.train_id,
+                operatorStationId: trainStation.station_id,
+                operatorRealmId: req.realmId
+            });
+        }
 
         return res._respondCreated({
             data: trainStation

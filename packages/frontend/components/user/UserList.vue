@@ -65,6 +65,8 @@ export default {
 
             try {
                 let data = {
+                    // todo: remove this and add prop
+                    include: 'realm',
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset

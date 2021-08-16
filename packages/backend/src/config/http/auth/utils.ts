@@ -18,78 +18,76 @@ const isIp4InCidr = (ip: string, cidr: string) => {
 };
 
 export async function authenticateWithAuthorizationHeader(request: any, value: AuthorizationHeaderValue) : Promise<void> {
-    try {
-        switch (value.type) {
-            case "Bearer":
-                const tokenPayload : TokenPayload = await verifyToken(value.token, {
-                    directory: getWritableDirPath()
-                });
+    switch (value.type) {
+        case "Bearer":
+            const tokenPayload : TokenPayload = await verifyToken(value.token, {
+                directory: getWritableDirPath()
+            });
 
-                const {sub: userId} = tokenPayload;
+            const {sub: userId} = tokenPayload;
 
-                if(typeof userId === 'undefined' || typeof tokenPayload.remoteAddress !== 'string') {
-                    return;
-                }
+            if(typeof userId === 'undefined' || typeof tokenPayload.remoteAddress !== 'string') {
+                return;
+            }
 
-                // remove ipv6 space from embedded ipv4 address
-                const tokenAddress = tokenPayload.remoteAddress.replace('::ffff:', '');
-                const currentAddress : string = request.ip.replace('::ffff:', '');
+            // remove ipv6 space from embedded ipv4 address
+            const tokenAddress = tokenPayload.remoteAddress.replace('::ffff:', '');
+            const currentAddress : string = request.ip.replace('::ffff:', '');
 
-                if(
-                    // ipv4 + ipv6 local addresses
-                    ['::1', '127.0.0.1'].indexOf(currentAddress) === -1 &&
-                    tokenAddress !== currentAddress &&
-                    // allow private network addresses, maybe explicit whitelist possible frontend ip addresses instead.
-                    !isIp4InCidr(currentAddress, '10.0.0.0/8') &&
-                    !isIp4InCidr(currentAddress, '172.16.0.0/12') &&
-                    !isIp4InCidr(currentAddress, '192.168.0.0/16')
-                ) {
-                    console.log(tokenAddress, currentAddress);
-                    throw new UnauthorizedError();
-                }
+            if(
+                // ipv4 + ipv6 local addresses
+                ['::1', '127.0.0.1'].indexOf(currentAddress) === -1 &&
+                tokenAddress !== currentAddress &&
+                // allow private network addresses, maybe explicit whitelist possible frontend ip addresses instead.
+                !isIp4InCidr(currentAddress, '10.0.0.0/8') &&
+                !isIp4InCidr(currentAddress, '172.16.0.0/12') &&
+                !isIp4InCidr(currentAddress, '192.168.0.0/16')
+            ) {
+                console.log(tokenAddress, currentAddress);
+                throw new UnauthorizedError();
+            }
 
-                const userRepository = getCustomRepository<UserRepository>(UserRepository);
-                const user = await userRepository.findOne(userId, {relations: ['realm']});
+            const userRepository = getCustomRepository<UserRepository>(UserRepository);
+            const userQuery = userRepository.createQueryBuilder('user')
+                .addSelect('user.email')
+                .where('user.id = :id', {id: userId});
 
-                if (typeof user === 'undefined') {
-                    throw new UnauthorizedError();
-                }
+            const user = await userQuery.getOne();
 
-                const permissions =  await userRepository.getOwnedPermissions(user.id);
+            if (typeof user === 'undefined') {
+                throw new UnauthorizedError();
+            }
 
-                request.user = user;
-                request.userId = user.id;
-                request.realmId = user.realm_id;
+            const permissions =  await userRepository.getOwnedPermissions(user.id);
 
-                request.ability = new AbilityManager(permissions);
-                break;
-            case "Basic":
-                const clientRepository = getRepository(Client);
-                const client = await clientRepository.findOne({
-                    id: value.username,
-                    secret: value.password
-                }, {relations: ['service']});
+            request.user = user;
+            request.userId = user.id;
+            request.realmId = user.realm_id;
 
-                if(typeof client === 'undefined') {
-                    throw new UnauthorizedError();
-                }
+            request.ability = new AbilityManager(permissions);
+            break;
+        case "Basic":
+            const clientRepository = getRepository(Client);
+            const client = await clientRepository.findOne({
+                id: value.username,
+                secret: value.password
+            }, {relations: ['service']});
 
-                if(!client.service) {
-                    // only allow services for now... ^^
-                    return;
-                }
+            if(typeof client === 'undefined') {
+                throw new UnauthorizedError();
+            }
 
-                request.service = client.service;
-                request.serviceId = client.service.id;
-                request.realmId = client.service.realm_id;
+            if(!client.service) {
+                // only allow services for now... ^^
+                return;
+            }
 
-                request.ability = new AbilityManager([]);
-                break;
-        }
-    } catch (e) {
-        useLogger().error(e.message);
+            request.service = client.service;
+            request.serviceId = client.service.id;
+            request.realmId = client.service.realm_id;
 
-        throw e;
+            request.ability = new AbilityManager([]);
+            break;
     }
 }
 

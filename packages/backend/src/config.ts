@@ -1,7 +1,8 @@
+import {buildDispatcherComponent} from "./components/event-dispatcher";
 import {Environment} from "./env";
 import {buildTrainBuilderAggregator} from "./aggregators/train-builder";
 import {buildTrainResultAggregator} from "./aggregators/train-result";
-import {buildHarborAggregator} from "./aggregators/harbor";
+import {buildDispatcherAggregator} from "./aggregators/dispatcher";
 import {useVaultApi} from "./modules/api/service/vault";
 import {useHarborApi} from "./modules/api/service/harbor";
 import {buildServiceSecurityComponent} from "./components/service-security";
@@ -17,13 +18,14 @@ export type Config = {
 
 function createConfig({env} : ConfigContext) : Config {
     const aggregators : {start: () => void}[] = [
-        buildHarborAggregator(),
+        buildDispatcherAggregator(),
         buildTrainBuilderAggregator(),
         buildTrainResultAggregator()
     ];
 
     const components : {start: () => void}[] = [
-        buildServiceSecurityComponent()
+        buildServiceSecurityComponent(),
+        buildDispatcherComponent()
     ];
 
     useVaultApi(env.vaultConnectionString);

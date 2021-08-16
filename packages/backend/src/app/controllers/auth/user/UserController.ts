@@ -1,6 +1,6 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getCustomRepository, getRepository} from "typeorm";
-import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
+import {applyRequestFields, applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
 import {Params, Controller, Get, Request, Response, Post, Body, Delete} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 
@@ -96,20 +96,23 @@ export class UserController {
 }
 
 export async function getUsersRouteHandler(req: any, res: any) {
-    const { filter, page } = req.query;
+    const { filter, page, include, fields } = req.query;
 
     try {
 
         const userRepository = getCustomRepository<UserRepository>(UserRepository);
-        const query = userRepository.createQueryBuilder('user')
-            .leftJoinAndSelect('user.realm', 'realm');
+        const query = userRepository.createQueryBuilder('user');
 
         onlyRealmPermittedQueryResources(query, req.realmId);
+
+        applyRequestFields(query, fields, {user: ['email']});
 
         applyRequestFilter(query, filter, {
             id: 'user.id',
             name: 'user.name'
         });
+
+        applyRequestIncludes(query, 'user', include, ['realm', 'user_roles']);
 
         const pagination = applyRequestPagination(query, page, 50);
 
@@ -131,14 +134,18 @@ export async function getUsersRouteHandler(req: any, res: any) {
 
 export async function getUserRouteHandler(req: any, res: any) {
     const { id } = req.params;
+    const { include, fields } = req.query;
 
     try {
         const userRepository = getCustomRepository<UserRepository>(UserRepository);
         const query = await userRepository.createQueryBuilder('user')
-            .leftJoinAndSelect('user.realm', 'realm')
             .andWhere("user.id = :id", {id});
 
         onlyRealmPermittedQueryResources(query, req.realmId);
+
+        applyRequestFields(query, fields, {user: ['email']});
+
+        applyRequestIncludes(query, 'user', include, ['realm', 'user_roles']);
 
         const result = await query.getOne();
 

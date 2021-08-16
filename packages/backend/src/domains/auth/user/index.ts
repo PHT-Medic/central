@@ -24,7 +24,7 @@ export class User {
     @Column({type: "varchar", length: 128})
     display_name: string;
 
-    @Column({type: 'varchar', length: 255, default: null, nullable: true})
+    @Column({type: 'varchar', length: 255, default: null, nullable: true, select: false})
     email: string;
 
     @Column({type: 'varchar', length: 512, default: null, nullable: true, select: false})

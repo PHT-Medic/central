@@ -1,3 +1,6 @@
+
+// ----------------------------------------------------------
+
 export const MQ_UI_SELF_COMMAND_ROUTING_KEY = 'ui.self.command';
 export const MQ_UI_SELF_EVENT_ROUTING_KEY = 'ui.self.event';
 
@@ -6,12 +9,27 @@ export const MQ_UI_SELF_EVENT_ROUTING_KEY = 'ui.self.event';
 /**
  * User Interface
  */
-// Harbor (H)
-export const MQ_UI_H_EVENT_ROUTING_KEY = 'ui.harbor.event';
+// Dispatcher (D)
+export const MQ_UI_D_EVENT_ROUTING_KEY = 'ui.dispatcher.event';
 // Result Service (RS)
 export const MQ_UI_RS_EVENT_ROUTING_KEY = 'ui.rs.event';
 // Train Builder (TB)
 export const MQ_UI_TB_EVENT_ROUTING_KEY = 'ui.tb.event';
+
+
+// ----------------------------------------------------------
+
+/**
+ * Dispatcher (D)
+ */
+export const MQ_DISPATCHER_ROUTING_KEY = 'dispatcher.event';
+
+// ----------------------------------------------------------
+
+/**
+ * E-Mail Notifier (EN)
+ */
+export const MQ_EN_EVENT_ROUTING_KEY = 'en.event';
 
 // ----------------------------------------------------------
 

@@ -30,6 +30,11 @@ export class Station {
     @Column({type: "text", nullable: true, select: false})
     public_key: string;
 
+    @Column({type: "varchar", length: 256, nullable: true, select: false})
+    admin_email: string | null;
+
+    // ------------------------------------------------------------------
+
     @Column({nullable: true, default: null, select: false})
     harbor_project_id: number | null;
 

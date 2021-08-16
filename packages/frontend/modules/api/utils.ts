@@ -86,7 +86,7 @@ export type RequestRecord = {
     },
     fields?: {
         [key: string] : string[] | string
-    },
+    } | string[] | string,
     sort?: {
         [key: string] : 'asc' | 'desc'
     },

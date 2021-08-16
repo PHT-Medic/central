@@ -7,8 +7,8 @@ export async function getUsers(options?: RequestRecord) {
     return response.data;
 }
 
-export async function getUser(id: number) {
-    const response = await useApi('auth').get('users/'+id);
+export async function getUser(id: number, options?: RequestRecord) {
+    const response = await useApi('auth').get('users/'+id + formatRequestRecord(options));
 
     return response.data;
 }

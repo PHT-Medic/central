@@ -11,7 +11,7 @@ import {ProposalStationController} from "../../app/controllers/pht/proposal-stat
 import {StationController} from "../../app/controllers/pht/station/StationController";
 import {TrainController} from "../../app/controllers/pht/train/TrainController";
 import {TrainFileController} from "../../app/controllers/pht/train/file/TrainFileController";
-import {TrainStationController} from "../../app/controllers/pht/train/station/TrainStationController";
+import {TrainStationController} from "../../app/controllers/pht/train-station/TrainStationController";
 import {UserRoleController} from "../../app/controllers/auth/user/role/UserRoleController";
 import {RoleController} from "../../app/controllers/auth/role/RoleController";
 import {RolePermissionController} from "../../app/controllers/auth/role/permission/RolePermissionController";

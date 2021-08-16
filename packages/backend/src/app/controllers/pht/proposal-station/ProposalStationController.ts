@@ -1,12 +1,17 @@
 import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
+import {emitDispatcherProposalEvent, DispatcherProposalEventType} from "../../../../domains/pht/proposal/queue";
 import {ProposalStation} from "../../../../domains/pht/proposal/station";
 import {
     isPermittedForResourceRealm,
     onlyRealmPermittedQueryResources
 } from "../../../../domains/auth/realm/db/utils";
-import {isProposalStationState, ProposalStationStateApproved} from "../../../../domains/pht/proposal/station/states";
+import {
+    isProposalStationState,
+    ProposalStationState,
+    ProposalStationStateApproved
+} from "../../../../domains/pht/proposal/station/states";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
@@ -162,6 +167,13 @@ export async function addProposalStationRouteHandler(req: any, res: any) {
     try {
         entity = await repository.save(entity);
 
+        await emitDispatcherProposalEvent({
+            event: 'assigned',
+            id: entity.proposal_id,
+            operatorStationId: entity.station_id,
+            operatorRealmId: req.realmId
+        });
+
         return res._respondCreated({
             data: entity
         });
@@ -220,6 +232,19 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
 
     try {
         proposalStation = await repository.save(proposalStation);
+
+        if(
+            data.status &&
+            data.status !== proposalStation.status &&
+            ['approved', 'rejected'].indexOf(proposalStation.status as ProposalStationState) !== -1
+        ) {
+            await emitDispatcherProposalEvent({
+                event: proposalStation.status as DispatcherProposalEventType,
+                id: proposalStation.proposal_id,
+                operatorStationId: proposalStation.station_id,
+                operatorRealmId: req.realmId
+            });
+        }
 
         return res._respondCreated({
             data: proposalStation

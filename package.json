@@ -9,5 +9,13 @@
     "license": "MIT",
     "version": "1.0.0",
     "description": "This package contains all packages of the Central UI. It was initially developed as part of my Bachelor Thesis.",
-    "workspaces": ["./packages/*"]
+    "workspaces": [
+        "./packages/*"
+    ],
+    "devDependencies": {
+        "lerna": "^4.0.0"
+    },
+    "scripts": {
+        "cleanup": "lerna clean && lerna bootstrap"
+    }
 }
