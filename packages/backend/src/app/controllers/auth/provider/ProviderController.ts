@@ -35,7 +35,6 @@ export class ProviderController {
         @Request() req: any,
         @Response() res: any
     ) : Promise<OAuth2Provider> {
-        // todo: implement edit
         return await editProviderRoute(req, res);
     }
 

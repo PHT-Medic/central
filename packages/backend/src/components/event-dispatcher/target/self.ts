@@ -1,21 +1,19 @@
-import {getRepository} from "typeorm";
 import {AggregatorMasterImagePushedEvent} from "../../../aggregators/dispatcher/handlers/masterImage";
 import {AggregatorTrainBuiltEvent, AggregatorTrainFinishedEvent, AggregatorTrainStartedEvent} from "../../../aggregators/dispatcher/handlers/train";
 import {
-    buildStationHarborProjectName,
     HARBOR_INCOMING_PROJECT_NAME,
     HARBOR_MASTER_IMAGE_PROJECT_NAME, HARBOR_OUTGOING_PROJECT_NAME,
     isHarborStationProjectName
 } from "../../../config/services/harbor";
 import {MQ_UI_D_EVENT_ROUTING_KEY} from "../../../config/services/rabbitmq";
-import {TrainStation} from "../../../domains/pht/train/station";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
+import {DispatcherHarborEventWithAdditionalData} from "../data/harbor";
 
 export async function dispatchHarborEventToSelf(
     message: QueueMessage
 ) : Promise<QueueMessage> {
-    const data : DispatcherHarborEventData = message.data as DispatcherHarborEventData;
+    const data : DispatcherHarborEventWithAdditionalData = message.data as DispatcherHarborEventData;
 
     if(data.event !== 'PUSH_ARTIFACT') {
         return message;
@@ -51,7 +49,7 @@ export async function dispatchHarborEventToSelf(
     return message;
 }
 
-async function processMasterImage(data: DispatcherHarborEventData) : Promise<void> {
+async function processMasterImage(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     await publishQueueMessage(
         MQ_UI_D_EVENT_ROUTING_KEY,
         createQueueMessageTemplate(AggregatorMasterImagePushedEvent, {
@@ -61,7 +59,7 @@ async function processMasterImage(data: DispatcherHarborEventData) : Promise<voi
     );
 }
 
-async function processIncomingTrain(data: DispatcherHarborEventData) : Promise<void> {
+async function processIncomingTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     await publishQueueMessage(
         MQ_UI_D_EVENT_ROUTING_KEY,
         createQueueMessageTemplate(AggregatorTrainBuiltEvent, {
@@ -70,7 +68,7 @@ async function processIncomingTrain(data: DispatcherHarborEventData) : Promise<v
     );
 }
 
-async function processOutgoingTrain(data: DispatcherHarborEventData) : Promise<void> {
+async function processOutgoingTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     await publishQueueMessage(
         MQ_UI_D_EVENT_ROUTING_KEY,
         createQueueMessageTemplate(AggregatorTrainFinishedEvent, {
@@ -79,26 +77,25 @@ async function processOutgoingTrain(data: DispatcherHarborEventData) : Promise<v
     );
 }
 
-async function processStationTrain(data: DispatcherHarborEventData) : Promise<void> {
-    const repository = getRepository(TrainStation);
-    const query = repository.createQueryBuilder('trainStation')
-        .leftJoinAndSelect('trainStation.station', 'station')
-        .where("trainStation.train_id = :trainId", {trainId: data.repositoryName});
-
-    const entities = await query.getMany();
-
-    if(entities.length > 0) {
-        // todo: be aware of sorting
-        if(data.namespace === buildStationHarborProjectName(entities[0].station.secure_id)) {
-            await publishQueueMessage(
-                MQ_UI_D_EVENT_ROUTING_KEY,
-                createQueueMessageTemplate(AggregatorTrainStartedEvent, {
-                    id: data.repositoryName,
-                    stationId: entities[0].station.id
-                })
-            );
-        }
+async function processStationTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
+    if(
+        typeof data.station === 'undefined' ||
+        typeof data.stationIndex === 'undefined'
+    ) {
+        return;
     }
 
+    // If stationIndex is 0, than the target is the first station of the route.
+    if(data.stationIndex === 0) {
+        await publishQueueMessage(
+            MQ_UI_D_EVENT_ROUTING_KEY,
+            createQueueMessageTemplate(AggregatorTrainStartedEvent, {
+                id: data.repositoryName,
+                stationId: data.station.id
+            })
+        );
+    }
+
+    // data.stations is only required for train progress :)
     // todo: emit train status progress
 }

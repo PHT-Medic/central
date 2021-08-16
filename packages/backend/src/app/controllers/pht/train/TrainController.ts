@@ -225,9 +225,12 @@ export async function addTrainRouteHandler(req: any, res: any) {
         .exists()
         .isInt()
         .custom(value => {
-            return getRepository(Proposal).find(value).then((proposalResult) => {
-                if(typeof proposalResult === 'undefined') throw new Error('The referenced proposal does not exist.');
-                // todo: check if is request realm id is equal to proposal realm id.
+            return getRepository(Proposal).findOne(value).then((proposal) => {
+                if(typeof proposal === 'undefined') throw new Error('The referenced proposal does not exist.');
+
+                if(proposal.realm_id !== req.realmId) {
+                    throw new Error('You are not permitted to create a train for that realm.')
+                }
             })
         })
         .run(req);

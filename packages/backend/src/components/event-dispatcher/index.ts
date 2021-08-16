@@ -5,6 +5,7 @@ import {
     QueChannelHandler,
     QueueMessage
 } from "../../modules/message-queue";
+import {extendDispatcherHarborData} from "./data/harbor";
 import {
     dispatchHarborEventToEmailNotifier,
     dispatchProposalEventToEmailNotifier,
@@ -38,9 +39,8 @@ function createDispatcherHandlers() : Record<string, QueChannelHandler> {
         [DispatcherHarborEvent]: async(message: QueueMessage) => {
             // PUSH_ARTIFACT
 
-            // todo: maybe prepare stations, if it is stationRepository ^^
-
             return Promise.resolve(message)
+                .then(extendDispatcherHarborData)
                 .then(dispatchHarborEventToSelf)
                 .then(dispatchHarborEventToTrainRouter)
                 .then(dispatchHarborEventToResultService)
