@@ -233,6 +233,8 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
 
     const data = matchedData(req, {includeOptionals: false});
 
+    const entityStatus : string | undefined = proposalStation.status;
+
     proposalStation = repository.merge(proposalStation, data);
 
     try {
@@ -240,8 +242,8 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
 
         if(
             data.status &&
-            data.status !== proposalStation.status &&
-            ['approved', 'rejected'].indexOf(proposalStation.status as ProposalStationState) !== -1
+            data.status !== entityStatus &&
+            ['approved', 'rejected'].indexOf(data.status as ProposalStationState) !== -1
         ) {
             await emitDispatcherProposalEvent({
                 event: proposalStation.status as DispatcherProposalEventType,

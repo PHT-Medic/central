@@ -59,7 +59,7 @@ export default {
 
             try {
                 if(this.isEditing) {
-                    const stationProposal = await editApiProposalStation(this.proposalStationProperty.proposal.id, this.formData);
+                    const stationProposal = await editApiProposalStation(this.proposalStationProperty.id, this.formData);
 
                     this.message = {
                         isError: false,

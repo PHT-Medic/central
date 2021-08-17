@@ -255,14 +255,17 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
 
     const data = matchedData(req, {includeOptionals: false});
 
+    const entityStatus : string | undefined = trainStation.status;
+
     trainStation = repository.merge(trainStation, data);
 
     try {
         trainStation = await repository.save(trainStation);
 
         if(
-            trainStation.status &&
-            ['approved', 'rejected'].indexOf(trainStation.status as TrainStationState) !== -1
+            data.status &&
+            data.status !== entityStatus &&
+            ['approved', 'rejected'].indexOf(data.status as TrainStationState) !== -1
         ) {
             await emitDispatcherTrainEvent({
                 event: trainStation.status as DispatcherTrainEventType,
