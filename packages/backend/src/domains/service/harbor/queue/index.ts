@@ -25,7 +25,7 @@ export async function emitDispatcherHarborEvent(
 
     const message = createQueueMessageTemplate(DispatcherHarborEvent, data, metaData);
 
-    if(options.templateOnly) {
+    if(!options.templateOnly) {
         await publishQueueMessage(MQ_DISPATCHER_ROUTING_KEY, message);
     }
 

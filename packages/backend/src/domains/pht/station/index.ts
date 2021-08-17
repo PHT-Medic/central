@@ -31,7 +31,7 @@ export class Station {
     public_key: string;
 
     @Column({type: "varchar", length: 256, nullable: true, select: false})
-    admin_email: string | null;
+    email: string | null;
 
     // ------------------------------------------------------------------
 

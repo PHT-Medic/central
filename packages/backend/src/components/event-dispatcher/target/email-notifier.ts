@@ -26,8 +26,10 @@ export async function dispatchProposalEventToEmailNotifier(
             MQ_EN_EVENT_ROUTING_KEY,
             createQueueMessageTemplate(mapping[data.event], {
                 id: data.id,
-                operatorStationId: data.operatorStationId,
-                operatorRealmId: data.operatorRealmId
+                stationId: data.stationId,
+                operatorRealmId: data.operatorRealmId,
+                // operatorId: '',
+                // operatorType: 'user' | 'service'
             })
         );
     }
@@ -51,7 +53,7 @@ export async function dispatchTrainEventToEmailNotifier(
             MQ_EN_EVENT_ROUTING_KEY,
             createQueueMessageTemplate(mapping[data.event], {
                 id: data.id,
-                operatorStationId: data.operatorStationId,
+                stationId: data.stationId,
                 operatorRealmId: data.operatorRealmId
             })
         );

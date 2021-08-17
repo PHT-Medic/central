@@ -1,6 +1,6 @@
 <script>
 import {v4} from 'uuid';
-import {maxLength, minLength, required, helpers} from "vuelidate/lib/validators";
+import {maxLength, minLength, required, helpers, email} from "vuelidate/lib/validators";
 
 const safeStr = helpers.regex('safeStr', /^[a-zA-Z0-9-]*$/)
 
@@ -29,6 +29,7 @@ export default {
             formData: {
                 name: '',
                 publicKey: null,
+                email: null,
                 realmId: '',
                 secureId: '',
                 syncPublicKey: true,
@@ -52,6 +53,11 @@ export default {
             },
             realmId: {
                 required
+            },
+            email: {
+                minLength: minLength(10),
+                maxLength: maxLength(256),
+                email
             },
             publicKey: {
                 minLength: minLength(10),
@@ -226,10 +232,6 @@ export default {
                 </div>
             </div>
 
-            <div class="mb-1">
-
-            </div>
-
             <div class="alert alert-sm" :class="{'alert-danger': secureIdChanged, 'alert-info': !secureIdChanged}">
                 <div class="mb-1">
                     <template v-if="secureIdChanged">
@@ -264,7 +266,7 @@ export default {
                 </div>
             </div>
 
-            <div class="d-flex">
+            <div class="d-flex mb-2">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" v-model="formData.syncPublicKey" id="sync-public-key" required>
                     <label class="form-check-label" for="sync-public-key">
@@ -273,6 +275,21 @@ export default {
                 </div>
                 <div class="ml-auto">
                     Pushed: <i class="fa" :class="{'fa-check text-success': formData.vaultPublicKeySaved, 'fa-times text-danger': !formData.vaultPublicKeySaved}" />
+                </div>
+            </div>
+
+            <div class="form-group" :class="{ 'form-group-error': $v.formData.email.$error }">
+                <label>E-Mail</label>
+                <input v-model="$v.formData.email.$model" type="text" name="name" class="form-control" placeholder="E-Mail...">
+
+                <div v-if="!$v.formData.email.minLength" class="form-group-hint group-required">
+                    The length of the e-mail address must be greater than <strong>{{ $v.formData.email.$params.minLength.min }}</strong> characters.
+                </div>
+                <div v-if="!$v.formData.email.maxLength" class="form-group-hint group-required">
+                    The length of the e-mail address must be less than <strong>{{ $v.formData.email.$params.maxLength.max }}</strong> characters.
+                </div>
+                <div v-if="!$v.formData.email.email" class="form-group-hint group-required">
+                    The e-mail address is not valid.
                 </div>
             </div>
 

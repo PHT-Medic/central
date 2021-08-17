@@ -26,11 +26,15 @@ function createDispatcherHandlers() : Record<string, QueChannelHandler> {
         [DispatcherProposalEvent]: async(message: QueueMessage) => {
             // assigned, approved, rejected
 
+            console.log(message);
+
             return Promise.resolve(message)
                 .then(dispatchProposalEventToEmailNotifier);
         },
         [DispatcherTrainEvent]: async(message: QueueMessage) => {
             // assigned, approved, rejected
+
+            console.log(message);
 
             return Promise.resolve(message)
                 .then(dispatchTrainEventToEmailNotifier);

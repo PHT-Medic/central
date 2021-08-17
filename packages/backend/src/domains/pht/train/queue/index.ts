@@ -6,7 +6,7 @@ export type DispatcherTrainEventType = 'approved' | 'assigned' | 'rejected';
 export type DispatcherTrainEventData = {
     event: DispatcherTrainEventType,
     id: string | number,
-    operatorStationId: string | number,
+    stationId: string | number,
     operatorRealmId: string | number
 }
 
@@ -22,8 +22,10 @@ export async function emitDispatcherTrainEvent(
     const message = createQueueMessageTemplate(DispatcherTrainEvent, data, metaData);
 
     if(options.templateOnly) {
-        await publishQueueMessage(MQ_DISPATCHER_ROUTING_KEY, message);
+        return message;
     }
+
+    await publishQueueMessage(MQ_DISPATCHER_ROUTING_KEY, message);
 
     return message;
 }

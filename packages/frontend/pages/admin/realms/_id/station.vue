@@ -36,7 +36,7 @@ export default {
                         'harbor_project_webhook_exists',
                         'vault_public_key_saved',
                         'public_key',
-
+                        'email',
                         'secure_id'
                     ]
                 }

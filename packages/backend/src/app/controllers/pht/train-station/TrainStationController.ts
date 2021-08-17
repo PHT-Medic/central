@@ -189,7 +189,7 @@ export async function addTrainStationRouteHandler(req: any, res: any) {
         await emitDispatcherTrainEvent( {
             event: 'assigned',
             id: entity.train_id,
-            operatorStationId: entity.station_id,
+            stationId: entity.station_id,
             operatorRealmId: req.realmId
         });
 
@@ -267,7 +267,7 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
             await emitDispatcherTrainEvent({
                 event: trainStation.status as DispatcherTrainEventType,
                 id: trainStation.train_id,
-                operatorStationId: trainStation.station_id,
+                stationId: trainStation.station_id,
                 operatorRealmId: req.realmId
             });
         }

@@ -98,6 +98,7 @@ export async function getStationRouteHandler(req: any, res: any) {
             station: [
                 'secure_id',
                 'public_key',
+                'email',
                 'harbor_project_account_name',
                 'harbor_project_account_token',
                 'harbor_project_id',
@@ -135,6 +136,7 @@ export async function getStationsRouteHandler(req: any, res: any) {
             station: [
                 'secure_id',
                 'public_key',
+                'email',
                 'harbor_project_account_name',
                 'harbor_project_account_token',
                 'harbor_project_id',
@@ -167,6 +169,7 @@ export async function addStationRouteHandler(req: any, res: any) {
     await check('name').isLength({min: 5, max: 100}).exists().notEmpty().run(req);
     await check('secure_id').isLength({min: 1, max: 100}).exists().matches(/^[a-zA-Z0-9-]*$/).run(req);
     await check('public_key').isLength({min: 5, max: 4096}).exists().optional({nullable: true}).run(req);
+    await check('email').isLength({min: 5, max: 256}).exists().optional({nullable: true}).run(req);
     await check('sync_public_key').isBoolean().optional().run(req);
     await check('realm_id').exists().notEmpty().run(req);
 
@@ -225,6 +228,7 @@ export async function editStationRouteHandler(req: any, res: any) {
     await check('name').isLength({min: 5, max: 100}).exists().optional().run(req);
     await check('secure_id').isLength({min: 1, max: 100}).exists().matches(/^[a-zA-Z0-9-]*$/).optional().run(req);
     await check('public_key').isLength({min: 5, max: 4096}).exists().notEmpty().optional({nullable: true}).run(req);
+    await check('email').isLength({min: 5, max: 256}).exists().optional({nullable: true}).run(req);
     await check('sync_public_key').isBoolean().optional().run(req);
 
     const validation = validationResult(req);

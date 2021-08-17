@@ -1,5 +1,6 @@
 import {getRepository, In} from "typeorm";
 import {applyRequestFilter, applyRequestPagination, applyRequestIncludes} from "typeorm-extension";
+import {emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
 import {Station} from "../../../../domains/pht/station";
 import {
     isPermittedForResourceRealm,
@@ -159,7 +160,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
         .exists()
         .isInt()
         .custom(value => {
-            return getRepository(MasterImage).find(value).then((masterImageResult) => {
+            return getRepository(MasterImage).findOne(value).then((masterImageResult) => {
                 if(typeof masterImageResult === 'undefined') throw new Error('The provided master image does not exist.');
             })
         })
@@ -201,6 +202,17 @@ export async function addProposalRouteHandler(req: any, res: any) {
         });
 
         await proposalStationRepository.save(proposalStations);
+
+        const proposalStationPromise = Promise.all(station_ids.map((stationId: string | number) => {
+            return emitDispatcherProposalEvent({
+                event: 'assigned',
+                id: entity.id,
+                stationId,
+                operatorRealmId: req.realmId
+            });
+        }));
+
+        await proposalStationPromise;
 
         return res._respond({data: entity});
     } catch (e) {

@@ -16,6 +16,7 @@ import {
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import env from "../../../../env";
 
 type PartialProposalStation = Partial<ProposalStation>;
 const simpleExample = {proposal_id: 1, station_id: 1, comment: 'Looks good to me', status: ProposalStationStateApproved};
@@ -164,13 +165,17 @@ export async function addProposalStationRouteHandler(req: any, res: any) {
     const repository = getRepository(ProposalStation);
     let entity = repository.create(data);
 
+    if(env.demo) {
+        entity.status = ProposalStationStateApproved;
+    }
+
     try {
         entity = await repository.save(entity);
 
         await emitDispatcherProposalEvent({
             event: 'assigned',
             id: entity.proposal_id,
-            operatorStationId: entity.station_id,
+            stationId: entity.station_id,
             operatorRealmId: req.realmId
         });
 
@@ -241,7 +246,7 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
             await emitDispatcherProposalEvent({
                 event: proposalStation.status as DispatcherProposalEventType,
                 id: proposalStation.proposal_id,
-                operatorStationId: proposalStation.station_id,
+                stationId: proposalStation.station_id,
                 operatorRealmId: req.realmId
             });
         }

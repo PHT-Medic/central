@@ -19,12 +19,11 @@
 <template>
     <div class="">
         <h1 class="title no-border mb-5 text-center">
-            PHT <span class="sub-title">{{ user.realm.name }} Realm</span>
+            PHT <span class="sub-title">Discover the PHT today!</span>
         </h1>
 
         <div class="row">
             <div class="col-lg-6 col-12">
-                <h5 class="text-center">Discover the PHT today!</h5>
                 <world-svg width="100%" />
                 <div class="text-center">
                     <p>The DIFUTURE implementation of the <strong>Personal Health Train (PHT)</strong> from Tübingen University as part of the PHT implementation network.</p>

@@ -16,7 +16,7 @@
                 return vm.$store.state.auth.user;
             },
             infoText(vm) {
-                return vm.user ? vm.user.realm?.name ?? vm.user.realmId : 'Personal Health Train'
+                return vm.user ? vm.user.realmId : 'Personal Health Train'
             }
         },
         methods: {
