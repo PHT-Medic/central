@@ -66,15 +66,15 @@ export default {
 
             this.$refs['form'].show();
         },
-        async drop(user) {
+        async drop(item) {
             let l = this.$createElement;
 
             try {
                 let proceed = await this.$bvModal.msgBoxConfirm(l('div', {class: 'alert alert-info m-b-0'}, [
                     l('p', null, [
-                        'Sind Sie sicher, dass Sie den Realm ',
-                        l('b', null, [user.name]),
-                        ' löschen möchten?'
+                        'Are you sure that you want to delete  ',
+                        l('b', null, [item.name]),
+                        '?'
                     ])
                 ]), {
                     size: 'sm',
@@ -84,12 +84,10 @@ export default {
 
                 if(proceed) {
                     try {
-                        let index = this.items.findIndex((el) => {
-                            return el.id === user.id
-                        });
+                        let index = this.items.findIndex(el => el.id === item.id);
 
                         if(index !== -1) {
-                            await dropRealm(user.id);
+                            await dropRealm(item.id);
 
                             this.items.splice(index,1);
                         }

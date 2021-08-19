@@ -1,6 +1,7 @@
 import {getRepository} from "typeorm";
 import {applyRequestFields, applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
+import {MASTER_REALM_ID} from "../../../../domains/auth/realm";
 import {Station} from "../../../../domains/pht/station";
 import {deleteStationHarborProject} from "../../../../domains/pht/station/harbor/api";
 import {
@@ -93,7 +94,9 @@ export async function getStationRouteHandler(req: any, res: any) {
     const query = repository.createQueryBuilder('station')
         .where("station.id = :id", {id});
 
-    if(req.ability.can('edit', 'station')) {
+    // todo: should be implemented by assigning permissions to a service.
+    const isPermittedService : boolean = typeof req.serviceId !== 'undefined' && req.realmId === MASTER_REALM_ID;
+    if(req.ability.can('edit', 'station') || isPermittedService) {
         applyRequestFields(query, fields, {
             station: [
                 'secure_id',
@@ -131,7 +134,9 @@ export async function getStationsRouteHandler(req: any, res: any) {
         realmId: 'station.realm_id'
     });
 
-    if(req.ability.can('edit', 'station')) {
+    // todo: should be implemented by assigning permissions to a service.
+    const isPermittedService : boolean = typeof req.serviceId !== 'undefined' && req.realmId === MASTER_REALM_ID;
+    if(req.ability.can('edit', 'station') || isPermittedService) {
         applyRequestFields(query, fields, {
             station: [
                 'secure_id',
