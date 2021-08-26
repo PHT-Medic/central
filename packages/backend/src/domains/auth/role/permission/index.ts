@@ -10,7 +10,6 @@ import {
 } from "typeorm";
 import {Role} from "../index";
 import {Permission} from "../../permission";
-import {Condition} from "@typescript-auth/core";
 
 @Entity({name: 'role_permissions'})
 @Index(['permission_id', 'role_id'], {unique: true})
