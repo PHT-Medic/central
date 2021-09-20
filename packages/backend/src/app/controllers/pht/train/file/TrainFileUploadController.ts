@@ -7,7 +7,7 @@ import {getWritableDirPath} from "../../../../../config/paths";
 import fs from "fs";
 import {buildMulterFileHandler} from "./busboy";
 import crypto from "crypto";
-import {TrainConfiguratorStateOpen} from "../../../../../domains/pht/train/states";
+import {TrainConfigurationStatus} from "../../../../../domains/pht/train/status";
 
 export async function uploadTrainFilesRouteHandler(req: any, res: any) {
     const {id} = req.params;
@@ -100,7 +100,7 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
             await trainFileRepository.save(files);
 
             await repository.save(repository.merge(entity, {
-                configurator_status: TrainConfiguratorStateOpen,
+                configurator_status: null,
                 hash: null,
                 hash_signed: null
             }))

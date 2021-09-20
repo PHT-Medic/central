@@ -58,7 +58,7 @@ export class SetupCommand implements CommandModule {
         try {
             await connection.synchronize();
 
-            if (args.seeder === 'yes') {
+            if (args.databaseSeeder === 'yes') {
                 await runSeeder(connection);
             }
         } catch (e) {

@@ -1,32 +1,29 @@
 import {getRepository, Not} from "typeorm";
-import {Train} from "../../../../domains/pht/train";
-import {createTrainBuilderQueueMessage, publishTrainBuilderQueueMessage} from "../../../../domains/service/train-builder/queue";
+import {Train} from "../../../../../domains/pht/train";
+import {createTrainBuilderQueueMessage, publishTrainBuilderQueueMessage} from "../../../../../domains/service/train-builder/queue";
 import {
-    TrainConfiguratorStateFinished,
-    TrainConfiguratorStateHashGenerated,
-    TrainStateBuilding,
-    TrainStateFinished,
-    TrainStateStarted,
-    TrainStateStarting,
-    TrainStateStopping
-} from "../../../../domains/pht/train/states";
+    TrainBuildStatus,
+    TrainConfigurationStatus,
+    TrainRunStatus
+} from "../../../../../domains/pht/train/status";
 import * as crypto from "crypto";
-import {getTrainFileFilePath} from "../../../../domains/pht/train/file/path";
+import {getTrainFileFilePath} from "../../../../../domains/pht/train/file/path";
 import * as fs from "fs";
 import {check, matchedData, validationResult} from "express-validator";
 import {
     createTrainRouterQueueMessageCommand,
     publishTrainRouterQueueMessage
-} from "../../../../domains/service/train-router/queue";
-import {TrainResult} from "../../../../domains/pht/train/result";
-import {createResultServiceResultCommand} from "../../../../domains/service/result-service/queue";
-import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/services/harbor";
-import {TrainResultStateFinished, TrainResultStateOpen} from "../../../../domains/pht/train/result/states";
-import {findHarborProjectRepository, HarborRepository} from "../../../../domains/service/harbor/project/repository/api";
-import env from "../../../../env";
-import {TrainStation} from "../../../../domains/pht/train/station";
-import {TrainStationStateApproved} from "../../../../domains/pht/train/station/states";
-import {isPermittedForResourceRealm} from "../../../../domains/auth/realm/db/utils";
+} from "../../../../../domains/service/train-router/queue";
+import {TrainResult} from "../../../../../domains/pht/train/result";
+import {createResultServiceResultCommand} from "../../../../../domains/service/result-service/queue";
+import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../../config/services/harbor";
+import {TrainResultStateFinished, TrainResultStateOpen} from "../../../../../domains/pht/train/result/states";
+import {findHarborProjectRepository, HarborRepository} from "../../../../../domains/service/harbor/project/repository/api";
+import env from "../../../../../env";
+import {TrainStation} from "../../../../../domains/pht/train/station";
+import {TrainStationApprovalStatus} from "../../../../../domains/pht/train/station/status";
+import {isPermittedForResourceRealm} from "../../../../../domains/auth/realm/db/utils";
+import {detectTrainRunStatus} from "./detect-run-status";
 
 /**
  * Execute a train command (start, stop, build).
@@ -43,7 +40,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
 
     await check('task')
         .exists()
-        .isIn(['start', 'stop', 'build', 'scanHarbor', 'generateHash'])
+        .isIn(['start', 'stop', 'build', 'scanHarbor', 'generateHash', 'detectRunStatus'])
         .run(req);
 
     const validation = validationResult(req);
@@ -55,7 +52,13 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
 
     const repository = getRepository(Train);
 
-    let entity = await repository.findOne(id, {relations: ['master_image', 'entrypoint_file', 'files']});
+    let entity = await repository.findOne(id, {
+        relations: [
+            'master_image',
+            'entrypoint_file',
+            'files'
+        ]
+    });
 
     if (typeof entity === 'undefined') {
         return res._failNotFound();
@@ -66,17 +69,20 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
     }
 
     try {
-
         switch (validationData.task) {
+            case 'resetRunStatus':
+                entity = await detectTrainRunStatus(entity);
+
+                return res._respond(entity);
             case "build":
-                if (entity.status === TrainStateStarted || entity.status === TrainStateFinished) {
+                if (!!entity.run_status) {
                     return res._failBadRequest({message: 'The train can no longer be build...'});
                 } else {
                     if(!env.demo) {
                         const trainStationRepository = getRepository(TrainStation);
                         const trainStations = await trainStationRepository.find({
                             train_id: entity.id,
-                            status: Not(TrainStationStateApproved)
+                            approval_status: Not(TrainStationApprovalStatus.APPROVED)
                         });
 
                         if (trainStations.length > 0) {
@@ -89,8 +95,9 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                     }
 
                     entity = repository.merge(entity, {
-                        configurator_status: TrainConfiguratorStateFinished,
-                        status: env.demo ? TrainStateFinished : TrainStateBuilding
+                        configurator_status: TrainConfigurationStatus.FINISHED,
+                        run_status: env.demo ? TrainRunStatus.FINISHED : null,
+                        build_status: env.demo ? null : TrainBuildStatus.STARTING
                     });
 
                     await repository.save(entity);
@@ -111,15 +118,15 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                     return res._respond({data: entity});
                 }
             case "start":
-                if (entity.status === TrainStateStarted || entity.status === TrainStateFinished) {
-                    return res._failBadRequest({message: 'The train has already been started...'});
+                if (!!entity.run_status) {
+                    return res._failBadRequest({message: 'The train has already started...'});
                 } else {
                     const queueMessage = await createTrainRouterQueueMessageCommand('startTrain', {trainId: entity.id});
 
                     await publishTrainRouterQueueMessage(queueMessage);
 
                     entity = repository.merge(entity, {
-                        status: TrainStateStarting
+                        run_status: TrainRunStatus.STARTING
                     });
 
                     await repository.save(entity);
@@ -127,7 +134,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                     return res._respond({data: entity});
                 }
             case "stop":
-                if (entity.status === TrainStateFinished) {
+                if (entity.run_status === TrainRunStatus.FINISHED) {
                     return res._failBadRequest({message: 'The train has already been terminated...'});
                 } else {
                     const queueMessage = await createTrainRouterQueueMessageCommand('stopTrain', {trainId: entity.id});
@@ -135,7 +142,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                     await publishTrainRouterQueueMessage(queueMessage);
 
                     entity = repository.merge(entity, {
-                        status: TrainStateStopping
+                        run_status: TrainRunStatus.STOPPING
                     });
 
                     await repository.save(entity);
@@ -216,7 +223,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
                 entity.session_id = sessionId.toString('hex');
 
                 entity.hash = hash.digest('hex');
-                entity.configurator_status = TrainConfiguratorStateHashGenerated;
+                entity.configurator_status = TrainConfigurationStatus.HASH_GENERATED;
 
                 try {
                     entity = await repository.save(entity);

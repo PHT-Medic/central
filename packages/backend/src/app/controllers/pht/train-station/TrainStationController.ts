@@ -11,17 +11,17 @@ import {
     onlyRealmPermittedQueryResources
 } from "../../../../domains/auth/realm/db/utils";
 import {
-    isTrainStationState,
-    TrainStationState,
-    TrainStationStateApproved
-} from "../../../../domains/pht/train/station/states";
+    isTrainStationApprovalStatus,
+    TrainStationApprovalStatus,
+    TrainStationApprovalStatusType
+} from "../../../../domains/pht/train/station/status";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import env from "../../../../env";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialTrainStation = Partial<TrainStation>;
-const simpleExample = {train_id: 'xxx', station_id: 1, comment: 'Looks good to me', status: TrainStationStateApproved};
+const simpleExample = {train_id: 'xxx', station_id: 1, comment: 'Looks good to me', status: TrainStationApprovalStatus.APPROVED};
 
 @SwaggerTags('pht')
 @Controller("/train-stations")
@@ -180,7 +180,7 @@ export async function addTrainStationRouteHandler(req: any, res: any) {
     let entity = repository.create(data);
 
     if(env.demo) {
-        entity.status = TrainStationStateApproved;
+        entity.approval_status = TrainStationApprovalStatus.APPROVED;
     }
 
     try {
@@ -231,7 +231,7 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
     if(isAuthorityOfStation) {
         await check('status')
             .optional()
-            .custom(value => isTrainStationState(value))
+            .custom(value => isTrainStationApprovalStatus(value))
             .run(req);
 
         await check('comment')
@@ -255,7 +255,7 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
 
     const data = matchedData(req, {includeOptionals: false});
 
-    const entityStatus : string | undefined = trainStation.status;
+    const entityStatus : string | undefined = trainStation.approval_status;
 
     trainStation = repository.merge(trainStation, data);
 
@@ -265,10 +265,10 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
         if(
             data.status &&
             data.status !== entityStatus &&
-            ['approved', 'rejected'].indexOf(data.status as TrainStationState) !== -1
+            ['approved', 'rejected'].indexOf(data.status as TrainStationApprovalStatusType) !== -1
         ) {
             await emitDispatcherTrainEvent({
-                event: trainStation.status as DispatcherTrainEventType,
+                event: trainStation.approval_status as DispatcherTrainEventType,
                 id: trainStation.train_id,
                 stationId: trainStation.station_id,
                 operatorRealmId: req.realmId

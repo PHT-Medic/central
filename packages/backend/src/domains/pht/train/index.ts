@@ -13,9 +13,9 @@ import {TrainResult} from "./result";
 import {TrainFile} from "./file";
 import {User} from "../../auth/user";
 import {Realm} from "../../auth/realm";
-import {TrainConfiguratorStateOpen} from "./states";
 import {TrainStation} from "./station";
 import {TrainModel} from "./model";
+import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "./status";
 
 @Entity()
 export class Train {
@@ -47,11 +47,16 @@ export class Train {
     @Column({nullable: true})
     entrypoint_executable: string;
 
-    @Column({type: "varchar", default: TrainConfiguratorStateOpen})
-    configurator_status: string;
+    // ------------------------------------------------------------------
 
-    @Column({nullable: true, default: null})
-    status: string;
+    @Column({type: "varchar", nullable: true, default: true})
+    configurator_status: TrainConfigurationStatus | null;
+
+    @Column({type: "varchar", nullable: true, default: true})
+    build_status: TrainBuildStatus | null;
+
+    @Column({type: "varchar", nullable: true, default: null})
+    run_status: TrainRunStatus | null;
 
     // ------------------------------------------------------------------
 

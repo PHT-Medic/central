@@ -9,15 +9,21 @@ import {
 } from "typeorm";
 import {Station} from "../../station";
 import {Train} from "../index";
-import {TrainStationStateOpen} from "./states";
+import {
+    TrainStationApprovalStatus,
+    TrainStationRunStatus
+} from "./status";
 
 @Entity({name: 'train_stations'})
 export class TrainStation {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({default: TrainStationStateOpen})
-    status: string;
+    @Column({default: null})
+    approval_status: TrainStationApprovalStatus | null;
+
+    @Column({type: "varchar", nullable: true, default: null})
+    run_status: TrainStationRunStatus | null;
 
     @Column({type: "text", nullable: true})
     comment: string;

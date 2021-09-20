@@ -1,14 +1,17 @@
 import {AggregatorMasterImagePushedEvent} from "../../../aggregators/dispatcher/handlers/masterImage";
-import {AggregatorTrainBuiltEvent, AggregatorTrainFinishedEvent, AggregatorTrainStartedEvent} from "../../../aggregators/dispatcher/handlers/train";
+import {AggregatorTrainEvent} from "../../../aggregators/dispatcher/handlers/train";
 import {
     HARBOR_INCOMING_PROJECT_NAME,
-    HARBOR_MASTER_IMAGE_PROJECT_NAME, HARBOR_OUTGOING_PROJECT_NAME,
+    HARBOR_MASTER_IMAGE_PROJECT_NAME,
+    HARBOR_OUTGOING_PROJECT_NAME,
+    HARBOR_SYSTEM_USER_NAME,
     isHarborStationProjectName
 } from "../../../config/services/harbor";
 import {MQ_UI_D_EVENT_ROUTING_KEY} from "../../../config/services/rabbitmq";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 import {DispatcherHarborEventWithAdditionalData} from "../data/harbor";
+import {TrainStationRunStatus} from "../../../domains/pht/train/station/status";
 
 export async function dispatchHarborEventToSelf(
     message: QueueMessage
@@ -62,7 +65,7 @@ async function processMasterImage(data: DispatcherHarborEventWithAdditionalData)
 async function processIncomingTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     await publishQueueMessage(
         MQ_UI_D_EVENT_ROUTING_KEY,
-        createQueueMessageTemplate(AggregatorTrainBuiltEvent, {
+        createQueueMessageTemplate(AggregatorTrainEvent.BUILT, {
             id: data.repositoryName
         })
     );
@@ -71,7 +74,7 @@ async function processIncomingTrain(data: DispatcherHarborEventWithAdditionalDat
 async function processOutgoingTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     await publishQueueMessage(
         MQ_UI_D_EVENT_ROUTING_KEY,
-        createQueueMessageTemplate(AggregatorTrainFinishedEvent, {
+        createQueueMessageTemplate(AggregatorTrainEvent.FINISHED, {
             id: data.repositoryName
         })
     );
@@ -89,13 +92,19 @@ async function processStationTrain(data: DispatcherHarborEventWithAdditionalData
     if(data.stationIndex === 0) {
         await publishQueueMessage(
             MQ_UI_D_EVENT_ROUTING_KEY,
-            createQueueMessageTemplate(AggregatorTrainStartedEvent, {
+            createQueueMessageTemplate(AggregatorTrainEvent.STARTED, {
                 id: data.repositoryName,
                 stationId: data.station.id
             })
         );
     }
 
-    // data.stations is only required for train progress :)
-    // todo: emit train status progress
+    await publishQueueMessage(
+        MQ_UI_D_EVENT_ROUTING_KEY,
+        createQueueMessageTemplate(AggregatorTrainEvent.MOVED, {
+            id: data.repositoryName,
+            stationId: data.station.id,
+            status: data.operator === HARBOR_SYSTEM_USER_NAME ? TrainStationRunStatus.ARRIVED : TrainStationRunStatus.DEPARTED
+        })
+    );
 }

@@ -1,7 +1,7 @@
 import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../modules/message-queue";
 import {getRepository} from "typeorm";
 import {Train} from "../domains/pht/train";
-import {TrainStateBuilt, TrainStateFailed} from "../domains/pht/train/states";
+import {TrainBuildStatus} from "../domains/pht/train/status";
 import {MQ_UI_TB_EVENT_ROUTING_KEY} from "../config/services/rabbitmq";
 
 function createTrainBuilderAggregatorHandlers() {
@@ -12,7 +12,7 @@ function createTrainBuilderAggregatorHandlers() {
             await repository.update({
                 id: message.data.trainId
             }, {
-                status: TrainStateFailed
+                build_status: TrainBuildStatus.FAILED
             });
         },
         trainBuilt: async (message: QueueMessage) => {
@@ -21,7 +21,7 @@ function createTrainBuilderAggregatorHandlers() {
             await repository.update({
                 id: message.data.trainId
             }, {
-                status: TrainStateBuilt
+                build_status: TrainBuildStatus.FINISHED
             });
         }
     }

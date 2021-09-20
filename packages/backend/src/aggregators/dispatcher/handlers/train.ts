@@ -1,49 +1,57 @@
 import {getRepository} from "typeorm";
 import {Train} from "../../../domains/pht/train";
-import {TrainStateFinished, TrainStateStarted} from "../../../domains/pht/train/states";
+import {
+    TrainBuildStatus,
+    TrainRunStatus
+} from "../../../domains/pht/train/status";
 import {QueChannelHandler, QueueMessage} from "../../../modules/message-queue";
+import {TrainStation} from "../../../domains/pht/train/station";
+import {TrainStationRunStatus} from "../../../domains/pht/train/station/status";
 
-export type AggregatorTrainEventType =
-    'trainCreated' | // not implemented yet
-    'trainUpdated' | // not implemented yet
-    'trainDeleted' | // not implemented yet
+export enum AggregatorTrainEvent {
+    BUILT = 'trainBuilt',
 
-    'trainStarted' |
-    'trainFinished' |
-    'trainBuilt' |
-    'trainFailed'; // not implemented yet
-
-export const AggregatorTrainFinishedEvent : AggregatorTrainEventType = 'trainFinished';
-export const AggregatorTrainStartedEvent : AggregatorTrainEventType = 'trainStarted';
-export const AggregatorTrainBuiltEvent : AggregatorTrainEventType = 'trainBuilt';
+    STARTED = 'trainStarted',
+    MOVED = 'trainMoved',
+    FINISHED = 'trainFinished'
+}
 
 export function createDispatcherAggregatorTrainHandlers() : Record<string, QueChannelHandler> {
     return {
-        [AggregatorTrainBuiltEvent]: async (message: QueueMessage) => {
+        [AggregatorTrainEvent.BUILT]: async (message: QueueMessage) => {
             const repository = getRepository(Train);
 
             await repository.update({
                 id: message.data.id
             }, {
-                status: AggregatorTrainBuiltEvent
+                build_status: TrainBuildStatus.FINISHED
             });
         },
-        [AggregatorTrainStartedEvent]: async (message: QueueMessage) => {
+        [AggregatorTrainEvent.STARTED]: async (message: QueueMessage) => {
             const repository = getRepository(Train);
 
             await repository.update({
                 id: message.data.id
             }, {
-                status: TrainStateStarted
+                run_status: TrainRunStatus.STARTED
             });
         },
-        [AggregatorTrainFinishedEvent]: async (message: QueueMessage) => {
+        [AggregatorTrainEvent.STARTED]: async (message: QueueMessage) => {
+            const trainStationRepository = getRepository(TrainStation);
+            await trainStationRepository.update({
+                train_id: message.data.id,
+                station_id: message.data.stationId
+            }, {
+                run_status: message.data.mode as TrainStationRunStatus
+            });
+        },
+        [AggregatorTrainEvent.FINISHED]: async (message: QueueMessage) => {
             const repository = getRepository(Train);
 
             await repository.update({
                 id: message.data.id
             }, {
-                status: TrainStateFinished
+                run_status: TrainRunStatus.FINISHED
             });
         }
     }

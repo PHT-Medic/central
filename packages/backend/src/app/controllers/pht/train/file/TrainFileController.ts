@@ -6,7 +6,7 @@ import {
 } from "../../../../../domains/auth/realm/db/utils";
 import {TrainFile} from "../../../../../domains/pht/train/file";
 import fs from "fs";
-import {TrainConfiguratorStateOpen} from "../../../../../domains/pht/train/states";
+import {TrainConfigurationStatus} from "../../../../../domains/pht/train/status";
 import {getTrainFileFilePath} from "../../../../../domains/pht/train/file/path";
 import {Train} from "../../../../../domains/pht/train";
 
@@ -159,7 +159,7 @@ export async function dropTrainFileRouteHandler(req: any, res: any) {
 
         const trainRepository = getRepository(Train);
         await trainRepository.update({id: entity.train_id}, {
-            configurator_status: TrainConfiguratorStateOpen,
+            configurator_status: null,
             hash: null,
             hash_signed: null
         });

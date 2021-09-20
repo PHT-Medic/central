@@ -5,7 +5,7 @@ import {UserKeyRing} from "../../auth/user/key-ring";
 import {TrainFile} from "../../pht/train/file";
 import {MQ_TB_ROUTING_KEY} from "../../../config/services/rabbitmq";
 import {TrainStation} from "../../pht/train/station";
-import {TrainStationStateApproved} from "../../pht/train/station/states";
+import {TrainStationApprovalStatus} from "../../pht/train/station/status";
 
 export type TrainBuilderCommand = 'trainBuild';
 export async function createTrainBuilderQueueMessage(
@@ -30,7 +30,7 @@ export async function createTrainBuilderQueueMessage(
         .leftJoinAndSelect('trainStation.station', 'station')
         .addSelect('station.secure_id')
         .where("trainStation.train_id = :trainId", {trainId: train.id})
-        .andWhere("trainStation.status = :status", {status: TrainStationStateApproved})
+        .andWhere("trainStation.status = :status", {status: TrainStationApprovalStatus.APPROVED})
         .getMany();
 
     return createQueueMessageTemplate(type, {

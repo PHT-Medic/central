@@ -10,15 +10,13 @@ import {MasterImage} from "../../../../domains/pht/master-image";
 import {Proposal} from "../../../../domains/pht/proposal";
 import {isTrainType} from "../../../../domains/pht/train/types";
 import {
-    TrainConfiguratorStateFinished,
-    TrainConfiguratorStateHashGenerated,
-    TrainConfiguratorStateHashSigned, TrainStateConfigured
-} from "../../../../domains/pht/train/states";
+    TrainConfigurationStatus
+} from "../../../../domains/pht/train/status";
 import {TrainFile} from "../../../../domains/pht/train/file";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {doTrainTaskRouteHandler} from "./TrainActionController";
+import {doTrainTaskRouteHandler} from "./action/TrainActionController";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialTrain = Partial<Train>;
@@ -29,8 +27,7 @@ const simpleExample = {
     hash_signed: 'xxx',
     session_id: 'xxx',
     // @ts-ignore
-    files: [],
-    status: TrainStateConfigured
+    files: []
 }
 
 enum TrainTask {
@@ -317,17 +314,17 @@ export async function editTrainRouteHandler(req: any, res: any) {
     train = repository.merge(train, data);
 
     if(train.hash) {
-        train.configurator_status = TrainConfiguratorStateHashGenerated;
+        train.configurator_status = TrainConfigurationStatus.HASH_GENERATED;
 
         if(train.hash_signed) {
-            train.configurator_status = TrainConfiguratorStateHashSigned;
+            train.configurator_status = TrainConfigurationStatus.HASH_SIGNED;
         }
     }
 
     // check if all conditions are met
     if(train.hash_signed && train.hash) {
-        train.configurator_status = TrainConfiguratorStateFinished;
-        train.status = TrainStateConfigured;
+        train.configurator_status = TrainConfigurationStatus.FINISHED;
+        train.run_status = null;
     }
 
     try {
