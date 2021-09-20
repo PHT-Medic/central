@@ -25,6 +25,7 @@ export async function detectTrainRunStatus(train: Train) : Promise<Train> {
         train = repository.merge(train, {
             build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
             configurator_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
+            run_station_id: null, // optional, just to ensure
             run_status: TrainRunStatus.FINISHED
         });
 
@@ -52,6 +53,7 @@ export async function detectTrainRunStatus(train: Train) : Promise<Train> {
             train = repository.merge(train, {
                 build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
                 configurator_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
+                run_station_id: trainStations[i].station_id,
                 run_status: TrainRunStatus.STARTED
             });
 
@@ -67,6 +69,7 @@ export async function detectTrainRunStatus(train: Train) : Promise<Train> {
         train = repository.merge(train, {
             build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
             configurator_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
+            run_station_id: null, // optional, just to ensure
             run_status: null
         });
 
@@ -74,4 +77,13 @@ export async function detectTrainRunStatus(train: Train) : Promise<Train> {
 
         return train
     }
+
+    train = repository.merge(train, {
+        run_station_id: null,
+        run_status: null
+    });
+
+    await repository.save(train);
+
+    return train
 }

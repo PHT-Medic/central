@@ -58,6 +58,9 @@ export class Train {
     @Column({type: "varchar", nullable: true, default: null})
     run_status: TrainRunStatus | null;
 
+    @Column({type: "integer", length: 11, unsigned: true, nullable: true, default: null})
+    run_station_id: number | null;
+
     // ------------------------------------------------------------------
 
     @CreateDateColumn()

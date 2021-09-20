@@ -19,11 +19,15 @@ export class TrainStation {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    // ------------------------------------------------------------------
+
     @Column({default: null})
     approval_status: TrainStationApprovalStatus | null;
 
     @Column({type: "varchar", nullable: true, default: null})
     run_status: TrainStationRunStatus | null;
+
+    // ------------------------------------------------------------------
 
     @Column({type: "text", nullable: true})
     comment: string;

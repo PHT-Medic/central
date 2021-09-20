@@ -65,7 +65,7 @@ async function processMasterImage(data: DispatcherHarborEventWithAdditionalData)
 async function processIncomingTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     await publishQueueMessage(
         MQ_UI_D_EVENT_ROUTING_KEY,
-        createQueueMessageTemplate(AggregatorTrainEvent.BUILT, {
+        createQueueMessageTemplate(AggregatorTrainEvent.BUILD_FINISHED, {
             id: data.repositoryName
         })
     );

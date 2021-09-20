@@ -9,8 +9,7 @@ import {TrainStation} from "../../../domains/pht/train/station";
 import {TrainStationRunStatus} from "../../../domains/pht/train/station/status";
 
 export enum AggregatorTrainEvent {
-    BUILT = 'trainBuilt',
-
+    BUILD_FINISHED = 'trainBuilt',
     STARTED = 'trainStarted',
     MOVED = 'trainMoved',
     FINISHED = 'trainFinished'
@@ -18,7 +17,7 @@ export enum AggregatorTrainEvent {
 
 export function createDispatcherAggregatorTrainHandlers() : Record<string, QueChannelHandler> {
     return {
-        [AggregatorTrainEvent.BUILT]: async (message: QueueMessage) => {
+        [AggregatorTrainEvent.BUILD_FINISHED]: async (message: QueueMessage) => {
             const repository = getRepository(Train);
 
             await repository.update({
@@ -33,10 +32,20 @@ export function createDispatcherAggregatorTrainHandlers() : Record<string, QueCh
             await repository.update({
                 id: message.data.id
             }, {
-                run_status: TrainRunStatus.STARTED
+                run_status: TrainRunStatus.STARTED,
+                run_station_id: null
             });
         },
-        [AggregatorTrainEvent.STARTED]: async (message: QueueMessage) => {
+        [AggregatorTrainEvent.MOVED]: async (message: QueueMessage) => {
+            const repository = getRepository(Train);
+
+            await repository.update({
+                id: message.data.id
+            }, {
+                run_status: TrainRunStatus.STARTED,
+                run_station_id: message.data.stationId
+            });
+
             const trainStationRepository = getRepository(TrainStation);
             await trainStationRepository.update({
                 train_id: message.data.id,
@@ -51,7 +60,8 @@ export function createDispatcherAggregatorTrainHandlers() : Record<string, QueCh
             await repository.update({
                 id: message.data.id
             }, {
-                run_status: TrainRunStatus.FINISHED
+                run_status: TrainRunStatus.FINISHED,
+                run_station_id: null
             });
         }
     }

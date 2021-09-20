@@ -70,7 +70,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
 
     try {
         switch (validationData.task) {
-            case 'resetRunStatus':
+            case 'detectRunStatus':
                 entity = await detectTrainRunStatus(entity);
 
                 return res._respond(entity);
