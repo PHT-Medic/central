@@ -2,7 +2,7 @@ import {getRepository} from "typeorm";
 
 import {  HARBOR_OUTGOING_PROJECT_NAME,} from "../../../config/services/harbor";
 import {MQ_RS_COMMAND_ROUTING_KEY} from "../../../config/services/rabbitmq";
-import {TrainResult} from "../../../domains/pht/train/result";
+import {TrainResult} from "../../../domains/pht/train-result";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {useLogger} from "../../../modules/log";
 import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";

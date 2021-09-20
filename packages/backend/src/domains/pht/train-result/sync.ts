@@ -1,9 +1,9 @@
-import {getHarborProjectRepositories} from "../../../service/harbor/project/repository/api";
+import {getHarborProjectRepositories} from "../../service/harbor/project/repository/api";
 import {getRepository, In} from "typeorm";
 import {TrainResult} from "./index";
 
-import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/services/harbor";
-import {createResultServiceResultCommand} from "../../../service/result-service/queue";
+import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../config/services/harbor";
+import {createResultServiceResultCommand} from "../../service/result-service/queue";
 
 export async function syncTrainResults(onlyUncovered: boolean = true) {
     const harborRepositories = await getHarborProjectRepositories(HARBOR_OUTGOING_PROJECT_NAME);

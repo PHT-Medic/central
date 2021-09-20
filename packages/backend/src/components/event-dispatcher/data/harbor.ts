@@ -1,7 +1,7 @@
 import {getRepository} from "typeorm";
 import {buildStationHarborProjectName, isHarborStationProjectName} from "../../../config/services/harbor";
 import {Station} from "../../../domains/pht/station";
-import {TrainStation} from "../../../domains/pht/train/station";
+import {TrainStation} from "../../../domains/pht/train-station";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {QueueMessage} from "../../../modules/message-queue";
 

@@ -9,12 +9,12 @@ import {
 } from "typeorm";
 import {Proposal} from "../proposal";
 import {MasterImage} from "../master-image";
-import {TrainResult} from "./result";
+import {TrainResult} from "../train-result";
 import {TrainFile} from "./file";
 import {User} from "../../auth/user";
 import {Realm} from "../../auth/realm";
-import {TrainStation} from "./station";
-import {TrainModel} from "./model";
+import {TrainStation} from "../train-station";
+import {TrainModel} from "../train-model";
 import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "./status";
 
 @Entity()

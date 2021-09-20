@@ -1,6 +1,6 @@
 import {Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn} from "typeorm";
-import {User} from "../../../auth/user";
-import {TrainFile} from "../file";
+import {User} from "../../auth/user";
+import {TrainFile} from "../train-file";
 
 @Entity({name: 'train_models'})
 export class TrainModel {

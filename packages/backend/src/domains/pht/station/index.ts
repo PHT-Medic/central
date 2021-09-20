@@ -13,7 +13,7 @@ import {v4} from "uuid";
 
 import {ProposalStation} from "../proposal/station";
 import {Realm} from "../../auth/realm";
-import {TrainStation} from "../train/station";
+import {TrainStation} from "../train-station";
 
 @Entity({name: 'stations'})
 export class Station {

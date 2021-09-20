@@ -11,7 +11,7 @@ import {MQ_UI_D_EVENT_ROUTING_KEY} from "../../../config/services/rabbitmq";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 import {DispatcherHarborEventWithAdditionalData} from "../data/harbor";
-import {TrainStationRunStatus} from "../../../domains/pht/train/station/status";
+import {TrainStationRunStatus} from "../../../domains/pht/train-station/status";
 
 export async function dispatchHarborEventToSelf(
     message: QueueMessage

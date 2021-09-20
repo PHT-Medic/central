@@ -1,9 +1,8 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
-import {TrainResult} from "../../../../../domains/pht/train/result";
+import {TrainResult} from "../../../../../domains/pht/train-result";
 import {createResultServiceResultCommand} from "../../../../../domains/service/result-service/queue";
 import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../../config/services/harbor";
-import {TrainResultStateFinished, TrainResultStateOpen} from "../../../../../domains/pht/train/result/states";
 
 import {Body, Controller, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
@@ -20,7 +19,7 @@ type PartialTrainResult = Partial<TrainResult>;
 @Controller("/train-results")
 export class TrainResultController {
     @Post("/:id/task",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrainResult>({train_id: 'xxx', status: TrainResultStateFinished, image: 'xxx'})
+    @ResponseExample<PartialTrainResult>({train_id: 'xxx', status: null, image: 'xxx'})
     async edit(
         @Params('id') id: string,
         @Body() data: {
@@ -75,7 +74,7 @@ export async function doTrainResultTaskRouteHandler(req: any, res: any) {
                 resultId: entity.id
             });
 
-            entity.status = TrainResultStateOpen;
+            entity.status = null;
 
             await repository.save(entity);
 

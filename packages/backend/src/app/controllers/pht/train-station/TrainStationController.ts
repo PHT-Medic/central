@@ -3,7 +3,7 @@ import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {DispatcherTrainEventType, emitDispatcherTrainEvent} from "../../../../domains/pht/train/queue";
 
-import {TrainStation} from "../../../../domains/pht/train/station";
+import {TrainStation} from "../../../../domains/pht/train-station";
 
 import {Train} from "../../../../domains/pht/train";
 import {
@@ -14,7 +14,7 @@ import {
     isTrainStationApprovalStatus,
     TrainStationApprovalStatus,
     TrainStationApprovalStatusType
-} from "../../../../domains/pht/train/station/status";
+} from "../../../../domains/pht/train-station/status";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import env from "../../../../env";

@@ -7,8 +7,8 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {Station} from "../../station";
-import {Train} from "../index";
+import {Station} from "../station";
+import {Train} from "../train";
 import {
     TrainStationApprovalStatus,
     TrainStationRunStatus

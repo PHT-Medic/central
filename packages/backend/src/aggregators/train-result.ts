@@ -1,11 +1,9 @@
 import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../modules/message-queue";
 import {getRepository} from "typeorm";
-import {TrainResult} from "../domains/pht/train/result";
+import {TrainResult} from "../domains/pht/train-result";
 import {
-    TrainResultStateDownloaded,
-    TrainResultStateDownloading, TrainResultStateExtracted, TrainResultStateExtracting,
-    TrainResultStateFailed, TrainResultStateFinished
-} from "../domains/pht/train/result/states";
+    TrainResultStatus
+} from "../domains/pht/train-result/status";
 import {MQ_UI_RS_EVENT_ROUTING_KEY} from "../config/services/rabbitmq";
 
 function createTrainBuilderAggregatorHandlers() {
@@ -16,7 +14,7 @@ function createTrainBuilderAggregatorHandlers() {
             await repository.update({
                 train_id: message.data.trainId
             }, {
-                status: TrainResultStateDownloading
+                status: TrainResultStatus.DOWNLOADING
             });
         },
         downloaded: async (message: QueueMessage) => {
@@ -25,7 +23,7 @@ function createTrainBuilderAggregatorHandlers() {
             await repository.update({
                 id: message.data.trainId
             }, {
-                status: TrainResultStateDownloaded
+                status: TrainResultStatus.DOWNLOADED
             });
         },
         downloadingFailed: async (message: QueueMessage) => {
@@ -35,7 +33,7 @@ function createTrainBuilderAggregatorHandlers() {
             await repository.update({
                 id: message.data.trainId
             }, {
-                status: TrainResultStateFailed
+                status: TrainResultStatus.FAILED
             });
         },
         extracting: async (message: QueueMessage) => {
@@ -44,7 +42,7 @@ function createTrainBuilderAggregatorHandlers() {
             await repository.update({
                 train_id: message.data.trainId
             }, {
-                status: TrainResultStateExtracting
+                status: TrainResultStatus.EXTRACTING
             });
         },
         extracted: async (message: QueueMessage) => {
@@ -53,7 +51,7 @@ function createTrainBuilderAggregatorHandlers() {
             await repository.update({
                 train_id: message.data.trainId
             }, {
-                status: TrainResultStateFinished // because TrainResultStateExtracted = finished
+                status: TrainResultStatus.FINISHED // because TrainResultStateExtracted = finished
             });
         },
         extractingFailed: async (message: QueueMessage) => {
@@ -63,7 +61,7 @@ function createTrainBuilderAggregatorHandlers() {
             await repository.update({
                 train_id: message.data.trainId
             }, {
-                status: TrainResultStateFailed
+                status: TrainResultStatus.FAILED
             });
         }
     }

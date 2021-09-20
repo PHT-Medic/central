@@ -1,27 +1,40 @@
-import {Train} from "../../../../../domains/pht/train";
+import {Train} from "../index";
 import {
     findHarborProjectRepository,
     HarborRepository
-} from "../../../../../domains/service/harbor/project/repository/api";
+} from "../../../service/harbor/project/repository/api";
 import {
     buildStationHarborProjectName,
     HARBOR_INCOMING_PROJECT_NAME,
     HARBOR_OUTGOING_PROJECT_NAME
-} from "../../../../../config/services/harbor";
+} from "../../../../config/services/harbor";
 import {
     TrainBuildStatus,
     TrainConfigurationStatus,
     TrainRunStatus,
-} from "../../../../../domains/pht/train/status";
+} from "../status";
 import {getRepository} from "typeorm";
-import {TrainStation} from "../../../../../domains/pht/train/station";
+import {TrainStation} from "../../train-station";
+import {findTrain} from "./utils";
+import {triggerTrainDownload} from "./trigger-download";
 
-export async function detectTrainRunStatus(train: Train) : Promise<Train> {
+export async function detectTrainRunStatus(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);
+
+    train = await findTrain(train, repository);
+
+    if(typeof train === 'undefined') {
+        throw new Error('The train could not be found.');
+    }
 
     // 1. Check PHT outgoing ( -> TrainFinished )
     let harborRepository: HarborRepository | undefined = await findHarborProjectRepository(HARBOR_OUTGOING_PROJECT_NAME, train.id);
     if(typeof harborRepository !== 'undefined') {
+        // check if we marked the train as terminated yet :O ?
+        if(train.run_status !== TrainRunStatus.FINISHED) {
+            train.result = await triggerTrainDownload(train.id, harborRepository);
+        }
+
         train = repository.merge(train, {
             build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
             configurator_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure

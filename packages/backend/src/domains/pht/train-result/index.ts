@@ -5,8 +5,8 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {Train} from "../index";
-import {TrainResultStateOpen} from "./states";
+import {Train} from "../train";
+import {TrainResultStatus} from "./status";
 
 @Entity({name: 'train_results'})
 export class TrainResult {
@@ -19,8 +19,8 @@ export class TrainResult {
     @Column({nullable: true, default: null})
     image: string;
 
-    @Column({default: TrainResultStateOpen})
-    status: string;
+    @Column({type: "varchar", default: null, nullable: null})
+    status: TrainResultStatus | null;
 
     // ------------------------------------------------------------------
 

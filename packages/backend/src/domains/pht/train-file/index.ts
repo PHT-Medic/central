@@ -8,9 +8,9 @@ import {
     UpdateDateColumn
 } from "typeorm";
 
-import {User} from "../../../auth/user";
-import {Train} from "../index";
-import {Realm} from "../../../auth/realm";
+import {User} from "../../auth/user";
+import {Train} from "../train";
+import {Realm} from "../../auth/realm";
 
 @Entity({name: 'train_files'})
 export class TrainFile {
