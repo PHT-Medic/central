@@ -2,10 +2,10 @@ import {Train} from "../index";
 import {getRepository} from "typeorm";
 import {findTrain} from "./utils";
 import crypto from "crypto";
-import {getTrainFileFilePath} from "../file/path";
+import {getTrainFileFilePath} from "../../train-file/path";
 import fs from "fs";
 import {TrainConfigurationStatus} from "../status";
-import {TrainFile} from "../file";
+import {TrainFile} from "../../train-file";
 
 export async function generateTrainHash(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);

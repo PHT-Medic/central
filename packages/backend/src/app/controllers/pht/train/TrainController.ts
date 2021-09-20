@@ -12,11 +12,11 @@ import {isTrainType} from "../../../../domains/pht/train/types";
 import {
     TrainConfigurationStatus
 } from "../../../../domains/pht/train/status";
-import {TrainFile} from "../../../../domains/pht/train/file";
+import {TrainFile} from "../../../../domains/pht/train-file";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {doTrainTaskRouteHandler} from "./action/TrainActionController";
+import {doTrainTaskRouteHandler, TrainCommand} from "./action/TrainActionController";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialTrain = Partial<Train>;
@@ -28,14 +28,6 @@ const simpleExample = {
     session_id: 'xxx',
     // @ts-ignore
     files: []
-}
-
-enum TrainTask {
-    START = 'start',
-    STOP = 'stop',
-    BUILD = 'build',
-    SCAN_HARBOR = 'scanHarbor',
-    GENERATE_HASH = 'generateHash'
 }
 
 @SwaggerTags('pht')
@@ -86,7 +78,7 @@ export class TrainController {
     async doTask(
         @Params('id') id: string,
         @Body() data: {
-            task: TrainTask
+            task: TrainCommand
         },
         @Request() req: any,
         @Response() res: any

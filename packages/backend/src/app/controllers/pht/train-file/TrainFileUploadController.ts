@@ -1,13 +1,12 @@
 import {getRepository} from "typeorm";
-import {Train} from "../../../../../domains/pht/train";
-import {TrainFile} from "../../../../../domains/pht/train/file";
+import {Train} from "../../../../domains/pht/train";
+import {TrainFile} from "../../../../domains/pht/train-file";
 import BusBoy from "busboy";
 import path from "path";
-import {getWritableDirPath} from "../../../../../config/paths";
+import {getWritableDirPath} from "../../../../config/paths";
 import fs from "fs";
 import {buildMulterFileHandler} from "./busboy";
 import crypto from "crypto";
-import {TrainConfigurationStatus} from "../../../../../domains/pht/train/status";
 
 export async function uploadTrainFilesRouteHandler(req: any, res: any) {
     const {id} = req.params;

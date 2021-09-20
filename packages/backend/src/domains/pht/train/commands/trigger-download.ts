@@ -9,7 +9,7 @@ export async function triggerTrainDownload(
     harborRepository?: HarborRepository
 ) : Promise<TrainResult> {
     if(typeof harborRepository === 'undefined') {
-        harborRepository= await findHarborProjectRepository(HARBOR_OUTGOING_PROJECT_NAME, trainId);
+        harborRepository = await findHarborProjectRepository(HARBOR_OUTGOING_PROJECT_NAME, trainId);
         if(typeof harborRepository === 'undefined') {
             throw new Error('The train has not arrived at the outgoing station yet...');
         }

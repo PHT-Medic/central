@@ -1,13 +1,13 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
-import {TrainResult} from "../../../../../domains/pht/train-result";
-import {createResultServiceResultCommand} from "../../../../../domains/service/result-service/queue";
-import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../../config/services/harbor";
+import {TrainResult} from "../../../../domains/pht/train-result";
+import {createResultServiceResultCommand} from "../../../../domains/service/result-service/queue";
+import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/services/harbor";
 
 import {Body, Controller, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {ForceLoggedInMiddleware} from "../../../../../config/http/middleware/auth";
-import {isPermittedForResourceRealm} from "../../../../../domains/auth/realm/db/utils";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {isPermittedForResourceRealm} from "../../../../domains/auth/realm/db/utils";
 
 enum TrainResultTask {
     RESET = 'reset'
@@ -53,8 +53,8 @@ export async function doTrainResultTaskRouteHandler(req: any, res: any) {
 
     const repository = getRepository(TrainResult);
 
-    switch (validationData.task) {
-        case "reset":
+    switch (validationData.task as TrainResultTask) {
+        case TrainResultTask.RESET:
             const entity = await repository.findOne(id, {relations: ["train"]});
 
             if (typeof entity === 'undefined') {

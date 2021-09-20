@@ -2,7 +2,7 @@ import {Train} from "../../pht/train";
 import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 import {getRepository} from "typeorm";
 import {UserKeyRing} from "../../auth/user/key-ring";
-import {TrainFile} from "../../pht/train/file";
+import {TrainFile} from "../../pht/train-file";
 import {MQ_TB_ROUTING_KEY} from "../../../config/services/rabbitmq";
 import {TrainStation} from "../../pht/train-station";
 import {TrainStationApprovalStatus} from "../../pht/train-station/status";

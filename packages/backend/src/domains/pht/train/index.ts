@@ -10,7 +10,7 @@ import {
 import {Proposal} from "../proposal";
 import {MasterImage} from "../master-image";
 import {TrainResult} from "../train-result";
-import {TrainFile} from "./file";
+import {TrainFile} from "../train-file";
 import {User} from "../../auth/user";
 import {Realm} from "../../auth/realm";
 import {TrainStation} from "../train-station";

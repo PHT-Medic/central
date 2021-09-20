@@ -1,10 +1,10 @@
 import {getRepository} from "typeorm";
-import {UserKeyRing} from "../../../../../domains/auth/user/key-ring";
+import {UserKeyRing} from "../../../../domains/auth/user/key-ring";
 import {check, matchedData, validationResult} from "express-validator";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {SwaggerTags} from "typescript-swagger";
-import {removeUserPublicKeyFromVault, saveUserPublicKeyToVault} from "../../../../../domains/service/vault/user/api";
-import {ForceLoggedInMiddleware} from "../../../../../config/http/middleware/auth";
+import {removeUserPublicKeyFromVault, saveUserPublicKeyToVault} from "../../../../domains/service/vault/user/api";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 @SwaggerTags('user', 'pht')
 @Controller("/user-key-rings")

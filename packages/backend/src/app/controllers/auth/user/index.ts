@@ -12,7 +12,7 @@ import {
 import {Realm} from "../../../../domains/auth/realm";
 import {User} from "../../../../domains/auth/user";
 import {Station} from "../../../../domains/pht/station";
-import {getUserStationRouteHandler} from "./station/UserStationController";
+import {getUserStationRouteHandler} from "./station";
 import {useLogger} from "../../../../modules/log";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 

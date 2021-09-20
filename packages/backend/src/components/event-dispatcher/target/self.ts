@@ -1,4 +1,4 @@
-import {AggregatorMasterImagePushedEvent} from "../../../aggregators/dispatcher/handlers/masterImage";
+import {AggregatorMasterImagePushedEvent} from "../../../aggregators/dispatcher/handlers/master-image";
 import {AggregatorTrainEvent} from "../../../aggregators/dispatcher/handlers/train";
 import {
     HARBOR_INCOMING_PROJECT_NAME,

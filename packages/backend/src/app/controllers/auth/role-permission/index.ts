@@ -1,13 +1,13 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
-import {RolePermission} from "../../../../../domains/auth/role/permission";
+import {RolePermission} from "../../../../domains/auth/role/permission";
 
 // ---------------------------------------------------------------------------------
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {ForceLoggedInMiddleware} from "../../../../../config/http/middleware/auth";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialPermissionController = Partial<RolePermission>;
 const simpleExample = {role_id: 1, permission_id: "user_add"};

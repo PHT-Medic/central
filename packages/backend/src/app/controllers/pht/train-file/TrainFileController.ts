@@ -3,19 +3,18 @@ import {applyRequestFilter} from "typeorm-extension";
 import {
     isPermittedForResourceRealm,
     onlyRealmPermittedQueryResources
-} from "../../../../../domains/auth/realm/db/utils";
-import {TrainFile} from "../../../../../domains/pht/train/file";
+} from "../../../../domains/auth/realm/db/utils";
+import {TrainFile} from "../../../../domains/pht/train-file";
 import fs from "fs";
-import {TrainConfigurationStatus} from "../../../../../domains/pht/train/status";
-import {getTrainFileFilePath} from "../../../../../domains/pht/train/file/path";
-import {Train} from "../../../../../domains/pht/train";
+import {getTrainFileFilePath} from "../../../../domains/pht/train-file/path";
+import {Train} from "../../../../domains/pht/train";
 
 import {Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from 'typescript-swagger';
 
 import {getTrainFileStreamRouteHandler} from "./TrainFileStreamController";
 import {uploadTrainFilesRouteHandler} from "./TrainFileUploadController";
-import {ForceLoggedInMiddleware} from "../../../../../config/http/middleware/auth";
+import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialTrainFile = Partial<TrainFile>;
 const simpleExample : PartialTrainFile = {

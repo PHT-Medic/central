@@ -1,12 +1,12 @@
 import {getRepository} from "typeorm";
-import {Train} from "../../../../../domains/pht/train";
+import {Train} from "../../../../domains/pht/train";
 import tar from "tar-stream";
 import path from "path";
-import {getWritableDirPath} from "../../../../../config/paths";
-import {TrainFile} from "../../../../../domains/pht/train/file";
+import {getWritableDirPath} from "../../../../config/paths";
+import {TrainFile} from "../../../../domains/pht/train-file";
 import fs from "fs";
-import {TrainStation} from "../../../../../domains/pht/train-station";
-import {isPermittedForResourceRealm} from "../../../../../domains/auth/realm/db/utils";
+import {TrainStation} from "../../../../domains/pht/train-station";
+import {isPermittedForResourceRealm} from "../../../../domains/auth/realm/db/utils";
 
 export async function getTrainFileStreamRouteHandler(req: any, res: any) {
     const {id} = req.params;

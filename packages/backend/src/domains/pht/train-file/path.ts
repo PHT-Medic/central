@@ -1,4 +1,4 @@
-import path from "src/domains/pht/train-file/path";
+import path from "path";
 import {TrainFile} from "./index";
 import {getWritableDirPath} from "../../../config/paths";
 

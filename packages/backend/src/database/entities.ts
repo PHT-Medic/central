@@ -6,7 +6,7 @@ export {Proposal} from '../domains/pht/proposal';
 export {ProposalStation} from '../domains/pht/proposal/station';
 export {Station} from '../domains/pht/station';
 export {Train} from '../domains/pht/train';
-export {TrainFile} from '../domains/pht/train/file';
+export {TrainFile} from '../domains/pht/train-file';
 export {TrainModel} from '../domains/pht/train-model';
 export {TrainResult} from '../domains/pht/train-result';
 export {TrainStation} from '../domains/pht/train-station';
