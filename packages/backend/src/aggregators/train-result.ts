@@ -1,68 +1,59 @@
-import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../modules/message-queue";
+
 import {getRepository} from "typeorm";
 import {TrainResult} from "../domains/pht/train-result";
 import {
     TrainResultStatus
 } from "../domains/pht/train-result/status";
 import {MQ_UI_RS_EVENT_ROUTING_KEY} from "../config/services/rabbitmq";
+import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../modules/message-queue";
+
+export enum TrainResultEvent {
+    DOWNLOADING = 'downloading',
+    DOWNLOADED = 'downloaded',
+    DOWNLOADING_FAILED = 'downloadingFailed',
+    EXTRACTING = 'extracting',
+    EXTRACTED = 'extracted',
+    EXTRACTING_FAILED = 'extractingFailed',
+}
+
+const EventStatusMap : Record<TrainResultEvent, TrainResultStatus> = {
+    [TrainResultEvent.DOWNLOADING]: TrainResultStatus.DOWNLOADING,
+    [TrainResultEvent.DOWNLOADED]: TrainResultStatus.DOWNLOADED,
+    [TrainResultEvent.DOWNLOADING_FAILED]: TrainResultStatus.FAILED,
+    [TrainResultEvent.EXTRACTING]: TrainResultStatus.EXTRACTING,
+    [TrainResultEvent.EXTRACTED]: TrainResultStatus.FINISHED,
+    [TrainResultEvent.EXTRACTING_FAILED]: TrainResultStatus.FAILED,
+}
+
+async function updateTrainResult(trainId: string, event: TrainResultEvent) {
+    const repository = getRepository(TrainResult);
+
+    await repository.update({
+        train_id: trainId
+    }, {
+        status: EventStatusMap[event]
+    });
+}
 
 function createTrainBuilderAggregatorHandlers() {
     return {
-        downloading: async (message: QueueMessage) => {
-            const repository = getRepository(TrainResult);
-
-            await repository.update({
-                train_id: message.data.trainId
-            }, {
-                status: TrainResultStatus.DOWNLOADING
-            });
+        [TrainResultEvent.DOWNLOADING]: async (message: QueueMessage) => {
+            await updateTrainResult(message.data.trainId, TrainResultEvent.DOWNLOADING);
         },
-        downloaded: async (message: QueueMessage) => {
-            const repository = getRepository(TrainResult);
-
-            await repository.update({
-                id: message.data.trainId
-            }, {
-                status: TrainResultStatus.DOWNLOADED
-            });
+        [TrainResultEvent.DOWNLOADED]: async (message: QueueMessage) => {
+            await updateTrainResult(message.data.trainId, TrainResultEvent.DOWNLOADED);
         },
-        downloadingFailed: async (message: QueueMessage) => {
-            const repository = getRepository(TrainResult);
-
-            // todo: better status
-            await repository.update({
-                id: message.data.trainId
-            }, {
-                status: TrainResultStatus.FAILED
-            });
+        [TrainResultEvent.DOWNLOADING_FAILED]: async (message: QueueMessage) => {
+            await updateTrainResult(message.data.trainId, TrainResultEvent.DOWNLOADING_FAILED);
         },
-        extracting: async (message: QueueMessage) => {
-            const repository = getRepository(TrainResult);
-
-            await repository.update({
-                train_id: message.data.trainId
-            }, {
-                status: TrainResultStatus.EXTRACTING
-            });
+        [TrainResultEvent.EXTRACTING]: async (message: QueueMessage) => {
+            await updateTrainResult(message.data.trainId, TrainResultEvent.EXTRACTING);
         },
-        extracted: async (message: QueueMessage) => {
-            const repository = getRepository(TrainResult);
-
-            await repository.update({
-                train_id: message.data.trainId
-            }, {
-                status: TrainResultStatus.FINISHED // because TrainResultStateExtracted = finished
-            });
+        [TrainResultEvent.EXTRACTED]: async (message: QueueMessage) => {
+            await updateTrainResult(message.data.trainId, TrainResultEvent.EXTRACTED);
         },
-        extractingFailed: async (message: QueueMessage) => {
-            const repository = getRepository(TrainResult);
-
-            // todo: better status
-            await repository.update({
-                train_id: message.data.trainId
-            }, {
-                status: TrainResultStatus.FAILED
-            });
+        [TrainResultEvent.EXTRACTING_FAILED]: async (message: QueueMessage) => {
+            await updateTrainResult(message.data.trainId, TrainResultEvent.EXTRACTING_FAILED);
         }
     }
 }

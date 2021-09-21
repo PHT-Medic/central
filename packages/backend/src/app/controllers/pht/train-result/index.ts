@@ -1,7 +1,7 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 import {TrainResult} from "../../../../domains/pht/train-result";
-import {createResultServiceResultCommand} from "../../../../domains/service/result-service/queue";
+import {emitResultServiceQueueMessage, ResultServiceCommand} from "../../../../domains/service/result-service/queue";
 import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/services/harbor";
 
 import {Body, Controller, Params, Post, Request, Response} from "@decorators/express";
@@ -65,7 +65,7 @@ export async function doTrainResultTaskRouteHandler(req: any, res: any) {
                 return res._failForbidden();
             }
 
-            await createResultServiceResultCommand('download', {
+            await emitResultServiceQueueMessage(ResultServiceCommand.DOWNLOAD, {
                 projectName: HARBOR_OUTGOING_PROJECT_NAME,
                 repositoryName: entity.train.id,
                 repositoryFullName: HARBOR_OUTGOING_PROJECT_NAME + '/' + entity.train.id,

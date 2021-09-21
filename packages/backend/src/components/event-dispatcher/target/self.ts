@@ -9,9 +9,9 @@ import {
 } from "../../../config/services/harbor";
 import {MQ_UI_D_EVENT_ROUTING_KEY} from "../../../config/services/rabbitmq";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
-import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 import {DispatcherHarborEventWithAdditionalData} from "../data/harbor";
 import {TrainStationRunStatus} from "../../../domains/pht/train-station/status";
+import {buildQueueMessage, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 
 export async function dispatchHarborEventToSelf(
     message: QueueMessage
@@ -53,31 +53,34 @@ export async function dispatchHarborEventToSelf(
 }
 
 async function processMasterImage(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
-    await publishQueueMessage(
-        MQ_UI_D_EVENT_ROUTING_KEY,
-        createQueueMessageTemplate(AggregatorMasterImagePushedEvent, {
+    await publishQueueMessage(buildQueueMessage({
+        routingKey: MQ_UI_D_EVENT_ROUTING_KEY,
+        type: AggregatorMasterImagePushedEvent,
+        data: {
             path: data.repositoryFullName,
             name: data.repositoryName
-        })
-    );
+        }
+    }));
 }
 
 async function processIncomingTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
-    await publishQueueMessage(
-        MQ_UI_D_EVENT_ROUTING_KEY,
-        createQueueMessageTemplate(AggregatorTrainEvent.BUILD_FINISHED, {
+    await publishQueueMessage(buildQueueMessage({
+        routingKey: MQ_UI_D_EVENT_ROUTING_KEY,
+        type: AggregatorTrainEvent.BUILD_FINISHED,
+        data: {
             id: data.repositoryName
-        })
-    );
+        }
+    }));
 }
 
 async function processOutgoingTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
-    await publishQueueMessage(
-        MQ_UI_D_EVENT_ROUTING_KEY,
-        createQueueMessageTemplate(AggregatorTrainEvent.FINISHED, {
+    await publishQueueMessage(buildQueueMessage({
+        routingKey: MQ_UI_D_EVENT_ROUTING_KEY,
+        type: AggregatorTrainEvent.FINISHED,
+        data: {
             id: data.repositoryName
-        })
-    );
+        }
+    }));
 }
 
 async function processStationTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
@@ -90,21 +93,23 @@ async function processStationTrain(data: DispatcherHarborEventWithAdditionalData
 
     // If stationIndex is 0, than the target is the first station of the route.
     if(data.stationIndex === 0) {
-        await publishQueueMessage(
-            MQ_UI_D_EVENT_ROUTING_KEY,
-            createQueueMessageTemplate(AggregatorTrainEvent.STARTED, {
+        await publishQueueMessage(buildQueueMessage({
+            routingKey: MQ_UI_D_EVENT_ROUTING_KEY,
+            type: AggregatorTrainEvent.STARTED,
+            data: {
                 id: data.repositoryName,
                 stationId: data.station.id
-            })
-        );
+            }
+        }));
     }
 
-    await publishQueueMessage(
-        MQ_UI_D_EVENT_ROUTING_KEY,
-        createQueueMessageTemplate(AggregatorTrainEvent.MOVED, {
+    await publishQueueMessage(buildQueueMessage({
+        routingKey: MQ_UI_D_EVENT_ROUTING_KEY,
+        type: AggregatorTrainEvent.MOVED,
+        data: {
             id: data.repositoryName,
             stationId: data.station.id,
             status: data.operator === HARBOR_SYSTEM_USER_NAME ? TrainStationRunStatus.ARRIVED : TrainStationRunStatus.DEPARTED
-        })
-    );
+        }
+    }));
 }

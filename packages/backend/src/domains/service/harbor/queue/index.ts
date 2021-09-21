@@ -1,6 +1,6 @@
-import {DispatcherHarborEvent} from "../../../../components/event-dispatcher";
+import {DispatcherEvent} from "../../../../components/event-dispatcher";
 import {MQ_DISPATCHER_ROUTING_KEY} from "../../../../config/services/rabbitmq";
-import {createQueueMessageTemplate, publishQueueMessage} from "../../../../modules/message-queue";
+import {buildQueueMessage, publishQueueMessage} from "../../../../modules/message-queue";
 
 export type DispatcherHarborEventType = 'PUSH_ARTIFACT';
 
@@ -23,10 +23,15 @@ export async function emitDispatcherHarborEvent(
 ) {
     options = options ?? {};
 
-    const message = createQueueMessageTemplate(DispatcherHarborEvent, data, metaData);
+    const message = buildQueueMessage({
+        routingKey: MQ_DISPATCHER_ROUTING_KEY,
+        type: DispatcherEvent.HARBOR,
+        data,
+        metadata: metaData
+    });
 
     if(!options.templateOnly) {
-        await publishQueueMessage(MQ_DISPATCHER_ROUTING_KEY, message);
+        await publishQueueMessage(message);
     }
 
     return message;

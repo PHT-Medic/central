@@ -4,10 +4,14 @@ import {findTrain} from "./utils";
 import env from "../../../../env";
 import {TrainStation} from "../../train-station";
 import {TrainStationApprovalStatus} from "../../train-station/status";
-import {createTrainBuilderQueueMessage, publishTrainBuilderQueueMessage} from "../../../service/train-builder/queue";
+import {
+    buildTrainBuilderQueueMessage,
+    TrainBuilderCommand
+} from "../../../service/train-builder/queue";
 import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "../status";
 import {TrainResult} from "../../train-result";
 import {TrainResultStatus} from "../../train-result/status";
+import {publishQueueMessage} from "../../../../modules/message-queue";
 
 export async function buildTrain(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);
@@ -35,9 +39,9 @@ export async function buildTrain(train: Train | number | string) : Promise<Train
                 throw new Error('Not all stations have approved your train yet.');
             }
 
-            const queueMessage = await createTrainBuilderQueueMessage('trainBuild', train);
+            const queueMessage = await buildTrainBuilderQueueMessage(TrainBuilderCommand.START, train);
 
-            await publishTrainBuilderQueueMessage(queueMessage);
+            await publishQueueMessage(queueMessage);
         }
 
         train = repository.merge(train, {

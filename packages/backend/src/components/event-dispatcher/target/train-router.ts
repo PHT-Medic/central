@@ -1,13 +1,8 @@
-import {
-    isHarborStationProjectName
-} from "../../../config/services/harbor";
+import {isHarborStationProjectName} from "../../../config/services/harbor";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
-import {
-    createTrainRouterQueueMessageEvent,
-    publishTrainRouterQueueMessage
-} from "../../../domains/service/train-router/queue";
+import {buildTrainRouterQueueMessage, TrainRouterHarborEvent} from "../../../domains/service/train-router/queue";
 import {useLogger} from "../../../modules/log";
-import {QueueMessage} from "../../../modules/message-queue";
+import {publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 
 export async function dispatchHarborEventToTrainRouter(
     message: QueueMessage
@@ -22,8 +17,8 @@ export async function dispatchHarborEventToTrainRouter(
         return message;
     }
 
-    await publishTrainRouterQueueMessage(createTrainRouterQueueMessageEvent(
-        'trainPushed',
+    await publishQueueMessage(buildTrainRouterQueueMessage(
+        TrainRouterHarborEvent.TRAIN_PUSHED,
         {
             repositoryFullName: data.repositoryFullName,
             operator: data.operator

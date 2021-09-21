@@ -1,18 +1,23 @@
-import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
+
 import {MQ_RS_COMMAND_ROUTING_KEY} from "../../../config/services/rabbitmq";
+import {buildQueueMessage, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 
-export async function createResultServiceResultCommand(command: string, data: Record<string,any>) {
-    let queueMessage = createQueueMessageTemplate();
-    queueMessage.type = command;
-    queueMessage.metadata = {
-        token: undefined
-    }
-
-    queueMessage.data = data;
-
-    await publishResultServiceQueueMessageCommand(queueMessage);
+export enum ResultServiceCommand {
+    DOWNLOAD = 'download'
 }
 
-export async function publishResultServiceQueueMessageCommand(message: QueueMessage) {
-    await publishQueueMessage(MQ_RS_COMMAND_ROUTING_KEY, message);
+export async function emitResultServiceQueueMessage(
+    command: ResultServiceCommand,
+    data: Record<string,any>
+) {
+    const message : QueueMessage = buildQueueMessage({
+        routingKey: MQ_RS_COMMAND_ROUTING_KEY,
+        type: command,
+        data,
+        metadata: {
+            token: undefined
+        }
+    })
+
+    await publishQueueMessage(message);
 }

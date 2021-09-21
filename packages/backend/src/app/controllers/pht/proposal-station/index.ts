@@ -1,12 +1,9 @@
 import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
-import {emitDispatcherProposalEvent, DispatcherProposalEventType} from "../../../../domains/pht/proposal/queue";
+import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
 import {ProposalStation} from "../../../../domains/pht/proposal/station";
-import {
-    isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources
-} from "../../../../domains/auth/realm/db/utils";
+import {isPermittedForResourceRealm, onlyRealmPermittedQueryResources} from "../../../../domains/auth/realm/db/utils";
 import {
     isProposalStationState,
     ProposalStationState,
@@ -173,7 +170,7 @@ export async function addProposalStationRouteHandler(req: any, res: any) {
         entity = await repository.save(entity);
 
         await emitDispatcherProposalEvent({
-            event: 'assigned',
+            event: DispatcherProposalEvent.ASSIGNED,
             id: entity.proposal_id,
             stationId: entity.station_id,
             operatorRealmId: req.realmId
@@ -246,7 +243,7 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
             ['approved', 'rejected'].indexOf(data.status as ProposalStationState) !== -1
         ) {
             await emitDispatcherProposalEvent({
-                event: proposalStation.status as DispatcherProposalEventType,
+                event: proposalStation.status as DispatcherProposalEvent,
                 id: proposalStation.proposal_id,
                 stationId: proposalStation.station_id,
                 operatorRealmId: req.realmId

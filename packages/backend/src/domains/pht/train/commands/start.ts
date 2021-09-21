@@ -2,10 +2,11 @@ import {Train} from "../index";
 import {getRepository} from "typeorm";
 import {findTrain} from "./utils";
 import {
-    createTrainRouterQueueMessageCommand,
-    publishTrainRouterQueueMessage
+    buildTrainRouterQueueMessage,
+    TrainRouterCommand
 } from "../../../service/train-router/queue";
 import {TrainRunStatus} from "../status";
+import {publishQueueMessage} from "../../../../modules/message-queue";
 
 export async function startTrain(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);
@@ -21,9 +22,9 @@ export async function startTrain(train: Train | number | string) : Promise<Train
         // todo: make it a ClientError.BadRequest
         throw new Error('The train has already been started...');
     } else {
-        const queueMessage = await createTrainRouterQueueMessageCommand('startTrain', {trainId: train.id});
+        const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.START, {trainId: train.id});
 
-        await publishTrainRouterQueueMessage(queueMessage);
+        await publishQueueMessage(queueMessage);
 
         train = repository.merge(train, {
             run_status: TrainRunStatus.STARTING

@@ -5,7 +5,7 @@ import {MQ_RS_COMMAND_ROUTING_KEY} from "../../../config/services/rabbitmq";
 import {TrainResult} from "../../../domains/pht/train-result";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {useLogger} from "../../../modules/log";
-import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
+import {buildQueueMessage, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 
 export async function dispatchHarborEventToResultService(
     message: QueueMessage
@@ -43,10 +43,11 @@ export async function dispatchHarborEventToResultService(
         resultId: entity.id
     }
 
-    await publishQueueMessage(
-        MQ_RS_COMMAND_ROUTING_KEY,
-        createQueueMessageTemplate('download', queueData)
-    );
+    await publishQueueMessage(buildQueueMessage({
+        routingKey: MQ_RS_COMMAND_ROUTING_KEY,
+        type: 'download',
+        data: queueData
+    }));
 
     useLogger().debug('train event pushed to result service aggregator.', {service: 'api-harbor-hook'})
 

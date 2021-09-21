@@ -1,6 +1,6 @@
-import {DispatcherTrainEvent} from "../../../../components/event-dispatcher";
+import {DispatcherEvent} from "../../../../components/event-dispatcher";
 import {MQ_DISPATCHER_ROUTING_KEY} from "../../../../config/services/rabbitmq";
-import {createQueueMessageTemplate, publishQueueMessage} from "../../../../modules/message-queue";
+import {buildQueueMessage, publishQueueMessage} from "../../../../modules/message-queue";
 
 export type DispatcherTrainEventType = 'approved' | 'assigned' | 'rejected';
 export type DispatcherTrainEventData = {
@@ -19,13 +19,18 @@ export async function emitDispatcherTrainEvent(
 ) {
     options = options ?? {};
 
-    const message = createQueueMessageTemplate(DispatcherTrainEvent, data, metaData);
+    const message = buildQueueMessage({
+        routingKey: MQ_DISPATCHER_ROUTING_KEY,
+        type: DispatcherEvent.TRAIN,
+        data,
+        metadata: metaData
+    });
 
     if(options.templateOnly) {
         return message;
     }
 
-    await publishQueueMessage(MQ_DISPATCHER_ROUTING_KEY, message);
+    await publishQueueMessage(message);
 
     return message;
 }

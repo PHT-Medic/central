@@ -1,39 +1,40 @@
-import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
+
 import {MQ_TR_ROUTING_KEY} from "../../../config/services/rabbitmq";
+import {buildQueueMessage, QueueMessage} from "../../../modules/message-queue";
 
 // -------------------------------------------
 
-export type HarborTrainRouterEvent = 'trainPushed';
-export type HarborTrainRouterEventPayload = {
+export enum TrainRouterHarborEvent {
+    TRAIN_PUSHED = 'trainPushed'
+}
+
+export type TrainRouterHarborEventPayload = {
     repositoryFullName: string,
     operator: string
 }
 
-export function createTrainRouterQueueMessageEvent(
-    event: HarborTrainRouterEvent,
-    data: HarborTrainRouterEventPayload,
-    metaData: Record<string, any> = {}
-) : QueueMessage {
-    return createQueueMessageTemplate(event, data, metaData);
-}
-
 // -------------------------------------------
 
-export type HarborTrainRouterCommand = 'startTrain' | 'stopTrain';
-export type HarborTrainRouterCommandPayload = {
+export enum TrainRouterCommand {
+    START = 'startTrain',
+    STOP = 'stopTrain'
+}
+
+export type TrainRouterCommandPayload = {
     trainId: string
 };
 
-export function createTrainRouterQueueMessageCommand(
-    command: HarborTrainRouterCommand,
-    data: HarborTrainRouterCommandPayload,
-    metaData: Record<string, any> = {}
-) : QueueMessage {
-    return createQueueMessageTemplate(command, data, metaData);
-}
-
 // -------------------------------------------
 
-export async function publishTrainRouterQueueMessage(queueMessage: QueueMessage) {
-    await publishQueueMessage(MQ_TR_ROUTING_KEY, queueMessage);
+export function buildTrainRouterQueueMessage<T extends TrainRouterCommand | TrainRouterHarborEvent>(
+    type: T,
+    data: T extends TrainRouterCommand ? TrainRouterCommandPayload : TrainRouterHarborEventPayload,
+    metaData: Record<string, any> = {}
+) : QueueMessage {
+    return buildQueueMessage({
+        routingKey: MQ_TR_ROUTING_KEY,
+        type,
+        data,
+        metadata: metaData
+    });
 }

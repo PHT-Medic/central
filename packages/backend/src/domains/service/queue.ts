@@ -1,19 +1,21 @@
-import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../modules/message-queue";
 import {MQ_UI_SELF_COMMAND_ROUTING_KEY} from "../../config/services/rabbitmq";
 import {Client} from "../auth/client";
+import {buildQueueMessage, QueueMessage} from "../../modules/message-queue";
+import {ServiceSecurityComponent} from "../../components/service-security";
 
-export async function publishSelfQM(queueMessage: QueueMessage) {
-    await publishQueueMessage(MQ_UI_SELF_COMMAND_ROUTING_KEY, queueMessage);
-}
-
-export function createSelfServiceSyncQMCommand(
+export function buildServiceSecurityQueueMessage(
+    type: ServiceSecurityComponent,
     serviceId: string,
     client: Pick<Client, 'id' | 'secret'>,
     metaData: Record<string, any> = {}
 ) : QueueMessage {
-    return createQueueMessageTemplate('sync', {
-        id: serviceId,
-        clientId: client.id,
-        clientSecret: client.secret
-    }, metaData);
+    return buildQueueMessage({
+        routingKey: MQ_UI_SELF_COMMAND_ROUTING_KEY,
+        type,
+        data: {
+            clientId: client.id,
+            clientSecret: client.secret
+        },
+        metadata: metaData
+    })
 }

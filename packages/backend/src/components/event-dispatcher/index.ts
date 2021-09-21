@@ -1,10 +1,4 @@
 import {MQ_DISPATCHER_ROUTING_KEY} from "../../config/services/rabbitmq";
-import {
-    consumeMessageQueue,
-    handleMessageQueueChannel,
-    QueChannelHandler,
-    QueueMessage
-} from "../../modules/message-queue";
 import {extendDispatcherHarborData} from "./data/harbor";
 import {
     dispatchHarborEventToEmailNotifier,
@@ -14,16 +8,22 @@ import {
 import {dispatchHarborEventToResultService} from "./target/result-service";
 import {dispatchHarborEventToSelf} from "./target/self";
 import {dispatchHarborEventToTrainRouter} from "./target/train-router";
+import {
+    consumeMessageQueue,
+    handleMessageQueueChannel,
+    QueChannelHandler,
+    QueueMessage
+} from "../../modules/message-queue";
 
-export type DispatcherEventType = 'proposalEvent' | 'trainEvent' | 'harborEvent';
+export enum DispatcherEvent {
+    PROPOSAL = 'proposalEvent',
+    TRAIN = 'trainEvent',
+    HARBOR = 'harborEvent'
+}
 
-export const DispatcherProposalEvent : DispatcherEventType = 'proposalEvent';
-export const DispatcherTrainEvent : DispatcherEventType = 'trainEvent';
-export const DispatcherHarborEvent : DispatcherEventType = 'harborEvent';
-
-function createDispatcherHandlers() : Record<string, QueChannelHandler> {
+function createDispatcherHandlers() : Record<DispatcherEvent, QueChannelHandler> {
     return {
-        [DispatcherProposalEvent]: async(message: QueueMessage) => {
+        [DispatcherEvent.PROPOSAL]: async(message: QueueMessage) => {
             // assigned, approved, rejected
 
             console.log(message);
@@ -31,7 +31,7 @@ function createDispatcherHandlers() : Record<string, QueChannelHandler> {
             return Promise.resolve(message)
                 .then(dispatchProposalEventToEmailNotifier);
         },
-        [DispatcherTrainEvent]: async(message: QueueMessage) => {
+        [DispatcherEvent.TRAIN]: async(message: QueueMessage) => {
             // assigned, approved, rejected
 
             console.log(message);
@@ -40,7 +40,7 @@ function createDispatcherHandlers() : Record<string, QueChannelHandler> {
                 .then(dispatchTrainEventToEmailNotifier);
         },
 
-        [DispatcherHarborEvent]: async(message: QueueMessage) => {
+        [DispatcherEvent.HARBOR]: async(message: QueueMessage) => {
             // PUSH_ARTIFACT
 
             return Promise.resolve(message)

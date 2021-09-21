@@ -1,28 +1,46 @@
-import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../modules/message-queue";
 import {getRepository} from "typeorm";
 import {Train} from "../domains/pht/train";
 import {TrainBuildStatus} from "../domains/pht/train/status";
 import {MQ_UI_TB_EVENT_ROUTING_KEY} from "../config/services/rabbitmq";
+import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../modules/message-queue";
+
+export enum TrainBuilderEvent {
+    STARTED = 'trainBuildStarted',
+    STOPPED = 'trainBuildStopped',
+    FAILED = 'trainBuildFailed',
+    FINISHED = 'trainBuildFinished',
+}
+
+const EventStatusMap : Record<TrainBuilderEvent, TrainBuildStatus> = {
+    [TrainBuilderEvent.STARTED]: TrainBuildStatus.BUILDING,
+    [TrainBuilderEvent.STOPPED]: TrainBuildStatus.STOPPED,
+    [TrainBuilderEvent.FAILED]: TrainBuildStatus.FAILED,
+    [TrainBuilderEvent.FINISHED]: TrainBuildStatus.FINISHED
+};
+
+async function updateTrain(trainId: string, event: TrainBuilderEvent) {
+    const repository = getRepository(Train);
+
+    await repository.update({
+        id: trainId
+    }, {
+        build_status: EventStatusMap[event]
+    });
+}
 
 function createTrainBuilderAggregatorHandlers() {
     return {
-        trainBuildFailed: async (message: QueueMessage) => {
-            const repository = getRepository(Train);
-
-            await repository.update({
-                id: message.data.trainId
-            }, {
-                build_status: TrainBuildStatus.FAILED
-            });
+        [TrainBuilderEvent.FINISHED]: async (message: QueueMessage) => {
+            await updateTrain(message.data.trainId, TrainBuilderEvent.FINISHED);
         },
-        trainBuilt: async (message: QueueMessage) => {
-            const repository = getRepository(Train);
-
-            await repository.update({
-                id: message.data.trainId
-            }, {
-                build_status: TrainBuildStatus.FINISHED
-            });
+        [TrainBuilderEvent.FAILED]: async (message: QueueMessage) => {
+            await updateTrain(message.data.trainId, TrainBuilderEvent.FAILED);
+        },
+        [TrainBuilderEvent.STOPPED]: async (message: QueueMessage) => {
+            await updateTrain(message.data.trainId, TrainBuilderEvent.STOPPED);
+        },
+        [TrainBuilderEvent.STARTED]: async (message: QueueMessage) => {
+            await updateTrain(message.data.trainId, TrainBuilderEvent.STARTED);
         }
     }
 }

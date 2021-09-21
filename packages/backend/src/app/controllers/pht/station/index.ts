@@ -11,7 +11,7 @@ import {
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {doStationTaskRouteHandler, StationTask} from "./StationActionController";
+import {doStationTaskRouteHandler, StationTask} from "./action";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialStation = Partial<Station>;

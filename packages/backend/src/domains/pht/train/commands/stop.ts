@@ -3,9 +3,10 @@ import {getRepository} from "typeorm";
 import {findTrain} from "./utils";
 import {TrainRunStatus} from "../status";
 import {
-    createTrainRouterQueueMessageCommand,
-    publishTrainRouterQueueMessage
+    buildTrainRouterQueueMessage,
+    TrainRouterCommand
 } from "../../../service/train-router/queue";
+import {publishQueueMessage} from "../../../../modules/message-queue";
 
 export async function stopTrain(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);
@@ -21,9 +22,9 @@ export async function stopTrain(train: Train | number | string) : Promise<Train>
         // todo: make it a ClientError.BadRequest
         throw new Error('The train has already been terminated...');
     } else {
-        const queueMessage = await createTrainRouterQueueMessageCommand('stopTrain', {trainId: train.id});
+        const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.STOP, {trainId: train.id});
 
-        await publishTrainRouterQueueMessage(queueMessage);
+        await publishQueueMessage(queueMessage);
 
         train = repository.merge(train, {
             run_status: TrainRunStatus.STOPPING

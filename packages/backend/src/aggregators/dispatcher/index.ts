@@ -1,12 +1,8 @@
-import {
-    consumeMessageQueue,
-    handleMessageQueueChannel,
-    QueChannelHandler,
-} from "../../modules/message-queue";
 import {MQ_UI_D_EVENT_ROUTING_KEY} from "../../config/services/rabbitmq";
 import {createDispatcherAggregatorMasterImageHandlers} from "./handlers/master-image";
 import {createDispatcherAggregatorProposalHandlers} from "./handlers/proposal";
 import {createDispatcherAggregatorTrainHandlers} from "./handlers/train";
+import {consumeMessageQueue, handleMessageQueueChannel, QueChannelHandler} from "../../modules/message-queue";
 
 
 function createDispatcherAggregatorHandlers() : Record<string, QueChannelHandler> {

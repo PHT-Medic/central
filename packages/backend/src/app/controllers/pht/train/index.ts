@@ -16,7 +16,7 @@ import {TrainFile} from "../../../../domains/pht/train-file";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {doTrainTaskRouteHandler, TrainCommand} from "./action/TrainActionController";
+import {doTrainTaskRouteHandler, TrainCommand} from "./action";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialTrain = Partial<Train>;

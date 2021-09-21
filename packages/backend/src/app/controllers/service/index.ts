@@ -2,15 +2,17 @@ import {SwaggerTags} from "typescript-swagger";
 import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
-import {Body, Controller, Get, Post, Request, Response, Params} from "@decorators/express";
+import {Body, Controller, Get, Params, Post, Request, Response} from "@decorators/express";
 
 import {BaseService, Service} from "../../../domains/service";
-import {createSelfServiceSyncQMCommand, publishSelfQM} from "../../../domains/service/queue";
+import {buildServiceSecurityQueueMessage} from "../../../domains/service/queue";
 import {ForceLoggedInMiddleware} from "../../../config/http/middleware/auth";
 
 import {HarborHook, postHarborHookRouteHandler} from "./harbor/hook";
 
 import {doHarborTask} from "./harbor/task";
+import {publishQueueMessage} from "../../../modules/message-queue";
+import {ServiceSecurityComponent} from "../../../components/service-security";
 
 enum ServiceClientTask {
     SYNC = 'sync',
@@ -177,12 +179,13 @@ async function doClientTask(req: any, res: any) {
 }
 
 async function syncServiceClient(entity: Service) {
-    const queueMessage = createSelfServiceSyncQMCommand(
+    const queueMessage = buildServiceSecurityQueueMessage(
+        ServiceSecurityComponent.SYNC,
         entity.id,
         {
             id: entity.client.id,
             secret: entity.client.secret
         }
     );
-    await publishSelfQM(queueMessage);
+    await publishQueueMessage(queueMessage);
 }

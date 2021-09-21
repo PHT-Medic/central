@@ -1,5 +1,5 @@
 import {TrainResult} from "../../train-result";
-import {createResultServiceResultCommand} from "../../../service/result-service/queue";
+import {emitResultServiceQueueMessage, ResultServiceCommand} from "../../../service/result-service/queue";
 import {getRepository} from "typeorm";
 import {findHarborProjectRepository, HarborRepository} from "../../../service/harbor/project/repository/api";
 import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/services/harbor";
@@ -40,7 +40,7 @@ export async function triggerTrainDownload(
     }
 
     // send queue message
-    await createResultServiceResultCommand('download', {
+    await emitResultServiceQueueMessage(ResultServiceCommand.DOWNLOAD, {
         projectName: harborRepository.projectName,
         repositoryName: harborRepository.name,
         repositoryFullName: harborRepository.fullName,

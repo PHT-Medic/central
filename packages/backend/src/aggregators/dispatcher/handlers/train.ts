@@ -4,9 +4,9 @@ import {
     TrainBuildStatus,
     TrainRunStatus
 } from "../../../domains/pht/train/status";
-import {QueChannelHandler, QueueMessage} from "../../../modules/message-queue";
 import {TrainStation} from "../../../domains/pht/train-station";
 import {TrainStationRunStatus} from "../../../domains/pht/train-station/status";
+import {QueChannelHandler, QueueMessage} from "../../../modules/message-queue";
 
 export enum AggregatorTrainEvent {
     BUILD_FINISHED = 'trainBuilt',

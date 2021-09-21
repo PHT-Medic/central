@@ -5,7 +5,7 @@ import {buildTrainResultAggregator} from "./aggregators/train-result";
 import {buildDispatcherAggregator} from "./aggregators/dispatcher";
 import {useVaultApi} from "./modules/api/service/vault";
 import {useHarborApi} from "./modules/api/service/harbor";
-import {buildServiceSecurityComponent} from "./components/service-security";
+import {buildCommandRouterComponent} from "./components/command-router";
 
 interface ConfigContext {
     env: Environment
@@ -24,7 +24,7 @@ function createConfig({env} : ConfigContext) : Config {
     ];
 
     const components : {start: () => void}[] = [
-        buildServiceSecurityComponent(),
+        buildCommandRouterComponent(),
         buildDispatcherComponent()
     ];
 

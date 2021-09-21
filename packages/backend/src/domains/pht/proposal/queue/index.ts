@@ -1,10 +1,15 @@
-import {DispatcherProposalEvent} from "../../../../components/event-dispatcher";
 import {MQ_DISPATCHER_ROUTING_KEY} from "../../../../config/services/rabbitmq";
-import {createQueueMessageTemplate, publishQueueMessage} from "../../../../modules/message-queue";
+import {buildQueueMessage, publishQueueMessage} from "../../../../modules/message-queue";
+import {DispatcherEvent} from "../../../../components/event-dispatcher";
 
-export type DispatcherProposalEventType = 'approved' | 'rejected' | 'assigned';
+export enum DispatcherProposalEvent {
+    APPROVED = 'approved',
+    REJECTED = 'rejected',
+    ASSIGNED = 'assigned'
+}
+
 export type DispatcherProposalEventData = {
-    event: DispatcherProposalEventType,
+    event: DispatcherProposalEvent,
     id: string | number,
     stationId?: string | number,
     operatorRealmId: string
@@ -19,13 +24,18 @@ export async function emitDispatcherProposalEvent(
 ) {
     options = options ?? {};
 
-    const message = createQueueMessageTemplate(DispatcherProposalEvent, data, metaData);
+    const message = buildQueueMessage({
+        routingKey: MQ_DISPATCHER_ROUTING_KEY,
+        type: DispatcherEvent.PROPOSAL,
+        data,
+        metadata: metaData
+    })
 
     if(options.templateOnly) {
         return message;
     }
 
-    await publishQueueMessage(MQ_DISPATCHER_ROUTING_KEY, message);
+    await publishQueueMessage(message);
 
     return message;
 }

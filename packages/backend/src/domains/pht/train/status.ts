@@ -1,6 +1,7 @@
 export enum TrainBuildStatus {
     STARTING = 'starting',
-    STARTED = 'started',
+    STOPPED = 'stopped',
+    BUILDING = 'building',
     FINISHED = 'finished',
     FAILED = 'failed'
 }
@@ -14,7 +15,6 @@ export function isTrainBuildStatus(type: string) : type is TrainBuildStatusType 
 // -------------------------------------------------------------------------
 
 export enum TrainConfigurationStatus {
-    OPEN = 'open',
     FILES_UPLOADED = 'files_uploaded',
     HASH_GENERATED = 'hash_generated',
     HASH_SIGNED = 'hash_signed',

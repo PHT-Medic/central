@@ -4,34 +4,38 @@ import {
 } from "../../../config/services/harbor";
 
 import {MQ_EN_EVENT_ROUTING_KEY} from "../../../config/services/rabbitmq";
-import {DispatcherProposalEventData, DispatcherProposalEventType} from "../../../domains/pht/proposal/queue";
+import {
+    DispatcherProposalEvent,
+    DispatcherProposalEventData
+} from "../../../domains/pht/proposal/queue";
 import {DispatcherTrainEventData, DispatcherTrainEventType} from "../../../domains/pht/train/queue";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
-import {createQueueMessageTemplate, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 import {DispatcherHarborEventWithAdditionalData} from "../data/harbor";
+import {buildQueueMessage, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 
 export async function dispatchProposalEventToEmailNotifier(
     message: QueueMessage
 ) : Promise<QueueMessage> {
     const data : DispatcherProposalEventData = message.data as DispatcherProposalEventData;
 
-    const mapping : Record<DispatcherProposalEventType, string> = {
+    const mapping : Record<DispatcherProposalEvent, string> = {
         assigned: 'proposalAssigned',
         approved: 'proposalApproved',
         rejected: 'proposalRejected'
     }
 
     if(mapping[data.event]) {
-        await publishQueueMessage(
-            MQ_EN_EVENT_ROUTING_KEY,
-            createQueueMessageTemplate(mapping[data.event], {
+        await publishQueueMessage(buildQueueMessage({
+            routingKey: MQ_EN_EVENT_ROUTING_KEY,
+            type: mapping[data.event],
+            data: {
                 id: data.id,
                 stationId: data.stationId,
                 operatorRealmId: data.operatorRealmId,
                 // operatorId: '',
                 // operatorType: 'user' | 'service'
-            })
-        );
+            }
+        }));
     }
 
     return message;
@@ -49,14 +53,15 @@ export async function dispatchTrainEventToEmailNotifier(
     }
 
     if(mapping[data.event]) {
-        await publishQueueMessage(
-            MQ_EN_EVENT_ROUTING_KEY,
-            createQueueMessageTemplate(mapping[data.event], {
+        await publishQueueMessage(buildQueueMessage({
+            routingKey: MQ_EN_EVENT_ROUTING_KEY,
+            type: mapping[data.event],
+            data: {
                 id: data.id,
                 stationId: data.stationId,
                 operatorRealmId: data.operatorRealmId
-            })
-        );
+            }
+        }));
     }
 
     return message;
@@ -73,24 +78,27 @@ export async function dispatchHarborEventToEmailNotifier(
 
     const isIncomingProject : boolean = data.namespace === HARBOR_INCOMING_PROJECT_NAME;
     if(isIncomingProject) {
-        await publishQueueMessage(
-            MQ_EN_EVENT_ROUTING_KEY,
-            createQueueMessageTemplate('trainBuilt', {
+        await publishQueueMessage(buildQueueMessage({
+            routingKey: MQ_EN_EVENT_ROUTING_KEY,
+            type: 'trainBuilt',
+            data: {
                 id: data.repositoryName
-            })
-        );
+            }
+        }));
 
         return message;
     }
 
     const isOutgoingProject : boolean = data.namespace === HARBOR_OUTGOING_PROJECT_NAME;
     if(isOutgoingProject) {
-        await publishQueueMessage(
-            MQ_EN_EVENT_ROUTING_KEY,
-            createQueueMessageTemplate('trainFinished', {
+
+        await publishQueueMessage(buildQueueMessage({
+            routingKey: MQ_EN_EVENT_ROUTING_KEY,
+            type: 'trainFinished',
+            data: {
                 id: data.repositoryName
-            })
-        );
+            }
+        }));
 
         return message;
     }
@@ -107,22 +115,24 @@ export async function dispatchHarborEventToEmailNotifier(
 
         // If stationIndex is 0, than the target is the first station of the route.
         if(data.stationIndex === 0) {
-            await publishQueueMessage(
-                MQ_EN_EVENT_ROUTING_KEY,
-                createQueueMessageTemplate('trainStarted', {
+            await publishQueueMessage(buildQueueMessage({
+                routingKey: MQ_EN_EVENT_ROUTING_KEY,
+                type: 'trainStarted',
+                data: {
                     id: data.repositoryName,
                     stationId: data.station?.id
-                })
-            );
+                }
+            }));
         }
 
-        await publishQueueMessage(
-            MQ_EN_EVENT_ROUTING_KEY,
-            createQueueMessageTemplate('trainReady', {
+        await publishQueueMessage(buildQueueMessage({
+            routingKey: MQ_EN_EVENT_ROUTING_KEY,
+            type: 'trainReady',
+            data: {
                 id: data.repositoryName,
                 stationId: data.station?.id
-            })
-        );
+            }
+        }));
     }
 
     return message;

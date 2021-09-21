@@ -1,11 +1,8 @@
 import {getRepository, In} from "typeorm";
-import {applyRequestFilter, applyRequestPagination, applyRequestIncludes} from "typeorm-extension";
-import {emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
+import {applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
+import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
 import {Station} from "../../../../domains/pht/station";
-import {
-    isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources
-} from "../../../../domains/auth/realm/db/utils";
+import {isPermittedForResourceRealm, onlyRealmPermittedQueryResources} from "../../../../domains/auth/realm/db/utils";
 import {check, matchedData, validationResult} from "express-validator";
 import {Proposal} from "../../../../domains/pht/proposal";
 import {MasterImage} from "../../../../domains/pht/master-image";
@@ -205,7 +202,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
 
         const proposalStationPromise = Promise.all(station_ids.map((stationId: string | number) => {
             return emitDispatcherProposalEvent({
-                event: 'assigned',
+                event: DispatcherProposalEvent.ASSIGNED,
                 id: entity.id,
                 stationId,
                 operatorRealmId: req.realmId

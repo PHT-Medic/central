@@ -1,7 +1,7 @@
 import {QueueMessage} from "../../modules/message-queue";
 import {BaseService} from "../../domains/service";
-import {getRepository, Not, IsNull} from "typeorm";
 import {saveServiceSecretToVault} from "../../domains/service/vault/service/api";
+import {getRepository, IsNull, Not} from "typeorm";
 import {Station} from "../../domains/pht/station";
 import {ensureHarborProjectWebHook} from "../../domains/service/harbor/project/web-hook/api";
 

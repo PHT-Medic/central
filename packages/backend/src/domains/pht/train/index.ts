@@ -55,6 +55,10 @@ export class Train {
     @Column({type: "varchar", nullable: true, default: true})
     build_status: TrainBuildStatus | null;
 
+    @Column({type: "uuid", nullable: true, default: null})
+    build_id: string;
+
+
     @Column({type: "varchar", nullable: true, default: null})
     run_status: TrainRunStatus | null;
 
