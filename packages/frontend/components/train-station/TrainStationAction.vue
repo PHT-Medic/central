@@ -70,10 +70,10 @@ export default {
         }
     },
     methods: {
-        click(ev) {
+        async click(ev) {
             ev.preventDefault();
 
-            this.doAction();
+            await this.doAction();
         },
         async doAction() {
             if(this.itemBusy) return;

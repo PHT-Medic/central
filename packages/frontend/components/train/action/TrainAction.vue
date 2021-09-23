@@ -8,7 +8,7 @@
     </slot>
 </template>
 <script>
-import {runTrainTask} from "@/domains/train/api";
+import {runTrainCommand} from "@/domains/train/api";
 
 export default {
     props: {
@@ -28,7 +28,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runTrainTask(this.train.id, this.task);
+                const train = await runTrainCommand(this.train.id, this.task);
                 this.$emit('done', train);
             } catch (e) {
                 this.$emit('failed', e);

@@ -4,12 +4,20 @@ import {UserKeyRing} from "../../../auth/user/key-ring";
 import {TrainFile} from "../../../pht/train-file";
 import {TrainStation} from "../../../pht/train-station";
 import {TrainStationApprovalStatus} from "../../../pht/train-station/status";
+import {MasterImage} from "../../../pht/master-image";
 
 export async function buildTrainBuilderStartCommandPayload(train: Train) {
+    const masterImageRepository = getRepository(MasterImage);
+    const masterImage = await masterImageRepository.findOne(train.master_image_id);
+
+    // todo: check existence
+
     const keyRingRepository = getRepository(UserKeyRing);
     const keyRing = await keyRingRepository.findOne({
         user_id: train.user_id
     });
+
+    // todo: check existence
 
     const filesRepository = getRepository(TrainFile);
     const files: TrainFile[] = await filesRepository
@@ -17,13 +25,16 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) {
         .where('file.train_id = :id', {id: train.id})
         .getMany();
 
+    const entryPointFile = await filesRepository.findOne(train.entrypoint_file_id);
+    // todo: check existence
+
     const trainStationRepository = getRepository(TrainStation);
     const trainStations = await trainStationRepository
         .createQueryBuilder('trainStation')
         .leftJoinAndSelect('trainStation.station', 'station')
         .addSelect('station.secure_id')
         .where("trainStation.train_id = :trainId", {trainId: train.id})
-        .andWhere("trainStation.status = :status", {status: TrainStationApprovalStatus.APPROVED})
+        .andWhere("trainStation.approval_status = :status", {status: TrainStationApprovalStatus.APPROVED})
         .getMany();
 
     return {
@@ -33,9 +44,9 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) {
         proposalId: train.proposal_id,
         stations: trainStations.map(trainStation => trainStation.station.secure_id),
         files: files.map((file: TrainFile) => file.directory + '/' + file.name),
-        masterImage: train.master_image.path,
+        masterImage: masterImage.path,
         entrypointExecutable: train.entrypoint_executable,
-        entrypointPath: train.entrypoint_file.directory + '/' + train.entrypoint_file.name,
+        entrypointPath: entryPointFile.directory + '/' + entryPointFile.name,
         sessionId: train.session_id,
         hash: train.hash,
         hashSigned: train.hash_signed,

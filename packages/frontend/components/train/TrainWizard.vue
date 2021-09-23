@@ -1,10 +1,10 @@
 <script>
 import TrainWizardConfiguratorStep from "@/components/train/wizard/TrainWizardConfiguratorStep";
 import TrainFileManager from "@/components/train/file/TrainFileManager";
-import {editTrain, runTrainTask} from "@/domains/train/api.ts";
+import {editTrain, runTrainCommand} from "@/domains/train/api.ts";
 import TrainWizardHashStep from "@/components/train/wizard/TrainWizardHashStep";
 import TrainWizardFinalStep from "@/components/train/wizard/TrainWizardFinalStep";
-import {TrainConfiguratorStates} from "@/domains/train/index.ts";
+import {TrainConfigurationStatus, TrainConfiguratorStates} from "@/domains/train/index.ts";
 
 export default {
     components: {TrainWizardFinalStep, TrainWizardHashStep, TrainFileManager, TrainWizardConfiguratorStep},
@@ -90,7 +90,7 @@ export default {
 
                 const updateData = {
                     status: train.status,
-                    configuratorStatus: train.configuratorStatus,
+                    configurationStatus: train.configurationStatus,
                     ...data
                 };
 
@@ -105,11 +105,11 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runTrainTask(this.trainProperty.id, 'build');
+                const train = await runTrainCommand(this.trainProperty.id, 'build');
 
                 this.$emit('updated', {
                     status: train.status,
-                    configuratorStatus: train.configuratorStatus
+                    configurationStatus: train.configurationStatus
                 });
             } catch (e) {
 
@@ -260,14 +260,12 @@ export default {
         setHash(hash) {
             let data = {
                 hash: hash,
-                configuratorStatus: TrainConfiguratorStates.TrainConfiguratorStateHashGenerated
+                configurationStatus: TrainConfigurationStatus.HASH_GENERATED
             };
 
             for(let key in data) {
                 this.form[key] = data[key];
             }
-
-            console.log(this.form, hash);
 
             this.$emit('updated', data);
         },
@@ -294,7 +292,7 @@ export default {
 
         resetHashSignedStatus(id) {
             let data = {
-                configuratorStatus: TrainConfiguratorStates.TrainConfiguratorStateOpen,
+                configurationStatus: null,
                 hash: null,
                 hashSigned: null
             };
@@ -324,7 +322,7 @@ export default {
             return '';
         },
         isConfigured() {
-            return this.trainProperty.configuratorStatus === TrainConfiguratorStates.TrainConfiguratorStateFinished;
+            return this.trainProperty.configurationStatus === TrainConfigurationStatus.FINISHED;
         }
     }
 }

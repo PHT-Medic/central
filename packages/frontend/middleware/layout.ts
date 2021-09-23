@@ -1,7 +1,7 @@
 import {LayoutNavigationDefaultId} from "~/config/layout";
-import {Context, Middleware} from "@nuxt/types";
+import {Context} from "@nuxt/types";
 
-const layoutMiddleware : Middleware = ({ store, route } : Context) => {
+export default function layoutMiddleware({ store, route } : Context) {
     let key : string = 'navigationId';
     let navigationId : string | undefined;
 
@@ -28,5 +28,3 @@ const layoutMiddleware : Middleware = ({ store, route } : Context) => {
 
     return store.dispatch('layout/selectNavigation', navigationId).then(r => r)
 }
-
-export default layoutMiddleware;

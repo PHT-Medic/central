@@ -99,7 +99,7 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
             await trainFileRepository.save(files);
 
             await repository.save(repository.merge(entity, {
-                configurator_status: null,
+                configuration_status: null,
                 hash: null,
                 hash_signed: null
             }))

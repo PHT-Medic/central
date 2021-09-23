@@ -49,20 +49,19 @@ export class Train {
 
     // ------------------------------------------------------------------
 
-    @Column({type: "varchar", nullable: true, default: true})
-    configurator_status: TrainConfigurationStatus | null;
+    @Column({type: "enum", nullable: true, default: null, enum: TrainConfigurationStatus})
+    configuration_status: TrainConfigurationStatus | null;
 
-    @Column({type: "varchar", nullable: true, default: true})
+    @Column({type: "enum", nullable: true, default: null, enum: TrainBuildStatus})
     build_status: TrainBuildStatus | null;
 
     @Column({type: "uuid", nullable: true, default: null})
     build_id: string;
 
-
-    @Column({type: "varchar", nullable: true, default: null})
+    @Column({type: "enum", nullable: true, default: null, enum: TrainRunStatus})
     run_status: TrainRunStatus | null;
 
-    @Column({type: "integer", length: 11, unsigned: true, nullable: true, default: null})
+    @Column({type: "integer", unsigned: true, nullable: true, default: null})
     run_station_id: number | null;
 
     // ------------------------------------------------------------------
@@ -115,3 +114,4 @@ export class Train {
     @JoinColumn({name: 'master_image_id'})
     master_image: MasterImage;
 }
+export {TrainCommand} from "./types";

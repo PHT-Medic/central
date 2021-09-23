@@ -158,7 +158,7 @@ export async function dropTrainFileRouteHandler(req: any, res: any) {
 
         const trainRepository = getRepository(Train);
         await trainRepository.update({id: entity.train_id}, {
-            configurator_status: null,
+            configuration_status: null,
             hash: null,
             hash_signed: null
         });

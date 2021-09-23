@@ -9,7 +9,7 @@ export function buildQueueMessage(context: QueueMessageContext): QueueMessage {
 
     return {
         id: v4(),
-        routingKey: context.routingKey,
+        routingKey: context.routingKey, // this might be optional if we use another rabbitmq strategy.
         type: context.type,
         data: context.data,
         metadata: context.metadata
@@ -56,22 +56,9 @@ export async function consumeMessageQueue(routingKey: string | string[], cb: (ch
     await channel.consume(assertionQueue.queue, (msg: ConsumeMessage | null) => cb(channel, msg));
 }
 
-export function createQueueMessageTemplate(
-    type?: string,
-    data: Record<string, any> = {},
-    metaData: Record<string, any> = {}
-): QueueMessage {
-    return {
-        id: v4(),
-        type,
-        metadata: metaData,
-        data
-    }
-}
-
 export async function handleMessageQueueChannel(channel: Channel, handlers: Record<string, QueChannelHandler>, msg: ConsumeMessage) {
     const json: any = JSON.parse(msg.content.toString('utf-8'));
-    const queueMessage: QueueMessage | undefined = !!json ? <QueueMessage>json : undefined;
+    const queueMessage: QueueMessage | undefined = !!json ? json as QueueMessage : undefined;
 
     const handler = handlers[queueMessage.type] || handlers.$any;
 

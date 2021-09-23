@@ -6,22 +6,31 @@
     </span>
 </template>
 <script>
+import {TrainStationApprovalStatus} from "@/domains/train-station/type";
+
 export default {
     props: {
         status: {
             type: String,
-            default: 'open'
+            default: null
         }
     },
     computed: {
         statusText() {
-            return this.status;
+            switch (this.status) {
+                case TrainStationApprovalStatus.APPROVED:
+                    return 'approved';
+                case TrainStationApprovalStatus.REJECTED:
+                    return 'rejected';
+                default:
+                    return 'none';
+            }
         },
         classSuffix() {
             switch (this.status) {
-                case 'approved':
+                case TrainStationApprovalStatus.APPROVED:
                     return 'success';
-                case 'rejected':
+                case TrainStationApprovalStatus.REJECTED:
                     return 'danger';
                 default:
                     return 'info';

@@ -5,7 +5,7 @@ import {
     onlyRealmPermittedQueryResources
 } from "../../../../domains/auth/realm/db/utils";
 import {check, matchedData, validationResult} from "express-validator";
-import {Train} from "../../../../domains/pht/train";
+import {Train, TrainCommand} from "../../../../domains/pht/train";
 import {MasterImage} from "../../../../domains/pht/master-image";
 import {Proposal} from "../../../../domains/pht/proposal";
 import {isTrainType} from "../../../../domains/pht/train/types";
@@ -16,7 +16,7 @@ import {TrainFile} from "../../../../domains/pht/train-file";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {doTrainTaskRouteHandler, TrainCommand} from "./action";
+import {doTrainTaskRouteHandler} from "./action";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialTrain = Partial<Train>;
@@ -73,17 +73,17 @@ export class TrainController {
         return await addTrainRouteHandler(req, res) as PartialTrain | undefined;
     }
 
-    @Post("/:id/task",[ForceLoggedInMiddleware])
+    @Post("/:id/command",[ForceLoggedInMiddleware])
     @ResponseExample<PartialTrain>(simpleExample)
     async doTask(
         @Params('id') id: string,
         @Body() data: {
-            task: TrainCommand
+            command: TrainCommand
         },
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialTrain|undefined> {
-        return await doTrainTaskRouteHandler(req, res) as PartialTrain | undefined;
+        return (await doTrainTaskRouteHandler(req, res)) as PartialTrain | undefined;
     }
 
     @Delete("/:id",[ForceLoggedInMiddleware])
@@ -306,16 +306,16 @@ export async function editTrainRouteHandler(req: any, res: any) {
     train = repository.merge(train, data);
 
     if(train.hash) {
-        train.configurator_status = TrainConfigurationStatus.HASH_GENERATED;
+        train.configuration_status = TrainConfigurationStatus.HASH_GENERATED;
 
         if(train.hash_signed) {
-            train.configurator_status = TrainConfigurationStatus.HASH_SIGNED;
+            train.configuration_status = TrainConfigurationStatus.HASH_SIGNED;
         }
     }
 
     // check if all conditions are met
     if(train.hash_signed && train.hash) {
-        train.configurator_status = TrainConfigurationStatus.FINISHED;
+        train.configuration_status = TrainConfigurationStatus.FINISHED;
         train.run_status = null;
     }
 

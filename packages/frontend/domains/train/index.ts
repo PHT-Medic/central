@@ -36,22 +36,46 @@ const TrainStates = {
 
 //-----------------------------------------------------------
 
-const TrainResultStateOpen = 'open';
-const TrainResultStateDownloading = 'downloading';
-const TrainResultStateDownloaded = 'downloaded';
-const TrainResultStateExtracting = 'extracting';
-const TrainResultStateExtracted = 'extracted';
-const TrainResultStateFinished = 'finished';
-const TrainResultStateFailed = 'failed';
+export enum TrainBuildStatus {
+    STARTING = 'starting',
+    STARTED = 'started',
 
-const TrainResultStates = {
-    TrainResultStateOpen,
-    TrainResultStateDownloading,
-    TrainResultStateDownloaded,
-    TrainResultStateExtracting,
-    TrainResultStateExtracted,
-    TrainResultStateFinished,
-    TrainResultStateFailed
+    STOPPING = 'stopping',
+    STOPPED = 'stopped',
+
+    FINISHED = 'finished',
+    FAILED = 'failed'
+}
+
+//-----------------------------------------------------------
+
+export enum TrainConfigurationStatus {
+    FILES_UPLOADED = 'files_uploaded',
+    HASH_GENERATED = 'hash_generated',
+    HASH_SIGNED = 'hash_signed',
+    FINISHED = 'finished'
+}
+
+//-----------------------------------------------------------
+
+export enum TrainResultStatus {
+    DOWNLOADING = 'downloading',
+    DOWNLOADED = 'downloaded',
+    EXTRACTING = 'extracting',
+    EXTRACTED = 'extracted',
+    FINISHED = 'finished',
+    FAILED = 'failed'
+}
+
+//-----------------------------------------------------------
+
+export enum TrainRunStatus {
+    STARTING = 'starting',
+    STARTED = 'started',
+    STOPPING = 'stopping',
+    STOPPED = 'stopped',
+    FINISHED = 'finished',
+    FAILED = 'failed'
 }
 
 
@@ -67,7 +91,6 @@ const TrainTypes = {
 
 export {
     TrainStates,
-    TrainResultStates,
     TrainTypes,
     TrainConfiguratorStates
 }

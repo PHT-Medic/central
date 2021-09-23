@@ -37,7 +37,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
 
         train = repository.merge(train, {
             build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
-            configurator_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
+            configuration_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
             run_station_id: null, // optional, just to ensure
             run_status: TrainRunStatus.FINISHED
         });
@@ -65,7 +65,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
         if(typeof harborRepository === 'undefined') {
             train = repository.merge(train, {
                 build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
-                configurator_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
+                configuration_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
                 run_station_id: trainStations[i].station_id,
                 run_status: TrainRunStatus.STARTED
             });
@@ -81,7 +81,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     if(typeof harborRepository !== 'undefined') {
         train = repository.merge(train, {
             build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
-            configurator_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
+            configuration_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
             run_station_id: null, // optional, just to ensure
             run_status: null
         });

@@ -13,7 +13,7 @@ import {TrainResult} from "../../train-result";
 import {TrainResultStatus} from "../../train-result/status";
 import {publishQueueMessage} from "../../../../modules/message-queue";
 
-export async function buildTrain(train: Train | number | string) : Promise<Train> {
+export async function startBuildTrain(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);
 
     train = await findTrain(train, repository);
@@ -25,7 +25,7 @@ export async function buildTrain(train: Train | number | string) : Promise<Train
 
     if (!!train.run_status) {
         // todo: make it a ClientError.BadRequest
-        throw new Error('The train can no longer be build...');
+        throw new Error('The train can not longer be build...');
     } else {
         if(!env.demo) {
             const trainStationRepository = getRepository(TrainStation);
@@ -36,7 +36,7 @@ export async function buildTrain(train: Train | number | string) : Promise<Train
 
             if (trainStations.length > 0) {
                 // todo: make it a ClientError.NotFound
-                throw new Error('Not all stations have approved your train yet.');
+                throw new Error('Not all stations have approved the train yet.');
             }
 
             const queueMessage = await buildTrainBuilderQueueMessage(TrainBuilderCommand.START, train);
@@ -45,7 +45,7 @@ export async function buildTrain(train: Train | number | string) : Promise<Train
         }
 
         train = repository.merge(train, {
-            configurator_status: TrainConfigurationStatus.FINISHED,
+            configuration_status: TrainConfigurationStatus.FINISHED,
             run_status: env.demo ? TrainRunStatus.FINISHED : null,
             build_status: env.demo ? null : TrainBuildStatus.STARTING
         });

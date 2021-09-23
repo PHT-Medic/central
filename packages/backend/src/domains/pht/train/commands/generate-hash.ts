@@ -52,7 +52,7 @@ export async function generateTrainHash(train: Train | number | string) : Promis
     train.session_id = sessionId.toString('hex');
 
     train.hash = hash.digest('hex');
-    train.configurator_status = TrainConfigurationStatus.HASH_GENERATED;
+    train.configuration_status = TrainConfigurationStatus.HASH_GENERATED;
 
     train = await repository.save(train);
 

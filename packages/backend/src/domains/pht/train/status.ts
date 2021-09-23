@@ -1,9 +1,12 @@
 export enum TrainBuildStatus {
-    STARTING = 'starting',
-    STOPPED = 'stopped',
-    BUILDING = 'building',
-    FINISHED = 'finished',
-    FAILED = 'failed'
+    STARTING = 'starting', // ui trigger
+    STARTED = 'started', // tb trigger
+
+    STOPPING = 'stopping', // ui trigger
+    STOPPED = 'stopped', // tb trigger
+
+    FINISHED = 'finished', // tb trigger
+    FAILED = 'failed' // tb trigger
 }
 
 export type TrainBuildStatusType = keyof typeof TrainBuildStatus;
@@ -32,8 +35,10 @@ export function isTrainConfigurationStatus(type: string) : type is TrainConfigur
 export enum TrainRunStatus {
     STARTING = 'starting',
     STARTED = 'started',
+
     STOPPING = 'stopping',
     STOPPED = 'stopped',
+
     FINISHED = 'finished',
     FAILED = 'failed'
 }

@@ -3,13 +3,13 @@ import AlertMessage from "@/components/alert/AlertMessage";
 import Pagination from "@/components/Pagination";
 import {editTrainStation, getTrainStations} from "@/domains/train-station/api";
 import {TrainStationStatusOptions} from "@/domains/train-station";
-import TrainStationAction from "@/components/train/station/TrainStationAction";
-import TrainStationStatus from "@/components/train/station/TrainStationStatus";
+import TrainStationAction from "@/components/train-station/TrainStationAction";
+import TrainStationApprovalStatusText from "@/components/train-station/status/TrainStationApprovalStatusText";
 import {getTrainFilesDownloadUri} from "@/domains/train/file/api";
 
 export default {
     components: {
-        TrainStationStatus,
+        TrainStationApprovalStatusText,
         TrainStationAction,
         Pagination,
         AlertMessage
@@ -130,11 +130,11 @@ export default {
                 {{data.item.trainId}}
             </template>
             <template v-slot:cell(status)="data">
-                <train-station-status :status="data.item.status">
+                <train-station-approval-status-text :status="data.item.status">
                     <template v-slot:default="props">
                         <span class="badge" :class="'badge-'+props.classSuffix">{{props.statusText}}</span>
                     </template>
-                </train-station-status>
+                </train-station-approval-status-text>
             </template>
             <template v-slot:cell(createdAt)="data">
                 <timeago :datetime="data.item.createdAt" />

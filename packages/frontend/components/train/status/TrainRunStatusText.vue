@@ -1,0 +1,55 @@
+<template>
+    <span>
+       <slot v-bind:classSuffix="classSuffix" v-bind:statusText="statusText">
+            <span :class="'text-'+classSuffix">{{statusText}}</span>
+        </slot>
+    </span>
+</template>
+<script>
+import {TrainRunStatus} from "@/domains/train";
+
+export default {
+    props: {
+        status: {
+            type: String,
+            default: null
+        }
+    },
+    computed: {
+        statusText() {
+            switch (this.status) {
+                case TrainRunStatus.STARTING:
+                    return 'starting...';
+                case TrainRunStatus.STARTED:
+                    return 'started';
+                case TrainRunStatus.STOPPING:
+                    return 'stopping...';
+                case TrainRunStatus.STOPPED:
+                    return 'stopped...';
+                case TrainRunStatus.FINISHED:
+                    return 'finished';
+                case TrainRunStatus.FAILED:
+                    return 'failed';
+                default:
+                    return 'none';
+            }
+        },
+        classSuffix() {
+            switch (this.status) {
+                case TrainRunStatus.STARTING:
+                case TrainRunStatus.STOPPING:
+                case TrainRunStatus.STARTED:
+                    return 'primary';
+                case TrainRunStatus.STOPPED:
+                    return 'warning';
+                case TrainRunStatus.FINISHED:
+                    return 'success';
+                case TrainRunStatus.FAILED:
+                    return 'danger';
+                default:
+                    return 'info';
+            }
+        }
+    }
+}
+</script>

@@ -1,26 +1,17 @@
 import {getRepository} from "typeorm";
-import {Train} from "../../../../../domains/pht/train";
+import {Train, TrainCommand} from "../../../../../domains/pht/train";
 
 import {check, matchedData, validationResult} from "express-validator";
 import {isPermittedForResourceRealm} from "../../../../../domains/auth/realm/db/utils";
 import {
-    buildTrain,
     detectTrainBuildStatus,
     detectTrainRunStatus,
     generateTrainHash,
-    startTrain,
-    stopTrain, triggerTrainDownload
+    startBuildTrain,
+    startTrain, stopBuildTrain,
+    stopTrain,
+    triggerTrainDownload
 } from "../../../../../domains/pht/train/commands";
-
-export enum TrainCommand {
-    BUILD = 'build',
-    DETECT_BUILD_STATUS = 'detectBuildStatus',
-    DETECT_RUN_STATUS = 'detectRunStatus',
-    GENERATE_HASH = 'generateHash',
-    START = 'start',
-    STOP = 'stop',
-    TRIGGER_DOWNLOAD = 'triggerDownload'
-}
 
 /**
  * Execute a train command (start, stop, build).
@@ -35,9 +26,11 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
         return res._failNotFound();
     }
 
-    await check('task')
+    await check('command')
         .exists()
-        .isIn(['build', 'detectBuildStatus', 'generateHash', 'detectRunStatus', 'start', 'stop'])
+        .custom(command => {
+            return Object.values(TrainCommand).includes(command);
+        })
         .run(req);
 
     const validation = validationResult(req);
@@ -60,18 +53,22 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
     }
 
     try {
-        switch (validationData.task as TrainCommand) {
-            case TrainCommand.BUILD:
-                entity = await buildTrain(entity);
-                break;
+        switch (validationData.command as TrainCommand) {
+            // Build Commands
             case TrainCommand.DETECT_BUILD_STATUS:
                 entity = await detectTrainBuildStatus(entity);
                 break;
+            case TrainCommand.BUILD_START:
+                entity = await startBuildTrain(entity);
+                break;
+            case TrainCommand.BUILD_STOP:
+                entity = await stopBuildTrain(entity);
+                break;
+
+
+            // Run Commands
             case TrainCommand.DETECT_RUN_STATUS:
                 entity = await detectTrainRunStatus(entity);
-                break;
-            case TrainCommand.GENERATE_HASH:
-                entity = await generateTrainHash(entity);
                 break;
             case TrainCommand.START:
                 entity = await startTrain(entity);
@@ -79,12 +76,17 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
             case TrainCommand.STOP:
                 entity = await stopTrain(entity);
                 break;
+
+            // General Commands
+            case TrainCommand.GENERATE_HASH:
+                entity = await generateTrainHash(entity);
+                break;
             case TrainCommand.TRIGGER_DOWNLOAD:
                 entity.result = await triggerTrainDownload(entity.id);
                 break;
         }
 
-        return res._respond(entity);
+        return res._respond({data: entity});
     } catch (e) {
         return res._failServerError({message: 'An unknown error occurred. The Task could not be executed...'})
     }

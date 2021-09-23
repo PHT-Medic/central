@@ -1,7 +1,7 @@
 <script>
-import {TrainResultStates, TrainStates} from "@/domains/train";
-import {runTrainResultTask} from "@/domains/train/result/api";
-import {runTrainTask} from "@/domains/train/api";
+import { TrainResultStatus, TrainStates} from "@/domains/train";
+import {runTrainResultTask} from "@/domains/train-result/api";
+import {runTrainCommand} from "@/domains/train/api";
 import TrainStatusText from "@/components/train/text/TrainStatusText";
 
 export default {
@@ -14,7 +14,7 @@ export default {
         return {
             train: undefined,
             result: undefined,
-            resultStates: TrainResultStates,
+            resultStatus: TrainResultStatus,
             trainStates: TrainStates,
 
             busy: false
@@ -75,7 +75,7 @@ export default {
             let variant = 'success';
 
             try {
-                const response = await runTrainTask(this.train.id, 'scanHarbor');
+                const response = await runTrainCommand(this.train.id, 'scanHarbor');
 
                 this.result.status = response.status;
 
@@ -102,8 +102,8 @@ export default {
         isTrainResultInProgress() {
             return this.result &&
                 (
-                        this.result.status === TrainResultStates.TrainResultStateDownloading ||
-                        this.result.status === TrainResultStates.TrainResultStateExtracting
+                        this.result.status === TrainResultStatus.DOWNLOADING ||
+                        this.result.status === TrainResultStatus.EXTRACTING
                  )
         }
     }
@@ -123,19 +123,19 @@ export default {
 
                 <p class="mb-2">Download the compressed train result files.</p>
 
-                <button class="btn btn-primary btn-sm" @click.prevent="download" :disabled="!result || result.status !== resultStates.TrainResultStateFinished">
+                <button class="btn btn-primary btn-sm" @click.prevent="download" :disabled="!result || result.status !== resultStatus.FINISHED">
                     <i class="fa fa-download"></i> Download
                 </button>
 
                 <div
                     class="alert alert-sm mt-2"
                     :class="{
-                    'alert-danger': result && result.status === resultStates.TrainResultStateFailed,
-                    'alert-info': !result || result.status !== resultStates.TrainResultStateFailed
+                    'alert-danger': result && result.status === resultStatus.FAILED,
+                    'alert-info': !result || result.status !== resultStatus.FAILED
                     }"
-                    v-if="!result || result.status !== resultStates.TrainResultStateFinished"
+                    v-if="!result || result.status !== resultStatus.FINISHED"
                 >
-                    <template v-if="result && result.status === resultStates.TrainResultStateFailed">
+                    <template v-if="result && result.status === resultStatus.FAILED">
                         The train result download or extracting progress failed.
                     </template>
                     <template v-else>

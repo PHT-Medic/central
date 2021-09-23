@@ -1,5 +1,6 @@
 import {useApi} from "~/modules/api";
 import {formatRequestRecord, RequestRecord} from "~/modules/api/utils";
+import {TrainCommand} from "~/domains/train/type";
 
 export async function getTrains(options?: RequestRecord) {
     const {data: response} = await useApi('auth').get('trains'+formatRequestRecord(options));
@@ -30,14 +31,13 @@ export async function addTrain(data: Record<string, any>) {
     return response;
 }
 
-export type TrainTaskType = 'build' | 'start' | 'stop' | 'scanHarbor' | 'generateHash';
-export async function runTrainTask(id: string, task: TrainTaskType, data: Record<string,any> = {}) {
+export async function runTrainCommand(id: string, command: TrainCommand, data: Record<string,any> = {}) {
     const actionData = {
-        task,
+        command,
         ...data
     };
 
-    const {data: response} = await useApi('auth').post('trains/' + id + '/task', actionData);
+    const {data: response} = await useApi('auth').post('trains/' + id + '/command', actionData);
 
     return response;
 }

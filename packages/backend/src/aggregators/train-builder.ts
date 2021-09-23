@@ -12,7 +12,7 @@ export enum TrainBuilderEvent {
 }
 
 const EventStatusMap : Record<TrainBuilderEvent, TrainBuildStatus> = {
-    [TrainBuilderEvent.STARTED]: TrainBuildStatus.BUILDING,
+    [TrainBuilderEvent.STARTED]: TrainBuildStatus.STARTED,
     [TrainBuilderEvent.STOPPED]: TrainBuildStatus.STOPPED,
     [TrainBuilderEvent.FAILED]: TrainBuildStatus.FAILED,
     [TrainBuilderEvent.FINISHED]: TrainBuildStatus.FINISHED
