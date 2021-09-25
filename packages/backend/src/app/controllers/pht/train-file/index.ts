@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {applyRequestFilter} from "typeorm-extension";
+import {applyFilters} from "typeorm-extension";
 import {
     isPermittedForResourceRealm,
     onlyRealmPermittedQueryResources
@@ -115,10 +115,9 @@ export async function getTrainFilesRouteHandler(req: any, res: any) {
 
     onlyRealmPermittedQueryResources(query, req.realmId);
 
-    applyRequestFilter(query, filter, {
-        id: 'trainFile.id',
-        name: 'trainFile.name',
-        realmId: 'train.realm_id'
+    applyFilters(query, filter, {
+        queryAlias: 'trainFile',
+        allowed: ['id', 'name', 'realm_id']
     });
 
     const entity = await query.getMany();

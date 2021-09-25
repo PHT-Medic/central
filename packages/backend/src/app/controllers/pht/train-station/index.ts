@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
+import {applyFilters, applyPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {DispatcherTrainEventType, emitDispatcherTrainEvent} from "../../../../domains/pht/train/queue";
 
@@ -88,12 +88,12 @@ export async function getTrainStationsRouteHandler(req: any, res: any) {
 
         onlyRealmPermittedQueryResources(query, req.realmId, ['train.realm_id', 'station.realm_id']);
 
-        applyRequestFilter(query, filter, {
-            trainId: 'trainStation.train_id',
-            stationId: 'trainStation.station_id'
+        applyFilters(query, filter, {
+            queryAlias: 'trainStation',
+            allowed: ['train_id', 'station_id']
         });
 
-        const pagination = applyRequestPagination(query, page, 50);
+        const pagination = applyPagination(query, page, {maxLimit: 50});
 
         const [entities, total] = await query.getManyAndCount();
 

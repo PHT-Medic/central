@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {applyRequestPagination, applyRequestIncludes, applyRequestFilter} from "typeorm-extension";
+import {applyPagination, applyIncludes, applyFilters} from "typeorm-extension";
 import {
     isPermittedForResourceRealm,
     onlyRealmPermittedQueryResources
@@ -137,20 +137,17 @@ export async function getTrainsRouteHandler(req: any, res: any) {
 
     onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
 
-    applyRequestIncludes(query, 'train', include, {
-        trainStations: 'train_stations',
-        result: 'result',
-        user: 'user'
+    applyIncludes(query, include, {
+        queryAlias: 'train',
+        allowed: ['train_station', 'result', 'user']
     });
 
-    applyRequestFilter(query, filter, {
-        id: 'train.id',
-        name: 'train.name',
-        proposalId: 'train.proposal_id',
-        realmId: 'train.realm_id'
+    applyFilters(query, filter, {
+        queryAlias: 'train',
+        allowed: ['id', 'name', 'proposal_id', 'realm_id']
     });
 
-    const pagination = applyRequestPagination(query, page, 50);
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
     query.orderBy("train.updated_at", "DESC");
 

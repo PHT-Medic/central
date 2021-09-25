@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
+import {applyFilters, applyPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {SwaggerTags} from "typescript-swagger";
 import {Controller, Get, Post, Delete, Request, Response, Params, Body} from "@decorators/express";
@@ -63,9 +63,12 @@ export async function getRealmsRoute(req: any, res: any) {
 
     const query = realmRepository.createQueryBuilder('realm');
 
-    applyRequestFilter(query, filter, ['id', 'name']);
+    applyFilters(query, filter, {
+        queryAlias: 'realm',
+        allowed: ['id', 'name']
+    });
 
-    const pagination = applyRequestPagination(query, page, 50);
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
     const [entities, total] = await query.getManyAndCount();
 

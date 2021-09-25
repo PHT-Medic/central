@@ -1,5 +1,5 @@
 import {getRepository, In} from "typeorm";
-import {applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
+import {applyFilters, applyIncludes, applyPagination} from "typeorm-extension";
 import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
 import {Station} from "../../../../domains/pht/station";
 import {isPermittedForResourceRealm, onlyRealmPermittedQueryResources} from "../../../../domains/auth/realm/db/utils";
@@ -79,10 +79,9 @@ export async function getProposalRouteHandler(req: any, res: any) {
     const query = repository.createQueryBuilder('proposal')
         .where("proposal.id = :id", {id});
 
-    applyRequestIncludes(query, 'proposal', include, {
-        masterImage: 'master_image',
-        realm: 'realm',
-        user: 'user'
+    applyIncludes(query,  include, {
+        queryAlias: 'proposal',
+        allowed: ['master_image', 'realm', 'user']
     });
 
     const entity = await query.getOne();
@@ -109,13 +108,12 @@ export async function getProposalsRouteHandler(req: any, res: any) {
 
     onlyRealmPermittedQueryResources(query, req.realmId);
 
-    applyRequestFilter(query, filter, {
-        id: 'proposal.id',
-        name: 'proposal.name',
-        realmId: 'proposal.realm_id'
+    applyFilters(query, filter, {
+        queryAlias: 'proposal',
+        allowed: ['id', 'name', 'realm_id']
     });
 
-    const pagination = applyRequestPagination(query, page, 50);
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
     query.orderBy("proposal.updated_at", "DESC");
 

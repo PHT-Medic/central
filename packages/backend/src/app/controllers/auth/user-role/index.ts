@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
+import {applyFilters, applyPagination} from "typeorm-extension";
 import {UserRole} from "../../../../domains/auth/user/role";
 import {check, matchedData, validationResult} from "express-validator";
 
@@ -62,14 +62,12 @@ export async function getUserRolesRouteHandler(req: any, res: any) {
             .leftJoinAndSelect('user_roles.role', 'role')
             .leftJoinAndSelect('user_roles.user', 'user');
 
-        applyRequestFilter(query, filter, {
-            role_id: 'user_roles.role_id',
-            user_id: 'user_roles.user_id',
-            role_name: 'role.name',
-            user_name: 'user.name'
+        applyFilters(query, filter, {
+            allowed: ['user_roles.role_id', 'user_roles.user_id', 'user.name', 'role.name'],
+            queryAlias: 'user_roles'
         });
 
-        const pagination = applyRequestPagination(query, page, 50);
+        const pagination = applyPagination(query, page, {maxLimit: 50});
 
         const [entities, total] = await query.getManyAndCount();
 

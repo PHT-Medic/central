@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
+import {applyFilters, applyPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
 import {ProposalStation} from "../../../../domains/pht/proposal/station";
@@ -87,12 +87,12 @@ export async function getProposalStationsRouteHandler(req: any, res: any) {
             'proposal.realm_id'
         ]);
 
-        applyRequestFilter(query, filter, {
-            proposalId: 'proposalStation.proposal_id',
-            stationId: 'proposalStation.station_id'
+        applyFilters(query, filter, {
+            allowed: ['proposal_id', 'station_id'],
+            queryAlias: 'proposalStation'
         });
 
-        const pagination = applyRequestPagination(query, page, 50);
+        const pagination = applyPagination(query, page, {maxLimit: 50});
 
         const [entities, total] = await query.getManyAndCount();
 

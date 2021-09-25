@@ -1,6 +1,6 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
-import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
+import {applyFilters, applyPagination} from "typeorm-extension";
 import {RolePermission} from "../../../../domains/auth/role/permission";
 
 // ---------------------------------------------------------------------------------
@@ -69,12 +69,12 @@ async function getRolePermissions(req: any, res: any) {
         const query = rolePermissionRepository.createQueryBuilder('rolePermission')
             .leftJoinAndSelect('rolePermission.permission', 'permission');
 
-        applyRequestFilter(query, filter, {
-            role_id: 'rolePermission.role_id',
-            permission_id: 'rolePermission.permission_id'
+        applyFilters(query, filter, {
+            queryAlias: 'rolePermission',
+            allowed: ['role_id', 'permission_id']
         });
 
-        const pagination = applyRequestPagination(query, page, 50);
+        const pagination = applyPagination(query, page, {maxLimit: 50});
 
         const [entities, total] = await query.getManyAndCount();
 

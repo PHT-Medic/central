@@ -1,6 +1,6 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
-import {applyRequestPagination, applyRequestFilter} from "typeorm-extension";
+import {applyPagination, applyFilters} from "typeorm-extension";
 import {Role} from "../../../../domains/auth/role";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
@@ -72,9 +72,12 @@ async function getRoles(req: any, res: any) {
     const roleRepository = getRepository(Role);
     const query = roleRepository.createQueryBuilder('role');
 
-    applyRequestFilter(query, filter, ['id', 'name']);
+    applyFilters(query, filter, {
+        allowed: ['id', 'name'],
+        queryAlias: 'role'
+    });
 
-    const pagination = applyRequestPagination(query, page, 50);
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
     const [entities, total] = await query.getManyAndCount();
 

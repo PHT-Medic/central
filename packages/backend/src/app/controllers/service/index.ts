@@ -1,7 +1,7 @@
 import {publishMessage} from "amqp-extension";
 import {SwaggerTags} from "typescript-swagger";
 import {getRepository} from "typeorm";
-import {applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
+import {applyFilters, applyIncludes, applyPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {Body, Controller, Get, Params, Post, Request, Response} from "@decorators/express";
 
@@ -81,11 +81,17 @@ async function getManyRoute(req: any, res: any) {
 
     const query = realmRepository.createQueryBuilder('service');
 
-    applyRequestIncludes(query, 'service', include, ['client', 'realm']);
+    applyIncludes(query, include, {
+        queryAlias: 'service',
+        allowed: ['client', 'realm']
+    });
 
-    applyRequestFilter(query, filter, ['id']);
+    applyFilters(query, filter, {
+        queryAlias: 'service',
+        allowed: ['id']
+    });
 
-    const pagination = applyRequestPagination(query, page, 50);
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
     const [entities, total] = await query.getManyAndCount();
 
@@ -113,7 +119,10 @@ async function getRoute(req: any, res: any) {
         const query =  repository.createQueryBuilder('service')
             .where("service.id = :id", {id});
 
-        applyRequestIncludes(query, 'service', include, ['client', 'realm']);
+        applyIncludes(query, include, {
+            queryAlias: 'service',
+            allowed: ['client', 'realm']
+        });
 
         const entity = await query.getOne();
 

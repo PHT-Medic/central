@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
+import {applyFilters, applyPagination} from "typeorm-extension";
 import {MasterImage} from "../../../../domains/pht/master-image";
 
 import {Controller, Delete, Get, Params, Request, Response} from "@decorators/express";
@@ -63,13 +63,11 @@ export async function getManyRouteHandler(req: any, res: any) {
     const repository = getRepository(MasterImage);
     const query = repository.createQueryBuilder('image');
 
-    applyRequestFilter(query, filter, {
-        id: 'image.id',
-        name: 'image.name',
-        path: 'image.path'
+    applyFilters(query, filter, {
+        allowed: ['id', 'name', 'path']
     });
 
-    const pagination = applyRequestPagination(query, page, 50);
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
     query.addOrderBy("image.path", "ASC");
 

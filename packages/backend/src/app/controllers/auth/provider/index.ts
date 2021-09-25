@@ -1,6 +1,6 @@
 import {OAuth2Provider} from "../../../../domains/auth/oauth2-provider";
 import {getRepository} from "typeorm";
-import {applyRequestFields, applyRequestFilter, applyRequestPagination} from "typeorm-extension";
+import {applyFields, applyFilters, applyPagination} from "typeorm-extension";
 import {Realm} from "../../../../domains/auth/realm";
 import {check, matchedData, validationResult} from "express-validator";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
@@ -87,24 +87,24 @@ export async function getProvidersRoute(req: any, res: any) {
     const query = repository.createQueryBuilder('provider').
     leftJoinAndSelect('provider.realm', 'realm');
 
-    applyRequestFilter(query, filter, {
-        realmId: 'provider.realm_id'
+    applyFilters(query, filter, {
+        queryAlias: 'provider',
+        allowed: ['realm_id']
     });
 
-    applyRequestFields(
-        query,
-        fields,
-        {
-            provider: ['client_secret']
-        },
-        {
-            aliasMapping: {
-                provider: 'provider'
+    // todo: allow realm owner view of client_secret
+    if(!req.user || !req.ability.can('edit','realm')) {
+        applyFields(
+            query,
+            fields,
+            {
+                queryAlias: 'provider',
+                allowed: ['client_secret']
             }
-        }
-    );
+        );
+    }
 
-    const pagination = applyRequestPagination(query, page, 50);
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
     // tslint:disable-next-line:prefer-const
     let [entities, total] = await query.getManyAndCount();
@@ -143,16 +143,12 @@ export async function getProviderRoute(req: any, res: any) {
 
     // todo: allow realm owner view of client_secret
     if(!req.user || !req.ability.can('edit','realm')) {
-        applyRequestFields(
+        applyFields(
             query,
             fields,
             {
-                provider: ['client_secret']
-            },
-            {
-                aliasMapping: {
-                    provider: 'provider'
-                }
+                queryAlias: 'provider',
+                allowed: ['client_secret']
             }
         );
     }

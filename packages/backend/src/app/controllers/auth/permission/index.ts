@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {applyRequestFilter, applyRequestPagination} from "typeorm-extension";
+import {applyFilters, applyPagination} from "typeorm-extension";
 import {SwaggerTags} from "typescript-swagger";
 
 import {Permission} from "../../../../domains/auth/permission";
@@ -33,9 +33,11 @@ async function getPermissions (req: any, res: any) {
     const repository = getRepository(Permission);
     const query = repository.createQueryBuilder('permission');
 
-    applyRequestFilter(query, filter, ['id']);
+    applyFilters(query, filter, {
+        allowed: ['id']
+    })
 
-    const pagination = applyRequestPagination(query, page, 50);
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
     const [entities, total] = await query.getManyAndCount();
 

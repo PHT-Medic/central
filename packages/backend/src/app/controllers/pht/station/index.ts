@@ -1,5 +1,5 @@
 import {getRepository} from "typeorm";
-import {applyRequestFields, applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
+import {applyFields, applyFilters, applyIncludes, applyPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {MASTER_REALM_ID} from "../../../../domains/auth/realm";
 import {Station} from "../../../../domains/pht/station";
@@ -97,8 +97,8 @@ export async function getStationRouteHandler(req: any, res: any) {
     // todo: should be implemented by assigning permissions to a service.
     const isPermittedService : boolean = typeof req.serviceId !== 'undefined' && req.realmId === MASTER_REALM_ID;
     if(req.ability.can('edit', 'station') || isPermittedService) {
-        applyRequestFields(query, fields, {
-            station: [
+        applyFields(query, fields, {
+            allowed: [
                 'secure_id',
                 'public_key',
                 'email',
@@ -107,8 +107,9 @@ export async function getStationRouteHandler(req: any, res: any) {
                 'harbor_project_id',
                 'harbor_project_webhook_exists',
                 'vault_public_key_saved'
-            ]
-        }, {aliasMapping: {station: 'station'}});
+            ],
+            queryAlias: 'station'
+        });
     }
 
     const entity = await query.getOne();
@@ -126,19 +127,21 @@ export async function getStationsRouteHandler(req: any, res: any) {
     const repository = getRepository(Station);
     const query = repository.createQueryBuilder('station');
 
-    applyRequestIncludes(query, 'station', includes, ['realm']);
+    applyIncludes(query, includes, {
+        queryAlias: 'station',
+        allowed: ['realm']
+    });
 
-    applyRequestFilter(query, filter, {
-        id: 'station.id',
-        name: 'station.name',
-        realmId: 'station.realm_id'
+    applyFilters(query, filter, {
+        allowed: ['id', 'name', 'realm_id'],
+        queryAlias: 'station'
     });
 
     // todo: should be implemented by assigning permissions to a service.
     const isPermittedService : boolean = typeof req.serviceId !== 'undefined' && req.realmId === MASTER_REALM_ID;
     if(req.ability.can('edit', 'station') || isPermittedService) {
-        applyRequestFields(query, fields, {
-            station: [
+        applyFields(query, fields, {
+            allowed: [
                 'secure_id',
                 'public_key',
                 'email',
@@ -147,11 +150,12 @@ export async function getStationsRouteHandler(req: any, res: any) {
                 'harbor_project_id',
                 'harbor_project_webhook_exists',
                 'vault_public_key_saved'
-            ]
-        }, {aliasMapping: {station: 'station'}});
+            ],
+            queryAlias: 'station'
+        });
     }
 
-    const pagination = applyRequestPagination(query, page, 50);
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
     const [entities, total] = await query.getManyAndCount();
 
