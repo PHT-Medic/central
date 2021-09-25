@@ -2,8 +2,8 @@ import {Message} from "amqp-extension";
 import {DockerOptions} from "dockerode";
 import {URL} from "url";
 import {getFullHarborRepositoryNamePath} from "../../config/services/harbor";
+import {parseHarborConnectionString} from "../../domains/service/harbor";
 import env from "../../env";
-import {parseHarborConnectionString} from "../../modules/api/provider/harbor";
 import {DockerPullOptions, pullDockerRegistryImage} from "../../modules/docker";
 
 const harborConfig = parseHarborConnectionString(env.harborConnectionString);

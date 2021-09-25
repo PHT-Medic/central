@@ -26,7 +26,6 @@ export interface Environment {
 
     rabbitMqConnectionString: string,
     harborConnectionString: string,
-    vaultConnectionString: string,
 }
 
 const env : Environment = {
@@ -35,7 +34,6 @@ const env : Environment = {
 
     rabbitMqConnectionString: requireFromEnv('RABBITMQ_CONNECTION_STRING'),
     harborConnectionString: requireFromEnv('HARBOR_CONNECTION_STRING'),
-    vaultConnectionString: requireFromEnv('VAULT_CONNECTION_STRING'),
 };
 
 export default env;

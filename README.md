@@ -1,3 +1,5 @@
+[![Master Workflow](https://github.com/Tada5hi/pht-result-service/workflows/main/badge.svg)](https://github.com/Tada5hi/pht-result-service)
+
 # Result Service 🏭
 This repository contains the Result Service of the Personal Health Train.
 It communicates with some services of the PHT and need therefore to be configured properly, like described 

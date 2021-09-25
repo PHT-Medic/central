@@ -16,8 +16,6 @@
     },
     "dependencies": {
         "amqp-extension": "^0.0.5",
-        "amqplib": "^0.8.0",
-        "axios": "^0.21.1",
         "body-parser": "^1.19.0",
         "change-case": "^4.1.1",
         "cookie-parser": "^1.4.4",
@@ -37,8 +35,6 @@
         "winston": "^3.3.3"
     },
     "devDependencies": {
-        "@types/amqplib": "^0.8.1",
-        "@types/axios": "^0.14.0",
         "@types/change-case": "^2.3.1",
         "@types/cookie-parser": "^1.4.2",
         "@types/cors": "^2.8.8",
