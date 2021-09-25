@@ -1,9 +1,9 @@
+import {publishMessage} from "amqp-extension";
 import {Train} from "../index";
 import {getRepository} from "typeorm";
 import {findTrain} from "./utils";
 import env from "../../../../env";
 import {buildTrainBuilderQueueMessage, TrainBuilderCommand} from "../../../service/train-builder/queue";
-import {publishQueueMessage} from "../../../../modules/message-queue";
 import {TrainBuildStatus} from "../status";
 
 export async function stopBuildTrain(train: Train | number | string) : Promise<Train> {
@@ -25,7 +25,7 @@ export async function stopBuildTrain(train: Train | number | string) : Promise<T
             if (!env.demo) {
                 const queueMessage = await buildTrainBuilderQueueMessage(TrainBuilderCommand.STOP, train);
 
-                await publishQueueMessage(queueMessage);
+                await publishMessage(queueMessage);
             }
         }
 

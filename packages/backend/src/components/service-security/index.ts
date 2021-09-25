@@ -1,13 +1,13 @@
-import {QueChannelHandler, QueueMessage} from "../../modules/message-queue";
+import {ConsumeHandler, Message} from "amqp-extension";
 import {syncServiceSecurity} from "./sync";
 
 export enum ServiceSecurityComponent {
     SYNC = 'syncServiceSecurity'
 }
 
-export function createServiceSecurityComponentHandlers() : Record<ServiceSecurityComponent, QueChannelHandler> {
+export function createServiceSecurityComponentHandlers() : Record<ServiceSecurityComponent, ConsumeHandler> {
     return {
-        [ServiceSecurityComponent.SYNC]: async(message: QueueMessage) => {
+        [ServiceSecurityComponent.SYNC]: async(message: Message) => {
             await syncServiceSecurity(message);
         }
     }

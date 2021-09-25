@@ -15,6 +15,8 @@ export const MQ_UI_D_EVENT_ROUTING_KEY = 'ui.dispatcher.event';
 export const MQ_UI_RS_EVENT_ROUTING_KEY = 'ui.rs.event';
 // Train Builder (TB)
 export const MQ_UI_TB_EVENT_ROUTING_KEY = 'ui.tb.event';
+// Train Router (TR)
+export const MQ_UI_TR_EVENT_ROUTING_KEY = 'ui.tr.event';
 
 
 // ----------------------------------------------------------

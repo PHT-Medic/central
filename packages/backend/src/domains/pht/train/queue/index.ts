@@ -1,6 +1,6 @@
+import {buildMessage, publishMessage} from "amqp-extension";
 import {DispatcherEvent} from "../../../../components/event-dispatcher";
 import {MQ_DISPATCHER_ROUTING_KEY} from "../../../../config/services/rabbitmq";
-import {buildQueueMessage, publishQueueMessage} from "../../../../modules/message-queue";
 
 export type DispatcherTrainEventType = 'approved' | 'assigned' | 'rejected';
 export type DispatcherTrainEventData = {
@@ -19,8 +19,10 @@ export async function emitDispatcherTrainEvent(
 ) {
     options = options ?? {};
 
-    const message = buildQueueMessage({
-        routingKey: MQ_DISPATCHER_ROUTING_KEY,
+    const message = buildMessage({
+        options: {
+            routingKey: MQ_DISPATCHER_ROUTING_KEY
+        },
         type: DispatcherEvent.TRAIN,
         data,
         metadata: metaData
@@ -30,7 +32,7 @@ export async function emitDispatcherTrainEvent(
         return message;
     }
 
-    await publishQueueMessage(message);
+    await publishMessage(message);
 
     return message;
 }

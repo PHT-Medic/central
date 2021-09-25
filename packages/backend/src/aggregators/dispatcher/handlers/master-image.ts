@@ -1,14 +1,14 @@
+import {ConsumeHandlers, Message} from "amqp-extension";
 import {getRepository} from "typeorm";
 import {MasterImage} from "../../../domains/pht/master-image";
 import {useLogger} from "../../../modules/log";
-import {QueChannelHandler, QueueMessage} from "../../../modules/message-queue";
 
 export type AggregatorMasterImageEventType = 'masterImagePushed';
 export const AggregatorMasterImagePushedEvent : AggregatorMasterImageEventType = 'masterImagePushed';
 
-export function createDispatcherAggregatorMasterImageHandlers() : Record<string, QueChannelHandler> {
+export function createDispatcherAggregatorMasterImageHandlers() : ConsumeHandlers {
     return {
-        [AggregatorMasterImagePushedEvent]: async (message: QueueMessage) => {
+        [AggregatorMasterImagePushedEvent]: async (message: Message) => {
             useLogger().debug('masterImagePushed event received.', {service: 'aggregator-harbor'});
 
             const repository = getRepository(MasterImage);

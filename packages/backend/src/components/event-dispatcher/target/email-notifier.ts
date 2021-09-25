@@ -1,3 +1,4 @@
+import {buildMessage, Message, publishMessage} from "amqp-extension";
 import {
     HARBOR_INCOMING_PROJECT_NAME,
     HARBOR_OUTGOING_PROJECT_NAME, isHarborStationProjectName
@@ -11,11 +12,10 @@ import {
 import {DispatcherTrainEventData, DispatcherTrainEventType} from "../../../domains/pht/train/queue";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {DispatcherHarborEventWithAdditionalData} from "../data/harbor";
-import {buildQueueMessage, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 
 export async function dispatchProposalEventToEmailNotifier(
-    message: QueueMessage
-) : Promise<QueueMessage> {
+    message: Message
+) : Promise<Message> {
     const data : DispatcherProposalEventData = message.data as DispatcherProposalEventData;
 
     const mapping : Record<DispatcherProposalEvent, string> = {
@@ -25,8 +25,10 @@ export async function dispatchProposalEventToEmailNotifier(
     }
 
     if(mapping[data.event]) {
-        await publishQueueMessage(buildQueueMessage({
-            routingKey: MQ_EN_EVENT_ROUTING_KEY,
+        await publishMessage(buildMessage({
+            options: {
+                routingKey: MQ_EN_EVENT_ROUTING_KEY
+            },
             type: mapping[data.event],
             data: {
                 id: data.id,
@@ -42,8 +44,8 @@ export async function dispatchProposalEventToEmailNotifier(
 }
 
 export async function dispatchTrainEventToEmailNotifier(
-    message: QueueMessage
-) : Promise<QueueMessage> {
+    message: Message
+) : Promise<Message> {
     const data : DispatcherTrainEventData = message.data as DispatcherTrainEventData;
 
     const mapping : Record<DispatcherTrainEventType, string> = {
@@ -53,8 +55,10 @@ export async function dispatchTrainEventToEmailNotifier(
     }
 
     if(mapping[data.event]) {
-        await publishQueueMessage(buildQueueMessage({
-            routingKey: MQ_EN_EVENT_ROUTING_KEY,
+        await publishMessage(buildMessage({
+            options: {
+                routingKey: MQ_EN_EVENT_ROUTING_KEY
+            },
             type: mapping[data.event],
             data: {
                 id: data.id,
@@ -68,8 +72,8 @@ export async function dispatchTrainEventToEmailNotifier(
 }
 
 export async function dispatchHarborEventToEmailNotifier(
-    message: QueueMessage
-) : Promise<QueueMessage> {
+    message: Message
+) : Promise<Message> {
     const data : DispatcherHarborEventWithAdditionalData = message.data as DispatcherHarborEventData;
 
     if(data.event !== 'PUSH_ARTIFACT') {
@@ -78,8 +82,10 @@ export async function dispatchHarborEventToEmailNotifier(
 
     const isIncomingProject : boolean = data.namespace === HARBOR_INCOMING_PROJECT_NAME;
     if(isIncomingProject) {
-        await publishQueueMessage(buildQueueMessage({
-            routingKey: MQ_EN_EVENT_ROUTING_KEY,
+        await publishMessage(buildMessage({
+            options: {
+                routingKey: MQ_EN_EVENT_ROUTING_KEY
+            },
             type: 'trainBuilt',
             data: {
                 id: data.repositoryName
@@ -92,8 +98,10 @@ export async function dispatchHarborEventToEmailNotifier(
     const isOutgoingProject : boolean = data.namespace === HARBOR_OUTGOING_PROJECT_NAME;
     if(isOutgoingProject) {
 
-        await publishQueueMessage(buildQueueMessage({
-            routingKey: MQ_EN_EVENT_ROUTING_KEY,
+        await publishMessage(buildMessage({
+            options: {
+                routingKey: MQ_EN_EVENT_ROUTING_KEY,
+            },
             type: 'trainFinished',
             data: {
                 id: data.repositoryName
@@ -115,8 +123,10 @@ export async function dispatchHarborEventToEmailNotifier(
 
         // If stationIndex is 0, than the target is the first station of the route.
         if(data.stationIndex === 0) {
-            await publishQueueMessage(buildQueueMessage({
-                routingKey: MQ_EN_EVENT_ROUTING_KEY,
+            await publishMessage(buildMessage({
+                options: {
+                    routingKey: MQ_EN_EVENT_ROUTING_KEY,
+                },
                 type: 'trainStarted',
                 data: {
                     id: data.repositoryName,
@@ -125,8 +135,10 @@ export async function dispatchHarborEventToEmailNotifier(
             }));
         }
 
-        await publishQueueMessage(buildQueueMessage({
-            routingKey: MQ_EN_EVENT_ROUTING_KEY,
+        await publishMessage(buildMessage({
+            options: {
+                routingKey: MQ_EN_EVENT_ROUTING_KEY
+            },
             type: 'trainReady',
             data: {
                 id: data.repositoryName,

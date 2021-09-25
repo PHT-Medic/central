@@ -1,6 +1,6 @@
+import {buildMessage, publishMessage} from "amqp-extension";
 import {DispatcherEvent} from "../../../../components/event-dispatcher";
 import {MQ_DISPATCHER_ROUTING_KEY} from "../../../../config/services/rabbitmq";
-import {buildQueueMessage, publishQueueMessage} from "../../../../modules/message-queue";
 
 export type DispatcherHarborEventType = 'PUSH_ARTIFACT';
 
@@ -23,15 +23,17 @@ export async function emitDispatcherHarborEvent(
 ) {
     options = options ?? {};
 
-    const message = buildQueueMessage({
-        routingKey: MQ_DISPATCHER_ROUTING_KEY,
+    const message = buildMessage({
+        options: {
+            routingKey: MQ_DISPATCHER_ROUTING_KEY
+        },
         type: DispatcherEvent.HARBOR,
         data,
         metadata: metaData
     });
 
     if(!options.templateOnly) {
-        await publishQueueMessage(message);
+        await publishMessage(message);
     }
 
     return message;

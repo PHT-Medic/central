@@ -1,3 +1,4 @@
+import {publishMessage} from "amqp-extension";
 import {Train} from "../index";
 import {getRepository} from "typeorm";
 import {findTrain} from "./utils";
@@ -6,7 +7,6 @@ import {
     TrainRouterCommand
 } from "../../../service/train-router/queue";
 import {TrainRunStatus} from "../status";
-import {publishQueueMessage} from "../../../../modules/message-queue";
 
 export async function startTrain(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);
@@ -24,7 +24,7 @@ export async function startTrain(train: Train | number | string) : Promise<Train
     } else {
         const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.START, {trainId: train.id});
 
-        await publishQueueMessage(queueMessage);
+        await publishMessage(queueMessage);
 
         train = repository.merge(train, {
             run_status: TrainRunStatus.STARTING

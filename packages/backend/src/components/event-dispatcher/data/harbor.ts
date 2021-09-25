@@ -1,9 +1,9 @@
+import {Message} from "amqp-extension";
 import {getRepository} from "typeorm";
 import {buildStationHarborProjectName, isHarborStationProjectName} from "../../../config/services/harbor";
 import {Station} from "../../../domains/pht/station";
 import {TrainStation} from "../../../domains/pht/train-station";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
-import {QueueMessage} from "../../../modules/message-queue";
 
 
 export type DispatcherHarborEventWithAdditionalData = DispatcherHarborEventData & {
@@ -17,7 +17,7 @@ export type DispatcherHarborEventWithAdditionalData = DispatcherHarborEventData 
  *
  * @param message
  */
-export async function extendDispatcherHarborData(message: QueueMessage) : Promise<QueueMessage> {
+export async function extendDispatcherHarborData(message: Message) : Promise<Message> {
     const data : DispatcherHarborEventWithAdditionalData = message.data as DispatcherHarborEventWithAdditionalData;
 
     const isStationProject : boolean = isHarborStationProjectName(data.namespace);

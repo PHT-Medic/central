@@ -1,7 +1,7 @@
+import {publishMessage} from "amqp-extension";
 import {EntitySubscriberInterface, InsertEvent, UpdateEvent} from "typeorm";
 import {buildServiceSecurityQueueMessage} from "../../service/queue";
 import {Client} from "./index";
-import {publishQueueMessage} from "../../../modules/message-queue";
 import {ServiceSecurityComponent} from "../../../components/service-security";
 
 export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
@@ -19,7 +19,7 @@ export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
                     secret: event.entity.secret
                 }
             );
-            await publishQueueMessage(queueMessage);
+            await publishMessage(queueMessage);
         }
     }
 
@@ -33,7 +33,7 @@ export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
                     secret: event.entity.secret
                 }
             );
-            await publishQueueMessage(queueMessage);
+            await publishMessage(queueMessage);
         }
     }
 }

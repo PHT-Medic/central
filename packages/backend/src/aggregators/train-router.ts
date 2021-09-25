@@ -1,8 +1,10 @@
+import {consumeQueue, Message} from "amqp-extension";
 import {getRepository} from "typeorm";
 import {Train} from "../domains/pht/train";
 import {TrainRunStatus} from "../domains/pht/train/status";
-import {MQ_UI_TB_EVENT_ROUTING_KEY} from "../config/services/rabbitmq";
-import {consumeMessageQueue, handleMessageQueueChannel, QueueMessage} from "../modules/message-queue";
+import {
+    MQ_UI_TR_EVENT_ROUTING_KEY
+} from "../config/services/rabbitmq";
 
 export enum TrainRouterEvent {
     STOPPED = 'trainStopped',
@@ -24,30 +26,16 @@ async function updateTrain(trainId: string, event: TrainRouterEvent) {
     });
 }
 
-function createTrainBuilderAggregatorHandlers() {
-    return {
-        [TrainRouterEvent.FAILED]: async (message: QueueMessage) => {
-            await updateTrain(message.data.trainId, TrainRouterEvent.FAILED);
-        },
-        [TrainRouterEvent.STOPPED]: async (message: QueueMessage) => {
-            await updateTrain(message.data.trainId, TrainRouterEvent.STOPPED);
-        }
-    }
-}
-
-export function buildTrainBuilderAggregator() {
-    const handlers = createTrainBuilderAggregatorHandlers();
-
+export function buildTrainRouterAggregator() {
     function start() {
-        return consumeMessageQueue(MQ_UI_TB_EVENT_ROUTING_KEY, ((async (channel, msg) => {
-            try {
-                await handleMessageQueueChannel(channel, handlers, msg);
-                await channel.ack(msg);
-            } catch (e) {
-                console.log(e);
-                await channel.reject(msg, false);
+        return consumeQueue({routingKey: MQ_UI_TR_EVENT_ROUTING_KEY}, {
+            [TrainRouterEvent.FAILED]: async (message: Message) => {
+                await updateTrain(message.data.trainId, TrainRouterEvent.FAILED);
+            },
+            [TrainRouterEvent.STOPPED]: async (message: Message) => {
+                await updateTrain(message.data.trainId, TrainRouterEvent.STOPPED);
             }
-        })));
+        });
     }
 
     return {

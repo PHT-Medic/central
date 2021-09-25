@@ -88,7 +88,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
 
         await repository.save(train);
 
-        return train
+        return train;
     }
 
     train = repository.merge(train, {

@@ -1,12 +1,12 @@
+import {Message, publishMessage} from "amqp-extension";
 import {isHarborStationProjectName} from "../../../config/services/harbor";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {buildTrainRouterQueueMessage, TrainRouterHarborEvent} from "../../../domains/service/train-router/queue";
 import {useLogger} from "../../../modules/log";
-import {publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 
 export async function dispatchHarborEventToTrainRouter(
-    message: QueueMessage
-) : Promise<QueueMessage> {
+    message: Message
+) : Promise<Message> {
     const data : DispatcherHarborEventData = message.data as DispatcherHarborEventData;
 
     // station project
@@ -17,7 +17,7 @@ export async function dispatchHarborEventToTrainRouter(
         return message;
     }
 
-    await publishQueueMessage(buildTrainRouterQueueMessage(
+    await publishMessage(buildTrainRouterQueueMessage(
         TrainRouterHarborEvent.TRAIN_PUSHED,
         {
             repositoryFullName: data.repositoryFullName,

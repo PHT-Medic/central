@@ -1,5 +1,5 @@
-# PHT - Web API 🚀
-This repository contains the Backend API of the Personal Health Train (PHT).
+# UI - Backend 🌠
+This repository contains the Central UI Backend API of the Personal Health Train (PHT).
 It communicates with some services of the PHT and need therefore to be configured properly, like described 
 in the following sections.
 
@@ -31,6 +31,6 @@ RABBITMQ_CONNECTION_STRING=amqp://admin:start123@rabbitmq
 ```
 
 ## Credits
-If you have any questions, feel free to contact the author Peter Placzek of the project.
-The project was initial developed during this bachelor thesis, and he worked after that as employee
+If you have any questions, feel free to contact the author [Peter Placzek](https://github.com/Tada5hi) of the project.
+The project was initially developed during his bachelor thesis, and he worked after that as employee
 on the project.

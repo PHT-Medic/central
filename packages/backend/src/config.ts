@@ -1,3 +1,4 @@
+import {setConfig} from "amqp-extension";
 import {buildDispatcherComponent} from "./components/event-dispatcher";
 import {Environment} from "./env";
 import {buildTrainBuilderAggregator} from "./aggregators/train-builder";
@@ -6,6 +7,7 @@ import {buildDispatcherAggregator} from "./aggregators/dispatcher";
 import {useVaultApi} from "./modules/api/service/vault";
 import {useHarborApi} from "./modules/api/service/harbor";
 import {buildCommandRouterComponent} from "./components/command-router";
+import {buildTrainRouterAggregator} from "./aggregators/train-router";
 
 interface ConfigContext {
     env: Environment
@@ -17,19 +19,28 @@ export type Config = {
 }
 
 function createConfig({env} : ConfigContext) : Config {
+    useVaultApi(env.vaultConnectionString);
+    useHarborApi(env.harborConnectionString);
+
+    setConfig({
+        connection: env.rabbitMqConnectionString,
+        exchange: {
+            name: "pht",
+            type: "topic"
+        }
+    });
+
     const aggregators : {start: () => void}[] = [
         buildDispatcherAggregator(),
         buildTrainBuilderAggregator(),
-        buildTrainResultAggregator()
+        buildTrainResultAggregator(),
+        buildTrainRouterAggregator()
     ];
 
     const components : {start: () => void}[] = [
         buildCommandRouterComponent(),
         buildDispatcherComponent()
     ];
-
-    useVaultApi(env.vaultConnectionString);
-    useHarborApi(env.harborConnectionString);
 
     return {
         aggregators,

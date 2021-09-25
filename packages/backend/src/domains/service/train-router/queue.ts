@@ -1,6 +1,6 @@
 
+import {buildMessage, Message} from "amqp-extension";
 import {MQ_TR_ROUTING_KEY} from "../../../config/services/rabbitmq";
-import {buildQueueMessage, QueueMessage} from "../../../modules/message-queue";
 
 // -------------------------------------------
 
@@ -30,9 +30,11 @@ export function buildTrainRouterQueueMessage<T extends TrainRouterCommand | Trai
     type: T,
     data: T extends TrainRouterCommand ? TrainRouterCommandPayload : TrainRouterHarborEventPayload,
     metaData: Record<string, any> = {}
-) : QueueMessage {
-    return buildQueueMessage({
-        routingKey: MQ_TR_ROUTING_KEY,
+) : Message {
+    return buildMessage({
+        options: {
+            routingKey: MQ_TR_ROUTING_KEY
+        },
         type,
         data,
         metadata: metaData

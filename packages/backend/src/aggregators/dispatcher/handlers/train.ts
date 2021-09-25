@@ -1,3 +1,4 @@
+import {ConsumeHandlers, Message} from "amqp-extension";
 import {getRepository} from "typeorm";
 import {Train} from "../../../domains/pht/train";
 import {
@@ -6,7 +7,6 @@ import {
 } from "../../../domains/pht/train/status";
 import {TrainStation} from "../../../domains/pht/train-station";
 import {TrainStationRunStatus} from "../../../domains/pht/train-station/status";
-import {QueChannelHandler, QueueMessage} from "../../../modules/message-queue";
 
 export enum AggregatorTrainEvent {
     BUILD_FINISHED = 'trainBuilt',
@@ -15,9 +15,9 @@ export enum AggregatorTrainEvent {
     FINISHED = 'trainFinished'
 }
 
-export function createDispatcherAggregatorTrainHandlers() : Record<string, QueChannelHandler> {
+export function createDispatcherAggregatorTrainHandlers() : ConsumeHandlers {
     return {
-        [AggregatorTrainEvent.BUILD_FINISHED]: async (message: QueueMessage) => {
+        [AggregatorTrainEvent.BUILD_FINISHED]: async (message: Message) => {
             const repository = getRepository(Train);
 
             await repository.update({
@@ -26,7 +26,7 @@ export function createDispatcherAggregatorTrainHandlers() : Record<string, QueCh
                 build_status: TrainBuildStatus.FINISHED
             });
         },
-        [AggregatorTrainEvent.STARTED]: async (message: QueueMessage) => {
+        [AggregatorTrainEvent.STARTED]: async (message: Message) => {
             const repository = getRepository(Train);
 
             await repository.update({
@@ -36,7 +36,7 @@ export function createDispatcherAggregatorTrainHandlers() : Record<string, QueCh
                 run_station_id: null
             });
         },
-        [AggregatorTrainEvent.MOVED]: async (message: QueueMessage) => {
+        [AggregatorTrainEvent.MOVED]: async (message: Message) => {
             const repository = getRepository(Train);
 
             await repository.update({
@@ -54,7 +54,7 @@ export function createDispatcherAggregatorTrainHandlers() : Record<string, QueCh
                 run_status: message.data.mode as TrainStationRunStatus
             });
         },
-        [AggregatorTrainEvent.FINISHED]: async (message: QueueMessage) => {
+        [AggregatorTrainEvent.FINISHED]: async (message: Message) => {
             const repository = getRepository(Train);
 
             await repository.update({

@@ -1,3 +1,4 @@
+import {publishMessage} from "amqp-extension";
 import {SwaggerTags} from "typescript-swagger";
 import {getRepository} from "typeorm";
 import {applyRequestFilter, applyRequestIncludes, applyRequestPagination} from "typeorm-extension";
@@ -11,7 +12,6 @@ import {ForceLoggedInMiddleware} from "../../../config/http/middleware/auth";
 import {HarborHook, postHarborHookRouteHandler} from "./harbor/hook";
 
 import {doHarborTask} from "./harbor/task";
-import {publishQueueMessage} from "../../../modules/message-queue";
 import {ServiceSecurityComponent} from "../../../components/service-security";
 
 enum ServiceClientTask {
@@ -187,5 +187,5 @@ async function syncServiceClient(entity: Service) {
             secret: entity.client.secret
         }
     );
-    await publishQueueMessage(queueMessage);
+    await publishMessage(queueMessage);
 }

@@ -1,3 +1,4 @@
+import {buildMessage, Message, publishMessage} from "amqp-extension";
 import {getRepository} from "typeorm";
 
 import {  HARBOR_OUTGOING_PROJECT_NAME,} from "../../../config/services/harbor";
@@ -5,11 +6,10 @@ import {MQ_RS_COMMAND_ROUTING_KEY} from "../../../config/services/rabbitmq";
 import {TrainResult} from "../../../domains/pht/train-result";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {useLogger} from "../../../modules/log";
-import {buildQueueMessage, publishQueueMessage, QueueMessage} from "../../../modules/message-queue";
 
 export async function dispatchHarborEventToResultService(
-    message: QueueMessage
-) : Promise<QueueMessage> {
+    message: Message
+) : Promise<Message> {
     const data : DispatcherHarborEventData = message.data as DispatcherHarborEventData;
 
     const isOutgoingProject : boolean = data.namespace === HARBOR_OUTGOING_PROJECT_NAME;
@@ -43,8 +43,10 @@ export async function dispatchHarborEventToResultService(
         resultId: entity.id
     }
 
-    await publishQueueMessage(buildQueueMessage({
-        routingKey: MQ_RS_COMMAND_ROUTING_KEY,
+    await publishMessage(buildMessage({
+        options: {
+            routingKey: MQ_RS_COMMAND_ROUTING_KEY
+        },
         type: 'download',
         data: queueData
     }));

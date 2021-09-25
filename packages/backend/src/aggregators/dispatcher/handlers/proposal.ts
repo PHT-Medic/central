@@ -1,7 +1,6 @@
-import {QueChannelHandler} from "../../../modules/message-queue";
+import {ConsumeHandlers} from "amqp-extension";
 
-
-export function createDispatcherAggregatorProposalHandlers() : Record<string, QueChannelHandler> {
+export function createDispatcherAggregatorProposalHandlers() : ConsumeHandlers {
     return {
 
     }

@@ -1,6 +1,6 @@
+import {buildMessage, Message} from "amqp-extension";
 import {MQ_UI_SELF_COMMAND_ROUTING_KEY} from "../../config/services/rabbitmq";
 import {Client} from "../auth/client";
-import {buildQueueMessage, QueueMessage} from "../../modules/message-queue";
 import {ServiceSecurityComponent} from "../../components/service-security";
 
 export function buildServiceSecurityQueueMessage(
@@ -8,9 +8,11 @@ export function buildServiceSecurityQueueMessage(
     serviceId: string,
     client: Pick<Client, 'id' | 'secret'>,
     metaData: Record<string, any> = {}
-) : QueueMessage {
-    return buildQueueMessage({
-        routingKey: MQ_UI_SELF_COMMAND_ROUTING_KEY,
+) : Message {
+    return buildMessage({
+        options: {
+            routingKey: MQ_UI_SELF_COMMAND_ROUTING_KEY
+        },
         type,
         data: {
             clientId: client.id,
