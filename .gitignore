@@ -1,7 +1,5 @@
 node_modules
 
-docker-compose.yml
-
 # local env files
 .env.local
 .env.*.local

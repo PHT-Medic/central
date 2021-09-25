@@ -1,0 +1,14 @@
+version: '3.5'
+services:
+    result-service:
+        image: pht/result-service
+        build: .
+        ports:
+            - '3003:3000'
+        env_file:
+            - ./.env
+        environment:
+            PORT: 3000
+        volumes:
+            - ./packages/result-service/src:/usr/src/app/src
+            - ./packages/result-service/writable:/usr/src/app/writable
