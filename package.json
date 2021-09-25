@@ -1,12 +1,12 @@
 {
-    "name": "result-service",
+    "name": "@personalhealthtrain/result-service",
     "author": {
         "name": "Peter Placzek",
         "email": "tadashi@animesu.net",
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "description": "This package contains the Central UI Result Service of PHT.",
     "main": "dist/index.js",
     "scripts": {
