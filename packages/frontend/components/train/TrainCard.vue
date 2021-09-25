@@ -89,9 +89,6 @@ export default {
                         'fa-chevron-up': extendView
                     }"></i>
                 </button>
-                <button class="btn btn-primary btn-xs">
-                    <i class="fa fa-sync-alt"></i>
-                </button>
                 <button v-if="canDrop" @click.prevent="drop" class="btn btn-danger btn-xs" type="button">
                     <i class="fa fa-trash"></i>
                 </button>

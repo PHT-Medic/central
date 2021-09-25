@@ -32,13 +32,17 @@ export default {
         }
     },
     render(createElement) {
+        if(!this.isShown) {
+            return createElement('span', {}, ['']);
+        }
+
         let rootElement;
         let attributes = {
             on: {
                 click: this.click
             },
             props: {
-                disabled: this.isDisabled
+                disabled: this.isEnabled
             }
         };
 
@@ -60,8 +64,6 @@ export default {
                 break;
         }
 
-        attributes.disabled = !this.isAllowed;
-
         let text = [this.commandText];
         if(this.withIcon) {
             text.unshift(createElement('i', {
@@ -72,8 +74,8 @@ export default {
         if(typeof this.$scopedSlots.default === 'function') {
             text = this.$scopedSlots.default({
                 commandText: this.commandText,
-                isDisabled: this.isDisabled,
-                isAllowed: this.isAllowed,
+                isEnabled: this.isEnabled,
+                isShown: this.isShown,
                 iconClass: iconClasses
             });
         }
@@ -87,7 +89,7 @@ export default {
             await this.do();
         },
         async do() {
-            if(this.busy || !this.isAllowed) return;
+            if(this.busy || !this.isEnabled) return;
 
             this.busy = true;
 
@@ -103,7 +105,7 @@ export default {
         }
     },
     computed: {
-        isAllowed() {
+        isShown() {
             if(this.train.configurationStatus !== TrainConfigurationStatus.FINISHED ||
                 this.train.buildStatus !== TrainBuildStatus.FINISHED ||
                 !this.$auth.can('edit','train')
@@ -111,12 +113,17 @@ export default {
                 return false;
             }
 
+            return true;
+        },
+        isEnabled() {
             switch (this.command) {
                 case TrainCommand.START:
                     return !this.train.runStatus || [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.train.runStatus) !== -1
                 case TrainCommand.STOP:
                     return this.train.runStatus && [TrainRunStatus.STOPPED, TrainRunStatus.FINISHED].indexOf(this.train.runStatus) === -1
             }
+
+            return false;
         },
         commandText() {
             switch (this.command) {

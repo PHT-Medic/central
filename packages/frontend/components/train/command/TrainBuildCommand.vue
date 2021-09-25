@@ -30,18 +30,24 @@ export default {
         }
     },
     render(createElement) {
+        if(!this.isShown) {
+            return createElement('span', {}, ['']);
+        }
+
         let rootElement;
         let attributes = {
             on: {
                 click: this.click
             },
             props: {
-                disabled: !this.isAvailable
+                disabled: !this.isEnabled
             },
             domProps: {
-                disabled: !this.isAvailable
+                disabled: !this.isEnabled
             }
         };
+
+        console.log(this.isShown);
 
         let iconClasses = [this.iconClass, 'pr-1'];
 
@@ -71,8 +77,8 @@ export default {
         if(typeof this.$scopedSlots.default === 'function') {
             this.$scopedSlots.default({
                 commandText: this.commandText,
-                isDisabled: !this.isAvailable,
-                isAllowed: this.isAllowed,
+                isDisabled: !this.isEnabled,
+                isAllowed: this.isShown,
                 iconClass: iconClasses
             });
         }
@@ -86,7 +92,7 @@ export default {
             await this.do();
         },
         async do() {
-            if(this.busy || !this.isAllowed) return;
+            if(this.busy || !this.isShown) return;
 
             this.busy = true;
 
@@ -102,10 +108,13 @@ export default {
         }
     },
     computed: {
-        isAvailable() {
+        isShown() {
+            return this.$auth.can('edit','train');
+        },
+        isEnabled() {
             if(
                 this.train.configurationStatus !== TrainConfigurationStatus.FINISHED ||
-                !this.isAllowed
+                !this.isShown
             ) {
                 return false;
             }
@@ -127,9 +136,6 @@ export default {
                         ].indexOf(this.train.buildStatus) !== -1
             }
             return false;
-        },
-        isAllowed() {
-            return this.$auth.can('edit','train');
         },
         commandText() {
             switch (this.command) {

@@ -1,36 +1,33 @@
 {
+    "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "experimentalDecorators": true,
+        "skipLibCheck": true,
         "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
         "module": "commonjs",
         "esModuleInterop": true,
         "target": "esnext",
-        "lib": [
-            "ESNext",
-            "dom"
-        ],
         "noImplicitAny": true,
         "moduleResolution": "node",
-        "sourceMap": true,
-        "outDir": "dist",
+        "outDir": "./dist",
+        "rootDir": "./src",
         "baseUrl": ".",
-        "skipLibCheck": true
+        "typeRoots": [
+            "./src/@types",
+            "./node_modules/@types"
+        ],
+        "paths": {
+            "@package/common": ["../common/src"],
+            "@package/common/*": ["../common/src/*"]
+        }
     },
-    "paths": {
-        "express": ["src/@types/express", "node_modules/express"],
-        "@writable": [
-            "writable/*"
-        ]
-    },
-    "typeRoots": [
-        "./src/@types",
-        "./node_modules/@types"
-    ],
     "include": [
-        "src/**/*"
+        "./src/**/*"
     ],
+    "compileOnSave": true,
     "exclude": [
-        "node_modules/**/*"
+        "node_modules/**/*",
+        "dist/**/*"
     ],
-    "compileOnSave": true
+    "references": []
 }

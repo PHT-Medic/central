@@ -186,7 +186,6 @@ export default {
             <div v-if="withCommand" class="mt-1 flex-row d-flex justify-content-between">
                 <train-build-command
                     class="mr-1"
-                    v-if="canBuildStart"
                     :command="trainCommand.BUILD_START"
                     :with-icon="true"
                     :train="train"
@@ -194,7 +193,6 @@ export default {
                     @failed="handleFailed"
                 />
                 <train-build-command
-                    v-if="canBuildStop"
                     :command="trainCommand.BUILD_STOP"
                     :with-icon="true"
                     :train="train"
