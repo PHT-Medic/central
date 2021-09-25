@@ -41,20 +41,6 @@ services:
             PORT: 3000
         env_file:
             - ./packages/frontend/.env
-    result-service:
-        image: pht/central-ui-result-service
-        build: ./packages/result-service
-        depends_on:
-            - rabbitmq
-        ports:
-            - '3003:3000'
-        env_file:
-            - ./packages/result-service/.env
-        environment:
-            PORT: 3000
-        volumes:
-            - ./packages/result-service/src:/usr/src/app/src
-            - ./packages/result-service/writable:/usr/src/app/writable
 volumes:
     pht-central-ui-db:
     pht-central-ui-rabbitmq:
