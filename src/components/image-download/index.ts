@@ -1,5 +1,5 @@
 import {ConsumeHandlers, Message} from "amqp-extension";
-import {ResultServiceCommand} from "../../domains/result-service";
+import {ResultServiceCommand} from "../../domains/service/result-service";
 
 import {writeDownloadingFailedEvent} from "./write-downloading-failed";
 import {writeDownloadedEvent} from "./write-downloaded";

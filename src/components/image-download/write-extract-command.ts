@@ -1,6 +1,6 @@
 import {buildMessage, Message, publishMessage} from "amqp-extension";
 import {MessageQueueSelfRoutingKey} from "../../config/services/rabbitmq";
-import {ResultServiceCommand} from "../../domains/result-service";
+import {ResultServiceCommand} from "../../domains/service/result-service";
 
 export async function writeExtractCommand(message: Message) {
     await publishMessage(buildMessage({
