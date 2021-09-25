@@ -22,15 +22,6 @@ export function getRootDirPath() {
     return rootDirPath;
 }
 
-export function getPublicDirPath() {
-    if(typeof publicDirPath !== 'undefined') {
-        return publicDirPath;
-    }
-
-    publicDirPath = path.resolve(__dirname + '../../../public');
-    return publicDirPath;
-}
-
 export function getTrainResultDirectoryPath() {
     return path.resolve(getWritableDirPath() + '/train-results');
 }
