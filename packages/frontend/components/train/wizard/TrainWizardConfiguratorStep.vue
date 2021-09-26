@@ -126,7 +126,7 @@ export default {
             try {
                 const response = await getApiProposalStations({
                     filter: {
-                        proposalId
+                        proposal_id: proposalId
                     }
                 });
 

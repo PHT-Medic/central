@@ -16,7 +16,7 @@ export default {
         try {
             const {data: stations} = await getStations({
                 filter: {
-                    realmId: ctx.store.getters['auth/userRealmId']
+                    realm_id: ctx.store.getters['auth/userRealmId']
                 }
             });
 

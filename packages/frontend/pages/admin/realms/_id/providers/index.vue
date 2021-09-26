@@ -63,11 +63,9 @@ export default {
                         offset: this.meta.offset
                     },
                     filter: {
-                        realmId: this.realm.id
+                        realm_id: this.realm.id
                     },
-                    fields: {
-                        provider: ['clientSecret']
-                    }
+                    fields: ['+client_secret']
                 };
 
                 const response = await getProviders(record);

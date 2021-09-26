@@ -27,7 +27,7 @@
                     try {
                         const {data: stations} = await getStations({
                             filter: {
-                                realmId: proposal.realmId
+                                realm_id: proposal.realmId
                             }
                         });
 
@@ -36,8 +36,8 @@
 
                             const response = await getApiProposalStations({
                                 filter: {
-                                    proposalId: proposal.id,
-                                    stationId: visitorStation.id
+                                    proposal_id: proposal.id,
+                                    station_id: visitorStation.id
                                 }
                             });
 

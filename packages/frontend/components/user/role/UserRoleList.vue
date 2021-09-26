@@ -37,7 +37,7 @@ export default {
                         offset: this.meta.offset
                     },
                     filter: {
-                        userId: this.userId
+                        user_id: this.userId
                     }
                 });
 

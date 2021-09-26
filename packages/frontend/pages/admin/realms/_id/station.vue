@@ -26,11 +26,11 @@ export default {
         try {
             const {data: stations} = await getStations( {
                 filter: {
-                    realmId: ctx.params.id
+                    realm_id: ctx.params.id
                 },
                 fields: {
                     station: [
-                        'harbor_project_id',
+                        '+harbor_project_id',
                         'harbor_project_account_name',
                         'harbor_project_account_token',
                         'harbor_project_webhook_exists',

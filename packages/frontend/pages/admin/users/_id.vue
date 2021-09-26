@@ -14,9 +14,7 @@
             let user;
 
             try {
-                user = await getUser(context.params.id, {fields: {
-                    user: ['email']
-                }});
+                user = await getUser(context.params.id, {fields: ['+email']});
 
                 return {
                     user

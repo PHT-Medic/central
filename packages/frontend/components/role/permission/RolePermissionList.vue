@@ -37,7 +37,7 @@ export default {
                         offset: this.meta.offset
                     },
                     filter: {
-                        roleId: this.roleId
+                        role_id: this.roleId
                     }
                 });
 

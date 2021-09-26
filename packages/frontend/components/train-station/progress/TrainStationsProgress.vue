@@ -35,7 +35,7 @@
                 try {
                     const response = await getTrainStations({
                         filter: {
-                            trainId: this.train.id
+                            train_id: this.train.id
                         }
                     });
 

@@ -51,7 +51,7 @@ export default {
             try {
                 const response = await getApiProposalStations({
                     filter: {
-                        proposalId: this.proposalId
+                        proposal_id: this.proposalId
                     },
                     page: {
                         limit: this.meta.limit,

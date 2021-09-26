@@ -25,8 +25,8 @@ export default {
                 { key: 'proposal_title', label: 'Title', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'status', label: 'Status', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'created_at', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'updated_at', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'options', label: '', tdClass: 'text-left' }
             ],
             items: [],
@@ -73,7 +73,7 @@ export default {
         async init() {
             const {data: stations} = await getStations({
                 filter: {
-                    realmId: this.user.realmId
+                    realm_id: this.user.realmId
                 }
             });
 
@@ -101,7 +101,7 @@ export default {
                         offset: this.meta.offset
                     },
                     filter: {
-                        stationId: this.station.id
+                        station_id: this.station.id
                     }
                 };
 

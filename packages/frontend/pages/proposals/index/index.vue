@@ -21,9 +21,9 @@
                 isBusy: false,
                 fields: [
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'title', label: 'Titel', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'created_at', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
-                    { key: 'updated_at', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
+                    { key: 'title', label: 'Title', thClass: 'text-left', tdClass: 'text-left' },
+                    { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
+                    { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }
                 ],
                 items: [],
@@ -46,7 +46,7 @@
                 try {
                     const record = {
                         filter: {
-                            realmId: this.$store.getters['auth/userRealmId']
+                            realm_id: this.$store.getters['auth/userRealmId']
                         },
                         page: {
                             limit: this.meta.limit,

@@ -73,7 +73,7 @@
                             offset: this.provider.meta.offset
                         },
                         filter: {
-                            realmId: '!=master'
+                            realm_id: '!=master'
                         }
                     };
 

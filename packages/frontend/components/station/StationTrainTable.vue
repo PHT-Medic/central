@@ -67,12 +67,12 @@ export default {
 
                     ],
                     filter: {
-                        stationId: this.stationId
+                        station_id: this.stationId
                     }
                 };
 
                 if (typeof this.proposalId !== 'undefined') {
-                    record.filter.proposalId = this.proposalId;
+                    record.filter.proposal_id = this.proposalId;
                 }
 
                 const response = await getTrainStations(record);
