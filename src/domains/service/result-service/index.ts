@@ -1,5 +1,12 @@
 export enum ResultServiceCommand {
-    EXTRACT = 'extract',
+    START = 'start',
+    STOP = 'stop',
     DOWNLOAD = 'download',
-    STATUS = 'reset'
+    EXTRACT = 'extract',
+    STATUS = 'status'
+}
+
+export type ResultServiceDataPayload = {
+    trainId: string,
+    id?: string,
 }

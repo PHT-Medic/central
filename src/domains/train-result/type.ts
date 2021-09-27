@@ -1,16 +1,22 @@
 export enum TrainResultEvent {
-    FAILED = 'failed',
+    STARTING = 'starting', // ui trigger
+    STARTED = 'started', // rs trigger
 
-    DOWNLOADING = 'downloading',
-    DOWNLOADED = 'downloaded',
-    DOWNLOADING_FAILED = 'downloadingFailed',
+    STOPPING = 'stopping', // ui trigger
+    STOPPED = 'stopped', // rs trigger
 
-    EXTRACTING = 'extracting',
-    EXTRACTED = 'extracted',
-    EXTRACTING_FAILED = 'extractingFailed',
+    DOWNLOADING = 'downloading', // rs trigger
+    DOWNLOADED = 'downloaded', // rs trigger
+
+    EXTRACTING = 'extracting', // rs trigger
+    EXTRACTED = 'extracted', // rs trigger
+
+    FAILED = 'failed' // rs trigger
 }
 
 export enum TrainResultStep {
+    START = 'start',
+    STOP = 'stop',
     DOWNLOAD = 'download',
     EXTRACT = 'extract'
 }

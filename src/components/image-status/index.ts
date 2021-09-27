@@ -9,6 +9,7 @@ export function createImageStatusComponentHandlers() : ConsumeHandlers {
         [ResultServiceCommand.STATUS]: async (message: Message) => {
             useLogger().debug('status event received', {component: 'image-status', trainId: message.data.trainId});
 
+            console.log(message);
             await Promise.resolve(message)
                 .then(statusImage)
                 .catch(err => writeFailedEvent(message, err));
