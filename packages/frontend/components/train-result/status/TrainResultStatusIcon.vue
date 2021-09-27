@@ -6,7 +6,8 @@
     </span>
 </template>
 <script>
-import {TrainResultStatus} from "@/domains/train";
+
+import {TrainResultStatus} from "@/domains/train-result/type";
 
 export default {
     props: {
@@ -18,6 +19,9 @@ export default {
     computed: {
         iconClass() {
             switch (this.status) {
+                case TrainResultStatus.STARTING:
+                case TrainResultStatus.STOPPING:
+                    return 'fas fa-sync';
                 case TrainResultStatus.DOWNLOADING:
                     return 'fa-download';
                 case TrainResultStatus.DOWNLOADED:
@@ -30,7 +34,7 @@ export default {
                 case TrainResultStatus.FAILED:
                     return 'fa-exclamation';
                 default:
-                    return 'info';
+                    return 'fa fa-info';
             }
         }
     }

@@ -1,18 +1,14 @@
-import {useApi} from "~/modules/api";
-import {changeResponseKeyCase} from "~/modules/api/utils";
+import {useApi} from "@/modules/api";
+import {changeResponseKeyCase} from "@/modules/api/utils";
 
 export function getTrainFilesDownloadUri(trainId: number) {
     return 'trains/'+trainId+'/files/download'
 }
 
 export async function getApiTrainFiles(trainId: number) {
-    try {
-        const response = await useApi('auth').get('trains/'+trainId+'/files');
+    const response = await useApi('auth').get('trains/'+trainId+'/files');
 
-        return response.data;
-    } catch (e) {
-        throw new Error('Die Dateien konnten nicht geladen werden.');
-    }
+    return response.data;
 }
 
 export async function getApiTrainFile(trainId: number, fileId: number) {

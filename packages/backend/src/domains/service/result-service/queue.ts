@@ -1,24 +1,26 @@
-import {buildMessage, publishMessage} from "amqp-extension";
+import {buildMessage, Message} from "amqp-extension";
 import {MQ_RS_COMMAND_ROUTING_KEY} from "../../../config/services/rabbitmq";
 
 export enum ResultServiceCommand {
-    DOWNLOAD = 'download'
+    START = 'start',
+    STOP = 'stop',
+    STATUS = 'status'
 }
 
-export async function emitResultServiceQueueMessage(
+export type ResultServiceDataPayload = {
+    id?: string,
+    trainId: string
+}
+
+export function buildResultServiceQueueMessage(
     command: ResultServiceCommand,
-    data: Record<string,any>
-) {
-    const message = buildMessage({
+    data: ResultServiceDataPayload
+) : Message {
+   return buildMessage({
         options: {
             routingKey: MQ_RS_COMMAND_ROUTING_KEY
         },
         type: command,
-        data,
-        metadata: {
-            token: undefined
-        }
-    })
-
-    await publishMessage(message);
+        data
+    });
 }

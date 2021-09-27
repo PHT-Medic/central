@@ -22,6 +22,10 @@ export default {
         withIcon: {
             type: Boolean,
             default: false
+        },
+        withText: {
+            type: Boolean,
+            default: true
         }
     },
     data() {
@@ -47,8 +51,6 @@ export default {
             }
         };
 
-        console.log(this.isShown);
-
         let iconClasses = [this.iconClass, 'pr-1'];
 
         switch (this.elementType) {
@@ -58,6 +60,7 @@ export default {
                 break;
             case 'link':
                 rootElement = 'a';
+                attributes.domProps.href= 'javascript:void(0)';
                 iconClasses.push('text-'+this.classSuffix);
                 break;
             default:
@@ -68,6 +71,11 @@ export default {
         }
 
         let text = [this.commandText];
+
+        if(!this.withText) {
+            text = [];
+        }
+
         if(this.withIcon) {
             text.unshift(createElement('i', {
                 class: iconClasses
@@ -98,9 +106,14 @@ export default {
 
             try {
                 const train = await runTrainCommand(this.train.id, this.command);
+
+                const message =  `Successfully executed build command ${this.commandText}`;
+                this.$bvToast.toast(message, {toaster: 'b-toaster-top-center', variant: 'success'});
+
                 this.$emit('done', train);
             } catch (e) {
                 this.$bvToast.toast(e.message, {toaster: 'b-toaster-top-center', variant: 'danger'});
+
                 this.$emit('failed', e);
             }
 
@@ -109,11 +122,10 @@ export default {
     },
     computed: {
         isShown() {
-            return this.$auth.can('edit','train');
+            return this.$auth.can('edit','train') && this.train.configurationStatus === TrainConfigurationStatus.FINISHED;
         },
         isEnabled() {
             if(
-                this.train.configurationStatus !== TrainConfigurationStatus.FINISHED ||
                 !this.isShown
             ) {
                 return false;
@@ -133,8 +145,11 @@ export default {
                             TrainBuildStatus.STARTED,
                             TrainBuildStatus.FINISHED,
                             TrainBuildStatus.STOPPING
-                        ].indexOf(this.train.buildStatus) !== -1
+                        ].indexOf(this.train.buildStatus) !== -1;
+                    case TrainCommand.BUILD_STATUS:
+                        return true;
             }
+
             return false;
         },
         commandText() {
@@ -143,6 +158,8 @@ export default {
                     return 'start';
                 case TrainCommand.BUILD_STOP:
                     return 'stop';
+                case TrainCommand.BUILD_STATUS:
+                    return 'status';
                 default:
                     return '';
             }
@@ -153,6 +170,8 @@ export default {
                     return 'fa fa-wrench';
                 case TrainCommand.BUILD_STOP:
                     return 'fa fa-stop';
+                case TrainCommand.BUILD_STATUS:
+                    return 'fas fa-search';
                 default:
                     return '';
             }
@@ -163,6 +182,8 @@ export default {
                     return 'success';
                 case TrainCommand.BUILD_STOP:
                     return 'danger';
+                case TrainCommand.BUILD_STATUS:
+                    return 'primary';
                 default:
                     return 'info';
             }

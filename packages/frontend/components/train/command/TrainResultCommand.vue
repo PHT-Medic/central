@@ -1,4 +1,5 @@
 <script>
+import {TrainResultStatus} from "@/domains/train-result/type";
 import {TrainConfigurationStatus, TrainBuildStatus, TrainRunStatus} from "@/domains/train/index.ts";
 import {runTrainCommand} from "@/domains/train/api.ts";
 import {TrainCommand} from "@/domains/train/type";
@@ -10,9 +11,13 @@ export default {
             type: Object,
             default: undefined
         },
+        trainResultId: {
+            type: String,
+            default: null
+        },
         command: {
             type: String,
-            default: TrainCommand.RUN_START
+            default: TrainCommand.RESULT_START
         },
 
         elementType: {
@@ -30,8 +35,7 @@ export default {
     },
     data() {
         return {
-            busy: false,
-            trainCommand: TrainCommand
+            busy: false
         }
     },
     render(createElement) {
@@ -45,10 +49,10 @@ export default {
                 click: this.click
             },
             props: {
-                disabled: this.isEnabled
+                disabled: !this.isEnabled
             },
             domProps: {
-                disabled: this.isEnabled
+                disabled: !this.isEnabled
             }
         };
 
@@ -84,10 +88,10 @@ export default {
         }
 
         if(typeof this.$scopedSlots.default === 'function') {
-            text = this.$scopedSlots.default({
+            this.$scopedSlots.default({
                 commandText: this.commandText,
-                isEnabled: this.isEnabled,
-                isShown: this.isShown,
+                isDisabled: !this.isEnabled,
+                isAllowed: this.isShown,
                 iconClass: iconClasses
             });
         }
@@ -101,17 +105,25 @@ export default {
             await this.do();
         },
         async do() {
-            if(this.busy || !this.isEnabled) return;
+            if(this.busy || !this.isShown) return;
 
             this.busy = true;
 
             try {
-                const train = await runTrainCommand(this.train.id, this.command);
+                switch (this.command) {
+                    case TrainCommand.RESULT_DOWNLOAD:
+                        window.open(this.$config.resultServiceApiUrl+'train-results/'+this.trainResultId+'/download');
+                        break;
+                    default:
+                        const train = await runTrainCommand(this.train.id, this.command);
+                        this.$emit('done', train);
+                        break;
+                }
 
-                const message =  `Successfully executed run command ${this.commandText}.`;
+                const message =  `Successfully executed result command ${this.commandText}`;
                 this.$bvToast.toast(message, {toaster: 'b-toaster-top-center', variant: 'success'});
 
-                this.$emit('done', train);
+
             } catch (e) {
                 this.$bvToast.toast(e.message, {toaster: 'b-toaster-top-center', variant: 'danger'});
 
@@ -123,22 +135,33 @@ export default {
     },
     computed: {
         isShown() {
-            return (
-                    (
-                        this.train.configurationStatus === TrainConfigurationStatus.FINISHED &&
-                        this.train.buildStatus === TrainBuildStatus.FINISHED
-                    ) ||
-                        this.command === TrainCommand.RUN_STATUS
-                ) &&
-                this.$auth.can('edit', 'train');
+            return this.$auth.can('edit','train') &&
+                (this.train.runStatus === TrainRunStatus.FINISHED || this.command === TrainCommand.RESULT_STATUS);
         },
         isEnabled() {
+            if(
+                !this.isShown
+            ) {
+                return false;
+            }
+
             switch (this.command) {
-                case TrainCommand.RUN_START:
-                    return !this.train.runStatus || [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.train.runStatus) !== -1
-                case TrainCommand.RUN_STOP:
-                    return this.train.runStatus && [TrainRunStatus.STOPPED, TrainRunStatus.FINISHED].indexOf(this.train.runStatus) === -1
-                case TrainCommand.RUN_STATUS:
+                case TrainCommand.RESULT_START:
+                    return !this.train.resultStatus ||
+                        [
+                            TrainResultStatus.STOPPED,
+                            TrainResultStatus.FAILED
+                        ].indexOf(this.train.resultStatus) !== -1;
+                case TrainCommand.RESULT_STOP:
+                    return this.train.resultStatus &&
+                        [
+                            TrainResultStatus.STARTING,
+                            TrainResultStatus.STARTED,
+                            TrainResultStatus.FINISHED,
+                            TrainResultStatus.STOPPING
+                        ].indexOf(this.train.resultStatus) !== -1;
+                case TrainCommand.RESULT_STATUS:
+                case TrainCommand.RESULT_DOWNLOAD:
                     return true;
             }
 
@@ -146,11 +169,13 @@ export default {
         },
         commandText() {
             switch (this.command) {
-                case TrainCommand.RUN_START:
+                case TrainCommand.RESULT_DOWNLOAD:
+                    return 'download';
+                case TrainCommand.RESULT_START:
                     return 'start';
-                case TrainCommand.RUN_STOP:
+                case TrainCommand.RESULT_STOP:
                     return 'stop';
-                case TrainCommand.RUN_STATUS:
+                case TrainCommand.RESULT_STATUS:
                     return 'status';
                 default:
                     return '';
@@ -158,11 +183,13 @@ export default {
         },
         iconClass() {
             switch (this.command) {
-                case TrainCommand.RUN_START:
-                    return 'fa fa-play';
-                case TrainCommand.RUN_STOP:
+                case TrainCommand.RESULT_DOWNLOAD:
+                    return 'fa fa-download';
+                case TrainCommand.RESULT_START:
+                    return 'fa fa-wrench';
+                case TrainCommand.RESULT_STOP:
                     return 'fa fa-stop';
-                case TrainCommand.RUN_STATUS:
+                case TrainCommand.RESULT_STATUS:
                     return 'fas fa-search';
                 default:
                     return '';
@@ -170,11 +197,13 @@ export default {
         },
         classSuffix() {
             switch (this.command) {
-                case TrainCommand.RUN_START:
+                case TrainCommand.RESULT_DOWNLOAD:
+                    return 'dark';
+                case TrainCommand.RESULT_START:
                     return 'success';
-                case TrainCommand.RUN_STOP:
+                case TrainCommand.RESULT_STOP:
                     return 'danger';
-                case TrainCommand.RUN_STATUS:
+                case TrainCommand.RESULT_STATUS:
                     return 'primary';
                 default:
                     return 'info';

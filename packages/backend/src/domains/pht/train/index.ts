@@ -13,6 +13,7 @@ import {TrainResult} from "../train-result";
 import {TrainFile} from "../train-file";
 import {User} from "../../auth/user";
 import {Realm} from "../../auth/realm";
+import {TrainResultStatus} from "../train-result/status";
 import {TrainStation} from "../train-station";
 import {TrainModel} from "../train-model";
 import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "./status";
@@ -52,11 +53,15 @@ export class Train {
     @Column({type: "enum", nullable: true, default: null, enum: TrainConfigurationStatus})
     configuration_status: TrainConfigurationStatus | null;
 
+    // ------------------------------------------------------------------
+
     @Column({type: "enum", nullable: true, default: null, enum: TrainBuildStatus})
     build_status: TrainBuildStatus | null;
 
     @Column({type: "uuid", nullable: true, default: null})
     build_id: string;
+
+    // ------------------------------------------------------------------
 
     @Column({type: "enum", nullable: true, default: null, enum: TrainRunStatus})
     run_status: TrainRunStatus | null;
@@ -94,8 +99,15 @@ export class Train {
     @OneToMany(() => TrainFile, trainFile => trainFile.train)
     files: TrainFile[]
 
+    @Column({type: "varchar", nullable: true, default: null})
+    result_last_id: string;
+
+    // todo: change to 1:n
     @OneToOne(() => TrainResult, trainResult => trainResult.train)
     result: TrainResult;
+
+    @Column({type: "enum", nullable: true, default: null, enum: TrainResultStatus})
+    result_status: TrainResultStatus | null;
 
     @Column()
     proposal_id: number;

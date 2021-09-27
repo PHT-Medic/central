@@ -1,21 +1,22 @@
 <script>
 import Vue from 'vue';
+import TrainResultCommand from "@/components/train/command/TrainResultCommand";
+import {TrainResultStatus} from "@/domains/train-result/type";
 import TrainBuildStatusText from "@/components/train/status/TrainBuildStatusText";
 import TrainBuildCommand from "@/components/train/command/TrainBuildCommand";
 import TrainRunStatusText from "@/components/train/status/TrainRunStatusText";
 import TrainRunCommand from "@/components/train/command/TrainRunCommand";
 import TrainResultStatusIcon from "@/components/train-result/status/TrainResultStatusIcon";
 import TrainResultStatusText from "@/components/train-result/status/TrainResultStatusText";
-import TrainResultDownload from "@/components/train-result/TrainResultDownload";
 
-import {TrainBuildStatus, TrainConfigurationStatus, TrainResultStatus, TrainRunStatus} from "@/domains/train";
+import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "@/domains/train";
 import {TrainCommand} from "@/domains/train/type";
 import TrainConfigurationStatusText from "@/components/train/status/TrainConfigurationStatusText";
 
 export default {
     components: {
+        TrainResultCommand,
         TrainConfigurationStatusText,
-        TrainResultDownload,
         TrainResultStatusText,
         TrainResultStatusIcon,
         TrainRunCommand,
@@ -51,40 +52,15 @@ export default {
         }
     },
     computed: {
-        isPermittedToEdit() {
+        canEdit() {
             return this.$auth.can('edit','train');
         },
 
         // ---------------------------------------------------------
 
-        resultStatus() {
-            return this.train.result ? this.train.result.status : null;
-        },
-
-
-        // ---------------------------------------------------------
-
         canConfigure() {
-            return this.isPermittedToEdit && this.train.configurationStatus !== TrainConfigurationStatus.FINISHED;
+            return this.canEdit && this.train.configurationStatus !== TrainConfigurationStatus.FINISHED;
         },
-
-        canBuildStart() {
-            return this.canBuildCommand(TrainCommand.BUILD_START);
-        },
-        canBuildStop() {
-            return this.canBuildCommand(TrainCommand.BUILD_STOP);
-        },
-
-        canRunStart() {
-            return this.canRunCommand(TrainCommand.START);
-        },
-        canRunStop() {
-            return this.canRunCommand(TrainCommand.STOP);
-        },
-
-        canInspectResult() {
-            return this.train.runStatus === TrainRunStatus.FINISHED;
-        }
     },
     methods: {
         handleDone(train) {
@@ -96,50 +72,6 @@ export default {
         },
         handleFailed(e) {
             this.$emit('failed', e);
-        },
-
-        // ---------------------------------------------------------
-
-        canBuildCommand(command) {
-            if(
-                this.train.configurationStatus !== TrainConfigurationStatus.FINISHED ||
-                !this.$auth.can('edit','train')
-            ) {
-                return false;
-            }
-
-            switch (command) {
-                case TrainCommand.BUILD_START:
-                    return [
-                        TrainBuildStatus.STARTED,
-                        TrainBuildStatus.FINISHED
-                    ].indexOf(this.train.buildStatus) === -1
-                case TrainCommand.BUILD_STOP:
-                    return this.train.buildStatus && [
-                        TrainBuildStatus.STOPPED,
-                        TrainBuildStatus.FINISHED,
-                        TrainBuildStatus.FAILED
-                    ].indexOf(this.train.buildStatus) === -1
-            }
-
-            return false;
-        },
-        canRunCommand(command) {
-            if(this.train.configurationStatus !== TrainConfigurationStatus.FINISHED ||
-                this.train.buildStatus !== TrainBuildStatus.FINISHED
-                // startExecution /stopExecution
-            ) {
-                return false;
-            }
-
-            switch (command) {
-                case TrainCommand.START:
-                    return !this.train.runStatus || [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.train.runStatus) !== -1
-                case TrainCommand.STOP:
-                    return this.train.runStatus && [TrainRunStatus.STOPPED, TrainRunStatus.FINISHED].indexOf(this.train.runStatus) === -1
-            }
-
-            return false;
         }
     }
 }
@@ -153,7 +85,7 @@ export default {
         }"
     >
         <div
-            class="d-flex flex-column"
+            class="d-flex flex-column flex-grow-1" style="flex-basis: 0"
             :class="{
                 'mb-2': listDirection === 'column'
             }"
@@ -172,7 +104,7 @@ export default {
         </div>
 
         <div
-            class="d-flex flex-column"
+            class="d-flex flex-column flex-grow-1" style="flex-basis: 0"
             :class="{
                 'mb-2': listDirection === 'column'
             }"
@@ -182,8 +114,18 @@ export default {
             </div>
             <div>
                 Status: <train-build-status-text :status="train.buildStatus" />
+                <train-build-command
+                    class="ml-1"
+                    :command="trainCommand.BUILD_STATUS"
+                    :element-type="'link'"
+                    :with-text="false"
+                    :with-icon="true"
+                    :train="train"
+                    @done="handleDone"
+                    @failed="handleFailed"
+                />
             </div>
-            <div v-if="withCommand" class="mt-1 flex-row d-flex justify-content-between">
+            <div v-if="withCommand" class="mt-1 flex-row d-flex">
                 <train-build-command
                     class="mr-1"
                     :command="trainCommand.BUILD_START"
@@ -203,7 +145,7 @@ export default {
         </div>
 
         <div
-            class="d-flex flex-column"
+            class="d-flex flex-column flex-grow-1" style="flex-basis: 0"
             :class="{
                 'mb-2': listDirection === 'column'
             }"
@@ -213,20 +155,28 @@ export default {
             </div>
             <div>
                 Status: <train-run-status-text :status="train.runStatus" />
-            </div>
-            <div v-if="withCommand" class="mt-1 flex-row d-flex justify-content-between">
                 <train-run-command
-                    v-if="canRunStart"
+                    class="ml-1"
+                    :command="trainCommand.RUN_STATUS"
+                    :with-text="false"
+                    :with-icon="true"
+                    :element-type="'link'"
+                    :train="train"
+                    @done="handleDone"
+                    @failed="handleFailed"
+                />
+            </div>
+            <div v-if="withCommand" class="mt-1 flex-row d-flex">
+                <train-run-command
                     class="mr-1"
-                    :command="trainCommand.START"
+                    :command="trainCommand.RUN_START"
                     :with-icon="true"
                     :train="train"
                     @done="handleDone"
                     @failed="handleFailed"
                 />
                 <train-run-command
-                    v-if="canRunStop"
-                    :command="trainCommand.STOP"
+                    :command="trainCommand.RUN_STOP"
                     :with-icon="true"
                     :train="train"
                     @done="handleDone"
@@ -235,16 +185,48 @@ export default {
             </div>
         </div>
         <div
-            class="d-flex flex-column"
+            class="d-flex flex-column flex-grow-1" style="flex-basis: 0"
         >
             <div>
                 <strong>4. Result</strong>
             </div>
             <div >
-                Status: <train-result-status-icon :status="resultStatus" /> <train-result-status-text :status="resultStatus" />
+                Status: <train-result-status-text :status="train.resultStatus" />
+                <train-result-command
+                    class="ml-1"
+                    :command="trainCommand.RESULT_STATUS"
+                    :with-text="false"
+                    :with-icon="true"
+                    :element-type="'link'"
+                    :train="train"
+                    @done="handleDone"
+                    @failed="handleFailed"
+                />
             </div>
-            <div v-if="withCommand" class="mt-1">
-                <train-result-download v-if="canInspectResult" :train="train" />
+            <div v-if="withCommand" class="mt-1 flex-row d-flex">
+                <train-result-command
+                    class="mr-1"
+                    :command="trainCommand.RESULT_DOWNLOAD"
+                    :with-icon="true"
+                    :train="train"
+                    @done="handleDone"
+                    @failed="handleFailed"
+                />
+                <train-result-command
+                    class="mr-1"
+                    :command="trainCommand.RESULT_START"
+                    :with-icon="true"
+                    :train="train"
+                    @done="handleDone"
+                    @failed="handleFailed"
+                />
+                <train-result-command
+                    :command="trainCommand.RESULT_STOP"
+                    :with-icon="true"
+                    :train="train"
+                    @done="handleDone"
+                    @failed="handleFailed"
+                />
             </div>
         </div>
     </div>

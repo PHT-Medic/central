@@ -1,16 +1,16 @@
-import {getRepository} from "typeorm";
-import {Train, TrainCommand} from "../../../../../domains/pht/train";
-
 import {check, matchedData, validationResult} from "express-validator";
+import {getRepository} from "typeorm";
 import {isPermittedForResourceRealm} from "../../../../../domains/auth/realm/db/utils";
+import {Train, TrainCommand} from "../../../../../domains/pht/train";
 import {
     detectTrainBuildStatus,
     detectTrainRunStatus,
     generateTrainHash,
     startBuildTrain,
-    startTrain, stopBuildTrain,
+    startTrain,
+    stopBuildTrain,
     stopTrain,
-    triggerTrainDownload
+    triggerTrainResultStart, triggerTrainResultStatus, triggerTrainResultStop
 } from "../../../../../domains/pht/train/commands";
 
 /**
@@ -55,7 +55,7 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
     try {
         switch (validationData.command as TrainCommand) {
             // Build Commands
-            case TrainCommand.DETECT_BUILD_STATUS:
+            case TrainCommand.BUILD_STATUS:
                 entity = await detectTrainBuildStatus(entity);
                 break;
             case TrainCommand.BUILD_START:
@@ -67,27 +67,36 @@ export async function doTrainTaskRouteHandler(req: any, res: any) {
 
 
             // Run Commands
-            case TrainCommand.DETECT_RUN_STATUS:
+            case TrainCommand.RUN_STATUS:
                 entity = await detectTrainRunStatus(entity);
                 break;
-            case TrainCommand.START:
+            case TrainCommand.RUN_START:
                 entity = await startTrain(entity);
                 break;
-            case TrainCommand.STOP:
+            case TrainCommand.RUN_STOP:
                 entity = await stopTrain(entity);
+                break;
+
+            // Result Service
+            case TrainCommand.RESULT_STATUS:
+                entity = await triggerTrainResultStatus(entity.id);
+                break;
+            case TrainCommand.RESULT_START:
+                entity = await triggerTrainResultStart(entity.id);
+                break;
+            case TrainCommand.RESULT_STOP:
+                entity = await triggerTrainResultStop(entity.id);
                 break;
 
             // General Commands
             case TrainCommand.GENERATE_HASH:
                 entity = await generateTrainHash(entity);
                 break;
-            case TrainCommand.TRIGGER_DOWNLOAD:
-                entity.result = await triggerTrainDownload(entity.id);
-                break;
         }
 
         return res._respond({data: entity});
     } catch (e) {
+        console.log(e);
         return res._failServerError({message: 'An unknown error occurred. The Task could not be executed...'})
     }
 }

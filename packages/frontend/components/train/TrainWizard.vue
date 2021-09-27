@@ -5,6 +5,7 @@ import {editTrain, runTrainCommand} from "@/domains/train/api.ts";
 import TrainWizardHashStep from "@/components/train/wizard/TrainWizardHashStep";
 import TrainWizardFinalStep from "@/components/train/wizard/TrainWizardFinalStep";
 import {TrainConfigurationStatus, TrainConfiguratorStates} from "@/domains/train/index.ts";
+import {TrainCommand} from "~/domains/train/type";
 
 export default {
     components: {TrainWizardFinalStep, TrainWizardHashStep, TrainFileManager, TrainWizardConfiguratorStep},
@@ -105,7 +106,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runTrainCommand(this.trainProperty.id, 'build');
+                const train = await runTrainCommand(this.trainProperty.id, TrainCommand.BUILD_START);
 
                 this.$emit('updated', {
                     status: train.status,

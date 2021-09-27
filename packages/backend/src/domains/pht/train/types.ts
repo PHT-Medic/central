@@ -18,10 +18,16 @@ export function isTrainType(type: string) : type is TrainType {
 export enum TrainCommand {
     BUILD_START = 'buildStart',
     BUILD_STOP = 'buildStop',
-    DETECT_BUILD_STATUS = 'detectBuildStatus',
-    DETECT_RUN_STATUS = 'detectRunStatus',
+    BUILD_STATUS = 'buildStatus',
+
+    RUN_START = 'runStart',
+    RUN_STOP = 'runStop',
+    RUN_STATUS = 'runStatus',
+
+    RESULT_STATUS = 'resultStatus',
+    RESULT_START = 'resultStart',
+    RESULT_STOP = 'resultStop',
+
     GENERATE_HASH = 'generateHash',
-    START = 'start',
-    STOP = 'stop',
-    TRIGGER_DOWNLOAD = 'triggerDownload'
+
 }

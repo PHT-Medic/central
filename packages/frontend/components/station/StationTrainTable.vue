@@ -5,7 +5,7 @@ import {editTrainStation, getTrainStations} from "@/domains/train-station/api";
 import {TrainStationStatusOptions} from "@/domains/train-station";
 import TrainStationAction from "@/components/train-station/TrainStationAction";
 import TrainStationApprovalStatusText from "@/components/train-station/status/TrainStationApprovalStatusText";
-import {getTrainFilesDownloadUri} from "@/domains/train/file/api";
+import {getTrainFilesDownloadUri} from "@/domains/train-file/api";
 
 export default {
     components: {

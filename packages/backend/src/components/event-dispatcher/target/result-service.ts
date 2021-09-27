@@ -1,10 +1,11 @@
-import {buildMessage, Message, publishMessage} from "amqp-extension";
-import {getRepository} from "typeorm";
+import {Message, publishMessage} from "amqp-extension";
 
-import {  HARBOR_OUTGOING_PROJECT_NAME,} from "../../../config/services/harbor";
-import {MQ_RS_COMMAND_ROUTING_KEY} from "../../../config/services/rabbitmq";
-import {TrainResult} from "../../../domains/pht/train-result";
+import {HARBOR_OUTGOING_PROJECT_NAME,} from "../../../config/services/harbor";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
+import {
+    buildResultServiceQueueMessage,
+    ResultServiceCommand
+} from "../../../domains/service/result-service/queue";
 import {useLogger} from "../../../modules/log";
 
 export async function dispatchHarborEventToResultService(
@@ -18,37 +19,8 @@ export async function dispatchHarborEventToResultService(
         return message;
     }
 
-    const repository = getRepository(TrainResult);
-
-    let entity = await repository.findOne({
-        train_id: data.repositoryName
-    });
-
-    if(typeof entity === 'undefined') {
-        const dbData = repository.create({
-            train_id: data.repositoryName,
-            image: data.repositoryFullName
-        });
-
-        await repository.save(dbData);
-
-        entity = dbData;
-    }
-
-    const queueData : DispatcherHarborEventData = {
-        ...data,
-
-        // additional information
-        trainId: data.repositoryName,
-        resultId: entity.id
-    }
-
-    await publishMessage(buildMessage({
-        options: {
-            routingKey: MQ_RS_COMMAND_ROUTING_KEY
-        },
-        type: 'download',
-        data: queueData
+    await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.START, {
+        trainId: data.repositoryName
     }));
 
     useLogger().debug('train event pushed to result service aggregator.', {service: 'api-harbor-hook'})

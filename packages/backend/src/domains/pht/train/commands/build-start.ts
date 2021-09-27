@@ -1,17 +1,13 @@
 import {publishMessage} from "amqp-extension";
-import {Train} from "../index";
 import {getRepository, Not} from "typeorm";
-import {findTrain} from "./utils";
 import env from "../../../../env";
+import {buildTrainBuilderQueueMessage, TrainBuilderCommand} from "../../../service/train-builder/queue";
+import {TrainResultStatus} from "../../train-result/status";
 import {TrainStation} from "../../train-station";
 import {TrainStationApprovalStatus} from "../../train-station/status";
-import {
-    buildTrainBuilderQueueMessage,
-    TrainBuilderCommand
-} from "../../../service/train-builder/queue";
+import {Train} from "../index";
 import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "../status";
-import {TrainResult} from "../../train-result";
-import {TrainResultStatus} from "../../train-result/status";
+import {findTrain} from "./utils";
 
 export async function startBuildTrain(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);
@@ -47,23 +43,11 @@ export async function startBuildTrain(train: Train | number | string) : Promise<
         train = repository.merge(train, {
             configuration_status: TrainConfigurationStatus.FINISHED,
             run_status: env.demo ? TrainRunStatus.FINISHED : null,
-            build_status: env.demo ? null : TrainBuildStatus.STARTING
+            build_status: env.demo ? null : TrainBuildStatus.STARTING,
+            result_status: env.demo ? TrainResultStatus.FINISHED : null
         });
 
         await repository.save(train);
-
-        if(env.demo) {
-            const trainResultRepository = getRepository(TrainResult);
-            // tslint:disable-next-line:no-shadowed-variable
-            const trainResult = trainResultRepository.create({
-                download_id: 'DEMO',
-                train_id: train.id,
-                status: TrainResultStatus.FINISHED
-            });
-
-            await trainResultRepository.save(trainResult);
-            train.result = trainResult;
-        }
     }
 
     return train;

@@ -1,6 +1,7 @@
 <script>
 import AlertMessage from "@/components/alert/AlertMessage";
 import {runTrainCommand} from "@/domains/train/api.ts";
+import {TrainCommand} from "~/domains/train/type";
 export default {
     components: {AlertMessage},
     props: {
@@ -36,7 +37,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runTrainCommand(this.train.id, 'generateHash');
+                const train = await runTrainCommand(this.train.id, TrainCommand.GENERATE_HASH);
 
                 this.setHash(train.hash);
                 this.$emit('hashGenerated', this.form.hash);
