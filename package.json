@@ -15,7 +15,7 @@
         "build": "rm -rf ./dist && tsc"
     },
     "dependencies": {
-        "amqp-extension": "^0.0.5",
+        "amqp-extension": "^0.0.6",
         "body-parser": "^1.19.0",
         "cookie-parser": "^1.4.4",
         "cors": "^2.8.5",
