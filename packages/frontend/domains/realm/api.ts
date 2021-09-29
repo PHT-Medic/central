@@ -1,7 +1,8 @@
+import {Realm, ResourceCollectionResponse} from "@personalhealthtrain/ui-common";
 import {useApi} from "~/modules/api";
 import {changeRequestKeyCase, formatRequestRecord, RequestRecord} from "~/modules/api/utils";
 
-export async function getRealms(data?: RequestRecord) {
+export async function getRealms(data?: RequestRecord) : Promise<ResourceCollectionResponse<Realm>> {
     let response = await useApi('auth').get('realms' + formatRequestRecord(data));
 
     return response.data;
