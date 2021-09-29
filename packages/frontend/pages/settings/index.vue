@@ -1,3 +1,9 @@
+<!--
+  Copyright (c) 2021-2021.
+  Author Peter Placzek (tada5hi)
+  For the full copyright and license information,
+  view the LICENSE file that was distributed with this source code.
+  -->
 <template>
     <div>
         <h1 class="title no-border mb-3">Settings <span class="sub-title">manage your settings</span> </h1>

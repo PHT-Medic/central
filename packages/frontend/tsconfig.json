@@ -1,32 +1,18 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "target": "esnext",
-        "module": "esnext",
-        "moduleResolution": "Node",
-        "skipLibCheck": true,
+        "rootDir": ".",
         "lib": [
             "ESNext",
-            "ESNext.AsyncIterable",
             "DOM"
         ],
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "noImplicitAny": false,
-        "esModuleInterop": true,
-        "allowJs": true,
-        "sourceMap": true,
-        "strict": true,
-        "noEmit": true,
-        "baseUrl": ".",
-        "rootDir": ".",
         "paths": {
-            "@personalhealthtrain/ui-common": ["../common/src"],
+            "@personalhealthtrain/ui-common": ["./packages/common/src"],
             "@/*": [
-                "./*"
+                "./packages/frontend/*"
             ],
             "~/*": [
-                "./*"
+                "./packages/frontend/*"
             ]
         },
         "typeRoots": [
@@ -37,11 +23,6 @@
             "@nuxt/types",
             "vue-router/types"
         ]
-    },
-    "references": [
-        {
-            "path": "../common"
-        }
-    ]
+    }
 }
 

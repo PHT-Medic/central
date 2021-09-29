@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2021-2021.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../../../domains/auth/user/repository";
 import {isPermittedForResourceRealm, Station} from "@personalhealthtrain/ui-common";

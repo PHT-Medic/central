@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2021-2021.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
 import { camelCase, snakeCase } from 'change-case';
 
 export function buildUrlRelationsSuffix(uriResourceName: string, uriResourceId: number | string, UriRelationName: string, type: 'self' | 'related') {

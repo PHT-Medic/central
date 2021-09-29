@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2021-2021.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
 import axios, {AxiosInstance} from 'axios';
 import {ApiRequestConfig, ApiResponse} from "./type";
 
@@ -15,17 +22,13 @@ export class BaseAPI {
      */
     constructor(config: ApiRequestConfig) {
         this.api = axios.create(config);
-
-        this.api.interceptors.request.use((param: ApiRequestConfig) => ({
-            ...param
-        }));
-
-        this.api.interceptors.response.use((param: ApiResponse) => ({
-            ...param
-        }));
     }
 
     // ---------------------------------------------------------------------------------
+
+    get config() : ApiRequestConfig {
+        return this.api.defaults;
+    }
 
     public getUri(config?: ApiRequestConfig): string {
         return this.api.getUri(config);

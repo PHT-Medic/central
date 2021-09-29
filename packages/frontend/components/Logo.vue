@@ -1,3 +1,9 @@
+<!--
+  Copyright (c) 2021-2021.
+  Author Peter Placzek (tada5hi)
+  For the full copyright and license information,
+  view the LICENSE file that was distributed with this source code.
+  -->
 <template>
   <svg class="NuxtLogo" width="245" height="180" viewBox="0 0 452 342" xmlns="http://www.w3.org/2000/svg">
     <g fill="none" fill-rule="evenodd">

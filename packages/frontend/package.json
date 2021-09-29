@@ -7,7 +7,7 @@
     },
     "license": "MIT",
     "version": "1.0.0",
-    "description": "This package contains the Central UI frontend application of PHT. It was initially developed as part of my Bachelor Thesis.",
+    "description": "This package contains the Central UI frontend application of the PHT. It was initially developed as part of my Bachelor Thesis.",
     "scripts": {
         "dev": "nuxt",
         "build": "nuxt build",

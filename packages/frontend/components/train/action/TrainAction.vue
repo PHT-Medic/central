@@ -1,3 +1,9 @@
+<!--
+  Copyright (c) 2021-2021.
+  Author Peter Placzek (tada5hi)
+  For the full copyright and license information,
+  view the LICENSE file that was distributed with this source code.
+  -->
 <template>
     <slot name="body" v-bind:classSuffix="classSuffix" v-bind:iconClass="iconClass">
         <button class="btn btn-xs" :class="'btn-'+classSuffix" @click.prevent="doAction" :disabled="!isValidStatus || !isPermitted">
