@@ -2,10 +2,8 @@ import {AbilityManager, AuthorizationHeaderValue} from "@typescript-auth/core";
 import {verifyToken} from "@typescript-auth/server";
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../domains/auth/user/repository";
-import {Client} from "../../../domains/auth/client";
 import {getWritableDirPath} from "../../paths";
-import {useLogger} from "../../../modules/log";
-import {TokenPayload} from "../../../domains/auth/token/type";
+import {Client, TokenPayload} from "@personalhealthtrain/ui-common";
 import {UnauthorizedError} from "../error/unauthorized";
 
 const ip4ToInt = (ip: string) =>

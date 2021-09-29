@@ -1,8 +1,7 @@
+import {Train} from "@personalhealthtrain/ui-common";
 import {publishMessage} from "amqp-extension";
 import {getRepository} from "typeorm";
-import {buildResultServiceQueueMessage, ResultServiceCommand} from "../../../service/result-service/queue";
-import {HarborRepository} from "../../../service/harbor/project/repository/api";
-import {Train} from "../index";
+import {buildResultServiceQueueMessage, ResultServiceCommand} from "../../../service/result-service";
 import {findTrain} from "./utils";
 
 export async function triggerTrainResultStatus(

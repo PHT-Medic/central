@@ -1,11 +1,11 @@
 import {Message, publishMessage} from "amqp-extension";
 
-import {HARBOR_OUTGOING_PROJECT_NAME,} from "../../../config/services/harbor";
+import {HARBOR_OUTGOING_PROJECT_NAME,} from "@personalhealthtrain/ui-common";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {
     buildResultServiceQueueMessage,
     ResultServiceCommand
-} from "../../../domains/service/result-service/queue";
+} from "../../../domains/service/result-service";
 import {useLogger} from "../../../modules/log";
 
 export async function dispatchHarborEventToResultService(

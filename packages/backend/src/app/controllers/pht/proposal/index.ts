@@ -1,16 +1,17 @@
 import {getRepository, In} from "typeorm";
 import {applyFilters, applyIncludes, applyPagination} from "typeorm-extension";
 import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
-import {Station} from "../../../../domains/pht/station";
-import {isPermittedForResourceRealm, onlyRealmPermittedQueryResources} from "../../../../domains/auth/realm/db/utils";
+import {
+    isPermittedForResourceRealm,
+    onlyRealmPermittedQueryResources,
+    Proposal, ProposalStation, Station
+} from "@personalhealthtrain/ui-common";
 import {check, matchedData, validationResult} from "express-validator";
-import {Proposal} from "../../../../domains/pht/proposal";
-import {MasterImage} from "../../../../domains/pht/master-image";
-import {ProposalStation} from "../../../../domains/pht/proposal/station";
+import {MasterImage} from "@personalhealthtrain/ui-common";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {ProposalStationStateApproved, ProposalStationStateOpen} from "../../../../domains/pht/proposal/station/states";
+import {ProposalStationStateApproved, ProposalStationStateOpen} from "@personalhealthtrain/ui-common";
 import env from "../../../../env";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 

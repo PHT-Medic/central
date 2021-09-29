@@ -1,28 +1,24 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
-import {Station} from "../../../../../domains/pht/station";
+
 import {
-    deleteStationHarborProject,
-    ensureStationHarborProject,
-    findStationHarborProject
-} from "../../../../../domains/pht/station/harbor/api";
-import {
-    dropStationHarborProjectRobotAccount,
-    ensureStationHarborProjectRobotAccount,
-    findStationHarborProjectRobotAccount
-} from "../../../../../domains/pht/station/harbor/robot-account/api";
+    BaseService, deleteStationHarborProject,
+    dropStationHarborProjectRobotAccount, ensureStationHarborProject,
+    ensureStationHarborProjectRobotAccount, findStationHarborProject,
+    findStationHarborProjectRobotAccount, Service, Station
+} from "@personalhealthtrain/ui-common";
 import {
     findStationVaultPublicKey,
     deleteStationVaultPublicKey,
     saveStationVaultPublicKey
-} from "../../../../../domains/pht/station/vault/api";
+} from "@personalhealthtrain/ui-common";
 import {
     dropHarborProjectWebHook,
     ensureHarborProjectWebHook,
     findHarborProjectWebHook
-} from "../../../../../domains/service/harbor/project/web-hook/api";
-import {BaseService, Service} from "../../../../../domains/service";
-import {isPermittedForResourceRealm} from "../../../../../domains/auth/realm/db/utils";
+} from "@personalhealthtrain/ui-common";
+import {isPermittedForResourceRealm} from "@personalhealthtrain/ui-common";
+import env from "../../../../../env";
 
 export enum StationTask {
     CHECK_HARBOR = 'checkHarbor',
@@ -109,7 +105,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
                 entity.harbor_project_id = project.id;
 
                 const webhook = await findHarborProjectWebHook(entity.harbor_project_id);
-                entity.harbor_project_webhook_exists = webhook ? true : false;
+                entity.harbor_project_webhook_exists = !!webhook;
 
                 if(!entity.harbor_project_account_token) {
                     const robotAccount = await findStationHarborProjectRobotAccount(entity.secure_id, true);
@@ -161,7 +157,7 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
                     });
                 }
 
-                await ensureHarborProjectWebHook(entity.harbor_project_id, serviceEntity.client);
+                await ensureHarborProjectWebHook(entity.harbor_project_id, serviceEntity.client, {internalAPIUrl: env.internalApiUrl});
 
                 entity.harbor_project_webhook_exists = true;
 

@@ -1,7 +1,7 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
-import {isPermittedForResourceRealm} from "../../../../../domains/auth/realm/db/utils";
-import {Train, TrainCommand} from "../../../../../domains/pht/train";
+import {isPermittedForResourceRealm, Train} from "@personalhealthtrain/ui-common";
+import {TrainCommand} from "@personalhealthtrain/ui-common";
 import {
     detectTrainBuildStatus,
     detectTrainRunStatus,

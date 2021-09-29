@@ -1,6 +1,6 @@
+import {UserRole} from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
 import {applyFilters, applyPagination} from "typeorm-extension";
-import {UserRole} from "../../../../domains/auth/user/role";
 import {check, matchedData, validationResult} from "express-validator";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";

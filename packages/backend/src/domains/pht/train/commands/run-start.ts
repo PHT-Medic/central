@@ -1,12 +1,8 @@
 import {publishMessage} from "amqp-extension";
-import {Train} from "../index";
 import {getRepository} from "typeorm";
+import {buildTrainRouterQueueMessage, TrainRouterCommand} from "../../../service/train-router";
 import {findTrain} from "./utils";
-import {
-    buildTrainRouterQueueMessage,
-    TrainRouterCommand
-} from "../../../service/train-router/queue";
-import {TrainRunStatus} from "../status";
+import {Train, TrainRunStatus} from "@personalhealthtrain/ui-common";
 
 export async function startTrain(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);

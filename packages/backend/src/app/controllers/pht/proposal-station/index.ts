@@ -2,13 +2,16 @@ import {getRepository} from "typeorm";
 import {applyFilters, applyPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
-import {ProposalStation} from "../../../../domains/pht/proposal/station";
-import {isPermittedForResourceRealm, onlyRealmPermittedQueryResources} from "../../../../domains/auth/realm/db/utils";
+import {
+    isPermittedForResourceRealm,
+    onlyRealmPermittedQueryResources,
+    ProposalStation
+} from "@personalhealthtrain/ui-common";
 import {
     isProposalStationState,
     ProposalStationState,
     ProposalStationStateApproved
-} from "../../../../domains/pht/proposal/station/states";
+} from "@personalhealthtrain/ui-common";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";

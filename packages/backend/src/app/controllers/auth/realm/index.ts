@@ -4,9 +4,8 @@ import {check, matchedData, validationResult} from "express-validator";
 import {SwaggerTags} from "typescript-swagger";
 import {Controller, Get, Post, Delete, Request, Response, Params, Body} from "@decorators/express";
 
-import {Realm} from "../../../../domains/auth/realm";
-import {OAuth2Provider} from "../../../../domains/auth/oauth2-provider";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {OAuth2Provider, Realm} from "@personalhealthtrain/ui-common";
 
 @SwaggerTags('auth')
 @Controller("/realms")

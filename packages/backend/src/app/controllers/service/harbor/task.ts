@@ -1,12 +1,11 @@
 import {check, matchedData, validationResult} from 'express-validator';
 import {getRepository, In} from 'typeorm';
-import {HARBOR_MASTER_IMAGE_PROJECT_NAME} from "../../../../config/services/harbor";
-import {Client} from "../../../../domains/auth/client";
-import {BaseService} from "../../../../domains/service";
+import {BaseService, HARBOR_MASTER_IMAGE_PROJECT_NAME} from "@personalhealthtrain/ui-common";
 
-import {getHarborProjectRepositories} from "../../../../domains/service/harbor/project/repository/api";
-import {MasterImage} from "../../../../domains/pht/master-image";
-import {ensureHarborProjectWebHook} from "../../../../domains/service/harbor/project/web-hook/api";
+import {getHarborProjectRepositories} from "@personalhealthtrain/ui-common";
+import {Client, MasterImage} from "@personalhealthtrain/ui-common";
+import {ensureHarborProjectWebHook} from "@personalhealthtrain/ui-common";
+import env from "../../../../env";
 
 enum HarborTask {
     REGISTER_WEBHOOK_FOR_MASTER_IMAGES = 'registerWebhookForMasterImages',
@@ -40,7 +39,7 @@ export async function doHarborTask(req: any, res: any) {
                 }
             });
 
-            await ensureHarborProjectWebHook(HARBOR_MASTER_IMAGE_PROJECT_NAME, client, true);
+            await ensureHarborProjectWebHook(HARBOR_MASTER_IMAGE_PROJECT_NAME, client, {internalAPIUrl: env.internalApiUrl}, true);
 
             return res._respondAccepted();
         case HarborTask.SYNC_MASTER_IMAGES:

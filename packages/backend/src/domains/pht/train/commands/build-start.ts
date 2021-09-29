@@ -1,15 +1,15 @@
 import {publishMessage} from "amqp-extension";
 import {getRepository, Not} from "typeorm";
-import env from "../../../../env";
-import {buildTrainBuilderQueueMessage, TrainBuilderCommand} from "../../../service/train-builder/queue";
-import {TrainResultStatus} from "../../train-result/status";
-import {TrainStation} from "../../train-station";
-import {TrainStationApprovalStatus} from "../../train-station/status";
-import {Train} from "../index";
-import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "../status";
+import {TrainResultStatus} from "@personalhealthtrain/ui-common";
+import {TrainStation} from "@personalhealthtrain/ui-common";
+import {TrainStationApprovalStatus} from "@personalhealthtrain/ui-common";
+import {Train} from "@personalhealthtrain/ui-common";
+import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "@personalhealthtrain/ui-common";
+import {buildTrainBuilderQueueMessage} from "../../../service/train-builder/queue";
+import {TrainBuilderCommand} from "../../../service/train-builder/type";
 import {findTrain} from "./utils";
 
-export async function startBuildTrain(train: Train | number | string) : Promise<Train> {
+export async function startBuildTrain(train: Train | number | string, demo: boolean = false) : Promise<Train> {
     const repository = getRepository(Train);
 
     train = await findTrain(train, repository);
@@ -23,7 +23,7 @@ export async function startBuildTrain(train: Train | number | string) : Promise<
         // todo: make it a ClientError.BadRequest
         throw new Error('The train can not longer be build...');
     } else {
-        if(!env.demo) {
+        if(!demo) {
             const trainStationRepository = getRepository(TrainStation);
             const trainStations = await trainStationRepository.find({
                 train_id: train.id,
@@ -42,9 +42,9 @@ export async function startBuildTrain(train: Train | number | string) : Promise<
 
         train = repository.merge(train, {
             configuration_status: TrainConfigurationStatus.FINISHED,
-            run_status: env.demo ? TrainRunStatus.FINISHED : null,
-            build_status: env.demo ? null : TrainBuildStatus.STARTING,
-            result_status: env.demo ? TrainResultStatus.FINISHED : null
+            run_status: demo ? TrainRunStatus.FINISHED : null,
+            build_status: demo ? null : TrainBuildStatus.STARTING,
+            result_status: demo ? TrainResultStatus.FINISHED : null
         });
 
         await repository.save(train);

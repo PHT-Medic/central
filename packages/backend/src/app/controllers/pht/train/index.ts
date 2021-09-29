@@ -2,17 +2,15 @@ import {getRepository} from "typeorm";
 import {applyPagination, applyIncludes, applyFilters} from "typeorm-extension";
 import {
     isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources
-} from "../../../../domains/auth/realm/db/utils";
+    onlyRealmPermittedQueryResources, Proposal, Train, TrainFile
+} from "@personalhealthtrain/ui-common";
 import {check, matchedData, validationResult} from "express-validator";
-import {Train, TrainCommand} from "../../../../domains/pht/train";
-import {MasterImage} from "../../../../domains/pht/master-image";
-import {Proposal} from "../../../../domains/pht/proposal";
-import {isTrainType} from "../../../../domains/pht/train/types";
+import {TrainCommand} from "@personalhealthtrain/ui-common";
+import {MasterImage} from "@personalhealthtrain/ui-common";
+import {isTrainType} from "@personalhealthtrain/ui-common";
 import {
     TrainConfigurationStatus
-} from "../../../../domains/pht/train/status";
-import {TrainFile} from "../../../../domains/pht/train-file";
+} from "@personalhealthtrain/ui-common";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";

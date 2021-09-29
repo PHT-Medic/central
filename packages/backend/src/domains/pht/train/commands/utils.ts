@@ -1,4 +1,4 @@
-import {Train} from "../index";
+import {Train} from "@personalhealthtrain/ui-common";
 import {getRepository, Repository} from "typeorm";
 
 export async function findTrain(

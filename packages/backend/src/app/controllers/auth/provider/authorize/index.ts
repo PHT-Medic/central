@@ -1,13 +1,13 @@
+import {TokenPayload} from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
 import {Oauth2Client, Oauth2TokenResponse} from "@typescript-auth/core";
 import {createToken} from "@typescript-auth/server";
+import {OAuth2Provider} from "@personalhealthtrain/ui-common";
 
 import env from "../../../../../env";
 import {getWritableDirPath} from "../../../../../config/paths";
 
-import {OAuth2Provider} from "../../../../../domains/auth/oauth2-provider";
-import {createOauth2ProviderAccountWithToken} from "../../../../../domains/auth/oauth2-provider/account/utils";
-import {buildTokenPayload} from "../../../../../domains/auth/token";
+import {createOauth2ProviderAccountWithToken} from "../../../../../domains/auth/oauth2-provider-account/utils";
 
 export async function authorizeUrlRoute(req: any, res: any) {
     const {id} = req.params;
@@ -76,10 +76,11 @@ export async function authorizeCallbackRoute(req: any, res: any) {
         const account = await createOauth2ProviderAccountWithToken(provider, tokenResponse);
         const expiresIn = env.jwtMaxAge;
 
-        const tokenPayload = buildTokenPayload({
+        const tokenPayload : TokenPayload = {
+            iss: env.apiUrl,
             sub: account.user.id,
             remoteAddress: req.ip
-        }, expiresIn);
+        };
 
         const token = await createToken(tokenPayload, expiresIn,{directory: getWritableDirPath()});
 

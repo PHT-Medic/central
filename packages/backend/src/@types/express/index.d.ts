@@ -1,4 +1,4 @@
-import {User as DomainUser} from "../../domains/auth/user";
+
 import {Result} from "express-validator";
 import {AbilityManager, OwnedPermission} from "@typescript-auth/core";
 

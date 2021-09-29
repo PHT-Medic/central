@@ -1,11 +1,13 @@
+import {
+    MQ_UI_RS_EVENT_ROUTING_KEY,
+    Train,
+    TrainResult,
+    TrainResultStatus
+} from "@personalhealthtrain/ui-common";
 import {consumeQueue, Message} from "amqp-extension";
 import {getRepository} from "typeorm";
-import {MQ_UI_RS_EVENT_ROUTING_KEY} from "../config/services/rabbitmq";
-import {Train} from "../domains/pht/train";
-import {TrainResult} from "../domains/pht/train-result";
+import {ResultServiceDataPayload} from "../domains/service/result-service";
 
-import {TrainResultStatus} from "../domains/pht/train-result/status";
-import {ResultServiceDataPayload} from "../domains/service/result-service/queue";
 
 export enum TrainResultEvent {
     STARTING = 'starting', // ui trigger

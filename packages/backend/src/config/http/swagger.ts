@@ -3,16 +3,14 @@ import {getRootDirPath, getWritableDirPath} from "../paths";
 import path from "path";
 import env from "../../env";
 
+// tslint:disable-next-line:no-var-requires
 const packageJson = require('../../../package.json');
+// tslint:disable-next-line:no-var-requires
 const tsConfig = require('../../../tsconfig.json');
-
-const url = new URL(env.apiUrl);
-let host : string = (url.host + url.pathname).replace(/([^:]\/)\/+/g, "$1");
-host = host.substr(-1, 1) === '/' ? host.substr(0, host.length -1) : host;
 
 export const swaggerConfig : SwaggerConfig = {
     yaml: true,
-    host,
+    host: env.apiUrl,
     name: 'Central UI - API Documentation',
     description: packageJson.description,
     basePath: '/',

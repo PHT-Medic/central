@@ -1,7 +1,7 @@
+import {RolePermission} from "@personalhealthtrain/ui-common";
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 import {applyFilters, applyPagination} from "typeorm-extension";
-import {RolePermission} from "../../../../domains/auth/role/permission";
 
 // ---------------------------------------------------------------------------------
 

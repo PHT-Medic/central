@@ -1,10 +1,6 @@
+import {MQ_UI_TR_EVENT_ROUTING_KEY, Train, TrainRunStatus} from "@personalhealthtrain/ui-common";
 import {consumeQueue, Message} from "amqp-extension";
 import {getRepository} from "typeorm";
-import {Train} from "../domains/pht/train";
-import {TrainRunStatus} from "../domains/pht/train/status";
-import {
-    MQ_UI_TR_EVENT_ROUTING_KEY
-} from "../config/services/rabbitmq";
 
 export enum TrainRouterEvent {
     STOPPED = 'trainStopped',

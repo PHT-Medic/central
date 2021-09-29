@@ -1,20 +1,20 @@
-import {Train} from "../index";
 import {
     findHarborProjectRepository,
-    HarborRepository
-} from "../../../service/harbor/project/repository/api";
+    HarborRepository,
+    Train,
+    TrainStation
+} from "@personalhealthtrain/ui-common";
 import {
     buildStationHarborProjectName,
     HARBOR_INCOMING_PROJECT_NAME,
     HARBOR_OUTGOING_PROJECT_NAME
-} from "../../../../config/services/harbor";
+} from "@personalhealthtrain/ui-common";
 import {
     TrainBuildStatus,
     TrainConfigurationStatus,
     TrainRunStatus,
-} from "../status";
+} from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
-import {TrainStation} from "../../train-station";
 import {findTrain} from "./utils";
 import {triggerTrainResultStart} from "./result-start";
 

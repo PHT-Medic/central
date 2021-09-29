@@ -4,10 +4,7 @@ import {Seeder, Factory} from 'typeorm-seeding';
 import {getPermissions} from "../../config/permissions";
 
 import {UserRepository} from "../../domains/auth/user/repository";
-import {Permission} from "../../domains/auth/permission";
-import {RolePermission} from "../../domains/auth/role/permission";
-import {MASTER_REALM_ID, Realm} from "../../domains/auth/realm";
-import {UserRole} from "../../domains/auth/user/role";
+import {MASTER_REALM_ID, Permission, Realm, RolePermission, UserRole} from "@personalhealthtrain/ui-common";
 import {RoleRepository} from "../../domains/auth/role/repository";
 
 export default class CreateCore implements Seeder {

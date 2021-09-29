@@ -1,11 +1,14 @@
+import {
+    setAPIConfig
+} from "@personalhealthtrain/ui-common";
 import {setConfig} from "amqp-extension";
 import {buildDispatcherComponent} from "./components/event-dispatcher";
 import {Environment} from "./env";
 import {buildTrainBuilderAggregator} from "./aggregators/train-builder";
 import {buildTrainResultAggregator} from "./aggregators/train-result";
 import {buildDispatcherAggregator} from "./aggregators/dispatcher";
-import {useVaultApi} from "./modules/api/service/vault";
-import {useHarborApi} from "./modules/api/service/harbor";
+import {useVaultApi} from "@personalhealthtrain/ui-common";
+import {useHarborApi} from "@personalhealthtrain/ui-common";
 import {buildCommandRouterComponent} from "./components/command-router";
 import {buildTrainRouterAggregator} from "./aggregators/train-router";
 
@@ -19,6 +22,9 @@ export type Config = {
 }
 
 function createConfig({env} : ConfigContext) : Config {
+    setAPIConfig('harbor', {connectionString: env.harborConnectionString});
+    setAPIConfig('vault', {connectionString: env.vaultConnectionString});
+
     useVaultApi(env.vaultConnectionString);
     useHarborApi(env.harborConnectionString);
 

@@ -1,5 +1,5 @@
+import {MQ_DISPATCHER_ROUTING_KEY} from "@personalhealthtrain/ui-common";
 import {buildMessage, publishMessage} from "amqp-extension";
-import {MQ_DISPATCHER_ROUTING_KEY} from "../../../../config/services/rabbitmq";
 import {DispatcherEvent} from "../../../../components/event-dispatcher";
 
 export enum DispatcherProposalEvent {

@@ -1,8 +1,8 @@
 import {publishMessage} from "amqp-extension";
 import {EntitySubscriberInterface, InsertEvent, UpdateEvent} from "typeorm";
-import {buildServiceSecurityQueueMessage} from "../../service/queue";
-import {Client} from "./index";
+import {Client} from "@personalhealthtrain/ui-common";
 import {ServiceSecurityComponent} from "../../../components/service-security";
+import {buildServiceSecurityQueueMessage} from "../../service/queue";
 
 export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
     listenTo(): Function | string {

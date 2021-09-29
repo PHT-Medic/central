@@ -1,17 +1,20 @@
 import {buildMessage, Message, publishMessage} from "amqp-extension";
 import {AggregatorMasterImagePushedEvent} from "../../../aggregators/dispatcher/handlers/master-image";
 import {AggregatorTrainEvent} from "../../../aggregators/dispatcher/handlers/train";
+
 import {
     HARBOR_INCOMING_PROJECT_NAME,
     HARBOR_MASTER_IMAGE_PROJECT_NAME,
     HARBOR_OUTGOING_PROJECT_NAME,
     HARBOR_SYSTEM_USER_NAME,
-    isHarborStationProjectName
-} from "../../../config/services/harbor";
-import {MQ_UI_D_EVENT_ROUTING_KEY} from "../../../config/services/rabbitmq";
+    MQ_UI_D_EVENT_ROUTING_KEY,
+    isHarborStationProjectName,
+    TrainStationRunStatus
+} from "@personalhealthtrain/ui-common";
+
+import {} from "@personalhealthtrain/ui-common";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {DispatcherHarborEventWithAdditionalData} from "../data/harbor";
-import {TrainStationRunStatus} from "../../../domains/pht/train-station/status";
 
 export async function dispatchHarborEventToSelf(
     message: Message

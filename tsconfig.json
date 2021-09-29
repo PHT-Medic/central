@@ -1,8 +1,7 @@
 {
+    "extends": "./tsconfig.build.json",
     "compilerOptions": {
         "baseUrl": ".",
-        "composite": true,
-        "declaration": true,
-        "declarationMap": true
+        "noEmit": true
     }
 }

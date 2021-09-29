@@ -1,10 +1,6 @@
-import {Train} from "../../../pht/train";
 import {getRepository} from "typeorm";
-import {UserKeyRing} from "../../../auth/user/key-ring";
-import {TrainFile} from "../../../pht/train-file";
-import {TrainStation} from "../../../pht/train-station";
-import {TrainStationApprovalStatus} from "../../../pht/train-station/status";
-import {MasterImage} from "../../../pht/master-image";
+import {UserKeyRing} from "@personalhealthtrain/ui-common";
+import {MasterImage, Train, TrainFile, TrainStation, TrainStationApprovalStatus} from "@personalhealthtrain/ui-common";
 
 export async function buildTrainBuilderStartCommandPayload(train: Train) {
     const masterImageRepository = getRepository(MasterImage);

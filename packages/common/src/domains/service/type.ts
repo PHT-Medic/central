@@ -1,0 +1,6 @@
+export enum BaseService {
+    HARBOR = 'HARBOR',
+    TRAIN_BUILDER = 'TRAIN_BUILDER',
+    TRAIN_ROUTER = 'TRAIN_ROUTER',
+    RESULT_SERVICE = 'RESULT_SERVICE'
+}

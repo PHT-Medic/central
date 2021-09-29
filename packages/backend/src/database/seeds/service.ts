@@ -1,7 +1,6 @@
+import {BaseService, Client, Service} from "@personalhealthtrain/ui-common";
 import {Connection, getRepository} from "typeorm";
 import {Factory, Seeder} from "typeorm-seeding";
-import {BaseService, Service} from "../../domains/service";
-import {Client} from "../../domains/auth/client";
 
 export default class ServiceSeeder implements Seeder {
     public async run(factory: Factory, connection: Connection): Promise<any> {

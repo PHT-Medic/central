@@ -7,11 +7,8 @@ import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {UserRepository} from "../../../../domains/auth/user/repository";
 import {
     isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources
-} from "../../../../domains/auth/realm/db/utils";
-import {Realm} from "../../../../domains/auth/realm";
-import {User} from "../../../../domains/auth/user";
-import {Station} from "../../../../domains/pht/station";
+    onlyRealmPermittedQueryResources, Realm, Station, User
+} from "@personalhealthtrain/ui-common";
 import {getUserStationRouteHandler} from "./station";
 import {useLogger} from "../../../../modules/log";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";

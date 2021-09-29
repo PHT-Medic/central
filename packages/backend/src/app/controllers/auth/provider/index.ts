@@ -1,11 +1,10 @@
-import {OAuth2Provider} from "../../../../domains/auth/oauth2-provider";
 import {getRepository} from "typeorm";
 import {applyFields, applyFilters, applyPagination} from "typeorm-extension";
-import {Realm} from "../../../../domains/auth/realm";
 import {check, matchedData, validationResult} from "express-validator";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {SwaggerHidden, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {OAuth2Provider, Realm} from "@personalhealthtrain/ui-common";
 import {authorizeCallbackRoute, authorizeUrlRoute} from "./authorize";
 
 @SwaggerTags('auth')

@@ -2,10 +2,10 @@ import {Repository, EntityRepository, In} from "typeorm";
 import {hashPassword, verifyPassword} from "@typescript-auth/server";
 import {OwnedPermission} from "@typescript-auth/core";
 
-import {User} from "./index";
+import {Role} from "@personalhealthtrain/ui-common";
+import {UserRole} from "@personalhealthtrain/ui-common";
+import {User} from "@personalhealthtrain/ui-common";
 import {RoleRepository} from "../role/repository";
-import {Role} from "../role";
-import {UserRole} from "./role";
 
 
 type PermissionOptions = {

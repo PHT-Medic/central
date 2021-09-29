@@ -2,12 +2,10 @@ import {getRepository} from "typeorm";
 import {applyFilters} from "typeorm-extension";
 import {
     isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources
-} from "../../../../domains/auth/realm/db/utils";
-import {TrainFile} from "../../../../domains/pht/train-file";
+    onlyRealmPermittedQueryResources, Train, TrainFile
+} from "@personalhealthtrain/ui-common";
 import fs from "fs";
-import {getTrainFileFilePath} from "../../../../domains/pht/train-file/path";
-import {Train} from "../../../../domains/pht/train";
+import {getTrainFileFilePath} from "../../../../config/pht/train-file/path";
 
 import {Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from 'typescript-swagger';

@@ -1,9 +1,8 @@
 import {Message} from "amqp-extension";
-import {BaseService} from "../../domains/service";
-import {saveServiceSecretToVault} from "../../domains/service/vault/service/api";
+import {BaseService, saveServiceSecretToVault, Station} from "@personalhealthtrain/ui-common";
 import {getRepository, IsNull, Not} from "typeorm";
-import {Station} from "../../domains/pht/station";
-import {ensureHarborProjectWebHook} from "../../domains/service/harbor/project/web-hook/api";
+import {ensureHarborProjectWebHook} from "@personalhealthtrain/ui-common";
+import env from "../../env";
 
 export async function syncServiceSecurity(message: Message) {
     const serviceId : number | string = message.data.id;
@@ -23,7 +22,7 @@ export async function syncServiceSecurity(message: Message) {
             });
 
             await Promise.all(stations.map((station: Station) => {
-                return ensureHarborProjectWebHook(station.harbor_project_id, {id: clientId, secret: clientSecret});
+                return ensureHarborProjectWebHook(station.harbor_project_id, {id: clientId, secret: clientSecret}, {internalAPIUrl: env.internalApiUrl});
             }));
             break;
     }

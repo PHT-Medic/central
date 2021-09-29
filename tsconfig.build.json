@@ -1,10 +1,26 @@
 {
-    "references": [
-        {
-            "path": "packages/backend/tsconfig.ref.json"
-        }
-    ],
     "compilerOptions": {
-        "rootDir": "."
-    }
+        "sourceMap": true,
+
+        "declaration": true,
+        "declarationMap": true,
+
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+
+        "noEmitOnError": true,
+
+        "skipLibCheck": true,
+
+        "esModuleInterop": true,
+        "lib": ["ES6"],
+        "target": "ESNext",
+
+        "moduleResolution": "Node",
+        "module": "CommonJS"
+    },
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
 }

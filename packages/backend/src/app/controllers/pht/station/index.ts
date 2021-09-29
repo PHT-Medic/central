@@ -1,13 +1,12 @@
 import {getRepository} from "typeorm";
 import {applyFields, applyFilters, applyIncludes, applyPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
-import {MASTER_REALM_ID} from "../../../../domains/auth/realm";
-import {Station} from "../../../../domains/pht/station";
-import {deleteStationHarborProject} from "../../../../domains/pht/station/harbor/api";
 import {
+    MASTER_REALM_ID,
+    deleteStationHarborProject,
     deleteStationVaultPublicKey,
-    saveStationVaultPublicKey
-} from "../../../../domains/pht/station/vault/api";
+    saveStationVaultPublicKey, Station
+} from "@personalhealthtrain/ui-common";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";

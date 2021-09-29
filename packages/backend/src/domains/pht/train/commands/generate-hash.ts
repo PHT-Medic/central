@@ -1,11 +1,9 @@
-import {Train} from "../index";
+import {Train, TrainConfigurationStatus, TrainFile} from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
+import {getTrainFileFilePath} from "../../../../config/pht/train-file/path";
 import {findTrain} from "./utils";
 import crypto from "crypto";
-import {getTrainFileFilePath} from "../../train-file/path";
 import fs from "fs";
-import {TrainConfigurationStatus} from "../status";
-import {TrainFile} from "../../train-file";
 
 export async function generateTrainHash(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);

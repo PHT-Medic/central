@@ -1,20 +1,22 @@
-export {Client} from '../domains/auth/client';
-export {OAuth2Provider} from '../domains/auth/oauth2-provider';
-export {Permission} from '../domains/auth/permission';
-export {MasterImage} from '../domains/pht/master-image';
-export {Proposal} from '../domains/pht/proposal';
-export {ProposalStation} from '../domains/pht/proposal/station';
-export {Station} from '../domains/pht/station';
-export {Train} from '../domains/pht/train';
-export {TrainFile} from '../domains/pht/train-file';
-export {TrainModel} from '../domains/pht/train-model';
-export {TrainResult} from '../domains/pht/train-result';
-export {TrainStation} from '../domains/pht/train-station';
-export {Realm} from '../domains/auth/realm';
-export {Role} from '../domains/auth/role';
-export {RolePermission} from '../domains/auth/role/permission';
-export {Service} from '../domains/service';
-export {User} from '../domains/auth/user';
-export {Oauth2ProviderAccount} from '../domains/auth/oauth2-provider/account';
-export {UserRole} from '../domains/auth/user/role';
-export {UserKeyRing} from '../domains/auth/user/key-ring';
+export {
+    MasterImage,
+    Proposal,
+    ProposalStation,
+    Station,
+    Train,
+    TrainFile,
+    TrainModel,
+    TrainResult,
+    TrainStation,
+    Client,
+    OAuth2Provider,
+    Oauth2ProviderAccount,
+    Permission,
+    Realm,
+    Role,
+    RolePermission,
+    Service,
+    User,
+    UserKeyRing,
+    UserRole,
+} from '@personalhealthtrain/ui-common';

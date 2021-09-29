@@ -1,7 +1,7 @@
+import {Role} from "@personalhealthtrain/ui-common";
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 import {applyPagination, applyFilters} from "typeorm-extension";
-import {Role} from "../../../../domains/auth/role";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";

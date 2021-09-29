@@ -1,18 +1,16 @@
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../../domains/auth/user/repository";
-import {OAuth2Provider} from "../../../../domains/auth/oauth2-provider";
 
 import {Response, Request, Controller, Post, Body, Delete} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {OAuth2Provider, Oauth2ProviderAccount} from "@personalhealthtrain/ui-common";
 import env from "../../../../env";
 import {createToken} from "@typescript-auth/server";
 import {getWritableDirPath} from "../../../../config/paths";
-import {MASTER_REALM_ID} from "../../../../domains/auth/realm";
+import {MASTER_REALM_ID} from "@personalhealthtrain/ui-common";
 import {Oauth2Client} from "@typescript-auth/core";
-import {Oauth2ProviderAccount} from "../../../../domains/auth/oauth2-provider/account";
-import {createOauth2ProviderAccountWithToken} from "../../../../domains/auth/oauth2-provider/account/utils";
-import {TokenPayload} from "../../../../domains/auth/token/type";
-import {buildTokenPayload} from "../../../../domains/auth/token";
+import {createOauth2ProviderAccountWithToken} from "../../../../domains/auth/oauth2-provider-account/utils";
+import {TokenPayload} from "@personalhealthtrain/ui-common";
 
 
 type Token = {
@@ -96,10 +94,11 @@ async function grantToken(req: any, res: any) : Promise<any> {
 
         const expiresIn: number = env.jwtMaxAge;
 
-        const tokenPayload: TokenPayload = buildTokenPayload({
+        const tokenPayload: TokenPayload = {
+            iss: env.apiUrl,
             sub: userId,
             remoteAddress: req.ip
-        }, expiresIn);
+        };
 
         const token = await createToken(tokenPayload, expiresIn, {directory: getWritableDirPath()});
 

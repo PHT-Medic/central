@@ -1,7 +1,7 @@
 import {EntityRepository, In, Repository} from "typeorm";
-import {Role} from "./index";
-import {RolePermission} from "./permission";
 import {OwnedPermission} from "@typescript-auth/core";
+import {RolePermission} from "@personalhealthtrain/ui-common";
+import {Role} from "@personalhealthtrain/ui-common";
 
 @EntityRepository(Role)
 export class RoleRepository extends Repository<Role> {

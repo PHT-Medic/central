@@ -1,5 +1,5 @@
 import {consumeQueue, Message} from "amqp-extension";
-import {MQ_DISPATCHER_ROUTING_KEY} from "../../config/services/rabbitmq";
+import {MQ_DISPATCHER_ROUTING_KEY} from "@personalhealthtrain/ui-common";
 import {extendDispatcherHarborData} from "./data/harbor";
 import {
     dispatchHarborEventToEmailNotifier,

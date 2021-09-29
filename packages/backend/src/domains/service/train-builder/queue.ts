@@ -1,17 +1,7 @@
+import {MQ_TB_ROUTING_KEY, Train} from "@personalhealthtrain/ui-common";
 import {buildMessage, Message} from "amqp-extension";
-import {Train} from "../../pht/train";
-import {MQ_TB_ROUTING_KEY} from "../../../config/services/rabbitmq";
-import {
-    buildTrainBuilderStartCommandPayload,
-    buildTrainBuilderStatusCommandPayload,
-    buildTrainBuilderStopCommandPayload
-} from "./commands";
-
-export enum TrainBuilderCommand {
-    START = 'trainBuildStart',
-    STOP = 'trainBuildStop',
-    STATUS = 'trainBuildStatus'
-}
+import {buildTrainBuilderStartCommandPayload, buildTrainBuilderStatusCommandPayload, buildTrainBuilderStopCommandPayload} from "./commands";
+import {TrainBuilderCommand} from "./type";
 
 export async function buildTrainBuilderQueueMessage(
     type: TrainBuilderCommand,

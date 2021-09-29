@@ -1,6 +1,6 @@
 import {ConsumeHandlers, Message} from "amqp-extension";
 import {getRepository} from "typeorm";
-import {MasterImage} from "../../../domains/pht/master-image";
+import {MasterImage} from "@personalhealthtrain/ui-common";
 import {useLogger} from "../../../modules/log";
 
 export type AggregatorMasterImageEventType = 'masterImagePushed';

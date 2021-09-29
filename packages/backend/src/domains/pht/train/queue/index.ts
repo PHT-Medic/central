@@ -1,6 +1,6 @@
+import {MQ_DISPATCHER_ROUTING_KEY} from "@personalhealthtrain/ui-common";
 import {buildMessage, publishMessage} from "amqp-extension";
 import {DispatcherEvent} from "../../../../components/event-dispatcher";
-import {MQ_DISPATCHER_ROUTING_KEY} from "../../../../config/services/rabbitmq";
 
 export type DispatcherTrainEventType = 'approved' | 'assigned' | 'rejected';
 export type DispatcherTrainEventData = {

@@ -1,9 +1,6 @@
+import {Realm, Role, RolePermission, Station} from "@personalhealthtrain/ui-common";
 import {Connection} from "typeorm";
 import {RoleRepository} from "../../domains/auth/role/repository";
-import {Role} from "../../domains/auth/role";
-import {RolePermission} from "../../domains/auth/role/permission";
-import {Realm} from "../../domains/auth/realm";
-import {Station} from "../../domains/pht/station";
 import {Factory, Seeder} from "typeorm-seeding";
 import {getPHTStationRolePermissions, PHTStationRole} from "../../config/pht/permissions/station";
 

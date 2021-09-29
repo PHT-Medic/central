@@ -1,12 +1,12 @@
+import {
+    Train,
+    TrainBuildStatus,
+    TrainRunStatus,
+    TrainStation,
+    TrainStationRunStatus
+} from "@personalhealthtrain/ui-common";
 import {ConsumeHandlers, Message} from "amqp-extension";
 import {getRepository} from "typeorm";
-import {Train} from "../../../domains/pht/train";
-import {
-    TrainBuildStatus,
-    TrainRunStatus
-} from "../../../domains/pht/train/status";
-import {TrainStation} from "../../../domains/pht/train-station";
-import {TrainStationRunStatus} from "../../../domains/pht/train-station/status";
 
 export enum AggregatorTrainEvent {
     BUILD_FINISHED = 'trainBuilt',

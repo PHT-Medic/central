@@ -21,6 +21,7 @@
         "baseUrl": ".",
         "rootDir": ".",
         "paths": {
+            "@personalhealthtrain/ui-common": ["../common/src"],
             "@/*": [
                 "./*"
             ],
@@ -37,6 +38,10 @@
             "vue-router/types"
         ]
     },
-    "references": []
+    "references": [
+        {
+            "path": "../common"
+        }
+    ]
 }
 

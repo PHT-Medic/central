@@ -1,6 +1,5 @@
+import {Train, TrainFile} from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
-import {Train} from "../../../../domains/pht/train";
-import {TrainFile} from "../../../../domains/pht/train-file";
 import BusBoy from "busboy";
 import path from "path";
 import {getWritableDirPath} from "../../../../config/paths";

@@ -1,3 +1,4 @@
+import {BaseService, Service} from "@personalhealthtrain/ui-common";
 import {publishMessage} from "amqp-extension";
 import {SwaggerTags} from "typescript-swagger";
 import {getRepository} from "typeorm";
@@ -5,9 +6,8 @@ import {applyFilters, applyIncludes, applyPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {Body, Controller, Get, Params, Post, Request, Response} from "@decorators/express";
 
-import {BaseService, Service} from "../../../domains/service";
-import {buildServiceSecurityQueueMessage} from "../../../domains/service/queue";
 import {ForceLoggedInMiddleware} from "../../../config/http/middleware/auth";
+import {buildServiceSecurityQueueMessage} from "../../../domains/service/queue";
 
 import {HarborHook, postHarborHookRouteHandler} from "./harbor/hook";
 

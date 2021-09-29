@@ -1,8 +1,6 @@
+import {MQ_UI_TB_EVENT_ROUTING_KEY, Train, TrainBuildStatus} from "@personalhealthtrain/ui-common";
 import {consumeQueue, Message} from "amqp-extension";
 import {getRepository} from "typeorm";
-import {Train} from "../domains/pht/train";
-import {TrainBuildStatus} from "../domains/pht/train/status";
-import {MQ_UI_TB_EVENT_ROUTING_KEY} from "../config/services/rabbitmq";
 
 export enum TrainBuilderEvent {
     STARTED = 'trainBuildStarted',

@@ -1,6 +1,6 @@
 import {buildMessage, Message} from "amqp-extension";
-import {MQ_UI_SELF_COMMAND_ROUTING_KEY} from "../../config/services/rabbitmq";
-import {Client} from "../auth/client";
+import {Client} from "@personalhealthtrain/ui-common";
+import {MQ_UI_SELF_COMMAND_ROUTING_KEY} from "@personalhealthtrain/ui-common";
 import {ServiceSecurityComponent} from "../../components/service-security";
 
 export function buildServiceSecurityQueueMessage(

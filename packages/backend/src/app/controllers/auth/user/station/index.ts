@@ -1,7 +1,6 @@
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../../../domains/auth/user/repository";
-import {Station} from "../../../../../domains/pht/station";
-import {isPermittedForResourceRealm} from "../../../../../domains/auth/realm/db/utils";
+import {isPermittedForResourceRealm, Station} from "@personalhealthtrain/ui-common";
 
 export async function getUserStationRouteHandler(req: any, res: any) {
     const { id } = req.params;

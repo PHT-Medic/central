@@ -1,33 +1,8 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "skipLibCheck": true,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "module": "commonjs",
-        "esModuleInterop": true,
-        "target": "esnext",
-        "noImplicitAny": true,
-        "moduleResolution": "node",
-        "outDir": "./dist",
-        "rootDir": "./src",
-        "baseUrl": ".",
-        "typeRoots": [
-            "./src/@types",
-            "./node_modules/@types"
-        ],
         "paths": {
-            "@package/common": ["../common/src"],
-            "@package/common/*": ["../common/src/*"]
+            "@personalhealthtrain/ui-common": ["./packages/common/src"]
         }
-    },
-    "include": [
-        "./src/**/*"
-    ],
-    "compileOnSave": true,
-    "exclude": [
-        "node_modules/**/*",
-        "dist/**/*"
-    ],
-    "references": []
+    }
 }

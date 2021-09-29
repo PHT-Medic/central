@@ -1,11 +1,10 @@
 import {getRepository} from "typeorm";
-import {Train} from "../../../../domains/pht/train";
 import {DispatcherHarborEventType, emitDispatcherHarborEvent} from "../../../../domains/service/harbor/queue";
 import {array, BaseSchema, object, string} from "yup";
 
 import {
-    HARBOR_MASTER_IMAGE_PROJECT_NAME,
-} from "../../../../config/services/harbor";
+    HARBOR_MASTER_IMAGE_PROJECT_NAME, Train,
+} from "@personalhealthtrain/ui-common";
 import {useLogger} from "../../../../modules/log";
 
 let eventValidator : undefined | BaseSchema;

@@ -1,12 +1,11 @@
+import {Train, TrainBuildStatus} from "@personalhealthtrain/ui-common";
 import {publishMessage} from "amqp-extension";
-import {Train} from "../index";
 import {getRepository} from "typeorm";
+import {buildTrainBuilderQueueMessage} from "../../../service/train-builder/queue";
+import {TrainBuilderCommand} from "../../../service/train-builder/type";
 import {findTrain} from "./utils";
-import env from "../../../../env";
-import {buildTrainBuilderQueueMessage, TrainBuilderCommand} from "../../../service/train-builder/queue";
-import {TrainBuildStatus} from "../status";
 
-export async function stopBuildTrain(train: Train | number | string) : Promise<Train> {
+export async function stopBuildTrain(train: Train | number | string, demo: boolean = false) : Promise<Train> {
     const repository = getRepository(Train);
 
     train = await findTrain(train, repository);
@@ -22,7 +21,7 @@ export async function stopBuildTrain(train: Train | number | string) : Promise<T
     } else {
         // if we already send a stop event, we dont send it again... :)
         if(train.build_status !== TrainBuildStatus.STOPPING) {
-            if (!env.demo) {
+            if (!demo) {
                 const queueMessage = await buildTrainBuilderQueueMessage(TrainBuilderCommand.STOP, train);
 
                 await publishMessage(queueMessage);

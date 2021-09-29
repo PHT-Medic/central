@@ -1,6 +1,6 @@
 import {getRepository} from "typeorm";
 import {applyFilters, applyPagination} from "typeorm-extension";
-import {MasterImage} from "../../../../domains/pht/master-image";
+import {MasterImage} from "@personalhealthtrain/ui-common";
 
 import {Controller, Delete, Get, Params, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";

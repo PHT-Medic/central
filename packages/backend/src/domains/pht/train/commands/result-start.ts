@@ -1,11 +1,11 @@
 import {publishMessage} from "amqp-extension";
 import {getRepository} from "typeorm";
-import {buildResultServiceQueueMessage, ResultServiceCommand} from "../../../service/result-service/queue";
-import {findHarborProjectRepository, HarborRepository} from "../../../service/harbor/project/repository/api";
-import {HARBOR_OUTGOING_PROJECT_NAME} from "../../../../config/services/harbor";
-import {TrainResultStatus} from "../../train-result/status";
-import {Train} from "../index";
-import {TrainRunStatus} from "../status";
+import {findHarborProjectRepository, HarborRepository} from "@personalhealthtrain/ui-common";
+import {HARBOR_OUTGOING_PROJECT_NAME} from "@personalhealthtrain/ui-common";
+import {TrainResultStatus} from "@personalhealthtrain/ui-common";
+import {Train} from "@personalhealthtrain/ui-common";
+import {TrainRunStatus} from "@personalhealthtrain/ui-common";
+import {buildResultServiceQueueMessage, ResultServiceCommand} from "../../../service/result-service";
 import {findTrain} from "./utils";
 
 export async function triggerTrainResultStart(

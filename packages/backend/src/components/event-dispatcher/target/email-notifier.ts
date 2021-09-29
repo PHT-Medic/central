@@ -2,9 +2,9 @@ import {buildMessage, Message, publishMessage} from "amqp-extension";
 import {
     HARBOR_INCOMING_PROJECT_NAME,
     HARBOR_OUTGOING_PROJECT_NAME, isHarborStationProjectName
-} from "../../../config/services/harbor";
+} from "@personalhealthtrain/ui-common";
 
-import {MQ_EN_EVENT_ROUTING_KEY} from "../../../config/services/rabbitmq";
+import {MQ_EN_EVENT_ROUTING_KEY} from "@personalhealthtrain/ui-common";
 import {
     DispatcherProposalEvent,
     DispatcherProposalEventData

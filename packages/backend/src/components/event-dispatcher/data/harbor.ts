@@ -1,8 +1,11 @@
 import {Message} from "amqp-extension";
 import {getRepository} from "typeorm";
-import {buildStationHarborProjectName, isHarborStationProjectName} from "../../../config/services/harbor";
-import {Station} from "../../../domains/pht/station";
-import {TrainStation} from "../../../domains/pht/train-station";
+import {
+    buildStationHarborProjectName,
+    isHarborStationProjectName,
+    Station
+} from "@personalhealthtrain/ui-common";
+import {TrainStation} from "@personalhealthtrain/ui-common";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 
 
