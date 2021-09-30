@@ -14,7 +14,7 @@
     </slot>
 </template>
 <script>
-import {runTrainCommand} from "@/domains/train/api";
+import {runAPITrainCommand} from "@personalhealthtrain/ui-common/src";
 
 export default {
     props: {
@@ -34,7 +34,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runTrainCommand(this.train.id, this.task);
+                const train = await runAPITrainCommand(this.train.id, this.task);
                 this.$emit('done', train);
             } catch (e) {
                 this.$emit('failed', e);

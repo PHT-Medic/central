@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {LayoutNavigationAdminId} from "@/config/layout";
-    import {dropUser, getUsers} from "@/domains/user/api.ts";
-    import UserList from "@/components/user/UserList";
+    import {dropAPIUser} from "@personalhealthtrain/ui-common/src";
+    import {LayoutNavigationAdminId} from "../../../config/layout";
+    import UserList from "../../../components/user/UserList";
 
     export default {
         components: {UserList},
@@ -49,7 +49,7 @@
 
                     if(proceed) {
                         try {
-                            await dropUser(user.id);
+                            await dropAPIUser(user.id);
                             this.$refs['userList'].dropArrayItem(user);
                         } catch (e) {
 

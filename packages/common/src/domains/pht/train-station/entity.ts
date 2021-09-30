@@ -16,7 +16,7 @@ import {
 } from "typeorm";
 import {Station} from "../station";
 import {Train} from "../train";
-import {TrainStationApprovalStatus, TrainStationRunStatus} from "./status";
+import {TrainStationApprovalStatus, TrainStationRunStatus} from "./type";
 
 @Entity({name: 'train_stations'})
 export class TrainStation {

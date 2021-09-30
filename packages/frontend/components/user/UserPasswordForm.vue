@@ -5,15 +5,16 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {User} from "@personalhealthtrain/ui-common";
+import {editAPIUser} from "@personalhealthtrain/ui-common/src";
 import {maxLength, minLength, required, sameAs} from "vuelidate/lib/validators";
-import {editUser} from "@/domains/user/api.ts";
-import AlertMessage from "@/components/alert/AlertMessage";
+import AlertMessage from "../../components/alert/AlertMessage";
 
 export default {
     components: {AlertMessage},
     props: {
         userProperty: {
-            type: Object,
+            type: User,
             default: undefined
         }
     },
@@ -21,7 +22,7 @@ export default {
         return {
             form: {
                 password: '',
-                passwordRepeat: '',
+                password_repeat: '',
                 passwordShow: false,
 
                 message: null,
@@ -37,7 +38,7 @@ export default {
                 minLength: minLength(5),
                 maxLength: maxLength(100)
             },
-            passwordRepeat: {
+            password_repeat: {
                 required,
                 minLength: minLength(5),
                 maxLength: maxLength(100),
@@ -54,14 +55,14 @@ export default {
             this.form.busy = true;
 
             try {
-                const user = await editUser(this.userProperty.id, {
+                const user = await editAPIUser(this.userProperty.id, {
                     password: this.form.password,
-                    passwordRepeat: this.form.passwordRepeat
+                    password_repeat: this.form.password_repeat
                 });
 
                 this.form.message = {
                     isError: false,
-                    data: 'Das Passwort wurde erfolgreich aktualisiert.'
+                    data: 'The password was successfully updated.'
                 }
 
                 this.$emit('updated', user);
@@ -96,20 +97,20 @@ export default {
             </div>
         </div>
 
-        <div class="form-group" :class="{ 'form-group-error': $v.form.passwordRepeat.$error }">
+        <div class="form-group" :class="{ 'form-group-error': $v.form.password_repeat.$error }">
             <label>Passwort wiederholen</label>
-            <input v-model="$v.form.passwordRepeat.$model" :type="form.passwordShow ? 'text' : 'password'" name="name" class="form-control" placeholder="Passwort wiederholen...">
+            <input v-model="$v.form.password_repeat.$model" :type="form.passwordShow ? 'text' : 'password'" name="name" class="form-control" placeholder="Passwort wiederholen...">
 
-            <div v-if="!$v.form.passwordRepeat.required" class="form-group-hint group-required">
+            <div v-if="!$v.form.password_repeat.required" class="form-group-hint group-required">
                 Bitte geben Sie das Passwort erneut an.
             </div>
-            <div v-if="!$v.form.passwordRepeat.minLength" class="form-group-hint group-required">
-                Das Password muss mindestens <strong>{{ $v.form.passwordRepeat.$params.minLength.min }}</strong> Zeichen lang sein.
+            <div v-if="!$v.form.password_repeat.minLength" class="form-group-hint group-required">
+                Das Password muss mindestens <strong>{{ $v.form.password_repeat.$params.minLength.min }}</strong> Zeichen lang sein.
             </div>
-            <div v-if="!$v.form.passwordRepeat.maxLength" class="form-group-hint group-required">
-                Das Password darf maximal <strong>{{ $v.form.passwordRepeat.$params.maxLength.max }}</strong> Zeichen lang sein.
+            <div v-if="!$v.form.password_repeat.maxLength" class="form-group-hint group-required">
+                Das Password darf maximal <strong>{{ $v.form.password_repeat.$params.maxLength.max }}</strong> Zeichen lang sein.
             </div>
-            <div v-if="!$v.form.passwordRepeat.sameAsPassword" class="form-group-hint group-required">
+            <div v-if="!$v.form.password_repeat.sameAsPassword" class="form-group-hint group-required">
                 Die Passwörter sind nicht identisch...
             </div>
         </div>

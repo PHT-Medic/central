@@ -12,12 +12,7 @@ import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../
 import {
     isPermittedForResourceRealm,
     onlyRealmPermittedQueryResources,
-    ProposalStation
-} from "@personalhealthtrain/ui-common";
-import {
-    isProposalStationState,
-    ProposalStationState,
-    ProposalStationStateApproved
+    ProposalStation, ProposalStationApprovalStatus
 } from "@personalhealthtrain/ui-common";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
@@ -26,7 +21,7 @@ import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 import env from "../../../../env";
 
 type PartialProposalStation = Partial<ProposalStation>;
-const simpleExample = {proposal_id: 1, station_id: 1, comment: 'Looks good to me', status: ProposalStationStateApproved};
+const simpleExample = {proposal_id: 1, station_id: 1, comment: 'Looks good to me', status: ProposalStationApprovalStatus.APPROVED};
 
 @SwaggerTags('pht')
 @Controller("/proposal-stations")
@@ -173,7 +168,7 @@ export async function addProposalStationRouteHandler(req: any, res: any) {
     let entity = repository.create(data);
 
     if(env.demo) {
-        entity.status = ProposalStationStateApproved;
+        entity.status = ProposalStationApprovalStatus.APPROVED;
     }
 
     try {
@@ -224,7 +219,9 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
     if(isAuthorityOfStation) {
         await check('status')
             .optional()
-            .custom(value => isProposalStationState(value))
+            .custom(command => {
+                return Object.values(ProposalStationApprovalStatus).includes(command);
+            })
             .run(req);
 
         await check('comment')
@@ -250,7 +247,7 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
         if(
             data.status &&
             data.status !== entityStatus &&
-            ['approved', 'rejected'].indexOf(data.status as ProposalStationState) !== -1
+            Object.values(ProposalStationApprovalStatus).includes(data.status)
         ) {
             await emitDispatcherProposalEvent({
                 event: proposalStation.status as DispatcherProposalEvent,

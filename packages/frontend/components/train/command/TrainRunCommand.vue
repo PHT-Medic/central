@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {TrainConfigurationStatus, TrainBuildStatus, TrainRunStatus} from "@/domains/train/index.ts";
-import {runTrainCommand} from "@/domains/train/api.ts";
-import {TrainCommand} from "@/domains/train/type";
+import {runAPITrainCommand} from "@personalhealthtrain/ui-common/src";
+import {TrainConfigurationStatus, TrainBuildStatus, TrainRunStatus} from "../../../domains/train";
+import {FrontendTrainCommand} from "../../../domains/train/type";
 import {BDropdownItem} from "bootstrap-vue";
 
 export default {
@@ -18,7 +18,7 @@ export default {
         },
         command: {
             type: String,
-            default: TrainCommand.RUN_START
+            default: FrontendTrainCommand.RUN_START
         },
 
         elementType: {
@@ -37,7 +37,7 @@ export default {
     data() {
         return {
             busy: false,
-            trainCommand: TrainCommand
+            trainCommand: FrontendTrainCommand
         }
     },
     render(createElement) {
@@ -112,7 +112,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runTrainCommand(this.train.id, this.command);
+                const train = await runAPITrainCommand(this.train.id, this.command);
 
                 const message =  `Successfully executed run command ${this.commandText}.`;
                 this.$bvToast.toast(message, {toaster: 'b-toaster-top-center', variant: 'success'});
@@ -134,17 +134,17 @@ export default {
                         this.train.configurationStatus === TrainConfigurationStatus.FINISHED &&
                         this.train.buildStatus === TrainBuildStatus.FINISHED
                     ) ||
-                        this.command === TrainCommand.RUN_STATUS
+                        this.command === FrontendTrainCommand.RUN_STATUS
                 ) &&
                 this.$auth.can('edit', 'train');
         },
         isEnabled() {
             switch (this.command) {
-                case TrainCommand.RUN_START:
+                case FrontendTrainCommand.RUN_START:
                     return !this.train.runStatus || [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.train.runStatus) !== -1
-                case TrainCommand.RUN_STOP:
+                case FrontendTrainCommand.RUN_STOP:
                     return this.train.runStatus && [TrainRunStatus.STOPPED, TrainRunStatus.FINISHED].indexOf(this.train.runStatus) === -1
-                case TrainCommand.RUN_STATUS:
+                case FrontendTrainCommand.RUN_STATUS:
                     return true;
             }
 
@@ -152,11 +152,11 @@ export default {
         },
         commandText() {
             switch (this.command) {
-                case TrainCommand.RUN_START:
+                case FrontendTrainCommand.RUN_START:
                     return 'start';
-                case TrainCommand.RUN_STOP:
+                case FrontendTrainCommand.RUN_STOP:
                     return 'stop';
-                case TrainCommand.RUN_STATUS:
+                case FrontendTrainCommand.RUN_STATUS:
                     return 'status';
                 default:
                     return '';
@@ -164,11 +164,11 @@ export default {
         },
         iconClass() {
             switch (this.command) {
-                case TrainCommand.RUN_START:
+                case FrontendTrainCommand.RUN_START:
                     return 'fa fa-play';
-                case TrainCommand.RUN_STOP:
+                case FrontendTrainCommand.RUN_STOP:
                     return 'fa fa-stop';
-                case TrainCommand.RUN_STATUS:
+                case FrontendTrainCommand.RUN_STATUS:
                     return 'fas fa-search';
                 default:
                     return '';
@@ -176,11 +176,11 @@ export default {
         },
         classSuffix() {
             switch (this.command) {
-                case TrainCommand.RUN_START:
+                case FrontendTrainCommand.RUN_START:
                     return 'success';
-                case TrainCommand.RUN_STOP:
+                case FrontendTrainCommand.RUN_STOP:
                     return 'danger';
-                case TrainCommand.RUN_STATUS:
+                case FrontendTrainCommand.RUN_STATUS:
                     return 'primary';
                 default:
                     return 'info';

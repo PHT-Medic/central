@@ -5,37 +5,37 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { TrainConfiguratorStates } from "@/domains/train/index.ts";
+import {TrainConfigurationStatus} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
         status: {
-            type: String,
+            type: TrainConfigurationStatus,
             default: undefined
         }
     },
     data() {
         return {
-            configurationStates: TrainConfiguratorStates
+            configurationStates: TrainConfigurationStatus
         }
     }
 }
 </script>
 <template>
     <span>
-        <template v-if="status === configurationStates.TrainConfiguratorStateOpen">
+        <template v-if="!status">
             open
         </template>
-        <template v-else-if="status === configurationStates.TrainConfiguratorStateFilesUploaded">
+        <template v-else-if="status === configurationStates.FILES_UPLOADED">
             files uploaded
         </template>
-        <template v-else-if="status === configurationStates.TrainConfiguratorStateHashGenerated">
+        <template v-else-if="status === configurationStates.HASH_GENERATED">
             hash generated
         </template>
-        <template v-else-if="status === configurationStates.TrainConfiguratorStateHashSigned">
+        <template v-else-if="status === configurationStates.HASH_SIGNED">
             hash signed
         </template>
-        <template v-else-if="status === configurationStates.TrainConfiguratorStateFinished">
+        <template v-else-if="status === configurationStates.FINISHED">
             completed
         </template>
         <template v-else>

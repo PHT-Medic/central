@@ -5,13 +5,15 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import AlertMessage from "@/components/alert/AlertMessage";
-import Pagination from "@/components/Pagination";
-import {editTrainStation, getTrainStations} from "@/domains/train-station/api";
-import {TrainStationStatusOptions} from "@/domains/train-station";
-import TrainStationAction from "@/components/train-station/TrainStationAction";
-import TrainStationApprovalStatusText from "@/components/train-station/status/TrainStationApprovalStatusText";
-import {getTrainFilesDownloadUri} from "@/domains/train-file/api";
+import {TrainStationApprovalStatus} from "@personalhealthtrain/ui-common";
+import {
+    getAPITrainFilesDownloadUri,
+    getAPITrainStations
+} from "@personalhealthtrain/ui-common/src";
+import AlertMessage from "../../components/alert/AlertMessage";
+import Pagination from "../../components/Pagination";
+import TrainStationAction from "../../components/train-station/TrainStationAction";
+import TrainStationApprovalStatusText from "../../components/train-station/status/TrainStationApprovalStatusText";
 
 export default {
     components: {
@@ -22,10 +24,6 @@ export default {
     },
     props: {
         proposalId: {
-            type: Number,
-            default: undefined
-        },
-        stationId: {
             type: Number,
             default: undefined
         }
@@ -51,7 +49,7 @@ export default {
             actionBusy: false,
 
             train: undefined,
-            statusOptions: TrainStationStatusOptions
+            statusOptions: TrainStationApprovalStatus
         }
     },
     created() {
@@ -64,24 +62,15 @@ export default {
             this.busy = true;
 
             try {
-                let record = {
+                const response = await getAPITrainStations({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset
                     },
-                    include: [
-
-                    ],
                     filter: {
                         station_id: this.stationId
                     }
-                };
-
-                if (typeof this.proposalId !== 'undefined') {
-                    record.filter.proposal_id = this.proposalId;
-                }
-
-                const response = await getTrainStations(record);
+                });
 
                 this.items = response.data;
                 const {total} = response.meta;
@@ -103,12 +92,12 @@ export default {
                 .catch(reject);
         },
         download(item) {
-            window.open(this.$config.apiUrl+getTrainFilesDownloadUri(item.trainId), '_blank')
+            window.open(this.$config.apiUrl+getAPITrainFilesDownloadUri(item.trainId), '_blank')
         },
         handleUpdated(item) {
             const index = this.items.findIndex(i => i.id === item.id);
             if(index !== -1) {
-                this.items[index].status = item.status;
+                this.items[index].approval_status = item.approval_status;
             }
         }
     },
@@ -136,7 +125,7 @@ export default {
                 {{data.item.trainId}}
             </template>
             <template v-slot:cell(status)="data">
-                <train-station-approval-status-text :status="data.item.status">
+                <train-station-approval-status-text :status="data.item.approval_status">
                     <template v-slot:default="props">
                         <span class="badge" :class="'badge-'+props.classSuffix">{{props.statusText}}</span>
                     </template>
@@ -160,7 +149,7 @@ export default {
                         </template>
                         <train-station-action
                             :train-station-id="data.item.id"
-                            :status="data.item.status"
+                            :status="data.item.approval_status"
                             :with-icon="true"
                             action-type="dropDownItem"
                             action="approve"
@@ -168,7 +157,7 @@ export default {
                         />
                         <train-station-action
                             :train-station-id="data.item.id"
-                            :status="data.item.status"
+                            :status="data.item.approval_status"
                             :with-icon="true"
                             action-type="dropDownItem"
                             action="reject"

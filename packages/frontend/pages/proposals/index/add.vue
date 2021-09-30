@@ -5,12 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {getAPIMasterImages, getAPIStations} from "@personalhealthtrain/ui-common";
     import { required, minLength, maxLength, integer, alpha } from 'vuelidate/lib/validators';
 
     import ProposalFormTitle from "../../../components/form/proposal/ProposalFormTitle";
-    import {getStations} from "@/domains/station/api.ts";
-    import {getMasterImages} from "@/domains/masterImage/api.ts";
-    import {addProposal} from "@/domains/proposal/api.ts";
 
     export default {
         components: {ProposalFormTitle},
@@ -84,13 +82,13 @@
         },
         created () {
             this.stationsLoading = true;
-            getStations().then((response) => {
+            getAPIStations().then((response) => {
                 this.stations = response.data;
                 this.stationsLoading = false
             });
 
             this.masterImagesLoading = true;
-            getMasterImages().then((data) => {
+            getAPIMasterImages().then((data) => {
                 this.masterImages = data.data;
                 this.masterImagesLoading = false
             });

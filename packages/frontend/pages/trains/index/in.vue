@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {LayoutNavigationDefaultId} from "@/config/layout.ts";
-import StationTrainTable from "@/components/station/StationTrainTable";
-import {getStations} from "@/domains/station/api";
+import {getAPIStations} from "@personalhealthtrain/ui-common/src";
+import {LayoutNavigationDefaultId} from "../../../config/layout.ts";
+import StationTrainTable from "../../../components/station/StationTrainTable";
 
 export default {
     components: {StationTrainTable},
@@ -20,7 +20,7 @@ export default {
     },
     async asyncData(ctx) {
         try {
-            const {data: stations} = await getStations({
+            const {data: stations} = await getAPIStations({
                 filter: {
                     realm_id: ctx.store.getters['auth/userRealmId']
                 }

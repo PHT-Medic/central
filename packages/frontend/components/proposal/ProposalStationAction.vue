@@ -5,9 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {ProposalStationStatusOptions} from "@/domains/proposal/station";
+import {editApiProposalStation, ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
 import {BDropdownItem} from "bootstrap-vue";
-import {editApiProposalStation} from "@/domains/proposal/station/api";
 
 export default {
     name: 'ProposalStationAction',
@@ -92,13 +91,13 @@ export default {
 
             switch (this.action) {
                 case 'approve':
-                    status = ProposalStationStatusOptions.ProposalStationStatusApproved;
+                    status = ProposalStationApprovalStatus.APPROVED;
                     break;
                 case 'reject':
-                    status = ProposalStationStatusOptions.ProposalStationStatusRejected;
+                    status = ProposalStationApprovalStatus.REJECTED;
                     break;
                 default:
-                    status = ProposalStationStatusOptions.ProposalStationStatusOpen;
+                    status = null;
                     break;
             }
 
@@ -145,17 +144,17 @@ export default {
             }
 
             switch (this.status) {
-                case ProposalStationStatusOptions.ProposalStationStatusApproved:
+                case ProposalStationApprovalStatus.APPROVED:
                     if(this.action === 'approve') {
                         return true;
                     }
                     break;
-                case ProposalStationStatusOptions.ProposalStationStatusRejected:
+                case ProposalStationApprovalStatus.REJECTED:
                     if(this.action === 'reject') {
                         return true;
                     }
                     break;
-                case ProposalStationStatusOptions.ProposalStationStatusOpen:
+                default:
                     if(this.action === 'reset') {
                         return true;
                     }

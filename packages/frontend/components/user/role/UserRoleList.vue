@@ -5,14 +5,15 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getApiUserRoles} from "@/domains/user/role/api";
-import RoleList from "@/components/role/RoleList";
-import UserRoleListItemActions from "@/components/user/role/UserRoleListItemActions";
+import {User} from "@personalhealthtrain/ui-common";
+import {getApiUserRoles} from "@personalhealthtrain/ui-common";
+import RoleList from "../../../components/role/RoleList";
+import UserRoleListItemActions from "../../../components/user/role/UserRoleListItemActions";
 
 export default {
     components: {UserRoleListItemActions, RoleList},
     props: {
-        userId: Number
+        userId: typeof User.prototype.id
     },
     data() {
         return {

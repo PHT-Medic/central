@@ -5,15 +5,21 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {addUserKeyRing, dropUserKeyRing, editUserKeyRing, getUserKeyRing} from "@/domains/user/publicKey/api.ts";
+import {User} from "@personalhealthtrain/ui-common";
+import {
+    addAPIUserKeyRing,
+    dropAPIUserKeyRing,
+    editAPIUserKeyRing,
+    getAPIUserKeyRing
+} from "@personalhealthtrain/ui-common/src";
 import {maxLength, minLength, required} from "vuelidate/lib/validators";
-import AlertMessage from "@/components/alert/AlertMessage";
+import AlertMessage from "../../components/alert/AlertMessage";
 
 export default {
     components: {AlertMessage},
     props: {
         userProperty: {
-            type: Object,
+            type: User,
             default: undefined
         }
     },
@@ -47,7 +53,7 @@ export default {
             this.busy = true;
 
             try {
-                this.item = await getUserKeyRing();
+                this.item = await getAPIUserKeyRing();
                 this.form.content = this.item.content;
             } catch (e) {
 
@@ -64,8 +70,8 @@ export default {
 
             try {
                 if(typeof this.item !== 'undefined') {
-                    this.item = await editUserKeyRing(this.item.id, {
-                        content: this.form.content
+                    this.item = await editAPIUserKeyRing(this.item.id, {
+                        public_key: this.form.content
                     });
 
                     this.$emit('updated', this.item);
@@ -74,7 +80,7 @@ export default {
                         isError: false
                     }
                 } else {
-                    this.item = await addUserKeyRing({
+                    this.item = await addAPIUserKeyRing({
                         content: this.form.content
                     });
 
@@ -100,7 +106,7 @@ export default {
             this.busy = true;
 
             try {
-                await dropUserKeyRing(this.item.id);
+                await dropAPIUserKeyRing(this.item.id);
 
                 this.item = undefined;
                 this.form.content = '';

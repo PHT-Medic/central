@@ -1,13 +1,15 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "rootDir": ".",
+        "target": "ES6",
         "lib": [
             "ESNext",
             "DOM"
         ],
         "paths": {
-            "@personalhealthtrain/ui-common": ["./packages/common/src"],
+            "@personalhealthtrain/ui-common": [
+                "./packages/common/src"
+            ],
             "@/*": [
                 "./packages/frontend/*"
             ],
@@ -23,6 +25,7 @@
             "@nuxt/types",
             "vue-router/types"
         ]
-    }
+    },
+    "exclude": ["node_modules"]
 }
 

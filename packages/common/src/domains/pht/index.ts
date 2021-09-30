@@ -14,3 +14,4 @@ export * from './train-file';
 export * from './train-model';
 export * from './train-result';
 export * from './train-station';
+export {MasterImage} from "./master-image/entity";

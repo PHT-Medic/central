@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import StationForm from "@/components/station/StationForm";
-import {dropStation} from "@/domains/station/api";
+import {dropAPIStation} from "@personalhealthtrain/ui-common/src";
+import StationForm from "../../../../../components/station/StationForm";
 
 export default {
     props: {
@@ -26,7 +26,7 @@ export default {
             this.busy = true;
 
             try {
-                await dropStation(this.station.id);
+                await dropAPIStation(this.station.id);
 
                 this.$emit('deleted', this.station);
             } catch (e) {

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {useHarborApi} from "../../../../../modules";
+import {APIType, useAPI} from "../../../../../modules";
 
 export interface HarborRepository {
     id: number | string,
@@ -19,7 +19,7 @@ export interface HarborRepository {
 }
 
 export async function findHarborProjectRepository(projectName: string, repositoryName: string) : Promise<HarborRepository|undefined> {
-    const result = await useHarborApi().get('projects/'+projectName+'/repositories?name='+repositoryName+'&=page_size=1');
+    const result = await useAPI(APIType.HARBOR).get('projects/'+projectName+'/repositories?name='+repositoryName+'&=page_size=1');
 
     if(result.data.length !== 1) {
         return undefined;
@@ -45,7 +45,7 @@ export async function findHarborProjectRepository(projectName: string, repositor
 }
 
 export async function getHarborProjectRepositories(projectName: string) : Promise<HarborRepository[]> {
-    const result = await useHarborApi()
+    const result = await useAPI(APIType.HARBOR)
         .get('projects/'+projectName+'/repositories');
 
     return result.data.map((item : Record<string, any>) => {

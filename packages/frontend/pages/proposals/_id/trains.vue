@@ -33,7 +33,7 @@
     </div>
 </template>
 <script>
-import ProposalSvg from "@/components/svg/ProposalSvg";
+import ProposalSvg from "../../../components/svg/ProposalSvg";
 export default {
     components: {ProposalSvg},
     props: {

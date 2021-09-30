@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import RolePermissionListItemActions from "@/components/role/permission/RolePermissionListItemActions";
-import {getRolePermissions} from "@/domains/role/permission/api";
-import PermissionList from "@/components/permission/PermissionList";
+import {getRolePermissions} from "@personalhealthtrain/ui-common/src";
+import RolePermissionListItemActions from "../../../components/role/permission/RolePermissionListItemActions";
+import PermissionList from "../../../components/permission/PermissionList";
 
 export default {
     components: {PermissionList, RolePermissionListItemActions},

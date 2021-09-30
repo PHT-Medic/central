@@ -5,11 +5,11 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {maxLength, minLength, required, email} from "vuelidate/lib/validators";
+import {addAPIRole, editAPIRole, Role} from "@personalhealthtrain/ui-common";
+import {maxLength, minLength, required} from "vuelidate/lib/validators";
 
 import AlertMessage from "../alert/AlertMessage";
 import NotImplemented from "../NotImplemented";
-import {addRole, editRole} from "@/domains/role/api.ts";
 
 export default {
     components: {
@@ -18,7 +18,7 @@ export default {
     },
     props: {
         roleProperty: {
-            type: Object,
+            type: Role,
             default: undefined
         }
     },
@@ -26,7 +26,7 @@ export default {
         return {
             formData: {
                 name: '',
-                providerRoleId: ''
+                provider_role_id: ''
             },
 
             busy: false,
@@ -40,7 +40,7 @@ export default {
                 minLength: minLength(3),
                 maxLength: maxLength(30)
             },
-            providerRoleId: {
+            provider_role_id: {
                 minLength: minLength(3),
                 maxLength: maxLength(100)
             }
@@ -48,7 +48,7 @@ export default {
     },
     created() {
         this.formData.name = this.roleProperty?.name ?? '';
-        this.formData.providerRoleId = this.roleProperty?.providerRoleId ?? '';
+        this.formData.provider_role_id = this.roleProperty?.provider_role_id ?? '';
     },
     methods: {
         async handleSubmit (e) {
@@ -65,7 +65,7 @@ export default {
                 let response;
 
                 if(this.isEditing) {
-                   response = await editRole(this.roleProperty.id, this.formData);
+                   response = await editAPIRole(this.roleProperty.id, this.formData);
 
                    this.message = {
                        isError: false,
@@ -74,7 +74,7 @@ export default {
 
                    this.$emit('updated', response);
                 } else {
-                    response = await addRole(this.formData);
+                    response = await addAPIRole(this.formData);
 
                     this.message = {
                         isError: false,
@@ -124,15 +124,15 @@ export default {
 
             <hr>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.formData.providerRoleId.$error }">
+            <div class="form-group" :class="{ 'form-group-error': $v.formData.provider_role_id.$error }">
                 <label>Provider Role-ID</label>
-                <input v-model="$v.formData.providerRoleId.$model" type="text" name="name" class="form-control" placeholder="Provider Role-ID...">
+                <input v-model="$v.formData.provider_role_id.$model" type="text" name="name" class="form-control" placeholder="Provider Role-ID...">
 
-                <div v-if="!$v.formData.providerRoleId.minLength" class="form-group-hint group-required">
-                    The length of the provide-role-id must be greater than <strong>{{ $v.formData.providerRoleId.$params.minLength.min }}</strong> characters
+                <div v-if="!$v.formData.provider_role_id.minLength" class="form-group-hint group-required">
+                    The length of the provide-role-id must be greater than <strong>{{ $v.formData.provider_role_id.$params.minLength.min }}</strong> characters
                 </div>
-                <div v-if="!$v.formData.providerRoleId.maxLength" class="form-group-hint group-required">
-                    The length of the provider-role-id must be greater than <strong>{{ $v.formData.providerRoleId.$params.maxLength.max }}</strong> characters
+                <div v-if="!$v.formData.provider_role_id.maxLength" class="form-group-hint group-required">
+                    The length of the provider-role-id must be greater than <strong>{{ $v.formData.provider_role_id.$params.maxLength.max }}</strong> characters
                 </div>
             </div>
 
@@ -146,8 +146,3 @@ export default {
         </div>
     </div>
 </template>
-<style>
-.list-group-item {
-    padding: .45rem .65rem;
-}
-</style>

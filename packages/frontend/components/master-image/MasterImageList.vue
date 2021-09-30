@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import Pagination from "~/components/Pagination";
+import {getAPIMasterImages} from "@personalhealthtrain/ui-common";
+import Pagination from "../../components/Pagination";
 import Vue from 'vue';
-import {getMasterImages} from "~/domains/masterImage/api";
 
 export default {
     components: {Pagination},
@@ -90,7 +90,7 @@ export default {
                     }
                 }
 
-                const response = await getMasterImages(data);
+                const response = await getAPIMasterImages(data);
 
                 this.items = response.data;
                 const {total} = response.meta;

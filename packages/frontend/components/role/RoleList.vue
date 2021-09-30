@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import Pagination from "@/components/Pagination";
+import {getAPIRoles} from "@personalhealthtrain/ui-common/src";
+import Pagination from "../../components/Pagination";
 import Vue from 'vue';
-import {getRoles} from "@/domains/role/api";
 
 export default {
     components: {Pagination},
@@ -86,7 +86,7 @@ export default {
                     }
                 }
 
-                const response = await getRoles(data);
+                const response = await getAPIRoles(data);
 
                 this.items = response.data;
                 const {total} = response.meta;

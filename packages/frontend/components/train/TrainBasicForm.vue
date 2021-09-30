@@ -5,8 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {addTrain} from "@/domains/train/api.ts";
-import {getProposals} from "@/domains/proposal/api.ts";
+import {addAPITrain, getProposals} from "@personalhealthtrain/ui-common";
 import {required} from 'vuelidate/lib/validators';
 
 export default {
@@ -75,7 +74,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await addTrain(this.form);
+                const train = await addAPITrain(this.form);
                 this.$emit('created', train);
             } catch (e) {
                 console.log(e);

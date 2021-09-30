@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {TrainStationApprovalStatus} from "@personalhealthtrain/ui-common";
+import {editAPITrainStation} from "@personalhealthtrain/ui-common/src";
 import {BDropdownItem} from "bootstrap-vue";
-import {editTrainStation} from "@/domains/train-station/api";
-import {TrainStationStatusOptions} from "@/domains/train-station";
 
 export default {
     name: 'TrainStationAction',
@@ -90,19 +90,19 @@ export default {
 
             switch (this.action) {
                 case 'approve':
-                    status = TrainStationStatusOptions.TrainStationStatusApproved;
+                    status = TrainStationApprovalStatus.APPROVED;
                     break;
                 case 'reject':
-                    status = TrainStationStatusOptions.TrainStationStatusRejected;
+                    status = TrainStationApprovalStatus.REJECTED;
                     break;
                 default:
-                    status = TrainStationStatusOptions.TrainStationStatusOpen;
+                    status = null;
                     break;
             }
 
             try {
-                const item = await editTrainStation(this.trainStationId, {
-                    status
+                const item = await editAPITrainStation(this.trainStationId, {
+                    approval_status: status
                 });
 
                 this.$emit('done',item);
@@ -143,17 +143,17 @@ export default {
             }
 
             switch (this.status) {
-                case TrainStationStatusOptions.TrainStationStatusApproved:
+                case TrainStationApprovalStatus.APPROVED:
                     if(this.action === 'approve') {
                         return true;
                     }
                     break;
-                case TrainStationStatusOptions.TrainStationStatusRejected:
+                case TrainStationApprovalStatus.REJECTED:
                     if(this.action === 'reject') {
                         return true;
                     }
                     break;
-                case TrainStationStatusOptions.TrainStationStatusOpen:
+                default:
                     if(this.action === 'reset') {
                         return true;
                     }

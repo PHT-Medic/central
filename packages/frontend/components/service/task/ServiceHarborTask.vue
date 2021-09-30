@@ -5,9 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {executeServiceTask} from "~/domains/service/api";
-import MasterImageList from "~/components/master-image/MasterImageList";
-import {dropMasterImage} from "~/domains/masterImage/api";
+import {dropAPIMasterImage, executeAPIServiceTask} from "@personalhealthtrain/ui-common";
+import MasterImageList from "../../../components/master-image/MasterImageList";
 
 export default {
     components: {MasterImageList},
@@ -32,7 +31,7 @@ export default {
             this.busy = true;
 
             try {
-                const data = await executeServiceTask(this.service.id, task, {});
+                const data = await executeAPIServiceTask(this.service.id, task, {});
 
                 this.$bvToast.toast('You successfully executed the service task.', {
                     toaster: 'b-toaster-top-center'
@@ -66,7 +65,7 @@ export default {
 
         async dropMasterImage(id) {
             try {
-                await dropMasterImage(id);
+                await dropAPIMasterImage(id);
 
                 this.$refs["master-image-list"].dropArrayItem(id);
             } catch (e) {

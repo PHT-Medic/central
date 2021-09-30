@@ -11,14 +11,13 @@ import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../
 import {
     isPermittedForResourceRealm,
     onlyRealmPermittedQueryResources,
-    Proposal, ProposalStation, Station
+    Proposal, ProposalStation, ProposalStationApprovalStatus, Station
 } from "@personalhealthtrain/ui-common";
 import {check, matchedData, validationResult} from "express-validator";
 import {MasterImage} from "@personalhealthtrain/ui-common";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {ProposalStationStateApproved, ProposalStationStateOpen} from "@personalhealthtrain/ui-common";
 import env from "../../../../env";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
@@ -200,7 +199,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
             return proposalStationRepository.create({
                 proposal_id: entity.id,
                 station_id: stationId,
-                status: env.demo ? ProposalStationStateApproved : ProposalStationStateOpen
+                status: env.demo ? ProposalStationApprovalStatus.APPROVED : null
             });
         });
 

@@ -7,7 +7,7 @@
 <script>
     import NotImplemented from "../../../../components/NotImplemented";
     import AlertMessage from "../../../../components/alert/AlertMessage";
-    import RolePermissionList from "@/components/role/permission/RolePermissionList";
+    import RolePermissionList from "../../../../components/role/permission/RolePermissionList";
 
     export default {
         props: {

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {useVaultApi} from "../../../../modules/api/service";
+import {APIType, useAPI} from "../../../../modules";
 
 export type VaultStationPublicKey = {
     path: string,
@@ -14,7 +14,7 @@ export type VaultStationPublicKey = {
 
 export async function findStationVaultPublicKey(stationId: number | string) : Promise<VaultStationPublicKey|undefined> {
     try {
-        const { data } = await useVaultApi()
+        const { data } = await useAPI(APIType.VAULT)
             .get('station_pks/' + stationId);
 
         return {
@@ -33,7 +33,7 @@ export async function findStationVaultPublicKey(stationId: number | string) : Pr
 export async function saveStationVaultPublicKey(id: string, publicKey?: string) {
     if (!publicKey || !id) return;
 
-    await useVaultApi()
+    await useAPI(APIType.VAULT)
         .post('station_pks/' + id, {
             data: {
                 rsa_station_public_key: publicKey
@@ -46,7 +46,7 @@ export async function saveStationVaultPublicKey(id: string, publicKey?: string) 
 
 export async function deleteStationVaultPublicKey(id: string) : Promise<void> {
     try {
-        await useVaultApi()
+        await useAPI(APIType.VAULT)
             .delete('station_pks/' + id);
     } catch (e) {
         if(e.response.status === 404) {

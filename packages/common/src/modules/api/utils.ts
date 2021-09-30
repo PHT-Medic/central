@@ -7,9 +7,7 @@
 
 import {
     API_CONFIG_DEFAULT_KEY,
-    APIConfig, APIDefaultType,
-    APIHarborType,
-    APIVaultType,
+    APIConfig, APIConfigType, APIType,
     getAPIConfig
 } from "./config";
 import {BaseAPI} from "./module";
@@ -17,12 +15,12 @@ import {HarborAPI, VaultAPI} from "./service";
 
 const instanceMap: Map<string, BaseAPI> = new Map<string, BaseAPI>();
 
-export type APIReturnType<T extends APIHarborType | APIVaultType | APIDefaultType> =
-    T extends APIHarborType ? HarborAPI :
-        T extends APIVaultType ? VaultAPI :
+export type APIReturnType<T extends APIConfigType> =
+    T extends APIType.HARBOR ? HarborAPI :
+        T extends APIType.VAULT ? VaultAPI :
             BaseAPI;
 
-export function useAPI<T extends APIVaultType | APIHarborType | APIDefaultType>(
+export function useAPI<T extends APIType>(
     key?: string,
 ) : APIReturnType<T> {
     key ??= API_CONFIG_DEFAULT_KEY;
@@ -37,10 +35,10 @@ export function useAPI<T extends APIVaultType | APIHarborType | APIDefaultType>(
 
     switch (config.type) {
         case 'harbor':
-            instance = new HarborAPI(config as APIConfig<APIHarborType>);
+            instance = new HarborAPI(config as APIConfig<APIType.HARBOR>);
             break;
         case 'vault':
-            instance = new VaultAPI(config as APIConfig<APIVaultType>);
+            instance = new VaultAPI(config as APIConfig<APIType.VAULT>);
             break;
         default:
             instance = new BaseAPI(config.driver);
@@ -50,4 +48,17 @@ export function useAPI<T extends APIVaultType | APIHarborType | APIDefaultType>(
     instanceMap.set(config.type, instance);
 
     return instance as APIReturnType<T>;
+}
+
+export function mapOnAllAPIs(callback: CallableFunction) {
+    const iterator = instanceMap.keys();
+
+    let value = iterator.next();
+
+    while (!value.done) {
+        const instance = useAPI(value.value);
+        callback(instance);
+
+        value = iterator.next();
+    }
 }

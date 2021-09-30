@@ -5,10 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {LayoutNavigationAdminId} from "@/config/layout";
-    import {dropRole} from "@/domains/role/api.ts";
-    import Pagination from "@/components/Pagination";
-    import RoleList from "@/components/role/RoleList";
+    import {dropAPIRole} from "@personalhealthtrain/ui-common/src";
+    import {LayoutNavigationAdminId} from "../../../config/layout";
+    import Pagination from "../../../components/Pagination";
+    import RoleList from "../../../components/role/RoleList";
 
     export default {
         components: {RoleList, Pagination},
@@ -49,7 +49,7 @@
 
                     if(proceed) {
                         try {
-                            await dropRole(role.id);
+                            await dropAPIRole(role.id);
                             this.$refs['roleList'].dropArrayItem(role);
                         } catch (e) {
 

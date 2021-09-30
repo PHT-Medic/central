@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import TrainSvg from "@/components/svg/TrainSvg";
+import TrainSvg from "../../components/svg/TrainSvg";
 export default {
     components: {TrainSvg},
     data() {

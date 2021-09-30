@@ -6,8 +6,8 @@
  */
 
 import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn} from 'typeorm';
-import {MasterImage} from "../master-image";
 import {Realm, User} from "../../auth";
+import {MasterImage} from "../master-image/entity";
 import {Train} from "../train";
 import {ProposalStation} from "../proposal-station";
 

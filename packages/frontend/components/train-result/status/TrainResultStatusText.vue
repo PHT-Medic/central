@@ -13,7 +13,7 @@
 </template>
 <script>
 
-import {TrainResultStatus} from "@/domains/train-result/type";
+import {TrainResultStatus} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {

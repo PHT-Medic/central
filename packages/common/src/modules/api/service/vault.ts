@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIConfig, APIServiceVaultConfig, APIVaultType} from "../config";
+import {APIConfig, APIServiceVaultConfig, APIType} from "../config";
 import {BaseAPI} from "../module";
 import {ApiRequestConfig} from "../type";
 import {APIServiceError} from "./error";
@@ -33,7 +33,7 @@ export type VaultEnginePayload = {
 }
 
 export class VaultAPI extends BaseAPI {
-    constructor(config: APIConfig<APIVaultType>) {
+    constructor(config: APIConfig<APIType.VAULT>) {
         const vaultConfig : APIServiceVaultConfig = config.connection ?? parseVaultConnectionString(config.connectionString);
 
         const driverConfig : ApiRequestConfig = {
@@ -76,19 +76,4 @@ export class VaultAPI extends BaseAPI {
 
         return response.data;
     }
-}
-
-let instance : VaultAPI | undefined;
-
-export function useVaultApi(connectionString?: string) {
-    if(typeof instance !== 'undefined') {
-        return instance;
-    }
-
-    if(typeof connectionString === 'undefined') {
-        throw APIServiceError.connectionStringMissing('vault');
-    }
-
-    instance = new VaultAPI({connectionString});
-    return instance;
 }

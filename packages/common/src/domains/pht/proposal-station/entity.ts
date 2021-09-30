@@ -8,14 +8,13 @@
 import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn} from 'typeorm';
 import {Proposal} from "../proposal";
 import {Station} from "../station";
-import {ProposalStationStateOpen} from "./states";
 
 @Entity({name: 'proposal_stations'})
 export class ProposalStation {
     @PrimaryGeneratedColumn({unsigned: true})
     id: number;
 
-    @Column({default: ProposalStationStateOpen})
+    @Column({default: null})
     status: string;
 
     @Column({type: "text", nullable: true})

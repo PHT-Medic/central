@@ -52,6 +52,16 @@ export class BaseAPI {
 
     // ---------------------------------------------------------------------------------
 
+    public setAuthorizationBearerHeader(token: string) {
+        this.setHeader('Authorization','Bearer ' + token);
+    }
+
+    public unsetAuthorizationBearerHeader() {
+        this.unsetHeader('Authorization');
+    }
+
+    // ---------------------------------------------------------------------------------
+
     public request<T, R = ApiResponse<T>>(config: ApiRequestConfig): Promise<R> {
         return this.api.request(config);
     }
@@ -91,4 +101,25 @@ export class BaseAPI {
     public patch<T, R = ApiResponse<T>>(url: string, data?: any, config?: ApiRequestConfig): Promise<R> {
         return this.api.patch(url, data, config);
     }
+
+    //---------------------------------------------------------------------------------
+
+    public mountResponseInterceptor(onFulfilled: (value: ApiResponse<any>) => any | Promise<ApiResponse<any>>, onRejected: (error: any) => any) : number {
+        return this.api.interceptors.response.use(onFulfilled, onRejected);
+    }
+
+    public unmountResponseInterceptor(id: number) {
+        this.api.interceptors.response.eject(id);
+    }
+
+    //---------------------------------------------------------------------------------
+
+    public mountRequestInterceptor(onFulfilled: (value: ApiRequestConfig) => any | Promise<ApiRequestConfig>, onRejected: (error: any) => any) : number {
+        return this.api.interceptors.request.use(onFulfilled, onRejected);
+    }
+
+    public unmountRequestInterceptor(id: number) {
+        this.api.interceptors.request.eject(id);
+    }
 }
+

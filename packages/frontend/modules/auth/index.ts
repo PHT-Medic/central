@@ -5,16 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import {AuthStoreToken} from "../../store/auth";
 import {Context} from "@nuxt/types";
+import {APIType, useAPI} from "@personalhealthtrain/ui-common";
+import {AbilityManager, Oauth2Client, Oauth2TokenResponse, OwnedPermission} from "@typescript-auth/core";
+import axios from "axios";
 import {Store} from 'vuex';
-import {AbilityManager, OwnedPermission, Oauth2TokenResponse, Oauth2Client} from "@typescript-auth/core";
-
-import {mapOnAllApis} from "~/modules/api";
-import BaseApi from "~/modules/api/base";
-
-import {AuthStoreToken} from "~/store/auth";
-import {changeResponseKeyCase} from "~/modules/api/utils";
-
 
 export type AuthModuleOptions = {
     tokenHost: string,
@@ -28,6 +24,8 @@ class AuthModule {
     protected client: Oauth2Client;
 
     protected refreshTokenJob: undefined | ReturnType<typeof setTimeout>;
+
+    protected responseInterceptorId : number | undefined;
 
     protected storeKeys : string[] = [
         'token',
@@ -182,20 +180,43 @@ class AuthModule {
     // --------------------------------------------------------------------
 
     public setRequestToken = (token: string) => {
-        mapOnAllApis((api: BaseApi) => {
-            api.setAuthorizationBearerHeader(token);
-            api.mountAuthResponseInterceptor();
+        this.responseInterceptorId = useAPI(APIType.DEFAULT)
+            .mountResponseInterceptor((data) => data, (error: any) => {
+                if(typeof this.ctx === 'undefined') return;
 
-            return api;
-        });
+                if(typeof error !== 'undefined' && error && typeof error.response !== 'undefined') {
+                    if (error.response.status === 401) {
+                        // Refresh the access accessToken
+                        try {
+                            this.ctx.store.dispatch('auth/triggerRefreshToken').then(() => {
+                                return axios({
+                                    method: error.config.method,
+                                    url: error.config.url,
+                                    data: error.config.data
+                                });
+                            });
+                        } catch (e) {
+                            //this.ctx.store.dispatch('triggerSetLoginRequired', true).then(r => r);
+                            this.ctx.redirect('/logout');
+
+                            throw error;
+                        }
+                    }
+
+                    throw error;
+                }
+            });
+
+        useAPI(APIType.DEFAULT).setAuthorizationBearerHeader(token);
     };
 
     public unsetRequestToken = () => {
-        mapOnAllApis((api: BaseApi) => {
-            api.unsetAuthorizationBearerHeader();
-            api.unMountAuthResponseInterceptor();
-            return api;
-        });
+        if(this.responseInterceptorId) {
+            useAPI(APIType.DEFAULT).unmountRequestInterceptor(this.responseInterceptorId);
+            this.responseInterceptorId = undefined;
+        }
+
+        useAPI(APIType.DEFAULT).unsetAuthorizationBearerHeader();
     }
 
     // --------------------------------------------------------------------
@@ -237,10 +258,7 @@ class AuthModule {
      * @param token
      */
     public async getUserInfo(token: string) : Promise<Record<string, any>> {
-        const data = await this.client.getUserInfo(token);
-
-        // change key case, because all user objects are in that format.
-        return changeResponseKeyCase(data);
+        return await this.client.getUserInfo(token);
     }
 
 }

@@ -8,7 +8,7 @@
 import {buildAuthorizationHeaderValue} from "@typescript-auth/core";
 
 import {Client} from "../../../../auth"
-import {useHarborApi} from "../../../../../modules";
+import {APIType, useAPI} from "../../../../../modules";
 import {BaseService} from "../../../type";
 import {HarborProjectWebhookOptions} from "./type";
 
@@ -30,7 +30,7 @@ export async function findHarborProjectWebHook(
         headers['X-Is-Resource-Name'] = true;
     }
 
-    const { data } = await useHarborApi()
+    const { data } = await useAPI(APIType.HARBOR)
         .get('projects/' + projectIdOrName + '/webhook/policies', headers);
 
     const policies = data.filter((policy: { name: string; }) => policy.name === WEBHOOK_ID);
@@ -81,13 +81,13 @@ export async function ensureHarborProjectWebHook(
     }
 
     try {
-        await useHarborApi()
+        await useAPI(APIType.HARBOR)
             .post('projects/' + projectIdOrName + '/webhook/policies', webhook, headers);
     } catch (e) {
         if(e.response.status === 409) {
             const existingWebhook = await findHarborProjectWebHook(projectIdOrName, isProjectName);
 
-            await useHarborApi()
+            await useAPI(APIType.HARBOR)
                 .put('projects/' + projectIdOrName + '/webhook/policies/'+existingWebhook.id, webhook, headers);
 
             return;
@@ -107,7 +107,7 @@ export async function dropHarborProjectWebHook(projectIdOrName: number | string,
     const webhook = await findHarborProjectWebHook(projectIdOrName, isProjectName);
 
     if(typeof webhook !== 'undefined') {
-        await useHarborApi()
+        await useAPI(APIType.HARBOR)
             .delete('projects/' + projectIdOrName+ '/webhook/policies/' + webhook.id, headers);
     }
 }

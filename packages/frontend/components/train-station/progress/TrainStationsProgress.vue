@@ -5,16 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {getTrainStations} from "@/domains/train-station/api";
-    import {TrainBuildStatus, TrainRunStatus} from "@/domains/train";
-    import TrainStationRunStatusText from "@/components/train-station/status/TrainStationRunStatusText";
-    import {TrainStationStatic} from "@/domains/train-station/type";
-    import TrainStationStaticRunStatusText from "@/components/train-station/status/TrainStationStaticRunStatusText";
+    import {getAPITrainStations, Train, TrainBuildStatus, TrainRunStatus, TrainStationStatic} from "@personalhealthtrain/ui-common";
+    import TrainStationRunStatusText from "../../../components/train-station/status/TrainStationRunStatusText";
+    import TrainStationStaticRunStatusText from "../../../components/train-station/status/TrainStationStaticRunStatusText";
 
     export default {
         components: {TrainStationStaticRunStatusText, TrainStationRunStatusText},
         props: {
-            train: Object
+            train: Train
         },
         data() {
             return {
@@ -39,7 +37,7 @@
                 this.busy = false;
 
                 try {
-                    const response = await getTrainStations({
+                    const response = await getAPITrainStations({
                         filter: {
                             train_id: this.train.id
                         }
@@ -56,30 +54,23 @@
         },
         computed: {
             progressPercentage() {
-                if(this.train.buildStatus !== TrainBuildStatus.FINISHED) {
+                if(this.train.build_status !== TrainBuildStatus.FINISHED) {
                     return 0;
                 }
 
                 const total = this.meta.total + 2; // + 2 because incoming + outgoing
 
                 // no index -> outgoing or incoming
-                if(!this.train.runStationIndex) {
+                if(!this.train.run_station_index) {
                     // outgoing, because train terminated
-                    if(this.train.runStatus === TrainRunStatus.FINISHED) {
+                    if(this.train.run_status === TrainRunStatus.FINISHED) {
                         return 100;
                     } else {
                         return 100 * (1 / total);
                     }
                 }
 
-                return 100 * ((this.train.runStationIndex + 1) / total);
-            },
-            isIncomingStation() {
-                return this.train.runStatus === TrainRunStatus.STARTED &&
-                    this.train.runStationIndex === 0;
-            },
-            isOutgoingStation() {
-                return this.train.runStatus === TrainRunStatus.FINISHED;
+                return 100 * ((this.train.run_station_index + 1) / total);
             }
         }
     }
@@ -110,19 +101,19 @@
                 <div>
                     <train-station-static-run-status-text
                         :id="trainStationStatic.INCOMING"
-                        :train-build-status="train.buildStatus"
-                        :train-run-status="train.runStatus"
-                        :train-run-station-index="train.runStationIndex"
+                        :train-build-status="train.build_status"
+                        :train-run-status="train.run_status"
+                        :train-run-station-index="train.run_station_index"
                     />
                 </div>
             </div>
-            <template v-for="(item,key) in items">
+            <template v-for="(item) in items">
                 <div class="progress-step d-flex flex-column text-center">
                     <div class="">
                         <strong>Status</strong>
                     </div>
                     <div>
-                        <train-station-run-status-text :status="item.runStatus" />
+                        <train-station-run-status-text :status="item.run_status" />
                     </div>
                 </div>
             </template>
@@ -133,9 +124,9 @@
                 <div>
                     <train-station-static-run-status-text
                         :id="trainStationStatic.OUTGOING"
-                        :train-build-status="train.buildStatus"
-                        :train-run-status="train.runStatus"
-                        :train-run-station-index="train.runStationIndex"
+                        :train-build-status="train.build_status"
+                        :train-run-status="train.run_status"
+                        :train-run-station-index="train.run_station_index"
                     />
                 </div>
             </div>

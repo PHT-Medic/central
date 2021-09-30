@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {dropProposal, getProposals} from "@/domains/proposal/api.ts";
-    import {LayoutNavigationDefaultId} from "@/config/layout.ts";
-    import Pagination from "@/components/Pagination";
+    import {dropProposal, getProposals} from "@personalhealthtrain/ui-common";
+    import {LayoutNavigationDefaultId} from "../../../config/layout.ts";
+    import Pagination from "../../../components/Pagination";
 
     export default {
         components: {Pagination},
@@ -28,7 +28,7 @@
                 fields: [
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'title', label: 'Title', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
+                    { key: 'createdAt', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
                     { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }
                 ],
@@ -115,7 +115,7 @@
         </div>
         <div class="m-t-10">
             <b-table :items="items" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
-                <template v-slot:cell(created_at)="data">
+                <template v-slot:cell(createdAt)="data">
                     <timeago :datetime="data.item.createdAt" />
                 </template>
                 <template v-slot:cell(updated_at)="data">

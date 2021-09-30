@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import Pagination from "@/components/Pagination";
+import {getRealms} from "@personalhealthtrain/ui-common/src";
+import Pagination from "../../components/Pagination";
 import Vue from 'vue';
-import {getRealms} from "@/domains/realm/api";
 
 export default {
     components: {Pagination},

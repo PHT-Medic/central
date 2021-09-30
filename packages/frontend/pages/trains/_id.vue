@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {getAPITrain} from "@personalhealthtrain/ui-common/src";
 import Vue from 'vue';
-import {LayoutNavigationDefaultId} from "@/config/layout.ts";
-import {getTrain} from "@/domains/train/api.ts";
+import {LayoutNavigationDefaultId} from "../../config/layout.ts";
 
 export default {
     meta: {
@@ -16,7 +16,7 @@ export default {
     },
     async asyncData(context) {
         try {
-            const train = await getTrain(context.params.id);
+            const train = await getAPITrain(context.params.id);
 
             return {
                 train

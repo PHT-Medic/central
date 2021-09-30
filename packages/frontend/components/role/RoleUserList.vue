@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getApiUserRoles} from "@/domains/user/role/api";
-import UserRoleListItemActions from "@/components/user/role/UserRoleListItemActions";
-import UserList from "@/components/user/UserList";
+import {getApiUserRoles} from "@personalhealthtrain/ui-common/src";
+import UserRoleListItemActions from "../../components/user/role/UserRoleListItemActions";
+import UserList from "../../components/user/UserList";
 
 export default {
     components: {UserList, UserRoleListItemActions},

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {useHarborApi} from "../../../../modules";
+import {APIType, useAPI} from "../../../../modules";
 
 // ------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@ export type HarborRobotAccount = {
 }
 
 export async function findHarborRobotAccount(name: string, withSecret: boolean = true) : Promise<HarborRobotAccount|undefined> {
-    const {data} = await useHarborApi().get('robots?q=name%3D'+name+'&page_size=1');
+    const {data} = await useAPI(APIType.HARBOR).get('robots?q=name%3D'+name+'&page_size=1');
 
     const accounts = Array.isArray(data) ? data.filter(account => account.name === 'robot$'+name) : [];
 
@@ -56,7 +56,7 @@ export async function patchHarborProjectRobotAccount(robotId: string | number, r
         ...record
     };
 
-    const { data } : {data: HarborRobotAccount} = await useHarborApi()
+    const { data } : {data: HarborRobotAccount} = await useAPI(APIType.HARBOR)
         .patch('robots/'+robotId, robot);
 
     if(typeof record.secret !== 'undefined') {
@@ -93,13 +93,13 @@ export async function ensureHarborProjectRobotAccount(robotName: string, project
         ]
     };
 
-    const { data } : {data: HarborRobotAccount} = await useHarborApi()
+    const { data } : {data: HarborRobotAccount} = await useAPI(APIType.HARBOR)
         .post('robots', robot);
 
     return data;
 }
 
 export async function dropHarborProjectAccount(robotId: string | number) : Promise<void> {
-    await useHarborApi()
+    await useAPI(APIType.HARBOR)
         .delete('robots/'+robotId);
 }

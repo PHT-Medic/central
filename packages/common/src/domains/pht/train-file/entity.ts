@@ -15,7 +15,7 @@ import {
     UpdateDateColumn
 } from "typeorm";
 import {Realm} from "../../auth";
-import {User} from "../../auth/user";
+import {User} from "../../auth";
 import {Train} from "../train";
 
 

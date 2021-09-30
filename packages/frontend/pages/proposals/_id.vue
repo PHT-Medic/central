@@ -5,12 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import { LayoutNavigationDefaultId } from "@/config/layout";
-    import {getProposal} from "@/domains/proposal/api.ts";
-    import {getApiProposalStations} from "@/domains/proposal/station/api.ts";
-    import ProposalSvg from "@/components/svg/ProposalSvg";
-    import ProposalStationAction from "@/components/proposal/ProposalStationAction";
-    import {getStations} from "@/domains/station/api";
+import {getApiProposalStations, getAPIStations, getProposal} from "@personalhealthtrain/ui-common";
+    import { LayoutNavigationDefaultId } from "../../config/layout";
+    import ProposalSvg from "../../components/svg/ProposalSvg";
+    import ProposalStationAction from "../../components/proposal/ProposalStationAction";
 
     export default {
         components: {ProposalStationAction, ProposalSvg},
@@ -31,7 +29,7 @@
 
                 if(proposal.realmId !== realmId) {
                     try {
-                        const {data: stations} = await getStations({
+                        const {data: stations} = await getAPIStations({
                             filter: {
                                 realm_id: proposal.realmId
                             }
@@ -43,7 +41,7 @@
                             const response = await getApiProposalStations({
                                 filter: {
                                     proposal_id: proposal.id,
-                                    station_id: visitorStation.id
+                                    station_id: stations[0].id
                                 }
                             });
 

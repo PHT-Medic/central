@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+    import {getAPIUser} from "@personalhealthtrain/ui-common/src";
     import {LayoutNavigationAdminId} from "../../../config/layout";
-    import {getUser} from "@/domains/user/api.ts";
 
     export default {
         meta: {
@@ -20,7 +20,7 @@
             let user;
 
             try {
-                user = await getUser(context.params.id, {fields: ['+email']});
+                user = await getAPIUser(context.params.id, {fields: ['+email']});
 
                 return {
                     user

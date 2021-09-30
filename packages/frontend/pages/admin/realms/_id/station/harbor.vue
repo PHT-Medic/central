@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {doStationTask} from "@/domains/station/api";
+import {doAPIStationTask} from "@personalhealthtrain/ui-common/src";
 
 export default {
     props: {
@@ -46,7 +46,7 @@ export default {
             }
 
             try {
-                const station = await doStationTask(this.station.id, action, {});
+                const station = await doAPIStationTask(this.station.id, action, {});
 
                 switch (action) {
                     case 'checkHarbor':

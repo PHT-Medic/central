@@ -6,8 +6,7 @@
   -->
 <script>
     import AlertMessage from "../../../components/alert/AlertMessage";
-    import { mapGetters } from "vuex";
-    import UserDetailsForm from "@/components/user/UserDetailsForm";
+    import UserDetailsForm from "../../../components/user/UserDetailsForm";
 
     export default {
         meta: {

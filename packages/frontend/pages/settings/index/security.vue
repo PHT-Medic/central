@@ -5,14 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import userPasswordFormMixin from "../../../mixins/userPasswordFormMixin";
-import UserPublicKeyForm from "@/components/user/UserPublicKeyForm";
-import UserPasswordForm from "@/components/user/UserPasswordForm";
+import UserPublicKeyForm from "../../../components/user/UserPublicKeyForm";
+import UserPasswordForm from "../../../components/user/UserPasswordForm";
 
 export default {
-        mixins: [
-            userPasswordFormMixin
-        ],
         components: {
             UserPasswordForm,
             UserPublicKeyForm

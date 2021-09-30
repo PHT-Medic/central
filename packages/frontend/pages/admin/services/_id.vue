@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {LayoutNavigationAdminId} from "@/config/layout";
+import {getAPIService} from "@personalhealthtrain/ui-common";
+import {LayoutNavigationAdminId} from "../../../config/layout";
 import Vue from "vue";
-import {getService} from "~/domains/service/api";
 
 export default {
     meta: {
@@ -16,7 +16,7 @@ export default {
     },
     async asyncData(context) {
         try {
-            const service = await getService(context.params.id, {include: 'client'});
+            const service = await getAPIService(context.params.id, {include: ['client']});
 
             return {
                 service

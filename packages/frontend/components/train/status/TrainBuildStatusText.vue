@@ -12,7 +12,7 @@
     </span>
 </template>
 <script>
-import {TrainBuildStatus} from "@/domains/train";
+import {TrainBuildStatus} from "../../../domains/train";
 
 export default {
     props: {

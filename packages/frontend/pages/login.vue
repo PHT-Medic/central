@@ -5,10 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+    import {getProviderAuthorizeUri, getAPIProviders} from "@personalhealthtrain/ui-common";
     import { mapGetters, mapActions } from 'vuex'
-    import {getProviderAuthorizeUri, getProviders} from "@/domains/provider/api.ts";
-    import MedicineWorker from "@/components/svg/MedicineWorker";
-    import Pagination from "@/components/Pagination";
+    import MedicineWorker from "../components/svg/MedicineWorker";
+    import Pagination from "../components/Pagination";
     import {maxLength, minLength, required} from "vuelidate/lib/validators";
 
     export default {
@@ -73,17 +73,18 @@
                 this.provider.busy = true;
 
                 try {
-                    let record = {
+                    const response = await getAPIProviders({
                         page: {
                             limit: this.provider.meta.limit,
                             offset: this.provider.meta.offset
                         },
                         filter: {
-                            realm_id: '!=master'
+                            realm_id: {
+                                operator: '!',
+                                value: 'master'
+                            }
                         }
-                    };
-
-                    const response = await getProviders(record);
+                    });
 
                     this.provider.items = response.data;
                     const {total} = response.meta;

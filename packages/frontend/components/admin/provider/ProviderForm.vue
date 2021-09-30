@@ -5,13 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {addAPIProvider, editAPIProvider, getRealms} from "@personalhealthtrain/ui-common";
 import {maxLength, minLength, required} from "vuelidate/lib/validators";
 
 import AlertMessage from "../../alert/AlertMessage";
 import NotImplemented from "../../NotImplemented";
-import {addProvider, editProvider} from "@/domains/provider/api.ts";
-import {getRealms} from "@/domains/realm/api.ts";
-import {clearObjectProperties} from "@/modules/utils.ts";
+import {clearObjectProperties} from "../../../modules/utils.ts";
 
 export default {
     name: 'ProviderForm',
@@ -145,7 +144,7 @@ export default {
                 let response;
 
                 if(this.isEditing) {
-                    response = await editProvider(this.provider.id, clearObjectProperties(this.formData));
+                    response = await editAPIProvider(this.provider.id, clearObjectProperties(this.formData));
 
                     this.message = {
                         isError: false,
@@ -154,7 +153,7 @@ export default {
 
                     this.$emit('updated', response);
                 } else {
-                    response = await addProvider(clearObjectProperties(this.formData));
+                    response = await addAPIProvider(clearObjectProperties(this.formData));
 
                     this.message = {
                         isError: false,

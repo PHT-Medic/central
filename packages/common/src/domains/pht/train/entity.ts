@@ -77,6 +77,9 @@ export class Train {
     @Column({type: "integer", unsigned: true, nullable: true, default: null})
     run_station_id: number | null;
 
+    @Column({type: "integer", unsigned: true, nullable: true, default: null})
+    run_station_index: number | null;
+
     // ------------------------------------------------------------------
 
     @CreateDateColumn()

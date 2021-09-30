@@ -28,3 +28,8 @@ export type TrainStationRunStatusType = keyof typeof TrainStationRunStatus;
 export function isTrainStationRunStatus(type: string) : type is TrainStationRunStatusType {
     return type in TrainStationRunStatus;
 }
+
+export enum TrainStationStatic {
+    INCOMING = 'incoming',
+    OUTGOING = 'outgoing'
+}

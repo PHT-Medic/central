@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import TrainTable from "@/components/train/TrainTable";
-    import TrainBasicForm from "@/components/train/TrainBasicForm";
-    import StationTrainTable from "@/components/station/StationTrainTable";
+    import TrainTable from "../../../../components/train/TrainTable";
+    import TrainBasicForm from "../../../../components/train/TrainBasicForm";
+    import StationTrainTable from "../../../../components/station/StationTrainTable";
 
     export default {
         meta: {
@@ -44,11 +44,7 @@
     <div>
         <div class="m-t-10">
             <template v-if="visitorStation">
-                <station-train-table
-                    ref="trainTable"
-                    :proposal-id="proposal.id"
-                    :station-id="stationId"
-                />
+                mmhhh station train table missing :) !!!
             </template>
             <template v-else>
                 <train-table

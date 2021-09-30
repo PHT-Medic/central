@@ -5,12 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import {User} from "@personalhealthtrain/ui-common";
 import Vue from 'vue';
 import {ActionTree, GetterTree, MutationTree} from "vuex";
 
 import {RootState} from "~/store/index";
 
-import {Oauth2TokenResponse} from "@typescript-auth/core";
+import {Oauth2TokenResponse, OwnedPermission} from "@typescript-auth/core";
 
 export const AuthStoreKey = {
     user: 'user',
@@ -24,9 +25,9 @@ export type AuthStoreToken = Oauth2TokenResponse & {
 }
 
 export interface AuthState {
-    user: Record<string, any> | undefined,
+    user: User | undefined,
 
-    permissions: Record<string, any>[],
+    permissions: OwnedPermission<any>[],
     permissionsResolved: boolean,
 
     token: AuthStoreToken | undefined,
@@ -54,11 +55,11 @@ export const getters : GetterTree<AuthState, RootState> = {
     user: (state: AuthState) => {
         return state.user
     },
-    userId: (state: AuthState) => {
+    userId: (state: AuthState) : typeof User.prototype.id => {
         return state.user ? state.user.id : undefined;
     },
-    userRealmId: (state: AuthState) => {
-        return state.user ? state.user.realmId : undefined;
+    userRealmId: (state: AuthState) : typeof User.prototype.realm_id => {
+        return state.user ? state.user.realm_id : undefined;
     },
     permissions: (state: AuthState) => {
         return state.permissions

@@ -5,13 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {addAPIUser, getRealms} from "@personalhealthtrain/ui-common/src";
     import {maxLength, minLength, required, email} from "vuelidate/lib/validators";
 
     import AlertMessage from "../../../components/alert/AlertMessage";
     import NotImplemented from "../../../components/NotImplemented";
     import {LayoutNavigationAdminId} from "../../../config/layout";
-    import {addUser} from "@/domains/user/api.ts";
-    import {getRealms} from "@/domains/realm/api.ts";
 
     export default {
         meta: {
@@ -90,7 +89,7 @@
                 this.busy = true;
 
                 try {
-                    let response = await addUser(this.formData);
+                    let response = await addAPIUser(this.formData);
                     await this.$nuxt.$router.push('/admin/users/' + response.id);
                 } catch (e) {
                     this.message = {

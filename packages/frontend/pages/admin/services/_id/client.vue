@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import ServiceClientDetails from "~/components/service/ServiceClientDetails";
+import ServiceClientDetails from "../../../../components/service/ServiceClientDetails";
 
 export default {
     components: {ServiceClientDetails},

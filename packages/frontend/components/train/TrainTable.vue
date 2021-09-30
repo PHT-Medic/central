@@ -5,10 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropTrain, getTrains} from "@/domains/train/api.ts";
-import AlertMessage from "@/components/alert/AlertMessage";
-import Pagination from "@/components/Pagination";
-import TrainCard from "@/components/train/TrainCard";
+import {dropAPITrain, getAPITrains} from "@personalhealthtrain/ui-common/src";
+import AlertMessage from "../../components/alert/AlertMessage";
+import Pagination from "../../components/Pagination";
+import TrainCard from "../../components/train/TrainCard";
 
 export default {
     components: {
@@ -66,7 +66,7 @@ export default {
                     }
                 }
 
-                const response = await getTrains(record);
+                const response = await getAPITrains(record);
 
                 this.items = response.data;
                 const {total} = response.meta;
@@ -93,7 +93,7 @@ export default {
             this.actionBusy = true;
 
             try {
-                await dropTrain(train.id);
+                await dropAPITrain(train.id);
 
                 let index = this.items.findIndex(item => item.id === train.id);
                 if (index !== -1) {

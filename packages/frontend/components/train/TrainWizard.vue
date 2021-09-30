@@ -5,13 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import TrainWizardConfiguratorStep from "@/components/train/wizard/TrainWizardConfiguratorStep";
-import TrainFileManager from "@/components/train/file/TrainFileManager";
-import {editTrain, runTrainCommand} from "@/domains/train/api.ts";
-import TrainWizardHashStep from "@/components/train/wizard/TrainWizardHashStep";
-import TrainWizardFinalStep from "@/components/train/wizard/TrainWizardFinalStep";
-import {TrainConfigurationStatus, TrainConfiguratorStates} from "@/domains/train/index.ts";
-import {TrainCommand} from "~/domains/train/type";
+import {editAPITrain, runAPITrainCommand} from "@personalhealthtrain/ui-common/src";
+import TrainWizardConfiguratorStep from "../../components/train/wizard/TrainWizardConfiguratorStep";
+import TrainFileManager from "../../components/train/file/TrainFileManager";
+import TrainWizardHashStep from "../../components/train/wizard/TrainWizardHashStep";
+import TrainWizardFinalStep from "../../components/train/wizard/TrainWizardFinalStep";
+import {TrainConfigurationStatus} from "../../domains/train";
+import {FrontendTrainCommand} from "../../domains/train/type";
 
 export default {
     components: {TrainWizardFinalStep, TrainWizardHashStep, TrainFileManager, TrainWizardConfiguratorStep},
@@ -93,7 +93,7 @@ export default {
             if(keys.length === 0) return;
 
             try {
-                const train = await editTrain(this.trainProperty.id, data);
+                const train = await editAPITrain(this.trainProperty.id, data);
 
                 const updateData = {
                     status: train.status,
@@ -112,7 +112,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runTrainCommand(this.trainProperty.id, TrainCommand.BUILD_START);
+                const train = await runAPITrainCommand(this.trainProperty.id, FrontendTrainCommand.BUILD_START);
 
                 this.$emit('updated', {
                     status: train.status,

@@ -5,15 +5,21 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {addUserKeyRing, dropUserKeyRing, editUserKeyRing, getUserKeyRing} from "@/domains/user/publicKey/api.ts";
-import {maxLength, minLength, numeric, required} from "vuelidate/lib/validators";
-import AlertMessage from "@/components/alert/AlertMessage";
+import {User} from "@personalhealthtrain/ui-common";
+import {
+    addAPIUserKeyRing,
+    dropAPIUserKeyRing,
+    editAPIUserKeyRing,
+    getAPIUserKeyRing
+} from "@personalhealthtrain/ui-common/src";
+import {maxLength, minLength, numeric} from "vuelidate/lib/validators";
+import AlertMessage from "../../components/alert/AlertMessage";
 
 export default {
     components: {AlertMessage},
     props: {
         userProperty: {
-            type: Object,
+            type: User,
             default: undefined
         }
     },
@@ -22,8 +28,8 @@ export default {
             item: undefined,
             busy: false,
             form: {
-                publicKey: '',
-                heKey: ''
+                public_key: '',
+                he_key: ''
             },
             formMeta: {
                 busy: false
@@ -33,11 +39,11 @@ export default {
     },
     validations: {
         form: {
-            publicKey: {
+            public_key: {
                 minLength: minLength(5),
                 maxLength: maxLength(4096)
             },
-            heKey: {
+            he_key: {
                 numeric,
                 minLength: minLength(5),
                 maxLength: maxLength(4096)
@@ -54,10 +60,10 @@ export default {
             this.busy = true;
 
             try {
-                this.item = await getUserKeyRing();
+                this.item = await getAPIUserKeyRing();
 
-                this.form.publicKey = this.item.publicKey;
-                this.form.heKey = this.item.heKey;
+                this.form.public_key = this.item.public_key;
+                this.form.he_key = this.item.he_key;
             } catch (e) {
 
             }
@@ -73,7 +79,7 @@ export default {
 
             try {
                 if(typeof this.item !== 'undefined') {
-                    this.item = await editUserKeyRing(this.item.id, this.form);
+                    this.item = await editAPIUserKeyRing(this.item.id, this.form);
 
                     this.$emit('updated', this.item);
                     this.message = {
@@ -81,7 +87,7 @@ export default {
                         isError: false
                     }
                 } else {
-                    this.item = await addUserKeyRing(this.form);
+                    this.item = await addAPIUserKeyRing(this.form);
 
                     this.$emit('created', this.item);
                     this.message = {
@@ -105,11 +111,11 @@ export default {
             this.busy = true;
 
             try {
-                await dropUserKeyRing(this.item.id);
+                await dropAPIUserKeyRing(this.item.id);
 
                 this.item = undefined;
-                this.form.publicKey = '';
-                this.form.heKey = '';
+                this.form.public_key = '';
+                this.form.he_key = '';
             } catch (e) {
 
             }
@@ -124,7 +130,7 @@ export default {
             let reader = new FileReader();
             reader.readAsText(file, 'UTF-8');
             reader.onload = (evt) => {
-                this.form.publicKey = evt.target.result;
+                this.form.public_key = evt.target.result;
                 this.formMeta.busy = false;
                 this.$refs.myPublicKey.value = '';
             };
@@ -138,18 +144,18 @@ export default {
         exists() {
             return typeof this.item !== 'undefined';
         },
-        publicKeyExists() {
-            return this.exists && !!this.item.publicKey && this.item.publicKey !== '';
+        public_keyExists() {
+            return this.exists && !!this.item.public_key && this.item.public_key !== '';
         },
-        heKeyExists() {
-            return this.exists && !!this.item.heKey && this.item.heKey !== '';
+        he_keyExists() {
+            return this.exists && !!this.item.he_key && this.item.he_key !== '';
         }
     }
 }
 </script>
 <template>
     <div class="">
-        <div v-if="!exists" class="alert-sm m-b-20" :class="{'alert-warning': !publicKeyExists || !heKeyExists, 'alert-info': publicKeyExists && heKeyExists}">
+        <div v-if="!exists" class="alert-sm m-b-20" :class="{'alert-warning': !public_keyExists || !he_keyExists, 'alert-info': public_keyExists && he_keyExists}">
             Please upload your <strong>public-key</strong>. It will be used for the creation of a train.
             In addition you can also provide an he-key.
         </div>
@@ -168,7 +174,7 @@ export default {
                             </div>
                         </template>
                         <template v-else>
-                            <textarea class="form-control" v-model="$v.form.publicKey.$model" rows="8" placeholder="public key..."></textarea>
+                            <textarea class="form-control" v-model="$v.form.public_key.$model" rows="8" placeholder="public key..."></textarea>
                         </template>
                     </div>
 
@@ -182,18 +188,18 @@ export default {
                 <div class="col">
                     <h6>2. He-Key <i class="fa fa-key text-success"></i></h6>
 
-                    <div class="form-group" :class="{ 'form-group-error': $v.form.heKey.$anyError }">
+                    <div class="form-group" :class="{ 'form-group-error': $v.form.he_key.$anyError }">
                         <template v-if="busy">
                             <div class="fa-3x">
                                 <i class="fas fa-cog fa-spin"></i>
                             </div>
                         </template>
                         <template v-else>
-                            <textarea class="form-control" v-model="$v.form.heKey.$model" rows="8" placeholder="he key..."></textarea>
+                            <textarea class="form-control" v-model="$v.form.he_key.$model" rows="8" placeholder="he key..."></textarea>
                         </template>
 
-                        <div v-if="!$v.form.heKey.numeric" class="form-group-hint group-required">
-                            The value of the field heKey must be numeric.
+                        <div v-if="!$v.form.he_key.numeric" class="form-group-hint group-required">
+                            The value of the field he_key must be numeric.
                         </div>
                     </div>
 

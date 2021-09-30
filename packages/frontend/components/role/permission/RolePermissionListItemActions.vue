@@ -15,7 +15,7 @@
     </div>
 </template>
 <script>
-import {addRolePermission, dropRolePermission} from "@/domains/role/permission/api";
+import {addRolePermission, dropRolePermission} from "@personalhealthtrain/ui-common/src";
 
 export default {
     props: {

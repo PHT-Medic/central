@@ -5,12 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getMasterImages} from "@/domains/masterImage/api.ts";
-import {getApiProposalStations} from "@/domains/proposal/station/api.ts";
+import {
+    addAPITrainStation, dropAPITrainStation,
+    editAPITrainStation,
+    getAPIMasterImages,
+    getApiProposalStations, ProposalStationApprovalStatus
+} from "@personalhealthtrain/ui-common";
 import {minLength, numeric, required} from "vuelidate/lib/validators";
-import {addTrainStation, dropTrainStation, editTrainStation} from "@/domains/train-station/api";
-import {ProposalStationStatusOptions} from "@/domains/proposal/station";
-import ProposalStationList from "@/components/proposal/ProposalStationList";
+import ProposalStationList from "../../../components/proposal/ProposalStationList";
 
 export default {
     components: {ProposalStationList},
@@ -32,7 +34,7 @@ export default {
                 stationIds: []
             },
 
-            proposalStationStates: ProposalStationStatusOptions,
+            proposalStationStatus: ProposalStationApprovalStatus,
             proposalStation: {
                 items: [],
                 busy: false
@@ -106,7 +108,7 @@ export default {
             this.masterImage.busy = true;
 
             try {
-                const response = await getMasterImages();
+                const response = await getAPIMasterImages();
                 this.masterImage.items = response.data;
                 if(this.form.masterImageId === '' && this.masterImage.items.length > 0) {
                     this.form.masterImageId = this.masterImage.items[0].id;
@@ -160,7 +162,7 @@ export default {
             this.trainStation.busy = true;
 
             try {
-                const trainStation = await addTrainStation({
+                const trainStation = await addAPITrainStation({
                     trainId: this.train.id,
                     stationId: stationId,
                     position: this.trainStation.items.length
@@ -185,7 +187,7 @@ export default {
             this.trainStation.busy = true;
 
             try {
-                await dropTrainStation(trainStationId);
+                await dropAPITrainStation(trainStationId);
 
                 const index = this.trainStation.items.findIndex(trainStation => trainStation.id === trainStationId);
                 if(index !== -1) {
@@ -216,11 +218,11 @@ export default {
                             return;
                         }
 
-                        await editTrainStation(this.trainStation.items[index].id, {
+                        await editAPITrainStation(this.trainStation.items[index].id, {
                             position: index - 1
                         });
 
-                        await editTrainStation(this.trainStation.items[index-1].id, {
+                        await editAPITrainStation(this.trainStation.items[index-1].id, {
                             position: index
                         })
 
@@ -232,11 +234,11 @@ export default {
                         break;
                     // 3 -> 4
                     case 'down':
-                        await editTrainStation(this.trainStation.items[index].id, {
+                        await editAPITrainStation(this.trainStation.items[index].id, {
                             position: index + 1
                         });
 
-                        await editTrainStation(this.trainStation.items[index+1].id, {
+                        await editAPITrainStation(this.trainStation.items[index+1].id, {
                             position: index
                         })
 
@@ -290,7 +292,7 @@ export default {
                             <button
                                 type="button"
                                 class="btn btn-primary btn-xs"
-                                :disabled="props.item.status !== proposalStationStates.ProposalStationStatusApproved"
+                                :disabled="props.item.status !== proposalStationStatus.APPROVED"
                                 @click.prevent="addTrainStation(props.item.stationId)"
                             >
                                 <i class="fa fa-plus"></i>

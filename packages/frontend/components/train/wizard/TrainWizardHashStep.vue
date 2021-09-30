@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import AlertMessage from "@/components/alert/AlertMessage";
-import {runTrainCommand} from "@/domains/train/api.ts";
-import {TrainCommand} from "~/domains/train/type";
+import {runAPITrainCommand} from "@personalhealthtrain/ui-common/src";
+import AlertMessage from "../../../components/alert/AlertMessage";
+import {FrontendTrainCommand} from "../../../domains/train/type";
 export default {
     components: {AlertMessage},
     props: {
@@ -43,7 +43,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runTrainCommand(this.train.id, TrainCommand.GENERATE_HASH);
+                const train = await runAPITrainCommand(this.train.id, FrontendTrainCommand.GENERATE_HASH);
 
                 this.setHash(train.hash);
                 this.$emit('hashGenerated', this.form.hash);

@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+    import {getAPIRole} from "@personalhealthtrain/ui-common/src";
     import {LayoutNavigationAdminId} from "../../../config/layout";
-    import {getRole} from "@/domains/role/api.ts";
 
     export default {
         meta: {
@@ -18,7 +18,7 @@
         },
         async asyncData(context) {
             try {
-                const role = await getRole(context.params.id);
+                const role = await getAPIRole(context.params.id);
 
                 return {
                     role

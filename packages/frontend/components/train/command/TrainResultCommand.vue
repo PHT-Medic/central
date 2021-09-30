@@ -5,16 +5,15 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {TrainResultStatus} from "@/domains/train-result/type";
-import {TrainConfigurationStatus, TrainBuildStatus, TrainRunStatus} from "@/domains/train/index.ts";
-import {runTrainCommand} from "@/domains/train/api.ts";
-import {TrainCommand} from "@/domains/train/type";
+import {runAPITrainCommand, Train, TrainResultStatus} from "@personalhealthtrain/ui-common";
+import {TrainRunStatus} from "../../../domains/train";
+import {FrontendTrainCommand} from "../../../domains/train/type";
 import {BDropdownItem} from "bootstrap-vue";
 
 export default {
     props: {
         train: {
-            type: Object,
+            type: Train,
             default: undefined
         },
         trainResultId: {
@@ -23,7 +22,7 @@ export default {
         },
         command: {
             type: String,
-            default: TrainCommand.RESULT_START
+            default: FrontendTrainCommand.RESULT_START
         },
 
         elementType: {
@@ -117,11 +116,11 @@ export default {
 
             try {
                 switch (this.command) {
-                    case TrainCommand.RESULT_DOWNLOAD:
+                    case FrontendTrainCommand.RESULT_DOWNLOAD:
                         window.open(this.$config.resultServiceApiUrl+'train-results/'+this.trainResultId+'/download');
                         break;
                     default:
-                        const train = await runTrainCommand(this.train.id, this.command);
+                        const train = await runAPITrainCommand(this.train.id, this.command);
                         this.$emit('done', train);
                         break;
                 }
@@ -142,7 +141,7 @@ export default {
     computed: {
         isShown() {
             return this.$auth.can('edit','train') &&
-                (this.train.runStatus === TrainRunStatus.FINISHED || this.command === TrainCommand.RESULT_STATUS);
+                (this.train.run_status === TrainRunStatus.FINISHED || this.command === FrontendTrainCommand.RESULT_STATUS);
         },
         isEnabled() {
             if(
@@ -152,22 +151,22 @@ export default {
             }
 
             switch (this.command) {
-                case TrainCommand.RESULT_START:
-                    return !this.train.resultStatus ||
+                case FrontendTrainCommand.RESULT_START:
+                    return !this.train.result_status ||
                         [
                             TrainResultStatus.STOPPED,
                             TrainResultStatus.FAILED
-                        ].indexOf(this.train.resultStatus) !== -1;
-                case TrainCommand.RESULT_STOP:
-                    return this.train.resultStatus &&
+                        ].indexOf(this.train.result_status) !== -1;
+                case FrontendTrainCommand.RESULT_STOP:
+                    return this.train.result_status &&
                         [
                             TrainResultStatus.STARTING,
                             TrainResultStatus.STARTED,
                             TrainResultStatus.FINISHED,
                             TrainResultStatus.STOPPING
-                        ].indexOf(this.train.resultStatus) !== -1;
-                case TrainCommand.RESULT_STATUS:
-                case TrainCommand.RESULT_DOWNLOAD:
+                        ].indexOf(this.train.result_status) !== -1;
+                case FrontendTrainCommand.RESULT_STATUS:
+                case FrontendTrainCommand.RESULT_DOWNLOAD:
                     return true;
             }
 
@@ -175,13 +174,13 @@ export default {
         },
         commandText() {
             switch (this.command) {
-                case TrainCommand.RESULT_DOWNLOAD:
+                case FrontendTrainCommand.RESULT_DOWNLOAD:
                     return 'download';
-                case TrainCommand.RESULT_START:
+                case FrontendTrainCommand.RESULT_START:
                     return 'start';
-                case TrainCommand.RESULT_STOP:
+                case FrontendTrainCommand.RESULT_STOP:
                     return 'stop';
-                case TrainCommand.RESULT_STATUS:
+                case FrontendTrainCommand.RESULT_STATUS:
                     return 'status';
                 default:
                     return '';
@@ -189,13 +188,13 @@ export default {
         },
         iconClass() {
             switch (this.command) {
-                case TrainCommand.RESULT_DOWNLOAD:
+                case FrontendTrainCommand.RESULT_DOWNLOAD:
                     return 'fa fa-download';
-                case TrainCommand.RESULT_START:
+                case FrontendTrainCommand.RESULT_START:
                     return 'fa fa-wrench';
-                case TrainCommand.RESULT_STOP:
+                case FrontendTrainCommand.RESULT_STOP:
                     return 'fa fa-stop';
-                case TrainCommand.RESULT_STATUS:
+                case FrontendTrainCommand.RESULT_STATUS:
                     return 'fas fa-search';
                 default:
                     return '';
@@ -203,13 +202,13 @@ export default {
         },
         classSuffix() {
             switch (this.command) {
-                case TrainCommand.RESULT_DOWNLOAD:
+                case FrontendTrainCommand.RESULT_DOWNLOAD:
                     return 'dark';
-                case TrainCommand.RESULT_START:
+                case FrontendTrainCommand.RESULT_START:
                     return 'success';
-                case TrainCommand.RESULT_STOP:
+                case FrontendTrainCommand.RESULT_STOP:
                     return 'danger';
-                case TrainCommand.RESULT_STATUS:
+                case FrontendTrainCommand.RESULT_STATUS:
                     return 'primary';
                 default:
                     return 'info';

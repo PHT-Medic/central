@@ -5,10 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {getAPIServices} from "@personalhealthtrain/ui-common/src";
 import {LayoutNavigationAdminId} from "~/config/layout";
-import StationForm from "@/components/station/StationForm";
-import {getServices} from "@/domains/service/api.ts";
-import ServiceClientDetails from "~/components/service/ServiceClientDetails";
+import StationForm from "../../../components/station/StationForm";
+import ServiceClientDetails from "../../../components/service/ServiceClientDetails";
 
 export default {
     components: {ServiceClientDetails, StationForm},
@@ -42,7 +42,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getServices({
+                const response = await getAPIServices({
                     include: ['realm', 'client']
                 });
 

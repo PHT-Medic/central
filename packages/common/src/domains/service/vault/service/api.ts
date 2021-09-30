@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {useVaultApi} from "../../../../modules/api/service";
+import {APIType, useAPI} from "../../../../modules";
 import {Service} from "../../entity";
 import {Client} from "../../../auth";
 
@@ -16,7 +16,7 @@ export async function saveServiceSecretToVault(
     const id : string = typeof service === 'string' ? service : service.id;
 
     try {
-        const {data} = await useVaultApi()
+        const {data} = await useAPI(APIType.VAULT)
             .post('services/' + id, {
                 clientId: client.id,
                 clientSecret: client.secret
@@ -26,7 +26,7 @@ export async function saveServiceSecretToVault(
     } catch (e) {
         if(e?.response?.status === 404) {
             // create engine
-            await useVaultApi().createKeyValueEngine({path: 'services'});
+            await useAPI<APIType.VAULT>().createKeyValueEngine({path: 'services'});
 
             return await saveServiceSecretToVault(service, client);
         }
@@ -38,6 +38,6 @@ export async function saveServiceSecretToVault(
 export async function removeServiceSecretFromVault(entity: Pick<Service, 'id'> | string) {
     const id : string = typeof entity === 'string' ? entity : entity.id;
 
-    await useVaultApi()
+    await useAPI(APIType.VAULT)
         .delete('services/'+id);
 }

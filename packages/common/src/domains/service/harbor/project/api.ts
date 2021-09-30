@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {useHarborApi} from "../../../../modules/api/service";
+import {APIType, useAPI} from "../../../../modules";
 
 export type HarborProject = {
     name: string,
@@ -20,7 +20,7 @@ export async function findHarborProject(id: string | number, isProjectName: bool
     }
 
     try {
-        const {data} = await useHarborApi()
+        const {data} = await useAPI(APIType.HARBOR)
             .get('projects/' + id);
 
         return {
@@ -38,7 +38,7 @@ export async function findHarborProject(id: string | number, isProjectName: bool
 
 export async function ensureHarborProject(name: string) {
     try {
-        await useHarborApi()
+        await useAPI(APIType.HARBOR)
             .post('projects', {
                 project_name: name,
                 public: true
@@ -61,6 +61,6 @@ export async function deleteHarborProject(id: string | number, isProjectName: bo
         headers['X-Is-Resource-Name'] = true;
     }
 
-    await useHarborApi()
+    await useAPI(APIType.HARBOR)
         .delete('projects/' + id, headers);
 }

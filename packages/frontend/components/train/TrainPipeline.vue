@@ -5,19 +5,24 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {
+    Train,
+    TrainBuildStatus,
+    TrainConfigurationStatus,
+    TrainResultStatus,
+    TrainRunStatus
+} from "@personalhealthtrain/ui-common";
 import Vue from 'vue';
-import TrainResultCommand from "@/components/train/command/TrainResultCommand";
-import {TrainResultStatus} from "@/domains/train-result/type";
-import TrainBuildStatusText from "@/components/train/status/TrainBuildStatusText";
-import TrainBuildCommand from "@/components/train/command/TrainBuildCommand";
-import TrainRunStatusText from "@/components/train/status/TrainRunStatusText";
-import TrainRunCommand from "@/components/train/command/TrainRunCommand";
-import TrainResultStatusIcon from "@/components/train-result/status/TrainResultStatusIcon";
-import TrainResultStatusText from "@/components/train-result/status/TrainResultStatusText";
+import TrainResultCommand from "../../components/train/command/TrainResultCommand";
+import TrainBuildStatusText from "../../components/train/status/TrainBuildStatusText";
+import TrainBuildCommand from "../../components/train/command/TrainBuildCommand";
+import TrainRunStatusText from "../../components/train/status/TrainRunStatusText";
+import TrainRunCommand from "../../components/train/command/TrainRunCommand";
+import TrainResultStatusIcon from "../../components/train-result/status/TrainResultStatusIcon";
+import TrainResultStatusText from "../../components/train-result/status/TrainResultStatusText";
 
-import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "@/domains/train";
-import {TrainCommand} from "@/domains/train/type";
-import TrainConfigurationStatusText from "@/components/train/status/TrainConfigurationStatusText";
+import {FrontendTrainCommand} from "../../domains/train/type";
+import TrainConfigurationStatusText from "../../components/train/status/TrainConfigurationStatusText";
 
 export default {
     components: {
@@ -39,7 +44,7 @@ export default {
             type: Boolean,
             default: true
         },
-        trainProperty: Object
+        trainProperty: Train
     },
     created() {
         this.train = this.trainProperty;
@@ -52,7 +57,7 @@ export default {
             trainConfigurationStatus: TrainConfigurationStatus,
             trainRunStatus: TrainRunStatus,
             trainResultStatus: TrainResultStatus,
-            trainCommand: TrainCommand,
+            trainCommand: FrontendTrainCommand,
 
             busy: false
         }
@@ -65,7 +70,7 @@ export default {
         // ---------------------------------------------------------
 
         canConfigure() {
-            return this.canEdit && this.train.configurationStatus !== TrainConfigurationStatus.FINISHED;
+            return this.canEdit && this.train.configuration_status !== TrainConfigurationStatus.FINISHED;
         },
     },
     methods: {
@@ -100,7 +105,7 @@ export default {
                 <strong>1. Config</strong>
             </div>
             <div>
-                Status: <train-configuration-status-text :status="train.configurationStatus" />
+                Status: <train-configuration-status-text :status="train.configuration_status" />
             </div>
             <div v-if="withCommand" class="mt-1">
                 <nuxt-link v-if="canConfigure" class="btn btn-xs btn-primary" type="button" :to="'/trains/'+train.id+'/wizard'">
@@ -119,7 +124,7 @@ export default {
                 <strong>2. Build</strong>
             </div>
             <div>
-                Status: <train-build-status-text :status="train.buildStatus" />
+                Status: <train-build-status-text :status="train.build_status" />
                 <train-build-command
                     class="ml-1"
                     :command="trainCommand.BUILD_STATUS"
@@ -160,7 +165,7 @@ export default {
                 <strong>3. Run</strong>
             </div>
             <div>
-                Status: <train-run-status-text :status="train.runStatus" />
+                Status: <train-run-status-text :status="train.run_status" />
                 <train-run-command
                     class="ml-1"
                     :command="trainCommand.RUN_STATUS"
@@ -197,7 +202,7 @@ export default {
                 <strong>4. Result</strong>
             </div>
             <div >
-                Status: <train-result-status-text :status="train.resultStatus" />
+                Status: <train-result-status-text :status="train.result_status" />
                 <train-result-command
                     class="ml-1"
                     :command="trainCommand.RESULT_STATUS"

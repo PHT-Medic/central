@@ -5,12 +5,11 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {dropApiTrainFile, getApiTrainFiles, uploadTrainFiles} from "@personalhealthtrain/ui-common/src";
 import {required, minLength, maxLength } from 'vuelidate/lib/validators';
-import {getApiTrainFiles, dropApiTrainFile, uploadTrainFiles} from "@/domains/train-file/api.ts";
-import TrainFile from "@/components/train/file/TrainFile";
-import TrainFolder from "@/components/train/file/TrainFolder";
-import TrainFormFile from "@/components/train/file/TrainFormFile";
-import {editTrain} from "@/domains/train/api.ts";
+import TrainFile from "../../../components/train/file/TrainFile";
+import TrainFolder from "../../../components/train/file/TrainFolder";
+import TrainFormFile from "../../../components/train/file/TrainFormFile";
 
 export default {
     components: {TrainFormFile, TrainFolder, TrainFile},

@@ -5,10 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {dropAPITrain} from "@personalhealthtrain/ui-common/src";
 import Vue from 'vue';
-import TrainPipeline from "@/components/train/TrainPipeline";
-import {dropTrain} from "@/domains/train/api";
-import TrainStationsProgress from "@/components/train-station/progress/TrainStationsProgress";
+import TrainPipeline from "../../components/train/TrainPipeline";
+import TrainStationsProgress from "../../components/train-station/progress/TrainStationsProgress";
 
 export default {
     components: {
@@ -63,7 +63,7 @@ export default {
             this.busy = true;
 
             try {
-                await dropTrain(this.train.id);
+                await dropAPITrain(this.train.id);
 
                 this.$emit('deleted', this.train);
             } catch (e) {

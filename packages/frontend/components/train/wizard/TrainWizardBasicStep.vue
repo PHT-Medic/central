@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getUserKeyRing} from "@/domains/user/publicKey/api.ts";
+import {getAPIUserKeyRing} from "@personalhealthtrain/ui-common/src";
 
 export default {
     props: {
@@ -47,7 +47,7 @@ export default {
             this.publicKey.busy = true;
 
             try {
-                this.publicKey = await getUserKeyRing();
+                this.publicKey = await getAPIUserKeyRing();
             } catch (e) {
 
             }

@@ -5,20 +5,19 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {TrainConfigurationStatus, TrainBuildStatus, TrainRunStatus} from "@/domains/train/index.ts";
-import {runTrainCommand} from "@/domains/train/api.ts";
-import {TrainCommand} from "@/domains/train/type";
+import {runAPITrainCommand, Train, TrainBuildStatus, TrainConfigurationStatus} from "@personalhealthtrain/ui-common";
+import {FrontendTrainCommand} from "../../../domains/train/type";
 import {BDropdownItem} from "bootstrap-vue";
 
 export default {
     props: {
         train: {
-            type: Object,
+            type: Train,
             default: undefined
         },
         command: {
             type: String,
-            default: TrainCommand.BUILD_START
+            default: FrontendTrainCommand.BUILD_START
         },
 
         elementType: {
@@ -111,7 +110,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runTrainCommand(this.train.id, this.command);
+                const train = await runAPITrainCommand(this.train.id, this.command);
 
                 const message =  `Successfully executed build command ${this.commandText}`;
                 this.$bvToast.toast(message, {toaster: 'b-toaster-top-center', variant: 'success'});
@@ -128,7 +127,7 @@ export default {
     },
     computed: {
         isShown() {
-            return this.$auth.can('edit','train') && this.train.configurationStatus === TrainConfigurationStatus.FINISHED;
+            return this.$auth.can('edit','train') && this.train.configuration_status === TrainConfigurationStatus.FINISHED;
         },
         isEnabled() {
             if(
@@ -138,21 +137,21 @@ export default {
             }
 
             switch (this.command) {
-                case TrainCommand.BUILD_START:
-                    return !this.train.buildStatus ||
+                case FrontendTrainCommand.BUILD_START:
+                    return !this.train.build_status ||
                         [
                             TrainBuildStatus.STOPPED,
                             TrainBuildStatus.FAILED
-                        ].indexOf(this.train.buildStatus) !== -1;
-                case TrainCommand.BUILD_STOP:
-                    return this.train.buildStatus &&
+                        ].indexOf(this.train.build_status) !== -1;
+                case FrontendTrainCommand.BUILD_STOP:
+                    return this.train.build_status &&
                         [
                             TrainBuildStatus.STARTING,
                             TrainBuildStatus.STARTED,
                             TrainBuildStatus.FINISHED,
                             TrainBuildStatus.STOPPING
-                        ].indexOf(this.train.buildStatus) !== -1;
-                    case TrainCommand.BUILD_STATUS:
+                        ].indexOf(this.train.build_status) !== -1;
+                    case FrontendTrainCommand.BUILD_STATUS:
                         return true;
             }
 
@@ -160,11 +159,11 @@ export default {
         },
         commandText() {
             switch (this.command) {
-                case TrainCommand.BUILD_START:
+                case FrontendTrainCommand.BUILD_START:
                     return 'start';
-                case TrainCommand.BUILD_STOP:
+                case FrontendTrainCommand.BUILD_STOP:
                     return 'stop';
-                case TrainCommand.BUILD_STATUS:
+                case FrontendTrainCommand.BUILD_STATUS:
                     return 'status';
                 default:
                     return '';
@@ -172,11 +171,11 @@ export default {
         },
         iconClass() {
             switch (this.command) {
-                case TrainCommand.BUILD_START:
+                case FrontendTrainCommand.BUILD_START:
                     return 'fa fa-wrench';
-                case TrainCommand.BUILD_STOP:
+                case FrontendTrainCommand.BUILD_STOP:
                     return 'fa fa-stop';
-                case TrainCommand.BUILD_STATUS:
+                case FrontendTrainCommand.BUILD_STATUS:
                     return 'fas fa-search';
                 default:
                     return '';
@@ -184,11 +183,11 @@ export default {
         },
         classSuffix() {
             switch (this.command) {
-                case TrainCommand.BUILD_START:
+                case FrontendTrainCommand.BUILD_START:
                     return 'success';
-                case TrainCommand.BUILD_STOP:
+                case FrontendTrainCommand.BUILD_STOP:
                     return 'danger';
-                case TrainCommand.BUILD_STATUS:
+                case FrontendTrainCommand.BUILD_STATUS:
                     return 'primary';
                 default:
                     return 'info';

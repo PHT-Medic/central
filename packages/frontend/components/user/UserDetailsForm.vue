@@ -5,14 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {User} from "@personalhealthtrain/ui-common";
+import {editAPIUser, getRealms} from "@personalhealthtrain/ui-common/src";
 import {email, maxLength, minLength, required} from "vuelidate/lib/validators";
-import {editUser} from "@/domains/user/api.ts";
-import {getRealms} from "@/domains/realm/api.ts";
 
 export default {
     props: {
         userProperty: {
-            type: Object,
+            type: User,
             default: undefined
         }
     },
@@ -20,9 +20,9 @@ export default {
         return {
             form: {
                 name: '',
-                displayName: '',
+                display_name: '',
                 email: '',
-                realmId: '',
+                realm_id: '',
             },
             message: null,
             busy: false,
@@ -39,7 +39,7 @@ export default {
                 minLength: minLength(5),
                 maxLength: maxLength(128)
             },
-            displayName: {
+            display_name: {
                 required,
                 minLength: minLength(5),
                 maxLength: maxLength(128)
@@ -49,7 +49,7 @@ export default {
                 maxLength: maxLength(255),
                 email
             },
-            realmId: {
+            realm_id: {
                 required
             }
         }
@@ -57,9 +57,9 @@ export default {
     created() {
         if(typeof this.userProperty !== 'undefined') {
             this.form.name = this.userProperty.name ?? '';
-            this.form.displayName = this.userProperty.displayName ?? '';
+            this.form.display_name = this.userProperty.display_name ?? '';
             this.form.email = this.userProperty.email ?? '';
-            this.form.realmId = this.userProperty.realmId ?? '';
+            this.form.realm_id = this.userProperty.realm_id ?? '';
         }
 
         this.loadRealms();
@@ -113,7 +113,7 @@ export default {
                 let fieldsCount = Object.keys(fields).length;
 
                 if(fieldsCount > 0) {
-                    const user = await editUser(this.userProperty.id, fields);
+                    const user = await editAPIUser(this.userProperty.id, {...fields});
 
                     this.$emit('updated', user);
 
@@ -122,7 +122,7 @@ export default {
                         data: 'The user was successfully updated.'
                     }
 
-                    if(fields.hasOwnProperty('realmId')) {
+                    if(fields.hasOwnProperty('realm_id')) {
                         fields.realm = user.realm;
                     }
 
@@ -155,10 +155,10 @@ export default {
                 {{ message.data }}
             </div>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.form.realmId.$error }">
+            <div class="form-group" :class="{ 'form-group-error': $v.form.realm_id.$error }">
                 <label>Realm</label>
                 <select
-                    v-model="$v.form.realmId.$model"
+                    v-model="$v.form.realm_id.$model"
                     class="form-control"
                     :disabled="realm.busy || !$auth.can('edit','user')"
                 >
@@ -166,7 +166,7 @@ export default {
                     <option v-for="(item,key) in realm.items" :value="item.id" :key="key">{{ item.name }}</option>
                 </select>
 
-                <div v-if="!$v.form.realmId.required && !$v.form.realmId.$model" class="form-group-hint group-required">
+                <div v-if="!$v.form.realm_id.required && !$v.form.realm_id.$model" class="form-group-hint group-required">
                     Please select a realm.
                 </div>
             </div>
@@ -186,18 +186,18 @@ export default {
                 </div>
             </div>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.form.displayName.$error }">
+            <div class="form-group" :class="{ 'form-group-error': $v.form.display_name.$error }">
                 <label>Display Name</label>
-                <input v-model="$v.form.displayName.$model" type="text" name="displayName" class="form-control" placeholder="Display-Name...">
+                <input v-model="$v.form.display_name.$model" type="text" name="display_name" class="form-control" placeholder="Display-Name...">
 
-                <div v-if="!$v.form.displayName.required && !$v.form.displayName.$model" class="form-group-hint group-required">
+                <div v-if="!$v.form.display_name.required && !$v.form.display_name.$model" class="form-group-hint group-required">
                     Please enter a display name.
                 </div>
-                <div v-if="!$v.form.displayName.minLength" class="form-group-hint group-required">
-                    The length of the display name must be less than <strong>{{ $v.form.displayName.$params.minLength.min }}</strong> characters.
+                <div v-if="!$v.form.display_name.minLength" class="form-group-hint group-required">
+                    The length of the display name must be less than <strong>{{ $v.form.display_name.$params.minLength.min }}</strong> characters.
                 </div>
-                <div v-if="!$v.form.displayName.maxLength" class="form-group-hint group-required">
-                    The length of the display name must be greater than  <strong>{{ $v.form.displayName.$params.maxLength.max }}</strong> characters.
+                <div v-if="!$v.form.display_name.maxLength" class="form-group-hint group-required">
+                    The length of the display name must be greater than  <strong>{{ $v.form.display_name.$params.maxLength.max }}</strong> characters.
                 </div>
             </div>
 

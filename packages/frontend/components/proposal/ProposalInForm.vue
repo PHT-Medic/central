@@ -5,11 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {editApiProposalStation, ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
 import {maxLength, minLength, required, email} from "vuelidate/lib/validators";
 
-import AlertMessage from "@/components/alert/AlertMessage";
-import {ProposalStationStatusOptions} from "@/domains/proposal/station";
-import {editApiProposalStation} from "@/domains/proposal/station/api";
+import AlertMessage from "../../components/alert/AlertMessage";
 
 export default {
     components: {AlertMessage},
@@ -27,9 +26,8 @@ export default {
             },
 
             statusOptions: [
-                ProposalStationStatusOptions.ProposalStationStatusOpen,
-                ProposalStationStatusOptions.ProposalStationStatusApproved,
-                ProposalStationStatusOptions.ProposalStationStatusRejected
+                ProposalStationApprovalStatus.APPROVED,
+                ProposalStationApprovalStatus.REJECTED
             ],
 
             busy: false,

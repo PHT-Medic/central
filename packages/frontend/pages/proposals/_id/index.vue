@@ -5,10 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import ProposalStationStatus from "@/components/proposal/ProposalStationStatus";
-import {ProposalStationStatusOptions} from "@/domains/proposal/station";
-import ProposalStationList from "@/components/proposal/ProposalStationList";
-import ProposalStationAction from "@/components/proposal/ProposalStationAction";
+import {ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
+import ProposalStationStatus from "../../../components/proposal/ProposalStationStatus";
+import ProposalStationList from "../../../components/proposal/ProposalStationList";
+import ProposalStationAction from "../../../components/proposal/ProposalStationAction";
 
 export default {
     components:{
@@ -23,7 +23,7 @@ export default {
     },
     data() {
         return {
-            proposalStationStates: ProposalStationStatusOptions
+            proposalStationStatus: ProposalStationApprovalStatus
         }
     },
     props: {

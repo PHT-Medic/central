@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+const {TsconfigPathsPlugin} = require("tsconfig-paths-webpack-plugin");
+
 const config = {
     publicRuntimeConfig() {
         return {
@@ -101,6 +103,32 @@ const config = {
     router: {
         //base: '/',
         middleware: ['auth', 'layout']
+    },
+
+    build: {
+        extend(config, ctx) {
+            if (!config.resolve) {
+                config.resolve = {};
+            }
+
+            if(!config.resolve.alias) {
+                config.resolve.alias = {};
+            }
+
+            if (!config.resolve.plugins) {
+                config.resolve.plugins = [];
+            }
+
+            config.resolve.plugins.push(new TsconfigPathsPlugin({configFile: "./tsconfig.json"}));
+
+            if(config.resolve.alias.hasOwnProperty('~')) {
+                delete config.resolve.alias['~'];
+            }
+
+            if(config.resolve.alias.hasOwnProperty('@')) {
+                delete config.resolve.alias['@'];
+            }
+        }
     }
 }
 

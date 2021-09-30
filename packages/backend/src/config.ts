@@ -6,6 +6,7 @@
  */
 
 import {
+    APIType,
     setAPIConfig
 } from "@personalhealthtrain/ui-common";
 import {setConfig} from "amqp-extension";
@@ -14,8 +15,6 @@ import {Environment} from "./env";
 import {buildTrainBuilderAggregator} from "./aggregators/train-builder";
 import {buildTrainResultAggregator} from "./aggregators/train-result";
 import {buildDispatcherAggregator} from "./aggregators/dispatcher";
-import {useVaultApi} from "@personalhealthtrain/ui-common";
-import {useHarborApi} from "@personalhealthtrain/ui-common";
 import {buildCommandRouterComponent} from "./components/command-router";
 import {buildTrainRouterAggregator} from "./aggregators/train-router";
 
@@ -29,11 +28,8 @@ export type Config = {
 }
 
 function createConfig({env} : ConfigContext) : Config {
-    setAPIConfig('harbor', {connectionString: env.harborConnectionString});
-    setAPIConfig('vault', {connectionString: env.vaultConnectionString});
-
-    useVaultApi(env.vaultConnectionString);
-    useHarborApi(env.harborConnectionString);
+    setAPIConfig(APIType.HARBOR, {connectionString: env.harborConnectionString});
+    setAPIConfig(APIType.VAULT, {connectionString: env.vaultConnectionString});
 
     setConfig({
         connection: env.rabbitMqConnectionString,

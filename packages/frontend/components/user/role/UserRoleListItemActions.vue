@@ -15,7 +15,7 @@
     </div>
 </template>
 <script>
-import {addUserRole, dropUserRole} from "@/domains/user/role/api";
+import {addAPIUserRole, dropAPIUserRole} from "@personalhealthtrain/ui-common/src";
 
 export default {
     props: {
@@ -50,7 +50,7 @@ export default {
             this.busy = true;
 
             try {
-                const userRole = await addUserRole({
+                const userRole = await addAPIUserRole({
                     roleId: this.roleId,
                     userId: this.userId
                 });
@@ -68,7 +68,7 @@ export default {
             this.busy = true;
 
             try {
-                const userRole = await dropUserRole(this.userRoles[this.userRoleIndex].id);
+                const userRole = await dropAPIUserRole(this.userRoles[this.userRoleIndex].id);
 
                 this.$emit('dropped', userRole);
             } catch (e) {

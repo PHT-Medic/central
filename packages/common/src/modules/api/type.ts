@@ -16,8 +16,8 @@ export interface ApiResponse<T = any> extends AxiosResponse {
 
 }
 
-export type ResourceSimpleResponse<R> = R;
-export type ResourceCollectionResponse<R> = {
+export type SingleResourceResponse<R> = R;
+export type CollectionResourceResponse<R> = {
     data: R[],
     meta: {
         limit: number,

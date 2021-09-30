@@ -5,10 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {LayoutNavigationAdminId} from "@/config/layout";
-import ProviderForm from "@/components/admin/provider/ProviderForm";
-import {dropProvider, getProviders} from "@/domains/provider/api.ts";
-import Pagination from "@/components/Pagination";
+import {dropAPIProvider, getAPIProviders} from "@personalhealthtrain/ui-common/src";
+import {LayoutNavigationAdminId} from "../../../../../config/layout";
+import ProviderForm from "../../../../../components/admin/provider/ProviderForm";
+import Pagination from "../../../../../components/Pagination";
 
 export default {
     props: {
@@ -63,7 +63,7 @@ export default {
             this.isBusy = true;
 
             try {
-                let record = {
+                const response = await getAPIProviders({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset
@@ -72,9 +72,8 @@ export default {
                         realm_id: this.realm.id
                     },
                     fields: ['+client_secret']
-                };
+                });
 
-                const response = await getProviders(record);
                 this.items = response.data;
                 const {total} = response.meta;
 
@@ -118,7 +117,7 @@ export default {
                         });
 
                         if(index !== -1) {
-                            await dropProvider(user.id);
+                            await dropAPIProvider(user.id);
 
                             this.items.splice(index,1);
                         }

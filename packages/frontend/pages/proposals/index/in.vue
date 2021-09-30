@@ -5,13 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import ProposalInForm from "@/components/proposal/ProposalInForm";
-import ProposalStationStatus from "@/components/proposal/ProposalStationStatus";
-import Pagination from "@/components/Pagination";
-import {ProposalStationStatusOptions} from "@/domains/proposal/station";
-import ProposalStationAction from "@/components/proposal/ProposalStationAction";
-import {getApiProposalStations} from "@/domains/proposal/station/api";
-import {getStations} from "@/domains/station/api";
+import {ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
+import {getApiProposalStations, getAPIStations} from "@personalhealthtrain/ui-common/src";
+import ProposalInForm from "../../../components/proposal/ProposalInForm";
+import ProposalStationStatus from "../../../components/proposal/ProposalStationStatus";
+import Pagination from "../../../components/Pagination";
+import ProposalStationAction from "../../../components/proposal/ProposalStationAction";
 
 export default {
     components: {ProposalStationAction, Pagination, ProposalStationStatus, ProposalInForm},
@@ -31,7 +30,7 @@ export default {
                 { key: 'proposal_title', label: 'Title', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'status', label: 'Status', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'createdAt', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'options', label: '', tdClass: 'text-left' }
             ],
@@ -42,7 +41,7 @@ export default {
                 total: 0
             },
 
-            statusOptions: ProposalStationStatusOptions,
+            statusOptions: ProposalStationApprovalStatus,
 
             station: null
         }
@@ -77,7 +76,7 @@ export default {
          * @return {Promise<void>}
          */
         async init() {
-            const {data: stations} = await getStations({
+            const {data: stations} = await getAPIStations({
                 filter: {
                     realm_id: this.user.realmId
                 }
@@ -208,7 +207,7 @@ export default {
                         </b-dropdown>
                     </template>
                 </template>
-                <template v-slot:cell(created_at)="data">
+                <template v-slot:cell(createdAt)="data">
                     <timeago :datetime="data.item.createdAt" />
                 </template>
                 <template v-slot:cell(updated_at)="data">

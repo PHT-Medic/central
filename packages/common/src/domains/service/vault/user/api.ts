@@ -6,7 +6,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {useVaultApi} from "../../../../modules/api/service";
+import {APIType, useAPI} from "../../../../modules";
 import {UserKeyRing} from "../../../auth";
 
 export async function saveUserPublicKeyToVault(entity: UserKeyRing) {
@@ -19,7 +19,7 @@ export async function saveUserPublicKeyToVault(entity: UserKeyRing) {
         cas: 0
     };
 
-    await useVaultApi().post('user_pks/'+entity.user_id, {
+    await useAPI(APIType.VAULT).post('user_pks/'+entity.user_id, {
         data,
         options
     });
@@ -27,5 +27,5 @@ export async function saveUserPublicKeyToVault(entity: UserKeyRing) {
 
 export async function removeUserPublicKeyFromVault(entity: UserKeyRing | number) {
     const id : number = typeof entity === 'number' ? entity : entity.user_id;
-    await useVaultApi().delete('user_pks/'+id);
+    await useAPI(APIType.VAULT).delete('user_pks/'+id);
 }

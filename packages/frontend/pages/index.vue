@@ -6,8 +6,8 @@
   -->
 <script>
     import { mapGetters } from 'vuex'
-    import MedicineLab from "@/components/svg/MedicineLab";
-    import WorldSvg from "@/components/svg/WorldSvg";
+    import MedicineLab from "../components/svg/MedicineLab";
+    import WorldSvg from "../components/svg/WorldSvg";
 
     export default {
         components: {WorldSvg, MedicineLab},

@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {getAPIStations} from "@personalhealthtrain/ui-common/src";
 import Vue from 'vue';
-import {getStations} from "@/domains/station/api";
-import StationForm from "@/components/station/StationForm";
+import StationForm from "../../../../components/station/StationForm";
 
 export default {
     components: {StationForm},
@@ -30,7 +30,7 @@ export default {
     },
     async asyncData(ctx) {
         try {
-            const {data: stations} = await getStations( {
+            const {data: stations} = await getAPIStations( {
                 filter: {
                     realm_id: ctx.params.id
                 },

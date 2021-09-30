@@ -6,7 +6,6 @@
  */
 
 export * from './config';
-export * from './request';
 export * from './module';
 export * from './service';
 export * from "./type";

@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import Pagination from "@/components/Pagination";
+import {getAPIStations} from "@personalhealthtrain/ui-common/src";
+import Pagination from "../../components/Pagination";
 import Vue from 'vue';
-import {getStations} from "@/domains/station/api";
 
 export default {
     components: {Pagination},
@@ -45,7 +45,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getStations({
+                const response = await getAPIStations({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset

@@ -5,11 +5,15 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {addApiProposalStation, dropApiProposalStation, getApiProposalStations} from "@/domains/proposal/station/api";
-import ProposalStationStatus from "@/components/proposal/ProposalStationStatus";
-import Pagination from "@/components/Pagination";
+import {
+    addApiProposalStation,
+    dropApiProposalStation,
+    getApiProposalStations
+} from "@personalhealthtrain/ui-common";
+import ProposalStationStatus from "../../components/proposal/ProposalStationStatus";
+import Pagination from "../../components/Pagination";
 import Vue from 'vue';
-import StationList from "@/components/station/StationList";
+import StationList from "../../components/station/StationList";
 
 export default {
     components: {StationList, Pagination, ProposalStationStatus},

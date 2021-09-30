@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIConfig, APIHarborType, APIServiceHarborConfig} from "../config";
+import {APIConfig, APIServiceHarborConfig, APIType} from "../config";
 import {BaseAPI} from "../module";
 import {ApiRequestConfig} from "../type";
 import {APIServiceError} from "./error";
@@ -32,7 +32,7 @@ export function parseHarborConnectionString(connectionString: string) : APIServi
 }
 
 export class HarborAPI extends BaseAPI {
-    constructor(config: APIConfig<APIHarborType>) {
+    constructor(config: APIConfig<APIType.HARBOR>) {
         const harborConfig : APIServiceHarborConfig = config.connection ?? parseHarborConnectionString(config.connectionString);
 
         const driverConfig : ApiRequestConfig = {
@@ -48,19 +48,4 @@ export class HarborAPI extends BaseAPI {
             return request;
         });
     }
-}
-
-let instance : HarborAPI | undefined;
-
-export function useHarborApi(connectionString?: string) {
-    if(typeof instance !== 'undefined') {
-        return instance;
-    }
-
-    if(typeof connectionString === 'undefined') {
-        throw APIServiceError.connectionStringMissing('harbor');
-    }
-
-    instance = new HarborAPI({connectionString});
-    return instance;
 }

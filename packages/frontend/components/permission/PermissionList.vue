@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import Pagination from "@/components/Pagination";
+import Pagination from "../../components/Pagination";
 import Vue from 'vue';
-import {getPermissions} from "@/domains/permission/api";
+import {getPermissions} from "@personalhealthtrain/ui-common";
 
 export default {
     components: {Pagination},

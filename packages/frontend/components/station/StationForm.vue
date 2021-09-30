@@ -5,6 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {addAPIStation, editAPIStation, getRealms} from "@personalhealthtrain/ui-common/src";
 import {v4} from 'uuid';
 import {maxLength, minLength, required, helpers, email} from "vuelidate/lib/validators";
 
@@ -12,8 +13,6 @@ const safeStr = helpers.regex('safeStr', /^[a-zA-Z0-9-]*$/)
 
 import AlertMessage from "../alert/AlertMessage";
 import NotImplemented from "../NotImplemented";
-import {addStation, editStation} from "@/domains/station/api.ts";
-import {getRealms} from "@/domains/realm/api.ts";
 
 export default {
     components: {
@@ -116,7 +115,7 @@ export default {
             try {
                 let station;
                 if(this.isEditing) {
-                    station = await editStation(this.stationProperty.id, this.formData);
+                    station = await editAPIStation(this.stationProperty.id, this.formData);
 
                     this.$bvToast.toast('The station was successfully updated.', {
                         variant: 'success',
@@ -125,7 +124,7 @@ export default {
 
                     this.$emit('updated', station);
                 } else {
-                    station = await addStation(this.formData);
+                    station = await addAPIStation(this.formData);
 
                     this.$emit('created', station);
 
