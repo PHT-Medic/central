@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {addRealm, editRealm} from "@personalhealthtrain/ui-common/src";
-import {maxLength, minLength, required, email} from "vuelidate/lib/validators";
+import {addRealm, editRealm, Realm} from "@personalhealthtrain/ui-common";
+import {maxLength, minLength, required} from "vuelidate/lib/validators";
 
 import AlertMessage from "../../alert/AlertMessage";
 import NotImplemented from "../../NotImplemented";
@@ -155,8 +155,3 @@ export default {
         </div>
     </div>
 </template>
-<style>
-.list-group-item {
-    padding: .45rem .65rem;
-}
-</style>

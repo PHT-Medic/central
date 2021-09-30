@@ -14,12 +14,12 @@
     </slot>
 </template>
 <script>
-import {runAPITrainCommand} from "@personalhealthtrain/ui-common/src";
+import {runAPITrainCommand} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
         trainId: String,
-        trainStations: Array,
+        train_stations: Array,
         task: String
     },
     data() {

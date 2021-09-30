@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {dropAPIUser} from "@personalhealthtrain/ui-common/src";
+    import {dropAPIUser} from "@personalhealthtrain/ui-common";
     import {LayoutNavigationAdminId} from "../../../config/layout";
     import UserList from "../../../components/user/UserList";
 
@@ -25,8 +25,8 @@
                     { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'email', label: 'Email', thClass: 'text-center', tdClass: 'text-center' },
-                    { key: 'createdAt', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
-                    { key: 'updatedAt', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
+                    { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
+                    { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }
                 ]
             }
@@ -87,11 +87,11 @@
                             <i class="fa fa-times"></i>
                         </button>
                     </template>
-                    <template v-slot:cell(createdAt)="data">
-                        <timeago :datetime="data.item.createdAt" />
+                    <template v-slot:cell(created_at)="data">
+                        <timeago :datetime="data.item.created_at" />
                     </template>
-                    <template v-slot:cell(updatedAt)="data">
-                        <timeago :datetime="data.item.updatedAt" />
+                    <template v-slot:cell(updated_at)="data">
+                        <timeago :datetime="data.item.updated_at" />
                     </template>
                     <template v-slot:table-busy>
                         <div class="text-center text-danger my-2">

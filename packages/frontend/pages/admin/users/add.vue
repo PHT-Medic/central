@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {addAPIUser, getRealms} from "@personalhealthtrain/ui-common/src";
+    import {addAPIUser, getRealms} from "@personalhealthtrain/ui-common";
     import {maxLength, minLength, required, email} from "vuelidate/lib/validators";
 
     import AlertMessage from "../../../components/alert/AlertMessage";
@@ -28,7 +28,7 @@ import {addAPIUser, getRealms} from "@personalhealthtrain/ui-common/src";
             return {
                 formData: {
                     name: '',
-                    realmId: '',
+                    realm_id: '',
                     email: '',
                     password: ''
                 },
@@ -59,7 +59,7 @@ import {addAPIUser, getRealms} from "@personalhealthtrain/ui-common/src";
                     minLength: minLength(5),
                     maxLength: maxLength(100)
                 },
-                realmId: {
+                realm_id: {
                     required
                 }
             }
@@ -111,10 +111,10 @@ import {addAPIUser, getRealms} from "@personalhealthtrain/ui-common/src";
 
         <alert-message :message="message" />
 
-        <div class="form-group" :class="{ 'form-group-error': $v.formData.realmId.$error }">
+        <div class="form-group" :class="{ 'form-group-error': $v.formData.realm_id.$error }">
             <label>Realm</label>
             <select
-                v-model="$v.formData.realmId.$model"
+                v-model="$v.formData.realm_id.$model"
                 class="form-control"
                 :disabled="realm.busy"
             >
@@ -122,7 +122,7 @@ import {addAPIUser, getRealms} from "@personalhealthtrain/ui-common/src";
                 <option v-for="(item,key) in realm.items" :value="item.id" :key="key">{{ item.name }}</option>
             </select>
 
-            <div v-if="!$v.formData.realmId.required && !$v.formData.realmId.$model" class="form-group-hint group-required">
+            <div v-if="!$v.formData.realm_id.required && !$v.formData.realm_id.$model" class="form-group-hint group-required">
                 Select a realm
             </div>
         </div>

@@ -11,7 +11,7 @@ export * from './proposal-station';
 export * from './station';
 export * from './train';
 export * from './train-file';
-export * from './train-model';
+export * from './model';
 export * from './train-result';
 export * from './train-station';
 export {MasterImage} from "./master-image/entity";

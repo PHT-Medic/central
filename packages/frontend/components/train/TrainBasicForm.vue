@@ -20,7 +20,7 @@ export default {
             busy: false,
             form: {
                 type: 'discovery',
-                proposalId: ''
+                proposal_id: ''
             },
             proposal: {
                 items: [],
@@ -38,7 +38,7 @@ export default {
                 type: {
                     required,
                 },
-                proposalId: {
+                proposal_id: {
                     required
                 }
             }
@@ -49,7 +49,7 @@ export default {
             if(typeof this.proposalId !== 'undefined') {
                 const index = this.proposal.items.findIndex(proposal => proposal.id === this.proposalId);
                 if (index !== -1) {
-                    this.form.proposalId = this.proposalId;
+                    this.form.proposal_id = this.proposalId;
                 }
             }
         })
@@ -123,14 +123,14 @@ export default {
 
         <div v-if="!fixedProposal" class="form-group">
             <label>Proposal</label>
-            <select class="form-control" v-model="$v.form.proposalId.$model" :disabled="proposal.busy">
+            <select class="form-control" v-model="$v.form.proposal_id.$model" :disabled="proposal.busy">
                 <option value="">--- Select an option ---</option>
                 <option v-for="(value,key) in proposal.items" :key="key" :value="value.id">
                     {{value.title}}
                 </option>
             </select>
 
-            <div v-if="!$v.form.proposalId.required && !$v.form.proposalId.$model" class="form-group-hint group-required">
+            <div v-if="!$v.form.proposal_id.required && !$v.form.proposal_id.$model" class="form-group-hint group-required">
                 Choose a proposal as base of your train
             </div>
         </div>

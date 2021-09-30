@@ -6,7 +6,7 @@
   -->
 <script>
     import NotImplemented from "../../../../components/NotImplemented";
-    import UserRoleList from "../../../../components/user/role/UserRoleList";
+    import UserRoleList from "../../../../components/user-role/UserRoleList";
 
     export default {
         props: {

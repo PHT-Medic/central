@@ -5,12 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {doAPIStationTask} from "@personalhealthtrain/ui-common/src";
+import {doAPIStationTask, Realm, Station} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
-        realm: Object,
-        station: Object
+        realm: Realm,
+        station: Station
     },
     data() {
         return {
@@ -114,7 +114,7 @@ export default {
                     class="btn btn-danger btn-xs"
                     @click.prevent="doStationAction('dropVaultPublicKey')"
                     :disabled="busy"
-                    v-if="station.publicKey"
+                    v-if="station.public_key"
                 >
                     <i class="fa fa-trash"></i> Drop
                 </button>

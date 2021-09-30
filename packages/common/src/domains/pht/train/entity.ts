@@ -21,7 +21,7 @@ import {User} from "../../auth";
 import {MasterImage} from "../master-image";
 import {Proposal} from "../proposal";
 import {TrainFile} from "../train-file";
-import {TrainModel} from "../train-model";
+import {Model} from "../model";
 import {TrainResult, TrainResultStatus} from "../train-result";
 import {TrainStation} from "../train-station";
 import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "./status";
@@ -104,8 +104,8 @@ export class Train {
     @JoinColumn({name: 'user_id'})
     user: User;
 
-    @OneToOne(() => TrainModel)
-    model: TrainModel;
+    @OneToOne(() => Model)
+    model: Model;
 
     @OneToMany(() => TrainFile, trainFile => trainFile.train)
     files: TrainFile[]

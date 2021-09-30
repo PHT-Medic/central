@@ -5,11 +5,11 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {TrainStationApprovalStatus} from "@personalhealthtrain/ui-common";
 import {
     getAPITrainFilesDownloadUri,
-    getAPITrainStations
-} from "@personalhealthtrain/ui-common/src";
+    getAPITrainStations,
+    TrainStationApprovalStatus
+} from "@personalhealthtrain/ui-common";
 import AlertMessage from "../../components/alert/AlertMessage";
 import Pagination from "../../components/Pagination";
 import TrainStationAction from "../../components/train-station/TrainStationAction";
@@ -35,8 +35,8 @@ export default {
             fields: [
                 { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'status', label: 'Status', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'updatedAt', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'createdAt', label: 'Created At', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'created_at', label: 'Created At', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'options', label: '', tdClass: 'text-left' }
             ],
             items: [],
@@ -68,7 +68,7 @@ export default {
                         offset: this.meta.offset
                     },
                     filter: {
-                        station_id: this.stationId
+                        station_id: this.station_id
                     }
                 });
 
@@ -92,7 +92,7 @@ export default {
                 .catch(reject);
         },
         download(item) {
-            window.open(this.$config.apiUrl+getAPITrainFilesDownloadUri(item.trainId), '_blank')
+            window.open(this.$config.apiUrl+getAPITrainFilesDownloadUri(item.train_id), '_blank')
         },
         handleUpdated(item) {
             const index = this.items.findIndex(i => i.id === item.id);
@@ -122,7 +122,7 @@ export default {
 
         <b-table :items="items" :fields="fields" :busy="busy" head-variant="'dark'" sort-by="id" :sort-desc="true" outlined>
             <template v-slot:cell(id)="data">
-                {{data.item.trainId}}
+                {{data.item.train_id}}
             </template>
             <template v-slot:cell(status)="data">
                 <train-station-approval-status-text :status="data.item.approval_status">
@@ -131,11 +131,11 @@ export default {
                     </template>
                 </train-station-approval-status-text>
             </template>
-            <template v-slot:cell(createdAt)="data">
-                <timeago :datetime="data.item.createdAt" />
+            <template v-slot:cell(created_at)="data">
+                <timeago :datetime="data.item.created_at" />
             </template>
-            <template v-slot:cell(updatedAt)="data">
-                <timeago :datetime="data.item.updatedAt" />
+            <template v-slot:cell(updated_at)="data">
+                <timeago :datetime="data.item.updated_at" />
             </template>
 
             <template v-slot:cell(options)="data">

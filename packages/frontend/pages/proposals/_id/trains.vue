@@ -55,7 +55,7 @@ export default {
     },
     computed: {
         isOwner() {
-            return this.proposal.realmId === this.$store.getters['auth/userRealmId'];
+            return this.proposal.realm_id === this.$store.getters['auth/userRealmId'];
         }
     },
     methods: {

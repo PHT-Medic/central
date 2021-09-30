@@ -7,13 +7,13 @@
 <script>
 import {User} from "@personalhealthtrain/ui-common";
 import {getApiUserRoles} from "@personalhealthtrain/ui-common";
-import RoleList from "../../../components/role/RoleList";
-import UserRoleListItemActions from "../../../components/user/role/UserRoleListItemActions";
+import RoleList from "../role/RoleList";
+import UserRoleListItemActions from "./UserRoleListItemActions";
 
 export default {
     components: {UserRoleListItemActions, RoleList},
     props: {
-        userId: typeof User.prototype.id
+        userId: User.prototype.id
     },
     data() {
         return {
@@ -61,7 +61,7 @@ export default {
         },
 
         buildRoleRequestFilter(build) {
-            const ids = this.items.map(item => item.roleId);
+            const ids = this.items.map(item => item.role_id);
             let additionFilter = undefined;
 
             build = build ?? this.assignedOnly;
@@ -84,7 +84,7 @@ export default {
                 return true;
             }
 
-            return this.items.findIndex(userRole => userRole.roleId === item.id) !== -1;
+            return this.items.findIndex(userRole => userRole.role_id === item.id) !== -1;
         },
 
         handleAdded(item) {

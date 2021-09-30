@@ -19,19 +19,21 @@ import {getApiProposalStations, getAPIStations, getProposal} from "@personalheal
         async asyncData (context) {
             try {
                 const proposal = await getProposal(context.params.id, {
-                    include: ['masterImage', 'user']
+                    include: ['master_image', 'user']
                 });
 
-                const {realmId} = context.store.getters['auth/user'];
+                console.log(proposal);
+
+                const {realm_id} = context.store.getters['auth/user'];
 
                 let visitorStation = null;
                 let visitorProposalStation = null;
 
-                if(proposal.realmId !== realmId) {
+                if(proposal.realm_id !== realm_id) {
                     try {
                         const {data: stations} = await getAPIStations({
                             filter: {
-                                realm_id: proposal.realmId
+                                realm_id: proposal.realm_id
                             }
                         });
 
@@ -84,7 +86,7 @@ import {getApiProposalStations, getAPIStations, getProposal} from "@personalheal
         },
         computed: {
             isProposalOwner() {
-                return this.$store.getters['auth/user'].realmId === this.proposal.realmId;
+                return this.$store.getters['auth/user'].realm_id === this.proposal.realm_id;
             },
             isStationAuthority() {
                 return !!this.visitorStation;

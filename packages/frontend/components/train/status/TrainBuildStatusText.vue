@@ -12,7 +12,8 @@
     </span>
 </template>
 <script>
-import {TrainBuildStatus} from "../../../domains/train";
+
+import {TrainBuildStatus} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {

@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {runAPITrainCommand} from "@personalhealthtrain/ui-common/src";
+import {runAPITrainCommand, Train, TrainCommand} from "@personalhealthtrain/ui-common";
 import AlertMessage from "../../../components/alert/AlertMessage";
 import {FrontendTrainCommand} from "../../../domains/train/type";
 export default {
@@ -19,7 +19,7 @@ export default {
     data() {
         return {
             form: {
-                hashSigned: '',
+                hash_signed: '',
                 hash: '',
             },
             formInfo: {
@@ -32,8 +32,8 @@ export default {
         if(typeof this.train.hash !== 'undefined' && this.train.hash) {
             this.form.hash = this.train.hash;
         }
-        if(typeof this.train.hashSigned !== 'undefined' && this.train.hashSigned) {
-            this.form.hashSigned = this.train.hashSigned;
+        if(typeof this.train.hash_signed !== 'undefined' && this.train.hash_signed) {
+            this.form.hash_signed = this.train.hash_signed;
         }
     },
     methods: {
@@ -43,7 +43,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runAPITrainCommand(this.train.id, FrontendTrainCommand.GENERATE_HASH);
+                const train = await runAPITrainCommand(this.train.id, TrainCommand.GENERATE_HASH);
 
                 this.setHash(train.hash);
                 this.$emit('hashGenerated', this.form.hash);
@@ -64,13 +64,13 @@ export default {
         },
         reset() {
             this.form.hash = null;
-            this.form.hashSigned = null;
+            this.form.hash_signed = null;
         },
 
         //---------------------------------
 
         handleHashSigned() {
-            this.$emit('setHashSigned', this.form.hashSigned);
+            this.$emit('setHashSigned', this.form.hash_signed);
         }
     },
     computed: {
@@ -128,7 +128,7 @@ export default {
 
         <div class="form-group">
             <label>Signed Hash</label>
-            <textarea class="form-control" v-model="form.hashSigned" @change.prevent="handleHashSigned" placeholder="Signed hash of the pht offline tool..." rows="4" />
+            <textarea class="form-control" v-model="form.hash_signed" @change.prevent="handleHashSigned" placeholder="Signed hash of the pht offline tool..." rows="4" />
         </div>
     </div>
 </template>

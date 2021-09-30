@@ -22,8 +22,8 @@
                 isBusy: false,
                 fields: [
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'createdAt', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
-                    { key: 'updatedAt', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
+                    { key: 'created_at', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
+                    { key: 'updated_at', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }
                 ]
             }
@@ -44,11 +44,11 @@
             </template>
             <template v-slot:items="props">
                 <b-table :items="props.items" :fields="fields" :busy="props.busy" head-variant="'dark'" outlined>
-                    <template v-slot:cell(createdAt)="data">
-                        <timeago :datetime="data.item.createdAt" />
+                    <template v-slot:cell(created_at)="data">
+                        <timeago :datetime="data.item.created_at" />
                     </template>
-                    <template v-slot:cell(updatedAt)="data">
-                        <timeago :datetime="data.item.updatedAt" />
+                    <template v-slot:cell(updated_at)="data">
+                        <timeago :datetime="data.item.updated_at" />
                     </template>
                     <template v-slot:table-busy>
                         <div class="text-center text-danger my-2">

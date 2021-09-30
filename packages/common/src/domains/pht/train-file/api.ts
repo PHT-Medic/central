@@ -25,13 +25,13 @@ export async function getApiTrainFile(trainId: typeof Train.prototype.id, fileId
     return response.data;
 }
 
-export async function dropApiTrainFile(trainId: number, fileId: number) : Promise<SingleResourceResponse<TrainFile>> {
+export async function dropApiTrainFile(trainId: typeof Train.prototype.id, fileId: typeof Train.prototype.id) : Promise<SingleResourceResponse<TrainFile>> {
     let response = await useAPI(APIType.DEFAULT).delete('trains/' + trainId + '/files/' + fileId);
 
     return response.data;
 }
 
-export async function uploadTrainFiles(trainId: number, formData: any) : Promise<CollectionResourceResponse<TrainFile>> {
+export async function uploadTrainFiles(trainId: typeof Train.prototype.id, formData: any) : Promise<CollectionResourceResponse<TrainFile>> {
     const response = await useAPI(APIType.DEFAULT).post('trains/' + trainId + '/files', formData, {
         headers: {
             'Content-Type': 'multipart/form-data'

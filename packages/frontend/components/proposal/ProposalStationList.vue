@@ -34,7 +34,7 @@ export default {
                 return false;
             }
 
-            return this.$store.getters['auth/userRealmId'] === this.formattedItems[0].proposal.realmId;
+            return this.$store.getters['auth/userRealmId'] === this.formattedItems[0].proposal.realm_id;
         }
     },
     data() {
@@ -112,8 +112,8 @@ export default {
 
             try {
                 let proposalStation = await addApiProposalStation({
-                    proposalId: this.proposalId,
-                    stationId: station.id
+                    proposal_id: this.proposalId,
+                    station_id: station.id
                 });
 
                 proposalStation.station = station;
@@ -133,7 +133,7 @@ export default {
         },
 
         notInItems(item) {
-            return this.items.findIndex(el => el.stationId === item.id) === -1;
+            return this.items.findIndex(el => el.station_id === item.id) === -1;
         },
 
         addArrayItem(item) {

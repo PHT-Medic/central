@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {getAPIUser} from "@personalhealthtrain/ui-common/src";
+    import {getAPIUser} from "@personalhealthtrain/ui-common";
     import {LayoutNavigationAdminId} from "../../../config/layout";
 
     export default {

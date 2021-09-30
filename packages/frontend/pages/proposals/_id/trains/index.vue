@@ -34,7 +34,7 @@
         methods: {
         },
         computed: {
-            stationId() {
+            station_id() {
                 return this.visitorStation ? this.visitorStation.id : undefined;
             }
         }

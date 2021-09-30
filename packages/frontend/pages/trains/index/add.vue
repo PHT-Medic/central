@@ -11,7 +11,7 @@ export default {
     components: {TrainBasicForm},
     data() {
         return {
-            proposalId: undefined
+            proposal_id: undefined
         }
     },
     methods: {
@@ -20,10 +20,10 @@ export default {
         }
     },
     created() {
-        if(typeof this.$route.query.proposalId !== "undefined") {
-            const proposalId = parseInt(this.$route.query.proposalId);
-            if(!Number.isNaN(proposalId)) {
-                this.proposalId = proposalId;
+        if(typeof this.$route.query.proposal_id !== "undefined") {
+            const proposal_id = parseInt(this.$route.query.proposal_id);
+            if(!Number.isNaN(proposal_id)) {
+                this.proposal_id = proposal_id;
             }
         }
     },
@@ -31,7 +31,7 @@ export default {
 </script>
 <template>
     <train-basic-form
-        :proposal-id="proposalId"
+        :proposal-id="proposal_id"
         @created="handleCreated"
     />
 </template>

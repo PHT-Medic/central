@@ -67,7 +67,7 @@ export default {
                     <div class="mb-1">
                         <i class="fa fa-compact-disc fa-4x"></i>
                     </div>
-                    <p class="badge badge-dark">{{ proposal.masterImage ? proposal.masterImage.name :  proposal.masterImageId }}</p>
+                    <p class="badge badge-dark">{{ proposal.master_image ? proposal.master_image.name :  proposal.master_image_id }}</p>
                 </div>
             </div>
 
@@ -77,7 +77,7 @@ export default {
                     <div class="mb-1">
                         <i class="fas fa-university fa-4x"></i>
                     </div>
-                    <p class="badge badge-dark">{{ proposal.realmId }}</p>
+                    <p class="badge badge-dark">{{ proposal.realm_id }}</p>
                 </div>
             </div>
 
@@ -87,7 +87,7 @@ export default {
                     <div class="mb-1">
                         <i class="fa fa-user fa-4x"></i>
                     </div>
-                    <p class="badge badge-dark">{{ proposal.user ? proposal.user.name : proposal.userId }}</p>
+                    <p class="badge badge-dark">{{ proposal.user ? proposal.user.name : proposal.user_id }}</p>
                 </div>
             </div>
         </div>
@@ -95,16 +95,16 @@ export default {
             <div class="row">
                 <div class="col-3">
                     <h6>Risk Comment</h6>
-                    <p>{{proposal.riskComment}}</p>
+                    <p>{{proposal.risk_comment}}</p>
 
                     <h6>RequestedData</h6>
-                    <p>{{proposal.requestedData}}</p>
+                    <p>{{proposal.requested_data}}</p>
                 </div>
                 <div class="col-3">
                     <h6>Created At</h6>
-                    <p><timeago :datetime="proposal.createdAt" /></p>
+                    <p><timeago :datetime="proposal.created_at" /></p>
                     <h6>Updated At</h6>
-                    <p><timeago :datetime="proposal.updatedAt" /></p>
+                    <p><timeago :datetime="proposal.updated_at" /></p>
                 </div>
                 <div class="col-6">
                     <proposal-station-list :proposal-id="proposal.id" ref="proposalStationList">

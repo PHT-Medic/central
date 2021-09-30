@@ -5,13 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {User} from "@personalhealthtrain/ui-common";
 import {
     addAPIUserKeyRing,
     dropAPIUserKeyRing,
     editAPIUserKeyRing,
-    getAPIUserKeyRing
-} from "@personalhealthtrain/ui-common/src";
+    getAPIUserKeyRing,
+    User
+} from "@personalhealthtrain/ui-common";
 import {maxLength, minLength, numeric} from "vuelidate/lib/validators";
 import AlertMessage from "../../components/alert/AlertMessage";
 
@@ -19,7 +19,7 @@ export default {
     components: {AlertMessage},
     props: {
         userProperty: {
-            type: User,
+            type: Object,
             default: undefined
         }
     },

@@ -5,13 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropAPIStation} from "@personalhealthtrain/ui-common/src";
+import {dropAPIStation, Realm, Station} from "@personalhealthtrain/ui-common";
 import StationForm from "../../../../../components/station/StationForm";
 
 export default {
     props: {
-        realm: Object,
-        station: Object
+        realm: Realm,
+        station: Station
     },
     components: {StationForm},
     data() {
@@ -70,7 +70,7 @@ export default {
 
             <hr />
 
-            <station-form :station-property="{realmId: this.realm.id, name: this.realm.name}" @created="handleCreated" @updated="handleUpdated" :realm-locked="true"/>
+            <station-form :station-property="{realm_id: this.realm.id, name: this.realm.name}" @created="handleCreated" @updated="handleUpdated" :realm-locked="true"/>
         </template>
     </div>
 </template>

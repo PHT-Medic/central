@@ -21,17 +21,14 @@ export default {
             type: Object,
             default: undefined
         },
-        trainStations: {
-            type: Array,
-            default: []
-        }
+        train_stations: Array
     },
     data() {
         return {
             form: {
-                masterImageId: '',
+                master_image_id: '',
                 query: '',
-                stationIds: []
+                station_ids: []
             },
 
             proposalStationStatus: ProposalStationApprovalStatus,
@@ -44,7 +41,7 @@ export default {
                 busy: false
             },
 
-            masterImage: {
+            master_image: {
                 items: [],
                 busy: false
             }
@@ -53,11 +50,11 @@ export default {
     validations() {
         return {
             form: {
-                masterImageId: {
+                master_image_id: {
                     required,
                     numeric
                 },
-                stationIds: {
+                station_ids: {
                     required,
                     minLength: minLength(1),
                     $each: {
@@ -76,7 +73,7 @@ export default {
             return this.trainStation.items.sort((a,b) => a.position > b.position ? 1 : -1);
         },
         availableProposalStations() {
-            return this.proposalStation.items.filter(item => this.trainStation.items.findIndex(trainStation => trainStation.stationId === item.stationId) === -1);
+            return this.proposalStation.items.filter(item => this.trainStation.items.findIndex(trainStation => trainStation.station_id === item.station_id) === -1);
         }
     },
     created() {
@@ -87,15 +84,15 @@ export default {
     },
     methods: {
         proposalStationFilter(item) {
-            return this.trainStation.items.findIndex(trainStation => trainStation.stationId === item.stationId) === -1;
+            return this.trainStation.items.findIndex(trainStation => trainStation.station_id === item.station_id) === -1;
         },
         initTrain() {
-            if(!!this.trainStations) {
-                this.trainStation.items = this.trainStations;
+            if(!!this.train_stations) {
+                this.trainStation.items = this.train_stations;
             }
 
-            if(!!this.train.masterImageId) {
-                this.form.masterImageId = this.train.masterImageId;
+            if(!!this.train.master_image_id) {
+                this.form.master_image_id = this.train.master_image_id;
             }
 
             if(!!this.train.query) {
@@ -103,38 +100,38 @@ export default {
             }
         },
         async loadMasterImages() {
-            if(this.masterImage.busy) return;
+            if(this.master_image.busy) return;
 
-            this.masterImage.busy = true;
+            this.master_image.busy = true;
 
             try {
                 const response = await getAPIMasterImages();
-                this.masterImage.items = response.data;
-                if(this.form.masterImageId === '' && this.masterImage.items.length > 0) {
-                    this.form.masterImageId = this.masterImage.items[0].id;
+                this.master_image.items = response.data;
+                if(this.form.master_image_id === '' && this.master_image.items.length > 0) {
+                    this.form.master_image_id = this.master_image.items[0].id;
                     this.setTrainMasterImage();
                 }
             } catch (e) {
 
             }
 
-            this.masterImage.busy = false;
+            this.master_image.busy = false;
         },
         async loadProposalStations() {
             if(this.proposalStation.busy) return;
 
-            if(typeof this.train.proposalId === 'undefined') {
+            if(typeof this.train.proposal_id === 'undefined') {
                 return;
             }
 
-            const proposalId = this.train.proposalId ?? this.train.proposal.id;
+            const proposal_id = this.train.proposal_id ?? this.train.proposal.id;
 
             this.proposalStation.busy = true;
 
             try {
                 const response = await getApiProposalStations({
                     filter: {
-                        proposal_id: proposalId
+                        proposal_id: proposal_id
                     }
                 });
 
@@ -147,7 +144,7 @@ export default {
         },
 
         setTrainMasterImage() {
-            this.$emit('setTrainMasterImage', this.form.masterImageId);
+            this.$emit('setTrainMasterImage', this.form.master_image_id);
         },
         setTrainStations() {
             this.$emit('setTrainStations', this.trainStation.items);
@@ -156,19 +153,19 @@ export default {
             this.$emit('setTrainQuery', this.form.query);
         },
 
-        async addTrainStation(stationId) {
+        async addTrainStation(station_id) {
             if(this.trainStation.busy) return;
 
             this.trainStation.busy = true;
 
             try {
                 const trainStation = await addAPITrainStation({
-                    trainId: this.train.id,
-                    stationId: stationId,
+                    train_id: this.train.id,
+                    station_id: station_id,
                     position: this.trainStation.items.length
                 });
 
-                const index = this.proposalStation.items.findIndex(proposalStation => proposalStation.stationId === stationId);
+                const index = this.proposalStation.items.findIndex(proposalStation => proposalStation.station_id === station_id);
                 if(index !== -1) {
                     trainStation.station = this.proposalStation.items[index].station;
                     this.trainStation.items.push(trainStation);
@@ -264,16 +261,16 @@ export default {
 <template>
     <div class="row">
         <div class="col">
-            <div class="form-group" :class="{ 'form-group-error': $v.form.masterImageId.$error }">
+            <div class="form-group" :class="{ 'form-group-error': $v.form.master_image_id.$error }">
                 <label>Master Image</label>
-                <select v-model="$v.form.masterImageId.$model" class="form-control" @change="setTrainMasterImage" :disabled="masterImage.busy">
+                <select v-model="$v.form.master_image_id.$model" class="form-control" @change="setTrainMasterImage" :disabled="master_image.busy">
                     <option value="">--- Select an option ---</option>
-                    <option v-for="(item,key) in masterImage.items" :key="key" :value="item.id">
+                    <option v-for="(item,key) in master_image.items" :key="key" :value="item.id">
                         {{ item.name }}
                     </option>
                 </select>
 
-                <div v-if="!$v.form.masterImageId.required" class="form-group-hint group-required">
+                <div v-if="!$v.form.master_image_id.required" class="form-group-hint group-required">
                     Bitte wählen Sie ein Master Image aus, dass diesem Zug zugrunde liegt.
                 </div>
             </div>
@@ -281,7 +278,7 @@ export default {
             <div class="row">
                 <div class="col-4">
                     <proposal-station-list
-                        :proposal-id="train.proposalId"
+                        :proposal-id="train.proposal_id"
                         :filter="proposalStationFilter"
                     >
                         <template v-slot:header="props">
@@ -293,7 +290,7 @@ export default {
                                 type="button"
                                 class="btn btn-primary btn-xs"
                                 :disabled="props.item.status !== proposalStationStatus.APPROVED"
-                                @click.prevent="addTrainStation(props.item.stationId)"
+                                @click.prevent="addTrainStation(props.item.station_id)"
                             >
                                 <i class="fa fa-plus"></i>
                             </button>

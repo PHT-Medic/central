@@ -12,7 +12,7 @@
     </span>
 </template>
 <script>
-import {TrainConfigurationStatus} from "../../../domains/train";
+import {TrainConfigurationStatus} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {

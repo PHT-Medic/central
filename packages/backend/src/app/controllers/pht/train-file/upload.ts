@@ -110,7 +110,14 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
                 hash_signed: null
             }))
 
-            return res._respond({data: files});
+            return res._respond({
+                data: {
+                    data: files,
+                    meta: {
+                        total: files.length
+                    }
+                }
+            });
         } catch (e) {
             return res._failValidationError({message: 'The train files could not be uploaded.'})
         }

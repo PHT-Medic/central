@@ -5,20 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type TrainTypeAnalyse = 'analyse';
-export type TrainTypeDiscovery = 'discovery';
-
-export type TrainType = TrainTypeAnalyse |
-    TrainTypeDiscovery;
-
-export function isTrainType(type: string) : type is TrainType {
-    switch (type) {
-        case "analyse":
-        case "discovery":
-            return true;
-        default:
-            return false;
-    }
+export enum TrainType {
+    ANALYSE = 'analyse',
+    DISCOVERY = 'discovery'
 }
 
 export enum TrainCommand {

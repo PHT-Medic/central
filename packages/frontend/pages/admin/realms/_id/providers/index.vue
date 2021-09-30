@@ -5,14 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropAPIProvider, getAPIProviders} from "@personalhealthtrain/ui-common/src";
+import {dropAPIProvider, getAPIProviders, Realm} from "@personalhealthtrain/ui-common";
 import {LayoutNavigationAdminId} from "../../../../../config/layout";
 import ProviderForm from "../../../../../components/admin/provider/ProviderForm";
 import Pagination from "../../../../../components/Pagination";
 
 export default {
     props: {
-        realm: Object
+        realm: Realm
     },
     components: {Pagination, ProviderForm},
     meta: {
@@ -31,8 +31,8 @@ export default {
                 { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'openId', label: 'OpenID?', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'createdAt', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'updatedAt', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'options', label: '', tdClass: 'text-left' }
             ],
             items: [],
@@ -169,11 +169,11 @@ export default {
                         <i class="fa fa-times"></i>
                     </button>
                 </template>
-                <template v-slot:cell(createdAt)="data">
-                    <timeago :datetime="data.item.createdAt" />
+                <template v-slot:cell(created_at)="data">
+                    <timeago :datetime="data.item.created_at" />
                 </template>
-                <template v-slot:cell(updatedAt)="data">
-                    <timeago :datetime="data.item.updatedAt" />
+                <template v-slot:cell(updated_at)="data">
+                    <timeago :datetime="data.item.updated_at" />
                 </template>
                 <template v-slot:cell(openId)="data">
                     <i class="fa" :class="{'fa-check text-success': data.item.openId, 'fa-times text-danger': !data.item.openId}" />

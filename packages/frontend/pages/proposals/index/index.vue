@@ -28,7 +28,7 @@
                 fields: [
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'title', label: 'Title', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'createdAt', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
+                    { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
                     { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }
                 ],
@@ -115,11 +115,11 @@
         </div>
         <div class="m-t-10">
             <b-table :items="items" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
-                <template v-slot:cell(createdAt)="data">
-                    <timeago :datetime="data.item.createdAt" />
+                <template v-slot:cell(created_at)="data">
+                    <timeago :datetime="data.item.created_at" />
                 </template>
                 <template v-slot:cell(updated_at)="data">
-                    <timeago :datetime="data.item.updatedAt" />
+                    <timeago :datetime="data.item.updated_at" />
                 </template>
 
                 <template v-slot:cell(options)="data">

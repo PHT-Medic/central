@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {executeAPIServiceClientTask} from "@personalhealthtrain/ui-common/src";
+import {executeAPIServiceClientTask} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
@@ -60,9 +60,9 @@ export default {
         <div class="mb-1">
             <i class="fa fa-sync"></i> Synced?
                 <i class="fa" :class="{
-                'fa-check text-success': service.clientSynced,
-                'fa-times text-danger': !service.clientSynced
-            }" /> {{service.clientSynced ? 'true' : 'false'}}
+                'fa-check text-success': service.client_synced,
+                'fa-times text-danger': !service.client_synced
+            }" /> {{service.client_synced ? 'true' : 'false'}}
         </div>
 
         <hr />

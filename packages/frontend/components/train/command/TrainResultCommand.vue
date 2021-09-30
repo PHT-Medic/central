@@ -5,15 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {runAPITrainCommand, Train, TrainResultStatus} from "@personalhealthtrain/ui-common";
-import {TrainRunStatus} from "../../../domains/train";
+import {runAPITrainCommand, TrainResultStatus, TrainRunStatus} from "@personalhealthtrain/ui-common";
 import {FrontendTrainCommand} from "../../../domains/train/type";
 import {BDropdownItem} from "bootstrap-vue";
 
 export default {
     props: {
         train: {
-            type: Train,
+            type: Object,
             default: undefined
         },
         trainResultId: {

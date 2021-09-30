@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getRealm} from "@personalhealthtrain/ui-common/src";
+import {getRealm} from "@personalhealthtrain/ui-common";
 import {LayoutNavigationAdminId} from "../../../config/layout";
 import Vue from "vue";
 import MedicineWorker from "../../../components/svg/MedicineWorker";

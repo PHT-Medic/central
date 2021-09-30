@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropAPITrain} from "@personalhealthtrain/ui-common/src";
+import {Train, dropAPITrain} from "@personalhealthtrain/ui-common";
 import Vue from 'vue';
 import TrainPipeline from "../../components/train/TrainPipeline";
 import TrainStationsProgress from "../../components/train-station/progress/TrainStationsProgress";
@@ -32,6 +32,9 @@ export default {
     computed: {
         canDrop() {
             return this.$auth.can('drop','train');
+        },
+        userName() {
+            return typeof this.trainProperty.user === 'undefined' ? this.trainProperty.user_id : this.trainProperty.user.name;
         }
     },
     methods: {
@@ -116,10 +119,10 @@ export default {
 
         <div class="train-card-footer">
             <div>
-                <small><span class="text-muted">created by </span><span>{{train.user.name}}</span></small>
+                <small><span class="text-muted">created by </span><span>{{userName}}</span></small>
             </div>
             <div class="ml-auto">
-                <small><span class="text-muted">updated</span> <timeago :datetime="train.createdAt" /></small>
+                <small><span class="text-muted">updated</span> <timeago :datetime="train.created_at" /></small>
             </div>
         </div>
     </div>

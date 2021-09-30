@@ -5,8 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
-import {getApiProposalStations, getAPIStations} from "@personalhealthtrain/ui-common/src";
+import {getApiProposalStations, getAPIStations, ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
 import ProposalInForm from "../../../components/proposal/ProposalInForm";
 import ProposalStationStatus from "../../../components/proposal/ProposalStationStatus";
 import Pagination from "../../../components/Pagination";
@@ -30,7 +29,7 @@ export default {
                 { key: 'proposal_title', label: 'Title', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'status', label: 'Status', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'createdAt', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'options', label: '', tdClass: 'text-left' }
             ],
@@ -78,7 +77,7 @@ export default {
         async init() {
             const {data: stations} = await getAPIStations({
                 filter: {
-                    realm_id: this.user.realmId
+                    realm_id: this.user.realm_id
                 }
             });
 
@@ -157,7 +156,7 @@ export default {
         <div class="m-t-10">
             <b-table :items="items" :fields="fields" :busy="busy" head-variant="'dark'" outlined>
                 <template v-slot:cell(realm)="data">
-                    <span class="badge-dark badge">{{data.item.proposal.realmId}}</span>
+                    <span class="badge-dark badge">{{data.item.proposal.realm_id}}</span>
                 </template>
 
                 <template v-slot:cell(status)="data">
@@ -178,7 +177,7 @@ export default {
                     {{data.item.proposal.title}}
                 </template>
                 <template v-slot:cell(options)="data">
-                    <nuxt-link class="btn btn-primary btn-xs" :to="'/proposals/'+data.item.proposalId+'?refPath=/proposals/in'">
+                    <nuxt-link class="btn btn-primary btn-xs" :to="'/proposals/'+data.item.proposal_id+'?refPath=/proposals/in'">
                         <i class="fa fa-arrow-right"></i>
                     </nuxt-link>
                     <template v-if="$auth.can('approve', 'proposal')">
@@ -207,11 +206,11 @@ export default {
                         </b-dropdown>
                     </template>
                 </template>
-                <template v-slot:cell(createdAt)="data">
-                    <timeago :datetime="data.item.createdAt" />
+                <template v-slot:cell(created_at)="data">
+                    <timeago :datetime="data.item.created_at" />
                 </template>
                 <template v-slot:cell(updated_at)="data">
-                    <timeago :datetime="data.item.updatedAt" />
+                    <timeago :datetime="data.item.updated_at" />
                 </template>
                 <template v-slot:table-busy>
                     <div class="text-center text-danger my-2">

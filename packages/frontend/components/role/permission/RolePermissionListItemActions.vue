@@ -15,11 +15,11 @@
     </div>
 </template>
 <script>
-import {addRolePermission, dropRolePermission} from "@personalhealthtrain/ui-common/src";
+import {addRolePermission, dropRolePermission, RolePermission} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
-        rolePermissions: {
+        role_permissions: {
             type: Array,
             default: []
         },
@@ -27,8 +27,8 @@ export default {
             type: String,
             default: 'permission'
         },
-        roleId: Number,
-        permissionId: String
+        role_id: Number,
+        permission_id: String
     },
     data() {
         return {
@@ -36,11 +36,11 @@ export default {
         }
     },
     computed: {
-        rolePermissionIndex() {
-            return this.rolePermissions.findIndex(rolePermission => this.primaryParameter === 'permission' ?  rolePermission.permissionId === this.permissionId : rolePermission.roleId === this.roleId);
+        role_permissionIndex() {
+            return this.role_permissions.findIndex(role_permission => this.primaryParameter === 'permission' ?  role_permission.permission_id === this.permission_id : role_permission.role_id === this.role_id);
         },
         isAssigned() {
-            return this.rolePermissionIndex !== -1;
+            return this.role_permissionIndex !== -1;
         }
     },
     methods: {
@@ -51,8 +51,8 @@ export default {
 
             try {
                 const item = await addRolePermission({
-                    roleId: this.roleId,
-                    permissionId: this.permissionId
+                    role_id: this.role_id,
+                    permission_id: this.permission_id
                 });
 
                 this.$emit('added', item);
@@ -63,14 +63,14 @@ export default {
             this.busy = false;
         },
         async drop() {
-            if(this.busy || this.rolePermissionIndex === -1) return;
+            if(this.busy || this.role_permissionIndex === -1) return;
 
             this.busy = true;
 
             try {
-                await dropRolePermission(this.rolePermissions[this.rolePermissionIndex].id);
+                await dropRolePermission(this.role_permissions[this.role_permissionIndex].id);
 
-                this.$emit('dropped', this.rolePermissions[this.rolePermissionIndex]);
+                this.$emit('dropped', this.role_permissions[this.role_permissionIndex]);
             } catch (e) {
 
             }

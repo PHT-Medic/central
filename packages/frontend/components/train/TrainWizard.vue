@@ -5,13 +5,17 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {editAPITrain, runAPITrainCommand} from "@personalhealthtrain/ui-common/src";
+import {
+    editAPITrain,
+    runAPITrainCommand,
+    Train,
+    TrainCommand,
+    TrainConfigurationStatus
+} from "@personalhealthtrain/ui-common";
 import TrainWizardConfiguratorStep from "../../components/train/wizard/TrainWizardConfiguratorStep";
 import TrainFileManager from "../../components/train/file/TrainFileManager";
 import TrainWizardHashStep from "../../components/train/wizard/TrainWizardHashStep";
 import TrainWizardFinalStep from "../../components/train/wizard/TrainWizardFinalStep";
-import {TrainConfigurationStatus} from "../../domains/train";
-import {FrontendTrainCommand} from "../../domains/train/type";
 
 export default {
     components: {TrainWizardFinalStep, TrainWizardHashStep, TrainFileManager, TrainWizardConfiguratorStep},
@@ -38,19 +42,19 @@ export default {
                 ]
             },
             form: {
-                // required attributes for child components (id, proposalId)
+                // required attributes for child components (id, proposal_id)
                 id: null,
-                proposalId: null,
+                proposal_id: null,
 
                 query: null,
-                masterImageId: null,
-                stationIds: [],
+                master_image_id: null,
+                station_ids: [],
 
-                entrypointFileId: null,
-                entrypointExecutable: '',
+                entrypoint_file_id: null,
+                entrypoint_executable: '',
                 files: [],
 
-                hashSigned: '',
+                hash_signed: '',
                 hash: null
             },
             trainStation: {
@@ -81,8 +85,8 @@ export default {
                 this.form[key] = this.trainProperty[key];
             }
 
-            if(typeof this.trainProperty.trainStations !== 'undefined') {
-                this.trainStation.items = this.trainProperty.trainStations;
+            if(typeof this.trainProperty.train_stations !== 'undefined') {
+                this.trainStation.items = this.trainProperty.train_stations;
             }
         },
         async updateTrain(data) {
@@ -96,8 +100,7 @@ export default {
                 const train = await editAPITrain(this.trainProperty.id, data);
 
                 const updateData = {
-                    status: train.status,
-                    configurationStatus: train.configurationStatus,
+                    configuration_status: train.configuration_status,
                     ...data
                 };
 
@@ -112,11 +115,10 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runAPITrainCommand(this.trainProperty.id, FrontendTrainCommand.BUILD_START);
+                const train = await runAPITrainCommand(this.trainProperty.id, TrainCommand.BUILD_START);
 
                 this.$emit('updated', {
-                    status: train.status,
-                    configurationStatus: train.configurationStatus
+                    configuration_status: train.configuration_status
                 });
             } catch (e) {
 
@@ -150,7 +152,7 @@ export default {
             if(process.server) {
                 this.startIndex = index;
             } else {
-                await this.$refs['wizard'].changeTab(0, index);
+                this.$refs['wizard'].changeTab(0, index);
             }
 
             this.wizard.initialized = true;
@@ -190,7 +192,7 @@ export default {
             });
         },
         async canPassConfigurationWizardStep() {
-            if(this.form.masterImageId === '' || typeof this.form.masterImageId === 'undefined') {
+            if(this.form.master_image_id === '' || typeof this.form.master_image_id === 'undefined') {
                 throw new Error('A master image must be selected...');
             }
 
@@ -199,24 +201,24 @@ export default {
             }
 
             await this.updateTrain({
-                masterImageId: this.form.masterImageId,
+                master_image_id: this.form.master_image_id,
                 query: this.form.query
             });
 
             return true;
         },
         async canPassFilesWizardStep() {
-            if(this.form.entrypointFileId === '' || !this.form.entrypointFileId) {
+            if(this.form.entrypoint_file_id === '' || !this.form.entrypoint_file_id) {
                 throw new Error('An uploaded file must be selected as entrypoint...');
             }
 
-            console.log(this.form.entrypointFileId);
+            console.log(this.form.entrypoint_file_id);
 
-            if(this.form.entrypointExecutable === '' || !this.form.entrypointExecutable) {
+            if(this.form.entrypoint_executable === '' || !this.form.entrypoint_executable) {
                 throw new Error('An executable for the entrypoint must be selected...');
             }
 
-            await this.updateTrain({entrypointFileId: this.form.entrypointFileId, entrypointExecutable: this.form.entrypointExecutable});
+            await this.updateTrain({entrypoint_file_id: this.form.entrypoint_file_id, entrypoint_executable: this.form.entrypoint_executable});
 
             return true;
         },
@@ -225,11 +227,11 @@ export default {
                 throw new Error('The hash is not generated yet or is maybe still in process.');
             }
 
-            if(this.form.hashSigned === '' || !this.form.hashSigned) {
+            if(this.form.hash_signed === '' || !this.form.hash_signed) {
                 throw new Error('The provided hash must be signed by the offline tool...');
             }
 
-            await this.updateTrain({hashSigned: this.form.hashSigned});
+            await this.updateTrain({hash_signed: this.form.hash_signed});
 
             return true;
         },
@@ -250,7 +252,7 @@ export default {
             this.form.files = files;
         },
         setMasterImage(id) {
-            this.form.masterImageId = id;
+            this.form.master_image_id = id;
         },
         setQuery(query) {
             this.form.query = query;
@@ -259,15 +261,15 @@ export default {
             this.trainStation.items = stations;
         },
         setEntrypointFileId(id) {
-            this.form.entrypointFileId = id;
+            this.form.entrypoint_file_id = id;
         },
         setEntrypointExecutable(executable) {
-            this.form.entrypointExecutable = executable;
+            this.form.entrypoint_executable = executable;
         },
         setHash(hash) {
             let data = {
                 hash: hash,
-                configurationStatus: TrainConfigurationStatus.HASH_GENERATED
+                configuration_status: TrainConfigurationStatus.HASH_GENERATED
             };
 
             for(let key in data) {
@@ -276,8 +278,8 @@ export default {
 
             this.$emit('updated', data);
         },
-        setHashSigned(hashSigned) {
-            this.form.hashSigned = hashSigned;
+        setHashSigned(hash_signed) {
+            this.form.hash_signed = hash_signed;
         },
 
         //----------------------------------
@@ -299,13 +301,13 @@ export default {
 
         resetHashSignedStatus(id) {
             let data = {
-                configurationStatus: null,
+                configuration_status: null,
                 hash: null,
-                hashSigned: null
+                hash_signed: null
             };
 
-            if(typeof id !== 'undefined' && id === this.form.entrypointFileId) {
-                data.entrypointFileId = null;
+            if(typeof id !== 'undefined' && id === this.form.entrypoint_file_id) {
+                data.entrypoint_file_id = null;
             }
 
             for(let key in data) {
@@ -329,7 +331,7 @@ export default {
             return '';
         },
         isConfigured() {
-            return this.trainProperty.configurationStatus === TrainConfigurationStatus.FINISHED;
+            return this.trainProperty.configuration_status === TrainConfigurationStatus.FINISHED;
         }
     }
 }

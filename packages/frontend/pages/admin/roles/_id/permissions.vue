@@ -5,6 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+    import {Role} from "@personalhealthtrain/ui-common";
     import NotImplemented from "../../../../components/NotImplemented";
     import AlertMessage from "../../../../components/alert/AlertMessage";
     import RolePermissionList from "../../../../components/role/permission/RolePermissionList";
@@ -12,7 +13,7 @@
     export default {
         props: {
             roleProperty: {
-                type: Object
+                type: Role
             }
         },
         components: {

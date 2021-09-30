@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPIUserKeyRing} from "@personalhealthtrain/ui-common/src";
+import {getAPIUserKeyRing, Train} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
@@ -16,7 +16,7 @@ export default {
     },
     data() {
         return {
-            publicKey: {
+            public_key: {
                 item: undefined,
                 busy: false,
                 loaded: false
@@ -42,18 +42,18 @@ export default {
     },
     methods: {
         async loadPublicKey() {
-            if(typeof this.user === 'undefined' || this.publicKey.busy) return;
+            if(typeof this.user === 'undefined' || this.public_key.busy) return;
 
-            this.publicKey.busy = true;
+            this.public_key.busy = true;
 
             try {
-                this.publicKey = await getAPIUserKeyRing();
+                this.public_key = await getAPIUserKeyRing();
             } catch (e) {
 
             }
 
-            this.publicKey.busy = false;
-            this.publicKey.loaded = true;
+            this.public_key.busy = false;
+            this.public_key.loaded = true;
         },
 
         setTrainType(type) {
@@ -64,8 +64,8 @@ export default {
 </script>
 <template>
     <div>
-        <div v-if="!publicKey" class="alert alert-danger m-b-20">
-            Es muss ein PublicKey in den <nuxt-link :to="'/settings/security'"><i class="fa fa-cog"></i> Einstellungen</nuxt-link> hochgeladen werden.
+        <div v-if="!public_key" class="alert alert-danger m-b-20">
+            A public key must be specified in the <nuxt-link :to="'/settings/security'"><i class="fa fa-cog"></i> settings</nuxt-link> section.
         </div>
 
         <div class="alert alert-sm" :class="{'alert-info': !train.type, 'alert-warning': train.type}">
@@ -81,12 +81,12 @@ export default {
             <b-tabs pills card vertical>
                 <b-tab title="Discovery" :active="isDiscoveryTrain" @click="setTrainType('discovery')">
                     <b-card-text>
-                        Starte einen Discovery Zug, um zu erfahren wie viele Daten augrund der angefoderten Parameter in den Krankenhäuser verfügbar sind.
+                        Start a <strong>discovery</strong> train, to know which data and params are available at all specified stations.
                     </b-card-text>
                 </b-tab>
                 <b-tab title="Analyse" :active="isAnalyseTrain" @click="setTrainType('analyse')">
                     <b-card-text>
-                        Starte einen Analyse auf Basis der zugrunde liegenden Ergebnisse des Discovery Zuges.
+                        Run a <strong>analyse</strong> train, to run your analyse according the achieved metadata achieved during the discovery phase.
                     </b-card-text>
                 </b-tab>
             </b-tabs>

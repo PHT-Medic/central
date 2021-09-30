@@ -12,7 +12,7 @@ import {BDropdownItem} from "bootstrap-vue";
 export default {
     props: {
         train: {
-            type: Train,
+            type: Object,
             default: undefined
         },
         command: {

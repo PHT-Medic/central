@@ -44,7 +44,7 @@ export default {
             type: Boolean,
             default: true
         },
-        trainProperty: Train
+        trainProperty: Object
     },
     created() {
         this.train = this.trainProperty;

@@ -12,7 +12,7 @@
     export default {
         components: {TrainStationStaticRunStatusText, TrainStationRunStatusText},
         props: {
-            train: Train
+            train: Object
         },
         data() {
             return {
@@ -46,6 +46,7 @@
                     this.meta = response.meta;
                     this.items = response.data;
                 } catch (e) {
+                    console.log(e);
                     this.$emit('failed', e);
                 }
 

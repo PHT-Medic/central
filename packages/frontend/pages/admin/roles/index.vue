@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {dropAPIRole} from "@personalhealthtrain/ui-common/src";
+    import {dropAPIRole} from "@personalhealthtrain/ui-common";
     import {LayoutNavigationAdminId} from "../../../config/layout";
     import Pagination from "../../../components/Pagination";
     import RoleList from "../../../components/role/RoleList";
@@ -25,8 +25,8 @@
                 fields: [
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'createdAt', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
-                    { key: 'updatedAt', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
+                    { key: 'created_at', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center' },
+                    { key: 'updated_at', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }
                 ]
             }
@@ -76,7 +76,7 @@
                 <b-table :items="props.items" :fields="fields" :busy="props.busy" head-variant="'dark'" outlined>
                     <template v-slot:cell(options)="data">
                         <nuxt-link
-                            v-if="$auth.can('edit','role') || $auth.can('add','rolePermission') || $auth.can('drop','rolePermission')"
+                            v-if="$auth.can('edit','role') || $auth.can('add','role_permission') || $auth.can('drop','role_permission')"
                             class="btn btn-xs btn-outline-primary" :to="'/admin/roles/'+data.item.id">
                             <i class="fa fa-bars"></i>
                         </nuxt-link>
@@ -84,11 +84,11 @@
                             <i class="fa fa-times"></i>
                         </button>
                     </template>
-                    <template v-slot:cell(createdAt)="data">
-                        <timeago :datetime="data.item.createdAt" />
+                    <template v-slot:cell(created_at)="data">
+                        <timeago :datetime="data.item.created_at" />
                     </template>
-                    <template v-slot:cell(updatedAt)="data">
-                        <timeago :datetime="data.item.updatedAt" />
+                    <template v-slot:cell(updated_at)="data">
+                        <timeago :datetime="data.item.updated_at" />
                     </template>
                     <template v-slot:table-busy>
                         <div class="text-center text-danger my-2">

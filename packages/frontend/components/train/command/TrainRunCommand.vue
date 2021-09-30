@@ -5,8 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {runAPITrainCommand} from "@personalhealthtrain/ui-common/src";
-import {TrainConfigurationStatus, TrainBuildStatus, TrainRunStatus} from "../../../domains/train";
+import {
+    runAPITrainCommand, Train,
+    TrainBuildStatus,
+    TrainConfigurationStatus,
+    TrainRunStatus
+} from "@personalhealthtrain/ui-common";
 import {FrontendTrainCommand} from "../../../domains/train/type";
 import {BDropdownItem} from "bootstrap-vue";
 
@@ -131,8 +135,8 @@ export default {
         isShown() {
             return (
                     (
-                        this.train.configurationStatus === TrainConfigurationStatus.FINISHED &&
-                        this.train.buildStatus === TrainBuildStatus.FINISHED
+                        this.train.configuration_status === TrainConfigurationStatus.FINISHED &&
+                        this.train.build_status === TrainBuildStatus.FINISHED
                     ) ||
                         this.command === FrontendTrainCommand.RUN_STATUS
                 ) &&
@@ -141,9 +145,9 @@ export default {
         isEnabled() {
             switch (this.command) {
                 case FrontendTrainCommand.RUN_START:
-                    return !this.train.runStatus || [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.train.runStatus) !== -1
+                    return !this.train.run_status || [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.train.run_status) !== -1
                 case FrontendTrainCommand.RUN_STOP:
-                    return this.train.runStatus && [TrainRunStatus.STOPPED, TrainRunStatus.FINISHED].indexOf(this.train.runStatus) === -1
+                    return this.train.run_status && [TrainRunStatus.STOPPED, TrainRunStatus.FINISHED].indexOf(this.train.run_status) === -1
                 case FrontendTrainCommand.RUN_STATUS:
                     return true;
             }

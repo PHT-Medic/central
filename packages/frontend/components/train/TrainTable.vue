@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropAPITrain, getAPITrains} from "@personalhealthtrain/ui-common/src";
+import {dropAPITrain, getAPITrains} from "@personalhealthtrain/ui-common";
 import AlertMessage from "../../components/alert/AlertMessage";
 import Pagination from "../../components/Pagination";
 import TrainCard from "../../components/train/TrainCard";
@@ -55,18 +55,17 @@ export default {
                     },
                     include: [
                         'result',
-                        //'stations',
                         'user'
                     ]
                 };
 
                 if (typeof this.proposalId !== 'undefined') {
                     record.filter = {
-                        proposalId: this.proposalId
+                        proposal_id: this.proposalId
                     }
                 }
 
-                const response = await getAPITrains(record);
+                const response = await getAPITrains({...record});
 
                 this.items = response.data;
                 const {total} = response.meta;

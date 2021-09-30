@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {addAPIProvider, editAPIProvider, getRealms} from "@personalhealthtrain/ui-common";
+import {addAPIProvider, editAPIProvider, getRealms, OAuth2Provider} from "@personalhealthtrain/ui-common";
 import {maxLength, minLength, required} from "vuelidate/lib/validators";
 
 import AlertMessage from "../../alert/AlertMessage";
@@ -33,14 +33,14 @@ export default {
             formData: {
                 name: '',
                 openId: false,
-                tokenHost: '',
-                tokenPath: '',
-                authorizeHost: '',
-                authorizePath: '',
+                token_host: '',
+                token_path: '',
+                authorize_host: '',
+                authorize_path: '',
                 scope: '',
-                clientId: '',
-                clientSecret: '',
-                realmId: ''
+                client_id: '',
+                client_secret: '',
+                realm_id: ''
             },
 
             schemes: [
@@ -72,20 +72,20 @@ export default {
             openId: {
                 required
             },
-            tokenHost: {
+            token_host: {
                 required,
                 minLength: minLength(5),
                 maxLength: maxLength(512),
             },
-            tokenPath: {
+            token_path: {
                 minLength: minLength(5),
                 maxLength: maxLength(256),
             },
-            authorizeHost: {
+            authorize_host: {
                 minLength: minLength(5),
                 maxLength: maxLength(512),
             },
-            authorizePath: {
+            authorize_path: {
                 minLength: minLength(5),
                 maxLength: maxLength(256),
             },
@@ -93,23 +93,23 @@ export default {
                 minLength: minLength(3),
                 maxLength: maxLength(512),
             },
-            clientId: {
+            client_id: {
                 required,
                 minLength: minLength(3),
                 maxLength: maxLength(128),
             },
-            clientSecret: {
+            client_secret: {
                 minLength: minLength(3),
                 maxLength: maxLength(128),
             },
-            realmId: {
+            realm_id: {
                 required
             }
         }
     },
     created() {
         if(this.realmId) {
-            this.formData.realmId = this.realmId;
+            this.formData.realm_id = this.realmId;
         }
 
         for(let key in this.formData) {
@@ -204,18 +204,18 @@ export default {
                     </div>
                 </div>
 
-                <div v-if="!realmId" class="form-group" :class="{ 'form-group-error': $v.formData.realmId.$error }">
+                <div v-if="!realmId" class="form-group" :class="{ 'form-group-error': $v.formData.realm_id.$error }">
                     <label>Realm</label>
 
                     <select
-                        v-model="$v.formData.realmId.$model"
+                        v-model="$v.formData.realm_id.$model"
                         class="form-control"
                     >
                         <option value="">-- Bitte auswählen --</option>
                         <option v-for="(item,key) in realm.items" :value="item.id" :key="key">{{ item.name }}</option>
                     </select>
 
-                    <div v-if="!$v.formData.realmId.required && !$v.formData.realmId.$model" class="form-group-hint group-required">
+                    <div v-if="!$v.formData.realm_id.required && !$v.formData.realm_id.$model" class="form-group-hint group-required">
                         Please select a realm.
                     </div>
                 </div>
@@ -235,30 +235,30 @@ export default {
             <div class="col">
                 <h5><i class="fa fa-key"></i> Security</h5>
 
-                <div class="form-group" :class="{ 'form-group-error': $v.formData.clientId.$error }">
+                <div class="form-group" :class="{ 'form-group-error': $v.formData.client_id.$error }">
                     <label>Client ID</label>
-                    <input v-model="$v.formData.clientId.$model" type="text" name="name" class="form-control" placeholder="Name...">
+                    <input v-model="$v.formData.client_id.$model" type="text" name="name" class="form-control" placeholder="Name...">
 
-                    <div v-if="!$v.formData.clientId.required && !$v.formData.clientId.$model" class="form-group-hint group-required">
+                    <div v-if="!$v.formData.client_id.required && !$v.formData.client_id.$model" class="form-group-hint group-required">
                         Please enter a client id.
                     </div>
-                    <div v-if="!$v.formData.clientId.minLength" class="form-group-hint group-required">
+                    <div v-if="!$v.formData.client_id.minLength" class="form-group-hint group-required">
                         The length of the client id must be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters.
                     </div>
-                    <div v-if="!$v.formData.clientId.maxLength" class="form-group-hint group-required">
+                    <div v-if="!$v.formData.client_id.maxLength" class="form-group-hint group-required">
                         The length of the client id must be less than  <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
                     </div>
                 </div>
 
-                <div class="form-group" :class="{ 'form-group-error': $v.formData.clientSecret.$error }">
+                <div class="form-group" :class="{ 'form-group-error': $v.formData.client_secret.$error }">
                     <label>Client Secret (optional)</label>
-                    <input v-model="$v.formData.clientSecret.$model" type="text" name="name" class="form-control" placeholder="Secret...">
+                    <input v-model="$v.formData.client_secret.$model" type="text" name="name" class="form-control" placeholder="Secret...">
 
-                    <div v-if="!$v.formData.clientSecret.minLength" class="form-group-hint group-required">
-                        The length of the client secret must be greater than <strong>{{ $v.formData.clientSecret.$params.minLength.min }}</strong> characters.
+                    <div v-if="!$v.formData.client_secret.minLength" class="form-group-hint group-required">
+                        The length of the client secret must be greater than <strong>{{ $v.formData.client_secret.$params.minLength.min }}</strong> characters.
                     </div>
-                    <div v-if="!$v.formData.clientSecret.maxLength" class="form-group-hint group-required">
-                        The length of the client secret must be less than <strong>{{ $v.formData.clientSecret.$params.maxLength.max }}</strong> characters.
+                    <div v-if="!$v.formData.client_secret.maxLength" class="form-group-hint group-required">
+                        The length of the client secret must be less than <strong>{{ $v.formData.client_secret.$params.maxLength.max }}</strong> characters.
                     </div>
                 </div>
             </div>
@@ -269,55 +269,55 @@ export default {
         <h5><i class="fa fa-wrench"></i> Configuration</h5>
         <div class="row">
             <div class="col">
-                <div class="form-group" :class="{ 'form-group-error': $v.formData.tokenHost.$error }">
+                <div class="form-group" :class="{ 'form-group-error': $v.formData.token_host.$error }">
                     <label>Token Host</label>
-                    <input v-model="$v.formData.tokenHost.$model" type="text" name="name" class="form-control" placeholder="https://...">
+                    <input v-model="$v.formData.token_host.$model" type="text" name="name" class="form-control" placeholder="https://...">
 
-                    <div v-if="!$v.formData.tokenHost.required && !$v.formData.tokenHost.$model" class="form-group-hint group-required">
+                    <div v-if="!$v.formData.token_host.required && !$v.formData.token_host.$model" class="form-group-hint group-required">
                         Please enter a token host.
                     </div>
-                    <div v-if="!$v.formData.tokenHost.minLength" class="form-group-hint group-required">
-                        The length of the token host must be greater than <strong>{{ $v.formData.tokenHost.$params.minLength.min }}</strong> characters.
+                    <div v-if="!$v.formData.token_host.minLength" class="form-group-hint group-required">
+                        The length of the token host must be greater than <strong>{{ $v.formData.token_host.$params.minLength.min }}</strong> characters.
                     </div>
-                    <div v-if="!$v.formData.tokenHost.maxLength" class="form-group-hint group-required">
-                        The length of the token host must be less than  <strong>{{ $v.formData.tokenHost.$params.maxLength.max }}</strong> characters.
+                    <div v-if="!$v.formData.token_host.maxLength" class="form-group-hint group-required">
+                        The length of the token host must be less than  <strong>{{ $v.formData.token_host.$params.maxLength.max }}</strong> characters.
                     </div>
                 </div>
 
-                <div class="form-group" :class="{ 'form-group-error': $v.formData.tokenPath.$error }">
+                <div class="form-group" :class="{ 'form-group-error': $v.formData.token_path.$error }">
                     <label>Token Path (optional) <small class="text-success">default: "oauth/token"</small></label>
-                    <input v-model="$v.formData.tokenPath.$model" type="text" name="name" class="form-control" placeholder="path/...">
+                    <input v-model="$v.formData.token_path.$model" type="text" name="name" class="form-control" placeholder="path/...">
 
-                    <div v-if="!$v.formData.tokenPath.minLength" class="form-group-hint group-required">
-                        The length of the token path must be greater than  <strong>{{ $v.formData.tokenPath.$params.minLength.min }}</strong> characters.
+                    <div v-if="!$v.formData.token_path.minLength" class="form-group-hint group-required">
+                        The length of the token path must be greater than  <strong>{{ $v.formData.token_path.$params.minLength.min }}</strong> characters.
                     </div>
-                    <div v-if="!$v.formData.tokenPath.maxLength" class="form-group-hint group-required">
-                        The length of the password must be less than <strong>{{ $v.formData.tokenPath.$params.maxLength.max }}</strong> characters.
+                    <div v-if="!$v.formData.token_path.maxLength" class="form-group-hint group-required">
+                        The length of the password must be less than <strong>{{ $v.formData.token_path.$params.maxLength.max }}</strong> characters.
                     </div>
                 </div>
             </div>
             <div class="col">
-                <div class="form-group" :class="{ 'form-group-error': $v.formData.authorizeHost.$error }">
+                <div class="form-group" :class="{ 'form-group-error': $v.formData.authorize_host.$error }">
                     <label>Authorization Host (optional) <small class="text-success">default: Token Host</small></label>
-                    <input v-model="$v.formData.authorizeHost.$model" type="text" name="name" class="form-control" placeholder="https://...">
+                    <input v-model="$v.formData.authorize_host.$model" type="text" name="name" class="form-control" placeholder="https://...">
 
-                    <div v-if="!$v.formData.authorizeHost.minLength" class="form-group-hint group-required">
-                        The length of the authorization host must be greater than <strong>{{ $v.formData.tokenHost.$params.minLength.min }}</strong> characters.
+                    <div v-if="!$v.formData.authorize_host.minLength" class="form-group-hint group-required">
+                        The length of the authorization host must be greater than <strong>{{ $v.formData.token_host.$params.minLength.min }}</strong> characters.
                     </div>
-                    <div v-if="!$v.formData.authorizeHost.maxLength" class="form-group-hint group-required">
-                        The length of the authorization host must be less than  <strong>{{ $v.formData.authorizeHost.$params.maxLength.max }}</strong> characters.
+                    <div v-if="!$v.formData.authorize_host.maxLength" class="form-group-hint group-required">
+                        The length of the authorization host must be less than  <strong>{{ $v.formData.authorize_host.$params.maxLength.max }}</strong> characters.
                     </div>
                 </div>
 
-                <div class="form-group" :class="{ 'form-group-error': $v.formData.authorizePath.$error }">
+                <div class="form-group" :class="{ 'form-group-error': $v.formData.authorize_path.$error }">
                     <label>Authorization Path (optional) <small class="text-success">default: "oauth/authorize"</small></label>
-                    <input v-model="$v.formData.authorizePath.$model" type="text" name="name" class="form-control" placeholder="path/...">
+                    <input v-model="$v.formData.authorize_path.$model" type="text" name="name" class="form-control" placeholder="path/...">
 
-                    <div v-if="!$v.formData.authorizePath.minLength" class="form-group-hint group-required">
-                        The length of the authorization path must be greater than  <strong>{{ $v.formData.authorizePath.$params.minLength.min }}</strong> characters.
+                    <div v-if="!$v.formData.authorize_path.minLength" class="form-group-hint group-required">
+                        The length of the authorization path must be greater than  <strong>{{ $v.formData.authorize_path.$params.minLength.min }}</strong> characters.
                     </div>
-                    <div v-if="!$v.formData.authorizePath.maxLength" class="form-group-hint group-required">
-                        The length of the authorization path must be less than  <strong>{{ $v.formData.authorizePath.$params.maxLength.max }}</strong> characters.
+                    <div v-if="!$v.formData.authorize_path.maxLength" class="form-group-hint group-required">
+                        The length of the authorization path must be less than  <strong>{{ $v.formData.authorize_path.$params.maxLength.max }}</strong> characters.
                     </div>
                 </div>
             </div>

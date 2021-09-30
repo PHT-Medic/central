@@ -58,8 +58,8 @@ export default {
     },
     props: {
         proposalStationId: Number,
-        proposalId: Number,
-        stationId: Number,
+        proposal_id: Number,
+        station_id: Number,
         status: String,
         action: String,
         actionType: {

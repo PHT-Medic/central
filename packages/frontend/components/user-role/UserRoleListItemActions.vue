@@ -15,11 +15,11 @@
     </div>
 </template>
 <script>
-import {addAPIUserRole, dropAPIUserRole} from "@personalhealthtrain/ui-common/src";
+import {addAPIUserRole, dropAPIUserRole} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
-        userRoles: {
+        user_roles: {
             type: Array,
             default: []
         },
@@ -37,7 +37,7 @@ export default {
     },
     computed: {
         userRoleIndex() {
-            return this.userRoles.findIndex(userRole => this.primaryParameter === 'role' ? userRole.roleId === this.roleId : userRole.userId === this.userId);
+            return this.user_roles.findIndex(userRole => this.primaryParameter === 'role' ? userRole.role_id === this.roleId : userRole.user_id === this.userId);
         },
         isInUserRoles() {
             return this.userRoleIndex !== -1;
@@ -51,8 +51,8 @@ export default {
 
             try {
                 const userRole = await addAPIUserRole({
-                    roleId: this.roleId,
-                    userId: this.userId
+                    role_id: this.roleId,
+                    user_id: this.userId
                 });
 
                 this.$emit('added', userRole);
@@ -68,7 +68,7 @@ export default {
             this.busy = true;
 
             try {
-                const userRole = await dropAPIUserRole(this.userRoles[this.userRoleIndex].id);
+                const userRole = await dropAPIUserRole(this.user_roles[this.userRoleIndex].id);
 
                 this.$emit('dropped', userRole);
             } catch (e) {

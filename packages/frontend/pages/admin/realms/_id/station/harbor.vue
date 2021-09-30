@@ -5,12 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {doAPIStationTask} from "@personalhealthtrain/ui-common/src";
+import {doAPIStationTask, Realm, Station} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
-        realm: Object,
-        station: Object
+        realm: Realm,
+        station: Station
     },
     data() {
         return {
@@ -124,16 +124,16 @@ export default {
                     <div class="mb-2">
                         <div class="form-group">
                             <label>Name</label>
-                            <input type="text" class="form-control" :value="station.harborProjectId ? 'station_'+station.secureId : ''" :disabled="true" placeholder="Project ID" />
+                            <input type="text" class="form-control" :value="station.harbor_project_id ? 'station_'+station.secure_id : ''" :disabled="true" placeholder="Project ID" />
                         </div>
 
                         <div class="form-group">
                             <label>Path</label>
-                            <input type="text" class="form-control" :value="station.harborProjectId ? '/harbor/projects/'+station.harborProjectId : ''" :disabled="true" placeholder="Project Path" />
+                            <input type="text" class="form-control" :value="station.harbor_project_id ? '/harbor/projects/'+station.harbor_project_id : ''" :disabled="true" placeholder="Project Path" />
                         </div>
                     </div>
 
-                    <button type="button" class="btn btn-primary btn-xs" @click.prevent="doStationAction('ensureHarborProject')" :disabled="busy" v-if="!station.harborProjectId">
+                    <button type="button" class="btn btn-primary btn-xs" @click.prevent="doStationAction('ensureHarborProject')" :disabled="busy" v-if="!station.harbor_project_id">
                         <i class="fas fa-bolt"></i> Create
                     </button>
 
@@ -154,13 +154,13 @@ export default {
                     </p>
 
                     <div class="mb-2">
-                        <b-form-checkbox button-variant="success" v-model="station.harborProjectWebhookExists" switch :disabled="true">
+                        <b-form-checkbox button-variant="success" v-model="station.harbor_project_webhook_exists" switch :disabled="true">
                             Exists?
                         </b-form-checkbox>
                     </div>
 
-                    <template v-if="station.harborProjectId">
-                        <button type="button" class="btn btn-primary btn-xs" @click.prevent="doStationAction('ensureHarborProjectWebHook')" :disabled="busy" v-if="!station.harborProjectWebhookExists">
+                    <template v-if="station.harbor_project_id">
+                        <button type="button" class="btn btn-primary btn-xs" @click.prevent="doStationAction('ensureHarborProjectWebHook')" :disabled="busy" v-if="!station.harbor_project_webhook_exists">
                             <i class="fas fa-bolt"></i> Create
                         </button>
 
@@ -182,18 +182,18 @@ export default {
             <div class="mb-2">
                 <div class="form-group">
                     <label>Name</label>
-                    <input type="text" class="form-control" :value="station.harborProjectAccountName" :disabled="true" placeholder="robot$account_name"  />
+                    <input type="text" class="form-control" :value="station.harbor_project_account_name" :disabled="true" placeholder="robot$account_name"  />
                 </div>
                 <div class="form-group">
                     <label>Token</label>
-                    <textarea type="text" class="form-control" :value="station.harborProjectAccountToken" :disabled="true" placeholder="token" rows="14">
+                    <textarea type="text" class="form-control" :value="station.harbor_project_account_token" :disabled="true" placeholder="token" rows="14">
 
                     </textarea>
                 </div>
             </div>
 
-            <template v-if="station.harborProjectId">
-                <button type="button" class="btn btn-primary btn-xs" @click.prevent="doStationAction('ensureHarborProjectAccount')" :disabled="busy" v-if="station.harborProjectId && !station.harborProjectAccountToken">
+            <template v-if="station.harbor_project_id">
+                <button type="button" class="btn btn-primary btn-xs" @click.prevent="doStationAction('ensureHarborProjectAccount')" :disabled="busy" v-if="station.harbor_project_id && !station.harbor_project_account_token">
                     <i class="fas fa-bolt"></i> Create
                 </button>
                 <button type="button" class="btn btn-dark btn-xs" @click.prevent="doStationAction('dropHarborProjectAccount')" :disabled="busy">

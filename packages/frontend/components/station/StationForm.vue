@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {addAPIStation, editAPIStation, getRealms} from "@personalhealthtrain/ui-common/src";
+import {Station, addAPIStation, editAPIStation, getRealms} from "@personalhealthtrain/ui-common";
 import {v4} from 'uuid';
 import {maxLength, minLength, required, helpers, email} from "vuelidate/lib/validators";
 
@@ -33,12 +33,12 @@ export default {
         return {
             formData: {
                 name: '',
-                publicKey: null,
+                public_key: null,
                 email: null,
-                realmId: '',
-                secureId: '',
+                realm_id: '',
+                secure_id: '',
                 syncPublicKey: true,
-                vaultPublicKeySaved: false
+                vault_public_key_saved: false
             },
 
             busy: false,
@@ -56,7 +56,7 @@ export default {
                 minLength: minLength(3),
                 maxLength: maxLength(30)
             },
-            realmId: {
+            realm_id: {
                 required
             },
             email: {
@@ -64,11 +64,11 @@ export default {
                 maxLength: maxLength(256),
                 email
             },
-            publicKey: {
+            public_key: {
                 minLength: minLength(10),
                 maxLength: maxLength(4096)
             },
-            secureId: {
+            secure_id: {
                 required,
                 safeStr,
                 minLength: minLength(1),
@@ -77,8 +77,8 @@ export default {
         }
     },
     watch: {
-        publicKey(val) {
-            this.formData.publicKey = val;
+        public_key(val) {
+            this.formData.public_key = val;
         }
     },
     created() {
@@ -152,16 +152,16 @@ export default {
         },
 
         generateSecureId() {
-            this.formData.secureId = v4();
+            this.formData.secure_id = v4();
         },
         resetSecureId() {
-            this.formData.secureId = this.stationProperty.secureId;
+            this.formData.secure_id = this.stationProperty.secure_id;
         },
 
         handleRealmChanged() {
             if(this.$v.formData.name && this.$v.formData.name.length > 0) return;
 
-            const index = this.realm.items.findIndex(realm => realm.id === this.$v.formData.realmId.$model);
+            const index = this.realm.items.findIndex(realm => realm.id === this.$v.formData.realm_id.$model);
             if(index !== -1) {
                 this.formData.name = this.realm.items[index].name;
             }
@@ -171,15 +171,15 @@ export default {
         isEditing() {
             return typeof this.stationProperty?.id === 'number';
         },
-        publicKey() {
-            return this.stationProperty.publicKey;
+        public_key() {
+            return this.stationProperty.public_key;
         },
-        secureIdChanged() {
-            if(typeof this.stationProperty?.secureId === 'undefined') {
+        secure_idChanged() {
+            if(typeof this.stationProperty?.secure_id === 'undefined') {
                 return false;
             }
 
-            return this.stationProperty.secureId !== this.formData.secureId;
+            return this.stationProperty.secure_id !== this.formData.secure_id;
         }
     }
 }
@@ -187,10 +187,10 @@ export default {
 <template>
     <div>
         <div class="form-group">
-            <div v-if="!realmLocked" class="form-group" :class="{ 'form-group-error': $v.formData.realmId.$error }">
+            <div v-if="!realmLocked" class="form-group" :class="{ 'form-group-error': $v.formData.realm_id.$error }">
                 <label>Realm</label>
                 <select
-                    v-model="$v.formData.realmId.$model"
+                    v-model="$v.formData.realm_id.$model"
                     class="form-control"
                     :disabled="realm.busy"
                     @change="handleRealmChanged"
@@ -199,7 +199,7 @@ export default {
                     <option v-for="(item,key) in realm.items" :value="item.id" :key="key">{{ item.name }}</option>
                 </select>
 
-                <div v-if="!$v.formData.realmId.required && !$v.formData.realmId.$model" class="form-group-hint group-required">
+                <div v-if="!$v.formData.realm_id.required && !$v.formData.realm_id.$model" class="form-group-hint group-required">
                     Please select a realm...
                 </div>
             </div>
@@ -219,27 +219,27 @@ export default {
                 </div>
             </div>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.formData.secureId.$error }">
+            <div class="form-group" :class="{ 'form-group-error': $v.formData.secure_id.$error }">
                 <label>SecureID</label>
-                <input v-model="$v.formData.secureId.$model" type="text" name="name" class="form-control" placeholder="Secure ID...">
+                <input v-model="$v.formData.secure_id.$model" type="text" name="name" class="form-control" placeholder="Secure ID...">
 
-                <div v-if="!$v.formData.secureId.required" class="form-group-hint group-required">
+                <div v-if="!$v.formData.secure_id.required" class="form-group-hint group-required">
                     Please enter a secure identifier.
                 </div>
-                <div v-if="!$v.formData.secureId.minLength" class="form-group-hint group-required">
-                    The length of the secure identifier must be greater than <strong>{{ $v.formData.secureId.$params.minLength.min }}</strong> characters.
+                <div v-if="!$v.formData.secure_id.minLength" class="form-group-hint group-required">
+                    The length of the secure identifier must be greater than <strong>{{ $v.formData.secure_id.$params.minLength.min }}</strong> characters.
                 </div>
-                <div v-if="!$v.formData.secureId.maxLength" class="form-group-hint group-required">
-                    The length of the secure identifier must be less than <strong>{{ $v.formData.secureId.$params.maxLength.max }}</strong> characters.
+                <div v-if="!$v.formData.secure_id.maxLength" class="form-group-hint group-required">
+                    The length of the secure identifier must be less than <strong>{{ $v.formData.secure_id.$params.maxLength.max }}</strong> characters.
                 </div>
-                <div v-if="!$v.formData.secureId.safeStr" class="form-group-hint group-required">
+                <div v-if="!$v.formData.secure_id.safeStr" class="form-group-hint group-required">
                     The secure identifier is only allowed to consist of the following characters: [0-9a-zA-Z-]+
                 </div>
             </div>
 
-            <div class="alert alert-sm" :class="{'alert-danger': secureIdChanged, 'alert-info': !secureIdChanged}">
+            <div class="alert alert-sm" :class="{'alert-danger': secure_idChanged, 'alert-info': !secure_idChanged}">
                 <div class="mb-1">
-                    <template v-if="secureIdChanged">
+                    <template v-if="secure_idChanged">
                         If you change the Secure ID, a new representation for the station will be created in Harbor & Vault.
                     </template>
                     <template v-else>
@@ -249,25 +249,25 @@ export default {
                 <button class="btn btn-dark btn-xs" @click.prevent="generateSecureId">
                     <i class="fa fa-wrench"></i> Generate
                 </button>
-                <button class="btn btn-dark btn-xs" v-if="secureIdChanged" @click.prevent="resetSecureId">
+                <button class="btn btn-dark btn-xs" v-if="secure_idChanged" @click.prevent="resetSecureId">
                     <i class="fa fa-undo"></i> Reset
                 </button>
             </div>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.formData.publicKey.$error }">
+            <div class="form-group" :class="{ 'form-group-error': $v.formData.public_key.$error }">
                 <label>PublicKey</label>
                 <textarea
-                    v-model="$v.formData.publicKey.$model"
+                    v-model="$v.formData.public_key.$model"
                     class="form-control"
                     rows="4"
                     placeholder="Provide a public key for the station. The public key will also be passed to the Vault Key Storage for further usage."
                 ></textarea>
 
-                <div v-if="!$v.formData.publicKey.minLength" class="form-group-hint group-required">
-                    The length of the public key must be greater than <strong>{{ $v.formData.publicKey.$params.minLength.min }}</strong> characters.
+                <div v-if="!$v.formData.public_key.minLength" class="form-group-hint group-required">
+                    The length of the public key must be greater than <strong>{{ $v.formData.public_key.$params.minLength.min }}</strong> characters.
                 </div>
-                <div v-if="!$v.formData.publicKey.maxLength" class="form-group-hint group-required">
-                    The length of the public key must be less than <strong>{{ $v.formData.publicKey.$params.maxLength.max }}</strong> characters.
+                <div v-if="!$v.formData.public_key.maxLength" class="form-group-hint group-required">
+                    The length of the public key must be less than <strong>{{ $v.formData.public_key.$params.maxLength.max }}</strong> characters.
                 </div>
             </div>
 
@@ -279,7 +279,7 @@ export default {
                     </label>
                 </div>
                 <div class="ml-auto">
-                    Pushed: <i class="fa" :class="{'fa-check text-success': formData.vaultPublicKeySaved, 'fa-times text-danger': !formData.vaultPublicKeySaved}" />
+                    Pushed: <i class="fa" :class="{'fa-check text-success': formData.vault_public_key_saved, 'fa-times text-danger': !formData.vault_public_key_saved}" />
                 </div>
             </div>
 

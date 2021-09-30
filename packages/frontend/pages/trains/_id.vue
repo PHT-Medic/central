@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPITrain} from "@personalhealthtrain/ui-common/src";
+import {getAPITrain} from "@personalhealthtrain/ui-common";
 import Vue from 'vue';
 import {LayoutNavigationDefaultId} from "../../config/layout.ts";
 

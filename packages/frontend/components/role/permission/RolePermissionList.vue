@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getRolePermissions} from "@personalhealthtrain/ui-common/src";
+import {getRolePermissions} from "@personalhealthtrain/ui-common";
 import RolePermissionListItemActions from "../../../components/role/permission/RolePermissionListItemActions";
 import PermissionList from "../../../components/permission/PermissionList";
 
@@ -60,7 +60,7 @@ export default {
         },
 
         buildRequestFilter(build) {
-            const ids = this.items.map(item => item.permissionId);
+            const ids = this.items.map(item => item.permission_id);
             let additionFilter = undefined;
 
             build = build ?? this.assignedOnly;
@@ -83,17 +83,17 @@ export default {
                 return true;
             }
 
-            return this.items.findIndex(rolePermission => rolePermission.permissionId === item.id) !== -1;
+            return this.items.findIndex(role_permission => role_permission.permission_id === item.id) !== -1;
         },
 
         handleAdded(item) {
-            const index = this.items.findIndex(rolePermission => rolePermission.id === item.id);
+            const index = this.items.findIndex(role_permission => role_permission.id === item.id);
             if(index === -1) {
                 this.items.push(item);
             }
         },
         handleDropped(item) {
-            const index = this.items.findIndex(rolePermission => rolePermission.id === item.id);
+            const index = this.items.findIndex(role_permission => role_permission.id === item.id);
             if(index !== -1) {
                 this.items.splice(index, 1);
             }

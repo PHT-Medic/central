@@ -12,6 +12,8 @@
     </span>
 </template>
 <script>
+import {ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
+
 export default {
     props: {
         status: {
@@ -21,7 +23,14 @@ export default {
     },
     computed: {
         statusText() {
-            return this.status;
+            switch (this.status) {
+                case ProposalStationApprovalStatus.APPROVED:
+                    return 'approved';
+                case ProposalStationApprovalStatus.REJECTED:
+                    return 'rejected';
+                default:
+                    return 'none';
+            }
         },
         classSuffix() {
             switch (this.status) {

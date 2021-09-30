@@ -28,18 +28,18 @@
         data () {
             return {
                 formData: {
-                    masterImageId: this.proposal.masterImageId,
+                    master_image_id: this.proposal.master_image_id,
                     title: this.proposal.title,
                     risk: this.proposal.risk,
-                    riskComment: this.proposal.riskComment
+                    risk_comment: this.proposal.risk_comment
                 },
 
                 message: null,
 
                 busy: false,
 
-                masterImages: [],
-                masterImagesLoading: false,
+                master_images: [],
+                master_imagesLoading: false,
 
                 risks: [
                     { id: 'low', name: '(Low) Niedriges Risiko' },
@@ -50,7 +50,7 @@
         },
         validations: {
             formData: {
-                masterImageId: {
+                master_image_id: {
                     required
                 },
                 title: {
@@ -62,7 +62,7 @@
                     required,
                     alpha
                 },
-                riskComment: {
+                risk_comment: {
                     required,
                     minLength: minLength(10),
                     maxLength: maxLength(2048)
@@ -70,10 +70,10 @@
             }
         },
         created() {
-            this.masterImagesLoading = true;
+            this.master_imagesLoading = true;
             getAPIMasterImages().then((data) => {
-                this.masterImages = data.data;
-                this.masterImagesLoading = false
+                this.master_images = data.data;
+                this.master_imagesLoading = false
             });
         },
         methods: {
@@ -125,18 +125,18 @@
 
             <hr>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.formData.masterImageId.$error }">
+            <div class="form-group" :class="{ 'form-group-error': $v.formData.master_image_id.$error }">
                 <label>Master Image</label>
-                <select v-model="$v.formData.masterImageId.$model" class="form-control" :disabled="masterImagesLoading">
+                <select v-model="$v.formData.master_image_id.$model" class="form-control" :disabled="master_imagesLoading">
                     <option value="">
                         --Auswählen--
                     </option>
-                    <option v-for="(item,key) in masterImages" :key="key" :value="item.id">
+                    <option v-for="(item,key) in master_images" :key="key" :value="item.id">
                         {{ item.name }}
                     </option>
                 </select>
 
-                <div v-if="!$v.formData.masterImageId.required" class="form-group-hint group-required">
+                <div v-if="!$v.formData.master_image_id.required" class="form-group-hint group-required">
                     Bitte wählen Sie ein Master Image aus, welches als Grundlage für ihren Entrypoint den Sie beim Starten der
                     Data-Discovery und Data-Analysis jeweils angeben könenn, zugrunde liegt.
                 </div>
@@ -161,17 +161,17 @@
 
             <hr>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.formData.riskComment.$error }">
+            <div class="form-group" :class="{ 'form-group-error': $v.formData.risk_comment.$error }">
                 <label>Risiko Bewertung</label>
-                <textarea v-model="$v.formData.riskComment.$model" class="form-control" placeholder="..." rows="6" />
-                <div v-if="!$v.formData.riskComment.required" class="form-group-hint group-required">
+                <textarea v-model="$v.formData.risk_comment.$model" class="form-control" placeholder="..." rows="6" />
+                <div v-if="!$v.formData.risk_comment.required" class="form-group-hint group-required">
                     Bitte beschreiben Sie in wenigen Worten, wie Sie das Risiko für die Krankenhäuser bewerten würden.
                 </div>
-                <div v-if="!$v.formData.riskComment.minLength" class="form-group-hint group-required">
-                    Die Risiko Bewertung muss mindestens <strong>{{ $v.formData.riskComment.$params.minLength.min }}</strong> Zeichen lang sein.
+                <div v-if="!$v.formData.risk_comment.minLength" class="form-group-hint group-required">
+                    Die Risiko Bewertung muss mindestens <strong>{{ $v.formData.risk_comment.$params.minLength.min }}</strong> Zeichen lang sein.
                 </div>
-                <div v-if="!$v.formData.riskComment.maxLength" class="form-group-hint group-required">
-                    Die Risiko Bewertung darf maximal <strong>{{ $v.formData.riskComment.$params.maxLength.max }}</strong> Zeichen lang sein.
+                <div v-if="!$v.formData.risk_comment.maxLength" class="form-group-hint group-required">
+                    Die Risiko Bewertung darf maximal <strong>{{ $v.formData.risk_comment.$params.maxLength.max }}</strong> Zeichen lang sein.
                 </div>
             </div>
 

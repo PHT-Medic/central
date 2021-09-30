@@ -5,12 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {Service} from "@personalhealthtrain/ui-common";
 import ServiceClientDetails from "../../../../components/service/ServiceClientDetails";
 
 export default {
     components: {ServiceClientDetails},
     props: {
-        service: Object
+        service: Service
     },
     methods: {
         handleUpdated(event) {

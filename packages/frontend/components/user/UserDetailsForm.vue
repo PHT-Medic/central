@@ -5,14 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {User} from "@personalhealthtrain/ui-common";
-import {editAPIUser, getRealms} from "@personalhealthtrain/ui-common/src";
+import {editAPIUser, getRealms, User} from "@personalhealthtrain/ui-common";
 import {email, maxLength, minLength, required} from "vuelidate/lib/validators";
 
 export default {
     props: {
         userProperty: {
-            type: User,
+            type: Object,
             default: undefined
         }
     },

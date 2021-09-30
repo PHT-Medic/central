@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropRealm, getRealms} from "@personalhealthtrain/ui-common/src";
+import {dropRealm, getRealms} from "@personalhealthtrain/ui-common";
 import {LayoutNavigationAdminId} from "../../../config/layout";
 import RealmForm from "../../../components/admin/realm/RealmForm";
 import RealmList from "../../../components/realm/RealmList";
@@ -26,8 +26,8 @@ export default {
             isBusy: false,
             fields: [
                 { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'updatedAt', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'createdAt', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'options', label: '', tdClass: 'text-left' }
             ],
             items: []
@@ -144,7 +144,7 @@ export default {
                             <i class="fa fa-arrow-right"></i>
                         </nuxt-link>
                         <button
-                            v-if="$auth.can('drop','realm') && data.item.dropAble"
+                            v-if="$auth.can('drop','realm') && data.item.drop_able"
                             @click.prevent="drop(data.item)"
                             type="button"
                             class="btn btn-xs btn-outline-danger"
@@ -153,11 +153,11 @@ export default {
                             <i class="fa fa-times"></i>
                         </button>
                     </template>
-                    <template v-slot:cell(createdAt)="data">
-                        <timeago :datetime="data.item.createdAt" />
+                    <template v-slot:cell(created_at)="data">
+                        <timeago :datetime="data.item.created_at" />
                     </template>
-                    <template v-slot:cell(updatedAt)="data">
-                        <timeago :datetime="data.item.updatedAt" />
+                    <template v-slot:cell(updated_at)="data">
+                        <timeago :datetime="data.item.updated_at" />
                     </template>
                     <template v-slot:table-busy>
                         <div class="text-center text-danger my-2">

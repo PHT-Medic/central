@@ -12,7 +12,7 @@ export {
     Station,
     Train,
     TrainFile,
-    TrainModel,
+    Model,
     TrainResult,
     TrainStation,
     Client,

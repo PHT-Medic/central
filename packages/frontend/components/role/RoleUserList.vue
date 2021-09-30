@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getApiUserRoles} from "@personalhealthtrain/ui-common/src";
-import UserRoleListItemActions from "../../components/user/role/UserRoleListItemActions";
+import {getApiUserRoles} from "@personalhealthtrain/ui-common";
+import UserRoleListItemActions from "../user-role/UserRoleListItemActions";
 import UserList from "../../components/user/UserList";
 
 export default {
@@ -60,7 +60,7 @@ export default {
         },
 
         buildRoleRequestFilter(build) {
-            const ids = this.items.map(item => item.userId);
+            const ids = this.items.map(item => item.user_id);
             let additionFilter = undefined;
 
             build = build ?? this.assignedOnly;
@@ -83,7 +83,7 @@ export default {
                 return true;
             }
 
-            return this.items.findIndex(userRole => userRole.userId === item.id) !== -1;
+            return this.items.findIndex(userRole => userRole.user_id === item.id) !== -1;
         },
 
         handleAdded(item) {

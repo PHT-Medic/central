@@ -5,6 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+    import {Role} from "@personalhealthtrain/ui-common";
     import NotImplemented from "../../../../components/NotImplemented";
     import {LayoutNavigationAdminId} from "../../../../config/layout";
     import AlertMessage from "../../../../components/alert/AlertMessage";
@@ -13,7 +14,7 @@
     export default {
         props: {
             roleProperty: {
-                type: Object
+                type: Role
             }
         },
         meta: {

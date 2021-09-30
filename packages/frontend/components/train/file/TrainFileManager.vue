@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropApiTrainFile, getApiTrainFiles, uploadTrainFiles} from "@personalhealthtrain/ui-common/src";
-import {required, minLength, maxLength } from 'vuelidate/lib/validators';
+import {dropApiTrainFile, getApiTrainFiles, uploadTrainFiles, Train} from "@personalhealthtrain/ui-common";
+import {required } from 'vuelidate/lib/validators';
 import TrainFile from "../../../components/train/file/TrainFile";
 import TrainFolder from "../../../components/train/file/TrainFolder";
 import TrainFormFile from "../../../components/train/file/TrainFormFile";
@@ -33,8 +33,8 @@ export default {
                 filesSyncing: false
             },
             form: {
-                entrypointFileId: undefined,
-                entrypointExecutable: '',
+                entrypoint_file_id: undefined,
+                entrypoint_executable: '',
                 path: '',
                 files: []
             },
@@ -45,12 +45,12 @@ export default {
         }
     },
     created() {
-        if(typeof this.train.entrypointExecutable !== 'undefined' && this.train.entrypointExecutable) {
-            this.form.entrypointExecutable = this.train.entrypointExecutable;
+        if(typeof this.train.entrypoint_executable !== 'undefined' && this.train.entrypoint_executable) {
+            this.form.entrypoint_executable = this.train.entrypoint_executable;
         }
 
-        if(typeof this.train.entrypointFileId !== 'undefined') {
-            this.form.entrypointFileId = this.train.entrypointFileId;
+        if(typeof this.train.entrypoint_file_id !== 'undefined') {
+            this.form.entrypoint_file_id = this.train.entrypoint_file_id;
         }
 
         this.load().then(r => r);
@@ -83,11 +83,11 @@ export default {
                     formData.append('files['+i+']', this.form.files[i]);
                 }
 
-                const files = await uploadTrainFiles(this.train.id, formData);
+                const response = await uploadTrainFiles(this.train.id, formData);
                 this.form.files = [];
 
-                for(let i=0; i<files.length; i++) {
-                    this.items.push(files[i]);
+                for(let i=0; i<response.data.length; i++) {
+                    this.items.push(response.data[i]);
                 }
 
                 this.$emit('uploaded', files);
@@ -127,7 +127,7 @@ export default {
         },
         selectAllFiles() {
             if(this.selectAll) {
-                this.selected = this.items.map(file => file.id).filter(id => id !== this.form.entrypointFileId);
+                this.selected = this.items.map(file => file.id).filter(id => id !== this.form.entrypoint_file_id);
             } else {
                 this.selected = [];
             }
@@ -166,27 +166,27 @@ export default {
         },
 
         changeEntryPointFile(file) {
-            if(!this.form.entrypointFileId) {
-                this.form.entrypointFileId = file.id;
+            if(!this.form.entrypoint_file_id) {
+                this.form.entrypoint_file_id = file.id;
             } else {
-                if(this.form.entrypointFileId === file.id) {
-                    this.form.entrypointFileId = undefined;
+                if(this.form.entrypoint_file_id === file.id) {
+                    this.form.entrypoint_file_id = undefined;
                 } else {
-                    this.form.entrypointFileId = file.id;
+                    this.form.entrypoint_file_id = file.id;
                 }
             }
 
-            if(this.form.entrypointFileId) {
-                const index = this.selected.findIndex(file => file === this.form.entrypointFileId);
+            if(this.form.entrypoint_file_id) {
+                const index = this.selected.findIndex(file => file === this.form.entrypoint_file_id);
                 if(index !== -1) {
                     this.selected.splice(index, 1);
                 }
             }
 
-            this.$emit('setEntrypointFile', this.form.entrypointFileId);
+            this.$emit('setEntrypointFile', this.form.entrypoint_file_id);
         },
         changeEntryPointExecutable() {
-            this.$emit('setEntrypointExecutable', this.form.entrypointExecutable);
+            this.$emit('setEntrypointExecutable', this.form.entrypoint_executable);
         },
 
         getParentPath(path) {
@@ -201,7 +201,7 @@ export default {
     validations() {
         return {
             form: {
-                entrypointExecutable: {
+                entrypoint_executable: {
                     required
                 }
             }
@@ -211,12 +211,12 @@ export default {
         paths() {
             return this.form.path.split('/').filter(el => el !== '');
         },
-        entrypointFileId() {
-            if(!this.form.entrypointFileId) {
+        entrypoint_file_id() {
+            if(!this.form.entrypoint_file_id) {
                 return '';
             }
 
-            const index = this.items.findIndex(file => file.id === this.form.entrypointFileId);
+            const index = this.items.findIndex(file => file.id === this.form.entrypoint_file_id);
             if(index === -1) {
                 return '';
             }
@@ -245,7 +245,7 @@ export default {
             <div class="col">
                 <div class="form-group">
                     <label>EntryPoint Executable</label>
-                    <select class="form-control" v-model="$v.form.entrypointExecutable.$model" @change="changeEntryPointExecutable">
+                    <select class="form-control" v-model="$v.form.entrypoint_executable.$model" @change="changeEntryPointExecutable">
                         <option value="">--- Select an option ---</option>
                         <option v-for="(option,key) in executableOptions" :key="key" :value="option.id">
                             {{option.name}}
@@ -254,7 +254,7 @@ export default {
                 </div>
                 <div class="form-group">
                     <label>Entrypoint File</label>
-                    <input type="text" class="form-control" :value="entrypointFileId" :disabled="true" placeholder="Please toggle a file in the file list, to be selected as entrypoint file">
+                    <input type="text" class="form-control" :value="entrypoint_file_id" :disabled="true" placeholder="Please toggle a file in the file list, to be selected as entrypoint file">
                 </div>
             </div>
         </div>
@@ -327,7 +327,7 @@ export default {
                         :key="key"
                         :file="file"
                         :files-selected="selected"
-                        :file-selected-id="form.entrypointFileId"
+                        :file-selected-id="form.entrypoint_file_id"
                         @check="selectFile"
                         @toggle="changeEntryPointFile"
                     />

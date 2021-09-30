@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPIServices} from "@personalhealthtrain/ui-common/src";
+import {getAPIServices} from "@personalhealthtrain/ui-common";
 import {LayoutNavigationAdminId} from "~/config/layout";
 import StationForm from "../../../components/station/StationForm";
 import ServiceClientDetails from "../../../components/service/ServiceClientDetails";
@@ -24,10 +24,10 @@ export default {
             busy: false,
             fields: [
                 { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'clientSynced', label: 'Synced', thClass: 'text-center', tdClass: 'text-center'},
+                { key: 'client_synced', label: 'Synced', thClass: 'text-center', tdClass: 'text-center'},
                 { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'createdAt', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'updatedAt', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'options', label: '', tdClass: 'text-left' }
             ],
             items: [],
@@ -73,10 +73,10 @@ export default {
         </div>
         <div class="m-t-10">
             <b-table :items="items" :fields="fields" :busy="busy" head-variant="'dark'" outlined>
-                <template v-slot:cell(clientSynced)="data">
+                <template v-slot:cell(client_synced)="data">
                     <i class="fa" :class="{
-                        'fa-check text-success': data.item.clientSynced,
-                        'fa-times text-danger': !data.item.clientSynced
+                        'fa-check text-success': data.item.client_synced,
+                        'fa-times text-danger': !data.item.client_synced
                     }" />
                 </template>
                 <template v-slot:cell(realm)="data">
@@ -87,11 +87,11 @@ export default {
                         <i class="fa fa-arrow-right"></i>
                     </nuxt-link>
                 </template>
-                <template v-slot:cell(createdAt)="data">
-                    <timeago :datetime="data.item.createdAt" />
+                <template v-slot:cell(created_at)="data">
+                    <timeago :datetime="data.item.created_at" />
                 </template>
-                <template v-slot:cell(updatedAt)="data">
-                    <timeago :datetime="data.item.updatedAt" />
+                <template v-slot:cell(updated_at)="data">
+                    <timeago :datetime="data.item.updated_at" />
                 </template>
                 <template v-slot:table-busy>
                     <div class="text-center text-danger my-2">

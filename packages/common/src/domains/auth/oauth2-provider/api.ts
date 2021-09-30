@@ -13,7 +13,7 @@ import {
 } from "../../../modules";
 import {OAuth2Provider} from "./entity";
 
-export function getProviderAuthorizeUri(id) : string {
+export function getProviderAuthorizeUri(id: typeof OAuth2Provider.prototype.id) : string {
     const baseUrl: string = useAPI(APIType.DEFAULT).config.baseURL ?? '';
 
     return baseUrl + 'providers/' + id + '/authorize-url';
@@ -25,26 +25,26 @@ export async function getAPIProviders(record?: RequestRecord<OAuth2Provider>) : 
     return response.data;
 }
 
-export async function getAPIProvider(id: number) : Promise<SingleResourceResponse<OAuth2Provider>>  {
+export async function getAPIProvider(id: typeof OAuth2Provider.prototype.id) : Promise<SingleResourceResponse<OAuth2Provider>>  {
     let response = await useAPI(APIType.DEFAULT).get('providers/' + id);
 
     return response.data;
 }
 
-export async function dropAPIProvider(id: number) : Promise<SingleResourceResponse<OAuth2Provider>>{
+export async function dropAPIProvider(id: typeof OAuth2Provider.prototype.id) : Promise<SingleResourceResponse<OAuth2Provider>>{
     let response = await useAPI(APIType.DEFAULT).delete('providers/' + id);
 
     return response.data;
 }
 
-export async function addAPIProvider(data: { [key: string]: any }): Promise<SingleResourceResponse<OAuth2Provider>> {
-    let response = await useAPI('auth').post('providers', data);
+export async function addAPIProvider(data: Partial<OAuth2Provider>): Promise<SingleResourceResponse<OAuth2Provider>> {
+    let response = await useAPI(APIType.DEFAULT).post('providers', data);
 
     return response.data;
 }
 
-export async function editAPIProvider(userId: number, data: { [key: string]: any }): Promise<SingleResourceResponse<OAuth2Provider>> {
-    let response = await useAPI('auth').post('providers/' + userId, data);
+export async function editAPIProvider(userId: number, data: Partial<OAuth2Provider>): Promise<SingleResourceResponse<OAuth2Provider>> {
+    let response = await useAPI(APIType.DEFAULT).post('providers/' + userId, data);
 
     return response.data;
 }

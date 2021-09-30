@@ -22,7 +22,7 @@
                 return vm.$store.state.auth.user;
             },
             infoText(vm) {
-                return vm.user ? vm.user.realmId : 'Personal Health Train'
+                return vm.user ? vm.user.realm_id : 'Personal Health Train'
             }
         },
         methods: {
@@ -71,7 +71,7 @@
                         <li class="nav-item">
                             <nuxt-link class="nav-link user-link"  :to="'/users/'+user.id">
                                 <v-gravatar :email="user.email ? user.email : ''" />
-                                <span>{{ user.displayName ? user.displayName : user.name }}</span>
+                                <span>{{ user.display_name ? user.display_name : user.name }}</span>
                             </nuxt-link>
                         </li>
                         <li class="nav-item">

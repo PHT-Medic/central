@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPIStations} from "@personalhealthtrain/ui-common/src";
+import {getAPIStations} from "@personalhealthtrain/ui-common";
 import {LayoutNavigationDefaultId} from "../../../config/layout.ts";
 import StationTrainTable from "../../../components/station/StationTrainTable";
 

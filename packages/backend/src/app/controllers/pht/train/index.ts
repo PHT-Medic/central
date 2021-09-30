@@ -9,12 +9,11 @@ import {getRepository} from "typeorm";
 import {applyPagination, applyIncludes, applyFilters} from "typeorm-extension";
 import {
     isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources, Proposal, Train, TrainFile
+    onlyRealmPermittedQueryResources, Proposal, Train, TrainFile, TrainType
 } from "@personalhealthtrain/ui-common";
 import {check, matchedData, validationResult} from "express-validator";
 import {TrainCommand} from "@personalhealthtrain/ui-common";
 import {MasterImage} from "@personalhealthtrain/ui-common";
-import {isTrainType} from "@personalhealthtrain/ui-common";
 import {
     TrainConfigurationStatus
 } from "@personalhealthtrain/ui-common";
@@ -231,11 +230,7 @@ export async function addTrainRouteHandler(req: any, res: any) {
         .notEmpty()
         .isString()
         .custom(value => {
-            if(!isTrainType(value)) {
-                throw new Error('The train type is not valid');
-            }
-
-            return true;
+            return Object.values(TrainType).includes(value);
         })
         .run(req);
 

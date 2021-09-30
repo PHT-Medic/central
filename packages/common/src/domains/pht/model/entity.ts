@@ -13,11 +13,11 @@ import {
     OneToOne,
     PrimaryGeneratedColumn,
 } from "typeorm";
-import {User} from "../../auth/user";
+import {User} from "../../auth";
 import {TrainFile} from "../train-file";
 
-@Entity({name: 'train_models'})
-export class TrainModel {
+@Entity({name: 'models'})
+export class Model {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 

@@ -5,8 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {User} from "@personalhealthtrain/ui-common";
-import {editAPIUser} from "@personalhealthtrain/ui-common/src";
+import {editAPIUser, User} from "@personalhealthtrain/ui-common";
 import {maxLength, minLength, required, sameAs} from "vuelidate/lib/validators";
 import AlertMessage from "../../components/alert/AlertMessage";
 
@@ -14,7 +13,7 @@ export default {
     components: {AlertMessage},
     props: {
         userProperty: {
-            type: User,
+            type: Object,
             default: undefined
         }
     },

@@ -5,12 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+    import {Role} from "@personalhealthtrain/ui-common";
     import RoleUserList from "../../../../components/role/RoleUserList";
 
     export default {
         props: {
             roleProperty: {
-                type: Object
+                type: Role
             }
         },
         components: {
