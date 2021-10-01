@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {formatRequestRecord, RequestRecord} from "@trapi/data-fetching";
+import {formatRequestRecord, RequestRecord} from "@trapi/query";
 import {
     CollectionResourceResponse,
     SingleResourceResponse,

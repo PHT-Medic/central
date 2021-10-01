@@ -1,6 +1,6 @@
 {
     "extends": "./tsconfig.json",
-    "include": ["./src/**/*"],
+    "include": ["./src/**/*", "../common/src/**/*"],
     "compilerOptions": {
         "composite": true
     }
