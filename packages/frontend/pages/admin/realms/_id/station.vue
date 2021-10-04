@@ -49,7 +49,9 @@ export default {
             });
 
             if(stations.length !== 1) {
-                return undefined;
+                return {
+                    station: undefined
+                };
             }
 
             return {

@@ -9,11 +9,8 @@
     "version": "1.0.0",
     "description": "This package contains the Central UI backend application of PHT. It was initially developed as part of my Bachelor Thesis.",
     "main": "./dist/index.js",
-    "_moduleAliases": {
-        "@package/common": "../common/dist"
-    },
     "dependencies": {
-        "@personalhealthtrain/ui-common": "^0.0.1",
+        "@personalhealthtrain/ui-common": "^0.0.2",
         "@decorators/di": "^1.0.2",
         "@decorators/express": "^2.4.0",
         "@typescript-auth/core": "^0.0.15",
@@ -31,7 +28,6 @@
         "express": "^4.17.1",
         "express-validator": "^6.12.1",
         "mysql": "^2.18.1",
-        "module-alias": "^2.2.2",
         "reflect-metadata": "^0.1.13",
         "swagger-stats": "^0.99.1",
         "swagger-ui-express": "^4.1.6",
@@ -73,6 +69,7 @@
     "scripts": {
         "dev": "ts-node src/index.ts",
         "dev-watch": "nodemon --legacy-watch --watch 'src/**/*.ts' --exec 'ts-node src/index.ts'",
-        "build": "tsc -p tsconfig.build.json"
+        "build": "tsc -p tsconfig.build.json",
+        "start": "node dist/index.js"
     }
 }

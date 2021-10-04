@@ -1,18 +1,15 @@
 FROM node:16-alpine
 
-RUN mkdir -p /usr/src/app
-RUN mkdir -p /usr/src/app/writable
+RUN mkdir -p /usr/src/project
 
-WORKDIR /usr/src/app
-
-COPY package.json ./package.json
+WORKDIR /usr/src/project/
 
 COPY . .
 
 RUN rm -rf ./node-modules
 
-RUN npm install &&\
-  npm run build
+RUN npm ci
+RUN npm run build
 
 RUN touch .env
 
@@ -20,5 +17,7 @@ COPY ./entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x ./entrypoint.sh
 
+EXPOSE 3000
+
 ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]
-CMD ["start"]
+CMD ["setup"]
