@@ -16,7 +16,7 @@ export default {
     },
     async asyncData(context) {
         try {
-            const service = await getAPIService(context.params.id, {include: ['client']});
+            const service = await getAPIService(context.params.id, {include: {client: true}});
 
             return {
                 service

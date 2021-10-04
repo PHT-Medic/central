@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPIUserKeyRing, Train} from "@personalhealthtrain/ui-common";
+import {getAPIUserKeyRing, TrainType} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
@@ -20,7 +20,8 @@ export default {
                 item: undefined,
                 busy: false,
                 loaded: false
-            }
+            },
+            trainType: TrainType
         }
     },
     computed: {
@@ -32,9 +33,6 @@ export default {
         },
         isAnalyseTrain() {
             return this.train.type === 'analyse';
-        },
-        trainExists() {
-            return this.train.hasOwnProperty('id');
         }
     },
     created() {
@@ -79,12 +77,12 @@ export default {
 
         <b-card no-body class="m-b-20">
             <b-tabs pills card vertical>
-                <b-tab title="Discovery" :active="isDiscoveryTrain" @click="setTrainType('discovery')">
+                <b-tab title="Discovery" :active="isDiscoveryTrain" @click="setTrainType(trainType.DISCOVERY)">
                     <b-card-text>
                         Start a <strong>discovery</strong> train, to know which data and params are available at all specified stations.
                     </b-card-text>
                 </b-tab>
-                <b-tab title="Analyse" :active="isAnalyseTrain" @click="setTrainType('analyse')">
+                <b-tab title="Analyse" :active="isAnalyseTrain" @click="setTrainType(trainType.ANALYSE)">
                     <b-card-text>
                         Run a <strong>analyse</strong> train, to run your analyse according the achieved metadata achieved during the discovery phase.
                     </b-card-text>

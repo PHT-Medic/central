@@ -5,6 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import {
+    AuthorizationHeaderValue,
+    buildAuthorizationHeaderValue
+} from "@typescript-auth/core";
 import axios, {AxiosInstance} from 'axios';
 import {ApiRequestConfig, ApiResponse} from "./type";
 
@@ -52,11 +56,11 @@ export class BaseAPI {
 
     // ---------------------------------------------------------------------------------
 
-    public setAuthorizationBearerHeader(token: string) {
-        this.setHeader('Authorization','Bearer ' + token);
+    public setAuthorizationHeader(options: AuthorizationHeaderValue) {
+        this.setHeader('Authorization', buildAuthorizationHeaderValue(options));
     }
 
-    public unsetAuthorizationBearerHeader() {
+    public unsetAuthorizationHeader() {
         this.unsetHeader('Authorization');
     }
 

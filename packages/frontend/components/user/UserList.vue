@@ -70,25 +70,19 @@ export default {
             this.busy = true;
 
             try {
-                let data = {
-                    // todo: remove this and add prop
-                    include: 'realm',
+                const response = await getAPIUsers({
+                    include: {
+                        realm: true
+                    },
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset
                     },
                     filter: {
-                        name: this.q.length > 0 ? '~'+this.q : this.q
+                        name: this.q.length > 0 ? '~'+this.q : this.q,
+                        ...(this.requestFilters ? this.requestFilters : {})
                     }
-                }
-
-                if(typeof this.requestFilters !== 'undefined') {
-                    for(let key in this.requestFilters) {
-                        data.filter[key] = this.requestFilters[key];
-                    }
-                }
-
-                const response = await getAPIUsers({...data});
+                });
 
                 this.items = response.data;
                 const {total} = response.meta;

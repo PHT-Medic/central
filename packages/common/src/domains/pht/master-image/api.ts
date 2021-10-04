@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {formatRequestRecord, RequestRecord} from "@trapi/query";
+import {buildQuery, BuildInput} from "@trapi/query";
 import {
     CollectionResourceResponse,
     useAPI, SingleResourceResponse, APIType
@@ -13,8 +13,8 @@ import {
 
 import {MasterImage} from "./entity";
 
-export async function getAPIMasterImages(data?: RequestRecord<MasterImage>) : Promise<CollectionResourceResponse<MasterImage>> {
-    const response = await useAPI(APIType.DEFAULT).get('master-images' + formatRequestRecord(data));
+export async function getAPIMasterImages(data?: BuildInput<MasterImage>) : Promise<CollectionResourceResponse<MasterImage>> {
+    const response = await useAPI(APIType.DEFAULT).get('master-images' + buildQuery(data));
     return response.data;
 }
 

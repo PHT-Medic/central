@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {formatRequestRecord, RequestRecord} from "@trapi/query";
+import {buildQuery, BuildInput} from "@trapi/query";
 import {
     APIType,
     CollectionResourceResponse,
@@ -14,8 +14,8 @@ import {
 } from "../../../modules";
 import {Station} from "./entity";
 
-export async function getAPIStations(options?: RequestRecord<Station>) : Promise<CollectionResourceResponse<Station>> {
-    const response = await useAPI(APIType.DEFAULT).get('stations' + formatRequestRecord(options));
+export async function getAPIStations(options?: BuildInput<Station>) : Promise<CollectionResourceResponse<Station>> {
+    const response = await useAPI(APIType.DEFAULT).get('stations' + buildQuery(options));
 
     return response.data;
 }

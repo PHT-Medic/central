@@ -43,7 +43,10 @@ export default {
 
             try {
                 const response = await getAPIServices({
-                    include: ['realm', 'client']
+                    include: {
+                        realm: true,
+                        client: true
+                    }
                 });
 
                 this.items = response.data;

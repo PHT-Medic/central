@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {formatRequestRecord, RequestRecord} from "@trapi/query";
+import {buildQuery, BuildInput} from "@trapi/query";
 import {
     CollectionResourceResponse,
     SingleResourceResponse,
@@ -19,8 +19,8 @@ export function getProviderAuthorizeUri(id: typeof OAuth2Provider.prototype.id) 
     return baseUrl + 'providers/' + id + '/authorize-url';
 }
 
-export async function getAPIProviders(record?: RequestRecord<OAuth2Provider>) : Promise<CollectionResourceResponse<OAuth2Provider>> {
-    let response = await useAPI(APIType.DEFAULT).get('providers' + formatRequestRecord(record));
+export async function getAPIProviders(record?: BuildInput<OAuth2Provider>) : Promise<CollectionResourceResponse<OAuth2Provider>> {
+    let response = await useAPI(APIType.DEFAULT).get('providers' + buildQuery(record));
 
     return response.data;
 }

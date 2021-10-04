@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {AuthStoreToken} from "../../store/auth";
+import {AuthStoreToken} from "@/store/auth";
 import {Context} from "@nuxt/types";
 import {APIType, useAPI} from "@personalhealthtrain/ui-common";
 import {AbilityManager, Oauth2Client, Oauth2TokenResponse, OwnedPermission} from "@typescript-auth/core";
@@ -207,7 +207,10 @@ class AuthModule {
                 }
             });
 
-        useAPI(APIType.DEFAULT).setAuthorizationBearerHeader(token);
+        useAPI(APIType.DEFAULT).setAuthorizationHeader({
+            type: 'Bearer',
+            token
+        });
     };
 
     public unsetRequestToken = () => {
@@ -216,7 +219,7 @@ class AuthModule {
             this.responseInterceptorId = undefined;
         }
 
-        useAPI(APIType.DEFAULT).unsetAuthorizationBearerHeader();
+        useAPI(APIType.DEFAULT).unsetAuthorizationHeader();
     }
 
     // --------------------------------------------------------------------

@@ -13,7 +13,7 @@
         "@package/common": "../common/dist"
     },
     "dependencies": {
-        "@personalhealthtrain/ui-common": "^1.0.0",
+        "@personalhealthtrain/ui-common": "^0.0.1",
         "@decorators/di": "^1.0.2",
         "@decorators/express": "^2.4.0",
         "@typescript-auth/core": "^0.0.15",

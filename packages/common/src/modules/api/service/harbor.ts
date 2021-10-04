@@ -26,8 +26,7 @@ export function parseHarborConnectionString(connectionString: string) : APIServi
     return {
         host,
         user: authParts[0],
-        password: authParts[1],
-        token: Buffer.from(authParts[0]+':'+authParts[1]).toString('base64')
+        password: authParts[1]
     }
 }
 
@@ -42,10 +41,10 @@ export class HarborAPI extends BaseAPI {
 
         super(driverConfig);
 
-        this.api.interceptors.request.use((request: ApiRequestConfig) => {
-            request.headers.common.Authorization = 'Basic ' + harborConfig.token;
-
-            return request;
+        this.setAuthorizationHeader({
+            type: "Basic",
+            username: harborConfig.user,
+            password: harborConfig.password
         });
     }
 }

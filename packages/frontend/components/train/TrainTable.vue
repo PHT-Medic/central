@@ -48,24 +48,19 @@ export default {
             this.busy = true;
 
             try {
-                let record = {
+                const response = await getAPITrains({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset
                     },
-                    include: [
-                        'result',
-                        'user'
-                    ]
-                };
-
-                if (typeof this.proposalId !== 'undefined') {
-                    record.filter = {
-                        proposal_id: this.proposalId
+                    include: {
+                        result: true,
+                        user: true
+                    },
+                    filter: {
+                        ...(this.proposalId ? {proposal_id: this.proposalId} : {})
                     }
-                }
-
-                const response = await getAPITrains({...record});
+                });
 
                 this.items = response.data;
                 const {total} = response.meta;

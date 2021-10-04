@@ -19,7 +19,10 @@ import {getApiProposalStations, getAPIStations, getProposal} from "@personalheal
         async asyncData (context) {
             try {
                 const proposal = await getProposal(context.params.id, {
-                    include: ['master_image', 'user']
+                    include: {
+                        master_image: true,
+                        user: true
+                    }
                 });
 
                 console.log(proposal);

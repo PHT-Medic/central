@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {formatRequestRecord, RequestRecord} from "@trapi/query";
+import {buildQuery, BuildInput} from "@trapi/query";
 import {
     APIType,
     CollectionResourceResponse,
@@ -14,8 +14,8 @@ import {
 } from "../../../modules";
 import {Role} from "./entity";
 
-export async function getAPIRoles(data?: RequestRecord<Role>) : Promise<CollectionResourceResponse<Role>> {
-    let response = await useAPI(APIType.DEFAULT).get('roles' + formatRequestRecord(data));
+export async function getAPIRoles(data?: BuildInput<Role>) : Promise<CollectionResourceResponse<Role>> {
+    let response = await useAPI(APIType.DEFAULT).get('roles' + buildQuery(data));
 
     return response.data;
 }

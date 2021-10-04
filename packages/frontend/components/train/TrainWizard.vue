@@ -8,7 +8,6 @@
 import {
     editAPITrain,
     runAPITrainCommand,
-    Train,
     TrainCommand,
     TrainConfigurationStatus
 } from "@personalhealthtrain/ui-common";

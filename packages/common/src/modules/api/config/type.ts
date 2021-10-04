@@ -10,8 +10,7 @@ import {ApiRequestConfig} from "../type";
 export type APIServiceHarborConfig = {
     host: string,
     user: string,
-    password: string,
-    token: string
+    password: string
 }
 
 export type APIServiceVaultConfig = {

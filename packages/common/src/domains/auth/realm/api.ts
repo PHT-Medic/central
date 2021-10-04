@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {RequestRecord, formatRequestRecord} from "@trapi/query";
+import {BuildInput, buildQuery} from "@trapi/query";
 import {
     APIType,
     CollectionResourceResponse,
@@ -14,8 +14,8 @@ import {
 } from "../../../modules";
 import {Realm} from "./entity";
 
-export async function getRealms(data?: RequestRecord<Realm>) : Promise<CollectionResourceResponse<Realm>> {
-    let response = await useAPI(APIType.DEFAULT).get('realms' + formatRequestRecord(data));
+export async function getRealms(data?: BuildInput<Realm>) : Promise<CollectionResourceResponse<Realm>> {
+    let response = await useAPI(APIType.DEFAULT).get('realms' + buildQuery(data));
 
     return response.data;
 }

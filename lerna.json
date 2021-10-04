@@ -2,13 +2,15 @@
     "packages": [
         "packages/*"
     ],
+    "publishConfig": {
+        "access": "public"
+    },
     "command": {
         "publish": {
-            "ignoreChanges": ["ignored-file", "*.md"],
-            "message": "chore(release): publish",
-            "registry": "https://npm.pkg.github.com"
+            "ignoreChanges": ["*.md"],
+            "message": "chore(release): publish"
         }
     },
-    "version": "0.0.0",
+    "version": "independent",
     "useWorkspaces": true
 }

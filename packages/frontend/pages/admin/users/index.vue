@@ -24,7 +24,6 @@
                     { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'email', label: 'Email', thClass: 'text-center', tdClass: 'text-center' },
                     { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
                     { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                     { key: 'options', label: '', tdClass: 'text-left' }
@@ -75,7 +74,7 @@
             <template v-slot:items="props">
                 <b-table :items="props.items" :fields="fields" :busy="props.busy" head-variant="'dark'" outlined>
                     <template v-slot:cell(realm)="data">
-                        <span class="badge-dark badge">{{data.item.realm.name}}</span>
+                        <span class="badge-dark badge">{{data.item.realm_id}}</span>
                     </template>
                     <template v-slot:cell(options)="data">
                         <nuxt-link

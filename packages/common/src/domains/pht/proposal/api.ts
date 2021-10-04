@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {formatRequestRecord, RequestRecord} from "@trapi/query";
+import {buildQuery, BuildInput} from "@trapi/query";
 import {
     APIType,
     CollectionResourceResponse,
@@ -20,8 +20,8 @@ export async function addProposal(data: Record<string, any>) : Promise<SingleRes
     return response.data;
 }
 
-export async function getProposal(id: number, requestRecord?: RequestRecord<Proposal>) : Promise<SingleResourceResponse<Proposal>> {
-    const response = await useAPI(APIType.DEFAULT).get('proposals/' + id + formatRequestRecord(requestRecord));
+export async function getProposal(id: number, requestRecord?: BuildInput<Proposal>) : Promise<SingleResourceResponse<Proposal>> {
+    const response = await useAPI(APIType.DEFAULT).get('proposals/' + id + buildQuery(requestRecord));
 
     return response.data;
 }
@@ -36,7 +36,7 @@ export async function editProposal(id: number, data: Record<string, any>): Promi
     return response.data;
 }
 
-export async function getProposals(record?: RequestRecord<Proposal>): Promise<CollectionResourceResponse<Proposal>>  {
-    const response = await useAPI(APIType.DEFAULT).get('proposals' + formatRequestRecord(record));
+export async function getProposals(record?: BuildInput<Proposal>): Promise<CollectionResourceResponse<Proposal>>  {
+    const response = await useAPI(APIType.DEFAULT).get('proposals' + buildQuery(record));
     return response.data;
 }

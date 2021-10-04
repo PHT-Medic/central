@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {formatRequestRecord, RequestRecord} from "@trapi/query";
+import {buildQuery, BuildInput} from "@trapi/query";
 import {
     APIType,
     CollectionResourceResponse,
@@ -14,14 +14,14 @@ import {
 } from "../../../modules";
 import {User} from "./entity";
 
-export async function getAPIUsers(options?: RequestRecord<User>) : Promise<CollectionResourceResponse<User>> {
-    const response = await useAPI(APIType.DEFAULT).get('users' + formatRequestRecord(options));
+export async function getAPIUsers(options?: BuildInput<User>) : Promise<CollectionResourceResponse<User>> {
+    const response = await useAPI(APIType.DEFAULT).get('users' + buildQuery(options));
 
     return response.data;
 }
 
-export async function getAPIUser(id: typeof User.prototype.id, options?: RequestRecord<User>) : Promise<SingleResourceResponse<User>> {
-    const response = await useAPI(APIType.DEFAULT).get('users/' + id + formatRequestRecord(options));
+export async function getAPIUser(id: typeof User.prototype.id, options?: BuildInput<User>) : Promise<SingleResourceResponse<User>> {
+    const response = await useAPI(APIType.DEFAULT).get('users/' + id + buildQuery(options));
 
     return response.data;
 }
