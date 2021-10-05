@@ -14,7 +14,6 @@ const envResult = config({
 
 if (envResult.error) {
     console.error('[ERROR] env failed to load:' + envResult.error);
-    process.exit(1)
 }
 
 export function requireFromEnv(key : string, alt?: any) {
