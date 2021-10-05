@@ -31,7 +31,7 @@ jobs:
 
             - name: Push API Image
               run: |
-                  IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$API_IMAGE_NAME
+                  IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
                   # Change all uppercase to lowercase
                   IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
                   # Strip git ref prefix from version
@@ -42,5 +42,5 @@ jobs:
                   [ "$VERSION" == "master" ] && VERSION=latest
                   echo IMAGE_ID=$IMAGE_ID
                   echo VERSION=$VERSION
-                  docker tag $API_IMAGE_NAME $IMAGE_ID:$VERSION
+                  docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
                   docker push $IMAGE_ID:$VERSION
