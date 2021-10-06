@@ -9,16 +9,39 @@
 
 set -e
 
-cd /usr/src/project
+BASE_DIR=/usr/src/project
 
-if [ "$1" = "frontend-start" ]; then
-    export NUXT_HOST=0.0.0.0
-    export NUXT_PORT=3000
-    exec npm run start --workspace=packages/frontend
-elif [ "$1" = "backend-start" ]; then
-    exec npm run start --workspace=packages/backend
+cd "${BASE_DIR}"
+
+case "${1}" in
+    backend) PACKAGE=backend;;
+    frontend) PACKAGE=frontend;;
+    *) echo "Unknown package: ${1}";;
+esac
+
+shift
+
+if [[ -z "${PACKAGE}" ]]; then
+    printf 'Usage:\n'
+    printf '  frontend <command>\n    Start or run the frontend app in dev mode.\n'
+    printf '  backend <command>\n    Start or run the back app in dev mode.\n'
+    exit 0
 fi
 
-cd /usr/src/project/packages/backend
+case "${PACKAGE}" in
+    backend)
+        if [[ -z "$2" ]]; then
+            exec npm run "$@" --workspace=packages/backend
+        else
+            cd "${BASE_DIR}packages/backend"
+            exec node dist/cli/index.js "$@"
+        fi
+        ;;
+    frontend)
+        export NUXT_HOST=0.0.0.0
+        export NUXT_PORT=3000
+        exec npm run "$1" --workspace=packages/frontend
+        ;;
+esac
 
-exec node dist/cli/index.js "$@"
+
