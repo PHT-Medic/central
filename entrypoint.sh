@@ -40,7 +40,7 @@ case "${PACKAGE}" in
         exec npm run "$1" --workspace=packages/frontend
         ;;
     cli)
-        cd "${BASE_DIR}packages/backend"
+        cd "${BASE_DIR}/packages/backend"
         exec node dist/cli/index.js "$@"
         ;;
 esac
