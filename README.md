@@ -1,30 +1,29 @@
 [![main](https://github.com/Tada5hi/pht-central-ui/actions/workflows/main.yml/badge.svg)](https://github.com/Tada5hi/pht-central-ui/actions/workflows/main.yml)
 [![Known Vulnerabilities](https://snyk.io/test/github/Tada5hi/pht-central-ui/badge.svg)](https://snyk.io/test/github/Tada5hi/pht-central-ui)
 
-# UI 🚀
+# User Interface (UI) 🚀
 This repository contains all packages for the Central-UI of the Personal Health Train (PHT).
 
 ## Installation
-This package requires docker to be installed on the host machine.
+This package requires `nodejs` & `npm` to be installed on the host machine.
+```
+$ npm i
+```
 
 ## Configuration
-
 Read the `Readme.md` in each package directory.
 
-## Setup
-To setup the database and other parts of the backend, run the following command:
+## Run
+To run the setup:
 ```
-$ docker network create --driver bridge pht-network
-
-$ docker-compose run -d db
-$ docker-compose run backend setup
+$ npm run setup --workspace=packages/backend
 ```
-This will setup everything you need.
-
-## Start
-To run all packages just execute the following command:
- ```
-$ docker-compose up
+Then open two terminals and run each of the following commands in one of them:
+```
+$ npm run start --workspace=packages/backend
+```
+```
+$ npm run start --workspace=packages/frontend
 ```
 
 ## Credits
