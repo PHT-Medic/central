@@ -34,7 +34,7 @@ import {buildConnectionOptions} from "typeorm-extension";
         config.components.forEach(c => c.start());
         config.aggregators.forEach(a => a.start());
 
-        httpServer.listen(env.port, signalStart);
+        httpServer.listen(env.port, '0.0.0.0',  signalStart);
     }
 
     function signalStart() {
