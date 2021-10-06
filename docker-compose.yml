@@ -30,7 +30,7 @@ services:
             - ./packages/backend/writable:/usr/src/app/writable
         environment:
             PORT: 3000
-        command: ["backend-start"]
+        command: ["backend", "start"]
         env_file:
             -   ./packages/backend/.env
     frontend:
@@ -40,7 +40,7 @@ services:
             - '3000:3000'
         environment:
             PORT: 3000
-        command: ["frontend-start"]
+        command: ["frontend", "start"]
         env_file:
             - ./packages/frontend/.env
 volumes:
