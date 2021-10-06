@@ -29,7 +29,7 @@
         "@typescript-auth/core": "^0.0.15",
         "axios": "^0.19.2",
         "babel-eslint": "^10.1.0",
-        "bootstrap": "^4.5.3",
+        "bootstrap": "^5.1.2",
         "bootstrap-vue": "^2.18.1",
         "change-case": "^4.1.1",
         "cookie": "^0.4.1",
