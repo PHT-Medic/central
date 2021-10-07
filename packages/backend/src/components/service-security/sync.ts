@@ -16,28 +16,24 @@ export async function syncServiceSecurity(message: Message) {
     const clientId : string = message.data.clientId;
     const clientSecret : string = message.data.clientSecret;
 
-    try {
-        switch (serviceId) {
-            case BaseService.RESULT_SERVICE:
-            case BaseService.TRAIN_BUILDER:
-            case BaseService.TRAIN_ROUTER:
-                await saveServiceSecretToVault(serviceId, {id: clientId, secret: clientSecret});
-                break;
-            case BaseService.HARBOR:
-                const stationRepository = getRepository(Station);
-                const stations = await stationRepository.find({
-                    harbor_project_id: Not(IsNull())
-                });
+    switch (serviceId) {
+        case BaseService.RESULT_SERVICE:
+        case BaseService.TRAIN_BUILDER:
+        case BaseService.TRAIN_ROUTER:
+            await saveServiceSecretToVault(serviceId, {id: clientId, secret: clientSecret});
+            break;
+        case BaseService.HARBOR:
+            const stationRepository = getRepository(Station);
+            const stations = await stationRepository.find({
+                harbor_project_id: Not(IsNull())
+            });
 
-                await Promise.all(stations.map((station: Station) => {
-                    return ensureHarborProjectWebHook(station.harbor_project_id, {
-                        id: clientId,
-                        secret: clientSecret
-                    }, {internalAPIUrl: env.internalApiUrl});
-                }));
-                break;
-        }
-    } catch (e) {
-        console.log(e);
+            await Promise.all(stations.map((station: Station) => {
+                return ensureHarborProjectWebHook(station.harbor_project_id, {
+                    id: clientId,
+                    secret: clientSecret
+                }, {internalAPIUrl: env.internalApiUrl});
+            }));
+            break;
     }
 }
