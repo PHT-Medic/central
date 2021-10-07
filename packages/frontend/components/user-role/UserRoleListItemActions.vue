@@ -69,7 +69,6 @@ export default {
         <button v-if="!isInUserRoles" class="btn btn-xs btn-success" @click.prevent="add">
             <i class="fa fa-plus"></i>
         </button>
-        {{ userRoles }}
         <button v-if="isInUserRoles" class="btn btn-xs btn-danger" @click.prevent="drop">
             <i class="fa fa-trash"></i>
         </button>
