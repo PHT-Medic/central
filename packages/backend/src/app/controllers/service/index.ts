@@ -203,5 +203,6 @@ async function syncServiceClient(entity: Service) {
             secret: entity.client.secret
         }
     );
+
     await publishMessage(queueMessage);
 }

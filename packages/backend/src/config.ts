@@ -28,8 +28,8 @@ export type Config = {
 }
 
 function createConfig({env} : ConfigContext) : Config {
-    setAPIConfig(APIType.HARBOR, {connectionString: env.harborConnectionString});
-    setAPIConfig(APIType.VAULT, {connectionString: env.vaultConnectionString});
+    setAPIConfig(APIType.HARBOR, {type: APIType.HARBOR, connectionString: env.harborConnectionString});
+    setAPIConfig(APIType.VAULT, {type: APIType.VAULT, connectionString: env.vaultConnectionString});
 
     setConfig({
         connection: env.rabbitMqConnectionString,

@@ -22,6 +22,7 @@ export function buildServiceSecurityQueueMessage(
         },
         type,
         data: {
+            id: serviceId,
             clientId: client.id,
             clientSecret: client.secret
         },

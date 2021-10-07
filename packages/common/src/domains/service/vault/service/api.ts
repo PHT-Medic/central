@@ -24,9 +24,9 @@ export async function saveServiceSecretToVault(
 
         return data;
     } catch (e) {
-        if(e?.response?.status === 404) {
+        if (e?.response?.status === 404) {
             // create engine
-            await useAPI<APIType.VAULT>().createKeyValueEngine({path: 'services'});
+            await useAPI<APIType.VAULT>(APIType.VAULT).createKeyValueEngine({path: 'services'});
 
             return await saveServiceSecretToVault(service, client);
         }
