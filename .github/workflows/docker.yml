@@ -41,10 +41,13 @@ jobs:
                   [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
                   # Use Docker `latest` tag convention
-                  [ "$VERSION" == "master" || $VERSION == "docker" ] && VERSION=latest
-                  [[ $string != *"alpha"* ]] && VERSION=latest
+                  LATEST=false
+                  [ $VERSION == "docker" ] && LATEST=true
+                  [[ $string != *"alpha"* && $string != *"pre"* ]] && LATEST=true
 
                   echo IMAGE_ID=$IMAGE_ID
                   echo VERSION=$VERSION
                   docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
                   docker push $IMAGE_ID:$VERSION
+
+                  [ "${LATEST}" == true ] && echo "VERSION=${VERSION}" && docker tag $IMAGE_NAME $IMAGE_ID:latest && docker push $IMAGE_ID:latest
