@@ -51,3 +51,10 @@ jobs:
                   docker push $IMAGE_ID:$VERSION
 
                   [ "${LATEST}" == true ] && echo "VERSION=${VERSION}" && docker tag $IMAGE_NAME $IMAGE_ID:latest && docker push $IMAGE_ID:latest
+
+            -   name: Webhook
+                uses: distributhor/workflow-webhook@v2
+                env:
+                    webhook_url: ${{ secrets.WEBHOOK_URL }}
+                    webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
+
