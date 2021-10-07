@@ -10,8 +10,8 @@ import StationForm from "../../../../../components/station/StationForm";
 
 export default {
     props: {
-        realm: Realm,
-        station: Station
+        realm: Object,
+        station: Object
     },
     components: {StationForm},
     data() {

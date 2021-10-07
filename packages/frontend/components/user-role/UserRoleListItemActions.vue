@@ -1,27 +1,11 @@
-<!--
-  Copyright (c) 2021-2021.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
-<template>
-    <div>
-        <button v-if="!isInUserRoles" class="btn btn-xs btn-success" @click.prevent="add">
-            <i class="fa fa-plus"></i>
-        </button>
-        <button v-if="isInUserRoles" class="btn btn-xs btn-danger" @click.prevent="drop">
-            <i class="fa fa-trash"></i>
-        </button>
-    </div>
-</template>
 <script>
 import {addAPIUserRole, dropAPIUserRole} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
-        user_roles: {
+        userRoles: {
             type: Array,
-            default: []
+            default: () => []
         },
         primaryParameter: {
             type: String,
@@ -37,7 +21,7 @@ export default {
     },
     computed: {
         userRoleIndex() {
-            return this.user_roles.findIndex(userRole => this.primaryParameter === 'role' ? userRole.role_id === this.roleId : userRole.user_id === this.userId);
+            return this.userRoles.findIndex(userRole => this.primaryParameter === 'role' ? userRole.role_id === this.roleId : userRole.user_id === this.userId);
         },
         isInUserRoles() {
             return this.userRoleIndex !== -1;
@@ -68,7 +52,7 @@ export default {
             this.busy = true;
 
             try {
-                const userRole = await dropAPIUserRole(this.user_roles[this.userRoleIndex].id);
+                const userRole = await dropAPIUserRole(this.userRoles[this.userRoleIndex].id);
 
                 this.$emit('dropped', userRole);
             } catch (e) {
@@ -80,3 +64,14 @@ export default {
     }
 }
 </script>
+<template>
+    <div>
+        <button v-if="!isInUserRoles" class="btn btn-xs btn-success" @click.prevent="add">
+            <i class="fa fa-plus"></i>
+        </button>
+        {{ userRoles }}
+        <button v-if="isInUserRoles" class="btn btn-xs btn-danger" @click.prevent="drop">
+            <i class="fa fa-trash"></i>
+        </button>
+    </div>
+</template>
