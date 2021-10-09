@@ -1,5 +1,6 @@
 {
     "name": "@personalhealthtrain/ui-frontend",
+    "private": true,
     "author": {
         "name": "Peter Placzek",
         "email": "tadashi@animesu.net",
@@ -48,5 +49,9 @@
         "vuelidate": "^0.7.6",
         "vuescroll": "^4.16.1",
         "vuex": "^3.6.2"
+    },
+    "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
+    "publishConfig": {
+        "access": "public"
     }
 }
