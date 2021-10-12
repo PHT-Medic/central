@@ -152,14 +152,16 @@ export default {
         },
         dropFormFile(event) {
             const index = this.form.files.findIndex(file => {
-                if(file.path !== event.path) {
-                    return false;
+                if(
+                    file.hasOwnProperty('webkitRelativePath') &&
+                    event.hasOwnProperty('webkitRelativePath')
+                ) {
+                    return file.webkitRelativePath === event.webkitRelativePath;
+                } else {
+                    return file.name === event.name;
                 }
-
-                return !(file.hasOwnProperty('webkitRelativePath') &&
-                    event.hasOwnProperty('webkitRelativePath') &&
-                    file.webkitRelativePath !== event.webkitRelativePath);
             });
+
             if(index !== -1) {
                 this.form.files.splice(index, 1);
             }

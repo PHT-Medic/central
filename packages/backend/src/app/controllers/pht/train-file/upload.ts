@@ -30,8 +30,7 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
 
     const trainFileRepository = getRepository(TrainFile);
 
-    const busboy = new BusBoy({headers: req.headers, preservePath: true, highWaterMark: 128});
-    req.pipe(busboy);
+    const busboy = new BusBoy({headers: req.headers, preservePath: true});
 
     const files: TrainFile[] = [];
 
@@ -98,9 +97,7 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
         return res._failBadRequest().end();
     })
 
-    console.log(files);
-
-    return busboy.on('finish', async () => {
+    busboy.on('finish', async () => {
         if (files.length === 0) {
             return res._failBadRequest({message: 'No train files provided'});
         }
@@ -126,4 +123,6 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
             return res._failValidationError({message: 'The train files could not be uploaded.'})
         }
     });
+
+    return req.pipe(busboy);
 }

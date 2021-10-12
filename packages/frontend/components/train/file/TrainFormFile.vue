@@ -42,8 +42,8 @@ export default {
                 <small class="text-muted">{{file.size}} Bytes</small>
             </span>
         </div>
-        <div class="card-footer d-flex flex-row align-items-center">
-            <a href="javascript:void(0)" @click.prevent="drop" style="margin-top: 0.125rem; margin-right: .75rem">
+        <div class="ml-auto">
+            <a href="javascript:void(0)" @click.prevent="drop" style="margin-right: .75rem">
                 <i class="fa fa-times"></i>
             </a>
         </div>

@@ -35,7 +35,8 @@ export async function uploadTrainFiles(trainId: typeof Train.prototype.id, formD
     const response = await useAPI(APIType.DEFAULT).post('trains/' + trainId + '/files', formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
-        }
+        },
+        timeout: 10000
     });
 
     return response.data;
