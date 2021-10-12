@@ -25,7 +25,7 @@ export async function buildTrainBuilderQueueMessage(
              *     ...
              * }
              */
-            data = buildTrainBuilderStartCommandPayload(train);
+            data = await buildTrainBuilderStartCommandPayload(train);
             break;
         case TrainBuilderCommand.STOP:
             /**
@@ -33,7 +33,7 @@ export async function buildTrainBuilderQueueMessage(
              *     trainId: 'xyz'
              * }
              */
-            data = buildTrainBuilderStopCommandPayload(train);
+            data = await buildTrainBuilderStopCommandPayload(train);
             break;
         case TrainBuilderCommand.STATUS:
             /**
@@ -41,9 +41,10 @@ export async function buildTrainBuilderQueueMessage(
              *     trainId: 'xyz'
              * }
              */
-            data = buildTrainBuilderStatusCommandPayload(train);
+            data = await buildTrainBuilderStatusCommandPayload(train);
             break;
     }
+
     return buildMessage({
         type,
         options: {
