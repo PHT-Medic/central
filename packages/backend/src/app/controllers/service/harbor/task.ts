@@ -7,90 +7,142 @@
 
 import {check, matchedData, validationResult} from 'express-validator';
 import {getRepository, In} from 'typeorm';
-import {BaseService, HARBOR_MASTER_IMAGE_PROJECT_NAME} from "@personalhealthtrain/ui-common";
+import {
+    BaseService,
+    Client,
+    ensureHarborProject,
+    ensureHarborProjectWebHook,
+    getHarborProjectRepositories,
+    HARBOR_INCOMING_PROJECT_NAME,
+    HARBOR_MASTER_IMAGE_PROJECT_NAME,
+    HARBOR_OUTGOING_PROJECT_NAME,
+    HarborCommand,
+    MasterImage
+} from "@personalhealthtrain/ui-common";
 
-import {getHarborProjectRepositories} from "@personalhealthtrain/ui-common";
-import {Client, MasterImage} from "@personalhealthtrain/ui-common";
-import {ensureHarborProjectWebHook} from "@personalhealthtrain/ui-common";
 import env from "../../../../env";
 
-enum HarborTask {
-    REGISTER_WEBHOOK_FOR_MASTER_IMAGES = 'registerWebhookForMasterImages',
-    SYNC_MASTER_IMAGES = 'syncMasterImages'
-}
+const commands = Object.values(HarborCommand);
 
-export async function doHarborTask(req: any, res: any) {
+export async function doHarborCommand(req: any, res: any) {
     if(!req.ability.can('manage','service')) {
         return res._failForbidden({message: 'You are not allowed to manage the harbor service.'});
     }
 
-    await check('task')
-        .exists()
-        .isIn(Object.values(HarborTask))
-        .run(req);
+    const {command} = req.body;
 
-    const validation = validationResult(req);
-    if (!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+    if(
+        !command ||
+        commands.indexOf(command) === -1
+    ) {
+        return res._failBadRequest({message: 'The harbor command is not valid.'});
     }
 
-    const validationData = matchedData(req, {includeOptionals: true});
+    switch (command as HarborCommand) {
+        case HarborCommand.REPOSITORY_CREATE:
+            await check('name')
+                .exists()
+                .isString()
+                .isIn([
+                    HARBOR_INCOMING_PROJECT_NAME,
+                    HARBOR_OUTGOING_PROJECT_NAME,
+                    HARBOR_MASTER_IMAGE_PROJECT_NAME
+                ])
+                .run(req);
 
-    switch (validationData.task) {
-        case HarborTask.REGISTER_WEBHOOK_FOR_MASTER_IMAGES:
-            const clientRepository = await getRepository(Client);
+            await check('webhook')
+                .optional({nullable: true})
+                .isBoolean()
+                .run(req);
 
-            const client = await clientRepository.findOne({
-                where: {
-                    service_id: BaseService.HARBOR
-                }
-            });
+            const createValidation = validationResult(req);
+            if (!createValidation.isEmpty()) {
+                return res._failExpressValidationError(createValidation);
+            }
 
-            await ensureHarborProjectWebHook(HARBOR_MASTER_IMAGE_PROJECT_NAME, client, {internalAPIUrl: env.internalApiUrl}, true);
+            const createData = matchedData(req, {includeOptionals: true});
 
-            return res._respondAccepted();
-        case HarborTask.SYNC_MASTER_IMAGES:
+            await ensureHarborProject(createData.name);
+
+            if(!!createData.webhook) {
+                const clientRepository = await getRepository(Client);
+
+                const client = await clientRepository.findOne({
+                    where: {
+                        service_id: BaseService.HARBOR
+                    }
+                });
+
+                await ensureHarborProjectWebHook(createData.name, client, {
+                    internalAPIUrl: env.internalApiUrl
+                }, true);
+            }
+
+            return res._respond();
+        case HarborCommand.REPOSITORY_SYNC:
+            await check('name')
+                .exists()
+                .isString()
+                .isIn([
+                    HARBOR_MASTER_IMAGE_PROJECT_NAME
+                ])
+                .run(req);
+
+            const syncValidation = validationResult(req);
+            if (!syncValidation.isEmpty()) {
+                return res._failExpressValidationError(syncValidation);
+            }
+
+            const syncData = matchedData(req, {includeOptionals: true});
+
             const meta : { created: number, deleted: number } = {
                 created: 0,
                 deleted: 0
             };
 
-            const repository = getRepository(MasterImage);
-
-            const harborRepositories = await getHarborProjectRepositories(HARBOR_MASTER_IMAGE_PROJECT_NAME);
+            const harborRepositories = await getHarborProjectRepositories(syncData.name);
             const harborRepositoryPaths : string[] = harborRepositories.map(harborRepository => harborRepository.fullName);
 
-            const existingEntities = await repository.find({
-                where: {
-                    path: In(harborRepositoryPaths)
-                }
-            });
+            let data : unknown[] = [];
 
-            const existingEntityPaths : string[] = existingEntities.map(entity => entity.path);
+            switch (syncData.name) {
+                case HARBOR_MASTER_IMAGE_PROJECT_NAME:
+                    const repository = getRepository(MasterImage);
+                    const existingEntities = await repository.find({
+                        where: {
+                            path: In(harborRepositoryPaths)
+                        }
+                    });
 
-            const nonExistingHarborRepositories = harborRepositories.filter(harborRepository => !existingEntityPaths.includes(harborRepository.fullName));
-            if(nonExistingHarborRepositories.length === 0) {
-                return res._respond({
-                    data: {
-                        meta
+                    const existingEntityPaths : string[] = existingEntities.map(entity => entity.path);
+
+                    const nonExistingHarborRepositories = harborRepositories.filter(harborRepository => !existingEntityPaths.includes(harborRepository.fullName));
+                    if(nonExistingHarborRepositories.length === 0) {
+                        return res._respond({
+                            data: {
+                                meta
+                            }
+                        });
                     }
-                });
+
+                    const entities : MasterImage[] = nonExistingHarborRepositories.map(harborRepository => {
+                        return repository.create({
+                            path: harborRepository.fullName,
+                            name: harborRepository.name
+                        }) as MasterImage;
+                    });
+
+                    await repository.insert(entities);
+
+                    meta.created = entities.length;
+
+                    data = entities;
+                    break;
             }
-
-            const entities : MasterImage[] = nonExistingHarborRepositories.map(harborRepository => {
-                return repository.create({
-                    path: harborRepository.fullName,
-                    name: harborRepository.name
-                }) as MasterImage;
-            });
-
-            await repository.insert(entities);
-
-            meta.created = entities.length;
 
             return res._respond({
                 data: {
-                    created: entities,
+                    data: [...data],
                     meta
                 }
             });

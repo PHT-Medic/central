@@ -6,14 +6,14 @@
  */
 
 import {consumeQueue} from "amqp-extension";
-import {MQ_UI_D_EVENT_ROUTING_KEY} from "@personalhealthtrain/ui-common";
 import {createDispatcherAggregatorMasterImageHandlers} from "./handlers/master-image";
 import {createDispatcherAggregatorProposalHandlers} from "./handlers/proposal";
 import {createDispatcherAggregatorTrainHandlers} from "./handlers/train";
+import {MessageQueueDispatcherRoutingKey} from "../../config/service/mq";
 
 export function buildDispatcherAggregator() {
     function start() {
-        return consumeQueue({routingKey: MQ_UI_D_EVENT_ROUTING_KEY}, {
+        return consumeQueue({routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN}, {
             ...createDispatcherAggregatorMasterImageHandlers(),
             ...createDispatcherAggregatorProposalHandlers(),
             ...createDispatcherAggregatorTrainHandlers()

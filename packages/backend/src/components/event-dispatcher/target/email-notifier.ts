@@ -11,7 +11,6 @@ import {
     HARBOR_OUTGOING_PROJECT_NAME, isHarborStationProjectName
 } from "@personalhealthtrain/ui-common";
 
-import {MQ_EN_EVENT_ROUTING_KEY} from "@personalhealthtrain/ui-common";
 import {
     DispatcherProposalEvent,
     DispatcherProposalEventData
@@ -19,6 +18,7 @@ import {
 import {DispatcherTrainEventData, DispatcherTrainEventType} from "../../../domains/pht/train/queue";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {DispatcherHarborEventWithAdditionalData} from "../data/harbor";
+import {MessageQueueEmailServiceRoutingKey} from "../../../config/service/mq";
 
 export async function dispatchProposalEventToEmailNotifier(
     message: Message
@@ -34,7 +34,7 @@ export async function dispatchProposalEventToEmailNotifier(
     if(mapping[data.event]) {
         await publishMessage(buildMessage({
             options: {
-                routingKey: MQ_EN_EVENT_ROUTING_KEY
+                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT
             },
             type: mapping[data.event],
             data: {
@@ -64,7 +64,7 @@ export async function dispatchTrainEventToEmailNotifier(
     if(mapping[data.event]) {
         await publishMessage(buildMessage({
             options: {
-                routingKey: MQ_EN_EVENT_ROUTING_KEY
+                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT
             },
             type: mapping[data.event],
             data: {
@@ -91,7 +91,7 @@ export async function dispatchHarborEventToEmailNotifier(
     if(isIncomingProject) {
         await publishMessage(buildMessage({
             options: {
-                routingKey: MQ_EN_EVENT_ROUTING_KEY
+                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT
             },
             type: 'trainBuilt',
             data: {
@@ -107,7 +107,7 @@ export async function dispatchHarborEventToEmailNotifier(
 
         await publishMessage(buildMessage({
             options: {
-                routingKey: MQ_EN_EVENT_ROUTING_KEY,
+                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT,
             },
             type: 'trainFinished',
             data: {
@@ -132,7 +132,7 @@ export async function dispatchHarborEventToEmailNotifier(
         if(data.stationIndex === 0) {
             await publishMessage(buildMessage({
                 options: {
-                    routingKey: MQ_EN_EVENT_ROUTING_KEY,
+                    routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT,
                 },
                 type: 'trainStarted',
                 data: {
@@ -144,7 +144,7 @@ export async function dispatchHarborEventToEmailNotifier(
 
         await publishMessage(buildMessage({
             options: {
-                routingKey: MQ_EN_EVENT_ROUTING_KEY
+                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT
             },
             type: 'trainReady',
             data: {

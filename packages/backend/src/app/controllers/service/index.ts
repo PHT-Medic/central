@@ -5,12 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {BaseService, Service} from "@personalhealthtrain/ui-common";
+import {BaseService, HarborCommand, Service} from "@personalhealthtrain/ui-common";
 import {publishMessage} from "amqp-extension";
 import {SwaggerTags} from "typescript-swagger";
 import {getRepository} from "typeorm";
 import {applyFilters, applyIncludes, applyPagination} from "typeorm-extension";
-import {check, matchedData, validationResult} from "express-validator";
 import {Body, Controller, Get, Params, Post, Request, Response} from "@decorators/express";
 
 import {ForceLoggedInMiddleware} from "../../../config/http/middleware/auth";
@@ -18,10 +17,10 @@ import {buildServiceSecurityQueueMessage} from "../../../domains/service/queue";
 
 import {HarborHook, postHarborHookRouteHandler} from "./harbor/hook";
 
-import {doHarborTask} from "./harbor/task";
+import {doHarborCommand} from "./harbor/task";
 import {ServiceSecurityComponent} from "../../../components/service-security";
 
-enum ServiceClientTask {
+enum ServiceClientCommand {
     SYNC = 'sync',
     REFRESH_SECRET = 'refreshSecret'
 }
@@ -57,24 +56,24 @@ export class ServiceController {
         return postHarborHookRouteHandler(req, res);
     }
 
-    @Post("/"+BaseService.HARBOR+'/task', [ForceLoggedInMiddleware])
+    @Post("/"+BaseService.HARBOR+'/command', [ForceLoggedInMiddleware])
     async execHarborTask(
         @Request() req: any,
         @Response() res: any,
-        @Body() harborHook: HarborHook
+        @Body() data: {command: HarborCommand},
     ) {
-        return doHarborTask(req, res);
+        return doHarborCommand(req, res);
     }
 
     // ------------------------------------------------------------
 
-    @Post("/:id/client/task", [ForceLoggedInMiddleware])
+    @Post("/:id/client/command", [ForceLoggedInMiddleware])
     async doTask(
-        @Body() data: {task: ServiceClientTask},
+        @Body() data: {command: ServiceClientCommand},
         @Request() req: any,
         @Response() res: any
     ): Promise<Service> {
-        return await doClientTask(req, res);
+        return await doClientCommand(req, res);
     }
 }
 
@@ -144,24 +143,22 @@ async function getRoute(req: any, res: any) {
     }
 }
 
-async function doClientTask(req: any, res: any) {
+const commands = Object.values(ServiceClientCommand);
+async function doClientCommand(req: any, res: any) {
     const {id} = req.params;
 
     if(!req.ability.can('manage','service')) {
         return res._failForbidden({message: 'You are not allowed to manage services.'});
     }
 
-    await check('task')
-        .exists()
-        .isIn(Object.values(ServiceClientTask))
-        .run(req);
+    const {command} = req.body;
 
-    const validation = validationResult(req);
-    if (!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+    if(
+        !command ||
+        commands.indexOf(command) === -1
+    ) {
+        return res._failBadRequest({message: 'The client command is not valid.'});
     }
-
-    const validationData = matchedData(req, {includeOptionals: true});
 
     try {
         const repository = getRepository(Service);
@@ -171,15 +168,15 @@ async function doClientTask(req: any, res: any) {
             return res._failNotFound();
         }
 
-        switch (validationData.task) {
-            case ServiceClientTask.SYNC:
+        switch (command) {
+            case ServiceClientCommand.SYNC:
                 await syncServiceClient(entity);
 
                 entity.client_synced = true;
 
                 await repository.save(entity);
                 break;
-            case ServiceClientTask.REFRESH_SECRET:
+            case ServiceClientCommand.REFRESH_SECRET:
                 entity.client.refreshSecret();
                 entity.client_synced = false;
 
