@@ -6,7 +6,7 @@
   -->
 <script>
 import {dropApiTrainFile, getApiTrainFiles, uploadTrainFiles, Train} from "@personalhealthtrain/ui-common";
-import {required } from 'vuelidate/lib/validators';
+import {required} from 'vuelidate/lib/validators';
 import TrainFile from "../../../components/train/file/TrainFile";
 import TrainFolder from "../../../components/train/file/TrainFolder";
 import TrainFormFile from "../../../components/train/file/TrainFormFile";
@@ -151,7 +151,15 @@ export default {
             this.$refs.files.value = '';
         },
         dropFormFile(event) {
-            const index = this.form.files.findIndex(file => file.path === event.path || file.webkitRelativePath === event.path);
+            const index = this.form.files.findIndex(file => {
+                if(file.path !== event.path) {
+                    return false;
+                }
+
+                return !(file.hasOwnProperty('webkitRelativePath') &&
+                    event.hasOwnProperty('webkitRelativePath') &&
+                    file.webkitRelativePath !== event.webkitRelativePath);
+            });
             if(index !== -1) {
                 this.form.files.splice(index, 1);
             }
@@ -317,7 +325,7 @@ export default {
 
                 <div class="form-check">
                     <input type="checkbox" v-model="selectAll" @change="selectAllFiles" class="form-check-input" id="selectAllFiles">
-                    <label for="selectAllFiles">Alle auswählen</label>
+                    <label for="selectAllFiles">Select all</label>
                 </div>
 
                 <div class="d-flex flex-column">
@@ -335,7 +343,7 @@ export default {
 
                 <div class="form-group">
                     <button type="button" class="btn btn-warning btn-xs" :disabled="actionBusy || selected.length === 0" @click.prevent="dropSelected">
-                        Löschen
+                        Delete
                     </button>
                 </div>
             </div>

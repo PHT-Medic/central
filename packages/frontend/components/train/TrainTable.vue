@@ -72,6 +72,12 @@ export default {
 
             this.busy = false;
         },
+        handleDeleted(train) {
+            const index = this.items.findIndex(item => item.id === train.id);
+            if(index !== -1) {
+                this.items.splice(index, 1);
+            }
+        },
         goTo(options, resolve, reject) {
             if(options.offset === this.meta.offset) return;
 
@@ -122,8 +128,8 @@ export default {
         <alert-message :message="message" />
 
         <div class="row mb-2">
-            <div class="col-12 mb-2" v-for="(item, key) in items">
-                <train-card :train-property="item" />
+            <div class="col-12 mb-2" v-for="(item, key) in items" :key="key">
+                <train-card :train-property="item" @deleted="handleDeleted" />
             </div>
         </div>
 
