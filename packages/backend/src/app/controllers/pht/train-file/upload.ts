@@ -37,11 +37,13 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
 
     const trainDirectoryPath = path.resolve(getWritableDirPath() + '/train-files');
 
-    if (!fs.existsSync(trainDirectoryPath)) {
+    try {
+        await fs.promises.access(trainDirectoryPath, fs.constants.R_OK | fs.constants.W_OK);
+    } catch (e) {
         fs.mkdirSync(trainDirectoryPath, {mode: 0o770});
     }
 
-    busboy.on('file', (fieldname, file, fullFileName, encoding, mimetype) => {
+    busboy.on('file', (filename, file, fullFileName, encoding, mimetype) => {
         const fileHandler = buildMulterFileHandler();
         const hash = crypto.createHash('sha256');
 
@@ -95,6 +97,8 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
 
         return res._failBadRequest().end();
     })
+
+    console.log(files);
 
     return busboy.on('finish', async () => {
         if (files.length === 0) {
