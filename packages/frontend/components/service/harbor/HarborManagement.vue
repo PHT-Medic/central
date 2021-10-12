@@ -5,12 +5,11 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import HarborRepositoryManagement from "./HarborRepositoryManagement";
 
+import HarborProjectManagement from "./HarborProjectManagement";
 export default {
     components: {
-        HarborRepositoryManagement
-
+        HarborProjectManagement
     },
     props: {
         service: Object
@@ -19,6 +18,6 @@ export default {
 </script>
 <template>
     <div>
-        <harbor-repository-management :service="service" class="mb-2" />
+        <harbor-project-management :service="service" class="mb-2" />
     </div>
 </template>

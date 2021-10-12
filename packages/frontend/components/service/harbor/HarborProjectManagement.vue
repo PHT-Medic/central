@@ -56,26 +56,26 @@ export default {
             }
         },
 
-        async addIncomingRepository() {
+        async addIncomingProject() {
             await this.executeTask(HarborCommand.REPOSITORY_CREATE, {
                 name: HARBOR_INCOMING_PROJECT_NAME,
                 webhook: true
             });
         },
-        async addOutgoingRepository() {
+        async addOutgoingProject() {
             await this.executeTask(HarborCommand.REPOSITORY_CREATE, {
                 name: HARBOR_OUTGOING_PROJECT_NAME,
                 webhook: true
             });
         },
 
-        async addMasterImageRepository() {
+        async addMasterImageProject() {
             await this.executeTask(HarborCommand.REPOSITORY_CREATE, {
                 name: HARBOR_MASTER_IMAGE_PROJECT_NAME,
                 webhook: true
             });
         },
-        async syncMasterImageRepository() {
+        async syncMasterImageProject() {
             const {data, meta} = await this.executeTask(HarborCommand.REPOSITORY_SYNC, {
                 name: HARBOR_MASTER_IMAGE_PROJECT_NAME
             });
@@ -103,19 +103,19 @@ export default {
 </script>
 <template>
     <div>
-        <h4><i class="fas fa-archive"></i> Repositories</h4>
+        <h4><i class="fas fa-archive"></i> Projects</h4>
 
         <div class="row mb-3">
             <div class="col">
                 <h6><i class="fa fa-sign-in-alt"></i> Incoming</h6>
 
                 <p class="mb-1">
-                    The incoming repository is required for the <i>TrainBuilder</i> to work properly. When the TrainBuilder
-                    is finished with building the train, the train will be pushed to the incoming repository.
-                    From there the TrainRouter can move it to the first station repository of the route.
+                    The incoming project is required for the <i>TrainBuilder</i> to work properly. When the TrainBuilder
+                    is finished with building the train, the train will be pushed to the incoming project.
+                    From there the TrainRouter can move it to the first station project of the route.
                 </p>
 
-                <button type="button" class="btn btn-primary btn-xs" @click.prevent="addIncomingRepository" :disabled="busy">
+                <button type="button" class="btn btn-primary btn-xs" @click.prevent="addIncomingProject" :disabled="busy">
                     <i class="fa fa-wrench"></i> Create
                 </button>
             </div>
@@ -123,11 +123,11 @@ export default {
                 <h6><i class="fa fa-sign-out-alt"></i>Outgoing</h6>
 
                 <p class="mb-1">
-                    The outgoing repository is required for the <i>ResultService</i> to pull the train from the
-                    outgoing repository and extract the results of the journey.
+                    The outgoing project is required for the <i>ResultService</i> to pull the train from the
+                    outgoing project and extract the results of the journey.
                 </p>
 
-                <button type="button" class="btn btn-primary btn-xs" @click.prevent="addOutgoingRepository" :disabled="busy">
+                <button type="button" class="btn btn-primary btn-xs" @click.prevent="addOutgoingProject" :disabled="busy">
                     <i class="fa fa-wrench"></i> Create
                 </button>
             </div>
@@ -139,16 +139,16 @@ export default {
         <div class="row">
             <div class="col">
                 <p>
-                    The creation of the master image repository, will also register a webhook,
+                    The creation of the master image project, will also register a webhook,
                     which will keep the master images between the harbor service and the UI in sync.
                     It is also possible to manually sync the master images from harbor.
                 </p>
 
                 <div class="mb-1">
-                    <button type="button" class="btn btn-xs btn-primary" :disabled="busy" @click.prevent="addMasterImageRepository">
+                    <button type="button" class="btn btn-xs btn-primary" :disabled="busy" @click.prevent="addMasterImageProject">
                         <i class="fa fa-wrench"></i> Create
                     </button>
-                    <button type="button" class="btn btn-xs btn-success" :disabled="busy" @click.prevent="syncMasterImageRepository">
+                    <button type="button" class="btn btn-xs btn-success" :disabled="busy" @click.prevent="syncMasterImageProject">
                         <i class="fa fa-sync"></i> Sync
                     </button>
                 </div>
