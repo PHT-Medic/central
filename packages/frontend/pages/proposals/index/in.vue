@@ -42,12 +42,13 @@ export default {
 
             statusOptions: ProposalStationApprovalStatus,
 
-            station: null
+            stationId: null
         }
     },
     created() {
         this.init()
-            .then(this.load);
+            .then(this.load)
+            .catch(e => console.log(e));
     },
     computed: {
       user() {
@@ -75,17 +76,17 @@ export default {
          * @return {Promise<void>}
          */
         async init() {
-            const {data: stations} = await getAPIStations({
+            const response = await getAPIStations({
                 filter: {
                     realm_id: this.user.realm_id
                 }
             });
 
-            if(stations.length !== 1) {
+            if(response.meta.total !== 1) {
                 return;
             }
 
-            this.station = stations[0];
+            this.stationId = response.data[0].id;
         },
 
         /**
@@ -94,22 +95,20 @@ export default {
          * @return {Promise<void>}
          */
         async load() {
-            if(this.busy || !this.station) return;
+            if(this.busy || !this.stationId) return;
 
             this.busy = true;
 
             try {
-                let record = {
+                const response = await getApiProposalStations({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset
                     },
                     filter: {
-                        station_id: this.station.id
+                        station_id: this.stationId
                     }
-                };
-
-                const response = await getApiProposalStations(record);
+                });
 
                 this.items = response.data;
                 const {total} = response.meta;

@@ -68,7 +68,7 @@ export default {
                 <small class="text-muted">{{file.size}} Bytes</small>
             </span>
         </div>
-        <div class="card-footer">
+        <div class="ml-auto">
             <b-form-checkbox switch :checked="isIdleFile" @change="toggleEnabled"></b-form-checkbox>
         </div>
     </div>

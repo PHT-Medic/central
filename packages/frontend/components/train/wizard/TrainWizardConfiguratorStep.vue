@@ -9,7 +9,7 @@ import {
     addAPITrainStation, dropAPITrainStation,
     editAPITrainStation,
     getAPIMasterImages,
-    getApiProposalStations, ProposalStationApprovalStatus
+    getApiProposalStations, getAPITrainStations, ProposalStationApprovalStatus
 } from "@personalhealthtrain/ui-common";
 import {minLength, numeric, required} from "vuelidate/lib/validators";
 import ProposalStationList from "../../../components/proposal/ProposalStationList";
@@ -89,6 +89,8 @@ export default {
         initTrain() {
             if(!!this.train_stations) {
                 this.trainStation.items = this.train_stations;
+            } else {
+                this.loadTrainStations();
             }
 
             if(!!this.train.master_image_id) {
@@ -99,6 +101,17 @@ export default {
                 this.form.query = this.train.query;
             }
         },
+
+        setTrainMasterImage() {
+            this.$emit('setTrainMasterImage', this.form.master_image_id);
+        },
+        setTrainStations() {
+            this.$emit('setTrainStations', this.trainStation.items);
+        },
+        setQuery() {
+            this.$emit('setTrainQuery', this.form.query);
+        },
+
         async loadMasterImages() {
             if(this.master_image.busy) return;
 
@@ -142,17 +155,25 @@ export default {
 
             this.proposalStation.busy = false;
         },
+        async loadTrainStations() {
+            if(this.trainStation.busy) return;
 
-        setTrainMasterImage() {
-            this.$emit('setTrainMasterImage', this.form.master_image_id);
-        },
-        setTrainStations() {
-            this.$emit('setTrainStations', this.trainStation.items);
-        },
-        setQuery() {
-            this.$emit('setTrainQuery', this.form.query);
-        },
+            this.trainStation.busy = true;
 
+            try {
+                const response = await getAPITrainStations({
+                    filter: {
+                        train_id: this.train.id
+                    }
+                });
+
+                this.trainStation.items = response.data;
+            } catch (e) {
+                console.log(e);
+            }
+
+            this.trainStation.busy = false;
+        },
         async addTrainStation(station_id) {
             if(this.trainStation.busy) return;
 
@@ -271,7 +292,7 @@ export default {
                 </select>
 
                 <div v-if="!$v.form.master_image_id.required" class="form-group-hint group-required">
-                    Bitte wählen Sie ein Master Image aus, dass diesem Zug zugrunde liegt.
+                    Please select a master image for this train.
                 </div>
             </div>
 

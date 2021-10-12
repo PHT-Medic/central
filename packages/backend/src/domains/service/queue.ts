@@ -7,8 +7,8 @@
 
 import {buildMessage, Message} from "amqp-extension";
 import {Client} from "@personalhealthtrain/ui-common";
-import {MQ_UI_SELF_COMMAND_ROUTING_KEY} from "@personalhealthtrain/ui-common";
 import {ServiceSecurityComponent} from "../../components/service-security";
+import {MessageQueueSelfRoutingKey} from "../../config/service/mq";
 
 export function buildServiceSecurityQueueMessage(
     type: ServiceSecurityComponent,
@@ -18,7 +18,7 @@ export function buildServiceSecurityQueueMessage(
 ) : Message {
     return buildMessage({
         options: {
-            routingKey: MQ_UI_SELF_COMMAND_ROUTING_KEY
+            routingKey: MessageQueueSelfRoutingKey.COMMAND
         },
         type,
         data: {

@@ -69,15 +69,19 @@ export async function getTrainFileStreamRouteHandler(req: any, res: any) {
 
     if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
-            const buffer: Buffer = fs.readFileSync(trainDirectoryPath + '/' + files[i].hash + '.file');
+            try {
+                const buffer: Buffer = await fs.promises.readFile(trainDirectoryPath + '/' + files[i].hash + '.file');
 
-            await new Promise((resolve: (data?: any) => void, reject) => {
-                pack.entry({name: files[i].directory + '/' + files[i].name, size: files[i].size}, buffer, (err) => {
-                    if (err) reject();
+                await new Promise((resolve: (data?: any) => void, reject) => {
+                    pack.entry({name: files[i].directory + '/' + files[i].name, size: files[i].size}, buffer, (err) => {
+                        if (err) reject();
 
-                    resolve();
+                        resolve();
+                    });
                 });
-            });
+            } catch (e) {
+                console.log(e);
+            }
         }
 
         pack.finalize();

@@ -27,8 +27,8 @@ export function useAPI<T extends APIType>(
 
     const config : APIConfig<T> = getAPIConfig(key);
 
-    if(instanceMap.has(config.type)) {
-        return instanceMap.get(config.type) as APIReturnType<T>;
+    if(instanceMap.has(key)) {
+        return instanceMap.get(key) as APIReturnType<T>;
     }
 
     let instance : BaseAPI;

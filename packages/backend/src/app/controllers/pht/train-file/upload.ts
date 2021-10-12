@@ -11,8 +11,8 @@ import BusBoy from "busboy";
 import path from "path";
 import {getWritableDirPath} from "../../../../config/paths";
 import fs from "fs";
-import {buildMulterFileHandler} from "./busboy";
 import crypto from "crypto";
+import {createFileStreamHandler} from "../../../../modules/file-system/utils";
 
 export async function uploadTrainFilesRouteHandler(req: any, res: any) {
     const {id} = req.params;
@@ -30,19 +30,21 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
 
     const trainFileRepository = getRepository(TrainFile);
 
-    const busboy = new BusBoy({headers: req.headers, preservePath: true, highWaterMark: 128});
-    req.pipe(busboy);
+    const instance = new BusBoy({headers: req.headers, preservePath: true});
 
     const files: TrainFile[] = [];
 
     const trainDirectoryPath = path.resolve(getWritableDirPath() + '/train-files');
 
-    if (!fs.existsSync(trainDirectoryPath)) {
+    try {
+        await fs.promises.access(trainDirectoryPath, fs.constants.R_OK | fs.constants.W_OK);
+    } catch (e) {
         fs.mkdirSync(trainDirectoryPath, {mode: 0o770});
     }
 
-    busboy.on('file', (fieldname, file, fullFileName, encoding, mimetype) => {
-        const fileHandler = buildMulterFileHandler();
+    const promises : Promise<void>[] = [];
+
+    instance.on('file', (filename, file, fullFileName) => {
         const hash = crypto.createHash('sha256');
 
         hash.update(entity.id);
@@ -51,22 +53,16 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
         const destinationFileName = hash.digest('hex');
         const destinationFilePath = trainDirectoryPath + '/' + destinationFileName + '.file';
 
-        const fd: number = fs.openSync(destinationFilePath, 'w');
-
-        const fileName: string = path.basename(fullFileName);
-        const filePath: string = path.dirname(fullFileName);
+        const handler =  createFileStreamHandler(destinationFilePath);
+        const handlerPromise = handler.getWritePromise();
 
         file.on('data', (data) => {
-            fs.writeSync(fd, data, 0, data.length, null);
-            fileHandler.pushFileSize(data.length);
+            handler.add(data);
         });
 
         file.on('limit', () => {
-            req.unpipe(busboy);
-
-            fs.closeSync(fd);
-
-            fileHandler.cleanup();
+            handler.cleanup();
+            req.unpipe(instance);
 
             return res._failBadRequest({
                 message: 'Size of file ' + fullFileName + ' is too large...'
@@ -74,32 +70,42 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
         })
 
         file.on('end', () => {
-            fs.closeSync(fd);
+            if(!fullFileName && handler.getFileSize() === 0) {
+                handler.cleanup();
+                return;
+            }
 
-            fileHandler.cleanup();
+            handler.complete();
+
+            const fileName: string = path.basename(fullFileName);
+            const filePath: string = path.dirname(fullFileName);
 
             files.push(trainFileRepository.create({
                 hash: destinationFileName,
                 name: fileName,
                 directory: filePath,
-                size: fileHandler.getFileSize(),
+                size: handler.getFileSize(),
                 user_id: req.user.id,
                 train_id: entity.id,
                 realm_id: req.realmId,
             }));
+
+            promises.push(handlerPromise);
         });
     });
 
-    busboy.on('error', () => {
-        req.unpipe(busboy);
+    instance.on('error', () => {
+        req.unpipe(instance);
 
         return res._failBadRequest().end();
     })
 
-    return busboy.on('finish', async () => {
+    instance.on('finish', async () => {
         if (files.length === 0) {
             return res._failBadRequest({message: 'No train files provided'});
         }
+
+        await Promise.all(promises);
 
         try {
             await trainFileRepository.save(files);
@@ -122,4 +128,6 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
             return res._failValidationError({message: 'The train files could not be uploaded.'})
         }
     });
+
+    return req.pipe(instance);
 }

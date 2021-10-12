@@ -6,7 +6,6 @@
  */
 
 import {
-    MQ_UI_RS_EVENT_ROUTING_KEY,
     Train,
     TrainResult,
     TrainResultStatus
@@ -14,6 +13,7 @@ import {
 import {consumeQueue, Message} from "amqp-extension";
 import {getRepository} from "typeorm";
 import {ResultServiceDataPayload} from "../domains/service/result-service";
+import {MessageQueueResultServiceRoutingKey} from "../config/service/mq";
 
 
 export enum TrainResultEvent {
@@ -85,7 +85,7 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: TrainRes
 
 export function buildTrainResultAggregator() {
     function start() {
-        return consumeQueue({routingKey: MQ_UI_RS_EVENT_ROUTING_KEY}, {
+        return consumeQueue({routingKey: MessageQueueResultServiceRoutingKey.EVENT_IN}, {
             [TrainResultEvent.STARTED]: async (message: Message) => {
                 await handleTrainResult(message.data as ResultServiceDataPayload, TrainResultEvent.STARTED);
             },

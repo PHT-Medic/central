@@ -26,14 +26,14 @@ export async function getAPIService(id: string, options?: BuildInput<Service>) :
     return data;
 }
 
-export async function executeAPIServiceTask(id: string, task: string, data: Record<string, any>) : Promise<SingleResourceResponse<Service>> {
-    const {data: resultData} = await useAPI(APIType.DEFAULT).post('services/' + id + '/task', {task, ...data});
+export async function executeAPIServiceTask(id: string, command: string, data: Record<string, any>) : Promise<SingleResourceResponse<Service>> {
+    const {data: resultData} = await useAPI(APIType.DEFAULT).post('services/' + id + '/command', {command, ...data});
 
     return resultData;
 }
 
-export async function executeAPIServiceClientTask(id: number, task: string, data: Record<string, any>) : Promise<SingleResourceResponse<Service>> {
-    const {data: resultData} = await useAPI(APIType.DEFAULT).post('services/' + id + '/client/task', {task, ...data});
+export async function executeAPIServiceClientTask(id: number, command: string, data: Record<string, any>) : Promise<SingleResourceResponse<Service>> {
+    const {data: resultData} = await useAPI(APIType.DEFAULT).post('services/' + id + '/client/command', {command, ...data});
 
     return resultData;
 }

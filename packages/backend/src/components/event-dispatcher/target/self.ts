@@ -14,7 +14,6 @@ import {
     HARBOR_MASTER_IMAGE_PROJECT_NAME,
     HARBOR_OUTGOING_PROJECT_NAME,
     HARBOR_SYSTEM_USER_NAME,
-    MQ_UI_D_EVENT_ROUTING_KEY,
     isHarborStationProjectName,
     TrainStationRunStatus
 } from "@personalhealthtrain/ui-common";
@@ -22,6 +21,7 @@ import {
 import {} from "@personalhealthtrain/ui-common";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {DispatcherHarborEventWithAdditionalData} from "../data/harbor";
+import {MessageQueueDispatcherRoutingKey} from "../../../config/service/mq";
 
 export async function dispatchHarborEventToSelf(
     message: Message
@@ -65,7 +65,7 @@ export async function dispatchHarborEventToSelf(
 async function processMasterImage(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     await publishMessage(buildMessage({
         options: {
-            routingKey: MQ_UI_D_EVENT_ROUTING_KEY
+            routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN
         },
         type: AggregatorMasterImagePushedEvent,
         data: {
@@ -78,7 +78,7 @@ async function processMasterImage(data: DispatcherHarborEventWithAdditionalData)
 async function processIncomingTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     await publishMessage(buildMessage({
         options: {
-            routingKey: MQ_UI_D_EVENT_ROUTING_KEY
+            routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN
         },
         type: AggregatorTrainEvent.BUILD_FINISHED,
         data: {
@@ -90,7 +90,7 @@ async function processIncomingTrain(data: DispatcherHarborEventWithAdditionalDat
 async function processOutgoingTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     await publishMessage(buildMessage({
         options: {
-            routingKey: MQ_UI_D_EVENT_ROUTING_KEY
+            routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN
         },
         type: AggregatorTrainEvent.FINISHED,
         data: {
@@ -111,7 +111,7 @@ async function processStationTrain(data: DispatcherHarborEventWithAdditionalData
     if(data.stationIndex === 0) {
         await publishMessage(buildMessage({
             options: {
-                routingKey: MQ_UI_D_EVENT_ROUTING_KEY
+                routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN
             },
             type: AggregatorTrainEvent.STARTED,
             data: {
@@ -123,7 +123,7 @@ async function processStationTrain(data: DispatcherHarborEventWithAdditionalData
 
     await publishMessage(buildMessage({
         options: {
-            routingKey: MQ_UI_D_EVENT_ROUTING_KEY
+            routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN
         },
         type: AggregatorTrainEvent.MOVED,
         data: {

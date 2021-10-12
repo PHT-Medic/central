@@ -16,7 +16,7 @@
         "@personalhealthtrain/ui-common": "^1.0.0-alpha.0",
         "@typescript-auth/core": "^0.0.15",
         "@typescript-auth/server": "^0.0.15",
-        "amqp-extension": "^0.0.6",
+        "amqp-extension": "^0.0.7",
         "axios": "^0.21.1",
         "bcrypt": "^5.0.1",
         "body-parser": "^1.19.0",
@@ -72,7 +72,7 @@
         "dev-watch": "nodemon --legacy-watch --watch 'src/**/*.ts' --exec 'ts-node src/index.ts'",
         "build": "tsc -p tsconfig.build.json",
         "start": "node dist/index.js",
-        "setup": "node/dist/cli/index.js setup"
+        "setup": "node dist/cli/index.js setup"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
     "publishConfig": {

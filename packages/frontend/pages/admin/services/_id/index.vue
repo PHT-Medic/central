@@ -5,7 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import ServiceHarborTask from "../../../../components/service/task/ServiceHarborTask"
+
+import HarborManagement from "../../../../components/service/harbor/HarborManagement";
 
 export default {
     props: {
@@ -16,7 +17,7 @@ export default {
 
         switch (this.service.id) {
             case 'HARBOR':
-                template = ServiceHarborTask;
+                template = HarborManagement;
                 break;
         }
 

@@ -19,7 +19,8 @@ export default (ctx: Context) => {
 
     setAPIConfig(APIType.DEFAULT, {
         driver: {
-            baseURL: apiUrl
+            baseURL: apiUrl,
+            withCredentials: true
         }
     })
 

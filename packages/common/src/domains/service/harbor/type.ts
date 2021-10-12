@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2021-2021.
+ * Copyright (c) 2021.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './project';
-export * from './robot-account';
-export * from './type';
+export enum HarborCommand {
+    REPOSITORY_CREATE = 'harborRepositoryCreate',
+    REPOSITORY_SYNC = 'harborRepositorySync'
+}

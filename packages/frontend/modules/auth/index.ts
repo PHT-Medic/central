@@ -179,7 +179,12 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public setRequestToken = (token: string) => {
+    public setRequestToken(token: string) {
+        useAPI(APIType.DEFAULT).setAuthorizationHeader({
+            type: 'Bearer',
+            token
+        });
+
         this.responseInterceptorId = useAPI(APIType.DEFAULT)
             .mountResponseInterceptor((data) => data, (error: any) => {
                 if(typeof this.ctx === 'undefined') return;
@@ -206,11 +211,6 @@ class AuthModule {
                     throw error;
                 }
             });
-
-        useAPI(APIType.DEFAULT).setAuthorizationHeader({
-            type: 'Bearer',
-            token
-        });
     };
 
     public unsetRequestToken = () => {

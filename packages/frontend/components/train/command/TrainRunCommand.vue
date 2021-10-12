@@ -55,10 +55,10 @@ export default {
                 click: this.click
             },
             props: {
-                disabled: this.isEnabled
+                disabled: !this.isEnabled
             },
             domProps: {
-                disabled: this.isEnabled
+                disabled: !this.isEnabled
             }
         };
 

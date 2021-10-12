@@ -6,8 +6,8 @@
  */
 
 import {buildMessage, publishMessage} from "amqp-extension";
-import {MQ_DISPATCHER_ROUTING_KEY} from "@personalhealthtrain/ui-common";
 import {DispatcherEvent} from "../../../components/event-dispatcher";
+import {MessageQueueDispatcherRoutingKey} from "../../../config/service/mq";
 
 export type DispatcherHarborEventType = 'PUSH_ARTIFACT';
 
@@ -32,7 +32,7 @@ export async function emitDispatcherHarborEvent(
 
     const message = buildMessage({
         options: {
-            routingKey: MQ_DISPATCHER_ROUTING_KEY
+            routingKey: MessageQueueDispatcherRoutingKey.EVENT_OUT
         },
         type: DispatcherEvent.HARBOR,
         data,

@@ -37,7 +37,19 @@ export interface ExpressAppInterface extends Express{
 async function createExpressApp() : Promise<ExpressAppInterface> {
     useLogger().debug('setup express app...', {service: 'express'});
     const expressApp : Express = express();
-    expressApp.use(cors());
+
+    /*
+    let webAppUrl : string = env.webAppUrl;
+    webAppUrl  = webAppUrl.replace(/^[/\\\s]+|[/\\\s]+$/g, '');
+    webAppUrl = webAppUrl.replace(/([^:]\/)\/+/g, "$1");
+    */
+
+    expressApp.use(cors({
+        origin: function (origin, callback) {
+            callback(null, true);
+        },
+        credentials: true
+    }));
 
     // Payload parser
     expressApp.use(bodyParser.urlencoded({extended: false}));
