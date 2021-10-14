@@ -36,7 +36,6 @@ shift
 DOCKER_PORT="${DOCKER_PORT:-3003}"
 
 DOCKER_ID=$(docker ps -qf name=^"${DOCKER_NAME}"$)
-
 case "${COMMAND}" in
     start)
         if [ -z "${DOCKER_ID}" ]; then
@@ -56,8 +55,8 @@ case "${COMMAND}" in
         ;;
     stop)
         if [ -n "${DOCKER_ID}" ]; then
-            docker stop "${DOCKER_ID_FRONTEND}"
-            docker rm "${DOCKER_ID_FRONTEND}"
+            docker stop "${DOCKER_ID}"
+            docker rm "${DOCKER_ID}"
         fi
         ;;
 esac
