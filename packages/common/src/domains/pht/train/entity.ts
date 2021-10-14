@@ -22,14 +22,12 @@ import {MasterImage} from "../master-image";
 import {Proposal} from "../proposal";
 import {TrainFile} from "../train-file";
 import {Model} from "../model";
-import {TrainResult, TrainResultStatus, TrainResultStatusType} from "../train-result";
+import {TrainResult, TrainResultStatus} from "../train-result";
 import {TrainStation} from "../train-station";
 import {
     TrainBuildStatus,
-    TrainBuildStatusType,
     TrainConfigurationStatus,
-    TrainConfigurationStatusType,
-    TrainRunStatus, TrainRunStatusType
+    TrainRunStatus,
 } from "./status";
 
 @Entity()
@@ -65,12 +63,12 @@ export class Train {
     // ------------------------------------------------------------------
 
     @Column({type: "enum", nullable: true, default: null, enum: TrainConfigurationStatus})
-    configuration_status: TrainConfigurationStatusType | null;
+    configuration_status: TrainConfigurationStatus | null;
 
     // ------------------------------------------------------------------
 
     @Column({type: "enum", nullable: true, default: null, enum: TrainBuildStatus})
-    build_status: TrainBuildStatusType | null;
+    build_status: TrainBuildStatus | null;
 
     @Column({type: "uuid", nullable: true, default: null})
     build_id: string;
@@ -78,7 +76,7 @@ export class Train {
     // ------------------------------------------------------------------
 
     @Column({type: "enum", nullable: true, default: null, enum: TrainRunStatus})
-    run_status: TrainRunStatusType | null;
+    run_status: TrainRunStatus | null;
 
     @Column({type: "integer", unsigned: true, nullable: true, default: null})
     run_station_id: number | null;
@@ -124,7 +122,7 @@ export class Train {
     result: TrainResult;
 
     @Column({type: "enum", nullable: true, default: null, enum: TrainResultStatus})
-    result_status: TrainResultStatusType | null;
+    result_status: TrainResultStatus | null;
 
     @Column()
     proposal_id: number;
