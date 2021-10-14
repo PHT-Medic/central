@@ -8,6 +8,7 @@
 import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn} from 'typeorm';
 import {Proposal} from "../proposal";
 import {Station} from "../station";
+import {ProposalStationApprovalStatusType} from "./status";
 
 @Entity({name: 'proposal_stations'})
 export class ProposalStation {
@@ -15,7 +16,7 @@ export class ProposalStation {
     id: number;
 
     @Column({default: null})
-    status: string;
+    approval_status: ProposalStationApprovalStatusType | null;
 
     @Column({type: "text", nullable: true})
     comment: string;

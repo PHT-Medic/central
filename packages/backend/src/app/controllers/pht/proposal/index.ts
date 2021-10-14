@@ -199,7 +199,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
             return proposalStationRepository.create({
                 proposal_id: entity.id,
                 station_id: stationId,
-                status: env.demo ? ProposalStationApprovalStatus.APPROVED : null
+                approval_status: env.demo ? ProposalStationApprovalStatus.APPROVED : null
             });
         });
 

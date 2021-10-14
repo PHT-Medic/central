@@ -10,7 +10,7 @@ export enum TrainStationApprovalStatus {
     APPROVED = 'approved'
 }
 
-export type TrainStationApprovalStatusType = keyof typeof TrainStationApprovalStatus;
+export type TrainStationApprovalStatusType = `${TrainStationApprovalStatus}`;
 
 const TrainStationApprovalStatusValues = Object.values(TrainStationApprovalStatus);
 
@@ -25,7 +25,7 @@ export enum TrainStationRunStatus {
     DEPARTED = 'departed'
 }
 
-export type TrainStationRunStatusType = keyof typeof TrainStationRunStatus;
+export type TrainStationRunStatusType = `${TrainStationRunStatus}`;
 
 const TrainStationRunStatusValues = Object.values(TrainStationRunStatus);
 export function isTrainStationRunStatus(type: any) : type is TrainStationRunStatusType {

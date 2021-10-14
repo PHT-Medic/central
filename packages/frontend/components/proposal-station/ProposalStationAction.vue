@@ -58,9 +58,7 @@ export default {
     },
     props: {
         proposalStationId: Number,
-        proposal_id: Number,
-        station_id: Number,
-        status: String,
+        approvalStatus: String,
         action: String,
         actionType: {
             type: String,
@@ -103,7 +101,7 @@ export default {
 
             try {
                 const item = await editApiProposalStation(this.proposalStationId, {
-                    status
+                    approval_status: status
                 });
 
                 this.$emit('done',item);
@@ -139,11 +137,11 @@ export default {
             }
         },
         isDisabled() {
-            if(typeof this.status === 'undefined') {
+            if(typeof this.approvalStatus === 'undefined') {
                 return false;
             }
 
-            switch (this.status) {
+            switch (this.approvalStatus) {
                 case ProposalStationApprovalStatus.APPROVED:
                     if(this.action === 'approve') {
                         return true;

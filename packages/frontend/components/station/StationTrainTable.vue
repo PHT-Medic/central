@@ -149,7 +149,7 @@ export default {
                         </template>
                         <train-station-action
                             :train-station-id="data.item.id"
-                            :status="data.item.approval_status"
+                            :approval-status="data.item.approval_status"
                             :with-icon="true"
                             action-type="dropDownItem"
                             action="approve"
@@ -157,7 +157,7 @@ export default {
                         />
                         <train-station-action
                             :train-station-id="data.item.id"
-                            :status="data.item.approval_status"
+                            :approval-status="data.item.approval_status"
                             :with-icon="true"
                             action-type="dropDownItem"
                             action="reject"

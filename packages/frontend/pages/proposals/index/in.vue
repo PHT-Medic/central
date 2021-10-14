@@ -7,9 +7,9 @@
 <script>
 import {getApiProposalStations, getAPIStations, ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
 import ProposalInForm from "../../../components/proposal/ProposalInForm";
-import ProposalStationStatus from "../../../components/proposal/ProposalStationStatus";
+import ProposalStationStatus from "../../../components/proposal-station/ProposalStationStatus";
 import Pagination from "../../../components/Pagination";
-import ProposalStationAction from "../../../components/proposal/ProposalStationAction";
+import ProposalStationAction from "../../../components/proposal-station/ProposalStationAction";
 
 export default {
     components: {ProposalStationAction, Pagination, ProposalStationStatus, ProposalInForm},
@@ -28,7 +28,7 @@ export default {
                 { key: 'proposal_id', label: 'Id', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'proposal_title', label: 'Title', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'status', label: 'Status', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'approval_status', label: 'Approval Status', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'options', label: '', tdClass: 'text-left' }
@@ -158,9 +158,9 @@ export default {
                     <span class="badge-dark badge">{{data.item.proposal.realm_id}}</span>
                 </template>
 
-                <template v-slot:cell(status)="data">
+                <template v-slot:cell(approval_status)="data">
                     <proposal-station-status
-                        :status="data.item.status"
+                        :status="data.item.approval_status"
                         v-slot:default="slotProps"
                     >
                         <span class="badge" :class="'badge-'+slotProps.classSuffix">
@@ -188,7 +188,7 @@ export default {
                             <b-dropdown-divider />
                             <proposal-station-action
                                 :proposal-station-id="data.item.id"
-                                :status="data.item.status"
+                                :approval-status="data.item.approval_status"
                                 :with-icon="true"
                                 action-type="dropDownItem"
                                 action="approve"
@@ -196,7 +196,7 @@ export default {
                             />
                             <proposal-station-action
                                 :proposal-station-id="data.item.id"
-                                :status="data.item.status"
+                                :approval-status="data.item.approval_status"
                                 :with-icon="true"
                                 action-type="dropDownItem"
                                 action="reject"

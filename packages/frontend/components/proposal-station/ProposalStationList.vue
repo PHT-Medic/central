@@ -10,13 +10,14 @@ import {
     dropApiProposalStation,
     getApiProposalStations
 } from "@personalhealthtrain/ui-common";
-import ProposalStationStatus from "../../components/proposal/ProposalStationStatus";
-import Pagination from "../../components/Pagination";
+
+import Pagination from "../Pagination";
 import Vue from 'vue';
-import StationList from "../../components/station/StationList";
+import StationList from "../station/StationList";
+import ProposalStationApprovalStatusText from "./ProposalStationApprovalStatusText";
 
 export default {
-    components: {StationList, Pagination, ProposalStationStatus},
+    components: {ProposalStationApprovalStatusText, StationList, Pagination},
     props: {
         proposalId: Number | String,
         filter: Function
@@ -180,15 +181,14 @@ export default {
                         <i class="fa fa-hospital"></i>
                     </div>
                     <span class="mb-0">{{item.station.name}}</span>
-                    <proposal-station-status
+                    <proposal-station-approval-status-text
                         :status="item.status"
                         v-slot:default="slotProps"
-                        class="ml-2"
-                    >
+                        class="ml-2">
                         <span class="badge" :class="'badge-'+slotProps.classSuffix">
                             {{slotProps.statusText}}
                         </span>
-                    </proposal-station-status>
+                    </proposal-station-approval-status-text>
 
                     <div class="ml-auto">
                         <slot name="actions" v-bind:item="item" v-bind:drop="drop">

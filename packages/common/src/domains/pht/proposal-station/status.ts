@@ -10,3 +10,10 @@ export enum ProposalStationApprovalStatus {
     REJECTED = 'rejected',
     APPROVED = 'approved'
 }
+
+export type ProposalStationApprovalStatusType = `${ProposalStationApprovalStatus}`;
+
+const ProposalStationApprovalStatusValues = Object.values(ProposalStationApprovalStatus);
+export function isProposalStationApprovalStatus(type: any) : type is ProposalStationApprovalStatusType {
+    return ProposalStationApprovalStatusValues.indexOf(type) !== -1;
+}
