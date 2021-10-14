@@ -43,14 +43,12 @@ case "${COMMAND}" in
 
             docker run \
                 -d \
-                -v "./src:/usr/src/app/src" \
-                -v "./writable:/usr/src/app/writable" \
                 -p "${DOCKER_PORT}":3000 \
                 --restart=always \
                 --network="${DOCKER_NETWORK_NAME}" \
                 --env-file ./.env \
                 --name="${DOCKER_NAME}" \
-                "${DOCKER_IMAGE_NAME}":latest backend start
+                "${DOCKER_IMAGE_NAME}":latest start
         fi
         ;;
     stop)

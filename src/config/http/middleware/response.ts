@@ -13,7 +13,7 @@ type RespondErrorMessage = {
 
 export default function responseMiddleware(request: any, response: any, next: any) {
     let defaultErrorCode = 'service_error';
-    let defaultErrorMessage = 'Der Dienst ist in einen unerwarteten Zustand geraten, welcher ihn daran gehindert hat die Anfrage zu bearbeiten.';
+    let defaultErrorMessage = 'The service encountered an unknown error, which prevented it from fulfilling the request.';
 
     response._respond = (message?: RespondMessage) => {
         if(message) {
@@ -51,14 +51,10 @@ export default function responseMiddleware(request: any, response: any, next: an
 
         response.status(message.statusCode);
 
-        let data: object = {
-            error: {
-                message: message.message,
-                code: message.code
-            }
-        };
-
-        response.json(data);
+        response.json({
+            message: message.message,
+            code: message.code
+        });
 
         return response.end();
     };
