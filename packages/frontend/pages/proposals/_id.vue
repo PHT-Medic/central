@@ -124,7 +124,7 @@
             },
             handleProposalStationUpdated(item) {
                 if(typeof this.visitorProposalStation !== 'undefined' && this.visitorProposalStation.id === item.id) {
-                    this.visitorProposalStation.approval_status = item.status;
+                    this.visitorProposalStation.approval_status = item.approval_status;
                 }
             }
         }

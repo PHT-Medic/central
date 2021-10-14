@@ -310,7 +310,7 @@ export default {
                             <button
                                 type="button"
                                 class="btn btn-primary btn-xs"
-                                :disabled="props.item.status !== proposalStationStatus.APPROVED"
+                                :disabled="props.item.approval_status !== proposalStationStatus.APPROVED"
                                 @click.prevent="addTrainStation(props.item.station_id)"
                             >
                                 <i class="fa fa-plus"></i>

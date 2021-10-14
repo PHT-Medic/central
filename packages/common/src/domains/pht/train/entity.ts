@@ -22,9 +22,15 @@ import {MasterImage} from "../master-image";
 import {Proposal} from "../proposal";
 import {TrainFile} from "../train-file";
 import {Model} from "../model";
-import {TrainResult, TrainResultStatus} from "../train-result";
+import {TrainResult, TrainResultStatus, TrainResultStatusType} from "../train-result";
 import {TrainStation} from "../train-station";
-import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "./status";
+import {
+    TrainBuildStatus,
+    TrainBuildStatusType,
+    TrainConfigurationStatus,
+    TrainConfigurationStatusType,
+    TrainRunStatus, TrainRunStatusType
+} from "./status";
 
 @Entity()
 export class Train {
@@ -59,12 +65,12 @@ export class Train {
     // ------------------------------------------------------------------
 
     @Column({type: "enum", nullable: true, default: null, enum: TrainConfigurationStatus})
-    configuration_status: TrainConfigurationStatus | null;
+    configuration_status: TrainConfigurationStatusType | null;
 
     // ------------------------------------------------------------------
 
     @Column({type: "enum", nullable: true, default: null, enum: TrainBuildStatus})
-    build_status: TrainBuildStatus | null;
+    build_status: TrainBuildStatusType | null;
 
     @Column({type: "uuid", nullable: true, default: null})
     build_id: string;
@@ -72,7 +78,7 @@ export class Train {
     // ------------------------------------------------------------------
 
     @Column({type: "enum", nullable: true, default: null, enum: TrainRunStatus})
-    run_status: TrainRunStatus | null;
+    run_status: TrainRunStatusType | null;
 
     @Column({type: "integer", unsigned: true, nullable: true, default: null})
     run_station_id: number | null;
@@ -118,7 +124,7 @@ export class Train {
     result: TrainResult;
 
     @Column({type: "enum", nullable: true, default: null, enum: TrainResultStatus})
-    result_status: TrainResultStatus | null;
+    result_status: TrainResultStatusType | null;
 
     @Column()
     proposal_id: number;

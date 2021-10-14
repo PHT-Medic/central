@@ -13,7 +13,6 @@ export enum TrainStationApprovalStatus {
 export type TrainStationApprovalStatusType = `${TrainStationApprovalStatus}`;
 
 const TrainStationApprovalStatusValues = Object.values(TrainStationApprovalStatus);
-
 export function isTrainStationApprovalStatus(type: any) : type is TrainStationApprovalStatusType {
     return TrainStationApprovalStatusValues.indexOf(type) !== -1;
 }
@@ -31,6 +30,8 @@ const TrainStationRunStatusValues = Object.values(TrainStationRunStatus);
 export function isTrainStationRunStatus(type: any) : type is TrainStationRunStatusType {
     return TrainStationRunStatusValues.indexOf(type) !== -1;
 }
+
+// -------------------------------------------------------------------------
 
 export enum TrainStationStatic {
     INCOMING = 'incoming',
