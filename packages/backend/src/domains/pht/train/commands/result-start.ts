@@ -37,11 +37,12 @@ export async function triggerTrainResultStart(
 
     // send queue message
     await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.START, {
-        trainId: train.id
+        trainId: train.id,
+        latest: true
     }));
 
     train = repository.merge(train, {
-        result_status: TrainResultStatus.STARTING
+        result_last_status: TrainResultStatus.STARTING
     });
 
     await repository.save(train);

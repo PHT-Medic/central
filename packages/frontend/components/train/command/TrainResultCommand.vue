@@ -113,10 +113,12 @@ export default {
 
             this.busy = true;
 
+            const resultId = this.trainResultId ?? this.train.result_last_id;
+
             try {
                 switch (this.command) {
                     case FrontendTrainCommand.RESULT_DOWNLOAD:
-                        window.open(this.$config.resultServiceApiUrl+'train-results/'+this.trainResultId+'/download');
+                        window.open(this.$config.resultServiceApiUrl+'train-results/'+resultId+'/download');
                         break;
                     default:
                         const train = await runAPITrainCommand(this.train.id, this.command);
@@ -126,8 +128,6 @@ export default {
 
                 const message =  `Successfully executed result command ${this.commandText}`;
                 this.$bvToast.toast(message, {toaster: 'b-toaster-top-center', variant: 'success'});
-
-
             } catch (e) {
                 this.$bvToast.toast(e.message, {toaster: 'b-toaster-top-center', variant: 'danger'});
 
@@ -151,19 +151,19 @@ export default {
 
             switch (this.command) {
                 case FrontendTrainCommand.RESULT_START:
-                    return !this.train.result_status ||
+                    return !this.train.result_last_status ||
                         [
                             TrainResultStatus.STOPPED,
                             TrainResultStatus.FAILED
-                        ].indexOf(this.train.result_status) !== -1;
+                        ].indexOf(this.train.result_last_status) !== -1;
                 case FrontendTrainCommand.RESULT_STOP:
-                    return this.train.result_status &&
+                    return this.train.result_last_status &&
                         [
                             TrainResultStatus.STARTING,
                             TrainResultStatus.STARTED,
                             TrainResultStatus.FINISHED,
                             TrainResultStatus.STOPPING
-                        ].indexOf(this.train.result_status) !== -1;
+                        ].indexOf(this.train.result_last_status) !== -1;
                 case FrontendTrainCommand.RESULT_STATUS:
                 case FrontendTrainCommand.RESULT_DOWNLOAD:
                     return true;

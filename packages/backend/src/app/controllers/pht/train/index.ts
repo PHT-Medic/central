@@ -143,7 +143,7 @@ export async function getTrainsRouteHandler(req: any, res: any) {
 
     applyIncludes(query, include, {
         queryAlias: 'train',
-        allowed: ['train_station', 'result', 'user']
+        allowed: ['train_station', 'user']
     });
 
     applyFilters(query, filter, {

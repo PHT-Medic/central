@@ -108,22 +108,20 @@ export class Train {
     @JoinColumn({name: 'user_id'})
     user: User;
 
-    @OneToOne(() => Model)
-    model: Model;
+    // ------------------------------------------------------------------
 
     @OneToMany(() => TrainFile, trainFile => trainFile.train)
-    files: TrainFile[]
+    files: TrainFile[];
 
-    @Column({type: "varchar", nullable: true, default: null})
+    // ------------------------------------------------------------------
+
+    @Column({type: "uuid", nullable: true, default: null})
     result_last_id: string;
 
-    // todo: change to 1:n
-    @OneToOne(() => TrainResult, trainResult => trainResult.train)
-    result: TrainResult;
-
     @Column({type: "enum", nullable: true, default: null, enum: TrainResultStatus})
-    result_status: TrainResultStatus | null;
+    result_last_status: TrainResultStatus | null;
 
+    // ------------------------------------------------------------------
     @Column()
     proposal_id: number;
 
@@ -131,8 +129,12 @@ export class Train {
     @JoinColumn({name: 'proposal_id'})
     proposal: Proposal;
 
+    // ------------------------------------------------------------------
+
     @OneToMany(() => TrainStation, trainStation => trainStation.train)
     train_stations: TrainStation[];
+
+    // ------------------------------------------------------------------
 
     @Column({nullable: true})
     master_image_id: number;

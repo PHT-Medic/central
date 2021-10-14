@@ -27,7 +27,8 @@ export async function dispatchHarborEventToResultService(
     }
 
     await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.START, {
-        trainId: data.repositoryName
+        trainId: data.repositoryName,
+        latest: true
     }));
 
     useLogger().debug('train event pushed to result service aggregator.', {service: 'api-harbor-hook'})

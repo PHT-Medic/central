@@ -167,7 +167,7 @@ export async function addProposalStationRouteHandler(req: any, res: any) {
     const repository = getRepository(ProposalStation);
     let entity = repository.create(data);
 
-    if(env.demo) {
+    if(env.skipProposalApprovalOperation) {
         entity.approval_status = ProposalStationApprovalStatus.APPROVED;
     }
 

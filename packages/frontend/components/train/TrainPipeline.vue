@@ -6,7 +6,6 @@
   -->
 <script>
 import {
-    Train,
     TrainBuildStatus,
     TrainConfigurationStatus,
     TrainResultStatus,
@@ -96,7 +95,7 @@ export default {
         }"
     >
         <div
-            class="d-flex flex-column flex-grow-1" style="flex-basis: 0"
+            class="d-flex flex-column flex-grow-1 align-items-center" style="flex-basis: 0"
             :class="{
                 'mb-2': listDirection === 'column'
             }"
@@ -115,7 +114,7 @@ export default {
         </div>
 
         <div
-            class="d-flex flex-column flex-grow-1" style="flex-basis: 0"
+            class="d-flex flex-column flex-grow-1 align-items-center" style="flex-basis: 0"
             :class="{
                 'mb-2': listDirection === 'column'
             }"
@@ -156,7 +155,7 @@ export default {
         </div>
 
         <div
-            class="d-flex flex-column flex-grow-1" style="flex-basis: 0"
+            class="d-flex flex-column flex-grow-1 align-items-center" style="flex-basis: 0"
             :class="{
                 'mb-2': listDirection === 'column'
             }"
@@ -196,13 +195,13 @@ export default {
             </div>
         </div>
         <div
-            class="d-flex flex-column flex-grow-1" style="flex-basis: 0"
+            class="d-flex flex-column flex-grow-1 align-items-center" style="flex-basis: 0"
         >
             <div>
                 <strong>4. Result</strong>
             </div>
             <div >
-                Status: <train-result-status-text :status="train.result_status" />
+                Status: <train-result-status-text :status="train.result_last_status" />
                 <train-result-command
                     class="ml-1"
                     :command="trainCommand.RESULT_STATUS"
@@ -218,6 +217,7 @@ export default {
                 <train-result-command
                     class="mr-1"
                     :command="trainCommand.RESULT_DOWNLOAD"
+                    :train-result-id="train.result_last_id"
                     :with-icon="true"
                     :train="train"
                     @done="handleDone"

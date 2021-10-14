@@ -15,7 +15,6 @@ import {getRepository} from "typeorm";
 import {ResultServiceDataPayload} from "../domains/service/result-service";
 import {MessageQueueResultServiceRoutingKey} from "../config/service/mq";
 
-
 export enum TrainResultEvent {
     STARTING = 'starting', // ui trigger
     STARTED = 'started', // rs trigger
@@ -32,13 +31,6 @@ export enum TrainResultEvent {
     FAILED = 'failed' // rs trigger
 }
 
-export enum TrainResultStep {
-    START = 'start',
-    STOP = 'stop',
-    DOWNLOAD = 'download',
-    EXTRACT = 'extract'
-}
-
 const EventStatusMap : Record<TrainResultEvent, TrainResultStatus> = {
     [TrainResultEvent.STARTING]: TrainResultStatus.STARTING,
     [TrainResultEvent.STARTED]: TrainResultStatus.STARTED,
@@ -52,35 +44,45 @@ const EventStatusMap : Record<TrainResultEvent, TrainResultStatus> = {
 }
 
 async function handleTrainResult(data: ResultServiceDataPayload, event: TrainResultEvent) {
-    const trainRepository = getRepository(Train);
-
-    await trainRepository.update({
-        id: data.trainId
-    }, {
-        result_status: EventStatusMap[event]
-    });
-
     const status : TrainResultStatus = EventStatusMap[event];
+    const latest = typeof data.latest === 'boolean' ? data.latest : true;
 
-    console.log(data, event, status);
+    if(latest) {
+        const trainRepository = getRepository(Train);
+
+        await trainRepository.update({
+            id: data.trainId
+        }, {
+            result_last_status: status,
+            ...(data.id ? {result_last_id: data.id} : {})
+        });
+    }
 
     // If an id is available, than the progress succeeded :) ^^
-    if(
-        [TrainResultStatus.EXTRACTED, TrainResultStatus.FINISHED].indexOf(status) !== -1 &&
-        typeof data.id !== 'undefined'
-    ) {
-        const resultRepository = getRepository(TrainResult);
-        const result = await resultRepository.findOne({train_id: data.trainId});
-
-        if (typeof result === 'undefined') {
-            const dbData = resultRepository.create({
-                id: data.id,
-                train_id: data.trainId
-            });
-
-            await resultRepository.save(dbData);
-        }
+    // This is nearly always the case, expect when no result id is generated.
+    if(typeof data.id === 'undefined') {
+        return;
     }
+
+    const resultRepository = getRepository(TrainResult);
+    let result = await resultRepository.findOne({
+        id: data.id,
+        train_id: data.trainId
+    });
+
+    if (typeof result === 'undefined') {
+        result = resultRepository.create({
+            id: data.id,
+            train_id: data.trainId,
+            status
+        });
+    } else {
+        result = resultRepository.merge(result, {
+            status
+        });
+    }
+
+    await resultRepository.save(result);
 }
 
 export function buildTrainResultAggregator() {

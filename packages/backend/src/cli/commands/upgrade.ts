@@ -26,10 +26,6 @@ export class UpgradeCommand implements CommandModule {
 
         const connection = await createConnection(connectionOptions);
 
-        if(process.env.NODE_ENV === 'development') {
-            await connection.synchronize();
-        }
-
         try {
             await connection.runMigrations({transaction: "all"});
         } catch (e) {
