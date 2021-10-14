@@ -235,7 +235,7 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
 
     if(isAuthorityOfStation) {
         await check('approval_status')
-            .optional()
+            .optional({nullable: true})
             .custom(value => isTrainStationApprovalStatus(value))
             .run(req);
 
@@ -268,9 +268,9 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
         trainStation = await repository.save(trainStation);
 
         if(
-            data.status &&
-            data.status !== entityStatus &&
-            ['approved', 'rejected'].indexOf(data.status as TrainStationApprovalStatusType) !== -1
+            data.approval_status &&
+            data.approval_status !== entityStatus &&
+            isTrainStationApprovalStatus(data.approval_status)
         ) {
             await emitDispatcherTrainEvent({
                 event: trainStation.approval_status as DispatcherTrainEventType,

@@ -12,8 +12,10 @@ export enum TrainStationApprovalStatus {
 
 export type TrainStationApprovalStatusType = keyof typeof TrainStationApprovalStatus;
 
-export function isTrainStationApprovalStatus(type: string) : type is TrainStationApprovalStatusType {
-    return type in TrainStationApprovalStatus;
+const TrainStationApprovalStatusValues = Object.values(TrainStationApprovalStatus);
+
+export function isTrainStationApprovalStatus(type: any) : type is TrainStationApprovalStatusType {
+    return TrainStationApprovalStatusValues.indexOf(type) !== -1;
 }
 
 // -------------------------------------------------------------------------
@@ -25,8 +27,9 @@ export enum TrainStationRunStatus {
 
 export type TrainStationRunStatusType = keyof typeof TrainStationRunStatus;
 
-export function isTrainStationRunStatus(type: string) : type is TrainStationRunStatusType {
-    return type in TrainStationRunStatus;
+const TrainStationRunStatusValues = Object.values(TrainStationRunStatus);
+export function isTrainStationRunStatus(type: any) : type is TrainStationRunStatusType {
+    return TrainStationRunStatusValues.indexOf(type) !== -1;
 }
 
 export enum TrainStationStatic {
