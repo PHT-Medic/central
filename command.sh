@@ -33,22 +33,31 @@ fi
 
 shift
 
-DOCKER_PORT="${DOCKER_PORT:3003}"
+DOCKER_PORT="${DOCKER_PORT:-3003}"
+
+DOCKER_ID=$(docker ps -qf name=^"${DOCKER_NAME}"$)
 
 case "${COMMAND}" in
     start)
-        docker run \
+        if [ -z "${DOCKER_ID}" ]; then
+            docker rm "${DOCKER_NAME}" 2> /dev/null
+
+            docker run \
                 -d \
-                -v ./src:/usr/src/app/src \
-                -v ./writable:/usr/src/app/writable \
+                -v "./src:/usr/src/app/src" \
+                -v "./writable:/usr/src/app/writable" \
                 -p "${DOCKER_PORT}":3000 \
                 --restart=always \
                 --network="${DOCKER_NETWORK_NAME}" \
                 --env-file ./.env \
                 --name="${DOCKER_NAME}" \
                 "${DOCKER_IMAGE_NAME}":latest backend start
+        fi
         ;;
     stop)
-
+        if [ -n "${DOCKER_ID}" ]; then
+            docker stop "${DOCKER_ID_FRONTEND}"
+            docker rm "${DOCKER_ID_FRONTEND}"
+        fi
         ;;
 esac
