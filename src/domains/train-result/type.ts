@@ -11,7 +11,8 @@ export enum TrainResultEvent {
     EXTRACTING = 'extracting', // rs trigger
     EXTRACTED = 'extracted', // rs trigger
 
-    FAILED = 'failed' // rs trigger
+    FAILED = 'failed', // rs trigger,
+    UNKNOWN = 'unknown' // rs trigger
 }
 
 export enum TrainResultStep {

@@ -43,9 +43,22 @@ export async function statusImage(message: Message) {
             options: {
                 routingKey: MessageQueueSelfToUIRoutingKey.EVENT
             },
-            type: TrainResultEvent.EXTRACTED,
+            type: TrainResultEvent.DOWNLOADED,
             data: message.data,
             metadata: message.metadata
         }));
+
+        return;
     }
+
+    // 3. Is unknown
+
+    await publishMessage(buildMessage({
+        options: {
+            routingKey: MessageQueueSelfToUIRoutingKey.EVENT
+        },
+        type: TrainResultEvent.UNKNOWN,
+        data: message.data,
+        metadata: message.metadata
+    }));
 }
