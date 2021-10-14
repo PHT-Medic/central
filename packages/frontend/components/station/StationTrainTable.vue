@@ -23,7 +23,7 @@ export default {
         AlertMessage
     },
     props: {
-        proposalId: {
+        stationId: {
             type: Number,
             default: undefined
         }
