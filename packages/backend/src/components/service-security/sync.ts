@@ -6,7 +6,12 @@
  */
 
 import {Message} from "amqp-extension";
-import {BaseService, saveServiceSecretToVault, Station} from "@personalhealthtrain/ui-common";
+import {
+    BaseService, HARBOR_INCOMING_PROJECT_NAME,
+    HARBOR_MASTER_IMAGE_PROJECT_NAME, HARBOR_OUTGOING_PROJECT_NAME,
+    saveServiceSecretToVault,
+    Station
+} from "@personalhealthtrain/ui-common";
 import {getRepository, IsNull, Not} from "typeorm";
 import {ensureHarborProjectWebHook} from "@personalhealthtrain/ui-common";
 import env from "../../env";
@@ -28,12 +33,29 @@ export async function syncServiceSecurity(message: Message) {
                 harbor_project_id: Not(IsNull())
             });
 
-            await Promise.all(stations.map((station: Station) => {
+            const promises : Promise<void>[] = stations.map((station: Station) => {
                 return ensureHarborProjectWebHook(station.harbor_project_id, {
                     id: clientId,
                     secret: clientSecret
                 }, {internalAPIUrl: env.internalApiUrl});
-            }));
+            });
+
+            const specialProjects = [
+                HARBOR_MASTER_IMAGE_PROJECT_NAME,
+                HARBOR_INCOMING_PROJECT_NAME,
+                HARBOR_OUTGOING_PROJECT_NAME
+            ];
+
+            specialProjects.map(repository => {
+                promises.push(ensureHarborProjectWebHook(repository, {
+                    id: clientId,
+                    secret: clientSecret
+                }, {internalAPIUrl: env.internalApiUrl}, true));
+
+                return repository;
+            });
+
+            await Promise.all(promises);
             break;
     }
 }

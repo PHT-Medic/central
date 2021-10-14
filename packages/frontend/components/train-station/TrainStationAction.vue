@@ -58,7 +58,7 @@ export default {
     },
     props: {
         trainStationId: String | Number,
-        status: String,
+        approvalStatus: String,
         action: String,
         actionType: {
             type: String,
@@ -137,11 +137,11 @@ export default {
             }
         },
         isDisabled() {
-            if(typeof this.status === 'undefined') {
+            if(typeof this.approvalStatus === 'undefined') {
                 return false;
             }
 
-            switch (this.status) {
+            switch (this.approvalStatus) {
                 case TrainStationApprovalStatus.APPROVED:
                     if(this.action === 'approve') {
                         return true;

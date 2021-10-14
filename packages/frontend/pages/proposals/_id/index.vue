@@ -6,9 +6,9 @@
   -->
 <script>
 import {ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
-import ProposalStationStatus from "../../../components/proposal/ProposalStationStatus";
-import ProposalStationList from "../../../components/proposal/ProposalStationList";
-import ProposalStationAction from "../../../components/proposal/ProposalStationAction";
+import ProposalStationStatus from "../../../components/proposal-station/ProposalStationStatus";
+import ProposalStationList from "../../../components/proposal-station/ProposalStationList";
+import ProposalStationAction from "../../../components/proposal-station/ProposalStationAction";
 
 export default {
     components:{
@@ -116,7 +116,7 @@ export default {
                                     </template>
                                     <proposal-station-action
                                         :proposal-station-id="visitorProposalStation.id"
-                                        :status="visitorProposalStation.status"
+                                        :approval-status="visitorProposalStation.approval_status"
                                         :with-icon="true"
                                         action-type="dropDownItem"
                                         action="approve"
@@ -124,7 +124,7 @@ export default {
                                     />
                                     <proposal-station-action
                                         :proposal-station-id="visitorProposalStation.id"
-                                        :status="visitorProposalStation.status"
+                                        :approval-status="visitorProposalStation.approval_status"
                                         :with-icon="true"
                                         action-type="dropDownItem"
                                         action="reject"

@@ -5,13 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getApiProposalStations, getAPIStations, getProposal} from "@personalhealthtrain/ui-common";
+    import {getApiProposalStations, getAPIStations, getProposal} from "@personalhealthtrain/ui-common";
     import { LayoutNavigationDefaultId } from "../../config/layout";
     import ProposalSvg from "../../components/svg/ProposalSvg";
-    import ProposalStationAction from "../../components/proposal/ProposalStationAction";
 
     export default {
-        components: {ProposalStationAction, ProposalSvg},
+        components: {ProposalSvg},
         meta: {
             requireLoggedIn: true,
             navigationId: LayoutNavigationDefaultId
@@ -125,7 +124,7 @@ import {getApiProposalStations, getAPIStations, getProposal} from "@personalheal
             },
             handleProposalStationUpdated(item) {
                 if(typeof this.visitorProposalStation !== 'undefined' && this.visitorProposalStation.id === item.id) {
-                    this.visitorProposalStation.status = item.status;
+                    this.visitorProposalStation.approval_status = item.status;
                 }
             }
         }

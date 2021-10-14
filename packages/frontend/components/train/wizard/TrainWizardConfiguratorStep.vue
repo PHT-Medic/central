@@ -12,7 +12,7 @@ import {
     getApiProposalStations, getAPITrainStations, ProposalStationApprovalStatus
 } from "@personalhealthtrain/ui-common";
 import {minLength, numeric, required} from "vuelidate/lib/validators";
-import ProposalStationList from "../../../components/proposal/ProposalStationList";
+import ProposalStationList from "../../proposal-station/ProposalStationList";
 
 export default {
     components: {ProposalStationList},

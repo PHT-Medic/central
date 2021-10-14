@@ -10,7 +10,7 @@ import {applyFilters, applyPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
 import {
-    isPermittedForResourceRealm,
+    isPermittedForResourceRealm, isProposalStationApprovalStatus,
     onlyRealmPermittedQueryResources,
     ProposalStation, ProposalStationApprovalStatus
 } from "@personalhealthtrain/ui-common";
@@ -168,7 +168,7 @@ export async function addProposalStationRouteHandler(req: any, res: any) {
     let entity = repository.create(data);
 
     if(env.demo) {
-        entity.status = ProposalStationApprovalStatus.APPROVED;
+        entity.approval_status = ProposalStationApprovalStatus.APPROVED;
     }
 
     try {
@@ -217,11 +217,9 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
     }
 
     if(isAuthorityOfStation) {
-        await check('status')
+        await check('approval_status')
             .optional()
-            .custom(command => {
-                return Object.values(ProposalStationApprovalStatus).includes(command);
-            })
+            .custom(command => isProposalStationApprovalStatus(command))
             .run(req);
 
         await check('comment')
@@ -237,7 +235,7 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
 
     const data = matchedData(req, {includeOptionals: false});
 
-    const entityStatus : string | undefined = proposalStation.status;
+    const entityStatus : string | undefined = proposalStation.approval_status;
 
     proposalStation = repository.merge(proposalStation, data);
 
@@ -245,12 +243,12 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
         proposalStation = await repository.save(proposalStation);
 
         if(
-            data.status &&
-            data.status !== entityStatus &&
-            Object.values(ProposalStationApprovalStatus).includes(data.status)
+            data.approval_status &&
+            data.approval_status !== entityStatus &&
+            Object.values(ProposalStationApprovalStatus).includes(data.approval_status)
         ) {
             await emitDispatcherProposalEvent({
-                event: proposalStation.status as DispatcherProposalEvent,
+                event: proposalStation.approval_status as DispatcherProposalEvent,
                 id: proposalStation.proposal_id,
                 stationId: proposalStation.station_id,
                 operatorRealmId: req.realmId
