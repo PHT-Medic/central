@@ -68,7 +68,7 @@ export default {
                         offset: this.meta.offset
                     },
                     filter: {
-                        station_id: this.station_id
+                        station_id: this.stationId
                     }
                 });
 
