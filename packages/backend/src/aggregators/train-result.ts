@@ -28,10 +28,12 @@ export enum TrainResultEvent {
     EXTRACTING = 'extracting', // rs trigger
     EXTRACTED = 'extracted', // rs trigger
 
-    FAILED = 'failed' // rs trigger
+    FAILED = 'failed', // rs trigger
+
+    UNKNOWN = 'unknown' // rs trigger
 }
 
-const EventStatusMap : Record<TrainResultEvent, TrainResultStatus> = {
+const EventStatusMap : Record<TrainResultEvent, TrainResultStatus | null> = {
     [TrainResultEvent.STARTING]: TrainResultStatus.STARTING,
     [TrainResultEvent.STARTED]: TrainResultStatus.STARTED,
     [TrainResultEvent.STOPPING]: TrainResultStatus.STOPPING,
@@ -41,10 +43,15 @@ const EventStatusMap : Record<TrainResultEvent, TrainResultStatus> = {
     [TrainResultEvent.DOWNLOADED]: TrainResultStatus.DOWNLOADED,
     [TrainResultEvent.EXTRACTING]: TrainResultStatus.EXTRACTING,
     [TrainResultEvent.EXTRACTED]: TrainResultStatus.FINISHED,
+    [TrainResultEvent.UNKNOWN]: null
 }
 
 async function handleTrainResult(data: ResultServiceDataPayload, event: TrainResultEvent) {
-    const status : TrainResultStatus = EventStatusMap[event];
+    if(!(EventStatusMap.hasOwnProperty(event))) {
+        return;
+    }
+
+    const status : TrainResultStatus | null = EventStatusMap[event];
     const latest = typeof data.latest === 'boolean' ? data.latest : true;
 
     if(latest) {
@@ -88,24 +95,12 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: TrainRes
 export function buildTrainResultAggregator() {
     function start() {
         return consumeQueue({routingKey: MessageQueueResultServiceRoutingKey.EVENT_IN}, {
-            [TrainResultEvent.STARTED]: async (message: Message) => {
-                await handleTrainResult(message.data as ResultServiceDataPayload, TrainResultEvent.STARTED);
-            },
-            [TrainResultEvent.STOPPED]: async (message: Message) => {
-                await handleTrainResult(message.data as ResultServiceDataPayload, TrainResultEvent.STARTED);
-            },
-            [TrainResultEvent.DOWNLOADING]: async (message: Message) => {
-                await handleTrainResult(message.data as ResultServiceDataPayload, TrainResultEvent.DOWNLOADING);
-            },
-            [TrainResultEvent.DOWNLOADED]: async (message: Message) => {
-                await handleTrainResult(message.data as ResultServiceDataPayload, TrainResultEvent.DOWNLOADED);
-            },
-            [TrainResultEvent.EXTRACTING]: async (message: Message) => {
-                await handleTrainResult(message.data as ResultServiceDataPayload, TrainResultEvent.EXTRACTING);
-            },
-            [TrainResultEvent.EXTRACTED]: async (message: Message) => {
-                await handleTrainResult(message.data as ResultServiceDataPayload, TrainResultEvent.EXTRACTED);
-            },
+            $any: async (message: Message) => {
+                await handleTrainResult(
+                    message.data as ResultServiceDataPayload,
+                    message.type as TrainResultEvent
+                );
+            }
         });
     }
 
