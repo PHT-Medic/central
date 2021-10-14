@@ -234,7 +234,7 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
     }
 
     if(isAuthorityOfStation) {
-        await check('status')
+        await check('approval_status')
             .optional()
             .custom(value => isTrainStationApprovalStatus(value))
             .run(req);
