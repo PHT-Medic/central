@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {executeAPIServiceClientTask} from "@personalhealthtrain/ui-common";
+import {executeAPIServiceClientCommand} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
@@ -27,7 +27,7 @@ export default {
             this.busy = true;
 
             try {
-                const service = await executeAPIServiceClientTask(this.serviceProperty.id, task, {});
+                const service = await executeAPIServiceClientCommand(this.serviceProperty.id, task, {});
                 this.service = service;
                 this.$emit('updated', service);
             } catch (e) {

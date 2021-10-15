@@ -7,6 +7,7 @@
 <script>
 
 import HarborManagement from "../../../../components/service/harbor/HarborManagement";
+import {StaticService} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
@@ -16,7 +17,7 @@ export default {
         let template;
 
         switch (this.service.id) {
-            case 'HARBOR':
+            case StaticService.REGISTRY:
                 template = HarborManagement;
                 break;
         }

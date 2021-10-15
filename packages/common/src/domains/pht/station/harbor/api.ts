@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildStationHarborProjectName} from "../../../../config";
+import {buildRegistryHarborProjectName} from "../../../../config";
 import {
     deleteHarborProject,
     ensureHarborProject,
@@ -14,19 +14,19 @@ import {
 } from "../../../service";
 
 export async function findStationHarborProject(id: string | number): Promise<HarborProject | undefined> {
-    const projectName: string = buildStationHarborProjectName(id);
+    const projectName: string = buildRegistryHarborProjectName(id);
 
     return await findHarborProject(projectName, true);
 }
 
 export async function deleteStationHarborProject(id: string | number): Promise<void> {
-    const name: string = buildStationHarborProjectName(id);
+    const name: string = buildRegistryHarborProjectName(id);
 
     await deleteHarborProject(name, true);
 }
 
 export async function ensureStationHarborProject(id: string | number): Promise<HarborProject> {
-    const name: string = buildStationHarborProjectName(id);
+    const name: string = buildRegistryHarborProjectName(id);
 
     return await ensureHarborProject(name);
 }

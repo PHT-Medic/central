@@ -9,21 +9,15 @@ import {buildAuthorizationHeaderValue} from "@typescript-auth/core";
 
 import {Client} from "../../../../auth"
 import {APIType, useAPI} from "../../../../../modules";
-import {BaseService} from "../../../type";
-import {HarborProjectWebhookOptions} from "./type";
+import {StaticService} from "../../../type";
+import {HarborProjectWebhook, HarborProjectWebhookOptions} from "./type";
 
 const WEBHOOK_ID = 'UI';
-
-export type HarborProjectPolicy = {
-    id: number,
-    name: string,
-    projectId: number
-}
 
 export async function findHarborProjectWebHook(
     projectIdOrName: number | string,
     isProjectName: boolean = false
-) : Promise<HarborProjectPolicy | undefined> {
+) : Promise<HarborProjectWebhook | undefined> {
     const headers : Record<string, any> = {};
 
     if(isProjectName) {
@@ -36,13 +30,7 @@ export async function findHarborProjectWebHook(
     const policies = data.filter((policy: { name: string; }) => policy.name === WEBHOOK_ID);
 
     if(policies.length === 1) {
-        const policy = policies[0];
-
-        return {
-            id: policy.id,
-            name: policy.name,
-            projectId: policy.project_id
-        }
+        return policies[0];
     }
 
     return undefined;
@@ -53,7 +41,7 @@ export async function ensureHarborProjectWebHook(
     client: Pick<Client, 'id' | 'secret'>,
     options: HarborProjectWebhookOptions,
     isProjectName: boolean = false
-) {
+) : Promise<HarborProjectWebhook> {
     const headers : Record<string, any> = {};
 
     if(isProjectName) {
@@ -65,7 +53,7 @@ export async function ensureHarborProjectWebHook(
         throw new Error('An API Harbor URL must be specified.');
     }
 
-    const webhook: Record<string, any> = {
+    const webhook: HarborProjectWebhook = {
         name: WEBHOOK_ID,
         enabled: true,
         targets: [
@@ -73,7 +61,7 @@ export async function ensureHarborProjectWebHook(
                 auth_header: buildAuthorizationHeaderValue({type: "Basic", username: client.id, password: client.secret}),
                 skip_cert_verify: true,
                 // todo: change this, if service not on same machine.
-                address: apiUrl + "services/"+BaseService.HARBOR+"/hook",
+                address: apiUrl + "services/"+StaticService.REGISTRY+"/hook",
                 type: "http"
             }
         ],
@@ -81,7 +69,7 @@ export async function ensureHarborProjectWebHook(
     }
 
     try {
-        await useAPI(APIType.HARBOR)
+         await useAPI(APIType.HARBOR)
             .post('projects/' + projectIdOrName + '/webhook/policies', webhook, headers);
     } catch (e) {
         if(e?.response?.status === 409) {
@@ -95,6 +83,8 @@ export async function ensureHarborProjectWebHook(
 
         throw e;
     }
+
+    return webhook;
 }
 
 export async function dropHarborProjectWebHook(projectIdOrName: number | string, isProjectName: boolean = false) {

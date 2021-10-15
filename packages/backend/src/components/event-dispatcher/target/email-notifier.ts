@@ -7,8 +7,8 @@
 
 import {buildMessage, Message, publishMessage} from "amqp-extension";
 import {
-    HARBOR_INCOMING_PROJECT_NAME,
-    HARBOR_OUTGOING_PROJECT_NAME, isHarborStationProjectName
+    REGISTRY_INCOMING_PROJECT_NAME,
+    REGISTRY_OUTGOING_PROJECT_NAME, isRegistryStationProjectName
 } from "@personalhealthtrain/ui-common";
 
 import {
@@ -87,7 +87,7 @@ export async function dispatchHarborEventToEmailNotifier(
         return message;
     }
 
-    const isIncomingProject : boolean = data.namespace === HARBOR_INCOMING_PROJECT_NAME;
+    const isIncomingProject : boolean = data.namespace === REGISTRY_INCOMING_PROJECT_NAME;
     if(isIncomingProject) {
         await publishMessage(buildMessage({
             options: {
@@ -102,7 +102,7 @@ export async function dispatchHarborEventToEmailNotifier(
         return message;
     }
 
-    const isOutgoingProject : boolean = data.namespace === HARBOR_OUTGOING_PROJECT_NAME;
+    const isOutgoingProject : boolean = data.namespace === REGISTRY_OUTGOING_PROJECT_NAME;
     if(isOutgoingProject) {
 
         await publishMessage(buildMessage({
@@ -119,7 +119,7 @@ export async function dispatchHarborEventToEmailNotifier(
     }
 
     // station project
-    const isStationProject : boolean = isHarborStationProjectName(data.namespace);
+    const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
     if(isStationProject) {
         if(
             typeof data.station === 'undefined' ||

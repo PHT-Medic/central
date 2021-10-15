@@ -12,16 +12,16 @@ import StationForm from "../../../../components/station/StationForm";
 export default {
     components: {StationForm},
     props: {
-        realm: Realm
+        realm: Object
     },
     data() {
         return {
             sidebar: {
                 hide: false,
                 items: [
-                    { name: 'General', urlSuffix: '', componentName: 'chat-rooms-index', icon: 'fa fa-info-circle', stationRequired: false },
-                    { name: 'Harbor', urlSuffix: '/harbor', componentName: 'chat-rooms-index', icon: 'fas fa-folder-open', stationRequired: true },
-                    { name: 'Vault', urlSuffix: '/vault', componentName: 'chat-rooms-index-channel', icon: 'fa fa-key', stationRequired: true},
+                    { name: 'General', urlSuffix: '', icon: 'fa fa-info-circle', stationRequired: false },
+                    { name: 'Registry', urlSuffix: '/registry', icon: 'fas fa-folder-open', stationRequired: true },
+                    { name: 'Vault', urlSuffix: '/vault', icon: 'fa fa-key', stationRequired: true},
                 ]
             },
             station: undefined,
@@ -36,10 +36,10 @@ export default {
                 },
                 fields: {
                     station: [
-                        '+harbor_project_id',
-                        'harbor_project_account_name',
-                        'harbor_project_account_token',
-                        'harbor_project_webhook_exists',
+                        '+registry_project_id',
+                        'registry_project_account_name',
+                        'registry_project_account_token',
+                        'registry_project_webhook_exists',
                         'vault_public_key_saved',
                         'public_key',
                         'email',

@@ -7,7 +7,7 @@
 
 import {Message, publishMessage} from "amqp-extension";
 
-import {HARBOR_OUTGOING_PROJECT_NAME,} from "@personalhealthtrain/ui-common";
+import {REGISTRY_OUTGOING_PROJECT_NAME,} from "@personalhealthtrain/ui-common";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {
     buildResultServiceQueueMessage,
@@ -20,7 +20,7 @@ export async function dispatchHarborEventToResultService(
 ) : Promise<Message> {
     const data : DispatcherHarborEventData = message.data as DispatcherHarborEventData;
 
-    const isOutgoingProject : boolean = data.namespace === HARBOR_OUTGOING_PROJECT_NAME;
+    const isOutgoingProject : boolean = data.namespace === REGISTRY_OUTGOING_PROJECT_NAME;
     // only process terminated trains and the PUSH_ARTIFACT event
     if(!isOutgoingProject || data.event !== 'PUSH_ARTIFACT') {
         return message;

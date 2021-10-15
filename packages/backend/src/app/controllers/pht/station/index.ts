@@ -108,10 +108,10 @@ export async function getStationRouteHandler(req: any, res: any) {
                 'secure_id',
                 'public_key',
                 'email',
-                'harbor_project_account_name',
-                'harbor_project_account_token',
-                'harbor_project_id',
-                'harbor_project_webhook_exists',
+                'registry_project_account_name',
+                'registry_project_account_token',
+                'registry_project_id',
+                'registry_project_webhook_exists',
                 'vault_public_key_saved'
             ],
             queryAlias: 'station'
@@ -151,10 +151,10 @@ export async function getStationsRouteHandler(req: any, res: any) {
                 'secure_id',
                 'public_key',
                 'email',
-                'harbor_project_account_name',
-                'harbor_project_account_token',
-                'harbor_project_id',
-                'harbor_project_webhook_exists',
+                'registry_project_account_name',
+                'registry_project_account_token',
+                'registry_project_id',
+                'registry_project_webhook_exists',
                 'vault_public_key_saved'
             ],
             queryAlias: 'station'

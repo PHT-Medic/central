@@ -5,12 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {doAPIStationTask, Realm, Station} from "@personalhealthtrain/ui-common";
+import {doAPIStationTask} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
-        realm: Realm,
-        station: Station
+        realm: Object,
+        station: Object
     },
     data() {
         return {

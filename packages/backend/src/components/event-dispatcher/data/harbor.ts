@@ -8,8 +8,8 @@
 import {Message} from "amqp-extension";
 import {getRepository} from "typeorm";
 import {
-    buildStationHarborProjectName,
-    isHarborStationProjectName,
+    buildRegistryHarborProjectName,
+    isRegistryStationProjectName,
     Station
 } from "@personalhealthtrain/ui-common";
 import {TrainStation} from "@personalhealthtrain/ui-common";
@@ -30,7 +30,7 @@ export type DispatcherHarborEventWithAdditionalData = DispatcherHarborEventData 
 export async function extendDispatcherHarborData(message: Message) : Promise<Message> {
     const data : DispatcherHarborEventWithAdditionalData = message.data as DispatcherHarborEventWithAdditionalData;
 
-    const isStationProject : boolean = isHarborStationProjectName(data.namespace);
+    const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
     if(!isStationProject) {
         return message;
     }
@@ -47,7 +47,7 @@ export async function extendDispatcherHarborData(message: Message) : Promise<Mes
         const entities = await query.getMany();
         data.stations = entities.map(entity => entity.station);
 
-        const index = data.stations.findIndex(entity => buildStationHarborProjectName(entity.secure_id) === data.namespace);
+        const index = data.stations.findIndex(entity => buildRegistryHarborProjectName(entity.secure_id) === data.namespace);
 
         data.station = index !== -1 ? data.stations[index] : undefined;
 

@@ -10,11 +10,11 @@ import {AggregatorMasterImagePushedEvent} from "../../../aggregators/dispatcher/
 import {AggregatorTrainEvent} from "../../../aggregators/dispatcher/handlers/train";
 
 import {
-    HARBOR_INCOMING_PROJECT_NAME,
-    HARBOR_MASTER_IMAGE_PROJECT_NAME,
-    HARBOR_OUTGOING_PROJECT_NAME,
-    HARBOR_SYSTEM_USER_NAME,
-    isHarborStationProjectName,
+    REGISTRY_INCOMING_PROJECT_NAME,
+    REGISTRY_MASTER_IMAGE_PROJECT_NAME,
+    REGISTRY_OUTGOING_PROJECT_NAME,
+    REGISTRY_SYSTEM_USER_NAME,
+    isRegistryStationProjectName,
     TrainStationRunStatus
 } from "@personalhealthtrain/ui-common";
 
@@ -33,20 +33,20 @@ export async function dispatchHarborEventToSelf(
     }
 
     // master Image project
-    const isLibraryProject : boolean = data.namespace === HARBOR_MASTER_IMAGE_PROJECT_NAME;
+    const isLibraryProject : boolean = data.namespace === REGISTRY_MASTER_IMAGE_PROJECT_NAME;
     if(isLibraryProject) {
         await processMasterImage(data);
         return message;
     }
 
-    const isIncomingProject : boolean = data.namespace === HARBOR_INCOMING_PROJECT_NAME;
+    const isIncomingProject : boolean = data.namespace === REGISTRY_INCOMING_PROJECT_NAME;
     if(isIncomingProject) {
         await processIncomingTrain(data);
 
         return message;
     }
 
-    const isOutgoingProject : boolean = data.namespace === HARBOR_OUTGOING_PROJECT_NAME;
+    const isOutgoingProject : boolean = data.namespace === REGISTRY_OUTGOING_PROJECT_NAME;
     if(isOutgoingProject) {
         await processOutgoingTrain(data);
 
@@ -54,7 +54,7 @@ export async function dispatchHarborEventToSelf(
     }
 
     // station project
-    const isStationProject : boolean = isHarborStationProjectName(data.namespace);
+    const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
     if(isStationProject) {
         await processStationTrain(data);
     }
@@ -129,7 +129,7 @@ async function processStationTrain(data: DispatcherHarborEventWithAdditionalData
         data: {
             id: data.repositoryName,
             stationId: data.station.id,
-            status: data.operator === HARBOR_SYSTEM_USER_NAME ? TrainStationRunStatus.ARRIVED : TrainStationRunStatus.DEPARTED
+            status: data.operator === REGISTRY_SYSTEM_USER_NAME ? TrainStationRunStatus.ARRIVED : TrainStationRunStatus.DEPARTED
         }
     }));
 }

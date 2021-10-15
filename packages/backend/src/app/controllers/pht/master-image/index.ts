@@ -20,7 +20,7 @@ type PartialMasterImage = Partial<MasterImage>;
 export class MasterImageController {
     @Get("",[ForceLoggedInMiddleware])
     @ResponseExample<PartialMasterImage[]>([
-        {name: 'slim', path: 'master/nf-core/hlaTyping', id: 1, proposals: [], trains: []}
+        {name: 'slim', path: 'master/nf-core/hlaTyping', id: 1}
     ])
     async getMany(
         @Request() req: any,
@@ -30,7 +30,7 @@ export class MasterImageController {
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialMasterImage>({name: 'slim', path: 'master/nf-core/hlaTyping', id: 1, proposals: [], trains: []})
+    @ResponseExample<PartialMasterImage>({name: 'slim', path: 'master/nf-core/hlaTyping', id: 1})
     async getOne(
         @Params('id') id: string,
         @Request() req: any,
@@ -40,7 +40,7 @@ export class MasterImageController {
     }
 
     @Delete("/:id",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialMasterImage>({name: 'slim', path: 'master/nf-core/hlaTyping', id: 1, proposals: [], trains: []})
+    @ResponseExample<PartialMasterImage>({name: 'slim', path: 'master/nf-core/hlaTyping', id: 1})
     async drop(
         @Params('id') id: string,
         @Request() req: any,

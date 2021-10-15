@@ -56,7 +56,7 @@ export class TrainFile {
     @Column()
     train_id: string;
 
-    @ManyToOne(() => Train, train => train.files, {onDelete: "CASCADE"})
+    @ManyToOne(() => Train, {onDelete: "CASCADE"})
     @JoinColumn({name: 'train_id'})
     train: Train;
 

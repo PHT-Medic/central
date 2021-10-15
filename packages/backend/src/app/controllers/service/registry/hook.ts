@@ -10,7 +10,7 @@ import {DispatcherHarborEventType, emitDispatcherHarborEvent} from "../../../../
 import {array, BaseSchema, object, string} from "yup";
 
 import {
-    HARBOR_MASTER_IMAGE_PROJECT_NAME, Train,
+    REGISTRY_MASTER_IMAGE_PROJECT_NAME, Train,
 } from "@personalhealthtrain/ui-common";
 import {useLogger} from "../../../../modules/log";
 
@@ -72,7 +72,7 @@ export async function postHarborHookRouteHandler(req: any, res: any) {
     try {
         const hook : HarborHook = await useHookEventDataValidator().validate(req.body);
 
-        const isLibraryProject : boolean = hook.event_data.repository.namespace === HARBOR_MASTER_IMAGE_PROJECT_NAME;
+        const isLibraryProject : boolean = hook.event_data.repository.namespace === REGISTRY_MASTER_IMAGE_PROJECT_NAME;
 
         if(!isLibraryProject) {
             /**

@@ -6,10 +6,14 @@
  */
 
 import {APIType, useAPI} from "../../../../modules";
+import {findHarborProjectWebHook, HarborProjectWebhook} from "./web-hook";
+import {findHarborRobotAccount, HarborRobotAccount} from "../robot-account";
 
 export type HarborProject = {
     name: string,
-    id: number
+    id: number,
+    webhook?: HarborProjectWebhook,
+    robot_account?: HarborRobotAccount
 }
 
 export async function findHarborProject(id: string | number, isProjectName: boolean = false) : Promise<HarborProject> {
@@ -63,4 +67,17 @@ export async function deleteHarborProject(id: string | number, isProjectName: bo
 
     await useAPI(APIType.HARBOR)
         .delete('projects/' + id, headers);
+}
+
+export async function pullProject(id: string | number, isProjectName: boolean = false) : Promise<HarborProject | undefined> {
+    const project = await findHarborProject(id, isProjectName);
+
+    if(!project) {
+        return undefined;
+    }
+
+    project.webhook = await findHarborProjectWebHook(id, isProjectName);
+    project.robot_account = await findHarborRobotAccount(project.name, true);
+
+    return project;
 }

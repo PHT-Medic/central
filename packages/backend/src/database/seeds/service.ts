@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {BaseService, Client, Service} from "@personalhealthtrain/ui-common";
+import {StaticService, Client, Service} from "@personalhealthtrain/ui-common";
 import {Connection, getRepository} from "typeorm";
 import {Factory, Seeder} from "typeorm-seeding";
 
@@ -14,10 +14,10 @@ export default class ServiceSeeder implements Seeder {
         const serviceRepository = connection.getRepository(Service);
 
         const rawServices : Record<string,any>[] = [
-            {id: BaseService.HARBOR},
-            {id: BaseService.TRAIN_BUILDER},
-            {id: BaseService.TRAIN_ROUTER},
-            {id: BaseService.RESULT_SERVICE}
+            {id: StaticService.REGISTRY},
+            {id: StaticService.TRAIN_BUILDER},
+            {id: StaticService.TRAIN_ROUTER},
+            {id: StaticService.RESULT_SERVICE}
         ];
 
         const services : Service[] = [];

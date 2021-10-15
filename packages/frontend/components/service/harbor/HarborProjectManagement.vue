@@ -9,9 +9,9 @@
 import {
     dropAPIMasterImage,
     executeAPIServiceTask,
-    HARBOR_INCOMING_PROJECT_NAME, HARBOR_MASTER_IMAGE_PROJECT_NAME,
-    HARBOR_OUTGOING_PROJECT_NAME,
-    HarborCommand
+    REGISTRY_INCOMING_PROJECT_NAME, REGISTRY_MASTER_IMAGE_PROJECT_NAME,
+    REGISTRY_OUTGOING_PROJECT_NAME,
+    RegistryCommand
 } from "@personalhealthtrain/ui-common"
 import MasterImageList from "../../master-image/MasterImageList";
 
@@ -27,6 +27,11 @@ export default {
                 executed: false,
                 created: '?',
                 deleted: '?'
+            },
+            projectKey: {
+                INCOMING: REGISTRY_INCOMING_PROJECT_NAME,
+                OUTGOING: REGISTRY_OUTGOING_PROJECT_NAME,
+                MASTER_IMAGE: REGISTRY_MASTER_IMAGE_PROJECT_NAME
             }
         }
     },
@@ -56,37 +61,44 @@ export default {
             }
         },
 
-        async addIncomingProject() {
-            await this.executeTask(HarborCommand.REPOSITORY_CREATE, {
-                name: HARBOR_INCOMING_PROJECT_NAME,
-                webhook: true
+        async addProject(key) {
+            await this.executeTask(RegistryCommand.PROJECT_CREATE, {
+                name: key,
             });
         },
-        async addOutgoingProject() {
-            await this.executeTask(HarborCommand.REPOSITORY_CREATE, {
-                name: HARBOR_OUTGOING_PROJECT_NAME,
-                webhook: true
+        async addProjectWebhook(key) {
+            await this.executeTask(RegistryCommand.PROJECT_WEBHOOK_CREATE, {
+                name: key
             });
         },
-
-        async addMasterImageProject() {
-            await this.executeTask(HarborCommand.REPOSITORY_CREATE, {
-                name: HARBOR_MASTER_IMAGE_PROJECT_NAME,
-                webhook: true
+        async addProjectRobotAccount(key) {
+            await this.executeTask(RegistryCommand.PROJECT_ROBOT_ACCOUNT_CREATE, {
+                name: key
             });
         },
-        async syncMasterImageProject() {
-            const {data, meta} = await this.executeTask(HarborCommand.REPOSITORY_SYNC, {
-                name: HARBOR_MASTER_IMAGE_PROJECT_NAME
-            });
+        async syncProjectRepositories(key) {
+            try {
+                const {data, meta} = await this.executeTask(RegistryCommand.PROJECT_REPOSITORIES_SYNC, {
+                    name: key
+                });
 
-            this.masterImagesMeta.executed = true;
+                switch (key) {
+                    case REGISTRY_MASTER_IMAGE_PROJECT_NAME:
+                        this.masterImagesMeta.executed = true;
 
-            this.masterImagesMeta.created = meta.created;
-            this.masterImagesMeta.deleted = meta.deleted;
+                        this.masterImagesMeta.created = meta.created;
+                        this.masterImagesMeta.deleted = meta.deleted;
 
-            if(Array.isArray(data)) {
-                data.map(item => this.$refs["master-image-list"].addArrayItem(item));
+                        if (Array.isArray(data)) {
+                            data.map(item => this.$refs["master-image-list"].addArrayItem(item));
+                        }
+                        break;
+                }
+            } catch (e) {
+                this.$bvToast.toast(e.message, {
+                    toaster: 'b-toaster-top-center',
+                    variant: 'danger'
+                })
             }
         },
         async dropMasterImage(id) {
@@ -115,8 +127,11 @@ export default {
                     From there the TrainRouter can move it to the first station project of the route.
                 </p>
 
-                <button type="button" class="btn btn-primary btn-xs" @click.prevent="addIncomingProject" :disabled="busy">
-                    <i class="fa fa-wrench"></i> Create
+                <button type="button" class="btn btn-success btn-xs" @click.prevent="addProject(projectKey.INCOMING)" :disabled="busy">
+                    <i class="fa fa-plus"></i> Create
+                </button>
+                <button type="button" class="btn btn-dark btn-xs" @click.prevent="addProjectWebhook(projectKey.INCOMING)" :disabled="busy">
+                    <i class="fas fa-chess-rook"></i> Webhook
                 </button>
             </div>
             <div class="col">
@@ -127,8 +142,11 @@ export default {
                     outgoing project and extract the results of the journey.
                 </p>
 
-                <button type="button" class="btn btn-primary btn-xs" @click.prevent="addOutgoingProject" :disabled="busy">
-                    <i class="fa fa-wrench"></i> Create
+                <button type="button" class="btn btn-success btn-xs" @click.prevent="addProject(projectKey.OUTGOING)" :disabled="busy">
+                    <i class="fa fa-plus"></i> Create
+                </button>
+                <button type="button" class="btn btn-dark btn-xs" @click.prevent="addProjectWebhook(projectKey.OUTGOING)" :disabled="busy">
+                    <i class="fas fa-chess-rook"></i> Webhook
                 </button>
             </div>
         </div>
@@ -145,14 +163,16 @@ export default {
                 </p>
 
                 <div class="mb-1">
-                    <button type="button" class="btn btn-xs btn-primary" :disabled="busy" @click.prevent="addMasterImageProject">
-                        <i class="fa fa-wrench"></i> Create
+                    <button type="button" class="btn btn-success btn-xs" @click.prevent="addProject(projectKey.MASTER_IMAGE)" :disabled="busy">
+                        <i class="fa fa-plus"></i> Create
                     </button>
-                    <button type="button" class="btn btn-xs btn-success" :disabled="busy" @click.prevent="syncMasterImageProject">
+                    <button type="button" class="btn btn-dark btn-xs" @click.prevent="addProjectWebhook(projectKey.MASTER_IMAGE)" :disabled="busy">
+                        <i class="fas fa-chess-rook"></i> Webhook
+                    </button>
+                    <button type="button" class="btn btn-xs btn-primary" :disabled="busy" @click.prevent="syncProjectRepositories(projectKey.MASTER_IMAGE)">
                         <i class="fa fa-sync"></i> Sync
                     </button>
                 </div>
-
 
                 <p class="text-muted">
                     The last synchronisation

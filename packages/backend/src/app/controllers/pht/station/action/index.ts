@@ -9,36 +9,14 @@ import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 
 import {
-    BaseService, deleteStationHarborProject,
-    dropStationHarborProjectRobotAccount, ensureStationHarborProject,
-    ensureStationHarborProjectRobotAccount, findStationHarborProject,
-    findStationHarborProjectRobotAccount, Service, Station
-} from "@personalhealthtrain/ui-common";
-import {
+    isPermittedForResourceRealm,
     findStationVaultPublicKey,
     deleteStationVaultPublicKey,
-    saveStationVaultPublicKey
+    saveStationVaultPublicKey,
+    Station
 } from "@personalhealthtrain/ui-common";
-import {
-    dropHarborProjectWebHook,
-    ensureHarborProjectWebHook,
-    findHarborProjectWebHook
-} from "@personalhealthtrain/ui-common";
-import {isPermittedForResourceRealm} from "@personalhealthtrain/ui-common";
-import env from "../../../../../env";
 
 export enum StationTask {
-    CHECK_HARBOR = 'checkHarbor',
-
-    ENSURE_HARBOR_PROJECT = 'ensureHarborProject',
-    DROP_HARBOR_PROJECT = 'dropHarborProject',
-
-    ENSURE_HARBOR_PROJECT_WEBHOOK = 'ensureHarborProjectWebHook',
-    DROP_HARBOR_PROJECT_WEBHOOK = 'dropHarborProjectWebHook',
-
-    ENSURE_HARBOR_PROJECT_ACCOUNT = 'ensureHarborProjectAccount',
-    DROP_HARBOR_PROJECT_ACCOUNT = 'dropHarborProjectAccount',
-
     CHECK_VAULT = 'checkVault',
 
     SAVE_VAULT_PUBLIC_KEY = 'saveVaultPublicKey',
@@ -75,10 +53,6 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
     const addSelection : string[] = [
         'secure_id',
         'public_key',
-        'harbor_project_account_name',
-        'harbor_project_account_token',
-        'harbor_project_id',
-        'harbor_project_webhook_exists',
         'vault_public_key_saved'
     ];
 
@@ -101,128 +75,6 @@ export async function doStationTaskRouteHandler(req: any, res: any) {
     }
 
     switch (validationData.task) {
-        case StationTask.CHECK_HARBOR:
-            try {
-                const project = await findStationHarborProject(entity.secure_id);
-
-                if(typeof project === 'undefined') {
-                    return res._respondAccepted({data: entity});
-                }
-
-                entity.harbor_project_id = project.id;
-
-                const webhook = await findHarborProjectWebHook(entity.harbor_project_id);
-                entity.harbor_project_webhook_exists = !!webhook;
-
-                if(!entity.harbor_project_account_token) {
-                    const robotAccount = await findStationHarborProjectRobotAccount(entity.secure_id, true);
-
-                    entity.harbor_project_account_name = robotAccount ? robotAccount.name : null;
-                    entity.harbor_project_account_token = robotAccount ? robotAccount.secret : null;
-                }
-
-                await repository.save(entity);
-
-                return res._respondAccepted({data: entity});
-            } catch (e) {
-                console.log(e);
-                return res._failBadRequest({message: e.message});
-            }
-        case StationTask.ENSURE_HARBOR_PROJECT:
-            try {
-                const {id: projectId} = await ensureStationHarborProject(entity.secure_id);
-
-                entity.harbor_project_id = projectId;
-
-                await repository.save(entity);
-
-                return res._respond({data: entity});
-            } catch (e) {
-                return res._failBadRequest({message: e.message});
-            }
-        case StationTask.DROP_HARBOR_PROJECT:
-            try {
-                await deleteStationHarborProject(entity.secure_id);
-
-                entity.harbor_project_id = null;
-
-                await repository.save(entity);
-
-                return res._respondDeleted({data: entity});
-            } catch (e) {
-                return res._failBadRequest({message: e.message});
-            }
-
-        case StationTask.ENSURE_HARBOR_PROJECT_WEBHOOK:
-            try {
-                const serviceRepository = getRepository(Service);
-                const serviceEntity = await serviceRepository.findOne(BaseService.HARBOR, {relations: ['client']});
-
-                if(typeof serviceEntity.client.secret !== 'string') {
-                    return res._failBadRequest({
-                        message: 'No client credentials are available for harbor yet. Please generate it first.'
-                    });
-                }
-
-                await ensureHarborProjectWebHook(entity.harbor_project_id, serviceEntity.client, {internalAPIUrl: env.internalApiUrl});
-
-                entity.harbor_project_webhook_exists = true;
-
-                await repository.save(entity);
-
-                return res._respond({data: entity});
-            } catch (e) {
-                return res._failBadRequest({message: e.message});
-            }
-        case StationTask.DROP_HARBOR_PROJECT_WEBHOOK:
-            try {
-                if(entity.harbor_project_id) {
-                    await dropHarborProjectWebHook(entity.harbor_project_id);
-                }
-
-                entity.harbor_project_webhook_exists = false;
-
-                await repository.save(entity);
-
-                return res._respondDeleted({data: entity});
-            } catch (e) {
-                return res._failBadRequest({message: e.message});
-            }
-
-        case StationTask.ENSURE_HARBOR_PROJECT_ACCOUNT:
-            try {
-                if(
-                    !entity.harbor_project_account_name ||
-                    !entity.harbor_project_account_token
-                ) {
-                    const { secret, name } = await ensureStationHarborProjectRobotAccount(entity.secure_id);
-
-                    entity.harbor_project_account_name = name;
-                    entity.harbor_project_account_token = secret;
-
-                    await repository.save(entity);
-                }
-
-                return res._respond({data: entity});
-            } catch (e) {
-                return res._failBadRequest({message: e.message});
-            }
-        case StationTask.DROP_HARBOR_PROJECT_ACCOUNT:
-            try {
-                if(entity.harbor_project_id) {
-                    await dropStationHarborProjectRobotAccount(entity.secure_id);
-                }
-
-                entity.harbor_project_account_name = null;
-                entity.harbor_project_account_token = null;
-
-                await repository.save(entity);
-
-                return res._respond({data: entity});
-            } catch (e) {
-                return res._failBadRequest({message: e.message});
-            }
-
         case StationTask.CHECK_VAULT:
             try {
                 const publicKey = await findStationVaultPublicKey(entity.id);

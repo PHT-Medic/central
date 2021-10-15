@@ -21,8 +21,7 @@ import {User} from "../../auth";
 import {MasterImage} from "../master-image";
 import {Proposal} from "../proposal";
 import {TrainFile} from "../train-file";
-import {Model} from "../model";
-import {TrainResult, TrainResultStatus} from "../train-result";
+import {TrainResultStatus} from "../train-result";
 import {TrainStation} from "../train-station";
 import {
     TrainBuildStatus,
@@ -110,11 +109,6 @@ export class Train {
 
     // ------------------------------------------------------------------
 
-    @OneToMany(() => TrainFile, trainFile => trainFile.train)
-    files: TrainFile[];
-
-    // ------------------------------------------------------------------
-
     @Column({type: "uuid", nullable: true, default: null})
     result_last_id: string;
 
@@ -139,7 +133,7 @@ export class Train {
     @Column({nullable: true})
     master_image_id: number;
 
-    @ManyToOne(() => MasterImage, masterImage => masterImage.trains, {onDelete: 'CASCADE', nullable: true})
+    @ManyToOne(() => MasterImage,{onDelete: 'CASCADE', nullable: true})
     @JoinColumn({name: 'master_image_id'})
     master_image: MasterImage;
 }

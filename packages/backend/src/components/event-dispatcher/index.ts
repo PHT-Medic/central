@@ -46,12 +46,15 @@ export function buildDispatcherComponent() {
             [DispatcherEvent.HARBOR]: async(message: Message) => {
                 // PUSH_ARTIFACT
 
+                console.log(message);
+
                 await Promise.resolve(message)
                     .then(extendDispatcherHarborData)
                     .then(dispatchHarborEventToSelf)
                     .then(dispatchHarborEventToTrainRouter)
                     .then(dispatchHarborEventToResultService)
-                    .then(dispatchHarborEventToEmailNotifier);
+                    .then(dispatchHarborEventToEmailNotifier)
+                    .catch(e => {console.log(e); throw e});
             }
         });
     }

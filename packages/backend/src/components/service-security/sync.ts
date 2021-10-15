@@ -7,8 +7,8 @@
 
 import {Message} from "amqp-extension";
 import {
-    BaseService, HARBOR_INCOMING_PROJECT_NAME,
-    HARBOR_MASTER_IMAGE_PROJECT_NAME, HARBOR_OUTGOING_PROJECT_NAME,
+    StaticService, REGISTRY_INCOMING_PROJECT_NAME,
+    REGISTRY_MASTER_IMAGE_PROJECT_NAME, REGISTRY_OUTGOING_PROJECT_NAME, HarborProjectWebhook,
     saveServiceSecretToVault,
     Station
 } from "@personalhealthtrain/ui-common";
@@ -22,28 +22,28 @@ export async function syncServiceSecurity(message: Message) {
     const clientSecret : string = message.data.clientSecret;
 
     switch (serviceId) {
-        case BaseService.RESULT_SERVICE:
-        case BaseService.TRAIN_BUILDER:
-        case BaseService.TRAIN_ROUTER:
+        case StaticService.RESULT_SERVICE:
+        case StaticService.TRAIN_BUILDER:
+        case StaticService.TRAIN_ROUTER:
             await saveServiceSecretToVault(serviceId, {id: clientId, secret: clientSecret});
             break;
-        case BaseService.HARBOR:
+        case StaticService.REGISTRY:
             const stationRepository = getRepository(Station);
             const stations = await stationRepository.find({
-                harbor_project_id: Not(IsNull())
+                registry_project_id: Not(IsNull())
             });
 
-            const promises : Promise<void>[] = stations.map((station: Station) => {
-                return ensureHarborProjectWebHook(station.harbor_project_id, {
+            const promises : Promise<HarborProjectWebhook>[] = stations.map((station: Station) => {
+                return ensureHarborProjectWebHook(station.registry_project_id, {
                     id: clientId,
                     secret: clientSecret
                 }, {internalAPIUrl: env.internalApiUrl});
             });
 
             const specialProjects = [
-                HARBOR_MASTER_IMAGE_PROJECT_NAME,
-                HARBOR_INCOMING_PROJECT_NAME,
-                HARBOR_OUTGOING_PROJECT_NAME
+                REGISTRY_MASTER_IMAGE_PROJECT_NAME,
+                REGISTRY_INCOMING_PROJECT_NAME,
+                REGISTRY_OUTGOING_PROJECT_NAME
             ];
 
             specialProjects.map(repository => {

@@ -58,7 +58,7 @@ export class Proposal {
     @Column()
     master_image_id: number;
 
-    @ManyToOne(() => MasterImage, masterImage => masterImage.proposals, {onDelete: 'CASCADE'})
+    @ManyToOne(() => MasterImage, {onDelete: 'CASCADE'})
     @JoinColumn({name: 'master_image_id'})
     master_image: MasterImage;
 

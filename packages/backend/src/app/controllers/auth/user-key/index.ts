@@ -75,7 +75,7 @@ async function runValidationRules(req: any) {
     await check('he_key').optional({nullable: true}).isLength({min: 5, max: 4096}).run(req);
 }
 
-export async function addUserKeyRouteHandler(req: any, res: any) {
+async function addUserKeyRouteHandler(req: any, res: any) {
     await runValidationRules(req);
 
     const validation = validationResult(req);
@@ -104,7 +104,7 @@ export async function addUserKeyRouteHandler(req: any, res: any) {
     }
 }
 
-export async function editUserKeyRouteHandler(req: any, res: any) {
+async function editUserKeyRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
     await runValidationRules(req);
@@ -141,7 +141,7 @@ export async function editUserKeyRouteHandler(req: any, res: any) {
     }
 }
 
-export async function dropUserKeyRouteHandler(req: any, res: any) {
+async function dropUserKeyRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
     const repository = getRepository(UserKeyRing);

@@ -28,12 +28,4 @@ export class MasterImage {
 
     @UpdateDateColumn()
     updated_at: Date;
-
-    // ------------------------------------------------------------------
-
-    @OneToMany(() => Proposal, proposal => proposal.master_image)
-    proposals: Proposal[];
-
-    @OneToMany(() => Train, train => train.master_image)
-    trains: Train[];
 }

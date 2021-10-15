@@ -5,9 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export enum BaseService {
-    HARBOR = 'HARBOR',
+export enum StaticService {
+    REGISTRY = 'REGISTRY',
+    SECRET_STORAGE = 'SECRET_STORAGE',
     TRAIN_BUILDER = 'TRAIN_BUILDER',
     TRAIN_ROUTER = 'TRAIN_ROUTER',
     RESULT_SERVICE = 'RESULT_SERVICE'
 }
+
+export type StaticServiceType = `${StaticService}`;
