@@ -18,7 +18,10 @@ export function createImageDownloadComponentHandlers() : ConsumeHandlers {
                 .then(downloadImage)
                 .then(writeDownloadedEvent)
                 .then(writeExtractCommand)
-                .catch(err => writeDownloadingFailedEvent(message, err));
+                .catch(err => {
+                    console.log(err);
+                    return writeDownloadingFailedEvent(message, err);
+                });
         }
     }
 }
