@@ -8,7 +8,7 @@
 import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn} from 'typeorm';
 import {Proposal} from "../proposal";
 import {Station} from "../station";
-import {ProposalStationApprovalStatusType} from "./status";
+import {ProposalStationApprovalStatus} from "./status";
 
 @Entity({name: 'proposal_stations'})
 export class ProposalStation {
@@ -16,7 +16,7 @@ export class ProposalStation {
     id: number;
 
     @Column({default: null})
-    approval_status: ProposalStationApprovalStatusType | null;
+    approval_status: ProposalStationApprovalStatus | null;
 
     @Column({type: "text", nullable: true})
     comment: string;
@@ -34,14 +34,14 @@ export class ProposalStation {
     @Column()
     proposal_id: number;
 
-    @ManyToOne(() => Proposal, proposal => proposal.proposal_stations, {onDelete: "CASCADE"})
+    @ManyToOne(() => Proposal, {onDelete: "CASCADE"})
     @JoinColumn({name: 'proposal_id'})
     proposal: Proposal;
 
     @Column()
     station_id: number;
 
-    @ManyToOne(() => Station, station => station.proposal_stations, {onDelete: "CASCADE"})
+    @ManyToOne(() => Station, {onDelete: "CASCADE"})
     @JoinColumn({name: 'station_id'})
     station: Station;
 }

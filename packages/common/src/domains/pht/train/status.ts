@@ -16,10 +16,11 @@ export enum TrainBuildStatus {
     FAILED = 'failed' // tb trigger
 }
 
-export type TrainBuildStatusType = keyof typeof TrainBuildStatus;
+export type TrainBuildStatusType = `${TrainBuildStatus}`;
 
-export function isTrainBuildStatus(type: string) : type is TrainBuildStatusType {
-    return type in TrainBuildStatus;
+const TrainBuildStatusValues = Object.values(TrainBuildStatus);
+export function isTrainBuildStatus(type: any) : type is TrainBuildStatusType {
+    return TrainBuildStatusValues.indexOf(type) !== -1;
 }
 
 // -------------------------------------------------------------------------
@@ -32,10 +33,11 @@ export enum TrainConfigurationStatus {
     FINISHED = 'finished'
 }
 
-export type TrainConfigurationStatusType = keyof typeof TrainConfigurationStatus;
+export type TrainConfigurationStatusType = `${TrainConfigurationStatus}`;
 
-export function isTrainConfigurationStatus(type: string) : type is TrainConfigurationStatusType {
-    return type in TrainConfigurationStatus;
+const TrainConfigurationStatusValues = Object.values(TrainConfigurationStatus);
+export function isTrainConfigurationStatus(type: any) : type is TrainConfigurationStatusType {
+    return TrainConfigurationStatusValues.indexOf(type) !== -1;
 }
 
 // -------------------------------------------------------------------------
@@ -51,8 +53,9 @@ export enum TrainRunStatus {
     FAILED = 'failed'
 }
 
-export type TrainRunStatusType = keyof typeof TrainRunStatus;
+export type TrainRunStatusType = `${TrainRunStatus}`;
 
-export function isTrainRunStatus(type: string) : type is TrainRunStatusType {
-    return type in TrainRunStatus;
+const TrainRunStatusValues = Object.values(TrainRunStatus);
+export function isTrainRunStatus(type: any) : type is TrainRunStatusType {
+    return TrainRunStatusValues.indexOf(type) !== -1;
 }

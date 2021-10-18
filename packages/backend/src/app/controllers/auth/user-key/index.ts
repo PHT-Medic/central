@@ -10,8 +10,8 @@ import {check, matchedData, validationResult} from "express-validator";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {SwaggerTags} from "typescript-swagger";
 import {
-    removeUserPublicKeyFromVault,
-    saveUserPublicKeyToVault,
+    removeUserSecretsFromSecretEngine,
+    saveUserSecretsToSecretEngine,
     UserKeyRing
 } from "@personalhealthtrain/ui-common";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
@@ -75,7 +75,7 @@ async function runValidationRules(req: any) {
     await check('he_key').optional({nullable: true}).isLength({min: 5, max: 4096}).run(req);
 }
 
-export async function addUserKeyRouteHandler(req: any, res: any) {
+async function addUserKeyRouteHandler(req: any, res: any) {
     await runValidationRules(req);
 
     const validation = validationResult(req);
@@ -95,7 +95,7 @@ export async function addUserKeyRouteHandler(req: any, res: any) {
 
         await repository.save(entity);
 
-        await saveUserPublicKeyToVault(entity);
+        await saveUserSecretsToSecretEngine(entity);
 
         return res._respond({data: entity});
     } catch (e) {
@@ -104,7 +104,7 @@ export async function addUserKeyRouteHandler(req: any, res: any) {
     }
 }
 
-export async function editUserKeyRouteHandler(req: any, res: any) {
+async function editUserKeyRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
     await runValidationRules(req);
@@ -130,7 +130,7 @@ export async function editUserKeyRouteHandler(req: any, res: any) {
     entity = repository.merge(entity,data);
 
     try {
-        await saveUserPublicKeyToVault(entity);
+        await saveUserSecretsToSecretEngine(entity);
 
         await repository.save(entity);
 
@@ -141,7 +141,7 @@ export async function editUserKeyRouteHandler(req: any, res: any) {
     }
 }
 
-export async function dropUserKeyRouteHandler(req: any, res: any) {
+async function dropUserKeyRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
     const repository = getRepository(UserKeyRing);
@@ -156,7 +156,7 @@ export async function dropUserKeyRouteHandler(req: any, res: any) {
     }
 
     try {
-        await removeUserPublicKeyFromVault(entity);
+        await removeUserSecretsFromSecretEngine(entity.id);
 
         await repository.remove(entity);
 

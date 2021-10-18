@@ -26,7 +26,7 @@ export async function getApiProposalStation(id: number | string) : Promise<Singl
     return response.data;
 }
 
-export async function addApiProposalStation(data: Record<string, any>) : Promise<SingleResourceResponse<ProposalStation>>{
+export async function addApiProposalStation(data: Partial<ProposalStation>) : Promise<SingleResourceResponse<ProposalStation>>{
     const response = await useAPI(APIType.DEFAULT).post('proposal-stations', data);
 
     return response.data;

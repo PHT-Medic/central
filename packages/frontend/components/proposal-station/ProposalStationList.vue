@@ -182,7 +182,7 @@ export default {
                     </div>
                     <span class="mb-0">{{item.station.name}}</span>
                     <proposal-station-approval-status-text
-                        :status="item.status"
+                        :status="item.approval_status"
                         v-slot:default="slotProps"
                         class="ml-2">
                         <span class="badge" :class="'badge-'+slotProps.classSuffix">

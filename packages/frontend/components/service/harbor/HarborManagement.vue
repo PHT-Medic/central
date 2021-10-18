@@ -7,17 +7,18 @@
 <script>
 
 import HarborProjectManagement from "./HarborProjectManagement";
+import {SERVICE_ID} from "@personalhealthtrain/ui-common";
 export default {
     components: {
         HarborProjectManagement
     },
     props: {
-        service: Object
+        serviceId: SERVICE_ID
     }
 }
 </script>
 <template>
     <div>
-        <harbor-project-management :service="service" class="mb-2" />
+        <harbor-project-management :service-id="serviceId" class="mb-2" />
     </div>
 </template>

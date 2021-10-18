@@ -34,7 +34,7 @@ export default {
             message: null,
             fields: [
                 { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'status', label: 'Status', thClass: 'text-center', tdClass: 'text-center' },
+                { key: 'approval_status', label: 'Approval Status', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'created_at', label: 'Created At', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'options', label: '', tdClass: 'text-left' }
@@ -124,7 +124,7 @@ export default {
             <template v-slot:cell(id)="data">
                 {{data.item.train_id}}
             </template>
-            <template v-slot:cell(status)="data">
+            <template v-slot:cell(approval_status)="data">
                 <train-station-approval-status-text :status="data.item.approval_status">
                     <template v-slot:default="props">
                         <span class="badge" :class="'badge-'+props.classSuffix">{{props.statusText}}</span>

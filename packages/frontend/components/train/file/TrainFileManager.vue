@@ -310,7 +310,7 @@ export default {
 
                 <div class="form-group">
                     <button type="button" class="btn btn-xs btn-dark" :disabled="actionBusy || form.files.length === 0" @click.prevent="upload">
-                        Hochladen
+                        Upload
                     </button>
                 </div>
             </div>

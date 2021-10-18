@@ -8,4 +8,4 @@
 export * from './api';
 export * from './entity';
 export * from './harbor';
-export * from './vault';
+export * from './secret-engine';

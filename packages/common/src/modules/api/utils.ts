@@ -13,7 +13,7 @@ import {
 import {BaseAPI} from "./module";
 import {HarborAPI, VaultAPI} from "./service";
 
-const instanceMap: Map<string, BaseAPI> = new Map<string, BaseAPI>();
+const instanceMap: Record<string, BaseAPI> = {};
 
 export type APIReturnType<T extends APIConfigType> =
     T extends APIType.HARBOR ? HarborAPI :
@@ -27,8 +27,8 @@ export function useAPI<T extends APIType>(
 
     const config : APIConfig<T> = getAPIConfig(key);
 
-    if(instanceMap.has(key)) {
-        return instanceMap.get(key) as APIReturnType<T>;
+    if(instanceMap.hasOwnProperty(key)) {
+        return instanceMap[key] as APIReturnType<T>;
     }
 
     let instance : BaseAPI;
@@ -45,20 +45,7 @@ export function useAPI<T extends APIType>(
             break;
     }
 
-    instanceMap.set(config.type, instance);
+    instanceMap[key] = instance;
 
     return instance as APIReturnType<T>;
-}
-
-export function mapOnAllAPIs(callback: CallableFunction) {
-    const iterator = instanceMap.keys();
-
-    let value = iterator.next();
-
-    while (!value.done) {
-        const instance = useAPI(value.value);
-        callback(instance);
-
-        value = iterator.next();
-    }
 }

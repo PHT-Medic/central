@@ -32,16 +32,16 @@ export class Station {
     // ------------------------------------------------------------------
 
     @Column({nullable: true, default: null, select: false})
-    harbor_project_id: number | null;
+    registry_project_id: number | null;
 
     @Column({nullable: true, default: null, select: false})
-    harbor_project_account_name: string | null;
+    registry_project_account_name: string | null;
 
     @Column({type: "text", nullable: true, default: null, select: false})
-    harbor_project_account_token: string | null;
+    registry_project_account_token: string | null;
 
     @Column({default: false, select: false})
-    harbor_project_webhook_exists: boolean;
+    registry_project_webhook_exists: boolean;
 
     @Column({default: false, select: false})
     vault_public_key_saved: boolean;

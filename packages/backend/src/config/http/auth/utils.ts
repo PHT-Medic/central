@@ -10,7 +10,7 @@ import {verifyToken} from "@typescript-auth/server";
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../domains/auth/user/repository";
 import {getWritableDirPath} from "../../paths";
-import {Client, TokenPayload} from "@personalhealthtrain/ui-common";
+import {Client, MASTER_REALM_ID, TokenPayload} from "@personalhealthtrain/ui-common";
 import {UnauthorizedError} from "../error/unauthorized";
 
 const ip4ToInt = (ip: string) =>
@@ -76,20 +76,20 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
             const client = await clientRepository.findOne({
                 id: value.username,
                 secret: value.password
-            }, {relations: ['service']});
+            });
 
             if(typeof client === 'undefined') {
                 throw new UnauthorizedError();
             }
 
-            if(!client.service) {
+            if(!client.service_id) {
                 // only allow services for now... ^^
                 return;
             }
 
-            request.service = client.service;
-            request.serviceId = client.service.id;
-            request.realmId = client.service.realm_id;
+            request.serviceId = client.service_id;
+            // SERVICES are always central services ;)
+            request.realmId = MASTER_REALM_ID;
 
             request.ability = new AbilityManager([]);
             break;

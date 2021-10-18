@@ -143,7 +143,7 @@ export default {
     <div>
         <div class="alert alert-primary alert-sm">
             This is a slight overview of all incoming proposals from other stations. If you approve a proposal,
-            your station can be targeted by inherited trains from that proposal.
+            your station can be used by inherited trains.
         </div>
         <div class="d-flex flex-row">
             <div>

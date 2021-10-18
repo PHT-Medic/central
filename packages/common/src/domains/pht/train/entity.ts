@@ -21,10 +21,13 @@ import {User} from "../../auth";
 import {MasterImage} from "../master-image";
 import {Proposal} from "../proposal";
 import {TrainFile} from "../train-file";
-import {Model} from "../model";
-import {TrainResult, TrainResultStatus} from "../train-result";
+import {TrainResultStatus} from "../train-result";
 import {TrainStation} from "../train-station";
-import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "./status";
+import {
+    TrainBuildStatus,
+    TrainConfigurationStatus,
+    TrainRunStatus,
+} from "./status";
 
 @Entity()
 export class Train {
@@ -104,22 +107,15 @@ export class Train {
     @JoinColumn({name: 'user_id'})
     user: User;
 
-    @OneToOne(() => Model)
-    model: Model;
+    // ------------------------------------------------------------------
 
-    @OneToMany(() => TrainFile, trainFile => trainFile.train)
-    files: TrainFile[]
-
-    @Column({type: "varchar", nullable: true, default: null})
+    @Column({type: "uuid", nullable: true, default: null})
     result_last_id: string;
 
-    // todo: change to 1:n
-    @OneToOne(() => TrainResult, trainResult => trainResult.train)
-    result: TrainResult;
-
     @Column({type: "enum", nullable: true, default: null, enum: TrainResultStatus})
-    result_status: TrainResultStatus | null;
+    result_last_status: TrainResultStatus | null;
 
+    // ------------------------------------------------------------------
     @Column()
     proposal_id: number;
 
@@ -127,13 +123,17 @@ export class Train {
     @JoinColumn({name: 'proposal_id'})
     proposal: Proposal;
 
+    // ------------------------------------------------------------------
+
     @OneToMany(() => TrainStation, trainStation => trainStation.train)
     train_stations: TrainStation[];
+
+    // ------------------------------------------------------------------
 
     @Column({nullable: true})
     master_image_id: number;
 
-    @ManyToOne(() => MasterImage, masterImage => masterImage.trains, {onDelete: 'CASCADE', nullable: true})
+    @ManyToOne(() => MasterImage,{onDelete: 'CASCADE', nullable: true})
     @JoinColumn({name: 'master_image_id'})
     master_image: MasterImage;
 }

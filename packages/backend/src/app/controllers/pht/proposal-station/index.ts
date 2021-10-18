@@ -167,7 +167,7 @@ export async function addProposalStationRouteHandler(req: any, res: any) {
     const repository = getRepository(ProposalStation);
     let entity = repository.create(data);
 
-    if(env.demo) {
+    if(env.skipProposalApprovalOperation) {
         entity.approval_status = ProposalStationApprovalStatus.APPROVED;
     }
 
@@ -248,7 +248,7 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
             Object.values(ProposalStationApprovalStatus).includes(data.approval_status)
         ) {
             await emitDispatcherProposalEvent({
-                event: proposalStation.approval_status as DispatcherProposalEvent,
+                event: proposalStation.approval_status as unknown as DispatcherProposalEvent,
                 id: proposalStation.proposal_id,
                 stationId: proposalStation.station_id,
                 operatorRealmId: req.realmId

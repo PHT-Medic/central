@@ -16,7 +16,8 @@ export enum ResultServiceCommand {
 
 export type ResultServiceDataPayload = {
     id?: string,
-    trainId: string
+    trainId: string,
+    latest?: boolean
 }
 
 export function buildResultServiceQueueMessage(

@@ -16,7 +16,7 @@ import {
 } from "typeorm";
 import {Station} from "../station";
 import {Train} from "../train";
-import {TrainStationApprovalStatusType, TrainStationRunStatusType} from "./type";
+import {TrainStationApprovalStatus, TrainStationRunStatus} from "./status";
 
 @Entity({name: 'train_stations'})
 export class TrainStation {
@@ -26,10 +26,10 @@ export class TrainStation {
     // ------------------------------------------------------------------
 
     @Column({default: null})
-    approval_status: TrainStationApprovalStatusType | null;
+    approval_status: TrainStationApprovalStatus | null;
 
     @Column({type: "varchar", nullable: true, default: null})
-    run_status: TrainStationRunStatusType | null;
+    run_status: TrainStationRunStatus | null;
 
     // ------------------------------------------------------------------
 

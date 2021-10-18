@@ -184,7 +184,7 @@ export async function addTrainStationRouteHandler(req: any, res: any) {
 
     let entity = repository.create(data);
 
-    if(env.demo) {
+    if(env.skipTrainApprovalOperation) {
         entity.approval_status = TrainStationApprovalStatus.APPROVED;
     }
 

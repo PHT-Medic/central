@@ -23,15 +23,17 @@ export async function triggerTrainResultStop(
         throw new Error('The train has not finished yet...');
     }
 
-    if(train.result_status !== TrainResultStatus.STOPPING) {
+    if(train.result_last_status !== TrainResultStatus.STOPPING) {
         // send queue message
         await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.STOP, {
-            trainId: train.id
+            trainId: train.id,
+            latest: true,
+            ...(train.result_last_id ? {id: train.result_last_id} : {})
         }));
     }
 
     train = repository.merge(train, {
-        result_status: train.result_status !== TrainResultStatus.STOPPING ? TrainResultStatus.STOPPING : TrainResultStatus.STOPPED
+        result_last_status: train.result_last_status !== TrainResultStatus.STOPPING ? TrainResultStatus.STOPPING : TrainResultStatus.STOPPED
     });
 
     await repository.save(train);

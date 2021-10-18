@@ -8,7 +8,7 @@
 import {publishMessage} from "amqp-extension";
 import {getRepository} from "typeorm";
 import {findHarborProjectRepository, HarborRepository} from "@personalhealthtrain/ui-common";
-import {HARBOR_OUTGOING_PROJECT_NAME} from "@personalhealthtrain/ui-common";
+import {REGISTRY_OUTGOING_PROJECT_NAME} from "@personalhealthtrain/ui-common";
 import {TrainResultStatus} from "@personalhealthtrain/ui-common";
 import {Train} from "@personalhealthtrain/ui-common";
 import {TrainRunStatus} from "@personalhealthtrain/ui-common";
@@ -29,7 +29,7 @@ export async function triggerTrainResultStart(
     }
 
     if(typeof harborRepository === 'undefined') {
-        harborRepository = await findHarborProjectRepository(HARBOR_OUTGOING_PROJECT_NAME, train.id);
+        harborRepository = await findHarborProjectRepository(REGISTRY_OUTGOING_PROJECT_NAME, train.id);
         if(typeof harborRepository === 'undefined') {
             throw new Error('The train has not arrived at the outgoing station yet...');
         }
@@ -37,11 +37,12 @@ export async function triggerTrainResultStart(
 
     // send queue message
     await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.START, {
-        trainId: train.id
+        trainId: train.id,
+        latest: true
     }));
 
     train = repository.merge(train, {
-        result_status: TrainResultStatus.STARTING
+        result_last_status: TrainResultStatus.STARTING
     });
 
     await repository.save(train);
