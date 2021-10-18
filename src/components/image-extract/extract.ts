@@ -27,14 +27,15 @@ export async function extractImage(message: Message) {
         // do nothing :)
     }
 
+    const repositoryPath : string = getHarborFQRepositoryPath(data.trainId);
+
     await saveDockerContainerPathsTo(
-        getHarborFQRepositoryPath(data.trainId),
+        repositoryPath,
         ['/opt/pht_results', '/opt/train_config.json'],
         trainResultPath
     );
 
     // we are done here with the docker image :)
-    const repositoryPath : string = getHarborFQRepositoryPath(data.trainId);
     await removeLocalRegistryImage(repositoryPath);
 
     return message;

@@ -15,7 +15,10 @@ export function createImageExtractComponentHandlers() : ConsumeHandlers {
                 .then(writeExtractingEvent)
                 .then(extractImage)
                 .then(writeExtractedEvent)
-                .catch(err => writeExtractingFailedEvent(message, err));
+                .catch(err => {
+                    console.log(err);
+                    return writeExtractingFailedEvent(message, err);
+                });
         },
     }
 }
