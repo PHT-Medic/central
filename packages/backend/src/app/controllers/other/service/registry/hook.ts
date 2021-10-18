@@ -6,13 +6,14 @@
  */
 
 import {getRepository} from "typeorm";
-import {DispatcherHarborEventType, emitDispatcherHarborEvent} from "../../../../../domains/service/harbor/queue";
+import {DispatcherHarborEventType, buildDispatcherHarborEvent} from "../../../../../domains/service/harbor/queue";
 import {array, BaseSchema, object, string} from "yup";
 
 import {
     REGISTRY_MASTER_IMAGE_PROJECT_NAME, Train,
 } from "@personalhealthtrain/ui-common";
 import {useLogger} from "../../../../../modules/log";
+import {publishMessage} from "amqp-extension";
 
 let eventValidator : undefined | BaseSchema;
 function useHookEventDataValidator() : BaseSchema {
@@ -86,7 +87,7 @@ export async function postHarborHookRouteHandler(req: any, res: any) {
             }
         }
 
-        await emitDispatcherHarborEvent({
+        const message = buildDispatcherHarborEvent({
             event: hook.type as DispatcherHarborEventType,
             operator: hook.operator,
             namespace: hook.event_data.repository.namespace,
@@ -95,8 +96,13 @@ export async function postHarborHookRouteHandler(req: any, res: any) {
             artifactTag: hook.event_data.resources[0]?.tag
         });
 
+        console.log(message);
+
+        await publishMessage(message);
+
         return res.status(200).end();
     } catch (e) {
+        console.log(e);
         useLogger().warn('hook could not be proceeded.', {service: 'api-harbor-hook', errorMessage: e.message})
 
         return res._failBadRequest({message: 'The hook event is not valid...'});

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildMessage, publishMessage} from "amqp-extension";
+import {buildMessage} from "amqp-extension";
 import {DispatcherEvent} from "../../../components/event-dispatcher";
 import {MessageQueueDispatcherRoutingKey} from "../../../config/service/mq";
 
@@ -21,16 +21,11 @@ export type DispatcherHarborEventData = {
     [key: string]: string
 }
 
-export async function emitDispatcherHarborEvent(
+export function buildDispatcherHarborEvent(
     data: DispatcherHarborEventData,
-    metaData: Record<string, any> = {},
-    options?: {
-        templateOnly?: boolean
-    }
+    metaData: Record<string, any> = {}
 ) {
-    options = options ?? {};
-
-    const message = buildMessage({
+    return buildMessage({
         options: {
             routingKey: MessageQueueDispatcherRoutingKey.EVENT_OUT
         },
@@ -38,10 +33,4 @@ export async function emitDispatcherHarborEvent(
         data,
         metadata: metaData
     });
-
-    if(!options.templateOnly) {
-        await publishMessage(message);
-    }
-
-    return message;
 }
