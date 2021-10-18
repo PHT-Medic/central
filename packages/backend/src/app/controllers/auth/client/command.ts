@@ -6,7 +6,7 @@
  */
 
 import {AuthClientCommand, AuthClientType, Client} from "@personalhealthtrain/ui-common";
-import {buildServiceSecurityQueueMessage} from "../../../../domains/service/queue";
+import {buildAuthClientSecurityQueueMessage} from "../../../../domains/service/queue";
 import {AuthClientSecurityComponentCommand} from "../../../../components/auth-security";
 import {publishMessage} from "amqp-extension";
 import {getRepository} from "typeorm";
@@ -43,7 +43,7 @@ export async function doAuthClientCommand(req: any, res: any) {
             entity.refreshSecret();
             break;
         case AuthClientCommand.SECRET_SYNC:
-            const queueMessage = buildServiceSecurityQueueMessage(
+            const queueMessage = buildAuthClientSecurityQueueMessage(
                 AuthClientSecurityComponentCommand.SYNC,
                 {
                     id: entity.service_id,

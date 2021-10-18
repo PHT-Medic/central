@@ -9,7 +9,7 @@ import {publishMessage} from "amqp-extension";
 import {EntitySubscriberInterface, InsertEvent, UpdateEvent} from "typeorm";
 import {AuthClientType, Client} from "@personalhealthtrain/ui-common";
 import {AuthClientSecurityComponentCommand} from "../../../components/auth-security";
-import {buildServiceSecurityQueueMessage} from "../../service/queue";
+import {buildAuthClientSecurityQueueMessage} from "../../service/queue";
 
 export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
     listenTo(): Function | string {
@@ -18,7 +18,7 @@ export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
 
     async afterInsert(event: InsertEvent<Client>): Promise<any|void> {
         if(typeof event.entity.service_id === 'string') {
-            const queueMessage = buildServiceSecurityQueueMessage(
+            const queueMessage = buildAuthClientSecurityQueueMessage(
                 AuthClientSecurityComponentCommand.SYNC,
                 {
                     id: event.entity.service_id,
@@ -33,7 +33,7 @@ export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
 
     async afterUpdate(event: UpdateEvent<Client>): Promise<any|void> {
         if(typeof event.entity.service_id === 'string') {
-            const queueMessage = buildServiceSecurityQueueMessage(
+            const queueMessage = buildAuthClientSecurityQueueMessage(
                 AuthClientSecurityComponentCommand.SYNC,
                 {
                     id: event.entity.service_id,
