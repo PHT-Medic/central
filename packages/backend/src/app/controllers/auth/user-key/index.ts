@@ -10,8 +10,8 @@ import {check, matchedData, validationResult} from "express-validator";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {SwaggerTags} from "typescript-swagger";
 import {
-    removeUserPublicKeyFromVault,
-    saveUserPublicKeyToVault,
+    removeUserSecretsFromSecretEngine,
+    saveUserSecretsToSecretEngine,
     UserKeyRing
 } from "@personalhealthtrain/ui-common";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
@@ -95,7 +95,7 @@ async function addUserKeyRouteHandler(req: any, res: any) {
 
         await repository.save(entity);
 
-        await saveUserPublicKeyToVault(entity);
+        await saveUserSecretsToSecretEngine(entity);
 
         return res._respond({data: entity});
     } catch (e) {
@@ -130,7 +130,7 @@ async function editUserKeyRouteHandler(req: any, res: any) {
     entity = repository.merge(entity,data);
 
     try {
-        await saveUserPublicKeyToVault(entity);
+        await saveUserSecretsToSecretEngine(entity);
 
         await repository.save(entity);
 
@@ -156,7 +156,7 @@ async function dropUserKeyRouteHandler(req: any, res: any) {
     }
 
     try {
-        await removeUserPublicKeyFromVault(entity);
+        await removeUserSecretsFromSecretEngine(entity.id);
 
         await repository.remove(entity);
 

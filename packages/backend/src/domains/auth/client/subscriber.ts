@@ -7,8 +7,8 @@
 
 import {publishMessage} from "amqp-extension";
 import {EntitySubscriberInterface, InsertEvent, UpdateEvent} from "typeorm";
-import {Client} from "@personalhealthtrain/ui-common";
-import {ServiceSecurityComponent} from "../../../components/service-security";
+import {AuthClientType, Client} from "@personalhealthtrain/ui-common";
+import {AuthClientSecurityComponentCommand} from "../../../components/auth-security";
 import {buildServiceSecurityQueueMessage} from "../../service/queue";
 
 export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
@@ -19,11 +19,12 @@ export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
     async afterInsert(event: InsertEvent<Client>): Promise<any|void> {
         if(typeof event.entity.service_id === 'string') {
             const queueMessage = buildServiceSecurityQueueMessage(
-                ServiceSecurityComponent.SYNC,
-                event.entity.service_id,
+                AuthClientSecurityComponentCommand.SYNC,
                 {
-                    id: event.entity.id,
-                    secret: event.entity.secret
+                    id: event.entity.service_id,
+                    type: AuthClientType.SERVICE,
+                    clientId: event.entity.id,
+                    clientSecret: event.entity.secret
                 }
             );
             await publishMessage(queueMessage);
@@ -33,13 +34,15 @@ export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
     async afterUpdate(event: UpdateEvent<Client>): Promise<any|void> {
         if(typeof event.entity.service_id === 'string') {
             const queueMessage = buildServiceSecurityQueueMessage(
-                ServiceSecurityComponent.SYNC,
-                event.entity.service_id,
+                AuthClientSecurityComponentCommand.SYNC,
                 {
-                    id: event.entity.id,
-                    secret: event.entity.secret
+                    id: event.entity.service_id,
+                    type: AuthClientType.SERVICE,
+                    clientId: event.entity.id,
+                    clientSecret: event.entity.secret
                 }
             );
+
             await publishMessage(queueMessage);
         }
     }

@@ -5,31 +5,49 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {executeAPIServiceClientCommand} from "@personalhealthtrain/ui-common";
+import {
+    addAPIClient,
+    AuthClientCommand,
+    executeAPIClientCommand,
+    getAPIServiceClient,
+    SERVICE_ID
+} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
-        serviceProperty: Object
+        serviceId: SERVICE_ID
     },
     data() {
         return {
-            service: null,
+            client: {
+                busy: false,
+                item: null
+            },
             busy: false
         }
     },
     created() {
-        this.service = this.serviceProperty;
+        this.getClient().then(r => r);
     },
     methods: {
-        async doTask(task) {
-            if(this.busy) return;
+        async getClient() {
+            this.client.busy = true;
+
+            try {
+                this.client.item = await getAPIServiceClient(this.serviceId);
+            } catch (e) {
+
+            }
+
+            this.client.busy = false;
+        },
+        async doClientCommand(task) {
+            if(this.busy || !this.clientId) return;
 
             this.busy = true;
 
             try {
-                const service = await executeAPIServiceClientCommand(this.serviceProperty.id, task, {});
-                this.service = service;
-                this.$emit('updated', service);
+                this.client.item = await executeAPIClientCommand(this.clientId, task, {});
             } catch (e) {
                 this.$bvToast.toast(e.message, {
                     toaster: 'b-toaster-top-center'
@@ -38,15 +56,42 @@ export default {
 
             this.busy = false;
         },
-        async refreshClientSecret() {
-            await this.doTask('refreshSecret');
+        async refreshSecret() {
+            await this.doClientCommand(AuthClientCommand.SECRET_REFRESH);
         },
-        async syncClient() {
-            await this.doTask('sync');
+        async syncSecret() {
+            await this.doClientCommand(AuthClientCommand.SECRET_SYNC);
         },
 
+        async add() {
+            if(this.busy || this.client.item) return;
+
+            this.busy = true;
+
+            try {
+                this.client.item = await addAPIClient({
+                    type: 'service',
+                    id: this.serviceId
+                });
+            } catch (e) {
+                console.log(e);
+            }
+
+            this.busy = false;
+        },
+        async drop() {
+
+        },
         close() {
             this.$emit('close');
+        }
+    },
+    computed: {
+        clientId() {
+            return !!this.client.item ? this.client.item.id : '???';
+        },
+        clientSecret(){
+            return !!this.client.item ? this.client.item.secret : '???';
         }
     }
 }
@@ -57,33 +102,54 @@ export default {
             Client credentials (ID & Secret) are required to authenticate as a service against the Central UI.<br />
             Always <strong>sync</strong> the credentials, that the service can work properly.
         </p>
-        <div class="mb-1">
-            <i class="fa fa-sync"></i> Synced?
-                <i class="fa" :class="{
-                'fa-check text-success': service.client_synced,
-                'fa-times text-danger': !service.client_synced
-            }" /> {{service.client_synced ? 'true' : 'false'}}
+
+        <div class="mb-2">
+            <template v-if="!client.busy">
+                <template v-if="client.item">
+                    <button type="button" class="btn btn-danger btn-xs" @click.prevent="drop" :disabled="busy">
+                        <i class="fa fa-minus"></i> Drop
+                    </button>
+                </template>
+                <template v-else>
+                    <button type="button" class="btn btn-success btn-xs" @click.prevent="add" :disabled="busy">
+                        <i class="fa fa-plus"></i> Add
+                    </button>
+                </template>
+            </template>
         </div>
 
         <hr />
 
-        <div class="form-group">
-            <label>ID</label>
-            <input type="text" class="form-control" :disabled="true" :value="service.client.id">
-        </div>
+        <template v-if="client.busy">
+            <div class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </template>
+        <template v-else>
+            <template v-if="client.item">
+                <h6>Details</h6>
 
-        <div class="form-group">
-            <label>Secret</label>
-            <input type="text" class="form-control" :disabled="true" :value="service.client.secret">
-        </div>
+                <div class="form-group">
+                    <label>ID</label>
+                    <input type="text" class="form-control" :disabled="true" :value="clientId">
+                </div>
 
-        <div>
-            <button type="button" class="btn btn-primary btn-xs" @click.prevent="syncClient">
-                <i class="fa fa-sync-alt"></i> Sync
-            </button>
-            <button type="button" class="btn btn-dark btn-xs" @click.prevent="refreshClientSecret">
-                <i class="fa fa-key"></i> Refresh secret
-            </button>
-        </div>
+                <div class="form-group">
+                    <label>Secret</label>
+                    <input type="text" class="form-control" :disabled="true" :value="clientSecret">
+                </div>
+
+                <div>
+                    <button type="button" class="btn btn-primary btn-xs" @click.prevent="syncSecret" :disabled="busy">
+                        <i class="fa fa-sync-alt"></i> Sync
+                    </button>
+                    <button type="button" class="btn btn-dark btn-xs" @click.prevent="refreshSecret" :disabled="busy">
+                        <i class="fa fa-key"></i> Refresh
+                    </button>
+                </div>
+            </template>
+        </template>
     </div>
 </template>

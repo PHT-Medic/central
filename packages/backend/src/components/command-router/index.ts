@@ -6,13 +6,13 @@
  */
 
 import {consumeQueue} from "amqp-extension";
-import {createServiceSecurityComponentHandlers} from "../service-security";
+import {createAuthSecurityComponentHandlers} from "../auth-security";
 import {MessageQueueSelfRoutingKey} from "../../config/service/mq";
 
 export function buildCommandRouterComponent() {
     function start() {
         return consumeQueue({routingKey: MessageQueueSelfRoutingKey.COMMAND}, {
-            ...createServiceSecurityComponentHandlers()
+            ...createAuthSecurityComponentHandlers()
         });
     }
 

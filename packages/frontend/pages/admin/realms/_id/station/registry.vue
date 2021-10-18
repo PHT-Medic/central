@@ -7,7 +7,7 @@
 <script>
 import {
     buildRegistryHarborProjectName,
-    executeAPIServiceHarborCommand,
+    executeAPIRegistryServiceCommand,
     RegistryCommand,
 } from "@personalhealthtrain/ui-common";
 
@@ -51,7 +51,7 @@ export default {
             }
 
             try {
-                const data = await executeAPIServiceHarborCommand(command, {
+                const data = await executeAPIRegistryServiceCommand(command, {
                     name: buildRegistryHarborProjectName(this.station.id)
                 });
 
@@ -125,6 +125,7 @@ export default {
                     ...additionalData
                 });
             } catch (e) {
+                console.log(e);
                 variant = 'danger';
                 message = e.message;
             }
@@ -153,9 +154,8 @@ export default {
                 <h6><i class="fa fa-cog"></i> Settings</h6>
 
                 <p class="mb-2">
-                    To keep the data between the registry application and the ui in sync, you can
-                    <strong>check the image registry </strong> for the corresponding information (project, webhook, account, etc)
-                    and update the local data.
+                    To keep the data between the registry and the ui in sync, you can pull all available information about the
+                    project, webhook, robot-account,... of a station or create them.
                 </p>
 
                 <p>
@@ -163,42 +163,49 @@ export default {
                 </p>
 
                 <div class="d-flex flex-row">
-                    <div class="mr-1">
-                        <button
-                            type="button"
-                            class="btn btn-success btn-xs"
-                            @click.prevent="doCommand(command.PROJECT_PULL)"
-                        >
-                            <i class="fa fa-sync"></i> Check
-                        </button>
-                    </div>
-
-                    <div v-if="!station.registry_project_id">
-                        <button type="button" class="btn btn-primary btn-xs" @click.prevent="doCommand(command.PROJECT_CREATE)" :disabled="busy" >
-                            <i class="fas fa-bolt"></i> Create
-                        </button>
-                    </div>
-
-                    <div v-if="station.registry_project_id">
+                    <div>
                         <button
                             type="button"
                             class="btn btn-dark btn-xs"
-                            @click.prevent="doCommand(command.PROJECT_DROP)"
-                            :disabled="busy"
+                            @click.prevent="doCommand(command.PROJECT_PULL)"
                         >
-                            <i class="fa fa-trash"></i> Drop
+                            <i class="fa fa-chevron-down"></i> Pull
+                        </button>
+                        <button
+                            v-if="!station.registry_project_id"
+                            type="button"
+                            class="btn btn-primary btn-xs ml-1"
+                            @click.prevent="doCommand(command.PROJECT_CREATE)" :disabled="busy"
+                        >
+                            <i class="fas fa-plus"></i> Create
                         </button>
                     </div>
+                    <div class="ml-auto">
+                        <div v-if="station.registry_project_id">
+                            <button
+                                type="button"
+                                class="btn btn-danger btn-xs"
+                                @click.prevent="doCommand(command.PROJECT_DROP)"
+                                :disabled="busy"
+                            >
+                                <i class="fa fa-trash"></i> Drop
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert-warning alert-sm mt-2">
+                    Use the <strong>Pull</strong> command with caution, it will reset the secret of the robot-account.
                 </div>
             </div>
 
             <hr />
 
             <div>
-                <h6><i class="fa fa-sync"></i> Project Webhook</h6>
+                <h6><i class="fa fa-sync"></i> Webhook</h6>
 
                 <p class="mb-2">
-                    Use the registry webhook to contact the local api endpoint, to notify the train router and the train result service for incoming trains or trains which must be proceed.
+                    Use the registry webhook to contact the local api endpoint, to notify the train-router, train-builder and other services for incoming trains or trains which must be proceed.
                 </p>
 
                 <div class="mb-2">
@@ -208,13 +215,21 @@ export default {
                 </div>
 
                 <template v-if="station.registry_project_id">
-                    <button type="button" class="btn btn-primary btn-xs" @click.prevent="doCommand(command.PROJECT_WEBHOOK_CREATE)" :disabled="busy" v-if="!station.registry_project_webhook_exists">
-                        <i class="fas fa-bolt"></i> Create
-                    </button>
+                    <div class="d-flex flex-row">
+                        <div>
+                            <button type="button" class="btn btn-primary btn-xs" @click.prevent="doCommand(command.PROJECT_WEBHOOK_CREATE)" :disabled="busy" v-if="!station.registry_project_webhook_exists">
+                                <i class="fas fa-bolt"></i> Create
+                            </button>
+                        </div>
+                        <div class="ml-auto">
+                            <button type="button" class="btn btn-danger btn-xs" @click.prevent="doCommand(command.PROJECT_WEBHOOK_DROP)" :disabled="busy">
+                                <i class="fa fa-trash"></i> Drop
+                            </button>
+                        </div>
+                    </div>
 
-                    <button type="button" class="btn btn-dark btn-xs" @click.prevent="doCommand(command.PROJECT_WEBHOOK_DROP)" :disabled="busy">
-                        <i class="fa fa-trash"></i> Drop
-                    </button>
+
+
                 </template>
             </div>
 
@@ -241,7 +256,7 @@ export default {
                 <button type="button" class="btn btn-primary btn-xs" @click.prevent="doCommand(command.PROJECT_ROBOT_ACCOUNT_CREATE)" :disabled="busy" v-if="station.registry_project_id && !station.registry_project_account_token">
                     <i class="fas fa-bolt"></i> Create
                 </button>
-                <button type="button" class="btn btn-dark btn-xs" @click.prevent="doCommand(command.PROJECT_ROBOT_ACCOUNT_DROP)" :disabled="busy">
+                <button type="button" class="btn btn-danger btn-xs" @click.prevent="doCommand(command.PROJECT_ROBOT_ACCOUNT_DROP)" :disabled="busy">
                     <i class="fa fa-trash"></i> Drop
                 </button>
             </template>

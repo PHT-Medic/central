@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPIStations, Realm} from "@personalhealthtrain/ui-common";
+import {dropAPIStation, getAPIStations, Realm} from "@personalhealthtrain/ui-common";
 import Vue from 'vue';
 import StationForm from "../../../../components/station/StationForm";
 
@@ -21,7 +21,7 @@ export default {
                 items: [
                     { name: 'General', urlSuffix: '', icon: 'fa fa-info-circle', stationRequired: false },
                     { name: 'Registry', urlSuffix: '/registry', icon: 'fas fa-folder-open', stationRequired: true },
-                    { name: 'Vault', urlSuffix: '/vault', icon: 'fa fa-key', stationRequired: true},
+                    { name: 'Secret Storage', urlSuffix: '/secret-storage', icon: 'fa fa-key', stationRequired: true},
                 ]
             },
             station: undefined,
@@ -76,7 +76,23 @@ export default {
         },
         handleDeleted() {
             this.station = undefined;
-        }
+        },
+
+        async dropStation() {
+            if(this.busy || !this.station) return;
+
+            this.busy = true;
+
+            try {
+                await dropAPIStation(this.station.id);
+
+                this.$emit('deleted', this.station);
+            } catch (e) {
+
+            }
+
+            this.busy = false;
+        },
     }
 }
 </script>
@@ -99,6 +115,13 @@ export default {
             </b-nav>
         </div>
         <div class="content-container">
+            <div class="d-flex">
+                <div class="ml-auto">
+                    <button class="btn btn-danger btn-xs" @click.prevent="dropStation">
+                        <i class="fa fa-trash"></i> Drop
+                    </button>
+                </div>
+            </div>
             <nuxt-child :realm="realm" :station="station" @created="handleCreated" @updated="handleUpdated" @deleted="handleDeleted" />
         </div>
     </div>

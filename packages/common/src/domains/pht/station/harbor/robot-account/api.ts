@@ -11,7 +11,7 @@ import {
     ensureHarborProjectRobotAccount,
     findHarborRobotAccount,
     HarborRobotAccount
-} from "../../../../service";
+} from "../../../../other/service";
 
 export async function findStationHarborProjectRobotAccount(id: string | number, withSecret: boolean = true): Promise<HarborRobotAccount | undefined> {
     const name: string = buildRegistryHarborProjectName(id);

@@ -22,7 +22,6 @@ export {
     Realm,
     Role,
     RolePermission,
-    Service,
     User,
     UserKeyRing,
     UserRole,

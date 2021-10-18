@@ -11,14 +11,14 @@ import {
     executeAPIServiceTask,
     REGISTRY_INCOMING_PROJECT_NAME, REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
-    RegistryCommand
+    RegistryCommand, SERVICE_ID
 } from "@personalhealthtrain/ui-common"
 import MasterImageList from "../../master-image/MasterImageList";
 
 export default {
     components: {MasterImageList},
     props: {
-        service: Object
+        serviceId: SERVICE_ID
     },
     data() {
         return {
@@ -42,7 +42,7 @@ export default {
             this.busy = true;
 
             try {
-                const data = await executeAPIServiceTask(this.service.id, task, taskData);
+                const data = await executeAPIServiceTask(this.serviceId, task, taskData);
 
                 this.$bvToast.toast('You successfully executed the harbor command.', {
                     toaster: 'b-toaster-top-center'

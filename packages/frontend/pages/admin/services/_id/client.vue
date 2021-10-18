@@ -5,13 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {Service} from "@personalhealthtrain/ui-common";
 import ServiceClientDetails from "../../../../components/service/ServiceClientDetails";
+import {SERVICE_ID} from "@personalhealthtrain/ui-common";
 
 export default {
     components: {ServiceClientDetails},
     props: {
-        service: Service
+        serviceId: SERVICE_ID
     },
     methods: {
         handleUpdated(event) {
@@ -26,5 +26,5 @@ export default {
 }
 </script>
 <template>
-    <service-client-details :service-property="service" @updated="handleUpdated" />
+    <service-client-details :service-id="serviceId" @updated="handleUpdated" />
 </template>

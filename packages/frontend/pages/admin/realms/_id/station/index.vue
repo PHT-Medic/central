@@ -20,22 +20,6 @@ export default {
         }
     },
     methods: {
-        async dropStation() {
-            if(this.busy || !this.station) return;
-
-            this.busy = true;
-
-            try {
-                await dropAPIStation(this.station.id);
-
-                this.$emit('deleted', this.station);
-            } catch (e) {
-
-            }
-
-            this.busy = false;
-        },
-
         handleCreated(station) {
             this.$emit('created', station);
         },
@@ -54,9 +38,7 @@ export default {
                     If you remove the station association to the realm, the station will be deleted.
                 </p>
 
-                <button class="btn btn-danger btn-xs" @click.prevent="dropStation">
-                    <i class="fa fa-trash"></i> Delete
-                </button>
+
 
                 <hr />
 

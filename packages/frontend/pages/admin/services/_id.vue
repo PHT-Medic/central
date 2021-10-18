@@ -5,9 +5,11 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPIService} from "@personalhealthtrain/ui-common";
 import {LayoutNavigationAdminId} from "../../../config/layout";
 import Vue from "vue";
+import {SERVICE_ID} from "@personalhealthtrain/ui-common";
+
+const services = Object.values(SERVICE_ID);
 
 export default {
     meta: {
@@ -15,19 +17,19 @@ export default {
         navigationId: LayoutNavigationAdminId
     },
     async asyncData(context) {
-        try {
-            const service = await getAPIService(context.params.id, {include: {client: true}});
+        const index = services.indexOf(context.params.id);
 
-            return {
-                service
-            };
-        } catch (e) {
+        if(index === -1) {
             await context.redirect('/admin/services');
         }
+
+        return {
+            serviceId: services[index]
+        };
     },
     data() {
         return {
-            service: undefined,
+            serviceId: undefined,
             tabs: [
                 { name: 'Tasks', icon: 'fas fa-bars', urlSuffix: '' },
                 { name: 'Client', icon: 'fa fa-robot', urlSuffix: '/client'},
@@ -47,7 +49,7 @@ export default {
 <template>
     <div class="container">
         <h1 class="title no-border mb-3">
-            {{service.id}} <span class="sub-title">Service</span>
+            {{serviceId}} <span class="sub-title">Service</span>
         </h1>
 
         <div class="m-b-20 m-t-10">
@@ -68,7 +70,7 @@ export default {
                                     v-for="(item,key) in tabs"
                                     :key="key"
                                     :disabled="item.active"
-                                    :to="'/admin/services/' + service.id + item.urlSuffix"
+                                    :to="'/admin/services/' + serviceId + item.urlSuffix"
                                     exact
                                     exact-active-class="active"
                                 >
@@ -82,6 +84,6 @@ export default {
                 </div>
             </div>
         </div>
-        <nuxt-child :service="service" @updated="update" />
+        <nuxt-child :service-id="serviceId" @updated="update" />
     </div>
 </template>

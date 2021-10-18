@@ -11,7 +11,7 @@ import {
     ensureHarborProject,
     findHarborProject,
     HarborProject
-} from "../../../service";
+} from "../../../other/service";
 
 export async function findStationHarborProject(id: string | number): Promise<HarborProject | undefined> {
     const projectName: string = buildRegistryHarborProjectName(id);

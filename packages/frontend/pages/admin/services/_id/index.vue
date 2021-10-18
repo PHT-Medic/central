@@ -7,17 +7,17 @@
 <script>
 
 import HarborManagement from "../../../../components/service/harbor/HarborManagement";
-import {StaticService} from "@personalhealthtrain/ui-common";
+import {SERVICE_ID} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
-        service: Object
+        serviceId: SERVICE_ID
     },
     render(createElement) {
         let template;
 
-        switch (this.service.id) {
-            case StaticService.REGISTRY:
+        switch (this.serviceId) {
+            case SERVICE_ID.REGISTRY:
                 template = HarborManagement;
                 break;
         }
@@ -25,10 +25,10 @@ export default {
         if(typeof template === 'undefined') {
             return createElement('div', {
                 class: 'alert alert-info alert-sm'
-            }, `You can not execute any task for the ${this.service.id} service yet.`);
+            }, `You can not execute any task for the ${this.serviceId} service yet.`);
         } else {
             return createElement(template, {
-                props: { service: this.service},
+                props: { serviceId: this.serviceId},
                 on: {
                     updated: (event) => this.$emit('updated', event)
                 }
