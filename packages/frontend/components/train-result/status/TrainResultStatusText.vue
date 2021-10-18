@@ -47,6 +47,9 @@ export default {
 
                 case TrainResultStatus.FINISHED:
                     return 'finished';
+                case TrainResultStatus.FAILED:
+                    return 'failed';
+
                 default:
                     return 'none';
             }

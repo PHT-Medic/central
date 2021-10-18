@@ -6,4 +6,3 @@
  */
 
 export * from './registry';
-export * from './secure-storage';

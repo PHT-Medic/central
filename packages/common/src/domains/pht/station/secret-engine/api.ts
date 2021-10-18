@@ -8,8 +8,7 @@
 
 import {APIType, useAPI} from "../../../../modules";
 import {StationSecretEngineSecretPayload} from "./type";
-
-const STATION_ENGINE_PATH = 'station_pks';
+import {STATION_SECRET_ENGINE_KEY} from "./constants";
 
 export async function saveStationSecretsToSecretEngine(
     id: string,
@@ -18,7 +17,7 @@ export async function saveStationSecretsToSecretEngine(
     try {
         const {data} = await useAPI<APIType.VAULT>(APIType.VAULT)
             .saveKeyValuePair(
-                STATION_ENGINE_PATH,
+                STATION_SECRET_ENGINE_KEY,
                 id,
                 {
                     data: {
@@ -35,7 +34,7 @@ export async function saveStationSecretsToSecretEngine(
             // create engine
             await useAPI<APIType.VAULT>(APIType.VAULT)
                 .createKeyValueSecretEngine({
-                    path: STATION_ENGINE_PATH
+                    path: STATION_SECRET_ENGINE_KEY
                 });
 
             return await saveStationSecretsToSecretEngine(id, record);
@@ -45,7 +44,7 @@ export async function saveStationSecretsToSecretEngine(
 
 export async function removeStationSecretsFromSecretEngine(id: string) {
     await useAPI<APIType.VAULT>(APIType.VAULT).dropKeyValuePair(
-        STATION_ENGINE_PATH,
+        STATION_SECRET_ENGINE_KEY,
         id
     );
 }

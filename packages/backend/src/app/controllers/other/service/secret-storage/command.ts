@@ -8,15 +8,12 @@
 import {check, matchedData, validationResult} from "express-validator";
 import {
     APIType,
-    buildSecretStorageStationKey,
-    getSecretStorageStationKey,
-    getSecretStorageUserKey,
-    isSecretStorageStationKey,
-    isSecretStorageUserKey,
     Station,
     SecretStorageCommand,
     useAPI,
-    UserKeyRing
+    UserKeyRing,
+    isSecretStorageStationKey,
+    isSecretStorageUserKey, getSecretStorageStationKey, buildSecretStorageStationKey, getSecretStorageUserKey
 } from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
 
