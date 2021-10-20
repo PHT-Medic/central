@@ -7,7 +7,7 @@
 <script>
 import {dropAPIStation, getAPIStations, Realm} from "@personalhealthtrain/ui-common";
 import Vue from 'vue';
-import StationForm from "../../../../components/station/StationForm";
+import StationForm from "../../../../components/domains/station/StationForm";
 
 export default {
     components: {StationForm},

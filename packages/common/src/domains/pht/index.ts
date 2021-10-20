@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './master-image-group';
 export * from './master-image';
 export * from './proposal';
 export * from './proposal-station';
@@ -14,4 +15,3 @@ export * from './train-file';
 export * from './model';
 export * from './train-result';
 export * from './train-station';
-export {MasterImage} from "./master-image/entity";

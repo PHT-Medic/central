@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {addAPIUser, getRealms} from "@personalhealthtrain/ui-common";
+    import {addAPIUser, getAPIRealms} from "@personalhealthtrain/ui-common";
     import {maxLength, minLength, required, email} from "vuelidate/lib/validators";
 
     import AlertMessage from "../../../components/alert/AlertMessage";
@@ -70,7 +70,7 @@
         methods: {
             async loadRealms() {
                 try {
-                    const response = await getRealms();
+                    const response = await getAPIRealms();
                     this.realm.items = response.data;
                     this.realm.busy = false;
                 }  catch (e) {

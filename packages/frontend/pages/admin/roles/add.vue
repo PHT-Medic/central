@@ -8,7 +8,7 @@
     import AlertMessage from "../../../components/alert/AlertMessage";
     import NotImplemented from "../../../components/NotImplemented";
     import {LayoutNavigationAdminId} from "../../../config/layout";
-    import RoleForm from "../../../components/role/RoleForm";
+    import RoleForm from "../../../components/domains/role/RoleForm";
 
     export default {
         meta: {

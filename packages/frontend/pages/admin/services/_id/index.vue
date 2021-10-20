@@ -6,7 +6,7 @@
   -->
 <script>
 
-import HarborManagement from "../../../../components/service/harbor/HarborManagement";
+import HarborManagement from "../../../../components/domains/service/harbor/HarborManagement";
 import {SERVICE_ID} from "@personalhealthtrain/ui-common";
 
 export default {

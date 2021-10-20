@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import TrainTable from "../../../../components/train/TrainTable";
-    import TrainBasicForm from "../../../../components/train/TrainBasicForm";
-    import StationTrainTable from "../../../../components/station/StationTrainTable";
+    import TrainTable from "../../../../components/domains/train/TrainTable";
+    import TrainBasicForm from "../../../../components/domains/train/TrainBasicForm";
+    import StationTrainTable from "../../../../components/domains/station/StationTrainTable";
 
     export default {
         meta: {

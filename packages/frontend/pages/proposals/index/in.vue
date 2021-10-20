@@ -6,10 +6,10 @@
   -->
 <script>
 import {getApiProposalStations, getAPIStations, ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
-import ProposalInForm from "../../../components/proposal/ProposalInForm";
-import ProposalStationStatus from "../../../components/proposal-station/ProposalStationStatus";
+import ProposalInForm from "../../../components/domains/proposal/ProposalInForm";
+import ProposalStationStatus from "../../../components/domains/proposal-station/ProposalStationStatus";
 import Pagination from "../../../components/Pagination";
-import ProposalStationAction from "../../../components/proposal-station/ProposalStationAction";
+import ProposalStationAction from "../../../components/domains/proposal-station/ProposalStationAction";
 
 export default {
     components: {ProposalStationAction, Pagination, ProposalStationStatus, ProposalInForm},

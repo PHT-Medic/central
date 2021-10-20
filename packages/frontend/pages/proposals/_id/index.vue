@@ -6,9 +6,9 @@
   -->
 <script>
 import {ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
-import ProposalStationStatus from "../../../components/proposal-station/ProposalStationStatus";
-import ProposalStationList from "../../../components/proposal-station/ProposalStationList";
-import ProposalStationAction from "../../../components/proposal-station/ProposalStationAction";
+import ProposalStationStatus from "../../../components/domains/proposal-station/ProposalStationStatus";
+import ProposalStationList from "../../../components/domains/proposal-station/ProposalStationList";
+import ProposalStationAction from "../../../components/domains/proposal-station/ProposalStationAction";
 
 export default {
     components:{

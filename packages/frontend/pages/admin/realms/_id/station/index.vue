@@ -6,7 +6,7 @@
   -->
 <script>
 import {dropAPIStation, Realm, Station} from "@personalhealthtrain/ui-common";
-import StationForm from "../../../../../components/station/StationForm";
+import StationForm from "../../../../../components/domains/station/StationForm";
 
 export default {
     props: {

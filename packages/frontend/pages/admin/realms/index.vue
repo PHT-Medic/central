@@ -5,10 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropRealm, getRealms} from "@personalhealthtrain/ui-common";
+import {dropAPIRealm, getAPIRealms} from "@personalhealthtrain/ui-common";
 import {LayoutNavigationAdminId} from "../../../config/layout";
-import RealmForm from "../../../components/admin/realm/RealmForm";
-import RealmList from "../../../components/realm/RealmList";
+import RealmForm from "../../../components/domains/admin/realm/RealmForm";
+import RealmList from "../../../components/domains/realm/RealmList";
 
 export default {
     components: {RealmList, RealmForm},
@@ -53,7 +53,7 @@ export default {
             this.isBusy = true;
 
             try {
-                this.items = await getRealms();
+                this.items = await getAPIRealms();
                 this.isBusy = false;
             } catch (e) {
                 this.isBusy = false;
@@ -93,7 +93,7 @@ export default {
                         let index = this.items.findIndex(el => el.id === item.id);
 
                         if(index !== -1) {
-                            await dropRealm(item.id);
+                            await dropAPIRealm(item.id);
 
                             this.items.splice(index,1);
                         }

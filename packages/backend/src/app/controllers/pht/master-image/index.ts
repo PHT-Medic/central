@@ -7,11 +7,12 @@
 
 import {getRepository} from "typeorm";
 import {applyFilters, applyPagination} from "typeorm-extension";
-import {MasterImage} from "@personalhealthtrain/ui-common";
+import {MasterImage, MasterImageCommand, TrainCommand} from "@personalhealthtrain/ui-common";
 
-import {Controller, Delete, Get, Params, Request, Response} from "@decorators/express";
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {handleMasterImageCommandRouteHandler} from "./command";
 
 type PartialMasterImage = Partial<MasterImage>;
 
@@ -37,6 +38,18 @@ export class MasterImageController {
         @Response() res: any
     ): Promise<PartialMasterImage|undefined> {
         return await getRouteHandler(req, res) as PartialMasterImage | undefined;
+    }
+
+    @Post("/:id/command",[ForceLoggedInMiddleware])
+    async runCommand(
+        @Params('id') id: string,
+        @Body() data: {
+            command: MasterImageCommand
+        },
+        @Request() req: any,
+        @Response() res: any
+    ) {
+        return await handleMasterImageCommandRouteHandler(req, res);
     }
 
     @Delete("/:id",[ForceLoggedInMiddleware])

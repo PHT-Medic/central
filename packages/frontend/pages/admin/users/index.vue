@@ -7,7 +7,7 @@
 <script>
     import {dropAPIUser} from "@personalhealthtrain/ui-common";
     import {LayoutNavigationAdminId} from "../../../config/layout";
-    import UserList from "../../../components/user/UserList";
+    import UserList from "../../../components/domains/user/UserList";
 
     export default {
         components: {UserList},

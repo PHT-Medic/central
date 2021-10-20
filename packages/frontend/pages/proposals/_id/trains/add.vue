@@ -10,7 +10,7 @@
     </div>
 </template>
 <script>
-import TrainBasicForm from "../../../../components/train/TrainBasicForm";
+import TrainBasicForm from "../../../../components/domains/train/TrainBasicForm";
 export default {
     props: {
         proposal: Object

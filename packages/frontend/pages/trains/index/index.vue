@@ -6,7 +6,7 @@
   -->
 <script>
 import {LayoutNavigationDefaultId} from "../../../config/layout.ts";
-import TrainTable from "../../../components/train/TrainTable";
+import TrainTable from "../../../components/domains/train/TrainTable";
 
 export default {
     components: {TrainTable},

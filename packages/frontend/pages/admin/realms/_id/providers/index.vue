@@ -7,7 +7,7 @@
 <script>
 import {dropAPIProvider, getAPIProviders, Realm} from "@personalhealthtrain/ui-common";
 import {LayoutNavigationAdminId} from "../../../../../config/layout";
-import ProviderForm from "../../../../../components/admin/provider/ProviderForm";
+import ProviderForm from "../../../../../components/domains/admin/provider/ProviderForm";
 import Pagination from "../../../../../components/Pagination";
 
 export default {

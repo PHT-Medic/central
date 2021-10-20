@@ -7,7 +7,7 @@
 <script>
 import {getAPIStations} from "@personalhealthtrain/ui-common";
 import {LayoutNavigationDefaultId} from "../../../config/layout.ts";
-import StationTrainTable from "../../../components/station/StationTrainTable";
+import StationTrainTable from "../../../components/domains/station/StationTrainTable";
 
 export default {
     components: {StationTrainTable},

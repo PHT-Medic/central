@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserPublicKeyForm from "../../../components/user/UserPublicKeyForm";
-import UserKeyRingForm from "../../../components/user/UserKeyRingForm";
+import UserPublicKeyForm from "../../../components/domains/user/UserPublicKeyForm";
+import UserKeyRingForm from "../../../components/domains/user/UserKeyRingForm";
 export default {
     components: {UserKeyRingForm, UserPublicKeyForm},
     data() {

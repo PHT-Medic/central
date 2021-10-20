@@ -6,7 +6,7 @@
   -->
 <script>
     import {Role} from "@personalhealthtrain/ui-common";
-    import RoleUserList from "../../../../components/role/RoleUserList";
+    import RoleUserList from "../../../../components/domains/role-user/RoleUserList";
 
     export default {
         props: {

@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import TrainWizard from "../../../components/train/TrainWizard";
+import TrainWizard from "../../../components/domains/train/TrainWizard";
 export default {
     components: {TrainWizard},
     props: {

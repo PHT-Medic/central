@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getRealm} from "@personalhealthtrain/ui-common";
+import {getAPIRealm} from "@personalhealthtrain/ui-common";
 import {LayoutNavigationAdminId} from "../../../config/layout";
 import Vue from "vue";
 import MedicineWorker from "../../../components/svg/MedicineWorker";
@@ -19,7 +19,7 @@ export default {
     },
     async asyncData(context) {
         try {
-            const realm = await getRealm(context.params.id);
+            const realm = await getAPIRealm(context.params.id);
 
             return {
                 realm

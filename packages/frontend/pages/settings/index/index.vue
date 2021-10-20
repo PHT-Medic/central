@@ -6,7 +6,7 @@
   -->
 <script>
     import AlertMessage from "../../../components/alert/AlertMessage";
-    import UserDetailsForm from "../../../components/user/UserDetailsForm";
+    import UserDetailsForm from "../../../components/domains/user/UserDetailsForm";
 
     export default {
         meta: {

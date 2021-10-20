@@ -8,7 +8,7 @@
     import {dropAPIRole} from "@personalhealthtrain/ui-common";
     import {LayoutNavigationAdminId} from "../../../config/layout";
     import Pagination from "../../../components/Pagination";
-    import RoleList from "../../../components/role/RoleList";
+    import RoleList from "../../../components/domains/role/RoleList";
 
     export default {
         components: {RoleList, Pagination},

@@ -20,7 +20,7 @@ import {
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {doTrainTaskRouteHandler} from "./action";
+import {handleTrainCommandRouteHandler} from "./action";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialTrain = Partial<Train>;
@@ -87,7 +87,7 @@ export class TrainController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialTrain|undefined> {
-        return (await doTrainTaskRouteHandler(req, res)) as PartialTrain | undefined;
+        return (await handleTrainCommandRouteHandler(req, res)) as PartialTrain | undefined;
     }
 
     @Delete("/:id",[ForceLoggedInMiddleware])
@@ -101,8 +101,6 @@ export class TrainController {
     }
 
     // --------------------------------------------------------------------------
-
-
 }
 
 export async function getTrainRouteHandler(req: any, res: any) {

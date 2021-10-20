@@ -6,8 +6,8 @@
   -->
 <script>
     import {LayoutNavigationAdminId} from "../../../../config/layout";
-    import UserDetailsForm from "../../../../components/user/UserDetailsForm";
-    import UserPasswordForm from "../../../../components/user/UserPasswordForm";
+    import UserDetailsForm from "../../../../components/domains/user/UserDetailsForm";
+    import UserPasswordForm from "../../../../components/domains/user/UserPasswordForm";
 
     export default {
         props: {

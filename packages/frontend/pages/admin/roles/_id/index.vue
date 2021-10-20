@@ -9,7 +9,7 @@
     import NotImplemented from "../../../../components/NotImplemented";
     import {LayoutNavigationAdminId} from "../../../../config/layout";
     import AlertMessage from "../../../../components/alert/AlertMessage";
-    import RoleForm from "../../../../components/role/RoleForm";
+    import RoleForm from "../../../../components/domains/role/RoleForm";
 
     export default {
         props: {

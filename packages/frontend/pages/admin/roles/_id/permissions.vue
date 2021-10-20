@@ -8,7 +8,7 @@
     import {Role} from "@personalhealthtrain/ui-common";
     import NotImplemented from "../../../../components/NotImplemented";
     import AlertMessage from "../../../../components/alert/AlertMessage";
-    import RolePermissionList from "../../../../components/role/permission/RolePermissionList";
+    import RolePermissionList from "../../../../components/domains/role-permission/RolePermissionList";
 
     export default {
         props: {

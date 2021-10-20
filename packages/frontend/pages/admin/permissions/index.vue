@@ -6,7 +6,7 @@
   -->
 <script>
     import {LayoutNavigationAdminId} from "../../../config/layout";
-    import PermissionList from "../../../components/permission/PermissionList";
+    import PermissionList from "../../../components/domains/permission/PermissionList";
 
     export default {
         components: {PermissionList},

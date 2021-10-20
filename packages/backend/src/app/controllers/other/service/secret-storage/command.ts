@@ -13,7 +13,11 @@ import {
     useAPI,
     UserKeyRing,
     isSecretStorageStationKey,
-    isSecretStorageUserKey, getSecretStorageStationKey, buildSecretStorageStationKey, getSecretStorageUserKey
+    isSecretStorageUserKey,
+    getSecretStorageStationKey,
+    buildSecretStorageStationKey,
+    getSecretStorageUserKey,
+    saveStationSecretsToSecretEngine
 } from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
 
@@ -137,6 +141,7 @@ export async function doSecretStorageCommand(req: any, res: any) {
 
             switch (type) {
                 case TargetEntity.STATION:
+                    // saveStationSecretsToSecretEngine()
                     payload = {
                         data: {
                             rsa_station_public_key: station.public_key

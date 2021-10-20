@@ -6,8 +6,8 @@
   -->
 <script>
 import {LayoutNavigationAdminId} from "~/config/layout";
-import StationForm from "../../../components/station/StationForm";
-import ServiceClientDetails from "../../../components/service/ServiceClientDetails";
+import StationForm from "../../../components/domains/station/StationForm";
+import ServiceClientDetails from "../../../components/domains/service/ServiceClientDetails";
 import {SERVICE_ID} from "@personalhealthtrain/ui-common";
 
 export default {
