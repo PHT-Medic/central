@@ -23,7 +23,7 @@
     "dependencies": {
         "@trapi/query": "^2.0.1",
         "@typescript-auth/core": "^0.0.15",
-        "axios": "^0.21.4"
+        "axios": "^0.23.0"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
     "publishConfig": {
