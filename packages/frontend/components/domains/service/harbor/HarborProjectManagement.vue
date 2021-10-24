@@ -26,7 +26,8 @@ export default {
             masterImagesMeta: {
                 executed: false,
                 created: '?',
-                deleted: '?'
+                deleted: '?',
+                updated: '?'
             },
             projectKey: {
                 INCOMING: REGISTRY_INCOMING_PROJECT_NAME,
@@ -78,27 +79,23 @@ export default {
         },
         async syncProjectRepositories(key) {
             try {
-                /*
-                const {data, meta} = await this.executeTask(RegistryCommand.PROJECT_REPOSITORIES_SYNC, {
-                    name: key
-                });
-
                 switch (key) {
                     case REGISTRY_MASTER_IMAGE_PROJECT_NAME:
+                        const {images} = await runAPITMasterImagesCommand(MasterImageCommand.GIT_REPOSITORY_SYNC);
+
                         this.masterImagesMeta.executed = true;
 
-                        this.masterImagesMeta.created = meta.created;
-                        this.masterImagesMeta.deleted = meta.deleted;
+                        this.masterImagesMeta.created = images.created.length;
+                        this.masterImagesMeta.deleted = images.deleted.length;
+                        this.masterImagesMeta.updated = images.updated.length;
 
-                        if (Array.isArray(data)) {
-                            data.map(item => this.$refs["master-image-list"].addArrayItem(item));
-                        }
+                        await this.$refs["master-image-list"].load();
                         break;
+                    default:
+                        const {data, meta} = await this.executeTask(RegistryCommand.PROJECT_REPOSITORIES_SYNC, {
+                            name: key
+                        });
                 }
-
-                 */
-                const response = await runAPITMasterImagesCommand(MasterImageCommand.GIT_REPOSITORY_SYNC);
-                console.log(response);
             } catch (e) {
                 this.$bvToast.toast(e.message, {
                     toaster: 'b-toaster-top-center',
@@ -178,7 +175,8 @@ export default {
 
                 <p class="text-muted">
                     The last synchronisation
-                    created <strong class="text-success">{{ masterImagesMeta.created }}</strong> and
+                    created <strong class="text-success">{{ masterImagesMeta.created }}</strong>,
+                    updated <strong class="text-primary">{{ masterImagesMeta.updated }}</strong> and
                     deleted <strong class="text-danger">{{ masterImagesMeta.deleted }}</strong>
                     master image(s).
                 </p>

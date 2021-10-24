@@ -36,6 +36,12 @@ export class MasterImage {
     @Column({type: "varchar"})
     name: string;
 
+    @Column({type: "text", nullable: true})
+    command: string | null;
+
+    @Column({type: "json", nullable: true})
+    command_arguments: any | null;
+
     // ------------------------------------------------------------------
 
     @CreateDateColumn()

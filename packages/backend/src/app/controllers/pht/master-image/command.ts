@@ -6,7 +6,7 @@
  */
 
 import {MasterImage, MasterImageCommand, MasterImageGroup} from "@personalhealthtrain/ui-common";
-import {getRepository, Repository} from "typeorm";
+import {getRepository} from "typeorm";
 
 import path from "path";
 import {getWritableDirPath} from "../../../../config/paths";
@@ -106,20 +106,28 @@ async function mergeRepositoryImagesWithDatabase(
         const parts = entities[i].virtualPath.split('/');
         parts.pop();
 
+        const data : Partial<MasterImage> = {
+            name: entities[i].name,
+            path: entities[i].path,
+            group_virtual_path: parts.join('/')
+        }
+
+        if(typeof entities[i].command === 'string') {
+            data.command = entities[i].command;
+        }
+
+        if(typeof entities[i].command_arguments !== 'undefined') {
+            data.command_arguments = entities[i].commandArguments;
+        }
+
         const index = dbEntities.findIndex(dbEntity => dbEntity.virtual_path === entities[i].virtualPath);
         if(index === -1) {
             context.created.push(repository.create({
-                name: entities[i].name,
-                path: entities[i].path,
                 virtual_path: entities[i].virtualPath,
-                group_virtual_path: parts.join('/')
+                ...data
             }))
         } else {
-            context.updated.push(repository.merge(dbEntities[index], {
-                name: entities[i].name,
-                path: entities[i].path,
-                group_virtual_path: parts.join('/')
-            }));
+            context.updated.push(repository.merge(dbEntities[index], data));
         }
     }
 
@@ -163,19 +171,27 @@ async function mergeDirectoryGroupsWithDatabase(entities: Group[]) : Promise<Ret
         .filter(image => dirVirtualPaths.indexOf(image.virtual_path) === -1);
 
     for(let i=0; i<entities.length; i++) {
+        const data : Partial<MasterImageGroup> = {
+            name: entities[i].name,
+            path: entities[i].path,
+        }
+
+        if(typeof entities[i].command === 'string') {
+            data.command = entities[i].command;
+        }
+
+        if(typeof entities[i].command_arguments !== 'undefined') {
+            data.command_arguments = entities[i].commandArguments;
+        }
+
         const index = dbEntities.findIndex(dbEntity => dbEntity.virtual_path === entities[i].virtualPath);
         if(index === -1) {
             context.created.push(repository.create({
-                name: entities[i].name,
-                path: entities[i].path,
-                virtual_path: entities[i].virtualPath
+                virtual_path: entities[i].virtualPath,
+                ...data
             }))
         } else {
-            context.updated.push(repository.merge(dbEntities[index], {
-                name: entities[i].name,
-                path: entities[i].path,
-                virtual_path: entities[i].virtualPath
-            }));
+            context.updated.push(repository.merge(dbEntities[index], data));
         }
     }
 
