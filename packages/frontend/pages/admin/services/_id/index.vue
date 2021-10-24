@@ -6,7 +6,7 @@
   -->
 <script>
 
-import HarborManagement from "../../../../components/domains/service/harbor/HarborManagement";
+import RegistryManagement from "../../../../components/domains/service/harbor/HarborManagement";
 import {SERVICE_ID} from "@personalhealthtrain/ui-common";
 
 export default {
@@ -18,7 +18,7 @@ export default {
 
         switch (this.serviceId) {
             case SERVICE_ID.REGISTRY:
-                template = HarborManagement;
+                template = RegistryManagement;
                 break;
         }
 

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import express, {Express, Response, Request, NextFunction, static as expressStatic } from "express";
+import express, {Express, Request, static as expressStatic } from "express";
 import cors from "cors";
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -23,7 +23,6 @@ import {registerControllers} from "./routes";
 
 
 import {getMiddleware} from 'swagger-stats';
-import {setDefaultRequestKeyCase} from "typeorm-extension";
 import {setupAuthMiddleware} from "@typescript-auth/server";
 import {AuthorizationHeaderValue} from "@typescript-auth/core";
 
@@ -45,7 +44,7 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
     */
 
     expressApp.use(cors({
-        origin: function (origin, callback) {
+        origin(origin, callback) {
             callback(null, true);
         },
         credentials: true
@@ -104,7 +103,6 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
         }))
     }
 
-    setDefaultRequestKeyCase("snakeCase");
     registerControllers(expressApp);
 
     expressApp.use(errorMiddleware);

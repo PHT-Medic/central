@@ -6,7 +6,7 @@
  */
 
 import {getRepository, In} from "typeorm";
-import {applyFilters, applyIncludes, applyPagination} from "typeorm-extension";
+import {applyFilters, applyPagination, applyRelations} from "typeorm-extension";
 import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
 import {
     isPermittedForResourceRealm,
@@ -86,8 +86,8 @@ export async function getProposalRouteHandler(req: any, res: any) {
     const query = repository.createQueryBuilder('proposal')
         .where("proposal.id = :id", {id});
 
-    applyIncludes(query,  include, {
-        queryAlias: 'proposal',
+    applyRelations(query,  include, {
+        defaultAlias: 'proposal',
         allowed: ['master_image', 'realm', 'user']
     });
 
@@ -116,7 +116,7 @@ export async function getProposalsRouteHandler(req: any, res: any) {
     onlyRealmPermittedQueryResources(query, req.realmId);
 
     applyFilters(query, filter, {
-        queryAlias: 'proposal',
+        defaultAlias: 'proposal',
         allowed: ['id', 'name', 'realm_id']
     });
 

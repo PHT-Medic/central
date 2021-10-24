@@ -7,7 +7,7 @@
 
 import {check, matchedData, validationResult} from "express-validator";
 import {getCustomRepository, getRepository} from "typeorm";
-import {applyFields, applyFilters, applyIncludes, applyPagination} from "typeorm-extension";
+import {applyFields, applyFilters, applyRelations, applyPagination} from "typeorm-extension";
 import {Params, Controller, Get, Request, Response, Post, Body, Delete} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 
@@ -110,17 +110,17 @@ export async function getUsersRouteHandler(req: any, res: any) {
         onlyRealmPermittedQueryResources(query, req.realmId);
 
         applyFields(query, fields, {
-            queryAlias: 'user',
+            defaultAlias: 'user',
             allowed: ['email']
         });
 
         applyFilters(query, filter, {
-            queryAlias: 'user',
+            defaultAlias: 'user',
             allowed: ['id', 'name']
         });
 
-        applyIncludes(query, include, {
-            queryAlias: 'user',
+        applyRelations(query, include, {
+            defaultAlias: 'user',
             allowed: ['realm', 'user_roles']
         });
 
@@ -154,12 +154,12 @@ export async function getUserRouteHandler(req: any, res: any) {
         onlyRealmPermittedQueryResources(query, req.realmId);
 
         applyFields(query, fields, {
-            queryAlias: 'user',
+            defaultAlias: 'user',
             allowed: ['email']
         });
 
-        applyIncludes(query, include, {
-            queryAlias: 'user',
+        applyRelations(query, include, {
+            defaultAlias: 'user',
             allowed: ['realm', 'user_roles']
         });
 

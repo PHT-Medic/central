@@ -8,10 +8,10 @@
 <script>
 import {
     dropAPIMasterImage,
-    executeAPIServiceTask,
+    executeAPIServiceTask, MasterImageCommand,
     REGISTRY_INCOMING_PROJECT_NAME, REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
-    RegistryCommand, SERVICE_ID
+    RegistryCommand, runAPITMasterImagesCommand, SERVICE_ID
 } from "@personalhealthtrain/ui-common"
 import MasterImageList from "../../master-image/MasterImageList";
 
@@ -78,6 +78,7 @@ export default {
         },
         async syncProjectRepositories(key) {
             try {
+                /*
                 const {data, meta} = await this.executeTask(RegistryCommand.PROJECT_REPOSITORIES_SYNC, {
                     name: key
                 });
@@ -94,6 +95,10 @@ export default {
                         }
                         break;
                 }
+
+                 */
+                const response = await runAPITMasterImagesCommand(MasterImageCommand.GIT_REPOSITORY_SYNC);
+                console.log(response);
             } catch (e) {
                 this.$bvToast.toast(e.message, {
                     toaster: 'b-toaster-top-center',
@@ -165,9 +170,6 @@ export default {
                 <div class="mb-1">
                     <button type="button" class="btn btn-success btn-xs" @click.prevent="addProject(projectKey.MASTER_IMAGE)" :disabled="busy">
                         <i class="fa fa-plus"></i> Create
-                    </button>
-                    <button type="button" class="btn btn-dark btn-xs" @click.prevent="addProjectWebhook(projectKey.MASTER_IMAGE)" :disabled="busy">
-                        <i class="fas fa-chess-rook"></i> Webhook
                     </button>
                     <button type="button" class="btn btn-xs btn-primary" :disabled="busy" @click.prevent="syncProjectRepositories(projectKey.MASTER_IMAGE)">
                         <i class="fa fa-sync"></i> Sync

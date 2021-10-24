@@ -121,7 +121,7 @@ export async function getTrainFilesRouteHandler(req: any, res: any) {
     onlyRealmPermittedQueryResources(query, req.realmId);
 
     applyFilters(query, filter, {
-        queryAlias: 'trainFile',
+        defaultAlias: 'trainFile',
         allowed: ['id', 'name', 'realm_id']
     });
 

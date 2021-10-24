@@ -25,9 +25,15 @@ const isIp4InCidr = (ip: string, cidr: string) => {
 export async function authenticateWithAuthorizationHeader(request: any, value: AuthorizationHeaderValue) : Promise<void> {
     switch (value.type) {
         case "Bearer":
-            const tokenPayload : TokenPayload = await verifyToken(value.token, {
-                directory: getWritableDirPath()
-            });
+            let tokenPayload: TokenPayload;
+
+            try {
+                tokenPayload = await verifyToken(value.token, {
+                    directory: getWritableDirPath()
+                });
+            } catch (e) {
+                return;
+            }
 
             const {sub: userId} = tokenPayload;
 

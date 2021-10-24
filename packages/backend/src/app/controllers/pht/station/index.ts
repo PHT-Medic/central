@@ -6,7 +6,7 @@
  */
 
 import {getRepository} from "typeorm";
-import {applyFields, applyFilters, applyIncludes, applyPagination} from "typeorm-extension";
+import {applyFields, applyFilters, applyRelations, applyPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {
     MASTER_REALM_ID,
@@ -99,7 +99,7 @@ export async function getStationRouteHandler(req: any, res: any) {
                 'registry_project_webhook_exists',
                 'vault_public_key_saved'
             ],
-            queryAlias: 'station'
+            defaultAlias: 'station'
         });
     }
 
@@ -118,14 +118,14 @@ export async function getStationsRouteHandler(req: any, res: any) {
     const repository = getRepository(Station);
     const query = repository.createQueryBuilder('station');
 
-    applyIncludes(query, includes, {
-        queryAlias: 'station',
+    applyRelations(query, includes, {
+        defaultAlias: 'station',
         allowed: ['realm']
     });
 
     applyFilters(query, filter, {
         allowed: ['id', 'name', 'realm_id'],
-        queryAlias: 'station'
+        defaultAlias: 'station'
     });
 
     // todo: should be implemented by assigning permissions to a service.
@@ -142,7 +142,7 @@ export async function getStationsRouteHandler(req: any, res: any) {
                 'registry_project_webhook_exists',
                 'vault_public_key_saved'
             ],
-            queryAlias: 'station'
+            defaultAlias: 'station'
         });
     }
 

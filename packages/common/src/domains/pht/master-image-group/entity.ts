@@ -8,31 +8,25 @@
 import {
     Column,
     CreateDateColumn,
-    Entity,
+    Entity, Index,
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {MasterImageGroupType} from "../master-image";
 
 @Entity({name: 'master_image_groups'})
 export class MasterImageGroup {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({type: "enum", enum: MasterImageGroupType, default: MasterImageGroupType.DEFAULT})
-    type: MasterImageGroupType;
-
     @Column({type: 'varchar', length: 128})
     name: string;
 
-    @Column({type: "varchar", length: 12})
-    version: string;
+    @Column({type: 'varchar', length: 512})
+    path: string;
 
-    @Column({type: "varchar", length: 5, nullable: true})
-    license: string | null;
-
-    @Column({type: "text", nullable: true})
-    description: string | null;
+    @Index()
+    @Column({type: 'varchar', length: 256})
+    virtual_path: string;
 
     // ------------------------------------------------------------------
 

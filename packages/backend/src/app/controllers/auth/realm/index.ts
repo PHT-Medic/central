@@ -70,7 +70,7 @@ export async function getRealmsRoute(req: any, res: any) {
     const query = realmRepository.createQueryBuilder('realm');
 
     applyFilters(query, filter, {
-        queryAlias: 'realm',
+        defaultAlias: 'realm',
         allowed: ['id', 'name']
     });
 

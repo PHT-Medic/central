@@ -15,24 +15,26 @@ import {
 } from "typeorm";
 
 import {MasterImageGroup} from "../master-image-group";
+import {MasterImageGroupType} from "./type";
 
 @Entity({name: 'master_images'})
 export class MasterImage {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({type: 'varchar', nullable: true})
+    path: string | null;
+
     @Index()
-    @Column({type: 'varchar'})
-    path: string;
+    @Column({type: "varchar", length: 256})
+    virtual_path: string;
+
+    @Index()
+    @Column({type: "varchar", length: 256})
+    group_virtual_path: string;
 
     @Column({type: "varchar"})
     name: string;
-
-    @ManyToOne(() => MasterImageGroup, {onDelete: "CASCADE"})
-    group: MasterImageGroup;
-
-    @Column({type: "varchar", length: 20, nullable: true})
-    group_id: string | null;
 
     // ------------------------------------------------------------------
 

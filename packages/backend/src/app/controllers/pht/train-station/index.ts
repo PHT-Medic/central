@@ -94,7 +94,7 @@ export async function getTrainStationsRouteHandler(req: any, res: any) {
         onlyRealmPermittedQueryResources(query, req.realmId, ['train.realm_id', 'station.realm_id']);
 
         applyFilters(query, filter, {
-            queryAlias: 'trainStation',
+            defaultAlias: 'trainStation',
             allowed: ['train_id', 'station_id']
         });
 

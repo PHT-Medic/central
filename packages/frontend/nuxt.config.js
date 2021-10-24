@@ -53,7 +53,7 @@ const config = {
         '@/assets/css/core/sidebar.css',
         '@/assets/css/core/footer.css',
         '@/assets/css/card.css',
-
+        '@/assets/css/colors.css',
         '@/assets/css/form.css',
 
         '@/assets/css/bootstrap-override.css'

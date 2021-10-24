@@ -81,7 +81,7 @@ async function getRoles(req: any, res: any) {
 
     applyFilters(query, filter, {
         allowed: ['id', 'name'],
-        queryAlias: 'role'
+        defaultAlias: 'role'
     });
 
     const pagination = applyPagination(query, page, {maxLimit: 50});

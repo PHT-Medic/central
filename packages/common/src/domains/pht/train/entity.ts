@@ -131,7 +131,7 @@ export class Train {
     // ------------------------------------------------------------------
 
     @Column({nullable: true})
-    master_image_id: number;
+    master_image_id: number | null;
 
     @ManyToOne(() => MasterImage,{onDelete: 'CASCADE', nullable: true})
     @JoinColumn({name: 'master_image_id'})

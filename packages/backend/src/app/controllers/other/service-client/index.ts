@@ -44,12 +44,12 @@ async function getManyRoute(req: any, res: any) {
     const query = realmRepository.createQueryBuilder('client');
 
     applyFields(query, fields, {
-        queryAlias: 'client',
+        defaultAlias: 'client',
         allowed: ['id', 'name', 'secret', 'description']
     })
 
     applyFilters(query, filter, {
-        queryAlias: 'client',
+        defaultAlias: 'client',
         allowed: ['id', 'service_id']
     });
 
@@ -82,7 +82,7 @@ async function getRoute(req: any, res: any) {
             .where("client.service_id = :id", {id});
 
         applyFields(query, fields, {
-            queryAlias: 'client',
+            defaultAlias: 'client',
             allowed: ['id', 'name', 'secret', 'description']
         });
 

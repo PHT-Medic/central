@@ -94,7 +94,7 @@ export async function getProposalStationsRouteHandler(req: any, res: any) {
 
         applyFilters(query, filter, {
             allowed: ['proposal_id', 'station_id'],
-            queryAlias: 'proposalStation'
+            defaultAlias: 'proposalStation'
         });
 
         const pagination = applyPagination(query, page, {maxLimit: 50});

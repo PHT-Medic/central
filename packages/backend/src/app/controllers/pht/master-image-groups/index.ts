@@ -7,65 +7,48 @@
 
 import {getRepository} from "typeorm";
 import {applyFilters, applyPagination} from "typeorm-extension";
-import {MasterImage, MasterImageCommand, TrainCommand} from "@personalhealthtrain/ui-common";
+import {MasterImageGroup,} from "@personalhealthtrain/ui-common";
 
-import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
-import {handleMasterImageCommandRouteHandler} from "./command";
 
-type PartialMasterImage = Partial<MasterImage>;
+type PartialMasterImageGroup = Partial<MasterImageGroup>;
 
 @SwaggerTags('pht')
-@Controller("/master-images")
-export class MasterImageController {
+@Controller("/master-image-groups")
+export class MasterImageGroupController {
     @Get("",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialMasterImage[]>([
-        {name: 'slim', path: 'master/nf-core/hlaTyping', id: 1}
-    ])
     async getMany(
         @Request() req: any,
         @Response() res: any
-    ): Promise<PartialMasterImage[]> {
-        return await getManyRouteHandler(req, res) as PartialMasterImage[];
+    ): Promise<PartialMasterImageGroup[]> {
+        return await getManyRouteHandler(req, res) as PartialMasterImageGroup[];
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialMasterImage>({name: 'slim', path: 'master/nf-core/hlaTyping', id: 1})
     async getOne(
         @Params('id') id: string,
         @Request() req: any,
         @Response() res: any
-    ): Promise<PartialMasterImage|undefined> {
-        return await getRouteHandler(req, res) as PartialMasterImage | undefined;
-    }
-
-    @Post("/command",[ForceLoggedInMiddleware])
-    async runCommand(
-        @Body() data: {
-            command: MasterImageCommand
-        },
-        @Request() req: any,
-        @Response() res: any
-    ) {
-        return await handleMasterImageCommandRouteHandler(req, res);
+    ): Promise<PartialMasterImageGroup|undefined> {
+        return await getRouteHandler(req, res) as PartialMasterImageGroup | undefined;
     }
 
     @Delete("/:id",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialMasterImage>({name: 'slim', path: 'master/nf-core/hlaTyping', id: 1})
     async drop(
         @Params('id') id: string,
         @Request() req: any,
         @Response() res: any
-    ): Promise<PartialMasterImage|undefined> {
-        return await dropRouteHandler(req, res) as PartialMasterImage | undefined;
+    ): Promise<PartialMasterImageGroup|undefined> {
+        return await dropRouteHandler(req, res) as PartialMasterImageGroup | undefined;
     }
 }
 
 export async function getRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
-    const repository = getRepository(MasterImage);
+    const repository = getRepository(MasterImageGroup);
 
     const entity = await repository.findOne(id);
 
@@ -79,16 +62,15 @@ export async function getRouteHandler(req: any, res: any) {
 export async function getManyRouteHandler(req: any, res: any) {
     const { page, filter } = req.query;
 
-    const repository = getRepository(MasterImage);
-    const query = repository.createQueryBuilder('image');
+    const repository = getRepository(MasterImageGroup);
+    const query = repository.createQueryBuilder('imageGroup');
 
     applyFilters(query, filter, {
-        allowed: ['id', 'name', 'path', 'virtual_path', 'group_virtual_path']
+        allowed: ['id', 'name', 'path', 'virtual_path'],
+        defaultAlias: 'imageGroup'
     });
 
     const pagination = applyPagination(query, page, {maxLimit: 50});
-
-    query.addOrderBy("image.path", "ASC");
 
     const [entities, total] = await query.getManyAndCount();
 
@@ -106,11 +88,11 @@ export async function getManyRouteHandler(req: any, res: any) {
 export async function dropRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
-    if(!req.ability.can('manage', 'masterImage')) {
-        // return res._failUnauthorized();
+    if(!req.ability.can('manage', 'masterImageGroup')) {
+        return res._failUnauthorized();
     }
 
-    const repository = getRepository(MasterImage);
+    const repository = getRepository(MasterImageGroup);
 
     const entity = await repository.findOne(id);
 

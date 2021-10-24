@@ -13,9 +13,10 @@ import {
 } from "@personalhealthtrain/ui-common";
 import {minLength, numeric, required} from "vuelidate/lib/validators";
 import ProposalStationList from "../../proposal-station/ProposalStationList";
+import MasterImagePicker from "../../master-image/MasterImagePicker";
 
 export default {
-    components: {ProposalStationList},
+    components: {MasterImagePicker, ProposalStationList},
     props: {
         train: {
             type: Object,
@@ -79,7 +80,6 @@ export default {
     created() {
         this.initTrain();
 
-        this.loadMasterImages();
         this.loadProposalStations();
     },
     methods: {
@@ -102,6 +102,11 @@ export default {
             }
         },
 
+        handleMasterImageSelected(id) {
+            this.form.master_image_id = !!id ? id : '';
+            this.setTrainMasterImage();
+        },
+
         setTrainMasterImage() {
             this.$emit('setTrainMasterImage', this.form.master_image_id);
         },
@@ -112,24 +117,6 @@ export default {
             this.$emit('setTrainQuery', this.form.query);
         },
 
-        async loadMasterImages() {
-            if(this.master_image.busy) return;
-
-            this.master_image.busy = true;
-
-            try {
-                const response = await getAPIMasterImages();
-                this.master_image.items = response.data;
-                if(this.form.master_image_id === '' && this.master_image.items.length > 0) {
-                    this.form.master_image_id = this.master_image.items[0].id;
-                    this.setTrainMasterImage();
-                }
-            } catch (e) {
-
-            }
-
-            this.master_image.busy = false;
-        },
         async loadProposalStations() {
             if(this.proposalStation.busy) return;
 
@@ -168,6 +155,8 @@ export default {
                 });
 
                 this.trainStation.items = response.data;
+                this.setTrainStations();
+
             } catch (e) {
                 console.log(e);
             }
@@ -280,22 +269,22 @@ export default {
 }
 </script>
 <template>
-    <div class="row">
-        <div class="col">
-            <div class="form-group" :class="{ 'form-group-error': $v.form.master_image_id.$error }">
-                <label>Master Image</label>
-                <select v-model="$v.form.master_image_id.$model" class="form-control" @change="setTrainMasterImage" :disabled="master_image.busy">
-                    <option value="">--- Select an option ---</option>
-                    <option v-for="(item,key) in master_image.items" :key="key" :value="item.id">
-                        {{ item.name }}
-                    </option>
-                </select>
+    <div>
+        <div class="mb-2">
+            <h6>MasterImage</h6>
+            <div class="mb-2">
+                <master-image-picker @selected="handleMasterImageSelected" />
 
                 <div v-if="!$v.form.master_image_id.required" class="form-group-hint group-required">
-                    Please select a master image for this train.
+                    Please select a master image.
                 </div>
             </div>
+        </div>
 
+        <hr />
+
+        <div>
+            <h6>Stations</h6>
             <div class="row">
                 <div class="col-4">
                     <proposal-station-list
@@ -343,21 +332,18 @@ export default {
                         </div>
                     </div>
 
-                    <div v-if="trainStation.items.length === 0" class="alert alert-sm alert-info">
-                        You haven't made a selection yet.
+                    <div v-if="trainStation.items.length === 0" class="alert alert-sm alert-warning">
+                        Please select one or more stations for your train.
                     </div>
                 </div>
             </div>
 
-            <div v-if="trainStation.items.length === 0" class="alert alert-sm alert-warning">
-                Please select one or more stations for your train.
-            </div>
-        </div>
-        <div class="col">
+            <!--
             <div class="form-group">
                 <label>Fhir Query</label>
                 <textarea rows="8" class="form-control" @change.prevent="setQuery" v-model="$v.form.query.$model" placeholder="If you provide a query string, it must be a valid json formatted string..."></textarea>
             </div>
+            -->
         </div>
     </div>
 </template>

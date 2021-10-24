@@ -7,6 +7,7 @@
 
 export {
     MasterImage,
+    MasterImageGroup,
     Proposal,
     ProposalStation,
     Station,

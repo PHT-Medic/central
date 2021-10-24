@@ -6,21 +6,16 @@
  */
 
 import {MasterImage, MasterImageCommand, MasterImageGroup} from "@personalhealthtrain/ui-common";
-import {getRepository} from "typeorm";
+import {getRepository, Repository} from "typeorm";
 
 import path from "path";
 import {getWritableDirPath} from "../../../../config/paths";
-import {syncMasterImageGitRepository} from "../../../../domains/pht/master-image/commands/sync-git-remote-repository";
-import {readMasterImageGitLocalRepository} from "../../../../domains/pht/master-image/commands/read-git-local-repository";
-import {MasterImageGitGroupEntity, MasterImageGitImageEntity} from "../../../../domains/pht/master-image/commands/type";
+import fs from "fs";
+import {clone, pull} from "isomorphic-git";
+import http from "isomorphic-git/http/node";
+import {Group, Image, scanDirectory} from "fs-docker";
 
 export async function handleMasterImageCommandRouteHandler(req: any, res: any) {
-    const {id} = req.params;
-
-    if (typeof id !== 'string') {
-        return res._failNotFound();
-    }
-
     if(
         !req.body ||
         Object.values(MasterImageCommand).indexOf(req.body.command) === -1
@@ -30,96 +25,171 @@ export async function handleMasterImageCommandRouteHandler(req: any, res: any) {
 
     const command : MasterImageCommand = req.body.command;
 
-    const repository = getRepository(MasterImage);
-
-    const entity = await repository.findOne(id);
-
-    if (typeof entity === 'undefined') {
-        return res._failNotFound();
-    }
-
     switch (command) {
         case MasterImageCommand.GIT_REPOSITORY_SYNC:
-            const gitURL : string = '';
+            const gitURL : string = 'https://github.com/PHT-Medic/master-images';
             const directoryPath : string = path.join(getWritableDirPath(), 'master-images.git');
 
-            await syncMasterImageGitRepository({
-                directoryPath,
-                gitURL
-            });
+            try {
+                await fs.promises.access(directoryPath, fs.constants.F_OK | fs.constants.R_OK);
+                await pull({
+                    fs,
+                    http,
+                    dir: directoryPath,
+                    ref: 'master',
+                    author: {
+                        name: 'ui'
+                    }
+                })
+            } catch (e) {
+                await clone({
+                    fs,
+                    http,
+                    url: gitURL,
+                    dir: directoryPath,
+                    ref: 'master'
+                });
+            }
 
-            const data = await readMasterImageGitLocalRepository(directoryPath);
+            const data = await scanDirectory(directoryPath);
 
             // languages
-            await handleRepositoryLanguages(data.languages);
+            const groups = await mergeDirectoryGroupsWithDatabase(data.groups);
 
             // images
-            const images = await handleRepositoryImages(data.images);
+            const images = await mergeRepositoryImagesWithDatabase(data.images);
 
             return res._respondAccepted({
-                data: images
+                data: {
+                    groups,
+                    images
+                }
             });
     }
 
     return res._failNotFound();
 }
 
-async function handleRepositoryImages(entities: MasterImageGitImageEntity[]) : Promise<MasterImage[]> {
-    const masterImageRepository = getRepository(MasterImage);
+type ReturnContext<T> = {
+    updated: T[],
+    created: T[],
+    deleted: T[]
+}
 
-    const paths : string[] = entities.map(entity => entity.path);
-
-    const dbImages = await masterImageRepository.createQueryBuilder('image')
-        .where("image.path IN(:...paths)", {paths})
-        .getMany();
-    const dbImagePaths : string[] = dbImages.map(image => image.path);
-
-    const newEntries : MasterImage[] = [];
-    for(let i=0; i<entities.length; i++) {
-        const index = dbImagePaths.indexOf(entities[i].path);
-        if(index === -1) {
-            newEntries.push(masterImageRepository.create({
-                name: entities[i].name,
-                path: entities[i].path,
-                group_id: entities[i].groupId
-            }))
+async function mergeRepositoryImagesWithDatabase(
+    entities: Image[]
+) : Promise<ReturnContext<MasterImage>> {
+    if(entities.length === 0) {
+        return {
+            created: [],
+            updated: [],
+            deleted: []
         }
     }
 
-    if(newEntries.length > 0) {
-        await masterImageRepository.save(newEntries);
-    }
+    const virtualPaths : string[] = entities.map(entity => entity.virtualPath);
 
-    return newEntries;
-}
-
-async function handleRepositoryLanguages(entities: MasterImageGitGroupEntity[]) {
-    const repository = getRepository(MasterImageGroup);
-
-    const ids : string[] = entities.map(entity => entity.id);
-
-    const dbLanguages = await repository.createQueryBuilder('group')
-        .where("group.id IN(:...ids)", {ids})
+    const repository = getRepository(MasterImage);
+    const dbEntities = await repository.createQueryBuilder()
         .getMany();
 
-    const dBLanguageIds : string[] = dbLanguages.map(language => language.id);
+    const context : ReturnContext<MasterImage> = {
+        created: [],
+        updated: [],
+        deleted: []
+    }
 
-    const newEntries : MasterImageGroup[] = [];
+    context.deleted = dbEntities
+        .filter(image => virtualPaths.indexOf(image.virtual_path) === -1);
 
     for(let i=0; i<entities.length; i++) {
-        const index = dBLanguageIds.indexOf(entities[i].id);
+        const parts = entities[i].virtualPath.split('/');
+        parts.pop();
+
+        const index = dbEntities.findIndex(dbEntity => dbEntity.virtual_path === entities[i].virtualPath);
         if(index === -1) {
-            newEntries.push(repository.create({
-                id: entities[i].id,
+            context.created.push(repository.create({
                 name: entities[i].name,
-                version: entities[i].name,
-                ...(entities[i].license ? {license: entities[i].license} : {}),
-                ...(entities[i].description ? {description: entities[i].description} : {})
+                path: entities[i].path,
+                virtual_path: entities[i].virtualPath,
+                group_virtual_path: parts.join('/')
+            }))
+        } else {
+            context.updated.push(repository.merge(dbEntities[index], {
+                name: entities[i].name,
+                path: entities[i].path,
+                group_virtual_path: parts.join('/')
             }));
         }
     }
 
-    if(newEntries.length > 0) {
-        await repository.save(newEntries);
+    if(context.created.length > 0) {
+        await repository.insert(context.created);
     }
+
+    if(context.updated.length > 0) {
+        await repository.save(context.updated);
+    }
+
+    if(context.deleted.length > 0) {
+        await repository.delete(context.deleted.map(entry => entry.id));
+    }
+
+    return context;
+}
+
+async function mergeDirectoryGroupsWithDatabase(entities: Group[]) : Promise<ReturnContext<MasterImageGroup>> {
+    if(entities.length === 0) {
+        return {
+            created: [],
+            updated: [],
+            deleted: []
+        }
+    }
+
+    const dirVirtualPaths : string[] = entities.map(entity => entity.virtualPath);
+
+    const repository = getRepository(MasterImageGroup);
+    const dbEntities = await repository.createQueryBuilder()
+        .getMany();
+
+    const context : ReturnContext<MasterImageGroup> = {
+        created: [],
+        updated: [],
+        deleted: []
+    }
+
+    context.deleted = dbEntities
+        .filter(image => dirVirtualPaths.indexOf(image.virtual_path) === -1);
+
+    for(let i=0; i<entities.length; i++) {
+        const index = dbEntities.findIndex(dbEntity => dbEntity.virtual_path === entities[i].virtualPath);
+        if(index === -1) {
+            context.created.push(repository.create({
+                name: entities[i].name,
+                path: entities[i].path,
+                virtual_path: entities[i].virtualPath
+            }))
+        } else {
+            context.updated.push(repository.merge(dbEntities[index], {
+                name: entities[i].name,
+                path: entities[i].path,
+                virtual_path: entities[i].virtualPath
+            }));
+        }
+    }
+
+    if(context.created.length > 0) {
+        await repository.insert(context.created);
+    }
+
+    if(context.updated.length > 0) {
+        await repository.save(context.updated);
+    }
+
+    if(context.deleted.length > 0) {
+        await repository.delete(context.deleted.map(entry => entry.id));
+    }
+
+    return context;
 }

@@ -21,7 +21,10 @@ const permissionNames : string[] = [
     'train_execution_start',
     'train_execution_stop',
     'train_drop',
-    'train_result_read'
+    'train_result_read',
+
+    'master_image_manage',
+    'master_image_group_manage'
 ];
 
 export function getPHTPermissions() : string[] {

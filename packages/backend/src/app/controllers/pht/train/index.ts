@@ -6,7 +6,7 @@
  */
 
 import {getRepository} from "typeorm";
-import {applyPagination, applyIncludes, applyFilters} from "typeorm-extension";
+import {applyPagination, applyQueryRelations, applyFilters} from "typeorm-extension";
 import {
     isPermittedForResourceRealm,
     onlyRealmPermittedQueryResources, Proposal, Train, TrainFile, TrainType
@@ -139,13 +139,13 @@ export async function getTrainsRouteHandler(req: any, res: any) {
 
     onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
 
-    applyIncludes(query, include, {
-        queryAlias: 'train',
+    applyQueryRelations(query, include, {
+        defaultAlias: 'train',
         allowed: ['train_station', 'user']
     });
 
     applyFilters(query, filter, {
-        queryAlias: 'train',
+        defaultAlias: 'train',
         allowed: ['id', 'name', 'proposal_id', 'realm_id']
     });
 

@@ -40,7 +40,7 @@ export default {
                     'finish'
                 ]
             },
-            form: {
+            train: {
                 // required attributes for child components (id, proposal_id)
                 id: null,
                 proposal_id: null,
@@ -78,14 +78,10 @@ export default {
         initTrain() {
             if(typeof this.trainProperty === 'undefined') return;
 
-            for (let key in this.form) {
+            for (let key in this.train) {
                 if(!this.trainProperty.hasOwnProperty(key)) continue;
 
-                this.form[key] = this.trainProperty[key];
-            }
-
-            if(typeof this.trainProperty.train_stations !== 'undefined') {
-                this.trainStation.items = this.trainProperty.train_stations;
+                this.train[key] = this.trainProperty[key];
             }
         },
         async updateTrain(data) {
@@ -107,23 +103,6 @@ export default {
             } catch (e) {
                 throw e;
             }
-        },
-        async buildTrain() {
-            if(!this.wizard.initialized || this.busy) return;
-
-            this.busy = true;
-
-            try {
-                const train = await runAPITrainCommand(this.trainProperty.id, TrainCommand.BUILD_START);
-
-                this.$emit('updated', {
-                    configuration_status: train.configuration_status
-                });
-            } catch (e) {
-
-            }
-
-            this.busy = false;
         },
 
         //----------------------------------
@@ -191,7 +170,7 @@ export default {
             });
         },
         async canPassConfigurationWizardStep() {
-            if(this.form.master_image_id === '' || typeof this.form.master_image_id === 'undefined') {
+            if(this.train.master_image_id === '' || typeof this.train.master_image_id === 'undefined') {
                 throw new Error('A master image must be selected...');
             }
 
@@ -200,24 +179,24 @@ export default {
             }
 
             await this.updateTrain({
-                master_image_id: this.form.master_image_id,
-                query: this.form.query
+                master_image_id: this.train.master_image_id,
+                query: this.train.query
             });
 
             return true;
         },
         async canPassFilesWizardStep() {
-            if(this.form.entrypoint_file_id === '' || !this.form.entrypoint_file_id) {
+            if(this.train.entrypoint_file_id === '' || !this.train.entrypoint_file_id) {
                 throw new Error('An uploaded file must be selected as entrypoint...');
             }
 
-            console.log(this.form.entrypoint_file_id);
+            console.log(this.train.entrypoint_file_id);
 
-            if(this.form.entrypoint_executable === '' || !this.form.entrypoint_executable) {
+            if(this.train.entrypoint_executable === '' || !this.train.entrypoint_executable) {
                 throw new Error('An executable for the entrypoint must be selected...');
             }
 
-            await this.updateTrain({entrypoint_file_id: this.form.entrypoint_file_id, entrypoint_executable: this.form.entrypoint_executable});
+            await this.updateTrain({entrypoint_file_id: this.train.entrypoint_file_id, entrypoint_executable: this.train.entrypoint_executable});
 
             return true;
         },
@@ -226,11 +205,11 @@ export default {
                 throw new Error('The hash is not generated yet or is maybe still in process.');
             }
 
-            if(this.form.hash_signed === '' || !this.form.hash_signed) {
+            if(this.train.hash_signed === '' || !this.train.hash_signed) {
                 throw new Error('The provided hash must be signed by the offline tool...');
             }
 
-            await this.updateTrain({hash_signed: this.form.hash_signed});
+            await this.updateTrain({hash_signed: this.train.hash_signed});
 
             return true;
         },
@@ -248,22 +227,22 @@ export default {
         setTrainFiles(files) {
             console.log(files);
 
-            this.form.files = files;
+            this.train.files = files;
         },
         setMasterImage(id) {
-            this.form.master_image_id = id;
+            this.train.master_image_id = id;
         },
         setQuery(query) {
-            this.form.query = query;
+            this.train.query = query;
         },
         setStations(stations) {
             this.trainStation.items = stations;
         },
         setEntrypointFileId(id) {
-            this.form.entrypoint_file_id = id;
+            this.train.entrypoint_file_id = id;
         },
         setEntrypointExecutable(executable) {
-            this.form.entrypoint_executable = executable;
+            this.train.entrypoint_executable = executable;
         },
         setHash(hash) {
             let data = {
@@ -272,13 +251,13 @@ export default {
             };
 
             for(let key in data) {
-                this.form[key] = data[key];
+                this.train[key] = data[key];
             }
 
             this.$emit('updated', data);
         },
         setHashSigned(hash_signed) {
-            this.form.hash_signed = hash_signed;
+            this.train.hash_signed = hash_signed;
         },
 
         //----------------------------------
@@ -305,12 +284,12 @@ export default {
                 hash_signed: null
             };
 
-            if(typeof id !== 'undefined' && id === this.form.entrypoint_file_id) {
+            if(typeof id !== 'undefined' && id === this.train.entrypoint_file_id) {
                 data.entrypoint_file_id = null;
             }
 
             for(let key in data) {
-                this.form[key] = data[key];
+                this.train[key] = data[key];
             }
 
             this.$refs['wizard-hash-step'].reset();
@@ -352,24 +331,22 @@ export default {
                 :start-index="wizard.startIndex"
             >
                 <template slot="footer" slot-scope="props">
-                    <!--
                     <div v-if="canPassDefined && !wizard.valid" class="alert alert-warning alert-sm">
                         Error: {{wizardMessage}}
                     </div>
-                    -->
                     <div class="wizard-footer-left">
                         <wizard-button v-if="props.activeTabIndex > 0 && !props.isLastStep" @click.native="prevWizardStep" :style="props.fillButtonStyle">Back</wizard-button>
                     </div>
                     <div class="wizard-footer-right">
                         <wizard-button v-if="!props.isLastStep" @click.native="nextWizardStep" class="wizard-footer-right" :style="props.fillButtonStyle">Next</wizard-button>
 
-                        <wizard-button v-else @click.native="buildTrain" class="wizard-footer-right finish-button" :style="props.fillButtonStyle">Build train</wizard-button>
+                        <wizard-button v-else class="wizard-footer-right finish-button" :style="props.fillButtonStyle">Build train</wizard-button>
                     </div>
                 </template>
 
                 <tab-content title="Configuration" :before-change="passWizardStep">
                     <train-wizard-configurator-step
-                        :train="form"
+                        :train="train"
                         :train-stations="trainStation.items"
                         @setTrainMasterImage="setMasterImage"
                         @setTrainStations="setStations"
@@ -379,7 +356,7 @@ export default {
 
                 <tab-content title="Files" :before-change="passWizardStep">
                     <train-file-manager
-                        :train="form"
+                        :train="train"
                         @uploaded="handleFilesUploaded"
                         @deleted="handleFilesDeleted"
                         @setEntrypointFile="setEntrypointFileId"
@@ -390,7 +367,7 @@ export default {
                 <tab-content title="Hash" :before-change="passWizardStep">
                     <train-wizard-hash-step
                         ref="wizard-hash-step"
-                        :train="form"
+                        :train="train"
                         @hashGenerated="setHash"
                         @setHashSigned="setHashSigned"
                     />

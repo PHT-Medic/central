@@ -5,13 +5,17 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {addProposal, getAPIMasterImages, getAPIStations} from "@personalhealthtrain/ui-common";
+import {
+    addProposal,
+    getAPIStations
+} from "@personalhealthtrain/ui-common";
     import { required, minLength, maxLength, integer, alpha } from 'vuelidate/lib/validators';
 
     import ProposalFormTitle from "../../../components/form/proposal/ProposalFormTitle";
+import MasterImagePicker from "../../../components/domains/master-image/MasterImagePicker";
 
     export default {
-        components: {ProposalFormTitle},
+        components: {MasterImagePicker, ProposalFormTitle},
         meta: {
             requireLoggedIn: true,
             requireAbility: (can) => {
@@ -32,11 +36,12 @@ import {addProposal, getAPIMasterImages, getAPIStations} from "@personalhealthtr
                 busy: false,
                 errorMessage: '',
 
-                stations: [],
-                stationsLoading: false,
+                station: {
+                    items: [],
+                    busy: false,
+                },
 
-                master_images: [],
-                master_imagesLoading: false,
+
 
                 risks: [
                     { id: 'low', name: '(Low) Low risk' },
@@ -81,19 +86,28 @@ import {addProposal, getAPIMasterImages, getAPIStations} from "@personalhealthtr
             }
         },
         created () {
-            this.stationsLoading = true;
-            getAPIStations().then((response) => {
-                this.stations = response.data;
-                this.stationsLoading = false
-            });
-
-            this.master_imagesLoading = true;
-            getAPIMasterImages().then((data) => {
-                this.master_images = data.data;
-                this.master_imagesLoading = false
-            });
+            Promise.resolve()
+                .then(this.loadStations)
         },
         methods: {
+            handleMasterImagePicker(id) {
+                this.formData.master_image_id = !!id ? id : '';
+            },
+            async loadStations() {
+                if(this.station.busy) return;
+
+                this.station.busy = true;
+
+                try {
+                    const {data} = await getAPIStations();
+
+                    this.station.items = data;
+                }  catch (e) {
+
+                }
+
+                this.station.busy = false;
+            },
             async handleSubmit (e) {
                 e.preventDefault();
 
@@ -137,21 +151,12 @@ import {addProposal, getAPIMasterImages, getAPIStations} from "@personalhealthtr
                         </div>
                     </div>
 
-                    <hr>
+                    <hr />
 
-                    <div class="form-group" :class="{ 'form-group-error': $v.formData.master_image_id.$error }">
-                        <label>Master Image</label>
-                        <select v-model="$v.formData.master_image_id.$model" class="form-control" :disabled="master_imagesLoading">
-                            <option value="">
-                                -- Please select --
-                            </option>
-                            <option v-for="(item,key) in master_images" :key="key" :value="item.id">
-                                {{ item.name }}
-                            </option>
-                        </select>
-
+                    <div>
+                        <master-image-picker @selected="handleMasterImagePicker" />
                         <div v-if="!$v.formData.master_image_id.required" class="form-group-hint group-required">
-                            Please choose a master image. It will be the base for your entry point when you start a train.
+                            Please select a master image.
                         </div>
                     </div>
 
@@ -201,8 +206,8 @@ import {addProposal, getAPIMasterImages, getAPIStations} from "@personalhealthtr
 
                     <div class="form-group" :class="{ 'form-group-error': $v.formData.station_ids.$anyError }">
                         <label>Stations</label>
-                        <select v-model="$v.formData.station_ids.$model" class="form-control" style="height:100px;" multiple :disabled="stationsLoading">
-                            <option v-for="(item,key) in stations" :key="key" :value="item.id">
+                        <select v-model="$v.formData.station_ids.$model" class="form-control" style="height:100px;" multiple :disabled="station.busy">
+                            <option v-for="(item,key) in station.items" :key="key" :value="item.id">
                                 {{ item.name }}
                             </option>
                         </select>
