@@ -131,9 +131,9 @@ export class Train {
     // ------------------------------------------------------------------
 
     @Column({nullable: true})
-    master_image_id: number | null;
+    master_image_id: string | null;
 
-    @ManyToOne(() => MasterImage,{onDelete: 'CASCADE', nullable: true})
+    @ManyToOne(() => MasterImage,{onDelete: 'SET NULL', nullable: true})
     @JoinColumn({name: 'master_image_id'})
     master_image: MasterImage;
 }

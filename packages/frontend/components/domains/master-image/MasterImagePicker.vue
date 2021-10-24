@@ -15,7 +15,7 @@ export default {
     name: 'MasterImagePicker',
     props: {
         masterImageId: {
-            type: Number,
+            type: String,
             default: undefined
         }
     },
@@ -124,8 +124,6 @@ export default {
             } else {
                 this.imageId = id;
             }
-
-            console.log(this.imageId);
 
             this.$emit('selected', this.imageId);
         }

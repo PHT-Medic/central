@@ -7,10 +7,10 @@
 
 import {getRepository} from "typeorm";
 import {applyFilters, applyPagination} from "typeorm-extension";
-import {MasterImage, MasterImageCommand, TrainCommand} from "@personalhealthtrain/ui-common";
+import {MasterImage, MasterImageCommand} from "@personalhealthtrain/ui-common";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 import {handleMasterImageCommandRouteHandler} from "./command";
 
@@ -20,9 +20,6 @@ type PartialMasterImage = Partial<MasterImage>;
 @Controller("/master-images")
 export class MasterImageController {
     @Get("",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialMasterImage[]>([
-        {name: 'slim', path: 'master/nf-core/hlaTyping', id: 1}
-    ])
     async getMany(
         @Request() req: any,
         @Response() res: any
@@ -31,7 +28,6 @@ export class MasterImageController {
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialMasterImage>({name: 'slim', path: 'master/nf-core/hlaTyping', id: 1})
     async getOne(
         @Params('id') id: string,
         @Request() req: any,
@@ -52,7 +48,6 @@ export class MasterImageController {
     }
 
     @Delete("/:id",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialMasterImage>({name: 'slim', path: 'master/nf-core/hlaTyping', id: 1})
     async drop(
         @Params('id') id: string,
         @Request() req: any,
@@ -123,6 +118,7 @@ export async function dropRouteHandler(req: any, res: any) {
 
         return res._respondDeleted({data: entity});
     } catch (e) {
+        console.log(e);
         return res._failValidationError({message: 'The master image could not be deleted.'})
     }
 }

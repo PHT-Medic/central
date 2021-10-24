@@ -71,8 +71,7 @@ import MasterImagePicker from "../../../components/domains/master-image/MasterIm
                     }
                 },
                 master_image_id: {
-                    required,
-                    integer
+                    required
                 },
                 risk: {
                     required,
@@ -155,6 +154,7 @@ import MasterImagePicker from "../../../components/domains/master-image/MasterIm
 
                     <div>
                         <master-image-picker @selected="handleMasterImagePicker" />
+
                         <div v-if="!$v.formData.master_image_id.required" class="form-group-hint group-required">
                             Please select a master image.
                         </div>

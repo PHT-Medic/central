@@ -160,7 +160,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
 
     await check('master_image_id')
         .exists()
-        .isInt()
+        .isString()
         .custom(value => {
             return getRepository(MasterImage).findOne(value).then((masterImageResult) => {
                 if(typeof masterImageResult === 'undefined') throw new Error('The provided master image does not exist.');
@@ -250,10 +250,10 @@ export async function editProposalRouteHandler(req: any, res: any) {
 
     await check('master_image_id')
         .exists()
-        .isInt()
+        .isString()
         .optional()
         .custom(value => {
-            return getRepository(MasterImage).find(value).then((masterImageResult) => {
+            return getRepository(MasterImage).findOne(value).then((masterImageResult) => {
                 if(typeof masterImageResult === 'undefined') throw new Error('The specified master image does not exist.');
             })
         })

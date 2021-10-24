@@ -24,7 +24,7 @@ export class MasterImageGroup {
     @Column({type: 'varchar', length: 512})
     path: string;
 
-    @Index()
+    @Index({unique: true})
     @Column({type: 'varchar', length: 256})
     virtual_path: string;
 

@@ -193,10 +193,10 @@ async function runTrainValidations(req: any) {
 
     const masterImagePromise = check('master_image_id')
         .exists()
-        .isInt()
         .optional()
+        .isString()
         .custom(value => {
-            return getRepository(MasterImage).find(value).then((res) => {
+            return getRepository(MasterImage).findOne(value).then((res) => {
                 if(typeof res === 'undefined') throw new Error('The master image is not valid.');
             })
         });

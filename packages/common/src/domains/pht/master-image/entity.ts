@@ -19,13 +19,13 @@ import {MasterImageGroupType} from "./type";
 
 @Entity({name: 'master_images'})
 export class MasterImage {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
 
     @Column({type: 'varchar', nullable: true})
     path: string | null;
 
-    @Index()
+    @Index({unique: true})
     @Column({type: "varchar", length: 256})
     virtual_path: string;
 

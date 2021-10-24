@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    editAPITrain,
+    editAPITrain, getAPITrainStations,
     runAPITrainCommand,
     TrainCommand,
     TrainConfigurationStatus
@@ -15,9 +15,12 @@ import TrainWizardConfiguratorStep from "./wizard/TrainWizardConfiguratorStep";
 import TrainFileManager from "./file/TrainFileManager";
 import TrainWizardHashStep from "./wizard/TrainWizardHashStep";
 import TrainWizardFinalStep from "./wizard/TrainWizardFinalStep";
+import TrainWizardExtraStep from "./wizard/TrainWizardExtraStep";
 
 export default {
-    components: {TrainWizardFinalStep, TrainWizardHashStep, TrainFileManager, TrainWizardConfiguratorStep},
+    components: {
+        TrainWizardExtraStep,
+        TrainWizardFinalStep, TrainWizardHashStep, TrainFileManager, TrainWizardConfiguratorStep},
     props: {
         trainProperty: {
             type: Object,
@@ -36,6 +39,7 @@ export default {
                 steps: [
                     'configuration',
                     'files',
+                    'extra',
                     'hash',
                     'finish'
                 ]
@@ -50,32 +54,32 @@ export default {
                 station_ids: [],
 
                 entrypoint_file_id: null,
-                entrypoint_executable: '',
                 files: [],
 
                 hash_signed: '',
                 hash: null
             },
             trainStation: {
+                busy: false,
                 items: []
             },
             busy: false
         }
     },
     created() {
-        this.init();
+        if(this.isConfigured) return;
+
+        this.initTrainFromProperty();
+
+        Promise.resolve()
+            .then(this.loadTrainStations)
+            .then(this.initWizard);
     },
     methods: {
         //----------------------------------
-        // init
+        // Train
         //----------------------------------
-        async init() {
-            if(this.isConfigured) return;
-
-            this.initTrain();
-            this.initWizard().then(r => r);
-        },
-        initTrain() {
+        initTrainFromProperty() {
             if(typeof this.trainProperty === 'undefined') return;
 
             for (let key in this.train) {
@@ -103,6 +107,25 @@ export default {
             } catch (e) {
                 throw e;
             }
+        },
+        async loadTrainStations() {
+            if(this.trainStation.busy || !this.trainId) return;
+
+            this.trainStation.busy = true;
+
+            try {
+                const {data} = await getAPITrainStations({
+                    filters: {
+                        train_id: this.trainId
+                    }
+                });
+
+                this.trainStation.items = data;
+            } catch (e) {
+                console.log(e);
+            }
+
+            this.trainStation.busy = false;
         },
 
         //----------------------------------
@@ -141,12 +164,17 @@ export default {
                 const step = this.wizard.steps[this.wizard.index];
                 let promise;
 
+                console.log(step);
+
                 switch (step) {
                     case 'configuration':
                         promise = this.canPassConfigurationWizardStep()
                         break;
                     case 'files':
                         promise = this.canPassFilesWizardStep();
+                        break;
+                    case 'extra':
+                        promise = this.canPassExtraWizardStep();
                         break;
                     case 'hash':
                         promise = this.canPassHashWizardStep();
@@ -179,24 +207,24 @@ export default {
             }
 
             await this.updateTrain({
-                master_image_id: this.train.master_image_id,
-                query: this.train.query
+                master_image_id: this.train.master_image_id
             });
 
             return true;
         },
         async canPassFilesWizardStep() {
             if(this.train.entrypoint_file_id === '' || !this.train.entrypoint_file_id) {
-                throw new Error('An uploaded file must be selected as entrypoint...');
+                throw new Error('An uploaded file must be selected as entrypoint.');
             }
 
-            console.log(this.train.entrypoint_file_id);
+            await this.updateTrain({entrypoint_file_id: this.train.entrypoint_file_id});
 
-            if(this.train.entrypoint_executable === '' || !this.train.entrypoint_executable) {
-                throw new Error('An executable for the entrypoint must be selected...');
-            }
-
-            await this.updateTrain({entrypoint_file_id: this.train.entrypoint_file_id, entrypoint_executable: this.train.entrypoint_executable});
+            return true;
+        },
+        async canPassExtraWizardStep() {
+            await this.updateTrain({
+                query: this.train.query
+            });
 
             return true;
         },
@@ -232,7 +260,7 @@ export default {
         setMasterImage(id) {
             this.train.master_image_id = id;
         },
-        setQuery(query) {
+        setFhirQuery(query) {
             this.train.query = query;
         },
         setStations(stations) {
@@ -240,9 +268,6 @@ export default {
         },
         setEntrypointFileId(id) {
             this.train.entrypoint_file_id = id;
-        },
-        setEntrypointExecutable(executable) {
-            this.train.entrypoint_executable = executable;
         },
         setHash(hash) {
             let data = {
@@ -310,6 +335,9 @@ export default {
         },
         isConfigured() {
             return this.trainProperty.configuration_status === TrainConfigurationStatus.FINISHED;
+        },
+        trainId() {
+            return !!this.train ? this.train.id : undefined;
         }
     }
 }
@@ -350,7 +378,7 @@ export default {
                         :train-stations="trainStation.items"
                         @setTrainMasterImage="setMasterImage"
                         @setTrainStations="setStations"
-                        @setTrainQuery="setQuery"
+                        @setTrainQuery="setFhirQuery"
                     />
                 </tab-content>
 
@@ -360,7 +388,13 @@ export default {
                         @uploaded="handleFilesUploaded"
                         @deleted="handleFilesDeleted"
                         @setEntrypointFile="setEntrypointFileId"
-                        @setEntrypointExecutable="setEntrypointExecutable"
+                    />
+                </tab-content>
+
+                <tab-content title="Extra" :before-change="passWizardStep">
+                    <train-wizard-extra-step
+                        :train="train"
+                        @querySelected="setFhirQuery"
                     />
                 </tab-content>
 

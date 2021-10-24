@@ -34,14 +34,9 @@ export default {
             },
             form: {
                 entrypoint_file_id: undefined,
-                entrypoint_executable: '',
                 path: '',
                 files: []
-            },
-            executableOptions: [
-                {id: 'python', name: 'Python'},
-                {id: 'r', name: 'R'}
-            ]
+            }
         }
     },
     created() {
@@ -195,9 +190,6 @@ export default {
 
             this.$emit('setEntrypointFile', this.form.entrypoint_file_id);
         },
-        changeEntryPointExecutable() {
-            this.$emit('setEntrypointExecutable', this.form.entrypoint_executable);
-        },
 
         getParentPath(path) {
             if(path === '/') return '';
@@ -221,7 +213,7 @@ export default {
         paths() {
             return this.form.path.split('/').filter(el => el !== '');
         },
-        entrypoint_file_id() {
+        entrypointFileId() {
             if(!this.form.entrypoint_file_id) {
                 return '';
             }
@@ -239,36 +231,53 @@ export default {
 <template>
     <div>
         <div class="row">
+            <div class="col">
+                <h6 class="title text-muted">Files
+                    <span style="font-size: 0.65rem">
+                        <span class="text-success">
+                            <i class="fa fa-file"></i> uploaded
+                        </span>
+                    </span>
+                </h6>
 
-            <div class="col">
-                <div class="form-group">
-                    <label>Directories / Files</label>
-                    <div class="custom-file">
-                        <input type="file" :webkitdirectory="directoryMode" class="custom-file-input" id="files" ref="files" @change="checkFormFiles" multiple :disbaled="actionBusy">
-                        <label class="custom-file-label" for="files">Select files...</label>
-                    </div>
+
+                <div class="form-check">
+                    <input type="checkbox" v-model="selectAll" @change="selectAllFiles" class="form-check-input" id="selectAllFiles">
+                    <label for="selectAllFiles">Select all</label>
                 </div>
-                <div class="form-group">
-                    <b-form-checkbox switch v-model="directoryMode">Directory mode</b-form-checkbox>
+
+                <div class="d-flex flex-column">
+                    <train-file
+                        class="mr-1"
+                        v-for="(file,key) in items"
+                        :key="key"
+                        :file="file"
+                        :files-selected="selected"
+                        :file-selected-id="form.entrypoint_file_id"
+                        @check="selectFile"
+                        @toggle="changeEntryPointFile"
+                    />
                 </div>
-            </div>
-            <div class="col">
+
                 <div class="form-group">
-                    <label>EntryPoint Executable</label>
-                    <select class="form-control" v-model="$v.form.entrypoint_executable.$model" @change="changeEntryPointExecutable">
-                        <option value="">--- Select an option ---</option>
-                        <option v-for="(option,key) in executableOptions" :key="key" :value="option.id">
-                            {{option.name}}
-                        </option>
-                    </select>
+                    <button type="button" class="btn btn-warning btn-xs" :disabled="actionBusy || selected.length === 0" @click.prevent="dropSelected">
+                        Delete
+                    </button>
                 </div>
+
+                <hr />
+
                 <div class="form-group">
                     <label>Entrypoint File</label>
-                    <input type="text" class="form-control" :value="entrypoint_file_id" :disabled="true" placeholder="Please toggle a file in the file list, to be selected as entrypoint file">
+                    <input type="text" class="form-control" :value="entrypointFileId" :disabled="true">
+                </div>
+
+                <div
+                    v-if="!entrypointFileId"
+                    class="alert alert-warning alert-sm mb-0">
+                    A file from the list below must be selected as entrypoint for the image command.
                 </div>
             </div>
-        </div>
-        <div class="row">
             <div class="col">
                 <div class="d-flex flex-row">
                     <div>
@@ -313,43 +322,20 @@ export default {
                         Upload
                     </button>
                 </div>
-            </div>
 
-            <div class="col">
-                <h6 class="title text-muted">Files
-                    <span style="font-size: 0.65rem">
-                                <span class="text-success">
-                                    <i class="fa fa-file"></i> uploaded
-                                </span>
-                            </span>
-                </h6>
-
-
-                <div class="form-check">
-                    <input type="checkbox" v-model="selectAll" @change="selectAllFiles" class="form-check-input" id="selectAllFiles">
-                    <label for="selectAllFiles">Select all</label>
-                </div>
-
-                <div class="d-flex flex-column">
-                    <train-file
-                        class="mr-1"
-                        v-for="(file,key) in items"
-                        :key="key"
-                        :file="file"
-                        :files-selected="selected"
-                        :file-selected-id="form.entrypoint_file_id"
-                        @check="selectFile"
-                        @toggle="changeEntryPointFile"
-                    />
-                </div>
+                <hr />
 
                 <div class="form-group">
-                    <button type="button" class="btn btn-warning btn-xs" :disabled="actionBusy || selected.length === 0" @click.prevent="dropSelected">
-                        Delete
-                    </button>
+                    <label>Directories / Files</label>
+                    <div class="custom-file">
+                        <input type="file" :webkitdirectory="directoryMode" class="custom-file-input" id="files" ref="files" @change="checkFormFiles" multiple :disbaled="actionBusy">
+                        <label class="custom-file-label" for="files">Select files...</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <b-form-checkbox switch v-model="directoryMode">Directory mode</b-form-checkbox>
                 </div>
             </div>
-
         </div>
     </div>
 </template>

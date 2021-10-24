@@ -109,7 +109,6 @@ export default {
 
         <train-pipeline
             :train-property="train"
-            :with-command="extendView"
             @done="handleDone"
             @failed="handleFailed"
             @deleted="handleDeleted"

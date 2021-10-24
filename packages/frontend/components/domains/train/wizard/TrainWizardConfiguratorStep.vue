@@ -28,7 +28,6 @@ export default {
         return {
             form: {
                 master_image_id: '',
-                query: '',
                 station_ids: []
             },
 
@@ -62,9 +61,6 @@ export default {
                         required,
                         numeric
                     }
-                },
-                query: {
-
                 }
             }
         }
@@ -124,14 +120,12 @@ export default {
                 return;
             }
 
-            const proposal_id = this.train.proposal_id ?? this.train.proposal.id;
-
             this.proposalStation.busy = true;
 
             try {
                 const response = await getApiProposalStations({
                     filter: {
-                        proposal_id: proposal_id
+                        proposal_id: this.train.proposal_id
                     }
                 });
 

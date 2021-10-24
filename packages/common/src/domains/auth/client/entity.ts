@@ -45,7 +45,7 @@ export class Client {
 
     // ------------------------------------------------------------------
 
-    @Column({nullable: true, enum: SERVICE_ID})
+    @Column({type: "enum", nullable: true, enum: SERVICE_ID})
     service_id: SERVICE_ID | null;
 
     @Column({type: "int", length: 11, nullable: true})

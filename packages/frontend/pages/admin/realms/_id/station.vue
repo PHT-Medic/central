@@ -37,13 +37,13 @@ export default {
                 fields: {
                     station: [
                         '+registry_project_id',
-                        'registry_project_account_name',
-                        'registry_project_account_token',
-                        'registry_project_webhook_exists',
-                        'vault_public_key_saved',
-                        'public_key',
-                        'email',
-                        'secure_id'
+                        '+registry_project_account_name',
+                        '+registry_project_account_token',
+                        '+registry_project_webhook_exists',
+                        '+vault_public_key_saved',
+                        '+public_key',
+                        '+email',
+                        '+secure_id'
                     ]
                 }
             });
