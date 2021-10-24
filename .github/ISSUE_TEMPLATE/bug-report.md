@@ -1,13 +1,13 @@
 ---
 name: 🚨 Bug report
-about: Report a bug report, to improve the central ui.
+about: Report a bug report, to improve this project.
 title: 'Bug: '
 labels: 'bug-report'
 assignees: ''
 
 ---
 
-<!-- 💚 Thanks for your time to make the UI better with your feedbacks 💚 
+<!-- 💚 Thanks for your time to make this project better with your feedback 💚 
 
 **IMPORTANT** Before reporting a bug:
 
