@@ -24,7 +24,7 @@ import {registerControllers} from "./routes";
 
 import {getMiddleware} from 'swagger-stats';
 import {setupAuthMiddleware} from "@typescript-auth/server";
-import {AuthorizationHeaderValue} from "@typescript-auth/core";
+import {AuthorizationHeader} from "@typescript-auth/core";
 
 import {authenticateWithAuthorizationHeader, parseCookie} from "./auth/utils";
 import {errorMiddleware} from "./middleware/error";
@@ -65,7 +65,7 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
 
     expressApp.use(setupAuthMiddleware({
         parseCookie: (request: Request) => parseCookie(request),
-        authenticateWithAuthorizationHeader: (request: Request, value: AuthorizationHeaderValue) => authenticateWithAuthorizationHeader(request, value)
+        authenticateWithAuthorizationHeader: (request: Request, value: AuthorizationHeader) => authenticateWithAuthorizationHeader(request, value)
     }));
 
     let swaggerDocument : any;

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildAuthorizationHeaderValue} from "@typescript-auth/core";
+import {stringifyAuthorizationHeader} from "@typescript-auth/core";
 
 import {Client} from "../../../../../auth"
 import {APIType, useAPI} from "../../../../../../modules";
@@ -58,7 +58,7 @@ export async function ensureHarborProjectWebHook(
         enabled: true,
         targets: [
             {
-                auth_header: buildAuthorizationHeaderValue({type: "Basic", username: client.id, password: client.secret}),
+                auth_header: stringifyAuthorizationHeader({type: "Basic", username: client.id, password: client.secret}),
                 skip_cert_verify: true,
                 // todo: change this, if service not on same machine.
                 address: apiUrl + "services/"+SERVICE_ID.REGISTRY+"/hook",

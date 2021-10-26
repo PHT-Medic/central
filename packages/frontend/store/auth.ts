@@ -11,7 +11,7 @@ import {ActionTree, GetterTree, MutationTree} from "vuex";
 
 import {RootState} from "~/store/index";
 
-import {Oauth2TokenResponse, OwnedPermission} from "@typescript-auth/core";
+import {Oauth2TokenResponse, PermissionItem} from "@typescript-auth/core";
 
 export const AuthStoreKey = {
     user: 'user',
@@ -27,7 +27,7 @@ export type AuthStoreToken = Oauth2TokenResponse & {
 export interface AuthState {
     user: User | undefined,
 
-    permissions: OwnedPermission<any>[],
+    permissions: PermissionItem<any>[],
     permissionsResolved: boolean,
 
     token: AuthStoreToken | undefined,

@@ -7,7 +7,7 @@
 
 import {Repository, EntityRepository, In} from "typeorm";
 import {hashPassword, verifyPassword} from "@typescript-auth/server";
-import {OwnedPermission} from "@typescript-auth/core";
+import {PermissionItem} from "@typescript-auth/core";
 
 import {Role} from "@personalhealthtrain/ui-common";
 import {UserRole} from "@personalhealthtrain/ui-common";
@@ -55,12 +55,12 @@ export class UserRepository extends Repository<User> {
 
     // ------------------------------------------------------------------
 
-    async getOwnedPermissions(userId: string | number, options?: PermissionOptions) : Promise<OwnedPermission<unknown>[]> {
+    async getOwnedPermissions(userId: string | number, options?: PermissionOptions) : Promise<PermissionItem<unknown>[]> {
         options = options ?? {};
         options.selfOwned = options.selfOwned ?? true;
         options.roleOwned = options.roleOwned ?? true;
 
-        let permissions : OwnedPermission<unknown>[] = [];
+        let permissions : PermissionItem<unknown>[] = [];
 
         if(options.selfOwned) {
             permissions = [...await this.getSelfOwnedPermissions(userId)];
@@ -89,7 +89,7 @@ export class UserRepository extends Repository<User> {
         return permissions;
     }
 
-    async getSelfOwnedPermissions(userId: string | number) : Promise<OwnedPermission<unknown>[]> {
+    async getSelfOwnedPermissions(userId: string | number) : Promise<PermissionItem<unknown>[]> {
         return [];
     }
 

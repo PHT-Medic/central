@@ -8,7 +8,7 @@
 import {AuthStoreToken} from "@/store/auth";
 import {Context} from "@nuxt/types";
 import {APIType, useAPI} from "@personalhealthtrain/ui-common";
-import {AbilityManager, Oauth2Client, Oauth2TokenResponse, OwnedPermission} from "@typescript-auth/core";
+import {AbilityManager, Oauth2Client, Oauth2TokenResponse, PermissionItem} from "@typescript-auth/core";
 import axios from "axios";
 import {Store} from 'vuex';
 
@@ -173,7 +173,7 @@ class AuthModule {
         return this.abilityManager.can(action, subject, field);
     }
 
-    public setPermissions(permissions: OwnedPermission<any>[]) {
+    public setPermissions(permissions: PermissionItem<any>[]) {
         this.abilityManager.setPermissions(permissions);
     }
 

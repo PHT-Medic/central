@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {AbilityManager, AuthorizationHeaderValue} from "@typescript-auth/core";
+import {AbilityManager, AuthorizationHeader} from "@typescript-auth/core";
 import {verifyToken} from "@typescript-auth/server";
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../domains/auth/user/repository";
@@ -22,7 +22,7 @@ const isIp4InCidr = (ip: string, cidr: string) => {
     return (ip4ToInt(ip) & mask) === (ip4ToInt(range) & mask);
 };
 
-export async function authenticateWithAuthorizationHeader(request: any, value: AuthorizationHeaderValue) : Promise<void> {
+export async function authenticateWithAuthorizationHeader(request: any, value: AuthorizationHeader) : Promise<void> {
     switch (value.type) {
         case "Bearer":
             let tokenPayload: TokenPayload;

@@ -232,6 +232,20 @@ export default {
     <div>
         <div class="row">
             <div class="col">
+                <h6>Manage</h6>
+                <div class="form-group">
+                    <label>Entrypoint File</label>
+                    <input type="text" class="form-control" :value="entrypointFileId" :disabled="true">
+                </div>
+
+                <div
+                    v-if="!entrypointFileId"
+                    class="alert alert-warning alert-sm mb-0">
+                    A file from the list below must be selected as entrypoint for the image command.
+                </div>
+
+                <hr />
+
                 <h6 class="title text-muted">Files
                     <span style="font-size: 0.65rem">
                         <span class="text-success">
@@ -264,21 +278,22 @@ export default {
                         Delete
                     </button>
                 </div>
+            </div>
+            <div class="col">
+                <h6>Upload</h6>
+                <div class="form-group">
+                    <label>Directories / Files</label>
+                    <div class="custom-file">
+                        <input type="file" :webkitdirectory="directoryMode" class="custom-file-input" id="files" ref="files" @change="checkFormFiles" multiple :disbaled="actionBusy">
+                        <label class="custom-file-label" for="files">Select files...</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <b-form-checkbox switch v-model="directoryMode">Directory mode</b-form-checkbox>
+                </div>
 
                 <hr />
 
-                <div class="form-group">
-                    <label>Entrypoint File</label>
-                    <input type="text" class="form-control" :value="entrypointFileId" :disabled="true">
-                </div>
-
-                <div
-                    v-if="!entrypointFileId"
-                    class="alert alert-warning alert-sm mb-0">
-                    A file from the list below must be selected as entrypoint for the image command.
-                </div>
-            </div>
-            <div class="col">
                 <div class="d-flex flex-row">
                     <div>
                         <h6 class="title text-muted">Files
@@ -321,19 +336,6 @@ export default {
                     <button type="button" class="btn btn-xs btn-dark" :disabled="actionBusy || form.files.length === 0" @click.prevent="upload">
                         Upload
                     </button>
-                </div>
-
-                <hr />
-
-                <div class="form-group">
-                    <label>Directories / Files</label>
-                    <div class="custom-file">
-                        <input type="file" :webkitdirectory="directoryMode" class="custom-file-input" id="files" ref="files" @change="checkFormFiles" multiple :disbaled="actionBusy">
-                        <label class="custom-file-label" for="files">Select files...</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <b-form-checkbox switch v-model="directoryMode">Directory mode</b-form-checkbox>
                 </div>
             </div>
         </div>
