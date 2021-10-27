@@ -7,7 +7,7 @@
 
 import {check, matchedData, validationResult} from "express-validator";
 import {getCustomRepository, getRepository} from "typeorm";
-import {applyFields, applyFilters, applyRelations, applyPagination} from "typeorm-extension";
+import {applyFields, applyFilters, applyRelations, applyPagination, applyQueryParseOutput} from "typeorm-extension";
 import {Params, Controller, Get, Request, Response, Post, Body, Delete} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 
@@ -19,6 +19,7 @@ import {
 import {getUserStationRouteHandler} from "./station";
 import {useLogger} from "../../../../modules/log";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {parseQueryFields} from "@trapi/query";
 
 // ---------------------------------------------------------------------------------
 
@@ -109,10 +110,21 @@ export async function getUsersRouteHandler(req: any, res: any) {
 
         onlyRealmPermittedQueryResources(query, req.realmId);
 
+        const fieldsParsed = parseQueryFields(fields, {
+            defaultAlias: 'user',
+            allowed: ['email']
+        });
+
+        applyQueryParseOutput(query, {
+            fields: fieldsParsed
+        })
+
+        /*
         applyFields(query, fields, {
             defaultAlias: 'user',
             allowed: ['email']
         });
+         */
 
         applyFilters(query, filter, {
             defaultAlias: 'user',

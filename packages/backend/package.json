@@ -3,7 +3,7 @@
     "private": true,
     "author": {
         "name": "Peter Placzek",
-        "email": "admin@tada5hi.net",
+        "email": "contact@tada5hi.net",
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
@@ -14,6 +14,7 @@
         "@decorators/di": "^1.0.2",
         "@decorators/express": "^2.4.0",
         "@personalhealthtrain/ui-common": "^1.0.0-alpha.1",
+        "@trapi/query": "^2.0.1",
         "@typescript-auth/core": "^1.0.0",
         "@typescript-auth/server": "^1.0.0",
         "amqp-extension": "^1.0.0",
@@ -36,7 +37,7 @@
         "tar": "^6.1.2",
         "tar-stream": "^2.1.4",
         "typeorm": "^0.2.38",
-        "typeorm-extension": "^1.0.0",
+        "typeorm-extension": "^1.0.1",
         "typeorm-seeding": "^1.6.1",
         "typescript-swagger": "^0.1.2",
         "uuid": "^8.3.2",
