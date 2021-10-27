@@ -18,7 +18,7 @@
         "@typescript-auth/core": "^1.0.0",
         "@typescript-auth/server": "^1.0.0",
         "amqp-extension": "^1.0.0",
-        "axios": "^0.21.1",
+        "axios": "^0.24.0",
         "bcrypt": "^5.0.1",
         "body-parser": "^1.19.0",
         "busboy": "^0.3.1",
