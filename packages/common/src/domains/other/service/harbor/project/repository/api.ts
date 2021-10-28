@@ -19,7 +19,7 @@ export interface HarborRepository {
 }
 
 export async function findHarborProjectRepository(projectName: string, repositoryName: string) : Promise<HarborRepository|undefined> {
-    const result = await useAPI(APIType.HARBOR).get('projects/'+projectName+'/repositories?name='+repositoryName+'&=page_size=1');
+    const result = await useAPI(APIType.HARBOR).get('projects/'+projectName+'/repositories?q=name=~'+repositoryName+'&=page_size=1');
 
     if(result.data.length !== 1) {
         return undefined;

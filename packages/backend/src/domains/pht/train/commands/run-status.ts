@@ -37,6 +37,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     // 1. Check PHT outgoing ( -> TrainFinished )
     let harborRepository: HarborRepository | undefined = await findHarborProjectRepository(REGISTRY_OUTGOING_PROJECT_NAME, train.id);
     if(typeof harborRepository !== 'undefined') {
+
         train = repository.merge(train, {
             build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
             configuration_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
@@ -78,7 +79,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
 
         try {
             harborRepository = await findHarborProjectRepository(stationName, train.id);
-            if (typeof harborRepository === 'undefined') {
+            if (typeof harborRepository !== 'undefined') {
                 train = repository.merge(train, {
                     build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
                     configuration_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
@@ -92,7 +93,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
             }
         } catch (e) {
             if(
-                typeof e?.response?.$status === "number" &&
+                typeof e?.response?.status === "number" &&
                 e.response.status === 404
             ) {
                 continue;
