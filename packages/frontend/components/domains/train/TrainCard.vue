@@ -107,6 +107,10 @@ export default {
             :train="train"
         />
 
+        <div>
+            <hr />
+        </div>
+
         <train-pipeline
             :train-property="train"
             :with-command="extendView"
