@@ -40,7 +40,9 @@ export default {
 
     },
     methods: {
-
+        async goTo(id) {
+            await this.$router.push('/admin/services/'+id);
+        }
     }
 }
 </script>
@@ -56,11 +58,12 @@ export default {
         <div class="m-t-10">
             <div class="row">
                 <div class="col-md-4 col-lg-3 col-12 mb-3" v-for="(item,key) in items" :key="key">
-                    <div class="event-card p-2 d-flex flex-column text-center">
+                    <div
+                        class="event-card p-2 d-flex flex-column text-center"
+                        @click.prevent="goTo(item.id)"
+                    >
                         <div class="event-card-header">
-                            <nuxt-link :to="'/admin/services/'+item.id">
-                                <h3>{{item.name}}</h3>
-                            </nuxt-link>
+                            <h3>{{item.name}}</h3>
                         </div>
                         <div class="event-card-body">
                             <i :class="item.icon"></i>
@@ -83,6 +86,7 @@ export default {
     background-color: #ececec;
     border: 1px solid #dedede;
     border-radius: 4px;
+    cursor: pointer;
 }
 .event-card-header,
 .event-card-header a {
