@@ -280,7 +280,7 @@ export default {
         <div>
             <h6>Stations</h6>
             <div class="row">
-                <div class="col-4">
+                <div class="col-12 col-xl-6">
                     <proposal-station-list
                         :proposal-id="train.proposal_id"
                         :filter="proposalStationFilter"
@@ -301,7 +301,7 @@ export default {
                         </template>
                     </proposal-station-list>
                 </div>
-                <div class="col-8">
+                <div class="col-12 col-xl-6">
                     <span>Stations <span class="text-success">selected</span></span>
 
                     <div class="c-list">

@@ -41,7 +41,7 @@ export default {
     },
     methods: {
         async goTo(id) {
-            await this.$router.push('/admin/services/'+id);
+            await this.$nuxt.$router.push('/admin/services/'+id);
         }
     }
 }
