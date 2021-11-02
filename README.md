@@ -1,4 +1,5 @@
 [![main](https://github.com/Tada5hi/pht-central-ui/actions/workflows/main.yml/badge.svg)](https://github.com/Tada5hi/pht-central-ui/actions/workflows/main.yml)
+[![CodeQL](https://github.com/PHT-Medic/central-ui/actions/workflows/codeql.yml/badge.svg)](https://github.com/PHT-Medic/central-ui/actions/workflows/codeql.yml)
 [![Known Vulnerabilities](https://snyk.io/test/github/Tada5hi/pht-central-ui/badge.svg)](https://snyk.io/test/github/Tada5hi/pht-central-ui)
 
 # User Interface (UI) 🚀
