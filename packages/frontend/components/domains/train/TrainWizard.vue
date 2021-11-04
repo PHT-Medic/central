@@ -5,6 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import Vue from 'vue';
 import {
     editAPITrain, getAPITrainStations,
     runAPITrainCommand,
@@ -252,6 +253,11 @@ export default {
         //----------------------------------
         // actions
         //----------------------------------
+        handleUpdated(item) {
+            for(let key in item) {
+                Vue.set(this.train, key, item[key]);
+            }
+        },
         setTrainFiles(files) {
             console.log(files);
 
@@ -374,7 +380,7 @@ export default {
 
                 <tab-content title="Configuration" :before-change="passWizardStep">
                     <train-wizard-configurator-step
-                        :train="train"
+                        :train="trainProperty"
                         :train-stations="trainStation.items"
                         @setTrainMasterImage="setMasterImage"
                         @setTrainStations="setStations"

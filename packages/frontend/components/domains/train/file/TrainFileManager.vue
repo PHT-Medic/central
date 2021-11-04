@@ -232,54 +232,6 @@ export default {
     <div>
         <div class="row">
             <div class="col">
-                <h6>Manage</h6>
-                <div class="form-group">
-                    <label>Entrypoint File</label>
-                    <input type="text" class="form-control" :value="entrypointFileId" :disabled="true">
-                </div>
-
-                <div
-                    v-if="!entrypointFileId"
-                    class="alert alert-warning alert-sm mb-0">
-                    A file from the list below must be selected as entrypoint for the image command.
-                </div>
-
-                <hr />
-
-                <h6 class="title text-muted">Files
-                    <span style="font-size: 0.65rem">
-                        <span class="text-success">
-                            <i class="fa fa-file"></i> uploaded
-                        </span>
-                    </span>
-                </h6>
-
-
-                <div class="form-check">
-                    <input type="checkbox" v-model="selectAll" @change="selectAllFiles" class="form-check-input" id="selectAllFiles">
-                    <label for="selectAllFiles">Select all</label>
-                </div>
-
-                <div class="d-flex flex-column">
-                    <train-file
-                        class="mr-1"
-                        v-for="(file,key) in items"
-                        :key="key"
-                        :file="file"
-                        :files-selected="selected"
-                        :file-selected-id="form.entrypoint_file_id"
-                        @check="selectFile"
-                        @toggle="changeEntryPointFile"
-                    />
-                </div>
-
-                <div class="form-group">
-                    <button type="button" class="btn btn-warning btn-xs" :disabled="actionBusy || selected.length === 0" @click.prevent="dropSelected">
-                        Delete
-                    </button>
-                </div>
-            </div>
-            <div class="col">
                 <h6>Upload</h6>
                 <div class="form-group">
                     <label>Directories / Files</label>
@@ -335,6 +287,54 @@ export default {
                 <div class="form-group">
                     <button type="button" class="btn btn-xs btn-dark" :disabled="actionBusy || form.files.length === 0" @click.prevent="upload">
                         Upload
+                    </button>
+                </div>
+            </div>
+            <div class="col">
+                <h6>Manage</h6>
+                <div class="form-group">
+                    <label>Entrypoint File</label>
+                    <input type="text" class="form-control" :value="entrypointFileId" :disabled="true">
+                </div>
+
+                <div
+                    v-if="!entrypointFileId"
+                    class="alert alert-warning alert-sm mb-0">
+                    A file from the list below must be selected as entrypoint for the image command.
+                </div>
+
+                <hr />
+
+                <h6 class="title text-muted">Files
+                    <span style="font-size: 0.65rem">
+                        <span class="text-success">
+                            <i class="fa fa-file"></i> uploaded
+                        </span>
+                    </span>
+                </h6>
+
+
+                <div class="form-check">
+                    <input type="checkbox" v-model="selectAll" @change="selectAllFiles" class="form-check-input" id="selectAllFiles">
+                    <label for="selectAllFiles">Select all</label>
+                </div>
+
+                <div class="d-flex flex-column">
+                    <train-file
+                        class="mr-1"
+                        v-for="(file,key) in items"
+                        :key="key"
+                        :file="file"
+                        :files-selected="selected"
+                        :file-selected-id="form.entrypoint_file_id"
+                        @check="selectFile"
+                        @toggle="changeEntryPointFile"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="btn btn-warning btn-xs" :disabled="actionBusy || selected.length === 0" @click.prevent="dropSelected">
+                        Delete
                     </button>
                 </div>
             </div>

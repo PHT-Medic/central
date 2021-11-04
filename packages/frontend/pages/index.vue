@@ -47,7 +47,8 @@
                     &bull;  Use container technologies to adapt rapidly on the analytical requirements<br />
                     &bull; A central architecture to submit and distribute trains to each station<br />
                     <br />
-                    Code available at: <a href="https://gitlab.com/PersonalHealthTrain/implementations/germanmii/difuture" target="_blank">gitlab.com</a>
+                    Code available at: <a href="https://github.com/PHT-Medic" target="_blank">github.com</a><br />
+                    Additional Information at: <a href="https://personalhealthtrain.de" target="_blank">personalhealthtrain.de</a>
                 </div>
                 <div class="text-center">
                     <img src="/services.png" class="img-fluid w-75"/>

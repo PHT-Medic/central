@@ -8,7 +8,6 @@
 import {
     addAPITrainStation, dropAPITrainStation,
     editAPITrainStation,
-    getAPIMasterImages,
     getApiProposalStations, getAPITrainStations, ProposalStationApprovalStatus
 } from "@personalhealthtrain/ui-common";
 import {minLength, numeric, required} from "vuelidate/lib/validators";
@@ -71,6 +70,13 @@ export default {
         },
         availableProposalStations() {
             return this.proposalStation.items.filter(item => this.trainStation.items.findIndex(trainStation => trainStation.station_id === item.station_id) === -1);
+        },
+        proposalMasterImageId() {
+            if(typeof this.train.proposal !== 'undefined') {
+                return this.train.proposal.master_image_id;
+            }
+
+            return undefined;
         }
     },
     created() {
@@ -267,7 +273,7 @@ export default {
         <div class="mb-2">
             <h6>MasterImage</h6>
             <div class="mb-2">
-                <master-image-picker @selected="handleMasterImageSelected" />
+                <master-image-picker :master-image-id="proposalMasterImageId"  @selected="handleMasterImageSelected" />
 
                 <div v-if="!$v.form.master_image_id.required" class="form-group-hint group-required">
                     Please select a master image.
