@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {LayoutNavigationDefaultId} from "~/config/layout";
 import {Context} from "@nuxt/types";
+import {Layout, LayoutNavigationID} from "../modules/layout/contants";
 
-export default function layoutMiddleware({ store, route } : Context) {
-    let key : string = 'navigationId';
+export default async function layoutMiddleware({ store, route } : Context) {
+    const key = Layout.NAVIGATION_ID_KEY;
     let navigationId : string | undefined;
 
     if(route.meta) {
@@ -30,8 +30,8 @@ export default function layoutMiddleware({ store, route } : Context) {
     }
 
     if(typeof navigationId === 'undefined') {
-        navigationId = LayoutNavigationDefaultId;
+        navigationId = LayoutNavigationID.DEFAULT;
     }
 
-    return store.dispatch('layout/selectNavigation', navigationId).then(r => r)
+    await store.dispatch('layout/selectNavigation', navigationId);
 }

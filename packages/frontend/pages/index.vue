@@ -8,11 +8,13 @@
     import { mapGetters } from 'vuex'
     import MedicineLab from "../components/svg/MedicineLab";
     import WorldSvg from "../components/svg/WorldSvg";
+    import {Layout, LayoutNavigationID} from "../modules/layout/contants";
 
     export default {
         components: {WorldSvg, MedicineLab},
         meta: {
-            requireLoggedIn: true
+            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
         },
         computed: {
             ...mapGetters('auth', [

@@ -6,14 +6,14 @@
   -->
 <script>
     import {getApiProposalStations, getAPIStations, getProposal} from "@personalhealthtrain/ui-common";
-    import { LayoutNavigationDefaultId } from "../../config/layout";
     import ProposalSvg from "../../components/svg/ProposalSvg";
+    import {Layout, LayoutNavigationID} from "../../modules/layout/contants";
 
     export default {
         components: {ProposalSvg},
         meta: {
-            requireLoggedIn: true,
-            navigationId: LayoutNavigationDefaultId
+            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
         },
         async asyncData (context) {
             try {

@@ -7,12 +7,12 @@
 <script>
 import {getAPITrain} from "@personalhealthtrain/ui-common";
 import Vue from 'vue';
-import {LayoutNavigationDefaultId} from "../../config/layout.ts";
+import {Layout, LayoutNavigationID} from "../../modules/layout/contants";
 
 export default {
     meta: {
-        requireLoggedIn: true,
-        navigationId: LayoutNavigationDefaultId
+        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
     },
     async asyncData(context) {
         try {

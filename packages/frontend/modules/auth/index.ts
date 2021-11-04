@@ -8,7 +8,14 @@
 import {AuthStoreToken} from "@/store/auth";
 import {Context} from "@nuxt/types";
 import {APIType, useAPI} from "@personalhealthtrain/ui-common";
-import {AbilityManager, Oauth2Client, Oauth2TokenResponse, PermissionItem} from "@typescript-auth/core";
+import {
+    AbilityManager,
+    AbilityMeta,
+    buildAbilityMetaFromName,
+    Oauth2Client,
+    Oauth2TokenResponse,
+    PermissionItem
+} from "@typescript-auth/core";
 import axios from "axios";
 import {Store} from 'vuex';
 
@@ -171,6 +178,15 @@ class AuthModule {
 
     public can(action: string, subject: any, field?: string) {
         return this.abilityManager.can(action, subject, field);
+    }
+
+    public hasAbility(ability: AbilityMeta) : boolean {
+        return this.abilityManager.can(ability.action, ability.subject);
+    }
+
+    public hasPermission(name: string) : boolean {
+        const ability = buildAbilityMetaFromName(name);
+        return this.hasAbility(ability);
     }
 
     public setPermissions(permissions: PermissionItem<any>[]) {

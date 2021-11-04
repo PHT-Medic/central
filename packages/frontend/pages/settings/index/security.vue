@@ -26,7 +26,7 @@ export default {
 <template>
     <div class="mb-2">
         <h6 class="title">
-            Passwort
+            Password
         </h6>
 
         <user-password-form :user-property="user" />

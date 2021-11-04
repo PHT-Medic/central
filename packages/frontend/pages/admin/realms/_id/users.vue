@@ -8,7 +8,7 @@
 <script>
 
 import {PermissionID} from "@personalhealthtrain/ui-common";
-import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
+import {Layout, LayoutNavigationID} from "../../../../modules/layout/contants";
 
 export default {
     meta: {
@@ -22,6 +22,9 @@ export default {
             PermissionID.USER_ROLE_EDIT,
             PermissionID.USER_ROLE_DROP
         ]
+    },
+    props: {
+        realm: Object
     },
     data() {
         return {
@@ -45,30 +48,24 @@ export default {
 }
 </script>
 <template>
-    <div class="container">
-        <h1 class="title no-border mb-3">
-            User <span class="sub-title">Management</span>
-        </h1>
-
-        <div class="content-wrapper">
-            <div class="content-sidebar flex-column">
-                <b-nav pills vertical>
-                    <b-nav-item
-                        v-for="(item,key) in sidebar.items"
-                        :key="key"
-                        :disabled="item.active"
-                        :to="'/admin/users' + item.urlSuffix"
-                        exact
-                        exact-active-class="active"
-                    >
-                        <i :class="item.icon" />
-                        {{ item.name }}
-                    </b-nav-item>
-                </b-nav>
-            </div>
-            <div class="content-container">
-                <nuxt-child />
-            </div>
+    <div class="content-wrapper">
+        <div class="content-sidebar flex-column">
+            <b-nav pills vertical>
+                <b-nav-item
+                    v-for="(item,key) in sidebar.items"
+                    :key="key"
+                    :disabled="item.active"
+                    :to="'/admin/realms/'+realm.id+'/users' + item.urlSuffix"
+                    exact
+                    exact-active-class="active"
+                >
+                    <i :class="item.icon" />
+                    {{ item.name }}
+                </b-nav-item>
+            </b-nav>
+        </div>
+        <div class="content-container">
+            <nuxt-child :realm="realm" />
         </div>
     </div>
 </template>

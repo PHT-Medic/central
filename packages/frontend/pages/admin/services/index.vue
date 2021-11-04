@@ -8,16 +8,16 @@
 import {LayoutNavigationAdminId} from "~/config/layout";
 import StationForm from "../../../components/domains/station/StationForm";
 import ServiceClientDetails from "../../../components/domains/service/ServiceClientDetails";
-import {SERVICE_ID} from "@personalhealthtrain/ui-common";
+import {PermissionID, SERVICE_ID} from "@personalhealthtrain/ui-common";
+import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
 
 export default {
     components: {ServiceClientDetails, StationForm},
     meta: {
-        navigationId: LayoutNavigationAdminId,
-        requireLoggedIn: true,
-        requireAbility: (can) => {
-            return can('manage','service')
-        }
+        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
+        [Layout.REQUIRED_PERMISSIONS_KEY]: [
+            PermissionID.SERVICE_MANAGE
+        ]
     },
     data() {
         return {

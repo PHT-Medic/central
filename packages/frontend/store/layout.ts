@@ -5,30 +5,36 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import LayoutModule from '~/modules/layout';
-import { LayoutNavigationDefaultId } from "~/config/layout";
 import {ActionTree, GetterTree, MutationTree} from "vuex";
-import {RootState} from "~/store/index";
+import {reduceComponents} from "../modules/layout/components";
+import {getNavigationComponentById, getNavigationComponents} from "../modules/layout/navigation";
+import {getSidebarComponentsForNavigationId} from "../modules/layout/sidebar";
+import {RootState} from "./index";
 import {
     LayoutComponent,
-    LayoutNavigationComponentInterface,
-    LayoutSidebarComponentInterface
-} from "~/modules/layout/types";
+    LayoutNavigationComponent, LayoutNavigationIDType,
+    LayoutSidebarComponent
+} from "../modules/layout/types";
+import {LayoutNavigationID} from "../modules/layout/contants";
 
 // --------------------------------------------------------------------
 
 export interface LayoutState {
-    navigationComponents: LayoutNavigationComponentInterface[],
-    navigation: LayoutNavigationComponentInterface | undefined,
-    navigationId: string,
+    initialized: boolean,
 
-    sidebarComponents: LayoutSidebarComponentInterface[]
+    navigationComponents: LayoutNavigationComponent[],
+    navigation: LayoutNavigationComponent | undefined,
+    navigationId: LayoutNavigationIDType,
+
+    sidebarComponents: LayoutSidebarComponent[]
 }
 
 export const state = () : LayoutState => ({
-    navigationComponents: LayoutModule.getNavigation(),
-    navigation: LayoutModule.getNavigationById(LayoutNavigationDefaultId),
-    navigationId: LayoutNavigationDefaultId,
+    initialized: false,
+
+    navigationComponents: getNavigationComponents(),
+    navigation: getNavigationComponentById(LayoutNavigationID.DEFAULT),
+    navigationId: LayoutNavigationID.DEFAULT,
 
     sidebarComponents: [],
 });
@@ -40,36 +46,40 @@ export const getters : GetterTree<LayoutState, RootState> = {
     navigation: (state) => {
         return state.navigation;
     },
-    navigationId: (state) => {
+    navigationId: (state) : LayoutNavigationIDType => {
         return state.navigationId
     },
-    sidebarComponents: (state, getters) => {
+
+    sidebarComponents: (state) => {
         return state.sidebarComponents;
     },
 
 };
 
 export const actions : ActionTree<LayoutState, RootState> = {
-    selectNavigation ({ commit, state, dispatch }, id: string) {
-        id = id === undefined ? LayoutNavigationDefaultId : id;
-
-        if (state.navigationId === id && state.sidebarComponents.length > 0) {
-            return;
+    selectNavigation ({ commit, state, dispatch }, id?: LayoutNavigationID) {
+        if (
+            state.initialized &&
+            state.navigationId === id
+        ) {
+            return state.sidebarComponents;
         }
 
-        const navigation = LayoutModule.getNavigationById(id);
+        const navigation = getNavigationComponentById(id);
 
         if(typeof navigation === 'undefined') {
-            return;
+            console.log('layout navigation not found...');
+            return state.sidebarComponents;
         }
 
         commit('setNavigationId', id);
         commit('setNavigation', navigation);
 
-        const sidebarComponents = LayoutModule.getSidebarById(id);
-        commit('setSidebarComponents', sidebarComponents);
-
         dispatch('update'); // navigation update also required, for init page load to render nav bar correctly (loggedIn).
+
+        commit('setInitialized', true);
+
+        return state.sidebarComponents;
     },
 
     /**
@@ -98,17 +108,16 @@ export const actions : ActionTree<LayoutState, RootState> = {
 
         switch (type) {
             case 'sidebar':
-                components = LayoutModule.getSidebarById(state.navigationId);
+                components = [...getSidebarComponentsForNavigationId(state.navigationId)]
                 break;
             case 'navigation':
-                components = LayoutModule.getNavigation();
+                components = [...getNavigationComponents()];
                 break;
         }
 
-        components = LayoutModule.reduceComponents({
-            components,
+        components = reduceComponents(components, {
             loggedIn: rootGetters['auth/loggedIn'],
-            can: this.$auth.can.bind(this.$auth)
+            auth: this.$auth
         });
 
         switch (type) {
@@ -123,6 +132,9 @@ export const actions : ActionTree<LayoutState, RootState> = {
 };
 
 export const mutations : MutationTree<LayoutState> = {
+    setInitialized(state, value) {
+        state.initialized = value;
+    },
     setNavigationId (state, id) {
         state.navigationId = id
     },

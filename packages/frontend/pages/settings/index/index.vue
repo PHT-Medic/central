@@ -33,7 +33,7 @@
                 </h6>
 
                 <hr />
-                <user-details-form :user-property="user"/>
+                <user-details-form :realm-id="user.realm_id" :user-property="user"/>
             </div>
             <div class="col-6">
 

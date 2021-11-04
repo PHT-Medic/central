@@ -105,6 +105,12 @@ export default {
                 .catch(reject);
         },
 
+        dropArrayItem(item) {
+            const index = this.items.findIndex(el => el.id === item.id);
+            if(index !== -1) {
+                this.items.splice(index, 1);
+            }
+        },
         addArrayItem(item) {
             this.items.push(item);
         },

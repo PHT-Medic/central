@@ -5,13 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Permission} from "@personalhealthtrain/ui-common";
+import {Permission, PermissionID} from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
 import {applyFilters, applyPagination} from "typeorm-extension";
 import {SwaggerTags} from "typescript-swagger";
 
-import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {Body, Controller, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {check, matchedData, validationResult} from "express-validator";
 
 @SwaggerTags("auth")
 @Controller("/permissions")
@@ -31,6 +32,15 @@ export class PermissionController {
         @Response() res: any
     ): Promise<Permission> {
         return await getPermission(req, res);
+    }
+
+    @Post("", [ForceLoggedInMiddleware])
+    async add(
+        @Body() user: NonNullable<Permission>,
+        @Request() req: any,
+        @Response() res: any
+    ): Promise<Permission[]> {
+        return await addRouteHandler(req, res);
     }
 }
 
@@ -77,4 +87,30 @@ async function getPermission(req: any, res: any) {
     } catch (e) {
         return res._failNotFound();
     }
+}
+
+async function addRouteHandler(req: any, res: any) : Promise<any> {
+    if(!req.ability.hasPermission(PermissionID.PERMISSION_MANAGE)) {
+        return res._failForbidden();
+    }
+
+    await check('id').exists().notEmpty().isLength({min: 3, max: 30}).run(req);
+
+    const validation = validationResult(req);
+    if(!validation.isEmpty()) {
+        return res._failExpressValidationError(validation);
+    }
+
+    const data = matchedData(req, {includeOptionals: false});
+
+    const repository = getRepository(Permission);
+    const role = repository.create(data);
+
+    await repository.save(role);
+
+    return res.respondCreated({
+        data: {
+            id: role.id
+        }
+    });
 }

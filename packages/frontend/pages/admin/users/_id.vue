@@ -58,6 +58,13 @@
                 <div class="panel-card-body">
                     <b-nav pills>
                         <b-nav-item
+                            :to="'/admin/users'"
+                            exact
+                            exact-active-class="active"
+                        >
+                            <i class="fa fa-arrow-left" />
+                        </b-nav-item>
+                        <b-nav-item
                             v-for="(item,key) in tabs"
                             :key="key"
                             :disabled="item.active"

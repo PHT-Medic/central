@@ -7,19 +7,18 @@
 
 import {check, matchedData, validationResult} from "express-validator";
 import {getCustomRepository, getRepository} from "typeorm";
-import {applyFields, applyFilters, applyRelations, applyPagination, applyQueryParseOutput} from "typeorm-extension";
+import {applyFields, applyFilters, applyRelations, applyPagination} from "typeorm-extension";
 import {Params, Controller, Get, Request, Response, Post, Body, Delete} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 
 import {UserRepository} from "../../../../domains/auth/user/repository";
 import {
     isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources, Realm, Station, User
+    onlyRealmPermittedQueryResources, PermissionID, Realm, Station, User
 } from "@personalhealthtrain/ui-common";
 import {getUserStationRouteHandler} from "./station";
 import {useLogger} from "../../../../modules/log";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
-import {parseQueryFields} from "@trapi/query";
 
 // ---------------------------------------------------------------------------------
 
@@ -110,25 +109,14 @@ export async function getUsersRouteHandler(req: any, res: any) {
 
         onlyRealmPermittedQueryResources(query, req.realmId);
 
-        const fieldsParsed = parseQueryFields(fields, {
-            defaultAlias: 'user',
-            allowed: ['email']
-        });
-
-        applyQueryParseOutput(query, {
-            fields: fieldsParsed
-        })
-
-        /*
         applyFields(query, fields, {
             defaultAlias: 'user',
-            allowed: ['email']
+            allowed: ['id', 'name', 'display_name', 'email']
         });
-         */
 
         applyFilters(query, filter, {
             defaultAlias: 'user',
-            allowed: ['id', 'name']
+            allowed: ['id', 'name', 'realm_id']
         });
 
         applyRelations(query, include, {
@@ -200,12 +188,13 @@ export async function getMeRouteHandler(req: any, res: any) {
 }
 
 export async function addUserRouteHandler(req: any, res: any) {
-    if(!req.ability.can('add','user')) {
+    if(!req.ability.hasPermission(PermissionID.USER_ADD)) {
         return res._failForbidden('You are not authorized to add a user.');
     }
 
+    await check('display_name').exists().notEmpty().isLength({min: 4, max: 128}).optional().run(req);
     await check('email').exists().normalizeEmail().isEmail().optional({nullable: true}).run(req);
-    await check('name').exists().notEmpty().isLength({min: 5, max: 128}).run(req);
+    await check('name').exists().notEmpty().isLength({min: 4, max: 128}).run(req);
     await check('password').exists().isLength({min: 5, max: 512}).optional({nullable: true}).run(req);
     await check('realm_id').exists().notEmpty().custom((value: any) => {
         return getRepository(Realm).findOne(value).then((realm: Realm | undefined) => {
@@ -258,11 +247,11 @@ export async function editUserRouteHandler(req: any, res: any) {
         return res._failNotFound({message: 'The user identifier is not valid.'});
     }
 
-    if(!req.ability.can('edit','user') && !req.user.id === id) {
+    if(!req.ability.hasPermission(PermissionID.USER_EDIT) && !req.user.id === id) {
         return res._failForbidden({message: 'You are not authorized to modify a user.'});
     }
 
-    await check('display_name').exists().notEmpty().isLength({min: 5, max: 128}).optional().run(req);
+    await check('display_name').exists().notEmpty().isLength({min: 4, max: 128}).optional().run(req);
     await check('email').exists().normalizeEmail({gmail_remove_dots: false}).isEmail().optional({nullable: true}).run(req);
     await check('password').exists().isLength({min: 5, max: 512})
         .custom((value, {req: request}) => {
@@ -338,7 +327,7 @@ export async function editUserRouteHandler(req: any, res: any) {
 export async function dropUserRouteHandler(req: any, res: any) {
     const {id} = req.params;
 
-    if (!req.ability.can('drop', 'user')) {
+    if (!req.ability.hasPermission(PermissionID.USER_DROP)) {
         return res._failForbidden({message: 'You are not authorized to drop a user.'});
     }
 

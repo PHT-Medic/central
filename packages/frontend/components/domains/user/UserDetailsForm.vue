@@ -27,24 +27,28 @@ export default {
                 email: '',
                 realm_id: '',
             },
+
             message: null,
             busy: false,
+
             realm: {
                 items: [],
                 busy: false
-            }
+            },
+
+            displayNameChanged: false
         }
     },
     validations: {
         form: {
             name: {
                 required,
-                minLength: minLength(5),
+                minLength: minLength(4),
                 maxLength: maxLength(128)
             },
             display_name: {
                 required,
-                minLength: minLength(5),
+                minLength: minLength(4),
                 maxLength: maxLength(128)
             },
             email: {
@@ -158,6 +162,14 @@ export default {
             }
 
             this.busy = false;
+        },
+        updateDisplayName(e) {
+            if(!this.displayNameChanged) {
+                this.form.display_name = e.target.value;
+            }
+        },
+        handleDisplayNameChanged(e) {
+            this.displayNameChanged = e.target.value.length !== 0;
         }
     },
     computed: {
@@ -180,14 +192,18 @@ export default {
                 {{ message.data }}
             </div>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.form.realm_id.$error }">
+            <div
+                v-if="!isRealmPredefined"
+                class="form-group"
+                :class="{ 'form-group-error': $v.form.realm_id.$error }"
+            >
                 <label>Realm</label>
                 <select
                     v-model="$v.form.realm_id.$model"
                     class="form-control"
                     :disabled="realm.busy || !$auth.can('edit','user')"
                 >
-                    <option value="">--- Bitte auswählen ---</option>
+                    <option value="">--- Select ---</option>
                     <option v-for="(item,key) in realm.items" :value="item.id" :key="key">{{ item.name }}</option>
                 </select>
 
@@ -198,7 +214,7 @@ export default {
 
             <div class="form-group" :class="{ 'form-group-error': $v.form.name.$error }">
                 <label>Name</label>
-                <input v-model="$v.form.name.$model" :disabled="!$auth.can('edit','user')" type="text" name="name" class="form-control" placeholder="Benutzer-Name...">
+                <input v-model="$v.form.name.$model" @change.prevent="updateDisplayName" :disabled="!$auth.can('edit','user')" type="text" name="name" class="form-control" placeholder="...">
 
                 <div v-if="!$v.form.name.required && !$v.form.name.$model" class="form-group-hint group-required">
                     Please enter a name.
@@ -213,7 +229,7 @@ export default {
 
             <div class="form-group" :class="{ 'form-group-error': $v.form.display_name.$error }">
                 <label>Display Name</label>
-                <input v-model="$v.form.display_name.$model" type="text" name="display_name" class="form-control" placeholder="Display-Name...">
+                <input v-model="$v.form.display_name.$model"@change.prevent="handleDisplayNameChanged"  type="text" name="display_name" class="form-control" placeholder="...">
 
                 <div v-if="!$v.form.display_name.required && !$v.form.display_name.$model" class="form-group-hint group-required">
                     Please enter a display name.
@@ -228,7 +244,7 @@ export default {
 
             <div class="form-group" :class="{ 'form-group-error': $v.form.email.$error }">
                 <label>Email</label>
-                <input v-model="$v.form.email.$model" type="email" name="email" class="form-control" placeholder="Email-Address...">
+                <input v-model="$v.form.email.$model" type="email" name="email" class="form-control" placeholder="...">
 
                 <div v-if="!$v.form.email.minLength" class="form-group-hint group-required">
                     The length of the e-mail address must be less than  <strong>{{ $v.form.email.$params.minLength.min }}</strong> characters.

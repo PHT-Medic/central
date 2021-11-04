@@ -5,16 +5,18 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {getAPIRole} from "@personalhealthtrain/ui-common";
-    import {LayoutNavigationAdminId} from "../../../config/layout";
+import {getAPIRole, PermissionID} from "@personalhealthtrain/ui-common";
+    import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
 
     export default {
         meta: {
-            navigationId: LayoutNavigationAdminId,
-            requireLoggedIn: true,
-            requireAbility: (can) => {
-                return can('edit','role') || can('role_permission_add') || can('role_permission_drop')
-            }
+            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
+            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+            [Layout.REQUIRED_PERMISSIONS_KEY]: [
+                PermissionID.ROLE_EDIT,
+                PermissionID.ROLE_PERMISSION_ADD,
+                PermissionID.ROLE_PERMISSION_DROP
+            ]
         },
         async asyncData(context) {
             try {

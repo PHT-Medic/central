@@ -82,48 +82,50 @@ export default {
         <alert-message :message="form.message" />
 
         <div class="form-group" :class="{ 'form-group-error': $v.form.password.$error }">
-            <label>Passwort</label>
-            <input v-model="$v.form.password.$model" :type="form.passwordShow ? 'text' : 'password'"  name="name" class="form-control" placeholder="Passwort...">
+            <label>Password</label>
+            <input v-model="$v.form.password.$model" :type="form.passwordShow ? 'text' : 'password'"  name="name" class="form-control" placeholder="...">
 
             <div v-if="!$v.form.password.required" class="form-group-hint group-required">
-                Bitte geben Sie ein Passwort an.
+                Enter a password.
             </div>
             <div v-if="!$v.form.password.minLength" class="form-group-hint group-required">
-                Das Passwort muss mindestens <strong>{{ $v.form.password.$params.minLength.min }}</strong> Zeichen lang sein.
+                The length of the password must be greater than <strong>{{ $v.form.password.$params.minLength.min }}</strong> characters.
             </div>
             <div v-if="!$v.form.password.maxLength" class="form-group-hint group-required">
-                Das Passwort darf maximal <strong>{{ $v.form.password.$params.maxLength.max }}</strong> Zeichen lang sein.
+                The length of the password must be less than <strong>{{ $v.form.password.$params.maxLength.max }}</strong> characters.
             </div>
         </div>
 
         <div class="form-group" :class="{ 'form-group-error': $v.form.password_repeat.$error }">
-            <label>Passwort wiederholen</label>
-            <input v-model="$v.form.password_repeat.$model" :type="form.passwordShow ? 'text' : 'password'" name="name" class="form-control" placeholder="Passwort wiederholen...">
+            <label>Repeat password</label>
+            <input v-model="$v.form.password_repeat.$model" :type="form.passwordShow ? 'text' : 'password'" name="name" class="form-control" placeholder="...">
 
             <div v-if="!$v.form.password_repeat.required" class="form-group-hint group-required">
-                Bitte geben Sie das Passwort erneut an.
+                Repeat the password from above.
             </div>
             <div v-if="!$v.form.password_repeat.minLength" class="form-group-hint group-required">
-                Das Password muss mindestens <strong>{{ $v.form.password_repeat.$params.minLength.min }}</strong> Zeichen lang sein.
+                The length of the password must be greater than <strong>{{ $v.form.password_repeat.$params.minLength.min }}</strong> characters.
             </div>
             <div v-if="!$v.form.password_repeat.maxLength" class="form-group-hint group-required">
-                Das Password darf maximal <strong>{{ $v.form.password_repeat.$params.maxLength.max }}</strong> Zeichen lang sein.
+                The length of the password must be less than <strong>{{ $v.form.password_repeat.$params.maxLength.max }}</strong> characters.
             </div>
             <div v-if="!$v.form.password_repeat.sameAsPassword" class="form-group-hint group-required">
-                Die Passwörter sind nicht identisch...
+                The entered passwords are not the same.
             </div>
         </div>
 
         <div class="form-group pl-1 mb-1">
             <b-form-checkbox v-model="form.passwordShow" switch>
-                Passwort {{ form.passwordShow ? 'ausblenden' : 'anzeigen' }}
+                Password {{ form.passwordShow ? 'hide' : 'show' }}
             </b-form-checkbox>
         </div>
 
         <hr>
 
         <div class="form-group">
-            <button :disabled="$v.form.$invalid || form.busy" @click.prevent="submit" type="submit" class="btn btn-primary btn-xs"><i class="fa fa-save"></i> Ändern</button>
+            <button :disabled="$v.form.$invalid || form.busy" @click.prevent="submit" type="submit" class="btn btn-primary btn-xs">
+                <i class="fa fa-save"></i> Update
+            </button>
         </div>
     </form>
 </template>
