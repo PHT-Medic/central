@@ -78,9 +78,11 @@
 </script>
 <template>
     <div>
+        <!--
         <div class="progress-with-circle">
             <div class="progress-bar" :style="{width: progressPercentage + '%'}" style="background-color: rgb(51, 51, 51); color: rgb(51, 51, 51);"></div>
         </div>
+        -->
         <div class="d-flex flex-row justify-content-between position-relative">
             <div class="icon-circle progress-step bg-dark text-light">
                 <span class="icon">Incoming Station</span>
