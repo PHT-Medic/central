@@ -13,6 +13,7 @@ import {
     useAPI
 } from "../../../modules";
 import {User} from "./entity";
+import {nullifyEmptyObjectProperties} from "../../../utils";
 
 export async function getAPIUsers(options?: BuildInput<User>) : Promise<CollectionResourceResponse<User>> {
     const response = await useAPI(APIType.DEFAULT).get('users' + buildQuery(options));
@@ -33,13 +34,13 @@ export async function dropAPIUser(id: typeof User.prototype.id) : Promise<Single
 }
 
 export async function addAPIUser(data: Partial<User>) : Promise<SingleResourceResponse<User>> {
-    const response = await useAPI(APIType.DEFAULT).post('users', data);
+    const response = await useAPI(APIType.DEFAULT).post('users', nullifyEmptyObjectProperties(data));
 
     return response.data;
 }
 
 export async function editAPIUser(userId: typeof User.prototype.id, data: Partial<User> & {password_repeat: typeof User.prototype.password}) : Promise<SingleResourceResponse<User>> {
-    const response = await useAPI(APIType.DEFAULT).post('users/' + userId, data);
+    const response = await useAPI(APIType.DEFAULT).post('users/' + userId, nullifyEmptyObjectProperties(data));
 
     return response.data;
 }

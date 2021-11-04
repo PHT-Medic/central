@@ -14,16 +14,6 @@ import {
 import {maxLength, minLength, numeric} from "vuelidate/lib/validators";
 import AlertMessage from "../../alert/AlertMessage";
 
-function nullifyEmptyProperties(data) {
-    for(let key in data) {
-        if(data[key] === '') {
-            data[key] = null;
-        }
-    }
-
-    return data;
-}
-
 export default {
     components: {AlertMessage},
     props: {
@@ -88,7 +78,7 @@ export default {
 
             try {
                 if(typeof this.item !== 'undefined') {
-                    this.item = await editAPIUserKeyRing(this.item.id, nullifyEmptyProperties(this.form));
+                    this.item = await editAPIUserKeyRing(this.item.id, this.form);
 
                     this.$emit('updated', this.item);
                     this.message = {

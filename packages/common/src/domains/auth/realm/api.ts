@@ -13,6 +13,7 @@ import {
     useAPI
 } from "../../../modules";
 import {Realm} from "./entity";
+import {nullifyEmptyObjectProperties} from "../../../utils";
 
 export async function getAPIRealms(data?: BuildInput<Realm>) : Promise<CollectionResourceResponse<Realm>> {
     let response = await useAPI(APIType.DEFAULT).get('realms' + buildQuery(data));
@@ -33,13 +34,13 @@ export async function dropAPIRealm(id: typeof Realm.prototype.id) : Promise<Sing
 }
 
 export async function addAPIRealm(data: Partial<Realm>) : Promise<SingleResourceResponse<Realm>> {
-    let response = await useAPI(APIType.DEFAULT).post('realms', data);
+    let response = await useAPI(APIType.DEFAULT).post('realms', nullifyEmptyObjectProperties(data));
 
     return response.data;
 }
 
 export async function editAPIRealm(realmId: typeof Realm.prototype.id, data: Partial<Realm>) : Promise<SingleResourceResponse<Realm>> {
-    let response = await useAPI(APIType.DEFAULT).post('realms/' + realmId, data);
+    let response = await useAPI(APIType.DEFAULT).post('realms/' + realmId, nullifyEmptyObjectProperties(data));
 
     return response.data;
 }

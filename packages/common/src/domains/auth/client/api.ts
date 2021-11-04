@@ -8,6 +8,7 @@
 import {APIType, SingleResourceResponse, useAPI} from "../../../modules";
 import {Client} from "./entity";
 import {AuthClientType} from "./type";
+import {nullifyEmptyObjectProperties} from "../../../utils";
 
 export async function executeAPIClientCommand(id: typeof Client.prototype.id, command: string, data: Record<string, any>): Promise<SingleResourceResponse<Client>> {
     const {data: resultData} = await useAPI(APIType.DEFAULT).post('clients/' + id + '/command', {command, ...data});
@@ -21,7 +22,7 @@ type AuthClientCreateContext = {
 };
 
 export async function addAPIClient(data: AuthClientCreateContext) {
-    const {data: resultData} = await useAPI(APIType.DEFAULT).post('clients', data);
+    const {data: resultData} = await useAPI(APIType.DEFAULT).post('clients', nullifyEmptyObjectProperties(data));
 
     return resultData;
 }

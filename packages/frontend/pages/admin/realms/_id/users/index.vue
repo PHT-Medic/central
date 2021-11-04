@@ -72,9 +72,6 @@
         </template>
         <template v-slot:items="props">
             <b-table :items="props.items" :fields="fields" :busy="props.busy" head-variant="'dark'" outlined>
-                <template v-slot:cell(realm)="data">
-                    <span class="badge-dark badge">{{data.item.realm_id}}</span>
-                </template>
                 <template v-slot:cell(options)="data">
                     <nuxt-link
                         v-if="$auth.can('edit','user') || $auth.can('edit','user_permissions') || $auth.can('drop','user_permissions')"
