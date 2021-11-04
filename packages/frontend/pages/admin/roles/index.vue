@@ -25,7 +25,7 @@ export default {
                 hide: false,
                 items: [
                     {
-                        name: 'Overview',
+                        name: 'overview',
                         urlSuffix: '',
                         icon: 'fa fa-bars'
                     },
