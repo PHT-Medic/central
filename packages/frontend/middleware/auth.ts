@@ -81,8 +81,10 @@ export default async function({ route, from, redirect, $auth, store } : Context)
         route.meta.some(meta => !!meta[Layout.REQUIRED_LOGGED_IN_KEY])
     ) {
         if (!store.getters['auth/loggedIn']) {
+            await store.dispatch('auth/triggerLogout');
+
             await redirect({
-                path: '/logout',
+                path: '/login',
                 query: { redirect: route.fullPath }
             });
         }
