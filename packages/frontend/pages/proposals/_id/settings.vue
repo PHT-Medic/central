@@ -5,16 +5,19 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {editProposal, getAPIMasterImages} from "@personalhealthtrain/ui-common";
+import {editProposal, getAPIMasterImages, PermissionID} from "@personalhealthtrain/ui-common";
     import {alpha, maxLength, minLength, required} from "vuelidate/lib/validators";
     import AlertMessage from "../../../components/alert/AlertMessage";
-
+    import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
 
     export default {
         meta: {
-            requireAbility: (can) => {
-                return can('edit', 'proposal') || can('drop', 'proposal')
-            }
+            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
+            [Layout.REQUIRED_PERMISSIONS_KEY]: [
+                PermissionID.PROPOSAL_EDIT,
+                PermissionID.PROPOSAL_DROP
+            ]
         },
         components: {AlertMessage },
         props: {

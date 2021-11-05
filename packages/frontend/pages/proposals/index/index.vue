@@ -5,22 +5,29 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {dropProposal, getProposals} from "@personalhealthtrain/ui-common";
-    import {LayoutNavigationDefaultId} from "../../../config/layout.ts";
+import {dropProposal, getProposals, PermissionID} from "@personalhealthtrain/ui-common";
     import Pagination from "../../../components/Pagination";
+    import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
 
     export default {
         components: {Pagination},
         meta: {
-            navigationId: LayoutNavigationDefaultId,
-            requireLoggedIn: true,
-            requireAbility: (can) => {
-                return can('add', 'proposal') || can('edit', 'proposal') || can('drop','proposal') ||
-                    can('add', 'train') || can('drop', 'train') ||
-                    can('read', 'trainResult') ||
-                    can('start', 'trainExecution') ||
-                    can('stop', 'trainExecution');
-            }
+            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
+            [Layout.REQUIRED_PERMISSIONS_KEY]: [
+                PermissionID.PROPOSAL_ADD,
+                PermissionID.PROPOSAL_DROP,
+                PermissionID.PROPOSAL_EDIT,
+
+                PermissionID.TRAIN_ADD,
+                PermissionID.TRAIN_EDIT,
+                PermissionID.TRAIN_DROP,
+
+                PermissionID.TRAIN_RESULT_READ,
+
+                PermissionID.TRAIN_EXECUTION_START,
+                PermissionID.TRAIN_EXECUTION_STOP
+            ]
         },
         data () {
             return {

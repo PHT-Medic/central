@@ -7,20 +7,22 @@
 <script>
 import {
     addProposal,
-    getAPIStations
+    getAPIStations, PermissionID
 } from "@personalhealthtrain/ui-common";
     import { required, minLength, maxLength, integer, alpha } from 'vuelidate/lib/validators';
 
     import ProposalFormTitle from "../../../components/form/proposal/ProposalFormTitle";
 import MasterImagePicker from "../../../components/domains/master-image/MasterImagePicker";
+import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
 
     export default {
         components: {MasterImagePicker, ProposalFormTitle},
         meta: {
-            requireLoggedIn: true,
-            requireAbility: (can) => {
-                return can('add', 'proposal');
-            }
+            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
+            [Layout.REQUIRED_PERMISSIONS_KEY]: [
+                PermissionID.PROPOSAL_ADD
+            ]
         },
         data () {
             return {

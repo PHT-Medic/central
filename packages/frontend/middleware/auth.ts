@@ -92,6 +92,7 @@ export default async function({ route, from, redirect, $auth, store } : Context)
         try {
             checkAbilityOrPermission({route, $auth} as Context);
         } catch (e) {
+            console.log(e);
             console.log('not permitted...');
 
             await redirect({
