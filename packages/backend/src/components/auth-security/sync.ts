@@ -24,8 +24,6 @@ import {AuthClientSecurityQueueMessagePayload} from "../../domains/service/queue
 export async function syncAuthClientSecurity(message: Message) {
     const payload : AuthClientSecurityQueueMessagePayload = message.data as AuthClientSecurityQueueMessagePayload;
 
-    console.log(payload);
-
     switch (payload.type) {
         case AuthClientType.SERVICE:
             switch (payload.id) {
@@ -39,9 +37,11 @@ export async function syncAuthClientSecurity(message: Message) {
                     break;
                 case SERVICE_ID.REGISTRY:
                     const stationRepository = getRepository(Station);
-                    const stations = await stationRepository.find({
-                        registry_project_id: Not(IsNull())
-                    });
+                    const queryBuilder = stationRepository.createQueryBuilder('station');
+                    const stations = await queryBuilder
+                        .addSelect('station.registry_project_id')
+                        .where("station.registry_project_id IS NOT NULL")
+                        .getMany();
 
                     const promises : Promise<HarborProjectWebhook>[] = stations.map((station: Station) => {
                         return ensureHarborProjectWebHook(station.registry_project_id, {
