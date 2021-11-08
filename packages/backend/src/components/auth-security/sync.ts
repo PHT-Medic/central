@@ -24,6 +24,8 @@ import {AuthClientSecurityQueueMessagePayload} from "../../domains/service/queue
 export async function syncAuthClientSecurity(message: Message) {
     const payload : AuthClientSecurityQueueMessagePayload = message.data as AuthClientSecurityQueueMessagePayload;
 
+    console.log(payload);
+
     switch (payload.type) {
         case AuthClientType.SERVICE:
             switch (payload.id) {
