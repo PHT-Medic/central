@@ -58,7 +58,7 @@ export function createDispatcherAggregatorTrainHandlers() : ConsumeHandlers {
                 train_id: message.data.id,
                 station_id: message.data.stationId
             }, {
-                run_status: message.data.mode as TrainStationRunStatus
+                run_status: message.data.status as TrainStationRunStatus
             });
         },
         [AggregatorTrainEvent.FINISHED]: async (message: Message) => {

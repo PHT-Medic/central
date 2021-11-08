@@ -84,6 +84,8 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
                 secret: value.password
             });
 
+            console.log(value);
+
             if(typeof client === 'undefined') {
                 throw new UnauthorizedError();
             }
