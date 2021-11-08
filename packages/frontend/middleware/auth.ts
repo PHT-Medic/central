@@ -62,17 +62,27 @@ function checkAbilityOrPermission({route, $auth} : Context) {
 }
 
 export default async function({ route, from, redirect, $auth, store } : Context) : Promise<void> {
-    let destinationPath : string = '/';
+    let redirectPath : string = '/';
 
     if(typeof from !== 'undefined') {
-        destinationPath = from.fullPath;
+        redirectPath = from.fullPath;
     }
 
-    if (!route.path.includes('logout')) {
+    if (!route.path.includes('/logout')) {
         try {
             await (<AuthModule> $auth).resolveMe();
         } catch (e) {
-            await redirect('/logout');
+            if (store.getters['auth/loggedIn']) {
+                await redirect({
+                    path: '/logout',
+                    query: { redirect: route.fullPath }
+                });
+            } else {
+                await redirect({
+                    path: '/login',
+                    query: { redirect: route.fullPath }
+                });
+            }
         }
     }
 
@@ -92,11 +102,10 @@ export default async function({ route, from, redirect, $auth, store } : Context)
         try {
             checkAbilityOrPermission({route, $auth} as Context);
         } catch (e) {
-            console.log(e);
             console.log('not permitted...');
 
             await redirect({
-                path: destinationPath
+                path: redirectPath
             });
         }
     }
@@ -106,7 +115,7 @@ export default async function({ route, from, redirect, $auth, store } : Context)
         route.meta.some(meta => meta[Layout.REQUIRED_LOGGED_OUT_KEY])
     ) {
         if (store.getters['auth/loggedIn']) {
-            await redirect({ path: destinationPath });
+            await redirect({ path: redirectPath });
         }
     }
 };
