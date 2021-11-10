@@ -19,6 +19,7 @@ import {
 import {getUserStationRouteHandler} from "./station";
 import {useLogger} from "../../../../modules/log";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import env from "../../../../env";
 
 // ---------------------------------------------------------------------------------
 
@@ -187,22 +188,47 @@ export async function getMeRouteHandler(req: any, res: any) {
     });
 }
 
+async function runValidations(req: any, mode: 'create' | 'update') {
+    await check('display_name').exists().notEmpty().isLength({min: 3, max: 128}).optional().run(req);
+    await check('email').exists().normalizeEmail().isEmail().optional({nullable: true}).run(req);
+    await check('password').exists().isLength({min: 5, max: 512}).optional({nullable: true}).run(req);
+
+    if(mode !== 'update' || req.ability.hasPermission(PermissionID.USER_EDIT)) {
+        const nameChain = check('name')
+            .exists()
+            .notEmpty()
+            .isLength({min: 3, max: 128});
+
+        if(mode === 'update') {
+            nameChain.optional({nullable: true});
+        }
+
+        await nameChain.run(req);
+
+        // -------
+
+        const realmChain = check('realm_id').exists().notEmpty().custom((value: any) => {
+            return getRepository(Realm).findOne(value).then((realm: Realm | undefined) => {
+                if (typeof realm === 'undefined') {
+                    throw new Error('The provided realm was not found.')
+                }
+            })
+        });
+
+        if(mode === 'update') {
+            realmChain.optional({nullable: true});
+        }
+
+        await realmChain.run(req);
+    }
+}
+
 export async function addUserRouteHandler(req: any, res: any) {
     if(!req.ability.hasPermission(PermissionID.USER_ADD)) {
         return res._failForbidden('You are not authorized to add a user.');
     }
 
-    await check('display_name').exists().notEmpty().isLength({min: 4, max: 128}).optional().run(req);
-    await check('email').exists().normalizeEmail().isEmail().optional({nullable: true}).run(req);
-    await check('name').exists().notEmpty().isLength({min: 4, max: 128}).run(req);
-    await check('password').exists().isLength({min: 5, max: 512}).optional({nullable: true}).run(req);
-    await check('realm_id').exists().notEmpty().custom((value: any) => {
-        return getRepository(Realm).findOne(value).then((realm: Realm | undefined) => {
-            if(typeof realm === 'undefined') {
-                throw new Error('The provided realm was not found.')
-            }
-        })
-    }).run(req);
+    await runValidations(req, 'create');
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
@@ -251,28 +277,7 @@ export async function editUserRouteHandler(req: any, res: any) {
         return res._failForbidden({message: 'You are not authorized to modify a user.'});
     }
 
-    await check('display_name').exists().notEmpty().isLength({min: 4, max: 128}).optional().run(req);
-    await check('email').exists().normalizeEmail({gmail_remove_dots: false}).isEmail().optional({nullable: true}).run(req);
-    await check('password').exists().isLength({min: 5, max: 512})
-        .custom((value, {req: request}) => {
-            if(value !== request.body.password_repeat) {
-                throw new Error('The provided passwords do not match.');
-            } else {
-                return value;
-            }
-        }).optional({nullable: true}).run(req);
-
-    if(req.ability.can('edit','user')) {
-        await check('name').exists().notEmpty().isLength({min: 5, max: 128}).optional().run(req);
-
-        await check('realm_id').exists().optional().notEmpty().custom((value: any) => {
-            return getRepository(Realm).findOne(value).then((realm: Realm | undefined) => {
-                if (typeof realm === 'undefined') {
-                    throw new Error('The provided realm does not exist.')
-                }
-            })
-        }).run(req);
-    }
+    await runValidations(req, 'update');
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
@@ -282,6 +287,14 @@ export async function editUserRouteHandler(req: any, res: any) {
     const data = matchedData(req, {includeOptionals: false});
     if(!data) {
         return res._respondAccepted();
+    }
+
+    if(
+        data.hasOwnProperty('password') &&
+        env.userPasswordImmutable &&
+        !req.ability.hasPermission(PermissionID.USER_EDIT)
+    ) {
+        return res._failBadRequest({message: 'User passwords are immutable and can not be changed in this environment.'});
     }
 
     const userRepository = getCustomRepository<UserRepository>(UserRepository);

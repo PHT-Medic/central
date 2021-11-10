@@ -15,9 +15,6 @@
                 type: Object
             }
         },
-        meta: {
-            navigationId: LayoutNavigationAdminId
-        },
         components: {
             UserPasswordForm,
             UserDetailsForm

@@ -43,12 +43,12 @@ export default {
         form: {
             name: {
                 required,
-                minLength: minLength(4),
+                minLength: minLength(3),
                 maxLength: maxLength(128)
             },
             display_name: {
                 required,
-                minLength: minLength(4),
+                minLength: minLength(3),
                 maxLength: maxLength(128)
             },
             email: {
@@ -259,7 +259,7 @@ export default {
 
             <div class="form-group">
                 <button :disabled="$v.form.$invalid || busy" @click.prevent="submit" type="submit" class="btn btn-primary btn-xs">
-                    <i :class="{'fa fa-save': isExistingUser, 'fa fa-plus': !isExistingUser}"></i> {{ isExistingUser ? 'Updated' : 'Created' }}
+                    <i :class="{'fa fa-save': isExistingUser, 'fa fa-plus': !isExistingUser}"></i> {{ isExistingUser ? 'Update' : 'Create' }}
                 </button>
             </div>
         </form>

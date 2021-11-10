@@ -10,11 +10,13 @@ import {check, matchedData, validationResult} from "express-validator";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {SwaggerTags} from "typescript-swagger";
 import {
+    PermissionID,
     removeUserSecretsFromSecretEngine,
     saveUserSecretsToSecretEngine,
     UserKeyRing
 } from "@personalhealthtrain/ui-common";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import env from "../../../../env";
 
 @SwaggerTags('user', 'pht')
 @Controller("/user-key-rings")
@@ -76,6 +78,13 @@ async function runValidationRules(req: any) {
 }
 
 async function addUserKeyRouteHandler(req: any, res: any) {
+    if(
+        env.userSecretsImmutable &&
+        !req.ability.hasPermission(PermissionID.USER_EDIT)
+    ) {
+        return res._failBadRequest({message: 'User secrets are immutable and can not be changed in this environment.'});
+    }
+
     await runValidationRules(req);
 
     const validation = validationResult(req);
@@ -106,6 +115,13 @@ async function addUserKeyRouteHandler(req: any, res: any) {
 
 async function editUserKeyRouteHandler(req: any, res: any) {
     const { id } = req.params;
+
+    if(
+        env.userSecretsImmutable &&
+        !req.ability.hasPermission(PermissionID.USER_EDIT)
+    ) {
+        return res._failBadRequest({message: 'User secrets are immutable and can not be changed in this environment.'});
+    }
 
     await runValidationRules(req);
 

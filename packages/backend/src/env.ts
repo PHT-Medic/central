@@ -43,6 +43,9 @@ export interface Environment {
 
     skipProposalApprovalOperation: boolean,
     skipTrainApprovalOperation: boolean,
+
+    userPasswordImmutable: boolean,
+    userSecretsImmutable: boolean
 }
 
 // tslint:disable-next-line:radix
@@ -64,7 +67,10 @@ const env : Environment = {
     webAppUrl: requireFromEnv('WEB_APP_URL'),
 
     skipProposalApprovalOperation: requireFromEnv('SKIP_PROPOSAL_APPROVAL_OPERATION', 'false').toLowerCase() !== 'false',
-    skipTrainApprovalOperation: requireFromEnv('SKIP_TRAIN_APPROVAL_OPERATION', 'false').toLowerCase() !== 'false'
+    skipTrainApprovalOperation: requireFromEnv('SKIP_TRAIN_APPROVAL_OPERATION', 'false').toLowerCase() !== 'false',
+
+    userPasswordImmutable: requireFromEnv('USER_PASSWORD_IMMUTABLE', 'false').toLowerCase() !== 'false',
+    userSecretsImmutable: requireFromEnv('USER_SECRETS_IMMUTABLE', 'false').toLowerCase() !== 'false'
 };
 
 export default env;

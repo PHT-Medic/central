@@ -31,11 +31,6 @@ type LayoutSidebarGroup = {
 export const LayoutSidebars : LayoutSidebarGroup = {
     admin: [
         {
-            name: 'General',
-            type: 'separator',
-            [Layout.REQUIRED_LOGGED_IN_KEY]: true
-        },
-        {
             name: 'Realms',
             type: 'link',
             url: '/admin/realms',
@@ -100,11 +95,6 @@ export const LayoutSidebars : LayoutSidebarGroup = {
         }
     ],
     default: [
-        {
-            name: 'General',
-            type: 'separator',
-            requireLoggedIn: true
-        },
         {
             name: 'Info',
             type: 'link',
