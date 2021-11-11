@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {LayoutNavigationID} from "@/modules/layout/contants";
+import {LayoutNavigationID} from "./contants";
 
 export type LayoutComponentType = 'sidebar' | 'navigation';
+export type LayoutSidebarComponentType = 'link' | 'separator';
 
 export interface LayoutComponentBase {
     name: string,
@@ -25,7 +26,7 @@ export interface LayoutNavigationComponent extends LayoutComponentBase {
     components?: LayoutNavigationComponent[]
 }
 
-export type LayoutSidebarComponentType = 'link' | 'separator';
+
 export interface LayoutSidebarComponent extends LayoutComponentBase {
     type: LayoutSidebarComponentType,
     rootLink?: boolean,

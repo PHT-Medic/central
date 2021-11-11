@@ -35,7 +35,7 @@ export default {
         pages() {
             let pages = [];
 
-            for(let i=this.currentPage-3; i<(this.currentPage + 3); i++) {
+            for(let i=this.currentPage-2; i<(this.currentPage + 2); i++) {
                 if(i<= 0 || i > this.totalPages) continue;
 
                 pages.push(i);
