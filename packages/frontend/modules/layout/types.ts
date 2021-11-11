@@ -7,6 +7,8 @@
 
 import {LayoutNavigationID} from "@/modules/layout/contants";
 
+export type LayoutComponentType = 'sidebar' | 'navigation';
+
 export interface LayoutComponentBase {
     name: string,
     url?: string,
@@ -15,7 +17,7 @@ export interface LayoutComponentBase {
     requireLoggedIn?: boolean,
     requirePermissions?: string[],
     requireLoggedOut?: boolean,
-
+    show?: boolean
 }
 
 export interface LayoutNavigationComponent extends LayoutComponentBase {

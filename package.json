@@ -18,6 +18,9 @@
         "clean": "lerna run clean",
         "build": "lerna run build",
         "test": "lerna run test",
-        "pub": "lerna publish"
+        "pub": "lerna publish",
+        "frontend": "npm run dev --workspace=packages/frontend",
+        "backend": "npm run dev --workspace=packages/backend",
+        "common": "npm run build-watch --workspace=packages/common"
     }
 }

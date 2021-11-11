@@ -19,13 +19,8 @@ export default {
         //setTimeout(this.doLogout,0);
     },
     methods: {
-        ...mapActions('auth', [
-            'triggerLogout',
-            'triggerAuthError'
-        ]),
-
         async doLogout () {
-            await this.triggerLogout();
+            await this.$store.dispatch('auth/triggerLogout');
 
             let query = {};
             if(this.$route.query && this.$route.query.hasOwnProperty('redirect')) {

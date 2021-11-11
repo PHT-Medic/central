@@ -6,12 +6,12 @@
  */
 
 import {ActionTree, GetterTree, MutationTree} from "vuex";
-import {reduceComponents} from "../modules/layout/components";
+import {buildComponents, isLayoutComponentMatch, reduceComponents} from "../modules/layout/components";
 import {getNavigationComponentById, getNavigationComponents} from "../modules/layout/navigation";
 import {getSidebarComponentsForNavigationId} from "../modules/layout/sidebar";
 import {RootState} from "./index";
 import {
-    LayoutComponent,
+    LayoutComponent, LayoutComponentType,
     LayoutNavigationComponent, LayoutNavigationIDType,
     LayoutSidebarComponent
 } from "../modules/layout/types";
@@ -23,109 +23,101 @@ export interface LayoutState {
     initialized: boolean,
 
     navigationComponents: LayoutNavigationComponent[],
-    navigation: LayoutNavigationComponent | undefined,
-    navigationId: LayoutNavigationIDType,
+    navigationComponent: LayoutNavigationComponent | undefined,
 
-    sidebarComponents: LayoutSidebarComponent[]
+    sidebarComponents: LayoutSidebarComponent[],
+    sidebarComponent: LayoutSidebarComponent | undefined
 }
 
 export const state = () : LayoutState => ({
     initialized: false,
 
-    navigationComponents: getNavigationComponents(),
-    navigation: getNavigationComponentById(LayoutNavigationID.DEFAULT),
-    navigationId: LayoutNavigationID.DEFAULT,
+    navigationComponents: [],
+    navigationComponent: undefined,
 
     sidebarComponents: [],
+    sidebarComponent: undefined
 });
 
 export const getters : GetterTree<LayoutState, RootState> = {
     navigationComponents: (state) => {
         return state.navigationComponents;
     },
-    navigation: (state) => {
-        return state.navigation;
+    navigationComponent: (state) => {
+        return state.navigationComponent;
     },
-    navigationId: (state) : LayoutNavigationIDType => {
-        return state.navigationId
+    navigationComponentId: (state) : LayoutNavigationIDType => {
+        return state.navigationComponent.id as LayoutNavigationIDType;
     },
 
+    sidebarComponent: (state) => {
+        return state.sidebarComponent;
+    },
     sidebarComponents: (state) => {
         return state.sidebarComponents;
-    },
-
+    }
 };
 
 export const actions : ActionTree<LayoutState, RootState> = {
-    selectNavigation ({ commit, state, dispatch }, id?: LayoutNavigationID) {
-        if (
-            state.initialized &&
-            state.navigationId === id
+    async selectComponent({dispatch, commit, rootGetters, getters}, context : {
+        type: 'sidebar' | 'navigation',
+        component: LayoutComponent
+    }) {
+        if(
+            context.type === 'navigation' &&
+            context.component.hasOwnProperty('id')
         ) {
-            return state.sidebarComponents;
+            context.component = getNavigationComponentById((context.component as any).id);
         }
 
-        const navigation = getNavigationComponentById(id);
+        const isMatch = context.type === 'sidebar' ?
+            isLayoutComponentMatch(getters.sidebarComponent, context.component) :
+            isLayoutComponentMatch(getters.navigationComponent, context.component);
 
-        if(typeof navigation === 'undefined') {
-            console.log('layout navigation not found...');
-            return state.sidebarComponents;
+        switch (context.type) {
+            case 'sidebar':
+                commit('setSidebarComponent', context.component);
+
+                await dispatch('update', {type: 'sidebar', component: context.component});
+
+                break;
+            case 'navigation':
+                commit('setNavigationComponent', context.component);
+
+                await dispatch('update', {type: 'navigation'});
+
+                if(!isMatch) {
+                    await dispatch('update', {type: 'sidebar'});
+                }
+                break;
         }
-
-        commit('setNavigationId', id);
-        commit('setNavigation', navigation);
-
-        dispatch('update'); // navigation update also required, for init page load to render nav bar correctly (loggedIn).
-
-        commit('setInitialized', true);
-
-        return state.sidebarComponents;
     },
-
-    /**
-     * Update sidebar & navigation components.
-     *
-     * @param dispatch
-     */
-    update({dispatch}) {
-        dispatch('reduceComponents', {type: 'sidebar'});
-        dispatch('reduceComponents', {type: 'navigation'});
-    },
-
-    /**
-     * Reduce sidebar or navigation components by login state, permissions, ...
-     *
-     * @param commit
-     * @param state
-     * @param rootGetters
-     * @param type
-     */
-    reduceComponents(
-        {commit, state, rootGetters},
-        {type} : {type: string}
+    async update(
+        {dispatch, commit, rootGetters, getters},
+        context: {
+            type: LayoutComponentType,
+            component?: LayoutComponent
+        }
     ) {
-        let components: LayoutComponent[] = [];
-
-        switch (type) {
-            case 'sidebar':
-                components = [...getSidebarComponentsForNavigationId(state.navigationId)]
+        switch (context.type) {
+            case "navigation":
+                commit('setNavigationComponents', {
+                    auth: this.$auth,
+                    loggedIn: rootGetters["auth/loggedIn"]
+                });
                 break;
-            case 'navigation':
-                components = [...getNavigationComponents()];
-                break;
-        }
+            case "sidebar":
+                const component : LayoutComponent = !!context.component ?
+                    context.component :
+                    {
+                        url: (this.$router as any)?.history?.current?.fullPath
+                    } as LayoutComponent;
 
-        components = reduceComponents(components, {
-            loggedIn: rootGetters['auth/loggedIn'],
-            auth: this.$auth
-        });
-
-        switch (type) {
-            case 'sidebar':
-                commit('setSidebarComponents', components);
-                break;
-            case 'navigation':
-                commit('setNavigationComponents', components);
+                commit('setSidebarComponents', {
+                    component,
+                    auth: this.$auth,
+                    loggedIn: rootGetters["auth/loggedIn"]
+                });
                 break;
         }
     }
@@ -135,18 +127,44 @@ export const mutations : MutationTree<LayoutState> = {
     setInitialized(state, value) {
         state.initialized = value;
     },
-    setNavigationId (state, id) {
-        state.navigationId = id
+
+    setNavigationComponent (state, component) {
+        state.navigationComponent = component;
     },
-    setNavigation (state, navigation) {
-        state.navigation = navigation;
-    },
-    setNavigationComponents(state, components) {
+    setNavigationComponents(state, context) {
+        let components = getNavigationComponents();
+
+        components = reduceComponents(components, {
+            loggedIn: context.loggedIn,
+            auth: context.auth
+        });
+
         state.navigationComponents = components;
     },
 
-    setSidebarComponents (state, menu) {
-        state.sidebarComponents = menu;
+    setSidebarComponent(state, component) {
+        state.sidebarComponent = isLayoutComponentMatch(state.sidebarComponent, component) ? undefined : component;
+    },
+    setSidebarComponents (state, context) {
+        let components = getSidebarComponentsForNavigationId(state.navigationComponent.id as LayoutNavigationIDType);
+
+        const isMatch = context.component && isLayoutComponentMatch(state.sidebarComponent, context.component);
+
+        const build = buildComponents(components, {
+            component: context.component ?? undefined,
+            type: 'sidebar',
+            navigationId: state.navigationComponent.id as LayoutNavigationIDType,
+            matchShow: isMatch
+        });
+
+        components = build.components;
+
+        components = reduceComponents(components, {
+            loggedIn: context.loggedIn,
+            auth: context.auth
+        });
+
+        state.sidebarComponents = components;
     }
 };
 

@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {LayoutNavigationAdminId} from "../../../../config/layout";
     import UserDetailsForm from "../../../../components/domains/user/UserDetailsForm";
     import UserPasswordForm from "../../../../components/domains/user/UserPasswordForm";
 

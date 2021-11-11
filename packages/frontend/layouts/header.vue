@@ -10,7 +10,7 @@
     export default {
         computed: {
             navigationId(vm) {
-                return vm.$store.state.layout.navigationId;
+                return vm.$store.getters["layout/navigationComponentId"];
             },
             components(vm) {
                 return vm.$store.state.layout.navigationComponents;
@@ -26,16 +26,18 @@
             }
         },
         methods: {
-            ...mapActions('layout', [
-                'selectNavigation'
-            ]),
-            componentClick($index) {
+            async click($index) {
                 const component = this.components[$index];
 
-                this.selectNavigation(component.id);
+                await this.$store.dispatch('layout/selectComponent', {
+                    type: 'navigation',
+                    component: {
+                        id: component.id
+                    }
+                });
 
                 if (typeof component.url !== 'undefined') {
-                    this.$router.push(component.url)
+                    await this.$router.push(component.url)
                 }
             }
         }
@@ -62,7 +64,7 @@
                 <b-collapse id="page-navbar" class="navbar-content navbar-collapse">
                     <ul class="navbar-nav navbar-links">
                         <li v-for="(component,key) in components" :key="key" class="nav-item">
-                            <a class="nav-link" :class="{'router-link-active': component.id === navigationId }" @click.prevent="componentClick(key)" href="javascript:void(0)" >
+                            <a class="nav-link" :class="{'router-link-active': component.id === navigationId }" @click.prevent="click(key)" href="javascript:void(0)" >
                                 <i v-if="component.icon" :class="component.icon" /> {{ component.name }}
                             </a>
                         </li>

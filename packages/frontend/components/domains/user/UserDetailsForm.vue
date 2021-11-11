@@ -229,7 +229,7 @@ export default {
 
             <div class="form-group" :class="{ 'form-group-error': $v.form.display_name.$error }">
                 <label>Display Name</label>
-                <input v-model="$v.form.display_name.$model"@change.prevent="handleDisplayNameChanged"  type="text" name="display_name" class="form-control" placeholder="...">
+                <input v-model="$v.form.display_name.$model" @change.prevent="handleDisplayNameChanged"  type="text" name="display_name" class="form-control" placeholder="...">
 
                 <div v-if="!$v.form.display_name.required && !$v.form.display_name.$model" class="form-group-hint group-required">
                     Please enter a display name.

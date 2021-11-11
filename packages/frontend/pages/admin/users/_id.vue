@@ -5,9 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPIUser, PermissionID} from "@personalhealthtrain/ui-common";
-    import {LayoutNavigationAdminId} from "../../../config/layout";
-import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
+    import {getAPIUser, PermissionID} from "@personalhealthtrain/ui-common";
+    import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
 
     export default {
         meta: {

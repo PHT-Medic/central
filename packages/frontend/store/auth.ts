@@ -183,7 +183,9 @@ export const actions : ActionTree<AuthState, RootState> = {
             dispatch('triggerSetToken', extendedToken);
 
             await dispatch('triggerRefreshMe');
-            this.dispatch('layout/update');
+
+            await dispatch('layout/update', {type: 'navigation'}, {root: true});
+            await dispatch('layout/update', {type: 'sidebar'}, {root: true});
         } catch (e) {
             dispatch('triggerUnsetToken');
 
@@ -254,14 +256,15 @@ export const actions : ActionTree<AuthState, RootState> = {
      * Try to logout the user.
      * @param commit
      */
-    triggerLogout ({ dispatch }) {
-        dispatch('triggerUnsetToken');
-        dispatch('triggerUnsetUser');
-        dispatch('triggerUnsetPermissions');
+    async triggerLogout ({ dispatch }) {
+        await dispatch('triggerUnsetToken');
+        await dispatch('triggerUnsetUser');
+        await  dispatch('triggerUnsetPermissions');
 
-        dispatch('triggerSetLoginRequired', false);
+        await dispatch('triggerSetLoginRequired', false);
 
-        this.dispatch('layout/update');
+        await dispatch('layout/update', {type: 'navigation'}, {root: true});
+        await dispatch('layout/update', {type: 'sidebar'}, {root: true});
     },
 
     // --------------------------------------------------------------------

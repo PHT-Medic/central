@@ -33,5 +33,10 @@ export default async function layoutMiddleware({ store, route } : Context) {
         navigationId = LayoutNavigationID.DEFAULT;
     }
 
-    await store.dispatch('layout/selectNavigation', navigationId);
+    await store.dispatch('layout/selectComponent', {
+        type: 'navigation',
+        component: {
+            id: navigationId
+        }
+    });
 }
