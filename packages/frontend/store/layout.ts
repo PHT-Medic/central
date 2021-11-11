@@ -46,8 +46,10 @@ export const getters : GetterTree<LayoutState, RootState> = {
     navigationComponent: (state) => {
         return state.navigationComponent;
     },
-    navigationComponentId: (state) : LayoutNavigationIDType => {
-        return state.navigationComponent.id as LayoutNavigationIDType;
+    navigationComponentId: (state) : LayoutNavigationIDType | undefined => {
+        return state.navigationComponent ?
+            state.navigationComponent.id as LayoutNavigationIDType :
+            undefined;
     },
 
     sidebarComponent: (state) => {

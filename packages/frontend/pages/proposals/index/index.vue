@@ -102,15 +102,19 @@ import {dropProposal, getProposals, PermissionID} from "@personalhealthtrain/ui-
                 }
             },
 
-            canGoToTrainView() {
-                return this.$auth.can('add','train') || this.$auth.can('edit','train') || this.$auth.can('drop','train') ||
-                    this.$auth.can('read', 'trainResult') || this.$auth.can('start', 'trainExecution') || this.$auth.can('stop','trainExecution')
+            canView() {
+                return this.$auth.hasPermission(PermissionID.TRAIN_ADD) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_EDIT) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_DROP) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_RESULT_READ) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_START) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_STOP)
             },
             canEdit() {
-                return this.$auth.can('edit','proposal');
+                return this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT);
             },
             canDrop() {
-                return this.$auth.can('drop','proposal');
+                return this.$auth.hasPermission(PermissionID.PROPOSAL_DROP)
             }
         }
     }
@@ -133,11 +137,12 @@ import {dropProposal, getProposals, PermissionID} from "@personalhealthtrain/ui-
                     <nuxt-link v-if="canEdit" :to="'/proposals/' + data.item.id " title="View" class="btn btn-outline-primary btn-xs">
                         <i class="fa fa-arrow-right" />
                     </nuxt-link>
-                    <nuxt-link v-if="canGoToTrainView" :to="'/proposals/' + data.item.id + '/trains'" title="Zug Verwaltung" class="btn btn-outline-dark btn-xs">
+                    <nuxt-link v-if="canView" :to="'/proposals/' + data.item.id + '/trains'" title="Zug Verwaltung" class="btn btn-outline-dark btn-xs">
                         <i class="fa fa-train" />
                     </nuxt-link>
                     <a v-if="canDrop" class="btn btn-outline-danger btn-xs" title="Delete" @click="dropProposal(data.item.id)">
-                        <i class="fas fa-trash-alt" /></a>
+                        <i class="fas fa-trash-alt" />
+                    </a>
                 </template>
 
                 <template v-slot:table-busy>

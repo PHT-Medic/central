@@ -7,6 +7,7 @@
 
 <script>
 export default {
+    name: 'SidebarComponents',
     props: {
         items: {
             type: Array,

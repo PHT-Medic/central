@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropAPITrain, getAPITrains} from "@personalhealthtrain/ui-common";
+import {dropAPITrain, getAPITrains, mergeDeep} from "@personalhealthtrain/ui-common";
 import AlertMessage from "../../alert/AlertMessage";
 import Pagination from "../../Pagination";
 import TrainCard from "./TrainCard";
@@ -24,13 +24,21 @@ export default {
         trainAddTo: {
             type: String,
             default: '/trains/add'
-        }
+        },
+        query: {
+            type: Object,
+            default: function () {
+                return {}
+            }
+        },
     },
     data () {
         return {
             busy: false,
+
             message: null,
             items: [],
+
             meta: {
                 limit: 10,
                 offset: 0,
@@ -48,7 +56,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getAPITrains({
+                const response = await getAPITrains(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset
@@ -60,7 +68,7 @@ export default {
                     filter: {
                         ...(this.proposalId ? {proposal_id: this.proposalId} : {})
                     }
-                });
+                }, this.query));
 
                 this.items = response.data;
                 const {total} = response.meta;

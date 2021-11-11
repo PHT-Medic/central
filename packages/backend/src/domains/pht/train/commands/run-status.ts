@@ -80,6 +80,8 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
         try {
             harborRepository = await findHarborProjectRepository(stationName, train.id);
             if (typeof harborRepository !== 'undefined') {
+                // update train station status
+
                 train = repository.merge(train, {
                     build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
                     configuration_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure

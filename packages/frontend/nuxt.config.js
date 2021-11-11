@@ -43,6 +43,7 @@ const config = {
     ** Global CSS
     */
     css: [
+        'vue-form-wizard/dist/vue-form-wizard.min.css',
         '@fortawesome/fontawesome-free/css/all.css',
         'bootstrap/dist/css/bootstrap.min.css',
         'bootstrap-vue/dist/bootstrap-vue.css',

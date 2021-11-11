@@ -12,6 +12,13 @@ import {PermissionID} from "@personalhealthtrain/ui-common";
 
 export default {
     components: {TrainTable},
+    data() {
+        return {
+            query: {
+                sort: '-created_at'
+            }
+        }
+    },
     meta: {
         [Layout.REQUIRED_LOGGED_IN_KEY]: true,
         [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
@@ -35,7 +42,7 @@ export default {
         </div>
 
         <div class="m-t-10">
-            <train-table />
+            <train-table :query="query" />
         </div>
     </div>
 </template>
