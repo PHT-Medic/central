@@ -73,7 +73,6 @@ export async function ensureHarborProjectWebHook(
          await useAPI(APIType.HARBOR)
             .post('projects/' + projectIdOrName + '/webhook/policies', webhook, headers);
     } catch (e) {
-        console.log(e);
         if(e?.response?.status === 409) {
             /*
             const existingWebhook = await findHarborProjectWebHook(projectIdOrName, isProjectName);
