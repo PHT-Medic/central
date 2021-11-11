@@ -11,6 +11,7 @@ import {Client} from "../../../../../auth"
 import {APIType, useAPI} from "../../../../../../modules";
 import {SERVICE_ID} from "../../../type";
 import {HarborProjectWebhook, HarborProjectWebhookOptions} from "./type";
+import * as console from "console";
 
 const WEBHOOK_ID = 'UI';
 
@@ -72,6 +73,7 @@ export async function ensureHarborProjectWebHook(
          await useAPI(APIType.HARBOR)
             .post('projects/' + projectIdOrName + '/webhook/policies', webhook, headers);
     } catch (e) {
+        console.log(e);
         if(e?.response?.status === 409) {
             /*
             const existingWebhook = await findHarborProjectWebHook(projectIdOrName, isProjectName);

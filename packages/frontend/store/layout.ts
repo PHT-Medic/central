@@ -146,7 +146,10 @@ export const mutations : MutationTree<LayoutState> = {
         state.sidebarComponent = isLayoutComponentMatch(state.sidebarComponent, component) ? undefined : component;
     },
     setSidebarComponents (state, context) {
-        const navigation = state.navigationComponent ? state.navigationComponent : getNavigationComponentById(LayoutNavigationID.DEFAULT);
+        const navigation = state.navigationComponent ?
+            state.navigationComponent :
+            getNavigationComponentById(LayoutNavigationID.DEFAULT);
+
         if(navigation !== state.navigationComponent) {
             state.navigationComponent = navigation;
         }
