@@ -5,7 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {editApiProposalStation, ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
+import {
+    editApiProposalStation,
+    Permission,
+    PermissionID,
+    ProposalStationApprovalStatus
+} from "@personalhealthtrain/ui-common";
 import {BDropdownItem} from "bootstrap-vue";
 
 export default {
@@ -139,6 +144,10 @@ export default {
         isDisabled() {
             if(typeof this.approvalStatus === 'undefined') {
                 return false;
+            }
+
+            if(!this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT)) {
+                return true;
             }
 
             switch (this.approvalStatus) {

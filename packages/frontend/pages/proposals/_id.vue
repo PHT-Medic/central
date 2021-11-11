@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {getApiProposalStations, getAPIStations, getProposal} from "@personalhealthtrain/ui-common";
+import {getApiProposalStations, getAPIStations, getProposal, PermissionID} from "@personalhealthtrain/ui-common";
     import ProposalSvg from "../../components/svg/ProposalSvg";
     import {Layout, LayoutNavigationID} from "../../modules/layout/contants";
 
@@ -108,11 +108,16 @@
 
                 ];
 
-                if(this.isProposalOwner || this.isStationAuthority) {
+                if(
+                    this.isProposalOwner || this.isStationAuthority
+                ) {
                     items.push({ name: 'Trains', icon: 'fas fa-train', urlSuffix: '/trains' });
                 }
 
-                if(this.isProposalOwner) {
+                if(
+                    this.isProposalOwner &&
+                    this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT)
+                ) {
                     items.push({ name: 'Settings', icon: 'fa fa-cog', urlSuffix: '/settings' });
                 }
 
