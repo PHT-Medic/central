@@ -74,18 +74,10 @@ export async function ensureHarborProjectWebHook(
             .post('projects/' + projectIdOrName + '/webhook/policies', webhook, headers);
     } catch (e) {
         if(e?.response?.status === 409) {
-            /*
-            const existingWebhook = await findHarborProjectWebHook(projectIdOrName, isProjectName);
+            await dropHarborProjectWebHook(projectIdOrName, isProjectName);
 
             await useAPI(APIType.HARBOR)
-                .put('projects/' + projectIdOrName + '/webhook/policies/'+existingWebhook.id, webhook, headers);
-
-            return;
-
-             */
-
-            await dropHarborProjectWebHook(projectIdOrName, isProjectName);
-            await ensureHarborProjectWebHook(projectIdOrName, client, options, isProjectName);
+                .post('projects/' + projectIdOrName + '/webhook/policies', webhook, headers);
 
             return;
         }
@@ -97,16 +89,10 @@ export async function ensureHarborProjectWebHook(
 }
 
 export async function dropHarborProjectWebHook(projectIdOrName: number | string, isProjectName: boolean = false) {
-    const headers : Record<string, any> = {};
-
-    if(isProjectName) {
-        headers['X-Is-Resource-Name'] = true;
-    }
-
     const webhook = await findHarborProjectWebHook(projectIdOrName, isProjectName);
 
     if(typeof webhook !== 'undefined') {
         await useAPI(APIType.HARBOR)
-            .delete('projects/' + projectIdOrName+ '/webhook/policies/' + webhook.id, headers);
+            .delete('projects/' + webhook.project_id + '/webhook/policies/' + webhook.id);
     }
 }
