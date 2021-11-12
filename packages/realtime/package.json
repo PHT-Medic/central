@@ -8,17 +8,5 @@
     },
     "license": "MIT",
     "version": "1.0.2",
-    "description": "This package contains the Central UI realtime application of PHT.",
-    "main": "./dist/index.js",
-    "dependencies": {
-
-    },
-    "devDependencies": {
-
-    },
-    "scripts": {
-        "dev": "ts-node src/index.ts",
-        "dev-watch": "nodemon --legacy-watch --watch 'src/**/*.ts' --exec 'ts-node src/index.ts'",
-        "start": "node dist/index.js",
-    }
+    "description": "This package contains the Central UI realtime application of PHT."
 }
