@@ -52,7 +52,7 @@ import {dropProposal, getProposals, PermissionID} from "@personalhealthtrain/ui-
         },
         methods: {
             async load() {
-                if(this.isBusy) return;
+                if (this.isBusy) return;
 
                 this.isBusy = true;
 
@@ -80,7 +80,7 @@ import {dropProposal, getProposals, PermissionID} from "@personalhealthtrain/ui-
                 this.isBusy = false;
             },
             goTo(options, resolve, reject) {
-                if(options.offset === this.meta.offset) return;
+                if (options.offset === this.meta.offset) return;
 
                 this.meta.offset = options.offset;
 
@@ -88,7 +88,7 @@ import {dropProposal, getProposals, PermissionID} from "@personalhealthtrain/ui-
                     .then(resolve)
                     .catch(reject);
             },
-            async dropProposal (id) {
+            async dropProposal(id) {
                 const index = this.items.findIndex(item => item.id === id);
                 if (index === -1) {
                     return;
@@ -101,7 +101,8 @@ import {dropProposal, getProposals, PermissionID} from "@personalhealthtrain/ui-
 
                 }
             },
-
+        },
+        computed: {
             canView() {
                 return this.$auth.hasPermission(PermissionID.TRAIN_ADD) ||
                     this.$auth.hasPermission(PermissionID.TRAIN_EDIT) ||
@@ -114,7 +115,7 @@ import {dropProposal, getProposals, PermissionID} from "@personalhealthtrain/ui-
                 return this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT);
             },
             canDrop() {
-                return this.$auth.hasPermission(PermissionID.PROPOSAL_DROP)
+                return this.$auth.hasPermission(PermissionID.PROPOSAL_DROP);
             }
         }
     }

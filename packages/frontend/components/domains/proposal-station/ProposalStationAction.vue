@@ -9,20 +9,27 @@ import {
     editApiProposalStation,
     Permission,
     PermissionID,
-    ProposalStationApprovalStatus
+    ProposalStationApprovalStatus, TrainConfigurationStatus
 } from "@personalhealthtrain/ui-common";
 import {BDropdownItem} from "bootstrap-vue";
 
 export default {
     name: 'ProposalStationAction',
     render(createElement, context) {
+        if(!this.isShown) {
+            return createElement('span', {}, ['']);
+        }
+
         let rootElement;
         let attributes = {
             on: {
                 click: this.click
             },
             props: {
-                disabled: this.isDisabled
+                disabled: !this.isEnabled
+            },
+            domProps: {
+                disabled: !this.isEnabled
             }
         };
 
@@ -54,7 +61,8 @@ export default {
         if(typeof this.$scopedSlots.default === 'function') {
             text = this.$scopedSlots.default({
                 actionText: this.actionText,
-                isDisabled: this.isDisabled,
+                isDisabled: !this.isEnabled,
+                isAllowed: this.isShown,
                 iconClass: iconClasses
             });
         }
@@ -141,34 +149,33 @@ export default {
                     return 'info';
             }
         },
-        isDisabled() {
+        isShown() {
+            return this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT);
+        },
+        isEnabled() {
             if(typeof this.approvalStatus === 'undefined') {
-                return false;
-            }
-
-            if(!this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT)) {
                 return true;
             }
 
             switch (this.approvalStatus) {
                 case ProposalStationApprovalStatus.APPROVED:
                     if(this.action === 'approve') {
-                        return true;
+                        return false;
                     }
                     break;
                 case ProposalStationApprovalStatus.REJECTED:
                     if(this.action === 'reject') {
-                        return true;
+                        return false;
                     }
                     break;
                 default:
                     if(this.action === 'reset') {
-                        return true;
+                        return false;
                     }
                     break;
             }
 
-            return false;
+            return true;
         }
     }
 }

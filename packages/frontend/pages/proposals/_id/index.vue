@@ -19,11 +19,7 @@ export default {
     },
     meta: {
         [Layout.REQUIRED_LOGGED_IN_KEY]: true,
-        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
-        [Layout.REQUIRED_PERMISSIONS_KEY]: [
-            PermissionID.PROPOSAL_EDIT,
-            PermissionID.PROPOSAL_DROP
-        ]
+        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
     },
     data() {
         return {

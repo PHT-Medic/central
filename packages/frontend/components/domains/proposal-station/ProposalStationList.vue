@@ -8,7 +8,7 @@
 import {
     addApiProposalStation,
     dropApiProposalStation,
-    getApiProposalStations
+    getApiProposalStations, PermissionID
 } from "@personalhealthtrain/ui-common";
 
 import Pagination from "../../Pagination";
@@ -36,6 +36,9 @@ export default {
             }
 
             return this.$store.getters['auth/userRealmId'] === this.formattedItems[0].proposal.realm_id;
+        },
+        canEdit() {
+            return this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT);
         }
     },
     data() {
@@ -163,7 +166,7 @@ export default {
                 <div class="ml-auto">
                     <slot name="header-actions">
                         <button
-                            v-if="isProposalOwner"
+                            v-if="isProposalOwner && canEdit"
                             type="button"
                             class="btn btn-success btn-xs"
                             @click.prevent="showStations"
@@ -193,7 +196,7 @@ export default {
                     <div class="ml-auto">
                         <slot name="actions" v-bind:item="item" v-bind:drop="drop">
                             <button
-                                v-if="isProposalOwner"
+                                v-if="isProposalOwner && canEdit"
                                 type="button"
                                 class="btn btn-danger btn-xs"
                                 @click.prevent="drop(item.id)"
@@ -217,14 +220,20 @@ export default {
             size="lg"
             ref="form"
             button-size="sm"
-            title-html="<i class='fa fa-hospital'></i> Provider"
+            title-html="<i class='fa fa-hospital'></i>"
             :no-close-on-backdrop="true"
             :no-close-on-esc="true"
             :hide-footer="true"
         >
             <station-list :filter-items="notInItems">
                 <template v-slot:actions="props">
-                    <button type="button" class="btn btn-xs btn-success" :disabled="itemBusy" @click.prevent="add(props.item)">
+                    <button
+                        type="button"
+                        class="btn btn-xs btn-success"
+                        :disabled="itemBusy"
+                        @click.prevent="add(props.item)"
+                        v-if="canEdit"
+                    >
                         <i class="fa fa-plus"></i>
                     </button>
                 </template>
