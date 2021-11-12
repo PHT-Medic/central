@@ -9,7 +9,7 @@
     import TrainBasicForm from "../../../../components/domains/train/TrainBasicForm";
     import StationTrainTable from "../../../../components/domains/station/StationTrainTable";
     import {Layout, LayoutNavigationID} from "../../../../modules/layout/contants";
-    import {PermissionID} from "@personalhealthtrain/ui-common/src";
+    import {PermissionID} from "@personalhealthtrain/ui-common";
 
     export default {
         meta: {
