@@ -11,6 +11,13 @@ This package requires `nodejs` & `npm` to be installed on the host machine.
 $ npm i
 ```
 
+## Build
+Build the packages.
+
+```
+$ npm run build
+```
+
 ## Configuration
 Read the `Readme.md` in each package directory.
 
