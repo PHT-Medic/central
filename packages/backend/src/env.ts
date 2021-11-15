@@ -41,6 +41,8 @@ export interface Environment {
     internalApiUrl: string,
     webAppUrl: string,
 
+    demo: boolean,
+
     skipProposalApprovalOperation: boolean,
     skipTrainApprovalOperation: boolean,
 
@@ -65,6 +67,8 @@ const env : Environment = {
     apiUrl: requireFromEnv('API_URL'),
     internalApiUrl: requireFromEnv('INTERNAL_API_URL', requireFromEnv('API_URL')),
     webAppUrl: requireFromEnv('WEB_APP_URL'),
+
+    demo: requireFromEnv('DEMO', 'false').toLowerCase() !== 'false',
 
     skipProposalApprovalOperation: requireFromEnv('SKIP_PROPOSAL_APPROVAL_OPERATION', 'false').toLowerCase() !== 'false',
     skipTrainApprovalOperation: requireFromEnv('SKIP_TRAIN_APPROVAL_OPERATION', 'false').toLowerCase() !== 'false',

@@ -18,6 +18,7 @@ import {useLogger} from "./modules/log";
 
 import {createConnection} from "typeorm";
 import {buildConnectionOptions} from "typeorm-extension";
+import {initDemo} from "./demo";
 
 (async () => {
     /*
@@ -35,6 +36,8 @@ import {buildConnectionOptions} from "typeorm-extension";
         config.aggregators.forEach(a => a.start());
 
         httpServer.listen(env.port, '0.0.0.0',  signalStart);
+
+        initDemo();
     }
 
     function signalStart() {
