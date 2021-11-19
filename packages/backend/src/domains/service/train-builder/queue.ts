@@ -5,10 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {MQ_TB_ROUTING_KEY, Train} from "@personalhealthtrain/ui-common";
+import {Train} from "@personalhealthtrain/ui-common";
 import {buildMessage, Message} from "amqp-extension";
 import {buildTrainBuilderStartCommandPayload, buildTrainBuilderStatusCommandPayload, buildTrainBuilderStopCommandPayload} from "./commands";
 import {TrainBuilderCommand} from "./type";
+import {MessageQueueTrainBuilderRoutingKey} from "../../../config/service/mq";
 
 export async function buildTrainBuilderQueueMessage(
     type: TrainBuilderCommand,
@@ -25,7 +26,7 @@ export async function buildTrainBuilderQueueMessage(
              *     ...
              * }
              */
-            data = buildTrainBuilderStartCommandPayload(train);
+            data = await buildTrainBuilderStartCommandPayload(train);
             break;
         case TrainBuilderCommand.STOP:
             /**
@@ -33,7 +34,7 @@ export async function buildTrainBuilderQueueMessage(
              *     trainId: 'xyz'
              * }
              */
-            data = buildTrainBuilderStopCommandPayload(train);
+            data = await buildTrainBuilderStopCommandPayload(train);
             break;
         case TrainBuilderCommand.STATUS:
             /**
@@ -41,13 +42,14 @@ export async function buildTrainBuilderQueueMessage(
              *     trainId: 'xyz'
              * }
              */
-            data = buildTrainBuilderStatusCommandPayload(train);
+            data = await buildTrainBuilderStatusCommandPayload(train);
             break;
     }
+
     return buildMessage({
         type,
         options: {
-            routingKey: MQ_TB_ROUTING_KEY
+            routingKey: MessageQueueTrainBuilderRoutingKey.COMMAND_OUT
         },
         data,
         metadata: metaData

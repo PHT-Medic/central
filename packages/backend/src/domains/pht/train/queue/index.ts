@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {MQ_DISPATCHER_ROUTING_KEY} from "@personalhealthtrain/ui-common";
 import {buildMessage, publishMessage} from "amqp-extension";
 import {DispatcherEvent} from "../../../../components/event-dispatcher";
+import {MessageQueueDispatcherRoutingKey} from "../../../../config/service/mq";
 
 export type DispatcherTrainEventType = 'approved' | 'assigned' | 'rejected';
 export type DispatcherTrainEventData = {
@@ -28,7 +28,7 @@ export async function emitDispatcherTrainEvent(
 
     const message = buildMessage({
         options: {
-            routingKey: MQ_DISPATCHER_ROUTING_KEY
+            routingKey: MessageQueueDispatcherRoutingKey.EVENT_OUT
         },
         type: DispatcherEvent.TRAIN,
         data,

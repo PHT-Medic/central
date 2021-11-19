@@ -5,22 +5,29 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {dropProposal, getProposals} from "@personalhealthtrain/ui-common";
-    import {LayoutNavigationDefaultId} from "../../../config/layout.ts";
+import {dropProposal, getProposals, PermissionID} from "@personalhealthtrain/ui-common";
     import Pagination from "../../../components/Pagination";
+    import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
 
     export default {
         components: {Pagination},
         meta: {
-            navigationId: LayoutNavigationDefaultId,
-            requireLoggedIn: true,
-            requireAbility: (can) => {
-                return can('add', 'proposal') || can('edit', 'proposal') || can('drop','proposal') ||
-                    can('add', 'train') || can('drop', 'train') ||
-                    can('read', 'trainResult') ||
-                    can('start', 'trainExecution') ||
-                    can('stop', 'trainExecution');
-            }
+            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
+            [Layout.REQUIRED_PERMISSIONS_KEY]: [
+                PermissionID.PROPOSAL_ADD,
+                PermissionID.PROPOSAL_DROP,
+                PermissionID.PROPOSAL_EDIT,
+
+                PermissionID.TRAIN_ADD,
+                PermissionID.TRAIN_EDIT,
+                PermissionID.TRAIN_DROP,
+
+                PermissionID.TRAIN_RESULT_READ,
+
+                PermissionID.TRAIN_EXECUTION_START,
+                PermissionID.TRAIN_EXECUTION_STOP
+            ]
         },
         data () {
             return {
@@ -45,7 +52,7 @@
         },
         methods: {
             async load() {
-                if(this.isBusy) return;
+                if (this.isBusy) return;
 
                 this.isBusy = true;
 
@@ -73,7 +80,7 @@
                 this.isBusy = false;
             },
             goTo(options, resolve, reject) {
-                if(options.offset === this.meta.offset) return;
+                if (options.offset === this.meta.offset) return;
 
                 this.meta.offset = options.offset;
 
@@ -81,7 +88,7 @@
                     .then(resolve)
                     .catch(reject);
             },
-            async dropProposal (id) {
+            async dropProposal(id) {
                 const index = this.items.findIndex(item => item.id === id);
                 if (index === -1) {
                     return;
@@ -94,16 +101,21 @@
 
                 }
             },
-
-            canGoToTrainView() {
-                return this.$auth.can('add','train') || this.$auth.can('edit','train') || this.$auth.can('drop','train') ||
-                    this.$auth.can('read', 'trainResult') || this.$auth.can('start', 'trainExecution') || this.$auth.can('stop','trainExecution')
+        },
+        computed: {
+            canView() {
+                return this.$auth.hasPermission(PermissionID.TRAIN_ADD) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_EDIT) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_DROP) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_RESULT_READ) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_START) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_STOP)
             },
             canEdit() {
-                return this.$auth.can('edit','proposal');
+                return this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT);
             },
             canDrop() {
-                return this.$auth.can('drop','proposal');
+                return this.$auth.hasPermission(PermissionID.PROPOSAL_DROP);
             }
         }
     }
@@ -126,11 +138,12 @@
                     <nuxt-link v-if="canEdit" :to="'/proposals/' + data.item.id " title="View" class="btn btn-outline-primary btn-xs">
                         <i class="fa fa-arrow-right" />
                     </nuxt-link>
-                    <nuxt-link v-if="canGoToTrainView" :to="'/proposals/' + data.item.id + '/trains'" title="Zug Verwaltung" class="btn btn-outline-dark btn-xs">
+                    <nuxt-link v-if="canView" :to="'/proposals/' + data.item.id + '/trains'" title="Zug Verwaltung" class="btn btn-outline-dark btn-xs">
                         <i class="fa fa-train" />
                     </nuxt-link>
                     <a v-if="canDrop" class="btn btn-outline-danger btn-xs" title="Delete" @click="dropProposal(data.item.id)">
-                        <i class="fas fa-trash-alt" /></a>
+                        <i class="fas fa-trash-alt" />
+                    </a>
                 </template>
 
                 <template v-slot:table-busy>

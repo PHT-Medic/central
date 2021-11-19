@@ -23,7 +23,7 @@ export function getAPIConfig(
 ): APIConfig<any> {
     const data: APIConfig<any> | undefined = configMap.get(key);
     if (typeof data === 'undefined') {
-        throw new Error(`A config must be defined for the alias: ${key}`);
+        return {};
     }
 
     return data;

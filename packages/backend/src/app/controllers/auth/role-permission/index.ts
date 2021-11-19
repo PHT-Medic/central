@@ -77,7 +77,7 @@ async function getRolePermissions(req: any, res: any) {
             .leftJoinAndSelect('rolePermission.permission', 'permission');
 
         applyFilters(query, filter, {
-            queryAlias: 'rolePermission',
+            defaultAlias: 'rolePermission',
             allowed: ['role_id', 'permission_id']
         });
 

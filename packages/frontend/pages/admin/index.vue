@@ -5,15 +5,16 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {LayoutNavigationAdminId} from "../../config/layout";
+import {Layout, LayoutNavigationID} from "../../modules/layout/contants";
+import {PermissionID} from "@personalhealthtrain/ui-common";
 
     export default {
         meta: {
-            navigationId: LayoutNavigationAdminId,
-            requireLoggedIn: true,
-            requireAbility(can) {
-                return can('use','adminUi');
-            }
+            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
+            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+            [Layout.REQUIRED_PERMISSIONS_KEY]: [
+                PermissionID.ADMIN_UI_USE
+            ]
         },
     }
 </script>

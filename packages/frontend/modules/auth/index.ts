@@ -8,7 +8,14 @@
 import {AuthStoreToken} from "@/store/auth";
 import {Context} from "@nuxt/types";
 import {APIType, useAPI} from "@personalhealthtrain/ui-common";
-import {AbilityManager, Oauth2Client, Oauth2TokenResponse, OwnedPermission} from "@typescript-auth/core";
+import {
+    AbilityManager,
+    AbilityMeta,
+    buildAbilityMetaFromName,
+    Oauth2Client,
+    Oauth2TokenResponse,
+    PermissionItem
+} from "@typescript-auth/core";
 import axios from "axios";
 import {Store} from 'vuex';
 
@@ -173,13 +180,27 @@ class AuthModule {
         return this.abilityManager.can(action, subject, field);
     }
 
-    public setPermissions(permissions: OwnedPermission<any>[]) {
+    public hasAbility(ability: AbilityMeta) : boolean {
+        return this.abilityManager.can(ability.action, ability.subject);
+    }
+
+    public hasPermission(name: string) : boolean {
+        const ability = buildAbilityMetaFromName(name);
+        return this.hasAbility(ability);
+    }
+
+    public setPermissions(permissions: PermissionItem<any>[]) {
         this.abilityManager.setPermissions(permissions);
     }
 
     // --------------------------------------------------------------------
 
-    public setRequestToken = (token: string) => {
+    public setRequestToken(token: string) {
+        useAPI(APIType.DEFAULT).setAuthorizationHeader({
+            type: 'Bearer',
+            token
+        });
+
         this.responseInterceptorId = useAPI(APIType.DEFAULT)
             .mountResponseInterceptor((data) => data, (error: any) => {
                 if(typeof this.ctx === 'undefined') return;
@@ -206,11 +227,6 @@ class AuthModule {
                     throw error;
                 }
             });
-
-        useAPI(APIType.DEFAULT).setAuthorizationHeader({
-            type: 'Bearer',
-            token
-        });
     };
 
     public unsetRequestToken = () => {

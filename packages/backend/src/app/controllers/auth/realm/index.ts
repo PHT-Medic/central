@@ -12,7 +12,7 @@ import {SwaggerTags} from "typescript-swagger";
 import {Controller, Get, Post, Delete, Request, Response, Params, Body} from "@decorators/express";
 
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
-import {OAuth2Provider, Realm} from "@personalhealthtrain/ui-common";
+import {Realm} from "@personalhealthtrain/ui-common";
 
 @SwaggerTags('auth')
 @Controller("/realms")
@@ -27,7 +27,7 @@ export class RealmController {
 
     @Post("", [ForceLoggedInMiddleware])
     async add(
-        @Body() user: NonNullable<OAuth2Provider>,
+        @Body() user: NonNullable<Realm>,
         @Request() req: any,
         @Response() res: any
     ) : Promise<Realm> {
@@ -70,7 +70,7 @@ export async function getRealmsRoute(req: any, res: any) {
     const query = realmRepository.createQueryBuilder('realm');
 
     applyFilters(query, filter, {
-        queryAlias: 'realm',
+        defaultAlias: 'realm',
         allowed: ['id', 'name']
     });
 

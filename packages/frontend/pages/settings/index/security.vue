@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserPublicKeyForm from "../../../components/user/UserPublicKeyForm";
-import UserPasswordForm from "../../../components/user/UserPasswordForm";
+import UserPublicKeyForm from "../../../components/domains/user/UserPublicKeyForm";
+import UserPasswordForm from "../../../components/domains/user/UserPasswordForm";
 
 export default {
         components: {
@@ -26,7 +26,7 @@ export default {
 <template>
     <div class="mb-2">
         <h6 class="title">
-            Passwort
+            Password
         </h6>
 
         <user-password-form :user-property="user" />

@@ -5,22 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildStationHarborProjectName} from "../../../../../config";
+import {buildRegistryHarborProjectName} from "../../../../../config";
 import {
     dropHarborProjectAccount,
     ensureHarborProjectRobotAccount,
     findHarborRobotAccount,
     HarborRobotAccount
-} from "../../../../service";
+} from "../../../../other/service";
 
 export async function findStationHarborProjectRobotAccount(id: string | number, withSecret: boolean = true): Promise<HarborRobotAccount | undefined> {
-    const name: string = buildStationHarborProjectName(id);
+    const name: string = buildRegistryHarborProjectName(id);
 
     return await findHarborRobotAccount(name, withSecret);
 }
 
 export async function ensureStationHarborProjectRobotAccount(id: string | number): Promise<HarborRobotAccount> {
-    const name: string = buildStationHarborProjectName(id);
+    const name: string = buildRegistryHarborProjectName(id);
 
     return await ensureHarborProjectRobotAccount(name);
 }

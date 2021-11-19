@@ -6,10 +6,10 @@
  */
 
 import {
-    AuthorizationHeaderValue,
-    buildAuthorizationHeaderValue
+    AuthorizationHeader,
+    stringifyAuthorizationHeader
 } from "@typescript-auth/core";
-import axios, {AxiosInstance} from 'axios';
+import axios, {AxiosDefaults, AxiosInstance} from 'axios';
 import {ApiRequestConfig, ApiResponse} from "./type";
 
 /**
@@ -30,7 +30,7 @@ export class BaseAPI {
 
     // ---------------------------------------------------------------------------------
 
-    get config() : ApiRequestConfig {
+    get config() : AxiosDefaults<any> {
         return this.api.defaults;
     }
 
@@ -56,8 +56,8 @@ export class BaseAPI {
 
     // ---------------------------------------------------------------------------------
 
-    public setAuthorizationHeader(options: AuthorizationHeaderValue) {
-        this.setHeader('Authorization', buildAuthorizationHeaderValue(options));
+    public setAuthorizationHeader(options: AuthorizationHeader) {
+        this.setHeader('Authorization', stringifyAuthorizationHeader(options));
     }
 
     public unsetAuthorizationHeader() {

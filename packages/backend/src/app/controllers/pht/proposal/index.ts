@@ -6,7 +6,7 @@
  */
 
 import {getRepository, In} from "typeorm";
-import {applyFilters, applyIncludes, applyPagination} from "typeorm-extension";
+import {applyFilters, applyPagination, applyRelations} from "typeorm-extension";
 import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
 import {
     isPermittedForResourceRealm,
@@ -86,8 +86,8 @@ export async function getProposalRouteHandler(req: any, res: any) {
     const query = repository.createQueryBuilder('proposal')
         .where("proposal.id = :id", {id});
 
-    applyIncludes(query,  include, {
-        queryAlias: 'proposal',
+    applyRelations(query,  include, {
+        defaultAlias: 'proposal',
         allowed: ['master_image', 'realm', 'user']
     });
 
@@ -116,7 +116,7 @@ export async function getProposalsRouteHandler(req: any, res: any) {
     onlyRealmPermittedQueryResources(query, req.realmId);
 
     applyFilters(query, filter, {
-        queryAlias: 'proposal',
+        defaultAlias: 'proposal',
         allowed: ['id', 'name', 'realm_id']
     });
 
@@ -160,7 +160,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
 
     await check('master_image_id')
         .exists()
-        .isInt()
+        .isString()
         .custom(value => {
             return getRepository(MasterImage).findOne(value).then((masterImageResult) => {
                 if(typeof masterImageResult === 'undefined') throw new Error('The provided master image does not exist.');
@@ -199,7 +199,7 @@ export async function addProposalRouteHandler(req: any, res: any) {
             return proposalStationRepository.create({
                 proposal_id: entity.id,
                 station_id: stationId,
-                status: env.demo ? ProposalStationApprovalStatus.APPROVED : null
+                approval_status: env.skipProposalApprovalOperation ? ProposalStationApprovalStatus.APPROVED : null
             });
         });
 
@@ -250,10 +250,10 @@ export async function editProposalRouteHandler(req: any, res: any) {
 
     await check('master_image_id')
         .exists()
-        .isInt()
+        .isString()
         .optional()
         .custom(value => {
-            return getRepository(MasterImage).find(value).then((masterImageResult) => {
+            return getRepository(MasterImage).findOne(value).then((masterImageResult) => {
                 if(typeof masterImageResult === 'undefined') throw new Error('The specified master image does not exist.');
             })
         })

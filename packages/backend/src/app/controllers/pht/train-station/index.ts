@@ -94,7 +94,7 @@ export async function getTrainStationsRouteHandler(req: any, res: any) {
         onlyRealmPermittedQueryResources(query, req.realmId, ['train.realm_id', 'station.realm_id']);
 
         applyFilters(query, filter, {
-            queryAlias: 'trainStation',
+            defaultAlias: 'trainStation',
             allowed: ['train_id', 'station_id']
         });
 
@@ -184,7 +184,7 @@ export async function addTrainStationRouteHandler(req: any, res: any) {
 
     let entity = repository.create(data);
 
-    if(env.demo) {
+    if(env.skipTrainApprovalOperation) {
         entity.approval_status = TrainStationApprovalStatus.APPROVED;
     }
 
@@ -234,8 +234,8 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
     }
 
     if(isAuthorityOfStation) {
-        await check('status')
-            .optional()
+        await check('approval_status')
+            .optional({nullable: true})
             .custom(value => isTrainStationApprovalStatus(value))
             .run(req);
 
@@ -268,9 +268,9 @@ export async function editTrainStationRouteHandler(req: any, res: any) {
         trainStation = await repository.save(trainStation);
 
         if(
-            data.status &&
-            data.status !== entityStatus &&
-            ['approved', 'rejected'].indexOf(data.status as TrainStationApprovalStatusType) !== -1
+            data.approval_status &&
+            data.approval_status !== entityStatus &&
+            isTrainStationApprovalStatus(data.approval_status)
         ) {
             await emitDispatcherTrainEvent({
                 event: trainStation.approval_status as DispatcherTrainEventType,

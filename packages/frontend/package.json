@@ -1,12 +1,13 @@
 {
     "name": "@personalhealthtrain/ui-frontend",
+    "private": true,
     "author": {
         "name": "Peter Placzek",
-        "email": "tadashi@animesu.net",
+        "email": "contact@tada5hi.net",
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "This package contains the Central UI frontend application of the PHT. It was initially developed as part of my Bachelor Thesis.",
     "scripts": {
         "dev": "nuxt",
@@ -21,13 +22,13 @@
         "@nuxtjs/dotenv": "^1.4.0",
         "@nuxtjs/eslint-module": "^3.0.1",
         "@nuxtjs/google-fonts": "^1.2.0",
-        "@personalhealthtrain/ui-common": "^0.0.2",
+        "@personalhealthtrain/ui-common": "^1.0.0-alpha.1",
         "@types/change-case": "^2.3.1",
         "@types/cookie": "^0.4.0",
         "@types/moment": "^2.13.0",
         "@types/vuelidate": "^0.7.13",
-        "@typescript-auth/core": "^0.0.15",
-        "axios": "^0.19.2",
+        "@typescript-auth/core": "^1.0.1",
+        "axios": "^0.24.0",
         "babel-eslint": "^10.1.0",
         "bootstrap": "^4.5.3",
         "bootstrap-vue": "^2.18.1",
@@ -48,5 +49,9 @@
         "vuelidate": "^0.7.6",
         "vuescroll": "^4.16.1",
         "vuex": "^3.6.2"
+    },
+    "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
+    "publishConfig": {
+        "access": "public"
     }
 }

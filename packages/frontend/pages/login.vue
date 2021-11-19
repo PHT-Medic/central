@@ -10,11 +10,13 @@
     import MedicineWorker from "../components/svg/MedicineWorker";
     import Pagination from "../components/Pagination";
     import {maxLength, minLength, required} from "vuelidate/lib/validators";
+    import {Layout, LayoutNavigationID} from "../modules/layout/contants";
 
     export default {
         components: {Pagination, MedicineWorker},
         meta: {
-            requireGuestState: true
+            [Layout.REQUIRED_LOGGED_OUT_KEY]: true,
+            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
         },
         data () {
             return {

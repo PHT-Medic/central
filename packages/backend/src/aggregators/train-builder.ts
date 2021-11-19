@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {MQ_UI_TB_EVENT_ROUTING_KEY, Train, TrainBuildStatus} from "@personalhealthtrain/ui-common";
+import {Train, TrainBuildStatus} from "@personalhealthtrain/ui-common";
 import {consumeQueue, Message} from "amqp-extension";
 import {getRepository} from "typeorm";
+import {MessageQueueTrainBuilderRoutingKey} from "../config/service/mq";
 
 export enum TrainBuilderEvent {
     STARTED = 'trainBuildStarted',
@@ -35,7 +36,7 @@ async function updateTrain(trainId: string, event: TrainBuilderEvent) {
 
 export function buildTrainBuilderAggregator() {
     function start() {
-        return consumeQueue({routingKey: MQ_UI_TB_EVENT_ROUTING_KEY}, {
+        return consumeQueue({routingKey: MessageQueueTrainBuilderRoutingKey.EVENT_IN}, {
             [TrainBuilderEvent.FINISHED]: async (message: Message) => {
                 await updateTrain(message.data.trainId, TrainBuilderEvent.FINISHED);
             },

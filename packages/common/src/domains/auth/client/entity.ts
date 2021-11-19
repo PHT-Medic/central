@@ -14,8 +14,8 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {Service} from "../../service";
-import {ClientType} from "./type";
+import {SERVICE_ID} from "../../other";
+import {AuthClientType} from "./type";
 import {createAuthClientSecret} from "./utils";
 
 @Entity({name: 'auth_clients'})
@@ -32,8 +32,8 @@ export class Client {
     @Column({type: "text", nullable: true})
     description: string;
 
-    @Column({type: "enum", enum: ClientType})
-    type: ClientType;
+    @Column({type: "enum", enum: AuthClientType})
+    type: AuthClientType;
 
     // ------------------------------------------------------------------
 
@@ -45,12 +45,8 @@ export class Client {
 
     // ------------------------------------------------------------------
 
-    @Column({nullable: true})
-    service_id: string | null;
-
-    @OneToOne(() => Service, service => service.client, {nullable: true})
-    @JoinColumn({name: 'service_id'})
-    service: Service | null;
+    @Column({type: "enum", nullable: true, enum: SERVICE_ID})
+    service_id: SERVICE_ID | null;
 
     @Column({type: "int", length: 11, nullable: true})
     user_id: number | null;

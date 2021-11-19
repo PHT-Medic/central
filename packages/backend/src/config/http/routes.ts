@@ -22,8 +22,11 @@ import {TrainStationController} from "../../app/controllers/pht/train-station";
 import {UserRoleController} from "../../app/controllers/auth/user-role";
 import {RoleController} from "../../app/controllers/auth/role";
 import {RolePermissionController} from "../../app/controllers/auth/role-permission";
-import {ServiceController} from "../../app/controllers/service";
+import {ServiceController} from "../../app/controllers/other/service";
+import {ServiceClientController} from "../../app/controllers/other/service-client";
 import {PermissionController} from "../../app/controllers/auth/permission";
+import {ClientController} from "../../app/controllers/auth/client";
+import {MasterImageGroupController} from "../../app/controllers/pht/master-image-groups";
 
 export function registerControllers(router: Application) {
     attachControllers(router, [
@@ -34,7 +37,9 @@ export function registerControllers(router: Application) {
 
         // Service
         ServiceController,
+        ServiceClientController,
 
+        ClientController,
         PermissionController,
         RoleController,
         RolePermissionController,
@@ -44,6 +49,8 @@ export function registerControllers(router: Application) {
 
         // PHT Controllers
         MasterImageController,
+        MasterImageGroupController,
+
         ProposalController,
         ProposalStationController,
         StationController,

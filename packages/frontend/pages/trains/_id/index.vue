@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import TrainPipeline from "../../../components/train/TrainPipeline";
-import TrainStationsProgress from "../../../components/train-station/progress/TrainStationsProgress";
+import TrainPipeline from "../../../components/domains/train/TrainPipeline";
+import TrainStationsProgress from "../../../components/domains/train-station/progress/TrainStationsProgress";
 export default {
     components: {TrainStationsProgress, TrainPipeline},
     props: {

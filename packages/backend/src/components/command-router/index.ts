@@ -6,13 +6,13 @@
  */
 
 import {consumeQueue} from "amqp-extension";
-import {MQ_UI_SELF_COMMAND_ROUTING_KEY} from "@personalhealthtrain/ui-common";
-import {createServiceSecurityComponentHandlers} from "../service-security";
+import {createAuthSecurityComponentHandlers} from "../auth-security";
+import {MessageQueueSelfRoutingKey} from "../../config/service/mq";
 
 export function buildCommandRouterComponent() {
     function start() {
-        return consumeQueue({routingKey: MQ_UI_SELF_COMMAND_ROUTING_KEY}, {
-            ...createServiceSecurityComponentHandlers()
+        return consumeQueue({routingKey: MessageQueueSelfRoutingKey.COMMAND}, {
+            ...createAuthSecurityComponentHandlers()
         });
     }
 

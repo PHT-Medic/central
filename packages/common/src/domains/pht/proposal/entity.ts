@@ -55,10 +55,10 @@ export class Proposal {
     @OneToMany(() => Train, train => train.proposal)
     trains: Train[];
 
-    @Column()
-    master_image_id: number;
+    @Column({nullable: true})
+    master_image_id: string | null;
 
-    @ManyToOne(() => MasterImage, masterImage => masterImage.proposals, {onDelete: 'CASCADE'})
+    @ManyToOne(() => MasterImage,{onDelete: 'SET NULL', nullable: true})
     @JoinColumn({name: 'master_image_id'})
     master_image: MasterImage;
 

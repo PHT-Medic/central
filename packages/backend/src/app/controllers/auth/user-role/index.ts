@@ -71,7 +71,7 @@ export async function getUserRolesRouteHandler(req: any, res: any) {
 
         applyFilters(query, filter, {
             allowed: ['user_roles.role_id', 'user_roles.user_id', 'user.name', 'role.name'],
-            queryAlias: 'user_roles'
+            defaultAlias: 'user_roles'
         });
 
         const pagination = applyPagination(query, page, {maxLimit: 50});

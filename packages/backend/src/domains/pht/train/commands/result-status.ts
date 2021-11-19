@@ -20,7 +20,9 @@ export async function triggerTrainResultStatus(
 
     // send queue message
     await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.STATUS, {
-        trainId: train.id
+        trainId: train.id,
+        latest: true,
+        ...(train.result_last_id ? {id: train.result_last_id} : {})
     }));
 
     return train;

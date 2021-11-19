@@ -5,7 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export enum ClientType {
+export enum AuthClientType {
     SERVICE = 'service',
     USER = 'user'
 }
+
+export enum AuthClientCommand {
+    SECRET_SYNC = 'syncSecret',
+    SECRET_REFRESH = 'refreshSecret',
+}
+
+export type ClientCommandType = `${AuthClientCommand}`;

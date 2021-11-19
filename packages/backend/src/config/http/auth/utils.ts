@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {AbilityManager, AuthorizationHeaderValue} from "@typescript-auth/core";
+import {AbilityManager, AuthorizationHeader} from "@typescript-auth/core";
 import {verifyToken} from "@typescript-auth/server";
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../domains/auth/user/repository";
 import {getWritableDirPath} from "../../paths";
-import {Client, TokenPayload} from "@personalhealthtrain/ui-common";
+import {Client, MASTER_REALM_ID, TokenPayload} from "@personalhealthtrain/ui-common";
 import {UnauthorizedError} from "../error/unauthorized";
 
 const ip4ToInt = (ip: string) =>
@@ -22,12 +22,18 @@ const isIp4InCidr = (ip: string, cidr: string) => {
     return (ip4ToInt(ip) & mask) === (ip4ToInt(range) & mask);
 };
 
-export async function authenticateWithAuthorizationHeader(request: any, value: AuthorizationHeaderValue) : Promise<void> {
+export async function authenticateWithAuthorizationHeader(request: any, value: AuthorizationHeader) : Promise<void> {
     switch (value.type) {
         case "Bearer":
-            const tokenPayload : TokenPayload = await verifyToken(value.token, {
-                directory: getWritableDirPath()
-            });
+            let tokenPayload: TokenPayload;
+
+            try {
+                tokenPayload = await verifyToken(value.token, {
+                    directory: getWritableDirPath()
+                });
+            } catch (e) {
+                return;
+            }
 
             const {sub: userId} = tokenPayload;
 
@@ -76,20 +82,22 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
             const client = await clientRepository.findOne({
                 id: value.username,
                 secret: value.password
-            }, {relations: ['service']});
+            });
+
+            console.log(value);
 
             if(typeof client === 'undefined') {
                 throw new UnauthorizedError();
             }
 
-            if(!client.service) {
+            if(!client.service_id) {
                 // only allow services for now... ^^
                 return;
             }
 
-            request.service = client.service;
-            request.serviceId = client.service.id;
-            request.realmId = client.service.realm_id;
+            request.serviceId = client.service_id;
+            // SERVICES are always central services ;)
+            request.realmId = MASTER_REALM_ID;
 
             request.ability = new AbilityManager([]);
             break;

@@ -6,25 +6,27 @@
  */
 
 import {buildMessage, Message} from "amqp-extension";
-import {Client} from "@personalhealthtrain/ui-common";
-import {MQ_UI_SELF_COMMAND_ROUTING_KEY} from "@personalhealthtrain/ui-common";
-import {ServiceSecurityComponent} from "../../components/service-security";
+import {AuthClientType, Client} from "@personalhealthtrain/ui-common";
+import {AuthClientSecurityComponentCommand} from "../../components/auth-security";
+import {MessageQueueSelfRoutingKey} from "../../config/service/mq";
 
-export function buildServiceSecurityQueueMessage(
-    type: ServiceSecurityComponent,
-    serviceId: string,
-    client: Pick<Client, 'id' | 'secret'>,
-    metaData: Record<string, any> = {}
+export type AuthClientSecurityQueueMessagePayload = {
+    id: string | number,
+    type: AuthClientType,
+    clientId: typeof Client.prototype.id,
+    clientSecret: typeof Client.prototype.secret
+}
+
+export function buildAuthClientSecurityQueueMessage(
+    type: AuthClientSecurityComponentCommand,
+    context: AuthClientSecurityQueueMessagePayload
 ) : Message {
     return buildMessage({
         options: {
-            routingKey: MQ_UI_SELF_COMMAND_ROUTING_KEY
+            routingKey: MessageQueueSelfRoutingKey.COMMAND
         },
         type,
-        data: {
-            clientId: client.id,
-            clientSecret: client.secret
-        },
-        metadata: metaData
+        data: context,
+        metadata: {}
     })
 }

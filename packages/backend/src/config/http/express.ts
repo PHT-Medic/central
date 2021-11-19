@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import express, {Express, Response, Request, NextFunction, static as expressStatic } from "express";
+import express, {Express, Request, static as expressStatic } from "express";
 import cors from "cors";
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -23,9 +23,8 @@ import {registerControllers} from "./routes";
 
 
 import {getMiddleware} from 'swagger-stats';
-import {setDefaultRequestKeyCase} from "typeorm-extension";
 import {setupAuthMiddleware} from "@typescript-auth/server";
-import {AuthorizationHeaderValue} from "@typescript-auth/core";
+import {AuthorizationHeader} from "@typescript-auth/core";
 
 import {authenticateWithAuthorizationHeader, parseCookie} from "./auth/utils";
 import {errorMiddleware} from "./middleware/error";
@@ -37,7 +36,19 @@ export interface ExpressAppInterface extends Express{
 async function createExpressApp() : Promise<ExpressAppInterface> {
     useLogger().debug('setup express app...', {service: 'express'});
     const expressApp : Express = express();
-    expressApp.use(cors());
+
+    /*
+    let webAppUrl : string = env.webAppUrl;
+    webAppUrl  = webAppUrl.replace(/^[/\\\s]+|[/\\\s]+$/g, '');
+    webAppUrl = webAppUrl.replace(/([^:]\/)\/+/g, "$1");
+    */
+
+    expressApp.use(cors({
+        origin(origin, callback) {
+            callback(null, true);
+        },
+        credentials: true
+    }));
 
     // Payload parser
     expressApp.use(bodyParser.urlencoded({extended: false}));
@@ -54,7 +65,7 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
 
     expressApp.use(setupAuthMiddleware({
         parseCookie: (request: Request) => parseCookie(request),
-        authenticateWithAuthorizationHeader: (request: Request, value: AuthorizationHeaderValue) => authenticateWithAuthorizationHeader(request, value)
+        authenticateWithAuthorizationHeader: (request: Request, value: AuthorizationHeader) => authenticateWithAuthorizationHeader(request, value)
     }));
 
     let swaggerDocument : any;
@@ -92,7 +103,6 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
         }))
     }
 
-    setDefaultRequestKeyCase("snakeCase");
     registerControllers(expressApp);
 
     expressApp.use(errorMiddleware);

@@ -5,10 +5,15 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+    import SidebarComponents from "../components/layout/SidebarComponents";
     export default {
+        components: {SidebarComponents},
         computed: {
             loggedIn(vm) {
                 return vm.$store.getters['auth/loggedIn'];
+            },
+            navigationId(vm) {
+                return vm.$store.getters["layout/navigationComponentId"];
             },
             components(vm) {
                 return vm.$store.state.layout.sidebarComponents;
@@ -18,48 +23,32 @@
             },
             statsUrl() {
                 return new URL('stats/', this.$config.apiUrl).href;
+            },
+            generalDocsUrl() {
+                return 'https://pht-medic.github.io/documentation/';
             }
         }
     }
 </script>
 <template>
     <div class="page-sidebar">
-        <ul class="sidebar-menu">
-            <li
-                v-for="(component,key) in components"
-                :key="key">
-                <template v-if="component.type === 'separator'" >
-                    <div class="nav-separator">
-                        {{ component.name }}
-                    </div>
-                </template>
-                <template v-if="component.type === 'link'">
-                    <template v-if="!component.components">
-                        <nuxt-link :to="component.url" class="sidebar-menu-link" :class="{'root-link': component.rootLink}">
-                            <i v-if="component.icon" :class="component.icon" /> {{ component.name }}
-                        </nuxt-link>
-                    </template>
-                    <template v-if="component.components">
-                        <div class="sidebar-submenu-title">
-                            {{ component.name }}
-                        </div>
-                        <ul class="list-unstyled sidebar-submenu-components">
-                            <li v-for="(subValue,subKey) in component.subcomponents" :key="subKey">
-                                <nuxt-link :to="subValue.link" class="sidebar-menu-link">
-                                    <i v-if="component.icon" :class="component.icon" /> {{ subValue.name }}
-                                </nuxt-link>
-                            </li>
-                        </ul>
-                    </template>
-                </template>
-            </li>
-        </ul>
+
+        <sidebar-components
+            :key="navigationId"
+            class="sidebar-menu"
+            :items="components"
+        />
 
         <div class="mt-auto">
             <ul class="sidebar-menu">
                 <li>
+                    <div class="nav-separator">
+                        API
+                    </div>
+                </li>
+                <li>
                     <a class="sidebar-menu-link" :href="docsUrl" target="_blank">
-                        <i class="fa fa-file"></i> API Docs
+                        <i class="fa fa-file"></i> Documentation
                     </a>
                 </li>
                 <li>
@@ -67,6 +56,17 @@
                         <i class="fa fa-chart-bar"></i> Stats
                     </a>
                 </li>
+                <li>
+                    <div class="nav-separator">
+                        General
+                    </div>
+                </li>
+                <li>
+                    <a class="sidebar-menu-link" :href="generalDocsUrl" target="_blank">
+                        <i class="fa fa-file-pdf"></i> Documentation / Guide
+                    </a>
+                </li>
+
             </ul>
         </div>
     </div>

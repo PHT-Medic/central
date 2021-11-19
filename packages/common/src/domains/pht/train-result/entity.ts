@@ -11,10 +11,10 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
-    OneToOne,
-    JoinColumn
+    JoinColumn, ManyToOne
 } from 'typeorm';
 import {Train} from "../train";
+import {TrainResultStatus} from "./status";
 
 @Entity({name: 'train_results'})
 export class TrainResult {
@@ -23,6 +23,9 @@ export class TrainResult {
 
     @Column({nullable: true, default: null})
     image: string;
+
+    @Column({type: "enum", nullable: true, default: null, enum: TrainResultStatus})
+    status: TrainResultStatus | null;
 
     // ------------------------------------------------------------------
 
@@ -37,7 +40,7 @@ export class TrainResult {
     @Column()
     train_id: string;
 
-    @OneToOne(() => Train, train => train.result, {onDelete: "CASCADE"})
+    @ManyToOne(() => Train, {onDelete: "CASCADE"})
     @JoinColumn({name: 'train_id'})
     train: Train;
 }

@@ -6,18 +6,16 @@
  */
 
 import {getRepository} from "typeorm";
-import {applyFields, applyFilters, applyIncludes, applyPagination} from "typeorm-extension";
+import {applyFields, applyFilters, applyRelations, applyPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
 import {
     MASTER_REALM_ID,
     deleteStationHarborProject,
-    deleteStationVaultPublicKey,
-    saveStationVaultPublicKey, Station
+    Station, removeStationSecretsFromSecretEngine, saveStationSecretsToSecretEngine
 } from "@personalhealthtrain/ui-common";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {doStationTaskRouteHandler, StationTask} from "./action";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialStation = Partial<Station>;
@@ -68,19 +66,6 @@ export class StationController {
         return await editStationRouteHandler(req, res) as PartialStation | undefined;
     }
 
-    @Post("/:id/task",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialStation>(stationExample)
-    async doTask(
-        @Params('id') id: string,
-        @Body() data: {
-            task: StationTask
-        },
-        @Request() req: any,
-        @Response() res: any
-    ): Promise<PartialStation|undefined> {
-        return await doStationTaskRouteHandler(req, res) as PartialStation | undefined;
-    }
-
     @Delete("/:id",[ForceLoggedInMiddleware])
     @ResponseExample<PartialStation>(stationExample)
     async drop(
@@ -108,13 +93,13 @@ export async function getStationRouteHandler(req: any, res: any) {
                 'secure_id',
                 'public_key',
                 'email',
-                'harbor_project_account_name',
-                'harbor_project_account_token',
-                'harbor_project_id',
-                'harbor_project_webhook_exists',
+                'registry_project_account_name',
+                'registry_project_account_token',
+                'registry_project_id',
+                'registry_project_webhook_exists',
                 'vault_public_key_saved'
             ],
-            queryAlias: 'station'
+            defaultAlias: 'station'
         });
     }
 
@@ -133,14 +118,14 @@ export async function getStationsRouteHandler(req: any, res: any) {
     const repository = getRepository(Station);
     const query = repository.createQueryBuilder('station');
 
-    applyIncludes(query, includes, {
-        queryAlias: 'station',
+    applyRelations(query, includes, {
+        defaultAlias: 'station',
         allowed: ['realm']
     });
 
     applyFilters(query, filter, {
         allowed: ['id', 'name', 'realm_id'],
-        queryAlias: 'station'
+        defaultAlias: 'station'
     });
 
     // todo: should be implemented by assigning permissions to a service.
@@ -151,13 +136,13 @@ export async function getStationsRouteHandler(req: any, res: any) {
                 'secure_id',
                 'public_key',
                 'email',
-                'harbor_project_account_name',
-                'harbor_project_account_token',
-                'harbor_project_id',
-                'harbor_project_webhook_exists',
+                'registry_project_account_name',
+                'registry_project_account_token',
+                'registry_project_id',
+                'registry_project_webhook_exists',
                 'vault_public_key_saved'
             ],
-            queryAlias: 'station'
+            defaultAlias: 'station'
         });
     }
 
@@ -217,7 +202,9 @@ export async function addStationRouteHandler(req: any, res: any) {
         await repository.save(entity);
 
         if(syncPublicKey) {
-            await saveStationVaultPublicKey(entity.secure_id, entity.public_key);
+            await saveStationSecretsToSecretEngine(entity.secure_id, {
+                publicKey: entity.public_key
+            });
 
             await repository.update({
                 id: entity.id
@@ -291,14 +278,14 @@ export async function editStationRouteHandler(req: any, res: any) {
     if(typeof data.secure_id === 'string') {
         // secure id changed -> remove vault project
         if(data.secure_id !== station.secure_id) {
-            await deleteStationVaultPublicKey(station.secure_id);
+            await removeStationSecretsFromSecretEngine(station.secure_id);
         }
     }
 
     station = repository.merge(station, data);
 
     if (syncPublicKey) {
-        await saveStationVaultPublicKey(station.secure_id, station.public_key);
+        await saveStationSecretsToSecretEngine(station.secure_id, {publicKey: station.public_key});
 
         station.vault_public_key_saved = true;
     }
@@ -340,7 +327,7 @@ export async function dropStationRouteHandler(req: any, res: any) {
         await repository.remove(entity);
 
         await deleteStationHarborProject(entity.secure_id);
-        await deleteStationVaultPublicKey(entity.secure_id);
+        await removeStationSecretsFromSecretEngine(entity.secure_id);
 
         return res._respondDeleted({data: entity});
     } catch (e) {

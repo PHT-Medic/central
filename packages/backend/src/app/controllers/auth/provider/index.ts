@@ -94,7 +94,7 @@ export async function getProvidersRoute(req: any, res: any) {
     leftJoinAndSelect('provider.realm', 'realm');
 
     applyFilters(query, filter, {
-        queryAlias: 'provider',
+        defaultAlias: 'provider',
         allowed: ['realm_id']
     });
 
@@ -104,7 +104,7 @@ export async function getProvidersRoute(req: any, res: any) {
             query,
             fields,
             {
-                queryAlias: 'provider',
+                defaultAlias: 'provider',
                 allowed: ['client_secret']
             }
         );
@@ -153,7 +153,7 @@ export async function getProviderRoute(req: any, res: any) {
             query,
             fields,
             {
-                queryAlias: 'provider',
+                defaultAlias: 'provider',
                 allowed: ['client_secret']
             }
         );

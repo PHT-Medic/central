@@ -1,0 +1,12 @@
+{
+    "name": "@personalhealthtrain/ui-realtime",
+    "private": true,
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://tada5hi.net"
+    },
+    "license": "MIT",
+    "version": "1.0.2",
+    "description": "This package contains the Central UI realtime application of PHT."
+}

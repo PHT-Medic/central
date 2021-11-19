@@ -43,6 +43,7 @@ const config = {
     ** Global CSS
     */
     css: [
+        'vue-form-wizard/dist/vue-form-wizard.min.css',
         '@fortawesome/fontawesome-free/css/all.css',
         'bootstrap/dist/css/bootstrap.min.css',
         'bootstrap-vue/dist/bootstrap-vue.css',
@@ -53,7 +54,7 @@ const config = {
         '@/assets/css/core/sidebar.css',
         '@/assets/css/core/footer.css',
         '@/assets/css/card.css',
-
+        '@/assets/css/colors.css',
         '@/assets/css/form.css',
 
         '@/assets/css/bootstrap-override.css'

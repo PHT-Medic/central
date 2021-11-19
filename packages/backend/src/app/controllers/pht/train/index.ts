@@ -6,7 +6,7 @@
  */
 
 import {getRepository} from "typeorm";
-import {applyPagination, applyIncludes, applyFilters} from "typeorm-extension";
+import {applyPagination, applyQueryRelations, applyFilters} from "typeorm-extension";
 import {
     isPermittedForResourceRealm,
     onlyRealmPermittedQueryResources, Proposal, Train, TrainFile, TrainType
@@ -20,7 +20,7 @@ import {
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {doTrainTaskRouteHandler} from "./action";
+import {handleTrainCommandRouteHandler} from "./action";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 
 type PartialTrain = Partial<Train>;
@@ -87,7 +87,7 @@ export class TrainController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialTrain|undefined> {
-        return (await doTrainTaskRouteHandler(req, res)) as PartialTrain | undefined;
+        return (await handleTrainCommandRouteHandler(req, res)) as PartialTrain | undefined;
     }
 
     @Delete("/:id",[ForceLoggedInMiddleware])
@@ -101,11 +101,10 @@ export class TrainController {
     }
 
     // --------------------------------------------------------------------------
-
-
 }
 
 export async function getTrainRouteHandler(req: any, res: any) {
+    const { include } = req.query;
     const { id } = req.params;
 
     if (typeof id !== 'string') {
@@ -114,11 +113,14 @@ export async function getTrainRouteHandler(req: any, res: any) {
 
     const repository = getRepository(Train);
     const query = repository.createQueryBuilder('train')
-        .leftJoinAndSelect('train.train_stations','trainStations')
-        .leftJoinAndSelect('trainStations.station', 'station')
         .where("train.id = :id", {id});
 
     onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
+
+    applyQueryRelations(query, include, {
+        defaultAlias: 'train',
+        allowed: ['train_stations', 'user', 'proposal']
+    });
 
     const entity = await query.getOne();
 
@@ -141,13 +143,13 @@ export async function getTrainsRouteHandler(req: any, res: any) {
 
     onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
 
-    applyIncludes(query, include, {
-        queryAlias: 'train',
-        allowed: ['train_station', 'result', 'user']
+    applyQueryRelations(query, include, {
+        defaultAlias: 'train',
+        allowed: ['train_stations', 'user', 'proposal']
     });
 
     applyFilters(query, filter, {
-        queryAlias: 'train',
+        defaultAlias: 'train',
         allowed: ['id', 'name', 'proposal_id', 'realm_id']
     });
 
@@ -195,10 +197,10 @@ async function runTrainValidations(req: any) {
 
     const masterImagePromise = check('master_image_id')
         .exists()
-        .isInt()
         .optional()
+        .isString()
         .custom(value => {
-            return getRepository(MasterImage).find(value).then((res) => {
+            return getRepository(MasterImage).findOne(value).then((res) => {
                 if(typeof res === 'undefined') throw new Error('The master image is not valid.');
             })
         });

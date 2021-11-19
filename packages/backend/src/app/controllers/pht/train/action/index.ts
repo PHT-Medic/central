@@ -26,7 +26,7 @@ import {
  * @param req
  * @param res
  */
-export async function doTrainTaskRouteHandler(req: any, res: any) {
+export async function handleTrainCommandRouteHandler(req: any, res: any) {
     const {id} = req.params;
 
     if (typeof id !== 'string') {

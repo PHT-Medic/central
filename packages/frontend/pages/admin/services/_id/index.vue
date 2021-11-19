@@ -5,28 +5,30 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import ServiceHarborTask from "../../../../components/service/task/ServiceHarborTask"
+
+import RegistryManagement from "../../../../components/domains/service/harbor/HarborManagement";
+import {SERVICE_ID} from "@personalhealthtrain/ui-common";
 
 export default {
     props: {
-        service: Object
+        serviceId: SERVICE_ID
     },
     render(createElement) {
         let template;
 
-        switch (this.service.id) {
-            case 'HARBOR':
-                template = ServiceHarborTask;
+        switch (this.serviceId) {
+            case SERVICE_ID.REGISTRY:
+                template = RegistryManagement;
                 break;
         }
 
         if(typeof template === 'undefined') {
             return createElement('div', {
                 class: 'alert alert-info alert-sm'
-            }, `You can not execute any task for the ${this.service.id} service yet.`);
+            }, `You can not execute any task for the ${this.serviceId} service yet.`);
         } else {
             return createElement(template, {
-                props: { service: this.service},
+                props: { serviceId: this.serviceId},
                 on: {
                     updated: (event) => this.$emit('updated', event)
                 }

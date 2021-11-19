@@ -51,7 +51,7 @@ export async function startBuildTrain(train: Train | number | string, demo: bool
             configuration_status: TrainConfigurationStatus.FINISHED,
             run_status: demo ? TrainRunStatus.FINISHED : null,
             build_status: demo ? null : TrainBuildStatus.STARTING,
-            result_status: demo ? TrainResultStatus.FINISHED : null
+            result_last_status: demo ? TrainResultStatus.FINISHED : null
         });
 
         await repository.save(train);

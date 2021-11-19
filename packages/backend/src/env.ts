@@ -14,7 +14,6 @@ const envResult = config({
 
 if (envResult.error) {
     console.error('[ERROR] env failed to load:' + envResult.error);
-    process.exit(1)
 }
 
 export function requireFromEnv(key : string, alt?: any) {
@@ -42,7 +41,13 @@ export interface Environment {
     internalApiUrl: string,
     webAppUrl: string,
 
-    demo: boolean
+    demo: boolean,
+
+    skipProposalApprovalOperation: boolean,
+    skipTrainApprovalOperation: boolean,
+
+    userPasswordImmutable: boolean,
+    userSecretsImmutable: boolean
 }
 
 // tslint:disable-next-line:radix
@@ -63,7 +68,13 @@ const env : Environment = {
     internalApiUrl: requireFromEnv('INTERNAL_API_URL', requireFromEnv('API_URL')),
     webAppUrl: requireFromEnv('WEB_APP_URL'),
 
-    demo: requireFromEnv('DEMO', 'false') !== 'false'
+    demo: requireFromEnv('DEMO', 'false').toLowerCase() !== 'false',
+
+    skipProposalApprovalOperation: requireFromEnv('SKIP_PROPOSAL_APPROVAL_OPERATION', 'false').toLowerCase() !== 'false',
+    skipTrainApprovalOperation: requireFromEnv('SKIP_TRAIN_APPROVAL_OPERATION', 'false').toLowerCase() !== 'false',
+
+    userPasswordImmutable: requireFromEnv('USER_PASSWORD_IMMUTABLE', 'false').toLowerCase() !== 'false',
+    userSecretsImmutable: requireFromEnv('USER_SECRETS_IMMUTABLE', 'false').toLowerCase() !== 'false'
 };
 
 export default env;

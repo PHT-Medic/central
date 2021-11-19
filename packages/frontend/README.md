@@ -3,9 +3,6 @@ This repository contains the Central UI Frontend Application of the Personal Hea
 It communicates with some APIs of the PHT and need therefore to be configured properly, like described
 in the following sections.
 
-## Installation
-This package requires docker to be installed on the host machine.
-
 ## Configuration
 The following settings need to be added to the environment file `.env` in the root directory.
 ```

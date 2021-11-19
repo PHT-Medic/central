@@ -5,16 +5,15 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getApiProposalStations, getAPIStations, getProposal} from "@personalhealthtrain/ui-common";
-    import { LayoutNavigationDefaultId } from "../../config/layout";
+import {getApiProposalStations, getAPIStations, getProposal, PermissionID} from "@personalhealthtrain/ui-common";
     import ProposalSvg from "../../components/svg/ProposalSvg";
-    import ProposalStationAction from "../../components/proposal/ProposalStationAction";
+    import {Layout, LayoutNavigationID} from "../../modules/layout/contants";
 
     export default {
-        components: {ProposalStationAction, ProposalSvg},
+        components: {ProposalSvg},
         meta: {
-            requireLoggedIn: true,
-            navigationId: LayoutNavigationDefaultId
+            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
         },
         async asyncData (context) {
             try {
@@ -109,11 +108,16 @@ import {getApiProposalStations, getAPIStations, getProposal} from "@personalheal
 
                 ];
 
-                if(this.isProposalOwner || this.isStationAuthority) {
+                if(
+                    this.isProposalOwner || this.isStationAuthority
+                ) {
                     items.push({ name: 'Trains', icon: 'fas fa-train', urlSuffix: '/trains' });
                 }
 
-                if(this.isProposalOwner) {
+                if(
+                    this.isProposalOwner &&
+                    this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT)
+                ) {
                     items.push({ name: 'Settings', icon: 'fa fa-cog', urlSuffix: '/settings' });
                 }
 
@@ -125,7 +129,7 @@ import {getApiProposalStations, getAPIStations, getProposal} from "@personalheal
             },
             handleProposalStationUpdated(item) {
                 if(typeof this.visitorProposalStation !== 'undefined' && this.visitorProposalStation.id === item.id) {
-                    this.visitorProposalStation.status = item.status;
+                    this.visitorProposalStation.approval_status = item.approval_status;
                 }
             }
         }

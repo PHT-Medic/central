@@ -6,7 +6,12 @@
   -->
 <script>
 import ProposalSvg from "../../components/svg/ProposalSvg";
+import {Layout, LayoutNavigationID} from "../../modules/layout/contants";
 export default {
+    meta: {
+        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
+    },
     components: {ProposalSvg},
     data() {
         return {

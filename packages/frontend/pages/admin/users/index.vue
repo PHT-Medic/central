@@ -1,105 +1,74 @@
 <!--
-  Copyright (c) 2021-2021.
+  Copyright (c) 2021.
   Author Peter Placzek (tada5hi)
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
+
 <script>
-    import {dropAPIUser} from "@personalhealthtrain/ui-common";
-    import {LayoutNavigationAdminId} from "../../../config/layout";
-    import UserList from "../../../components/user/UserList";
 
-    export default {
-        components: {UserList},
-        meta: {
-            navigationId: LayoutNavigationAdminId,
-            requireLoggedIn: true,
-            requireAbility(can) {
-                return can('add','user') || can('edit','user') || can('drop','user');
-            }
-        },
-        data() {
-            return {
-                fields: [
-                    { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
-                    { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'options', label: '', tdClass: 'text-left' }
-                ]
-            }
-        },
-        methods: {
-            async drop(user) {
-                let l = this.$createElement;
+import {PermissionID} from "@personalhealthtrain/ui-common";
+import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
 
-                try {
-                    let proceed = await this.$bvModal.msgBoxConfirm(l('div', {class: 'alert alert-info m-b-0'}, [
-                        l('p', null, [
-                            'Are you sure, that you want to delete: ',
-                            l('b', null, [user.name]),
-                            '?'
-                        ])
-                    ]), {
-                        size: 'sm',
-                        buttonSize: 'xs'
-                    });
-
-                    if(proceed) {
-                        try {
-                            await dropAPIUser(user.id);
-                            this.$refs['userList'].dropArrayItem(user);
-                        } catch (e) {
-
-                        }
+export default {
+    meta: {
+        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
+        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+        [Layout.REQUIRED_PERMISSIONS_KEY]: [
+            PermissionID.USER_ADD,
+            PermissionID.USER_EDIT,
+            PermissionID.USER_DROP,
+            PermissionID.USER_ROLE_ADD,
+            PermissionID.USER_ROLE_EDIT,
+            PermissionID.USER_ROLE_DROP
+        ]
+    },
+    data() {
+        return {
+            sidebar: {
+                hide: false,
+                items: [
+                    {
+                        name: 'overview',
+                        urlSuffix: '',
+                        icon: 'fa fa-bars'
+                    },
+                    {
+                        name: 'add',
+                        urlSuffix: '/add',
+                        icon: 'fa fa-plus'
                     }
-                } catch (e) {
-
-                }
+                ]
             }
         }
     }
+}
 </script>
 <template>
     <div class="container">
         <h1 class="title no-border mb-3">
-            Users <span class="sub-title">Management</span>
+            User <span class="sub-title">Management</span>
         </h1>
 
-        <user-list ref="userList" :load-on-init="true">
-            <template v-slot:header-title>
-                This is a slight overview of all users.
-            </template>
-            <template v-slot:items="props">
-                <b-table :items="props.items" :fields="fields" :busy="props.busy" head-variant="'dark'" outlined>
-                    <template v-slot:cell(realm)="data">
-                        <span class="badge-dark badge">{{data.item.realm_id}}</span>
-                    </template>
-                    <template v-slot:cell(options)="data">
-                        <nuxt-link
-                            v-if="$auth.can('edit','user') || $auth.can('edit','user_permissions') || $auth.can('drop','user_permissions')"
-                            class="btn btn-xs btn-outline-primary" :to="'/admin/users/'+data.item.id">
-                            <i class="fa fa-bars"></i>
-                        </nuxt-link>
-                        <button v-if="$auth.can('drop','user')" @click.prevent="drop(data.item)" type="button" class="btn btn-xs btn-outline-danger" title="Löschen">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </template>
-                    <template v-slot:cell(created_at)="data">
-                        <timeago :datetime="data.item.created_at" />
-                    </template>
-                    <template v-slot:cell(updated_at)="data">
-                        <timeago :datetime="data.item.updated_at" />
-                    </template>
-                    <template v-slot:table-busy>
-                        <div class="text-center text-danger my-2">
-                            <b-spinner class="align-middle" />
-                            <strong>Loading...</strong>
-                        </div>
-                    </template>
-                </b-table>
-            </template>
-        </user-list>
+        <div class="content-wrapper">
+            <div class="content-sidebar flex-column">
+                <b-nav pills vertical>
+                    <b-nav-item
+                        v-for="(item,key) in sidebar.items"
+                        :key="key"
+                        :disabled="item.active"
+                        :to="'/admin/users' + item.urlSuffix"
+                        exact
+                        exact-active-class="active"
+                    >
+                        <i :class="item.icon" />
+                        {{ item.name }}
+                    </b-nav-item>
+                </b-nav>
+            </div>
+            <div class="content-container">
+                <nuxt-child />
+            </div>
+        </div>
     </div>
 </template>

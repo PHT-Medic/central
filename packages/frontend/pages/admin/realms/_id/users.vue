@@ -1,0 +1,71 @@
+<!--
+  Copyright (c) 2021.
+  Author Peter Placzek (tada5hi)
+  For the full copyright and license information,
+  view the LICENSE file that was distributed with this source code.
+  -->
+
+<script>
+
+import {PermissionID} from "@personalhealthtrain/ui-common";
+import {Layout, LayoutNavigationID} from "../../../../modules/layout/contants";
+
+export default {
+    meta: {
+        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
+        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+        [Layout.REQUIRED_PERMISSIONS_KEY]: [
+            PermissionID.USER_ADD,
+            PermissionID.USER_EDIT,
+            PermissionID.USER_DROP,
+            PermissionID.USER_ROLE_ADD,
+            PermissionID.USER_ROLE_EDIT,
+            PermissionID.USER_ROLE_DROP
+        ]
+    },
+    props: {
+        realm: Object
+    },
+    data() {
+        return {
+            sidebar: {
+                hide: false,
+                items: [
+                    {
+                        name: 'overview',
+                        urlSuffix: '',
+                        icon: 'fa fa-bars'
+                    },
+                    {
+                        name: 'add',
+                        urlSuffix: '/add',
+                        icon: 'fa fa-plus'
+                    }
+                ]
+            }
+        }
+    }
+}
+</script>
+<template>
+    <div class="content-wrapper">
+        <div class="content-sidebar flex-column">
+            <b-nav pills vertical>
+                <b-nav-item
+                    v-for="(item,key) in sidebar.items"
+                    :key="key"
+                    :disabled="item.active"
+                    :to="'/admin/realms/'+realm.id+'/users' + item.urlSuffix"
+                    exact
+                    exact-active-class="active"
+                >
+                    <i :class="item.icon" />
+                    {{ item.name }}
+                </b-nav-item>
+            </b-nav>
+        </div>
+        <div class="content-container">
+            <nuxt-child :realm="realm" />
+        </div>
+    </div>
+</template>

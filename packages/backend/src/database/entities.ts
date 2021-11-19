@@ -7,6 +7,7 @@
 
 export {
     MasterImage,
+    MasterImageGroup,
     Proposal,
     ProposalStation,
     Station,
@@ -22,7 +23,6 @@ export {
     Realm,
     Role,
     RolePermission,
-    Service,
     User,
     UserKeyRing,
     UserRole,

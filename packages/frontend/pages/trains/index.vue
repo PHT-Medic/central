@@ -6,7 +6,13 @@
   -->
 <script>
 import TrainSvg from "../../components/svg/TrainSvg";
+import {Layout, LayoutNavigationID} from "../../modules/layout/contants";
+
 export default {
+    meta: {
+        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
+    },
     components: {TrainSvg},
     data() {
         return {

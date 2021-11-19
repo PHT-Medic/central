@@ -5,10 +5,11 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
-import ProposalStationStatus from "../../../components/proposal/ProposalStationStatus";
-import ProposalStationList from "../../../components/proposal/ProposalStationList";
-import ProposalStationAction from "../../../components/proposal/ProposalStationAction";
+import {PermissionID, ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
+import ProposalStationStatus from "../../../components/domains/proposal-station/ProposalStationStatus";
+import ProposalStationList from "../../../components/domains/proposal-station/ProposalStationList";
+import ProposalStationAction from "../../../components/domains/proposal-station/ProposalStationAction";
+import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
 
 export default {
     components:{
@@ -17,9 +18,8 @@ export default {
         ProposalStationStatus
     },
     meta: {
-        requireAbility: (can) => {
-            return can('edit', 'proposal') || can('drop', 'proposal')
-        }
+        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
     },
     data() {
         return {
@@ -116,7 +116,7 @@ export default {
                                     </template>
                                     <proposal-station-action
                                         :proposal-station-id="visitorProposalStation.id"
-                                        :status="visitorProposalStation.status"
+                                        :approval-status="visitorProposalStation.approval_status"
                                         :with-icon="true"
                                         action-type="dropDownItem"
                                         action="approve"
@@ -124,7 +124,7 @@ export default {
                                     />
                                     <proposal-station-action
                                         :proposal-station-id="visitorProposalStation.id"
-                                        :status="visitorProposalStation.status"
+                                        :approval-status="visitorProposalStation.approval_status"
                                         :with-icon="true"
                                         action-type="dropDownItem"
                                         action="reject"
@@ -191,35 +191,5 @@ export default {
     font-weight: 700;
     font-size: 1.8rem;
     display: block;
-}
-
-
-.bg-warm-flame {
-    background-image: linear-gradient(45deg, #ff9a9e, #fad0c4 99%, #fad0c4) !important
-}
-
-.bg-night-fade {
-    background-image: -webkit-gradient(linear, left bottom, left top, from(#a18cd1), to(#fbc2eb)) !important;
-    background-image: linear-gradient(0deg, #a18cd1 0, #fbc2eb) !important
-}
-.bg-sunny-morning {
-    background-image: linear-gradient(120deg, #f6d365, #fda085) !important
-}
-.bg-tempting-azure {
-    background-image: linear-gradient(120deg, #84fab0, #8fd3f4) !important
-}
-.bg-amy-crisp {
-    background-image: linear-gradient(120deg, #a6c0fe, #f68084) !important
-}
-.bg-heavy-rain {
-    background-image: -webkit-gradient(linear, left bottom, left top, from(#cfd9df), to(#e2ebf0)) !important;
-    background-image: linear-gradient(0deg, #cfd9df 0, #e2ebf0) !important
-}
-.bg-mean-fruit {
-    background-image: linear-gradient(120deg, #fccb90, #d57eeb) !important
-}
-.bg-malibu-beach {
-    background-image: -webkit-gradient(linear, left top, right top, from(#4facfe), to(#00f2fe)) !important;
-    background-image: linear-gradient(90deg, #4facfe 0, #00f2fe) !important
 }
 </style>

@@ -5,21 +5,21 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getRealm} from "@personalhealthtrain/ui-common";
-import {LayoutNavigationAdminId} from "../../../config/layout";
+import {getAPIRealm} from "@personalhealthtrain/ui-common";
 import Vue from "vue";
 import MedicineWorker from "../../../components/svg/MedicineWorker";
 import MedicineDoctors from "../../../components/svg/MedicineDoctors";
+import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
 
 export default {
     components: {MedicineDoctors, MedicineWorker},
     meta: {
-        requireLoggedIn: true,
-        navigationId: LayoutNavigationAdminId
+        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN
     },
     async asyncData(context) {
         try {
-            const realm = await getRealm(context.params.id);
+            const realm = await getAPIRealm(context.params.id);
 
             return {
                 realm
@@ -34,6 +34,7 @@ export default {
             tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
                 { name: 'Station', icon: 'fa fa-city', urlSuffix: '/station'},
+                { name: 'Users', icon: 'fa fa-users', urlSuffix: '/users'},
                 { name: 'Providers', icon: 'fas fa-boxes', urlSuffix: '/providers'}
             ]
         }

@@ -8,11 +8,13 @@
     import { mapGetters } from 'vuex'
     import MedicineLab from "../components/svg/MedicineLab";
     import WorldSvg from "../components/svg/WorldSvg";
+    import {Layout, LayoutNavigationID} from "../modules/layout/contants";
 
     export default {
         components: {WorldSvg, MedicineLab},
         meta: {
-            requireLoggedIn: true
+            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
         },
         computed: {
             ...mapGetters('auth', [
@@ -47,7 +49,8 @@
                     &bull;  Use container technologies to adapt rapidly on the analytical requirements<br />
                     &bull; A central architecture to submit and distribute trains to each station<br />
                     <br />
-                    Code available at: <a href="https://gitlab.com/PersonalHealthTrain/implementations/germanmii/difuture" target="_blank">gitlab.com</a>
+                    Code available at: <a href="https://github.com/PHT-Medic" target="_blank">github.com</a><br />
+                    Additional Information at: <a href="https://personalhealthtrain.de" target="_blank">personalhealthtrain.de</a>
                 </div>
                 <div class="text-center">
                     <img src="/services.png" class="img-fluid w-75"/>

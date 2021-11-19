@@ -12,6 +12,7 @@ import {
     useAPI, APIType
 } from "../../../modules";
 import {OAuth2Provider} from "./entity";
+import {nullifyEmptyObjectProperties} from "../../../utils";
 
 export function getProviderAuthorizeUri(id: typeof OAuth2Provider.prototype.id) : string {
     const baseUrl: string = useAPI(APIType.DEFAULT).config.baseURL ?? '';
@@ -38,13 +39,13 @@ export async function dropAPIProvider(id: typeof OAuth2Provider.prototype.id) : 
 }
 
 export async function addAPIProvider(data: Partial<OAuth2Provider>): Promise<SingleResourceResponse<OAuth2Provider>> {
-    let response = await useAPI(APIType.DEFAULT).post('providers', data);
+    let response = await useAPI(APIType.DEFAULT).post('providers', nullifyEmptyObjectProperties(data));
 
     return response.data;
 }
 
 export async function editAPIProvider(userId: number, data: Partial<OAuth2Provider>): Promise<SingleResourceResponse<OAuth2Provider>> {
-    let response = await useAPI(APIType.DEFAULT).post('providers/' + userId, data);
+    let response = await useAPI(APIType.DEFAULT).post('providers/' + userId, nullifyEmptyObjectProperties(data));
 
     return response.data;
 }

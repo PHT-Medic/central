@@ -19,11 +19,12 @@ export default (ctx: Context) => {
 
     setAPIConfig(APIType.DEFAULT, {
         driver: {
-            baseURL: apiUrl
+            baseURL: apiUrl,
+            withCredentials: true
         }
     })
 
-    useAPI<APIType.DEFAULT>(APIType.DEFAULT).mountResponseInterceptor(r => r, (error => {
+    useAPI(APIType.DEFAULT).mountResponseInterceptor(r => r, (error => {
         if(typeof error?.response?.data?.message === 'string') {
             error.message = error.response.data.message;
             throw error;

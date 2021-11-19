@@ -7,6 +7,7 @@
 
 import {APIType, SingleResourceResponse, useAPI} from "../../../modules";
 import {UserKeyRing} from "./entity";
+import {nullifyEmptyObjectProperties} from "../../../utils";
 
 export async function getAPIUserKeyRing() : Promise<SingleResourceResponse<UserKeyRing>> {
     const response = await useAPI(APIType.DEFAULT).get('user-key-rings');
@@ -14,12 +15,12 @@ export async function getAPIUserKeyRing() : Promise<SingleResourceResponse<UserK
 }
 
 export async function addAPIUserKeyRing(data: Partial<UserKeyRing>) : Promise<SingleResourceResponse<UserKeyRing>>  {
-    const response = await useAPI(APIType.DEFAULT).post('user-key-rings', data);
+    const response = await useAPI(APIType.DEFAULT).post('user-key-rings', nullifyEmptyObjectProperties(data));
     return response.data
 }
 
 export async function editAPIUserKeyRing(id: typeof UserKeyRing.prototype.id, data: Partial<UserKeyRing>) : Promise<SingleResourceResponse<UserKeyRing>>  {
-    const response = await useAPI(APIType.DEFAULT).post('user-key-rings/' + id, data);
+    const response = await useAPI(APIType.DEFAULT).post('user-key-rings/' + id, nullifyEmptyObjectProperties(data));
     return response.data
 }
 

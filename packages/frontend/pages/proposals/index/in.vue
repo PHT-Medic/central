@@ -5,19 +5,26 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getApiProposalStations, getAPIStations, ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
-import ProposalInForm from "../../../components/proposal/ProposalInForm";
-import ProposalStationStatus from "../../../components/proposal/ProposalStationStatus";
+import {
+    getApiProposalStations,
+    getAPIStations,
+    PermissionID,
+    ProposalStationApprovalStatus
+} from "@personalhealthtrain/ui-common";
+import ProposalInForm from "../../../components/domains/proposal/ProposalInForm";
+import ProposalStationStatus from "../../../components/domains/proposal-station/ProposalStationStatus";
 import Pagination from "../../../components/Pagination";
-import ProposalStationAction from "../../../components/proposal/ProposalStationAction";
+import ProposalStationAction from "../../../components/domains/proposal-station/ProposalStationAction";
+import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
 
 export default {
     components: {ProposalStationAction, Pagination, ProposalStationStatus, ProposalInForm},
     meta: {
-        requireLoggedIn: true,
-        requireAbility(can) {
-            return can('approve','proposal');
-        }
+        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
+        [Layout.REQUIRED_PERMISSIONS_KEY]: [
+            PermissionID.PROPOSAL_APPROVE
+        ]
     },
     data() {
         return {
@@ -28,7 +35,7 @@ export default {
                 { key: 'proposal_id', label: 'Id', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'proposal_title', label: 'Title', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'status', label: 'Status', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'approval_status', label: 'Approval Status', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
                 { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
                 { key: 'options', label: '', tdClass: 'text-left' }
@@ -42,12 +49,13 @@ export default {
 
             statusOptions: ProposalStationApprovalStatus,
 
-            station: null
+            stationId: null
         }
     },
     created() {
         this.init()
-            .then(this.load);
+            .then(this.load)
+            .catch(e => console.log(e));
     },
     computed: {
       user() {
@@ -75,17 +83,17 @@ export default {
          * @return {Promise<void>}
          */
         async init() {
-            const {data: stations} = await getAPIStations({
+            const response = await getAPIStations({
                 filter: {
                     realm_id: this.user.realm_id
                 }
             });
 
-            if(stations.length !== 1) {
+            if(response.meta.total !== 1) {
                 return;
             }
 
-            this.station = stations[0];
+            this.stationId = response.data[0].id;
         },
 
         /**
@@ -94,22 +102,20 @@ export default {
          * @return {Promise<void>}
          */
         async load() {
-            if(this.busy || !this.station) return;
+            if(this.busy || !this.stationId) return;
 
             this.busy = true;
 
             try {
-                let record = {
+                const response = await getApiProposalStations({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset
                     },
                     filter: {
-                        station_id: this.station.id
+                        station_id: this.stationId
                     }
-                };
-
-                const response = await getApiProposalStations(record);
+                });
 
                 this.items = response.data;
                 const {total} = response.meta;
@@ -144,7 +150,7 @@ export default {
     <div>
         <div class="alert alert-primary alert-sm">
             This is a slight overview of all incoming proposals from other stations. If you approve a proposal,
-            your station can be targeted by inherited trains from that proposal.
+            your station can be used by inherited trains.
         </div>
         <div class="d-flex flex-row">
             <div>
@@ -159,9 +165,9 @@ export default {
                     <span class="badge-dark badge">{{data.item.proposal.realm_id}}</span>
                 </template>
 
-                <template v-slot:cell(status)="data">
+                <template v-slot:cell(approval_status)="data">
                     <proposal-station-status
-                        :status="data.item.status"
+                        :status="data.item.approval_status"
                         v-slot:default="slotProps"
                     >
                         <span class="badge" :class="'badge-'+slotProps.classSuffix">
@@ -189,7 +195,7 @@ export default {
                             <b-dropdown-divider />
                             <proposal-station-action
                                 :proposal-station-id="data.item.id"
-                                :status="data.item.status"
+                                :approval-status="data.item.approval_status"
                                 :with-icon="true"
                                 action-type="dropDownItem"
                                 action="approve"
@@ -197,7 +203,7 @@ export default {
                             />
                             <proposal-station-action
                                 :proposal-station-id="data.item.id"
-                                :status="data.item.status"
+                                :approval-status="data.item.approval_status"
                                 :with-icon="true"
                                 action-type="dropDownItem"
                                 action="reject"

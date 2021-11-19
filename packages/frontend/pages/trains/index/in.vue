@@ -5,18 +5,18 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPIStations} from "@personalhealthtrain/ui-common";
-import {LayoutNavigationDefaultId} from "../../../config/layout.ts";
-import StationTrainTable from "../../../components/station/StationTrainTable";
+import {getAPIStations, PermissionID} from "@personalhealthtrain/ui-common";
+import StationTrainTable from "../../../components/domains/station/StationTrainTable";
+import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
 
 export default {
     components: {StationTrainTable},
     meta: {
-        navigationId: LayoutNavigationDefaultId,
-        requireLoggedIn: true,
-        requireAbility: (can) => {
-            return can('approve', 'train');
-        }
+        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
+        [Layout.REQUIRED_PERMISSIONS_KEY]: [
+            PermissionID.TRAIN_APPROVE
+        ]
     },
     async asyncData(ctx) {
         try {

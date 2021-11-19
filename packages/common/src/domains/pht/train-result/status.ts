@@ -21,3 +21,5 @@ export enum TrainResultStatus {
     FINISHED = 'finished',
     FAILED = 'failed'
 }
+
+export type TrainResultStatusType = `${TrainResultStatus}`;

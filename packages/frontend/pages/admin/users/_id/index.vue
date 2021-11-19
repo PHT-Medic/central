@@ -5,18 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {LayoutNavigationAdminId} from "../../../../config/layout";
-    import UserDetailsForm from "../../../../components/user/UserDetailsForm";
-    import UserPasswordForm from "../../../../components/user/UserPasswordForm";
+    import UserDetailsForm from "../../../../components/domains/user/UserDetailsForm";
+    import UserPasswordForm from "../../../../components/domains/user/UserPasswordForm";
 
     export default {
         props: {
             userProperty: {
                 type: Object
             }
-        },
-        meta: {
-            navigationId: LayoutNavigationAdminId
         },
         components: {
             UserPasswordForm,

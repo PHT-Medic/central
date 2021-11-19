@@ -6,7 +6,6 @@
  */
 
 import {consumeQueue, Message} from "amqp-extension";
-import {MQ_DISPATCHER_ROUTING_KEY} from "@personalhealthtrain/ui-common";
 import {extendDispatcherHarborData} from "./data/harbor";
 import {
     dispatchHarborEventToEmailNotifier,
@@ -16,6 +15,7 @@ import {
 import {dispatchHarborEventToResultService} from "./target/result-service";
 import {dispatchHarborEventToSelf} from "./target/self";
 import {dispatchHarborEventToTrainRouter} from "./target/train-router";
+import {MessageQueueDispatcherRoutingKey} from "../../config/service/mq";
 
 export enum DispatcherEvent {
     PROPOSAL = 'proposalEvent',
@@ -25,7 +25,7 @@ export enum DispatcherEvent {
 
 export function buildDispatcherComponent() {
     function start() {
-        return consumeQueue({routingKey: MQ_DISPATCHER_ROUTING_KEY},{
+        return consumeQueue({routingKey: MessageQueueDispatcherRoutingKey.EVENT_OUT},{
             [DispatcherEvent.PROPOSAL]: async(message: Message) => {
                 // assigned, approved, rejected
 
@@ -46,12 +46,15 @@ export function buildDispatcherComponent() {
             [DispatcherEvent.HARBOR]: async(message: Message) => {
                 // PUSH_ARTIFACT
 
+                console.log(message);
+
                 await Promise.resolve(message)
                     .then(extendDispatcherHarborData)
                     .then(dispatchHarborEventToSelf)
                     .then(dispatchHarborEventToTrainRouter)
                     .then(dispatchHarborEventToResultService)
-                    .then(dispatchHarborEventToEmailNotifier);
+                    .then(dispatchHarborEventToEmailNotifier)
+                    .catch(e => {console.log(e); throw e});
             }
         });
     }

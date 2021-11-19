@@ -7,19 +7,23 @@
 <script>
 import {getAPITrain} from "@personalhealthtrain/ui-common";
 import Vue from 'vue';
-import {LayoutNavigationDefaultId} from "../../config/layout.ts";
+import {Layout, LayoutNavigationID} from "../../modules/layout/contants";
 
 export default {
     meta: {
-        requireLoggedIn: true,
-        navigationId: LayoutNavigationDefaultId
+        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
     },
     async asyncData(context) {
         try {
-            const train = await getAPITrain(context.params.id);
+            const item = await getAPITrain(context.params.id, {
+                relations: {
+                    proposal: true
+                }
+            });
 
             return {
-                train
+                item
             };
         } catch (e) {
             await context.redirect('/trains');
@@ -27,7 +31,7 @@ export default {
     },
     data() {
         return {
-            train: undefined,
+            item: undefined,
             tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
                 { name: 'Configuration', icon: 'fa fa-cog', urlSuffix: '/wizard'},
@@ -38,7 +42,7 @@ export default {
     methods: {
         updateTrain(train) {
             for(let key in train) {
-                Vue.set(this.train, key, train[key]);
+                Vue.set(this.item, key, train[key]);
             }
         }
     }
@@ -48,7 +52,7 @@ export default {
     <div>
         <h1 class="title no-border mb-3">
             Train
-            <span class="sub-title">{{ train.id }} </span>
+            <span class="sub-title">{{ item.id }} </span>
         </h1>
 
         <div class="content-wrapper">
@@ -63,21 +67,21 @@ export default {
                     </b-nav-item>
 
                     <b-nav-item
-                        v-for="(item,key) in tabs"
+                        v-for="(navItem,key) in tabs"
                         :key="key"
-                        :disabled="item.active"
-                        :to="'/trains/'  +train.id + item.urlSuffix"
-                        :active="$route.path.startsWith('/trains/'+train.id + item.urlSuffix) && item.urlSuffix.length !== 0"
+                        :disabled="navItem.active"
+                        :to="'/trains/'  +item.id + navItem.urlSuffix"
+                        :active="$route.path.startsWith('/trains/'+item.id + navItem.urlSuffix) && navItem.urlSuffix.length !== 0"
                         exact-active-class="active"
                         exact
                     >
-                        <i :class="item.icon" />
-                        {{ item.name }}
+                        <i :class="navItem.icon" />
+                        {{ navItem.name }}
                     </b-nav-item>
                 </b-nav>
             </div>
             <div class="content-container">
-                <nuxt-child :train="train" @updated="updateTrain" />
+                <nuxt-child :train="item" @updated="updateTrain" />
             </div>
         </div>
     </div>

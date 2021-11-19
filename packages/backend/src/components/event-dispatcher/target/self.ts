@@ -10,18 +10,18 @@ import {AggregatorMasterImagePushedEvent} from "../../../aggregators/dispatcher/
 import {AggregatorTrainEvent} from "../../../aggregators/dispatcher/handlers/train";
 
 import {
-    HARBOR_INCOMING_PROJECT_NAME,
-    HARBOR_MASTER_IMAGE_PROJECT_NAME,
-    HARBOR_OUTGOING_PROJECT_NAME,
-    HARBOR_SYSTEM_USER_NAME,
-    MQ_UI_D_EVENT_ROUTING_KEY,
-    isHarborStationProjectName,
+    REGISTRY_INCOMING_PROJECT_NAME,
+    REGISTRY_MASTER_IMAGE_PROJECT_NAME,
+    REGISTRY_OUTGOING_PROJECT_NAME,
+    REGISTRY_SYSTEM_USER_NAME,
+    isRegistryStationProjectName,
     TrainStationRunStatus
 } from "@personalhealthtrain/ui-common";
 
 import {} from "@personalhealthtrain/ui-common";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {DispatcherHarborEventWithAdditionalData} from "../data/harbor";
+import {MessageQueueDispatcherRoutingKey} from "../../../config/service/mq";
 
 export async function dispatchHarborEventToSelf(
     message: Message
@@ -33,20 +33,20 @@ export async function dispatchHarborEventToSelf(
     }
 
     // master Image project
-    const isLibraryProject : boolean = data.namespace === HARBOR_MASTER_IMAGE_PROJECT_NAME;
+    const isLibraryProject : boolean = data.namespace === REGISTRY_MASTER_IMAGE_PROJECT_NAME;
     if(isLibraryProject) {
         await processMasterImage(data);
         return message;
     }
 
-    const isIncomingProject : boolean = data.namespace === HARBOR_INCOMING_PROJECT_NAME;
+    const isIncomingProject : boolean = data.namespace === REGISTRY_INCOMING_PROJECT_NAME;
     if(isIncomingProject) {
         await processIncomingTrain(data);
 
         return message;
     }
 
-    const isOutgoingProject : boolean = data.namespace === HARBOR_OUTGOING_PROJECT_NAME;
+    const isOutgoingProject : boolean = data.namespace === REGISTRY_OUTGOING_PROJECT_NAME;
     if(isOutgoingProject) {
         await processOutgoingTrain(data);
 
@@ -54,7 +54,7 @@ export async function dispatchHarborEventToSelf(
     }
 
     // station project
-    const isStationProject : boolean = isHarborStationProjectName(data.namespace);
+    const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
     if(isStationProject) {
         await processStationTrain(data);
     }
@@ -65,7 +65,7 @@ export async function dispatchHarborEventToSelf(
 async function processMasterImage(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     await publishMessage(buildMessage({
         options: {
-            routingKey: MQ_UI_D_EVENT_ROUTING_KEY
+            routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN
         },
         type: AggregatorMasterImagePushedEvent,
         data: {
@@ -78,7 +78,7 @@ async function processMasterImage(data: DispatcherHarborEventWithAdditionalData)
 async function processIncomingTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     await publishMessage(buildMessage({
         options: {
-            routingKey: MQ_UI_D_EVENT_ROUTING_KEY
+            routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN
         },
         type: AggregatorTrainEvent.BUILD_FINISHED,
         data: {
@@ -90,7 +90,7 @@ async function processIncomingTrain(data: DispatcherHarborEventWithAdditionalDat
 async function processOutgoingTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     await publishMessage(buildMessage({
         options: {
-            routingKey: MQ_UI_D_EVENT_ROUTING_KEY
+            routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN
         },
         type: AggregatorTrainEvent.FINISHED,
         data: {
@@ -111,7 +111,7 @@ async function processStationTrain(data: DispatcherHarborEventWithAdditionalData
     if(data.stationIndex === 0) {
         await publishMessage(buildMessage({
             options: {
-                routingKey: MQ_UI_D_EVENT_ROUTING_KEY
+                routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN
             },
             type: AggregatorTrainEvent.STARTED,
             data: {
@@ -123,13 +123,13 @@ async function processStationTrain(data: DispatcherHarborEventWithAdditionalData
 
     await publishMessage(buildMessage({
         options: {
-            routingKey: MQ_UI_D_EVENT_ROUTING_KEY
+            routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN
         },
         type: AggregatorTrainEvent.MOVED,
         data: {
             id: data.repositoryName,
             stationId: data.station.id,
-            status: data.operator === HARBOR_SYSTEM_USER_NAME ? TrainStationRunStatus.ARRIVED : TrainStationRunStatus.DEPARTED
+            status: data.operator === REGISTRY_SYSTEM_USER_NAME ? TrainStationRunStatus.ARRIVED : TrainStationRunStatus.DEPARTED
         }
     }));
 }

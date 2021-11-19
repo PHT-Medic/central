@@ -6,7 +6,7 @@
  */
 
 import {Message, publishMessage} from "amqp-extension";
-import {isHarborStationProjectName} from "@personalhealthtrain/ui-common";
+import {isRegistryStationProjectName} from "@personalhealthtrain/ui-common";
 import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
 import {buildTrainRouterQueueMessage, TrainRouterHarborEvent} from "../../../domains/service/train-router";
 import {useLogger} from "../../../modules/log";
@@ -17,7 +17,7 @@ export async function dispatchHarborEventToTrainRouter(
     const data : DispatcherHarborEventData = message.data as DispatcherHarborEventData;
 
     // station project
-    const isStationProject : boolean = isHarborStationProjectName(data.namespace);
+    const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
 
     // only process station trains and the PUSH_ARTIFACT event
     if(!isStationProject || data.event !== 'PUSH_ARTIFACT') {

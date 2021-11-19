@@ -7,11 +7,12 @@
 
 import {getRepository} from "typeorm";
 import {applyFilters, applyPagination} from "typeorm-extension";
-import {MasterImage} from "@personalhealthtrain/ui-common";
+import {MasterImage, MasterImageCommand} from "@personalhealthtrain/ui-common";
 
-import {Controller, Delete, Get, Params, Request, Response} from "@decorators/express";
-import {ResponseExample, SwaggerTags} from "typescript-swagger";
+import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
+import {SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {handleMasterImageCommandRouteHandler} from "./command";
 
 type PartialMasterImage = Partial<MasterImage>;
 
@@ -19,9 +20,6 @@ type PartialMasterImage = Partial<MasterImage>;
 @Controller("/master-images")
 export class MasterImageController {
     @Get("",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialMasterImage[]>([
-        {name: 'slim', path: 'master/nf-core/hlaTyping', id: 1, proposals: [], trains: []}
-    ])
     async getMany(
         @Request() req: any,
         @Response() res: any
@@ -30,7 +28,6 @@ export class MasterImageController {
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialMasterImage>({name: 'slim', path: 'master/nf-core/hlaTyping', id: 1, proposals: [], trains: []})
     async getOne(
         @Params('id') id: string,
         @Request() req: any,
@@ -39,8 +36,18 @@ export class MasterImageController {
         return await getRouteHandler(req, res) as PartialMasterImage | undefined;
     }
 
+    @Post("/command",[ForceLoggedInMiddleware])
+    async runCommand(
+        @Body() data: {
+            command: MasterImageCommand
+        },
+        @Request() req: any,
+        @Response() res: any
+    ) {
+        return await handleMasterImageCommandRouteHandler(req, res);
+    }
+
     @Delete("/:id",[ForceLoggedInMiddleware])
-    @ResponseExample<PartialMasterImage>({name: 'slim', path: 'master/nf-core/hlaTyping', id: 1, proposals: [], trains: []})
     async drop(
         @Params('id') id: string,
         @Request() req: any,
@@ -71,7 +78,7 @@ export async function getManyRouteHandler(req: any, res: any) {
     const query = repository.createQueryBuilder('image');
 
     applyFilters(query, filter, {
-        allowed: ['id', 'name', 'path']
+        allowed: ['id', 'name', 'path', 'virtual_path', 'group_virtual_path']
     });
 
     const pagination = applyPagination(query, page, {maxLimit: 50});
@@ -94,8 +101,8 @@ export async function getManyRouteHandler(req: any, res: any) {
 export async function dropRouteHandler(req: any, res: any) {
     const { id } = req.params;
 
-    if(!req.ability.can('manage', 'service')) {
-        return res._failUnauthorized();
+    if(!req.ability.can('manage', 'masterImage')) {
+        // return res._failUnauthorized();
     }
 
     const repository = getRepository(MasterImage);
@@ -111,6 +118,7 @@ export async function dropRouteHandler(req: any, res: any) {
 
         return res._respondDeleted({data: entity});
     } catch (e) {
+        console.log(e);
         return res._failValidationError({message: 'The master image could not be deleted.'})
     }
 }

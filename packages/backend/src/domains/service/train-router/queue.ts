@@ -6,7 +6,7 @@
  */
 
 import {buildMessage, Message} from "amqp-extension";
-import {MQ_TR_ROUTING_KEY} from "@personalhealthtrain/ui-common";
+import {MessageQueueTrainRouterRoutingKey} from "../../../config/service/mq";
 
 // -------------------------------------------
 
@@ -39,7 +39,7 @@ export function buildTrainRouterQueueMessage<T extends TrainRouterCommand | Trai
 ) : Message {
     return buildMessage({
         options: {
-            routingKey: MQ_TR_ROUTING_KEY
+            routingKey: MessageQueueTrainRouterRoutingKey.COMMAND_OUT
         },
         type,
         data,

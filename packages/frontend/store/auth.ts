@@ -11,7 +11,7 @@ import {ActionTree, GetterTree, MutationTree} from "vuex";
 
 import {RootState} from "~/store/index";
 
-import {Oauth2TokenResponse, OwnedPermission} from "@typescript-auth/core";
+import {Oauth2TokenResponse, PermissionItem} from "@typescript-auth/core";
 
 export const AuthStoreKey = {
     user: 'user',
@@ -27,7 +27,7 @@ export type AuthStoreToken = Oauth2TokenResponse & {
 export interface AuthState {
     user: User | undefined,
 
-    permissions: OwnedPermission<any>[],
+    permissions: PermissionItem<any>[],
     permissionsResolved: boolean,
 
     token: AuthStoreToken | undefined,
@@ -183,7 +183,9 @@ export const actions : ActionTree<AuthState, RootState> = {
             dispatch('triggerSetToken', extendedToken);
 
             await dispatch('triggerRefreshMe');
-            this.dispatch('layout/update');
+
+            await dispatch('layout/update', {type: 'navigation'}, {root: true});
+            await dispatch('layout/update', {type: 'sidebar'}, {root: true});
         } catch (e) {
             dispatch('triggerUnsetToken');
 
@@ -254,14 +256,15 @@ export const actions : ActionTree<AuthState, RootState> = {
      * Try to logout the user.
      * @param commit
      */
-    triggerLogout ({ dispatch }) {
-        dispatch('triggerUnsetToken');
-        dispatch('triggerUnsetUser');
-        dispatch('triggerUnsetPermissions');
+    async triggerLogout ({ dispatch }) {
+        await dispatch('triggerUnsetToken');
+        await dispatch('triggerUnsetUser');
+        await  dispatch('triggerUnsetPermissions');
 
-        dispatch('triggerSetLoginRequired', false);
+        await dispatch('triggerSetLoginRequired', false);
 
-        this.dispatch('layout/update');
+        await dispatch('layout/update', {type: 'navigation'}, {root: true});
+        await dispatch('layout/update', {type: 'sidebar'}, {root: true});
     },
 
     // --------------------------------------------------------------------
