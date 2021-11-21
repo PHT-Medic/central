@@ -42,7 +42,7 @@
         "@types/winston": "^2.4.4",
         "nodemon": "^2.0.9",
         "np": "^7.5.0",
-        "ts-node": "^10.3.0",
+        "ts-node": "^10.4.0",
         "ts-node-dev": "^1.1.6",
         "tslint": "^6.1.1",
         "typescript": "^4.4.4"
