@@ -16,7 +16,7 @@
         "@personalhealthtrain/ui-common": "^1.0.0-alpha.1",
         "@trapi/query": "^2.0.1",
         "@typescript-auth/core": "^1.0.1",
-        "@typescript-auth/server": "^1.0.1",
+        "@typescript-auth/server": "^1.0.2",
         "amqp-extension": "^1.0.0",
         "axios": "^0.24.0",
         "bcrypt": "^5.0.1",
