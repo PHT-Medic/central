@@ -7,7 +7,7 @@
     },
     "license": "MIT",
     "version": "1.0.0-alpha.0",
-    "description": "This package contains the Central UI Result Service of PHT.",
+    "description": "This project contains the Central UI Result Service of PHT.",
     "main": "dist/index.js",
     "scripts": {
         "start": "node dist/index.js",
