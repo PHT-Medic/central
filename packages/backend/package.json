@@ -60,7 +60,7 @@
         "@types/swagger-stats": "^0.95.3",
         "@types/swagger-ui-express": "^4.1.2",
         "@types/tar": "^6.1.0",
-        "@types/tar-stream": "^2.1.0",
+        "@types/tar-stream": "^2.2.2",
         "@types/uuid": "^8.3.1",
         "@types/winston": "^2.4.4",
         "@types/yargs": "^17.0.0",
