@@ -37,7 +37,7 @@
         "swagger-ui-express": "^4.1.6",
         "tar": "^6.1.2",
         "tar-stream": "^2.1.4",
-        "typeorm": "^0.2.38",
+        "typeorm": "^0.2.41",
         "typeorm-extension": "^1.0.1",
         "typeorm-seeding": "^1.6.1",
         "typescript-swagger": "^0.1.2",
