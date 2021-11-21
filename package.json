@@ -38,7 +38,7 @@
         "@types/express": "^4.17.4",
         "@types/node": "^16.11.9",
         "@types/tar-stream": "^2.2.2",
-        "@types/uuid": "^8.3.1",
+        "@types/uuid": "^8.3.3",
         "@types/winston": "^2.4.4",
         "nodemon": "^2.0.15",
         "np": "^7.6.0",
