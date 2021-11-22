@@ -13,6 +13,9 @@ import {SwaggerTags} from "typescript-swagger";
 import {Body, Controller, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 import {check, matchedData, validationResult} from "express-validator";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../config/http/error/validation";
 
 @SwaggerTags("auth")
 @Controller("/permissions")
@@ -22,7 +25,7 @@ export class PermissionController {
         @Request() req: any,
         @Response() res: any
     ): Promise<Permission[]> {
-        return await getPermissions(req, res);
+        return await getMany(req, res);
     }
 
     @Get("/:id", [ForceLoggedInMiddleware])
@@ -31,7 +34,7 @@ export class PermissionController {
         @Request() req: any,
         @Response() res: any
     ): Promise<Permission> {
-        return await getPermission(req, res);
+        return await getOne(req, res);
     }
 
     @Post("", [ForceLoggedInMiddleware])
@@ -40,11 +43,11 @@ export class PermissionController {
         @Request() req: any,
         @Response() res: any
     ): Promise<Permission[]> {
-        return await addRouteHandler(req, res);
+        return await addOne(req, res);
     }
 }
 
-async function getPermissions (req: any, res: any) {
+async function getMany(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page } = req.query;
 
     const repository = getRepository(Permission);
@@ -58,7 +61,7 @@ async function getPermissions (req: any, res: any) {
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res._respond({
+    return res.respond({
         data: {
             data: entities,
             meta: {
@@ -69,36 +72,31 @@ async function getPermissions (req: any, res: any) {
     });
 }
 
-async function getPermission(req: any, res: any) {
+async function getOne(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const id = req.params.id;
 
-    try {
-        const repository = getRepository(Permission);
-        const result = await repository.createQueryBuilder('permission')
-            .where("id = :id", {id})
-            .getOne();
+    const repository = getRepository(Permission);
+    const result = await repository.createQueryBuilder('permission')
+        .where("id = :id", {id})
+        .getOne();
 
-        if(typeof result === 'undefined') {
-            return res._failNotFound();
-        }
-
-        return res._respond({data: result});
-
-    } catch (e) {
-        return res._failNotFound();
+    if(typeof result === 'undefined') {
+        throw new NotFoundError();
     }
+
+    return res.respond({data: result});
 }
 
-async function addRouteHandler(req: any, res: any) : Promise<any> {
+async function addOne(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if(!req.ability.hasPermission(PermissionID.PERMISSION_MANAGE)) {
-        return res._failForbidden();
+        throw new NotFoundError();
     }
 
     await check('id').exists().notEmpty().isLength({min: 3, max: 30}).run(req);
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});

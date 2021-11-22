@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Role} from "@personalhealthtrain/ui-common";
+import {PermissionID, Role} from "@personalhealthtrain/ui-common";
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 import {applyPagination, applyFilters} from "typeorm-extension";
@@ -13,6 +13,9 @@ import {applyPagination, applyFilters} from "typeorm-extension";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {ForbiddenError, NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../config/http/error/validation";
 
 // ---------------------------------------------------------------------------------
 
@@ -38,7 +41,7 @@ export class RoleController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialRole> {
-        return await addRole(req, res) as PartialRole;
+        return await addOne(req, res) as PartialRole;
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
@@ -48,7 +51,7 @@ export class RoleController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialRole> {
-        return await getRole(req, res) as PartialRole;
+        return await getOne(req, res) as PartialRole;
     }
 
     @Post("/:id",[ForceLoggedInMiddleware])
@@ -73,7 +76,7 @@ export class RoleController {
     }
 }
 
-async function getRoles(req: any, res: any) {
+async function getRoles(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page } = req.query;
 
     const roleRepository = getRepository(Role);
@@ -88,7 +91,7 @@ async function getRoles(req: any, res: any) {
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res._respond({
+    return res.respond({
         data: {
             data: entities,
             meta: {
@@ -99,26 +102,22 @@ async function getRoles(req: any, res: any) {
     });
 }
 
-async function getRole(req: any, res: any) {
+async function getOne(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    try {
         const roleRepository = getRepository(Role);
         const result = await roleRepository.findOne(id);
 
         if(typeof result === 'undefined') {
-            return res._failNotFound();
+            throw new NotFoundError();
         }
 
-        return res._respond({data: result});
-    } catch (e) {
-        return res._failNotFound();
-    }
+        return res.respond({data: result});
 }
 
-async function addRole(req: any, res: any) {
-    if(!req.ability.can('add','role')) {
-        return res._failForbidden();
+async function addOne(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    if(!req.ability.hasPermission(PermissionID.ROLE_ADD)) {
+        throw new ForbiddenError();
     }
 
     await check('name').exists().notEmpty().isLength({min: 3, max: 30}).run(req);
@@ -128,7 +127,7 @@ async function addRole(req: any, res: any) {
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
@@ -136,24 +135,20 @@ async function addRole(req: any, res: any) {
     const roleRepository = getRepository(Role);
     const role = roleRepository.create(data);
 
-    try {
-        await roleRepository.save(role);
+    await roleRepository.save(role);
 
-        return res._respondCreated({
-            data: {
-                id: role.id
-            }
-        });
-    } catch (e) {
-        return res._failValidationError();
-    }
+    return res.respondCreated({
+        data: {
+            id: role.id
+        }
+    });
 }
 
-async function editRole(req: any, res: any) {
+async function editRole(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if(!req.ability.can('edit','role')) {
-        return res._failForbidden();
+    if(!req.ability.hasPermission(PermissionID.ROLE_EDIT)) {
+        throw new ForbiddenError();
     }
 
     await check('name').exists().notEmpty().isLength({min: 3, max: 30}).optional().run(req);
@@ -163,52 +158,42 @@ async function editRole(req: any, res: any) {
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: true});
     if(!data) {
-        return res._respondAccepted();
+        return res.respondAccepted();
     }
 
-    console.log(data);
 
     const roleRepository = getRepository(Role);
     let role = await roleRepository.findOne(id);
 
     if(typeof role === 'undefined') {
-        return res._failValidationError({message: 'Die Rolle konnte nicht gefunden werden.'});
+        throw new NotFoundError();
     }
 
     role = roleRepository.merge(role, data);
 
-    try {
-        const result = await roleRepository.save(role);
+    const result = await roleRepository.save(role);
 
-        return res._respondAccepted({
-            data: result
-        });
-    } catch (e) {
-        return res._failValidationError({message: 'Die Einstellungen konnten nicht aktualisiert werden.'});
-    }
+    return res.respondAccepted({
+        data: result
+    });
 }
 
 // ---------------------------------------------------------------------------------
 
-async function dropRole(req: any, res: any) {
+async function dropRole(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {id} = req.params;
 
-    if (!req.ability.can('drop', 'role')) {
-        return res._failForbidden();
+    if (!req.ability.hasPermission(PermissionID.ROLE_DROP)) {
+        throw new ForbiddenError();
     }
 
-    try {
-        const roleRepository = getRepository(Role);
-        await roleRepository.delete(id);
+    const roleRepository = getRepository(Role);
+    await roleRepository.delete(id);
 
-        return res._respondDeleted();
-    } catch(e) {
-        return res._failValidationError();
-    }
-
+    return res.respondDeleted();
 }

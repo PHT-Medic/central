@@ -11,7 +11,7 @@ import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../domains/auth/user/repository";
 import {getWritableDirPath} from "../../paths";
 import {Client, MASTER_REALM_ID, TokenPayload} from "@personalhealthtrain/ui-common";
-import {UnauthorizedError} from "../error/unauthorized";
+import {UnauthorizedError} from "@typescript-error/http";
 
 const ip4ToInt = (ip: string) =>
     ip.split('.').reduce((int, oct) => (int << 8) + parseInt(oct, 10), 0) >>> 0;
@@ -54,7 +54,6 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
                 !isIp4InCidr(currentAddress, '172.16.0.0/12') &&
                 !isIp4InCidr(currentAddress, '192.168.0.0/16')
             ) {
-                console.log(tokenAddress, currentAddress);
                 throw new UnauthorizedError();
             }
 

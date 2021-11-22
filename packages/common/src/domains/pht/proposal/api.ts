@@ -13,9 +13,10 @@ import {
     useAPI
 } from "../../../modules";
 import {Proposal} from "./entity";
+import {nullifyEmptyObjectProperties} from "../../../utils";
 
 export async function addProposal(data: Record<string, any>) : Promise<SingleResourceResponse<Proposal>> {
-    const response = await useAPI(APIType.DEFAULT).post('proposals', data);
+    const response = await useAPI(APIType.DEFAULT).post('proposals', nullifyEmptyObjectProperties(data));
 
     return response.data;
 }
@@ -32,7 +33,7 @@ export async function dropProposal(id: number): Promise<SingleResourceResponse<P
 }
 
 export async function editProposal(id: number, data: Record<string, any>): Promise<SingleResourceResponse<Proposal>>  {
-    const response = await useAPI(APIType.DEFAULT).post('proposals/' + id, data);
+    const response = await useAPI(APIType.DEFAULT).post('proposals/' + id, nullifyEmptyObjectProperties(data));
     return response.data;
 }
 

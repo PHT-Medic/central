@@ -6,22 +6,22 @@
  */
 
 import {Middleware} from "@decorators/express";
-import {NextFunction, Request, Response} from "express";
+import {ExpressNextFunction, ExpressRequest, ExpressResponse} from "../type";
+import {UnauthorizedError} from "@typescript-error/http";
 
-export function forceLoggedIn(req: any, res: any, next: any) {
+export function forceLoggedIn(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) {
     if (
         typeof req.userId === 'undefined' &&
         typeof req.serviceId === 'undefined'
     ) {
-        res._failUnauthorized({message: 'You are not authenticated.'});
-        return;
+        throw new UnauthorizedError('You are not authenticated.');
     }
 
     next();
 }
 
 export class ForceLoggedInMiddleware implements Middleware {
-    public use(request: Request, response: Response, next: NextFunction) {
+    public use(request: ExpressRequest, response: ExpressResponse, next: ExpressNextFunction) {
         return forceLoggedIn(request, response, next);
     }
 }

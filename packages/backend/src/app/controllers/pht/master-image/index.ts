@@ -7,12 +7,14 @@
 
 import {getRepository} from "typeorm";
 import {applyFilters, applyPagination} from "typeorm-extension";
-import {MasterImage, MasterImageCommand} from "@personalhealthtrain/ui-common";
+import {MasterImage, MasterImageCommand, PermissionID} from "@personalhealthtrain/ui-common";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 import {handleMasterImageCommandRouteHandler} from "./command";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {ForbiddenError, NotFoundError} from "@typescript-error/http";
 
 type PartialMasterImage = Partial<MasterImage>;
 
@@ -53,11 +55,11 @@ export class MasterImageController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialMasterImage|undefined> {
-        return await dropRouteHandler(req, res) as PartialMasterImage | undefined;
+        return await dropRouteHandler(req, res);
     }
 }
 
-export async function getRouteHandler(req: any, res: any) {
+export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     const repository = getRepository(MasterImage);
@@ -65,13 +67,13 @@ export async function getRouteHandler(req: any, res: any) {
     const entity = await repository.findOne(id);
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
-    return res._respond({data: entity})
+    return res.respond({data: entity});
 }
 
-export async function getManyRouteHandler(req: any, res: any) {
+export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { page, filter } = req.query;
 
     const repository = getRepository(MasterImage);
@@ -87,7 +89,7 @@ export async function getManyRouteHandler(req: any, res: any) {
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res._respond({
+    return res.respond({
         data: {
             data: entities,
             meta: {
@@ -98,11 +100,11 @@ export async function getManyRouteHandler(req: any, res: any) {
     });
 }
 
-export async function dropRouteHandler(req: any, res: any) {
+export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if(!req.ability.can('manage', 'masterImage')) {
-        // return res._failUnauthorized();
+    if(!req.ability.hasPermission(PermissionID.MASTER_IMAGE_MANAGE)) {
+        throw new ForbiddenError();
     }
 
     const repository = getRepository(MasterImage);
@@ -110,15 +112,10 @@ export async function dropRouteHandler(req: any, res: any) {
     const entity = await repository.findOne(id);
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
-    try {
-        await repository.delete(entity.id);
+    await repository.delete(entity.id);
 
-        return res._respondDeleted({data: entity});
-    } catch (e) {
-        console.log(e);
-        return res._failValidationError({message: 'The master image could not be deleted.'})
-    }
+    return res.respondDeleted({data: entity});
 }

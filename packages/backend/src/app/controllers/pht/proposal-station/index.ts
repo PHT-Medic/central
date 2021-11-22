@@ -11,7 +11,7 @@ import {check, matchedData, validationResult} from "express-validator";
 import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
 import {
     isPermittedForResourceRealm, isProposalStationApprovalStatus,
-    onlyRealmPermittedQueryResources,
+    onlyRealmPermittedQueryResources, PermissionID,
     ProposalStation, ProposalStationApprovalStatus
 } from "@personalhealthtrain/ui-common";
 
@@ -19,6 +19,9 @@ import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@d
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 import env from "../../../../env";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../config/http/error/validation";
 
 type PartialProposalStation = Partial<ProposalStation>;
 const simpleExample = {proposal_id: 1, station_id: 1, comment: 'Looks good to me', status: ProposalStationApprovalStatus.APPROVED};
@@ -32,7 +35,7 @@ export class ProposalStationController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialProposalStation[]> {
-        return await getProposalStationsRouteHandler(req, res) as PartialProposalStation[];
+        return await getProposalStationsRouteHandler(req, res);
     }
 
     @Post("",[ForceLoggedInMiddleware])
@@ -42,7 +45,7 @@ export class ProposalStationController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialProposalStation|undefined> {
-        return await addProposalStationRouteHandler(req, res) as PartialProposalStation | undefined;
+        return await addProposalStationRouteHandler(req, res);
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
@@ -52,7 +55,7 @@ export class ProposalStationController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialProposalStation|undefined> {
-        return await getProposalStationRouteHandler(req, res) as PartialProposalStation | undefined;
+        return await getProposalStationRouteHandler(req, res);
     }
 
     @Post("/:id",[ForceLoggedInMiddleware])
@@ -63,7 +66,7 @@ export class ProposalStationController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialProposalStation|undefined> {
-        return await editProposalStationRouteHandler(req, res) as PartialProposalStation | undefined;
+        return await editProposalStationRouteHandler(req, res);
     }
 
     @Delete("/:id",[ForceLoggedInMiddleware])
@@ -73,76 +76,68 @@ export class ProposalStationController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialProposalStation|undefined> {
-        return await dropProposalStationRouteHandler(req, res) as PartialProposalStation | undefined;
+        return await dropProposalStationRouteHandler(req, res);
     }
 }
 
-export async function getProposalStationsRouteHandler(req: any, res: any) {
+export async function getProposalStationsRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     // tslint:disable-next-line:prefer-const
     let { filter, page } = req.query;
 
-    try {
-        const repository = getRepository(ProposalStation);
-        const query = await repository.createQueryBuilder('proposalStation')
-            .leftJoinAndSelect('proposalStation.station', 'station')
-            .leftJoinAndSelect('proposalStation.proposal', 'proposal');
+    const repository = getRepository(ProposalStation);
+    const query = await repository.createQueryBuilder('proposalStation')
+        .leftJoinAndSelect('proposalStation.station', 'station')
+        .leftJoinAndSelect('proposalStation.proposal', 'proposal');
 
-        onlyRealmPermittedQueryResources(query, req.realmId, [
-            'station.realm_id',
-            'proposal.realm_id'
-        ]);
+    onlyRealmPermittedQueryResources(query, req.realmId, [
+        'station.realm_id',
+        'proposal.realm_id'
+    ]);
 
-        applyFilters(query, filter, {
-            allowed: ['proposal_id', 'station_id'],
-            defaultAlias: 'proposalStation'
-        });
+    applyFilters(query, filter, {
+        allowed: ['proposal_id', 'station_id'],
+        defaultAlias: 'proposalStation'
+    });
 
-        const pagination = applyPagination(query, page, {maxLimit: 50});
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
-        const [entities, total] = await query.getManyAndCount();
+    const [entities, total] = await query.getManyAndCount();
 
-        return res._respond({
-            data: {
-                data: entities,
-                meta: {
-                    total,
-                    ...pagination
-                }
+    return res.respond({
+        data: {
+            data: entities,
+            meta: {
+                total,
+                ...pagination
             }
-        });
-    } catch (e) {
-        console.log(e);
-        return res._failServerError();
-    }
+        }
+    });
+
 }
 
-export async function getProposalStationRouteHandler(req: any, res: any) {
+export async function getProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {id} = req.params;
 
     let repository;
 
-    try {
-        repository = getRepository(ProposalStation);
-        const entity = await repository.findOne(id, {relations: ['station', 'proposal']})
+    repository = getRepository(ProposalStation);
+    const entity = await repository.findOne(id, {relations: ['station', 'proposal']})
 
-        if (typeof entity === 'undefined') {
-            return res._failNotFound();
-        }
-
-        if(
-            !isPermittedForResourceRealm(req.realmId, entity.station.realm_id) &&
-            !isPermittedForResourceRealm(req.realmId, entity.proposal.realm_id)
-        ) {
-            return res._failForbidden();
-        }
-
-        return res._respond({data: entity});
-    } catch (e) {
-        return res._failServerError();
+    if (typeof entity === 'undefined') {
+        throw new NotFoundError();
     }
+
+    if(
+        !isPermittedForResourceRealm(req.realmId, entity.station.realm_id) &&
+        !isPermittedForResourceRealm(req.realmId, entity.proposal.realm_id)
+    ) {
+        throw new ForbiddenError();
+    }
+
+    return res.respond({data: entity});
 }
 
-export async function addProposalStationRouteHandler(req: any, res: any) {
+export async function addProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     await check('proposal_id')
         .exists()
         .isInt()
@@ -153,13 +148,16 @@ export async function addProposalStationRouteHandler(req: any, res: any) {
         .isInt()
         .run(req);
 
-    if(!req.ability.can('edit','proposal') && !req.ability.can('add', 'proposal')) {
-        return res._failForbidden({message: 'You are not allowed to add a proposal station.'});
+    if(
+        !req.ability.hasPermission(PermissionID.PROPOSAL_EDIT) &&
+        !req.ability.hasPermission(PermissionID.PROPOSAL_ADD)
+    ) {
+        throw new ForbiddenError('You are not allowed to add a proposal station.');
     }
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
@@ -171,36 +169,33 @@ export async function addProposalStationRouteHandler(req: any, res: any) {
         entity.approval_status = ProposalStationApprovalStatus.APPROVED;
     }
 
-    try {
-        entity = await repository.save(entity);
+    entity = await repository.save(entity);
 
-        await emitDispatcherProposalEvent({
-            event: DispatcherProposalEvent.ASSIGNED,
-            id: entity.proposal_id,
-            stationId: entity.station_id,
-            operatorRealmId: req.realmId
-        });
+    await emitDispatcherProposalEvent({
+        event: DispatcherProposalEvent.ASSIGNED,
+        id: entity.proposal_id,
+        stationId: entity.station_id,
+        operatorRealmId: req.realmId
+    });
 
-        return res._respondCreated({
-            data: entity
-        });
-    } catch (e) {
-        return res._failValidationError();
-    }
+    return res.respondCreated({
+        data: entity
+    });
+
 }
 
-export async function editProposalStationRouteHandler(req: any, res: any) {
+export async function editProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if(typeof id !== "string") {
-        return res._failBadRequest({message: 'the proposal-station id is not valid.'});
+        throw new BadRequestError('The proposal-station id is not valid.');
     }
 
     const repository = getRepository(ProposalStation);
     let proposalStation = await repository.findOne(id, {relations: ['station', 'proposal']});
 
     if(typeof proposalStation === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     const isAuthorityOfStation = isPermittedForResourceRealm(req.realmId, proposalStation.station.realm_id);
@@ -213,7 +208,7 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
         !(isAuthorityOfStation && isAuthorizedForStation) &&
         !(isAuthorityOfRealm && isAuthorizedForRealm)
     ) {
-        return res._failForbidden();
+        throw new ForbiddenError();
     }
 
     if(isAuthorityOfStation) {
@@ -230,7 +225,7 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
@@ -239,35 +234,35 @@ export async function editProposalStationRouteHandler(req: any, res: any) {
 
     proposalStation = repository.merge(proposalStation, data);
 
-    try {
-        proposalStation = await repository.save(proposalStation);
+    proposalStation = await repository.save(proposalStation);
 
-        if(
-            data.approval_status &&
-            data.approval_status !== entityStatus &&
-            Object.values(ProposalStationApprovalStatus).includes(data.approval_status)
-        ) {
-            await emitDispatcherProposalEvent({
-                event: proposalStation.approval_status as unknown as DispatcherProposalEvent,
-                id: proposalStation.proposal_id,
-                stationId: proposalStation.station_id,
-                operatorRealmId: req.realmId
-            });
-        }
-
-        return res._respondCreated({
-            data: proposalStation
+    if(
+        data.approval_status &&
+        data.approval_status !== entityStatus &&
+        Object.values(ProposalStationApprovalStatus).includes(data.approval_status)
+    ) {
+        await emitDispatcherProposalEvent({
+            event: proposalStation.approval_status as unknown as DispatcherProposalEvent,
+            id: proposalStation.proposal_id,
+            stationId: proposalStation.station_id,
+            operatorRealmId: req.realmId
         });
-    } catch (e) {
-        return res._failValidationError();
     }
+
+    return res.respondCreated({
+        data: proposalStation
+    });
+
 }
 
-export async function dropProposalStationRouteHandler(req: any, res: any) {
+export async function dropProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if(!req.ability.can('edit','proposal') && !req.ability.can('add','proposal')) {
-        return res._failForbidden({message: 'You are not authorized to drop this proposal station.'});
+    if(
+        !req.ability.hasPermission(PermissionID.PROPOSAL_EDIT) &&
+        !req.ability.hasPermission(PermissionID.PROPOSAL_ADD)
+    ) {
+        throw new ForbiddenError('You are not allowed to drop a proposal station.');
     }
 
     const repository = getRepository(ProposalStation);
@@ -277,21 +272,17 @@ export async function dropProposalStationRouteHandler(req: any, res: any) {
     });
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     if(
         !isPermittedForResourceRealm(req.realmId, entity.station.realm_id) &&
         !isPermittedForResourceRealm(req.realmId, entity.proposal.realm_id)
     ) {
-        return res._failForbidden({message: 'You are not authorized to drop this proposal station.'});
+        throw new ForbiddenError('You are not authorized to drop this proposal station.');
     }
 
-    try {
-        await repository.delete(entity.id);
+    await repository.delete(entity.id);
 
-        return res._respondDeleted({data: entity});
-    } catch (e) {
-        return res._failServerError();
-    }
+    return res.respondDeleted({data: entity});
 }

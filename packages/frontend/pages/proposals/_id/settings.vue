@@ -9,6 +9,7 @@ import {editProposal, getAPIMasterImages, PermissionID} from "@personalhealthtra
     import {alpha, maxLength, minLength, required} from "vuelidate/lib/validators";
     import AlertMessage from "../../../components/alert/AlertMessage";
     import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
+import MasterImagePicker from "../../../components/domains/master-image/MasterImagePicker";
 
     export default {
         meta: {
@@ -19,7 +20,7 @@ import {editProposal, getAPIMasterImages, PermissionID} from "@personalhealthtra
                 PermissionID.PROPOSAL_DROP
             ]
         },
-        components: {AlertMessage },
+        components: {MasterImagePicker, AlertMessage },
         props: {
             proposal: {
                 type: Object,
@@ -80,8 +81,10 @@ import {editProposal, getAPIMasterImages, PermissionID} from "@personalhealthtra
             });
         },
         methods: {
-            async submitDetails (e) {
-                e.preventDefault();
+            handleMasterImagePicker(id) {
+                this.formData.master_image_id = !!id ? id : '';
+            },
+            async submit () {
 
                 try {
                     await editProposal(this.proposal.id, this.formData);
@@ -128,20 +131,11 @@ import {editProposal, getAPIMasterImages, PermissionID} from "@personalhealthtra
 
             <hr>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.formData.master_image_id.$error }">
-                <label>Master Image</label>
-                <select v-model="$v.formData.master_image_id.$model" class="form-control" :disabled="master_imagesLoading">
-                    <option value="">
-                        --Auswählen--
-                    </option>
-                    <option v-for="(item,key) in master_images" :key="key" :value="item.id">
-                        {{ item.name }}
-                    </option>
-                </select>
+            <div>
+                <master-image-picker @selected="handleMasterImagePicker" />
 
                 <div v-if="!$v.formData.master_image_id.required" class="form-group-hint group-required">
-                    Bitte wählen Sie ein Master Image aus, welches als Grundlage für ihren Entrypoint den Sie beim Starten der
-                    Data-Discovery und Data-Analysis jeweils angeben könenn, zugrunde liegt.
+                    Please select a master image.
                 </div>
             </div>
 
@@ -181,7 +175,7 @@ import {editProposal, getAPIMasterImages, PermissionID} from "@personalhealthtra
             <hr>
 
             <div class="form-group">
-                <button type="submit" class="btn btn-primary btn-sm" :disabled="$v.$invalid" @click="submitDetails">
+                <button type="submit" class="btn btn-primary btn-sm" :disabled="$v.$invalid" @click.prevent="submit">
                     <i class="fa fa-save"></i> Speichern
                 </button>
             </div>

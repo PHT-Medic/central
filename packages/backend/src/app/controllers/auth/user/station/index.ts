@@ -8,15 +8,17 @@
 import {getCustomRepository, getRepository} from "typeorm";
 import {UserRepository} from "../../../../../domains/auth/user/repository";
 import {isPermittedForResourceRealm, Station} from "@personalhealthtrain/ui-common";
+import {ExpressRequest, ExpressResponse} from "../../../../../config/http/type";
+import {NotFoundError} from "@typescript-error/http";
 
-export async function getUserStationRouteHandler(req: any, res: any) {
+export async function getUserStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     const userRepository = getCustomRepository<UserRepository>(UserRepository);
     const user = await userRepository.findOne(id, {relations: ['realm']});
 
     if(typeof user === 'undefined') {
-        return res._failNotFound({message: 'The requested user was not found...'})
+        throw new NotFoundError();
     }
 
     if(!isPermittedForResourceRealm(req.realmId, user.realm_id)) {
@@ -29,8 +31,8 @@ export async function getUserStationRouteHandler(req: any, res: any) {
     });
 
     if(typeof station === 'undefined') {
-        return res._failNotFound({message: 'No station associated with user ' + user.name + '.'});
+        throw new NotFoundError();
     }
 
-    return res._respond({data: station});
+    return res.respond({data: station});
 }

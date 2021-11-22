@@ -44,6 +44,10 @@ export enum PermissionID {
     PROPOSAL_EDIT = 'proposal_edit',
     PROPOSAL_APPROVE = 'proposal_approve',
 
+    STATION_ADD = 'station_add',
+    STATION_DROP = 'station_drop',
+    STATION_EDIT = 'station_edit',
+
     TRAIN_APPROVE = 'train_approve',
     TRAIN_EDIT = 'train_edit',
     TRAIN_ADD = 'train_add',

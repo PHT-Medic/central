@@ -14,14 +14,16 @@ import {HarborHook, postHarborHookRouteHandler} from "./registry/hook";
 
 import {doRegistryCommand} from "./registry/command";
 import {doSecretStorageCommand} from "./secret-storage/command";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {NotFoundError} from "@typescript-error/http";
 
 @SwaggerTags('service')
 @Controller("/services")
 export class ServiceController {
     @Post("/:id/hook", [ForceLoggedInMiddleware])
     async handleHarborHook(
-        @Request() req: any,
-        @Response() res: any,
+        @Request() req: ExpressRequest,
+        @Response() res: ExpressResponse,
         @Body() harborHook: HarborHook
     ) {
         const {id} = req.params;
@@ -31,13 +33,13 @@ export class ServiceController {
                 return await postHarborHookRouteHandler(req, res);
         }
 
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     @Post("/:id/command", [ForceLoggedInMiddleware])
     async execHarborTask(
-        @Request() req: any,
-        @Response() res: any,
+        @Request() req: ExpressRequest,
+        @Response() res: ExpressResponse,
         @Body() data: {command: RegistryCommand},
     ) {
         const {id} = req.params;
@@ -49,6 +51,6 @@ export class ServiceController {
                 return await doSecretStorageCommand(req, res);
         }
 
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 }

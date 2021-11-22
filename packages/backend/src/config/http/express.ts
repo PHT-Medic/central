@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import express, {Express, Request, static as expressStatic } from "express";
+import express, {Express, static as expressStatic } from "express";
 import cors from "cors";
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -28,6 +28,7 @@ import {AuthorizationHeader} from "@typescript-auth/core";
 
 import {authenticateWithAuthorizationHeader, parseCookie} from "./auth/utils";
 import {errorMiddleware} from "./middleware/error";
+import {ExpressRequest} from "./type";
 
 export interface ExpressAppInterface extends Express{
 
@@ -36,12 +37,6 @@ export interface ExpressAppInterface extends Express{
 async function createExpressApp() : Promise<ExpressAppInterface> {
     useLogger().debug('setup express app...', {service: 'express'});
     const expressApp : Express = express();
-
-    /*
-    let webAppUrl : string = env.webAppUrl;
-    webAppUrl  = webAppUrl.replace(/^[/\\\s]+|[/\\\s]+$/g, '');
-    webAppUrl = webAppUrl.replace(/([^:]\/)\/+/g, "$1");
-    */
 
     expressApp.use(cors({
         origin(origin, callback) {
@@ -64,8 +59,8 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
     expressApp.use(responseMiddleware);
 
     expressApp.use(setupAuthMiddleware({
-        parseCookie: (request: Request) => parseCookie(request),
-        authenticateWithAuthorizationHeader: (request: Request, value: AuthorizationHeader) => authenticateWithAuthorizationHeader(request, value)
+        parseCookie: (request: ExpressRequest) => parseCookie(request),
+        authenticateWithAuthorizationHeader: (request: ExpressRequest, value: AuthorizationHeader) => authenticateWithAuthorizationHeader(request, value)
     }));
 
     let swaggerDocument : any;

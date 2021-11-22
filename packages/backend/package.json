@@ -17,6 +17,7 @@
         "@trapi/query": "^2.0.1",
         "@typescript-auth/core": "^1.0.1",
         "@typescript-auth/server": "^1.0.2",
+        "@typescript-error/http": "^1.0.3",
         "amqp-extension": "^1.0.0",
         "axios": "^0.24.0",
         "bcrypt": "^5.0.1",
@@ -76,7 +77,8 @@
         "dev-watch": "nodemon --legacy-watch --watch 'src/**/*.ts' --exec 'ts-node src/index.ts'",
         "build": "tsc -p tsconfig.build.json",
         "start": "node dist/index.js",
-        "setup": "node dist/cli/index.js setup"
+        "setup": "ts-node src/cli/index.ts setup",
+        "reset": "ts-node src/cli/index.ts reset"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
     "publishConfig": {
