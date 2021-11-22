@@ -45,9 +45,7 @@ import {initDemo} from "./demo";
     }
 
     const connectionOptions = await buildConnectionOptions();
-    const connection = await createConnection(connectionOptions);
-    if(process.env.NODE_ENV === 'development') {
-        await connection.synchronize();
-    }
+    await createConnection(connectionOptions);
+
     start();
 })();
