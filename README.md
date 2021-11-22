@@ -30,6 +30,8 @@ RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
 HARBOR_CONNECTION_STRING=<user>:<password>@<api url>
 ```
 
+## Usage
+
 ### Production
 
 ``` bash
