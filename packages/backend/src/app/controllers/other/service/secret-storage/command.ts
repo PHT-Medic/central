@@ -17,9 +17,12 @@ import {
     getSecretStorageStationKey,
     buildSecretStorageStationKey,
     getSecretStorageUserKey,
-    saveStationSecretsToSecretEngine
+    saveStationSecretsToSecretEngine, PermissionID
 } from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
+import {ExpressRequest, ExpressResponse} from "../../../../../config/http/type";
+import {BadRequestError, ForbiddenError, NotFoundError, NotImplementedError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../../config/http/error/validation";
 
 const commands = Object.values(SecretStorageCommand);
 
@@ -28,9 +31,9 @@ enum TargetEntity {
     STATION = 'station'
 }
 
-export async function doSecretStorageCommand(req: any, res: any) {
-    if(!req.ability.can('manage','service')) {
-        return res._failForbidden({message: 'You are not permitted to manage the secret storage service.'});
+export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    if(!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
+        throw new ForbiddenError('You are not permitted to manage the secret storage service.');
     }
 
     const {command} = req.body;
@@ -39,7 +42,7 @@ export async function doSecretStorageCommand(req: any, res: any) {
         !command ||
         commands.indexOf(command) === -1
     ) {
-        return res._failBadRequest({message: 'The secret storage command is not valid.'});
+        throw new BadRequestError('The secret storage command is not valid.');
     }
 
     await check('name')
@@ -50,7 +53,7 @@ export async function doSecretStorageCommand(req: any, res: any) {
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const validationData = matchedData(req, {includeOptionals: true});
@@ -80,7 +83,7 @@ export async function doSecretStorageCommand(req: any, res: any) {
 
         station = await query.getOne();
         if(typeof station === 'undefined') {
-            return res._failNotFound();
+            throw new NotFoundError();
         }
 
         path = buildSecretStorageStationKey(station.secure_id);
@@ -98,7 +101,7 @@ export async function doSecretStorageCommand(req: any, res: any) {
         });
 
         if(typeof userSecrets === 'undefined') {
-            return res._failNotFound();
+            throw new NotFoundError();
         }
 
         type = TargetEntity.USER;
@@ -106,8 +109,7 @@ export async function doSecretStorageCommand(req: any, res: any) {
 
     switch (command as SecretStorageCommand) {
         case SecretStorageCommand.ENGINE_CREATE:
-            // todo: Implement
-            return res._failNotFound();
+            throw new NotImplementedError();
         case SecretStorageCommand.ENGINE_KEY_PULL:
             try {
                 const { data: responseData } = await useAPI(APIType.VAULT)
@@ -128,10 +130,10 @@ export async function doSecretStorageCommand(req: any, res: any) {
                         break;
                 }
 
-                return res._respond({data});
+                return res.respond({data});
             } catch (e) {
                 if(e.response.status === 404) {
-                    return res._failNotFound();
+                    throw new NotFoundError();
                 }
 
                 throw e;
@@ -167,7 +169,7 @@ export async function doSecretStorageCommand(req: any, res: any) {
             await useAPI(APIType.VAULT)
                 .post(path, payload);
 
-            return res._respondCreated();
+            return res.respondCreated();
         case SecretStorageCommand.ENGINE_KEY_DROP:
             try {
                 await useAPI(APIType.VAULT)
@@ -180,6 +182,6 @@ export async function doSecretStorageCommand(req: any, res: any) {
                 throw e;
             }
 
-            return res._respondDeleted();
+            return res.respondDeleted();
     }
 }

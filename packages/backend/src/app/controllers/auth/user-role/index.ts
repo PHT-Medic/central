@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {UserRole} from "@personalhealthtrain/ui-common";
+import {PermissionID, UserRole} from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
 import {applyFilters, applyPagination} from "typeorm-extension";
 import {check, matchedData, validationResult} from "express-validator";
@@ -13,6 +13,9 @@ import {check, matchedData, validationResult} from "express-validator";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../config/http/error/validation";
 
 type PartialUserRole = Partial<UserRole>;
 const simpleExample = {role_id: 1, user_id: 1};
@@ -60,52 +63,49 @@ export class UserRoleController {
     }
 }
 
-export async function getUserRolesRouteHandler(req: any, res: any) {
+export async function getUserRolesRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page } = req.query;
 
-    try {
-        const repository = getRepository(UserRole);
-        const query = await repository.createQueryBuilder('user_roles')
-            .leftJoinAndSelect('user_roles.role', 'role')
-            .leftJoinAndSelect('user_roles.user', 'user');
+    const repository = getRepository(UserRole);
+    const query = await repository.createQueryBuilder('user_roles')
+        .leftJoinAndSelect('user_roles.role', 'role')
+        .leftJoinAndSelect('user_roles.user', 'user');
 
-        applyFilters(query, filter, {
-            allowed: ['user_roles.role_id', 'user_roles.user_id', 'user.name', 'role.name'],
-            defaultAlias: 'user_roles'
-        });
+    applyFilters(query, filter, {
+        allowed: ['user_roles.role_id', 'user_roles.user_id', 'user.name', 'role.name'],
+        defaultAlias: 'user_roles'
+    });
 
-        const pagination = applyPagination(query, page, {maxLimit: 50});
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
-        const [entities, total] = await query.getManyAndCount();
+    const [entities, total] = await query.getManyAndCount();
 
-        return res._respond({
-            data: {
-                data: entities,
-                meta: {
-                    total,
-                    ...pagination
-                }
+    return res.respond({
+        data: {
+            data: entities,
+            meta: {
+                total,
+                ...pagination
             }
-        });
-    } catch (e) {
-        return res._failServerError();
-    }
+        }
+    });
+
 }
 
-export async function getUserRoleRouteHandler(req: any, res: any) {
+export async function getUserRoleRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {id} = req.params;
 
     const repository = getRepository(UserRole);
     const entities = await repository.findOne(id)
 
     if (typeof entities === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
-    return res._respond({data: entities});
+    return res.respond({data: entities});
 }
 
-export async function addUserRoleRouteHandler(req: any, res: any) {
+export async function addUserRoleRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     await check('user_id')
         .exists()
         .isInt()
@@ -116,13 +116,13 @@ export async function addUserRoleRouteHandler(req: any, res: any) {
         .isInt()
         .run(req);
 
-    if(!req.ability.can('add','userRole')) {
-        return res._failForbidden();
+    if(!req.ability.hasPermission(PermissionID.USER_ROLE_ADD)) {
+        throw new NotFoundError();
     }
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
@@ -130,22 +130,18 @@ export async function addUserRoleRouteHandler(req: any, res: any) {
     const repository = getRepository(UserRole);
     let entity = repository.create(data);
 
-    try {
-        entity = await repository.save(entity);
+    entity = await repository.save(entity);
 
-        return res._respondCreated({
-            data: entity
-        });
-    } catch (e) {
-        return res._failValidationError();
-    }
+    return res.respondCreated({
+        data: entity
+    });
 }
 
-export async function dropUserRoleRouteHandler(req: any, res: any) {
+export async function dropUserRoleRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if(!req.ability.can('drop','userRole')) {
-        return res._failForbidden();
+    if(!req.ability.hasPermission(PermissionID.USER_ROLE_DROP)) {
+        throw new NotFoundError();
     }
 
     const repository = getRepository(UserRole);
@@ -153,14 +149,10 @@ export async function dropUserRoleRouteHandler(req: any, res: any) {
     const entity : UserRole | undefined = await repository.findOne(id);
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
-    try {
-        await repository.delete(entity.id);
+    await repository.delete(entity.id);
 
-        return res._respondDeleted({data: entity});
-    } catch (e) {
-        return res._failServerError();
-    }
+    return res.respondDeleted({data: entity});
 }

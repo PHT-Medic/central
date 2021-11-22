@@ -8,10 +8,13 @@
 import {SwaggerTags} from "typescript-swagger";
 import {Body, Controller, Post, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
-import {Client, AuthClientCommand, SERVICE_ID, AuthClientType} from "@personalhealthtrain/ui-common";
+import {Client, AuthClientCommand, SERVICE_ID, AuthClientType, PermissionID} from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
 import {check, matchedData, validationResult} from "express-validator";
 import {doAuthClientCommand} from "./command";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {BadRequestError, ForbiddenError, NotFoundError, NotImplementedError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../config/http/error/validation";
 
 @SwaggerTags('auth')
 @Controller("/clients")
@@ -34,9 +37,9 @@ export class ClientController {
     }
 }
 
-async function addRoute(req: any, res: any) {
-    if (!req.ability.can('manage', 'service')) {
-        return res._failForbidden({message: 'You are not allowed to add service-clients.'});
+async function addRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    if (!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
+        throw new ForbiddenError('You are not allowed to add service-clients.');
     }
 
     await check('type')
@@ -51,7 +54,7 @@ async function addRoute(req: any, res: any) {
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
@@ -64,12 +67,12 @@ async function addRoute(req: any, res: any) {
 
     switch (clientType) {
         case AuthClientType.SERVICE:
-            if (!req.ability.can('manage', 'service')) {
-                return res._failForbidden({message: 'You are not allowed to add service-clients.'});
+            if (!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
+                throw new ForbiddenError('You are not allowed to add service-clients.');
             }
 
             if(Object.values(SERVICE_ID).indexOf(clientTargetId) === -1) {
-                return res._failNotFound();
+                throw new NotFoundError();
             }
 
             const serviceId : SERVICE_ID = clientTargetId;
@@ -79,7 +82,7 @@ async function addRoute(req: any, res: any) {
             });
 
             if (typeof entity !== 'undefined') {
-                return res._failBadRequest('A client already exists for that service');
+                throw new BadRequestError('A client already exists for that service.');
             }
 
             entity = repository.create({
@@ -89,11 +92,11 @@ async function addRoute(req: any, res: any) {
             });
             break;
         case AuthClientType.USER:
-            return res._failForbidden('Not implemented yet... ^^')
+            throw new NotImplementedError('Not implemented yet... ^^');
     }
 
     await repository.save(entity);
 
-    return res._respondCreated({data: entity});
+    return res.respondCreated({data: entity});
 }
 

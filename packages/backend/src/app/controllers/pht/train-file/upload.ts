@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Train, TrainFile} from "@personalhealthtrain/ui-common";
+import {PermissionID, Train, TrainFile} from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
 import BusBoy from "busboy";
 import path from "path";
@@ -13,24 +13,29 @@ import {getWritableDirPath} from "../../../../config/paths";
 import fs from "fs";
 import crypto from "crypto";
 import {createFileStreamHandler} from "../../../../modules/file-system/utils";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
 
-export async function uploadTrainFilesRouteHandler(req: any, res: any) {
+export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: ExpressResponse) {
     const {id} = req.params;
 
-    if (!req.ability.can('add', 'train') && !req.ability.can('edit', 'train')) {
-        return res._failForbidden();
+    if (
+        !req.ability.hasPermission(PermissionID.TRAIN_ADD) &&
+        !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
+    ) {
+        throw new ForbiddenError();
     }
 
     const repository = getRepository(Train);
 
     const entity = await repository.findOne(id);
     if (typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     const trainFileRepository = getRepository(TrainFile);
 
-    const instance = new BusBoy({headers: req.headers, preservePath: true});
+    const instance = new BusBoy({headers: req.headers as BusBoy.BusboyHeaders, preservePath: true});
 
     const files: TrainFile[] = [];
 
@@ -64,9 +69,7 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
             handler.cleanup();
             req.unpipe(instance);
 
-            return res._failBadRequest({
-                message: 'Size of file ' + fullFileName + ' is too large...'
-            }).end();
+            throw new BadRequestError('Size of file ' + fullFileName + ' is too large...');
         })
 
         file.on('end', () => {
@@ -97,36 +100,33 @@ export async function uploadTrainFilesRouteHandler(req: any, res: any) {
     instance.on('error', () => {
         req.unpipe(instance);
 
-        return res._failBadRequest().end();
+        throw new BadRequestError();
     })
 
     instance.on('finish', async () => {
         if (files.length === 0) {
-            return res._failBadRequest({message: 'No train files provided'});
+            throw new BadRequestError('No files provided.');
         }
 
         await Promise.all(promises);
 
-        try {
-            await trainFileRepository.save(files);
+        await trainFileRepository.save(files);
 
-            await repository.save(repository.merge(entity, {
-                configuration_status: null,
-                hash: null,
-                hash_signed: null
-            }))
+        await repository.save(repository.merge(entity, {
+            configuration_status: null,
+            hash: null,
+            hash_signed: null
+        }))
 
-            return res._respond({
-                data: {
-                    data: files,
-                    meta: {
-                        total: files.length
-                    }
+        return res.respond({
+            data: {
+                data: files,
+                meta: {
+                    total: files.length
                 }
-            });
-        } catch (e) {
-            return res._failValidationError({message: 'The train files could not be uploaded.'})
-        }
+            }
+        });
+
     });
 
     return req.pipe(instance);

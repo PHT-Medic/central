@@ -11,12 +11,15 @@ import {check, matchedData, validationResult} from "express-validator";
 import {
     MASTER_REALM_ID,
     deleteStationHarborProject,
-    Station, removeStationSecretsFromSecretEngine, saveStationSecretsToSecretEngine
+    Station, removeStationSecretsFromSecretEngine, saveStationSecretsToSecretEngine, PermissionID
 } from "@personalhealthtrain/ui-common";
 
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../config/http/error/validation";
 
 type PartialStation = Partial<Station>;
 const stationExample = {name: 'University Tuebingen', realm_id: 'tuebingen', id: 1}
@@ -77,7 +80,7 @@ export class StationController {
     }
 }
 
-export async function getStationRouteHandler(req: any, res: any) {
+export async function getStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
     const { fields } = req.query;
 
@@ -87,7 +90,10 @@ export async function getStationRouteHandler(req: any, res: any) {
 
     // todo: should be implemented by assigning permissions to a service.
     const isPermittedService : boolean = typeof req.serviceId !== 'undefined' && req.realmId === MASTER_REALM_ID;
-    if(req.ability.can('edit', 'station') || isPermittedService) {
+    if(
+        req.ability.hasPermission(PermissionID.STATION_EDIT) ||
+        isPermittedService
+    ) {
         applyFields(query, fields, {
             allowed: [
                 'secure_id',
@@ -106,13 +112,13 @@ export async function getStationRouteHandler(req: any, res: any) {
     const entity = await query.getOne();
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
-    return res._respond({data: entity})
+    return res.respond({data: entity})
 }
 
-export async function getStationsRouteHandler(req: any, res: any) {
+export async function getStationsRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page, fields, includes } = req.query;
 
     const repository = getRepository(Station);
@@ -130,7 +136,10 @@ export async function getStationsRouteHandler(req: any, res: any) {
 
     // todo: should be implemented by assigning permissions to a service.
     const isPermittedService : boolean = typeof req.serviceId !== 'undefined' && req.realmId === MASTER_REALM_ID;
-    if(req.ability.can('edit', 'station') || isPermittedService) {
+    if(
+        req.ability.hasPermission(PermissionID.STATION_EDIT) ||
+        isPermittedService
+    ) {
         applyFields(query, fields, {
             allowed: [
                 'secure_id',
@@ -150,7 +159,7 @@ export async function getStationsRouteHandler(req: any, res: any) {
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res._respond({
+    return res.respond({
         data: {
             data: entities,
             meta: {
@@ -161,9 +170,9 @@ export async function getStationsRouteHandler(req: any, res: any) {
     });
 }
 
-export async function addStationRouteHandler(req: any, res: any) {
-    if(!req.ability.can('add', 'station')) {
-        return res._failBadRequest();
+export async function addStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    if (!req.ability.hasPermission(PermissionID.STATION_ADD)) {
+        throw new ForbiddenError();
     }
 
     await check('name').isLength({min: 5, max: 100}).exists().notEmpty().run(req);
@@ -175,56 +184,51 @@ export async function addStationRouteHandler(req: any, res: any) {
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        return res._failExpressValidationError({validation});
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
 
-    if(data.public_key) {
+    if (data.public_key) {
         const hexChecker = new RegExp("^[0-9a-fA-F]+$");
 
-        if(!hexChecker.test(data.public_key)) {
+        if (!hexChecker.test(data.public_key)) {
             data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
         }
     }
 
-    const syncPublicKey : boolean | undefined = data.sync_public_key;
+    const syncPublicKey: boolean | undefined = data.sync_public_key;
 
-    if(typeof data.sync_public_key !== 'undefined') {
+    if (typeof data.sync_public_key !== 'undefined') {
         delete data.sync_public_key;
     }
 
-    try {
-        const repository = getRepository(Station);
+    const repository = getRepository(Station);
 
-        const entity = repository.create(data);
+    const entity = repository.create(data);
 
-        await repository.save(entity);
+    await repository.save(entity);
 
-        if(syncPublicKey) {
-            await saveStationSecretsToSecretEngine(entity.secure_id, {
-                publicKey: entity.public_key
-            });
+    if (syncPublicKey) {
+        await saveStationSecretsToSecretEngine(entity.secure_id, {
+            publicKey: entity.public_key
+        });
 
-            await repository.update({
-                id: entity.id
-            }, {
-                vault_public_key_saved: true
-            })
-        }
-
-        return res._respond({data: entity});
-    } catch (e) {
-        console.log(e);
-        return res._failValidationError({message: 'The station could not be created.'})
+        await repository.update({
+            id: entity.id
+        }, {
+            vault_public_key_saved: true
+        })
     }
+
+    return res.respond({data: entity});
 }
 
-export async function editStationRouteHandler(req: any, res: any) {
+export async function editStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if(!req.ability.can('edit', 'station')) {
-        return res._failBadRequest();
+    if(!req.ability.hasPermission(PermissionID.STATION_EDIT)) {
+        throw new ForbiddenError();
     }
 
     await check('name').isLength({min: 5, max: 100}).exists().optional().run(req);
@@ -235,12 +239,12 @@ export async function editStationRouteHandler(req: any, res: any) {
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
     if(!data) {
-        return res._respondAccepted();
+        return res.respondAccepted();
     }
 
     const repository = getRepository(Station);
@@ -252,7 +256,7 @@ export async function editStationRouteHandler(req: any, res: any) {
     let station = await query.getOne();
 
     if(typeof station === 'undefined') {
-        return res._failValidationError({message: 'The requested station was not found.'});
+        throw new NotFoundError();
     }
 
     if(data.public_key && data.public_key !== station.public_key) {
@@ -290,29 +294,25 @@ export async function editStationRouteHandler(req: any, res: any) {
         station.vault_public_key_saved = true;
     }
 
-    try {
-        const result = await repository.save(station);
+    const result = await repository.save(station);
 
-        return res._respondAccepted({
-            data: result
-        });
-    } catch (e) {
-        return res._failValidationError({message: 'The station could not be updated.'});
-    }
+    return res.respondAccepted({
+        data: result
+    });
 }
 
-export async function dropStationRouteHandler(req: any, res: any) {
-    let { id } = req.params;
+export async function dropStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    const { id: idStr } = req.params;
 
     // tslint:disable-next-line:radix
-    id = parseInt(id);
+    const id = parseInt(idStr);
 
     if(typeof id !== 'number' || Number.isNaN(id)) {
-        return res._failNotFound();
+        throw new BadRequestError();
     }
 
-    if(!req.ability.can('drop', 'station')) {
-        return res._failBadRequest();
+    if(!req.ability.hasPermission(PermissionID.STATION_DROP)) {
+        throw new ForbiddenError();
     }
 
     const repository = getRepository(Station);
@@ -320,17 +320,13 @@ export async function dropStationRouteHandler(req: any, res: any) {
     const entity = await repository.findOne(id);
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
-    try {
-        await repository.remove(entity);
+    await repository.remove(entity);
 
-        await deleteStationHarborProject(entity.secure_id);
-        await removeStationSecretsFromSecretEngine(entity.secure_id);
+    await deleteStationHarborProject(entity.secure_id);
+    await removeStationSecretsFromSecretEngine(entity.secure_id);
 
-        return res._respondDeleted({data: entity});
-    } catch (e) {
-        return res._failValidationError({message: 'The station could not be deleted.'})
-    }
+    return res.respondDeleted({data: entity});
 }

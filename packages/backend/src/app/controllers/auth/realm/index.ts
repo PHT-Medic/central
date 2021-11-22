@@ -12,7 +12,10 @@ import {SwaggerTags} from "typescript-swagger";
 import {Controller, Get, Post, Delete, Request, Response, Params, Body} from "@decorators/express";
 
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
-import {Realm} from "@personalhealthtrain/ui-common";
+import {PermissionID, Realm} from "@personalhealthtrain/ui-common";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../config/http/error/validation";
 
 @SwaggerTags('auth')
 @Controller("/realms")
@@ -63,7 +66,7 @@ export class RealmController {
     }
 }
 
-export async function getRealmsRoute(req: any, res: any) {
+export async function getRealmsRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {filter, page} = req.query;
     const realmRepository = getRepository(Realm);
 
@@ -78,7 +81,7 @@ export async function getRealmsRoute(req: any, res: any) {
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res._respond({
+    return res.respond({
         data: {
             data: entities,
             meta: {
@@ -89,11 +92,11 @@ export async function getRealmsRoute(req: any, res: any) {
     });
 }
 
-export async function getRealmRoute(req: any, res: any) {
+export async function getRealmRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if(typeof id !== 'string') {
-        return res._failBadRequest();
+        throw new BadRequestError();
     }
 
     const realmRepository = getRepository(Realm);
@@ -101,17 +104,17 @@ export async function getRealmRoute(req: any, res: any) {
     const result = await realmRepository.findOne(id);
 
     if(typeof result === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
-    return res._respond({
+    return res.respond({
         data: result
     })
 }
 
 // ---------------------------------------------------------------------------------
 
-async function runValidation(req: any) {
+async function runValidation(req: ExpressRequest) {
     await check('id').exists().notEmpty().isString().isLength({min: 5, max: 36}).run(req);
     await check('name').exists().notEmpty().isString().isLength({min: 5, max: 100}).run(req);
     await check('description').exists().notEmpty().isString().isLength({min: 5, max: 100}).optional().run(req);
@@ -119,86 +122,78 @@ async function runValidation(req: any) {
 
 // ---------------------------------------------------------------------------------
 
-export async function addRealmRoute(req: any, res: any) {
-    if(!req.ability.can('add','realm')) {
-        return res._failForbidden({message: 'You are not allowed to add a realm.'});
+export async function addRealmRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    if(!req.ability.hasPermission(PermissionID.REALM_ADD)) {
+        throw new ForbiddenError('You are not allowed to add a realm.');
     }
 
     await runValidation(req);
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
     if(!data) {
-        return res._respondAccepted();
+        return res.respondAccepted();
     }
 
     const realmRepository = getRepository(Realm);
 
     const realm = realmRepository.create(data);
 
-    try {
-        await realmRepository.save(realm);
+    await realmRepository.save(realm);
 
-        return res._respond({
-            data: realm
-        })
-    } catch (e) {
-        return res._failValidationError({message: 'Der Realm konnte nicht erstellt werden.'});
-    }
+    return res.respond({
+        data: realm
+    });
 }
 
 // ---------------------------------------------------------------------------------
 
-export async function editRealmRoute(req: any, res: any) {
+export async function editRealmRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if(!req.ability.can('edit','realm')) {
-        return res._failForbidden({message: 'You are not allowed to edit a realm.'});
+    if(!req.ability.hasPermission(PermissionID.REALM_EDIT)) {
+        throw new ForbiddenError('You are not permitted to edit a realm.');
     }
 
     await runValidation(req);
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
     if(!data) {
-        return res._respondAccepted();
+        return res.respondAccepted();
     }
 
     const realmRepository = getRepository(Realm);
 
     let realm = await realmRepository.findOne(id);
     if(typeof realm === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     realm = realmRepository.merge(realm, data);
 
-    try {
-        await realmRepository.save(realm);
+    await realmRepository.save(realm);
 
-        return res._respond({
-            data: realm
-        })
-    } catch (e) {
-        return res._failValidationError({message: 'Der Realm konnte nicht bearbeitet werden.'});
-    }
+    return res.respond({
+        data: realm
+    })
 }
 
 // ---------------------------------------------------------------------------------
 
-export async function dropRealmRoute(req: any, res: any) {
+export async function dropRealmRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {id} = req.params;
 
-    if (!req.ability.can('drop', 'realm')) {
-        return res._failForbidden({message: 'You are not allowed to drop a realm.'});
+    if (!req.ability.hasPermission(PermissionID.REALM_DROP)) {
+        throw new ForbiddenError('You are not allowed to drop a realm.');
     }
 
     const repository = getRepository(Realm);
@@ -206,19 +201,14 @@ export async function dropRealmRoute(req: any, res: any) {
     const entity = await repository.findOne(id);
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     if(!entity.drop_able) {
-        return res._failForbidden({message: 'The realm can not be deleted in general.'})
+        throw new BadRequestError('The realm can not be deleted in general.');
     }
 
-    try {
+    await repository.delete(id);
 
-        await repository.delete(id);
-
-        return res._respondDeleted();
-    } catch(e) {
-        return res._failValidationError();
-    }
+    return res.respondDeleted();
 }

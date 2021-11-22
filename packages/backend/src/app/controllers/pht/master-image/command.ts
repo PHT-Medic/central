@@ -14,13 +14,15 @@ import fs from "fs";
 import {clone, pull} from "isomorphic-git";
 import http from "isomorphic-git/http/node";
 import {Group, Image, scanDirectory} from "fs-docker";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {BadRequestError, NotFoundError} from "@typescript-error/http";
 
-export async function handleMasterImageCommandRouteHandler(req: any, res: any) {
+export async function handleMasterImageCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) {
     if(
         !req.body ||
         Object.values(MasterImageCommand).indexOf(req.body.command) === -1
     ) {
-        return res._failBadRequest('The master image command is not valid.');
+        throw new BadRequestError('The master image command is not valid.');
     }
 
     const command : MasterImageCommand = req.body.command;
@@ -59,7 +61,7 @@ export async function handleMasterImageCommandRouteHandler(req: any, res: any) {
             // images
             const images = await mergeRepositoryImagesWithDatabase(data.images);
 
-            return res._respondAccepted({
+            return res.respondAccepted({
                 data: {
                     groups,
                     images
@@ -67,7 +69,7 @@ export async function handleMasterImageCommandRouteHandler(req: any, res: any) {
             });
     }
 
-    return res._failNotFound();
+    throw new NotFoundError();
 }
 
 type ReturnContext<T> = {

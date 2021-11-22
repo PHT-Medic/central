@@ -9,7 +9,7 @@ import {getRepository} from "typeorm";
 import {applyFilters} from "typeorm-extension";
 import {
     isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources, Train, TrainFile
+    onlyRealmPermittedQueryResources, PermissionID, Train, TrainFile
 } from "@personalhealthtrain/ui-common";
 import fs from "fs";
 import {getTrainFileFilePath} from "../../../../config/pht/train-file/path";
@@ -20,6 +20,8 @@ import {ResponseExample, SwaggerTags} from 'typescript-swagger';
 import {getTrainFileStreamRouteHandler} from "./stream";
 import {uploadTrainFilesRouteHandler} from "./upload";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
 
 type PartialTrainFile = Partial<TrainFile>;
 const simpleExample : PartialTrainFile = {
@@ -86,9 +88,12 @@ export class TrainFileController {
     }
 }
 
-export async function getTrainFileRouteHandler(req: any, res: any) {
-    if(!req.ability.can('add','train') && !req.ability.can('edit','train')) {
-        return res._failForbidden();
+export async function getTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    if(
+        !req.ability.hasPermission(PermissionID.TRAIN_ADD) &&
+        !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
+    ) {
+        throw new ForbiddenError();
     }
 
     const { fileId } = req.params;
@@ -100,17 +105,17 @@ export async function getTrainFileRouteHandler(req: any, res: any) {
     });
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     if(!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
-        return res._failForbidden();
+        throw new ForbiddenError();
     }
 
-    return res._respond({data: entity})
+    return res.respond({data: entity})
 }
 
-export async function getTrainFilesRouteHandler(req: any, res: any) {
+export async function getTrainFilesRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
     const { filter } = req.query;
 
@@ -128,21 +133,24 @@ export async function getTrainFilesRouteHandler(req: any, res: any) {
     const entity = await query.getMany();
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
-    return res._respond({data: entity})
+    return res.respond({data: entity})
 }
 
-export async function dropTrainFileRouteHandler(req: any, res: any) {
+export async function dropTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { fileId } = req.params;
 
     if(typeof fileId !== 'string' || !fileId.length) {
-        return res._failNotFound();
+        throw new BadRequestError();
     }
 
-    if(!req.ability.can('add', 'train') && !req.ability.can('edit','train')) {
-        return res._failUnauthorized();
+    if(
+        !req.ability.hasPermission(PermissionID.TRAIN_ADD) &&
+        !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
+    ) {
+        throw new ForbiddenError();
     }
 
     const repository = getRepository(TrainFile);
@@ -150,27 +158,23 @@ export async function dropTrainFileRouteHandler(req: any, res: any) {
     const entity = await repository.findOne(fileId);
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     if(!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
-        return res._failForbidden();
+        throw new ForbiddenError();
     }
 
-    try {
-        fs.unlinkSync(getTrainFileFilePath(entity));
+    fs.unlinkSync(getTrainFileFilePath(entity));
 
-        const trainRepository = getRepository(Train);
-        await trainRepository.update({id: entity.train_id}, {
-            configuration_status: null,
-            hash: null,
-            hash_signed: null
-        });
+    const trainRepository = getRepository(Train);
+    await trainRepository.update({id: entity.train_id}, {
+        configuration_status: null,
+        hash: null,
+        hash_signed: null
+    });
 
-        await repository.delete(entity.id);
+    await repository.delete(entity.id);
 
-        return res._respondDeleted({data: entity});
-    } catch (e) {
-        return res._failValidationError({message: 'Die Zug Dateien konnte nicht gelöscht werden...'})
-    }
+    return res.respondDeleted({data: entity});
 }

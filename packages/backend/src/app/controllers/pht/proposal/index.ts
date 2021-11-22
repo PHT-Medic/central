@@ -10,7 +10,7 @@ import {applyFilters, applyPagination, applyRelations} from "typeorm-extension";
 import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
 import {
     isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources,
+    onlyRealmPermittedQueryResources, PermissionID,
     Proposal, ProposalStation, ProposalStationApprovalStatus, Station
 } from "@personalhealthtrain/ui-common";
 import {check, matchedData, validationResult} from "express-validator";
@@ -20,6 +20,9 @@ import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@d
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import env from "../../../../env";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../config/http/error/validation";
 
 type PartialProposal = Partial<Proposal>;
 const simpleExample = {title: 'An example Proposal', risk: 'low', risk_comment: 'The risk is low', requested_data: 'all', realm_id: 'master'};
@@ -78,7 +81,7 @@ export class ProposalController {
     }
 }
 
-export async function getProposalRouteHandler(req: any, res: any) {
+export async function getProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
     const { include } = req.query;
 
@@ -94,7 +97,7 @@ export async function getProposalRouteHandler(req: any, res: any) {
     const entity = await query.getOne();
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     // todo: permit resource to realm/station owner XAND receiving realm/station OR to all
@@ -104,10 +107,10 @@ export async function getProposalRouteHandler(req: any, res: any) {
     }
      */
 
-    return res._respond({data: entity})
+    return res.respond({data: entity})
 }
 
-export async function getProposalsRouteHandler(req: any, res: any) {
+export async function getProposalsRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page } = req.query;
 
     const repository = getRepository(Proposal);
@@ -126,7 +129,7 @@ export async function getProposalsRouteHandler(req: any, res: any) {
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res._respond({
+    return res.respond({
         data: {
             data: entities,
             meta: {
@@ -137,9 +140,9 @@ export async function getProposalsRouteHandler(req: any, res: any) {
     });
 }
 
-export async function addProposalRouteHandler(req: any, res: any) {
-    if(!req.ability.can('add','proposal')) {
-        return res._failForbidden();
+export async function addProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    if(!req.ability.hasPermission(PermissionID.PROPOSAL_ADD)) {
+        throw new ForbiddenError();
     }
 
     await check('title')
@@ -178,55 +181,51 @@ export async function addProposalRouteHandler(req: any, res: any) {
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const validationData = matchedData(req, {includeOptionals: false});
 
     const {station_ids, ...data} = validationData;
 
-    try {
-        const repository = getRepository(Proposal);
-        const entity = repository.create({
-            realm_id: req.realmId,
-            user_id: req.user.id,
-            ...data
+    const repository = getRepository(Proposal);
+    const entity = repository.create({
+        realm_id: req.realmId,
+        user_id: req.user.id,
+        ...data
+    });
+    await repository.save(entity);
+
+    const proposalStationRepository = getRepository(ProposalStation);
+    const proposalStations = station_ids.map((stationId: number) => {
+        return proposalStationRepository.create({
+            proposal_id: entity.id,
+            station_id: stationId,
+            approval_status: env.skipProposalApprovalOperation ? ProposalStationApprovalStatus.APPROVED : null
         });
-        await repository.save(entity);
+    });
 
-        const proposalStationRepository = getRepository(ProposalStation);
-        const proposalStations = station_ids.map((stationId: number) => {
-            return proposalStationRepository.create({
-                proposal_id: entity.id,
-                station_id: stationId,
-                approval_status: env.skipProposalApprovalOperation ? ProposalStationApprovalStatus.APPROVED : null
-            });
+    await proposalStationRepository.save(proposalStations);
+
+    const proposalStationPromise = Promise.all(station_ids.map((stationId: string | number) => {
+        return emitDispatcherProposalEvent({
+            event: DispatcherProposalEvent.ASSIGNED,
+            id: entity.id,
+            stationId,
+            operatorRealmId: req.realmId
         });
+    }));
 
-        await proposalStationRepository.save(proposalStations);
+    await proposalStationPromise;
 
-        const proposalStationPromise = Promise.all(station_ids.map((stationId: string | number) => {
-            return emitDispatcherProposalEvent({
-                event: DispatcherProposalEvent.ASSIGNED,
-                id: entity.id,
-                stationId,
-                operatorRealmId: req.realmId
-            });
-        }));
-
-        await proposalStationPromise;
-
-        return res._respond({data: entity});
-    } catch (e) {
-        return res._failValidationError({message: 'The proposal could not be created.'})
-    }
+    return res.respond({data: entity});
 }
 
-export async function editProposalRouteHandler(req: any, res: any) {
+export async function editProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if(!req.ability.can('edit','proposal')) {
-        return res._failForbidden();
+    if(!req.ability.hasPermission(PermissionID.PROPOSAL_EDIT)) {
+        throw new ForbiddenError();
     }
 
     await check('title')
@@ -261,50 +260,46 @@ export async function editProposalRouteHandler(req: any, res: any) {
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req);
     if(!data) {
-        return res._respondAccepted();
+        return res.respondAccepted();
     }
 
     const repository = getRepository(Proposal);
     let proposal = await repository.findOne(id);
 
     if(typeof proposal === 'undefined') {
-        return res._failValidationError({message: 'The proposal could not be found.'});
+        throw new NotFoundError();
     }
 
     if(!isPermittedForResourceRealm(req.realmId, proposal.realm_id)) {
-        return res._failForbidden();
+        throw new ForbiddenError();
     }
 
     proposal = repository.merge(proposal, data);
 
-    try {
-        const result = await repository.save(proposal);
+    const result = await repository.save(proposal);
 
-        return res._respondAccepted({
-            data: result
-        });
-    } catch (e) {
-        return res._failValidationError({message: 'The proposal could not be updated.'});
-    }
+    return res.respondAccepted({
+        data: result
+    });
 }
 
-export async function dropProposalRouteHandler(req: any, res: any) {
-    let { id } = req.params;
+export async function dropProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    const { id: idStr } = req.params;
 
     // tslint:disable-next-line:radix
-    id = parseInt(id);
+    const id = parseInt(idStr, 10);
 
     if(typeof id !== 'number' || Number.isNaN(id)) {
-        return res._failNotFound();
+        throw new BadRequestError();
     }
 
-    if(!req.ability.can('drop', 'proposal')) {
-        return res._failUnauthorized();
+    if(!req.ability.hasPermission(PermissionID.PROPOSAL_DROP)) {
+        throw new ForbiddenError();
     }
 
     const repository = getRepository(Proposal);
@@ -312,18 +307,14 @@ export async function dropProposalRouteHandler(req: any, res: any) {
     const entity = await repository.findOne(id);
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     if(!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
-        return res._failForbidden();
+        throw new ForbiddenError();
     }
 
-    try {
-        await repository.delete(entity.id);
+    await repository.delete(entity.id);
 
-        return res._respondDeleted({data: entity});
-    } catch (e) {
-        return res._failValidationError({message: 'The proposal could not be deleted.'})
-    }
+    return res.respondDeleted({data: entity});
 }

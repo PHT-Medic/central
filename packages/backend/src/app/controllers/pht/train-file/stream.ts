@@ -11,12 +11,14 @@ import path from "path";
 import {getWritableDirPath} from "../../../../config/paths";
 import fs from "fs";
 import {isPermittedForResourceRealm, Train, TrainFile, TrainStation} from "@personalhealthtrain/ui-common";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
 
-export async function getTrainFileStreamRouteHandler(req: any, res: any) {
+export async function getTrainFileStreamRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {id} = req.params;
 
     if (typeof id !== 'string') {
-        return res._failNotFound({message: 'The given train id is not valid...'});
+        throw new BadRequestError();
     }
 
     const repository = getRepository(Train);
@@ -24,7 +26,7 @@ export async function getTrainFileStreamRouteHandler(req: any, res: any) {
     const train = await repository.findOne(id);
 
     if (typeof train === 'undefined') {
-        return res._failNotFound({message: 'The requested train was not found...'});
+        throw new NotFoundError();
     }
 
     if(!isPermittedForResourceRealm(req.realmId, train.realm_id)) {
@@ -45,7 +47,7 @@ export async function getTrainFileStreamRouteHandler(req: any, res: any) {
         }
 
         if(!isPermitted) {
-            return res._failForbidden({message: 'You are not allowed to inspect the train files.'});
+            throw new ForbiddenError('You are not allowed to inspect the train files.');
         }
     }
 
@@ -69,19 +71,16 @@ export async function getTrainFileStreamRouteHandler(req: any, res: any) {
 
     if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
-            try {
-                const buffer: Buffer = await fs.promises.readFile(trainDirectoryPath + '/' + files[i].hash + '.file');
+            const buffer: Buffer = await fs.promises.readFile(trainDirectoryPath + '/' + files[i].hash + '.file');
 
-                await new Promise((resolve: (data?: any) => void, reject) => {
-                    pack.entry({name: files[i].directory + '/' + files[i].name, size: files[i].size}, buffer, (err) => {
-                        if (err) reject();
+            await new Promise((resolve: (data?: any) => void, reject) => {
+                pack.entry({name: files[i].directory + '/' + files[i].name, size: files[i].size}, buffer, (err) => {
+                    if (err) reject();
 
-                        resolve();
-                    });
+                    resolve();
                 });
-            } catch (e) {
-                console.log(e);
-            }
+            });
+
         }
 
         pack.finalize();

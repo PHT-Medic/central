@@ -17,15 +17,18 @@ import {
     RegistryCommand,
     isRegistryStationProjectName,
     isSpecialRegistryProjectName,
-    MasterImage, pullProject, Station
+    MasterImage, pullProject, Station, PermissionID
 } from "@personalhealthtrain/ui-common";
 import env from "../../../../../env";
+import {ExpressRequest, ExpressResponse} from "../../../../../config/http/type";
+import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../../config/http/error/validation";
 
 const commands = Object.values(RegistryCommand);
 
-export async function doRegistryCommand(req: any, res: any) {
-    if(!req.ability.can('manage','service')) {
-        return res._failForbidden({message: 'You are not permitted to manage the registry service.'});
+export async function doRegistryCommand(req: ExpressRequest, res: ExpressResponse) {
+    if(!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
+        throw new ForbiddenError('You are not permitted to manage the registry service.');
     }
 
     const {command} = req.body;
@@ -34,7 +37,7 @@ export async function doRegistryCommand(req: any, res: any) {
         !command ||
         commands.indexOf(command) === -1
     ) {
-        return res._failBadRequest({message: 'The harbor command is not valid.'});
+        throw new BadRequestError('The harbor command is not valid.');
     }
 
     await check('name')
@@ -45,7 +48,7 @@ export async function doRegistryCommand(req: any, res: any) {
 
     const createValidation = validationResult(req);
     if (!createValidation.isEmpty()) {
-        return res._failExpressValidationError(createValidation);
+        throw new ExpressValidationError(createValidation);
     }
 
     const createData = matchedData(req, {includeOptionals: true});
@@ -74,7 +77,7 @@ export async function doRegistryCommand(req: any, res: any) {
 
         station = await query.getOne();
         if(typeof station === 'undefined') {
-            return res._failNotFound();
+            throw new NotFoundError();
         }
 
         projectName = buildRegistryHarborProjectName(station.secure_id);
@@ -86,7 +89,7 @@ export async function doRegistryCommand(req: any, res: any) {
             const project = await pullProject(projectName, true);
 
             if(typeof project === 'undefined') {
-                return res._failNotFound();
+                throw new NotFoundError();
             }
 
             if(
@@ -107,7 +110,7 @@ export async function doRegistryCommand(req: any, res: any) {
                 await stationRepository.save(station);
             }
 
-            return res._respond({data: project});
+            return res.respond({data: project});
         case RegistryCommand.PROJECT_CREATE:
             const entity = await ensureHarborProject(projectName);
 
@@ -119,7 +122,7 @@ export async function doRegistryCommand(req: any, res: any) {
                 await stationRepository.save(station);
             }
 
-            return res._respondCreated({data: entity});
+            return res.respondCreated({data: entity});
         case RegistryCommand.PROJECT_DROP:
             await deleteHarborProject(projectName, true);
 
@@ -134,7 +137,7 @@ export async function doRegistryCommand(req: any, res: any) {
                 await stationRepository.save(station);
             }
 
-            return res._respondDeleted();
+            return res.respondDeleted();
 
             // Repositories
         case RegistryCommand.PROJECT_REPOSITORIES_SYNC:
@@ -161,7 +164,7 @@ export async function doRegistryCommand(req: any, res: any) {
 
                     const nonExistingHarborRepositories = harborRepositories.filter(harborRepository => !existingEntityPaths.includes(harborRepository.fullName));
                     if(nonExistingHarborRepositories.length === 0) {
-                        return res._respond({
+                        return res.respond({
                             data: {
                                 meta
                             }
@@ -183,7 +186,7 @@ export async function doRegistryCommand(req: any, res: any) {
                     break;
             }
 
-            return res._respond({
+            return res.respond({
                 data: {
                     data: [...data],
                     meta
@@ -203,14 +206,14 @@ export async function doRegistryCommand(req: any, res: any) {
                 await stationRepository.save(station);
             }
 
-            return res._respondCreated({data: robotAccount});
+            return res.respondCreated({data: robotAccount});
         case RegistryCommand.PROJECT_ROBOT_ACCOUNT_DROP:
             const {id} = await findHarborRobotAccount(projectName, false);
             if(id) {
                 await dropHarborProjectAccount(id);
             }
 
-            return res._respondDeleted();
+            return res.respondDeleted();
 
             // Webhook
         case RegistryCommand.PROJECT_WEBHOOK_CREATE:
@@ -234,7 +237,7 @@ export async function doRegistryCommand(req: any, res: any) {
                 await stationRepository.save(station);
             }
 
-            return res._respondCreated({data: webhook});
+            return res.respondCreated({data: webhook});
 
         case RegistryCommand.PROJECT_WEBHOOK_DROP:
             await dropHarborProjectWebHook(projectName, true);
@@ -247,6 +250,6 @@ export async function doRegistryCommand(req: any, res: any) {
                 await stationRepository.save(station);
             }
 
-            return res._respondDeleted();
+            return res.respondDeleted();
     }
 }

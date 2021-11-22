@@ -19,6 +19,9 @@ import {
     stopTrain,
     triggerTrainResultStart, triggerTrainResultStatus, triggerTrainResultStop
 } from "../../../../../domains/pht/train/commands";
+import {ExpressRequest, ExpressResponse} from "../../../../../config/http/type";
+import {ForbiddenError, NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../../config/http/error/validation";
 
 /**
  * Execute a train command (start, stop, build).
@@ -26,11 +29,11 @@ import {
  * @param req
  * @param res
  */
-export async function handleTrainCommandRouteHandler(req: any, res: any) {
+export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {id} = req.params;
 
     if (typeof id !== 'string') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     await check('command')
@@ -42,7 +45,7 @@ export async function handleTrainCommandRouteHandler(req: any, res: any) {
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const validationData = matchedData(req, {includeOptionals: true});
@@ -52,59 +55,54 @@ export async function handleTrainCommandRouteHandler(req: any, res: any) {
     let entity = await repository.findOne(id);
 
     if (typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
-        return res._failForbidden();
+        throw new ForbiddenError();
     }
 
-    try {
-        switch (validationData.command as TrainCommand) {
-            // Build Commands
-            case TrainCommand.BUILD_STATUS:
-                entity = await detectTrainBuildStatus(entity);
-                break;
-            case TrainCommand.BUILD_START:
-                entity = await startBuildTrain(entity);
-                break;
-            case TrainCommand.BUILD_STOP:
-                entity = await stopBuildTrain(entity);
-                break;
+    switch (validationData.command as TrainCommand) {
+        // Build Commands
+        case TrainCommand.BUILD_STATUS:
+            entity = await detectTrainBuildStatus(entity);
+            break;
+        case TrainCommand.BUILD_START:
+            entity = await startBuildTrain(entity);
+            break;
+        case TrainCommand.BUILD_STOP:
+            entity = await stopBuildTrain(entity);
+            break;
 
 
-            // Run Commands
-            case TrainCommand.RUN_STATUS:
-                entity = await detectTrainRunStatus(entity);
-                break;
-            case TrainCommand.RUN_START:
-                entity = await startTrain(entity);
-                break;
-            case TrainCommand.RUN_STOP:
-                entity = await stopTrain(entity);
-                break;
+        // Run Commands
+        case TrainCommand.RUN_STATUS:
+            entity = await detectTrainRunStatus(entity);
+            break;
+        case TrainCommand.RUN_START:
+            entity = await startTrain(entity);
+            break;
+        case TrainCommand.RUN_STOP:
+            entity = await stopTrain(entity);
+            break;
 
-            // Result Service
-            case TrainCommand.RESULT_STATUS:
-                entity = await triggerTrainResultStatus(entity.id);
-                break;
-            case TrainCommand.RESULT_START:
-                entity = await triggerTrainResultStart(entity.id);
-                break;
-            case TrainCommand.RESULT_STOP:
-                entity = await triggerTrainResultStop(entity.id);
-                break;
+        // Result Service
+        case TrainCommand.RESULT_STATUS:
+            entity = await triggerTrainResultStatus(entity.id);
+            break;
+        case TrainCommand.RESULT_START:
+            entity = await triggerTrainResultStart(entity.id);
+            break;
+        case TrainCommand.RESULT_STOP:
+            entity = await triggerTrainResultStop(entity.id);
+            break;
 
-            // General Commands
-            case TrainCommand.GENERATE_HASH:
-                entity = await generateTrainHash(entity);
-                break;
-        }
-
-        return res._respond({data: entity});
-    } catch (e) {
-        console.log(e);
-        return res._failServerError({message: 'An unknown error occurred. The Task could not be executed...'})
+        // General Commands
+        case TrainCommand.GENERATE_HASH:
+            entity = await generateTrainHash(entity);
+            break;
     }
+
+    return res.respond({data: entity});
 }
 

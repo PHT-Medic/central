@@ -20,6 +20,9 @@ import {getUserStationRouteHandler} from "./station";
 import {useLogger} from "../../../../modules/log";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 import env from "../../../../env";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../config/http/error/validation";
 
 // ---------------------------------------------------------------------------------
 
@@ -37,7 +40,7 @@ export class UserController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialUser[]> {
-        return await getUsersRouteHandler(req, res) as PartialUser[];
+        return await getUsersRouteHandler(req, res);
     }
 
     @Post("",[ForceLoggedInMiddleware])
@@ -47,7 +50,7 @@ export class UserController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialUser|undefined> {
-        return await addUserRouteHandler(req, res) as PartialUser | undefined;
+        return await addUserRouteHandler(req, res);
     }
 
     @Get("/me",[ForceLoggedInMiddleware])
@@ -56,7 +59,7 @@ export class UserController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialUser|undefined> {
-        return await getMeRouteHandler(req, res) as PartialUser | undefined;
+        return await getMeRouteHandler(req, res);
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
@@ -66,7 +69,7 @@ export class UserController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialUser|undefined> {
-        return await getUserRouteHandler(req, res) as PartialUser | undefined;
+        return await getUserRouteHandler(req, res);
     }
 
     @Get("/:id/station", [])
@@ -75,7 +78,7 @@ export class UserController {
         @Request() req: any,
         @Response() res: any
     ): Promise<Station> {
-        return await getUserStationRouteHandler(req, res) as Station;
+        return await getUserStationRouteHandler(req, res);
     }
 
     @Post("/:id",[ForceLoggedInMiddleware])
@@ -86,7 +89,7 @@ export class UserController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialUser|undefined> {
-        return await editUserRouteHandler(req, res) as PartialUser | undefined;
+        return await editUserRouteHandler(req, res);
     }
 
     @Delete("/:id",[ForceLoggedInMiddleware])
@@ -96,91 +99,82 @@ export class UserController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialUser|undefined> {
-        return await dropUserRouteHandler(req, res) as PartialUser | undefined;
+        return await dropUserRouteHandler(req, res);
     }
 }
 
-export async function getUsersRouteHandler(req: any, res: any) {
+export async function getUsersRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page, include, fields } = req.query;
 
-    try {
+    const userRepository = getCustomRepository<UserRepository>(UserRepository);
+    const query = userRepository.createQueryBuilder('user');
 
-        const userRepository = getCustomRepository<UserRepository>(UserRepository);
-        const query = userRepository.createQueryBuilder('user');
+    onlyRealmPermittedQueryResources(query, req.realmId);
 
-        onlyRealmPermittedQueryResources(query, req.realmId);
+    applyFields(query, fields, {
+        defaultAlias: 'user',
+        allowed: ['id', 'name', 'display_name', 'email']
+    });
 
-        applyFields(query, fields, {
-            defaultAlias: 'user',
-            allowed: ['id', 'name', 'display_name', 'email']
-        });
+    applyFilters(query, filter, {
+        defaultAlias: 'user',
+        allowed: ['id', 'name', 'realm_id']
+    });
 
-        applyFilters(query, filter, {
-            defaultAlias: 'user',
-            allowed: ['id', 'name', 'realm_id']
-        });
+    applyRelations(query, include, {
+        defaultAlias: 'user',
+        allowed: ['realm', 'user_roles']
+    });
 
-        applyRelations(query, include, {
-            defaultAlias: 'user',
-            allowed: ['realm', 'user_roles']
-        });
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
-        const pagination = applyPagination(query, page, {maxLimit: 50});
+    const [entities, total] = await query.getManyAndCount();
 
-        const [entities, total] = await query.getManyAndCount();
-
-        return res._respond({
-            data: {
-                data: entities,
-                meta: {
-                    total,
-                    ...pagination
-                }
+    return res.respond({
+        data: {
+            data: entities,
+            meta: {
+                total,
+                ...pagination
             }
-        });
-    } catch (e) {
-        return res._failServerError();
-    }
+        }
+    });
 }
 
-export async function getUserRouteHandler(req: any, res: any) {
+export async function getUserRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
     const { include, fields } = req.query;
 
-    try {
-        const userRepository = getCustomRepository<UserRepository>(UserRepository);
-        const query = await userRepository.createQueryBuilder('user')
-            .andWhere("user.id = :id", {id});
+    const userRepository = getCustomRepository<UserRepository>(UserRepository);
+    const query = await userRepository.createQueryBuilder('user')
+        .andWhere("user.id = :id", {id});
 
-        onlyRealmPermittedQueryResources(query, req.realmId);
+    onlyRealmPermittedQueryResources(query, req.realmId);
 
-        applyFields(query, fields, {
-            defaultAlias: 'user',
-            allowed: ['email']
-        });
+    applyFields(query, fields, {
+        defaultAlias: 'user',
+        allowed: ['email']
+    });
 
-        applyRelations(query, include, {
-            defaultAlias: 'user',
-            allowed: ['realm', 'user_roles']
-        });
+    applyRelations(query, include, {
+        defaultAlias: 'user',
+        allowed: ['realm', 'user_roles']
+    });
 
-        const result = await query.getOne();
+    const result = await query.getOne();
 
-        if(typeof result === 'undefined') {
-            return res._failNotFound();
-        }
-
-        return res._respond({data: result});
-    } catch (e) {
-        return res._failNotFound();
+    if(typeof result === 'undefined') {
+        throw new NotFoundError();
     }
+
+    return res.respond({data: result});
 }
 
-export async function getMeRouteHandler(req: any, res: any) {
+export async function getMeRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const user = req.user;
     const permissions = req.ability.getPermissions();
 
-    return res._respond({
+    return res.respond({
         data: {
             ...user,
             permissions
@@ -188,7 +182,7 @@ export async function getMeRouteHandler(req: any, res: any) {
     });
 }
 
-async function runValidations(req: any, mode: 'create' | 'update') {
+async function runValidations(req: ExpressRequest, mode: 'create' | 'update') {
     await check('display_name').exists().notEmpty().isLength({min: 3, max: 128}).optional().run(req);
     await check('email').exists().normalizeEmail().isEmail().optional({nullable: true}).run(req);
     await check('password').exists().isLength({min: 5, max: 512}).optional({nullable: true}).run(req);
@@ -223,16 +217,16 @@ async function runValidations(req: any, mode: 'create' | 'update') {
     }
 }
 
-export async function addUserRouteHandler(req: any, res: any) {
+export async function addUserRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if(!req.ability.hasPermission(PermissionID.USER_ADD)) {
-        return res._failForbidden('You are not authorized to add a user.');
+        throw new ForbiddenError('You are not authorized to add a user.');
     }
 
     await runValidations(req, 'create');
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: true});
@@ -241,52 +235,50 @@ export async function addUserRouteHandler(req: any, res: any) {
     const user = await userRepository.create(data);
 
     if(!isPermittedForResourceRealm(req.realmId, user.realm_id)) {
-        return res._failForbidden({message: `You are not allowed to add users to the realm ${user.realm_id}`});
+        throw new ForbiddenError(`You are not allowed to add users to the realm ${user.realm_id}`);
     }
 
     if(user.password) {
         user.password = await userRepository.hashPassword(user.password);
     }
 
-    try {
-        const result = await userRepository.save(user);
+    const result = await userRepository.save(user);
 
-        useLogger().info('user "' + data.name + '" created...');
+    useLogger().info('user "' + data.name + '" created...');
 
-        return res._respondCreated({
-            data: {
-                id: result.id
-            }
-        });
-    } catch (e) {
-        return res._failValidationError();
-    }
+    return res.respondCreated({
+        data: {
+            id: result.id
+        }
+    });
 }
 
-export async function editUserRouteHandler(req: any, res: any) {
-    let { id } = req.params;
+export async function editUserRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    const { id: idStr } = req.params;
 
-    // tslint:disable-next-line:radix
-    id = parseInt(id);
+    const id : number = parseInt(idStr, 10);
 
     if(Number.isNaN(id)) {
-        return res._failNotFound({message: 'The user identifier is not valid.'});
+        throw new BadRequestError('The user identifier is not valid.');
     }
 
-    if(!req.ability.hasPermission(PermissionID.USER_EDIT) && !req.user.id === id) {
-        return res._failForbidden({message: 'You are not authorized to modify a user.'});
+    if(
+        !req.ability.hasPermission(PermissionID.USER_EDIT) &&
+        req.user.id !== id
+    ) {
+        throw new ForbiddenError('You are not authorized to modify a user.');
     }
 
     await runValidations(req, 'update');
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
     if(!data) {
-        return res._respondAccepted();
+        return res.respondAccepted();
     }
 
     if(
@@ -294,7 +286,7 @@ export async function editUserRouteHandler(req: any, res: any) {
         env.userPasswordImmutable &&
         !req.ability.hasPermission(PermissionID.USER_EDIT)
     ) {
-        return res._failBadRequest({message: 'User passwords are immutable and can not be changed in this environment.'});
+        throw new BadRequestError('User passwords are immutable and can not be changed in this environment.');
     }
 
     const userRepository = getCustomRepository<UserRepository>(UserRepository);
@@ -305,68 +297,57 @@ export async function editUserRouteHandler(req: any, res: any) {
 
     let user = await userRepository.findOne(id);
     if(typeof user === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     if(!isPermittedForResourceRealm(req.realmId, user.realm_id)) {
-        return res._failForbidden({message: `You are not allowed to edit users of the realm ${user.realm_id}`});
+        throw new ForbiddenError(`You are not allowed to edit users of the realm ${user.realm_id}`);
     }
 
     if(typeof data.realm_id === 'string') {
         if (!isPermittedForResourceRealm(req.realmId, data.realm_id)) {
-            return res._failForbidden({message: `You are not allowed to move users to the realm ${data.realm_id}`});
+            throw new ForbiddenError(`You are not allowed to move users to the realm ${data.realm_id}`);
         }
     }
 
     user = userRepository.merge(user, data);
 
-    try {
-        const result = await userRepository.save(user);
+    const result = await userRepository.save(user);
 
-        if(typeof result.realm_id !== 'undefined') {
-            result.realm = await getRepository(Realm).findOne(result.realm_id);
-        }
-
-        return res._respond({
-            data: result
-        });
-    } catch (e) {
-        return res._failValidationError({message: 'The user information could not be updated.'});
+    if(typeof result.realm_id !== 'undefined') {
+        result.realm = await getRepository(Realm).findOne(result.realm_id);
     }
+
+    return res.respond({
+        data: result
+    });
 }
 
 // ---------------------------------------------------------------------------------
 
-export async function dropUserRouteHandler(req: any, res: any) {
+export async function dropUserRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {id} = req.params;
 
     if (!req.ability.hasPermission(PermissionID.USER_DROP)) {
-        return res._failForbidden({message: 'You are not authorized to drop a user.'});
+        throw new ForbiddenError('You are not authorized to drop a user.');
     }
 
-    if(req.user.id === id) {
-        return res._failValidationError({
-            message: 'The own user can not be deleted.'
-        })
+    if(req.user.id === parseInt(id, 10)) {
+        throw new BadRequestError('The own user can not be deleted.');
     }
 
-    try {
-        const userRepository = getCustomRepository<UserRepository>(UserRepository);
-        const user = await userRepository.findOne(id);
+    const userRepository = getCustomRepository<UserRepository>(UserRepository);
+    const user = await userRepository.findOne(id);
 
-        if(typeof user === 'undefined') {
-            return res._failNotFound();
-        }
-
-        if(!isPermittedForResourceRealm(req.realmId, user.realm_id)) {
-            return res._failForbidden({message: `You are not authorized to drop a user fo the realm ${user.realm_id}`});
-        }
-
-        await userRepository.delete(id);
-
-        return res._respondDeleted();
-    } catch(e) {
-        return res._failValidationError();
+    if(typeof user === 'undefined') {
+        throw new NotFoundError();
     }
 
+    if(!isPermittedForResourceRealm(req.realmId, user.realm_id)) {
+        throw new ForbiddenError(`You are not authorized to drop a user fo the realm ${user.realm_id}`)
+    }
+
+    await userRepository.delete(id);
+
+    return res.respondDeleted();
 }

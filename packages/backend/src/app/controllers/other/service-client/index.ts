@@ -8,9 +8,11 @@
 import {SwaggerTags} from "typescript-swagger";
 import { Controller, Get, Params, Request, Response} from "@decorators/express";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
-import {Client} from "@personalhealthtrain/ui-common";
+import {Client, PermissionID} from "@personalhealthtrain/ui-common";
 import {getRepository} from "typeorm";
 import {applyFields, applyFilters, applyPagination} from "typeorm-extension";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {ForbiddenError, NotFoundError} from "@typescript-error/http";
 
 @SwaggerTags('service')
 @Controller("/service-clients")
@@ -33,9 +35,9 @@ export class ServiceClientController {
     }
 }
 
-async function getManyRoute(req: any, res: any) {
-    if(!req.ability.can('manage','service')) {
-        return res._failForbidden({message: 'You are not allowed to query service-clients.'});
+async function getManyRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    if(!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
+        throw new ForbiddenError('You are not allowed to query service-clients.');
     }
 
     const {filter, page, fields} = req.query;
@@ -57,7 +59,7 @@ async function getManyRoute(req: any, res: any) {
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res._respond({
+    return res.respond({
         data: {
             data: entities,
             meta: {
@@ -68,33 +70,28 @@ async function getManyRoute(req: any, res: any) {
     });
 }
 
-async function getRoute(req: any, res: any) {
-    if(!req.ability.can('manage','service')) {
-        return res._failForbidden({message: 'You are not allowed to query service-clients.'});
+async function getRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    if(!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
+        throw new ForbiddenError('You are not allowed to query service-clients.');
     }
 
     const {id} = req.params;
     const {fields} = req.query;
 
-    try {
-        const repository = getRepository(Client);
-        const query =  repository.createQueryBuilder('client')
-            .where("client.service_id = :id", {id});
+    const repository = getRepository(Client);
+    const query =  repository.createQueryBuilder('client')
+        .where("client.service_id = :id", {id});
 
-        applyFields(query, fields, {
-            defaultAlias: 'client',
-            allowed: ['id', 'name', 'secret', 'description']
-        });
+    applyFields(query, fields, {
+        defaultAlias: 'client',
+        allowed: ['id', 'name', 'secret', 'description']
+    });
 
-        const entity = await query.getOne();
+    const entity = await query.getOne();
 
-        if(typeof entity === 'undefined') {
-            return res._failNotFound();
-        }
-
-        return res._respond({data: entity});
-
-    } catch (e) {
-        return res._failServerError();
+    if(typeof entity === 'undefined') {
+        throw new NotFoundError();
     }
+
+    return res.respond({data: entity});
 }

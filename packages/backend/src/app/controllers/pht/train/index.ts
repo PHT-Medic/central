@@ -9,7 +9,7 @@ import {getRepository} from "typeorm";
 import {applyPagination, applyQueryRelations, applyFilters} from "typeorm-extension";
 import {
     isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources, Proposal, Train, TrainFile, TrainType
+    onlyRealmPermittedQueryResources, PermissionID, Proposal, Train, TrainFile, TrainType
 } from "@personalhealthtrain/ui-common";
 import {check, matchedData, validationResult} from "express-validator";
 import {TrainCommand} from "@personalhealthtrain/ui-common";
@@ -22,6 +22,9 @@ import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@d
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {handleTrainCommandRouteHandler} from "./action";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../config/http/error/validation";
 
 type PartialTrain = Partial<Train>;
 const simpleExample = {
@@ -87,7 +90,7 @@ export class TrainController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialTrain|undefined> {
-        return (await handleTrainCommandRouteHandler(req, res)) as PartialTrain | undefined;
+        return await handleTrainCommandRouteHandler(req, res);
     }
 
     @Delete("/:id",[ForceLoggedInMiddleware])
@@ -103,12 +106,12 @@ export class TrainController {
     // --------------------------------------------------------------------------
 }
 
-export async function getTrainRouteHandler(req: any, res: any) {
+export async function getTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { include } = req.query;
     const { id } = req.params;
 
     if (typeof id !== 'string') {
-        return res._failNotFound();
+        throw new BadRequestError();
     }
 
     const repository = getRepository(Train);
@@ -125,17 +128,17 @@ export async function getTrainRouteHandler(req: any, res: any) {
     const entity = await query.getOne();
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     if(!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
-        return res._failForbidden();
+        throw new ForbiddenError();
     }
 
-    return res._respond({data: entity})
+    return res.respond({data: entity})
 }
 
-export async function getTrainsRouteHandler(req: any, res: any) {
+export async function getTrainsRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page, include } = req.query;
 
     const repository = getRepository(Train);
@@ -159,7 +162,7 @@ export async function getTrainsRouteHandler(req: any, res: any) {
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res._respond({
+    return res.respond({
         data: {
             data: entities,
             meta: {
@@ -170,7 +173,7 @@ export async function getTrainsRouteHandler(req: any, res: any) {
     });
 }
 
-async function runTrainValidations(req: any) {
+async function runTrainValidations(req: ExpressRequest) {
     await check('entrypoint_executable')
         .exists()
         .notEmpty()
@@ -208,9 +211,9 @@ async function runTrainValidations(req: any) {
     await masterImagePromise.run(req);
 }
 
-export async function addTrainRouteHandler(req: any, res: any) {
-    if(!req.ability.can('add','train')) {
-        return res._failForbidden();
+export async function addTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    if(!req.ability.hasPermission(PermissionID.TRAIN_ADD)) {
+        throw new ForbiddenError();
     }
 
     await check('proposal_id')
@@ -240,7 +243,7 @@ export async function addTrainRouteHandler(req: any, res: any) {
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const validationData = matchedData(req, {includeOptionals: true});
@@ -248,28 +251,25 @@ export async function addTrainRouteHandler(req: any, res: any) {
     // tslint:disable-next-line:prefer-const
     let {station_ids, ...data} = validationData;
 
-    try {
-        const repository = getRepository(Train);
+    const repository = getRepository(Train);
 
-        const entity = repository.create({
-            realm_id: req.realmId,
-            user_id: req.user.id,
-            ...data
-        });
+    const entity = repository.create({
+        realm_id: req.realmId,
+        user_id: req.user.id,
+        ...data
+    });
 
-        await repository.save(entity);
+    await repository.save(entity);
 
-        return res._respond({data: entity});
-    } catch (e) {
-        return res._failValidationError({message: 'The train could not be created.'})
-    }
+    return res.respond({data: entity});
+
 }
 
-export async function editTrainRouteHandler(req: any, res: any) {
+export async function editTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if (typeof id !== 'string') {
-        return res._failNotFound();
+        throw new BadRequestError();
     }
 
     await runTrainValidations(req);
@@ -283,23 +283,23 @@ export async function editTrainRouteHandler(req: any, res: any) {
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req);
     if(!data) {
-        return res._respondAccepted();
+        return res.respondAccepted();
     }
 
     const repository = getRepository(Train);
     let train = await repository.findOne(id);
 
     if(typeof train === 'undefined') {
-        return res._failValidationError({message: 'The train could not be found.'});
+        throw new NotFoundError();
     }
 
     if(!isPermittedForResourceRealm(req.realmId, train.realm_id)) {
-        return res._failForbidden();
+        throw new ForbiddenError();
     }
 
     train = repository.merge(train, data);
@@ -318,27 +318,22 @@ export async function editTrainRouteHandler(req: any, res: any) {
         train.run_status = null;
     }
 
-    try {
-        const result = await repository.save(train);
+    const result = await repository.save(train);
 
-        return res._respondAccepted({
-            data: result
-        });
-    } catch (e) {
-        console.log(e);
-        return res._failValidationError({message: 'The train could not be updated.'});
-    }
+    return res.respondAccepted({
+        data: result
+    });
 }
 
-export async function dropTrainRouteHandler(req: any, res: any) {
+export async function dropTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if (typeof id !== 'string') {
-        return res._failNotFound();
+        throw new BadRequestError();
     }
 
-    if(!req.ability.can('drop', 'train')) {
-        return res._failUnauthorized();
+    if(!req.ability.hasPermission(PermissionID.TRAIN_DROP)) {
+        throw new ForbiddenError();
     }
 
     const repository = getRepository(Train);
@@ -346,19 +341,15 @@ export async function dropTrainRouteHandler(req: any, res: any) {
     const entity = await repository.findOne(id);
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     if(!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
-        return res._failForbidden();
+        throw new ForbiddenError();
     }
 
-    try {
-        await repository.delete(entity.id);
+    await repository.delete(entity.id);
 
-        return res._respondDeleted({data: entity});
-    } catch (e) {
-        return res._failValidationError({message: 'The train could not be deleted.'})
-    }
+    return res.respondDeleted({data: entity});
 }
 

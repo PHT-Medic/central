@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {RolePermission} from "@personalhealthtrain/ui-common";
+import {PermissionID, RolePermission} from "@personalhealthtrain/ui-common";
 import {check, matchedData, validationResult} from "express-validator";
 import {getRepository} from "typeorm";
 import {applyFilters, applyPagination} from "typeorm-extension";
@@ -15,6 +15,9 @@ import {applyFilters, applyPagination} from "typeorm-extension";
 import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
 import {ResponseExample, SwaggerTags} from "typescript-swagger";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {ForbiddenError, NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../config/http/error/validation";
 
 type PartialPermissionController = Partial<RolePermission>;
 const simpleExample = {role_id: 1, permission_id: "user_add"};
@@ -38,7 +41,7 @@ export class RolePermissionController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialPermissionController> {
-        return await addRolePermission(req, res) as PartialPermissionController;
+        return await addRolePermission(req, res);
     }
 
     @Get("/:id",[ForceLoggedInMiddleware])
@@ -48,7 +51,7 @@ export class RolePermissionController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialPermissionController> {
-        return await getRolePermission(req, res) as PartialPermissionController;
+        return await getRolePermission(req, res);
     }
 
     @Delete("/:id",[ForceLoggedInMiddleware])
@@ -58,7 +61,7 @@ export class RolePermissionController {
         @Request() req: any,
         @Response() res: any
     ): Promise<PartialPermissionController> {
-        return await dropRolePermission(req, res) as PartialPermissionController;
+        return await dropRolePermission(req, res);
     }
 }
 
@@ -68,36 +71,31 @@ export class RolePermissionController {
  * @param req
  * @param res
  */
-async function getRolePermissions(req: any, res: any) {
+async function getRolePermissions(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page } = req.query;
 
-    try {
-        const rolePermissionRepository = getRepository(RolePermission);
-        const query = rolePermissionRepository.createQueryBuilder('rolePermission')
-            .leftJoinAndSelect('rolePermission.permission', 'permission');
+    const rolePermissionRepository = getRepository(RolePermission);
+    const query = rolePermissionRepository.createQueryBuilder('rolePermission')
+        .leftJoinAndSelect('rolePermission.permission', 'permission');
 
-        applyFilters(query, filter, {
-            defaultAlias: 'rolePermission',
-            allowed: ['role_id', 'permission_id']
-        });
+    applyFilters(query, filter, {
+        defaultAlias: 'rolePermission',
+        allowed: ['role_id', 'permission_id']
+    });
 
-        const pagination = applyPagination(query, page, {maxLimit: 50});
+    const pagination = applyPagination(query, page, {maxLimit: 50});
 
-        const [entities, total] = await query.getManyAndCount();
+    const [entities, total] = await query.getManyAndCount();
 
-        return res._respond({
-            data: {
-                data: entities,
-                meta: {
-                    total,
-                    ...pagination
-                }
+    return res.respond({
+        data: {
+            data: entities,
+            meta: {
+                total,
+                ...pagination
             }
-        });
-    } catch (e) {
-        console.log(e);
-        return res._failServerError();
-    }
+        }
+    });
 }
 
 // ---------------------------------------------------------------------------------
@@ -108,21 +106,17 @@ async function getRolePermissions(req: any, res: any) {
  * @param req
  * @param res
  */
-async function getRolePermission(req: any, res: any) {
+async function getRolePermission(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {id} = req.params;
 
-    try {
-        const rolePermissionRepository = getRepository(RolePermission);
-        const entity = await rolePermissionRepository.findOne(id);
+    const rolePermissionRepository = getRepository(RolePermission);
+    const entity = await rolePermissionRepository.findOne(id);
 
-        if(typeof entity === 'undefined') {
-            return res._failNotFound();
-        }
-
-        return res._respond({data: entity});
-    } catch (e) {
-        return res._failServerError();
+    if(typeof entity === 'undefined') {
+        throw new NotFoundError();
     }
+
+    return res.respond({data: entity});
 }
 
 // ---------------------------------------------------------------------------------
@@ -133,7 +127,7 @@ async function getRolePermission(req: any, res: any) {
  * @param req
  * @param res
  */
-const addRolePermission = async (req: any, res: any) => {
+async function addRolePermission(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     await check('role_id')
         .exists()
         .isInt()
@@ -144,13 +138,13 @@ const addRolePermission = async (req: any, res: any) => {
         .isString()
         .run(req);
 
-    if(!req.ability.can('add','rolePermission')) {
-        return res._failForbidden();
+    if(!req.ability.hasPermission(PermissionID.ROLE_PERMISSION_ADD)) {
+        throw new ForbiddenError();
     }
 
     const validation = validationResult(req);
     if(!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
@@ -158,15 +152,11 @@ const addRolePermission = async (req: any, res: any) => {
     const repository = getRepository(RolePermission);
     let rolePermission = repository.create(data);
 
-    try {
-        rolePermission = await repository.save(rolePermission);
+    rolePermission = await repository.save(rolePermission);
 
-        return res._respondCreated({
-            data: rolePermission
-        });
-    } catch (e) {
-        return res._failValidationError();
-    }
+    return res.respondCreated({
+        data: rolePermission
+    });
 }
 
 // ---------------------------------------------------------------------------------
@@ -177,19 +167,15 @@ const addRolePermission = async (req: any, res: any) => {
  * @param req
  * @param res
  */
-async function dropRolePermission(req: any, res: any) {
+async function dropRolePermission(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if(!req.ability.can('drop','rolePermission')) {
-        return res._failForbidden();
+    if(!req.ability.hasPermission(PermissionID.ROLE_PERMISSION_DROP)) {
+        throw new ForbiddenError();
     }
 
-    try {
-        const repository = getRepository(RolePermission);
-        await repository.delete(id);
+    const repository = getRepository(RolePermission);
+    await repository.delete(id);
 
-        return res._respondDeleted();
-    } catch (e) {
-        return res._failValidationError();
-    }
+    return res.respondDeleted();
 }

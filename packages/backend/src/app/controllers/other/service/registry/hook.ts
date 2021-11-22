@@ -14,6 +14,7 @@ import {
 } from "@personalhealthtrain/ui-common";
 import {useLogger} from "../../../../../modules/log";
 import {publishMessage} from "amqp-extension";
+import {ExpressRequest, ExpressResponse} from "../../../../../config/http/type";
 
 let eventValidator : undefined | BaseSchema;
 function useHookEventDataValidator() : BaseSchema {
@@ -65,46 +66,39 @@ type HarborHookEvent = {
     [key: string]: any
 }
 
-export async function postHarborHookRouteHandler(req: any, res: any) {
+export async function postHarborHookRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     useLogger().debug('hook received', {service: 'api-harbor-hook'})
 
     const repository = getRepository(Train);
 
-    try {
-        const hook : HarborHook = await useHookEventDataValidator().validate(req.body);
+    const hook : HarborHook = await useHookEventDataValidator().validate(req.body);
 
-        const isLibraryProject : boolean = hook.event_data.repository.namespace === REGISTRY_MASTER_IMAGE_PROJECT_NAME;
+    const isLibraryProject : boolean = hook.event_data.repository.namespace === REGISTRY_MASTER_IMAGE_PROJECT_NAME;
 
-        if(!isLibraryProject) {
-            /**
-             * Process train project
-             */
-            const train = await repository.findOne({id: hook.event_data.repository.name});
+    if(!isLibraryProject) {
+        /**
+         * Process train project
+         */
+        const train = await repository.findOne({id: hook.event_data.repository.name});
 
-            if (typeof train === 'undefined') {
-                useLogger().warn('hook could not proceeded, train: ' + hook.event_data.repository.name + ' does not exist.', {service: 'api-harbor-hook'})
-                return res.status(200).end();
-            }
+        if (typeof train === 'undefined') {
+            useLogger().warn('hook could not proceeded, train: ' + hook.event_data.repository.name + ' does not exist.', {service: 'api-harbor-hook'})
+            return res.status(200).end();
         }
-
-        const message = buildDispatcherHarborEvent({
-            event: hook.type as DispatcherHarborEventType,
-            operator: hook.operator,
-            namespace: hook.event_data.repository.namespace,
-            repositoryName: hook.event_data.repository.name,
-            repositoryFullName: hook.event_data.repository.repo_full_name,
-            artifactTag: hook.event_data.resources[0]?.tag
-        });
-
-        console.log(message);
-
-        await publishMessage(message);
-
-        return res.status(200).end();
-    } catch (e) {
-        console.log(e);
-        useLogger().warn('hook could not be proceeded.', {service: 'api-harbor-hook', errorMessage: e.message})
-
-        return res._failBadRequest({message: 'The hook event is not valid...'});
     }
+
+    const message = buildDispatcherHarborEvent({
+        event: hook.type as DispatcherHarborEventType,
+        operator: hook.operator,
+        namespace: hook.event_data.repository.namespace,
+        repositoryName: hook.event_data.repository.name,
+        repositoryFullName: hook.event_data.repository.repo_full_name,
+        artifactTag: hook.event_data.resources[0]?.tag
+    });
+
+    console.log(message);
+
+    await publishMessage(message);
+
+    return res.status(200).end();
 }

@@ -17,6 +17,9 @@ import {
 } from "@personalhealthtrain/ui-common";
 import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
 import env from "../../../../env";
+import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
+import {BadRequestError, NotFoundError} from "@typescript-error/http";
+import {ExpressValidationError} from "../../../../config/http/error/validation";
 
 @SwaggerTags('user', 'pht')
 @Controller("/user-key-rings")
@@ -58,7 +61,7 @@ export class UserKeyController {
     }
 }
 
-export async function getUserKeyRouteHandler(req: any, res: any) {
+export async function getUserKeyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const repository = getRepository(UserKeyRing);
 
     const entity = await repository.findOne({
@@ -66,68 +69,63 @@ export async function getUserKeyRouteHandler(req: any, res: any) {
     });
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
-    return res._respond({data: entity})
+    return res.respond({data: entity})
 }
 
-async function runValidationRules(req: any) {
+async function runValidationRules(req: ExpressRequest) {
     await check('public_key').optional({nullable: true}).isLength({min: 5, max: 4096}).run(req);
     await check('he_key').optional({nullable: true}).isLength({min: 5, max: 4096}).run(req);
 }
 
-async function addUserKeyRouteHandler(req: any, res: any) {
+async function addUserKeyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if(
         env.userSecretsImmutable &&
         !req.ability.hasPermission(PermissionID.USER_EDIT)
     ) {
-        return res._failBadRequest({message: 'User secrets are immutable and can not be changed in this environment.'});
+        throw new BadRequestError('User secrets are immutable and can not be changed in this environment.');
     }
 
     await runValidationRules(req);
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
 
-    try {
-        const repository = getRepository(UserKeyRing);
+    const repository = getRepository(UserKeyRing);
 
-        const entity = repository.create({
-            user_id: req.user.id,
-            ...data
-        });
+    const entity = repository.create({
+        user_id: req.user.id,
+        ...data
+    });
 
-        await repository.save(entity);
+    await repository.save(entity);
 
-        await saveUserSecretsToSecretEngine(entity);
+    await saveUserSecretsToSecretEngine(entity);
 
-        return res._respond({data: entity});
-    } catch (e) {
-        console.log(e);
-        return res._failValidationError({message: 'The key ring could not be created...'})
-    }
+    return res.respond({data: entity});
 }
 
-async function editUserKeyRouteHandler(req: any, res: any) {
+async function editUserKeyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if(
         env.userSecretsImmutable &&
         !req.ability.hasPermission(PermissionID.USER_EDIT)
     ) {
-        return res._failBadRequest({message: 'User secrets are immutable and can not be changed in this environment.'});
+        throw new BadRequestError('User secrets are immutable and can not be changed in this environment.');
     }
 
     await runValidationRules(req);
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        return res._failExpressValidationError(validation);
+        throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req, {includeOptionals: false});
@@ -135,49 +133,40 @@ async function editUserKeyRouteHandler(req: any, res: any) {
     const repository = getRepository(UserKeyRing);
 
     let entity = await repository.findOne({
-        id,
+        id: parseInt(id, 10),
         user_id: req.user.id
     });
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     entity = repository.merge(entity,data);
 
-    try {
-        await saveUserSecretsToSecretEngine(entity);
+    await saveUserSecretsToSecretEngine(entity);
 
-        await repository.save(entity);
+    await repository.save(entity);
 
-        return res._respondDeleted({data: entity});
-    } catch (e) {
-        console.log(e);
-        return res._failValidationError({message: 'The key ring could not be updated...'})
-    }
+    return res.respondDeleted({data: entity});
 }
 
-async function dropUserKeyRouteHandler(req: any, res: any) {
+async function dropUserKeyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     const repository = getRepository(UserKeyRing);
 
     const entity = await repository.findOne({
-        id,
+        id: parseInt(id, 10),
         user_id: req.user.id
     });
 
     if(typeof entity === 'undefined') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
-    try {
-        await removeUserSecretsFromSecretEngine(entity.id);
+    await removeUserSecretsFromSecretEngine(entity.id);
 
-        await repository.remove(entity);
+    await repository.remove(entity);
 
-        return res._respondDeleted({data: entity});
-    } catch (e) {
-        return res._failValidationError({message: 'The key ring could not be deleted...'})
-    }
+    return res.respondDeleted({data: entity});
 }
