@@ -7,13 +7,13 @@
 <script>
     import {dropAPIUser} from "@personalhealthtrain/ui-common";
     import UserList from "../../../../components/domains/user/UserList";
-    import {Layout, LayoutNavigationID} from "../../../../modules/layout/contants";
+    import {LayoutKey, LayoutNavigationID} from "../../../../config/layout/contants";
 
     export default {
         components: {UserList},
         meta: {
-            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
-            [Layout.REQUIRED_LOGGED_IN_KEY]: true
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true
         },
         data() {
             return {

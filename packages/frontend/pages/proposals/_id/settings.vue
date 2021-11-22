@@ -8,13 +8,13 @@
 import {editProposal, getAPIMasterImages, PermissionID} from "@personalhealthtrain/ui-common";
     import {alpha, maxLength, minLength, required} from "vuelidate/lib/validators";
     import AlertMessage from "../../../components/alert/AlertMessage";
-    import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
+    import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
 
     export default {
         meta: {
-            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
-            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
-            [Layout.REQUIRED_PERMISSIONS_KEY]: [
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
                 PermissionID.PROPOSAL_EDIT,
                 PermissionID.PROPOSAL_DROP
             ]

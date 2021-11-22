@@ -47,6 +47,7 @@ const config = {
         '@fortawesome/fontawesome-free/css/all.css',
         'bootstrap/dist/css/bootstrap.min.css',
         'bootstrap-vue/dist/bootstrap-vue.css',
+        '@/assets/css/vue-layout-navigation.css',
         '@/assets/css/root.css',
         '@/assets/css/core/header.css',
         '@/assets/css/core/navbar.css',
@@ -67,7 +68,7 @@ const config = {
         '@/plugins/store',
         '@/plugins/auth',
         '@/plugins/app',
-
+        '@/plugins/layout',
         '@/plugins/vuelidate',
         '@/plugins/vueScroll',
         '@/plugins/vueFormWizard',
@@ -128,6 +129,11 @@ const config = {
 
             if(config.resolve.alias.hasOwnProperty('@')) {
                 delete config.resolve.alias['@'];
+            }
+
+            config.externals = {
+                ...config.externals,
+                'react-native-sqlite-storage': 'react-native-sqlite-storage'
             }
         }
     }

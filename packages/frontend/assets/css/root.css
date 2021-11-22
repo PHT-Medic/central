@@ -131,10 +131,10 @@ sidebar
 body
  */
 .page-wrapper {
+    padding-top: 56px;
     display: flex;
     width: 100%;
     align-items: stretch;
-    padding-top: 60px;
     height: -moz-calc(100% - (34px));
     height: -webkit-calc(100% - (34px));
     height: calc(100% - (34px));

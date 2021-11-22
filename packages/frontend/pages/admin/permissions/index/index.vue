@@ -6,13 +6,13 @@
   -->
 <script>
     import PermissionList from "../../../../components/domains/permission/PermissionList";
-    import {Layout, LayoutNavigationID} from "../../../../modules/layout/contants";
+    import {LayoutKey, LayoutNavigationID} from "../../../../config/layout/contants";
 
     export default {
         components: {PermissionList},
         meta: {
-            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
-            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
         },
         data() {
             return {

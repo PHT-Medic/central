@@ -7,14 +7,14 @@
 <script>
 import {getAPIStations, PermissionID} from "@personalhealthtrain/ui-common";
 import StationTrainTable from "../../../components/domains/station/StationTrainTable";
-import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
+import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
 
 export default {
     components: {StationTrainTable},
     meta: {
-        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
-        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
-        [Layout.REQUIRED_PERMISSIONS_KEY]: [
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.TRAIN_APPROVE
         ]
     },

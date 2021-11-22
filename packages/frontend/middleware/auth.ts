@@ -7,13 +7,13 @@
 
 import {Context} from "@nuxt/types";
 import AuthModule from "~/modules/auth";
-import {Layout} from "@/modules/layout/contants";
+import {LayoutKey} from "@/config/layout/contants";
 import {buildAbilityMetaFromName} from "@typescript-auth/core";
 
 function checkAbilityOrPermission({route, $auth} : Context) {
     const layoutKeys : string[] = [
-        Layout.REQUIRED_ABILITY_KEY,
-        Layout.REQUIRED_PERMISSIONS_KEY
+        LayoutKey.REQUIRED_ABILITIES,
+        LayoutKey.REQUIRED_PERMISSIONS
     ];
 
     let isAllowed : undefined | boolean;
@@ -31,7 +31,7 @@ function checkAbilityOrPermission({route, $auth} : Context) {
             const value = matchedRecordMeta[layoutKey];
             if(Array.isArray(value)) {
                 isAllowed = value.some(val => {
-                    if(layoutKey === Layout.REQUIRED_PERMISSIONS_KEY) {
+                    if(layoutKey === LayoutKey.REQUIRED_PERMISSIONS) {
                         val = buildAbilityMetaFromName(val);
                     }
 
@@ -88,7 +88,7 @@ export default async function({ route, from, redirect, $auth, store } : Context)
 
     if (
         Array.isArray(route.meta) &&
-        route.meta.some(meta => !!meta[Layout.REQUIRED_LOGGED_IN_KEY])
+        route.meta.some(meta => !!meta[LayoutKey.REQUIRED_LOGGED_IN])
     ) {
         if (!store.getters['auth/loggedIn']) {
             await store.dispatch('auth/triggerLogout');
@@ -112,7 +112,7 @@ export default async function({ route, from, redirect, $auth, store } : Context)
 
     if (
         Array.isArray(route.meta) &&
-        route.meta.some(meta => meta[Layout.REQUIRED_LOGGED_OUT_KEY])
+        route.meta.some(meta => meta[LayoutKey.REQUIRED_LOGGED_OUT])
     ) {
         if (store.getters['auth/loggedIn']) {
             await redirect({ path: redirectPath });

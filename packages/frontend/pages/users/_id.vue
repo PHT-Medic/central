@@ -6,12 +6,12 @@
   -->
 <script>
     import {getAPIUser} from "@personalhealthtrain/ui-common";
-    import {Layout, LayoutNavigationID} from "../../modules/layout/contants";
+    import {LayoutKey, LayoutNavigationID} from "../../config/layout/contants";
 
     export default {
         meta: {
-            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
-            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT
         },
         async asyncData(context) {
             let user;

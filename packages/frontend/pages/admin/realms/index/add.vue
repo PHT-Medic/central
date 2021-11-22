@@ -10,11 +10,11 @@
 <script>
 import {PermissionID} from "@personalhealthtrain/ui-common";
 import RealmForm from "../../../../components/domains/realm/RealmForm";
-import {Layout} from "../../../../modules/layout/contants";
+import {LayoutKey} from "../../../../config/layout/contants";
 export default {
     components: {RealmForm},
     meta: {
-        [Layout.REQUIRED_PERMISSIONS_KEY]: [
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.REALM_ADD
         ]
     },

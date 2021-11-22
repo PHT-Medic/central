@@ -8,14 +8,14 @@
 import {dropAPIRealm, getAPIRealms, PermissionID} from "@personalhealthtrain/ui-common";
 import RealmForm from "../../../../components/domains/admin/realm/RealmForm";
 import RealmList from "../../../../components/domains/realm/RealmList";
-import {Layout, LayoutNavigationID} from "../../../../modules/layout/contants";
+import {LayoutKey, LayoutNavigationID} from "../../../../config/layout/contants";
 
 export default {
     components: {RealmList, RealmForm},
     meta: {
-        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
-        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
-        [Layout.REQUIRED_PERMISSIONS_KEY]: [
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.REALM_ADD,
             PermissionID.REALM_EDIT,
             PermissionID.REALM_DROP

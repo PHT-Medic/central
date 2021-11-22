@@ -9,15 +9,15 @@
     import NotImplemented from "../../../../components/NotImplemented";
     import {LayoutNavigationAdminId} from "../../../../config/layout";
     import RoleForm from "../../../../components/domains/role/RoleForm";
-    import {Layout, LayoutNavigationID} from "../../../../modules/layout/contants";
+    import {LayoutKey, LayoutNavigationID} from "../../../../config/layout/contants";
     import {PermissionID} from "@personalhealthtrain/ui-common";
 
     export default {
         meta: {
             meta: {
-                [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
-                [Layout.REQUIRED_LOGGED_IN_KEY]: true,
-                [Layout.REQUIRED_PERMISSIONS_KEY]: [
+                [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+                [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                [LayoutKey.REQUIRED_PERMISSIONS]: [
                     PermissionID.ROLE_ADD
                 ]
             },

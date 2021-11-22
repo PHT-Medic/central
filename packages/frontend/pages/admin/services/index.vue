@@ -9,13 +9,13 @@ import {LayoutNavigationAdminId} from "~/config/layout";
 import StationForm from "../../../components/domains/station/StationForm";
 import ServiceClientDetails from "../../../components/domains/service/ServiceClientDetails";
 import {PermissionID, SERVICE_ID} from "@personalhealthtrain/ui-common";
-import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
+import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
 
 export default {
     components: {ServiceClientDetails, StationForm},
     meta: {
-        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
-        [Layout.REQUIRED_PERMISSIONS_KEY]: [
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.SERVICE_MANAGE
         ]
     },

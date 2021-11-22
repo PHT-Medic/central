@@ -9,12 +9,12 @@
     import PermissionForm from "../../../../components/domains/permission/PermissionForm";
     import NotImplemented from "../../../../components/NotImplemented";
     import RoleForm from "../../../../components/domains/role/RoleForm";
-    import {Layout, LayoutNavigationID} from "../../../../modules/layout/contants";
+    import {LayoutKey, LayoutNavigationID} from "../../../../config/layout/contants";
 
     export default {
         meta: {
-            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
-            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
         },
         components: {
             PermissionForm,

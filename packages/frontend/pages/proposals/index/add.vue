@@ -13,14 +13,14 @@ import {
 
     import ProposalFormTitle from "../../../components/form/proposal/ProposalFormTitle";
 import MasterImagePicker from "../../../components/domains/master-image/MasterImagePicker";
-import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
+import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
 
     export default {
         components: {MasterImagePicker, ProposalFormTitle},
         meta: {
-            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
-            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
-            [Layout.REQUIRED_PERMISSIONS_KEY]: [
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
                 PermissionID.PROPOSAL_ADD
             ]
         },

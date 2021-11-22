@@ -5,14 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {Layout, LayoutNavigationID} from "../../modules/layout/contants";
+import {LayoutKey, LayoutNavigationID} from "../../config/layout/contants";
 import {PermissionID} from "@personalhealthtrain/ui-common";
 
     export default {
         meta: {
-            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
-            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
-            [Layout.REQUIRED_PERMISSIONS_KEY]: [
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
                 PermissionID.ADMIN_UI_USE
             ]
         },

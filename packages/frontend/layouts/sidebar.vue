@@ -5,18 +5,11 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import SidebarComponents from "../components/layout/SidebarComponents";
     export default {
-        components: {SidebarComponents},
+        components: {},
         computed: {
             loggedIn(vm) {
                 return vm.$store.getters['auth/loggedIn'];
-            },
-            navigationId(vm) {
-                return vm.$store.getters["layout/navigationComponentId"];
-            },
-            components(vm) {
-                return vm.$store.state.layout.sidebarComponents;
             },
             docsUrl() {
                 return new URL('docs/', this.$config.apiUrl).href;
@@ -33,37 +26,36 @@
 <template>
     <div class="page-sidebar">
 
-        <sidebar-components
-            :key="navigationId"
-            class="sidebar-menu"
-            :items="components"
+        <navigation-components
+            class="sidebar-menu navbar-nav"
+            :tier="1"
         />
 
         <div class="mt-auto">
-            <ul class="sidebar-menu">
-                <li>
+            <ul class="sidebar-menu nav-items navbar-nav">
+                <li class="nav-item">
                     <div class="nav-separator">
                         API
                     </div>
                 </li>
-                <li>
-                    <a class="sidebar-menu-link" :href="docsUrl" target="_blank">
-                        <i class="fa fa-file"></i> Documentation
+                <li class="nav-item">
+                    <a class="nav-link" :href="docsUrl" target="_blank">
+                        <i class="fa fa-file"></i> <span class="nav-link-text">Documentation</span>
                     </a>
                 </li>
-                <li>
-                    <a class="sidebar-menu-link" :href="statsUrl" target="_blank">
-                        <i class="fa fa-chart-bar"></i> Stats
+                <li class="nav-item">
+                    <a class="nav-link" :href="statsUrl" target="_blank">
+                        <i class="fa fa-chart-bar"></i> <span class="nav-link-text">Stats</span>
                     </a>
                 </li>
-                <li>
+                <li class="nav-item">
                     <div class="nav-separator">
                         General
                     </div>
                 </li>
-                <li>
-                    <a class="sidebar-menu-link" :href="generalDocsUrl" target="_blank">
-                        <i class="fa fa-file-pdf"></i> Documentation / Guide
+                <li class="nav-item">
+                    <a class="nav-link" :href="generalDocsUrl" target="_blank">
+                        <i class="fa fa-file-pdf"></i> <span class="nav-link-text">Documentation / Guide</span>
                     </a>
                 </li>
 

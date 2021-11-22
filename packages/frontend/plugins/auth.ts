@@ -10,13 +10,6 @@ import {Inject} from "@nuxt/types/app";
 
 import AuthModule from "~/modules/auth";
 
-declare module 'vue/types/vue' {
-    // this.$myInjectedFunction inside Vue components
-    interface Vue {
-        $auth: AuthModule
-    }
-}
-
 declare module '@nuxt/types' {
     // nuxtContext.$myInjectedFunction
     interface Context {

@@ -184,8 +184,7 @@ export const actions : ActionTree<AuthState, RootState> = {
 
             await dispatch('triggerRefreshMe');
 
-            await dispatch('layout/update', {type: 'navigation'}, {root: true});
-            await dispatch('layout/update', {type: 'sidebar'}, {root: true});
+            await dispatch('layout/initNavigation', undefined, {root: true});
         } catch (e) {
             dispatch('triggerUnsetToken');
 
@@ -263,8 +262,7 @@ export const actions : ActionTree<AuthState, RootState> = {
 
         await dispatch('triggerSetLoginRequired', false);
 
-        await dispatch('layout/update', {type: 'navigation'}, {root: true});
-        await dispatch('layout/update', {type: 'sidebar'}, {root: true});
+        await dispatch('layout/initNavigation', undefined, {root: true});
     },
 
     // --------------------------------------------------------------------

@@ -8,14 +8,14 @@
     import TrainTable from "../../../../components/domains/train/TrainTable";
     import TrainBasicForm from "../../../../components/domains/train/TrainBasicForm";
     import StationTrainTable from "../../../../components/domains/station/StationTrainTable";
-    import {Layout, LayoutNavigationID} from "../../../../modules/layout/contants";
+    import {LayoutKey, LayoutNavigationID} from "../../../../config/layout/contants";
     import {PermissionID} from "@personalhealthtrain/ui-common";
 
     export default {
         meta: {
-            [Layout.REQUIRED_LOGGED_IN_KEY]: true,
-            [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
-            [Layout.REQUIRED_PERMISSIONS_KEY]: [
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
                 PermissionID.TRAIN_ADD,
                 PermissionID.TRAIN_EDIT,
                 PermissionID.TRAIN_DROP,

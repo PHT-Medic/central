@@ -8,12 +8,12 @@
 <script>
 
 import {PermissionID} from "@personalhealthtrain/ui-common";
-import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
+import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
 
 export default {
     meta: {
-        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.ADMIN,
-        [Layout.REQUIRED_PERMISSIONS_KEY]: [
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.ROLE_ADD,
             PermissionID.ROLE_EDIT,
             PermissionID.ROLE_DROP

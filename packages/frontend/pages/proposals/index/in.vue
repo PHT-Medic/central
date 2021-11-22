@@ -15,14 +15,14 @@ import ProposalInForm from "../../../components/domains/proposal/ProposalInForm"
 import ProposalStationStatus from "../../../components/domains/proposal-station/ProposalStationStatus";
 import Pagination from "../../../components/Pagination";
 import ProposalStationAction from "../../../components/domains/proposal-station/ProposalStationAction";
-import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
+import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
 
 export default {
     components: {ProposalStationAction, Pagination, ProposalStationStatus, ProposalInForm},
     meta: {
-        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
-        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
-        [Layout.REQUIRED_PERMISSIONS_KEY]: [
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.PROPOSAL_APPROVE
         ]
     },

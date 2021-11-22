@@ -11,14 +11,7 @@ import {Inject} from "@nuxt/types/app";
 import BaseStorage from "~/modules/storage";
 import AuthStorage from "~/modules/auth/storage";
 import AppStorage from "~/modules/app/storage";
-
-declare module 'vue/types/vue' {
-    // this.$myInjectedFunction inside Vue components
-    interface Vue {
-        $warehouse: BaseStorage,
-        $authWarehouse: BaseStorage
-    }
-}
+import {NavigationProvider} from "../config/layout/module";
 
 declare module '@nuxt/types' {
     // nuxtContext.app.$myInjectedFunction inside asyncData, fetch, plugins, middleware, nuxtServerInit
@@ -38,7 +31,8 @@ declare module 'vuex/types/index' {
 
     interface Store<S> {
         $warehouse: BaseStorage,
-        $authWarehouse: BaseStorage
+        $authWarehouse: BaseStorage,
+        $layoutNavigationProvider: NavigationProvider
     }
 }
 
@@ -50,5 +44,10 @@ export default (ctx : Context, inject : Inject) => {
 
     const authWarehouse = new AuthStorage(ctx);
     inject('authWarehouse', authWarehouse);
+
+    //--------------------------------------------------------------------
+
+    const navigationProvider = new NavigationProvider(ctx);
+    inject('layoutNavigationProvider', navigationProvider);
 };
 

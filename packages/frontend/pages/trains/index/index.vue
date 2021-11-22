@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {LayoutNavigationDefaultId} from "../../../config/layout.ts";
+import {LayoutNavigationDefaultId} from "../../../config/layout";
 import TrainTable from "../../../components/domains/train/TrainTable";
-import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
+import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
 import {PermissionID} from "@personalhealthtrain/ui-common";
 
 export default {
@@ -20,9 +20,9 @@ export default {
         }
     },
     meta: {
-        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
-        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT,
-        [Layout.REQUIRED_PERMISSIONS_KEY]: [
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.TRAIN_ADD,
             PermissionID.TRAIN_EDIT,
             PermissionID.TRAIN_DROP,

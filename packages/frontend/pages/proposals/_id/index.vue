@@ -9,7 +9,7 @@ import {PermissionID, ProposalStationApprovalStatus} from "@personalhealthtrain/
 import ProposalStationStatus from "../../../components/domains/proposal-station/ProposalStationStatus";
 import ProposalStationList from "../../../components/domains/proposal-station/ProposalStationList";
 import ProposalStationAction from "../../../components/domains/proposal-station/ProposalStationAction";
-import {Layout, LayoutNavigationID} from "../../../modules/layout/contants";
+import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
 
 export default {
     components:{
@@ -18,8 +18,8 @@ export default {
         ProposalStationStatus
     },
     meta: {
-        [Layout.REQUIRED_LOGGED_IN_KEY]: true,
-        [Layout.NAVIGATION_ID_KEY]: LayoutNavigationID.DEFAULT
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT
     },
     data() {
         return {
