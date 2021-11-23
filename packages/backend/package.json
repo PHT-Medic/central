@@ -29,7 +29,7 @@
         "crypto": "^1.0.1",
         "dotenv": "^10.0.0",
         "express": "^4.17.1",
-        "express-validator": "^6.12.1",
+        "express-validator": "^6.13.0",
         "fs-docker": "^0.1.1",
         "mysql": "^2.18.1",
         "node-cron": "^3.0.0",
