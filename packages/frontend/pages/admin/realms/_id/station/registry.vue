@@ -37,6 +37,7 @@ export default {
             let message = 'Succeeded...';
             let variant = 'success';
 
+            // eslint-disable-next-line default-case
             switch (command) {
                 case RegistryCommand.PROJECT_PULL:
                     title += ' - Check';
@@ -60,6 +61,7 @@ export default {
                     name: buildRegistryHarborProjectName(this.station.id),
                 });
 
+                // eslint-disable-next-line default-case
                 switch (command) {
                     case RegistryCommand.PROJECT_PULL:
                         message = 'Successfully checked harbor registry.';
@@ -86,6 +88,7 @@ export default {
 
                 let additionalData = {};
 
+                // eslint-disable-next-line default-case
                 switch (command) {
                     case RegistryCommand.PROJECT_PULL:
                     case RegistryCommand.PROJECT_CREATE:
@@ -130,7 +133,6 @@ export default {
                     ...additionalData,
                 });
             } catch (e) {
-                console.log(e);
                 variant = 'danger';
                 message = e.message;
             }
@@ -206,12 +208,13 @@ export default {
                 <h6><i class="fa fa-sync" /> Webhook</h6>
 
                 <p class="mb-2">
-                    Use the registry webhook to contact the local api endpoint, to notify the train-router, train-builder and other services for incoming trains or trains which must be proceed.
+                    Use the registry webhook to contact the local api endpoint, to notify the train-router,
+                    train-builder and other services for incoming trains or trains which must be proceed.
                 </p>
 
                 <div class="mb-2">
                     <b-form-checkbox
-                        v-model="station.registry_project_webhook_exists"
+                        :value="station.registry_project_webhook_exists"
                         button-variant="success"
                         switch
                         :disabled="true"

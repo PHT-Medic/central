@@ -16,7 +16,7 @@ export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
         return Client;
     }
 
-    async afterInsert(event: InsertEvent<Client>): Promise<any|void> {
+    async afterInsert(event: InsertEvent<Client>): Promise<any | void> {
         if (typeof event.entity.service_id === 'string') {
             const queueMessage = buildAuthClientSecurityQueueMessage(
                 AuthClientSecurityComponentCommand.SYNC,
@@ -31,7 +31,7 @@ export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
         }
     }
 
-    async afterUpdate(event: UpdateEvent<Client>): Promise<any|void> {
+    async afterUpdate(event: UpdateEvent<Client>): Promise<any | void> {
         if (typeof event.entity.service_id === 'string') {
             const queueMessage = buildAuthClientSecurityQueueMessage(
                 AuthClientSecurityComponentCommand.SYNC,

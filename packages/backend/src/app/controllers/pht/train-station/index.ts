@@ -39,7 +39,7 @@ export class TrainStationController {
     @ResponseExample<PartialTrainStation[]>([simpleExample])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<PartialTrainStation[]> {
         return await getTrainStationsRouteHandler(req, res) as PartialTrainStation[];
     }
@@ -48,9 +48,9 @@ export class TrainStationController {
     @ResponseExample<PartialTrainStation>(simpleExample)
     async getOne(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialTrainStation|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainStation | undefined> {
         return await getTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
     }
 
@@ -58,10 +58,10 @@ export class TrainStationController {
     @ResponseExample<PartialTrainStation>(simpleExample)
     async edit(
         @Params('id') id: string,
-        @Body() data: TrainStation,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialTrainStation|undefined> {
+            @Body() data: TrainStation,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainStation | undefined> {
         return await editTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
     }
 
@@ -69,9 +69,9 @@ export class TrainStationController {
     @ResponseExample<PartialTrainStation>(simpleExample)
     async add(
         @Body() data: TrainStation,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialTrainStation|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainStation | undefined> {
         return await addTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
     }
 
@@ -79,9 +79,9 @@ export class TrainStationController {
     @ResponseExample<PartialTrainStation>(simpleExample)
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialTrainStation|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainStation | undefined> {
         return await dropTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
     }
 }

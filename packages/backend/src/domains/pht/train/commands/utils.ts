@@ -13,5 +13,5 @@ export async function findTrain(
     repository?: Repository<Train>,
 ) : Promise<Train | undefined> {
     repository ??= getRepository(Train);
-    return typeof train === 'number' || typeof train === 'string' ? await repository.findOne(train) : train;
+    return typeof train === 'number' || typeof train === 'string' ? repository.findOne(train) : train;
 }

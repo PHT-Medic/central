@@ -43,7 +43,7 @@ export class TrainController {
     @ResponseExample<PartialTrain[]>([simpleExample])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<PartialTrain[]> {
         return await getTrainsRouteHandler(req, res) as PartialTrain[];
     }
@@ -52,9 +52,9 @@ export class TrainController {
     @ResponseExample<PartialTrain>(simpleExample)
     async getOne(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialTrain|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrain | undefined> {
         return await getTrainRouteHandler(req, res) as PartialTrain | undefined;
     }
 
@@ -62,10 +62,10 @@ export class TrainController {
     @ResponseExample<PartialTrain>(simpleExample)
     async edit(
         @Params('id') id: string,
-        @Body() data: PartialTrain,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialTrain|undefined> {
+            @Body() data: PartialTrain,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrain | undefined> {
         return await editTrainRouteHandler(req, res) as PartialTrain | undefined;
     }
 
@@ -73,9 +73,9 @@ export class TrainController {
     @ResponseExample<PartialTrain>(simpleExample)
     async add(
         @Body() data: PartialTrain,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialTrain|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrain | undefined> {
         return await addTrainRouteHandler(req, res) as PartialTrain | undefined;
     }
 
@@ -83,22 +83,22 @@ export class TrainController {
     @ResponseExample<PartialTrain>(simpleExample)
     async doTask(
         @Params('id') id: string,
-        @Body() data: {
-            command: TrainCommand
-        },
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialTrain|undefined> {
-        return await handleTrainCommandRouteHandler(req, res);
+            @Body() data: {
+                command: TrainCommand
+            },
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrain | undefined> {
+        return handleTrainCommandRouteHandler(req, res);
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialTrain>(simpleExample)
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialTrain|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrain | undefined> {
         return await dropTrainRouteHandler(req, res) as PartialTrain | undefined;
     }
 

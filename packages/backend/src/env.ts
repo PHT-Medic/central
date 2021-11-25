@@ -13,11 +13,13 @@ const envResult = config({
 });
 
 if (envResult.error) {
+    // eslint-disable-next-line no-console
     console.error(`[ERROR] env failed to load:${envResult.error}`);
 }
 
 export function requireFromEnv(key : string, alt?: any) {
     if (!process.env[key] && typeof alt === 'undefined') {
+        // eslint-disable-next-line no-console
         console.error(`[APP ERROR] Missing env variable:${key}`);
 
         return process.exit(1);
@@ -51,7 +53,7 @@ export interface Environment {
 }
 
 // tslint:disable-next-line:radix
-const jwtMaxAge : number = parseInt(requireFromEnv('JWT_MAX_AGE', '3600'));
+const jwtMaxAge : number = parseInt(requireFromEnv('JWT_MAX_AGE', '3600'), 10);
 
 const env : Environment = {
     env: requireFromEnv('NODE_ENV'),

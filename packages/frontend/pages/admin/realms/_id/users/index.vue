@@ -63,11 +63,11 @@ export default {
                         await dropAPIUser(user.id);
                         this.$refs.itemsList.dropArrayItem(user);
                     } catch (e) {
-
+                        // ...
                     }
                 }
             } catch (e) {
-
+                // ...
             }
         },
     },

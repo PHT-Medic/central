@@ -25,7 +25,7 @@ Levels
 }
  */
 
-const includeNamespaceInMessage = format((info, opts) => {
+const includeNamespaceInMessage = format((info) => {
     if (typeof info.meta?.namespace === 'string') {
         info.message = `${info.namespace}: ${info.message}`;
     }

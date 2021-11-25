@@ -25,46 +25,46 @@ export class ProviderController {
     @Get('', [])
     async getProviders(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<OAuth2Provider[]> {
-        return await getProvidersRoute(req, res);
+        return getProvidersRoute(req, res);
     }
 
     @Get('/:id', [])
     async getProvider(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<OAuth2Provider> {
-        return await getProviderRoute(req, res);
+        return getProviderRoute(req, res);
     }
 
     @Post('/:id', [ForceLoggedInMiddleware])
     async editProvider(
         @Params('id') id: string,
-        @Body() user: NonNullable<OAuth2Provider>,
-        @Request() req: any,
-        @Response() res: any,
+            @Body() user: NonNullable<OAuth2Provider>,
+            @Request() req: any,
+            @Response() res: any,
     ) : Promise<OAuth2Provider> {
-        return await editProviderRoute(req, res);
+        return editProviderRoute(req, res);
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
     async dropProvider(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ) : Promise<OAuth2Provider> {
-        return await dropProviderRoute(req, res);
+        return dropProviderRoute(req, res);
     }
 
     @Post('', [ForceLoggedInMiddleware])
     async addProvider(
         @Body() user: NonNullable<OAuth2Provider>,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ) : Promise<OAuth2Provider> {
-        return await addProviderRoute(req, res);
+        return addProviderRoute(req, res);
     }
 
     // ------------------------------------------------------------
@@ -72,21 +72,21 @@ export class ProviderController {
     @Get('/:id/authorize-url')
     @SwaggerHidden()
     async getAuthorizeUrl(
-        @Params('id') id: string,
+    @Params('id') id: string,
         @Request() req: any,
         @Response() res: any,
     ) {
-        return await authorizeUrlRoute(req, res);
+        return authorizeUrlRoute(req, res);
     }
 
     @Get('/:id/authorize-callback')
     @SwaggerHidden()
     async getAuthorizeCallback(
-        @Params('id') id: string,
+    @Params('id') id: string,
         @Request() req: any,
         @Response() res: any,
     ) {
-        return await authorizeCallbackRoute(req, res);
+        return authorizeCallbackRoute(req, res);
     }
 }
 

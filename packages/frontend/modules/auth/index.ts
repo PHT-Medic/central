@@ -23,7 +23,7 @@ export type AuthModuleOptions = {
     tokenHost: string,
     tokenPath: string,
     userInfoPath: string
-}
+};
 
 class AuthModule {
     protected ctx: Context;
@@ -91,6 +91,7 @@ class AuthModule {
         if (typeof this.ctx === 'undefined') return;
 
         (this.ctx.store as Store<any>).subscribe((mutation: any) => {
+            // eslint-disable-next-line default-case
             switch (mutation.type) {
                 case 'auth/setPermissions':
                     this.setPermissions(mutation.payload);
@@ -99,11 +100,13 @@ class AuthModule {
                     this.setPermissions([]);
                     break;
                 case 'auth/setToken':
+                    // eslint-disable-next-line no-case-declarations
                     const token = <AuthStoreToken> mutation.payload;
                     if (this.refreshTokenJob) {
                         clearTimeout(this.refreshTokenJob);
                     }
 
+                    // eslint-disable-next-line no-case-declarations
                     const callback = () => {
                         if (typeof this.ctx !== 'undefined') {
                             this.ctx.store.dispatch('auth/triggerTokenExpired')
@@ -140,13 +143,13 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public resolveMe() : Promise<Record<string, any>|undefined> {
+    public resolveMe() : Promise<Record<string, any> | undefined> {
         if (typeof this.identifyPromise !== 'undefined') {
             return this.identifyPromise;
         }
 
         const token : AuthStoreToken | undefined = this.ctx.store.getters['auth/token'];
-        if (!token) return new Promise(((resolve) => resolve(undefined)));
+        if (!token) return Promise.resolve(undefined);
 
         const resolved = this.ctx.store.getters['auth/permissionsResolved'];
         if (typeof resolved !== 'undefined' && resolved) {
@@ -155,7 +158,7 @@ class AuthModule {
                 ...this.ctx.store.getters['auth/user'],
             };
 
-            return new Promise(((resolve) => resolve(userInfo)));
+            return Promise.resolve(userInfo);
         }
 
         this.identifyPromise = this.getUserInfo(token.access_token)
@@ -275,7 +278,7 @@ class AuthModule {
      * @param token
      */
     public async getUserInfo(token: string) : Promise<Record<string, any>> {
-        return await this.client.getUserInfo(token);
+        return this.client.getUserInfo(token);
     }
 }
 

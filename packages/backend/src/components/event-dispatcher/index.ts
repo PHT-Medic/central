@@ -20,7 +20,7 @@ import { MessageQueueDispatcherRoutingKey } from '../../config/service/mq';
 export enum DispatcherEvent {
     PROPOSAL = 'proposalEvent',
     TRAIN = 'trainEvent',
-    HARBOR = 'harborEvent'
+    HARBOR = 'harborEvent',
 }
 
 export function buildDispatcherComponent() {

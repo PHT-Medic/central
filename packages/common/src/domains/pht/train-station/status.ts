@@ -7,7 +7,7 @@
 
 export enum TrainStationApprovalStatus {
     REJECTED = 'rejected',
-    APPROVED = 'approved'
+    APPROVED = 'approved',
 }
 
 export type TrainStationApprovalStatusType = `${TrainStationApprovalStatus}`;
@@ -21,7 +21,7 @@ export function isTrainStationApprovalStatus(type: any) : type is TrainStationAp
 
 export enum TrainStationRunStatus {
     ARRIVED = 'arrived',
-    DEPARTED = 'departed'
+    DEPARTED = 'departed',
 }
 
 export type TrainStationRunStatusType = `${TrainStationRunStatus}`;
@@ -35,5 +35,5 @@ export function isTrainStationRunStatus(type: any) : type is TrainStationRunStat
 
 export enum TrainStationStatic {
     INCOMING = 'incoming',
-    OUTGOING = 'outgoing'
+    OUTGOING = 'outgoing',
 }

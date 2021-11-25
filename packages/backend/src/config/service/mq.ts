@@ -10,7 +10,7 @@
  */
 export enum MessageQueueSelfRoutingKey {
     COMMAND = 'ui.self.command',
-    EVENT = 'ui.self.event'
+    EVENT = 'ui.self.event',
 }
 
 /**
@@ -26,7 +26,7 @@ export enum MessageQueueDispatcherRoutingKey {
  * Email (Service)
  */
 export enum MessageQueueEmailServiceRoutingKey {
-    EVENT_OUT = 'en.event'
+    EVENT_OUT = 'en.event',
 }
 
 /**
@@ -35,7 +35,7 @@ export enum MessageQueueEmailServiceRoutingKey {
 export enum MessageQueueResultServiceRoutingKey {
     EVENT_IN = 'ui.rs.event',
 
-    COMMAND_OUT = 'rs.command'
+    COMMAND_OUT = 'rs.command',
 }
 
 /**
@@ -44,7 +44,7 @@ export enum MessageQueueResultServiceRoutingKey {
 export enum MessageQueueTrainBuilderRoutingKey {
     EVENT_IN = 'ui.tb.event',
 
-    COMMAND_OUT = 'tb'
+    COMMAND_OUT = 'tb',
 }
 
 /**
@@ -53,5 +53,5 @@ export enum MessageQueueTrainBuilderRoutingKey {
 export enum MessageQueueTrainRouterRoutingKey {
     EVENT_IN = 'ui.tr.event',
 
-    COMMAND_OUT = 'tr'
+    COMMAND_OUT = 'tr',
 }

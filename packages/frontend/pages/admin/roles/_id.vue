@@ -26,7 +26,11 @@ export default {
                 role,
             };
         } catch (e) {
-            return await context.redirect('/admin/roles');
+            await context.redirect('/admin/roles');
+
+            return {
+
+            };
         }
     },
     data() {

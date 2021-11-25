@@ -28,18 +28,18 @@ export class ClientController {
     @Post('', [ForceLoggedInMiddleware])
     async add(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<Client[]> {
-        return await addRoute(req, res);
+        return addRoute(req, res);
     }
 
     @Post('/:id/command', [ForceLoggedInMiddleware])
     async runCommand(
-        @Body() data: {command: AuthClientCommand},
+    @Body() data: {command: AuthClientCommand},
         @Request() req: any,
         @Response() res: any,
     ) {
-        return await doAuthClientCommand(req, res);
+        return doAuthClientCommand(req, res);
     }
 }
 

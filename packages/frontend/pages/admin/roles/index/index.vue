@@ -6,12 +6,11 @@
   -->
 <script>
 import { PermissionID, dropAPIRole } from '@personalhealthtrain/ui-common';
-import Pagination from '../../../../components/Pagination';
 import RoleList from '../../../../components/domains/role/RoleList';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
-    components: { RoleList, Pagination },
+    components: { RoleList },
     meta: {
         meta: {
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -64,11 +63,11 @@ export default {
                         await dropAPIRole(role.id);
                         this.$refs.itemsList.dropArrayItem(role);
                     } catch (e) {
-
+                        // ...
                     }
                 }
             } catch (e) {
-
+                // ...
             }
         },
     },

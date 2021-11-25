@@ -12,7 +12,7 @@ import { MessageQueueDispatcherRoutingKey } from '../../../../config/service/mq'
 export enum DispatcherProposalEvent {
     APPROVED = 'approved',
     REJECTED = 'rejected',
-    ASSIGNED = 'assigned'
+    ASSIGNED = 'assigned',
 }
 
 export type DispatcherProposalEventData = {
@@ -20,7 +20,7 @@ export type DispatcherProposalEventData = {
     id: string | number,
     stationId?: string | number,
     operatorRealmId: string
-}
+};
 
 export async function emitDispatcherProposalEvent(
     data: DispatcherProposalEventData,

@@ -51,7 +51,7 @@ export type HarborHook = {
     occur_at?: string,
     operator: string,
     event_data: HarborHookEvent
-}
+};
 
 type HarborHookEvent = {
     repository: {
@@ -66,7 +66,7 @@ type HarborHookEvent = {
         resource_url: string
     }[],
     [key: string]: any
-}
+};
 
 export async function postHarborHookRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     useLogger().debug('hook received', { service: 'api-harbor-hook' });

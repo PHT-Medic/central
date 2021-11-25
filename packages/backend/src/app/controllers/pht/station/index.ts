@@ -37,7 +37,7 @@ export class StationController {
     ])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<PartialStation[]> {
         return await getStationsRouteHandler(req, res) as PartialStation[];
     }
@@ -46,9 +46,9 @@ export class StationController {
     @ResponseExample<PartialStation>(stationExample)
     async add(
         @Body() data: PartialStation,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialStation|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialStation | undefined> {
         return await addStationRouteHandler(req, res) as PartialStation | undefined;
     }
 
@@ -56,9 +56,9 @@ export class StationController {
     @ResponseExample<PartialStation>(stationExample)
     async getOne(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialStation|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialStation | undefined> {
         return await getStationRouteHandler(req, res) as PartialStation | undefined;
     }
 
@@ -66,10 +66,10 @@ export class StationController {
     @ResponseExample<PartialStation>(stationExample)
     async edit(
         @Params('id') id: string,
-        @Body() data: PartialStation,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialStation|undefined> {
+            @Body() data: PartialStation,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialStation | undefined> {
         return await editStationRouteHandler(req, res) as PartialStation | undefined;
     }
 
@@ -77,9 +77,9 @@ export class StationController {
     @ResponseExample<PartialStation>(stationExample)
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialStation|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialStation | undefined> {
         return await dropStationRouteHandler(req, res) as PartialStation | undefined;
     }
 }

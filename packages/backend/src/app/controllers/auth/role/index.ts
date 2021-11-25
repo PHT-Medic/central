@@ -31,7 +31,7 @@ export class RoleController {
     @ResponseExample<PartialRole[]>([simpleExample])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<PartialRole[]> {
         return await getRoles(req, res) as PartialRole[];
     }
@@ -40,8 +40,8 @@ export class RoleController {
     @ResponseExample<PartialRole>(simpleExample)
     async add(
         @Body() data: Pick<Role, 'name'>,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<PartialRole> {
         return await addOne(req, res) as PartialRole;
     }
@@ -50,8 +50,8 @@ export class RoleController {
     @ResponseExample<PartialRole>(simpleExample)
     async getOne(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<PartialRole> {
         return await getOne(req, res) as PartialRole;
     }
@@ -60,9 +60,9 @@ export class RoleController {
     @ResponseExample<PartialRole>(simpleExample)
     async edit(
         @Params('id') id: string,
-        @Body() data: Pick<Role, 'name'>,
-        @Request() req: any,
-        @Response() res: any,
+            @Body() data: Pick<Role, 'name'>,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<PartialRole> {
         return await editRole(req, res) as PartialRole;
     }
@@ -71,8 +71,8 @@ export class RoleController {
     @ResponseExample<PartialRole>(simpleExample)
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<PartialRole> {
         return await dropRole(req, res) as PartialRole;
     }

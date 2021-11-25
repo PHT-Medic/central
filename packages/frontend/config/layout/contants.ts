@@ -11,10 +11,10 @@ export enum LayoutKey {
     REQUIRED_LOGGED_OUT = 'requireLoggedOut',
 
     REQUIRED_PERMISSIONS = 'requirePermissions',
-    REQUIRED_ABILITIES = 'requireAbilities'
+    REQUIRED_ABILITIES = 'requireAbilities',
 }
 
 export enum LayoutNavigationID {
     ADMIN = 'admin',
-    DEFAULT = 'default'
+    DEFAULT = 'default',
 }

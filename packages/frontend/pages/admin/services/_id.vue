@@ -39,6 +39,7 @@ export default {
     },
     methods: {
         update(data) {
+            // eslint-disable-next-line no-restricted-syntax
             for (const key in data) {
                 Vue.set(this.service, key, data[key]);
             }

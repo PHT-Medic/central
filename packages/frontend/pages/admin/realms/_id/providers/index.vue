@@ -93,6 +93,7 @@ export default {
 
                 this.meta.total = total;
             } catch (e) {
+                // ...
             }
 
             this.isBusy = false;
@@ -105,7 +106,8 @@ export default {
         },
         async edit(id) {
             this.mode = 'edit';
-            this.item = this.items.filter((item) => item.id === id)[0];
+            // eslint-disable-next-line prefer-destructuring
+            this.item = [...this.items.filter((item) => item.id === id)][0];
 
             this.$refs.form.show();
         },
@@ -134,11 +136,11 @@ export default {
                             this.items.splice(index, 1);
                         }
                     } catch (e) {
-
+                        // ...
                     }
                 }
             } catch (e) {
-
+                // ...
             }
         },
     },

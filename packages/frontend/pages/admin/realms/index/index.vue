@@ -5,13 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID, dropAPIRealm, getAPIRealms } from '@personalhealthtrain/ui-common';
-import RealmForm from '../../../../components/domains/admin/realm/RealmForm';
+import { PermissionID, dropAPIRealm } from '@personalhealthtrain/ui-common';
 import RealmList from '../../../../components/domains/realm/RealmList';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
-    components: { RealmList, RealmForm },
+    components: { RealmList },
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,

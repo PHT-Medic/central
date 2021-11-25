@@ -8,7 +8,7 @@
 export type HarborProjectWebhookOptions = {
     internalAPIUrl?: string
     externalAPIUrl?: string
-}
+};
 
 export type HarborProjectWebhookEventType =
     'PUSH_ARTIFACT' | 'PULL_ARTIFACT' | 'DELETE_ARTIFACT' |
@@ -23,7 +23,7 @@ export type HarborProjectWebhookTarget = {
     auth_header?: string;
     skip_cert_verify: boolean;
     type: 'http';
-}
+};
 
 export type HarborProjectWebhook = {
     creation_time?: string;
@@ -35,4 +35,4 @@ export type HarborProjectWebhook = {
     project_id?: number;
     targets: HarborProjectWebhookTarget[];
     update_time?: string;
-}
+};

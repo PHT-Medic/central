@@ -12,6 +12,7 @@ import AuthModule from '~/modules/auth';
 
 declare module '@nuxt/types' {
     // nuxtContext.$myInjectedFunction
+    // eslint-disable-next-line no-unused-vars
     interface Context {
         $auth: AuthModule
     }
@@ -19,6 +20,7 @@ declare module '@nuxt/types' {
 
 declare module 'vuex/types/index' {
     // this.$myInjectedFunction inside Vuex stores
+    // eslint-disable-next-line no-unused-vars
     interface Store<S> {
         $auth: AuthModule
     }

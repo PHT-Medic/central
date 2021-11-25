@@ -6,9 +6,6 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/ui-common';
-import AlertMessage from '../../../../components/alert/AlertMessage';
-import NotImplemented from '../../../../components/NotImplemented';
-import { LayoutNavigationAdminId } from '../../../../config/layout';
 import RoleForm from '../../../../components/domains/role/RoleForm';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
@@ -24,8 +21,6 @@ export default {
     },
     components: {
         RoleForm,
-        AlertMessage,
-        NotImplemented,
     },
     methods: {
         handleRoleCreated(e) {
@@ -40,8 +35,3 @@ export default {
         @created="handleRoleCreated"
     />
 </template>
-<style>
-    .list-group-item {
-        padding: .45rem .65rem;
-    }
-</style>

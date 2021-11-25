@@ -15,7 +15,7 @@ export enum RegistryCommand {
     PROJECT_ROBOT_ACCOUNT_DROP = 'harborProjectRobotAccountDrop',
 
     PROJECT_WEBHOOK_CREATE = 'harborProjectWebHookCreate',
-    PROJECT_WEBHOOK_DROP = 'harborProjectWebhookDrop'
+    PROJECT_WEBHOOK_DROP = 'harborProjectWebhookDrop',
 }
 
 export type RegistryCommandType = `${RegistryCommand}`;

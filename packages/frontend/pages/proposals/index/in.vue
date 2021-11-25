@@ -73,8 +73,7 @@ export default {
     },
     created() {
         this.init()
-            .then(this.load)
-            .catch((e) => console.log(e));
+            .then(this.load);
     },
     methods: {
         handleCreated(e) {
@@ -135,7 +134,7 @@ export default {
 
                 this.meta.total = total;
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;

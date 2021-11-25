@@ -7,4 +7,4 @@
 
 export type StationSecretEngineSecretPayload = {
     publicKey: string
-}
+};

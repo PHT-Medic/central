@@ -8,4 +8,4 @@
 export type UserSecretEngineSecretPayload = {
     publicKey: string,
     heKey: string
-}
+};

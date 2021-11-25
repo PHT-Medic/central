@@ -31,7 +31,7 @@ export class RolePermissionController {
     @ResponseExample<PartialPermissionController[]>([simpleExample])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<PartialPermissionController[]> {
         return await getRolePermissions(req, res) as PartialPermissionController[];
     }
@@ -40,30 +40,30 @@ export class RolePermissionController {
     @ResponseExample<PartialPermissionController>(simpleExample)
     async add(
         @Body() data: Pick<RolePermission, 'role_id' | 'permission_id'>,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<PartialPermissionController> {
-        return await addRolePermission(req, res);
+        return addRolePermission(req, res);
     }
 
     @Get('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialPermissionController>(simpleExample)
     async getOne(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<PartialPermissionController> {
-        return await getRolePermission(req, res);
+        return getRolePermission(req, res);
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialPermissionController>(simpleExample)
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<PartialPermissionController> {
-        return await dropRolePermission(req, res);
+        return dropRolePermission(req, res);
     }
 }
 

@@ -21,5 +21,5 @@ export enum FrontendTrainCommand {
     // special command
     RESULT_DOWNLOAD = 'resultDownload',
 
-    GENERATE_HASH = 'generateHash'
+    GENERATE_HASH = 'generateHash',
 }

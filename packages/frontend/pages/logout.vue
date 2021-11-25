@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { mapActions } from 'vuex';
 import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';
 
 export default {
@@ -23,7 +22,7 @@ export default {
             await this.$store.dispatch('auth/triggerLogout');
 
             const query = {};
-            if (this.$route.query && this.$route.query.hasOwnProperty('redirect')) {
+            if (this.$route.query && Object.prototype.hasOwnProperty.call(this.$route.query, 'redirect')) {
                 query.redirect = this.$route.query.redirect;
             }
 

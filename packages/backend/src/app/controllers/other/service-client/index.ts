@@ -22,18 +22,18 @@ export class ServiceClientController {
     @Get('', [ForceLoggedInMiddleware])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<Client[]> {
-        return await getManyRoute(req, res);
+        return getManyRoute(req, res);
     }
 
     @Get('/:id', [ForceLoggedInMiddleware])
     async get(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<Client> {
-        return await getRoute(req, res);
+        return getRoute(req, res);
     }
 }
 

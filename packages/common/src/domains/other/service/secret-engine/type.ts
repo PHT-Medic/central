@@ -10,7 +10,7 @@ export enum SecretStorageCommand {
 
     ENGINE_KEY_SAVE = 'engineKeySave',
     ENGINE_KEY_PULL = 'engineKeyPull',
-    ENGINE_KEY_DROP = 'engineKeyDrop'
+    ENGINE_KEY_DROP = 'engineKeyDrop',
 }
 
 export type SecretStorageCommandType = `${SecretStorageCommand}`;

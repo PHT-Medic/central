@@ -25,7 +25,7 @@ export class MasterImageGroupController {
     @Get('', [ForceLoggedInMiddleware])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<PartialMasterImageGroup[]> {
         return await getManyRouteHandler(req, res) as PartialMasterImageGroup[];
     }
@@ -33,18 +33,18 @@ export class MasterImageGroupController {
     @Get('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialMasterImageGroup|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialMasterImageGroup | undefined> {
         return await getRouteHandler(req, res) as PartialMasterImageGroup | undefined;
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialMasterImageGroup|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialMasterImageGroup | undefined> {
         return await dropRouteHandler(req, res) as PartialMasterImageGroup | undefined;
     }
 }

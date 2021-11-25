@@ -27,6 +27,10 @@ export default {
             };
         } catch (e) {
             await context.redirect('/trains');
+
+            return {
+
+            };
         }
     },
     data() {
@@ -41,6 +45,7 @@ export default {
     },
     methods: {
         updateTrain(train) {
+            // eslint-disable-next-line no-restricted-syntax
             for (const key in train) {
                 Vue.set(this.item, key, train[key]);
             }

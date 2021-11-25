@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
 
 module.exports = {

@@ -6,16 +6,12 @@
   -->
 <script>
 import { Role } from '@personalhealthtrain/ui-common';
-import NotImplemented from '../../../../components/NotImplemented';
-import { LayoutNavigationAdminId } from '../../../../config/layout';
-import AlertMessage from '../../../../components/alert/AlertMessage';
 import RoleForm from '../../../../components/domains/role/RoleForm';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
     components: {
         RoleForm,
-        NotImplemented,
-        AlertMessage,
     },
     props: {
         roleProperty: {
@@ -23,7 +19,7 @@ export default {
         },
     },
     meta: {
-        navigationId: LayoutNavigationAdminId,
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
     },
     data() {
         return {
@@ -36,6 +32,7 @@ export default {
     methods: {
         handleRoleUpdated(e) {
             const { id, ...data } = e;
+            // eslint-disable-next-line no-restricted-syntax
             for (const key in data) {
                 this.roleData[key] = data[key];
             }

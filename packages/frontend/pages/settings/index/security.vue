@@ -5,13 +5,11 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserPublicKeyForm from '../../../components/domains/user/UserPublicKeyForm';
 import UserPasswordForm from '../../../components/domains/user/UserPasswordForm';
 
 export default {
     components: {
         UserPasswordForm,
-        UserPublicKeyForm,
     },
     meta: {
         requireLoggedIn: true,

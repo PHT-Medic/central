@@ -31,7 +31,7 @@ export default class BaseStorage {
     // ------------------------------------
 
     getKeyWithNamespace(key: string) : string {
-        let fullKey: string = '';
+        let fullKey = '';
 
         if (typeof this.options.namespace !== 'undefined') {
             fullKey += `${this.options.namespace}_`;
@@ -245,14 +245,14 @@ export default class BaseStorage {
     // Session storage
     // ------------------------------------
 
-    setSessionStorageItem(key: string, value: any) {
+    setSessionStorageItem(key: string, value: any) : any {
         // Unset null, undefined
         if (isUnset(value)) {
             return this.removeSessionStorageItem(key);
         }
 
         if (typeof sessionStorage === 'undefined' || !this.options.sessionStorage) {
-            return;
+            return undefined;
         }
 
         const _key = this.getKeyWithNamespace(key);

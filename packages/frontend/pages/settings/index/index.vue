@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import AlertMessage from '../../../components/alert/AlertMessage';
 import UserDetailsForm from '../../../components/domains/user/UserDetailsForm';
 
 export default {
@@ -14,7 +13,6 @@ export default {
     },
     components: {
         UserDetailsForm,
-        AlertMessage,
     },
     computed: {
         user() {

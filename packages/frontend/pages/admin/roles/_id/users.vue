@@ -15,6 +15,7 @@ export default {
     props: {
         roleProperty: {
             type: Role,
+            default: undefined,
         },
     },
 };

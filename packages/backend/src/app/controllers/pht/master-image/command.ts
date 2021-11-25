@@ -29,7 +29,7 @@ export async function handleMasterImageCommandRouteHandler(req: ExpressRequest, 
 
     switch (command) {
         case MasterImageCommand.GIT_REPOSITORY_SYNC:
-            const gitURL : string = 'https://github.com/PHT-Medic/master-images';
+            const gitURL = 'https://github.com/PHT-Medic/master-images';
             const directoryPath : string = path.join(getWritableDirPath(), 'master-images.git');
 
             try {
@@ -76,7 +76,7 @@ type ReturnContext<T> = {
     updated: T[],
     created: T[],
     deleted: T[]
-}
+};
 
 async function mergeRepositoryImagesWithDatabase(
     entities: Image[],

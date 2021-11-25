@@ -7,7 +7,6 @@
 
 import { stringifyAuthorizationHeader } from '@typescript-auth/core';
 
-import * as console from 'console';
 import { Client } from '../../../../../auth';
 import { APIType, useAPI } from '../../../../../../modules';
 import { SERVICE_ID } from '../../../type';
@@ -17,7 +16,7 @@ const WEBHOOK_ID = 'UI';
 
 export async function findHarborProjectWebHook(
     projectIdOrName: number | string,
-    isProjectName: boolean = false,
+    isProjectName = false,
 ) : Promise<HarborProjectWebhook | undefined> {
     const headers : Record<string, any> = {};
 
@@ -41,7 +40,7 @@ export async function ensureHarborProjectWebHook(
     projectIdOrName: number | string,
     client: Pick<Client, 'id' | 'secret'>,
     options: HarborProjectWebhookOptions,
-    isProjectName: boolean = false,
+    isProjectName = false,
 ) : Promise<HarborProjectWebhook> {
     const headers : Record<string, any> = {};
 
@@ -88,7 +87,7 @@ export async function ensureHarborProjectWebHook(
     return webhook;
 }
 
-export async function dropHarborProjectWebHook(projectIdOrName: number | string, isProjectName: boolean = false) {
+export async function dropHarborProjectWebHook(projectIdOrName: number | string, isProjectName = false) {
     const webhook = await findHarborProjectWebHook(projectIdOrName, isProjectName);
 
     if (typeof webhook !== 'undefined') {

@@ -24,7 +24,7 @@ import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 export class ServiceController {
     @Post('/:id/hook', [ForceLoggedInMiddleware])
     async handleHarborHook(
-        @Request() req: ExpressRequest,
+    @Request() req: ExpressRequest,
         @Response() res: ExpressResponse,
         @Body() harborHook: HarborHook,
     ) {
@@ -32,7 +32,7 @@ export class ServiceController {
 
         switch (id) {
             case SERVICE_ID.REGISTRY:
-                return await postHarborHookRouteHandler(req, res);
+                return postHarborHookRouteHandler(req, res);
         }
 
         throw new NotFoundError();
@@ -40,7 +40,7 @@ export class ServiceController {
 
     @Post('/:id/command', [ForceLoggedInMiddleware])
     async execHarborTask(
-        @Request() req: ExpressRequest,
+    @Request() req: ExpressRequest,
         @Response() res: ExpressResponse,
         @Body() data: {command: RegistryCommand},
     ) {
@@ -48,9 +48,9 @@ export class ServiceController {
 
         switch (id) {
             case SERVICE_ID.REGISTRY:
-                return await doRegistryCommand(req, res);
+                return doRegistryCommand(req, res);
             case SERVICE_ID.SECRET_STORAGE:
-                return await doSecretStorageCommand(req, res);
+                return doSecretStorageCommand(req, res);
         }
 
         throw new NotFoundError();

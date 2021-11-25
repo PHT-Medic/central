@@ -37,50 +37,50 @@ export class ProposalStationController {
     @ResponseExample<PartialProposalStation[]>([simpleExample])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<PartialProposalStation[]> {
-        return await getProposalStationsRouteHandler(req, res);
+        return getProposalStationsRouteHandler(req, res);
     }
 
     @Post('', [ForceLoggedInMiddleware])
     @ResponseExample<PartialProposalStation>(simpleExample)
     async add(
         @Body() data: Pick<ProposalStation, 'station_id' | 'proposal_id'>,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialProposalStation|undefined> {
-        return await addProposalStationRouteHandler(req, res);
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposalStation | undefined> {
+        return addProposalStationRouteHandler(req, res);
     }
 
     @Get('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialProposalStation>(simpleExample)
     async getOne(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialProposalStation|undefined> {
-        return await getProposalStationRouteHandler(req, res);
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposalStation | undefined> {
+        return getProposalStationRouteHandler(req, res);
     }
 
     @Post('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialProposalStation>(simpleExample)
     async edit(
         @Params('id') id: string,
-        @Body() data: Pick<ProposalStation, 'station_id' | 'proposal_id' | 'comment'>,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialProposalStation|undefined> {
-        return await editProposalStationRouteHandler(req, res);
+            @Body() data: Pick<ProposalStation, 'station_id' | 'proposal_id' | 'comment'>,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposalStation | undefined> {
+        return editProposalStationRouteHandler(req, res);
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialProposalStation>(simpleExample)
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialProposalStation|undefined> {
-        return await dropProposalStationRouteHandler(req, res);
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposalStation | undefined> {
+        return dropProposalStationRouteHandler(req, res);
     }
 }
 

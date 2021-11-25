@@ -186,7 +186,8 @@ export default {
                     v-if="!$v.formData.risk.required"
                     class="form-group-hint group-required"
                 >
-                    Bitte wählen Sie eine der Möglichkeiten aus, die am besten beschreibt, wie hoch das Risiko für die Krankenhäuser einzuschätzen ist.
+                    Bitte wählen Sie eine der Möglichkeiten aus, die am besten beschreibt,
+                    wie hoch das Risiko für die Krankenhäuser einzuschätzen ist.
                 </div>
             </div>
 

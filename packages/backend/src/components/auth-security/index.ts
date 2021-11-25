@@ -9,7 +9,7 @@ import { ConsumeHandler, Message } from 'amqp-extension';
 import { syncAuthClientSecurity } from './sync';
 
 export enum AuthClientSecurityComponentCommand {
-    SYNC = 'syncClientSecurity'
+    SYNC = 'syncClientSecurity',
 }
 
 export function createAuthSecurityComponentHandlers() : Record<AuthClientSecurityComponentCommand, ConsumeHandler> {

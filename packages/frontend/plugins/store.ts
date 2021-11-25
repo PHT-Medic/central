@@ -15,11 +15,8 @@ import { NavigationProvider } from '../config/layout/module';
 
 declare module '@nuxt/types' {
     // nuxtContext.app.$myInjectedFunction inside asyncData, fetch, plugins, middleware, nuxtServerInit
-    interface NuxtAppOptions {
-        $warehouse: BaseStorage,
-        $authWarehouse: BaseStorage
-    }
-    // nuxtContext.$myInjectedFunction
+// nuxtContext.$myInjectedFunction
+    // eslint-disable-next-line no-unused-vars
     interface Context {
         $warehouse: BaseStorage,
         $authWarehouse: BaseStorage
@@ -29,6 +26,7 @@ declare module '@nuxt/types' {
 declare module 'vuex/types/index' {
     // this.$myInjectedFunction inside Vuex stores
 
+    // eslint-disable-next-line no-unused-vars
     interface Store<S> {
         $warehouse: BaseStorage,
         $authWarehouse: BaseStorage,

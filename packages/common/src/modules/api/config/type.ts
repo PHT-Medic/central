@@ -11,17 +11,17 @@ export type APIServiceHarborConfig = {
     host: string,
     user: string,
     password: string
-}
+};
 
 export type APIServiceVaultConfig = {
     host: string,
     token: string
-}
+};
 
 export enum APIType {
     DEFAULT = 'default',
     HARBOR = 'harbor',
-    VAULT = 'vault'
+    VAULT = 'vault',
 }
 
 export type APIConnectionType<T extends APIType> = T extends APIType.VAULT ? APIServiceVaultConfig : T extends APIType.HARBOR ? APIServiceHarborConfig : never;
@@ -32,4 +32,4 @@ export type APIConfig<T extends APIConfigType> = {
     driver?: ApiRequestConfig,
     connection?: APIConnectionType<T>,
     connectionString?: string
-}
+};

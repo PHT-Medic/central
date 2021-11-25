@@ -38,7 +38,7 @@ export class ProposalController {
     @ResponseExample<PartialProposal[]>([simpleExample])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<PartialProposal[]> {
         return await getProposalsRouteHandler(req, res) as PartialProposal[];
     }
@@ -47,9 +47,9 @@ export class ProposalController {
     @ResponseExample<PartialProposal>(simpleExample)
     async getOne(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialProposal|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposal | undefined> {
         return await getProposalRouteHandler(req, res) as PartialProposal | undefined;
     }
 
@@ -57,10 +57,10 @@ export class ProposalController {
     @ResponseExample<PartialProposal>(simpleExample)
     async update(
         @Params('id') id: string,
-        @Body() data: Proposal,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialProposal|undefined> {
+            @Body() data: Proposal,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposal | undefined> {
         return await editProposalRouteHandler(req, res) as PartialProposal | undefined;
     }
 
@@ -68,9 +68,9 @@ export class ProposalController {
     @ResponseExample<PartialProposal>(simpleExample)
     async add(
         @Body() data: Proposal,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialProposal|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposal | undefined> {
         return await addProposalRouteHandler(req, res) as PartialProposal | undefined;
     }
 
@@ -78,9 +78,9 @@ export class ProposalController {
     @ResponseExample<PartialProposal>(simpleExample)
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialProposal|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposal | undefined> {
         return await dropProposalRouteHandler(req, res) as PartialProposal | undefined;
     }
 }

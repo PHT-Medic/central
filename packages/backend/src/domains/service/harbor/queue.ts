@@ -19,7 +19,7 @@ export type DispatcherHarborEventData = {
     repositoryFullName: string,
     artifactTag?: string,
     [key: string]: string
-}
+};
 
 export function buildDispatcherHarborEvent(
     data: DispatcherHarborEventData,

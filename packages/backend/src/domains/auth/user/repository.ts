@@ -15,7 +15,7 @@ import { RoleRepository } from '../role/repository';
 type PermissionOptions = {
     selfOwned?: boolean,
     roleOwned?: boolean
-}
+};
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
@@ -96,7 +96,7 @@ export class UserRepository extends Repository<User> {
      * @param password
      */
     async hashPassword(password: string) : Promise<string> {
-        return await hashPassword(password);
+        return hashPassword(password);
     }
 
     /**
@@ -105,7 +105,7 @@ export class UserRepository extends Repository<User> {
      * @param name
      * @param password
      */
-    async verifyCredentials(name: string, password: string) : Promise<User|undefined> {
+    async verifyCredentials(name: string, password: string) : Promise<User | undefined> {
         let user : User | undefined;
 
         try {

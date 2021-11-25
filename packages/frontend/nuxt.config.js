@@ -67,7 +67,6 @@ const config = {
         '@/plugins/api',
         '@/plugins/store',
         '@/plugins/auth',
-        '@/plugins/app',
         '@/plugins/layout',
         '@/plugins/vuelidate',
         '@/plugins/vueScroll',

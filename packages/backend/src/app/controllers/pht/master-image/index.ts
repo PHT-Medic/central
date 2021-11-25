@@ -26,7 +26,7 @@ export class MasterImageController {
     @Get('', [ForceLoggedInMiddleware])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<PartialMasterImage[]> {
         return await getManyRouteHandler(req, res) as PartialMasterImage[];
     }
@@ -34,30 +34,30 @@ export class MasterImageController {
     @Get('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialMasterImage|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialMasterImage | undefined> {
         return await getRouteHandler(req, res) as PartialMasterImage | undefined;
     }
 
     @Post('/command', [ForceLoggedInMiddleware])
     async runCommand(
-        @Body() data: {
-            command: MasterImageCommand
-        },
-        @Request() req: any,
-        @Response() res: any,
+    @Body() data: {
+        command: MasterImageCommand
+    },
+    @Request() req: any,
+    @Response() res: any,
     ) {
-        return await handleMasterImageCommandRouteHandler(req, res);
+        return handleMasterImageCommandRouteHandler(req, res);
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialMasterImage|undefined> {
-        return await dropRouteHandler(req, res);
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialMasterImage | undefined> {
+        return dropRouteHandler(req, res);
     }
 }
 

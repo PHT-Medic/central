@@ -42,68 +42,68 @@ export class UserController {
     ])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<PartialUser[]> {
-        return await getUsersRouteHandler(req, res);
+        return getUsersRouteHandler(req, res);
     }
 
     @Post('', [ForceLoggedInMiddleware])
     @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com', realm_id: 'master' })
     async add(
         @Body() user: NonNullable<User>/* Pick<User, 'name' | 'email' | 'password' | 'realm_id'> */,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialUser|undefined> {
-        return await addUserRouteHandler(req, res);
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialUser | undefined> {
+        return addUserRouteHandler(req, res);
     }
 
     @Get('/me', [ForceLoggedInMiddleware])
     @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com' })
     async getMe(
         @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialUser|undefined> {
-        return await getMeRouteHandler(req, res);
+            @Response() res: any,
+    ): Promise<PartialUser | undefined> {
+        return getMeRouteHandler(req, res);
     }
 
     @Get('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com' })
     async get(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialUser|undefined> {
-        return await getUserRouteHandler(req, res);
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialUser | undefined> {
+        return getUserRouteHandler(req, res);
     }
 
     @Get('/:id/station', [])
     async getStation(
         @Params('id') id: number,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<Station> {
-        return await getUserStationRouteHandler(req, res);
+        return getUserStationRouteHandler(req, res);
     }
 
     @Post('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com' })
     async edit(
         @Params('id') id: string,
-        @Body() user: PartialUser,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialUser|undefined> {
-        return await editUserRouteHandler(req, res);
+            @Body() user: PartialUser,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialUser | undefined> {
+        return editUserRouteHandler(req, res);
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com' })
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialUser|undefined> {
-        return await dropUserRouteHandler(req, res);
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialUser | undefined> {
+        return dropUserRouteHandler(req, res);
     }
 }
 

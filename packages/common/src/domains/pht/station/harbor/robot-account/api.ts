@@ -13,16 +13,16 @@ import {
     findHarborRobotAccount,
 } from '../../../../other/service';
 
-export async function findStationHarborProjectRobotAccount(id: string | number, withSecret: boolean = true): Promise<HarborRobotAccount | undefined> {
+export async function findStationHarborProjectRobotAccount(id: string | number, withSecret = true): Promise<HarborRobotAccount | undefined> {
     const name: string = buildRegistryHarborProjectName(id);
 
-    return await findHarborRobotAccount(name, withSecret);
+    return findHarborRobotAccount(name, withSecret);
 }
 
 export async function ensureStationHarborProjectRobotAccount(id: string | number): Promise<HarborRobotAccount> {
     const name: string = buildRegistryHarborProjectName(id);
 
-    return await ensureHarborProjectRobotAccount(name);
+    return ensureHarborProjectRobotAccount(name);
 }
 
 export async function dropStationHarborProjectRobotAccount(id: string | number): Promise<void> {

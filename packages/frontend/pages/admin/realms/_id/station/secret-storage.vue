@@ -42,6 +42,7 @@ export default {
                     name: buildSecretStorageStationKey(this.station.id),
                 });
 
+                // eslint-disable-next-line default-case
                 switch (action) {
                     case SecretStorageCommand.ENGINE_KEY_PULL:
                         message += 'Successfully pull secrets from storage engine.';

@@ -19,7 +19,7 @@ export enum AggregatorTrainEvent {
     BUILD_FINISHED = 'trainBuilt',
     STARTED = 'trainStarted',
     MOVED = 'trainMoved',
-    FINISHED = 'trainFinished'
+    FINISHED = 'trainFinished',
 }
 
 export function createDispatcherAggregatorTrainHandlers() : ConsumeHandlers {

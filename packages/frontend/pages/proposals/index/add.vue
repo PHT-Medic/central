@@ -13,12 +13,11 @@ import {
     alpha, integer, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 
-import ProposalFormTitle from '../../../components/form/proposal/ProposalFormTitle';
 import MasterImagePicker from '../../../components/domains/master-image/MasterImagePicker';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {
-    components: { MasterImagePicker, ProposalFormTitle },
+    components: { MasterImagePicker },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -104,7 +103,7 @@ export default {
 
                 this.station.items = data;
             } catch (e) {
-
+                // ...
             }
 
             this.station.busy = false;
@@ -240,13 +239,15 @@ export default {
                             v-if="!$v.formData.risk_comment.minLength"
                             class="form-group-hint group-required"
                         >
-                            The length of the comment must be greater than <strong>{{ $v.formData.risk_comment.$params.minLength.min }}</strong> characters.
+                            The length of the comment must be greater than
+                            <strong>{{ $v.formData.risk_comment.$params.minLength.min }}</strong> characters.
                         </div>
                         <div
                             v-if="!$v.formData.risk_comment.maxLength"
                             class="form-group-hint group-required"
                         >
-                            The length of the comment must be less than  <strong>{{ $v.formData.risk_comment.$params.maxLength.max }}</strong> characters.
+                            The length of the comment must be less than
+                            <strong>{{ $v.formData.risk_comment.$params.maxLength.max }}</strong> characters.
                         </div>
                     </div>
 
@@ -322,13 +323,15 @@ export default {
                             v-if="!$v.formData.requested_data.minLength"
                             class="form-group-hint group-required"
                         >
-                            The length of the comment must be greater than <strong>{{ $v.formData.requested_data.$params.minLength.min }}</strong> characters.
+                            The length of the comment must be greater than
+                            <strong>{{ $v.formData.requested_data.$params.minLength.min }}</strong> characters.
                         </div>
                         <div
                             v-if="!$v.formData.requested_data.maxLength"
                             class="form-group-hint group-required"
                         >
-                            The length of the comment must be less than <strong>{{ $v.formData.requested_data.$params.maxLength.max }}</strong> characters.
+                            The length of the comment must be less than
+                            <strong>{{ $v.formData.requested_data.$params.maxLength.max }}</strong> characters.
                         </div>
                     </div>
                 </div>

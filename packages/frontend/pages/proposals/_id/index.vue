@@ -5,8 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID, ProposalStationApprovalStatus } from '@personalhealthtrain/ui-common';
-import ProposalStationStatus from '../../../components/domains/proposal-station/ProposalStationStatus';
+import { ProposalStationApprovalStatus } from '@personalhealthtrain/ui-common';
 import ProposalStationList from '../../../components/domains/proposal-station/ProposalStationList';
 import ProposalStationAction from '../../../components/domains/proposal-station/ProposalStationAction';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
@@ -15,7 +14,6 @@ export default {
     components: {
         ProposalStationAction,
         ProposalStationList,
-        ProposalStationStatus,
     },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,

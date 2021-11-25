@@ -7,8 +7,6 @@
 <script>
 import { PermissionID } from '@personalhealthtrain/ui-common';
 import TrainTable from '../../../../components/domains/train/TrainTable';
-import TrainBasicForm from '../../../../components/domains/train/TrainBasicForm';
-import StationTrainTable from '../../../../components/domains/station/StationTrainTable';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
@@ -26,7 +24,7 @@ export default {
             PermissionID.TRAIN_EXECUTION_STOP,
         ],
     },
-    components: { StationTrainTable, TrainBasicForm, TrainTable },
+    components: { TrainTable },
     props: {
         proposal: {
             type: Object,

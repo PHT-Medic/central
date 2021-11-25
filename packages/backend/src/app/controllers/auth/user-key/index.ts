@@ -29,7 +29,7 @@ export class UserKeyController {
     @Get('', [ForceLoggedInMiddleware])
     async get(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ) : Promise<UserKeyRing> {
         return getUserKeyRouteHandler(req, res);
     }
@@ -37,8 +37,8 @@ export class UserKeyController {
     @Post('', [ForceLoggedInMiddleware])
     async add(
         @Request() req: any,
-        @Response() res: any,
-        @Body() keyRing: Pick<UserKeyRing, 'public_key' | 'he_key'>,
+            @Response() res: any,
+            @Body() keyRing: Pick<UserKeyRing, 'public_key' | 'he_key'>,
     ) : Promise<UserKeyRing> {
         return addUserKeyRouteHandler(req, res);
     }
@@ -46,9 +46,9 @@ export class UserKeyController {
     @Post('/:id', [ForceLoggedInMiddleware])
     async edit(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-        @Body() keyRing: Pick<UserKeyRing, 'public_key' | 'he_key'>,
+            @Request() req: any,
+            @Response() res: any,
+            @Body() keyRing: Pick<UserKeyRing, 'public_key' | 'he_key'>,
     ) : Promise<UserKeyRing> {
         return editUserKeyRouteHandler(req, res);
     }
@@ -56,8 +56,8 @@ export class UserKeyController {
     @Delete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ) : Promise<UserKeyRing> {
         return dropUserKeyRouteHandler(req, res);
     }

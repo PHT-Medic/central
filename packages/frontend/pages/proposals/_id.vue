@@ -8,11 +8,9 @@
 import {
     PermissionID, getAPIStations, getApiProposalStations, getProposal,
 } from '@personalhealthtrain/ui-common';
-import ProposalSvg from '../../components/svg/ProposalSvg';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
 
 export default {
-    components: { ProposalSvg },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -26,14 +24,12 @@ export default {
                 },
             });
 
-            console.log(proposal);
-
-            const { realm_id } = context.store.getters['auth/user'];
+            const { realm_id: realmId } = context.store.getters['auth/user'];
 
             let visitorStation = null;
             let visitorProposalStation = null;
 
-            if (proposal.realm_id !== realm_id) {
+            if (proposal.realm_id !== realmId) {
                 try {
                     const { data: stations } = await getAPIStations({
                         filter: {
@@ -42,6 +38,7 @@ export default {
                     });
 
                     if (stations.length === 1) {
+                        // eslint-disable-next-line prefer-destructuring
                         visitorStation = stations[0];
 
                         const response = await getApiProposalStations({
@@ -52,11 +49,12 @@ export default {
                         });
 
                         if (response.meta.total > 0) {
+                            // eslint-disable-next-line prefer-destructuring
                             visitorProposalStation = response.data[0];
                         }
                     }
                 } catch (e) {
-                    console.log(e);
+                    // ...
                 }
             }
 
@@ -67,6 +65,10 @@ export default {
             };
         } catch (e) {
             await context.redirect('/proposals');
+
+            return {
+
+            };
         }
     },
     data() {
@@ -101,7 +103,6 @@ export default {
     },
     created() {
         this.fillSidebar();
-        console.log(this.$route);
     },
     methods: {
         fillSidebar() {

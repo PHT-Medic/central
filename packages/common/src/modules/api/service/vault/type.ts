@@ -7,7 +7,7 @@
 
 export enum VaultKVVersion {
     ONE = 1,
-    TWO = 2
+    TWO = 2,
 }
 
 export type VaultEnginePayload = {
@@ -18,8 +18,8 @@ export type VaultEnginePayload = {
     generate_signing_key?: boolean,
     options: VaultKVOptions,
 
-}
+};
 
 export type VaultKVOptions = {
     version?: VaultKVVersion
-}
+};

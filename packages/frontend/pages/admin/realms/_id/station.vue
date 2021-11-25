@@ -92,7 +92,7 @@ export default {
 
                 this.$emit('deleted', this.station);
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;

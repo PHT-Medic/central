@@ -14,7 +14,7 @@ import { buildTrainBuilderQueueMessage } from '../../../service/train-builder/qu
 import { TrainBuilderCommand } from '../../../service/train-builder/type';
 import { findTrain } from './utils';
 
-export async function startBuildTrain(train: Train | number | string, demo: boolean = false) : Promise<Train> {
+export async function startBuildTrain(train: Train | number | string, demo = false) : Promise<Train> {
     const repository = getRepository(Train);
 
     train = await findTrain(train, repository);

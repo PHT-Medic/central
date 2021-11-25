@@ -63,7 +63,7 @@ function checkAbilityOrPermission({ route, $auth } : Context) {
 export default async function ({
     route, from, redirect, $auth, store,
 } : Context) : Promise<void> {
-    let redirectPath : string = '/';
+    let redirectPath = '/';
 
     if (typeof from !== 'undefined') {
         redirectPath = from.fullPath;

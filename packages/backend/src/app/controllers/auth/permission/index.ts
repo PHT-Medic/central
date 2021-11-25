@@ -25,27 +25,27 @@ export class PermissionController {
     @Get('', [ForceLoggedInMiddleware])
     async getPermissions(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<Permission[]> {
-        return await getMany(req, res);
+        return getMany(req, res);
     }
 
     @Get('/:id', [ForceLoggedInMiddleware])
     async getPermission(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<Permission> {
-        return await getOne(req, res);
+        return getOne(req, res);
     }
 
     @Post('', [ForceLoggedInMiddleware])
     async add(
         @Body() user: NonNullable<Permission>,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<Permission[]> {
-        return await addOne(req, res);
+        return addOne(req, res);
     }
 }
 

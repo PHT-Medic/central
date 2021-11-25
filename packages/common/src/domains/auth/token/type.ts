@@ -19,4 +19,4 @@ export type TokenPayload = {
      * remote address
      */
     remoteAddress: string
-}
+};

@@ -7,7 +7,7 @@
 
 export enum AuthClientType {
     SERVICE = 'service',
-    USER = 'user'
+    USER = 'user',
 }
 
 export enum AuthClientCommand {

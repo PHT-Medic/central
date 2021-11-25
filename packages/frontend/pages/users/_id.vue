@@ -24,6 +24,8 @@ export default {
             };
         } catch (e) {
             await context.redirect('/');
+
+            return {};
         }
     },
     data() {

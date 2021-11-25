@@ -6,13 +6,9 @@
   -->
 <script>
 import { PermissionID, SERVICE_ID } from '@personalhealthtrain/ui-common';
-import { LayoutNavigationAdminId } from '~/config/layout';
-import StationForm from '../../../components/domains/station/StationForm';
-import ServiceClientDetails from '../../../components/domains/service/ServiceClientDetails';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {
-    components: { ServiceClientDetails, StationForm },
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
@@ -45,11 +41,7 @@ export default {
                     id: SERVICE_ID.TRAIN_ROUTER, name: 'Train Router', icon: 'fas fa-map-marked-alt', version: 'v1.0.0-alpha.0',
                 },
             ],
-            item: undefined,
         };
-    },
-    created() {
-
     },
     methods: {
         async goTo(id) {

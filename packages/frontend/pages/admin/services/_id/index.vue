@@ -16,6 +16,7 @@ export default {
     render(createElement) {
         let template;
 
+        // eslint-disable-next-line default-case
         switch (this.serviceId) {
             case SERVICE_ID.REGISTRY:
                 template = RegistryManagement;

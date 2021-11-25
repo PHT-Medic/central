@@ -25,46 +25,46 @@ export class RealmController {
     @Get('', [])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<Realm[]> {
-        return await getRealmsRoute(req, res);
+        return getRealmsRoute(req, res);
     }
 
     @Post('', [ForceLoggedInMiddleware])
     async add(
         @Body() user: NonNullable<Realm>,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ) : Promise<Realm> {
-        return await addRealmRoute(req, res);
+        return addRealmRoute(req, res);
     }
 
     @Get('/:id', [])
     async get(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<Realm> {
-        return await getRealmRoute(req, res);
+        return getRealmRoute(req, res);
     }
 
     @Post('/:id', [ForceLoggedInMiddleware])
     async edit(
         @Params('id') id: string,
-        @Body() user: NonNullable<Realm>,
-        @Request() req: any,
-        @Response() res: any,
+            @Body() user: NonNullable<Realm>,
+            @Request() req: any,
+            @Response() res: any,
     ) : Promise<Realm> {
-        return await editRealmRoute(req, res);
+        return editRealmRoute(req, res);
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ) : Promise<Realm> {
-        return await dropRealmRoute(req, res);
+        return dropRealmRoute(req, res);
     }
 }
 

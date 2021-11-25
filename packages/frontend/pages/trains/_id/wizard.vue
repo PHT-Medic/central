@@ -17,7 +17,6 @@ export default {
     },
     methods: {
         handleUpdated(train) {
-            console.log('updated', train);
             this.$emit('updated', train);
         },
     },

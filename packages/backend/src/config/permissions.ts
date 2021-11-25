@@ -36,7 +36,7 @@ const permissions : string[] = [
     'role_permission_drop',
 ];
 
-export function getPermissions(includePHT: boolean = true) : string[] {
+export function getPermissions(includePHT = true) : string[] {
     if (includePHT) {
         return [...permissions, ...getPHTPermissions()];
     }

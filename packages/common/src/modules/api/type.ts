@@ -24,4 +24,4 @@ export type CollectionResourceResponse<R> = {
         offset: number,
         total: number
     }
-}
+};

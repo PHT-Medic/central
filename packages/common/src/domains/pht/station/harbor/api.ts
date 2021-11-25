@@ -16,7 +16,7 @@ import {
 export async function findStationHarborProject(id: string | number): Promise<HarborProject | undefined> {
     const projectName: string = buildRegistryHarborProjectName(id);
 
-    return await findHarborProject(projectName, true);
+    return findHarborProject(projectName, true);
 }
 
 export async function deleteStationHarborProject(id: string | number): Promise<void> {
@@ -28,5 +28,5 @@ export async function deleteStationHarborProject(id: string | number): Promise<v
 export async function ensureStationHarborProject(id: string | number): Promise<HarborProject> {
     const name: string = buildRegistryHarborProjectName(id);
 
-    return await ensureHarborProject(name);
+    return ensureHarborProject(name);
 }

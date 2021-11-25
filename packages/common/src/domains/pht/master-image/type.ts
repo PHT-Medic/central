@@ -6,10 +6,10 @@
  */
 
 export enum MasterImageCommand {
-    GIT_REPOSITORY_SYNC = 'syncGitRepository'
+    GIT_REPOSITORY_SYNC = 'syncGitRepository',
 }
 
 export enum MasterImageGroupType {
     LANGUAGE = 'language',
-    DEFAULT = 'default'
+    DEFAULT = 'default',
 }

@@ -25,7 +25,7 @@ interface ConfigContext {
 export type Config = {
     aggregators: {start: () => void}[]
     components: {start: () => void}[]
-}
+};
 
 function createConfig({ env } : ConfigContext) : Config {
     setAPIConfig(APIType.HARBOR, { type: APIType.HARBOR, connectionString: env.harborConnectionString });

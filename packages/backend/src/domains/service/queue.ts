@@ -15,7 +15,7 @@ export type AuthClientSecurityQueueMessagePayload = {
     type: AuthClientType,
     clientId: typeof Client.prototype.id,
     clientSecret: typeof Client.prototype.secret
-}
+};
 
 export function buildAuthClientSecurityQueueMessage(
     type: AuthClientSecurityComponentCommand,

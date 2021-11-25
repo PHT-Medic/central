@@ -55,5 +55,5 @@ export const swaggerConfig : SwaggerConfig = {
 };
 
 export async function generateSwaggerDocumentation() : Promise<string> {
-    return await generateDocumentation(swaggerConfig, tsConfig);
+    return generateDocumentation(swaggerConfig, tsConfig);
 }

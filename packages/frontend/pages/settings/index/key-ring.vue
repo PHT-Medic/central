@@ -5,11 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserPublicKeyForm from '../../../components/domains/user/UserPublicKeyForm';
 import UserKeyRingForm from '../../../components/domains/user/UserKeyRingForm';
 
 export default {
-    components: { UserKeyRingForm, UserPublicKeyForm },
+    components: { UserKeyRingForm },
     data() {
         return {
 

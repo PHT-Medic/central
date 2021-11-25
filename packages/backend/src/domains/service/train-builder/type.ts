@@ -8,5 +8,5 @@
 export enum TrainBuilderCommand {
     START = 'trainBuildStart',
     STOP = 'trainBuildStop',
-    STATUS = 'trainBuildStatus'
+    STATUS = 'trainBuildStatus',
 }

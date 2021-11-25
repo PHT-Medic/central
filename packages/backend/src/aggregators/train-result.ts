@@ -30,7 +30,7 @@ export enum TrainResultEvent {
 
     FAILED = 'failed', // rs trigger
 
-    UNKNOWN = 'unknown' // rs trigger
+    UNKNOWN = 'unknown', // rs trigger
 }
 
 const EventStatusMap : Record<TrainResultEvent, TrainResultStatus | null> = {

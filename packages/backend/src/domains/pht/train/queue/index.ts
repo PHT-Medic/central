@@ -15,7 +15,7 @@ export type DispatcherTrainEventData = {
     id: string | number,
     stationId: string | number,
     operatorRealmId: string | number
-}
+};
 
 export async function emitDispatcherTrainEvent(
     data: DispatcherTrainEventData,

@@ -15,9 +15,9 @@ export type HarborRobotAccount = {
     secret?: string | null,
     creationTime: string,
     expires_at: number
-}
+};
 
-export async function findHarborRobotAccount(name: string, withSecret: boolean = true) : Promise<HarborRobotAccount|undefined> {
+export async function findHarborRobotAccount(name: string, withSecret = true) : Promise<HarborRobotAccount | undefined> {
     const { data } = await useAPI(APIType.HARBOR).get(`robots?q=name%3D${name}&page_size=1`);
 
     const accounts = Array.isArray(data) ? data.filter((account) => account.name === `robot$${name}`) : [];

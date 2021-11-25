@@ -11,7 +11,10 @@ import TrainStationsProgress from '../../../components/domains/train-station/pro
 export default {
     components: { TrainStationsProgress, TrainPipeline },
     props: {
-        train: Object,
+        train: {
+            type: Object,
+            default: undefined,
+        },
     },
     methods: {
         handleDone(train) {

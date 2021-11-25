@@ -57,5 +57,5 @@ export enum PermissionID {
     TRAIN_RESULT_READ = 'train_result_read',
 
     MASTER_IMAGE_MANAGE = 'master_image_manage',
-    MASTER_IMAGE_GROUP_MANAGE = 'master_image_group_manage'
+    MASTER_IMAGE_GROUP_MANAGE = 'master_image_group_manage',
 }

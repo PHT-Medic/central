@@ -19,7 +19,7 @@ export type DispatcherHarborEventWithAdditionalData = DispatcherHarborEventData 
     station?: Station,
     stationIndex?: number,
     stations?: Station[]
-}
+};
 
 /**
  * Provide related data for the harbor event to f.e the email-notifier & central-ui

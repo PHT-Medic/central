@@ -13,7 +13,7 @@ export enum TrainBuildStatus {
     STOPPED = 'stopped', // tb trigger
 
     FINISHED = 'finished', // tb trigger
-    FAILED = 'failed' // tb trigger
+    FAILED = 'failed', // tb trigger
 }
 
 export type TrainBuildStatusType = `${TrainBuildStatus}`;
@@ -30,7 +30,7 @@ export enum TrainConfigurationStatus {
     FILES_UPLOADED = 'files_uploaded', // todo: rename RESOURCE_CONFIGURED
     HASH_GENERATED = 'hash_generated',
     HASH_SIGNED = 'hash_signed',
-    FINISHED = 'finished'
+    FINISHED = 'finished',
 }
 
 export type TrainConfigurationStatusType = `${TrainConfigurationStatus}`;
@@ -50,7 +50,7 @@ export enum TrainRunStatus {
     STOPPED = 'stopped',
 
     FINISHED = 'finished',
-    FAILED = 'failed'
+    FAILED = 'failed',
 }
 
 export type TrainRunStatusType = `${TrainRunStatus}`;

@@ -30,7 +30,7 @@ const commands = Object.values(SecretStorageCommand);
 
 enum TargetEntity {
     USER = 'user',
-    STATION = 'station'
+    STATION = 'station',
 }
 
 export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressResponse) : Promise<any> {

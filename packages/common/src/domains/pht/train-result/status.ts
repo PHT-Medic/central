@@ -19,7 +19,7 @@ export enum TrainResultStatus {
     EXTRACTED = 'extracted',
 
     FINISHED = 'finished',
-    FAILED = 'failed'
+    FAILED = 'failed',
 }
 
 export type TrainResultStatusType = `${TrainResultStatus}`;

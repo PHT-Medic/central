@@ -60,7 +60,7 @@ export class VaultAPI extends BaseAPI {
         config: Pick<VaultEnginePayload, 'path'> & Partial<VaultEnginePayload>,
         options?: VaultKVOptions,
     ) {
-        return await this.createSecretEngine({
+        return this.createSecretEngine({
             config: {},
             generate_signing_key: true,
             options,

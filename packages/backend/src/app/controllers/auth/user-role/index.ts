@@ -29,7 +29,7 @@ export class UserRoleController {
     @ResponseExample<PartialUserRole[]>([simpleExample])
     async getMany(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ): Promise<PartialUserRole[]> {
         return await getUserRolesRouteHandler(req, res) as PartialUserRole[];
     }
@@ -38,8 +38,8 @@ export class UserRoleController {
     @ResponseExample<PartialUserRole>(simpleExample)
     async add(
         @Body() data: Pick<UserRole, 'role_id' | 'user_id'>,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<PartialUserRole> {
         return await addUserRoleRouteHandler(req, res) as PartialUserRole;
     }
@@ -48,8 +48,8 @@ export class UserRoleController {
     @ResponseExample<PartialUserRole>(simpleExample)
     async getOne(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<UserRole> {
         return await getUserRoleRouteHandler(req, res) as UserRole;
     }
@@ -58,8 +58,8 @@ export class UserRoleController {
     @ResponseExample<PartialUserRole>(simpleExample)
     async drop(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<PartialUserRole> {
         return await dropUserRoleRouteHandler(req, res) as PartialUserRole;
     }

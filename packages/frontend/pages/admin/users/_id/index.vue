@@ -16,6 +16,7 @@ export default {
     props: {
         userProperty: {
             type: Object,
+            default: undefined,
         },
     },
     methods: {

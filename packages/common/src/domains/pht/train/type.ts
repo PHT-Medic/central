@@ -7,7 +7,7 @@
 
 export enum TrainType {
     ANALYSE = 'analyse',
-    DISCOVERY = 'discovery'
+    DISCOVERY = 'discovery',
 }
 
 export enum TrainCommand {

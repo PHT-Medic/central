@@ -6,7 +6,6 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/ui-common';
-import { LayoutNavigationDefaultId } from '../../../config/layout';
 import TrainTable from '../../../components/domains/train/TrainTable';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 

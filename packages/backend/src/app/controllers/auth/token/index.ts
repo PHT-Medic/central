@@ -27,7 +27,7 @@ type Token = {
     /* @IsInt */
     expires_in: number,
     token: string
-}
+};
 
 @SwaggerTags('auth')
 @Controller('/token')
@@ -36,8 +36,8 @@ export class TokenController {
     @ResponseExample<Token>({ expires_in: 3600, token: '20f81b13d51c65798f05' })
     async addToken(
         @Body() credentials: { username: string, password: string, provider?: string },
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ) : Promise<Token> {
         return (await grantToken(req, res)) as Token;
     }
@@ -45,9 +45,9 @@ export class TokenController {
     @Delete('')
     async dropToken(
         @Request() req: any,
-        @Response() res: any,
+            @Response() res: any,
     ) : Promise<void> {
-        return await revokeToken(req, res);
+        return revokeToken(req, res);
     }
 }
 

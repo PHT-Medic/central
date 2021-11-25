@@ -30,6 +30,10 @@ export default {
             };
         } catch (e) {
             await context.redirect('/admin/users');
+
+            return {
+
+            };
         }
     },
     data() {
@@ -47,6 +51,7 @@ export default {
     },
     methods: {
         handleUserUpdated(e) {
+            // eslint-disable-next-line no-restricted-syntax
             for (const key in e) {
                 this.user[key] = e[key];
             }

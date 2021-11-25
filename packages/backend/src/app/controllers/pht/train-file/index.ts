@@ -38,8 +38,8 @@ export class TrainFileController {
     @ResponseExample<PartialTrainFile[]>([simpleExample])
     async getMany(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<PartialTrainFile[]> {
         return await getTrainFilesRouteHandler(req, res) as PartialTrainFile[];
     }
@@ -48,8 +48,8 @@ export class TrainFileController {
     @ResponseExample<PartialTrainFile>(simpleExample)
     async download(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
+            @Request() req: any,
+            @Response() res: any,
     ): Promise<Buffer> {
         return await getTrainFileStreamRouteHandler(req, res) as Buffer;
     }
@@ -58,10 +58,10 @@ export class TrainFileController {
     @ResponseExample<PartialTrainFile>(simpleExample)
     async getOne(
         @Params('id') id: string,
-        @Params('fileId') fileId: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialTrainFile|undefined> {
+            @Params('fileId') fileId: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainFile | undefined> {
         return await getTrainFileRouteHandler(req, res) as PartialTrainFile | undefined;
     }
 
@@ -69,10 +69,10 @@ export class TrainFileController {
     @ResponseExample<PartialTrainFile>(simpleExample)
     async drop(
         @Params('id') id: string,
-        @Params('fileId') fileId: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialTrainFile|undefined> {
+            @Params('fileId') fileId: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainFile | undefined> {
         return await dropTrainFileRouteHandler(req, res) as PartialTrainFile | undefined;
     }
 
@@ -82,9 +82,9 @@ export class TrainFileController {
     ])
     async add(
         @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ): Promise<PartialTrainFile|undefined> {
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainFile | undefined> {
         return await uploadTrainFilesRouteHandler(req, res) as PartialTrainFile | undefined;
     }
 }

@@ -98,7 +98,7 @@ export default {
 
                 this.meta.total = total;
             } catch (e) {
-
+                // ...
             }
 
             this.isBusy = false;
@@ -122,7 +122,7 @@ export default {
                 await dropProposal(this.items[index].id);
                 this.items.splice(index, 1);
             } catch (e) {
-
+                // ...
             }
         },
     },

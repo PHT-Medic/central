@@ -11,14 +11,14 @@ import { MessageQueueResultServiceRoutingKey } from '../../../config/service/mq'
 export enum ResultServiceCommand {
     START = 'start',
     STOP = 'stop',
-    STATUS = 'status'
+    STATUS = 'status',
 }
 
 export type ResultServiceDataPayload = {
     id?: string,
     trainId: string,
     latest?: boolean
-}
+};
 
 export function buildResultServiceQueueMessage(
     command: ResultServiceCommand,

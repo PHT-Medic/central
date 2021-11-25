@@ -11,19 +11,19 @@ import { MessageQueueTrainRouterRoutingKey } from '../../../config/service/mq';
 // -------------------------------------------
 
 export enum TrainRouterHarborEvent {
-    TRAIN_PUSHED = 'trainPushed'
+    TRAIN_PUSHED = 'trainPushed',
 }
 
 export type TrainRouterHarborEventPayload = {
     repositoryFullName: string,
     operator: string
-}
+};
 
 // -------------------------------------------
 
 export enum TrainRouterCommand {
     START = 'startTrain',
-    STOP = 'stopTrain'
+    STOP = 'stopTrain',
 }
 
 export type TrainRouterCommandPayload = {

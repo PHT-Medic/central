@@ -7,7 +7,7 @@
 
 export enum ProposalStationApprovalStatus {
     REJECTED = 'rejected',
-    APPROVED = 'approved'
+    APPROVED = 'approved',
 }
 
 export type ProposalStationApprovalStatusType = `${ProposalStationApprovalStatus}`;

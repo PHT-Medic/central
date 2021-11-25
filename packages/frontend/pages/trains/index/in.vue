@@ -30,7 +30,9 @@ export default {
                 viewerStation: stations.length === 1 ? stations[0] : null,
             };
         } catch (e) {
-            console.log(e);
+            return {
+                viewerStation: null,
+            };
         }
     },
     data() {
