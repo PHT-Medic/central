@@ -6,12 +6,11 @@
   -->
 <script>
 import { mapGetters } from 'vuex';
-import MedicineLab from '../components/svg/MedicineLab';
 import WorldSvg from '../components/svg/WorldSvg';
 import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';
 
 export default {
-    components: { WorldSvg, MedicineLab },
+    components: { WorldSvg },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -34,7 +33,10 @@ export default {
       <div class="col-lg-6 col-12">
         <world-svg width="100%" />
         <div class="text-center">
-          <p>The DIFUTURE implementation of the <strong>Personal Health Train (PHT)</strong> from Tübingen University as part of the PHT implementation network.</p>
+          <p>
+            The DIFUTURE implementation of the <strong>Personal Health Train (PHT)</strong>
+            from Tübingen University as part of the PHT implementation network.
+          </p>
         </div>
       </div>
       <div class="col-lg-6 col-12">
