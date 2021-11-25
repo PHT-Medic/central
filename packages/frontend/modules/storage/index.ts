@@ -313,6 +313,7 @@ export default class BaseStorage {
         }
 
         const _key = this.getKeyWithNamespace(key);
+        // @ts-ignore
         const _options = <CookieSerializeOptions> ({ ...this.options.cookie });
         const _value = encodeValue(value);
 

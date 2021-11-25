@@ -72,7 +72,6 @@ const config = {
         '@/plugins/vueScroll',
         '@/plugins/vueFormWizard',
         '@/plugins/vueTimeAgo',
-        '@/plugins/socket.client',
         '@/plugins/vue',
 
     ],
