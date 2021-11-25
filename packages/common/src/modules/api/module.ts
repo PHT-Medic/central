@@ -7,10 +7,10 @@
 
 import {
     AuthorizationHeader,
-    stringifyAuthorizationHeader
-} from "@typescript-auth/core";
-import axios, {AxiosDefaults, AxiosInstance} from 'axios';
-import {ApiRequestConfig, ApiResponse} from "./type";
+    stringifyAuthorizationHeader,
+} from '@typescript-auth/core';
+import axios, { AxiosDefaults, AxiosInstance } from 'axios';
+import { ApiRequestConfig, ApiResponse } from './type';
 
 /**
  * Inspired by
@@ -46,7 +46,7 @@ export class BaseAPI {
 
     public unsetHeader(key: string) {
         if (key in this.api.defaults.headers.common) {
-            delete this.api.defaults.headers.common[key]
+            delete this.api.defaults.headers.common[key];
         }
     }
 
@@ -126,4 +126,3 @@ export class BaseAPI {
         this.api.interceptors.request.eject(id);
     }
 }
-

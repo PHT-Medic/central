@@ -5,45 +5,52 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {editApiProposalStation, ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
-import {maxLength, minLength, required, email} from "vuelidate/lib/validators";
+import { ProposalStationApprovalStatus, editApiProposalStation } from '@personalhealthtrain/ui-common';
+import {
+    email, maxLength, minLength, required,
+} from 'vuelidate/lib/validators';
 
-import AlertMessage from "../../alert/AlertMessage";
+import AlertMessage from '../../alert/AlertMessage';
 
 export default {
-    components: {AlertMessage},
+    components: { AlertMessage },
     props: {
         proposalStationProperty: {
             type: Object,
-            default: {}
-        }
+            default: {},
+        },
     },
     data() {
         return {
             formData: {
                 comment: '',
-                status: ''
+                status: '',
             },
 
             statusOptions: [
                 ProposalStationApprovalStatus.APPROVED,
-                ProposalStationApprovalStatus.REJECTED
+                ProposalStationApprovalStatus.REJECTED,
             ],
 
             busy: false,
-            message: null
-        }
+            message: null,
+        };
     },
     validations: {
         formData: {
             comment: {
                 minLength: minLength(5),
-                maxLength: maxLength(2048)
+                maxLength: maxLength(2048),
             },
             status: {
-                required
-            }
-        }
+                required,
+            },
+        },
+    },
+    computed: {
+        isEditing() {
+            return this.modeProperty !== 'add';
+        },
     },
     created() {
         this.formData.status = this.proposalStationProperty.status ?? '';
@@ -53,7 +60,7 @@ export default {
         initProposalStationOptions() {
 
         },
-        async handleSubmit () {
+        async handleSubmit() {
             if (this.busy || this.$v.$invalid) {
                 return;
             }
@@ -62,32 +69,27 @@ export default {
             this.busy = true;
 
             try {
-                if(this.isEditing) {
+                if (this.isEditing) {
                     const stationProposal = await editApiProposalStation(this.proposalStationProperty.id, this.formData);
 
                     this.message = {
                         isError: false,
-                        data: 'The proposal was successfully updated.'
-                    }
+                        data: 'The proposal was successfully updated.',
+                    };
 
                     this.$emit('updated', stationProposal);
                 }
             } catch (e) {
                 this.message = {
                     data: e.message,
-                    isError: true
-                }
+                    isError: true,
+                };
             }
 
             this.busy = false;
-        }
+        },
     },
-    computed: {
-        isEditing() {
-            return this.modeProperty !== 'add';
-        }
-    }
-}
+};
 </script>
 <template>
     <div>
@@ -98,38 +100,65 @@ export default {
         </div>
 
         <div>
-            <div class="form-group" :class="{ 'form-group-error': $v.formData.comment.$error }">
+            <div
+                class="form-group"
+                :class="{ 'form-group-error': $v.formData.comment.$error }"
+            >
                 <label>Comment</label>
                 <textarea
-                    rows="10"
                     v-model="$v.formData.comment.$model"
-                    type="text" name="name"
+                    rows="10"
+                    type="text"
+                    name="name"
                     class="form-control"
                     placeholder="Write a comment why you want to approve or either reject the proposal."
                 />
 
-                <div v-if="!$v.formData.comment.required && !$v.formData.comment.$model" class="form-group-hint group-required">
+                <div
+                    v-if="!$v.formData.comment.required && !$v.formData.comment.$model"
+                    class="form-group-hint group-required"
+                >
                     Please write a comment.
                 </div>
-                <div v-if="!$v.formData.comment.minLength" class="form-group-hint group-required">
+                <div
+                    v-if="!$v.formData.comment.minLength"
+                    class="form-group-hint group-required"
+                >
                     The length of the comment must be greater than <strong>{{ $v.formData.comment.$params.minLength.min }}</strong> characters.
                 </div>
-                <div v-if="!$v.formData.comment.maxLength" class="form-group-hint group-required">
+                <div
+                    v-if="!$v.formData.comment.maxLength"
+                    class="form-group-hint group-required"
+                >
                     The length of the comment must be less than <strong>{{ $v.formData.comment.$params.maxLength.max }}</strong> characters.
                 </div>
             </div>
 
-            <div class="form-group" :class="{ 'form-group-error': $v.formData.status.$error }">
+            <div
+                class="form-group"
+                :class="{ 'form-group-error': $v.formData.status.$error }"
+            >
                 <label>Status</label>
                 <select
                     v-model="$v.formData.status.$model"
                     class="form-control"
                 >
-                    <option value="">--- Please select ---</option>
-                    <option v-for="(item,key) in statusOptions" :value="item" :key="key">{{ item }}</option>
+                    <option value="">
+                        --- Please select ---
+                    </option>
+                    <option
+                        v-for="(item,key) in statusOptions"
+                        :key="key"
+                        :value="item"
+                    >
+                        {{ item }}
+                    </option>
                 </select>
 
-                <div v-if="!$v.formData.status.required && !$v.formData.status.$model" class="form-group-hint group-required">
+                <div
+                    v-if="!$v.formData.status.required && !$v.formData.status.$model"
+                    class="form-group-hint group-required"
+                >
                     Provide a status.
                 </div>
             </div>
@@ -137,7 +166,12 @@ export default {
             <hr>
 
             <div class="form-group">
-                <button type="submit" class="btn btn-outline-primary btn-sm" :disabled="$v.$invalid || busy" @click.prevent="handleSubmit">
+                <button
+                    type="submit"
+                    class="btn btn-outline-primary btn-sm"
+                    :disabled="$v.$invalid || busy"
+                    @click.prevent="handleSubmit"
+                >
                     {{ isEditing ? 'Update' : 'Create' }}
                 </button>
             </div>

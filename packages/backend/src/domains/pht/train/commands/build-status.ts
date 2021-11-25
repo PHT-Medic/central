@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {publishMessage} from "amqp-extension";
-import {getRepository} from "typeorm";
-import {Train} from "@personalhealthtrain/ui-common";
-import {buildTrainBuilderQueueMessage} from "../../../service/train-builder/queue";
-import {TrainBuilderCommand} from "../../../service/train-builder/type";
-import {findTrain} from "./utils";
+import { publishMessage } from 'amqp-extension';
+import { getRepository } from 'typeorm';
+import { Train } from '@personalhealthtrain/ui-common';
+import { buildTrainBuilderQueueMessage } from '../../../service/train-builder/queue';
+import { TrainBuilderCommand } from '../../../service/train-builder/type';
+import { findTrain } from './utils';
 
 export async function detectTrainBuildStatus(train: Train | number | string, demo: boolean = false) : Promise<Train> {
     const repository = getRepository(Train);

@@ -5,36 +5,36 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildMessage, Message, publishMessage} from "amqp-extension";
+import { Message, buildMessage, publishMessage } from 'amqp-extension';
 import {
     REGISTRY_INCOMING_PROJECT_NAME,
-    REGISTRY_OUTGOING_PROJECT_NAME, isRegistryStationProjectName
-} from "@personalhealthtrain/ui-common";
+    REGISTRY_OUTGOING_PROJECT_NAME, isRegistryStationProjectName,
+} from '@personalhealthtrain/ui-common';
 
 import {
     DispatcherProposalEvent,
-    DispatcherProposalEventData
-} from "../../../domains/pht/proposal/queue";
-import {DispatcherTrainEventData, DispatcherTrainEventType} from "../../../domains/pht/train/queue";
-import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
-import {DispatcherHarborEventWithAdditionalData} from "../data/harbor";
-import {MessageQueueEmailServiceRoutingKey} from "../../../config/service/mq";
+    DispatcherProposalEventData,
+} from '../../../domains/pht/proposal/queue';
+import { DispatcherTrainEventData, DispatcherTrainEventType } from '../../../domains/pht/train/queue';
+import { DispatcherHarborEventData } from '../../../domains/service/harbor/queue';
+import { DispatcherHarborEventWithAdditionalData } from '../data/harbor';
+import { MessageQueueEmailServiceRoutingKey } from '../../../config/service/mq';
 
 export async function dispatchProposalEventToEmailNotifier(
-    message: Message
+    message: Message,
 ) : Promise<Message> {
     const data : DispatcherProposalEventData = message.data as DispatcherProposalEventData;
 
     const mapping : Record<DispatcherProposalEvent, string> = {
         assigned: 'proposalAssigned',
         approved: 'proposalApproved',
-        rejected: 'proposalRejected'
-    }
+        rejected: 'proposalRejected',
+    };
 
-    if(mapping[data.event]) {
+    if (mapping[data.event]) {
         await publishMessage(buildMessage({
             options: {
-                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT
+                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT,
             },
             type: mapping[data.event],
             data: {
@@ -43,7 +43,7 @@ export async function dispatchProposalEventToEmailNotifier(
                 operatorRealmId: data.operatorRealmId,
                 // operatorId: '',
                 // operatorType: 'user' | 'service'
-            }
+            },
         }));
     }
 
@@ -51,27 +51,27 @@ export async function dispatchProposalEventToEmailNotifier(
 }
 
 export async function dispatchTrainEventToEmailNotifier(
-    message: Message
+    message: Message,
 ) : Promise<Message> {
     const data : DispatcherTrainEventData = message.data as DispatcherTrainEventData;
 
     const mapping : Record<DispatcherTrainEventType, string> = {
         assigned: 'trainAssigned',
         approved: 'trainApproved',
-        rejected: 'trainRejected'
-    }
+        rejected: 'trainRejected',
+    };
 
-    if(mapping[data.event]) {
+    if (mapping[data.event]) {
         await publishMessage(buildMessage({
             options: {
-                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT
+                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT,
             },
             type: mapping[data.event],
             data: {
                 id: data.id,
                 stationId: data.stationId,
-                operatorRealmId: data.operatorRealmId
-            }
+                operatorRealmId: data.operatorRealmId,
+            },
         }));
     }
 
@@ -79,40 +79,39 @@ export async function dispatchTrainEventToEmailNotifier(
 }
 
 export async function dispatchHarborEventToEmailNotifier(
-    message: Message
+    message: Message,
 ) : Promise<Message> {
     const data : DispatcherHarborEventWithAdditionalData = message.data as DispatcherHarborEventData;
 
-    if(data.event !== 'PUSH_ARTIFACT') {
+    if (data.event !== 'PUSH_ARTIFACT') {
         return message;
     }
 
     const isIncomingProject : boolean = data.namespace === REGISTRY_INCOMING_PROJECT_NAME;
-    if(isIncomingProject) {
+    if (isIncomingProject) {
         await publishMessage(buildMessage({
             options: {
-                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT
+                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT,
             },
             type: 'trainBuilt',
             data: {
-                id: data.repositoryName
-            }
+                id: data.repositoryName,
+            },
         }));
 
         return message;
     }
 
     const isOutgoingProject : boolean = data.namespace === REGISTRY_OUTGOING_PROJECT_NAME;
-    if(isOutgoingProject) {
-
+    if (isOutgoingProject) {
         await publishMessage(buildMessage({
             options: {
                 routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT,
             },
             type: 'trainFinished',
             data: {
-                id: data.repositoryName
-            }
+                id: data.repositoryName,
+            },
         }));
 
         return message;
@@ -120,16 +119,16 @@ export async function dispatchHarborEventToEmailNotifier(
 
     // station project
     const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
-    if(isStationProject) {
-        if(
-            typeof data.station === 'undefined' ||
-            typeof data.stationIndex === 'undefined'
+    if (isStationProject) {
+        if (
+            typeof data.station === 'undefined'
+            || typeof data.stationIndex === 'undefined'
         ) {
             return message;
         }
 
         // If stationIndex is 0, than the target is the first station of the route.
-        if(data.stationIndex === 0) {
+        if (data.stationIndex === 0) {
             await publishMessage(buildMessage({
                 options: {
                     routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT,
@@ -137,20 +136,20 @@ export async function dispatchHarborEventToEmailNotifier(
                 type: 'trainStarted',
                 data: {
                     id: data.repositoryName,
-                    stationId: data.station?.id
-                }
+                    stationId: data.station?.id,
+                },
             }));
         }
 
         await publishMessage(buildMessage({
             options: {
-                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT
+                routingKey: MessageQueueEmailServiceRoutingKey.EVENT_OUT,
             },
             type: 'trainReady',
             data: {
                 id: data.repositoryName,
-                stationId: data.station?.id
-            }
+                stationId: data.station?.id,
+            },
         }));
     }
 

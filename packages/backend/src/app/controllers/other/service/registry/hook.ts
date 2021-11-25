@@ -5,20 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {getRepository} from "typeorm";
-import {DispatcherHarborEventType, buildDispatcherHarborEvent} from "../../../../../domains/service/harbor/queue";
-import {array, BaseSchema, object, string} from "yup";
+import { getRepository } from 'typeorm';
+import {
+    BaseSchema, array, object, string,
+} from 'yup';
 
 import {
     REGISTRY_MASTER_IMAGE_PROJECT_NAME, Train,
-} from "@personalhealthtrain/ui-common";
-import {useLogger} from "../../../../../modules/log";
-import {publishMessage} from "amqp-extension";
-import {ExpressRequest, ExpressResponse} from "../../../../../config/http/type";
+} from '@personalhealthtrain/ui-common';
+import { publishMessage } from 'amqp-extension';
+import { useLogger } from '../../../../../modules/log';
+import { DispatcherHarborEventType, buildDispatcherHarborEvent } from '../../../../../domains/service/harbor/queue';
+import { ExpressRequest, ExpressResponse } from '../../../../../config/http/type';
 
 let eventValidator : undefined | BaseSchema;
 function useHookEventDataValidator() : BaseSchema {
-    if(typeof eventValidator !== 'undefined') {
+    if (typeof eventValidator !== 'undefined') {
         return eventValidator;
     }
 
@@ -31,14 +33,14 @@ function useHookEventDataValidator() : BaseSchema {
                 name: string().min(3).max(128),
                 repo_full_name: string().min(3).max(256),
                 date_created: string().optional().default(undefined),
-                namespace: string().min(3).max(128)
+                namespace: string().min(3).max(128),
             }),
             resources: array(object({
                 digest: string(),
                 tag: string().min(1).max(100),
-                resource_url: string()
-            }))
-        }).noUnknown(false).default(undefined)
+                resource_url: string(),
+            })),
+        }).noUnknown(false).default(undefined),
     }).noUnknown(false).default(undefined);
 
     return eventValidator;
@@ -67,7 +69,7 @@ type HarborHookEvent = {
 }
 
 export async function postHarborHookRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    useLogger().debug('hook received', {service: 'api-harbor-hook'})
+    useLogger().debug('hook received', { service: 'api-harbor-hook' });
 
     const repository = getRepository(Train);
 
@@ -75,14 +77,14 @@ export async function postHarborHookRouteHandler(req: ExpressRequest, res: Expre
 
     const isLibraryProject : boolean = hook.event_data.repository.namespace === REGISTRY_MASTER_IMAGE_PROJECT_NAME;
 
-    if(!isLibraryProject) {
+    if (!isLibraryProject) {
         /**
          * Process train project
          */
-        const train = await repository.findOne({id: hook.event_data.repository.name});
+        const train = await repository.findOne({ id: hook.event_data.repository.name });
 
         if (typeof train === 'undefined') {
-            useLogger().warn('hook could not proceeded, train: ' + hook.event_data.repository.name + ' does not exist.', {service: 'api-harbor-hook'})
+            useLogger().warn(`hook could not proceeded, train: ${hook.event_data.repository.name} does not exist.`, { service: 'api-harbor-hook' });
             return res.status(200).end();
         }
     }
@@ -93,7 +95,7 @@ export async function postHarborHookRouteHandler(req: ExpressRequest, res: Expre
         namespace: hook.event_data.repository.namespace,
         repositoryName: hook.event_data.repository.name,
         repositoryFullName: hook.event_data.repository.repo_full_name,
-        artifactTag: hook.event_data.resources[0]?.tag
+        artifactTag: hook.event_data.resources[0]?.tag,
     });
 
     console.log(message);

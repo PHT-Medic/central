@@ -21,8 +21,8 @@
         "build": "lerna run build",
         "test": "lerna run test",
         "pub": "lerna publish",
-        "lint": "eslint --ext .js,.vue src/",
-        "lint:fix": "eslint --fix --ext .ts,.vue packages/*",
+        "lint": "eslint --ext .ts,.vue,.js .",
+        "lint:fix": "eslint --fix --ext .ts,.vue,.js .",
         "frontend": "npm run dev --workspace=packages/frontend",
         "backend": "npm run dev --workspace=packages/backend",
         "common": "npm run build-watch --workspace=packages/common"

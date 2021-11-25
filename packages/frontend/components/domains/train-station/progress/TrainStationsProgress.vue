@@ -5,76 +5,77 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {getAPITrainStations, Train, TrainBuildStatus, TrainRunStatus, TrainStationStatic} from "@personalhealthtrain/ui-common";
-    import TrainStationRunStatusText from "../status/TrainStationRunStatusText";
-    import TrainStationStaticRunStatusText from "../status/TrainStationStaticRunStatusText";
+import {
+    Train, TrainBuildStatus, TrainRunStatus, TrainStationStatic, getAPITrainStations,
+} from '@personalhealthtrain/ui-common';
+import TrainStationRunStatusText from '../status/TrainStationRunStatusText';
+import TrainStationStaticRunStatusText from '../status/TrainStationStaticRunStatusText';
 
-    export default {
-        components: {TrainStationStaticRunStatusText, TrainStationRunStatusText},
-        props: {
-            train: Object
-        },
-        data() {
-            return {
-                meta: {
-                    limit: 20,
-                    offset: 0,
-                    total: 0
-                },
-                items: [],
-                busy: false,
+export default {
+    components: { TrainStationStaticRunStatusText, TrainStationRunStatusText },
+    props: {
+        train: Object,
+    },
+    data() {
+        return {
+            meta: {
+                limit: 20,
+                offset: 0,
+                total: 0,
+            },
+            items: [],
+            busy: false,
 
-                trainStationStatic: TrainStationStatic
+            trainStationStatic: TrainStationStatic,
+        };
+    },
+    computed: {
+        progressPercentage() {
+            if (this.train.build_status !== TrainBuildStatus.FINISHED) {
+                return 0;
             }
-        },
-        created() {
-            this.load().then(r => r);
-        },
-        methods: {
-            async load() {
-                if(this.busy) return;
 
-                this.busy = false;
+            const total = this.meta.total + 2; // + 2 because incoming + outgoing
 
-                try {
-                    const response = await getAPITrainStations({
-                        filter: {
-                            train_id: this.train.id
-                        }
-                    });
-
-                    this.meta = response.meta;
-                    this.items = response.data;
-                } catch (e) {
-                    console.log(e);
-                    this.$emit('failed', e);
+            // no index -> outgoing or incoming
+            if (!this.train.run_station_index) {
+                // outgoing, because train terminated
+                if (this.train.run_status === TrainRunStatus.FINISHED) {
+                    return 100;
                 }
-
-                this.busy = false;
+                return 100 * (1 / total);
             }
+
+            return 100 * ((this.train.run_station_index + 1) / total);
         },
-        computed: {
-            progressPercentage() {
-                if(this.train.build_status !== TrainBuildStatus.FINISHED) {
-                    return 0;
-                }
+    },
+    created() {
+        this.load().then((r) => r);
+    },
+    methods: {
+        async load() {
+            if (this.busy) return;
 
-                const total = this.meta.total + 2; // + 2 because incoming + outgoing
+            this.busy = false;
 
-                // no index -> outgoing or incoming
-                if(!this.train.run_station_index) {
-                    // outgoing, because train terminated
-                    if(this.train.run_status === TrainRunStatus.FINISHED) {
-                        return 100;
-                    } else {
-                        return 100 * (1 / total);
-                    }
-                }
+            try {
+                const response = await getAPITrainStations({
+                    filter: {
+                        train_id: this.train.id,
+                    },
+                });
 
-                return 100 * ((this.train.run_station_index + 1) / total);
+                this.meta = response.meta;
+                this.items = response.data;
+            } catch (e) {
+                console.log(e);
+                this.$emit('failed', e);
             }
-        }
-    }
+
+            this.busy = false;
+        },
+    },
+};
 </script>
 <template>
     <div>
@@ -89,7 +90,7 @@
             </div>
             <template v-for="(item,key) in items">
                 <div class="icon-circle progress-step bg-dark text-light">
-                    <span class="icon">Station {{key + 1}}</span>
+                    <span class="icon">Station {{ key + 1 }}</span>
                 </div>
             </template>
             <div class="icon-circle progress-step bg-dark text-light">

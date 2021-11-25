@@ -5,37 +5,37 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {check, matchedData, validationResult} from 'express-validator';
-import {getRepository, In} from 'typeorm';
+import { check, matchedData, validationResult } from 'express-validator';
+import { In, getRepository } from 'typeorm';
 import {
-    SERVICE_ID, buildRegistryHarborProjectName,
-    Client,
-    deleteHarborProject, dropHarborProjectAccount, dropHarborProjectWebHook,
-    ensureHarborProject, ensureHarborProjectRobotAccount, ensureHarborProjectWebHook, findHarborRobotAccount,
-    getHarborProjectRepositories, getRegistryStationProjectNameId,
-    REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-    RegistryCommand,
-    isRegistryStationProjectName,
-    isSpecialRegistryProjectName,
-    MasterImage, pullProject, Station, PermissionID
-} from "@personalhealthtrain/ui-common";
-import env from "../../../../../env";
-import {ExpressRequest, ExpressResponse} from "../../../../../config/http/type";
-import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
-import {ExpressValidationError} from "../../../../../config/http/error/validation";
+    Client, MasterImage,
+    PermissionID,
+    REGISTRY_MASTER_IMAGE_PROJECT_NAME, RegistryCommand, SERVICE_ID,
+    Station, buildRegistryHarborProjectName, deleteHarborProject, dropHarborProjectAccount,
+    dropHarborProjectWebHook, ensureHarborProject,
+    ensureHarborProjectRobotAccount,
+    ensureHarborProjectWebHook,
+    findHarborRobotAccount,
+    getHarborProjectRepositories,
+    getRegistryStationProjectNameId, isRegistryStationProjectName, isSpecialRegistryProjectName, pullProject,
+} from '@personalhealthtrain/ui-common';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import env from '../../../../../env';
+import { ExpressRequest, ExpressResponse } from '../../../../../config/http/type';
+import { ExpressValidationError } from '../../../../../config/http/error/validation';
 
 const commands = Object.values(RegistryCommand);
 
 export async function doRegistryCommand(req: ExpressRequest, res: ExpressResponse) {
-    if(!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
+    if (!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
         throw new ForbiddenError('You are not permitted to manage the registry service.');
     }
 
-    const {command} = req.body;
+    const { command } = req.body;
 
-    if(
-        !command ||
-        commands.indexOf(command) === -1
+    if (
+        !command
+        || commands.indexOf(command) === -1
     ) {
         throw new BadRequestError('The harbor command is not valid.');
     }
@@ -43,7 +43,7 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
     await check('name')
         .exists()
         .isString()
-        .custom(value => isSpecialRegistryProjectName(value) || isRegistryStationProjectName(value))
+        .custom((value) => isSpecialRegistryProjectName(value) || isRegistryStationProjectName(value))
         .run(req);
 
     const createValidation = validationResult(req);
@@ -51,13 +51,13 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
         throw new ExpressValidationError(createValidation);
     }
 
-    const createData = matchedData(req, {includeOptionals: true});
+    const createData = matchedData(req, { includeOptionals: true });
 
     let projectName : string = createData.name;
 
     const stationRepository = getRepository(Station);
     let station : Station | undefined;
-    if(isRegistryStationProjectName(projectName)) {
+    if (isRegistryStationProjectName(projectName)) {
         const stationId : string = getRegistryStationProjectNameId(projectName);
 
         const query = stationRepository.createQueryBuilder('station');
@@ -68,15 +68,15 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             'registry_project_account_name',
             'registry_project_account_token',
             'registry_project_id',
-            'registry_project_webhook_exists'
+            'registry_project_webhook_exists',
         ];
 
-        addSelection.map(selection => query.addSelect('station.'+selection));
+        addSelection.map((selection) => query.addSelect(`station.${selection}`));
 
-        query.where('id = :id', {id: stationId});
+        query.where('id = :id', { id: stationId });
 
         station = await query.getOne();
-        if(typeof station === 'undefined') {
+        if (typeof station === 'undefined') {
             throw new NotFoundError();
         }
 
@@ -84,54 +84,54 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
     }
 
     switch (command as RegistryCommand) {
-            // Project
+        // Project
         case RegistryCommand.PROJECT_PULL:
             const project = await pullProject(projectName, true);
 
-            if(typeof project === 'undefined') {
+            if (typeof project === 'undefined') {
                 throw new NotFoundError();
             }
 
-            if(
+            if (
                 typeof station !== 'undefined'
             ) {
                 station = stationRepository.merge(station, {
                     registry_project_id: project.id,
-                    registry_project_webhook_exists: !!project.webhook
+                    registry_project_webhook_exists: !!project.webhook,
                 });
 
-                if(typeof project.robot_account !== 'undefined') {
+                if (typeof project.robot_account !== 'undefined') {
                     station = stationRepository.merge(station, {
                         registry_project_account_name: project.robot_account.name,
-                        registry_project_account_token: project.robot_account.secret
-                    })
+                        registry_project_account_token: project.robot_account.secret,
+                    });
                 }
 
                 await stationRepository.save(station);
             }
 
-            return res.respond({data: project});
+            return res.respond({ data: project });
         case RegistryCommand.PROJECT_CREATE:
             const entity = await ensureHarborProject(projectName);
 
-            if(typeof station !== 'undefined') {
+            if (typeof station !== 'undefined') {
                 station = stationRepository.merge(station, {
-                    registry_project_id: entity.id
+                    registry_project_id: entity.id,
                 });
 
                 await stationRepository.save(station);
             }
 
-            return res.respondCreated({data: entity});
+            return res.respondCreated({ data: entity });
         case RegistryCommand.PROJECT_DROP:
             await deleteHarborProject(projectName, true);
 
-            if(typeof station !== 'undefined') {
+            if (typeof station !== 'undefined') {
                 station = stationRepository.merge(station, {
                     registry_project_id: null,
                     registry_project_webhook_exists: false,
                     registry_project_account_name: null,
-                    registry_project_account_token: null
+                    registry_project_account_token: null,
                 });
 
                 await stationRepository.save(station);
@@ -143,11 +143,11 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
         case RegistryCommand.PROJECT_REPOSITORIES_SYNC:
             const meta : { created: number, deleted: number } = {
                 created: 0,
-                deleted: 0
+                deleted: 0,
             };
 
             const harborRepositories = await getHarborProjectRepositories(projectName);
-            const harborRepositoryPaths : string[] = harborRepositories.map(harborRepository => harborRepository.fullName);
+            const harborRepositoryPaths : string[] = harborRepositories.map((harborRepository) => harborRepository.fullName);
 
             let data : unknown[] = [];
 
@@ -156,27 +156,25 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
                     const repository = getRepository(MasterImage);
                     const existingEntities = await repository.find({
                         where: {
-                            path: In(harborRepositoryPaths)
-                        }
+                            path: In(harborRepositoryPaths),
+                        },
                     });
 
-                    const existingEntityPaths : string[] = existingEntities.map(entity => entity.path);
+                    const existingEntityPaths : string[] = existingEntities.map((entity) => entity.path);
 
-                    const nonExistingHarborRepositories = harborRepositories.filter(harborRepository => !existingEntityPaths.includes(harborRepository.fullName));
-                    if(nonExistingHarborRepositories.length === 0) {
+                    const nonExistingHarborRepositories = harborRepositories.filter((harborRepository) => !existingEntityPaths.includes(harborRepository.fullName));
+                    if (nonExistingHarborRepositories.length === 0) {
                         return res.respond({
                             data: {
-                                meta
-                            }
+                                meta,
+                            },
                         });
                     }
 
-                    const entities : MasterImage[] = nonExistingHarborRepositories.map(harborRepository => {
-                        return repository.create({
-                            path: harborRepository.fullName,
-                            name: harborRepository.name
-                        }) as MasterImage;
-                    });
+                    const entities : MasterImage[] = nonExistingHarborRepositories.map((harborRepository) => repository.create({
+                        path: harborRepository.fullName,
+                        name: harborRepository.name,
+                    }) as MasterImage);
 
                     await repository.insert(entities);
 
@@ -189,27 +187,27 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             return res.respond({
                 data: {
                     data: [...data],
-                    meta
-                }
+                    meta,
+                },
             });
 
             // Robot Account
         case RegistryCommand.PROJECT_ROBOT_ACCOUNT_CREATE:
             const robotAccount = await ensureHarborProjectRobotAccount(projectName, projectName);
 
-            if(typeof station !== 'undefined') {
+            if (typeof station !== 'undefined') {
                 station = stationRepository.merge(station, {
                     registry_project_account_name: robotAccount.name,
-                    registry_project_account_token: robotAccount.secret
+                    registry_project_account_token: robotAccount.secret,
                 });
 
                 await stationRepository.save(station);
             }
 
-            return res.respondCreated({data: robotAccount});
+            return res.respondCreated({ data: robotAccount });
         case RegistryCommand.PROJECT_ROBOT_ACCOUNT_DROP:
-            const {id} = await findHarborRobotAccount(projectName, false);
-            if(id) {
+            const { id } = await findHarborRobotAccount(projectName, false);
+            if (id) {
                 await dropHarborProjectAccount(id);
             }
 
@@ -221,30 +219,30 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
 
             const client = await clientRepository.findOne({
                 where: {
-                    service_id: SERVICE_ID.REGISTRY
-                }
+                    service_id: SERVICE_ID.REGISTRY,
+                },
             });
 
             const webhook = await ensureHarborProjectWebHook(projectName, client, {
-                internalAPIUrl: env.internalApiUrl
+                internalAPIUrl: env.internalApiUrl,
             }, true);
 
-            if(typeof station !== 'undefined') {
+            if (typeof station !== 'undefined') {
                 station = stationRepository.merge(station, {
-                    registry_project_webhook_exists: true
+                    registry_project_webhook_exists: true,
                 });
 
                 await stationRepository.save(station);
             }
 
-            return res.respondCreated({data: webhook});
+            return res.respondCreated({ data: webhook });
 
         case RegistryCommand.PROJECT_WEBHOOK_DROP:
             await dropHarborProjectWebHook(projectName, true);
 
-            if(typeof station !== 'undefined') {
+            if (typeof station !== 'undefined') {
                 station = stationRepository.merge(station, {
-                    registry_project_webhook_exists: false
+                    registry_project_webhook_exists: false,
                 });
 
                 await stationRepository.save(station);

@@ -5,21 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIType, useAPI} from "../../../../modules";
-import {Client} from "../../../auth";
-import {SERVICE_ID} from "../type";
+import { APIType, useAPI } from '../../../../modules';
+import { Client } from '../../../auth';
+import { SERVICE_ID } from '../type';
 
 const SERVICE_ENGINE_PATH = 'services';
 
 export async function saveServiceSecretsToSecretEngine(
     id: SERVICE_ID,
-    client: Pick<Client, 'id' | 'secret'>
+    client: Pick<Client, 'id' | 'secret'>,
 ) : Promise<Record<string, any>> {
     try {
-        const {data} = await useAPI<APIType.VAULT>(APIType.VAULT)
+        const { data } = await useAPI<APIType.VAULT>(APIType.VAULT)
             .saveKeyValuePair(SERVICE_ENGINE_PATH, id, {
                 clientId: client.id,
-                clientSecret: client.secret
+                clientSecret: client.secret,
             });
 
         return data;
@@ -27,7 +27,7 @@ export async function saveServiceSecretsToSecretEngine(
         if (e?.response?.status === 404) {
             // create engine
             await useAPI<APIType.VAULT>(APIType.VAULT)
-                .createKeyValueSecretEngine({path: SERVICE_ENGINE_PATH});
+                .createKeyValueSecretEngine({ path: SERVICE_ENGINE_PATH });
 
             return await saveServiceSecretsToSecretEngine(id, client);
         }

@@ -5,16 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Message} from "amqp-extension";
-import {getRepository} from "typeorm";
+import { Message } from 'amqp-extension';
+import { getRepository } from 'typeorm';
 import {
+    Station,
+    TrainStation,
     buildRegistryHarborProjectName,
     isRegistryStationProjectName,
-    Station
-} from "@personalhealthtrain/ui-common";
-import {TrainStation} from "@personalhealthtrain/ui-common";
-import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
-
+} from '@personalhealthtrain/ui-common';
+import { DispatcherHarborEventData } from '../../../domains/service/harbor/queue';
 
 export type DispatcherHarborEventWithAdditionalData = DispatcherHarborEventData & {
     station?: Station,
@@ -31,23 +30,23 @@ export async function extendDispatcherHarborData(message: Message) : Promise<Mes
     const data : DispatcherHarborEventWithAdditionalData = message.data as DispatcherHarborEventWithAdditionalData;
 
     const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
-    if(!isStationProject) {
+    if (!isStationProject) {
         return message;
     }
 
-    if(
-        typeof data.station === 'undefined' ||
-        typeof data.stations === 'undefined'
+    if (
+        typeof data.station === 'undefined'
+        || typeof data.stations === 'undefined'
     ) {
         const repository = getRepository(TrainStation);
         const query = repository.createQueryBuilder('trainStation')
             .leftJoinAndSelect('trainStation.station', 'station')
-            .where("trainStation.train_id = :trainId", {trainId: data.repositoryName});
+            .where('trainStation.train_id = :trainId', { trainId: data.repositoryName });
 
         const entities = await query.getMany();
-        data.stations = entities.map(entity => entity.station);
+        data.stations = entities.map((entity) => entity.station);
 
-        const index = data.stations.findIndex(entity => buildRegistryHarborProjectName(entity.secure_id) === data.namespace);
+        const index = data.stations.findIndex((entity) => buildRegistryHarborProjectName(entity.secure_id) === data.namespace);
 
         data.station = index !== -1 ? data.stations[index] : undefined;
 

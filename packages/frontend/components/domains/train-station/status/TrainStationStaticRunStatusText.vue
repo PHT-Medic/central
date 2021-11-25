@@ -6,38 +6,36 @@
   -->
 <template>
     <span>
-       <slot v-bind:classSuffix="classSuffix" v-bind:statusText="statusText">
-            <span :class="'text-'+classSuffix">{{statusText}}</span>
+        <slot
+            :classSuffix="classSuffix"
+            :statusText="statusText"
+        >
+            <span :class="'text-'+classSuffix">{{ statusText }}</span>
         </slot>
     </span>
 </template>
 <script>
-import {TrainBuildStatus, TrainRunStatus, TrainStationStatic} from "@personalhealthtrain/ui-common";
+import { TrainBuildStatus, TrainRunStatus, TrainStationStatic } from '@personalhealthtrain/ui-common';
 
 export default {
     props: {
         id: {
             // incoming, outgoing
             type: String,
-            default: null
+            default: null,
         },
         trainBuildStatus: {
             type: String,
-            default: null
+            default: null,
         },
         trainRunStatus: {
             type: String,
-            default: null
+            default: null,
         },
         trainRunStationIndex: {
             type: Number,
-            default: null
-        }
-    },
-    methods: {
-        hasArrived(id) {
-
-        }
+            default: null,
+        },
     },
     computed: {
         arrived() {
@@ -59,13 +57,13 @@ export default {
             return false;
         },
         statusText() {
-            if(this.arrived) {
+            if (this.arrived) {
                 return 'arrived';
             }
 
-            if(
-                this.id === TrainStationStatic.INCOMING &&
-                this.departed
+            if (
+                this.id === TrainStationStatic.INCOMING
+                && this.departed
             ) {
                 return 'departed';
             }
@@ -81,7 +79,12 @@ export default {
                 default:
                     return 'info';
             }
-        }
-    }
-}
+        },
+    },
+    methods: {
+        hasArrived(id) {
+
+        },
+    },
+};
 </script>

@@ -5,27 +5,25 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIConfig, APIServiceVaultConfig, APIType} from "../../config";
-import {BaseAPI} from "../../module";
-import {ApiRequestConfig} from "../../type";
-import {APIServiceError} from "../error";
-import {VaultKVOptions, VaultKVVersion, VaultEnginePayload} from "./type";
-import {buildVaultKeyValueURLPath} from "./utils";
-import {useAPI} from "../../utils";
+import { APIConfig, APIServiceVaultConfig, APIType } from '../../config';
+import { BaseAPI } from '../../module';
+import { ApiRequestConfig } from '../../type';
+import { APIServiceError } from '../error';
+import { VaultEnginePayload, VaultKVOptions, VaultKVVersion } from './type';
+import { buildVaultKeyValueURLPath } from './utils';
+import { useAPI } from '../../utils';
 
 export function parseVaultConnectionString(connectionString: string) : APIServiceVaultConfig {
     const parts : string[] = connectionString.split('@');
-    if(parts.length !== 2) {
+    if (parts.length !== 2) {
         throw new APIServiceError('Vault connection string must be in the following format: token@host');
     }
 
     return {
         host: parts[1],
-        token: parts[0]
-    }
+        token: parts[0],
+    };
 }
-
-
 
 export class VaultAPI extends BaseAPI {
     constructor(config: APIConfig<APIType.VAULT>) {
@@ -39,9 +37,9 @@ export class VaultAPI extends BaseAPI {
             token: vaultConfig.token,
             headers: {
                 'X-Vault-Request': 'true',
-                'Content-Type': 'application/json'
-            }
-        }
+                'Content-Type': 'application/json',
+            },
+        };
 
         super(driverConfig);
 
@@ -60,19 +58,19 @@ export class VaultAPI extends BaseAPI {
 
     async createKeyValueSecretEngine(
         config: Pick<VaultEnginePayload, 'path'> & Partial<VaultEnginePayload>,
-        options?: VaultKVOptions
+        options?: VaultKVOptions,
     ) {
         return await this.createSecretEngine({
             config: {},
             generate_signing_key: true,
-            options: options,
+            options,
             type: 'kv',
-            ...config
+            ...config,
         });
     }
 
     async createSecretEngine(data: VaultEnginePayload) {
-        const response = await this.post('sys/mounts/'+data.path, data);
+        const response = await this.post(`sys/mounts/${data.path}`, data);
 
         return response.data;
     }
@@ -93,11 +91,11 @@ export class VaultAPI extends BaseAPI {
         options.version ??= VaultKVVersion.ONE;
 
         try {
-            const {data} = await this.get(buildVaultKeyValueURLPath(options.version, engine, key));
+            const { data } = await this.get(buildVaultKeyValueURLPath(options.version, engine, key));
 
             return data.data;
         } catch (e) {
-            if(e.response.status === 404) {
+            if (e.response.status === 404) {
                 return undefined;
             }
 
@@ -113,7 +111,7 @@ export class VaultAPI extends BaseAPI {
             await useAPI(APIType.VAULT)
                 .delete(buildVaultKeyValueURLPath(options.version, engine, key));
         } catch (e) {
-            if(e.response.status === 404) {
+            if (e.response.status === 404) {
                 return;
             }
 

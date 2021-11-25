@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Context} from "@nuxt/types";
-import {Inject} from "@nuxt/types/app";
+import { Context } from '@nuxt/types';
+import { Inject } from '@nuxt/types/app';
 
-import BaseStorage from "~/modules/storage";
-import AuthStorage from "~/modules/auth/storage";
-import AppStorage from "~/modules/app/storage";
-import {NavigationProvider} from "../config/layout/module";
+import BaseStorage from '~/modules/storage';
+import AuthStorage from '~/modules/auth/storage';
+import AppStorage from '~/modules/app/storage';
+import { NavigationProvider } from '../config/layout/module';
 
 declare module '@nuxt/types' {
     // nuxtContext.app.$myInjectedFunction inside asyncData, fetch, plugins, middleware, nuxtServerInit
@@ -50,4 +50,3 @@ export default (ctx : Context, inject : Inject) => {
     const navigationProvider = new NavigationProvider(ctx);
     inject('layoutNavigationProvider', navigationProvider);
 };
-

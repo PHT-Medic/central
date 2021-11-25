@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2021-2021.
  * Author Peter Placzek (tada5hi)

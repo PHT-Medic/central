@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {generateDocumentation, SwaggerConfig} from "typescript-swagger";
-import {getRootDirPath, getWritableDirPath} from "../paths";
-import path from "path";
-import env from "../../env";
+import { SwaggerConfig, generateDocumentation } from 'typescript-swagger';
+import path from 'path';
+import { getRootDirPath, getWritableDirPath } from '../paths';
+import env from '../../env';
 
 // tslint:disable-next-line:no-var-requires
 const packageJson = require('../../../package.json');
@@ -29,30 +29,30 @@ export const swaggerConfig : SwaggerConfig = {
         bearer: {
             name: 'Bearer',
             type: 'apiKey',
-            in: 'header'
+            in: 'header',
         },
         oauth2: {
             name: 'User',
             type: 'oauth2',
             in: 'header',
             flow: 'password',
-            tokenUrl: env.apiUrl+'token'
+            tokenUrl: `${env.apiUrl}token`,
         },
         basicAuth: {
             name: 'basic',
             type: 'basic',
-            in: 'header'
-        }
+            in: 'header',
+        },
     },
     decoratorConfig: {
         useBuildIn: true,
         useLibrary: [
-            "@decorators/express"
-        ]
+            '@decorators/express',
+        ],
     },
     consumes: ['application/json'],
-    produces: ['application/json']
-}
+    produces: ['application/json'],
+};
 
 export async function generateSwaggerDocumentation() : Promise<string> {
     return await generateDocumentation(swaggerConfig, tsConfig);

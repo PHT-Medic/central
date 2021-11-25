@@ -5,29 +5,29 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIConfig, APIServiceHarborConfig, APIType} from "../config";
-import {BaseAPI} from "../module";
-import {ApiRequestConfig} from "../type";
-import {APIServiceError} from "./error";
+import { APIConfig, APIServiceHarborConfig, APIType } from '../config';
+import { BaseAPI } from '../module';
+import { ApiRequestConfig } from '../type';
+import { APIServiceError } from './error';
 
 export function parseHarborConnectionString(connectionString: string) : APIServiceHarborConfig {
     const parts : string[] = connectionString.split('@');
-    if(parts.length !== 2) {
+    if (parts.length !== 2) {
         throw new APIServiceError('Harbor connection string must be in the following format: user:password@host');
     }
 
     const host : string = parts[1];
 
     const authParts : string[] = parts[0].split(':');
-    if(authParts.length !== 2) {
+    if (authParts.length !== 2) {
         throw new APIServiceError('Harbor connection string must be in the following format: user:password@host');
     }
 
     return {
         host,
         user: authParts[0],
-        password: authParts[1]
-    }
+        password: authParts[1],
+    };
 }
 
 export class HarborAPI extends BaseAPI {
@@ -36,15 +36,15 @@ export class HarborAPI extends BaseAPI {
 
         const driverConfig : ApiRequestConfig = {
             ...(config.driver ?? {}),
-            baseURL: harborConfig.host
-        }
+            baseURL: harborConfig.host,
+        };
 
         super(driverConfig);
 
         this.setAuthorizationHeader({
-            type: "Basic",
+            type: 'Basic',
             username: harborConfig.user,
-            password: harborConfig.password
+            password: harborConfig.password,
         });
     }
 }

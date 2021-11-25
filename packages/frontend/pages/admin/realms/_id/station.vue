@@ -5,34 +5,20 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropAPIStation, getAPIStations, Realm} from "@personalhealthtrain/ui-common";
+import { Realm, dropAPIStation, getAPIStations } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
-import StationForm from "../../../../components/domains/station/StationForm";
+import StationForm from '../../../../components/domains/station/StationForm';
 
 export default {
-    components: {StationForm},
+    components: { StationForm },
     props: {
-        realm: Object
-    },
-    data() {
-        return {
-            sidebar: {
-                hide: false,
-                items: [
-                    { name: 'General', urlSuffix: '', icon: 'fa fa-info-circle', stationRequired: false },
-                    { name: 'Registry', urlSuffix: '/registry', icon: 'fas fa-folder-open', stationRequired: true },
-                    { name: 'Secret Storage', urlSuffix: '/secret-storage', icon: 'fa fa-key', stationRequired: true},
-                ]
-            },
-            station: undefined,
-            busy: false,
-        }
+        realm: Object,
     },
     async asyncData(ctx) {
         try {
-            const {data: stations} = await getAPIStations( {
+            const { data: stations } = await getAPIStations({
                 filter: {
-                    realm_id: ctx.params.id
+                    realm_id: ctx.params.id,
                 },
                 fields: {
                     station: [
@@ -43,34 +29,52 @@ export default {
                         '+vault_public_key_saved',
                         '+public_key',
                         '+email',
-                        '+secure_id'
-                    ]
-                }
+                        '+secure_id',
+                    ],
+                },
             });
 
-            if(stations.length !== 1) {
+            if (stations.length !== 1) {
                 return {
-                    station: undefined
+                    station: undefined,
                 };
             }
 
             return {
-                station: stations[0]
-            }
+                station: stations[0],
+            };
         } catch (e) {
             return {
-                station: undefined
-            }
+                station: undefined,
+            };
         }
-
-
+    },
+    data() {
+        return {
+            sidebar: {
+                hide: false,
+                items: [
+                    {
+                        name: 'General', urlSuffix: '', icon: 'fa fa-info-circle', stationRequired: false,
+                    },
+                    {
+                        name: 'Registry', urlSuffix: '/registry', icon: 'fas fa-folder-open', stationRequired: true,
+                    },
+                    {
+                        name: 'Secret Storage', urlSuffix: '/secret-storage', icon: 'fa fa-key', stationRequired: true,
+                    },
+                ],
+            },
+            station: undefined,
+            busy: false,
+        };
     },
     methods: {
         handleCreated(station) {
             this.station = station;
         },
         handleUpdated(station) {
-            for(let key in station) {
+            for (const key in station) {
                 Vue.set(this.station, key, station[key]);
             }
         },
@@ -79,7 +83,7 @@ export default {
         },
 
         async dropStation() {
-            if(this.busy || !this.station) return;
+            if (this.busy || !this.station) return;
 
             this.busy = true;
 
@@ -93,16 +97,19 @@ export default {
 
             this.busy = false;
         },
-    }
-}
+    },
+};
 </script>
 <template>
     <div class="content-wrapper">
         <div class="content-sidebar">
-            <b-nav pills vertical>
+            <b-nav
+                pills
+                vertical
+            >
                 <b-nav-item
-                    v-if="!item.stationRequired || (item.stationRequired && station)"
                     v-for="(item,key) in sidebar.items"
+                    v-if="!item.stationRequired || (item.stationRequired && station)"
                     :key="key"
                     :disabled="item.active"
                     :to="'/admin/realms/' +realm.id + '/station'+ item.urlSuffix"
@@ -117,12 +124,21 @@ export default {
         <div class="content-container">
             <div class="d-flex">
                 <div class="ml-auto">
-                    <button class="btn btn-danger btn-xs" @click.prevent="dropStation">
-                        <i class="fa fa-trash"></i> Drop
+                    <button
+                        class="btn btn-danger btn-xs"
+                        @click.prevent="dropStation"
+                    >
+                        <i class="fa fa-trash" /> Drop
                     </button>
                 </div>
             </div>
-            <nuxt-child :realm="realm" :station="station" @created="handleCreated" @updated="handleUpdated" @deleted="handleDeleted" />
+            <nuxt-child
+                :realm="realm"
+                :station="station"
+                @created="handleCreated"
+                @updated="handleUpdated"
+                @deleted="handleDeleted"
+            />
         </div>
     </div>
 </template>

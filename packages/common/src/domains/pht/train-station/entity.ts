@@ -12,54 +12,54 @@ import {
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from "typeorm";
-import {Station} from "../station";
-import {Train} from "../train";
-import {TrainStationApprovalStatus, TrainStationRunStatus} from "./status";
+    UpdateDateColumn,
+} from 'typeorm';
+import { Station } from '../station';
+import { Train } from '../train';
+import { TrainStationApprovalStatus, TrainStationRunStatus } from './status';
 
-@Entity({name: 'train_stations'})
+@Entity({ name: 'train_stations' })
 export class TrainStation {
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+        id: string;
 
     // ------------------------------------------------------------------
 
-    @Column({default: null})
-    approval_status: TrainStationApprovalStatus | null;
+    @Column({ default: null })
+        approval_status: TrainStationApprovalStatus | null;
 
-    @Column({type: "varchar", nullable: true, default: null})
-    run_status: TrainStationRunStatus | null;
+    @Column({ type: 'varchar', nullable: true, default: null })
+        run_status: TrainStationRunStatus | null;
 
     // ------------------------------------------------------------------
 
-    @Column({type: "text", nullable: true})
-    comment: string;
+    @Column({ type: 'text', nullable: true })
+        comment: string;
 
-    @Column({type: "int", unsigned: true, nullable: true})
-    position: number;
+    @Column({ type: 'int', unsigned: true, nullable: true })
+        position: number;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-    created_at: Date;
+        created_at: Date;
 
     @UpdateDateColumn()
-    updated_at: Date;
+        updated_at: Date;
 
     // ------------------------------------------------------------------
 
     @Column()
-    train_id: string;
+        train_id: string;
 
-    @ManyToOne(() => Train, train => train.train_stations, {onDelete: "CASCADE"})
-    @JoinColumn({name: 'train_id'})
-    train: Train;
+    @ManyToOne(() => Train, (train) => train.train_stations, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'train_id' })
+        train: Train;
 
     @Column()
-    station_id: number;
+        station_id: number;
 
-    @ManyToOne(() => Station, station => station.train_stations, {onDelete: "CASCADE"})
-    @JoinColumn({name: 'station_id'})
-    station: Station;
+    @ManyToOne(() => Station, (station) => station.train_stations, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'station_id' })
+        station: Station;
 }

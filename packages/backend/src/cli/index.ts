@@ -9,19 +9,19 @@
 
 import 'reflect-metadata';
 import yargs from 'yargs';
-import {SetupCommand} from "./commands/setup";
-import {UpgradeCommand} from "./commands/upgrade";
-import {ResetCommand} from "./commands/reset";
+import { SetupCommand } from './commands/setup';
+import { UpgradeCommand } from './commands/upgrade';
+import { ResetCommand } from './commands/reset';
 
 // tslint:disable-next-line:no-unused-expression
 yargs
-    .usage("Usage: $0 <command> [options]")
+    .usage('Usage: $0 <command> [options]')
     .demandCommand(1)
     .command(new SetupCommand())
     .command(new UpgradeCommand())
     .command(new ResetCommand())
     .strict()
-    .alias("v", "version")
-    .help("h")
-    .alias("h", "help")
+    .alias('v', 'version')
+    .help('h')
+    .alias('h', 'help')
     .argv;

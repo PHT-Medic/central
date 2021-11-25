@@ -5,55 +5,55 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {User} from "../user";
 import {
     BeforeInsert,
     Column,
     CreateDateColumn,
     Entity, JoinColumn, OneToOne,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from "typeorm";
-import {SERVICE_ID} from "../../other";
-import {AuthClientType} from "./type";
-import {createAuthClientSecret} from "./utils";
+    UpdateDateColumn,
+} from 'typeorm';
+import { User } from '../user';
+import { SERVICE_ID } from '../../other';
+import { AuthClientType } from './type';
+import { createAuthClientSecret } from './utils';
 
-@Entity({name: 'auth_clients'})
+@Entity({ name: 'auth_clients' })
 export class Client {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn('uuid')
+        id: string;
 
-    @Column({type: "varchar", length: 100})
-    secret: string;
+    @Column({ type: 'varchar', length: 100 })
+        secret: string;
 
-    @Column({type: "varchar", length: 255})
-    name: string;
+    @Column({ type: 'varchar', length: 255 })
+        name: string;
 
-    @Column({type: "text", nullable: true})
-    description: string;
+    @Column({ type: 'text', nullable: true })
+        description: string;
 
-    @Column({type: "enum", enum: AuthClientType})
-    type: AuthClientType;
+    @Column({ type: 'enum', enum: AuthClientType })
+        type: AuthClientType;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-    created_at: string;
+        created_at: string;
 
     @UpdateDateColumn()
-    updated_at: string;
+        updated_at: string;
 
     // ------------------------------------------------------------------
 
-    @Column({type: "enum", nullable: true, enum: SERVICE_ID})
-    service_id: SERVICE_ID | null;
+    @Column({ type: 'enum', nullable: true, enum: SERVICE_ID })
+        service_id: SERVICE_ID | null;
 
-    @Column({type: "int", length: 11, nullable: true})
-    user_id: number | null;
+    @Column({ type: 'int', length: 11, nullable: true })
+        user_id: number | null;
 
-    @OneToOne(() => Client, {onDelete: "CASCADE"})
-    @JoinColumn({name: 'user_id'})
-    user: User | null;
+    @OneToOne(() => Client, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'user_id' })
+        user: User | null;
 
     // ------------------------------------------------------------------
 

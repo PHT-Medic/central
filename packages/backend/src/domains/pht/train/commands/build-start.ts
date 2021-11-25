@@ -5,16 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {publishMessage} from "amqp-extension";
-import {getRepository, Not} from "typeorm";
-import {TrainResultStatus} from "@personalhealthtrain/ui-common";
-import {TrainStation} from "@personalhealthtrain/ui-common";
-import {TrainStationApprovalStatus} from "@personalhealthtrain/ui-common";
-import {Train} from "@personalhealthtrain/ui-common";
-import {TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus} from "@personalhealthtrain/ui-common";
-import {buildTrainBuilderQueueMessage} from "../../../service/train-builder/queue";
-import {TrainBuilderCommand} from "../../../service/train-builder/type";
-import {findTrain} from "./utils";
+import { publishMessage } from 'amqp-extension';
+import { Not, getRepository } from 'typeorm';
+import {
+    Train, TrainBuildStatus, TrainConfigurationStatus, TrainResultStatus, TrainRunStatus, TrainStation, TrainStationApprovalStatus,
+} from '@personalhealthtrain/ui-common';
+import { buildTrainBuilderQueueMessage } from '../../../service/train-builder/queue';
+import { TrainBuilderCommand } from '../../../service/train-builder/type';
+import { findTrain } from './utils';
 
 export async function startBuildTrain(train: Train | number | string, demo: boolean = false) : Promise<Train> {
     const repository = getRepository(Train);
@@ -26,15 +24,15 @@ export async function startBuildTrain(train: Train | number | string, demo: bool
         throw new Error('The train could not be found.');
     }
 
-    if (!!train.run_status) {
+    if (train.run_status) {
         // todo: make it a ClientError.BadRequest
         throw new Error('The train can not longer be build...');
     } else {
-        if(!demo) {
+        if (!demo) {
             const trainStationRepository = getRepository(TrainStation);
             const trainStations = await trainStationRepository.find({
                 train_id: train.id,
-                approval_status: Not(TrainStationApprovalStatus.APPROVED)
+                approval_status: Not(TrainStationApprovalStatus.APPROVED),
             });
 
             if (trainStations.length > 0) {
@@ -51,7 +49,7 @@ export async function startBuildTrain(train: Train | number | string, demo: bool
             configuration_status: TrainConfigurationStatus.FINISHED,
             run_status: demo ? TrainRunStatus.FINISHED : null,
             build_status: demo ? null : TrainBuildStatus.STARTING,
-            result_last_status: demo ? TrainResultStatus.FINISHED : null
+            result_last_status: demo ? TrainResultStatus.FINISHED : null,
         });
 
         await repository.save(train);

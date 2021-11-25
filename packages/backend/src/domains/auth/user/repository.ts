@@ -5,15 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Repository, EntityRepository, In} from "typeorm";
-import {hashPassword, verifyPassword} from "@typescript-auth/server";
-import {PermissionItem} from "@typescript-auth/core";
+import { EntityRepository, In, Repository } from 'typeorm';
+import { hashPassword, verifyPassword } from '@typescript-auth/server';
+import { PermissionItem } from '@typescript-auth/core';
 
-import {Role} from "@personalhealthtrain/ui-common";
-import {UserRole} from "@personalhealthtrain/ui-common";
-import {User} from "@personalhealthtrain/ui-common";
-import {RoleRepository} from "../role/repository";
-
+import { Role, User, UserRole } from '@personalhealthtrain/ui-common';
+import { RoleRepository } from '../role/repository';
 
 type PermissionOptions = {
     selfOwned?: boolean,
@@ -26,29 +23,27 @@ export class UserRepository extends Repository<User> {
         const userRoleRepository = this.manager.getRepository(UserRole);
 
         const userRoles = await userRoleRepository.createQueryBuilder('userRole')
-            .where("userRole.user_id = :userId", {userId})
+            .where('userRole.user_id = :userId', { userId })
             .getMany();
 
         const userRoleIdsToDrop : number[] = userRoles
             .filter((userRole: UserRole) => roles.findIndex((item: Role) => item.id === userRole.role_id) === -1)
             .map((userRole: UserRole) => userRole.id);
 
-        if(userRoleIdsToDrop.length > 0) {
+        if (userRoleIdsToDrop.length > 0) {
             await userRoleRepository.delete({
-                id: In(userRoleIdsToDrop)
+                id: In(userRoleIdsToDrop),
             });
         }
 
         const userRolesToAdd : Partial<UserRole>[] = roles
             .filter((role: Role) => userRoles.findIndex((userRole: UserRole) => userRole.role_id === role.id) === -1)
-            .map((role: Role) => {
-                return {
-                    role_id: role.id,
-                    user_id: userId
-                }
-            });
+            .map((role: Role) => ({
+                role_id: role.id,
+                user_id: userId,
+            }));
 
-        if(userRolesToAdd.length > 0) {
+        if (userRolesToAdd.length > 0) {
             await userRoleRepository.insert(userRolesToAdd);
         }
     }
@@ -62,20 +57,20 @@ export class UserRepository extends Repository<User> {
 
         let permissions : PermissionItem<unknown>[] = [];
 
-        if(options.selfOwned) {
+        if (options.selfOwned) {
             permissions = [...await this.getSelfOwnedPermissions(userId)];
         }
 
-        if(options.roleOwned) {
+        if (options.roleOwned) {
             const entity = await this.manager
                 .getCustomRepository<UserRepository>(UserRepository)
-                .findOne(userId, {relations: ['user_roles']});
+                .findOne(userId, { relations: ['user_roles'] });
 
             if (typeof entity === 'undefined') {
                 return permissions;
             }
 
-            const roleIds: number[] = entity.user_roles.map(userRole => userRole.role_id);
+            const roleIds: number[] = entity.user_roles.map((userRole) => userRole.role_id);
 
             if (roleIds.length === 0) {
                 return permissions;
@@ -116,22 +111,22 @@ export class UserRepository extends Repository<User> {
         try {
             user = await this.createQueryBuilder('user')
                 .addSelect('user.password')
-                .where("user.name LIKE :name", {name})
+                .where('user.name LIKE :name', { name })
                 .getOne();
 
-            if(typeof user === 'undefined') {
+            if (typeof user === 'undefined') {
                 return undefined;
             }
         } catch (e) {
             return undefined;
         }
 
-        if(!user.password) {
+        if (!user.password) {
             return undefined;
         }
 
         const verified = await verifyPassword(password, user.password);
-        if(!verified) {
+        if (!verified) {
             return undefined;
         }
 

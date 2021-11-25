@@ -5,27 +5,27 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getRolePermissions} from "@personalhealthtrain/ui-common";
-import RolePermissionListItemActions from "./RolePermissionListItemActions";
-import PermissionList from "../permission/PermissionList";
+import { getRolePermissions } from '@personalhealthtrain/ui-common';
+import RolePermissionListItemActions from './RolePermissionListItemActions';
+import PermissionList from '../permission/PermissionList';
 
 export default {
-    components: {PermissionList, RolePermissionListItemActions},
+    components: { PermissionList, RolePermissionListItemActions },
     props: {
-        roleId: Number
+        roleId: Number,
     },
     data() {
         return {
             meta: {
                 limit: 50,
                 offset: 0,
-                total: 0
+                total: 0,
             },
             busy: false,
             items: [],
             assignedOnly: true,
-            query: {}
-        }
+            query: {},
+        };
     },
     created() {
         this.load();
@@ -40,18 +40,18 @@ export default {
                 const response = await getRolePermissions({
                     page: {
                         limit: this.meta.limit,
-                        offset: this.meta.offset
+                        offset: this.meta.offset,
                     },
                     filter: {
-                        role_id: this.roleId
-                    }
+                        role_id: this.roleId,
+                    },
                 });
 
                 this.items = response.data;
 
                 this.$nextTick(() => {
                     this.buildRequestFilter();
-                })
+                });
             } catch (e) {
                 console.log(e);
             }
@@ -60,58 +60,58 @@ export default {
         },
 
         buildRequestFilter(build) {
-            const ids = this.items.map(item => item.permission_id);
-            let additionFilter = undefined;
+            const ids = this.items.map((item) => item.permission_id);
+            let additionFilter;
 
             build = build ?? this.assignedOnly;
 
-            if(build) {
+            if (build) {
                 additionFilter = {
-                    id: ids.join(',')
-                }
+                    id: ids.join(','),
+                };
             }
 
             this.query = {
-                ...(additionFilter ? {filters: additionFilter} : {})
+                ...(additionFilter ? { filters: additionFilter } : {}),
             };
 
             this.$nextTick(() => {
-                this.$refs['roleList'].load();
+                this.$refs.roleList.load();
             });
         },
 
         filterItems(item) {
-            if(!this.assignedOnly) {
+            if (!this.assignedOnly) {
                 return true;
             }
 
-            return this.items.findIndex(role_permission => role_permission.permission_id === item.id) !== -1;
+            return this.items.findIndex((role_permission) => role_permission.permission_id === item.id) !== -1;
         },
 
         handleAdded(item) {
-            const index = this.items.findIndex(role_permission => role_permission.id === item.id);
-            if(index === -1) {
+            const index = this.items.findIndex((role_permission) => role_permission.id === item.id);
+            if (index === -1) {
                 this.items.push(item);
             }
         },
         handleDropped(item) {
-            const index = this.items.findIndex(role_permission => role_permission.id === item.id);
-            if(index !== -1) {
+            const index = this.items.findIndex((role_permission) => role_permission.id === item.id);
+            if (index !== -1) {
                 this.items.splice(index, 1);
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div>
         <permission-list
+            ref="roleList"
             :query="query"
             :filter-items="filterItems"
             :load-on-init="false"
-            ref="roleList"
         >
-            <template v-slot:header-title>
+            <template #header-title>
                 <template v-if="assignedOnly">
                     Slight overview of all assigned permissions.
                 </template>
@@ -119,12 +119,17 @@ export default {
                     Slight overview of all assigned and available permissions.
                 </template>
             </template>
-            <template v-slot:header-actions>
-                <b-form-checkbox v-model="assignedOnly" @change="buildRequestFilter" :disabled="busy" switch>
+            <template #header-actions>
+                <b-form-checkbox
+                    v-model="assignedOnly"
+                    :disabled="busy"
+                    switch
+                    @change="buildRequestFilter"
+                >
                     Show only assigned roles
                 </b-form-checkbox>
             </template>
-            <template v-slot:item-actions="props">
+            <template #item-actions="props">
                 <role-permission-list-item-actions
                     :role-id="roleId"
                     :permission-id="props.item.id"

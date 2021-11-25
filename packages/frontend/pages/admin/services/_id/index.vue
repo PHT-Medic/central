@@ -6,12 +6,12 @@
   -->
 <script>
 
-import RegistryManagement from "../../../../components/domains/service/harbor/HarborManagement";
-import {SERVICE_ID} from "@personalhealthtrain/ui-common";
+import { SERVICE_ID } from '@personalhealthtrain/ui-common';
+import RegistryManagement from '../../../../components/domains/service/harbor/HarborManagement';
 
 export default {
     props: {
-        serviceId: SERVICE_ID
+        serviceId: SERVICE_ID,
     },
     render(createElement) {
         let template;
@@ -22,18 +22,17 @@ export default {
                 break;
         }
 
-        if(typeof template === 'undefined') {
+        if (typeof template === 'undefined') {
             return createElement('div', {
-                class: 'alert alert-info alert-sm'
+                class: 'alert alert-info alert-sm',
             }, `You can not execute any task for the ${this.serviceId} service yet.`);
-        } else {
-            return createElement(template, {
-                props: { serviceId: this.serviceId},
-                on: {
-                    updated: (event) => this.$emit('updated', event)
-                }
-            });
         }
-    }
-}
+        return createElement(template, {
+            props: { serviceId: this.serviceId },
+            on: {
+                updated: (event) => this.$emit('updated', event),
+            },
+        });
+    },
+};
 </script>

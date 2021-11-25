@@ -5,14 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    export default {
+export default {
 
-    }
+};
 </script>
 <template>
     <div>
         <div class="alert alert-sm alert-info font-weight-bold">
-            Noch nicht implementiert <i class="fa fa-sad-tear text-dark"></i>
+            Noch nicht implementiert <i class="fa fa-sad-tear text-dark" />
         </div>
     </div>
 </template>

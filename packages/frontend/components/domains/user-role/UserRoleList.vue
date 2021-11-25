@@ -5,28 +5,27 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {User} from "@personalhealthtrain/ui-common";
-import {getApiUserRoles} from "@personalhealthtrain/ui-common";
-import RoleList from "../role/RoleList";
-import UserRoleListItemActions from "./UserRoleListItemActions";
+import { User, getApiUserRoles } from '@personalhealthtrain/ui-common';
+import RoleList from '../role/RoleList';
+import UserRoleListItemActions from './UserRoleListItemActions';
 
 export default {
-    components: {UserRoleListItemActions, RoleList},
+    components: { UserRoleListItemActions, RoleList },
     props: {
-        userId: User.prototype.id
+        userId: User.prototype.id,
     },
     data() {
         return {
             meta: {
                 limit: 50,
                 offset: 0,
-                total: 0
+                total: 0,
             },
             busy: false,
             items: [],
             assignedOnly: true,
-            query: {}
-        }
+            query: {},
+        };
     },
     created() {
         this.load();
@@ -41,18 +40,18 @@ export default {
                 const response = await getApiUserRoles({
                     page: {
                         limit: this.meta.limit,
-                        offset: this.meta.offset
+                        offset: this.meta.offset,
                     },
                     filter: {
-                        user_id: this.userId
-                    }
+                        user_id: this.userId,
+                    },
                 });
 
                 this.items = response.data;
 
                 this.$nextTick(() => {
                     this.buildRoleRequestFilter();
-                })
+                });
             } catch (e) {
                 console.log(e);
             }
@@ -61,58 +60,58 @@ export default {
         },
 
         buildRoleRequestFilter(build) {
-            const ids = this.items.map(item => item.role_id);
-            let additionFilter = undefined;
+            const ids = this.items.map((item) => item.role_id);
+            let additionFilter;
 
             build = build ?? this.assignedOnly;
 
-            if(build) {
+            if (build) {
                 additionFilter = {
-                    id: ids.join(',')
-                }
+                    id: ids.join(','),
+                };
             }
 
             this.query = {
-                ...(additionFilter ? {filters: additionFilter} : {})
+                ...(additionFilter ? { filters: additionFilter } : {}),
             };
 
             this.$nextTick(() => {
-                this.$refs['roleList'].load();
+                this.$refs.roleList.load();
             });
         },
 
         filterItems(item) {
-            if(!this.assignedOnly) {
+            if (!this.assignedOnly) {
                 return true;
             }
 
-            return this.items.findIndex(userRole => userRole.role_id === item.id) !== -1;
+            return this.items.findIndex((userRole) => userRole.role_id === item.id) !== -1;
         },
 
         handleAdded(item) {
-            const index = this.items.findIndex(userRole => userRole.id === item.id);
-            if(index === -1) {
+            const index = this.items.findIndex((userRole) => userRole.id === item.id);
+            if (index === -1) {
                 this.items.push(item);
             }
         },
         handleDropped(item) {
-            const index = this.items.findIndex(userRole => userRole.id === item.id);
-            if(index !== -1) {
+            const index = this.items.findIndex((userRole) => userRole.id === item.id);
+            if (index !== -1) {
                 this.items.splice(index, 1);
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div>
         <role-list
+            ref="roleList"
             :query="query"
             :filter-items="filterItems"
             :load-on-init="false"
-            ref="roleList"
         >
-            <template v-slot:header-title>
+            <template #header-title>
                 <template v-if="assignedOnly">
                     Slight overview of all assigned roles.
                 </template>
@@ -120,12 +119,17 @@ export default {
                     Slight overview of all assigned and available roles.
                 </template>
             </template>
-            <template v-slot:header-actions>
-                <b-form-checkbox v-model="assignedOnly" @change="buildRoleRequestFilter" :disabled="busy" switch>
+            <template #header-actions>
+                <b-form-checkbox
+                    v-model="assignedOnly"
+                    :disabled="busy"
+                    switch
+                    @change="buildRoleRequestFilter"
+                >
                     Show only assigned roles
                 </b-form-checkbox>
             </template>
-            <template v-slot:item-actions="props">
+            <template #item-actions="props">
                 <user-role-list-item-actions
                     :role-id="props.item.id"
                     :user-id="userId"

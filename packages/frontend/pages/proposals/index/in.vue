@@ -6,25 +6,27 @@
   -->
 <script>
 import {
-    getApiProposalStations,
-    getAPIStations,
     PermissionID,
-    ProposalStationApprovalStatus
-} from "@personalhealthtrain/ui-common";
-import ProposalInForm from "../../../components/domains/proposal/ProposalInForm";
-import ProposalStationStatus from "../../../components/domains/proposal-station/ProposalStationStatus";
-import Pagination from "../../../components/Pagination";
-import ProposalStationAction from "../../../components/domains/proposal-station/ProposalStationAction";
-import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
+    ProposalStationApprovalStatus,
+    getAPIStations,
+    getApiProposalStations,
+} from '@personalhealthtrain/ui-common';
+import ProposalInForm from '../../../components/domains/proposal/ProposalInForm';
+import ProposalStationStatus from '../../../components/domains/proposal-station/ProposalStationStatus';
+import Pagination from '../../../components/Pagination';
+import ProposalStationAction from '../../../components/domains/proposal-station/ProposalStationAction';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {
-    components: {ProposalStationAction, Pagination, ProposalStationStatus, ProposalInForm},
+    components: {
+        ProposalStationAction, Pagination, ProposalStationStatus, ProposalInForm,
+    },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.PROPOSAL_APPROVE
-        ]
+            PermissionID.PROPOSAL_APPROVE,
+        ],
     },
     data() {
         return {
@@ -32,50 +34,61 @@ export default {
             itemBusy: false,
             busy: false,
             fields: [
-                { key: 'proposal_id', label: 'Id', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'proposal_title', label: 'Title', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'approval_status', label: 'Approval Status', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'options', label: '', tdClass: 'text-left' }
+                {
+                    key: 'proposal_id', label: 'Id', thClass: 'text-center', tdClass: 'text-center',
+                },
+                {
+                    key: 'proposal_title', label: 'Title', thClass: 'text-left', tdClass: 'text-left',
+                },
+                {
+                    key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
+                },
+                {
+                    key: 'approval_status', label: 'Approval Status', thClass: 'text-left', tdClass: 'text-left',
+                },
+                {
+                    key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+                },
+                {
+                    key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+                },
+                { key: 'options', label: '', tdClass: 'text-left' },
             ],
             items: [],
             meta: {
                 limit: 10,
                 offset: 0,
-                total: 0
+                total: 0,
             },
 
             statusOptions: ProposalStationApprovalStatus,
 
-            stationId: null
-        }
+            stationId: null,
+        };
+    },
+    computed: {
+        user() {
+            return this.$store.getters['auth/user'];
+        },
     },
     created() {
         this.init()
             .then(this.load)
-            .catch(e => console.log(e));
-    },
-    computed: {
-      user() {
-          return this.$store.getters['auth/user'];
-      }
+            .catch((e) => console.log(e));
     },
     methods: {
         handleCreated(e) {
-            this.$refs['form'].hide();
+            this.$refs.form.hide();
 
             this.items.push(e);
         },
         handleUpdated(e) {
-            this.$refs['form'].hide();
+            this.$refs.form.hide();
 
-            const index = this.items.findIndex(item => item.id === e.id);
+            const index = this.items.findIndex((item) => item.id === e.id);
 
             Object.assign(this.items[index], e);
         },
-
 
         /**
          * Get station of current user.
@@ -85,11 +98,11 @@ export default {
         async init() {
             const response = await getAPIStations({
                 filter: {
-                    realm_id: this.user.realm_id
-                }
+                    realm_id: this.user.realm_id,
+                },
             });
 
-            if(response.meta.total !== 1) {
+            if (response.meta.total !== 1) {
                 return;
             }
 
@@ -102,7 +115,7 @@ export default {
          * @return {Promise<void>}
          */
         async load() {
-            if(this.busy || !this.stationId) return;
+            if (this.busy || !this.stationId) return;
 
             this.busy = true;
 
@@ -110,18 +123,17 @@ export default {
                 const response = await getApiProposalStations({
                     page: {
                         limit: this.meta.limit,
-                        offset: this.meta.offset
+                        offset: this.meta.offset,
                     },
                     filter: {
-                        station_id: this.stationId
-                    }
+                        station_id: this.stationId,
+                    },
                 });
 
                 this.items = response.data;
-                const {total} = response.meta;
+                const { total } = response.meta;
 
                 this.meta.total = total;
-
             } catch (e) {
 
             }
@@ -129,7 +141,7 @@ export default {
             this.busy = false;
         },
         goTo(options, resolve, reject) {
-            if(options.offset === this.meta.offset) return;
+            if (options.offset === this.meta.offset) return;
 
             this.meta.offset = options.offset;
 
@@ -141,10 +153,10 @@ export default {
         async edit(item) {
             this.item = item;
 
-            this.$refs['form'].show();
-        }
-    }
-}
+            this.$refs.form.show();
+        },
+    },
+};
 </script>
 <template>
     <div>
@@ -154,44 +166,65 @@ export default {
         </div>
         <div class="d-flex flex-row">
             <div>
-                <button @click.prevent="load" type="button" class="btn btn-xs btn-dark">
-                    <i class="fas fa-sync"></i> Refresh
+                <button
+                    type="button"
+                    class="btn btn-xs btn-dark"
+                    @click.prevent="load"
+                >
+                    <i class="fas fa-sync" /> Refresh
                 </button>
             </div>
         </div>
         <div class="m-t-10">
-            <b-table :items="items" :fields="fields" :busy="busy" head-variant="'dark'" outlined>
-                <template v-slot:cell(realm)="data">
-                    <span class="badge-dark badge">{{data.item.proposal.realm_id}}</span>
+            <b-table
+                :items="items"
+                :fields="fields"
+                :busy="busy"
+                head-variant="'dark'"
+                outlined
+            >
+                <template #cell(realm)="data">
+                    <span class="badge-dark badge">{{ data.item.proposal.realm_id }}</span>
                 </template>
 
-                <template v-slot:cell(approval_status)="data">
+                <template #cell(approval_status)="data">
                     <proposal-station-status
+                        v-slot="slotProps"
                         :status="data.item.approval_status"
-                        v-slot:default="slotProps"
                     >
-                        <span class="badge" :class="'badge-'+slotProps.classSuffix">
-                            {{slotProps.statusText}}
+                        <span
+                            class="badge"
+                            :class="'badge-'+slotProps.classSuffix"
+                        >
+                            {{ slotProps.statusText }}
                         </span>
                     </proposal-station-status>
                 </template>
 
-                <template v-slot:cell(proposal_id)="data">
-                    {{data.item.proposal.id}}
+                <template #cell(proposal_id)="data">
+                    {{ data.item.proposal.id }}
                 </template>
-                <template v-slot:cell(proposal_title)="data">
-                    {{data.item.proposal.title}}
+                <template #cell(proposal_title)="data">
+                    {{ data.item.proposal.title }}
                 </template>
-                <template v-slot:cell(options)="data">
-                    <nuxt-link class="btn btn-primary btn-xs" :to="'/proposals/'+data.item.proposal_id+'?refPath=/proposals/in'">
-                        <i class="fa fa-arrow-right"></i>
+                <template #cell(options)="data">
+                    <nuxt-link
+                        class="btn btn-primary btn-xs"
+                        :to="'/proposals/'+data.item.proposal_id+'?refPath=/proposals/in'"
+                    >
+                        <i class="fa fa-arrow-right" />
                     </nuxt-link>
                     <template v-if="$auth.can('approve', 'proposal')">
-                        <b-dropdown class="dropdown-xs" :no-caret="true">
+                        <b-dropdown
+                            class="dropdown-xs"
+                            :no-caret="true"
+                        >
                             <template #button-content>
-                                <i class="fa fa-bars"></i>
+                                <i class="fa fa-bars" />
                             </template>
-                            <b-dropdown-item @click.prevent="edit(data.item)"><i class="fa fa-comment-alt pl-1 pr-1"></i> comment</b-dropdown-item>
+                            <b-dropdown-item @click.prevent="edit(data.item)">
+                                <i class="fa fa-comment-alt pl-1 pr-1" /> comment
+                            </b-dropdown-item>
                             <b-dropdown-divider />
                             <proposal-station-action
                                 :proposal-station-id="data.item.id"
@@ -212,36 +245,47 @@ export default {
                         </b-dropdown>
                     </template>
                 </template>
-                <template v-slot:cell(created_at)="data">
+                <template #cell(created_at)="data">
                     <timeago :datetime="data.item.created_at" />
                 </template>
-                <template v-slot:cell(updated_at)="data">
+                <template #cell(updated_at)="data">
                     <timeago :datetime="data.item.updated_at" />
                 </template>
-                <template v-slot:table-busy>
+                <template #table-busy>
                     <div class="text-center text-danger my-2">
                         <b-spinner class="align-middle" />
                         <strong>Loading...</strong>
                     </div>
                 </template>
             </b-table>
-            <div class="alert alert-warning alert-sm" v-if="!busy && items.length === 0">
+            <div
+                v-if="!busy && items.length === 0"
+                class="alert alert-warning alert-sm"
+            >
                 There are no proposals available.
             </div>
         </div>
 
-        <pagination :total="meta.total" :offset="meta.offset" :limit="meta.limit" @to="goTo" />
+        <pagination
+            :total="meta.total"
+            :offset="meta.offset"
+            :limit="meta.limit"
+            @to="goTo"
+        />
 
         <b-modal
-            size="lg"
             ref="form"
+            size="lg"
             button-size="sm"
             :title-html="'<i class=\'fas fa-file-import\'></i> Proposal' + (item ? ': '+item.proposal.title : '')"
             :no-close-on-backdrop="true"
             :no-close-on-esc="true"
             :hide-footer="true"
         >
-            <proposal-in-form :proposal-station-property="item" @updated="handleUpdated" />
+            <proposal-in-form
+                :proposal-station-property="item"
+                @updated="handleUpdated"
+            />
         </b-modal>
     </div>
 </template>

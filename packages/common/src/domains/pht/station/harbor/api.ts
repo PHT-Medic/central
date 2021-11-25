@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildRegistryHarborProjectName} from "../../../../config";
+import { buildRegistryHarborProjectName } from '../../../../config';
 import {
+    HarborProject,
     deleteHarborProject,
     ensureHarborProject,
     findHarborProject,
-    HarborProject
-} from "../../../other/service";
+} from '../../../other/service';
 
 export async function findStationHarborProject(id: string | number): Promise<HarborProject | undefined> {
     const projectName: string = buildRegistryHarborProjectName(id);

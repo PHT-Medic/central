@@ -5,31 +5,31 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIType, setAPIConfig, useAPI} from "@personalhealthtrain/ui-common";
-import {Context} from "@nuxt/types";
+import { APIType, setAPIConfig, useAPI } from '@personalhealthtrain/ui-common';
+import { Context } from '@nuxt/types';
 
 export default (ctx: Context) => {
     let apiUrl : string | undefined;
 
     apiUrl = process.env.API_URL;
 
-    if(typeof ctx.$config.apiUrl === 'string') {
+    if (typeof ctx.$config.apiUrl === 'string') {
         apiUrl = ctx.$config.apiUrl;
     }
 
     setAPIConfig(APIType.DEFAULT, {
         driver: {
             baseURL: apiUrl,
-            withCredentials: true
-        }
-    })
+            withCredentials: true,
+        },
+    });
 
-    useAPI(APIType.DEFAULT).mountResponseInterceptor(r => r, (error => {
-        if(typeof error?.response?.data?.message === 'string') {
+    useAPI(APIType.DEFAULT).mountResponseInterceptor((r) => r, ((error) => {
+        if (typeof error?.response?.data?.message === 'string') {
             error.message = error.response.data.message;
             throw error;
         }
 
         throw new Error('A network error occurred.');
     }));
-}
+};

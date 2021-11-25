@@ -5,19 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue from 'vue'
-import {createTimeago} from 'vue-timeago';
+import Vue from 'vue';
+import { createTimeago } from 'vue-timeago';
 
 const Component = createTimeago({
-    locale: 'en'
+    locale: 'en',
 });
 
 const $timeago = {
-    locale: 'en'
+    locale: 'en',
 };
 
 Vue.prototype.$timeago = Vue.observable ? Vue.observable($timeago) : new Vue({
-    data: $timeago
+    data: $timeago,
 });
 
-Vue.component('timeago', Component);
+Vue.component('Timeago', Component);

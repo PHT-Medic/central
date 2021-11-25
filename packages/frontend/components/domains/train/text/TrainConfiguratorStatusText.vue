@@ -5,21 +5,21 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {TrainConfigurationStatus} from "@personalhealthtrain/ui-common";
+import { TrainConfigurationStatus } from '@personalhealthtrain/ui-common';
 
 export default {
     props: {
         status: {
             type: TrainConfigurationStatus,
-            default: undefined
-        }
+            default: undefined,
+        },
     },
     data() {
         return {
-            configurationStates: TrainConfigurationStatus
-        }
-    }
-}
+            configurationStates: TrainConfigurationStatus,
+        };
+    },
+};
 </script>
 <template>
     <span>
@@ -39,7 +39,7 @@ export default {
             completed
         </template>
         <template v-else>
-            unknown {{status}}
+            unknown {{ status }}
         </template>
     </span>
 </template>

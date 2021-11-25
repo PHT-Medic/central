@@ -8,43 +8,47 @@
 export default {
     props: {
         file: {
-            default: undefined
+            default: undefined,
         },
         pathSelected: {
             type: Boolean,
-            default: false
-        }
-    },
-    methods: {
-        drop() {
-            this.$emit('drop', this.file);
-        }
+            default: false,
+        },
     },
     computed: {
         path() {
             let filename = this.file.name;
-            if(typeof this.file.webkitRelativePath !== 'undefined') {
+            if (typeof this.file.webkitRelativePath !== 'undefined') {
                 filename = this.file.webkitRelativePath;
             }
             return filename;
-        }
-    }
-}
+        },
+    },
+    methods: {
+        drop() {
+            this.$emit('drop', this.file);
+        },
+    },
+};
 </script>
 <template>
     <div class="card card-file d-flex flex-row align-items-center">
         <div class="card-heading">
-            <i class="fafa-file-upload text-info"></i>
+            <i class="fafa-file-upload text-info" />
         </div>
         <div class="card-body">
             <span class="title">
-                {{path}}
-                <small class="text-muted">{{file.size}} Bytes</small>
+                {{ path }}
+                <small class="text-muted">{{ file.size }} Bytes</small>
             </span>
         </div>
         <div class="ml-auto">
-            <a href="javascript:void(0)" @click.prevent="drop" style="margin-right: .75rem">
-                <i class="fa fa-times"></i>
+            <a
+                href="javascript:void(0)"
+                style="margin-right: .75rem"
+                @click.prevent="drop"
+            >
+                <i class="fa fa-times" />
             </a>
         </div>
     </div>

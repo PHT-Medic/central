@@ -8,12 +8,12 @@
 import {
     Train,
     TrainResult,
-    TrainResultStatus
-} from "@personalhealthtrain/ui-common";
-import {consumeQueue, Message} from "amqp-extension";
-import {getRepository} from "typeorm";
-import {ResultServiceDataPayload} from "../domains/service/result-service";
-import {MessageQueueResultServiceRoutingKey} from "../config/service/mq";
+    TrainResultStatus,
+} from '@personalhealthtrain/ui-common';
+import { Message, consumeQueue } from 'amqp-extension';
+import { getRepository } from 'typeorm';
+import { ResultServiceDataPayload } from '../domains/service/result-service';
+import { MessageQueueResultServiceRoutingKey } from '../config/service/mq';
 
 export enum TrainResultEvent {
     STARTING = 'starting', // ui trigger
@@ -43,49 +43,49 @@ const EventStatusMap : Record<TrainResultEvent, TrainResultStatus | null> = {
     [TrainResultEvent.DOWNLOADED]: TrainResultStatus.DOWNLOADED,
     [TrainResultEvent.EXTRACTING]: TrainResultStatus.EXTRACTING,
     [TrainResultEvent.EXTRACTED]: TrainResultStatus.FINISHED,
-    [TrainResultEvent.UNKNOWN]: null
-}
+    [TrainResultEvent.UNKNOWN]: null,
+};
 
 async function handleTrainResult(data: ResultServiceDataPayload, event: TrainResultEvent) {
-    if(!(EventStatusMap.hasOwnProperty(event))) {
+    if (!(EventStatusMap.hasOwnProperty(event))) {
         return;
     }
 
     const status : TrainResultStatus | null = EventStatusMap[event];
     const latest = typeof data.latest === 'boolean' ? data.latest : true;
 
-    if(latest) {
+    if (latest) {
         const trainRepository = getRepository(Train);
 
         await trainRepository.update({
-            id: data.trainId
+            id: data.trainId,
         }, {
             result_last_status: status,
-            ...(data.id ? {result_last_id: data.id} : {})
+            ...(data.id ? { result_last_id: data.id } : {}),
         });
     }
 
     // If an id is available, than the progress succeeded :) ^^
     // This is nearly always the case, expect when no result id is generated.
-    if(typeof data.id === 'undefined') {
+    if (typeof data.id === 'undefined') {
         return;
     }
 
     const resultRepository = getRepository(TrainResult);
     let result = await resultRepository.findOne({
         id: data.id,
-        train_id: data.trainId
+        train_id: data.trainId,
     });
 
     if (typeof result === 'undefined') {
         result = resultRepository.create({
             id: data.id,
             train_id: data.trainId,
-            status
+            status,
         });
     } else {
         result = resultRepository.merge(result, {
-            status
+            status,
         });
     }
 
@@ -94,17 +94,17 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: TrainRes
 
 export function buildTrainResultAggregator() {
     function start() {
-        return consumeQueue({routingKey: MessageQueueResultServiceRoutingKey.EVENT_IN}, {
+        return consumeQueue({ routingKey: MessageQueueResultServiceRoutingKey.EVENT_IN }, {
             $any: async (message: Message) => {
                 await handleTrainResult(
                     message.data as ResultServiceDataPayload,
-                    message.type as TrainResultEvent
+                    message.type as TrainResultEvent,
                 );
-            }
+            },
         });
     }
 
     return {
-        start
-    }
+        start,
+    };
 }

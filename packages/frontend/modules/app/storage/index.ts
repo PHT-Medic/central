@@ -5,19 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import BaseStorage from "~/modules/storage";
-import {Context} from "@nuxt/types";
-import {StorageOptionsInterface} from "~/modules/storage/types";
+import { Context } from '@nuxt/types';
+import BaseStorage from '~/modules/storage';
+import { StorageOptionsInterface } from '~/modules/storage/types';
 
 export class AppStorage extends BaseStorage {
     constructor(ctx: Context, options?: StorageOptionsInterface) {
         options = options ?? {};
 
         const defaultOptions : StorageOptionsInterface = {
-            namespace: 'app'
+            namespace: 'app',
         };
 
-        options = Object.assign({}, defaultOptions, options);
+        options = { ...defaultOptions, ...options };
 
         super(ctx, options);
     }

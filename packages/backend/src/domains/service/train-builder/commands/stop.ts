@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Train} from "@personalhealthtrain/ui-common";
+import { Train } from '@personalhealthtrain/ui-common';
 
 export async function buildTrainBuilderStopCommandPayload(train: Train) {
     return {
-        trainId: train.id
-    }
+        trainId: train.id,
+    };
 }

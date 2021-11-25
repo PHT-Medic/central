@@ -5,27 +5,27 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {MasterImage, MasterImageCommand, MasterImageGroup} from "@personalhealthtrain/ui-common";
-import {getRepository} from "typeorm";
+import { MasterImage, MasterImageCommand, MasterImageGroup } from '@personalhealthtrain/ui-common';
+import { getRepository } from 'typeorm';
 
-import path from "path";
-import {getWritableDirPath} from "../../../../config/paths";
-import fs from "fs";
-import {clone, pull} from "isomorphic-git";
-import http from "isomorphic-git/http/node";
-import {Group, Image, scanDirectory} from "fs-docker";
-import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
-import {BadRequestError, NotFoundError} from "@typescript-error/http";
+import path from 'path';
+import fs from 'fs';
+import { clone, pull } from 'isomorphic-git';
+import http from 'isomorphic-git/http/node';
+import { Group, Image, scanDirectory } from 'fs-docker';
+import { BadRequestError, NotFoundError } from '@typescript-error/http';
+import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
+import { getWritableDirPath } from '../../../../config/paths';
 
 export async function handleMasterImageCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) {
-    if(
-        !req.body ||
-        Object.values(MasterImageCommand).indexOf(req.body.command) === -1
+    if (
+        !req.body
+        || Object.values(MasterImageCommand).indexOf(req.body.command) === -1
     ) {
         throw new BadRequestError('The master image command is not valid.');
     }
 
-    const command : MasterImageCommand = req.body.command;
+    const { command } = req.body;
 
     switch (command) {
         case MasterImageCommand.GIT_REPOSITORY_SYNC:
@@ -40,16 +40,16 @@ export async function handleMasterImageCommandRouteHandler(req: ExpressRequest, 
                     dir: directoryPath,
                     ref: 'master',
                     author: {
-                        name: 'ui'
-                    }
-                })
+                        name: 'ui',
+                    },
+                });
             } catch (e) {
                 await clone({
                     fs,
                     http,
                     url: gitURL,
                     dir: directoryPath,
-                    ref: 'master'
+                    ref: 'master',
                 });
             }
 
@@ -64,8 +64,8 @@ export async function handleMasterImageCommandRouteHandler(req: ExpressRequest, 
             return res.respondAccepted({
                 data: {
                     groups,
-                    images
-                }
+                    images,
+                },
             });
     }
 
@@ -79,17 +79,17 @@ type ReturnContext<T> = {
 }
 
 async function mergeRepositoryImagesWithDatabase(
-    entities: Image[]
+    entities: Image[],
 ) : Promise<ReturnContext<MasterImage>> {
-    if(entities.length === 0) {
+    if (entities.length === 0) {
         return {
             created: [],
             updated: [],
-            deleted: []
-        }
+            deleted: [],
+        };
     }
 
-    const virtualPaths : string[] = entities.map(entity => entity.virtualPath);
+    const virtualPaths : string[] = entities.map((entity) => entity.virtualPath);
 
     const repository = getRepository(MasterImage);
     const dbEntities = await repository.createQueryBuilder()
@@ -98,66 +98,66 @@ async function mergeRepositoryImagesWithDatabase(
     const context : ReturnContext<MasterImage> = {
         created: [],
         updated: [],
-        deleted: []
-    }
+        deleted: [],
+    };
 
     context.deleted = dbEntities
-        .filter(image => virtualPaths.indexOf(image.virtual_path) === -1);
+        .filter((image) => virtualPaths.indexOf(image.virtual_path) === -1);
 
-    for(let i=0; i<entities.length; i++) {
+    for (let i = 0; i < entities.length; i++) {
         const parts = entities[i].virtualPath.split('/');
         parts.pop();
 
         const data : Partial<MasterImage> = {
             name: entities[i].name,
             path: entities[i].path,
-            group_virtual_path: parts.join('/')
-        }
+            group_virtual_path: parts.join('/'),
+        };
 
-        if(typeof entities[i].command === 'string') {
+        if (typeof entities[i].command === 'string') {
             data.command = entities[i].command;
         }
 
-        if(typeof entities[i].command_arguments !== 'undefined') {
+        if (typeof entities[i].command_arguments !== 'undefined') {
             data.command_arguments = entities[i].commandArguments;
         }
 
-        const index = dbEntities.findIndex(dbEntity => dbEntity.virtual_path === entities[i].virtualPath);
-        if(index === -1) {
+        const index = dbEntities.findIndex((dbEntity) => dbEntity.virtual_path === entities[i].virtualPath);
+        if (index === -1) {
             context.created.push(repository.create({
                 virtual_path: entities[i].virtualPath,
-                ...data
-            }))
+                ...data,
+            }));
         } else {
             context.updated.push(repository.merge(dbEntities[index], data));
         }
     }
 
-    if(context.created.length > 0) {
+    if (context.created.length > 0) {
         await repository.insert(context.created);
     }
 
-    if(context.updated.length > 0) {
+    if (context.updated.length > 0) {
         await repository.save(context.updated);
     }
 
-    if(context.deleted.length > 0) {
-        await repository.delete(context.deleted.map(entry => entry.id));
+    if (context.deleted.length > 0) {
+        await repository.delete(context.deleted.map((entry) => entry.id));
     }
 
     return context;
 }
 
 async function mergeDirectoryGroupsWithDatabase(entities: Group[]) : Promise<ReturnContext<MasterImageGroup>> {
-    if(entities.length === 0) {
+    if (entities.length === 0) {
         return {
             created: [],
             updated: [],
-            deleted: []
-        }
+            deleted: [],
+        };
     }
 
-    const dirVirtualPaths : string[] = entities.map(entity => entity.virtualPath);
+    const dirVirtualPaths : string[] = entities.map((entity) => entity.virtualPath);
 
     const repository = getRepository(MasterImageGroup);
     const dbEntities = await repository.createQueryBuilder()
@@ -166,47 +166,47 @@ async function mergeDirectoryGroupsWithDatabase(entities: Group[]) : Promise<Ret
     const context : ReturnContext<MasterImageGroup> = {
         created: [],
         updated: [],
-        deleted: []
-    }
+        deleted: [],
+    };
 
     context.deleted = dbEntities
-        .filter(image => dirVirtualPaths.indexOf(image.virtual_path) === -1);
+        .filter((image) => dirVirtualPaths.indexOf(image.virtual_path) === -1);
 
-    for(let i=0; i<entities.length; i++) {
+    for (let i = 0; i < entities.length; i++) {
         const data : Partial<MasterImageGroup> = {
             name: entities[i].name,
             path: entities[i].path,
-        }
+        };
 
-        if(typeof entities[i].command === 'string') {
+        if (typeof entities[i].command === 'string') {
             data.command = entities[i].command;
         }
 
-        if(typeof entities[i].command_arguments !== 'undefined') {
+        if (typeof entities[i].command_arguments !== 'undefined') {
             data.command_arguments = entities[i].commandArguments;
         }
 
-        const index = dbEntities.findIndex(dbEntity => dbEntity.virtual_path === entities[i].virtualPath);
-        if(index === -1) {
+        const index = dbEntities.findIndex((dbEntity) => dbEntity.virtual_path === entities[i].virtualPath);
+        if (index === -1) {
             context.created.push(repository.create({
                 virtual_path: entities[i].virtualPath,
-                ...data
-            }))
+                ...data,
+            }));
         } else {
             context.updated.push(repository.merge(dbEntities[index], data));
         }
     }
 
-    if(context.created.length > 0) {
+    if (context.created.length > 0) {
         await repository.insert(context.created);
     }
 
-    if(context.updated.length > 0) {
+    if (context.updated.length > 0) {
         await repository.save(context.updated);
     }
 
-    if(context.deleted.length > 0) {
-        await repository.delete(context.deleted.map(entry => entry.id));
+    if (context.deleted.length > 0) {
+        await repository.delete(context.deleted.map((entry) => entry.id));
     }
 
     return context;

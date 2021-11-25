@@ -6,20 +6,23 @@
   -->
 <template>
     <span>
-       <slot v-bind:classSuffix="classSuffix" v-bind:statusText="statusText">
-            <span :class="'text-'+classSuffix">{{statusText}}</span>
+        <slot
+            :classSuffix="classSuffix"
+            :statusText="statusText"
+        >
+            <span :class="'text-'+classSuffix">{{ statusText }}</span>
         </slot>
     </span>
 </template>
 <script>
-import {TrainRunStatus} from "@personalhealthtrain/ui-common";
+import { TrainRunStatus } from '@personalhealthtrain/ui-common';
 
 export default {
     props: {
         status: {
             type: String,
-            default: null
-        }
+            default: null,
+        },
     },
     computed: {
         statusText() {
@@ -55,7 +58,7 @@ export default {
                 default:
                     return 'info';
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>

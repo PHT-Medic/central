@@ -5,17 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {consumeQueue, Message} from "amqp-extension";
-import {extendDispatcherHarborData} from "./data/harbor";
+import { Message, consumeQueue } from 'amqp-extension';
+import { extendDispatcherHarborData } from './data/harbor';
 import {
     dispatchHarborEventToEmailNotifier,
     dispatchProposalEventToEmailNotifier,
-    dispatchTrainEventToEmailNotifier
-} from "./target/email-notifier";
-import {dispatchHarborEventToResultService} from "./target/result-service";
-import {dispatchHarborEventToSelf} from "./target/self";
-import {dispatchHarborEventToTrainRouter} from "./target/train-router";
-import {MessageQueueDispatcherRoutingKey} from "../../config/service/mq";
+    dispatchTrainEventToEmailNotifier,
+} from './target/email-notifier';
+import { dispatchHarborEventToResultService } from './target/result-service';
+import { dispatchHarborEventToSelf } from './target/self';
+import { dispatchHarborEventToTrainRouter } from './target/train-router';
+import { MessageQueueDispatcherRoutingKey } from '../../config/service/mq';
 
 export enum DispatcherEvent {
     PROPOSAL = 'proposalEvent',
@@ -25,8 +25,8 @@ export enum DispatcherEvent {
 
 export function buildDispatcherComponent() {
     function start() {
-        return consumeQueue({routingKey: MessageQueueDispatcherRoutingKey.EVENT_OUT},{
-            [DispatcherEvent.PROPOSAL]: async(message: Message) => {
+        return consumeQueue({ routingKey: MessageQueueDispatcherRoutingKey.EVENT_OUT }, {
+            [DispatcherEvent.PROPOSAL]: async (message: Message) => {
                 // assigned, approved, rejected
 
                 console.log(message);
@@ -34,7 +34,7 @@ export function buildDispatcherComponent() {
                 await Promise.resolve(message)
                     .then(dispatchProposalEventToEmailNotifier);
             },
-            [DispatcherEvent.TRAIN]: async(message: Message) => {
+            [DispatcherEvent.TRAIN]: async (message: Message) => {
                 // assigned, approved, rejected
 
                 console.log(message);
@@ -43,7 +43,7 @@ export function buildDispatcherComponent() {
                     .then(dispatchTrainEventToEmailNotifier);
             },
 
-            [DispatcherEvent.HARBOR]: async(message: Message) => {
+            [DispatcherEvent.HARBOR]: async (message: Message) => {
                 // PUSH_ARTIFACT
 
                 console.log(message);
@@ -54,12 +54,12 @@ export function buildDispatcherComponent() {
                     .then(dispatchHarborEventToTrainRouter)
                     .then(dispatchHarborEventToResultService)
                     .then(dispatchHarborEventToEmailNotifier)
-                    .catch(e => {console.log(e); throw e});
-            }
+                    .catch((e) => { console.log(e); throw e; });
+            },
         });
     }
 
     return {
-        start
-    }
+        start,
+    };
 }

@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIType, useAPI} from "../../../../../modules";
-import {findHarborProjectWebHook, HarborProjectWebhook} from "./web-hook";
-import {findHarborRobotAccount, HarborRobotAccount} from "../robot-account";
+import { APIType, useAPI } from '../../../../../modules';
+import { HarborProjectWebhook, findHarborProjectWebHook } from './web-hook';
+import { HarborRobotAccount, findHarborRobotAccount } from '../robot-account';
 
 export type HarborProject = {
     name: string,
@@ -19,20 +19,20 @@ export type HarborProject = {
 export async function findHarborProject(id: string | number, isProjectName: boolean = false) : Promise<HarborProject> {
     const headers : Record<string, any> = {};
 
-    if(isProjectName) {
+    if (isProjectName) {
         headers['X-Is-Resource-Name'] = true;
     }
 
     try {
-        const {data} = await useAPI(APIType.HARBOR)
-            .get('projects/' + id);
+        const { data } = await useAPI(APIType.HARBOR)
+            .get(`projects/${id}`);
 
         return {
             name: data.name,
-            id: data.project_id
+            id: data.project_id,
         };
     } catch (e) {
-        if(e.response.status === 404) {
+        if (e.response.status === 404) {
             return undefined;
         }
 
@@ -45,12 +45,12 @@ export async function ensureHarborProject(name: string) {
         await useAPI(APIType.HARBOR)
             .post('projects', {
                 project_name: name,
-                public: true
+                public: true,
             });
 
         return await findHarborProject(name, true);
     } catch (e) {
-        if(e.response.status === 409) {
+        if (e.response.status === 409) {
             return await findHarborProject(name, true);
         }
 
@@ -61,18 +61,18 @@ export async function ensureHarborProject(name: string) {
 export async function deleteHarborProject(id: string | number, isProjectName: boolean = false) {
     const headers : Record<string, any> = {};
 
-    if(isProjectName) {
+    if (isProjectName) {
         headers['X-Is-Resource-Name'] = true;
     }
 
     await useAPI(APIType.HARBOR)
-        .delete('projects/' + id, headers);
+        .delete(`projects/${id}`, headers);
 }
 
 export async function pullProject(id: string | number, isProjectName: boolean = false) : Promise<HarborProject | undefined> {
     const project = await findHarborProject(id, isProjectName);
 
-    if(!project) {
+    if (!project) {
         return undefined;
     }
 

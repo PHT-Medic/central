@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {USER_SECRET_ENGINE_KEY} from "./constants";
+import { USER_SECRET_ENGINE_KEY } from './constants';
 
 export function isSecretStorageUserKey(name: string): boolean {
-    return name.startsWith(USER_SECRET_ENGINE_KEY + '/');
+    return name.startsWith(`${USER_SECRET_ENGINE_KEY}/`);
 }
 
 export function getSecretStorageUserKey(name: string): string {
-    return name.replace(USER_SECRET_ENGINE_KEY + '/', '');
+    return name.replace(`${USER_SECRET_ENGINE_KEY}/`, '');
 }
 
 export function buildSecretStorageUserKey(id: string | number): string {
-    return USER_SECRET_ENGINE_KEY + '/' + id;
+    return `${USER_SECRET_ENGINE_KEY}/${id}`;
 }

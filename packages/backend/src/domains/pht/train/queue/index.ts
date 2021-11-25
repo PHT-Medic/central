@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildMessage, publishMessage} from "amqp-extension";
-import {DispatcherEvent} from "../../../../components/event-dispatcher";
-import {MessageQueueDispatcherRoutingKey} from "../../../../config/service/mq";
+import { buildMessage, publishMessage } from 'amqp-extension';
+import { DispatcherEvent } from '../../../../components/event-dispatcher';
+import { MessageQueueDispatcherRoutingKey } from '../../../../config/service/mq';
 
 export type DispatcherTrainEventType = 'approved' | 'assigned' | 'rejected';
 export type DispatcherTrainEventData = {
@@ -22,20 +22,20 @@ export async function emitDispatcherTrainEvent(
     metaData: Record<string, any> = {},
     options?: {
         templateOnly?: boolean
-    }
+    },
 ) {
     options = options ?? {};
 
     const message = buildMessage({
         options: {
-            routingKey: MessageQueueDispatcherRoutingKey.EVENT_OUT
+            routingKey: MessageQueueDispatcherRoutingKey.EVENT_OUT,
         },
         type: DispatcherEvent.TRAIN,
         data,
-        metadata: metaData
+        metadata: metaData,
     });
 
-    if(options.templateOnly) {
+    if (options.templateOnly) {
         return message;
     }
 

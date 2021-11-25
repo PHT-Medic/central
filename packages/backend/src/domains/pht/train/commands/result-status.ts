@@ -5,14 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Train} from "@personalhealthtrain/ui-common";
-import {publishMessage} from "amqp-extension";
-import {getRepository} from "typeorm";
-import {buildResultServiceQueueMessage, ResultServiceCommand} from "../../../service/result-service";
-import {findTrain} from "./utils";
+import { Train } from '@personalhealthtrain/ui-common';
+import { publishMessage } from 'amqp-extension';
+import { getRepository } from 'typeorm';
+import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../service/result-service';
+import { findTrain } from './utils';
 
 export async function triggerTrainResultStatus(
-    train: string | Train
+    train: string | Train,
 ) : Promise<Train> {
     const repository = getRepository(Train);
 
@@ -22,7 +22,7 @@ export async function triggerTrainResultStatus(
     await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.STATUS, {
         trainId: train.id,
         latest: true,
-        ...(train.result_last_id ? {id: train.result_last_id} : {})
+        ...(train.result_last_id ? { id: train.result_last_id } : {}),
     }));
 
     return train;

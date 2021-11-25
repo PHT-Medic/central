@@ -5,34 +5,34 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {getCustomRepository, getRepository} from "typeorm";
-import {UserRepository} from "../../../../../domains/auth/user/repository";
-import {isPermittedForResourceRealm, Station} from "@personalhealthtrain/ui-common";
-import {ExpressRequest, ExpressResponse} from "../../../../../config/http/type";
-import {NotFoundError} from "@typescript-error/http";
+import { getCustomRepository, getRepository } from 'typeorm';
+import { Station, isPermittedForResourceRealm } from '@personalhealthtrain/ui-common';
+import { NotFoundError } from '@typescript-error/http';
+import { UserRepository } from '../../../../../domains/auth/user/repository';
+import { ExpressRequest, ExpressResponse } from '../../../../../config/http/type';
 
 export async function getUserStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     const userRepository = getCustomRepository<UserRepository>(UserRepository);
-    const user = await userRepository.findOne(id, {relations: ['realm']});
+    const user = await userRepository.findOne(id, { relations: ['realm'] });
 
-    if(typeof user === 'undefined') {
+    if (typeof user === 'undefined') {
         throw new NotFoundError();
     }
 
-    if(!isPermittedForResourceRealm(req.realmId, user.realm_id)) {
+    if (!isPermittedForResourceRealm(req.realmId, user.realm_id)) {
         // return res._failForbidden({});
     }
 
     const stationRepository = getRepository(Station);
     const station = await stationRepository.findOne({
-        realm_id: user.realm_id
+        realm_id: user.realm_id,
     });
 
-    if(typeof station === 'undefined') {
+    if (typeof station === 'undefined') {
         throw new NotFoundError();
     }
 
-    return res.respond({data: station});
+    return res.respond({ data: station });
 }

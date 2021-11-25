@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIConfig} from "./type";
+import { APIConfig } from './type';
 
 const configMap: Map<string, APIConfig<any>> = new Map<string, APIConfig<any>>();
 
 export function setAPIConfig(
     key: string,
-    value: APIConfig<any>
+    value: APIConfig<any>,
 ) {
     configMap.set(key, value);
 
@@ -19,7 +19,7 @@ export function setAPIConfig(
 }
 
 export function getAPIConfig(
-    key: string
+    key: string,
 ): APIConfig<any> {
     const data: APIConfig<any> | undefined = configMap.get(key);
     if (typeof data === 'undefined') {

@@ -5,23 +5,23 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserPublicKeyForm from "../../../components/domains/user/UserPublicKeyForm";
-import UserPasswordForm from "../../../components/domains/user/UserPasswordForm";
+import UserPublicKeyForm from '../../../components/domains/user/UserPublicKeyForm';
+import UserPasswordForm from '../../../components/domains/user/UserPasswordForm';
 
 export default {
-        components: {
-            UserPasswordForm,
-            UserPublicKeyForm
+    components: {
+        UserPasswordForm,
+        UserPublicKeyForm,
+    },
+    meta: {
+        requireLoggedIn: true,
+    },
+    computed: {
+        user() {
+            return this.$store.getters['auth/user'];
         },
-        meta: {
-            requireLoggedIn: true
-        },
-        computed: {
-            user() {
-                return this.$store.getters['auth/user'];
-            }
-        }
-    }
+    },
+};
 </script>
 <template>
     <div class="mb-2">

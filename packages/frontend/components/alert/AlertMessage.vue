@@ -5,11 +5,11 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    export default {
-        props: {
-            message: Object
-        }
-    }
+export default {
+    props: {
+        message: Object,
+    },
+};
 </script>
 
 <template>
@@ -17,8 +17,9 @@
         <div
             v-if="message"
             :class="{'alert-warning': message.isError, 'alert-info': !message.isError}"
-            class="alert alert-sm">
-            {{message.data}}
+            class="alert alert-sm"
+        >
+            {{ message.data }}
         </div>
     </div>
 </template>

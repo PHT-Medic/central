@@ -6,57 +6,52 @@
  */
 
 import {
-    findHarborProjectRepository,
     HarborRepository,
-    Train,
-    TrainStation
-} from "@personalhealthtrain/ui-common";
-import {
-    buildRegistryHarborProjectName,
     REGISTRY_INCOMING_PROJECT_NAME,
-    REGISTRY_OUTGOING_PROJECT_NAME
-} from "@personalhealthtrain/ui-common";
-import {
+    REGISTRY_OUTGOING_PROJECT_NAME,
+    Train,
     TrainBuildStatus,
     TrainConfigurationStatus,
     TrainRunStatus,
-} from "@personalhealthtrain/ui-common";
-import {getRepository} from "typeorm";
-import {findTrain} from "./utils";
-import {triggerTrainResultStart} from "./result-start";
+    TrainStation,
+    buildRegistryHarborProjectName,
+    findHarborProjectRepository,
+} from '@personalhealthtrain/ui-common';
+import { getRepository } from 'typeorm';
+import { findTrain } from './utils';
+import { triggerTrainResultStart } from './result-start';
 
 export async function detectTrainRunStatus(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);
 
     train = await findTrain(train, repository);
 
-    if(typeof train === 'undefined') {
+    if (typeof train === 'undefined') {
         throw new Error('The train could not be found.');
     }
 
     // 1. Check PHT outgoing ( -> TrainFinished )
     let harborRepository: HarborRepository | undefined = await findHarborProjectRepository(REGISTRY_OUTGOING_PROJECT_NAME, train.id);
-    if(typeof harborRepository !== 'undefined') {
-
+    if (typeof harborRepository !== 'undefined') {
         train = repository.merge(train, {
             build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
             configuration_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
             run_station_id: null, // optional, just to ensure
-            run_status: TrainRunStatus.FINISHED
+            run_status: TrainRunStatus.FINISHED,
         });
 
         // check if we marked the train as terminated yet :O ?
-        if(train.run_status !== TrainRunStatus.FINISHED) {
+        if (train.run_status !== TrainRunStatus.FINISHED) {
             train = await triggerTrainResultStart(train.id, harborRepository);
         } else {
             train = repository.merge(train, {
-                result_last_status: null
+                result_last_status: null,
             });
         }
 
         await repository.save(train);
 
-        return train
+        return train;
     }
 
     // 2. Check any Station Repository on route ( -> TrainRunning )
@@ -66,14 +61,14 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
         .leftJoinAndSelect('trainStation.station', 'station')
         .orderBy({
             'trainStation.position': 'DESC',
-            'trainStation.created_at': 'DESC'
+            'trainStation.created_at': 'DESC',
         });
 
     const trainStations = await trainStationQueryBuilder.getMany();
 
-    for(let i=0; i<trainStations.length; i++) {
+    for (let i = 0; i < trainStations.length; i++) {
         const stationId : string | number | undefined = trainStations[i].station.secure_id ?? trainStations[i].station.id;
-        if(!stationId) continue;
+        if (!stationId) continue;
 
         const stationName : string = buildRegistryHarborProjectName(stationId);
 
@@ -86,7 +81,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
                     build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
                     configuration_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
                     run_station_id: trainStations[i].station_id,
-                    run_status: TrainRunStatus.STARTED
+                    run_status: TrainRunStatus.STARTED,
                 });
 
                 await repository.save(train);
@@ -94,9 +89,9 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
                 return train;
             }
         } catch (e) {
-            if(
-                typeof e?.response?.status === "number" &&
-                e.response.status === 404
+            if (
+                typeof e?.response?.status === 'number'
+                && e.response.status === 404
             ) {
                 continue;
             }
@@ -107,12 +102,12 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
 
     // 3. Check PHT incoming ( -> TrainBuilt )
     harborRepository = await findHarborProjectRepository(REGISTRY_INCOMING_PROJECT_NAME, train.id);
-    if(typeof harborRepository !== 'undefined') {
+    if (typeof harborRepository !== 'undefined') {
         train = repository.merge(train, {
             build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
             configuration_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
             run_station_id: null, // optional, just to ensure
-            run_status: null
+            run_status: null,
         });
 
         await repository.save(train);
@@ -122,10 +117,10 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
 
     train = repository.merge(train, {
         run_station_id: null,
-        run_status: null
+        run_status: null,
     });
 
     await repository.save(train);
 
-    return train
+    return train;
 }

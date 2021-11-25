@@ -5,24 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {check, matchedData, validationResult} from "express-validator";
+import { check, matchedData, validationResult } from 'express-validator';
 import {
     APIType,
-    Station,
+    PermissionID,
     SecretStorageCommand,
-    useAPI,
+    Station,
     UserKeyRing,
+    buildSecretStorageStationKey,
+    getSecretStorageStationKey,
+    getSecretStorageUserKey,
     isSecretStorageStationKey,
     isSecretStorageUserKey,
-    getSecretStorageStationKey,
-    buildSecretStorageStationKey,
-    getSecretStorageUserKey,
-    saveStationSecretsToSecretEngine, PermissionID
-} from "@personalhealthtrain/ui-common";
-import {getRepository} from "typeorm";
-import {ExpressRequest, ExpressResponse} from "../../../../../config/http/type";
-import {BadRequestError, ForbiddenError, NotFoundError, NotImplementedError} from "@typescript-error/http";
-import {ExpressValidationError} from "../../../../../config/http/error/validation";
+    saveStationSecretsToSecretEngine, useAPI,
+} from '@personalhealthtrain/ui-common';
+import { getRepository } from 'typeorm';
+import {
+    BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
+} from '@typescript-error/http';
+import { ExpressRequest, ExpressResponse } from '../../../../../config/http/type';
+import { ExpressValidationError } from '../../../../../config/http/error/validation';
 
 const commands = Object.values(SecretStorageCommand);
 
@@ -32,15 +34,15 @@ enum TargetEntity {
 }
 
 export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if(!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
+    if (!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
         throw new ForbiddenError('You are not permitted to manage the secret storage service.');
     }
 
-    const {command} = req.body;
+    const { command } = req.body;
 
-    if(
-        !command ||
-        commands.indexOf(command) === -1
+    if (
+        !command
+        || commands.indexOf(command) === -1
     ) {
         throw new BadRequestError('The secret storage command is not valid.');
     }
@@ -48,7 +50,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
     await check('name')
         .exists()
         .isString()
-        .custom(value => isSecretStorageStationKey(value) || isSecretStorageUserKey(value))
+        .custom((value) => isSecretStorageStationKey(value) || isSecretStorageUserKey(value))
         .run(req);
 
     const validation = validationResult(req);
@@ -56,7 +58,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
         throw new ExpressValidationError(validation);
     }
 
-    const validationData = matchedData(req, {includeOptionals: true});
+    const validationData = matchedData(req, { includeOptionals: true });
 
     let userSecrets : UserKeyRing | undefined;
     let station : Station | undefined;
@@ -65,7 +67,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
 
     let type : TargetEntity | undefined;
 
-    if(isSecretStorageStationKey(path)) {
+    if (isSecretStorageStationKey(path)) {
         const stationId : string = getSecretStorageStationKey(path);
 
         const stationRepository = getRepository(Station);
@@ -74,15 +76,15 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
         const addSelection : string[] = [
             'secure_id',
             'public_key',
-            'vault_public_key_saved'
+            'vault_public_key_saved',
         ];
 
-        addSelection.map(selection => query.addSelect('station.'+selection));
+        addSelection.map((selection) => query.addSelect(`station.${selection}`));
 
-        query.where('id = :id', {id: stationId});
+        query.where('id = :id', { id: stationId });
 
         station = await query.getOne();
-        if(typeof station === 'undefined') {
+        if (typeof station === 'undefined') {
             throw new NotFoundError();
         }
 
@@ -90,17 +92,17 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
         type = TargetEntity.STATION;
     }
 
-    if(isSecretStorageUserKey(path)) {
+    if (isSecretStorageUserKey(path)) {
         const userId : string = getSecretStorageUserKey(path);
 
         const userKeyRingRepository = getRepository(UserKeyRing);
 
         userSecrets = await userKeyRingRepository.findOne({
             // tslint:disable-next-line:radix
-            user_id: parseInt(userId)
+            user_id: parseInt(userId),
         });
 
-        if(typeof userSecrets === 'undefined') {
+        if (typeof userSecrets === 'undefined') {
             throw new NotFoundError();
         }
 
@@ -118,7 +120,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                 const data : {
                     public_key?: string,
                     he_key?: string
-                } = {}
+                } = {};
 
                 switch (type) {
                     case TargetEntity.STATION:
@@ -130,9 +132,9 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                         break;
                 }
 
-                return res.respond({data});
+                return res.respond({ data });
             } catch (e) {
-                if(e.response.status === 404) {
+                if (e.response.status === 404) {
                     throw new NotFoundError();
                 }
 
@@ -146,22 +148,22 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                     // saveStationSecretsToSecretEngine()
                     payload = {
                         data: {
-                            rsa_station_public_key: station.public_key
+                            rsa_station_public_key: station.public_key,
                         },
                         options: {
-                            "cas": 1
-                        }
+                            cas: 1,
+                        },
                     };
                     break;
                 case TargetEntity.USER:
                     payload = {
                         data: {
                             rsa_public_key: userSecrets.public_key,
-                            he_key: userSecrets.he_key
+                            he_key: userSecrets.he_key,
                         },
                         options: {
-                            "cas": 0
-                        }
+                            cas: 0,
+                        },
                     };
                     break;
             }
@@ -175,7 +177,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                 await useAPI(APIType.VAULT)
                     .delete(path);
             } catch (e) {
-                if(e.response.status === 404) {
+                if (e.response.status === 404) {
                     return;
                 }
 

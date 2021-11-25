@@ -8,20 +8,21 @@
     <realm-form @created="handleCreated" />
 </template>
 <script>
-import {PermissionID} from "@personalhealthtrain/ui-common";
-import RealmForm from "../../../../components/domains/realm/RealmForm";
-import {LayoutKey} from "../../../../config/layout/contants";
+import { PermissionID } from '@personalhealthtrain/ui-common';
+import RealmForm from '../../../../components/domains/realm/RealmForm';
+import { LayoutKey } from '../../../../config/layout/contants';
+
 export default {
-    components: {RealmForm},
+    components: { RealmForm },
     meta: {
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.REALM_ADD
-        ]
+            PermissionID.REALM_ADD,
+        ],
     },
     methods: {
         handleCreated(realm) {
-            this.$router.push('/admin/realms/'+realm.id);
-        }
-    }
-}
+            this.$router.push(`/admin/realms/${realm.id}`);
+        },
+    },
+};
 </script>

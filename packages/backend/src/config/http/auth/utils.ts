@@ -5,16 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {AbilityManager, AuthorizationHeader} from "@typescript-auth/core";
-import {verifyToken} from "@typescript-auth/server";
-import {getCustomRepository, getRepository} from "typeorm";
-import {UserRepository} from "../../../domains/auth/user/repository";
-import {getWritableDirPath} from "../../paths";
-import {Client, MASTER_REALM_ID, TokenPayload} from "@personalhealthtrain/ui-common";
-import {UnauthorizedError} from "@typescript-error/http";
+import { AbilityManager, AuthorizationHeader } from '@typescript-auth/core';
+import { verifyToken } from '@typescript-auth/server';
+import { getCustomRepository, getRepository } from 'typeorm';
+import { Client, MASTER_REALM_ID, TokenPayload } from '@personalhealthtrain/ui-common';
+import { UnauthorizedError } from '@typescript-error/http';
+import { UserRepository } from '../../../domains/auth/user/repository';
+import { getWritableDirPath } from '../../paths';
 
-const ip4ToInt = (ip: string) =>
-    ip.split('.').reduce((int, oct) => (int << 8) + parseInt(oct, 10), 0) >>> 0;
+const ip4ToInt = (ip: string) => ip.split('.').reduce((int, oct) => (int << 8) + parseInt(oct, 10), 0) >>> 0;
 
 const isIp4InCidr = (ip: string, cidr: string) => {
     const [range, bits = 32] = cidr.split('/');
@@ -24,20 +23,20 @@ const isIp4InCidr = (ip: string, cidr: string) => {
 
 export async function authenticateWithAuthorizationHeader(request: any, value: AuthorizationHeader) : Promise<void> {
     switch (value.type) {
-        case "Bearer":
+        case 'Bearer':
             let tokenPayload: TokenPayload;
 
             try {
                 tokenPayload = await verifyToken(value.token, {
-                    directory: getWritableDirPath()
+                    directory: getWritableDirPath(),
                 });
             } catch (e) {
                 return;
             }
 
-            const {sub: userId} = tokenPayload;
+            const { sub: userId } = tokenPayload;
 
-            if(typeof userId === 'undefined' || typeof tokenPayload.remoteAddress !== 'string') {
+            if (typeof userId === 'undefined' || typeof tokenPayload.remoteAddress !== 'string') {
                 return;
             }
 
@@ -45,14 +44,14 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
             const tokenAddress = tokenPayload.remoteAddress.replace('::ffff:', '');
             const currentAddress : string = request.ip.replace('::ffff:', '');
 
-            if(
+            if (
                 // ipv4 + ipv6 local addresses
-                ['::1', '127.0.0.1'].indexOf(currentAddress) === -1 &&
-                tokenAddress !== currentAddress &&
+                ['::1', '127.0.0.1'].indexOf(currentAddress) === -1
+                && tokenAddress !== currentAddress
                 // allow private network addresses, maybe explicit whitelist possible frontend ip addresses instead.
-                !isIp4InCidr(currentAddress, '10.0.0.0/8') &&
-                !isIp4InCidr(currentAddress, '172.16.0.0/12') &&
-                !isIp4InCidr(currentAddress, '192.168.0.0/16')
+                && !isIp4InCidr(currentAddress, '10.0.0.0/8')
+                && !isIp4InCidr(currentAddress, '172.16.0.0/12')
+                && !isIp4InCidr(currentAddress, '192.168.0.0/16')
             ) {
                 throw new UnauthorizedError();
             }
@@ -60,7 +59,7 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
             const userRepository = getCustomRepository<UserRepository>(UserRepository);
             const userQuery = userRepository.createQueryBuilder('user')
                 .addSelect('user.email')
-                .where('user.id = :id', {id: userId});
+                .where('user.id = :id', { id: userId });
 
             const user = await userQuery.getOne();
 
@@ -68,7 +67,7 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
                 throw new UnauthorizedError();
             }
 
-            const permissions =  await userRepository.getOwnedPermissions(user.id);
+            const permissions = await userRepository.getOwnedPermissions(user.id);
 
             request.user = user;
             request.userId = user.id;
@@ -76,20 +75,20 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
 
             request.ability = new AbilityManager(permissions);
             break;
-        case "Basic":
+        case 'Basic':
             const clientRepository = getRepository(Client);
             const client = await clientRepository.findOne({
                 id: value.username,
-                secret: value.password
+                secret: value.password,
             });
 
             console.log(value);
 
-            if(typeof client === 'undefined') {
+            if (typeof client === 'undefined') {
                 throw new UnauthorizedError();
             }
 
-            if(!client.service_id) {
+            if (!client.service_id) {
                 // only allow services for now... ^^
                 return;
             }
@@ -106,7 +105,7 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
 export function parseCookie(request: any) : string | undefined {
     try {
         if (typeof request.cookies?.auth_token !== 'undefined') {
-            const {access_token} = JSON.parse(request.cookies?.auth_token);
+            const { access_token } = JSON.parse(request.cookies?.auth_token);
 
             return access_token;
         }

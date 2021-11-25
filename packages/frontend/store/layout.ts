@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {storePlugin} from 'vue-layout-navigation';
+import { storePlugin } from 'vue-layout-navigation';
 
 export default {
     namespaced: true,
-    ...storePlugin
+    ...storePlugin,
 };

@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Train, TrainBuildStatus} from "@personalhealthtrain/ui-common";
-import {publishMessage} from "amqp-extension";
-import {getRepository} from "typeorm";
-import {buildTrainBuilderQueueMessage} from "../../../service/train-builder/queue";
-import {TrainBuilderCommand} from "../../../service/train-builder/type";
-import {findTrain} from "./utils";
+import { Train, TrainBuildStatus } from '@personalhealthtrain/ui-common';
+import { publishMessage } from 'amqp-extension';
+import { getRepository } from 'typeorm';
+import { buildTrainBuilderQueueMessage } from '../../../service/train-builder/queue';
+import { TrainBuilderCommand } from '../../../service/train-builder/type';
+import { findTrain } from './utils';
 
 export async function stopBuildTrain(train: Train | number | string, demo: boolean = false) : Promise<Train> {
     const repository = getRepository(Train);
@@ -22,12 +22,12 @@ export async function stopBuildTrain(train: Train | number | string, demo: boole
         throw new Error('The train could not be found.');
     }
 
-    if (!!train.run_status) {
+    if (train.run_status) {
         // todo: make it a ClientError.BadRequest
         throw new Error('The train build can not longer be stopped...');
     } else {
         // if we already send a stop event, we dont send it again... :)
-        if(train.build_status !== TrainBuildStatus.STOPPING) {
+        if (train.build_status !== TrainBuildStatus.STOPPING) {
             if (!demo) {
                 const queueMessage = await buildTrainBuilderQueueMessage(TrainBuilderCommand.STOP, train);
 
@@ -36,7 +36,7 @@ export async function stopBuildTrain(train: Train | number | string, demo: boole
         }
 
         train = repository.merge(train, {
-            build_status: train.build_status !== TrainBuildStatus.STOPPING ? TrainBuildStatus.STOPPING : TrainBuildStatus.STOPPED
+            build_status: train.build_status !== TrainBuildStatus.STOPPING ? TrainBuildStatus.STOPPING : TrainBuildStatus.STOPPED,
         });
 
         await repository.save(train);

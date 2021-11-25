@@ -5,26 +5,29 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import ServiceClientDetails from "../../../../components/domains/service/ServiceClientDetails";
-import {SERVICE_ID} from "@personalhealthtrain/ui-common";
+import { SERVICE_ID } from '@personalhealthtrain/ui-common';
+import ServiceClientDetails from '../../../../components/domains/service/ServiceClientDetails';
 
 export default {
-    components: {ServiceClientDetails},
+    components: { ServiceClientDetails },
     props: {
-        serviceId: SERVICE_ID
-    },
-    methods: {
-        handleUpdated(event) {
-            this.$emit('updated', event);
-        }
+        serviceId: SERVICE_ID,
     },
     data() {
         return {
 
-        }
-    }
-}
+        };
+    },
+    methods: {
+        handleUpdated(event) {
+            this.$emit('updated', event);
+        },
+    },
+};
 </script>
 <template>
-    <service-client-details :service-id="serviceId" @updated="handleUpdated" />
+    <service-client-details
+        :service-id="serviceId"
+        @updated="handleUpdated"
+    />
 </template>

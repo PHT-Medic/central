@@ -5,26 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIType, SingleResourceResponse, useAPI} from "../../../modules";
-import {UserKeyRing} from "./entity";
-import {nullifyEmptyObjectProperties} from "../../../utils";
+import { APIType, SingleResourceResponse, useAPI } from '../../../modules';
+import { UserKeyRing } from './entity';
+import { nullifyEmptyObjectProperties } from '../../../utils';
 
 export async function getAPIUserKeyRing() : Promise<SingleResourceResponse<UserKeyRing>> {
     const response = await useAPI(APIType.DEFAULT).get('user-key-rings');
-    return response.data
+    return response.data;
 }
 
-export async function addAPIUserKeyRing(data: Partial<UserKeyRing>) : Promise<SingleResourceResponse<UserKeyRing>>  {
+export async function addAPIUserKeyRing(data: Partial<UserKeyRing>) : Promise<SingleResourceResponse<UserKeyRing>> {
     const response = await useAPI(APIType.DEFAULT).post('user-key-rings', nullifyEmptyObjectProperties(data));
-    return response.data
+    return response.data;
 }
 
-export async function editAPIUserKeyRing(id: typeof UserKeyRing.prototype.id, data: Partial<UserKeyRing>) : Promise<SingleResourceResponse<UserKeyRing>>  {
-    const response = await useAPI(APIType.DEFAULT).post('user-key-rings/' + id, nullifyEmptyObjectProperties(data));
-    return response.data
+export async function editAPIUserKeyRing(id: typeof UserKeyRing.prototype.id, data: Partial<UserKeyRing>) : Promise<SingleResourceResponse<UserKeyRing>> {
+    const response = await useAPI(APIType.DEFAULT).post(`user-key-rings/${id}`, nullifyEmptyObjectProperties(data));
+    return response.data;
 }
 
-export async function dropAPIUserKeyRing(id: typeof UserKeyRing.prototype.id) : Promise<SingleResourceResponse<UserKeyRing>>  {
-    const response = await useAPI(APIType.DEFAULT).delete('user-key-rings/' + id);
-    return response.data
+export async function dropAPIUserKeyRing(id: typeof UserKeyRing.prototype.id) : Promise<SingleResourceResponse<UserKeyRing>> {
+    const response = await useAPI(APIType.DEFAULT).delete(`user-key-rings/${id}`);
+    return response.data;
 }

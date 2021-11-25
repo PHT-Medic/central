@@ -5,21 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Message} from "amqp-extension";
+import { Message } from 'amqp-extension';
 import {
     AuthClientType,
-    ensureHarborProjectWebHook,
     HarborProjectWebhook,
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
-    saveServiceSecretsToSecretEngine,
     SERVICE_ID,
-    Station
-} from "@personalhealthtrain/ui-common";
-import {getRepository, IsNull, Not} from "typeorm";
-import env from "../../env";
-import {AuthClientSecurityQueueMessagePayload} from "../../domains/service/queue";
+    Station,
+    ensureHarborProjectWebHook,
+    saveServiceSecretsToSecretEngine,
+} from '@personalhealthtrain/ui-common';
+import { IsNull, Not, getRepository } from 'typeorm';
+import env from '../../env';
+import { AuthClientSecurityQueueMessagePayload } from '../../domains/service/queue';
 
 export async function syncAuthClientSecurity(message: Message) {
     const payload : AuthClientSecurityQueueMessagePayload = message.data as AuthClientSecurityQueueMessagePayload;
@@ -32,7 +32,7 @@ export async function syncAuthClientSecurity(message: Message) {
                 case SERVICE_ID.TRAIN_ROUTER:
                     await saveServiceSecretsToSecretEngine(payload.id, {
                         id: payload.clientId,
-                        secret: payload.clientSecret
+                        secret: payload.clientSecret,
                     });
                     break;
                 case SERVICE_ID.REGISTRY:
@@ -40,27 +40,25 @@ export async function syncAuthClientSecurity(message: Message) {
                     const queryBuilder = stationRepository.createQueryBuilder('station');
                     const stations = await queryBuilder
                         .addSelect('station.registry_project_id')
-                        .where("station.registry_project_id IS NOT NULL")
+                        .where('station.registry_project_id IS NOT NULL')
                         .getMany();
 
-                    const promises : Promise<HarborProjectWebhook>[] = stations.map((station: Station) => {
-                        return ensureHarborProjectWebHook(station.registry_project_id, {
-                            id: payload.clientId,
-                            secret: payload.clientSecret
-                        }, {internalAPIUrl: env.internalApiUrl});
-                    });
+                    const promises : Promise<HarborProjectWebhook>[] = stations.map((station: Station) => ensureHarborProjectWebHook(station.registry_project_id, {
+                        id: payload.clientId,
+                        secret: payload.clientSecret,
+                    }, { internalAPIUrl: env.internalApiUrl }));
 
                     const specialProjects = [
                         REGISTRY_MASTER_IMAGE_PROJECT_NAME,
                         REGISTRY_INCOMING_PROJECT_NAME,
-                        REGISTRY_OUTGOING_PROJECT_NAME
+                        REGISTRY_OUTGOING_PROJECT_NAME,
                     ];
 
-                    specialProjects.map(repository => {
+                    specialProjects.map((repository) => {
                         promises.push(ensureHarborProjectWebHook(repository, {
                             id: payload.clientId,
-                            secret: payload.clientSecret
-                        }, {internalAPIUrl: env.internalApiUrl}, true));
+                            secret: payload.clientSecret,
+                        }, { internalAPIUrl: env.internalApiUrl }, true));
 
                         return repository;
                     });

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {TrainBuildStatusType} from "../../pht";
+import { TrainBuildStatusType } from '../../pht';
 
 export enum SERVICE_ID {
     REGISTRY = 'REGISTRY',

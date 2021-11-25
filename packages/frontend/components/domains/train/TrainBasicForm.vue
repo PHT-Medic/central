@@ -5,32 +5,32 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {addAPITrain, getProposals} from "@personalhealthtrain/ui-common";
-import {required} from 'vuelidate/lib/validators';
+import { addAPITrain, getProposals } from '@personalhealthtrain/ui-common';
+import { required } from 'vuelidate/lib/validators';
 
 export default {
     props: {
         proposalId: {
             type: Number,
-            default: undefined
-        }
+            default: undefined,
+        },
     },
     data() {
         return {
             busy: false,
             form: {
                 type: 'discovery',
-                proposal_id: ''
+                proposal_id: '',
             },
             proposal: {
                 items: [],
-                busy: false
+                busy: false,
             },
             types: [
-                {id: 'analyse', name: 'Analyse'},
-                {id: 'discovery', name: 'Discovery'}
-            ]
-        }
+                { id: 'analyse', name: 'Analyse' },
+                { id: 'discovery', name: 'Discovery' },
+            ],
+        };
     },
     validations() {
         return {
@@ -39,20 +39,31 @@ export default {
                     required,
                 },
                 proposal_id: {
-                    required
-                }
-            }
-        }
+                    required,
+                },
+            },
+        };
+    },
+    computed: {
+        isDiscoveryTrain() {
+            return this.form.type === 'discovery';
+        },
+        isAnalyseTrain() {
+            return this.form.type === 'analyse';
+        },
+        fixedProposal() {
+            return typeof this.proposalId !== 'undefined';
+        },
     },
     created() {
         this.loadProposals().then(() => {
-            if(typeof this.proposalId !== 'undefined') {
-                const index = this.proposal.items.findIndex(proposal => proposal.id === this.proposalId);
+            if (typeof this.proposalId !== 'undefined') {
+                const index = this.proposal.items.findIndex((proposal) => proposal.id === this.proposalId);
                 if (index !== -1) {
                     this.form.proposal_id = this.proposalId;
                 }
             }
-        })
+        });
     },
     methods: {
         async loadProposals() {
@@ -69,7 +80,7 @@ export default {
             this.proposal.busy = false;
         },
         async add() {
-            if(this.busy) return;
+            if (this.busy) return;
 
             this.busy = true;
 
@@ -83,34 +94,36 @@ export default {
             this.busy = false;
         },
     },
-    computed: {
-        isDiscoveryTrain() {
-            return this.form.type === 'discovery';
-        },
-        isAnalyseTrain() {
-            return this.form.type === 'analyse';
-        },
-        fixedProposal() {
-            return typeof this.proposalId !== 'undefined';
-        }
-    }
-}
+};
 </script>
 <template>
     <form @submit.prevent="add">
         <div class="form-group">
             <label>Type</label>
-            <select class="form-control" v-model="$v.form.type.$model">
-                <option v-for="(value,key) in types" :key="key" :value="value.id">
-                    {{value.name}}
+            <select
+                v-model="$v.form.type.$model"
+                class="form-control"
+            >
+                <option
+                    v-for="(value,key) in types"
+                    :key="key"
+                    :value="value.id"
+                >
+                    {{ value.name }}
                 </option>
             </select>
 
-            <div v-if="!$v.form.type.required && !$v.form.type.$model" class="form-group-hint group-required">
+            <div
+                v-if="!$v.form.type.required && !$v.form.type.$model"
+                class="form-group-hint group-required"
+            >
                 Choose one of the available train types...
             </div>
         </div>
-        <div v-if="$v.form.type.$model" class="alert alert-info alert-sm">
+        <div
+            v-if="$v.form.type.$model"
+            class="alert alert-info alert-sm"
+        >
             <template v-if="$v.form.type.$model === 'analyse'">
                 Create a analyse train on base of the knowledge achieved during the discovery phase.
             </template>
@@ -119,25 +132,46 @@ export default {
             </template>
         </div>
 
-        <hr />
+        <hr>
 
-        <div v-if="!fixedProposal" class="form-group">
+        <div
+            v-if="!fixedProposal"
+            class="form-group"
+        >
             <label>Proposal</label>
-            <select class="form-control" v-model="$v.form.proposal_id.$model" :disabled="proposal.busy">
-                <option value="">--- Select an option ---</option>
-                <option v-for="(value,key) in proposal.items" :key="key" :value="value.id">
-                    {{value.title}}
+            <select
+                v-model="$v.form.proposal_id.$model"
+                class="form-control"
+                :disabled="proposal.busy"
+            >
+                <option value="">
+                    --- Select an option ---
+                </option>
+                <option
+                    v-for="(value,key) in proposal.items"
+                    :key="key"
+                    :value="value.id"
+                >
+                    {{ value.title }}
                 </option>
             </select>
 
-            <div v-if="!$v.form.proposal_id.required && !$v.form.proposal_id.$model" class="form-group-hint group-required">
+            <div
+                v-if="!$v.form.proposal_id.required && !$v.form.proposal_id.$model"
+                class="form-group-hint group-required"
+            >
                 Choose a proposal as base of your train
             </div>
         </div>
 
         <div>
-            <button type="submit" class="btn btn-xs btn-primary" :disabled="$v.form.$invalid || busy" @click.prevent="add">
-                <i class="fa fa-plus"></i> create
+            <button
+                type="submit"
+                class="btn btn-xs btn-primary"
+                :disabled="$v.form.$invalid || busy"
+                @click.prevent="add"
+            >
+                <i class="fa fa-plus" /> create
             </button>
         </div>
     </form>

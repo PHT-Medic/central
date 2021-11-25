@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildMessage, Message} from "amqp-extension";
-import {MessageQueueResultServiceRoutingKey} from "../../../config/service/mq";
+import { Message, buildMessage } from 'amqp-extension';
+import { MessageQueueResultServiceRoutingKey } from '../../../config/service/mq';
 
 export enum ResultServiceCommand {
     START = 'start',
@@ -22,13 +22,13 @@ export type ResultServiceDataPayload = {
 
 export function buildResultServiceQueueMessage(
     command: ResultServiceCommand,
-    data: ResultServiceDataPayload
+    data: ResultServiceDataPayload,
 ) : Message {
-   return buildMessage({
+    return buildMessage({
         options: {
-            routingKey: MessageQueueResultServiceRoutingKey.COMMAND_OUT
+            routingKey: MessageQueueResultServiceRoutingKey.COMMAND_OUT,
         },
         type: command,
-        data
+        data,
     });
 }

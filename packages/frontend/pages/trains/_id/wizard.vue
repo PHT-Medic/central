@@ -5,23 +5,27 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import TrainWizard from "../../../components/domains/train/TrainWizard";
+import TrainWizard from '../../../components/domains/train/TrainWizard';
+
 export default {
-    components: {TrainWizard},
+    components: { TrainWizard },
     props: {
         train: {
             type: Object,
-            default: undefined
-        }
+            default: undefined,
+        },
     },
     methods: {
         handleUpdated(train) {
             console.log('updated', train);
             this.$emit('updated', train);
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
-    <train-wizard :train-property="train" @updated="handleUpdated" />
+    <train-wizard
+        :train-property="train"
+        @updated="handleUpdated"
+    />
 </template>

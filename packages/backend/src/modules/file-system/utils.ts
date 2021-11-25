@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import fs from "fs";
-import path from "path";
-import crypto from "crypto";
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
 
 export async function ensureDirectoryExists(path: string) {
     try {
@@ -15,7 +15,7 @@ export async function ensureDirectoryExists(path: string) {
         await fs.promises.chmod(path, 0o775);
     } catch (e) {
         await fs.promises.mkdir(path, {
-            mode: 0o775
+            mode: 0o775,
         });
     }
 }
@@ -64,6 +64,6 @@ export function createFileStreamHandler(destinationFilePath: string) {
                 console.log(e);
             }
         },
-        getWritePromise: () => writePromise
+        getWritePromise: () => writePromise,
     };
 }

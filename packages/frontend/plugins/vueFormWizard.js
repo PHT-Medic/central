@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue from "vue";
-import VueFormWizard from "vue-form-wizard";
+import Vue from 'vue';
+import VueFormWizard from 'vue-form-wizard';
 
 Vue.use(VueFormWizard);

@@ -5,19 +5,21 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropApiTrainFile, getApiTrainFiles, uploadTrainFiles, Train} from "@personalhealthtrain/ui-common";
-import {required} from 'vuelidate/lib/validators';
-import TrainFile from "./TrainFile";
-import TrainFolder from "./TrainFolder";
-import TrainFormFile from "./TrainFormFile";
+import {
+    Train, dropApiTrainFile, getApiTrainFiles, uploadTrainFiles,
+} from '@personalhealthtrain/ui-common';
+import { required } from 'vuelidate/lib/validators';
+import TrainFile from './TrainFile';
+import TrainFolder from './TrainFolder';
+import TrainFormFile from './TrainFormFile';
 
 export default {
-    components: {TrainFormFile, TrainFolder, TrainFile},
+    components: { TrainFormFile, TrainFolder, TrainFile },
     props: {
         train: {
             type: Object,
-            default: undefined
-        }
+            default: undefined,
+        },
     },
     data() {
         return {
@@ -30,29 +32,46 @@ export default {
 
             actionBusy: false,
             formInfo: {
-                filesSyncing: false
+                filesSyncing: false,
             },
             form: {
                 entrypoint_file_id: undefined,
                 path: '',
-                files: []
+                files: [],
+            },
+        };
+    },
+    computed: {
+        paths() {
+            return this.form.path.split('/').filter((el) => el !== '');
+        },
+        entrypointFileId() {
+            if (!this.form.entrypoint_file_id) {
+                return '';
             }
-        }
+
+            const index = this.items.findIndex((file) => file.id === this.form.entrypoint_file_id);
+            if (index === -1) {
+                return '';
+            }
+
+            return `${this.items[index].directory}/${this.items[index].name}`;
+        },
     },
     created() {
-        if(typeof this.train.entrypoint_executable !== 'undefined' && this.train.entrypoint_executable) {
+        if (typeof this.train.entrypoint_executable !== 'undefined' && this.train.entrypoint_executable) {
             this.form.entrypoint_executable = this.train.entrypoint_executable;
         }
 
-        if(typeof this.train.entrypoint_file_id !== 'undefined') {
+        if (typeof this.train.entrypoint_file_id !== 'undefined') {
             this.form.entrypoint_file_id = this.train.entrypoint_file_id;
         }
 
-        this.load().then(r => r);
+        this.load().then((r) => r);
     },
     methods: {
         async load() {
-            if(this.busy) return;
+            if (this.busy) return;
 
             this.busy = true;
 
@@ -65,23 +84,23 @@ export default {
             this.busy = false;
         },
         async upload() {
-            if(this.actionBusy) return;
+            if (this.actionBusy) return;
 
-            if(this.form.files.length === 0) return;
+            if (this.form.files.length === 0) return;
 
             this.actionBusy = true;
 
             try {
-                let formData = new FormData();
-                for(let i=0; i<this.form.files.length; i++) {
+                const formData = new FormData();
+                for (let i = 0; i < this.form.files.length; i++) {
                     console.log(this.form.files[i]);
-                    formData.append('files['+i+']', this.form.files[i]);
+                    formData.append(`files[${i}]`, this.form.files[i]);
                 }
 
                 const response = await uploadTrainFiles(this.train.id, formData);
                 this.form.files = [];
 
-                for(let i=0; i<response.data.length; i++) {
+                for (let i = 0; i < response.data.length; i++) {
                     this.items.push(response.data[i]);
                 }
 
@@ -97,18 +116,18 @@ export default {
         //----------------------------------------------------------------
 
         async dropSelected() {
-            if(this.actionBusy) return;
+            if (this.actionBusy) return;
 
-            if(this.selected.length === 0) return;
+            if (this.selected.length === 0) return;
 
             this.actionBusy = true;
 
             try {
-                for(let i=0; i<this.selected.length; i++) {
+                for (let i = 0; i < this.selected.length; i++) {
                     await dropApiTrainFile(this.train.id, this.selected[i]);
 
-                    const index = this.items.findIndex(file => file.id === this.selected[i]);
-                    if(index !== -1) {
+                    const index = this.items.findIndex((file) => file.id === this.selected[i]);
+                    if (index !== -1) {
                         this.items.splice(index, 1);
                     }
 
@@ -121,15 +140,15 @@ export default {
             this.actionBusy = false;
         },
         selectAllFiles() {
-            if(this.selectAll) {
-                this.selected = this.items.map(file => file.id).filter(id => id !== this.form.entrypoint_file_id);
+            if (this.selectAll) {
+                this.selected = this.items.map((file) => file.id).filter((id) => id !== this.form.entrypoint_file_id);
             } else {
                 this.selected = [];
             }
         },
         selectFile(event) {
-            const index = this.selected.findIndex(file => file === event.id);
-            if(index === -1) {
+            const index = this.selected.findIndex((file) => file === event.id);
+            if (index === -1) {
                 this.selected.push(event.id);
             } else {
                 this.selected.splice(index, 1);
@@ -139,31 +158,30 @@ export default {
         checkFormFiles(event) {
             event.preventDefault();
 
-            for(let i=0; i < event.target.files.length; i++) {
+            for (let i = 0; i < event.target.files.length; i++) {
                 this.form.files.push(event.target.files[i]);
             }
 
             this.$refs.files.value = '';
         },
         dropFormFile(event) {
-            const index = this.form.files.findIndex(file => {
-                if(
-                    file.hasOwnProperty('webkitRelativePath') &&
-                    event.hasOwnProperty('webkitRelativePath')
+            const index = this.form.files.findIndex((file) => {
+                if (
+                    file.hasOwnProperty('webkitRelativePath')
+                    && event.hasOwnProperty('webkitRelativePath')
                 ) {
                     return file.webkitRelativePath === event.webkitRelativePath;
-                } else {
-                    return file.name === event.name;
                 }
+                return file.name === event.name;
             });
 
-            if(index !== -1) {
+            if (index !== -1) {
                 this.form.files.splice(index, 1);
             }
         },
         handleFileDeleted(id) {
-            const index = this.items.findIndex(file => file.id === id);
-            if(index !== -1) {
+            const index = this.items.findIndex((file) => file.id === id);
+            if (index !== -1) {
                 this.items.splice(index, 1);
             }
 
@@ -171,19 +189,17 @@ export default {
         },
 
         changeEntryPointFile(file) {
-            if(!this.form.entrypoint_file_id) {
+            if (!this.form.entrypoint_file_id) {
                 this.form.entrypoint_file_id = file.id;
+            } else if (this.form.entrypoint_file_id === file.id) {
+                this.form.entrypoint_file_id = undefined;
             } else {
-                if(this.form.entrypoint_file_id === file.id) {
-                    this.form.entrypoint_file_id = undefined;
-                } else {
-                    this.form.entrypoint_file_id = file.id;
-                }
+                this.form.entrypoint_file_id = file.id;
             }
 
-            if(this.form.entrypoint_file_id) {
-                const index = this.selected.findIndex(file => file === this.form.entrypoint_file_id);
-                if(index !== -1) {
+            if (this.form.entrypoint_file_id) {
+                const index = this.selected.findIndex((file) => file === this.form.entrypoint_file_id);
+                if (index !== -1) {
                     this.selected.splice(index, 1);
                 }
             }
@@ -192,41 +208,24 @@ export default {
         },
 
         getParentPath(path) {
-            if(path === '/') return '';
+            if (path === '/') return '';
 
-            let parts = path.split('/').filter(el => el !== '');
+            const parts = path.split('/').filter((el) => el !== '');
             parts.pop();
 
             return parts.join('/');
-        }
+        },
     },
     validations() {
         return {
             form: {
                 entrypoint_executable: {
-                    required
-                }
-            }
-        }
+                    required,
+                },
+            },
+        };
     },
-    computed: {
-        paths() {
-            return this.form.path.split('/').filter(el => el !== '');
-        },
-        entrypointFileId() {
-            if(!this.form.entrypoint_file_id) {
-                return '';
-            }
-
-            const index = this.items.findIndex(file => file.id === this.form.entrypoint_file_id);
-            if(index === -1) {
-                return '';
-            }
-
-            return this.items[index].directory + '/' + this.items[index].name;
-        }
-    }
-}
+};
 </script>
 <template>
     <div>
@@ -236,31 +235,53 @@ export default {
                 <div class="form-group">
                     <label>Directories / Files</label>
                     <div class="custom-file">
-                        <input type="file" :webkitdirectory="directoryMode" class="custom-file-input" id="files" ref="files" @change="checkFormFiles" multiple :disbaled="actionBusy">
-                        <label class="custom-file-label" for="files">Select files...</label>
+                        <input
+                            id="files"
+                            ref="files"
+                            type="file"
+                            :webkitdirectory="directoryMode"
+                            class="custom-file-input"
+                            multiple
+                            :disbaled="actionBusy"
+                            @change="checkFormFiles"
+                        >
+                        <label
+                            class="custom-file-label"
+                            for="files"
+                        >Select files...</label>
                     </div>
                 </div>
                 <div class="form-group">
-                    <b-form-checkbox switch v-model="directoryMode">Directory mode</b-form-checkbox>
+                    <b-form-checkbox
+                        v-model="directoryMode"
+                        switch
+                    >
+                        Directory mode
+                    </b-form-checkbox>
                 </div>
 
-                <hr />
+                <hr>
 
                 <div class="d-flex flex-row">
                     <div>
-                        <h6 class="title text-muted">Files
+                        <h6 class="title text-muted">
+                            Files
                             <span style="font-size: 0.65rem">
                                 <span class="text-info">
-                                    <i class="fa fa-file-upload"></i> not uploaded
+                                    <i class="fa fa-file-upload" /> not uploaded
                                 </span>
                             </span>
                         </h6>
                     </div>
                     <div class="ml-auto">
-                        <h6 class="title text-muted">Path:
+                        <h6 class="title text-muted">
+                            Path:
                             <span class="sub-title">
                                 <template v-for="(path, key) in paths">
-                                     {{path}} <span class="text-dark" :key="key">/</span>
+                                    {{ path }} <span
+                                        :key="key"
+                                        class="text-dark"
+                                    >/</span>
                                 </template>
                                 <template v-if="paths.length === 0">
                                     [root]
@@ -270,22 +291,30 @@ export default {
                     </div>
                 </div>
 
-                <div v-if="form.files.length === 0" class="alert alert-info alert-sm m-t-10">
+                <div
+                    v-if="form.files.length === 0"
+                    class="alert alert-info alert-sm m-t-10"
+                >
                     You have not selected any files to upload...
                 </div>
 
                 <div class="d-flex flex-column">
                     <train-form-file
-                        class="mr-1"
                         v-for="(file,key) in form.files"
                         :key="key"
+                        class="mr-1"
                         :file="file"
                         @drop="dropFormFile"
                     />
                 </div>
 
                 <div class="form-group">
-                    <button type="button" class="btn btn-xs btn-dark" :disabled="actionBusy || form.files.length === 0" @click.prevent="upload">
+                    <button
+                        type="button"
+                        class="btn btn-xs btn-dark"
+                        :disabled="actionBusy || form.files.length === 0"
+                        @click.prevent="upload"
+                    >
                         Upload
                     </button>
                 </div>
@@ -294,36 +323,48 @@ export default {
                 <h6>Manage</h6>
                 <div class="form-group">
                     <label>Entrypoint File</label>
-                    <input type="text" class="form-control" :value="entrypointFileId" :disabled="true">
+                    <input
+                        type="text"
+                        class="form-control"
+                        :value="entrypointFileId"
+                        :disabled="true"
+                    >
                 </div>
 
                 <div
                     v-if="!entrypointFileId"
-                    class="alert alert-warning alert-sm mb-0">
+                    class="alert alert-warning alert-sm mb-0"
+                >
                     A file from the list below must be selected as entrypoint for the image command.
                 </div>
 
-                <hr />
+                <hr>
 
-                <h6 class="title text-muted">Files
+                <h6 class="title text-muted">
+                    Files
                     <span style="font-size: 0.65rem">
                         <span class="text-success">
-                            <i class="fa fa-file"></i> uploaded
+                            <i class="fa fa-file" /> uploaded
                         </span>
                     </span>
                 </h6>
 
-
                 <div class="form-check">
-                    <input type="checkbox" v-model="selectAll" @change="selectAllFiles" class="form-check-input" id="selectAllFiles">
+                    <input
+                        id="selectAllFiles"
+                        v-model="selectAll"
+                        type="checkbox"
+                        class="form-check-input"
+                        @change="selectAllFiles"
+                    >
                     <label for="selectAllFiles">Select all</label>
                 </div>
 
                 <div class="d-flex flex-column">
                     <train-file
-                        class="mr-1"
                         v-for="(file,key) in items"
                         :key="key"
+                        class="mr-1"
                         :file="file"
                         :files-selected="selected"
                         :file-selected-id="form.entrypoint_file_id"
@@ -333,7 +374,12 @@ export default {
                 </div>
 
                 <div class="form-group">
-                    <button type="button" class="btn btn-warning btn-xs" :disabled="actionBusy || selected.length === 0" @click.prevent="dropSelected">
+                    <button
+                        type="button"
+                        class="btn btn-warning btn-xs"
+                        :disabled="actionBusy || selected.length === 0"
+                        @click.prevent="dropSelected"
+                    >
                         Delete
                     </button>
                 </div>

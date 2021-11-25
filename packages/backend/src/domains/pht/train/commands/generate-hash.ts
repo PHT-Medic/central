@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Train, TrainConfigurationStatus, TrainFile} from "@personalhealthtrain/ui-common";
-import {getRepository} from "typeorm";
-import {getTrainFileFilePath} from "../../../../config/pht/train-file/path";
-import {findTrain} from "./utils";
-import crypto from "crypto";
-import fs from "fs";
+import { Train, TrainConfigurationStatus, TrainFile } from '@personalhealthtrain/ui-common';
+import { getRepository } from 'typeorm';
+import crypto from 'crypto';
+import fs from 'fs';
+import { getTrainFileFilePath } from '../../../../config/pht/train-file/path';
+import { findTrain } from './utils';
 
 export async function generateTrainHash(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);
@@ -26,11 +26,10 @@ export async function generateTrainHash(train: Train | number | string) : Promis
     // User Hash
     hash.update(Buffer.from(train.user_id.toString(), 'utf-8'));
 
-
     // Files
     const trainFilesRepository = getRepository(TrainFile);
     const trainFiles = await trainFilesRepository.createQueryBuilder('trainFiles')
-        .where("trainFiles.train_id = :id", {id: train.id})
+        .where('trainFiles.train_id = :id', { id: train.id })
         .getMany();
 
     for (let i = 0; i < trainFiles.length; i++) {
@@ -46,9 +45,9 @@ export async function generateTrainHash(train: Train | number | string) : Promis
     const sessionId: Buffer = crypto.randomBytes(64);
     hash.update(sessionId);
 
-    const query: Buffer | undefined = !!train.query && train.query !== '' ?
-        Buffer.from(train.query, 'utf-8') :
-        undefined;
+    const query: Buffer | undefined = !!train.query && train.query !== ''
+        ? Buffer.from(train.query, 'utf-8')
+        : undefined;
 
     if (typeof query !== 'undefined') {
         hash.update(query);

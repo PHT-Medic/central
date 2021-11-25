@@ -7,18 +7,18 @@
 
 <script>
 import {
-    dropAPIMasterImage,
-    executeAPIServiceTask, MasterImageCommand,
+    MasterImageCommand,
     REGISTRY_INCOMING_PROJECT_NAME, REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-    REGISTRY_OUTGOING_PROJECT_NAME,
-    RegistryCommand, runAPITMasterImagesCommand, SERVICE_ID
-} from "@personalhealthtrain/ui-common"
-import MasterImageList from "../../master-image/MasterImageList";
+    REGISTRY_OUTGOING_PROJECT_NAME, RegistryCommand,
+    SERVICE_ID,
+    dropAPIMasterImage, executeAPIServiceTask, runAPITMasterImagesCommand,
+} from '@personalhealthtrain/ui-common';
+import MasterImageList from '../../master-image/MasterImageList';
 
 export default {
-    components: {MasterImageList},
+    components: { MasterImageList },
     props: {
-        serviceId: SERVICE_ID
+        serviceId: SERVICE_ID,
     },
     data() {
         return {
@@ -27,18 +27,18 @@ export default {
                 executed: false,
                 created: '?',
                 deleted: '?',
-                updated: '?'
+                updated: '?',
             },
             projectKey: {
                 INCOMING: REGISTRY_INCOMING_PROJECT_NAME,
                 OUTGOING: REGISTRY_OUTGOING_PROJECT_NAME,
-                MASTER_IMAGE: REGISTRY_MASTER_IMAGE_PROJECT_NAME
-            }
-        }
+                MASTER_IMAGE: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
+            },
+        };
     },
     methods: {
         async executeTask(task, taskData = {}) {
-            if(this.busy) return;
+            if (this.busy) return;
 
             this.busy = true;
 
@@ -46,7 +46,7 @@ export default {
                 const data = await executeAPIServiceTask(this.serviceId, task, taskData);
 
                 this.$bvToast.toast('You successfully executed the harbor command.', {
-                    toaster: 'b-toaster-top-center'
+                    toaster: 'b-toaster-top-center',
                 });
 
                 this.busy = false;
@@ -57,8 +57,8 @@ export default {
 
                 this.$bvToast.toast(e.message, {
                     toaster: 'b-toaster-top-center',
-                    variant: 'danger'
-                })
+                    variant: 'danger',
+                });
             }
         },
 
@@ -69,19 +69,19 @@ export default {
         },
         async addProjectWebhook(key) {
             await this.executeTask(RegistryCommand.PROJECT_WEBHOOK_CREATE, {
-                name: key
+                name: key,
             });
         },
         async addProjectRobotAccount(key) {
             await this.executeTask(RegistryCommand.PROJECT_ROBOT_ACCOUNT_CREATE, {
-                name: key
+                name: key,
             });
         },
         async syncProjectRepositories(key) {
             try {
                 switch (key) {
                     case REGISTRY_MASTER_IMAGE_PROJECT_NAME:
-                        const {images} = await runAPITMasterImagesCommand(MasterImageCommand.GIT_REPOSITORY_SYNC);
+                        const { images } = await runAPITMasterImagesCommand(MasterImageCommand.GIT_REPOSITORY_SYNC);
 
                         this.masterImagesMeta.executed = true;
 
@@ -89,39 +89,39 @@ export default {
                         this.masterImagesMeta.deleted = images.deleted.length;
                         this.masterImagesMeta.updated = images.updated.length;
 
-                        await this.$refs["master-image-list"].load();
+                        await this.$refs['master-image-list'].load();
                         break;
                     default:
-                        const {data, meta} = await this.executeTask(RegistryCommand.PROJECT_REPOSITORIES_SYNC, {
-                            name: key
+                        const { data, meta } = await this.executeTask(RegistryCommand.PROJECT_REPOSITORIES_SYNC, {
+                            name: key,
                         });
                 }
             } catch (e) {
                 this.$bvToast.toast(e.message, {
                     toaster: 'b-toaster-top-center',
-                    variant: 'danger'
-                })
+                    variant: 'danger',
+                });
             }
         },
         async dropMasterImage(id) {
             try {
                 await dropAPIMasterImage(id);
 
-                this.$refs["master-image-list"].dropArrayItem(id);
+                this.$refs['master-image-list'].dropArrayItem(id);
             } catch (e) {
 
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div>
-        <h4><i class="fas fa-archive"></i> Projects</h4>
+        <h4><i class="fas fa-archive" /> Projects</h4>
 
         <div class="row mb-3">
             <div class="col">
-                <h6><i class="fa fa-sign-in-alt"></i> Incoming</h6>
+                <h6><i class="fa fa-sign-in-alt" /> Incoming</h6>
 
                 <p class="mb-1">
                     The incoming project is required for the <i>TrainBuilder</i> to work properly. When the TrainBuilder
@@ -129,33 +129,53 @@ export default {
                     From there the TrainRouter can move it to the first station project of the route.
                 </p>
 
-                <button type="button" class="btn btn-success btn-xs" @click.prevent="addProject(projectKey.INCOMING)" :disabled="busy">
-                    <i class="fa fa-plus"></i> Create
+                <button
+                    type="button"
+                    class="btn btn-success btn-xs"
+                    :disabled="busy"
+                    @click.prevent="addProject(projectKey.INCOMING)"
+                >
+                    <i class="fa fa-plus" /> Create
                 </button>
-                <button type="button" class="btn btn-dark btn-xs" @click.prevent="addProjectWebhook(projectKey.INCOMING)" :disabled="busy">
-                    <i class="fas fa-chess-rook"></i> Webhook
+                <button
+                    type="button"
+                    class="btn btn-dark btn-xs"
+                    :disabled="busy"
+                    @click.prevent="addProjectWebhook(projectKey.INCOMING)"
+                >
+                    <i class="fas fa-chess-rook" /> Webhook
                 </button>
             </div>
             <div class="col">
-                <h6><i class="fa fa-sign-out-alt"></i>Outgoing</h6>
+                <h6><i class="fa fa-sign-out-alt" />Outgoing</h6>
 
                 <p class="mb-1">
                     The outgoing project is required for the <i>ResultService</i> to pull the train from the
                     outgoing project and extract the results of the journey.
                 </p>
 
-                <button type="button" class="btn btn-success btn-xs" @click.prevent="addProject(projectKey.OUTGOING)" :disabled="busy">
-                    <i class="fa fa-plus"></i> Create
+                <button
+                    type="button"
+                    class="btn btn-success btn-xs"
+                    :disabled="busy"
+                    @click.prevent="addProject(projectKey.OUTGOING)"
+                >
+                    <i class="fa fa-plus" /> Create
                 </button>
-                <button type="button" class="btn btn-dark btn-xs" @click.prevent="addProjectWebhook(projectKey.OUTGOING)" :disabled="busy">
-                    <i class="fas fa-chess-rook"></i> Webhook
+                <button
+                    type="button"
+                    class="btn btn-dark btn-xs"
+                    :disabled="busy"
+                    @click.prevent="addProjectWebhook(projectKey.OUTGOING)"
+                >
+                    <i class="fas fa-chess-rook" /> Webhook
                 </button>
             </div>
         </div>
 
-        <hr />
+        <hr>
 
-        <h6><i class="fas fa-sd-card"></i> Master Images</h6>
+        <h6><i class="fas fa-sd-card" /> Master Images</h6>
         <div class="row">
             <div class="col">
                 <p>
@@ -165,11 +185,21 @@ export default {
                 </p>
 
                 <div class="mb-1">
-                    <button type="button" class="btn btn-success btn-xs" @click.prevent="addProject(projectKey.MASTER_IMAGE)" :disabled="busy">
-                        <i class="fa fa-plus"></i> Create
+                    <button
+                        type="button"
+                        class="btn btn-success btn-xs"
+                        :disabled="busy"
+                        @click.prevent="addProject(projectKey.MASTER_IMAGE)"
+                    >
+                        <i class="fa fa-plus" /> Create
                     </button>
-                    <button type="button" class="btn btn-xs btn-primary" :disabled="busy" @click.prevent="syncProjectRepositories(projectKey.MASTER_IMAGE)">
-                        <i class="fa fa-sync"></i> Sync
+                    <button
+                        type="button"
+                        class="btn btn-xs btn-primary"
+                        :disabled="busy"
+                        @click.prevent="syncProjectRepositories(projectKey.MASTER_IMAGE)"
+                    >
+                        <i class="fa fa-sync" /> Sync
                     </button>
                 </div>
 
@@ -186,9 +216,16 @@ export default {
                     <template slot="header-title">
                         <strong>Overview</strong>
                     </template>
-                    <template slot="item-actions" slot-scope="{ item }">
-                        <button type="button" class="btn btn-danger btn-xs" @click.prevent="dropMasterImage(item.id)">
-                            <i class="fa fa-trash"></i>
+                    <template
+                        slot="item-actions"
+                        slot-scope="{ item }"
+                    >
+                        <button
+                            type="button"
+                            class="btn btn-danger btn-xs"
+                            @click.prevent="dropMasterImage(item.id)"
+                        >
+                            <i class="fa fa-trash" />
                         </button>
                     </template>
                 </master-image-list>

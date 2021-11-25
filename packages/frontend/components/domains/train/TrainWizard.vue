@@ -7,26 +7,30 @@
 <script>
 import Vue from 'vue';
 import {
-    editAPITrain, getAPITrainStations,
+    TrainCommand, TrainConfigurationStatus,
+    editAPITrain,
+    getAPITrainStations,
     runAPITrainCommand,
-    TrainCommand,
-    TrainConfigurationStatus
-} from "@personalhealthtrain/ui-common";
-import TrainWizardConfiguratorStep from "./wizard/TrainWizardConfiguratorStep";
-import TrainFileManager from "./file/TrainFileManager";
-import TrainWizardHashStep from "./wizard/TrainWizardHashStep";
-import TrainWizardFinalStep from "./wizard/TrainWizardFinalStep";
-import TrainWizardExtraStep from "./wizard/TrainWizardExtraStep";
+} from '@personalhealthtrain/ui-common';
+import TrainWizardConfiguratorStep from './wizard/TrainWizardConfiguratorStep';
+import TrainFileManager from './file/TrainFileManager';
+import TrainWizardHashStep from './wizard/TrainWizardHashStep';
+import TrainWizardFinalStep from './wizard/TrainWizardFinalStep';
+import TrainWizardExtraStep from './wizard/TrainWizardExtraStep';
 
 export default {
     components: {
         TrainWizardExtraStep,
-        TrainWizardFinalStep, TrainWizardHashStep, TrainFileManager, TrainWizardConfiguratorStep},
+        TrainWizardFinalStep,
+        TrainWizardHashStep,
+        TrainFileManager,
+        TrainWizardConfiguratorStep,
+    },
     props: {
         trainProperty: {
             type: Object,
-            default: undefined
-        }
+            default: undefined,
+        },
     },
     data() {
         return {
@@ -42,8 +46,8 @@ export default {
                     'files',
                     'extra',
                     'hash',
-                    'finish'
-                ]
+                    'finish',
+                ],
             },
             train: {
                 // required attributes for child components (id, proposal_id)
@@ -58,17 +62,35 @@ export default {
                 files: [],
 
                 hash_signed: '',
-                hash: null
+                hash: null,
             },
             trainStation: {
                 busy: false,
-                items: []
+                items: [],
             },
-            busy: false
-        }
+            busy: false,
+        };
+    },
+    computed: {
+        canPassDefined() {
+            return typeof this.wizard.valid !== 'undefined';
+        },
+        wizardMessage() {
+            if (typeof this.wizard.message !== 'undefined') {
+                return this.wizard.message;
+            }
+
+            return '';
+        },
+        isConfigured() {
+            return this.trainProperty.configuration_status === TrainConfigurationStatus.FINISHED;
+        },
+        trainId() {
+            return this.train ? this.train.id : undefined;
+        },
     },
     created() {
-        if(this.isConfigured) return;
+        if (this.isConfigured) return;
 
         this.initTrainFromProperty();
 
@@ -81,27 +103,27 @@ export default {
         // Train
         //----------------------------------
         initTrainFromProperty() {
-            if(typeof this.trainProperty === 'undefined') return;
+            if (typeof this.trainProperty === 'undefined') return;
 
-            for (let key in this.train) {
-                if(!this.trainProperty.hasOwnProperty(key)) continue;
+            for (const key in this.train) {
+                if (!this.trainProperty.hasOwnProperty(key)) continue;
 
                 this.train[key] = this.trainProperty[key];
             }
         },
         async updateTrain(data) {
-            if(!this.wizard.initialized) return;
+            if (!this.wizard.initialized) return;
 
             const keys = Object.keys(data);
 
-            if(keys.length === 0) return;
+            if (keys.length === 0) return;
 
             try {
                 const train = await editAPITrain(this.trainProperty.id, data);
 
                 const updateData = {
                     configuration_status: train.configuration_status,
-                    ...data
+                    ...data,
                 };
 
                 this.$emit('updated', updateData);
@@ -110,15 +132,15 @@ export default {
             }
         },
         async loadTrainStations() {
-            if(this.trainStation.busy || !this.trainId) return;
+            if (this.trainStation.busy || !this.trainId) return;
 
             this.trainStation.busy = true;
 
             try {
-                const {data} = await getAPITrainStations({
+                const { data } = await getAPITrainStations({
                     filters: {
-                        train_id: this.trainId
-                    }
+                        train_id: this.trainId,
+                    },
                 });
 
                 this.trainStation.items = data;
@@ -146,15 +168,15 @@ export default {
                     canPass = false;
                 }
 
-                if(index >= this.wizard.steps.length) {
+                if (index >= this.wizard.steps.length) {
                     canPass = false;
                 }
             }
 
-            if(process.server) {
+            if (process.server) {
                 this.startIndex = index;
             } else {
-                this.$refs['wizard'].changeTab(0, index);
+                this.$refs.wizard.changeTab(0, index);
             }
 
             this.wizard.initialized = true;
@@ -169,7 +191,7 @@ export default {
 
                 switch (step) {
                     case 'configuration':
-                        promise = this.canPassConfigurationWizardStep()
+                        promise = this.canPassConfigurationWizardStep();
                         break;
                     case 'files':
                         promise = this.canPassFilesWizardStep();
@@ -189,56 +211,56 @@ export default {
                     .then(() => {
                         this.wizard.valid = true;
                         this.wizard.message = undefined;
-                        resolve(true)
+                        resolve(true);
                     })
                     .catch((e) => {
                         this.wizard.valid = false;
                         this.wizard.message = e?.message ?? e;
-                        reject()
+                        reject();
                     });
             });
         },
         async canPassConfigurationWizardStep() {
-            if(this.train.master_image_id === '' || typeof this.train.master_image_id === 'undefined') {
+            if (this.train.master_image_id === '' || typeof this.train.master_image_id === 'undefined') {
                 throw new Error('A master image must be selected...');
             }
 
-            if(this.trainStation.items.length === 0) {
+            if (this.trainStation.items.length === 0) {
                 throw new Error('Train Stations have to be specified...');
             }
 
             await this.updateTrain({
-                master_image_id: this.train.master_image_id
+                master_image_id: this.train.master_image_id,
             });
 
             return true;
         },
         async canPassFilesWizardStep() {
-            if(this.train.entrypoint_file_id === '' || !this.train.entrypoint_file_id) {
+            if (this.train.entrypoint_file_id === '' || !this.train.entrypoint_file_id) {
                 throw new Error('An uploaded file must be selected as entrypoint.');
             }
 
-            await this.updateTrain({entrypoint_file_id: this.train.entrypoint_file_id});
+            await this.updateTrain({ entrypoint_file_id: this.train.entrypoint_file_id });
 
             return true;
         },
         async canPassExtraWizardStep() {
             await this.updateTrain({
-                query: this.train.query
+                query: this.train.query,
             });
 
             return true;
         },
         async canPassHashWizardStep() {
-            if(this.trainProperty.hash === '' || !this.trainProperty.hash) {
+            if (this.trainProperty.hash === '' || !this.trainProperty.hash) {
                 throw new Error('The hash is not generated yet or is maybe still in process.');
             }
 
-            if(this.train.hash_signed === '' || !this.train.hash_signed) {
+            if (this.train.hash_signed === '' || !this.train.hash_signed) {
                 throw new Error('The provided hash must be signed by the offline tool...');
             }
 
-            await this.updateTrain({hash_signed: this.train.hash_signed});
+            await this.updateTrain({ hash_signed: this.train.hash_signed });
 
             return true;
         },
@@ -254,7 +276,7 @@ export default {
         // actions
         //----------------------------------
         handleUpdated(item) {
-            for(let key in item) {
+            for (const key in item) {
                 Vue.set(this.train, key, item[key]);
             }
         },
@@ -276,12 +298,12 @@ export default {
             this.train.entrypoint_file_id = id;
         },
         setHash(hash) {
-            let data = {
-                hash: hash,
-                configuration_status: TrainConfigurationStatus.HASH_GENERATED
+            const data = {
+                hash,
+                configuration_status: TrainConfigurationStatus.HASH_GENERATED,
             };
 
-            for(let key in data) {
+            for (const key in data) {
                 this.train[key] = data[key];
             }
 
@@ -309,44 +331,26 @@ export default {
         },
 
         resetHashSignedStatus(id) {
-            let data = {
+            const data = {
                 configuration_status: null,
                 hash: null,
-                hash_signed: null
+                hash_signed: null,
             };
 
-            if(typeof id !== 'undefined' && id === this.train.entrypoint_file_id) {
+            if (typeof id !== 'undefined' && id === this.train.entrypoint_file_id) {
                 data.entrypoint_file_id = null;
             }
 
-            for(let key in data) {
+            for (const key in data) {
                 this.train[key] = data[key];
             }
 
             this.$refs['wizard-hash-step'].reset();
 
             this.$emit('updated', data);
-        }
+        },
     },
-    computed: {
-        canPassDefined() {
-            return typeof this.wizard.valid !== 'undefined';
-        },
-        wizardMessage() {
-            if(typeof this.wizard.message !== 'undefined') {
-                return this.wizard.message;
-            }
-
-            return '';
-        },
-        isConfigured() {
-            return this.trainProperty.configuration_status === TrainConfigurationStatus.FINISHED;
-        },
-        trainId() {
-            return !!this.train ? this.train.id : undefined;
-        }
-    }
-}
+};
 </script>
 <template>
     <div>
@@ -357,28 +361,56 @@ export default {
         </div>
         <div v-else>
             <form-wizard
-                @on-change="handleWizardChange"
                 ref="wizard"
                 color="#333"
                 title="Train Wizard"
                 :subtitle="'Configure your '+trainProperty.type+' train step by step'"
                 :start-index="wizard.startIndex"
+                @on-change="handleWizardChange"
             >
-                <template slot="footer" slot-scope="props">
-                    <div v-if="canPassDefined && !wizard.valid" class="alert alert-warning alert-sm">
-                        Error: {{wizardMessage}}
+                <template
+                    slot="footer"
+                    slot-scope="props"
+                >
+                    <div
+                        v-if="canPassDefined && !wizard.valid"
+                        class="alert alert-warning alert-sm"
+                    >
+                        Error: {{ wizardMessage }}
                     </div>
                     <div class="wizard-footer-left">
-                        <wizard-button v-if="props.activeTabIndex > 0 && !props.isLastStep" @click.native="prevWizardStep" :style="props.fillButtonStyle">Back</wizard-button>
+                        <wizard-button
+                            v-if="props.activeTabIndex > 0 && !props.isLastStep"
+                            :style="props.fillButtonStyle"
+                            @click.native="prevWizardStep"
+                        >
+                            Back
+                        </wizard-button>
                     </div>
                     <div class="wizard-footer-right">
-                        <wizard-button v-if="!props.isLastStep" @click.native="nextWizardStep" class="wizard-footer-right" :style="props.fillButtonStyle">Next</wizard-button>
+                        <wizard-button
+                            v-if="!props.isLastStep"
+                            class="wizard-footer-right"
+                            :style="props.fillButtonStyle"
+                            @click.native="nextWizardStep"
+                        >
+                            Next
+                        </wizard-button>
 
-                        <wizard-button v-else class="wizard-footer-right finish-button" :style="props.fillButtonStyle">Build train</wizard-button>
+                        <wizard-button
+                            v-else
+                            class="wizard-footer-right finish-button"
+                            :style="props.fillButtonStyle"
+                        >
+                            Build train
+                        </wizard-button>
                     </div>
                 </template>
 
-                <tab-content title="Configuration" :before-change="passWizardStep">
+                <tab-content
+                    title="Configuration"
+                    :before-change="passWizardStep"
+                >
                     <train-wizard-configurator-step
                         :train="trainProperty"
                         :train-stations="trainStation.items"
@@ -388,7 +420,10 @@ export default {
                     />
                 </tab-content>
 
-                <tab-content title="Files" :before-change="passWizardStep">
+                <tab-content
+                    title="Files"
+                    :before-change="passWizardStep"
+                >
                     <train-file-manager
                         :train="train"
                         @uploaded="handleFilesUploaded"
@@ -397,14 +432,20 @@ export default {
                     />
                 </tab-content>
 
-                <tab-content title="Extra" :before-change="passWizardStep">
+                <tab-content
+                    title="Extra"
+                    :before-change="passWizardStep"
+                >
                     <train-wizard-extra-step
                         :train="train"
                         @querySelected="setFhirQuery"
                     />
                 </tab-content>
 
-                <tab-content title="Hash" :before-change="passWizardStep">
+                <tab-content
+                    title="Hash"
+                    :before-change="passWizardStep"
+                >
                     <train-wizard-hash-step
                         ref="wizard-hash-step"
                         :train="train"
@@ -419,6 +460,4 @@ export default {
             </form-wizard>
         </div>
     </div>
-
-
 </template>

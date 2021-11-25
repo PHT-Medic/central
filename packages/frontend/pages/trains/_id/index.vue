@@ -5,12 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import TrainPipeline from "../../../components/domains/train/TrainPipeline";
-import TrainStationsProgress from "../../../components/domains/train-station/progress/TrainStationsProgress";
+import TrainPipeline from '../../../components/domains/train/TrainPipeline';
+import TrainStationsProgress from '../../../components/domains/train-station/progress/TrainStationsProgress';
+
 export default {
-    components: {TrainStationsProgress, TrainPipeline},
+    components: { TrainStationsProgress, TrainPipeline },
     props: {
-        train: Object
+        train: Object,
     },
     methods: {
         handleDone(train) {
@@ -18,16 +19,16 @@ export default {
         },
         handleFailed(e) {
             this.$emit('failed', e);
-        }
-    }
-}
+        },
+    },
+};
 </script>
 
 <template>
     <div class="row">
         <div class="col-6">
             <div class="panel-box mb-3">
-                <h6><i class="fa fa-list"></i> Pipeline</h6>
+                <h6><i class="fa fa-list" /> Pipeline</h6>
 
                 <train-pipeline
                     :train-property="train"
@@ -37,14 +38,14 @@ export default {
             </div>
 
             <div class="panel-box">
-                <h6><i class="fa fa-city"></i> Stations</h6>
+                <h6><i class="fa fa-city" /> Stations</h6>
 
                 <train-stations-progress :train="train" />
             </div>
         </div>
         <div class="col-6">
             <div class="panel-box">
-                <h6><i class="fa fa-history"></i> Logs</h6>
+                <h6><i class="fa fa-history" /> Logs</h6>
 
                 <div class="alert alert-info alert-sm mb-0">
                     Coming soon...

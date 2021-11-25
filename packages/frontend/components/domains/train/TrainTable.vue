@@ -5,34 +5,34 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropAPITrain, getAPITrains, mergeDeep} from "@personalhealthtrain/ui-common";
-import AlertMessage from "../../alert/AlertMessage";
-import Pagination from "../../Pagination";
-import TrainCard from "./TrainCard";
+import { dropAPITrain, getAPITrains, mergeDeep } from '@personalhealthtrain/ui-common';
+import AlertMessage from '../../alert/AlertMessage';
+import Pagination from '../../Pagination';
+import TrainCard from './TrainCard';
 
 export default {
     components: {
         TrainCard,
         Pagination,
-        AlertMessage
+        AlertMessage,
     },
     props: {
         proposalId: {
             type: Number,
-            default: undefined
+            default: undefined,
         },
         trainAddTo: {
             type: String,
-            default: '/trains/add'
+            default: '/trains/add',
         },
         query: {
             type: Object,
-            default: function () {
-                return {}
-            }
+            default() {
+                return {};
+            },
         },
     },
-    data () {
+    data() {
         return {
             busy: false,
 
@@ -42,16 +42,18 @@ export default {
             meta: {
                 limit: 10,
                 offset: 0,
-                total: 0
-            }
-        }
+                total: 0,
+            },
+        };
+    },
+    computed: {
     },
     created() {
         this.load();
     },
     methods: {
         async load() {
-            if(this.busy) return;
+            if (this.busy) return;
 
             this.busy = true;
 
@@ -59,19 +61,19 @@ export default {
                 const response = await getAPITrains(mergeDeep({
                     page: {
                         limit: this.meta.limit,
-                        offset: this.meta.offset
+                        offset: this.meta.offset,
                     },
                     include: {
                         result: true,
-                        user: true
+                        user: true,
                     },
                     filter: {
-                        ...(this.proposalId ? {proposal_id: this.proposalId} : {})
-                    }
+                        ...(this.proposalId ? { proposal_id: this.proposalId } : {}),
+                    },
                 }, this.query));
 
                 this.items = response.data;
-                const {total} = response.meta;
+                const { total } = response.meta;
 
                 this.meta.total = total;
             } catch (e) {
@@ -81,13 +83,13 @@ export default {
             this.busy = false;
         },
         handleDeleted(train) {
-            const index = this.items.findIndex(item => item.id === train.id);
-            if(index !== -1) {
+            const index = this.items.findIndex((item) => item.id === train.id);
+            if (index !== -1) {
                 this.items.splice(index, 1);
             }
         },
         goTo(options, resolve, reject) {
-            if(options.offset === this.meta.offset) return;
+            if (options.offset === this.meta.offset) return;
 
             this.meta.offset = options.offset;
 
@@ -103,7 +105,7 @@ export default {
             try {
                 await dropAPITrain(train.id);
 
-                let index = this.items.findIndex(item => item.id === train.id);
+                const index = this.items.findIndex((item) => item.id === train.id);
                 if (index !== -1) {
                     this.items.splice(index, 1);
                 }
@@ -112,23 +114,28 @@ export default {
             }
 
             this.actionBusy = false;
-        }
+        },
     },
-    computed: {
-    }
-}
+};
 </script>
 <template>
     <div>
         <div class="d-flex flex-row mb-2">
             <div>
-                <button class="btn btn-primary btn-xs" @click.prevent="load" :disabled="busy">
-                    <i class="fa fa-sync"></i> refresh
+                <button
+                    class="btn btn-primary btn-xs"
+                    :disabled="busy"
+                    @click.prevent="load"
+                >
+                    <i class="fa fa-sync" /> refresh
                 </button>
             </div>
             <div style="margin-left: auto;">
-                <nuxt-link :to="trainAddTo" class="btn btn-primary btn-xs">
-                    <i class="fa fa-plus"></i> add
+                <nuxt-link
+                    :to="trainAddTo"
+                    class="btn btn-primary btn-xs"
+                >
+                    <i class="fa fa-plus" /> add
                 </nuxt-link>
             </div>
         </div>
@@ -136,15 +143,30 @@ export default {
         <alert-message :message="message" />
 
         <div class="row mb-2">
-            <div class="col-12 mb-2" v-for="(item, key) in items" :key="key">
-                <train-card :train-property="item" @deleted="handleDeleted" />
+            <div
+                v-for="(item, key) in items"
+                :key="key"
+                class="col-12 mb-2"
+            >
+                <train-card
+                    :train-property="item"
+                    @deleted="handleDeleted"
+                />
             </div>
         </div>
 
-        <div v-if="!busy && items.length === 0" class="alert alert-sm alert-warning">
+        <div
+            v-if="!busy && items.length === 0"
+            class="alert alert-sm alert-warning"
+        >
             No trains available...
         </div>
 
-        <pagination :total="meta.total" :offset="meta.offset" :limit="meta.limit" @to="goTo" />
+        <pagination
+            :total="meta.total"
+            :offset="meta.offset"
+            :limit="meta.limit"
+            @to="goTo"
+        />
     </div>
 </template>

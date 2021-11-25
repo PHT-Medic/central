@@ -5,11 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Realm, Role, RolePermission, Station} from "@personalhealthtrain/ui-common";
-import {Connection} from "typeorm";
-import {RoleRepository} from "../../domains/auth/role/repository";
-import {Factory, Seeder} from "typeorm-seeding";
-import {getPHTStationRolePermissions, PHTStationRole} from "../../config/pht/permissions/station";
+import {
+    Realm, Role, RolePermission, Station,
+} from '@personalhealthtrain/ui-common';
+import { Connection } from 'typeorm';
+import { Factory, Seeder } from 'typeorm-seeding';
+import { RoleRepository } from '../../domains/auth/role/repository';
+import { PHTStationRole, getPHTStationRolePermissions } from '../../config/pht/permissions/station';
 
 // ----------------------------------------------
 
@@ -20,17 +22,15 @@ export default class CreatePHT implements Seeder {
          */
         const roleNames : PHTStationRole[] = [
             'StationAuthority', // 0
-            'StationEmployee' // 1
+            'StationEmployee', // 1
         ];
 
         const roleRepository = connection.getCustomRepository(RoleRepository);
 
-        const roles : Role[] = roleNames.map((role: string) => {
-            return roleRepository.create({
-                name: role,
-                provider_role_id: role
-            });
-        });
+        const roles : Role[] = roleNames.map((role: string) => roleRepository.create({
+            name: role,
+            provider_role_id: role,
+        }));
 
         await roleRepository.save(roles);
 
@@ -41,14 +41,10 @@ export default class CreatePHT implements Seeder {
          */
         const rolePermissionRepository = connection.getRepository(RolePermission);
         const rolePermissions : RolePermission[] = roles
-            .map(role => {
-                return getPHTStationRolePermissions(role.name as PHTStationRole).map(permission => {
-                    return rolePermissionRepository.create({
-                        role_id: role.id,
-                        permission_id: permission
-                    });
-                });
-            })
+            .map((role) => getPHTStationRolePermissions(role.name as PHTStationRole).map((permission) => rolePermissionRepository.create({
+                role_id: role.id,
+                permission_id: permission,
+            })))
             .reduce((accumulator, entity) => [...accumulator, ...entity]);
 
         await rolePermissionRepository.save(rolePermissions);
@@ -59,9 +55,9 @@ export default class CreatePHT implements Seeder {
          * Create PHT default realms
          */
         const realms : Partial<Realm>[] = [
-            {id: 'station_1', name: 'University Augsburg'},
-            {id: 'station_2', name: 'University Munich'},
-            {id: 'station_3', name: 'University Tuebingen'},
+            { id: 'station_1', name: 'University Augsburg' },
+            { id: 'station_2', name: 'University Munich' },
+            { id: 'station_3', name: 'University Tuebingen' },
         ];
         const realmRepository = connection.getRepository(Realm);
         await realmRepository.insert(realms);
@@ -73,10 +69,10 @@ export default class CreatePHT implements Seeder {
          */
         const stationRepository = connection.getRepository(Station);
         const stations : Partial<Station>[] = [];
-        for (let i=0; i<realms.length; i++) {
+        for (let i = 0; i < realms.length; i++) {
             stations.push({
                 realm_id: realms[i].id,
-                name: realms[i].name
+                name: realms[i].name,
             });
         }
 

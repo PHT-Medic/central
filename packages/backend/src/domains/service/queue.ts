@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildMessage, Message} from "amqp-extension";
-import {AuthClientType, Client} from "@personalhealthtrain/ui-common";
-import {AuthClientSecurityComponentCommand} from "../../components/auth-security";
-import {MessageQueueSelfRoutingKey} from "../../config/service/mq";
+import { Message, buildMessage } from 'amqp-extension';
+import { AuthClientType, Client } from '@personalhealthtrain/ui-common';
+import { AuthClientSecurityComponentCommand } from '../../components/auth-security';
+import { MessageQueueSelfRoutingKey } from '../../config/service/mq';
 
 export type AuthClientSecurityQueueMessagePayload = {
     id: string | number,
@@ -19,14 +19,14 @@ export type AuthClientSecurityQueueMessagePayload = {
 
 export function buildAuthClientSecurityQueueMessage(
     type: AuthClientSecurityComponentCommand,
-    context: AuthClientSecurityQueueMessagePayload
+    context: AuthClientSecurityQueueMessagePayload,
 ) : Message {
     return buildMessage({
         options: {
-            routingKey: MessageQueueSelfRoutingKey.COMMAND
+            routingKey: MessageQueueSelfRoutingKey.COMMAND,
         },
         type,
         data: context,
-        metadata: {}
-    })
+        metadata: {},
+    });
 }

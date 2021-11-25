@@ -14,7 +14,7 @@ function isObject(item) {
  * @param target
  * @param sources
  */
-export function mergeDeep<A extends Record<string, any>, B extends Record<string,any>>(target: A, ...sources: B[]) : A & B {
+export function mergeDeep<A extends Record<string, any>, B extends Record<string, any>>(target: A, ...sources: B[]) : A & B {
     if (!sources.length) return target as A & B;
     const source = sources.shift();
 

@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {publishMessage} from "amqp-extension";
-import {getRepository} from "typeorm";
-import {Train, TrainResultStatus, TrainRunStatus} from "@personalhealthtrain/ui-common";
-import {buildResultServiceQueueMessage, ResultServiceCommand} from "../../../service/result-service";
-import {findTrain} from "./utils";
+import { publishMessage } from 'amqp-extension';
+import { getRepository } from 'typeorm';
+import { Train, TrainResultStatus, TrainRunStatus } from '@personalhealthtrain/ui-common';
+import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../service/result-service';
+import { findTrain } from './utils';
 
 export async function triggerTrainResultStop(
     train: string | Train,
@@ -23,17 +23,17 @@ export async function triggerTrainResultStop(
         throw new Error('The train has not finished yet...');
     }
 
-    if(train.result_last_status !== TrainResultStatus.STOPPING) {
+    if (train.result_last_status !== TrainResultStatus.STOPPING) {
         // send queue message
         await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.STOP, {
             trainId: train.id,
             latest: true,
-            ...(train.result_last_id ? {id: train.result_last_id} : {})
+            ...(train.result_last_id ? { id: train.result_last_id } : {}),
         }));
     }
 
     train = repository.merge(train, {
-        result_last_status: train.result_last_status !== TrainResultStatus.STOPPING ? TrainResultStatus.STOPPING : TrainResultStatus.STOPPED
+        result_last_status: train.result_last_status !== TrainResultStatus.STOPPING ? TrainResultStatus.STOPPING : TrainResultStatus.STOPPED,
     });
 
     await repository.save(train);

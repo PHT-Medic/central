@@ -5,10 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue from 'vue'
+import Vue from 'vue';
 import vueDropZone from 'vue2-dropzone';
 
 export default ({ app, env }) => {
     Vue.use(vueDropZone);
 };
-

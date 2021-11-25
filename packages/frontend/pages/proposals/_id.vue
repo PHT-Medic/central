@@ -5,139 +5,143 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getApiProposalStations, getAPIStations, getProposal, PermissionID} from "@personalhealthtrain/ui-common";
-    import ProposalSvg from "../../components/svg/ProposalSvg";
-    import {LayoutKey, LayoutNavigationID} from "../../config/layout/contants";
+import {
+    PermissionID, getAPIStations, getApiProposalStations, getProposal,
+} from '@personalhealthtrain/ui-common';
+import ProposalSvg from '../../components/svg/ProposalSvg';
+import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
 
-    export default {
-        components: {ProposalSvg},
-        meta: {
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT
-        },
-        async asyncData (context) {
-            try {
-                const proposal = await getProposal(context.params.id, {
-                    include: {
-                        master_image: true,
-                        user: true
-                    }
-                });
+export default {
+    components: { ProposalSvg },
+    meta: {
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+    },
+    async asyncData(context) {
+        try {
+            const proposal = await getProposal(context.params.id, {
+                include: {
+                    master_image: true,
+                    user: true,
+                },
+            });
 
-                console.log(proposal);
+            console.log(proposal);
 
-                const {realm_id} = context.store.getters['auth/user'];
+            const { realm_id } = context.store.getters['auth/user'];
 
-                let visitorStation = null;
-                let visitorProposalStation = null;
+            let visitorStation = null;
+            let visitorProposalStation = null;
 
-                if(proposal.realm_id !== realm_id) {
-                    try {
-                        const {data: stations} = await getAPIStations({
+            if (proposal.realm_id !== realm_id) {
+                try {
+                    const { data: stations } = await getAPIStations({
+                        filter: {
+                            realm_id: proposal.realm_id,
+                        },
+                    });
+
+                    if (stations.length === 1) {
+                        visitorStation = stations[0];
+
+                        const response = await getApiProposalStations({
                             filter: {
-                                realm_id: proposal.realm_id
-                            }
+                                proposal_id: proposal.id,
+                                station_id: stations[0].id,
+                            },
                         });
 
-                        if(stations.length === 1) {
-                            visitorStation = stations[0];
-
-                            const response = await getApiProposalStations({
-                                filter: {
-                                    proposal_id: proposal.id,
-                                    station_id: stations[0].id
-                                }
-                            });
-
-                            if (response.meta.total > 0) {
-                                visitorProposalStation = response.data[0];
-                            }
+                        if (response.meta.total > 0) {
+                            visitorProposalStation = response.data[0];
                         }
-                    } catch (e) {
-                        console.log(e);
                     }
+                } catch (e) {
+                    console.log(e);
                 }
-
-                return {
-                    proposal,
-                    visitorStation,
-                    visitorProposalStation
-                };
-            } catch (e) {
-                await context.redirect('/proposals');
             }
-        },
-        data () {
+
             return {
-                proposal: null,
-
-                visitorStation: null,
-                visitorProposalStation: null,
-
-                proposalStations: [],
-                proposalStationsLoading: false,
-
-                sidebar: {
-                    items: []
-                }
-            }
-        },
-        created() {
-            this.fillSidebar();
-            console.log(this.$route);
-        },
-        computed: {
-            isProposalOwner() {
-                return this.$store.getters['auth/user'].realm_id === this.proposal.realm_id;
-            },
-            isStationAuthority() {
-                return !!this.visitorStation;
-            },
-            backLink() {
-                if(typeof this.$route.query.refPath === 'string') {
-                    return this.$route.query.refPath;
-                }
-
-                return '/proposals';
-            }
-        },
-        methods: {
-            fillSidebar() {
-                const items = [
-                    { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-
-                ];
-
-                if(
-                    this.isProposalOwner || this.isStationAuthority
-                ) {
-                    items.push({ name: 'Trains', icon: 'fas fa-train', urlSuffix: '/trains' });
-                }
-
-                if(
-                    this.isProposalOwner &&
-                    this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT)
-                ) {
-                    items.push({ name: 'Settings', icon: 'fa fa-cog', urlSuffix: '/settings' });
-                }
-
-                this.sidebar.items = items;
-            },
-
-            handleUpdated (data) {
-                Object.assign(this.proposal, data);
-            },
-            handleProposalStationUpdated(item) {
-                if(typeof this.visitorProposalStation !== 'undefined' && this.visitorProposalStation.id === item.id) {
-                    this.visitorProposalStation.approval_status = item.approval_status;
-                }
-            }
+                proposal,
+                visitorStation,
+                visitorProposalStation,
+            };
+        } catch (e) {
+            await context.redirect('/proposals');
         }
-    }
+    },
+    data() {
+        return {
+            proposal: null,
+
+            visitorStation: null,
+            visitorProposalStation: null,
+
+            proposalStations: [],
+            proposalStationsLoading: false,
+
+            sidebar: {
+                items: [],
+            },
+        };
+    },
+    computed: {
+        isProposalOwner() {
+            return this.$store.getters['auth/user'].realm_id === this.proposal.realm_id;
+        },
+        isStationAuthority() {
+            return !!this.visitorStation;
+        },
+        backLink() {
+            if (typeof this.$route.query.refPath === 'string') {
+                return this.$route.query.refPath;
+            }
+
+            return '/proposals';
+        },
+    },
+    created() {
+        this.fillSidebar();
+        console.log(this.$route);
+    },
+    methods: {
+        fillSidebar() {
+            const items = [
+                { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
+
+            ];
+
+            if (
+                this.isProposalOwner || this.isStationAuthority
+            ) {
+                items.push({ name: 'Trains', icon: 'fas fa-train', urlSuffix: '/trains' });
+            }
+
+            if (
+                this.isProposalOwner
+                    && this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT)
+            ) {
+                items.push({ name: 'Settings', icon: 'fa fa-cog', urlSuffix: '/settings' });
+            }
+
+            this.sidebar.items = items;
+        },
+
+        handleUpdated(data) {
+            Object.assign(this.proposal, data);
+        },
+        handleProposalStationUpdated(item) {
+            if (typeof this.visitorProposalStation !== 'undefined' && this.visitorProposalStation.id === item.id) {
+                this.visitorProposalStation.approval_status = item.approval_status;
+            }
+        },
+    },
+};
 </script>
 <template>
     <div>
-        <h1 class="title no-border mb-3">{{ proposal.title }}</h1>
+        <h1 class="title no-border mb-3">
+            {{ proposal.title }}
+        </h1>
 
         <div class="m-b-20 m-t-10">
             <div class="panel-card">
@@ -175,9 +179,9 @@ import {getApiProposalStations, getAPIStations, getProposal, PermissionID} from 
         <nuxt-child
             :proposal="proposal"
             :visitor-station="visitorStation"
+            :visitor-proposal-station="visitorProposalStation"
             @updated="handleUpdated"
             @proposalStationUpdated="handleProposalStationUpdated"
-            :visitor-proposal-station="visitorProposalStation"
         />
     </div>
 </template>

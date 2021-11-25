@@ -6,20 +6,24 @@
   -->
 <template>
     <div>
-        <train-basic-form :proposal-id="proposal.id" @created="handleCreated"/>
+        <train-basic-form
+            :proposal-id="proposal.id"
+            @created="handleCreated"
+        />
     </div>
 </template>
 <script>
-import TrainBasicForm from "../../../../components/domains/train/TrainBasicForm";
+import TrainBasicForm from '../../../../components/domains/train/TrainBasicForm';
+
 export default {
+    components: { TrainBasicForm },
     props: {
-        proposal: Object
+        proposal: Object,
     },
-    components: {TrainBasicForm},
     methods: {
         handleCreated() {
-            this.$router.push({path: '/proposals/'+this.proposal.id+'/trains'});
-        }
-    }
-}
+            this.$router.push({ path: `/proposals/${this.proposal.id}/trains` });
+        },
+    },
+};
 </script>

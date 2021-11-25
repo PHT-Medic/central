@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {ApiRequestConfig} from "../type";
+import { ApiRequestConfig } from '../type';
 
 export type APIServiceHarborConfig = {
     host: string,
@@ -26,7 +26,7 @@ export enum APIType {
 
 export type APIConnectionType<T extends APIType> = T extends APIType.VAULT ? APIServiceVaultConfig : T extends APIType.HARBOR ? APIServiceHarborConfig : never;
 
-export type APIConfigType = APIType.DEFAULT |  APIType.VAULT | APIType.HARBOR;
+export type APIConfigType = APIType.DEFAULT | APIType.VAULT | APIType.HARBOR;
 export type APIConfig<T extends APIConfigType> = {
     type?: T,
     driver?: ApiRequestConfig,

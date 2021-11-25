@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {AxiosRequestConfig, AxiosResponse} from "axios";
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
     token?: string | null,

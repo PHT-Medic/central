@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2021.
  * Author Peter Placzek (tada5hi)
@@ -7,8 +6,8 @@
  */
 
 export function nullifyEmptyObjectProperties(data) {
-    for(let key in data) {
-        if(data[key] === '') {
+    for (const key in data) {
+        if (data[key] === '') {
             data[key] = null;
         }
     }

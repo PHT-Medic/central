@@ -5,31 +5,34 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {PermissionID} from "@personalhealthtrain/ui-common";
-import UserDetailsForm from "../../../../../components/domains/user/UserDetailsForm";
-import {LayoutKey, LayoutNavigationID} from "../../../../../config/layout/contants";
+import { PermissionID } from '@personalhealthtrain/ui-common';
+import UserDetailsForm from '../../../../../components/domains/user/UserDetailsForm';
+import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';
 
 export default {
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.USER_ADD
-        ]
-    },
-    props: {
-        realm: Object
+            PermissionID.USER_ADD,
+        ],
     },
     components: {
         UserDetailsForm,
     },
+    props: {
+        realm: Object,
+    },
     methods: {
         handleCreated(e) {
-            this.$nuxt.$router.push('/admin/realms/'+this.realm.id+'/users/' + e.id);
-        }
-    }
-}
+            this.$nuxt.$router.push(`/admin/realms/${this.realm.id}/users/${e.id}`);
+        },
+    },
+};
 </script>
 <template>
-    <user-details-form :realm-id="realm.id" @created="handleCreated" />
+    <user-details-form
+        :realm-id="realm.id"
+        @created="handleCreated"
+    />
 </template>

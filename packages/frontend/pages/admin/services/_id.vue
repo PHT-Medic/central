@@ -5,26 +5,26 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {LayoutNavigationAdminId} from "../../../config/layout";
-import Vue from "vue";
-import {SERVICE_ID} from "@personalhealthtrain/ui-common";
+import Vue from 'vue';
+import { SERVICE_ID } from '@personalhealthtrain/ui-common';
+import { LayoutNavigationAdminId } from '../../../config/layout';
 
 const services = Object.values(SERVICE_ID);
 
 export default {
     meta: {
         requireLoggedIn: true,
-        navigationId: LayoutNavigationAdminId
+        navigationId: LayoutNavigationAdminId,
     },
     async asyncData(context) {
         const index = services.indexOf(context.params.id);
 
-        if(index === -1) {
+        if (index === -1) {
             await context.redirect('/admin/services');
         }
 
         return {
-            serviceId: services[index]
+            serviceId: services[index],
         };
     },
     data() {
@@ -32,24 +32,24 @@ export default {
             serviceId: undefined,
             tabs: [
                 { name: 'Tasks', icon: 'fas fa-bars', urlSuffix: '' },
-                { name: 'Client', icon: 'fa fa-robot', urlSuffix: '/client'},
-                { name: 'Settings', icon: 'fas fa-cog', urlSuffix: '/settings'}
-            ]
-        }
+                { name: 'Client', icon: 'fa fa-robot', urlSuffix: '/client' },
+                { name: 'Settings', icon: 'fas fa-cog', urlSuffix: '/settings' },
+            ],
+        };
     },
     methods: {
         update(data) {
-            for(let key in data) {
+            for (const key in data) {
                 Vue.set(this.service, key, data[key]);
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div class="container">
         <h1 class="title no-border mb-3">
-            {{serviceId}} <span class="sub-title">Service</span>
+            {{ serviceId }} <span class="sub-title">Service</span>
         </h1>
 
         <div class="m-b-20 m-t-10">
@@ -80,10 +80,12 @@ export default {
                             </b-nav>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
-        <nuxt-child :service-id="serviceId" @updated="update" />
+        <nuxt-child
+            :service-id="serviceId"
+            @updated="update"
+        />
     </div>
 </template>

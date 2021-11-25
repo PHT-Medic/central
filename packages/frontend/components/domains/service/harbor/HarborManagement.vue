@@ -6,19 +6,23 @@
   -->
 <script>
 
-import HarborProjectManagement from "./HarborProjectManagement";
-import {SERVICE_ID} from "@personalhealthtrain/ui-common";
+import { SERVICE_ID } from '@personalhealthtrain/ui-common';
+import HarborProjectManagement from './HarborProjectManagement';
+
 export default {
     components: {
-        HarborProjectManagement
+        HarborProjectManagement,
     },
     props: {
-        serviceId: SERVICE_ID
-    }
-}
+        serviceId: SERVICE_ID,
+    },
+};
 </script>
 <template>
     <div>
-        <harbor-project-management :service-id="serviceId" class="mb-2" />
+        <harbor-project-management
+            :service-id="serviceId"
+            class="mb-2"
+        />
     </div>
 </template>

@@ -5,19 +5,19 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropAPIStation, Realm, Station} from "@personalhealthtrain/ui-common";
-import StationForm from "../../../../../components/domains/station/StationForm";
+import { Realm, Station, dropAPIStation } from '@personalhealthtrain/ui-common';
+import StationForm from '../../../../../components/domains/station/StationForm';
 
 export default {
+    components: { StationForm },
     props: {
         realm: Object,
-        station: Object
+        station: Object,
     },
-    components: {StationForm},
     data() {
         return {
             busy: false,
-        }
+        };
     },
     methods: {
         handleCreated(station) {
@@ -25,9 +25,9 @@ export default {
         },
         handleUpdated(station) {
             this.$emit('updated', station);
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div>
@@ -38,21 +38,29 @@ export default {
                     If you remove the station association to the realm, the station will be deleted.
                 </p>
 
+                <hr>
 
-
-                <hr />
-
-                <station-form  :station-property="station" @created="handleCreated" @updated="handleUpdated" :realm-locked="true"/>
+                <station-form
+                    :station-property="station"
+                    :realm-locked="true"
+                    @created="handleCreated"
+                    @updated="handleUpdated"
+                />
             </div>
         </template>
         <template v-else>
             <p class="mb-2">
-                No station is associated to the  <strong>{{realm.name}}</strong> realm yet.
+                No station is associated to the  <strong>{{ realm.name }}</strong> realm yet.
             </p>
 
-            <hr />
+            <hr>
 
-            <station-form :station-property="{realm_id: this.realm.id, name: this.realm.name}" @created="handleCreated" @updated="handleUpdated" :realm-locked="true"/>
+            <station-form
+                :station-property="{realm_id: realm.id, name: realm.name}"
+                :realm-locked="true"
+                @created="handleCreated"
+                @updated="handleUpdated"
+            />
         </template>
     </div>
 </template>

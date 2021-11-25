@@ -9,54 +9,54 @@ export default {
     props: {
         total: {
             type: Number,
-            default: 0
+            default: 0,
         },
         limit: {
             type: Number,
-            default: 0
+            default: 0,
         },
         offset: {
             type: Number,
-            default: 0
-        }
+            default: 0,
+        },
+    },
+    data() {
+        return {
+            busy: false,
+        };
     },
     computed: {
         totalPages() {
-            if(this.limit === 0 || this.total === 0) return 1;
+            if (this.limit === 0 || this.total === 0) return 1;
 
             const pages = Math.ceil(this.total / this.limit);
             return pages >= 1 ? pages : 1;
         },
         currentPage() {
-            if(this.limit === 0 || this.total === 0) return 1;
+            if (this.limit === 0 || this.total === 0) return 1;
 
             return Math.floor(this.offset / this.limit) + 1;
         },
         pages() {
-            let pages = [];
+            const pages = [];
 
-            for(let i=this.currentPage-2; i<(this.currentPage + 2); i++) {
-                if(i<= 0 || i > this.totalPages) continue;
+            for (let i = this.currentPage - 2; i < (this.currentPage + 2); i++) {
+                if (i <= 0 || i > this.totalPages) continue;
 
                 pages.push(i);
             }
 
             return pages;
-        }
-    },
-    data() {
-        return {
-            busy: false
-        }
+        },
     },
     methods: {
         goTo(page) {
-            if(this.busy || page === this.currentPage) return;
+            if (this.busy || page === this.currentPage) return;
 
             const data = {
                 page,
                 offset: (page - 1) * this.limit,
-                limit: this.limit
+                limit: this.limit,
             };
 
             const result = new Promise(((resolve, reject) => this.$emit('to', data, resolve, reject)));
@@ -64,21 +64,50 @@ export default {
                 this.busy = false;
             }).catch(() => {
                 this.busy = false;
-            })
-        }
-    }
-}
+            });
+        },
+    },
+};
 </script>
 <template>
     <ul class="pagination justify-content-center">
-        <li v-if="currentPage > 1" class="page-item">
-            <button :disabled="busy" class="page-link" @click.prevent="goTo(currentPage-1)"><i class="fa fa-chevron-left"></i></button>
+        <li
+            v-if="currentPage > 1"
+            class="page-item"
+        >
+            <button
+                :disabled="busy"
+                class="page-link"
+                @click.prevent="goTo(currentPage-1)"
+            >
+                <i class="fa fa-chevron-left" />
+            </button>
         </li>
-        <li v-for="(page, key) in pages" :key="key" :class="{'active': page === currentPage}" class="page-item">
-            <button :disabled="busy" class="page-link" @click.prevent="goTo(page)">{{page}}</button>
+        <li
+            v-for="(page, key) in pages"
+            :key="key"
+            :class="{'active': page === currentPage}"
+            class="page-item"
+        >
+            <button
+                :disabled="busy"
+                class="page-link"
+                @click.prevent="goTo(page)"
+            >
+                {{ page }}
+            </button>
         </li>
-        <li v-if="currentPage < totalPages" class="page-item">
-            <button :disabled="busy" class="page-link" @click.prevent="goTo(currentPage+1)"><i class="fa fa-chevron-right"></i></button>
+        <li
+            v-if="currentPage < totalPages"
+            class="page-item"
+        >
+            <button
+                :disabled="busy"
+                class="page-link"
+                @click.prevent="goTo(currentPage+1)"
+            >
+                <i class="fa fa-chevron-right" />
+            </button>
         </li>
     </ul>
 </template>

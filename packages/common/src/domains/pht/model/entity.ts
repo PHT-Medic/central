@@ -12,30 +12,30 @@ import {
     ManyToOne,
     OneToOne,
     PrimaryGeneratedColumn,
-} from "typeorm";
-import {User} from "../../auth";
-import {TrainFile} from "../train-file";
+} from 'typeorm';
+import { User } from '../../auth';
+import { TrainFile } from '../train-file';
 
-@Entity({name: 'models'})
+@Entity({ name: 'models' })
 export class Model {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn('uuid')
+        id: string;
 
-    @Column({type: "varchar"})
-    type: string;
+    @Column({ type: 'varchar' })
+        type: string;
 
-    @Column({type: "varchar"})
-    name: string;
+    @Column({ type: 'varchar' })
+        name: string;
 
     @OneToOne(() => TrainFile)
-    src: TrainFile;
+        src: TrainFile;
 
     // ------------------------------------------------------------------
 
-    @Column({type: "int", unsigned: true})
-    user_id: number;
+    @Column({ type: 'int', unsigned: true })
+        user_id: number;
 
-    @ManyToOne(() => User, {onDelete: "CASCADE"})
-    @JoinColumn({name: 'user_id'})
-    user: User;
+    @ManyToOne(() => User, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'user_id' })
+        user: User;
 }

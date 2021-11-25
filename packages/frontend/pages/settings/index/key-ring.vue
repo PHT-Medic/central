@@ -5,21 +5,22 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserPublicKeyForm from "../../../components/domains/user/UserPublicKeyForm";
-import UserKeyRingForm from "../../../components/domains/user/UserKeyRingForm";
+import UserPublicKeyForm from '../../../components/domains/user/UserPublicKeyForm';
+import UserKeyRingForm from '../../../components/domains/user/UserKeyRingForm';
+
 export default {
-    components: {UserKeyRingForm, UserPublicKeyForm},
+    components: { UserKeyRingForm, UserPublicKeyForm },
     data() {
         return {
 
-        }
+        };
     },
     computed: {
         user() {
             return this.$store.getters['auth/user'];
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <user-key-ring-form :user-property="user" />

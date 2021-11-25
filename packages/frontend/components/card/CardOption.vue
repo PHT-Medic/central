@@ -7,28 +7,38 @@
 <script>
 export default {
     props: {
-        items: Array
+        items: Array,
     },
     data() {
         return {
-            showAll: false
-        }
+            showAll: false,
+        };
     },
     methods: {
         toggle() {
             this.showAll = !this.showAll;
-        }
-    }
-}
+        },
+    },
+};
 </script>
 
 <template>
-    <ul class="list-unstyled card-option" :class="{'show-all': showAll}">
+    <ul
+        class="list-unstyled card-option"
+        :class="{'show-all': showAll}"
+    >
         <li class="main-card-option">
-            <i class="fa" :class="{'fa-wrench': !showAll, 'fa-times': showAll}" @click.prevent="toggle"></i>
+            <i
+                class="fa"
+                :class="{'fa-wrench': !showAll, 'fa-times': showAll}"
+                @click.prevent="toggle"
+            />
         </li>
-        <li v-for="(value,key) in items" :key="key">
-            <i :class="value.class"></i>
+        <li
+            v-for="(value,key) in items"
+            :key="key"
+        >
+            <i :class="value.class" />
         </li>
     </ul>
 </template>

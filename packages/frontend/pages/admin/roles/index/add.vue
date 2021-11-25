@@ -5,37 +5,40 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import AlertMessage from "../../../../components/alert/AlertMessage";
-    import NotImplemented from "../../../../components/NotImplemented";
-    import {LayoutNavigationAdminId} from "../../../../config/layout";
-    import RoleForm from "../../../../components/domains/role/RoleForm";
-    import {LayoutKey, LayoutNavigationID} from "../../../../config/layout/contants";
-    import {PermissionID} from "@personalhealthtrain/ui-common";
+import { PermissionID } from '@personalhealthtrain/ui-common';
+import AlertMessage from '../../../../components/alert/AlertMessage';
+import NotImplemented from '../../../../components/NotImplemented';
+import { LayoutNavigationAdminId } from '../../../../config/layout';
+import RoleForm from '../../../../components/domains/role/RoleForm';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
-    export default {
+export default {
+    meta: {
         meta: {
-            meta: {
-                [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-                [LayoutKey.REQUIRED_LOGGED_IN]: true,
-                [LayoutKey.REQUIRED_PERMISSIONS]: [
-                    PermissionID.ROLE_ADD
-                ]
-            },
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.ROLE_ADD,
+            ],
         },
-        components: {
-            RoleForm,
-            AlertMessage,
-            NotImplemented
+    },
+    components: {
+        RoleForm,
+        AlertMessage,
+        NotImplemented,
+    },
+    methods: {
+        handleRoleCreated(e) {
+            this.$router.push(`/admin/roles/${e.id}`);
         },
-        methods: {
-            handleRoleCreated(e) {
-                this.$router.push('/admin/roles/' + e.id);
-            }
-        }
-    }
+    },
+};
 </script>
 <template>
-    <role-form :role-property="undefined" @created="handleRoleCreated" />
+    <role-form
+        :role-property="undefined"
+        @created="handleRoleCreated"
+    />
 </template>
 <style>
     .list-group-item {

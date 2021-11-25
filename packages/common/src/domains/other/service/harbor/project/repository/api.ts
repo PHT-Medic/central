@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIType, useAPI} from "../../../../../../modules";
+import { APIType, useAPI } from '../../../../../../modules';
 
 export interface HarborRepository {
     id: number | string,
@@ -19,9 +19,9 @@ export interface HarborRepository {
 }
 
 export async function findHarborProjectRepository(projectName: string, repositoryName: string) : Promise<HarborRepository|undefined> {
-    const result = await useAPI(APIType.HARBOR).get('projects/'+projectName+'/repositories?q=name=~'+repositoryName+'&=page_size=1');
+    const result = await useAPI(APIType.HARBOR).get(`projects/${projectName}/repositories?q=name=~${repositoryName}&=page_size=1`);
 
-    if(result.data.length !== 1) {
+    if (result.data.length !== 1) {
         return undefined;
     }
 
@@ -40,13 +40,13 @@ export async function findHarborProjectRepository(projectName: string, repositor
 
         updatedAt: item.update_time,
         createdAt: item.creation_time,
-        artifactCount: item.artifact_count
+        artifactCount: item.artifact_count,
     };
 }
 
 export async function getHarborProjectRepositories(projectName: string) : Promise<HarborRepository[]> {
     const result = await useAPI(APIType.HARBOR)
-        .get('projects/'+projectName+'/repositories');
+        .get(`projects/${projectName}/repositories`);
 
     return result.data.map((item : Record<string, any>) => {
         const parts : string[] = item.name.split('/');
@@ -63,7 +63,7 @@ export async function getHarborProjectRepositories(projectName: string) : Promis
 
             updatedAt: item.update_time,
             createdAt: item.creation_time,
-            artifactCount: item.artifact_count
+            artifactCount: item.artifact_count,
         } as HarborRepository;
     });
 }

@@ -6,148 +6,61 @@
   -->
 <script>
 import {
-    runAPITrainCommand, Train,
-    TrainBuildStatus,
+    Train, TrainBuildStatus,
     TrainConfigurationStatus,
-    TrainRunStatus
-} from "@personalhealthtrain/ui-common";
-import {FrontendTrainCommand} from "../../../../domains/train/type";
-import {BDropdownItem} from "bootstrap-vue";
+    TrainRunStatus,
+    runAPITrainCommand,
+} from '@personalhealthtrain/ui-common';
+import { BDropdownItem } from 'bootstrap-vue';
+import { FrontendTrainCommand } from '../../../../domains/train/type';
 
 export default {
     props: {
         train: {
             type: Object,
-            default: undefined
+            default: undefined,
         },
         command: {
             type: String,
-            default: FrontendTrainCommand.RUN_START
+            default: FrontendTrainCommand.RUN_START,
         },
 
         elementType: {
             type: String,
-            default: 'button'
+            default: 'button',
         },
         withIcon: {
             type: Boolean,
-            default: false
+            default: false,
         },
         withText: {
             type: Boolean,
-            default: true
-        }
+            default: true,
+        },
     },
     data() {
         return {
             busy: false,
-            trainCommand: FrontendTrainCommand
-        }
-    },
-    render(createElement) {
-        if(!this.isShown) {
-            return createElement('span', {}, ['']);
-        }
-
-        let rootElement;
-        let attributes = {
-            on: {
-                click: this.click
-            },
-            props: {
-                disabled: !this.isEnabled
-            },
-            domProps: {
-                disabled: !this.isEnabled
-            }
+            trainCommand: FrontendTrainCommand,
         };
-
-        let iconClasses = [this.iconClass, 'pr-1'];
-
-        switch (this.elementType) {
-            case 'dropDownItem':
-                rootElement = BDropdownItem;
-                iconClasses.push('pl-1', 'text-'+this.classSuffix);
-                break;
-            case 'link':
-                rootElement = 'a';
-                attributes.domProps.href= 'javascript:void(0)';
-                iconClasses.push('text-'+this.classSuffix);
-                break;
-            default:
-                rootElement = 'button';
-                attributes.type = 'button';
-                attributes.class = ['btn', 'btn-xs', 'btn-'+this.classSuffix];
-                break;
-        }
-
-        let text = [this.commandText];
-
-        if(!this.withText) {
-            text = [];
-        }
-
-        if(this.withIcon) {
-            text.unshift(createElement('i', {
-                class: iconClasses
-            }))
-        }
-
-        if(typeof this.$scopedSlots.default === 'function') {
-            text = this.$scopedSlots.default({
-                commandText: this.commandText,
-                isEnabled: this.isEnabled,
-                isShown: this.isShown,
-                iconClass: iconClasses
-            });
-        }
-
-        return createElement(rootElement, attributes, text);
-    },
-    methods: {
-        async click(ev) {
-            ev.preventDefault();
-
-            await this.do();
-        },
-        async do() {
-            if(this.busy || !this.isEnabled) return;
-
-            this.busy = true;
-
-            try {
-                const train = await runAPITrainCommand(this.train.id, this.command);
-
-                const message =  `Successfully executed run command ${this.commandText}.`;
-                this.$bvToast.toast(message, {toaster: 'b-toaster-top-center', variant: 'success'});
-
-                this.$emit('done', train);
-            } catch (e) {
-                this.$bvToast.toast(e.message, {toaster: 'b-toaster-top-center', variant: 'danger'});
-
-                this.$emit('failed', e);
-            }
-
-            this.busy = false;
-        }
     },
     computed: {
         isShown() {
             return (
-                    (
-                        this.train.configuration_status === TrainConfigurationStatus.FINISHED &&
-                        this.train.build_status === TrainBuildStatus.FINISHED
-                    ) ||
-                        this.command === FrontendTrainCommand.RUN_STATUS
-                ) &&
-                this.$auth.can('edit', 'train');
+                (
+                    this.train.configuration_status === TrainConfigurationStatus.FINISHED
+                        && this.train.build_status === TrainBuildStatus.FINISHED
+                )
+                        || this.command === FrontendTrainCommand.RUN_STATUS
+            )
+                && this.$auth.can('edit', 'train');
         },
         isEnabled() {
             switch (this.command) {
                 case FrontendTrainCommand.RUN_START:
-                    return !this.train.run_status || [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.train.run_status) !== -1
+                    return !this.train.run_status || [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.train.run_status) !== -1;
                 case FrontendTrainCommand.RUN_STOP:
-                    return this.train.run_status && [TrainRunStatus.STOPPED, TrainRunStatus.FINISHED].indexOf(this.train.run_status) === -1
+                    return this.train.run_status && [TrainRunStatus.STOPPED, TrainRunStatus.FINISHED].indexOf(this.train.run_status) === -1;
                 case FrontendTrainCommand.RUN_STATUS:
                     return true;
             }
@@ -190,6 +103,93 @@ export default {
                     return 'info';
             }
         },
-    }
-}
+    },
+    methods: {
+        async click(ev) {
+            ev.preventDefault();
+
+            await this.do();
+        },
+        async do() {
+            if (this.busy || !this.isEnabled) return;
+
+            this.busy = true;
+
+            try {
+                const train = await runAPITrainCommand(this.train.id, this.command);
+
+                const message = `Successfully executed run command ${this.commandText}.`;
+                this.$bvToast.toast(message, { toaster: 'b-toaster-top-center', variant: 'success' });
+
+                this.$emit('done', train);
+            } catch (e) {
+                this.$bvToast.toast(e.message, { toaster: 'b-toaster-top-center', variant: 'danger' });
+
+                this.$emit('failed', e);
+            }
+
+            this.busy = false;
+        },
+    },
+    render(createElement) {
+        if (!this.isShown) {
+            return createElement('span', {}, ['']);
+        }
+
+        let rootElement;
+        const attributes = {
+            on: {
+                click: this.click,
+            },
+            props: {
+                disabled: !this.isEnabled,
+            },
+            domProps: {
+                disabled: !this.isEnabled,
+            },
+        };
+
+        const iconClasses = [this.iconClass, 'pr-1'];
+
+        switch (this.elementType) {
+            case 'dropDownItem':
+                rootElement = BDropdownItem;
+                iconClasses.push('pl-1', `text-${this.classSuffix}`);
+                break;
+            case 'link':
+                rootElement = 'a';
+                attributes.domProps.href = 'javascript:void(0)';
+                iconClasses.push(`text-${this.classSuffix}`);
+                break;
+            default:
+                rootElement = 'button';
+                attributes.type = 'button';
+                attributes.class = ['btn', 'btn-xs', `btn-${this.classSuffix}`];
+                break;
+        }
+
+        let text = [this.commandText];
+
+        if (!this.withText) {
+            text = [];
+        }
+
+        if (this.withIcon) {
+            text.unshift(createElement('i', {
+                class: iconClasses,
+            }));
+        }
+
+        if (typeof this.$scopedSlots.default === 'function') {
+            text = this.$scopedSlots.default({
+                commandText: this.commandText,
+                isEnabled: this.isEnabled,
+                isShown: this.isShown,
+                iconClass: iconClasses,
+            });
+        }
+
+        return createElement(rootElement, attributes, text);
+    },
+};
 </script>

@@ -5,32 +5,32 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {stringifyAuthorizationHeader} from "@typescript-auth/core";
+import { stringifyAuthorizationHeader } from '@typescript-auth/core';
 
-import {Client} from "../../../../../auth"
-import {APIType, useAPI} from "../../../../../../modules";
-import {SERVICE_ID} from "../../../type";
-import {HarborProjectWebhook, HarborProjectWebhookOptions} from "./type";
-import * as console from "console";
+import * as console from 'console';
+import { Client } from '../../../../../auth';
+import { APIType, useAPI } from '../../../../../../modules';
+import { SERVICE_ID } from '../../../type';
+import { HarborProjectWebhook, HarborProjectWebhookOptions } from './type';
 
 const WEBHOOK_ID = 'UI';
 
 export async function findHarborProjectWebHook(
     projectIdOrName: number | string,
-    isProjectName: boolean = false
+    isProjectName: boolean = false,
 ) : Promise<HarborProjectWebhook | undefined> {
     const headers : Record<string, any> = {};
 
-    if(isProjectName) {
+    if (isProjectName) {
         headers['X-Is-Resource-Name'] = true;
     }
 
     const { data } = await useAPI(APIType.HARBOR)
-        .get('projects/' + projectIdOrName + '/webhook/policies', headers);
+        .get(`projects/${projectIdOrName}/webhook/policies`, headers);
 
     const policies = data.filter((policy: { name: string; }) => policy.name === WEBHOOK_ID);
 
-    if(policies.length === 1) {
+    if (policies.length === 1) {
         return policies[0];
     }
 
@@ -41,16 +41,16 @@ export async function ensureHarborProjectWebHook(
     projectIdOrName: number | string,
     client: Pick<Client, 'id' | 'secret'>,
     options: HarborProjectWebhookOptions,
-    isProjectName: boolean = false
+    isProjectName: boolean = false,
 ) : Promise<HarborProjectWebhook> {
     const headers : Record<string, any> = {};
 
-    if(isProjectName) {
+    if (isProjectName) {
         headers['X-Is-Resource-Name'] = true;
     }
 
     const apiUrl : string | undefined = options.internalAPIUrl ?? options.externalAPIUrl;
-    if(!apiUrl) {
+    if (!apiUrl) {
         throw new Error('An API Harbor URL must be specified.');
     }
 
@@ -59,25 +59,25 @@ export async function ensureHarborProjectWebHook(
         enabled: true,
         targets: [
             {
-                auth_header: stringifyAuthorizationHeader({type: "Basic", username: client.id, password: client.secret}),
+                auth_header: stringifyAuthorizationHeader({ type: 'Basic', username: client.id, password: client.secret }),
                 skip_cert_verify: true,
                 // todo: change this, if service not on same machine.
-                address: apiUrl + "services/"+SERVICE_ID.REGISTRY+"/hook",
-                type: "http"
-            }
+                address: `${apiUrl}services/${SERVICE_ID.REGISTRY}/hook`,
+                type: 'http',
+            },
         ],
-        event_types: ["PUSH_ARTIFACT"]
-    }
+        event_types: ['PUSH_ARTIFACT'],
+    };
 
     try {
-         await useAPI(APIType.HARBOR)
-            .post('projects/' + projectIdOrName + '/webhook/policies', webhook, headers);
+        await useAPI(APIType.HARBOR)
+            .post(`projects/${projectIdOrName}/webhook/policies`, webhook, headers);
     } catch (e) {
-        if(e?.response?.status === 409) {
+        if (e?.response?.status === 409) {
             await dropHarborProjectWebHook(projectIdOrName, isProjectName);
 
             await useAPI(APIType.HARBOR)
-                .post('projects/' + projectIdOrName + '/webhook/policies', webhook, headers);
+                .post(`projects/${projectIdOrName}/webhook/policies`, webhook, headers);
 
             return;
         }
@@ -91,8 +91,8 @@ export async function ensureHarborProjectWebHook(
 export async function dropHarborProjectWebHook(projectIdOrName: number | string, isProjectName: boolean = false) {
     const webhook = await findHarborProjectWebHook(projectIdOrName, isProjectName);
 
-    if(typeof webhook !== 'undefined') {
+    if (typeof webhook !== 'undefined') {
         await useAPI(APIType.HARBOR)
-            .delete('projects/' + webhook.project_id + '/webhook/policies/' + webhook.id);
+            .delete(`projects/${webhook.project_id}/webhook/policies/${webhook.id}`);
     }
 }

@@ -11,42 +11,42 @@ import {
     Entity,
     Index, ManyToOne,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from "typeorm";
+    UpdateDateColumn,
+} from 'typeorm';
 
-import {MasterImageGroup} from "../master-image-group";
-import {MasterImageGroupType} from "./type";
+import { MasterImageGroup } from '../master-image-group';
+import { MasterImageGroupType } from './type';
 
-@Entity({name: 'master_images'})
+@Entity({ name: 'master_images' })
 export class MasterImage {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn('uuid')
+        id: string;
 
-    @Column({type: 'varchar', nullable: true})
-    path: string | null;
+    @Column({ type: 'varchar', nullable: true })
+        path: string | null;
 
-    @Index({unique: true})
-    @Column({type: "varchar", length: 256})
-    virtual_path: string;
+    @Index({ unique: true })
+    @Column({ type: 'varchar', length: 256 })
+        virtual_path: string;
 
     @Index()
-    @Column({type: "varchar", length: 256})
-    group_virtual_path: string;
+    @Column({ type: 'varchar', length: 256 })
+        group_virtual_path: string;
 
-    @Column({type: "varchar"})
-    name: string;
+    @Column({ type: 'varchar' })
+        name: string;
 
-    @Column({type: "text", nullable: true})
-    command: string | null;
+    @Column({ type: 'text', nullable: true })
+        command: string | null;
 
-    @Column({type: "json", nullable: true})
-    command_arguments: any | null;
+    @Column({ type: 'json', nullable: true })
+        command_arguments: any | null;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-    created_at: Date;
+        created_at: Date;
 
     @UpdateDateColumn()
-    updated_at: Date;
+        updated_at: Date;
 }

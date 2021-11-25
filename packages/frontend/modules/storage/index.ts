@@ -6,20 +6,24 @@
  */
 
 import Vue from 'vue';
-import {CookieSerializeOptions, parse as parseCookie, serialize as serializeCookie} from 'cookie';
-import {Context} from "@nuxt/types";
-import {decodeValue, encodeValue, isSet, isUnset} from "~/modules/storage/utils";
-import {StorageOptionsInterface} from "~/modules/storage/types";
+import { CookieSerializeOptions, parse as parseCookie, serialize as serializeCookie } from 'cookie';
+import { Context } from '@nuxt/types';
+import {
+    decodeValue, encodeValue, isSet, isUnset,
+} from '~/modules/storage/utils';
+import { StorageOptionsInterface } from '~/modules/storage/types';
 
 export default class BaseStorage {
-    public ctx: Context
+    public ctx: Context;
+
     public options: StorageOptionsInterface;
+
     public state : {[key: string] : any} = {};
 
     // ------------------------------------
 
-    constructor (ctx: Context, options: StorageOptionsInterface) {
-        this.ctx = ctx
+    constructor(ctx: Context, options: StorageOptionsInterface) {
+        this.ctx = ctx;
         this.options = options;
         this.initState();
     }
@@ -29,35 +33,35 @@ export default class BaseStorage {
     getKeyWithNamespace(key: string) : string {
         let fullKey: string = '';
 
-        if(typeof this.options.namespace !== 'undefined') {
-            fullKey += this.options.namespace+'_';
+        if (typeof this.options.namespace !== 'undefined') {
+            fullKey += `${this.options.namespace}_`;
         }
 
-        return fullKey+key;
+        return fullKey + key;
     }
 
     // ------------------------------------
     // Universal
     // ------------------------------------
 
-    set (key: string, value: any) {
+    set(key: string, value: any) {
         // Unset null, undefined
         if (isUnset(value)) {
-            return this.remove(key)
+            return this.remove(key);
         }
 
-        this.setState(key,value);
+        this.setState(key, value);
 
-        this.setCookie(key, value)
+        this.setCookie(key, value);
 
         this.setLocalStorageItem(key, value);
 
         this.setSessionStorageItem(key, value);
 
-        return value
+        return value;
     }
 
-    get (key: string) {
+    get(key: string) {
         let value : any = this.getState(key);
 
         // Cookies
@@ -70,15 +74,15 @@ export default class BaseStorage {
             value = this.getLocalStorageItem(key);
         }
 
-        if(isUnset(value)) {
+        if (isUnset(value)) {
             value = this.getSessionStorageItem(key);
         }
 
         if (isUnset(value)) {
-            value = this.getState(key)
+            value = this.getState(key);
         }
 
-        return value
+        return value;
     }
 
     getAll() {
@@ -86,42 +90,42 @@ export default class BaseStorage {
         let storageValue : any;
 
         storageValue = this.getCookies();
-        if(storageValue) {
-            value = {...value, ...storageValue}
+        if (storageValue) {
+            value = { ...value, ...storageValue };
         }
 
         storageValue = this.getLocalStorageItems();
-        if(storageValue) {
-            value = {...value, ...storageValue}
+        if (storageValue) {
+            value = { ...value, ...storageValue };
         }
 
         storageValue = this.getSessionStorageItems();
-        if(storageValue) {
-            value = {...value, ...storageValue}
+        if (storageValue) {
+            value = { ...value, ...storageValue };
         }
 
         return value;
     }
 
-    sync (key: string, defaultValue?: any) {
-        let value = this.get(key)
+    sync(key: string, defaultValue?: any) {
+        let value = this.get(key);
 
         if (isUnset(value) && isSet(defaultValue)) {
-            value = defaultValue
+            value = defaultValue;
         }
 
         if (isSet(value)) {
-            this.set(key, value)
+            this.set(key, value);
         }
 
-        return value
+        return value;
     }
 
-    remove (key: string) {
+    remove(key: string) {
         this.removeState(key);
         this.removeSessionStorageItem(key);
-        this.removeLocalStorageItem(key)
-        this.removeCookie(key)
+        this.removeLocalStorageItem(key);
+        this.removeCookie(key);
     }
 
     // ------------------------------------
@@ -165,18 +169,18 @@ export default class BaseStorage {
             return;
         }
 
-        let items : {[key: string] : any} = {},
-            keys = Object.keys(storage),
-            i = keys.length;
+        const items : {[key: string] : any} = {};
+        const keys = Object.keys(storage);
+        let i = keys.length;
 
-        while ( i-- ) {
+        while (i--) {
             let key = keys[i];
-            if(typeof this.options.namespace !== "undefined") {
-                if(key.substr(0, this.options.namespace.length) !== this.options.namespace) {
+            if (typeof this.options.namespace !== 'undefined') {
+                if (key.substr(0, this.options.namespace.length) !== this.options.namespace) {
                     continue;
                 }
 
-                key = key.replace(this.options.namespace+'_', '');
+                key = key.replace(`${this.options.namespace}_`, '');
             }
 
             items[key] = decodeValue(storage.getItem(keys[i]));
@@ -189,145 +193,144 @@ export default class BaseStorage {
     // Local storage
     // ------------------------------------
 
-    setLocalStorageItem (key: string, value: any) {
+    setLocalStorageItem(key: string, value: any) {
         // Unset null, undefined
         if (isUnset(value)) {
-            return this.removeLocalStorageItem(key)
+            return this.removeLocalStorageItem(key);
         }
 
         if (typeof localStorage === 'undefined' || !this.options.localStorage) {
-            return
+            return;
         }
 
         const _key = this.getKeyWithNamespace(key);
 
         try {
-            localStorage.setItem(_key, encodeValue(value))
+            localStorage.setItem(_key, encodeValue(value));
         } catch (e) {
             if (!this.options.ignoreExceptions) {
-                throw e
+                throw e;
             }
         }
 
-        return value
+        return value;
     }
 
-    getLocalStorageItem (key: string) : any {
+    getLocalStorageItem(key: string) : any {
         if (typeof localStorage === 'undefined' || !this.options.localStorage) {
-            return
+            return;
         }
 
         const _key = this.getKeyWithNamespace(key);
 
-        const value = localStorage.getItem(_key)
+        const value = localStorage.getItem(_key);
 
-        return decodeValue(value)
+        return decodeValue(value);
     }
 
     getLocalStorageItems() : any {
         return this.getBrowserStorageItems('localStorage');
     }
 
-    removeLocalStorageItem (key: string) {
+    removeLocalStorageItem(key: string) {
         if (typeof localStorage === 'undefined' || !this.options.localStorage) {
-            return
+            return;
         }
 
         const _key = this.getKeyWithNamespace(key);
-        localStorage.removeItem(_key)
+        localStorage.removeItem(_key);
     }
 
     // ------------------------------------
     // Session storage
     // ------------------------------------
 
-    setSessionStorageItem (key: string, value: any) {
+    setSessionStorageItem(key: string, value: any) {
         // Unset null, undefined
         if (isUnset(value)) {
-            return this.removeSessionStorageItem(key)
+            return this.removeSessionStorageItem(key);
         }
 
         if (typeof sessionStorage === 'undefined' || !this.options.sessionStorage) {
-            return
+            return;
         }
 
         const _key = this.getKeyWithNamespace(key);
 
         try {
-            sessionStorage.setItem(_key, encodeValue(value))
+            sessionStorage.setItem(_key, encodeValue(value));
         } catch (e) {
             throw e;
         }
 
-        return value
+        return value;
     }
 
-    getSessionStorageItem (key: string) {
+    getSessionStorageItem(key: string) {
         if (typeof sessionStorage === 'undefined' || !this.options.sessionStorage) {
-            return
+            return;
         }
 
         const _key = this.getKeyWithNamespace(key);
 
-        const value = sessionStorage.getItem(_key)
+        const value = sessionStorage.getItem(_key);
 
-        return decodeValue(value)
+        return decodeValue(value);
     }
 
     getSessionStorageItems() : any {
         return this.getBrowserStorageItems('sessionStorage');
     }
 
-    removeSessionStorageItem (key: string) {
+    removeSessionStorageItem(key: string) {
         if (typeof sessionStorage === 'undefined' || !this.options.sessionStorage) {
-            return
+            return;
         }
 
         const _key = this.getKeyWithNamespace(key);
-        sessionStorage.removeItem(_key)
+        sessionStorage.removeItem(_key);
     }
 
     // ------------------------------------
     // Cookies
     // ------------------------------------
-    getCookies () {
+    getCookies() {
         const cookieStr = process.client
             ? document.cookie
-            : this.ctx.req.headers.cookie
+            : this.ctx.req.headers.cookie;
 
-        let items : {[key: string] : any} = decodeValue(parseCookie(cookieStr || '') || {});
-        for(let key in items) {
+        const items : {[key: string] : any} = decodeValue(parseCookie(cookieStr || '') || {});
+        for (const key in items) {
             items[key] = decodeValue(decodeURIComponent(items[key]));
         }
 
         return items;
     }
 
-    setCookie (key: string, value: any) {
+    setCookie(key: string, value: any) {
         if (!this.options.cookie || (process.server && !this.ctx.res)) {
-            return
+            return;
         }
 
         const _key = this.getKeyWithNamespace(key);
-        const _options = <CookieSerializeOptions> Object.assign({}, this.options.cookie);
-        const _value = encodeValue(value)
+        const _options = <CookieSerializeOptions> ({ ...this.options.cookie });
+        const _value = encodeValue(value);
 
         // Unset null, undefined
         if (isUnset(value)) {
-            _options.maxAge = -1
+            _options.maxAge = -1;
         }
 
         const serializedCookie = serializeCookie(_key, _value, _options);
 
-
         if (process.client) {
             // Set in browser
-            document.cookie = serializedCookie
+            document.cookie = serializedCookie;
         } else if (process.server && this.ctx.res) {
             // Send Set-Cookie header from server side
             let cookies = this.ctx.res.getHeader('Set-Cookie') || [];
-            if(typeof cookies === 'number' || typeof cookies === 'string') {
-                if(typeof cookies === 'number') {
+            if (typeof cookies === 'number' || typeof cookies === 'string') {
+                if (typeof cookies === 'number') {
                     cookies = cookies.toString();
                 }
                 cookies = [cookies];
@@ -335,26 +338,26 @@ export default class BaseStorage {
 
             cookies.unshift(serializedCookie);
 
-            this.ctx.res.setHeader('Set-Cookie', cookies.filter((v, i, arr) => arr.findIndex(val => val.startsWith(v.substr(0, v.indexOf('=')))) === i));
+            this.ctx.res.setHeader('Set-Cookie', cookies.filter((v, i, arr) => arr.findIndex((val) => val.startsWith(v.substr(0, v.indexOf('=')))) === i));
         }
 
-        return value
+        return value;
     }
 
-    getCookie (key: string) {
+    getCookie(key: string) {
         if (!this.options.cookie || (process.server && !this.ctx.req)) {
-            return
+            return;
         }
 
         const _key = this.getKeyWithNamespace(key);
 
-        const cookies = this.getCookies()
+        const cookies = this.getCookies();
 
         return cookies[_key] ?? undefined;
     }
 
-    removeCookie (key: string) {
-        this.setCookie(key, undefined)
+    removeCookie(key: string) {
+        this.setCookie(key, undefined);
     }
 }
 

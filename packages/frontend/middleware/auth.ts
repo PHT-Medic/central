@@ -5,33 +5,33 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Context} from "@nuxt/types";
-import AuthModule from "~/modules/auth";
-import {LayoutKey} from "@/config/layout/contants";
-import {buildAbilityMetaFromName} from "@typescript-auth/core";
+import { Context } from '@nuxt/types';
+import { buildAbilityMetaFromName } from '@typescript-auth/core';
+import AuthModule from '~/modules/auth';
+import { LayoutKey } from '@/config/layout/contants';
 
-function checkAbilityOrPermission({route, $auth} : Context) {
+function checkAbilityOrPermission({ route, $auth } : Context) {
     const layoutKeys : string[] = [
         LayoutKey.REQUIRED_ABILITIES,
-        LayoutKey.REQUIRED_PERMISSIONS
+        LayoutKey.REQUIRED_PERMISSIONS,
     ];
 
     let isAllowed : undefined | boolean;
 
-    for(let i=0; i<layoutKeys.length; i++) {
+    for (let i = 0; i < layoutKeys.length; i++) {
         const layoutKey = layoutKeys[i];
 
-        for(let j=0; j<route.meta.length; j++) {
+        for (let j = 0; j < route.meta.length; j++) {
             const matchedRecordMeta = route.meta[j];
 
-            if(!matchedRecordMeta.hasOwnProperty(layoutKey)) {
+            if (!matchedRecordMeta.hasOwnProperty(layoutKey)) {
                 continue;
             }
 
             const value = matchedRecordMeta[layoutKey];
-            if(Array.isArray(value)) {
-                isAllowed = value.some(val => {
-                    if(layoutKey === LayoutKey.REQUIRED_PERMISSIONS) {
+            if (Array.isArray(value)) {
+                isAllowed = value.some((val) => {
+                    if (layoutKey === LayoutKey.REQUIRED_PERMISSIONS) {
                         val = buildAbilityMetaFromName(val);
                     }
 
@@ -39,32 +39,33 @@ function checkAbilityOrPermission({route, $auth} : Context) {
                 });
             }
 
-            if(typeof value === 'function') {
+            if (typeof value === 'function') {
                 isAllowed = !!value($auth);
             }
 
-            if(isAllowed) {
+            if (isAllowed) {
                 return true;
             }
         }
-
     }
 
-    if(typeof isAllowed === 'undefined') {
+    if (typeof isAllowed === 'undefined') {
         return true;
     }
 
-    if(!isAllowed) {
+    if (!isAllowed) {
         const parts = route.path.split('/');
         parts.pop();
         throw new Error(parts.join('/'));
     }
 }
 
-export default async function({ route, from, redirect, $auth, store } : Context) : Promise<void> {
+export default async function ({
+    route, from, redirect, $auth, store,
+} : Context) : Promise<void> {
     let redirectPath : string = '/';
 
-    if(typeof from !== 'undefined') {
+    if (typeof from !== 'undefined') {
         redirectPath = from.fullPath;
     }
 
@@ -75,47 +76,47 @@ export default async function({ route, from, redirect, $auth, store } : Context)
             if (store.getters['auth/loggedIn']) {
                 await redirect({
                     path: '/logout',
-                    query: { redirect: route.fullPath }
+                    query: { redirect: route.fullPath },
                 });
             } else {
                 await redirect({
                     path: '/login',
-                    query: { redirect: route.fullPath }
+                    query: { redirect: route.fullPath },
                 });
             }
         }
     }
 
     if (
-        Array.isArray(route.meta) &&
-        route.meta.some(meta => !!meta[LayoutKey.REQUIRED_LOGGED_IN])
+        Array.isArray(route.meta)
+        && route.meta.some((meta) => !!meta[LayoutKey.REQUIRED_LOGGED_IN])
     ) {
         if (!store.getters['auth/loggedIn']) {
             await store.dispatch('auth/triggerLogout');
 
             await redirect({
                 path: '/login',
-                query: { redirect: route.fullPath }
+                query: { redirect: route.fullPath },
             });
         }
 
         try {
-            checkAbilityOrPermission({route, $auth} as Context);
+            checkAbilityOrPermission({ route, $auth } as Context);
         } catch (e) {
             console.log('not permitted...');
 
             await redirect({
-                path: redirectPath
+                path: redirectPath,
             });
         }
     }
 
     if (
-        Array.isArray(route.meta) &&
-        route.meta.some(meta => meta[LayoutKey.REQUIRED_LOGGED_OUT])
+        Array.isArray(route.meta)
+        && route.meta.some((meta) => meta[LayoutKey.REQUIRED_LOGGED_OUT])
     ) {
         if (store.getters['auth/loggedIn']) {
             await redirect({ path: redirectPath });
         }
     }
-};
+}

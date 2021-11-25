@@ -5,21 +5,21 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropAPIRealm, getAPIRealms, PermissionID} from "@personalhealthtrain/ui-common";
-import RealmForm from "../../../../components/domains/admin/realm/RealmForm";
-import RealmList from "../../../../components/domains/realm/RealmList";
-import {LayoutKey, LayoutNavigationID} from "../../../../config/layout/contants";
+import { PermissionID, dropAPIRealm, getAPIRealms } from '@personalhealthtrain/ui-common';
+import RealmForm from '../../../../components/domains/admin/realm/RealmForm';
+import RealmList from '../../../../components/domains/realm/RealmList';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
-    components: {RealmList, RealmForm},
+    components: { RealmList, RealmForm },
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.REALM_ADD,
             PermissionID.REALM_EDIT,
-            PermissionID.REALM_DROP
-        ]
+            PermissionID.REALM_DROP,
+        ],
     },
     data() {
         return {
@@ -27,31 +27,37 @@ export default {
             mode: 'add',
             isBusy: false,
             fields: [
-                { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'options', label: '', tdClass: 'text-left' }
+                {
+                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                },
+                {
+                    key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center',
+                },
+                {
+                    key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+                },
+                { key: 'options', label: '', tdClass: 'text-left' },
             ],
-            items: []
-        }
+            items: [],
+        };
     },
     methods: {
         async drop(item) {
-            let l = this.$createElement;
+            const l = this.$createElement;
 
-            await this.$bvModal.msgBoxConfirm(l('div', {class: 'alert alert-info m-b-0'}, [
+            await this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-info m-b-0' }, [
                 l('p', null, [
                     'Are you sure that you want to delete the realm  ',
                     l('b', null, [item.name]),
-                    '?'
-                ])
+                    '?',
+                ]),
             ]), {
                 size: 'sm',
                 buttonSize: 'xs',
-                cancelTitle: 'Abbrechen'
+                cancelTitle: 'Abbrechen',
             })
-                .then(value => {
-                    if(value) {
+                .then((value) => {
+                    if (value) {
                         return dropAPIRealm(item.id)
                             .then(() => {
                                 this.$refs['items-list'].dropArrayItem(item);
@@ -60,55 +66,66 @@ export default {
                     }
 
                     return value;
-                }).catch(e => {
+                }).catch((e) => {
                     throw e;
                 });
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <realm-list ref="items-list">
-        <template v-slot:header-title>
+        <template #header-title>
             This is a slight overview of all realms.
         </template>
-        <template v-slot:header-actions="props">
+        <template #header-actions="props">
             <div class="d-flex flex-row">
                 <div>
-                    <button type="button" class="btn btn-xs btn-dark" :disabled="props.busy" @click.prevent="props.load">
-                        <i class="fas fa-sync"></i> Refresh
+                    <button
+                        type="button"
+                        class="btn btn-xs btn-dark"
+                        :disabled="props.busy"
+                        @click.prevent="props.load"
+                    >
+                        <i class="fas fa-sync" /> Refresh
                     </button>
                 </div>
             </div>
         </template>
-        <template v-slot:items="props">
-            <b-table :items="props.items" :fields="fields" :busy="props.busy" head-variant="'dark'" outlined>
-                <template v-slot:cell(options)="data">
+        <template #items="props">
+            <b-table
+                :items="props.items"
+                :fields="fields"
+                :busy="props.busy"
+                head-variant="'dark'"
+                outlined
+            >
+                <template #cell(options)="data">
                     <nuxt-link
-                        :to="'/admin/realms/'+data.item.id"
                         v-if="$auth.can('edit','realm')"
-                        @click.prevent="edit(data.item.id)"
+                        :to="'/admin/realms/'+data.item.id"
                         class="btn btn-xs btn-outline-primary"
+                        @click.prevent="edit(data.item.id)"
                     >
-                        <i class="fa fa-arrow-right"></i>
+                        <i class="fa fa-arrow-right" />
                     </nuxt-link>
                     <button
                         v-if="$auth.can('drop','realm') && data.item.drop_able"
-                        @click.prevent="drop(data.item)"
                         type="button"
                         class="btn btn-xs btn-outline-danger"
                         title="Löschen"
+                        @click.prevent="drop(data.item)"
                     >
-                        <i class="fa fa-times"></i>
+                        <i class="fa fa-times" />
                     </button>
                 </template>
-                <template v-slot:cell(created_at)="data">
+                <template #cell(created_at)="data">
                     <timeago :datetime="data.item.created_at" />
                 </template>
-                <template v-slot:cell(updated_at)="data">
+                <template #cell(updated_at)="data">
                     <timeago :datetime="data.item.updated_at" />
                 </template>
-                <template v-slot:table-busy>
+                <template #table-busy>
                     <div class="text-center text-danger my-2">
                         <b-spinner class="align-middle" />
                         <strong>Loading...</strong>

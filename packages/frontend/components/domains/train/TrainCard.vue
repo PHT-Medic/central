@@ -5,41 +5,41 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {Train, dropAPITrain} from "@personalhealthtrain/ui-common";
+import { Train, dropAPITrain } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
-import TrainPipeline from "./TrainPipeline";
-import TrainStationsProgress from "../train-station/progress/TrainStationsProgress";
+import TrainPipeline from './TrainPipeline';
+import TrainStationsProgress from '../train-station/progress/TrainStationsProgress';
 
 export default {
     components: {
         TrainStationsProgress,
-        TrainPipeline
+        TrainPipeline,
 
     },
     props: {
-        trainProperty: Object
-    },
-    created() {
-        this.train = this.trainProperty;
+        trainProperty: Object,
     },
     data() {
         return {
             train: null,
 
-            extendView: false
-        }
+            extendView: false,
+        };
     },
     computed: {
         canDrop() {
-            return this.$auth.can('drop','train');
+            return this.$auth.can('drop', 'train');
         },
         userName() {
             return typeof this.trainProperty.user === 'undefined' ? this.trainProperty.user_id : this.trainProperty.user.name;
-        }
+        },
+    },
+    created() {
+        this.train = this.trainProperty;
     },
     methods: {
         handleDone(train) {
-            for(let key in train) {
+            for (const key in train) {
                 Vue.set(this.train, key, train[key]);
             }
 
@@ -74,30 +74,38 @@ export default {
             }
 
             this.busy = false;
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div class="train-card">
         <div class="train-card-content align-items-end">
             <div>
                 <strong class="m-b-0">
-                    <nuxt-link :to="'/trains/'+train.id">{{train.id}}</nuxt-link>
+                    <nuxt-link :to="'/trains/'+train.id">{{ train.id }}</nuxt-link>
                 </strong>
             </div>
             <div class="ml-auto">
                 <button
-                    @click.prevent="toggleExtendView"
                     class="btn btn-dark btn-xs"
+                    @click.prevent="toggleExtendView"
                 >
-                    <i class="fa" :class="{
-                        'fa-chevron-down': !extendView,
-                        'fa-chevron-up': extendView
-                    }"></i>
+                    <i
+                        class="fa"
+                        :class="{
+                            'fa-chevron-down': !extendView,
+                            'fa-chevron-up': extendView
+                        }"
+                    />
                 </button>
-                <button v-if="canDrop" @click.prevent="drop" class="btn btn-danger btn-xs" type="button">
-                    <i class="fa fa-trash"></i>
+                <button
+                    v-if="canDrop"
+                    class="btn btn-danger btn-xs"
+                    type="button"
+                    @click.prevent="drop"
+                >
+                    <i class="fa fa-trash" />
                 </button>
             </div>
         </div>
@@ -108,7 +116,7 @@ export default {
         />
 
         <div>
-            <hr />
+            <hr>
         </div>
 
         <train-pipeline
@@ -117,11 +125,11 @@ export default {
             @done="handleDone"
             @failed="handleFailed"
             @deleted="handleDeleted"
-            />
+        />
 
         <div class="train-card-footer">
             <div>
-                <small><span class="text-muted">created by </span><span>{{userName}}</span></small>
+                <small><span class="text-muted">created by </span><span>{{ userName }}</span></small>
             </div>
             <div class="ml-auto">
                 <small><span class="text-muted">updated</span> <timeago :datetime="train.created_at" /></small>

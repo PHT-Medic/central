@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue from 'vue'
-import Vuelidate from 'vuelidate'
+import Vue from 'vue';
+import Vuelidate from 'vuelidate';
 
 Vue.use(Vuelidate);

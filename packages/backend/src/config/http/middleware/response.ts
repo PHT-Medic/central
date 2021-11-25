@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {ExpressNextFunction, ExpressRequest, ExpressResponse} from "../type";
+import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 
 export type RespondMessage = {
     statusMessage?: string,
@@ -16,10 +16,10 @@ export type RespondMessage = {
 export default function responseMiddleware(
     request: ExpressRequest,
     response: ExpressResponse,
-    next: ExpressNextFunction
+    next: ExpressNextFunction,
 ) {
     response.respond = (message?: RespondMessage) => {
-        if(message) {
+        if (message) {
             if (message.data == null && message.statusCode == null) {
                 message.statusCode = 204;
             } else {
@@ -29,8 +29,8 @@ export default function responseMiddleware(
             if (message.data !== null) response.json(message.data);
         } else {
             message = {
-                statusCode: 204
-            }
+                statusCode: 204,
+            };
         }
 
         response.status(message.statusCode);
@@ -44,7 +44,7 @@ export default function responseMiddleware(
         const defaultMessage = {
             statusCode: 200,
             message: 'Deleted',
-        }
+        };
 
         message = message || {};
         message = Object.assign(defaultMessage, message);
@@ -56,7 +56,7 @@ export default function responseMiddleware(
         const defaultMessage = {
             statusCode: 201,
             message: 'Created',
-        }
+        };
 
         message = message || {};
         message = Object.assign(defaultMessage, message);
@@ -68,7 +68,7 @@ export default function responseMiddleware(
         const defaultMessage = {
             statusCode: 202,
             message: 'Accepted',
-        }
+        };
 
         message = message || {};
         message = Object.assign(defaultMessage, message);

@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Train, TrainRunStatus} from "@personalhealthtrain/ui-common";
-import {consumeQueue, Message} from "amqp-extension";
-import {getRepository} from "typeorm";
-import {MessageQueueTrainRouterRoutingKey} from "../config/service/mq";
+import { Train, TrainRunStatus } from '@personalhealthtrain/ui-common';
+import { Message, consumeQueue } from 'amqp-extension';
+import { getRepository } from 'typeorm';
+import { MessageQueueTrainRouterRoutingKey } from '../config/service/mq';
 
 export enum TrainRouterEvent {
     STOPPED = 'trainStopped',
@@ -24,25 +24,25 @@ async function updateTrain(trainId: string, event: TrainRouterEvent) {
     const repository = getRepository(Train);
 
     await repository.update({
-        id: trainId
+        id: trainId,
     }, {
-        run_status: EventStatusMap[event]
+        run_status: EventStatusMap[event],
     });
 }
 
 export function buildTrainRouterAggregator() {
     function start() {
-        return consumeQueue({routingKey: MessageQueueTrainRouterRoutingKey.EVENT_IN}, {
+        return consumeQueue({ routingKey: MessageQueueTrainRouterRoutingKey.EVENT_IN }, {
             [TrainRouterEvent.FAILED]: async (message: Message) => {
                 await updateTrain(message.data.trainId, TrainRouterEvent.FAILED);
             },
             [TrainRouterEvent.STOPPED]: async (message: Message) => {
                 await updateTrain(message.data.trainId, TrainRouterEvent.STOPPED);
-            }
+            },
         });
     }
 
     return {
-        start
-    }
+        start,
+    };
 }

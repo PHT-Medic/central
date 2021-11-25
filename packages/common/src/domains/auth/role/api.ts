@@ -5,42 +5,42 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildQuery, BuildInput} from "@trapi/query";
+import { BuildInput, buildQuery } from '@trapi/query';
 import {
     APIType,
     CollectionResourceResponse,
     SingleResourceResponse,
-    useAPI
-} from "../../../modules";
-import {Role} from "./entity";
-import {nullifyEmptyObjectProperties} from "../../../utils";
+    useAPI,
+} from '../../../modules';
+import { Role } from './entity';
+import { nullifyEmptyObjectProperties } from '../../../utils';
 
 export async function getAPIRoles(data?: BuildInput<Role>) : Promise<CollectionResourceResponse<Role>> {
-    let response = await useAPI(APIType.DEFAULT).get('roles' + buildQuery(data));
+    const response = await useAPI(APIType.DEFAULT).get(`roles${buildQuery(data)}`);
 
     return response.data;
 }
 
-export async function getAPIRole(roleId: number) : Promise<SingleResourceResponse<Role>>  {
-    let response = await useAPI(APIType.DEFAULT).get('roles/' + roleId);
+export async function getAPIRole(roleId: number) : Promise<SingleResourceResponse<Role>> {
+    const response = await useAPI(APIType.DEFAULT).get(`roles/${roleId}`);
 
     return response.data;
 }
 
-export async function dropAPIRole(roleId: number) : Promise<SingleResourceResponse<Role>>  {
-    let response = await useAPI(APIType.DEFAULT).delete('roles/' + roleId);
+export async function dropAPIRole(roleId: number) : Promise<SingleResourceResponse<Role>> {
+    const response = await useAPI(APIType.DEFAULT).delete(`roles/${roleId}`);
 
     return response.data;
 }
 
-export async function addAPIRole(data: Pick<Role, 'name' | 'provider_role_id'>) : Promise<SingleResourceResponse<Role>>  {
-    let response = await useAPI(APIType.DEFAULT).post('roles', nullifyEmptyObjectProperties(data));
+export async function addAPIRole(data: Pick<Role, 'name' | 'provider_role_id'>) : Promise<SingleResourceResponse<Role>> {
+    const response = await useAPI(APIType.DEFAULT).post('roles', nullifyEmptyObjectProperties(data));
 
     return response.data;
 }
 
 export async function editAPIRole(id: number, data: Pick<Role, 'name' | 'provider_role_id'>) : Promise<SingleResourceResponse<Role>> {
-    let response = await useAPI(APIType.DEFAULT).post('roles/' + id, nullifyEmptyObjectProperties(data));
+    const response = await useAPI(APIType.DEFAULT).post(`roles/${id}`, nullifyEmptyObjectProperties(data));
 
     return response.data;
 }

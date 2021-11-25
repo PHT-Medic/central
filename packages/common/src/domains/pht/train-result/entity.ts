@@ -6,41 +6,43 @@
  */
 
 import {
-    Entity,
-    PrimaryColumn,
     Column,
     CreateDateColumn,
-    UpdateDateColumn,
-    JoinColumn, ManyToOne
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryColumn, UpdateDateColumn,
 } from 'typeorm';
-import {Train} from "../train";
-import {TrainResultStatus} from "./status";
+import { Train } from '../train';
+import { TrainResultStatus } from './status';
 
-@Entity({name: 'train_results'})
+@Entity({ name: 'train_results' })
 export class TrainResult {
-    @PrimaryColumn({type: "uuid"})
-    id: string;
+    @PrimaryColumn({ type: 'uuid' })
+        id: string;
 
-    @Column({nullable: true, default: null})
-    image: string;
+    @Column({ nullable: true, default: null })
+        image: string;
 
-    @Column({type: "enum", nullable: true, default: null, enum: TrainResultStatus})
-    status: TrainResultStatus | null;
+    @Column({
+        type: 'enum', nullable: true, default: null, enum: TrainResultStatus,
+    })
+        status: TrainResultStatus | null;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-    created_at: Date;
+        created_at: Date;
 
     @UpdateDateColumn()
-    updated_at: Date;
+        updated_at: Date;
 
     // ------------------------------------------------------------------
 
     @Column()
-    train_id: string;
+        train_id: string;
 
-    @ManyToOne(() => Train, {onDelete: "CASCADE"})
-    @JoinColumn({name: 'train_id'})
-    train: Train;
+    @ManyToOne(() => Train, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'train_id' })
+        train: Train;
 }

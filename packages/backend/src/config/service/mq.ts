@@ -13,7 +13,6 @@ export enum MessageQueueSelfRoutingKey {
     EVENT = 'ui.self.event'
 }
 
-
 /**
  * Dispatcher
  */

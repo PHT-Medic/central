@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Proposal, Train} from "../../pht";
 import {
     Column,
     CreateDateColumn,
@@ -13,37 +12,38 @@ import {
     Index,
     OneToMany,
     PrimaryColumn,
-    UpdateDateColumn
-} from "typeorm";
-import {OAuth2Provider} from "../oauth2-provider";
+    UpdateDateColumn,
+} from 'typeorm';
+import { Proposal, Train } from '../../pht';
+import { OAuth2Provider } from '../oauth2-provider';
 
-@Entity({name: 'realms'})
+@Entity({ name: 'realms' })
 export class Realm {
-    @PrimaryColumn({type: 'varchar', length: 36})
-    id: string;
+    @PrimaryColumn({ type: 'varchar', length: 36 })
+        id: string;
 
-    @Column({type: 'varchar', length: 100})
-    @Index({unique: true})
-    name: string;
+    @Column({ type: 'varchar', length: 100 })
+    @Index({ unique: true })
+        name: string;
 
-    @Column({type: "text", nullable: true, default: null})
-    description: string | null;
+    @Column({ type: 'text', nullable: true, default: null })
+        description: string | null;
 
-    @Column({default: true})
-    drop_able: boolean;
+    @Column({ default: true })
+        drop_able: boolean;
 
     @CreateDateColumn()
-    created_at: string;
+        created_at: string;
 
     @UpdateDateColumn()
-    updated_at: string;
+        updated_at: string;
 
-    @OneToMany(() => OAuth2Provider, provider => provider.realm)
-    providers: OAuth2Provider[];
+    @OneToMany(() => OAuth2Provider, (provider) => provider.realm)
+        providers: OAuth2Provider[];
 
-    @OneToMany(() => Proposal, proposal => proposal.realm)
-    proposals: Proposal[];
+    @OneToMany(() => Proposal, (proposal) => proposal.realm)
+        proposals: Proposal[];
 
-    @OneToMany(() => Train, train => train.realm)
-    trains: Train[];
+    @OneToMany(() => Train, (train) => train.realm)
+        trains: Train[];
 }

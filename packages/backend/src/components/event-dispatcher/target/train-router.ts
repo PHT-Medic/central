@@ -5,14 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Message, publishMessage} from "amqp-extension";
-import {isRegistryStationProjectName} from "@personalhealthtrain/ui-common";
-import {DispatcherHarborEventData} from "../../../domains/service/harbor/queue";
-import {buildTrainRouterQueueMessage, TrainRouterHarborEvent} from "../../../domains/service/train-router";
-import {useLogger} from "../../../modules/log";
+import { Message, publishMessage } from 'amqp-extension';
+import { isRegistryStationProjectName } from '@personalhealthtrain/ui-common';
+import { DispatcherHarborEventData } from '../../../domains/service/harbor/queue';
+import { TrainRouterHarborEvent, buildTrainRouterQueueMessage } from '../../../domains/service/train-router';
+import { useLogger } from '../../../modules/log';
 
 export async function dispatchHarborEventToTrainRouter(
-    message: Message
+    message: Message,
 ) : Promise<Message> {
     const data : DispatcherHarborEventData = message.data as DispatcherHarborEventData;
 
@@ -20,7 +20,7 @@ export async function dispatchHarborEventToTrainRouter(
     const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
 
     // only process station trains and the PUSH_ARTIFACT event
-    if(!isStationProject || data.event !== 'PUSH_ARTIFACT') {
+    if (!isStationProject || data.event !== 'PUSH_ARTIFACT') {
         return message;
     }
 
@@ -28,12 +28,11 @@ export async function dispatchHarborEventToTrainRouter(
         TrainRouterHarborEvent.TRAIN_PUSHED,
         {
             repositoryFullName: data.repositoryFullName,
-            operator: data.operator
-        }
+            operator: data.operator,
+        },
     ));
 
-    useLogger().debug('train event pushed to train router aggregator.', {service: 'api-harbor-hook'})
+    useLogger().debug('train event pushed to train router aggregator.', { service: 'api-harbor-hook' });
 
     return message;
 }
-

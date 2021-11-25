@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildMessage, Message} from "amqp-extension";
-import {MessageQueueTrainRouterRoutingKey} from "../../../config/service/mq";
+import { Message, buildMessage } from 'amqp-extension';
+import { MessageQueueTrainRouterRoutingKey } from '../../../config/service/mq';
 
 // -------------------------------------------
 
@@ -35,14 +35,14 @@ export type TrainRouterCommandPayload = {
 export function buildTrainRouterQueueMessage<T extends TrainRouterCommand | TrainRouterHarborEvent>(
     type: T,
     data: T extends TrainRouterCommand ? TrainRouterCommandPayload : TrainRouterHarborEventPayload,
-    metaData: Record<string, any> = {}
+    metaData: Record<string, any> = {},
 ) : Message {
     return buildMessage({
         options: {
-            routingKey: MessageQueueTrainRouterRoutingKey.COMMAND_OUT
+            routingKey: MessageQueueTrainRouterRoutingKey.COMMAND_OUT,
         },
         type,
         data,
-        metadata: metaData
+        metadata: metaData,
     });
 }

@@ -5,16 +5,16 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    export default {
-        data() {
-            return {
+export default {
+    data() {
+        return {
 
-            }
-        },
-        created() {
+        };
+    },
+    created() {
 
-        }
-    }
+    },
+};
 </script>
 <template>
     <div>

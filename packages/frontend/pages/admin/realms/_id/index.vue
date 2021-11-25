@@ -7,38 +7,42 @@
 <script>
 export default {
     props: {
-        realm: Object
-    }
-}
+        realm: Object,
+    },
+};
 </script>
 <template>
     <div class="row">
         <div class="col">
-            <h6><i class="fa fa-city"></i> Station</h6>
+            <h6><i class="fa fa-city" /> Station</h6>
             <p>
-                You can create a station and associate it to the current realm. <br />
+                You can create a station and associate it to the current realm. <br>
                 This realm can than be the target for example of a proposal or a train.
             </p>
-            <nuxt-link :to="'/admin/realms/'+realm.id+'/station'" class="btn btn-xs btn-dark">
+            <nuxt-link
+                :to="'/admin/realms/'+realm.id+'/station'"
+                class="btn btn-xs btn-dark"
+            >
                 Manage
             </nuxt-link>
         </div>
         <div class="col">
-            <h6><i class="fa fa-boxes"></i> Provider(s)</h6>
+            <h6><i class="fa fa-boxes" /> Provider(s)</h6>
 
             <p>
                 To authenticate as a user of this realm, without local authentication (name/password) against the local database,
-                you have to link an authentication provider.<br />
+                you have to link an authentication provider.<br>
                 For example you can add an Open ID client like Keycloak.
             </p>
 
-            <nuxt-link :to="'/admin/realms/'+realm.id+'/oauth-providers'" class="btn btn-xs btn-dark">
+            <nuxt-link
+                :to="'/admin/realms/'+realm.id+'/oauth-providers'"
+                class="btn btn-xs btn-dark"
+            >
                 Manage
             </nuxt-link>
-
         </div>
 
-
-        <hr />
+        <hr>
     </div>
 </template>

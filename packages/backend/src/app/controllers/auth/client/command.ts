@@ -5,36 +5,36 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {AuthClientCommand, AuthClientType, Client} from "@personalhealthtrain/ui-common";
-import {buildAuthClientSecurityQueueMessage} from "../../../../domains/service/queue";
-import {AuthClientSecurityComponentCommand} from "../../../../components/auth-security";
-import {publishMessage} from "amqp-extension";
-import {getRepository} from "typeorm";
+import { AuthClientCommand, AuthClientType, Client } from '@personalhealthtrain/ui-common';
+import { publishMessage } from 'amqp-extension';
+import { getRepository } from 'typeorm';
+import { buildAuthClientSecurityQueueMessage } from '../../../../domains/service/queue';
+import { AuthClientSecurityComponentCommand } from '../../../../components/auth-security';
 
 const commands = Object.values(AuthClientCommand);
 
 export async function doAuthClientCommand(req: any, res: any) {
-    const {id} = req.params;
+    const { id } = req.params;
 
     if (
-        !req.body.command ||
-        commands.indexOf(req.body.command) === -1
+        !req.body.command
+        || commands.indexOf(req.body.command) === -1
     ) {
-        return res._failBadRequest({message: 'The client command is not valid.'});
+        return res._failBadRequest({ message: 'The client command is not valid.' });
     }
 
-    const command: AuthClientCommand = req.body.command;
+    const { command } = req.body;
 
     const repository = getRepository(Client);
     const entity = await repository.findOne(id);
 
-    if(typeof entity === 'undefined') {
+    if (typeof entity === 'undefined') {
         return res._failNotFound();
     }
 
-    if(typeof entity.service_id === 'string') {
-        if(!req.ability.can('manage','service')) {
-            return res._failForbidden({message: 'You are not allowed to manage service clients.'});
+    if (typeof entity.service_id === 'string') {
+        if (!req.ability.can('manage', 'service')) {
+            return res._failForbidden({ message: 'You are not allowed to manage service clients.' });
         }
     }
 
@@ -49,8 +49,8 @@ export async function doAuthClientCommand(req: any, res: any) {
                     id: entity.service_id,
                     type: AuthClientType.SERVICE,
                     clientId: entity.id,
-                    clientSecret: entity.secret
-                }
+                    clientSecret: entity.secret,
+                },
             );
 
             await publishMessage(queueMessage);
@@ -59,5 +59,5 @@ export async function doAuthClientCommand(req: any, res: any) {
 
     await repository.save(entity);
 
-    return res._respondAccepted({data: entity});
+    return res._respondAccepted({ data: entity });
 }

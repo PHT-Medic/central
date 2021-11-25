@@ -5,23 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPIStations} from "@personalhealthtrain/ui-common";
-import Pagination from "../../Pagination";
+import { getAPIStations } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
+import Pagination from '../../Pagination';
 
 export default {
-    components: {Pagination},
+    components: { Pagination },
     props: {
-        filterItems: Function
-    },
-    computed: {
-        formattedItems() {
-            if(typeof this.filterItems === 'undefined') {
-                return this.items;
-            }
-
-            return this.items.filter(this.filterItems);
-        }
+        filterItems: Function,
     },
     data() {
         return {
@@ -30,17 +21,26 @@ export default {
             meta: {
                 limit: 10,
                 offset: 0,
-                total: 0
+                total: 0,
             },
-            itemBusy: false
-        }
+            itemBusy: false,
+        };
+    },
+    computed: {
+        formattedItems() {
+            if (typeof this.filterItems === 'undefined') {
+                return this.items;
+            }
+
+            return this.items.filter(this.filterItems);
+        },
     },
     created() {
         this.load();
     },
     methods: {
         async load() {
-            if(this.busy) return;
+            if (this.busy) return;
 
             this.busy = true;
 
@@ -48,12 +48,12 @@ export default {
                 const response = await getAPIStations({
                     page: {
                         limit: this.meta.limit,
-                        offset: this.meta.offset
-                    }
+                        offset: this.meta.offset,
+                    },
                 });
 
                 this.items = response.data;
-                const {total} = response.meta;
+                const { total } = response.meta;
 
                 this.meta.total = total;
             } catch (e) {
@@ -63,7 +63,7 @@ export default {
             this.busy = false;
         },
         goTo(options, resolve, reject) {
-            if(options.offset === this.meta.offset) return;
+            if (options.offset === this.meta.offset) return;
 
             this.meta.offset = options.offset;
 
@@ -76,15 +76,15 @@ export default {
             this.items.push(item);
         },
         editArrayItem(item) {
-            const index = this.items.findIndex(el => el.id === item.id);
-            if(index !== -1) {
-                for(let key in item) {
+            const index = this.items.findIndex((el) => el.id === item.id);
+            if (index !== -1) {
+                for (const key in item) {
                     Vue.set(this.items[index], key, item[key]);
                 }
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div>
@@ -92,34 +92,51 @@ export default {
             <div class="d-flex flex-row mb-2">
                 <div>
                     <slot name="header-title">
-                        <h6 class="mb-0">Stations</h6>
+                        <h6 class="mb-0">
+                            Stations
+                        </h6>
                     </slot>
                 </div>
                 <div class="ml-auto">
-                    <slot name="header-actions"></slot>
+                    <slot name="header-actions" />
                 </div>
             </div>
         </slot>
         <div class="c-list">
-            <div class="c-list-item mb-2" v-for="(item,key) in formattedItems" :key="key">
+            <div
+                v-for="(item,key) in formattedItems"
+                :key="key"
+                class="c-list-item mb-2"
+            >
                 <div class="c-list-content align-items-center">
                     <div class="c-list-icon">
-                        <i class="fa fa-hospital"></i>
+                        <i class="fa fa-hospital" />
                     </div>
-                    <span class="mb-0">{{item.name}}</span>
+                    <span class="mb-0">{{ item.name }}</span>
 
                     <div class="ml-auto">
-                        <slot name="actions" v-bind:item="item"></slot>
+                        <slot
+                            name="actions"
+                            :item="item"
+                        />
                     </div>
                 </div>
             </div>
         </div>
-        <div v-if="!busy && formattedItems.length === 0" slot="no-more">
+        <div
+            v-if="!busy && formattedItems.length === 0"
+            slot="no-more"
+        >
             <div class="alert alert-sm alert-info">
                 No (more) stations available anymore.
             </div>
         </div>
 
-        <pagination :total="meta.total" :offset="meta.offset" :limit="meta.limit" @to="goTo" />
+        <pagination
+            :total="meta.total"
+            :offset="meta.offset"
+            :limit="meta.limit"
+            @to="goTo"
+        />
     </div>
 </template>

@@ -5,24 +5,26 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {dropAPIProvider, getAPIProviders, PermissionID, Realm} from "@personalhealthtrain/ui-common";
-import ProviderForm from "../../../../../components/domains/admin/provider/ProviderForm";
-import Pagination from "../../../../../components/Pagination";
-import {LayoutKey, LayoutNavigationID} from "../../../../../config/layout/contants";
+import {
+    PermissionID, Realm, dropAPIProvider, getAPIProviders,
+} from '@personalhealthtrain/ui-common';
+import ProviderForm from '../../../../../components/domains/admin/provider/ProviderForm';
+import Pagination from '../../../../../components/Pagination';
+import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';
 
 export default {
+    components: { Pagination, ProviderForm },
     props: {
-        realm: Realm
+        realm: Realm,
     },
-    components: {Pagination, ProviderForm},
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.PROVIDER_ADD,
             PermissionID.PROPOSAL_EDIT,
-            PermissionID.PROPOSAL_DROP
-        ]
+            PermissionID.PROPOSAL_DROP,
+        ],
     },
     data() {
         return {
@@ -30,34 +32,44 @@ export default {
             mode: 'add',
             isBusy: false,
             fields: [
-                { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'openId', label: 'OpenID?', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
-                { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'options', label: '', tdClass: 'text-left' }
+                {
+                    key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+                },
+                {
+                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                },
+                {
+                    key: 'openId', label: 'OpenID?', thClass: 'text-center', tdClass: 'text-center',
+                },
+                {
+                    key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+                },
+                {
+                    key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+                },
+                { key: 'options', label: '', tdClass: 'text-left' },
             ],
             items: [],
             meta: {
                 limit: 10,
                 offset: 0,
-                total: 0
-            }
-        }
+                total: 0,
+            },
+        };
     },
     created() {
         this.load();
     },
     methods: {
         handleCreated(e) {
-            this.$refs['form'].hide();
+            this.$refs.form.hide();
 
             this.items.push(e);
         },
         handleUpdated(e) {
-            this.$refs['form'].hide();
+            this.$refs.form.hide();
 
-            const index = this.items.findIndex(item => item.id === e.id);
+            const index = this.items.findIndex((item) => item.id === e.id);
 
             Object.assign(this.items[index], e);
         },
@@ -68,16 +80,16 @@ export default {
                 const response = await getAPIProviders({
                     page: {
                         limit: this.meta.limit,
-                        offset: this.meta.offset
+                        offset: this.meta.offset,
                     },
                     filter: {
-                        realm_id: this.realm.id
+                        realm_id: this.realm.id,
                     },
-                    fields: ['+client_secret']
+                    fields: ['+client_secret'],
                 });
 
                 this.items = response.data;
-                const {total} = response.meta;
+                const { total } = response.meta;
 
                 this.meta.total = total;
             } catch (e) {
@@ -89,39 +101,37 @@ export default {
             this.mode = 'add';
             this.item = undefined;
 
-            this.$refs['form'].show();
+            this.$refs.form.show();
         },
         async edit(id) {
             this.mode = 'edit';
             this.item = this.items.filter((item) => item.id === id)[0];
 
-            this.$refs['form'].show();
+            this.$refs.form.show();
         },
         async drop(user) {
-            let l = this.$createElement;
+            const l = this.$createElement;
 
             try {
-                let proceed = await this.$bvModal.msgBoxConfirm(l('div', {class: 'alert alert-warning m-b-0'}, [
+                const proceed = await this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-warning m-b-0' }, [
                     l('p', null, [
                         'Are you sure you want to delete the OAuth provider: ',
                         l('b', null, [user.name]),
-                        ' ?'
-                    ])
+                        ' ?',
+                    ]),
                 ]), {
                     size: 'sm',
-                    buttonSize: 'xs'
+                    buttonSize: 'xs',
                 });
 
-                if(proceed) {
+                if (proceed) {
                     try {
-                        let index = this.items.findIndex((el) => {
-                            return el.id === user.id
-                        });
+                        const index = this.items.findIndex((el) => el.id === user.id);
 
-                        if(index !== -1) {
+                        if (index !== -1) {
                             await dropAPIProvider(user.id);
 
-                            this.items.splice(index,1);
+                            this.items.splice(index, 1);
                         }
                     } catch (e) {
 
@@ -130,68 +140,90 @@ export default {
             } catch (e) {
 
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div class="container">
         <div class="d-flex flex-row">
             <div>
-                <button @click.prevent="load" type="button" class="btn btn-xs btn-dark">
-                    <i class="fas fa-sync"></i> Refresh
+                <button
+                    type="button"
+                    class="btn btn-xs btn-dark"
+                    @click.prevent="load"
+                >
+                    <i class="fas fa-sync" /> Refresh
                 </button>
             </div>
             <div style="margin-left: auto;">
-                <button @click.prevent="add" type="button" class="btn btn-xs btn-success">
-                    <i class="fa fa-plus"></i> Add
+                <button
+                    type="button"
+                    class="btn btn-xs btn-success"
+                    @click.prevent="add"
+                >
+                    <i class="fa fa-plus" /> Add
                 </button>
             </div>
         </div>
         <div class="m-t-10">
-            <b-table :items="items" :fields="fields" :busy="isBusy" head-variant="'dark'" outlined>
-                <template v-slot:cell(realm)="data">
-                    <span class="badge-dark badge">{{data.item.realm.name}}</span>
+            <b-table
+                :items="items"
+                :fields="fields"
+                :busy="isBusy"
+                head-variant="'dark'"
+                outlined
+            >
+                <template #cell(realm)="data">
+                    <span class="badge-dark badge">{{ data.item.realm.name }}</span>
                 </template>
-                <template v-slot:cell(options)="data">
+                <template #cell(options)="data">
                     <button
                         v-if="$auth.can('edit','provider')"
-                        @click.prevent="edit(data.item.id)"
                         class="btn btn-xs btn-outline-primary"
+                        @click.prevent="edit(data.item.id)"
                     >
-                        <i class="fa fa-bars"></i>
+                        <i class="fa fa-bars" />
                     </button>
                     <button
                         v-if="$auth.can('drop','provider')"
-                        @click.prevent="drop(data.item)"
                         type="button"
                         class="btn btn-xs btn-outline-danger"
                         title="Löschen"
+                        @click.prevent="drop(data.item)"
                     >
-                        <i class="fa fa-times"></i>
+                        <i class="fa fa-times" />
                     </button>
                 </template>
-                <template v-slot:cell(created_at)="data">
+                <template #cell(created_at)="data">
                     <timeago :datetime="data.item.created_at" />
                 </template>
-                <template v-slot:cell(updated_at)="data">
+                <template #cell(updated_at)="data">
                     <timeago :datetime="data.item.updated_at" />
                 </template>
-                <template v-slot:cell(openId)="data">
-                    <i class="fa" :class="{'fa-check text-success': data.item.openId, 'fa-times text-danger': !data.item.openId}" />
+                <template #cell(openId)="data">
+                    <i
+                        class="fa"
+                        :class="{'fa-check text-success': data.item.openId, 'fa-times text-danger': !data.item.openId}"
+                    />
                 </template>
-                <template v-slot:table-busy>
+                <template #table-busy>
                     <div class="text-center text-danger my-2">
                         <b-spinner class="align-middle" />
                         <strong>Loading...</strong>
                     </div>
                 </template>
             </b-table>
-            <pagination :total="meta.total" :offset="meta.offset" :limit="meta.limit" @to="goTo" />
+            <pagination
+                :total="meta.total"
+                :offset="meta.offset"
+                :limit="meta.limit"
+                @to="goTo"
+            />
         </div>
         <b-modal
-            size="lg"
             ref="form"
+            size="lg"
             button-size="sm"
             title-html="<i class='fas fa-sign-in-alt'></i> OAuth Provider"
             :no-close-on-backdrop="true"

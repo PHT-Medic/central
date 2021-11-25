@@ -5,42 +5,44 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {getAPIUser} from "@personalhealthtrain/ui-common";
-    import {LayoutKey, LayoutNavigationID} from "../../config/layout/contants";
+import { getAPIUser } from '@personalhealthtrain/ui-common';
+import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
 
-    export default {
-        meta: {
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT
-        },
-        async asyncData(context) {
-            let user;
+export default {
+    meta: {
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+    },
+    async asyncData(context) {
+        let user;
 
-            try {
-                user = await getAPIUser(context.params.id);
+        try {
+            user = await getAPIUser(context.params.id);
 
-                return {
-                    user
-                }
-            } catch (e) {
-                await context.redirect('/');
-            }
-        },
-        data() {
             return {
-                user: null,
-                tabs: [
-                    { name: 'Allgemein', routeName: 'users-id', icon: 'fas fa-bars', urlSuffix: '' }
-                ]
-            }
+                user,
+            };
+        } catch (e) {
+            await context.redirect('/');
         }
-    }
+    },
+    data() {
+        return {
+            user: null,
+            tabs: [
+                {
+                    name: 'Allgemein', routeName: 'users-id', icon: 'fas fa-bars', urlSuffix: '',
+                },
+            ],
+        };
+    },
+};
 </script>
 <template>
     <div class="">
         <div class="m-b-10">
             <h4 class="title">
-                {{user.name}}
+                {{ user.name }}
                 <span class="sub-title">Profil</span>
             </h4>
         </div>

@@ -5,24 +5,24 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPIRealm} from "@personalhealthtrain/ui-common";
-import Vue from "vue";
-import MedicineWorker from "../../../components/svg/MedicineWorker";
-import MedicineDoctors from "../../../components/svg/MedicineDoctors";
-import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
+import { getAPIRealm } from '@personalhealthtrain/ui-common';
+import Vue from 'vue';
+import MedicineWorker from '../../../components/svg/MedicineWorker';
+import MedicineDoctors from '../../../components/svg/MedicineDoctors';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {
-    components: {MedicineDoctors, MedicineWorker},
+    components: { MedicineDoctors, MedicineWorker },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
     },
     async asyncData(context) {
         try {
             const realm = await getAPIRealm(context.params.id);
 
             return {
-                realm
+                realm,
             };
         } catch (e) {
             await context.redirect('/admin/realms');
@@ -33,25 +33,25 @@ export default {
             realm: undefined,
             tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-                { name: 'Station', icon: 'fa fa-city', urlSuffix: '/station'},
-                { name: 'Users', icon: 'fa fa-users', urlSuffix: '/users'},
-                { name: 'Providers', icon: 'fas fa-boxes', urlSuffix: '/providers'}
-            ]
-        }
+                { name: 'Station', icon: 'fa fa-city', urlSuffix: '/station' },
+                { name: 'Users', icon: 'fa fa-users', urlSuffix: '/users' },
+                { name: 'Providers', icon: 'fas fa-boxes', urlSuffix: '/providers' },
+            ],
+        };
     },
     methods: {
         updateRealm(realm) {
-            for(let key in realm) {
+            for (const key in realm) {
                 Vue.set(this.realm, key, realm[key]);
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div class="container">
         <h1 class="title no-border mb-3">
-            {{realm.name}} <span class="sub-title">Details</span>
+            {{ realm.name }} <span class="sub-title">Details</span>
         </h1>
 
         <div class="m-b-20 m-t-10">
@@ -82,10 +82,12 @@ export default {
                             </b-nav>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
-        <nuxt-child :realm="realm" @updated="updateRealm" />
+        <nuxt-child
+            :realm="realm"
+            @updated="updateRealm"
+        />
     </div>
 </template>

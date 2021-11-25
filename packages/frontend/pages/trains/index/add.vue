@@ -5,29 +5,29 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import TrainBasicForm from "../../../components/domains/train/TrainBasicForm";
+import TrainBasicForm from '../../../components/domains/train/TrainBasicForm';
 
 export default {
-    components: {TrainBasicForm},
+    components: { TrainBasicForm },
     data() {
         return {
-            proposal_id: undefined
+            proposal_id: undefined,
+        };
+    },
+    created() {
+        if (typeof this.$route.query.proposal_id !== 'undefined') {
+            const proposalId = parseInt(this.$route.query.proposal_id, 10);
+            if (!Number.isNaN(proposalId)) {
+                this.proposal_id = proposalId;
+            }
         }
     },
     methods: {
         handleCreated(train) {
-            this.$router.push('/trains/'+train.id+'/wizard');
-        }
+            this.$router.push(`/trains/${train.id}/wizard`);
+        },
     },
-    created() {
-        if(typeof this.$route.query.proposal_id !== "undefined") {
-            const proposal_id = parseInt(this.$route.query.proposal_id);
-            if(!Number.isNaN(proposal_id)) {
-                this.proposal_id = proposal_id;
-            }
-        }
-    },
-}
+};
 </script>
 <template>
     <train-basic-form

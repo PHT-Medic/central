@@ -5,89 +5,104 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {PermissionID, ProposalStationApprovalStatus} from "@personalhealthtrain/ui-common";
-import ProposalStationStatus from "../../../components/domains/proposal-station/ProposalStationStatus";
-import ProposalStationList from "../../../components/domains/proposal-station/ProposalStationList";
-import ProposalStationAction from "../../../components/domains/proposal-station/ProposalStationAction";
-import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
+import { PermissionID, ProposalStationApprovalStatus } from '@personalhealthtrain/ui-common';
+import ProposalStationStatus from '../../../components/domains/proposal-station/ProposalStationStatus';
+import ProposalStationList from '../../../components/domains/proposal-station/ProposalStationList';
+import ProposalStationAction from '../../../components/domains/proposal-station/ProposalStationAction';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {
-    components:{
+    components: {
         ProposalStationAction,
         ProposalStationList,
-        ProposalStationStatus
+        ProposalStationStatus,
     },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT
-    },
-    data() {
-        return {
-            proposalStationStatus: ProposalStationApprovalStatus
-        }
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
     },
     props: {
         proposal: {
             type: Object,
-            default () {
+            default() {
                 return {};
-            }
+            },
         },
         visitorProposalStation: {
             type: Object,
-            default: null
-        }
+            default: null,
+        },
+    },
+    data() {
+        return {
+            proposalStationStatus: ProposalStationApprovalStatus,
+        };
     },
     methods: {
         handleUpdated(item) {
             this.$emit('proposalStationUpdated', item);
 
             this.$refs.proposalStationList.editArrayItem(item);
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div class="container">
         <div class="row align-items-center">
             <div class="col-xl-3 col-md-6 text-center">
                 <div class="bg-warm-flame p-1 rounded">
-                    <h6 class="mt-1">Risk</h6>
+                    <h6 class="mt-1">
+                        Risk
+                    </h6>
                     <div class="mb-1">
-                        <i class="fa fa-exclamation-triangle fa-4x"></i>
+                        <i class="fa fa-exclamation-triangle fa-4x" />
                     </div>
-                    <p class="badge badge-success">{{ proposal.risk }}</p>
+                    <p class="badge badge-success">
+                        {{ proposal.risk }}
+                    </p>
                 </div>
-
             </div>
 
             <div class="col-xl-3 col-md-6 text-center">
                 <div class="bg-warm-flame p-1 rounded">
-                    <h6 class="mt-1">MasterImage</h6>
+                    <h6 class="mt-1">
+                        MasterImage
+                    </h6>
                     <div class="mb-1">
-                        <i class="fa fa-compact-disc fa-4x"></i>
+                        <i class="fa fa-compact-disc fa-4x" />
                     </div>
-                    <p class="badge badge-dark">{{ proposal.master_image ? proposal.master_image.name :  proposal.master_image_id }}</p>
+                    <p class="badge badge-dark">
+                        {{ proposal.master_image ? proposal.master_image.name : proposal.master_image_id }}
+                    </p>
                 </div>
             </div>
 
             <div class="col-xl-3 col-md-6 text-center">
                 <div class="bg-tempting-azure p-1 rounded">
-                    <h6 class="mt-1">Realm</h6>
+                    <h6 class="mt-1">
+                        Realm
+                    </h6>
                     <div class="mb-1">
-                        <i class="fas fa-university fa-4x"></i>
+                        <i class="fas fa-university fa-4x" />
                     </div>
-                    <p class="badge badge-dark">{{ proposal.realm_id }}</p>
+                    <p class="badge badge-dark">
+                        {{ proposal.realm_id }}
+                    </p>
                 </div>
             </div>
 
             <div class="col-xl-3 col-md-6 text-center">
                 <div class="bg-tempting-azure p-1 rounded">
-                    <h6 class="mt-1">User</h6>
+                    <h6 class="mt-1">
+                        User
+                    </h6>
                     <div class="mb-1">
-                        <i class="fa fa-user fa-4x"></i>
+                        <i class="fa fa-user fa-4x" />
                     </div>
-                    <p class="badge badge-dark">{{ proposal.user ? proposal.user.name : proposal.user_id }}</p>
+                    <p class="badge badge-dark">
+                        {{ proposal.user ? proposal.user.name : proposal.user_id }}
+                    </p>
                 </div>
             </div>
         </div>
@@ -95,10 +110,10 @@ export default {
             <div class="row">
                 <div class="col-3">
                     <h6>Risk Comment</h6>
-                    <p>{{proposal.risk_comment}}</p>
+                    <p>{{ proposal.risk_comment }}</p>
 
                     <h6>RequestedData</h6>
-                    <p>{{proposal.requested_data}}</p>
+                    <p>{{ proposal.requested_data }}</p>
                 </div>
                 <div class="col-3">
                     <h6>Created At</h6>
@@ -107,12 +122,18 @@ export default {
                     <p><timeago :datetime="proposal.updated_at" /></p>
                 </div>
                 <div class="col-6">
-                    <proposal-station-list :proposal-id="proposal.id" ref="proposalStationList">
-                        <template v-slot:header-actions>
+                    <proposal-station-list
+                        ref="proposalStationList"
+                        :proposal-id="proposal.id"
+                    >
+                        <template #header-actions>
                             <template v-if="visitorProposalStation">
-                                <b-dropdown class="dropdown-xs" :no-caret="true">
+                                <b-dropdown
+                                    class="dropdown-xs"
+                                    :no-caret="true"
+                                >
                                     <template #button-content>
-                                        <i class="fa fa-bars"></i> Options
+                                        <i class="fa fa-bars" /> Options
                                     </template>
                                     <proposal-station-action
                                         :proposal-station-id="visitorProposalStation.id"

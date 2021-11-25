@@ -9,25 +9,36 @@ export default {
     props: {
         file: {
             type: Object,
-            default: undefined
+            default: undefined,
         },
         filesSelected: {
             type: Array,
-            default: []
+            default: [],
         },
         train: {
             type: Object,
-            default: undefined
+            default: undefined,
         },
         fileSelectedId: {
             type: String,
-            default: undefined
-        }
+            default: undefined,
+        },
     },
     data() {
         return {
-            busy: false
-        }
+            busy: false,
+        };
+    },
+    computed: {
+        path() {
+            return `${this.file.directory}/${this.file.name}`;
+        },
+        check() {
+            return this.filesSelected.findIndex((file) => file === this.file.id) !== -1;
+        },
+        isIdleFile() {
+            return this.fileSelectedId === this.file.id;
+        },
     },
     methods: {
         toggleEnabled() {
@@ -35,41 +46,41 @@ export default {
         },
         checkFile() {
             this.$emit('check', {
-                ...this.file
+                ...this.file,
             });
-        }
+        },
     },
-    computed: {
-        path() {
-            return this.file.directory + '/' + this.file.name;
-        },
-        check() {
-            return this.filesSelected.findIndex(file => file === this.file.id) !== -1;
-        },
-        isIdleFile() {
-            return this.fileSelectedId === this.file.id;
-        }
-    }
-}
+};
 </script>
 <template>
     <div class="card card-file d-flex flex-row align-items-center">
         <div class="card-heading align-items-center d-flex">
             <div class="form-check">
-                <input type="checkbox" :checked="check" :disabled="isIdleFile" @change="checkFile" class="form-check-input" style="position: relative; margin-top: .6rem;">
+                <input
+                    type="checkbox"
+                    :checked="check"
+                    :disabled="isIdleFile"
+                    class="form-check-input"
+                    style="position: relative; margin-top: .6rem;"
+                    @change="checkFile"
+                >
             </div>
             <div>
-                <i class="fa fa-file text-success ml-1"></i>
+                <i class="fa fa-file text-success ml-1" />
             </div>
         </div>
         <div class="card-body">
             <span class="title">
-                {{path}}
-                <small class="text-muted">{{file.size}} Bytes</small>
+                {{ path }}
+                <small class="text-muted">{{ file.size }} Bytes</small>
             </span>
         </div>
         <div class="ml-auto">
-            <b-form-checkbox switch :checked="isIdleFile" @change="toggleEnabled"></b-form-checkbox>
+            <b-form-checkbox
+                switch
+                :checked="isIdleFile"
+                @change="toggleEnabled"
+            />
         </div>
     </div>
 </template>

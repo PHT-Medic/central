@@ -5,43 +5,45 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn} from 'typeorm';
-import {Proposal} from "../proposal";
-import {Station} from "../station";
-import {ProposalStationApprovalStatus} from "./status";
+import {
+    Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
+} from 'typeorm';
+import { Proposal } from '../proposal';
+import { Station } from '../station';
+import { ProposalStationApprovalStatus } from './status';
 
-@Entity({name: 'proposal_stations'})
+@Entity({ name: 'proposal_stations' })
 export class ProposalStation {
-    @PrimaryGeneratedColumn({unsigned: true})
-    id: number;
+    @PrimaryGeneratedColumn({ unsigned: true })
+        id: number;
 
-    @Column({default: null})
-    approval_status: ProposalStationApprovalStatus | null;
+    @Column({ default: null })
+        approval_status: ProposalStationApprovalStatus | null;
 
-    @Column({type: "text", nullable: true})
-    comment: string;
+    @Column({ type: 'text', nullable: true })
+        comment: string;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-    created_at: Date;
+        created_at: Date;
 
     @UpdateDateColumn()
-    updated_at: Date;
+        updated_at: Date;
 
     // ------------------------------------------------------------------
 
     @Column()
-    proposal_id: number;
+        proposal_id: number;
 
-    @ManyToOne(() => Proposal, {onDelete: "CASCADE"})
-    @JoinColumn({name: 'proposal_id'})
-    proposal: Proposal;
+    @ManyToOne(() => Proposal, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'proposal_id' })
+        proposal: Proposal;
 
     @Column()
-    station_id: number;
+        station_id: number;
 
-    @ManyToOne(() => Station, {onDelete: "CASCADE"})
-    @JoinColumn({name: 'station_id'})
-    station: Station;
+    @ManyToOne(() => Station, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'station_id' })
+        station: Station;
 }

@@ -5,33 +5,39 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {SwaggerTags} from "typescript-swagger";
-import {Body, Controller, Post, Request, Response} from "@decorators/express";
-import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
-import {Client, AuthClientCommand, SERVICE_ID, AuthClientType, PermissionID} from "@personalhealthtrain/ui-common";
-import {getRepository} from "typeorm";
-import {check, matchedData, validationResult} from "express-validator";
-import {doAuthClientCommand} from "./command";
-import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
-import {BadRequestError, ForbiddenError, NotFoundError, NotImplementedError} from "@typescript-error/http";
-import {ExpressValidationError} from "../../../../config/http/error/validation";
+import { SwaggerTags } from 'typescript-swagger';
+import {
+    Body, Controller, Post, Request, Response,
+} from '@decorators/express';
+import {
+    AuthClientCommand, AuthClientType, Client, PermissionID, SERVICE_ID,
+} from '@personalhealthtrain/ui-common';
+import { getRepository } from 'typeorm';
+import { check, matchedData, validationResult } from 'express-validator';
+import {
+    BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
+} from '@typescript-error/http';
+import { doAuthClientCommand } from './command';
+import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
+import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
+import { ExpressValidationError } from '../../../../config/http/error/validation';
 
 @SwaggerTags('auth')
-@Controller("/clients")
+@Controller('/clients')
 export class ClientController {
-    @Post("", [ForceLoggedInMiddleware])
+    @Post('', [ForceLoggedInMiddleware])
     async add(
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<Client[]> {
         return await addRoute(req, res);
     }
 
-    @Post("/:id/command", [ForceLoggedInMiddleware])
+    @Post('/:id/command', [ForceLoggedInMiddleware])
     async runCommand(
         @Body() data: {command: AuthClientCommand},
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ) {
         return await doAuthClientCommand(req, res);
     }
@@ -44,12 +50,12 @@ async function addRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any
 
     await check('type')
         .exists()
-        .custom(value => Object.values(AuthClientType).indexOf(value) !== -1)
+        .custom((value) => Object.values(AuthClientType).indexOf(value) !== -1)
         .run(req);
 
     await check('id')
         .exists()
-        .custom(value => typeof value === 'number' || typeof value === 'string')
+        .custom((value) => typeof value === 'number' || typeof value === 'string')
         .run(req);
 
     const validation = validationResult(req);
@@ -57,7 +63,7 @@ async function addRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any
         throw new ExpressValidationError(validation);
     }
 
-    const data = matchedData(req, {includeOptionals: false});
+    const data = matchedData(req, { includeOptionals: false });
 
     const clientType : AuthClientType = data.type;
     const clientTargetId = data.id;
@@ -71,14 +77,14 @@ async function addRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any
                 throw new ForbiddenError('You are not allowed to add service-clients.');
             }
 
-            if(Object.values(SERVICE_ID).indexOf(clientTargetId) === -1) {
+            if (Object.values(SERVICE_ID).indexOf(clientTargetId) === -1) {
                 throw new NotFoundError();
             }
 
             const serviceId : SERVICE_ID = clientTargetId;
 
             entity = await repository.findOne({
-                service_id: serviceId
+                service_id: serviceId,
             });
 
             if (typeof entity !== 'undefined') {
@@ -88,7 +94,7 @@ async function addRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any
             entity = repository.create({
                 name: serviceId,
                 service_id: serviceId,
-                type: clientType
+                type: clientType,
             });
             break;
         case AuthClientType.USER:
@@ -97,6 +103,5 @@ async function addRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any
 
     await repository.save(entity);
 
-    return res.respondCreated({data: entity});
+    return res.respondCreated({ data: entity });
 }
-

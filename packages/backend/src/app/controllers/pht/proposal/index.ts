@@ -5,77 +5,81 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {getRepository, In} from "typeorm";
-import {applyFilters, applyPagination, applyRelations} from "typeorm-extension";
-import {DispatcherProposalEvent, emitDispatcherProposalEvent} from "../../../../domains/pht/proposal/queue";
+import { In, getRepository } from 'typeorm';
+import { applyFilters, applyPagination, applyRelations } from 'typeorm-extension';
 import {
-    isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources, PermissionID,
-    Proposal, ProposalStation, ProposalStationApprovalStatus, Station
-} from "@personalhealthtrain/ui-common";
-import {check, matchedData, validationResult} from "express-validator";
-import {MasterImage} from "@personalhealthtrain/ui-common";
+    MasterImage,
+    PermissionID, Proposal,
+    ProposalStation, ProposalStationApprovalStatus, Station, isPermittedForResourceRealm,
+    onlyRealmPermittedQueryResources,
+} from '@personalhealthtrain/ui-common';
+import { check, matchedData, validationResult } from 'express-validator';
 
-import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import env from "../../../../env";
-import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
-import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
-import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
-import {ExpressValidationError} from "../../../../config/http/error/validation";
+import {
+    Body, Controller, Delete, Get, Params, Post, Request, Response,
+} from '@decorators/express';
+import { ResponseExample, SwaggerTags } from 'typescript-swagger';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import env from '../../../../env';
+import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
+import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
+import { DispatcherProposalEvent, emitDispatcherProposalEvent } from '../../../../domains/pht/proposal/queue';
+import { ExpressValidationError } from '../../../../config/http/error/validation';
 
 type PartialProposal = Partial<Proposal>;
-const simpleExample = {title: 'An example Proposal', risk: 'low', risk_comment: 'The risk is low', requested_data: 'all', realm_id: 'master'};
+const simpleExample = {
+    title: 'An example Proposal', risk: 'low', risk_comment: 'The risk is low', requested_data: 'all', realm_id: 'master',
+};
 
 @SwaggerTags('pht')
-@Controller("/proposals")
+@Controller('/proposals')
 export class ProposalController {
-    @Get("",[ForceLoggedInMiddleware])
+    @Get('', [ForceLoggedInMiddleware])
     @ResponseExample<PartialProposal[]>([simpleExample])
     async getMany(
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<PartialProposal[]> {
         return await getProposalsRouteHandler(req, res) as PartialProposal[];
     }
 
-    @Get("/:id",[ForceLoggedInMiddleware])
+    @Get('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialProposal>(simpleExample)
     async getOne(
         @Params('id') id: string,
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<PartialProposal|undefined> {
         return await getProposalRouteHandler(req, res) as PartialProposal | undefined;
     }
 
-    @Post("/:id",[ForceLoggedInMiddleware])
+    @Post('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialProposal>(simpleExample)
     async update(
         @Params('id') id: string,
         @Body() data: Proposal,
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<PartialProposal|undefined> {
         return await editProposalRouteHandler(req, res) as PartialProposal | undefined;
     }
 
-    @Post("",[ForceLoggedInMiddleware])
+    @Post('', [ForceLoggedInMiddleware])
     @ResponseExample<PartialProposal>(simpleExample)
     async add(
         @Body() data: Proposal,
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<PartialProposal|undefined> {
         return await addProposalRouteHandler(req, res) as PartialProposal | undefined;
     }
 
-    @Delete("/:id",[ForceLoggedInMiddleware])
+    @Delete('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialProposal>(simpleExample)
     async drop(
         @Params('id') id: string,
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<PartialProposal|undefined> {
         return await dropProposalRouteHandler(req, res) as PartialProposal | undefined;
     }
@@ -87,16 +91,16 @@ export async function getProposalRouteHandler(req: ExpressRequest, res: ExpressR
 
     const repository = getRepository(Proposal);
     const query = repository.createQueryBuilder('proposal')
-        .where("proposal.id = :id", {id});
+        .where('proposal.id = :id', { id });
 
-    applyRelations(query,  include, {
+    applyRelations(query, include, {
         defaultAlias: 'proposal',
-        allowed: ['master_image', 'realm', 'user']
+        allowed: ['master_image', 'realm', 'user'],
     });
 
     const entity = await query.getOne();
 
-    if(typeof entity === 'undefined') {
+    if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
@@ -107,7 +111,7 @@ export async function getProposalRouteHandler(req: ExpressRequest, res: ExpressR
     }
      */
 
-    return res.respond({data: entity})
+    return res.respond({ data: entity });
 }
 
 export async function getProposalsRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
@@ -120,12 +124,12 @@ export async function getProposalsRouteHandler(req: ExpressRequest, res: Express
 
     applyFilters(query, filter, {
         defaultAlias: 'proposal',
-        allowed: ['id', 'name', 'realm_id']
+        allowed: ['id', 'name', 'realm_id'],
     });
 
-    const pagination = applyPagination(query, page, {maxLimit: 50});
+    const pagination = applyPagination(query, page, { maxLimit: 50 });
 
-    query.orderBy("proposal.updated_at", "DESC");
+    query.orderBy('proposal.updated_at', 'DESC');
 
     const [entities, total] = await query.getManyAndCount();
 
@@ -134,49 +138,45 @@ export async function getProposalsRouteHandler(req: ExpressRequest, res: Express
             data: entities,
             meta: {
                 total,
-                ...pagination
-            }
-        }
+                ...pagination,
+            },
+        },
     });
 }
 
 export async function addProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if(!req.ability.hasPermission(PermissionID.PROPOSAL_ADD)) {
+    if (!req.ability.hasPermission(PermissionID.PROPOSAL_ADD)) {
         throw new ForbiddenError();
     }
 
     await check('title')
         .exists()
-        .isLength({min: 5, max: 100})
+        .isLength({ min: 5, max: 100 })
         .run(req);
 
-    await check(['requested_data','risk_comment'])
+    await check(['requested_data', 'risk_comment'])
         .exists()
-        .isLength({min: 10, max: 2048})
+        .isLength({ min: 10, max: 2048 })
         .run(req);
 
     await check('risk')
         .exists()
         .isString()
-        .isIn(['low','mid','high'])
+        .isIn(['low', 'mid', 'high'])
         .run(req);
 
     await check('master_image_id')
         .exists()
         .isString()
-        .custom(value => {
-            return getRepository(MasterImage).findOne(value).then((masterImageResult) => {
-                if(typeof masterImageResult === 'undefined') throw new Error('The provided master image does not exist.');
-            })
-        })
+        .custom((value) => getRepository(MasterImage).findOne(value).then((masterImageResult) => {
+            if (typeof masterImageResult === 'undefined') throw new Error('The provided master image does not exist.');
+        }))
         .run(req);
     await check('station_ids')
         .isArray()
-        .custom((value: any[]) => {
-            return getRepository(Station).find({id: In(value)}).then((stationResult) => {
-                if(!stationResult || stationResult.length !== value.length) throw new Error('The provided stations are not valid.');
-            })
-        })
+        .custom((value: any[]) => getRepository(Station).find({ id: In(value) }).then((stationResult) => {
+            if (!stationResult || stationResult.length !== value.length) throw new Error('The provided stations are not valid.');
+        }))
         .run(req);
 
     const validation = validationResult(req);
@@ -184,59 +184,55 @@ export async function addProposalRouteHandler(req: ExpressRequest, res: ExpressR
         throw new ExpressValidationError(validation);
     }
 
-    const validationData = matchedData(req, {includeOptionals: false});
+    const validationData = matchedData(req, { includeOptionals: false });
 
-    const {station_ids, ...data} = validationData;
+    const { station_ids, ...data } = validationData;
 
     const repository = getRepository(Proposal);
     const entity = repository.create({
         realm_id: req.realmId,
         user_id: req.user.id,
-        ...data
+        ...data,
     });
     await repository.save(entity);
 
     const proposalStationRepository = getRepository(ProposalStation);
-    const proposalStations = station_ids.map((stationId: number) => {
-        return proposalStationRepository.create({
-            proposal_id: entity.id,
-            station_id: stationId,
-            approval_status: env.skipProposalApprovalOperation ? ProposalStationApprovalStatus.APPROVED : null
-        });
-    });
+    const proposalStations = station_ids.map((stationId: number) => proposalStationRepository.create({
+        proposal_id: entity.id,
+        station_id: stationId,
+        approval_status: env.skipProposalApprovalOperation ? ProposalStationApprovalStatus.APPROVED : null,
+    }));
 
     await proposalStationRepository.save(proposalStations);
 
-    const proposalStationPromise = Promise.all(station_ids.map((stationId: string | number) => {
-        return emitDispatcherProposalEvent({
-            event: DispatcherProposalEvent.ASSIGNED,
-            id: entity.id,
-            stationId,
-            operatorRealmId: req.realmId
-        });
-    }));
+    const proposalStationPromise = Promise.all(station_ids.map((stationId: string | number) => emitDispatcherProposalEvent({
+        event: DispatcherProposalEvent.ASSIGNED,
+        id: entity.id,
+        stationId,
+        operatorRealmId: req.realmId,
+    })));
 
     await proposalStationPromise;
 
-    return res.respond({data: entity});
+    return res.respond({ data: entity });
 }
 
 export async function editProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if(!req.ability.hasPermission(PermissionID.PROPOSAL_EDIT)) {
+    if (!req.ability.hasPermission(PermissionID.PROPOSAL_EDIT)) {
         throw new ForbiddenError();
     }
 
     await check('title')
         .exists()
-        .isLength({min: 5, max: 100})
+        .isLength({ min: 5, max: 100 })
         .optional()
         .run(req);
 
-    await check(['requested_data','risk_comment'])
+    await check(['requested_data', 'risk_comment'])
         .exists()
-        .isLength({min: 10, max: 2048})
+        .isLength({ min: 10, max: 2048 })
         .optional()
         .run(req);
 
@@ -244,38 +240,36 @@ export async function editProposalRouteHandler(req: ExpressRequest, res: Express
         .exists()
         .isString()
         .optional()
-        .isIn(['low','mid','high'])
+        .isIn(['low', 'mid', 'high'])
         .run(req);
 
     await check('master_image_id')
         .exists()
         .isString()
         .optional()
-        .custom(value => {
-            return getRepository(MasterImage).findOne(value).then((masterImageResult) => {
-                if(typeof masterImageResult === 'undefined') throw new Error('The specified master image does not exist.');
-            })
-        })
+        .custom((value) => getRepository(MasterImage).findOne(value).then((masterImageResult) => {
+            if (typeof masterImageResult === 'undefined') throw new Error('The specified master image does not exist.');
+        }))
         .run(req);
 
     const validation = validationResult(req);
-    if(!validation.isEmpty()) {
+    if (!validation.isEmpty()) {
         throw new ExpressValidationError(validation);
     }
 
     const data = matchedData(req);
-    if(!data) {
+    if (!data) {
         return res.respondAccepted();
     }
 
     const repository = getRepository(Proposal);
     let proposal = await repository.findOne(id);
 
-    if(typeof proposal === 'undefined') {
+    if (typeof proposal === 'undefined') {
         throw new NotFoundError();
     }
 
-    if(!isPermittedForResourceRealm(req.realmId, proposal.realm_id)) {
+    if (!isPermittedForResourceRealm(req.realmId, proposal.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -284,7 +278,7 @@ export async function editProposalRouteHandler(req: ExpressRequest, res: Express
     const result = await repository.save(proposal);
 
     return res.respondAccepted({
-        data: result
+        data: result,
     });
 }
 
@@ -294,11 +288,11 @@ export async function dropProposalRouteHandler(req: ExpressRequest, res: Express
     // tslint:disable-next-line:radix
     const id = parseInt(idStr, 10);
 
-    if(typeof id !== 'number' || Number.isNaN(id)) {
+    if (typeof id !== 'number' || Number.isNaN(id)) {
         throw new BadRequestError();
     }
 
-    if(!req.ability.hasPermission(PermissionID.PROPOSAL_DROP)) {
+    if (!req.ability.hasPermission(PermissionID.PROPOSAL_DROP)) {
         throw new ForbiddenError();
     }
 
@@ -306,15 +300,15 @@ export async function dropProposalRouteHandler(req: ExpressRequest, res: Express
 
     const entity = await repository.findOne(id);
 
-    if(typeof entity === 'undefined') {
+    if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
-    if(!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
         throw new ForbiddenError();
     }
 
     await repository.delete(entity.id);
 
-    return res.respondDeleted({data: entity});
+    return res.respondDeleted({ data: entity });
 }

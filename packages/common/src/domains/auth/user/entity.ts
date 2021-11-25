@@ -12,52 +12,56 @@ import {
     Entity, Index, JoinColumn,
     ManyToOne, OneToMany,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from "typeorm";
-import {Oauth2ProviderAccount} from "../oauth2-provider-account";
-import {Realm} from "../realm";
-import {UserRole} from "../user-role";
+    UpdateDateColumn,
+} from 'typeorm';
+import { Oauth2ProviderAccount } from '../oauth2-provider-account';
+import { Realm } from '../realm';
+import { UserRole } from '../user-role';
 
-@Entity({name: 'users'})
+@Entity({ name: 'users' })
 export class User {
-    @PrimaryGeneratedColumn({unsigned: true})
-    id: number;
+    @PrimaryGeneratedColumn({ unsigned: true })
+        id: number;
 
-    @Column({type: 'varchar', length: 128})
-    @Index({unique: true})
-    name: string;
+    @Column({ type: 'varchar', length: 128 })
+    @Index({ unique: true })
+        name: string;
 
-    @Column({type: "varchar", length: 128})
-    display_name: string;
+    @Column({ type: 'varchar', length: 128 })
+        display_name: string;
 
-    @Column({type: 'varchar', length: 255, default: null, nullable: true, select: false})
-    email: string;
+    @Column({
+        type: 'varchar', length: 255, default: null, nullable: true, select: false,
+    })
+        email: string;
 
-    @Column({type: 'varchar', length: 512, default: null, nullable: true, select: false})
-    password: string;
+    @Column({
+        type: 'varchar', length: 512, default: null, nullable: true, select: false,
+    })
+        password: string;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-    created_at: Date;
+        created_at: Date;
 
     @UpdateDateColumn()
-    updated_at: Date;
+        updated_at: Date;
 
     // ------------------------------------------------------------------
 
-    @Column({type: "varchar"})
-    realm_id: string;
+    @Column({ type: 'varchar' })
+        realm_id: string;
 
-    @ManyToOne(() => Realm, {onDelete: 'CASCADE'})
-    @JoinColumn({name: 'realm_id'})
-    realm: Realm;
+    @ManyToOne(() => Realm, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'realm_id' })
+        realm: Realm;
 
-    @OneToMany(() => UserRole, userRole => userRole.user)
-    user_roles: UserRole[];
+    @OneToMany(() => UserRole, (userRole) => userRole.user)
+        user_roles: UserRole[];
 
-    @OneToMany(() => Oauth2ProviderAccount, userAccount => userAccount.user)
-    oauth2_provider_accounts: Oauth2ProviderAccount[];
+    @OneToMany(() => Oauth2ProviderAccount, (userAccount) => userAccount.user)
+        oauth2_provider_accounts: Oauth2ProviderAccount[];
 
     // ------------------------------------------------------------------
 

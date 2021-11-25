@@ -5,43 +5,36 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <template>
-    <slot name="body" v-bind:classSuffix="classSuffix" v-bind:iconClass="iconClass">
-        <button class="btn btn-xs" :class="'btn-'+classSuffix" @click.prevent="doAction" :disabled="!isValidStatus || !isPermitted">
+    <slot
+        name="body"
+        :classSuffix="classSuffix"
+        :iconClass="iconClass"
+    >
+        <button
+            class="btn btn-xs"
+            :class="'btn-'+classSuffix"
+            :disabled="!isValidStatus || !isPermitted"
+            @click.prevent="doAction"
+        >
             <slot name="text">
-                <i :class="iconClass"></i>
+                <i :class="iconClass" />
             </slot>
         </button>
     </slot>
 </template>
 <script>
-import {runAPITrainCommand} from "@personalhealthtrain/ui-common";
+import { runAPITrainCommand } from '@personalhealthtrain/ui-common';
 
 export default {
     props: {
         trainId: String,
         train_stations: Array,
-        task: String
+        task: String,
     },
     data() {
         return {
-            busy: false
-        }
-    },
-    methods: {
-        async doAction() {
-            if(this.busy) return;
-
-            this.busy = true;
-
-            try {
-                const train = await runAPITrainCommand(this.train.id, this.task);
-                this.$emit('done', train);
-            } catch (e) {
-                this.$emit('failed', e);
-            }
-
-            this.busy = false;
-        }
+            busy: false,
+        };
     },
     computed: {
         isValidStatus() {
@@ -53,7 +46,7 @@ export default {
                     break;
             }
 
-            return this.$auth.can('start','trainExecution');
+            return this.$auth.can('start', 'trainExecution');
         },
         classSuffix() {
             switch (this.task) {
@@ -74,7 +67,23 @@ export default {
                 case 'stop':
                     return 'fa fa-stop';
             }
-        }
-    }
-}
+        },
+    },
+    methods: {
+        async doAction() {
+            if (this.busy) return;
+
+            this.busy = true;
+
+            try {
+                const train = await runAPITrainCommand(this.train.id, this.task);
+                this.$emit('done', train);
+            } catch (e) {
+                this.$emit('failed', e);
+            }
+
+            this.busy = false;
+        },
+    },
+};
 </script>

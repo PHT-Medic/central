@@ -5,19 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {publishMessage} from "amqp-extension";
-import {getRepository} from "typeorm";
-import {findHarborProjectRepository, HarborRepository} from "@personalhealthtrain/ui-common";
-import {REGISTRY_OUTGOING_PROJECT_NAME} from "@personalhealthtrain/ui-common";
-import {TrainResultStatus} from "@personalhealthtrain/ui-common";
-import {Train} from "@personalhealthtrain/ui-common";
-import {TrainRunStatus} from "@personalhealthtrain/ui-common";
-import {buildResultServiceQueueMessage, ResultServiceCommand} from "../../../service/result-service";
-import {findTrain} from "./utils";
+import { publishMessage } from 'amqp-extension';
+import { getRepository } from 'typeorm';
+import {
+    HarborRepository, REGISTRY_OUTGOING_PROJECT_NAME, Train, TrainResultStatus, TrainRunStatus, findHarborProjectRepository,
+} from '@personalhealthtrain/ui-common';
+import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../service/result-service';
+import { findTrain } from './utils';
 
 export async function triggerTrainResultStart(
     train: string | Train,
-    harborRepository?: HarborRepository
+    harborRepository?: HarborRepository,
 ) : Promise<Train> {
     const repository = getRepository(Train);
 
@@ -28,9 +26,9 @@ export async function triggerTrainResultStart(
         throw new Error('The train has not finished yet...');
     }
 
-    if(typeof harborRepository === 'undefined') {
+    if (typeof harborRepository === 'undefined') {
         harborRepository = await findHarborProjectRepository(REGISTRY_OUTGOING_PROJECT_NAME, train.id);
-        if(typeof harborRepository === 'undefined') {
+        if (typeof harborRepository === 'undefined') {
             throw new Error('The train has not arrived at the outgoing station yet...');
         }
     }
@@ -38,11 +36,11 @@ export async function triggerTrainResultStart(
     // send queue message
     await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.START, {
         trainId: train.id,
-        latest: true
+        latest: true,
     }));
 
     train = repository.merge(train, {
-        result_last_status: TrainResultStatus.STARTING
+        result_last_status: TrainResultStatus.STARTING,
     });
 
     await repository.save(train);

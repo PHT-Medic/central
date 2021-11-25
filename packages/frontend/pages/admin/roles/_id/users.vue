@@ -5,19 +5,19 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {Role} from "@personalhealthtrain/ui-common";
-    import RoleUserList from "../../../../components/domains/role-user/RoleUserList";
+import { Role } from '@personalhealthtrain/ui-common';
+import RoleUserList from '../../../../components/domains/role-user/RoleUserList';
 
-    export default {
-        props: {
-            roleProperty: {
-                type: Role
-            }
+export default {
+    components: {
+        RoleUserList,
+    },
+    props: {
+        roleProperty: {
+            type: Role,
         },
-        components: {
-            RoleUserList
-        },
-    }
+    },
+};
 </script>
 <template>
     <div>

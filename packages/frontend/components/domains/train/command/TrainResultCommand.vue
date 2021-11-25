@@ -5,145 +5,50 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {runAPITrainCommand, TrainResultStatus, TrainRunStatus} from "@personalhealthtrain/ui-common";
-import {FrontendTrainCommand} from "../../../../domains/train/type";
-import {BDropdownItem} from "bootstrap-vue";
+import { TrainResultStatus, TrainRunStatus, runAPITrainCommand } from '@personalhealthtrain/ui-common';
+import { BDropdownItem } from 'bootstrap-vue';
+import { FrontendTrainCommand } from '../../../../domains/train/type';
 
 export default {
     props: {
         train: {
             type: Object,
-            default: undefined
+            default: undefined,
         },
         trainResultId: {
             type: String,
-            default: null
+            default: null,
         },
         command: {
             type: String,
-            default: FrontendTrainCommand.RESULT_START
+            default: FrontendTrainCommand.RESULT_START,
         },
 
         elementType: {
             type: String,
-            default: 'button'
+            default: 'button',
         },
         withIcon: {
             type: Boolean,
-            default: false
+            default: false,
         },
         withText: {
             type: Boolean,
-            default: true
-        }
+            default: true,
+        },
     },
     data() {
         return {
-            busy: false
-        }
-    },
-    render(createElement) {
-        if(!this.isShown) {
-            return createElement('span', {}, ['']);
-        }
-
-        let rootElement;
-        let attributes = {
-            on: {
-                click: this.click
-            },
-            props: {
-                disabled: !this.isEnabled
-            },
-            domProps: {
-                disabled: !this.isEnabled
-            }
+            busy: false,
         };
-
-        let iconClasses = [this.iconClass, 'pr-1'];
-
-        switch (this.elementType) {
-            case 'dropDownItem':
-                rootElement = BDropdownItem;
-                iconClasses.push('pl-1', 'text-'+this.classSuffix);
-                break;
-            case 'link':
-                rootElement = 'a';
-                attributes.domProps.href= 'javascript:void(0)';
-                iconClasses.push('text-'+this.classSuffix);
-                break;
-            default:
-                rootElement = 'button';
-                attributes.type = 'button';
-                attributes.class = ['btn', 'btn-xs', 'btn-'+this.classSuffix];
-                break;
-        }
-
-        let text = [this.commandText];
-
-        if(!this.withText) {
-            text = [];
-        }
-
-        if(this.withIcon) {
-            text.unshift(createElement('i', {
-                class: iconClasses
-            }))
-        }
-
-        if(typeof this.$scopedSlots.default === 'function') {
-            this.$scopedSlots.default({
-                commandText: this.commandText,
-                isDisabled: !this.isEnabled,
-                isAllowed: this.isShown,
-                iconClass: iconClasses
-            });
-        }
-
-        return createElement(rootElement, attributes, text);
-    },
-    methods: {
-        async click(ev) {
-            ev.preventDefault();
-
-            await this.do();
-        },
-        async do() {
-            if(this.busy || !this.isShown) return;
-
-            this.busy = true;
-
-            const resultId = this.trainResultId ?? this.train.result_last_id;
-
-            try {
-                switch (this.command) {
-                    case FrontendTrainCommand.RESULT_DOWNLOAD:
-                        window.open(this.$config.resultServiceApiUrl+'train-results/'+resultId+'/download');
-                        break;
-                    default:
-                        const train = await runAPITrainCommand(this.train.id, this.command);
-                        this.$emit('done', train);
-                        break;
-                }
-
-                const message =  `Successfully executed result command ${this.commandText}`;
-                this.$bvToast.toast(message, {toaster: 'b-toaster-top-center', variant: 'success'});
-            } catch (e) {
-                this.$bvToast.toast(e.message, {toaster: 'b-toaster-top-center', variant: 'danger'});
-
-                this.$emit('failed', e);
-            }
-
-            this.busy = false;
-        }
     },
     computed: {
         isShown() {
-            return this.$auth.can('edit','train') &&
-                (this.train.run_status === TrainRunStatus.FINISHED || this.command === FrontendTrainCommand.RESULT_STATUS);
+            return this.$auth.can('edit', 'train')
+                && (this.train.run_status === TrainRunStatus.FINISHED || this.command === FrontendTrainCommand.RESULT_STATUS);
         },
         isEnabled() {
-            if(
+            if (
                 !this.isShown
             ) {
                 return false;
@@ -151,18 +56,18 @@ export default {
 
             switch (this.command) {
                 case FrontendTrainCommand.RESULT_START:
-                    return !this.train.result_last_status ||
-                        [
+                    return !this.train.result_last_status
+                        || [
                             TrainResultStatus.STOPPED,
-                            TrainResultStatus.FAILED
+                            TrainResultStatus.FAILED,
                         ].indexOf(this.train.result_last_status) !== -1;
                 case FrontendTrainCommand.RESULT_STOP:
-                    return this.train.result_last_status &&
-                        [
+                    return this.train.result_last_status
+                        && [
                             TrainResultStatus.STARTING,
                             TrainResultStatus.STARTED,
                             TrainResultStatus.FINISHED,
-                            TrainResultStatus.STOPPING
+                            TrainResultStatus.STOPPING,
                         ].indexOf(this.train.result_last_status) !== -1;
                 case FrontendTrainCommand.RESULT_STATUS:
                 case FrontendTrainCommand.RESULT_DOWNLOAD:
@@ -213,6 +118,101 @@ export default {
                     return 'info';
             }
         },
-    }
-}
+    },
+    methods: {
+        async click(ev) {
+            ev.preventDefault();
+
+            await this.do();
+        },
+        async do() {
+            if (this.busy || !this.isShown) return;
+
+            this.busy = true;
+
+            const resultId = this.trainResultId ?? this.train.result_last_id;
+
+            try {
+                switch (this.command) {
+                    case FrontendTrainCommand.RESULT_DOWNLOAD:
+                        window.open(`${this.$config.resultServiceApiUrl}train-results/${resultId}/download`);
+                        break;
+                    default:
+                        const train = await runAPITrainCommand(this.train.id, this.command);
+                        this.$emit('done', train);
+                        break;
+                }
+
+                const message = `Successfully executed result command ${this.commandText}`;
+                this.$bvToast.toast(message, { toaster: 'b-toaster-top-center', variant: 'success' });
+            } catch (e) {
+                this.$bvToast.toast(e.message, { toaster: 'b-toaster-top-center', variant: 'danger' });
+
+                this.$emit('failed', e);
+            }
+
+            this.busy = false;
+        },
+    },
+    render(createElement) {
+        if (!this.isShown) {
+            return createElement('span', {}, ['']);
+        }
+
+        let rootElement;
+        const attributes = {
+            on: {
+                click: this.click,
+            },
+            props: {
+                disabled: !this.isEnabled,
+            },
+            domProps: {
+                disabled: !this.isEnabled,
+            },
+        };
+
+        const iconClasses = [this.iconClass, 'pr-1'];
+
+        switch (this.elementType) {
+            case 'dropDownItem':
+                rootElement = BDropdownItem;
+                iconClasses.push('pl-1', `text-${this.classSuffix}`);
+                break;
+            case 'link':
+                rootElement = 'a';
+                attributes.domProps.href = 'javascript:void(0)';
+                iconClasses.push(`text-${this.classSuffix}`);
+                break;
+            default:
+                rootElement = 'button';
+                attributes.type = 'button';
+                attributes.class = ['btn', 'btn-xs', `btn-${this.classSuffix}`];
+                break;
+        }
+
+        let text = [this.commandText];
+
+        if (!this.withText) {
+            text = [];
+        }
+
+        if (this.withIcon) {
+            text.unshift(createElement('i', {
+                class: iconClasses,
+            }));
+        }
+
+        if (typeof this.$scopedSlots.default === 'function') {
+            this.$scopedSlots.default({
+                commandText: this.commandText,
+                isDisabled: !this.isEnabled,
+                isAllowed: this.isShown,
+                iconClass: iconClasses,
+            });
+        }
+
+        return createElement(rootElement, attributes, text);
+    },
+};
 </script>

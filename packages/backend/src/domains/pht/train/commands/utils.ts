@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Train} from "@personalhealthtrain/ui-common";
-import {getRepository, Repository} from "typeorm";
+import { Train } from '@personalhealthtrain/ui-common';
+import { Repository, getRepository } from 'typeorm';
 
 export async function findTrain(
     train: Train | number | string,
-    repository?: Repository<Train>
+    repository?: Repository<Train>,
 ) : Promise<Train | undefined> {
     repository ??= getRepository(Train);
     return typeof train === 'number' || typeof train === 'string' ? await repository.findOne(train) : train;

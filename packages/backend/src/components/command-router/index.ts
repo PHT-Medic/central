@@ -5,18 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {consumeQueue} from "amqp-extension";
-import {createAuthSecurityComponentHandlers} from "../auth-security";
-import {MessageQueueSelfRoutingKey} from "../../config/service/mq";
+import { consumeQueue } from 'amqp-extension';
+import { createAuthSecurityComponentHandlers } from '../auth-security';
+import { MessageQueueSelfRoutingKey } from '../../config/service/mq';
 
 export function buildCommandRouterComponent() {
     function start() {
-        return consumeQueue({routingKey: MessageQueueSelfRoutingKey.COMMAND}, {
-            ...createAuthSecurityComponentHandlers()
+        return consumeQueue({ routingKey: MessageQueueSelfRoutingKey.COMMAND }, {
+            ...createAuthSecurityComponentHandlers(),
         });
     }
 
     return {
-        start
-    }
+        start,
+    };
 }

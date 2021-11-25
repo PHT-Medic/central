@@ -13,16 +13,16 @@ export interface AbilityRepresentation {
 }
 
 export function parsePermissionNameToAbilityRepresentation(name: string) : AbilityRepresentation {
-    let parts : string[] = name.split('_');
-    let action : string | undefined = parts.pop();
-    let subject : string = camelCase(parts.join('_'));
+    const parts : string[] = name.split('_');
+    const action : string | undefined = parts.pop();
+    const subject : string = camelCase(parts.join('_'));
 
-    if(typeof action === 'undefined') {
+    if (typeof action === 'undefined') {
         throw new Error('Permission name not valid.');
     }
 
     return {
         action,
-        subject
-    }
+        subject,
+    };
 }

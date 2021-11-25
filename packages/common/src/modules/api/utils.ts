@@ -6,12 +6,12 @@
  */
 
 import {
-    API_CONFIG_DEFAULT_KEY,
-    APIConfig, APIConfigType, APIType,
-    getAPIConfig
-} from "./config";
-import {BaseAPI} from "./module";
-import {HarborAPI, VaultAPI} from "./service";
+    APIConfig,
+    APIConfigType, APIType, API_CONFIG_DEFAULT_KEY,
+    getAPIConfig,
+} from './config';
+import { BaseAPI } from './module';
+import { HarborAPI, VaultAPI } from './service';
 
 const instanceMap: Record<string, BaseAPI> = {};
 
@@ -27,7 +27,7 @@ export function useAPI<T extends APIType>(
 
     const config : APIConfig<T> = getAPIConfig(key);
 
-    if(instanceMap.hasOwnProperty(key)) {
+    if (instanceMap.hasOwnProperty(key)) {
         return instanceMap[key] as APIReturnType<T>;
     }
 

@@ -5,19 +5,19 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {LayoutNavigationDefaultId} from "../../../config/layout";
-import TrainTable from "../../../components/domains/train/TrainTable";
-import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
-import {PermissionID} from "@personalhealthtrain/ui-common";
+import { PermissionID } from '@personalhealthtrain/ui-common';
+import { LayoutNavigationDefaultId } from '../../../config/layout';
+import TrainTable from '../../../components/domains/train/TrainTable';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {
-    components: {TrainTable},
+    components: { TrainTable },
     data() {
         return {
             query: {
-                sort: '-created_at'
-            }
-        }
+                sort: '-created_at',
+            },
+        };
     },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -30,10 +30,10 @@ export default {
             PermissionID.TRAIN_RESULT_READ,
 
             PermissionID.TRAIN_EXECUTION_START,
-            PermissionID.TRAIN_EXECUTION_STOP
-        ]
-    }
-}
+            PermissionID.TRAIN_EXECUTION_STOP,
+        ],
+    },
+};
 </script>
 <template>
     <div>

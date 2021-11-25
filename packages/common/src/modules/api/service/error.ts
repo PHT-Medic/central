@@ -8,7 +8,7 @@
 export class APIServiceError extends Error {
     static connectionStringMissing(serviceName?: string) {
         const parts : string[] = ['The'];
-        if(typeof serviceName === 'string') {
+        if (typeof serviceName === 'string') {
             parts.push(serviceName);
         }
         parts.push('connection string is not specified.');
@@ -17,7 +17,7 @@ export class APIServiceError extends Error {
 
     static connectionStringInvalid(serviceName?: string) {
         const parts : string[] = ['The'];
-        if(typeof serviceName === 'string') {
+        if (typeof serviceName === 'string') {
             parts.push(serviceName);
         }
         parts.push('connection string is not valid.');

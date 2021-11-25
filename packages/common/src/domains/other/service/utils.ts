@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {SERVICE_ID, ServiceIDType} from "./type";
-
+import { SERVICE_ID, ServiceIDType } from './type';
 
 const values = Object.values(SERVICE_ID);
 export function isService(name: any) : name is ServiceIDType {

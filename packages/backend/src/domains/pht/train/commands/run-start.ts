@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {publishMessage} from "amqp-extension";
-import {getRepository} from "typeorm";
-import {buildTrainRouterQueueMessage, TrainRouterCommand} from "../../../service/train-router";
-import {findTrain} from "./utils";
-import {Train, TrainRunStatus} from "@personalhealthtrain/ui-common";
+import { publishMessage } from 'amqp-extension';
+import { getRepository } from 'typeorm';
+import { Train, TrainRunStatus } from '@personalhealthtrain/ui-common';
+import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../service/train-router';
+import { findTrain } from './utils';
 
 export async function startTrain(train: Train | number | string) : Promise<Train> {
     const repository = getRepository(Train);
@@ -22,18 +22,18 @@ export async function startTrain(train: Train | number | string) : Promise<Train
     }
 
     if (
-        !!train.run_status &&
-        [TrainRunStatus.STARTING, TrainRunStatus.STARTED].indexOf(train.run_status) !== -1
+        !!train.run_status
+        && [TrainRunStatus.STARTING, TrainRunStatus.STARTED].indexOf(train.run_status) !== -1
     ) {
         // todo: make it a ClientError.BadRequest
         throw new Error('The train has already been started...');
     } else {
-        const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.START, {trainId: train.id});
+        const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.START, { trainId: train.id });
 
         await publishMessage(queueMessage);
 
         train = repository.merge(train, {
-            run_status: TrainRunStatus.STARTING
+            run_status: TrainRunStatus.STARTING,
         });
 
         await repository.save(train);

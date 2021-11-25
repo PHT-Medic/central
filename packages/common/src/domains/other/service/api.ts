@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIType, SingleResourceResponse, useAPI} from "../../../modules";
-import {RegistryCommandType} from "./harbor";
-import {SERVICE_ID, ServiceIDType} from "./type";
+import { APIType, SingleResourceResponse, useAPI } from '../../../modules';
+import { RegistryCommandType } from './harbor';
+import { SERVICE_ID, ServiceIDType } from './type';
 
 export async function executeAPIServiceTask(id: ServiceIDType, command: string, data: Record<string, any>) : Promise<SingleResourceResponse<Record<string, any>>> {
-    const {data: resultData} = await useAPI(APIType.DEFAULT).post('services/' + id + '/command', {command, ...data});
+    const { data: resultData } = await useAPI(APIType.DEFAULT).post(`services/${id}/command`, { command, ...data });
 
     return resultData;
 }

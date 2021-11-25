@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2021-2021.
  * Author Peter Placzek (tada5hi)
@@ -6,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIType, useAPI} from "../../../../modules";
-import {StationSecretEngineSecretPayload} from "./type";
-import {STATION_SECRET_ENGINE_KEY} from "./constants";
+import { APIType, useAPI } from '../../../../modules';
+import { StationSecretEngineSecretPayload } from './type';
+import { STATION_SECRET_ENGINE_KEY } from './constants';
 
 export async function saveStationSecretsToSecretEngine(
     id: string,
-    record: StationSecretEngineSecretPayload
+    record: StationSecretEngineSecretPayload,
 ) {
     try {
-        const {data} = await useAPI<APIType.VAULT>(APIType.VAULT)
+        const { data } = await useAPI<APIType.VAULT>(APIType.VAULT)
             .saveKeyValuePair(
                 STATION_SECRET_ENGINE_KEY,
                 id,
@@ -24,9 +23,9 @@ export async function saveStationSecretsToSecretEngine(
                         rsa_station_public_key: record.publicKey,
                     },
                     options: {
-                        cas: 0
-                    }
-                }
+                        cas: 0,
+                    },
+                },
             );
         return data;
     } catch (e) {
@@ -34,7 +33,7 @@ export async function saveStationSecretsToSecretEngine(
             // create engine
             await useAPI<APIType.VAULT>(APIType.VAULT)
                 .createKeyValueSecretEngine({
-                    path: STATION_SECRET_ENGINE_KEY
+                    path: STATION_SECRET_ENGINE_KEY,
                 });
 
             return await saveStationSecretsToSecretEngine(id, record);
@@ -45,6 +44,6 @@ export async function saveStationSecretsToSecretEngine(
 export async function removeStationSecretsFromSecretEngine(id: string) {
     await useAPI<APIType.VAULT>(APIType.VAULT).dropKeyValuePair(
         STATION_SECRET_ENGINE_KEY,
-        id
+        id,
     );
 }

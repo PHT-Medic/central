@@ -11,45 +11,55 @@ export default {
     props: {
         items: {
             type: Array,
-            default: function () {
+            default() {
                 return [];
-            }
-        }
+            },
+        },
     },
     methods: {
         async selectComponent(component) {
             await this.$store.dispatch('layout/selectComponent', {
                 type: 'sidebar',
-                component: {...component}
-            })
-        }
-    }
-}
+                component: { ...component },
+            });
+        },
+    },
+};
 </script>
 <template>
     <ul>
         <li
-            v-if="component.show"
             v-for="(component,key) in items"
+            v-if="component.show"
             :key="key"
         >
-            <template v-if="component.type === 'separator'" >
+            <template v-if="component.type === 'separator'">
                 <div class="nav-separator">
                     {{ component.name }}
                 </div>
             </template>
             <template v-if="component.type === 'link'">
                 <template v-if="!component.components">
-                    <nuxt-link :to="component.url" class="sidebar-menu-link" :class="{'root-link': component.rootLink}">
-                        <i v-if="component.icon" :class="component.icon" /> {{ component.name }}
+                    <nuxt-link
+                        :to="component.url"
+                        class="sidebar-menu-link"
+                        :class="{'root-link': component.rootLink}"
+                    >
+                        <i
+                            v-if="component.icon"
+                            :class="component.icon"
+                        /> {{ component.name }}
                     </nuxt-link>
                 </template>
                 <template v-if="component.components">
                     <div
-                        @click.prevent="selectComponent(component)"
                         class="sidebar-submenu-title"
+                        @click.prevent="selectComponent(component)"
                     >
-                        <i v-if="component.icon" :class="component.icon" /> {{ component.name }}
+                        <i
+                            v-if="component.icon"
+                            :class="component.icon"
+                        /> {{ component.name }}
                     </div>
                     <sidebar-components
                         class="list-unstyled sidebar-submenu-components"

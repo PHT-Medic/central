@@ -5,48 +5,48 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import TrainTable from "../../../../components/domains/train/TrainTable";
-    import TrainBasicForm from "../../../../components/domains/train/TrainBasicForm";
-    import StationTrainTable from "../../../../components/domains/station/StationTrainTable";
-    import {LayoutKey, LayoutNavigationID} from "../../../../config/layout/contants";
-    import {PermissionID} from "@personalhealthtrain/ui-common";
+import { PermissionID } from '@personalhealthtrain/ui-common';
+import TrainTable from '../../../../components/domains/train/TrainTable';
+import TrainBasicForm from '../../../../components/domains/train/TrainBasicForm';
+import StationTrainTable from '../../../../components/domains/station/StationTrainTable';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
-    export default {
-        meta: {
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-            [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.TRAIN_ADD,
-                PermissionID.TRAIN_EDIT,
-                PermissionID.TRAIN_DROP,
+export default {
+    meta: {
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
+            PermissionID.TRAIN_ADD,
+            PermissionID.TRAIN_EDIT,
+            PermissionID.TRAIN_DROP,
 
-                PermissionID.TRAIN_RESULT_READ,
+            PermissionID.TRAIN_RESULT_READ,
 
-                PermissionID.TRAIN_EXECUTION_START,
-                PermissionID.TRAIN_EXECUTION_STOP
-            ]
-        },
-        components: {StationTrainTable, TrainBasicForm, TrainTable},
-        props: {
-            proposal: {
-                type: Object,
-                default () {
-                    return {};
-                }
+            PermissionID.TRAIN_EXECUTION_START,
+            PermissionID.TRAIN_EXECUTION_STOP,
+        ],
+    },
+    components: { StationTrainTable, TrainBasicForm, TrainTable },
+    props: {
+        proposal: {
+            type: Object,
+            default() {
+                return {};
             },
-            visitorStation: {
-                type: Object,
-                default: undefined
-            }
         },
-        methods: {
+        visitorStation: {
+            type: Object,
+            default: undefined,
         },
-        computed: {
-            station_id() {
-                return this.visitorStation ? this.visitorStation.id : undefined;
-            }
-        }
-    }
+    },
+    computed: {
+        station_id() {
+            return this.visitorStation ? this.visitorStation.id : undefined;
+        },
+    },
+    methods: {
+    },
+};
 </script>
 <template>
     <div>

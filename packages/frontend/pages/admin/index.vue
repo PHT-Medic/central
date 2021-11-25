@@ -5,18 +5,18 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {LayoutKey, LayoutNavigationID} from "../../config/layout/contants";
-import {PermissionID} from "@personalhealthtrain/ui-common";
+import { PermissionID } from '@personalhealthtrain/ui-common';
+import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
 
-    export default {
-        meta: {
-            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-            [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.ADMIN_UI_USE
-            ]
-        },
-    }
+export default {
+    meta: {
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
+            PermissionID.ADMIN_UI_USE,
+        ],
+    },
+};
 </script>
 <template>
     <div>

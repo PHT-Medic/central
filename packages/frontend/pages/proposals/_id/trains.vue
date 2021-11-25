@@ -12,7 +12,10 @@
                     <proposal-svg width="100%" />
                 </div>
 
-                <b-nav pills vertical>
+                <b-nav
+                    pills
+                    vertical
+                >
                     <b-nav-item
                         v-for="(item,key) in sidebar.items"
                         :key="key"
@@ -27,49 +30,57 @@
                 </b-nav>
             </div>
             <div class="content-container">
-                <nuxt-child :proposal="proposal" :visitor-station="visitorStation" />
+                <nuxt-child
+                    :proposal="proposal"
+                    :visitor-station="visitorStation"
+                />
             </div>
         </div>
     </div>
 </template>
 <script>
-import ProposalSvg from "../../../components/svg/ProposalSvg";
+import ProposalSvg from '../../../components/svg/ProposalSvg';
+
 export default {
-    components: {ProposalSvg},
+    components: { ProposalSvg },
     props: {
         proposal: Object,
         visitorStation: {
             type: Object,
-            default: undefined
-        }
+            default: undefined,
+        },
     },
-    data () {
+    data() {
         return {
             sidebar: {
-                items: []
-            }
-        }
-    },
-    created() {
-        this.fillSidebar();
+                items: [],
+            },
+        };
     },
     computed: {
         isOwner() {
             return this.proposal.realm_id === this.$store.getters['auth/userRealmId'];
-        }
+        },
+    },
+    created() {
+        this.fillSidebar();
     },
     methods: {
         fillSidebar() {
-            let items = [
-                { name: 'Overview', routeName: 'settings-id', icon: 'fas fa-bars', urlSuffix: '' },
+            const items = [
+                {
+                    name: 'Overview', routeName: 'settings-id', icon: 'fas fa-bars', urlSuffix: '',
+                },
             ];
 
-            if(this.isOwner) {
-                items.push({ name: 'Add', routeName: 'settings-id-security', icon: 'fa fa-plus', urlSuffix: '/add' });
+            if (this.isOwner) {
+                items.push({
+                    name: 'Add', routeName: 'settings-id-security', icon: 'fa fa-plus', urlSuffix: '/add',
+                });
             }
 
             this.sidebar.items = items;
-        }
-    }
-}
+        },
+    },
+};
 </script>

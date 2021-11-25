@@ -5,17 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Arguments, Argv, CommandModule} from "yargs";
-import {buildConnectionOptions} from "typeorm-extension";
-import {createConnection} from "typeorm";
+import { Arguments, Argv, CommandModule } from 'yargs';
+import { buildConnectionOptions } from 'typeorm-extension';
+import { createConnection } from 'typeorm';
 
 interface UpgradeArguments extends Arguments {
 
 }
 
 export class UpgradeCommand implements CommandModule {
-    command = "upgrade";
-    describe = "Run upgrade operation.";
+    command = 'upgrade';
+
+    describe = 'Run upgrade operation.';
 
     builder(args: Argv) {
         return args;
@@ -27,12 +28,11 @@ export class UpgradeCommand implements CommandModule {
         const connection = await createConnection(connectionOptions);
 
         try {
-            await connection.runMigrations({transaction: "all"});
+            await connection.runMigrations({ transaction: 'all' });
         } catch (e) {
             throw e;
         } finally {
             await connection.close();
         }
-
     }
 }

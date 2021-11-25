@@ -7,30 +7,35 @@
 <script>
 export default {
     props: {
-        realm: Object
+        realm: Object,
     },
     data() {
         return {
             sidebar: {
                 hide: false,
                 items: [
-                    { name: 'OAuth2', urlSuffix: '', componentName: 'chat-rooms-index', icon: 'fa fa-info-circle'},
-                ]
+                    {
+                        name: 'OAuth2', urlSuffix: '', componentName: 'chat-rooms-index', icon: 'fa fa-info-circle',
+                    },
+                ],
             },
             station: undefined,
             busy: false,
-        }
+        };
     },
 
     methods: {
 
-    }
-}
+    },
+};
 </script>
 <template>
     <div class="content-wrapper">
         <div class="content-sidebar">
-            <b-nav pills vertical>
+            <b-nav
+                pills
+                vertical
+            >
                 <b-nav-item
                     v-for="(item,key) in sidebar.items"
                     :key="key"

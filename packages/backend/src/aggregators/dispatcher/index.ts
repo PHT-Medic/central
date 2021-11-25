@@ -5,22 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {consumeQueue} from "amqp-extension";
-import {createDispatcherAggregatorMasterImageHandlers} from "./handlers/master-image";
-import {createDispatcherAggregatorProposalHandlers} from "./handlers/proposal";
-import {createDispatcherAggregatorTrainHandlers} from "./handlers/train";
-import {MessageQueueDispatcherRoutingKey} from "../../config/service/mq";
+import { consumeQueue } from 'amqp-extension';
+import { createDispatcherAggregatorMasterImageHandlers } from './handlers/master-image';
+import { createDispatcherAggregatorProposalHandlers } from './handlers/proposal';
+import { createDispatcherAggregatorTrainHandlers } from './handlers/train';
+import { MessageQueueDispatcherRoutingKey } from '../../config/service/mq';
 
 export function buildDispatcherAggregator() {
     function start() {
-        return consumeQueue({routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN}, {
+        return consumeQueue({ routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN }, {
             ...createDispatcherAggregatorMasterImageHandlers(),
             ...createDispatcherAggregatorProposalHandlers(),
-            ...createDispatcherAggregatorTrainHandlers()
+            ...createDispatcherAggregatorTrainHandlers(),
         });
     }
 
     return {
-        start
-    }
+        start,
+    };
 }

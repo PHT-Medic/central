@@ -5,10 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Client, SERVICE_ID, User} from "@personalhealthtrain/ui-common";
-import {Express, NextFunction, Request, Response} from "express";
-import {AbilityManager} from "@typescript-auth/core";
-import {RespondMessage} from "./middleware/response";
+import { Client, SERVICE_ID, User } from '@personalhealthtrain/ui-common';
+import {
+    Express, NextFunction, Request, Response,
+} from 'express';
+import { AbilityManager } from '@typescript-auth/core';
+import { RespondMessage } from './middleware/response';
 
 export interface ExpressAppInterface extends Express {
 

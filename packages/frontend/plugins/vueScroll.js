@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue from 'vue'
-import vueScroll from "vuescroll";
+import Vue from 'vue';
+import vueScroll from 'vuescroll';
 
 Vue.use(vueScroll);
 
 Vue.prototype.$vuescrollConfig = {
     bar: {
-        background: 'rgb(64,67,78)'
-    }
-}
+        background: 'rgb(64,67,78)',
+    },
+};

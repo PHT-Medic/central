@@ -9,7 +9,7 @@ export type PHTStationRole = 'StationAuthority' | 'StationEmployee';
 
 export function getPHTStationRolePermissions(type: PHTStationRole) : string[] {
     switch (type) {
-        case "StationEmployee":
+        case 'StationEmployee':
             return [
                 'proposal_add',
                 'proposal_drop',
@@ -19,9 +19,9 @@ export function getPHTStationRolePermissions(type: PHTStationRole) : string[] {
                 'train_execution_start',
                 'train_execution_stop',
                 'train_drop',
-                'train_result_read'
+                'train_result_read',
             ];
-        case "StationAuthority":
+        case 'StationAuthority':
             return [
                 'proposal_add',
                 'proposal_drop',

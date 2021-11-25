@@ -5,24 +5,24 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import AlertMessage from "../../../components/alert/AlertMessage";
-    import UserDetailsForm from "../../../components/domains/user/UserDetailsForm";
+import AlertMessage from '../../../components/alert/AlertMessage';
+import UserDetailsForm from '../../../components/domains/user/UserDetailsForm';
 
-    export default {
-        meta: {
-            requireLoggedIn: true
+export default {
+    meta: {
+        requireLoggedIn: true,
+    },
+    components: {
+        UserDetailsForm,
+        AlertMessage,
+    },
+    computed: {
+        user() {
+            return this.$store.getters['auth/user'];
         },
-        computed: {
-            user() {
-                return this.$store.getters['auth/user'];
-            }
-        },
-        components: {
-            UserDetailsForm,
-            AlertMessage
-        },
+    },
 
-    }
+};
 </script>
 <template>
     <div>
@@ -32,12 +32,13 @@
                     General
                 </h6>
 
-                <hr />
-                <user-details-form :realm-id="user.realm_id" :user-property="user"/>
+                <hr>
+                <user-details-form
+                    :realm-id="user.realm_id"
+                    :user-property="user"
+                />
             </div>
-            <div class="col-6">
-
-            </div>
+            <div class="col-6" />
         </div>
     </div>
 </template>

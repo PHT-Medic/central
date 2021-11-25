@@ -5,27 +5,26 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    export default {
-        components: {},
-        computed: {
-            loggedIn(vm) {
-                return vm.$store.getters['auth/loggedIn'];
-            },
-            docsUrl() {
-                return new URL('docs/', this.$config.apiUrl).href;
-            },
-            statsUrl() {
-                return new URL('stats/', this.$config.apiUrl).href;
-            },
-            generalDocsUrl() {
-                return 'https://pht-medic.github.io/documentation/';
-            }
-        }
-    }
+export default {
+    components: {},
+    computed: {
+        loggedIn(vm) {
+            return vm.$store.getters['auth/loggedIn'];
+        },
+        docsUrl() {
+            return new URL('docs/', this.$config.apiUrl).href;
+        },
+        statsUrl() {
+            return new URL('stats/', this.$config.apiUrl).href;
+        },
+        generalDocsUrl() {
+            return 'https://pht-medic.github.io/documentation/';
+        },
+    },
+};
 </script>
 <template>
     <div class="page-sidebar">
-
         <navigation-components
             class="sidebar-menu navbar-nav"
             :tier="1"
@@ -39,13 +38,21 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" :href="docsUrl" target="_blank">
-                        <i class="fa fa-file"></i> <span class="nav-link-text">Documentation</span>
+                    <a
+                        class="nav-link"
+                        :href="docsUrl"
+                        target="_blank"
+                    >
+                        <i class="fa fa-file" /> <span class="nav-link-text">Documentation</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" :href="statsUrl" target="_blank">
-                        <i class="fa fa-chart-bar"></i> <span class="nav-link-text">Stats</span>
+                    <a
+                        class="nav-link"
+                        :href="statsUrl"
+                        target="_blank"
+                    >
+                        <i class="fa fa-chart-bar" /> <span class="nav-link-text">Stats</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -54,13 +61,15 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" :href="generalDocsUrl" target="_blank">
-                        <i class="fa fa-file-pdf"></i> <span class="nav-link-text">Documentation / Guide</span>
+                    <a
+                        class="nav-link"
+                        :href="generalDocsUrl"
+                        target="_blank"
+                    >
+                        <i class="fa fa-file-pdf" /> <span class="nav-link-text">Documentation / Guide</span>
                     </a>
                 </li>
-
             </ul>
         </div>
     </div>
 </template>
-

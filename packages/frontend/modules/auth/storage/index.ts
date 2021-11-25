@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import BaseStorage from "~/modules/storage";
-import {Context} from "@nuxt/types";
-import {StorageOptionsInterface} from "~/modules/storage/types";
+import { Context } from '@nuxt/types';
+import BaseStorage from '~/modules/storage';
+import { StorageOptionsInterface } from '~/modules/storage/types';
 
 export class AuthStorage extends BaseStorage {
     constructor(ctx: Context, options?: StorageOptionsInterface) {
@@ -15,14 +15,14 @@ export class AuthStorage extends BaseStorage {
 
         const defaultOptions : StorageOptionsInterface = {
             cookie: {
-                path: '/'
+                path: '/',
             },
             localStorage: false,
             sessionStorage: false,
-            namespace: 'auth'
-        }
+            namespace: 'auth',
+        };
 
-        options = Object.assign({}, defaultOptions, options);
+        options = { ...defaultOptions, ...options };
 
         super(ctx, options);
     }

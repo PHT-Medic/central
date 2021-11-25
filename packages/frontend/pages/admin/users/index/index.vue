@@ -5,86 +5,113 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {dropAPIUser} from "@personalhealthtrain/ui-common";
-    import UserList from "../../../../components/domains/user/UserList";
-    import {LayoutKey, LayoutNavigationID} from "../../../../config/layout/contants";
+import { dropAPIUser } from '@personalhealthtrain/ui-common';
+import UserList from '../../../../components/domains/user/UserList';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
-    export default {
-        components: {UserList},
-        meta: {
-            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-            [LayoutKey.REQUIRED_LOGGED_IN]: true
-        },
-        data() {
-            return {
-                fields: [
-                    { key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center' },
-                    { key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left' },
-                    { key: 'options', label: '', tdClass: 'text-left' }
-                ]
-            }
-        },
-        methods: {
-            async drop(user) {
-                let l = this.$createElement;
+export default {
+    components: { UserList },
+    meta: {
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+    },
+    data() {
+        return {
+            fields: [
+                {
+                    key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+                },
+                {
+                    key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
+                },
+                {
+                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                },
+                {
+                    key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+                },
+                {
+                    key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+                },
+                { key: 'options', label: '', tdClass: 'text-left' },
+            ],
+        };
+    },
+    methods: {
+        async drop(user) {
+            const l = this.$createElement;
 
-                try {
-                    let proceed = await this.$bvModal.msgBoxConfirm(l('div', {class: 'alert alert-info m-b-0'}, [
-                        l('p', null, [
-                            'Are you sure, that you want to delete: ',
-                            l('b', null, [user.name]),
-                            '?'
-                        ])
-                    ]), {
-                        size: 'sm',
-                        buttonSize: 'xs'
-                    });
+            try {
+                const proceed = await this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-info m-b-0' }, [
+                    l('p', null, [
+                        'Are you sure, that you want to delete: ',
+                        l('b', null, [user.name]),
+                        '?',
+                    ]),
+                ]), {
+                    size: 'sm',
+                    buttonSize: 'xs',
+                });
 
-                    if(proceed) {
-                        try {
-                            await dropAPIUser(user.id);
-                            this.$refs['userList'].dropArrayItem(user);
-                        } catch (e) {
+                if (proceed) {
+                    try {
+                        await dropAPIUser(user.id);
+                        this.$refs.userList.dropArrayItem(user);
+                    } catch (e) {
 
-                        }
                     }
-                } catch (e) {
-
                 }
+            } catch (e) {
+
             }
-        }
-    }
+        },
+    },
+};
 </script>
 <template>
-    <user-list ref="userList" :load-on-init="true">
-        <template v-slot:header-title>
+    <user-list
+        ref="userList"
+        :load-on-init="true"
+    >
+        <template #header-title>
             This is a slight overview of all users.
         </template>
-        <template v-slot:items="props">
-            <b-table :items="props.items" :fields="fields" :busy="props.busy" head-variant="'dark'" outlined>
-                <template v-slot:cell(realm)="data">
-                    <span class="badge-dark badge">{{data.item.realm_id}}</span>
+        <template #items="props">
+            <b-table
+                :items="props.items"
+                :fields="fields"
+                :busy="props.busy"
+                head-variant="'dark'"
+                outlined
+            >
+                <template #cell(realm)="data">
+                    <span class="badge-dark badge">{{ data.item.realm_id }}</span>
                 </template>
-                <template v-slot:cell(options)="data">
+                <template #cell(options)="data">
                     <nuxt-link
                         v-if="$auth.can('edit','user') || $auth.can('edit','user_permissions') || $auth.can('drop','user_permissions')"
-                        class="btn btn-xs btn-outline-primary" :to="'/admin/users/'+data.item.id">
-                        <i class="fa fa-bars"></i>
+                        class="btn btn-xs btn-outline-primary"
+                        :to="'/admin/users/'+data.item.id"
+                    >
+                        <i class="fa fa-bars" />
                     </nuxt-link>
-                    <button v-if="$auth.can('drop','user')" @click.prevent="drop(data.item)" type="button" class="btn btn-xs btn-outline-danger" title="Löschen">
-                        <i class="fa fa-times"></i>
+                    <button
+                        v-if="$auth.can('drop','user')"
+                        type="button"
+                        class="btn btn-xs btn-outline-danger"
+                        title="Löschen"
+                        @click.prevent="drop(data.item)"
+                    >
+                        <i class="fa fa-times" />
                     </button>
                 </template>
-                <template v-slot:cell(created_at)="data">
+                <template #cell(created_at)="data">
                     <timeago :datetime="data.item.created_at" />
                 </template>
-                <template v-slot:cell(updated_at)="data">
+                <template #cell(updated_at)="data">
                     <timeago :datetime="data.item.updated_at" />
                 </template>
-                <template v-slot:table-busy>
+                <template #table-busy>
                     <div class="text-center text-danger my-2">
                         <b-spinner class="align-middle" />
                         <strong>Loading...</strong>

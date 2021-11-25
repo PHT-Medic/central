@@ -23,8 +23,8 @@ moment.locale('de', {
         M: 'einem Monat',
         MM: '%d Monaten',
         y: 'einem Jahr',
-        yy: '%d Jahren'
-    }
+        yy: '%d Jahren',
+    },
 });
 
 moment.locale('de');

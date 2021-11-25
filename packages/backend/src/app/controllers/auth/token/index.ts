@@ -5,22 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {getCustomRepository, getRepository} from "typeorm";
-import {UserRepository} from "../../../../domains/auth/user/repository";
+import { getCustomRepository, getRepository } from 'typeorm';
 
-import {Response, Request, Controller, Post, Body, Delete} from "@decorators/express";
-import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {OAuth2Provider, Oauth2ProviderAccount} from "@personalhealthtrain/ui-common";
-import env from "../../../../env";
-import {createToken} from "@typescript-auth/server";
-import {getWritableDirPath} from "../../../../config/paths";
-import {MASTER_REALM_ID} from "@personalhealthtrain/ui-common";
-import {Oauth2Client} from "@typescript-auth/core";
-import {createOauth2ProviderAccountWithToken} from "../../../../domains/auth/oauth2-provider-account/utils";
-import {TokenPayload} from "@personalhealthtrain/ui-common";
-import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
-import {BadRequestError} from "@typescript-error/http";
-
+import {
+    Body, Controller, Delete, Post, Request, Response,
+} from '@decorators/express';
+import { ResponseExample, SwaggerTags } from 'typescript-swagger';
+import {
+    MASTER_REALM_ID, OAuth2Provider, Oauth2ProviderAccount, TokenPayload,
+} from '@personalhealthtrain/ui-common';
+import { createToken } from '@typescript-auth/server';
+import { Oauth2Client } from '@typescript-auth/core';
+import { BadRequestError } from '@typescript-error/http';
+import { getWritableDirPath } from '../../../../config/paths';
+import { createOauth2ProviderAccountWithToken } from '../../../../domains/auth/oauth2-provider-account/utils';
+import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
+import env from '../../../../env';
+import { UserRepository } from '../../../../domains/auth/user/repository';
 
 type Token = {
     /* @IsInt */
@@ -29,22 +30,22 @@ type Token = {
 }
 
 @SwaggerTags('auth')
-@Controller("/token")
+@Controller('/token')
 export class TokenController {
-    @Post("")
-    @ResponseExample<Token>({expires_in: 3600, token: '20f81b13d51c65798f05'})
+    @Post('')
+    @ResponseExample<Token>({ expires_in: 3600, token: '20f81b13d51c65798f05' })
     async addToken(
         @Body() credentials: { username: string, password: string, provider?: string },
         @Request() req: any,
-        @Response() res: any
-    ) : Promise<Token>  {
-        return (await grantToken(req,res)) as Token;
+        @Response() res: any,
+    ) : Promise<Token> {
+        return (await grantToken(req, res)) as Token;
     }
 
-    @Delete("")
+    @Delete('')
     async dropToken(
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ) : Promise<void> {
         return await revokeToken(req, res);
     }
@@ -54,16 +55,16 @@ async function grantTokenWithMasterProvider(username: string, password: string) 
     const providerRepository = getRepository(OAuth2Provider);
     const providers = await providerRepository.createQueryBuilder('provider')
         .leftJoinAndSelect('provider.realm', 'realm')
-        .andWhere("provider.realm_id = :realmId", {realmId: MASTER_REALM_ID})
+        .andWhere('provider.realm_id = :realmId', { realmId: MASTER_REALM_ID })
         .getMany();
 
-    for(let i=0; i<providers.length; i++) {
+    for (let i = 0; i < providers.length; i++) {
         const oauth2Client = new Oauth2Client(providers[i]);
 
         try {
             const tokenResponse = await oauth2Client.getTokenWithPasswordGrant({
                 username,
-                password
+                password,
             });
 
             return await createOauth2ProviderAccountWithToken(providers[i], tokenResponse);
@@ -77,7 +78,7 @@ async function grantTokenWithMasterProvider(username: string, password: string) 
 }
 
 async function grantToken(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const {username, password} = req.body;
+    const { username, password } = req.body;
 
     let userId: number | undefined;
 
@@ -91,7 +92,7 @@ async function grantToken(req: ExpressRequest, res: ExpressResponse) : Promise<a
 
     if (typeof userId === 'undefined') {
         const userAccount = await grantTokenWithMasterProvider(username, password);
-        if(typeof userAccount !== 'undefined') {
+        if (typeof userAccount !== 'undefined') {
             userId = userAccount?.user_id ?? userAccount?.user?.id;
         }
     }
@@ -105,22 +106,22 @@ async function grantToken(req: ExpressRequest, res: ExpressResponse) : Promise<a
     const tokenPayload: TokenPayload = {
         iss: env.apiUrl,
         sub: userId,
-        remoteAddress: req.ip
+        remoteAddress: req.ip,
     };
 
-    const token = await createToken(tokenPayload, expiresIn, {directory: getWritableDirPath()});
+    const token = await createToken(tokenPayload, expiresIn, { directory: getWritableDirPath() });
 
     return res.respond({
         data: {
             access_token: token,
-            expires_in: expiresIn
-        }
+            expires_in: expiresIn,
+        },
     });
 }
 
 // ---------------------------------------------------------------------------------
 
 async function revokeToken(req: ExpressRequest, res: ExpressResponse) {
-    res.cookie('auth_token', null, {maxAge: 0});
+    res.cookie('auth_token', null, { maxAge: 0 });
     return res.respond();
 }

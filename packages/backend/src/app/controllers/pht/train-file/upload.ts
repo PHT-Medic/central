@@ -5,23 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {PermissionID, Train, TrainFile} from "@personalhealthtrain/ui-common";
-import {getRepository} from "typeorm";
-import BusBoy from "busboy";
-import path from "path";
-import {getWritableDirPath} from "../../../../config/paths";
-import fs from "fs";
-import crypto from "crypto";
-import {createFileStreamHandler} from "../../../../modules/file-system/utils";
-import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
-import {BadRequestError, ForbiddenError, NotFoundError} from "@typescript-error/http";
+import { PermissionID, Train, TrainFile } from '@personalhealthtrain/ui-common';
+import { getRepository } from 'typeorm';
+import BusBoy from 'busboy';
+import path from 'path';
+import fs from 'fs';
+import crypto from 'crypto';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { getWritableDirPath } from '../../../../config/paths';
+import { createFileStreamHandler } from '../../../../modules/file-system/utils';
+import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 
 export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: ExpressResponse) {
-    const {id} = req.params;
+    const { id } = req.params;
 
     if (
-        !req.ability.hasPermission(PermissionID.TRAIN_ADD) &&
-        !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
+        !req.ability.hasPermission(PermissionID.TRAIN_ADD)
+        && !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
     ) {
         throw new ForbiddenError();
     }
@@ -35,16 +35,16 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
 
     const trainFileRepository = getRepository(TrainFile);
 
-    const instance = new BusBoy({headers: req.headers as BusBoy.BusboyHeaders, preservePath: true});
+    const instance = new BusBoy({ headers: req.headers as BusBoy.BusboyHeaders, preservePath: true });
 
     const files: TrainFile[] = [];
 
-    const trainDirectoryPath = path.resolve(getWritableDirPath() + '/train-files');
+    const trainDirectoryPath = path.resolve(`${getWritableDirPath()}/train-files`);
 
     try {
         await fs.promises.access(trainDirectoryPath, fs.constants.R_OK | fs.constants.W_OK);
     } catch (e) {
-        fs.mkdirSync(trainDirectoryPath, {mode: 0o770});
+        fs.mkdirSync(trainDirectoryPath, { mode: 0o770 });
     }
 
     const promises : Promise<void>[] = [];
@@ -56,9 +56,9 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
         hash.update(fullFileName);
 
         const destinationFileName = hash.digest('hex');
-        const destinationFilePath = trainDirectoryPath + '/' + destinationFileName + '.file';
+        const destinationFilePath = `${trainDirectoryPath}/${destinationFileName}.file`;
 
-        const handler =  createFileStreamHandler(destinationFilePath);
+        const handler = createFileStreamHandler(destinationFilePath);
         const handlerPromise = handler.getWritePromise();
 
         file.on('data', (data) => {
@@ -69,11 +69,11 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
             handler.cleanup();
             req.unpipe(instance);
 
-            throw new BadRequestError('Size of file ' + fullFileName + ' is too large...');
-        })
+            throw new BadRequestError(`Size of file ${fullFileName} is too large...`);
+        });
 
         file.on('end', () => {
-            if(!fullFileName && handler.getFileSize() === 0) {
+            if (!fullFileName && handler.getFileSize() === 0) {
                 handler.cleanup();
                 return;
             }
@@ -101,7 +101,7 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
         req.unpipe(instance);
 
         throw new BadRequestError();
-    })
+    });
 
     instance.on('finish', async () => {
         if (files.length === 0) {
@@ -115,18 +115,17 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
         await repository.save(repository.merge(entity, {
             configuration_status: null,
             hash: null,
-            hash_signed: null
-        }))
+            hash_signed: null,
+        }));
 
         return res.respond({
             data: {
                 data: files,
                 meta: {
-                    total: files.length
-                }
-            }
+                    total: files.length,
+                },
+            },
         });
-
     });
 
     return req.pipe(instance);

@@ -5,18 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-const {TsconfigPathsPlugin} = require("tsconfig-paths-webpack-plugin");
+const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin');
 
 const config = {
     publicRuntimeConfig() {
         return {
             apiUrl: process.env.API_URL || 'https://pht-ui.personalhealthtrain.de/api/',
-            resultServiceApiUrl: process.env.RESULT_SERVICE_API_URL || 'https://pht-ui.personalhealthtrain.de/vapi/'
-        }
+            resultServiceApiUrl: process.env.RESULT_SERVICE_API_URL || 'https://pht-ui.personalhealthtrain.de/vapi/',
+        };
     },
     env: {
         apiUrl: process.env.API_URL || 'https://pht-ui.personalhealthtrain.de/api/',
-        resultServiceApiUrl: process.env.RESULT_SERVICE_API_URL || 'https://pht-ui.personalhealthtrain.de/vapi/'
+        resultServiceApiUrl: process.env.RESULT_SERVICE_API_URL || 'https://pht-ui.personalhealthtrain.de/vapi/',
     },
     telemetry: false,
     ssr: true,
@@ -28,12 +28,12 @@ const config = {
         meta: [
             { charset: 'utf-8' },
             { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-            { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
+            { hid: 'description', name: 'description', content: process.env.npm_package_description || '' },
         ],
         link: [
-            //{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-            { rel: 'icon', type: 'image/x-icon', href: '/fav.png' }
-        ]
+            // { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+            { rel: 'icon', type: 'image/x-icon', href: '/fav.png' },
+        ],
     },
     /*
     ** Customize the progress-bar color
@@ -58,7 +58,7 @@ const config = {
         '@/assets/css/colors.css',
         '@/assets/css/form.css',
 
-        '@/assets/css/bootstrap-override.css'
+        '@/assets/css/bootstrap-override.css',
     ],
     /*
     ** Plugins to load before mounting the App
@@ -74,7 +74,7 @@ const config = {
         '@/plugins/vueFormWizard',
         '@/plugins/vueTimeAgo',
         '@/plugins/socket.client',
-        '@/plugins/vue'
+        '@/plugins/vue',
 
     ],
     /*
@@ -82,15 +82,15 @@ const config = {
     */
     buildModules: [
         // Doc: https://github.com/nuxt-community/eslint-module
-        //'@nuxtjs/eslint-module'
+        // '@nuxtjs/eslint-module'
         '@nuxt/typescript-build',
-        '@nuxtjs/google-fonts'
+        '@nuxtjs/google-fonts',
     ],
     googleFonts: {
         families: {
-            'Asap': true,
-            'Nunito': true
-        }
+            Asap: true,
+            Nunito: true,
+        },
     },
     /*
     ** Nuxt.js modules
@@ -99,12 +99,12 @@ const config = {
         // Doc: https://bootstrap-vue.js.org
         'bootstrap-vue/nuxt',
         // Doc: https://github.com/nuxt-community/dotenv-module
-        '@nuxtjs/dotenv'
+        '@nuxtjs/dotenv',
     ],
 
     router: {
-        //base: '/',
-        middleware: ['auth', 'layout']
+        // base: '/',
+        middleware: ['auth', 'layout'],
     },
 
     build: {
@@ -113,7 +113,7 @@ const config = {
                 config.resolve = {};
             }
 
-            if(!config.resolve.alias) {
+            if (!config.resolve.alias) {
                 config.resolve.alias = {};
             }
 
@@ -121,22 +121,22 @@ const config = {
                 config.resolve.plugins = [];
             }
 
-            config.resolve.plugins.push(new TsconfigPathsPlugin({configFile: "./tsconfig.json"}));
+            config.resolve.plugins.push(new TsconfigPathsPlugin({ configFile: './tsconfig.json' }));
 
-            if(config.resolve.alias.hasOwnProperty('~')) {
+            if (config.resolve.alias.hasOwnProperty('~')) {
                 delete config.resolve.alias['~'];
             }
 
-            if(config.resolve.alias.hasOwnProperty('@')) {
+            if (config.resolve.alias.hasOwnProperty('@')) {
                 delete config.resolve.alias['@'];
             }
 
             config.externals = {
                 ...config.externals,
-                'react-native-sqlite-storage': 'react-native-sqlite-storage'
-            }
-        }
-    }
-}
+                'react-native-sqlite-storage': 'react-native-sqlite-storage',
+            };
+        },
+    },
+};
 
 module.exports = config;

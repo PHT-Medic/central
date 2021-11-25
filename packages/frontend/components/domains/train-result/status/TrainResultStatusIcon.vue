@@ -6,22 +6,24 @@
   -->
 <template>
     <span>
-        <slot v-bind:iconClass="iconClass">
-            <i class="fa" :class="iconClass"></i>
+        <slot :iconClass="iconClass">
+            <i
+                class="fa"
+                :class="iconClass"
+            />
         </slot>
     </span>
 </template>
 <script>
 
-
-import {TrainResultStatus} from "@personalhealthtrain/ui-common";
+import { TrainResultStatus } from '@personalhealthtrain/ui-common';
 
 export default {
     props: {
         status: {
             type: TrainResultStatus,
-            default: null
-        }
+            default: null,
+        },
     },
     computed: {
         iconClass() {
@@ -43,7 +45,7 @@ export default {
                 default:
                     return 'fa fa-info';
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>

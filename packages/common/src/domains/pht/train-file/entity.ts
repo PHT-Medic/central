@@ -12,58 +12,56 @@ import {
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from "typeorm";
-import {Realm} from "../../auth";
-import {User} from "../../auth";
-import {Train} from "../train";
+    UpdateDateColumn,
+} from 'typeorm';
+import { Realm, User } from '../../auth';
+import { Train } from '../train';
 
-
-@Entity({name: 'train_files'})
+@Entity({ name: 'train_files' })
 export class TrainFile {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn('uuid')
+        id: string;
 
-    @Column({type: "varchar", length: 256})
-    name: string;
+    @Column({ type: 'varchar', length: 256 })
+        name: string;
 
-    @Column({type: "varchar", length: 2048})
-    hash: string;
+    @Column({ type: 'varchar', length: 2048 })
+        hash: string;
 
-    @Column({nullable: true})
-    directory: string;
+    @Column({ nullable: true })
+        directory: string;
 
-    @Column({type: "int", unsigned: true, nullable: true})
-    size: number | null;
+    @Column({ type: 'int', unsigned: true, nullable: true })
+        size: number | null;
 
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
-    created_at: Date;
+        created_at: Date;
 
     @UpdateDateColumn()
-    updated_at: Date;
+        updated_at: Date;
 
     // ------------------------------------------------------------------
 
-    @Column({type: "int", unsigned: true})
-    user_id: number;
+    @Column({ type: 'int', unsigned: true })
+        user_id: number;
 
-    @ManyToOne(() => User, {onDelete: "CASCADE"})
-    @JoinColumn({name: 'user_id'})
-    user: User;
+    @ManyToOne(() => User, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'user_id' })
+        user: User;
 
     @Column()
-    train_id: string;
+        train_id: string;
 
-    @ManyToOne(() => Train, {onDelete: "CASCADE"})
-    @JoinColumn({name: 'train_id'})
-    train: Train;
+    @ManyToOne(() => Train, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'train_id' })
+        train: Train;
 
-    @Column({nullable: true})
-    realm_id: string;
+    @Column({ nullable: true })
+        realm_id: string;
 
-    @ManyToOne(() => Realm, {onDelete: "SET NULL"})
-    @JoinColumn({name: 'realm_id'})
-    realm: Realm;
+    @ManyToOne(() => Realm, { onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'realm_id' })
+        realm: Realm;
 }

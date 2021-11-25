@@ -7,15 +7,15 @@
 
 <script>
 
-import {PermissionID} from "@personalhealthtrain/ui-common";
-import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
+import { PermissionID } from '@personalhealthtrain/ui-common';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.PERMISSION_MANAGE
-        ]
+            PermissionID.PERMISSION_MANAGE,
+        ],
     },
     data() {
         return {
@@ -25,18 +25,18 @@ export default {
                     {
                         name: 'overview',
                         urlSuffix: '',
-                        icon: 'fa fa-bars'
+                        icon: 'fa fa-bars',
                     },
                     {
                         name: 'add',
                         urlSuffix: '/add',
-                        icon: 'fa fa-plus'
-                    }
-                ]
-            }
-        }
-    }
-}
+                        icon: 'fa fa-plus',
+                    },
+                ],
+            },
+        };
+    },
+};
 </script>
 <template>
     <div class="container">
@@ -46,7 +46,10 @@ export default {
 
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
-                <b-nav pills vertical>
+                <b-nav
+                    pills
+                    vertical
+                >
                     <b-nav-item
                         v-for="(item,key) in sidebar.items"
                         :key="key"

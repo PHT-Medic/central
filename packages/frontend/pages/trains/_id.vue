@@ -5,25 +5,25 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPITrain} from "@personalhealthtrain/ui-common";
+import { getAPITrain } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
-import {LayoutKey, LayoutNavigationID} from "../../config/layout/contants";
+import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
 
 export default {
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
     },
     async asyncData(context) {
         try {
             const item = await getAPITrain(context.params.id, {
                 relations: {
-                    proposal: true
-                }
+                    proposal: true,
+                },
             });
 
             return {
-                item
+                item,
             };
         } catch (e) {
             await context.redirect('/trains');
@@ -34,19 +34,19 @@ export default {
             item: undefined,
             tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-                { name: 'Configuration', icon: 'fa fa-cog', urlSuffix: '/wizard'},
-                { name: 'Stations', icon: 'fa fa-city', urlSuffix: '/stations' }
-            ]
-        }
+                { name: 'Configuration', icon: 'fa fa-cog', urlSuffix: '/wizard' },
+                { name: 'Stations', icon: 'fa fa-city', urlSuffix: '/stations' },
+            ],
+        };
     },
     methods: {
         updateTrain(train) {
-            for(let key in train) {
+            for (const key in train) {
                 Vue.set(this.item, key, train[key]);
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div>
@@ -57,7 +57,10 @@ export default {
 
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
-                <b-nav  pills vertical>
+                <b-nav
+                    pills
+                    vertical
+                >
                     <b-nav-item
                         :to="'/trains'"
                         exact
@@ -70,7 +73,7 @@ export default {
                         v-for="(navItem,key) in tabs"
                         :key="key"
                         :disabled="navItem.active"
-                        :to="'/trains/'  +item.id + navItem.urlSuffix"
+                        :to="'/trains/' +item.id + navItem.urlSuffix"
                         :active="$route.path.startsWith('/trains/'+item.id + navItem.urlSuffix) && navItem.urlSuffix.length !== 0"
                         exact-active-class="active"
                         exact
@@ -81,7 +84,10 @@ export default {
                 </b-nav>
             </div>
             <div class="content-container">
-                <nuxt-child :train="item" @updated="updateTrain" />
+                <nuxt-child
+                    :train="item"
+                    @updated="updateTrain"
+                />
             </div>
         </div>
     </div>

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIType, useAPI} from "../../../../../modules";
+import { APIType, useAPI } from '../../../../../modules';
 
 // ------------------------------------------------------------------------
 
@@ -18,16 +18,16 @@ export type HarborRobotAccount = {
 }
 
 export async function findHarborRobotAccount(name: string, withSecret: boolean = true) : Promise<HarborRobotAccount|undefined> {
-    const {data} = await useAPI(APIType.HARBOR).get('robots?q=name%3D'+name+'&page_size=1');
+    const { data } = await useAPI(APIType.HARBOR).get(`robots?q=name%3D${name}&page_size=1`);
 
-    const accounts = Array.isArray(data) ? data.filter(account => account.name === 'robot$'+name) : [];
+    const accounts = Array.isArray(data) ? data.filter((account) => account.name === `robot$${name}`) : [];
 
-    if(
+    if (
         accounts.length === 1
     ) {
         let secret : string | undefined;
 
-        if(withSecret) {
+        if (withSecret) {
             const patchedAccount = await patchHarborProjectRobotAccount(accounts[0].id);
             secret = patchedAccount.secret;
         }
@@ -37,8 +37,8 @@ export async function findHarborRobotAccount(name: string, withSecret: boolean =
             name: accounts[0].name,
             creationTime: accounts[0].creation_time,
             expires_at: accounts[0].expires_at,
-            secret
-        }
+            secret,
+        };
     }
 
     return undefined;
@@ -53,13 +53,13 @@ export async function findHarborRobotAccount(name: string, withSecret: boolean =
  */
 export async function patchHarborProjectRobotAccount(robotId: string | number, record: Record<string, any> = {}) : Promise<Pick<HarborRobotAccount, 'secret'>> {
     const robot : Record<string, any> = {
-        ...record
+        ...record,
     };
 
     const { data } : {data: HarborRobotAccount} = await useAPI(APIType.HARBOR)
-        .patch('robots/'+robotId, robot);
+        .patch(`robots/${robotId}`, robot);
 
-    if(typeof record.secret !== 'undefined') {
+    if (typeof record.secret !== 'undefined') {
         data.secret = record.secret;
     }
 
@@ -70,27 +70,27 @@ export async function ensureHarborProjectRobotAccount(robotName: string, project
     const robot: Record<string, any> = {
         name: robotName,
         duration: -1,
-        level: "system",
+        level: 'system',
         disable: false,
         permissions: [
             {
                 access: [
-                    {resource: 'artifact', action: 'delete'},
-                    {resource: 'artifact-label', action: 'create'},
-                    {resource: 'helm-chart', action: 'read'},
-                    {resource: 'helm-chart-version', action: 'create'},
-                    {resource: 'helm-chart-version', action: 'delete'},
-                    {resource: 'repository', action: 'push'},
-                    {resource: 'repository', action: 'pull'},
-                    {resource: 'scan', action: 'create'},
-                    {resource: 'tag', action: 'create'},
-                    {resource: 'tag', action: 'delete'}
+                    { resource: 'artifact', action: 'delete' },
+                    { resource: 'artifact-label', action: 'create' },
+                    { resource: 'helm-chart', action: 'read' },
+                    { resource: 'helm-chart-version', action: 'create' },
+                    { resource: 'helm-chart-version', action: 'delete' },
+                    { resource: 'repository', action: 'push' },
+                    { resource: 'repository', action: 'pull' },
+                    { resource: 'scan', action: 'create' },
+                    { resource: 'tag', action: 'create' },
+                    { resource: 'tag', action: 'delete' },
 
                 ],
                 kind: 'project',
-                namespace: projectName ?? robotName
-            }
-        ]
+                namespace: projectName ?? robotName,
+            },
+        ],
     };
 
     const { data } : {data: HarborRobotAccount} = await useAPI(APIType.HARBOR)
@@ -101,5 +101,5 @@ export async function ensureHarborProjectRobotAccount(robotName: string, project
 
 export async function dropHarborProjectAccount(robotId: string | number) : Promise<void> {
     await useAPI(APIType.HARBOR)
-        .delete('robots/'+robotId);
+        .delete(`robots/${robotId}`);
 }

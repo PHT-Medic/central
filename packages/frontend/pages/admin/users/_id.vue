@@ -5,55 +5,59 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-    import {getAPIUser, PermissionID} from "@personalhealthtrain/ui-common";
-    import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
+import { PermissionID, getAPIUser } from '@personalhealthtrain/ui-common';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
-    export default {
-        meta: {
-            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-            [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.USER_EDIT,
-                PermissionID.USER_ROLE_ADD,
-                PermissionID.USER_ROLE_EDIT,
-                PermissionID.USER_ROLE_DROP
-            ]
-        },
-        async asyncData(context) {
-            let user;
+export default {
+    meta: {
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
+            PermissionID.USER_EDIT,
+            PermissionID.USER_ROLE_ADD,
+            PermissionID.USER_ROLE_EDIT,
+            PermissionID.USER_ROLE_DROP,
+        ],
+    },
+    async asyncData(context) {
+        let user;
 
-            try {
-                user = await getAPIUser(context.params.id, {fields: ['+email']});
+        try {
+            user = await getAPIUser(context.params.id, { fields: ['+email'] });
 
-                return {
-                    user
-                }
-            } catch (e) {
-                await context.redirect('/admin/users');
-            }
-        },
-        data() {
             return {
-                user: null,
-                tabs: [
-                    { name: 'General', routeName: 'admin-users-id', icon: 'fas fa-bars', urlSuffix: '' },
-                    { name: 'Roles', routeName: 'admin-users-id-groups', icon: 'fas fa-users', urlSuffix: 'roles' }
-                ]
+                user,
+            };
+        } catch (e) {
+            await context.redirect('/admin/users');
+        }
+    },
+    data() {
+        return {
+            user: null,
+            tabs: [
+                {
+                    name: 'General', routeName: 'admin-users-id', icon: 'fas fa-bars', urlSuffix: '',
+                },
+                {
+                    name: 'Roles', routeName: 'admin-users-id-groups', icon: 'fas fa-users', urlSuffix: 'roles',
+                },
+            ],
+        };
+    },
+    methods: {
+        handleUserUpdated(e) {
+            for (const key in e) {
+                this.user[key] = e[key];
             }
         },
-        methods: {
-            handleUserUpdated(e) {
-                for(let key in e) {
-                    this.user[key] = e[key];
-                }
-            }
-        }
-    }
+    },
+};
 </script>
 <template>
     <div class="container">
         <h1 class="title no-border mb-3">
-            {{user.name}} <span class="sub-title">Details</span>
+            {{ user.name }} <span class="sub-title">Details</span>
         </h1>
 
         <div class="m-b-20 m-t-10">
@@ -83,6 +87,9 @@
             </div>
         </div>
 
-        <nuxt-child :user-property="user" @userUpdated="handleUserUpdated" />
+        <nuxt-child
+            :user-property="user"
+            @userUpdated="handleUserUpdated"
+        />
     </div>
 </template>

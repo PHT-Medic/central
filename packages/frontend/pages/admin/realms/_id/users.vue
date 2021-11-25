@@ -7,8 +7,8 @@
 
 <script>
 
-import {PermissionID} from "@personalhealthtrain/ui-common";
-import {LayoutKey, LayoutNavigationID} from "../../../../config/layout/contants";
+import { PermissionID } from '@personalhealthtrain/ui-common';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
     meta: {
@@ -20,11 +20,11 @@ export default {
             PermissionID.USER_DROP,
             PermissionID.USER_ROLE_ADD,
             PermissionID.USER_ROLE_EDIT,
-            PermissionID.USER_ROLE_DROP
-        ]
+            PermissionID.USER_ROLE_DROP,
+        ],
     },
     props: {
-        realm: Object
+        realm: Object,
     },
     data() {
         return {
@@ -34,23 +34,26 @@ export default {
                     {
                         name: 'overview',
                         urlSuffix: '',
-                        icon: 'fa fa-bars'
+                        icon: 'fa fa-bars',
                     },
                     {
                         name: 'add',
                         urlSuffix: '/add',
-                        icon: 'fa fa-plus'
-                    }
-                ]
-            }
-        }
-    }
-}
+                        icon: 'fa fa-plus',
+                    },
+                ],
+            },
+        };
+    },
+};
 </script>
 <template>
     <div class="content-wrapper">
         <div class="content-sidebar flex-column">
-            <b-nav pills vertical>
+            <b-nav
+                pills
+                vertical
+            >
                 <b-nav-item
                     v-for="(item,key) in sidebar.items"
                     :key="key"

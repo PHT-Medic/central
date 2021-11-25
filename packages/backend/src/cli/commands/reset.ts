@@ -5,17 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {Arguments, Argv, CommandModule} from "yargs";
-import {buildConnectionOptions, createDatabase, dropDatabase, runSeeder} from "typeorm-extension";
-import {createConnection} from "typeorm";
+import { Arguments, Argv, CommandModule } from 'yargs';
+import {
+    buildConnectionOptions, createDatabase, dropDatabase, runSeeder,
+} from 'typeorm-extension';
+import { createConnection } from 'typeorm';
 
 interface ResetArguments extends Arguments {
 
 }
 
 export class ResetCommand implements CommandModule {
-    command = "reset";
-    describe = "Run reset operation.";
+    command = 'reset';
+
+    describe = 'Run reset operation.';
 
     builder(args: Argv) {
         return args;
@@ -24,20 +27,19 @@ export class ResetCommand implements CommandModule {
     async handler(args: ResetArguments) {
         const connectionOptions = await buildConnectionOptions();
 
-        await dropDatabase({ifExist: true});
-        await createDatabase({ifNotExist: true});
+        await dropDatabase({ ifExist: true });
+        await createDatabase({ ifNotExist: true });
 
         const connection = await createConnection(connectionOptions);
 
         try {
             await connection.synchronize(true);
-            await connection.runMigrations({transaction: "all"});
+            await connection.runMigrations({ transaction: 'all' });
             await runSeeder(connection);
         } catch (e) {
             throw e;
         } finally {
             await connection.close();
         }
-
     }
 }

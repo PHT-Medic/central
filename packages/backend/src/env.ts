@@ -5,22 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {config} from "dotenv";
-import path from "path";
+import { config } from 'dotenv';
+import path from 'path';
 
 const envResult = config({
-    path: path.resolve(__dirname, '../.env')
+    path: path.resolve(__dirname, '../.env'),
 });
 
 if (envResult.error) {
-    console.error('[ERROR] env failed to load:' + envResult.error);
+    console.error(`[ERROR] env failed to load:${envResult.error}`);
 }
 
 export function requireFromEnv(key : string, alt?: any) {
     if (!process.env[key] && typeof alt === 'undefined') {
-        console.error('[APP ERROR] Missing env variable:'+key)
+        console.error(`[APP ERROR] Missing env variable:${key}`);
 
-        return process.exit(1)
+        return process.exit(1);
     }
 
     return process.env[key] ?? alt;
@@ -74,7 +74,7 @@ const env : Environment = {
     skipTrainApprovalOperation: requireFromEnv('SKIP_TRAIN_APPROVAL_OPERATION', 'false').toLowerCase() !== 'false',
 
     userPasswordImmutable: requireFromEnv('USER_PASSWORD_IMMUTABLE', 'false').toLowerCase() !== 'false',
-    userSecretsImmutable: requireFromEnv('USER_SECRETS_IMMUTABLE', 'false').toLowerCase() !== 'false'
+    userSecretsImmutable: requireFromEnv('USER_SECRETS_IMMUTABLE', 'false').toLowerCase() !== 'false',
 };
 
 export default env;

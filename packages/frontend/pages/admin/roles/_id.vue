@@ -5,52 +5,57 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPIRole, PermissionID} from "@personalhealthtrain/ui-common";
-    import {LayoutKey, LayoutNavigationID} from "../../../config/layout/contants";
+import { PermissionID, getAPIRole } from '@personalhealthtrain/ui-common';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
-    export default {
-        meta: {
-            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-            [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.ROLE_EDIT,
-                PermissionID.ROLE_PERMISSION_ADD,
-                PermissionID.ROLE_PERMISSION_DROP
-            ]
-        },
-        async asyncData(context) {
-            try {
-                const role = await getAPIRole(context.params.id);
+export default {
+    meta: {
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
+            PermissionID.ROLE_EDIT,
+            PermissionID.ROLE_PERMISSION_ADD,
+            PermissionID.ROLE_PERMISSION_DROP,
+        ],
+    },
+    async asyncData(context) {
+        try {
+            const role = await getAPIRole(context.params.id);
 
-                return {
-                    role
-                }
-            } catch (e) {
-                return await context.redirect('/admin/roles');
-            }
-        },
-        data() {
             return {
-                role: null,
-                tabs: [
-                    { name: 'General', routeName: 'admin-roles-id', icon: 'fas fa-bars', urlSuffix: '' },
-                    { name: 'Permissions', routeName: 'admin-roles-id-permissions', icon: 'fas fa-user-secret', urlSuffix: 'permissions' },
-                    { name: 'Users', routeName: 'admin-roles-id-users', icon: 'fa fa-users', urlSuffix: 'users' }
-                ]
-            }
+                role,
+            };
+        } catch (e) {
+            return await context.redirect('/admin/roles');
         }
-    }
+    },
+    data() {
+        return {
+            role: null,
+            tabs: [
+                {
+                    name: 'General', routeName: 'admin-roles-id', icon: 'fas fa-bars', urlSuffix: '',
+                },
+                {
+                    name: 'Permissions', routeName: 'admin-roles-id-permissions', icon: 'fas fa-user-secret', urlSuffix: 'permissions',
+                },
+                {
+                    name: 'Users', routeName: 'admin-roles-id-users', icon: 'fa fa-users', urlSuffix: 'users',
+                },
+            ],
+        };
+    },
+};
 </script>
 <template>
     <div class="container">
         <h1 class="title no-border mb-3">
-            {{role.name}} <span class="sub-title">Details</span>
+            {{ role.name }} <span class="sub-title">Details</span>
         </h1>
 
         <div class="m-b-20 m-t-10">
             <div class="panel-card">
                 <div class="panel-card-body">
-
                     <b-nav pills>
                         <b-nav-item
                             :to="'/admin/roles'"

@@ -9,19 +9,19 @@ import {
     TrainBuildStatus,
     TrainConfigurationStatus,
     TrainResultStatus,
-    TrainRunStatus
-} from "@personalhealthtrain/ui-common";
+    TrainRunStatus,
+} from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
-import TrainResultCommand from "./command/TrainResultCommand";
-import TrainBuildStatusText from "./status/TrainBuildStatusText";
-import TrainBuildCommand from "./command/TrainBuildCommand";
-import TrainRunStatusText from "./status/TrainRunStatusText";
-import TrainRunCommand from "./command/TrainRunCommand";
-import TrainResultStatusIcon from "../train-result/status/TrainResultStatusIcon";
-import TrainResultStatusText from "../train-result/status/TrainResultStatusText";
+import TrainResultCommand from './command/TrainResultCommand';
+import TrainBuildStatusText from './status/TrainBuildStatusText';
+import TrainBuildCommand from './command/TrainBuildCommand';
+import TrainRunStatusText from './status/TrainRunStatusText';
+import TrainRunCommand from './command/TrainRunCommand';
+import TrainResultStatusIcon from '../train-result/status/TrainResultStatusIcon';
+import TrainResultStatusText from '../train-result/status/TrainResultStatusText';
 
-import {FrontendTrainCommand} from "../../../domains/train/type";
-import TrainConfigurationStatusText from "./status/TrainConfigurationStatusText";
+import { FrontendTrainCommand } from '../../../domains/train/type';
+import TrainConfigurationStatusText from './status/TrainConfigurationStatusText';
 
 export default {
     components: {
@@ -32,21 +32,18 @@ export default {
         TrainRunCommand,
         TrainRunStatusText,
         TrainBuildCommand,
-        TrainBuildStatusText
+        TrainBuildStatusText,
     },
     props: {
         listDirection: {
             type: String,
-            default: 'row'
+            default: 'row',
         },
         withCommand: {
             type: Boolean,
-            default: true
+            default: true,
         },
-        trainProperty: Object
-    },
-    created() {
-        this.train = this.trainProperty;
+        trainProperty: Object,
     },
     data() {
         return {
@@ -58,12 +55,12 @@ export default {
             trainResultStatus: TrainResultStatus,
             trainCommand: FrontendTrainCommand,
 
-            busy: false
-        }
+            busy: false,
+        };
     },
     computed: {
         canEdit() {
-            return this.$auth.can('edit','train');
+            return this.$auth.can('edit', 'train');
         },
 
         // ---------------------------------------------------------
@@ -72,9 +69,12 @@ export default {
             return this.canEdit && this.train.configuration_status !== TrainConfigurationStatus.FINISHED;
         },
     },
+    created() {
+        this.train = this.trainProperty;
+    },
     methods: {
         handleDone(train) {
-            for(let key in train) {
+            for (const key in train) {
                 Vue.set(this.train, key, train[key]);
             }
 
@@ -82,9 +82,9 @@ export default {
         },
         handleFailed(e) {
             this.$emit('failed', e);
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div
@@ -95,7 +95,8 @@ export default {
         }"
     >
         <div
-            class="d-flex flex-column flex-grow-1 align-items-center" style="flex-basis: 0"
+            class="d-flex flex-column flex-grow-1 align-items-center"
+            style="flex-basis: 0"
             :class="{
                 'mb-2': listDirection === 'column'
             }"
@@ -106,15 +107,24 @@ export default {
             <div>
                 Status: <train-configuration-status-text :status="train.configuration_status" />
             </div>
-            <div v-if="withCommand" class="mt-1">
-                <nuxt-link v-if="canConfigure" class="btn btn-xs btn-primary" type="button" :to="'/trains/'+train.id+'/wizard'">
+            <div
+                v-if="withCommand"
+                class="mt-1"
+            >
+                <nuxt-link
+                    v-if="canConfigure"
+                    class="btn btn-xs btn-primary"
+                    type="button"
+                    :to="'/trains/'+train.id+'/wizard'"
+                >
                     <i class="fas fa-cog pr-1" /> setup
                 </nuxt-link>
             </div>
         </div>
 
         <div
-            class="d-flex flex-column flex-grow-1 align-items-center" style="flex-basis: 0"
+            class="d-flex flex-column flex-grow-1 align-items-center"
+            style="flex-basis: 0"
             :class="{
                 'mb-2': listDirection === 'column'
             }"
@@ -135,7 +145,10 @@ export default {
                     @failed="handleFailed"
                 />
             </div>
-            <div v-if="withCommand" class="mt-1 flex-row d-flex">
+            <div
+                v-if="withCommand"
+                class="mt-1 flex-row d-flex"
+            >
                 <train-build-command
                     class="mr-1"
                     :command="trainCommand.BUILD_START"
@@ -155,7 +168,8 @@ export default {
         </div>
 
         <div
-            class="d-flex flex-column flex-grow-1 align-items-center" style="flex-basis: 0"
+            class="d-flex flex-column flex-grow-1 align-items-center"
+            style="flex-basis: 0"
             :class="{
                 'mb-2': listDirection === 'column'
             }"
@@ -176,7 +190,10 @@ export default {
                     @failed="handleFailed"
                 />
             </div>
-            <div v-if="withCommand" class="mt-1 flex-row d-flex">
+            <div
+                v-if="withCommand"
+                class="mt-1 flex-row d-flex"
+            >
                 <train-run-command
                     class="mr-1"
                     :command="trainCommand.RUN_START"
@@ -195,12 +212,13 @@ export default {
             </div>
         </div>
         <div
-            class="d-flex flex-column flex-grow-1 align-items-center" style="flex-basis: 0"
+            class="d-flex flex-column flex-grow-1 align-items-center"
+            style="flex-basis: 0"
         >
             <div>
                 <strong>4. Result</strong>
             </div>
-            <div >
+            <div>
                 Status: <train-result-status-text :status="train.result_last_status" />
                 <train-result-command
                     class="ml-1"
@@ -213,7 +231,10 @@ export default {
                     @failed="handleFailed"
                 />
             </div>
-            <div v-if="withCommand" class="mt-1 flex-row d-flex">
+            <div
+                v-if="withCommand"
+                class="mt-1 flex-row d-flex"
+            >
                 <train-result-command
                     class="mr-1"
                     :command="trainCommand.RESULT_DOWNLOAD"

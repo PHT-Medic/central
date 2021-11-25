@@ -5,49 +5,23 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {getAPIMasterImages} from "@personalhealthtrain/ui-common";
-import Pagination from "../../Pagination";
+import { getAPIMasterImages } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
+import Pagination from '../../Pagination';
 
 export default {
-    components: {Pagination},
+    components: { Pagination },
     props: {
         filterItems: Function,
         requestFilters: Object,
         withSearch: {
             type: Boolean,
-            default: true
+            default: true,
         },
         loadOnInit: {
             type: Boolean,
-            default: true
-        }
-    },
-    watch: {
-        q: function (val, oldVal) {
-            if(val === oldVal) return;
-
-            if(val.length === 1 && val.length > oldVal.length) {
-                return;
-            }
-
-            this.meta.offset = 0;
-
-            this.load();
-        }
-    },
-    computed: {
-        formattedItems() {
-            const items = this.items.sort((a, b) => {
-                return a.path.toLocaleString().localeCompare(b.path);
-            });
-
-            if(typeof this.filterItems === 'undefined') {
-                return items;
-            }
-
-            return items.filter(this.filterItems);
-        }
+            default: true,
+        },
     },
     data() {
         return {
@@ -57,35 +31,59 @@ export default {
             meta: {
                 limit: 10,
                 offset: 0,
-                total: 0
+                total: 0,
             },
-            itemBusy: false
-        }
+            itemBusy: false,
+        };
+    },
+    computed: {
+        formattedItems() {
+            const items = this.items.sort((a, b) => a.path.toLocaleString().localeCompare(b.path));
+
+            if (typeof this.filterItems === 'undefined') {
+                return items;
+            }
+
+            return items.filter(this.filterItems);
+        },
+    },
+    watch: {
+        q(val, oldVal) {
+            if (val === oldVal) return;
+
+            if (val.length === 1 && val.length > oldVal.length) {
+                return;
+            }
+
+            this.meta.offset = 0;
+
+            this.load();
+        },
     },
     created() {
-        if(this.loadOnInit) {
+        if (this.loadOnInit) {
             this.load();
         }
     },
     methods: {
         async load() {
-            if(this.busy) return;
+            if (this.busy) return;
 
             this.busy = true;
 
             try {
-                let data = {
+                const data = {
                     page: {
                         limit: this.meta.limit,
-                        offset: this.meta.offset
+                        offset: this.meta.offset,
                     },
                     filter: {
-                        path: this.q.length > 0 ? '~'+this.q : this.q
-                    }
-                }
+                        path: this.q.length > 0 ? `~${this.q}` : this.q,
+                    },
+                };
 
-                if(typeof this.requestFilters !== 'undefined') {
-                    for(let key in this.requestFilters) {
+                if (typeof this.requestFilters !== 'undefined') {
+                    for (const key in this.requestFilters) {
                         data.filter[key] = this.requestFilters[key];
                     }
                 }
@@ -93,7 +91,7 @@ export default {
                 const response = await getAPIMasterImages(data);
 
                 this.items = response.data;
-                const {total} = response.meta;
+                const { total } = response.meta;
 
                 this.meta.total = total;
             } catch (e) {
@@ -103,7 +101,7 @@ export default {
             this.busy = false;
         },
         goTo(options, resolve, reject) {
-            if(options.offset === this.meta.offset) return;
+            if (options.offset === this.meta.offset) return;
 
             this.meta.offset = options.offset;
 
@@ -113,8 +111,8 @@ export default {
         },
 
         dropArrayItem(id) {
-            const index = this.items.findIndex(el => el.id === id);
-            if(index !== -1) {
+            const index = this.items.findIndex((el) => el.id === id);
+            if (index !== -1) {
                 this.items.splice(index, 1);
             }
         },
@@ -122,15 +120,15 @@ export default {
             this.items.push(item);
         },
         editArrayItem(item) {
-            const index = this.items.findIndex(el => el.id === item.id);
-            if(index !== -1) {
-                for(let key in item) {
+            const index = this.items.findIndex((el) => el.id === item.id);
+            if (index !== -1) {
+                for (const key in item) {
                     Vue.set(this.items[index], key, item[key]);
                 }
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div>
@@ -138,15 +136,26 @@ export default {
             <div class="d-flex flex-row mb-2">
                 <div>
                     <slot name="header-title">
-                        <h6 class="mb-0">Master Images</h6>
+                        <h6 class="mb-0">
+                            Master Images
+                        </h6>
                     </slot>
                 </div>
                 <div class="ml-auto">
-                    <slot name="header-actions" v-bind:load="load" v-bind:busy="busy">
+                    <slot
+                        name="header-actions"
+                        :load="load"
+                        :busy="busy"
+                    >
                         <div class="d-flex flex-row">
                             <div>
-                                <button type="button" class="btn btn-xs btn-dark" :disabled="busy" @click.prevent="load">
-                                    <i class="fas fa-sync"></i> Refresh
+                                <button
+                                    type="button"
+                                    class="btn btn-xs btn-dark"
+                                    :disabled="busy"
+                                    @click.prevent="load"
+                                >
+                                    <i class="fas fa-sync" /> Refresh
                                 </button>
                             </div>
                         </div>
@@ -156,38 +165,64 @@ export default {
         </slot>
         <div class="form-group">
             <div class="input-group">
-                <label for="q"></label>
-                <input v-model="q" type="text" name="q" id="q" class="form-control" placeholder="Name..."/>
+                <label for="q" />
+                <input
+                    id="q"
+                    v-model="q"
+                    type="text"
+                    name="q"
+                    class="form-control"
+                    placeholder="Name..."
+                >
                 <div class="input-group-append">
-                    <span class="input-group-text"><i class="fa fa-search"></i></span>
+                    <span class="input-group-text"><i class="fa fa-search" /></span>
                 </div>
             </div>
         </div>
-        <slot name="items" v-bind:items="formattedItems" v-bind:busy="busy">
+        <slot
+            name="items"
+            :items="formattedItems"
+            :busy="busy"
+        >
             <div class="c-list">
-                <div class="c-list-item mb-2" v-for="(item,key) in formattedItems" :key="key">
+                <div
+                    v-for="(item,key) in formattedItems"
+                    :key="key"
+                    class="c-list-item mb-2"
+                >
                     <div class="c-list-content align-items-center">
                         <div class="c-list-icon">
-                            <i class="fa fa-group"></i>
+                            <i class="fa fa-group" />
                         </div>
                         <slot name="item-name">
-                            <span class="mb-0">{{item.name}} <small class="text-primary">{{item.path}}</small></span>
+                            <span class="mb-0">{{ item.name }} <small class="text-primary">{{ item.path }}</small></span>
                         </slot>
 
                         <div class="ml-auto">
-                            <slot name="item-actions" v-bind:item="item"></slot>
+                            <slot
+                                name="item-actions"
+                                :item="item"
+                            />
                         </div>
                     </div>
                 </div>
             </div>
         </slot>
 
-        <div v-if="!busy && formattedItems.length === 0" slot="no-more">
+        <div
+            v-if="!busy && formattedItems.length === 0"
+            slot="no-more"
+        >
             <div class="alert alert-sm alert-info">
                 No (more) master images available anymore.
             </div>
         </div>
 
-        <pagination :total="meta.total" :offset="meta.offset" :limit="meta.limit" @to="goTo" />
+        <pagination
+            :total="meta.total"
+            :offset="meta.offset"
+            :limit="meta.limit"
+            @to="goTo"
+        />
     </div>
 </template>

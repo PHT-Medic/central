@@ -5,32 +5,32 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { mapActions } from 'vuex'
-import {LayoutKey, LayoutNavigationID} from "../config/layout/contants";
+import { mapActions } from 'vuex';
+import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';
 
 export default {
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
     },
-    created () {
+    created() {
         this.doLogout();
 
-        //setTimeout(this.doLogout,0);
+        // setTimeout(this.doLogout,0);
     },
     methods: {
-        async doLogout () {
+        async doLogout() {
             await this.$store.dispatch('auth/triggerLogout');
 
-            let query = {};
-            if(this.$route.query && this.$route.query.hasOwnProperty('redirect')) {
+            const query = {};
+            if (this.$route.query && this.$route.query.hasOwnProperty('redirect')) {
                 query.redirect = this.$route.query.redirect;
             }
 
-            await this.$router.push({path: '/login', query});
-        }
-    }
-}
+            await this.$router.push({ path: '/login', query });
+        },
+    },
+};
 </script>
 <template>
     <div />

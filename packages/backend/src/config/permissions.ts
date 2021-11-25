@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {getPHTPermissions} from "./pht/permissions";
+import { getPHTPermissions } from './pht/permissions';
 
 const permissions : string[] = [
     'admin_ui_use',
@@ -37,7 +37,7 @@ const permissions : string[] = [
 ];
 
 export function getPermissions(includePHT: boolean = true) : string[] {
-    if(includePHT) {
+    if (includePHT) {
         return [...permissions, ...getPHTPermissions()];
     }
 }

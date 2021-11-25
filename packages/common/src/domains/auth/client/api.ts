@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {APIType, SingleResourceResponse, useAPI} from "../../../modules";
-import {Client} from "./entity";
-import {AuthClientType} from "./type";
-import {nullifyEmptyObjectProperties} from "../../../utils";
+import { APIType, SingleResourceResponse, useAPI } from '../../../modules';
+import { Client } from './entity';
+import { AuthClientType } from './type';
+import { nullifyEmptyObjectProperties } from '../../../utils';
 
 export async function executeAPIClientCommand(id: typeof Client.prototype.id, command: string, data: Record<string, any>): Promise<SingleResourceResponse<Client>> {
-    const {data: resultData} = await useAPI(APIType.DEFAULT).post('clients/' + id + '/command', {command, ...data});
+    const { data: resultData } = await useAPI(APIType.DEFAULT).post(`clients/${id}/command`, { command, ...data });
 
     return resultData;
 }
@@ -22,7 +22,7 @@ type AuthClientCreateContext = {
 };
 
 export async function addAPIClient(data: AuthClientCreateContext) {
-    const {data: resultData} = await useAPI(APIType.DEFAULT).post('clients', nullifyEmptyObjectProperties(data));
+    const { data: resultData } = await useAPI(APIType.DEFAULT).post('clients', nullifyEmptyObjectProperties(data));
 
     return resultData;
 }

@@ -5,43 +5,45 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {getRepository} from "typeorm";
-import {applyFilters, applyPagination} from "typeorm-extension";
-import {MasterImageGroup, PermissionID,} from "@personalhealthtrain/ui-common";
+import { getRepository } from 'typeorm';
+import { applyFilters, applyPagination } from 'typeorm-extension';
+import { MasterImageGroup, PermissionID } from '@personalhealthtrain/ui-common';
 
-import {Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {SwaggerTags} from "typescript-swagger";
-import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
-import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
-import {ForbiddenError, NotFoundError} from "@typescript-error/http";
+import {
+    Controller, Delete, Get, Params, Post, Request, Response,
+} from '@decorators/express';
+import { SwaggerTags } from 'typescript-swagger';
+import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
+import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 
 type PartialMasterImageGroup = Partial<MasterImageGroup>;
 
 @SwaggerTags('pht')
-@Controller("/master-image-groups")
+@Controller('/master-image-groups')
 export class MasterImageGroupController {
-    @Get("",[ForceLoggedInMiddleware])
+    @Get('', [ForceLoggedInMiddleware])
     async getMany(
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<PartialMasterImageGroup[]> {
         return await getManyRouteHandler(req, res) as PartialMasterImageGroup[];
     }
 
-    @Get("/:id",[ForceLoggedInMiddleware])
+    @Get('/:id', [ForceLoggedInMiddleware])
     async getOne(
         @Params('id') id: string,
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<PartialMasterImageGroup|undefined> {
         return await getRouteHandler(req, res) as PartialMasterImageGroup | undefined;
     }
 
-    @Delete("/:id",[ForceLoggedInMiddleware])
+    @Delete('/:id', [ForceLoggedInMiddleware])
     async drop(
         @Params('id') id: string,
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<PartialMasterImageGroup|undefined> {
         return await dropRouteHandler(req, res) as PartialMasterImageGroup | undefined;
     }
@@ -54,11 +56,11 @@ export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse)
 
     const entity = await repository.findOne(id);
 
-    if(typeof entity === 'undefined') {
+    if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
-    return res.respond({data: entity})
+    return res.respond({ data: entity });
 }
 
 export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
@@ -69,10 +71,10 @@ export async function getManyRouteHandler(req: ExpressRequest, res: ExpressRespo
 
     applyFilters(query, filter, {
         allowed: ['id', 'name', 'path', 'virtual_path'],
-        defaultAlias: 'imageGroup'
+        defaultAlias: 'imageGroup',
     });
 
-    const pagination = applyPagination(query, page, {maxLimit: 50});
+    const pagination = applyPagination(query, page, { maxLimit: 50 });
 
     const [entities, total] = await query.getManyAndCount();
 
@@ -81,16 +83,16 @@ export async function getManyRouteHandler(req: ExpressRequest, res: ExpressRespo
             data: entities,
             meta: {
                 total,
-                ...pagination
-            }
-        }
+                ...pagination,
+            },
+        },
     });
 }
 
 export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if(!req.ability.hasPermission(PermissionID.MASTER_IMAGE_GROUP_MANAGE)) {
+    if (!req.ability.hasPermission(PermissionID.MASTER_IMAGE_GROUP_MANAGE)) {
         throw new ForbiddenError();
     }
 
@@ -98,11 +100,11 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
 
     const entity = await repository.findOne(id);
 
-    if(typeof entity === 'undefined') {
+    if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
     await repository.delete(entity.id);
 
-    return res.respondDeleted({data: entity});
+    return res.respondDeleted({ data: entity });
 }

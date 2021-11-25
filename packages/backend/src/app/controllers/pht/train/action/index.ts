@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {check, matchedData, validationResult} from "express-validator";
-import {getRepository} from "typeorm";
-import {isPermittedForResourceRealm, Train} from "@personalhealthtrain/ui-common";
-import {TrainCommand} from "@personalhealthtrain/ui-common";
+import { check, matchedData, validationResult } from 'express-validator';
+import { getRepository } from 'typeorm';
+import { Train, TrainCommand, isPermittedForResourceRealm } from '@personalhealthtrain/ui-common';
+import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import {
     detectTrainBuildStatus,
     detectTrainRunStatus,
@@ -17,11 +17,10 @@ import {
     startTrain,
     stopBuildTrain,
     stopTrain,
-    triggerTrainResultStart, triggerTrainResultStatus, triggerTrainResultStop
-} from "../../../../../domains/pht/train/commands";
-import {ExpressRequest, ExpressResponse} from "../../../../../config/http/type";
-import {ForbiddenError, NotFoundError} from "@typescript-error/http";
-import {ExpressValidationError} from "../../../../../config/http/error/validation";
+    triggerTrainResultStart, triggerTrainResultStatus, triggerTrainResultStop,
+} from '../../../../../domains/pht/train/commands';
+import { ExpressRequest, ExpressResponse } from '../../../../../config/http/type';
+import { ExpressValidationError } from '../../../../../config/http/error/validation';
 
 /**
  * Execute a train command (start, stop, build).
@@ -30,7 +29,7 @@ import {ExpressValidationError} from "../../../../../config/http/error/validatio
  * @param res
  */
 export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const {id} = req.params;
+    const { id } = req.params;
 
     if (typeof id !== 'string') {
         throw new NotFoundError();
@@ -38,9 +37,7 @@ export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: E
 
     await check('command')
         .exists()
-        .custom(command => {
-            return Object.values(TrainCommand).includes(command);
-        })
+        .custom((command) => Object.values(TrainCommand).includes(command))
         .run(req);
 
     const validation = validationResult(req);
@@ -48,7 +45,7 @@ export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: E
         throw new ExpressValidationError(validation);
     }
 
-    const validationData = matchedData(req, {includeOptionals: true});
+    const validationData = matchedData(req, { includeOptionals: true });
 
     const repository = getRepository(Train);
 
@@ -73,7 +70,6 @@ export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: E
         case TrainCommand.BUILD_STOP:
             entity = await stopBuildTrain(entity);
             break;
-
 
         // Run Commands
         case TrainCommand.RUN_STATUS:
@@ -103,6 +99,5 @@ export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: E
             break;
     }
 
-    return res.respond({data: entity});
+    return res.respond({ data: entity });
 }
-

@@ -5,61 +5,63 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {PermissionID, RolePermission} from "@personalhealthtrain/ui-common";
-import {check, matchedData, validationResult} from "express-validator";
-import {getRepository} from "typeorm";
-import {applyFilters, applyPagination} from "typeorm-extension";
+import { PermissionID, RolePermission } from '@personalhealthtrain/ui-common';
+import { check, matchedData, validationResult } from 'express-validator';
+import { getRepository } from 'typeorm';
+import { applyFilters, applyPagination } from 'typeorm-extension';
 
 // ---------------------------------------------------------------------------------
 
-import {Body, Controller, Delete, Get, Params, Post, Request, Response} from "@decorators/express";
-import {ResponseExample, SwaggerTags} from "typescript-swagger";
-import {ForceLoggedInMiddleware} from "../../../../config/http/middleware/auth";
-import {ExpressRequest, ExpressResponse} from "../../../../config/http/type";
-import {ForbiddenError, NotFoundError} from "@typescript-error/http";
-import {ExpressValidationError} from "../../../../config/http/error/validation";
+import {
+    Body, Controller, Delete, Get, Params, Post, Request, Response,
+} from '@decorators/express';
+import { ResponseExample, SwaggerTags } from 'typescript-swagger';
+import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
+import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
+import { ExpressValidationError } from '../../../../config/http/error/validation';
 
 type PartialPermissionController = Partial<RolePermission>;
-const simpleExample = {role_id: 1, permission_id: "user_add"};
+const simpleExample = { role_id: 1, permission_id: 'user_add' };
 
 @SwaggerTags('auth')
-@Controller("/role-permissions")
+@Controller('/role-permissions')
 export class RolePermissionController {
-    @Get("",[ForceLoggedInMiddleware])
+    @Get('', [ForceLoggedInMiddleware])
     @ResponseExample<PartialPermissionController[]>([simpleExample])
     async getMany(
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<PartialPermissionController[]> {
         return await getRolePermissions(req, res) as PartialPermissionController[];
     }
 
-    @Post("",[ForceLoggedInMiddleware])
+    @Post('', [ForceLoggedInMiddleware])
     @ResponseExample<PartialPermissionController>(simpleExample)
     async add(
         @Body() data: Pick<RolePermission, 'role_id' | 'permission_id'>,
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<PartialPermissionController> {
         return await addRolePermission(req, res);
     }
 
-    @Get("/:id",[ForceLoggedInMiddleware])
+    @Get('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialPermissionController>(simpleExample)
     async getOne(
         @Params('id') id: string,
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<PartialPermissionController> {
         return await getRolePermission(req, res);
     }
 
-    @Delete("/:id",[ForceLoggedInMiddleware])
+    @Delete('/:id', [ForceLoggedInMiddleware])
     @ResponseExample<PartialPermissionController>(simpleExample)
     async drop(
         @Params('id') id: string,
         @Request() req: any,
-        @Response() res: any
+        @Response() res: any,
     ): Promise<PartialPermissionController> {
         return await dropRolePermission(req, res);
     }
@@ -80,10 +82,10 @@ async function getRolePermissions(req: ExpressRequest, res: ExpressResponse) : P
 
     applyFilters(query, filter, {
         defaultAlias: 'rolePermission',
-        allowed: ['role_id', 'permission_id']
+        allowed: ['role_id', 'permission_id'],
     });
 
-    const pagination = applyPagination(query, page, {maxLimit: 50});
+    const pagination = applyPagination(query, page, { maxLimit: 50 });
 
     const [entities, total] = await query.getManyAndCount();
 
@@ -92,9 +94,9 @@ async function getRolePermissions(req: ExpressRequest, res: ExpressResponse) : P
             data: entities,
             meta: {
                 total,
-                ...pagination
-            }
-        }
+                ...pagination,
+            },
+        },
     });
 }
 
@@ -107,16 +109,16 @@ async function getRolePermissions(req: ExpressRequest, res: ExpressResponse) : P
  * @param res
  */
 async function getRolePermission(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const {id} = req.params;
+    const { id } = req.params;
 
     const rolePermissionRepository = getRepository(RolePermission);
     const entity = await rolePermissionRepository.findOne(id);
 
-    if(typeof entity === 'undefined') {
+    if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
-    return res.respond({data: entity});
+    return res.respond({ data: entity });
 }
 
 // ---------------------------------------------------------------------------------
@@ -138,16 +140,16 @@ async function addRolePermission(req: ExpressRequest, res: ExpressResponse) : Pr
         .isString()
         .run(req);
 
-    if(!req.ability.hasPermission(PermissionID.ROLE_PERMISSION_ADD)) {
+    if (!req.ability.hasPermission(PermissionID.ROLE_PERMISSION_ADD)) {
         throw new ForbiddenError();
     }
 
     const validation = validationResult(req);
-    if(!validation.isEmpty()) {
+    if (!validation.isEmpty()) {
         throw new ExpressValidationError(validation);
     }
 
-    const data = matchedData(req, {includeOptionals: false});
+    const data = matchedData(req, { includeOptionals: false });
 
     const repository = getRepository(RolePermission);
     let rolePermission = repository.create(data);
@@ -155,7 +157,7 @@ async function addRolePermission(req: ExpressRequest, res: ExpressResponse) : Pr
     rolePermission = await repository.save(rolePermission);
 
     return res.respondCreated({
-        data: rolePermission
+        data: rolePermission,
     });
 }
 
@@ -170,7 +172,7 @@ async function addRolePermission(req: ExpressRequest, res: ExpressResponse) : Pr
 async function dropRolePermission(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if(!req.ability.hasPermission(PermissionID.ROLE_PERMISSION_DROP)) {
+    if (!req.ability.hasPermission(PermissionID.ROLE_PERMISSION_DROP)) {
         throw new ForbiddenError();
     }
 

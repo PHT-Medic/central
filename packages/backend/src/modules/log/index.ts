@@ -5,8 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {createLogger, transports, format, Logger} from 'winston';
-import {getWritableDirPath} from "../../config/paths";
+import {
+    Logger, createLogger, format, transports,
+} from 'winston';
+import { getWritableDirPath } from '../../config/paths';
 
 let logger : undefined | any;
 
@@ -24,7 +26,7 @@ Levels
  */
 
 const includeNamespaceInMessage = format((info, opts) => {
-    if(typeof info.meta?.namespace === 'string') {
+    if (typeof info.meta?.namespace === 'string') {
         info.message = `${info.namespace}: ${info.message}`;
     }
 
@@ -32,7 +34,7 @@ const includeNamespaceInMessage = format((info, opts) => {
 });
 
 export function useLogger() : Logger {
-    if(typeof logger !== 'undefined') {
+    if (typeof logger !== 'undefined') {
         return logger;
     }
 
@@ -41,19 +43,19 @@ export function useLogger() : Logger {
             includeNamespaceInMessage(),
             format.colorize(),
             format.json(),
-            format.timestamp()
+            format.timestamp(),
         ),
         level: 'debug',
         transports: [
             new transports.Console({
-                level: 'debug'
+                level: 'debug',
             }),
             new transports.File({
-                filename: getWritableDirPath() + '/error.log',
+                filename: `${getWritableDirPath()}/error.log`,
                 level: 'warn',
-            })
-        ]
-    })
+            }),
+        ],
+    });
 
     return logger;
 }

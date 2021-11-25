@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {buildMessage} from "amqp-extension";
-import {DispatcherEvent} from "../../../components/event-dispatcher";
-import {MessageQueueDispatcherRoutingKey} from "../../../config/service/mq";
+import { buildMessage } from 'amqp-extension';
+import { DispatcherEvent } from '../../../components/event-dispatcher';
+import { MessageQueueDispatcherRoutingKey } from '../../../config/service/mq';
 
 export type DispatcherHarborEventType = 'PUSH_ARTIFACT';
 
@@ -23,14 +23,14 @@ export type DispatcherHarborEventData = {
 
 export function buildDispatcherHarborEvent(
     data: DispatcherHarborEventData,
-    metaData: Record<string, any> = {}
+    metaData: Record<string, any> = {},
 ) {
     return buildMessage({
         options: {
-            routingKey: MessageQueueDispatcherRoutingKey.EVENT_OUT
+            routingKey: MessageQueueDispatcherRoutingKey.EVENT_OUT,
         },
         type: DispatcherEvent.HARBOR,
         data,
-        metadata: metaData
+        metadata: metaData,
     });
 }

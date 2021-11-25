@@ -6,59 +6,65 @@
   -->
 <template>
     <div>
-        <button v-if="!isAssigned" class="btn btn-xs btn-success" @click.prevent="add">
-            <i class="fa fa-plus"></i>
+        <button
+            v-if="!isAssigned"
+            class="btn btn-xs btn-success"
+            @click.prevent="add"
+        >
+            <i class="fa fa-plus" />
         </button>
-        <button v-if="isAssigned" class="btn btn-xs btn-danger" @click.prevent="drop">
-            <i class="fa fa-trash"></i>
+        <button
+            v-if="isAssigned"
+            class="btn btn-xs btn-danger"
+            @click.prevent="drop"
+        >
+            <i class="fa fa-trash" />
         </button>
     </div>
 </template>
 <script>
-import {addRolePermission, dropRolePermission} from "@personalhealthtrain/ui-common";
+import { addRolePermission, dropRolePermission } from '@personalhealthtrain/ui-common';
 
 export default {
     props: {
         rolePermissions: {
             type: Array,
-            default: function () {
+            default() {
                 return [];
-            }
+            },
         },
         primaryParameter: {
             type: String,
-            default: 'permission'
+            default: 'permission',
         },
         roleId: Number,
-        permissionId: String
+        permissionId: String,
     },
     data() {
         return {
-            busy: false
-        }
+            busy: false,
+        };
     },
     computed: {
         rolePermissionIndex() {
-            return this.rolePermissions.findIndex(rolePermission => {
-                return this.primaryParameter === 'permission' ?
-                    rolePermission.permission_id === this.permissionId :
-                    rolePermission.role_id === this.roleId
-            });
+            return this.rolePermissions.findIndex((rolePermission) => (this.primaryParameter === 'permission'
+                ? rolePermission.permission_id === this.permissionId
+                : rolePermission.role_id === this.roleId));
         },
         isAssigned() {
             return this.rolePermissionIndex !== -1;
-        }
+        },
     },
     methods: {
         async add() {
-            if(this.busy) return;
+            if (this.busy) return;
 
             this.busy = true;
 
             try {
                 const item = await addRolePermission({
                     role_id: this.roleId,
-                    permission_id: this.permissionId
+                    permission_id: this.permissionId,
                 });
 
                 this.$emit('added', item);
@@ -69,7 +75,7 @@ export default {
             this.busy = false;
         },
         async drop() {
-            if(this.busy || this.rolePermissionIndex === -1) return;
+            if (this.busy || this.rolePermissionIndex === -1) return;
 
             this.busy = true;
 
@@ -83,6 +89,6 @@ export default {
 
             this.busy = false;
         },
-    }
-}
+    },
+};
 </script>

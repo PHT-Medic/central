@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {LayoutKey, LayoutNavigationID} from "./contants";
-import {PermissionID} from "@personalhealthtrain/ui-common";
-import {NavigationComponentConfig} from "vue-layout-navigation";
+import { PermissionID } from '@personalhealthtrain/ui-common';
+import { NavigationComponentConfig } from 'vue-layout-navigation';
+import { LayoutKey, LayoutNavigationID } from './contants';
 
 export const LayoutTopNavigation : NavigationComponentConfig[] = [
     {
@@ -20,8 +20,8 @@ export const LayoutTopNavigation : NavigationComponentConfig[] = [
         name: 'Admin',
         icon: 'fas fa-cog',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [PermissionID.ADMIN_UI_USE]
-    }
+        [LayoutKey.REQUIRED_PERMISSIONS]: [PermissionID.ADMIN_UI_USE],
+    },
 ];
 
 export const LayoutSideDefaultNavigation : NavigationComponentConfig[] = [
@@ -31,7 +31,7 @@ export const LayoutSideDefaultNavigation : NavigationComponentConfig[] = [
         url: '/',
         icon: 'fas fa-info',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        rootLink: true
+        rootLink: true,
     },
     {
         name: 'Proposals',
@@ -52,8 +52,8 @@ export const LayoutSideDefaultNavigation : NavigationComponentConfig[] = [
 
             PermissionID.TRAIN_RESULT_READ,
             PermissionID.TRAIN_EXECUTION_START,
-            PermissionID.TRAIN_EXECUTION_STOP
-        ]
+            PermissionID.TRAIN_EXECUTION_STOP,
+        ],
     },
     {
         name: 'Trains',
@@ -68,12 +68,12 @@ export const LayoutSideDefaultNavigation : NavigationComponentConfig[] = [
             PermissionID.TRAIN_APPROVE,
 
             PermissionID.TRAIN_EXECUTION_START,
-            PermissionID.TRAIN_EXECUTION_STOP
-        ]
+            PermissionID.TRAIN_EXECUTION_STOP,
+        ],
     },
     {
         name: 'Others',
-        type: 'separator'
+        type: 'separator',
     },
     {
         name: 'Login',
@@ -87,8 +87,8 @@ export const LayoutSideDefaultNavigation : NavigationComponentConfig[] = [
         type: 'link',
         url: '/settings',
         icon: 'fas fa-cog',
-        [LayoutKey.REQUIRED_LOGGED_IN]: true
-    }
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+    },
 ];
 
 export const LayoutSideAdminNavigation : NavigationComponentConfig[] = [
@@ -105,8 +105,8 @@ export const LayoutSideAdminNavigation : NavigationComponentConfig[] = [
 
             PermissionID.PROVIDER_ADD,
             PermissionID.PROVIDER_DROP,
-            PermissionID.PROPOSAL_EDIT
-        ]
+            PermissionID.PROPOSAL_EDIT,
+        ],
     },
     {
         name: 'Users',
@@ -117,8 +117,8 @@ export const LayoutSideAdminNavigation : NavigationComponentConfig[] = [
         [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.USER_ADD,
             PermissionID.USER_EDIT,
-            PermissionID.USER_DROP
-        ]
+            PermissionID.USER_DROP,
+        ],
     },
     {
         name: 'Roles',
@@ -132,8 +132,8 @@ export const LayoutSideAdminNavigation : NavigationComponentConfig[] = [
             PermissionID.ROLE_DROP,
 
             PermissionID.ROLE_PERMISSION_ADD,
-            PermissionID.ROLE_PERMISSION_DROP
-        ]
+            PermissionID.ROLE_PERMISSION_DROP,
+        ],
     },
     {
         name: 'Permissions',
@@ -142,8 +142,8 @@ export const LayoutSideAdminNavigation : NavigationComponentConfig[] = [
         icon: 'fas fa-key',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.PERMISSION_MANAGE
-        ]
+            PermissionID.PERMISSION_MANAGE,
+        ],
     },
     {
         name: 'Services',
@@ -152,7 +152,7 @@ export const LayoutSideAdminNavigation : NavigationComponentConfig[] = [
         icon: 'fas fa-concierge-bell',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.SERVICE_MANAGE
-        ]
-    }
+            PermissionID.SERVICE_MANAGE,
+        ],
+    },
 ];
