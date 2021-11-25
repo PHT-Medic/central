@@ -5,24 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {User} from "@personalhealthtrain/ui-common";
+import { User } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
-import {ActionTree, GetterTree, MutationTree} from "vuex";
+import { ActionTree, GetterTree, MutationTree } from 'vuex';
 
-import {RootState} from "~/store/index";
-
-import {Oauth2TokenResponse, PermissionItem} from "@typescript-auth/core";
+import { Oauth2TokenResponse, PermissionItem } from '@typescript-auth/core';
+import { RootState } from '~/store/index';
 
 export const AuthStoreKey = {
     user: 'user',
     permissions: 'permissions',
     token: 'token',
-    provider: 'provider'
-}
+    provider: 'provider',
+};
 
 export type AuthStoreToken = Oauth2TokenResponse & {
     expire_date: string
-}
+};
 
 export interface AuthState {
     user: User | undefined,
@@ -48,63 +47,48 @@ const state = () : AuthState => ({
 
     required: false,
     inProgress: false,
-    error: undefined
+    error: undefined,
 });
 
 export const getters : GetterTree<AuthState, RootState> = {
-    user: (state: AuthState) => {
-        return state.user
-    },
-    userId: (state: AuthState) : typeof User.prototype.id => {
-        return state.user ? state.user.id : undefined;
-    },
-    userRealmId: (state: AuthState) : typeof User.prototype.realm_id => {
-        return state.user ? state.user.realm_id : undefined;
-    },
-    permissions: (state: AuthState) => {
-        return state.permissions
-    },
-    permissionsResolved: (state: AuthState) => {
-        return state.permissionsResolved;
-    },
+    user: (state: AuthState) => state.user,
+    userId: (state: AuthState) : typeof User.prototype.id => (state.user ? state.user.id : undefined),
+    userRealmId: (state: AuthState) : typeof User.prototype.realm_id => (state.user ? state.user.realm_id : undefined),
+    permissions: (state: AuthState) => state.permissions,
+    permissionsResolved: (state: AuthState) => state.permissionsResolved,
     permission: (state: AuthState) => (id: number | string) => {
-        let items =  state.permissions.filter((item: Record<string, any>) => {
-            if(typeof id === 'number') {
+        const items = state.permissions.filter((item: Record<string, any>) => {
+            if (typeof id === 'number') {
                 return item.id === id;
-            } else {
-                return item.name === id;
             }
+            return item.name === id;
         });
 
         return items.length === 1 ? items[0] : undefined;
     },
-    loggedIn: (state : AuthState) => {
-        return !!state.token;
-    },
-    token: (state: AuthState) => {
-        return state.token;
-    }
+    loggedIn: (state : AuthState) => !!state.token,
+    token: (state: AuthState) => state.token,
 };
 
 export const actions : ActionTree<AuthState, RootState> = {
     // --------------------------------------------------------------------
 
-    triggerSetLoginRequired({commit}, required: boolean) {
+    triggerSetLoginRequired({ commit }, required: boolean) {
         commit('setLoginRequired', required);
     },
 
     // --------------------------------------------------------------------
 
-    triggerSetToken({commit}, token) {
+    triggerSetToken({ commit }, token) {
         this.$authWarehouse.set(AuthStoreKey.token, token);
 
-        if(typeof token === 'object' && token.hasOwnProperty('accessToken')) {
+        if (typeof token === 'object' && Object.prototype.hasOwnProperty.call(token, 'accessToken')) {
             this.$auth.setRequestToken(token.accessToken);
         }
 
         commit('setToken', token);
     },
-    triggerUnsetToken({commit}) {
+    triggerUnsetToken({ commit }) {
         this.$authWarehouse.remove(AuthStoreKey.token);
         this.$auth.unsetRequestToken();
 
@@ -113,22 +97,22 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     // --------------------------------------------------------------------
 
-    triggerSetUser({commit}, user) {
+    triggerSetUser({ commit }, user) {
         this.$authWarehouse.set(AuthStoreKey.user, user);
         commit('setUser', user);
     },
-    triggerUnsetUser({commit}) {
+    triggerUnsetUser({ commit }) {
         this.$authWarehouse.remove(AuthStoreKey.user);
         commit('unsetUser');
     },
 
     // --------------------------------------------------------------------
 
-    triggerSetPermissions({commit}, permissions) {
+    triggerSetPermissions({ commit }, permissions) {
         this.$authWarehouse.setLocalStorageItem(AuthStoreKey.permissions, permissions);
         commit('setPermissions', permissions);
     },
-    triggerUnsetPermissions({commit}) {
+    triggerUnsetPermissions({ commit }) {
         this.$authWarehouse.removeLocalStorageItem(AuthStoreKey.permissions);
         commit('unsetPermissions');
     },
@@ -143,8 +127,8 @@ export const actions : ActionTree<AuthState, RootState> = {
      *
      * @returns {Promise<boolean>}
      */
-    async triggerRefreshMe ({ state, dispatch }) {
-        const token = state.token;
+    async triggerRefreshMe({ state, dispatch }) {
+        const { token } = state;
 
         if (token) {
             try {
@@ -167,7 +151,7 @@ export const actions : ActionTree<AuthState, RootState> = {
      *
      * @return {Promise<boolean>}
      */
-    async triggerLogin ({ commit, dispatch }, {name, password}: {name: string, password: string}) {
+    async triggerLogin({ commit, dispatch }, { name, password }: {name: string, password: string}) {
         commit('loginRequest');
 
         try {
@@ -175,8 +159,8 @@ export const actions : ActionTree<AuthState, RootState> = {
 
             const extendedToken : AuthStoreToken = {
                 ...token,
-                expire_date: new Date(Date.now() + token.expires_in * 1000).toString()
-            }
+                expire_date: new Date(Date.now() + token.expires_in * 1000).toString(),
+            };
 
             commit('loginSuccess');
 
@@ -184,7 +168,7 @@ export const actions : ActionTree<AuthState, RootState> = {
 
             await dispatch('triggerRefreshMe');
 
-            await dispatch('layout/initNavigation', undefined, {root: true});
+            await dispatch('layout/initNavigation', undefined, { root: true });
         } catch (e) {
             dispatch('triggerUnsetToken');
 
@@ -194,8 +178,8 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     // --------------------------------------------------------------------
 
-    triggerRefreshToken ({ commit, state, dispatch }) {
-        if(
+    triggerRefreshToken({ commit, state, dispatch }) {
+        if (
             typeof state.token?.refresh_token !== 'string'
         ) {
             throw new Error('It is not possible to receive a new access token');
@@ -216,16 +200,16 @@ export const actions : ActionTree<AuthState, RootState> = {
 
                         const extendedToken : AuthStoreToken = {
                             ...token,
-                            expire_date: new Date(Date.now() + token.expires_in * 1000).toString()
-                        }
+                            expire_date: new Date(Date.now() + token.expires_in * 1000).toString(),
+                        };
 
                         dispatch('triggerSetToken', extendedToken);
                         dispatch('triggerRefreshMe');
                     },
                     () => {
-                        commit('setTokenPromise', null)
-                    }
-                )
+                        commit('setTokenPromise', null);
+                    },
+                );
             } catch (e) {
                 commit('setTokenPromise', null);
                 dispatch('triggerAuthError', e.message);
@@ -234,12 +218,12 @@ export const actions : ActionTree<AuthState, RootState> = {
             }
         }
 
-        return state.tokenPromise
+        return state.tokenPromise;
     },
 
     // --------------------------------------------------------------------
 
-    async triggerTokenExpired({dispatch}) {
+    async triggerTokenExpired({ dispatch }) {
         try {
             await dispatch('triggerRefreshToken');
         } catch (e) {
@@ -255,14 +239,14 @@ export const actions : ActionTree<AuthState, RootState> = {
      * Try to logout the user.
      * @param commit
      */
-    async triggerLogout ({ dispatch }) {
+    async triggerLogout({ dispatch }) {
         await dispatch('triggerUnsetToken');
         await dispatch('triggerUnsetUser');
-        await  dispatch('triggerUnsetPermissions');
+        await dispatch('triggerUnsetPermissions');
 
         await dispatch('triggerSetLoginRequired', false);
 
-        await dispatch('layout/initNavigation', undefined, {root: true});
+        await dispatch('layout/initNavigation', undefined, { root: true });
     },
 
     // --------------------------------------------------------------------
@@ -274,8 +258,8 @@ export const actions : ActionTree<AuthState, RootState> = {
      * @param commit
      * @param message
      */
-    triggerAuthError ({ commit }, message) {
-        commit('loginError', { errorCode: 'internal', errorMessage: message })
+    triggerAuthError({ commit }, message) {
+        commit('loginError', { errorCode: 'internal', errorMessage: message });
     },
 
     //--------------------------------------------------------
@@ -288,45 +272,45 @@ export const actions : ActionTree<AuthState, RootState> = {
      * @param property
      * @param value
      */
-    triggerSetUserProperty ({ commit, state }, {property, value}) {
-        commit('setUserProperty', { property, value});
+    triggerSetUserProperty({ commit, state }, { property, value }) {
+        commit('setUserProperty', { property, value });
         this.$authWarehouse.remove(AuthStoreKey.user);
         this.$authWarehouse.set(AuthStoreKey.user, state.user);
-    }
+    },
 };
 
 export const mutations : MutationTree<AuthState> = {
     // Login mutations
-    loginRequest (state) {
+    loginRequest(state) {
         state.inProgress = true;
 
-        state.error = undefined
+        state.error = undefined;
     },
-    loginSuccess (state) {
+    loginSuccess(state) {
         state.inProgress = false;
         state.required = false;
     },
-    loginError (state, { errorCode, errorMessage }) {
+    loginError(state, { errorCode, errorMessage }) {
         state.inProgress = false;
 
         state.error = {
             code: errorCode,
-            message: errorMessage
-        }
+            message: errorMessage,
+        };
     },
-    setLoginRequired (state, required) {
+    setLoginRequired(state, required) {
         state.required = required;
     },
 
     // --------------------------------------------------------------------
 
-    setTokenPromise (state, promise) {
+    setTokenPromise(state, promise) {
         state.tokenPromise = promise;
     },
 
     // --------------------------------------------------------------------
 
-    setUser (state, user) {
+    setUser(state, user) {
         state.user = user;
     },
     unsetUser(state) {
@@ -335,15 +319,15 @@ export const mutations : MutationTree<AuthState> = {
 
     // --------------------------------------------------------------------
 
-    setUserProperty(state, {property, value}) {
-        if(typeof state.user === 'undefined') return;
+    setUserProperty(state, { property, value }) {
+        if (typeof state.user === 'undefined') return;
 
         Vue.set(state.user, property, value);
     },
 
     // --------------------------------------------------------------------
 
-    setPermissions (state, permissions) {
+    setPermissions(state, permissions) {
         state.permissions = permissions;
     },
     unsetPermissions(state) {
@@ -355,12 +339,12 @@ export const mutations : MutationTree<AuthState> = {
     },
 
     // --------------------------------------------------------------------
-    setToken (state, token) {
+    setToken(state, token) {
         state.token = token;
     },
     unsetToken(state) {
         state.token = undefined;
-    }
+    },
 };
 
 export default {
@@ -368,5 +352,5 @@ export default {
     state,
     getters,
     actions,
-    mutations
-}
+    mutations,
+};

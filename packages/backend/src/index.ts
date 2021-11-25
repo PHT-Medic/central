@@ -7,46 +7,47 @@
 
 import 'reflect-metadata';
 import dotenv from 'dotenv';
-dotenv.config();
 
+import { createConnection } from 'typeorm';
+import { buildConnectionOptions } from 'typeorm-extension';
 import env from './env';
 
-import createConfig from "./config";
-import createExpressApp from "./config/http/express";
-import createHttpServer from "./config/http/server";
-import {useLogger} from "./modules/log";
+import createConfig from './config';
+import createExpressApp from './config/http/express';
+import createHttpServer from './config/http/server';
+import { useLogger } from './modules/log';
 
-import {createConnection} from "typeorm";
-import {buildConnectionOptions} from "typeorm-extension";
-import {initDemo} from "./demo";
+import { initDemo } from './demo';
+
+dotenv.config();
 
 (async () => {
     /*
     HTTP Server & Express App
     */
-    const config = createConfig({env});
+    const config = createConfig({ env });
     const expressApp = await createExpressApp();
-    const httpServer = createHttpServer({expressApp});
+    const httpServer = createHttpServer({ expressApp });
+
+    function signalStart() {
+        useLogger().debug(`Startup on 127.0.0.1:${env.port} (${env.env}) completed.`, { service: 'system' });
+    }
 
     /*
     Start Server
     */
     function start() {
-        config.components.forEach(c => c.start());
-        config.aggregators.forEach(a => a.start());
+        config.components.forEach((c) => c.start());
+        config.aggregators.forEach((a) => a.start());
 
-        httpServer.listen(env.port, '0.0.0.0',  signalStart);
+        httpServer.listen(env.port, '0.0.0.0', signalStart);
 
         initDemo();
     }
 
-    function signalStart() {
-        useLogger().debug('Startup on 127.0.0.1:'+env.port+' ('+env.env+') completed.', {service: 'system'});
-    }
-
     const connectionOptions = await buildConnectionOptions();
     const connection = await createConnection(connectionOptions);
-    if(env.env === 'development') {
+    if (env.env === 'development') {
         await connection.synchronize();
     }
 

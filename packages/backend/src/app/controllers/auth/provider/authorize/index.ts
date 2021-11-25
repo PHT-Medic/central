@@ -18,7 +18,7 @@ import {createOauth2ProviderAccountWithToken} from "../../../../../domains/auth/
 import {ExpressRequest, ExpressResponse} from "../../../../../config/http/type";
 import {BadRequestError, NotFoundError} from "@typescript-error/http";
 
-export async function authorizeUrlRoute(req: ExpressRequest, res: ExpressResponse) {
+export async function authorizeUrlRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {id} = req.params;
 
     const repository = getRepository(OAuth2Provider);
@@ -42,7 +42,7 @@ export async function authorizeUrlRoute(req: ExpressRequest, res: ExpressRespons
     return res.redirect(oauth2Client.buildAuthorizeURL({}));
 }
 
-export async function authorizeCallbackRoute(req: ExpressRequest, res: ExpressResponse) {
+export async function authorizeCallbackRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {id} = req.params;
     const {code, state} = req.query;
 
