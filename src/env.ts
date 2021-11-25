@@ -1,20 +1,22 @@
-import {config} from "dotenv";
-import path from "path";
+import { config } from 'dotenv';
+import path from 'path';
 
 const envResult = config({
-    path: path.resolve(__dirname, '../.env')
+    path: path.resolve(__dirname, '../.env'),
 });
 
 if (envResult.error) {
-    console.error('[ERROR] env failed to load:' + envResult.error);
-    process.exit(1)
+    // eslint-disable-next-line no-console
+    console.error(`[ERROR] env failed to load:${envResult.error}`);
+    process.exit(1);
 }
 
 export function requireFromEnv(key : string, alt?: string) {
     if (!process.env[key] && typeof alt === 'undefined') {
-        console.error('[APP ERROR] Missing env variable:'+key)
+        // eslint-disable-next-line no-console
+        console.error(`[APP ERROR] Missing env variable:${key}`);
 
-        return process.exit(1)
+        return process.exit(1);
     }
 
     return process.env[key] ?? alt;
@@ -33,6 +35,7 @@ const env : Environment = {
     port: parseInt(requireFromEnv('PORT'), 10),
 
     rabbitMqConnectionString: requireFromEnv('RABBITMQ_CONNECTION_STRING'),
+    // eslint-disable-next-line sort-keys
     harborConnectionString: requireFromEnv('HARBOR_CONNECTION_STRING'),
 };
 

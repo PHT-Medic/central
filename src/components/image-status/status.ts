@@ -1,16 +1,16 @@
-import {buildMessage, Message, publishMessage} from "amqp-extension";
-import fs from "fs";
-import {getTrainResultFilePath} from "../../config/paths";
-import {getHarborFQRepositoryPath} from "../../config/services/harbor";
-import {MessageQueueSelfToUIRoutingKey} from "../../config/services/rabbitmq";
-import {ResultServiceDataPayload} from "../../domains/service/result-service";
-import {TrainResultEvent} from "../../domains/train-result/type";
-import {checkIfLocalRegistryImageExists, useDocker} from "../../modules/docker";
+import { Message, buildMessage, publishMessage } from 'amqp-extension';
+import fs from 'fs';
+import { getTrainResultFilePath } from '../../config/paths';
+import { getHarborFQRepositoryPath } from '../../config/services/harbor';
+import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
+import { ResultServiceDataPayload } from '../../domains/service/result-service';
+import { TrainResultEvent } from '../../domains/train-result/type';
+import { checkIfLocalRegistryImageExists } from '../../modules/docker';
 
 export async function statusImage(message: Message) {
     const data : ResultServiceDataPayload = message.data as ResultServiceDataPayload;
 
-    if(typeof data.id === 'undefined') {
+    if (typeof data.id === 'undefined') {
         return;
     }
 
@@ -22,7 +22,7 @@ export async function statusImage(message: Message) {
 
         await publishMessage(buildMessage({
             options: {
-                routingKey: MessageQueueSelfToUIRoutingKey.EVENT
+                routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
             },
             type: TrainResultEvent.EXTRACTED,
             data: message.data,
@@ -38,14 +38,14 @@ export async function statusImage(message: Message) {
     const repositoryTag = getHarborFQRepositoryPath(data.id);
     const exists : boolean = await checkIfLocalRegistryImageExists(repositoryTag);
 
-    if(exists) {
+    if (exists) {
         await publishMessage(buildMessage({
             options: {
-                routingKey: MessageQueueSelfToUIRoutingKey.EVENT
+                routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
             },
             type: TrainResultEvent.DOWNLOADED,
             data: message.data,
-            metadata: message.metadata
+            metadata: message.metadata,
         }));
 
         return;
@@ -55,10 +55,10 @@ export async function statusImage(message: Message) {
 
     await publishMessage(buildMessage({
         options: {
-            routingKey: MessageQueueSelfToUIRoutingKey.EVENT
+            routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
         },
         type: TrainResultEvent.UNKNOWN,
         data: message.data,
-        metadata: message.metadata
+        metadata: message.metadata,
     }));
 }

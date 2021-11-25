@@ -1,8 +1,8 @@
 export enum MessageQueueSelfRoutingKey {
     COMMAND = 'rs.command',
-    EVENT = 'rs.event'
+    EVENT = 'rs.event',
 }
 
 export enum MessageQueueSelfToUIRoutingKey {
-    EVENT = 'ui.rs.event'
+    EVENT = 'ui.rs.event',
 }

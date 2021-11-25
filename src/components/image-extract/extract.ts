@@ -1,11 +1,11 @@
-import {Message} from "amqp-extension";
-import fs from "fs";
-import {getTrainResultDirectoryPath, getTrainResultFilePath} from "../../config/paths";
-import {getHarborFQRepositoryPath} from "../../config/services/harbor";
-import {ResultServiceCommand, ResultServiceDataPayload} from "../../domains/service/result-service";
-import {generateResultId} from "../../domains/train-result/utils";
-import {removeLocalRegistryImage, saveDockerContainerPathsTo} from "../../modules/docker";
-import {ensureDirectory} from "../../modules/fs";
+import { Message } from 'amqp-extension';
+import fs from 'fs';
+import { getTrainResultDirectoryPath, getTrainResultFilePath } from '../../config/paths';
+import { getHarborFQRepositoryPath } from '../../config/services/harbor';
+import { ResultServiceDataPayload } from '../../domains/service/result-service';
+import { generateResultId } from '../../domains/train-result/utils';
+import { removeLocalRegistryImage, saveDockerContainerPathsTo } from '../../modules/docker';
+import { ensureDirectory } from '../../modules/fs';
 
 export async function extractImage(message: Message) {
     const data : ResultServiceDataPayload = message.data as ResultServiceDataPayload;
@@ -32,7 +32,7 @@ export async function extractImage(message: Message) {
     await saveDockerContainerPathsTo(
         repositoryPath,
         ['/opt/pht_results', '/opt/train_config.json'],
-        trainResultPath
+        trainResultPath,
     );
 
     // we are done here with the docker image :)
@@ -40,5 +40,3 @@ export async function extractImage(message: Message) {
 
     return message;
 }
-
-

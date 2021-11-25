@@ -4,4 +4,4 @@ export type DockerPullOptions = {
         password: string,
         serveraddress: string
     }
-}
+};

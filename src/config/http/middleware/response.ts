@@ -9,14 +9,14 @@ type RespondErrorMessage = {
     statusCode?: number,
     message?: string,
     code?: string
-}
+};
 
 export default function responseMiddleware(request: any, response: any, next: any) {
-    let defaultErrorCode = 'service_error';
-    let defaultErrorMessage = 'The service encountered an unknown error, which prevented it from fulfilling the request.';
+    const defaultErrorCode = 'service_error';
+    const defaultErrorMessage = 'The service encountered an unknown error, which prevented it from fulfilling the request.';
 
     response._respond = (message?: RespondMessage) => {
-        if(message) {
+        if (message) {
             if (message.data == null && message.statusCode == null) {
                 message.statusCode = 204;
             } else {
@@ -26,8 +26,8 @@ export default function responseMiddleware(request: any, response: any, next: an
             if (message.data !== null) response.json(message.data);
         } else {
             message = {
-                statusCode: 204
-            }
+                statusCode: 204,
+            };
         }
 
         response.status(message.statusCode);
@@ -36,7 +36,7 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._respondException = (message?: RespondErrorMessage) => {
-        if(message) {
+        if (message) {
             message.code = message.code === undefined ? defaultErrorCode : message.code;
             message.message = message.message === undefined ? defaultErrorMessage : message.message;
 
@@ -45,15 +45,15 @@ export default function responseMiddleware(request: any, response: any, next: an
             message = {
                 code: defaultErrorCode,
                 message: defaultErrorMessage,
-                statusCode: 500
-            }
+                statusCode: 500,
+            };
         }
 
         response.status(message.statusCode);
 
         response.json({
             message: message.message,
-            code: message.code
+            code: message.code,
         });
 
         return response.end();
@@ -62,10 +62,10 @@ export default function responseMiddleware(request: any, response: any, next: an
     //--------------------------------------------------------------------
 
     response._respondDeleted = (message?: RespondMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 200,
             message: 'Deleted',
-        }
+        };
 
         message = message || {};
         message = Object.assign(defaultMessage, message);
@@ -74,10 +74,10 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._respondCreated = (message?: RespondMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 201,
             message: 'Created',
-        }
+        };
 
         message = message || {};
         message = Object.assign(defaultMessage, message);
@@ -86,10 +86,10 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._respondAccepted = (message?: RespondMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 202,
             message: 'Accepted',
-        }
+        };
 
         message = message || {};
         message = Object.assign(defaultMessage, message);
@@ -100,7 +100,7 @@ export default function responseMiddleware(request: any, response: any, next: an
     //--------------------------------------------------------------------
 
     response._fail = (message?: RespondErrorMessage) => {
-        if(message) {
+        if (message) {
             message.statusCode = message.statusCode ? message.statusCode : 400;
         }
 
@@ -110,32 +110,32 @@ export default function responseMiddleware(request: any, response: any, next: an
     //--------------------------------------------------------------------
 
     response._failExpressValidationError = (validation: any) => {
-        if(validation.isEmpty()) {
+        if (validation.isEmpty()) {
             return response._respond();
         }
 
-        let errors = validation.errors;
-        let invalidParams: string[] = [];
+        const { errors } = validation;
+        const invalidParams: string[] = [];
 
-        for(let i=0; i < errors.length; i++) {
-            if(invalidParams.indexOf(errors[i].param) === -1) {
+        for (let i = 0; i < errors.length; i++) {
+            if (invalidParams.indexOf(errors[i].param) === -1) {
                 invalidParams.push(errors[i].param);
             }
         }
 
         let message: string;
 
-        if(invalidParams) {
-            if(invalidParams.length > 1) {
-                message = 'Die Parameter ' + invalidParams.join(', ') + ' sind nicht gültig.';
+        if (invalidParams) {
+            if (invalidParams.length > 1) {
+                message = `Die Parameter ${invalidParams.join(', ')} sind nicht gültig.`;
             } else {
-                message = 'Der Parameter ' + invalidParams[0] + ' ist nicht gültig.';
+                message = `Der Parameter ${invalidParams[0]} ist nicht gültig.`;
             }
         } else {
-            message =  'Es ist ein unbekannter Validierungsfehler aufgetreten.';
+            message = 'Es ist ein unbekannter Validierungsfehler aufgetreten.';
         }
 
-        let result: RespondErrorMessage = {};
+        const result: RespondErrorMessage = {};
         result.message = message;
         result.statusCode = 400;
         result.code = 'invalid_request';
@@ -144,11 +144,11 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._failUnauthorized = (message?: RespondErrorMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 401,
             message: 'Unauhtorized',
-            code: 'unauhthorized'
-        }
+            code: 'unauhthorized',
+        };
 
         message = message || {};
         message = Object.assign(defaultMessage, message);
@@ -157,11 +157,11 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._failForbidden = (message?: RespondErrorMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 403,
             message: 'Forbidden',
-            code: 'forbidden'
-        }
+            code: 'forbidden',
+        };
 
         message = message || {};
         message = Object.assign(defaultMessage, message);
@@ -170,11 +170,11 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._failNotFound = (message?: RespondErrorMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 404,
             message: 'Not Found',
-            code: 'not-found'
-        }
+            code: 'not-found',
+        };
 
         message = message || {};
         message = Object.assign(defaultMessage, message);
@@ -183,11 +183,11 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._failBadRequest = (message?: RespondErrorMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 400,
             message: 'Bad Request',
-            code: 'bad-request'
-        }
+            code: 'bad-request',
+        };
 
         message = message || {};
         message = Object.assign(defaultMessage, message);
@@ -196,11 +196,11 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._failValidationError = (message?: RespondErrorMessage) => {
-        let defaultMessage = {
+        const defaultMessage = {
             statusCode: 400,
             message: 'Bad Request',
-            code: 'bad-request'
-        }
+            code: 'bad-request',
+        };
 
         message = message || {};
         message = Object.assign(defaultMessage, message);
@@ -209,7 +209,7 @@ export default function responseMiddleware(request: any, response: any, next: an
     };
 
     response._failServerError = (message?: RespondErrorMessage) => {
-        if(message) {
+        if (message) {
             message.statusCode = 500;
             message.message = message.message ? message.message : 'Internal Server Error';
             message.code = message.code ? message.code : 'server-error';

@@ -12,12 +12,12 @@ export enum TrainResultEvent {
     EXTRACTED = 'extracted', // rs trigger
 
     FAILED = 'failed', // rs trigger,
-    UNKNOWN = 'unknown' // rs trigger
+    UNKNOWN = 'unknown', // rs trigger
 }
 
 export enum TrainResultStep {
     START = 'start',
     STOP = 'stop',
     DOWNLOAD = 'download',
-    EXTRACT = 'extract'
+    EXTRACT = 'extract',
 }

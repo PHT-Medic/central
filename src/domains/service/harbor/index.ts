@@ -3,7 +3,7 @@ export type HarborConnectionConfig = {
     user: string,
     password: string,
     token: string
-}
+};
 
 export function parseHarborConnectionString(connectionString: string): HarborConnectionConfig {
     const parts: string[] = connectionString.split('@');
@@ -22,6 +22,6 @@ export function parseHarborConnectionString(connectionString: string): HarborCon
         host,
         user: authParts[0],
         password: authParts[1],
-        token: Buffer.from(authParts[0] + ':' + authParts[1]).toString('base64')
-    }
+        token: Buffer.from(`${authParts[0]}:${authParts[1]}`).toString('base64'),
+    };
 }

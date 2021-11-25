@@ -1,4 +1,4 @@
-import Docker from "dockerode";
+import Docker from 'dockerode';
 
 let dockerInstance : Docker | undefined;
 

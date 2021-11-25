@@ -1,15 +1,15 @@
-import {buildMessage, Message, publishMessage} from "amqp-extension";
-import {MessageQueueSelfRoutingKey} from "../../config/services/rabbitmq";
-import {ResultServiceCommand} from "../../domains/service/result-service";
+import { Message, buildMessage, publishMessage } from 'amqp-extension';
+import { MessageQueueSelfRoutingKey } from '../../config/services/rabbitmq';
+import { ResultServiceCommand } from '../../domains/service/result-service';
 
 export async function writeDownloadCommand(message: Message) {
     await publishMessage(buildMessage({
         options: {
-            routingKey: MessageQueueSelfRoutingKey.COMMAND
+            routingKey: MessageQueueSelfRoutingKey.COMMAND,
         },
         type: ResultServiceCommand.DOWNLOAD,
         data: message.data,
-        metadata: message.metadata
+        metadata: message.metadata,
     }));
 
     return message;
