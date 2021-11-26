@@ -12,7 +12,7 @@
     "workspaces": ["packages/*"],
     "devDependencies": {
         "lerna": "^4.0.0",
-        "@tada5hi/eslint-config-vue-typescript": "^0.0.17",
+        "@tada5hi/eslint-config-vue-typescript": "^0.0.18",
         "eslint": "^8.3.0"
     },
     "scripts": {

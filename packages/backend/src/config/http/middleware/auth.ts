@@ -21,6 +21,7 @@ export function forceLoggedIn(req: ExpressRequest, res: ExpressResponse, next: E
 }
 
 export class ForceLoggedInMiddleware implements Middleware {
+    // eslint-disable-next-line class-methods-use-this
     public use(request: ExpressRequest, response: ExpressResponse, next: ExpressNextFunction) {
         return forceLoggedIn(request, response, next);
     }

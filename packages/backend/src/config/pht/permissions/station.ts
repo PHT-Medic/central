@@ -8,6 +8,7 @@
 export type PHTStationRole = 'StationAuthority' | 'StationEmployee';
 
 export function getPHTStationRolePermissions(type: PHTStationRole) : string[] {
+    // eslint-disable-next-line default-case
     switch (type) {
         case 'StationEmployee':
             return [
@@ -37,4 +38,6 @@ export function getPHTStationRolePermissions(type: PHTStationRole) : string[] {
                 'train_result_read',
             ];
     }
+
+    return [];
 }

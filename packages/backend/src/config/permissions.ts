@@ -40,4 +40,6 @@ export function getPermissions(includePHT = true) : string[] {
     if (includePHT) {
         return [...permissions, ...getPHTPermissions()];
     }
+
+    return [...permissions];
 }

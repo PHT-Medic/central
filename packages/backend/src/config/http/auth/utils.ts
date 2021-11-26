@@ -22,8 +22,9 @@ const isIp4InCidr = (ip: string, cidr: string) => {
 };
 
 export async function authenticateWithAuthorizationHeader(request: any, value: AuthorizationHeader) : Promise<void> {
+    // eslint-disable-next-line default-case
     switch (value.type) {
-        case 'Bearer':
+        case 'Bearer': {
             let tokenPayload: TokenPayload;
 
             try {
@@ -42,7 +43,7 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
 
             // remove ipv6 space from embedded ipv4 address
             const tokenAddress = tokenPayload.remoteAddress.replace('::ffff:', '');
-            const currentAddress : string = request.ip.replace('::ffff:', '');
+            const currentAddress: string = request.ip.replace('::ffff:', '');
 
             if (
                 // ipv4 + ipv6 local addresses
@@ -75,7 +76,8 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
 
             request.ability = new AbilityManager(permissions);
             break;
-        case 'Basic':
+        }
+        case 'Basic': {
             const clientRepository = getRepository(Client);
             const client = await clientRepository.findOne({
                 id: value.username,
@@ -99,15 +101,16 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
 
             request.ability = new AbilityManager([]);
             break;
+        }
     }
 }
 
 export function parseCookie(request: any) : string | undefined {
     try {
         if (typeof request.cookies?.auth_token !== 'undefined') {
-            const { access_token } = JSON.parse(request.cookies?.auth_token);
+            const { access_token: accessToken } = JSON.parse(request.cookies?.auth_token);
 
-            return access_token;
+            return accessToken;
         }
     } catch (e) {
         // don't handle error, this is just fine :)

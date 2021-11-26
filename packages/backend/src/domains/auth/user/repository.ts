@@ -84,6 +84,7 @@ export class UserRepository extends Repository<User> {
         return permissions;
     }
 
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars,class-methods-use-this
     async getSelfOwnedPermissions(userId: string | number) : Promise<PermissionItem<unknown>[]> {
         return [];
     }
@@ -95,6 +96,7 @@ export class UserRepository extends Repository<User> {
      *
      * @param password
      */
+    // eslint-disable-next-line class-methods-use-this
     async hashPassword(password: string) : Promise<string> {
         return hashPassword(password);
     }

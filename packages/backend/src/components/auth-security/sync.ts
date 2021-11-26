@@ -35,7 +35,7 @@ export async function syncAuthClientSecurity(message: Message) {
                         secret: payload.clientSecret,
                     });
                     break;
-                case SERVICE_ID.REGISTRY:
+                case SERVICE_ID.REGISTRY: {
                     const stationRepository = getRepository(Station);
                     const queryBuilder = stationRepository.createQueryBuilder('station');
                     const stations = await queryBuilder
@@ -43,7 +43,8 @@ export async function syncAuthClientSecurity(message: Message) {
                         .where('station.registry_project_id IS NOT NULL')
                         .getMany();
 
-                    const promises : Promise<HarborProjectWebhook>[] = stations.map((station: Station) => ensureHarborProjectWebHook(station.registry_project_id, {
+                    // eslint-disable-next-line max-len
+                    const promises: Promise<HarborProjectWebhook>[] = stations.map((station: Station) => ensureHarborProjectWebHook(station.registry_project_id, {
                         id: payload.clientId,
                         secret: payload.clientSecret,
                     }, { internalAPIUrl: env.internalApiUrl }));
@@ -63,10 +64,9 @@ export async function syncAuthClientSecurity(message: Message) {
                         return repository;
                     });
 
-                    console.log(promises);
-
                     await Promise.all(promises);
                     break;
+                }
             }
             break;
     }

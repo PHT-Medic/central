@@ -13,7 +13,7 @@ import { SetupCommand } from './commands/setup';
 import { UpgradeCommand } from './commands/upgrade';
 import { ResetCommand } from './commands/reset';
 
-// tslint:disable-next-line:no-unused-expression
+// eslint-disable-next-line no-unused-expressions,@typescript-eslint/no-unused-expressions
 yargs
     .usage('Usage: $0 <command> [options]')
     .demandCommand(1)

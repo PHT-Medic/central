@@ -20,13 +20,13 @@ export function errorMiddleware(
     error: Error,
     request: ExpressRequest,
     response: ExpressResponse,
-    next: ExpressNextFunction,
 ) {
     const code : string | undefined = hasOwnProperty(error, 'code') && typeof error.code === 'string'
         ? error.code
         : undefined;
 
     // catch and decorate some mysql errors :)
+    // eslint-disable-next-line default-case
     switch (code) {
         case 'ER_DUP_ENTRY':
             error = new BadRequestError('An entry with some unique attributes already exist.', { previous: error });

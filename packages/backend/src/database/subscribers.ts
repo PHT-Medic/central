@@ -5,4 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 import { AuthClientSubscriber } from '../domains/auth/client/subscriber';

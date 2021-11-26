@@ -38,12 +38,6 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) {
         throw new Error();
     }
 
-    if (masterImage.command) {
-        message.entrypointCommand = masterImage.command;
-    } else {
-
-    }
-
     message.entrypointCommand = masterImage.command
         ? masterImage.command
         : masterImageGroup.command;

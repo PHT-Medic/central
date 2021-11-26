@@ -12,6 +12,7 @@ import { AuthClientSecurityComponentCommand } from '../../../components/auth-sec
 import { buildAuthClientSecurityQueueMessage } from '../../service/queue';
 
 export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
+    // eslint-disable-next-line @typescript-eslint/ban-types,class-methods-use-this
     listenTo(): Function | string {
         return Client;
     }
