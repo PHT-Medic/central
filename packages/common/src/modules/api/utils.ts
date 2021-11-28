@@ -27,7 +27,7 @@ export function useAPI<T extends APIType>(
 
     const config : APIConfig<T> = getAPIConfig(key);
 
-    if (instanceMap.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(instanceMap, key)) {
         return instanceMap[key] as APIReturnType<T>;
     }
 

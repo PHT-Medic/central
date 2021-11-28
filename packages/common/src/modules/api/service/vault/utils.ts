@@ -7,11 +7,13 @@
 
 import { VaultKVVersion } from './type';
 
-export function buildVaultKeyValueURLPath(version: VaultKVVersion, engine: string, key: string) {
+export function buildVaultKeyValueURLPath(version: VaultKVVersion, engine: string, key: string) : string {
     switch (version) {
         case VaultKVVersion.ONE:
             return `${engine}/${key}`;
         case VaultKVVersion.TWO:
             return `${engine}/data/${key}`;
+        default:
+            return '';
     }
 }

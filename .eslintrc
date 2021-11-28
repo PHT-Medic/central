@@ -1,0 +1,30 @@
+{
+    "extends": [
+        "@tada5hi/eslint-config-vue-typescript"
+    ],
+    "parserOptions": {
+        "project": "./tsconfig.json",
+        "extraFileExtensions": [".vue"]
+    },
+    "rules": {
+        "no-underscore-dangle": "off",
+        "no-shadow": "off",
+
+        "import/no-cycle": [2, {
+            "maxDepth": 1
+        }],
+        "import/no-extraneous-dependencies": ["error", {
+            "devDependencies": true,
+            "optionalDependencies": false,
+            "peerDependencies": false
+        }],
+
+        "@typescript-eslint/no-shadow": "off",
+
+        "vue/require-default-prop": "off"
+    },
+    "ignorePatterns": ["**/dist/*", "**/*.d.ts", "**/writable/**"],
+    "globals": {
+        "NodeJS": true
+    }
+}

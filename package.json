@@ -9,11 +9,13 @@
     "license": "MIT",
     "version": "1.0.0",
     "description": "This package contains all packages of the Central UI. It was initially developed as part of my Bachelor Thesis.",
-    "workspaces": ["packages/*"],
+    "workspaces": [
+        "packages/*"
+    ],
     "devDependencies": {
-        "lerna": "^4.0.0",
-        "@tada5hi/eslint-config-vue-typescript": "^0.0.18",
-        "eslint": "^8.3.0"
+        "@tada5hi/eslint-config-vue-typescript": "^0.0.19",
+        "eslint": "^8.3.0",
+        "lerna": "^4.0.0"
     },
     "scripts": {
         "bootstrap": "lerna bootstrap",
@@ -21,7 +23,7 @@
         "build": "lerna run build",
         "test": "lerna run test",
         "pub": "lerna publish",
-        "lint": "eslint --ext .ts,.vue,.js ./packages/backend",
+        "lint": "eslint --ext .ts,.vue,.js ./packages/common",
         "lint:fix": "eslint --fix --ext .ts,.vue,.js .",
         "frontend": "npm run dev --workspace=packages/frontend",
         "backend": "npm run dev --workspace=packages/backend",

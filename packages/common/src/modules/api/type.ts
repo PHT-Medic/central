@@ -12,6 +12,7 @@ export interface ApiRequestConfig extends AxiosRequestConfig {
     alias?: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface ApiResponse<T = any> extends AxiosResponse {
 
 }

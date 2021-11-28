@@ -21,7 +21,6 @@ import env from '../../env';
 import { useLogger } from '../../modules/log';
 import responseMiddleware from './middleware/response';
 
-import { generateSwaggerDocumentation } from './swagger';
 import { registerControllers } from './routes';
 
 import { authenticateWithAuthorizationHeader, parseCookie } from './auth/utils';
@@ -32,7 +31,7 @@ export interface ExpressAppInterface extends Express{
 
 }
 
-async function createExpressApp() : Promise<ExpressAppInterface> {
+function createExpressApp() : ExpressAppInterface {
     useLogger().debug('setup express app...', { service: 'express' });
     const expressApp : Express = express();
 
@@ -58,40 +57,38 @@ async function createExpressApp() : Promise<ExpressAppInterface> {
 
     expressApp.use(setupAuthMiddleware({
         parseCookie: (request: ExpressRequest) => parseCookie(request),
-        authenticateWithAuthorizationHeader: (request: ExpressRequest, value: AuthorizationHeader) => authenticateWithAuthorizationHeader(request, value),
+        authenticateWithAuthorizationHeader: (
+            request: ExpressRequest,
+            value: AuthorizationHeader,
+        ) => authenticateWithAuthorizationHeader(request, value),
     }));
 
-    let swaggerDocument : any;
-
-    if (env.swaggerDocumentation) {
-        useLogger().debug('craeting swagger documentation', { service: 'express' });
-
-        const swaggerDocumentPath: string = await generateSwaggerDocumentation();
-        swaggerDocument = require(path.join(swaggerDocumentPath, 'swagger.json'));
-    } else {
+    if (
+        env.swaggerDocumentation
+        && env.env !== 'test'
+    ) {
         const swaggerDocumentPath: string = path.join(getWritableDirPath(), 'swagger.json');
         if (existsSync(swaggerDocumentPath)) {
-            swaggerDocument = require(swaggerDocumentPath);
+            // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require, import/no-dynamic-require
+            const swaggerDocument = require(swaggerDocumentPath);
+
+            expressApp.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+                swaggerOptions: {
+                    withCredentials: true,
+                    plugins: [
+                        () => ({
+                            components: { Topbar: (): any => null },
+                        }),
+                    ],
+                },
+            }));
+
+            expressApp.use(getMiddleware({
+                uriPath: '/stats',
+                swaggerSpec: swaggerDocument,
+                name: 'stats',
+            }));
         }
-    }
-
-    if (typeof swaggerDocument !== 'undefined') {
-        expressApp.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
-            swaggerOptions: {
-                withCredentials: true,
-                plugins: [
-                    () => ({
-                        components: { Topbar: (): any => null },
-                    }),
-                ],
-            },
-        }));
-
-        expressApp.use(getMiddleware({
-            uriPath: '/stats',
-            swaggerSpec: swaggerDocument,
-            name: 'stats',
-        }));
     }
 
     registerControllers(expressApp);

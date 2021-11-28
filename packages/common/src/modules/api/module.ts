@@ -108,7 +108,10 @@ export class BaseAPI {
 
     //---------------------------------------------------------------------------------
 
-    public mountResponseInterceptor(onFulfilled: (value: ApiResponse<any>) => any | Promise<ApiResponse<any>>, onRejected: (error: any) => any) : number {
+    public mountResponseInterceptor(
+        onFulfilled: (value: ApiResponse<any>) => any | Promise<ApiResponse<any>>,
+        onRejected: (error: any) => any,
+    ) : number {
         return this.api.interceptors.response.use(onFulfilled, onRejected);
     }
 
@@ -118,7 +121,10 @@ export class BaseAPI {
 
     //---------------------------------------------------------------------------------
 
-    public mountRequestInterceptor(onFulfilled: (value: ApiRequestConfig) => any | Promise<ApiRequestConfig>, onRejected: (error: any) => any) : number {
+    public mountRequestInterceptor(
+        onFulfilled: (value: ApiRequestConfig) => any | Promise<ApiRequestConfig>,
+        onRejected: (error: any) => any,
+    ) : number {
         return this.api.interceptors.request.use(onFulfilled, onRejected);
     }
 

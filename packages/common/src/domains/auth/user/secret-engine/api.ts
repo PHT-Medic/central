@@ -35,7 +35,7 @@ export async function saveUserSecretsToSecretEngine(entity: UserKeyRing) {
                     path: USER_ENGINE_PATH,
                 });
 
-            return await saveUserSecretsToSecretEngine(entity);
+            return saveUserSecretsToSecretEngine(entity);
         }
     }
 }

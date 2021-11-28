@@ -10,10 +10,12 @@ import { buildConnectionOptions, createDatabase, runSeeder } from 'typeorm-exten
 import { createConnection } from 'typeorm';
 import { createSecurityKeyPair } from '@typescript-auth/server';
 import { getWritableDirPath } from '../../config/paths';
+import { generateSwaggerDocumentation } from '../../config/http/swagger';
 
 interface SetupArguments extends Arguments {
     auth: 'yes' | 'no',
     database: 'yes' | 'no',
+    documentation: 'yes' | 'no',
     databaseSeeder: 'yes' | 'no'
 }
 
@@ -22,6 +24,7 @@ export class SetupCommand implements CommandModule {
 
     describe = 'Run initial setup operation.';
 
+    // eslint-disable-next-line class-methods-use-this
     builder(args: Argv) {
         return args
             .option('auth', {
@@ -37,6 +40,13 @@ export class SetupCommand implements CommandModule {
                 choices: ['yes', 'no'],
             })
 
+            .option('documentation', {
+                alias: 'docs',
+                default: 'yes',
+                describe: 'Setup documentation.',
+                choices: ['yes', 'no'],
+            })
+
             .option('databaseSeeder', {
                 alias: 'db:seed',
                 default: 'yes',
@@ -45,12 +55,17 @@ export class SetupCommand implements CommandModule {
             });
     }
 
+    // eslint-disable-next-line class-methods-use-this
     async handler(args: SetupArguments) {
         /**
          * Setup auth module
          */
         if (args.auth === 'yes') {
             await createSecurityKeyPair({ directory: getWritableDirPath() });
+        }
+
+        if (args.documentation === 'yes') {
+            await generateSwaggerDocumentation();
         }
 
         /**

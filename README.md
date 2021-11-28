@@ -3,34 +3,42 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/Tada5hi/pht-central-ui/badge.svg)](https://snyk.io/test/github/Tada5hi/pht-central-ui)
 
 # User Interface (UI) 🚀
-This repository contains all packages for the Central-UI of the Personal Health Train (PHT).
+This repository contains all packages of the Central-UI for the Personal Health Train (PHT).
+
+[Overview](assets/ui.jpg)
 
 ## Installation
-This package requires `nodejs` & `npm` to be installed on the host machine.
+Download the source code.
+
+```shell
+git clone https://github.com/PHT-Medic/central-ui
+cd central-ui
 ```
+
+To start a package (frontend, backend), `nodejs` must be installed on the host machine.
+Nodejs is also required to install all dependencies, with the following command.
+
+```shell
 $ npm i
 ```
 
 ## Build
 Build the packages.
 
-```
+```shell
 $ npm run build
+$ npm run setup --workspace=packages/backend
 ```
 
 ## Configuration
 Read the `Readme.md` in each package directory.
 
 ## Run
-To run the setup:
-```
-$ npm run setup --workspace=packages/backend
-```
-Then open two terminals and run each of the following commands in one of them:
-```
+Start the frontend- & backend application in a single terminal window (or as background process) with the following command:
+```shell
 $ npm run start --workspace=packages/backend
 ```
-```
+```shell
 $ npm run start --workspace=packages/frontend
 ```
 

@@ -26,7 +26,7 @@ dotenv.config();
     HTTP Server & Express App
     */
     const config = createConfig({ env });
-    const expressApp = await createExpressApp();
+    const expressApp = createExpressApp();
     const httpServer = createHttpServer({ expressApp });
 
     function signalStart() {

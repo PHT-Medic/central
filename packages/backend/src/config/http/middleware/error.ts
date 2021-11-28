@@ -20,6 +20,8 @@ export function errorMiddleware(
     error: Error,
     request: ExpressRequest,
     response: ExpressResponse,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    next: ExpressNextFunction,
 ) {
     const code : string | undefined = hasOwnProperty(error, 'code') && typeof error.code === 'string'
         ? error.code
@@ -36,6 +38,8 @@ export function errorMiddleware(
             break;
     }
 
+    console.log(error);
+
     const baseError : ServerError | ClientError = error instanceof ClientError || error instanceof ServerError
         ? error
         : new InternalServerError(error, { decorateMessage: true });
@@ -48,7 +52,6 @@ export function errorMiddleware(
 
     if (baseError.getOption('decorateMessage')) {
         baseError.message = 'An error occurred.';
-        console.log(baseError);
     }
 
     return response
