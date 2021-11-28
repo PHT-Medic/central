@@ -6,9 +6,10 @@
  */
 
 import {
+    BeforeInsert, BeforeUpdate,
     Column,
     CreateDateColumn,
-    Entity,
+    Entity, Index,
     JoinColumn,
     ManyToOne,
     OneToMany,
@@ -36,6 +37,10 @@ export class Train {
     @Column({ length: 10 })
         type: string;
 
+    @Index()
+    @Column({ type: 'varchar', length: 128, nullable: true })
+        name: string;
+
     @Column({ nullable: true, type: 'text' })
         query: string;
 
@@ -55,15 +60,32 @@ export class Train {
     @JoinColumn({ name: 'entrypoint_file_id' })
         entrypoint_file: TrainFile;
 
-    @Column({ nullable: true })
-        entrypoint_executable: string;
-
     // ------------------------------------------------------------------
 
     @Column({
         type: 'enum', nullable: true, default: null, enum: TrainConfigurationStatus,
     })
         configuration_status: TrainConfigurationStatus | null;
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    setConfigurationStatus() {
+        this.configuration_status = null;
+
+        if (this.hash) {
+            this.configuration_status = TrainConfigurationStatus.HASH_GENERATED;
+
+            if (this.hash_signed) {
+                this.configuration_status = TrainConfigurationStatus.HASH_SIGNED;
+            }
+        }
+
+        // check if all conditions are met
+        if (this.hash_signed && this.hash) {
+            this.configuration_status = TrainConfigurationStatus.FINISHED;
+            this.run_status = null;
+        }
+    }
 
     // ------------------------------------------------------------------
 

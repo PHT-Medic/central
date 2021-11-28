@@ -26,7 +26,7 @@ export default {
         <template v-if="!status">
             open
         </template>
-        <template v-else-if="status === configurationStates.FILES_UPLOADED">
+        <template v-else-if="status === configurationStates.RESOURCE_CONFIGURED">
             files uploaded
         </template>
         <template v-else-if="status === configurationStates.HASH_GENERATED">

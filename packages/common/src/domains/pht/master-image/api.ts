@@ -12,7 +12,6 @@ import {
 } from '../../../modules';
 
 import { MasterImage } from './entity';
-import { Train, TrainCommand } from '../train';
 import { MasterImageCommand } from './type';
 
 export async function getAPIMasterImages(data?: BuildInput<MasterImage>) : Promise<CollectionResourceResponse<MasterImage>> {
@@ -20,7 +19,10 @@ export async function getAPIMasterImages(data?: BuildInput<MasterImage>) : Promi
     return response.data;
 }
 
-export async function getAPIMasterImage(id: typeof MasterImage.prototype.id, data?: BuildInput<MasterImage>) : Promise<SingleResourceResponse<MasterImage>> {
+export async function getAPIMasterImage(
+    id: typeof MasterImage.prototype.id,
+    data?: BuildInput<MasterImage>,
+) : Promise<SingleResourceResponse<MasterImage>> {
     const response = await useAPI(APIType.DEFAULT).get(`master-images/${id}${buildQuery(data)}`);
     return response.data;
 }

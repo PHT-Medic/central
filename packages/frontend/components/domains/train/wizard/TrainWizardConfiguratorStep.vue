@@ -21,7 +21,7 @@ export default {
             type: Object,
             default: undefined,
         },
-        train_stations: Array,
+        trainStations: Array,
     },
     data() {
         return {
@@ -66,12 +66,21 @@ export default {
     },
     computed: {
         selectedTrainStations() {
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             return this.trainStation.items.sort((a, b) => (a.position > b.position ? 1 : -1));
         },
         availableProposalStations() {
-            return this.proposalStation.items.filter((item) => this.trainStation.items.findIndex((trainStation) => trainStation.station_id === item.station_id) === -1);
+            return this.proposalStation.items.filter(
+                (item) => this.trainStation.items.findIndex(
+                    (trainStation) => trainStation.station_id === item.station_id,
+                ) === -1,
+            );
         },
-        proposalMasterImageId() {
+        masterImageId() {
+            if (typeof this.train.master_image_id !== 'undefined') {
+                return this.train.master_image_id;
+            }
+
             if (typeof this.train.proposal !== 'undefined') {
                 return this.train.proposal.master_image_id;
             }
@@ -89,8 +98,8 @@ export default {
             return this.trainStation.items.findIndex((trainStation) => trainStation.station_id === item.station_id) === -1;
         },
         initTrain() {
-            if (this.train_stations) {
-                this.trainStation.items = this.train_stations;
+            if (this.trainStations) {
+                this.trainStation.items = this.trainStations;
             } else {
                 this.loadTrainStations();
             }
@@ -157,12 +166,12 @@ export default {
                 this.trainStation.items = response.data;
                 this.setTrainStations();
             } catch (e) {
-                console.log(e);
+                // ...
             }
 
             this.trainStation.busy = false;
         },
-        async addTrainStation(station_id) {
+        async addTrainStation(stationId) {
             if (this.trainStation.busy) return;
 
             this.trainStation.busy = true;
@@ -170,18 +179,18 @@ export default {
             try {
                 const trainStation = await addAPITrainStation({
                     train_id: this.train.id,
-                    station_id,
+                    station_id: stationId,
                     position: this.trainStation.items.length,
                 });
 
-                const index = this.proposalStation.items.findIndex((proposalStation) => proposalStation.station_id === station_id);
+                const index = this.proposalStation.items.findIndex((proposalStation) => proposalStation.station_id === stationId);
                 if (index !== -1) {
                     trainStation.station = this.proposalStation.items[index].station;
                     this.trainStation.items.push(trainStation);
                     this.setTrainStations();
                 }
             } catch (e) {
-
+                // ...
             }
 
             this.trainStation.busy = false;
@@ -272,7 +281,7 @@ export default {
             <h6>MasterImage</h6>
             <div class="mb-2">
                 <master-image-picker
-                    :master-image-id="proposalMasterImageId"
+                    :master-image-id="masterImageId"
                     @selected="handleMasterImageSelected"
                 />
 
@@ -295,7 +304,7 @@ export default {
                         :proposal-id="train.proposal_id"
                         :filter="proposalStationFilter"
                     >
-                        <template #header="props">
+                        <template #header>
                             <span>Stations <span class="text-info">available</span></span>
                         </template>
 
@@ -362,13 +371,6 @@ export default {
                     </div>
                 </div>
             </div>
-
-            <!--
-            <div class="form-group">
-                <label>Fhir Query</label>
-                <textarea rows="8" class="form-control" @change.prevent="setQuery" v-model="$v.form.query.$model" placeholder="If you provide a query string, it must be a valid json formatted string..."></textarea>
-            </div>
-            -->
         </div>
     </div>
 </template>

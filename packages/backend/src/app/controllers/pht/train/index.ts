@@ -9,7 +9,7 @@ import { getRepository } from 'typeorm';
 import { applyFilters, applyPagination, applyQueryRelations } from 'typeorm-extension';
 import {
     MasterImage,
-    PermissionID, Proposal, Train, TrainCommand, TrainConfigurationStatus, TrainFile,
+    PermissionID, Proposal, Train, TrainCommand, TrainFile,
     TrainType, isPermittedForResourceRealm,
     onlyRealmPermittedQueryResources,
 } from '@personalhealthtrain/ui-common';
@@ -25,87 +25,7 @@ import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 
-type PartialTrain = Partial<Train>;
-const simpleExample = {
-    user_id: 1,
-    proposal_id: 1,
-    hash: 'xxx',
-    hash_signed: 'xxx',
-    session_id: 'xxx',
-    // @ts-ignore
-    files: [],
-};
-
-@SwaggerTags('pht')
-@Controller('/trains')
-export class TrainController {
-    @Get('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrain[]>([simpleExample])
-    async getMany(
-        @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrain[]> {
-        return await getTrainsRouteHandler(req, res) as PartialTrain[];
-    }
-
-    @Get('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrain>(simpleExample)
-    async getOne(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrain | undefined> {
-        return await getTrainRouteHandler(req, res) as PartialTrain | undefined;
-    }
-
-    @Post('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrain>(simpleExample)
-    async edit(
-        @Params('id') id: string,
-            @Body() data: PartialTrain,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrain | undefined> {
-        return await editTrainRouteHandler(req, res) as PartialTrain | undefined;
-    }
-
-    @Post('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrain>(simpleExample)
-    async add(
-        @Body() data: PartialTrain,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrain | undefined> {
-        return await addTrainRouteHandler(req, res) as PartialTrain | undefined;
-    }
-
-    @Post('/:id/command', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrain>(simpleExample)
-    async doTask(
-        @Params('id') id: string,
-            @Body() data: {
-                command: TrainCommand
-            },
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrain | undefined> {
-        return handleTrainCommandRouteHandler(req, res);
-    }
-
-    @Delete('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrain>(simpleExample)
-    async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrain | undefined> {
-        return await dropTrainRouteHandler(req, res) as PartialTrain | undefined;
-    }
-
-    // --------------------------------------------------------------------------
-}
-
-export async function getTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getOneRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { include } = req.query;
     const { id } = req.params;
 
@@ -121,7 +41,7 @@ export async function getTrainRouteHandler(req: ExpressRequest, res: ExpressResp
 
     applyQueryRelations(query, include, {
         defaultAlias: 'train',
-        allowed: ['train_stations', 'user', 'proposal'],
+        allowed: ['train_stations', 'user', 'proposal', 'master_image'],
     });
 
     const entity = await query.getOne();
@@ -137,7 +57,7 @@ export async function getTrainRouteHandler(req: ExpressRequest, res: ExpressResp
     return res.respond({ data: entity });
 }
 
-export async function getTrainsRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page, include } = req.query;
 
     const repository = getRepository(Train);
@@ -147,7 +67,7 @@ export async function getTrainsRouteHandler(req: ExpressRequest, res: ExpressRes
 
     applyQueryRelations(query, include, {
         defaultAlias: 'train',
-        allowed: ['train_stations', 'user', 'proposal'],
+        allowed: ['train_stations', 'user', 'proposal', 'master_image'],
     });
 
     applyFilters(query, filter, {
@@ -172,19 +92,33 @@ export async function getTrainsRouteHandler(req: ExpressRequest, res: ExpressRes
     });
 }
 
-async function runTrainValidations(req: ExpressRequest) {
-    await check('entrypoint_executable')
-        .exists()
-        .notEmpty()
-        .optional({ nullable: true })
-        .isLength({ min: 1, max: 100 })
-        .run(req);
+async function runValidations(req: ExpressRequest, mode: 'create' | 'update') {
+    if (mode === 'create') {
+        await check('proposal_id')
+            .exists()
+            .isInt()
+            .custom((value) => getRepository(Proposal).findOne(value).then((proposal) => {
+                if (typeof proposal === 'undefined') throw new Error('The referenced proposal does not exist.');
 
-    await check('query')
+                if (proposal.realm_id !== req.realmId) {
+                    throw new Error('You are not permitted to create a train for that realm.');
+                }
+            }))
+            .run(req);
+
+        await check('type')
+            .exists()
+            .notEmpty()
+            .isString()
+            .custom((value) => Object.values(TrainType).includes(value))
+            .run(req);
+    }
+
+    await check('name')
         .exists()
         .notEmpty()
         .optional({ nullable: true })
-        .isLength({ min: 1, max: 4096 })
+        .isLength({ min: 1, max: 128 })
         .run(req);
 
     await check('entrypoint_file_id')
@@ -192,7 +126,14 @@ async function runTrainValidations(req: ExpressRequest) {
         .optional()
         .custom((value) => getRepository(TrainFile).findOne(value).then((res) => {
             if (typeof res === 'undefined') throw new Error('The entrypoint file is not valid.');
-        }).catch((e) => console.log(e)))
+        }))
+        .run(req);
+
+    await check('hash_signed')
+        .exists()
+        .notEmpty()
+        .isLength({ min: 10, max: 8096 })
+        .optional({ nullable: true })
         .run(req);
 
     const masterImagePromise = check('master_image_id')
@@ -203,34 +144,22 @@ async function runTrainValidations(req: ExpressRequest) {
             if (typeof res === 'undefined') throw new Error('The master image is not valid.');
         }));
 
+    await check('query')
+        .exists()
+        .notEmpty()
+        .optional({ nullable: true })
+        .isLength({ min: 1, max: 4096 })
+        .run(req);
+
     await masterImagePromise.run(req);
 }
 
-export async function addTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.TRAIN_ADD)) {
         throw new ForbiddenError();
     }
 
-    await check('proposal_id')
-        .exists()
-        .isInt()
-        .custom((value) => getRepository(Proposal).findOne(value).then((proposal) => {
-            if (typeof proposal === 'undefined') throw new Error('The referenced proposal does not exist.');
-
-            if (proposal.realm_id !== req.realmId) {
-                throw new Error('You are not permitted to create a train for that realm.');
-            }
-        }))
-        .run(req);
-
-    await check('type')
-        .exists()
-        .notEmpty()
-        .isString()
-        .custom((value) => Object.values(TrainType).includes(value))
-        .run(req);
-
-    await runTrainValidations(req);
+    await runValidations(req, 'create');
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
@@ -239,15 +168,12 @@ export async function addTrainRouteHandler(req: ExpressRequest, res: ExpressResp
 
     const validationData = matchedData(req, { includeOptionals: true });
 
-    // tslint:disable-next-line:prefer-const
-    const { station_ids, ...data } = validationData;
-
     const repository = getRepository(Train);
 
     const entity = repository.create({
         realm_id: req.realmId,
         user_id: req.user.id,
-        ...data,
+        ...validationData,
     });
 
     await repository.save(entity);
@@ -255,21 +181,18 @@ export async function addTrainRouteHandler(req: ExpressRequest, res: ExpressResp
     return res.respond({ data: entity });
 }
 
-export async function editTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if (typeof id !== 'string') {
         throw new BadRequestError();
     }
 
-    await runTrainValidations(req);
+    if (!req.ability.hasPermission(PermissionID.TRAIN_EDIT)) {
+        throw new ForbiddenError();
+    }
 
-    await check('hash_signed')
-        .exists()
-        .notEmpty()
-        .isLength({ min: 10, max: 8096 })
-        .optional({ nullable: true })
-        .run(req);
+    await runValidations(req, 'update');
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
@@ -294,20 +217,6 @@ export async function editTrainRouteHandler(req: ExpressRequest, res: ExpressRes
 
     train = repository.merge(train, data);
 
-    if (train.hash) {
-        train.configuration_status = TrainConfigurationStatus.HASH_GENERATED;
-
-        if (train.hash_signed) {
-            train.configuration_status = TrainConfigurationStatus.HASH_SIGNED;
-        }
-    }
-
-    // check if all conditions are met
-    if (train.hash_signed && train.hash) {
-        train.configuration_status = TrainConfigurationStatus.FINISHED;
-        train.run_status = null;
-    }
-
     const result = await repository.save(train);
 
     return res.respondAccepted({
@@ -315,7 +224,7 @@ export async function editTrainRouteHandler(req: ExpressRequest, res: ExpressRes
     });
 }
 
-export async function dropTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if (typeof id !== 'string') {
@@ -341,4 +250,82 @@ export async function dropTrainRouteHandler(req: ExpressRequest, res: ExpressRes
     await repository.delete(entity.id);
 
     return res.respondDeleted({ data: entity });
+}
+
+type PartialTrain = Partial<Train>;
+const simpleExample = {
+    user_id: 1,
+    proposal_id: 1,
+    hash: 'xxx',
+    hash_signed: 'xxx',
+    session_id: 'xxx',
+};
+
+@SwaggerTags('pht')
+@Controller('/trains')
+export class TrainController {
+    @Get('', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrain[]>([simpleExample])
+    async getMany(
+        @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrain[]> {
+        return getManyRouteHandler(req, res);
+    }
+
+    @Get('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrain>(simpleExample)
+    async getOne(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrain | undefined> {
+        return getOneRouteHandler(req, res);
+    }
+
+    @Post('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrain>(simpleExample)
+    async edit(
+        @Params('id') id: string,
+            @Body() data: PartialTrain,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrain | undefined> {
+        return editRouteHandler(req, res);
+    }
+
+    @Post('', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrain>(simpleExample)
+    async add(
+        @Body() data: PartialTrain,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrain | undefined> {
+        return addRouteHandler(req, res);
+    }
+
+    @Post('/:id/command', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrain>(simpleExample)
+    async doTask(
+        @Params('id') id: string,
+            @Body() data: {
+                command: TrainCommand
+            },
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrain | undefined> {
+        return handleTrainCommandRouteHandler(req, res);
+    }
+
+    @Delete('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrain>(simpleExample)
+    async drop(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrain | undefined> {
+        return dropRouteHandler(req, res);
+    }
+
+    // --------------------------------------------------------------------------
 }

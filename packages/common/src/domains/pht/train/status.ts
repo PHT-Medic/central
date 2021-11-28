@@ -26,8 +26,7 @@ export function isTrainBuildStatus(type: any) : type is TrainBuildStatusType {
 // -------------------------------------------------------------------------
 
 export enum TrainConfigurationStatus {
-    BASE_CONFIGURED = 'base_configured', // todo: implement logic frontend and backend
-    FILES_UPLOADED = 'files_uploaded', // todo: rename RESOURCE_CONFIGURED
+    RESOURCE_CONFIGURED = 'resource_configured',
     HASH_GENERATED = 'hash_generated',
     HASH_SIGNED = 'hash_signed',
     FINISHED = 'finished',

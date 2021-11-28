@@ -51,6 +51,8 @@ export default {
             if (this.masterImageId) {
                 this.loading = true;
 
+                console.log(this.masterImageId);
+
                 try {
                     const data = await getAPIMasterImage(this.masterImageId, {
                         relations: {
@@ -61,7 +63,7 @@ export default {
                     await this.selectGroup(data.group_virtual_path);
                     await this.selectImage(data.id);
                 } catch (e) {
-                    console.log(e);
+                    // ...
                 }
 
                 this.loading = false;
@@ -81,7 +83,7 @@ export default {
 
                 this.image.items = data;
             } catch (e) {
-
+                // ...
             }
 
             this.image.busy = false;
@@ -96,7 +98,7 @@ export default {
 
                 this.group.items = data;
             } catch (e) {
-
+                // ...
             }
 
             this.group.busy = false;
@@ -116,6 +118,7 @@ export default {
 
             await this.selectImage(null);
 
+            // eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-unused-expressions
             this.groupVirtualPath && await this.loadImages();
         },
 

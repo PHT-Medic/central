@@ -6,15 +6,14 @@
   -->
 <script>
 import {
-    Train, dropApiTrainFile, getApiTrainFiles, uploadTrainFiles,
+    dropApiTrainFile, getApiTrainFiles, hasOwnProperty, uploadTrainFiles,
 } from '@personalhealthtrain/ui-common';
 import { required } from 'vuelidate/lib/validators';
 import TrainFile from './TrainFile';
-import TrainFolder from './TrainFolder';
 import TrainFormFile from './TrainFormFile';
 
 export default {
-    components: { TrainFormFile, TrainFolder, TrainFile },
+    components: { TrainFormFile, TrainFile },
     props: {
         train: {
             type: Object,
@@ -59,10 +58,6 @@ export default {
         },
     },
     created() {
-        if (typeof this.train.entrypoint_executable !== 'undefined' && this.train.entrypoint_executable) {
-            this.form.entrypoint_executable = this.train.entrypoint_executable;
-        }
-
         if (typeof this.train.entrypoint_file_id !== 'undefined') {
             this.form.entrypoint_file_id = this.train.entrypoint_file_id;
         }
@@ -78,7 +73,7 @@ export default {
             try {
                 this.items = await getApiTrainFiles(this.train.id);
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;
@@ -93,7 +88,6 @@ export default {
             try {
                 const formData = new FormData();
                 for (let i = 0; i < this.form.files.length; i++) {
-                    console.log(this.form.files[i]);
                     formData.append(`files[${i}]`, this.form.files[i]);
                 }
 
@@ -104,9 +98,8 @@ export default {
                     this.items.push(response.data[i]);
                 }
 
-                this.$emit('uploaded', files);
+                this.$emit('uploaded', this.form.files);
             } catch (e) {
-                console.log(e);
                 this.$emit('failed', e.message);
             }
 
@@ -134,7 +127,7 @@ export default {
                     this.$emit('deleted', this.selected[i]);
                 }
             } catch (e) {
-
+                // ...
             }
 
             this.actionBusy = false;
@@ -167,8 +160,8 @@ export default {
         dropFormFile(event) {
             const index = this.form.files.findIndex((file) => {
                 if (
-                    file.hasOwnProperty('webkitRelativePath')
-                    && event.hasOwnProperty('webkitRelativePath')
+                    hasOwnProperty(file, 'webkitRelativePath')
+                    && hasOwnProperty(event, 'webkitRelativePath')
                 ) {
                     return file.webkitRelativePath === event.webkitRelativePath;
                 }
