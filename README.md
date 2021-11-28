@@ -3,16 +3,16 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/Tada5hi/pht-central-ui/badge.svg)](https://snyk.io/test/github/Tada5hi/pht-central-ui)
 
 # User Interface (UI) 🚀
-This repository contains all packages of the Central-UI for the Personal Health Train (PHT).
+This repository contains all packages of the Central-UI in context of the Personal Health Train (PHT).
 
-[Overview](assets/ui.jpg)
+![](assets/ui.jpg)
 
 ## Installation
 Download the source code.
 
 ```shell
-git clone https://github.com/PHT-Medic/central-ui
-cd central-ui
+$ git clone https://github.com/PHT-Medic/central-ui
+$ cd central-ui
 ```
 
 To start a package (frontend, backend), `nodejs` must be installed on the host machine.
