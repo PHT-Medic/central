@@ -14,6 +14,7 @@ import {
 } from '../../../modules';
 import { Train } from './entity';
 import { TrainCommand } from './type';
+import { nullifyEmptyObjectProperties } from '../../../utils';
 
 export async function getAPITrains(options?: BuildInput<Train>) : Promise<CollectionResourceResponse<Train>> {
     const { data: response } = await useAPI(APIType.DEFAULT).get(`trains${buildQuery(options)}`);
@@ -33,13 +34,13 @@ export async function dropAPITrain(id: typeof Train.prototype.id) : Promise<Sing
 }
 
 export async function editAPITrain(id: typeof Train.prototype.id, data: Partial<Train>) : Promise<SingleResourceResponse<Train>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).post(`trains/${id}`, data);
+    const { data: response } = await useAPI(APIType.DEFAULT).post(`trains/${id}`, nullifyEmptyObjectProperties(data));
 
     return response;
 }
 
 export async function addAPITrain(data: Partial<Train>) : Promise<SingleResourceResponse<Train>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).post('trains', data);
+    const { data: response } = await useAPI(APIType.DEFAULT).post('trains', nullifyEmptyObjectProperties(data));
 
     return response;
 }

@@ -43,15 +43,11 @@ export default {
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            Train(s) <span class="sub-title">manage and create new trains</span>
+            🚊 Train(s) <span class="sub-title">Manage incoming & outgoing trains</span>
         </h1>
 
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
-                <div class="text-center">
-                    <train-svg width="100%" />
-                </div>
-
                 <b-nav
                     pills
                     vertical

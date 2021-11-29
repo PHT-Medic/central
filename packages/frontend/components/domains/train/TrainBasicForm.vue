@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { addAPITrain, getProposals } from '@personalhealthtrain/ui-common';
-import { required } from 'vuelidate/lib/validators';
+import { TrainType, addAPITrain, getProposals } from '@personalhealthtrain/ui-common';
+import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 
 export default {
     props: {
@@ -21,14 +21,15 @@ export default {
             form: {
                 type: 'discovery',
                 proposal_id: '',
+                name: '',
             },
             proposal: {
                 items: [],
                 busy: false,
             },
             types: [
-                { id: 'analyse', name: 'Analyse' },
-                { id: 'discovery', name: 'Discovery' },
+                { id: TrainType.ANALYSE, name: 'Analyse' },
+                { id: TrainType.DISCOVERY, name: 'Discovery' },
             ],
         };
     },
@@ -40,6 +41,10 @@ export default {
                 },
                 proposal_id: {
                     required,
+                },
+                name: {
+                    minLength: minLength(3),
+                    maxLength: maxLength(128),
                 },
             },
         };
@@ -74,7 +79,7 @@ export default {
                 const { data } = await getProposals();
                 this.proposal.items = data;
             } catch (e) {
-
+                // ...
             }
 
             this.proposal.busy = false;
@@ -85,10 +90,12 @@ export default {
             this.busy = true;
 
             try {
-                const train = await addAPITrain(this.form);
+                const train = await addAPITrain({
+                    ...this.form,
+                });
                 this.$emit('created', train);
             } catch (e) {
-                console.log(e);
+                // ...
             }
 
             this.busy = false;
@@ -98,6 +105,34 @@ export default {
 </script>
 <template>
     <form @submit.prevent="add">
+        <div
+            class="form-group"
+            :class="{ 'form-group-error': $v.form.name.$error }"
+        >
+            <label>Name <small class="text-muted">(optional)</small></label>
+            <input
+                v-model="$v.form.name.$model"
+                type="text"
+                class="form-control"
+                placeholder="..."
+            >
+
+            <div
+                v-if="!$v.form.name.minLength"
+                class="form-group-hint group-required"
+            >
+                The length of the name must be greater than <strong>{{ $v.form.name.$params.minLength.min }}</strong> characters.
+            </div>
+            <div
+                v-if="!$v.form.name.maxLength"
+                class="form-group-hint group-required"
+            >
+                The length of the name must be less than <strong>{{ $v.form.name.$params.maxLength.max }}</strong> characters.
+            </div>
+        </div>
+
+        <hr>
+
         <div class="form-group">
             <label>Type</label>
             <select
@@ -122,13 +157,13 @@ export default {
         </div>
         <div
             v-if="$v.form.type.$model"
-            class="alert alert-info alert-sm"
+            class="alert alert-secondary alert-sm"
         >
             <template v-if="$v.form.type.$model === 'analyse'">
-                Create a analyse train on base of the knowledge achieved during the discovery phase.
+                An analyse train should be created on base of the knowledge achieved during the discovery phase.
             </template>
             <template v-else>
-                Create a discovery train, to get to know about the availability of data in the specified stations, depending on the parameters you have chosen in the proposal.
+                ⚡ A discovery train can be used to get to know about the availability of data at the targeted stations.
             </template>
         </div>
 
@@ -145,7 +180,7 @@ export default {
                 :disabled="proposal.busy"
             >
                 <option value="">
-                    --- Select an option ---
+                    --- Select ---
                 </option>
                 <option
                     v-for="(value,key) in proposal.items"

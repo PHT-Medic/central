@@ -138,7 +138,7 @@ async function runValidations(req: ExpressRequest, mode: 'create' | 'update') {
 
     const masterImagePromise = check('master_image_id')
         .exists()
-        .optional()
+        .optional({ nullable: true })
         .isString()
         .custom((value) => getRepository(MasterImage).findOne(value).then((res) => {
             if (typeof res === 'undefined') throw new Error('The master image is not valid.');
@@ -199,7 +199,7 @@ export async function editRouteHandler(req: ExpressRequest, res: ExpressResponse
         throw new ExpressValidationError(validation);
     }
 
-    const data = matchedData(req);
+    const data = matchedData(req, { includeOptionals: true });
     if (!data) {
         return res.respondAccepted();
     }

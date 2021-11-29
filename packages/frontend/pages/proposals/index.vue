@@ -43,18 +43,11 @@ export default {
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            Proposal(s) <span class="sub-title">manage and create new proposals</span>
+            📜 Proposal(s) <span class="sub-title">Manage incoming & outgoing proposals</span>
         </h1>
 
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
-                <div>
-                    <proposal-svg
-                        width="100%"
-                        height="auto"
-                    />
-                </div>
-
                 <b-nav
                     pills
                     vertical

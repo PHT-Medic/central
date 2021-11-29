@@ -7,7 +7,7 @@
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            Settings <span class="sub-title">manage your settings</span>
+            <i class="fa fa-cog" /> Settings <span class="sub-title">Management</span>
         </h1>
 
         <div class="content-wrapper">

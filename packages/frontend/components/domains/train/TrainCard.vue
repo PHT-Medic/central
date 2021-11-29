@@ -5,16 +5,17 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { Train, dropAPITrain } from '@personalhealthtrain/ui-common';
+import { dropAPITrain } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import TrainPipeline from './TrainPipeline';
 import TrainStationsProgress from '../train-station/progress/TrainStationsProgress';
+import TrainName from './TrainName';
 
 export default {
     components: {
+        TrainName,
         TrainStationsProgress,
         TrainPipeline,
-
     },
     props: {
         trainProperty: Object,
@@ -22,6 +23,8 @@ export default {
     data() {
         return {
             train: null,
+
+            busy: false,
 
             extendView: false,
         };
@@ -38,7 +41,8 @@ export default {
         this.train = this.trainProperty;
     },
     methods: {
-        handleDone(train) {
+        handleUpdated(train) {
+            // eslint-disable-next-line no-restricted-syntax
             for (const key in train) {
                 Vue.set(this.train, key, train[key]);
             }
@@ -80,12 +84,20 @@ export default {
 </script>
 <template>
     <div class="train-card">
-        <div class="train-card-content align-items-end">
-            <div>
-                <strong class="m-b-0">
-                    <nuxt-link :to="'/trains/'+train.id">{{ train.id }}</nuxt-link>
-                </strong>
-            </div>
+        <div
+            class="train-card-content align-items-center"
+        >
+            <train-name :entity="train"
+                        :with-edit="true"
+                        @updated="handleUpdated"
+            >
+                <template #text="props">
+                    <nuxt-link :to="'/trains/'+props.entity.id">
+                        {{ props.displayText }}
+                    </nuxt-link>
+                </template>
+            </train-name>
+
             <div class="ml-auto">
                 <button
                     class="btn btn-dark btn-xs"
@@ -122,7 +134,7 @@ export default {
         <train-pipeline
             :train-property="train"
             :with-command="extendView"
-            @done="handleDone"
+            @done="handleUpdated"
             @failed="handleFailed"
             @deleted="handleDeleted"
         />
@@ -150,6 +162,14 @@ export default {
     padding: 0.5rem 1rem;
     display: flex;
     flex-direction: column;
+}
+
+.train-card-content{
+    min-height: 1.5rem;
+}
+
+.train-card-content input {
+    height: 1.5rem;
 }
 
 .train-card .train-card-content,

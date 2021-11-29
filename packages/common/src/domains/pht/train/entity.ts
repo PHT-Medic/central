@@ -6,10 +6,12 @@
  */
 
 import {
-    BeforeInsert, BeforeUpdate,
+    BeforeInsert,
+    BeforeUpdate,
     Column,
     CreateDateColumn,
-    Entity, Index,
+    Entity,
+    Index,
     JoinColumn,
     ManyToOne,
     OneToMany,
@@ -23,11 +25,7 @@ import { Proposal } from '../proposal';
 import { TrainFile } from '../train-file';
 import { TrainResultStatus } from '../train-result';
 import { TrainStation } from '../train-station';
-import {
-    TrainBuildStatus,
-    TrainConfigurationStatus,
-    TrainRunStatus,
-} from './status';
+import { TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus } from './status';
 
 @Entity()
 export class Train {
@@ -71,6 +69,10 @@ export class Train {
     @BeforeUpdate()
     setConfigurationStatus() {
         this.configuration_status = null;
+
+        if (this.entrypoint_file_id) {
+            this.configuration_status = TrainConfigurationStatus.RESOURCE_CONFIGURED;
+        }
 
         if (this.hash) {
             this.configuration_status = TrainConfigurationStatus.HASH_GENERATED;

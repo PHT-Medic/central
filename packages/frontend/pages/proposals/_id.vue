@@ -141,7 +141,7 @@ export default {
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            {{ proposal.title }}
+            📜 {{ proposal.title }}
         </h1>
 
         <div class="m-b-20 m-t-10">

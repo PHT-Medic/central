@@ -8,8 +8,10 @@
 import { getAPITrain } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
+import TrainName from '../../components/domains/train/TrainName';
 
 export default {
+    components: { TrainName },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -56,8 +58,12 @@ export default {
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            Train
-            <span class="sub-title">{{ item.id }} </span>
+            🚊 Train
+            <span class="sub-title">
+                <train-name
+                    :entity="item"
+                />
+            </span>
         </h1>
 
         <div class="content-wrapper">
