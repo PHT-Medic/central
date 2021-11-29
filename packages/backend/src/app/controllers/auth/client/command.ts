@@ -13,6 +13,7 @@ import { AuthClientSecurityComponentCommand } from '../../../../components/auth-
 
 const commands = Object.values(AuthClientCommand);
 
+/* istanbul ignore next */
 export async function doAuthClientCommand(req: any, res: any) {
     const { id } = req.params;
 
@@ -42,7 +43,7 @@ export async function doAuthClientCommand(req: any, res: any) {
         case AuthClientCommand.SECRET_REFRESH:
             entity.refreshSecret();
             break;
-        case AuthClientCommand.SECRET_SYNC:
+        case AuthClientCommand.SECRET_SYNC: {
             const queueMessage = buildAuthClientSecurityQueueMessage(
                 AuthClientSecurityComponentCommand.SYNC,
                 {
@@ -55,6 +56,7 @@ export async function doAuthClientCommand(req: any, res: any) {
 
             await publishMessage(queueMessage);
             break;
+        }
     }
 
     await repository.save(entity);

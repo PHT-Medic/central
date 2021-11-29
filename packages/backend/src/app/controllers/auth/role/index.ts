@@ -21,63 +21,6 @@ import { ExpressValidationError } from '../../../../config/http/error/validation
 
 // ---------------------------------------------------------------------------------
 
-type PartialRole = Partial<Role>;
-const simpleExample = { name: 'admin' };
-
-@SwaggerTags('auth')
-@Controller('/roles')
-export class RoleController {
-    @Get('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialRole[]>([simpleExample])
-    async getMany(
-        @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialRole[]> {
-        return await getRoles(req, res) as PartialRole[];
-    }
-
-    @Post('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialRole>(simpleExample)
-    async add(
-        @Body() data: Pick<Role, 'name'>,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialRole> {
-        return await addOne(req, res) as PartialRole;
-    }
-
-    @Get('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialRole>(simpleExample)
-    async getOne(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialRole> {
-        return await getOne(req, res) as PartialRole;
-    }
-
-    @Post('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialRole>(simpleExample)
-    async edit(
-        @Params('id') id: string,
-            @Body() data: Pick<Role, 'name'>,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialRole> {
-        return await editRole(req, res) as PartialRole;
-    }
-
-    @Delete('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialRole>(simpleExample)
-    async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialRole> {
-        return await dropRole(req, res) as PartialRole;
-    }
-}
-
 async function getRoles(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page } = req.query;
 
@@ -142,11 +85,7 @@ async function addOne(req: ExpressRequest, res: ExpressResponse) : Promise<any> 
 
     await roleRepository.save(role);
 
-    return res.respondCreated({
-        data: {
-            id: role.id,
-        },
-    });
+    return res.respondCreated({ data: role });
 }
 
 async function editRole(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
@@ -204,4 +143,61 @@ async function dropRole(req: ExpressRequest, res: ExpressResponse) : Promise<any
     await roleRepository.delete(id);
 
     return res.respondDeleted();
+}
+
+type PartialRole = Partial<Role>;
+const simpleExample = { name: 'admin' };
+
+@SwaggerTags('auth')
+@Controller('/roles')
+export class RoleController {
+    @Get('', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialRole[]>([simpleExample])
+    async getMany(
+        @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialRole[]> {
+        return await getRoles(req, res) as PartialRole[];
+    }
+
+    @Post('', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialRole>(simpleExample)
+    async add(
+        @Body() data: Pick<Role, 'name'>,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialRole> {
+        return await addOne(req, res) as PartialRole;
+    }
+
+    @Get('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialRole>(simpleExample)
+    async getOne(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialRole> {
+        return await getOne(req, res) as PartialRole;
+    }
+
+    @Post('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialRole>(simpleExample)
+    async edit(
+        @Params('id') id: string,
+            @Body() data: Pick<Role, 'name'>,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialRole> {
+        return await editRole(req, res) as PartialRole;
+    }
+
+    @Delete('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialRole>(simpleExample)
+    async drop(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialRole> {
+        return await dropRole(req, res) as PartialRole;
+    }
 }

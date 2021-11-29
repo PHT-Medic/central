@@ -9,7 +9,7 @@ import {
     BeforeInsert,
     Column,
     CreateDateColumn,
-    Entity, JoinColumn, OneToOne,
+    Entity, JoinColumn, ManyToOne, OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -17,6 +17,7 @@ import { User } from '../user';
 import { SERVICE_ID } from '../../other';
 import { AuthClientType } from './type';
 import { createAuthClientSecret } from './utils';
+import { MASTER_REALM_ID, Realm } from '../realm';
 
 @Entity({ name: 'auth_clients' })
 export class Client {
@@ -26,7 +27,7 @@ export class Client {
     @Column({ type: 'varchar', length: 100 })
         secret: string;
 
-    @Column({ type: 'varchar', length: 255 })
+    @Column({ type: 'varchar', length: 255, nullable: true })
         name: string;
 
     @Column({ type: 'text', nullable: true })
@@ -48,12 +49,11 @@ export class Client {
     @Column({ type: 'enum', nullable: true, enum: SERVICE_ID })
         service_id: SERVICE_ID | null;
 
-    @Column({ type: 'int', length: 11, nullable: true })
+    @Column({ type: 'int', nullable: true })
         user_id: number | null;
 
-    @OneToOne(() => Client, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'user_id' })
-        user: User | null;
+    @Column({ type: 'varchar', default: MASTER_REALM_ID })
+        realm_id: string;
 
     // ------------------------------------------------------------------
 

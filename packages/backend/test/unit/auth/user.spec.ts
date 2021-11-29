@@ -5,10 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { MASTER_REALM_ID, User } from '@personalhealthtrain/ui-common';
 import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
 
-describe('src/app/auth/realm', () => {
+describe('src/app/auth/user', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
@@ -19,9 +20,15 @@ describe('src/app/auth/realm', () => {
         await dropTestDatabase();
     });
 
-    it('should read collection', async () => {
+    const details : Partial<User> = {
+        name: 'Test',
+        realm_id: MASTER_REALM_ID,
+    };
+
+    it('should get collection', async () => {
         const response = await superTest
-            .get('/realms');
+            .get('/users')
+            .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
@@ -30,16 +37,9 @@ describe('src/app/auth/realm', () => {
     });
 
     it('should create, read, update, delete resource', async () => {
-        const details = {
-            name: 'Test',
-        };
-
         let response = await superTest
-            .post('/realms')
-            .send({
-                ...details,
-                id: 'test',
-            })
+            .post('/users')
+            .send(details)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -53,7 +53,7 @@ describe('src/app/auth/realm', () => {
         // ---------------------------------------------------------
 
         response = await superTest
-            .get(`/realms/${response.body.id}`)
+            .get(`/users/${response.body.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -64,7 +64,7 @@ describe('src/app/auth/realm', () => {
         details.name = 'TestA';
 
         response = await superTest
-            .post(`/realms/${response.body.id}`)
+            .post(`/users/${response.body.id}`)
             .send(details)
             .auth('admin', 'start123');
 
@@ -79,7 +79,7 @@ describe('src/app/auth/realm', () => {
         // ---------------------------------------------------------
 
         response = await superTest
-            .delete(`/realms/${response.body.id}`)
+            .delete(`/users/${response.body.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);

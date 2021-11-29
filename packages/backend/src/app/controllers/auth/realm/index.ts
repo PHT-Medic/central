@@ -19,55 +19,6 @@ import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 
-@SwaggerTags('auth')
-@Controller('/realms')
-export class RealmController {
-    @Get('', [])
-    async getMany(
-        @Request() req: any,
-            @Response() res: any,
-    ): Promise<Realm[]> {
-        return getRealmsRoute(req, res);
-    }
-
-    @Post('', [ForceLoggedInMiddleware])
-    async add(
-        @Body() user: NonNullable<Realm>,
-            @Request() req: any,
-            @Response() res: any,
-    ) : Promise<Realm> {
-        return addRealmRoute(req, res);
-    }
-
-    @Get('/:id', [])
-    async get(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<Realm> {
-        return getRealmRoute(req, res);
-    }
-
-    @Post('/:id', [ForceLoggedInMiddleware])
-    async edit(
-        @Params('id') id: string,
-            @Body() user: NonNullable<Realm>,
-            @Request() req: any,
-            @Response() res: any,
-    ) : Promise<Realm> {
-        return editRealmRoute(req, res);
-    }
-
-    @Delete('/:id', [ForceLoggedInMiddleware])
-    async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ) : Promise<Realm> {
-        return dropRealmRoute(req, res);
-    }
-}
-
 export async function getRealmsRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page } = req.query;
     const realmRepository = getRepository(Realm);
@@ -118,13 +69,13 @@ export async function getRealmRoute(req: ExpressRequest, res: ExpressResponse) :
 
 async function runValidation(req: ExpressRequest) {
     await check('id').exists().notEmpty().isString()
-        .isLength({ min: 5, max: 36 })
+        .isLength({ min: 3, max: 36 })
         .run(req);
     await check('name').exists().notEmpty().isString()
-        .isLength({ min: 5, max: 100 })
+        .isLength({ min: 3, max: 128 })
         .run(req);
     await check('description').exists().notEmpty().isString()
-        .isLength({ min: 5, max: 100 })
+        .isLength({ min: 3, max: 128 })
         .optional()
         .run(req);
 }
@@ -154,7 +105,7 @@ export async function addRealmRoute(req: ExpressRequest, res: ExpressResponse) :
 
     await realmRepository.save(realm);
 
-    return res.respond({
+    return res.respondCreated({
         data: realm,
     });
 }
@@ -220,4 +171,53 @@ export async function dropRealmRoute(req: ExpressRequest, res: ExpressResponse) 
     await repository.delete(id);
 
     return res.respondDeleted();
+}
+
+@SwaggerTags('auth')
+@Controller('/realms')
+export class RealmController {
+    @Get('', [])
+    async getMany(
+        @Request() req: any,
+            @Response() res: any,
+    ): Promise<Realm[]> {
+        return getRealmsRoute(req, res);
+    }
+
+    @Post('', [ForceLoggedInMiddleware])
+    async add(
+        @Body() user: NonNullable<Realm>,
+            @Request() req: any,
+            @Response() res: any,
+    ) : Promise<Realm> {
+        return addRealmRoute(req, res);
+    }
+
+    @Get('/:id', [])
+    async get(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<Realm> {
+        return getRealmRoute(req, res);
+    }
+
+    @Post('/:id', [ForceLoggedInMiddleware])
+    async edit(
+        @Params('id') id: string,
+            @Body() user: NonNullable<Realm>,
+            @Request() req: any,
+            @Response() res: any,
+    ) : Promise<Realm> {
+        return editRealmRoute(req, res);
+    }
+
+    @Delete('/:id', [ForceLoggedInMiddleware])
+    async drop(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ) : Promise<Realm> {
+        return dropRealmRoute(req, res);
+    }
 }

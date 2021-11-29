@@ -14,7 +14,7 @@ import {
     Body, Controller, Get, Params, Post, Request, Response,
 } from '@decorators/express';
 import { check, matchedData, validationResult } from 'express-validator';
-import { NotFoundError } from '@typescript-error/http';
+import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
@@ -91,7 +91,7 @@ async function getOne(req: ExpressRequest, res: ExpressResponse) : Promise<any> 
 
 async function addOne(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.PERMISSION_MANAGE)) {
-        throw new NotFoundError();
+        throw new ForbiddenError();
     }
 
     await check('id').exists().notEmpty().isLength({ min: 3, max: 30 })

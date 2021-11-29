@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+// eslint-disable-next-line import/no-cycle
 import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 
 export type RespondMessage = {
@@ -19,14 +20,14 @@ export default function responseMiddleware(
     next: ExpressNextFunction,
 ) {
     response.respond = (message?: RespondMessage) => {
-        if (message) {
-            if (message.data == null && message.statusCode == null) {
-                message.statusCode = 204;
+        if (typeof message !== 'undefined') {
+            if (message.data == null) {
+                message.statusCode ??= 204;
             } else {
-                message.statusCode = message.statusCode == null ? 200 : message.statusCode;
+                message.statusCode ??= 200;
             }
 
-            if (message.data !== null) response.json(message.data);
+            if (message.data) response.json(message.data);
         } else {
             message = {
                 statusCode: 204,
@@ -40,41 +41,23 @@ export default function responseMiddleware(
 
     // --------------------------------------------------------------------
 
-    response.respondDeleted = (message?: RespondMessage) => {
-        const defaultMessage = {
-            statusCode: 200,
-            message: 'Deleted',
-        };
+    response.respondDeleted = (message?: RespondMessage) => response.respond({
+        statusCode: 200,
+        statusMessage: 'Deleted',
+        ...(message || {}),
+    });
 
-        message = message || {};
-        message = Object.assign(defaultMessage, message);
+    response.respondCreated = (message?: RespondMessage) => response.respond({
+        statusCode: 201,
+        statusMessage: 'Created',
+        ...(message || {}),
+    });
 
-        return response.respond(message);
-    };
-
-    response.respondCreated = (message?: RespondMessage) => {
-        const defaultMessage = {
-            statusCode: 201,
-            message: 'Created',
-        };
-
-        message = message || {};
-        message = Object.assign(defaultMessage, message);
-
-        return response.respond(message);
-    };
-
-    response.respondAccepted = (message?: RespondMessage) => {
-        const defaultMessage = {
-            statusCode: 202,
-            message: 'Accepted',
-        };
-
-        message = message || {};
-        message = Object.assign(defaultMessage, message);
-
-        return response.respond(message);
-    };
+    response.respondAccepted = (message?: RespondMessage) => response.respond({
+        statusCode: 202,
+        statusMessage: 'Accepted',
+        ...(message || {}),
+    });
 
     next();
 }

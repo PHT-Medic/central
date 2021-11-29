@@ -41,6 +41,7 @@ export async function authorizeUrlRoute(req: ExpressRequest, res: ExpressRespons
     return res.redirect(oauth2Client.buildAuthorizeURL({}));
 }
 
+/* istanbul ignore next */
 export async function authorizeCallbackRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
     const { code, state } = req.query;

@@ -23,34 +23,7 @@ import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import env from '../../../../env';
 import { UserRepository } from '../../../../domains/auth/user/repository';
 
-type Token = {
-    /* @IsInt */
-    expires_in: number,
-    token: string
-};
-
-@SwaggerTags('auth')
-@Controller('/token')
-export class TokenController {
-    @Post('')
-    @ResponseExample<Token>({ expires_in: 3600, token: '20f81b13d51c65798f05' })
-    async addToken(
-        @Body() credentials: { username: string, password: string, provider?: string },
-            @Request() req: any,
-            @Response() res: any,
-    ) : Promise<Token> {
-        return (await grantToken(req, res)) as Token;
-    }
-
-    @Delete('')
-    async dropToken(
-        @Request() req: any,
-            @Response() res: any,
-    ) : Promise<void> {
-        return revokeToken(req, res);
-    }
-}
-
+/* istanbul ignore next */
 async function grantTokenWithMasterProvider(username: string, password: string) : Promise<Oauth2ProviderAccount | undefined> {
     const providerRepository = getRepository(OAuth2Provider);
     const providers = await providerRepository.createQueryBuilder('provider')
@@ -69,8 +42,8 @@ async function grantTokenWithMasterProvider(username: string, password: string) 
 
             return await createOauth2ProviderAccountWithToken(providers[i], tokenResponse);
         } catch (e) {
-            console.log(e);
-            // don't handle error, maybe log it.
+            // ...
+            // todo: don't handle error, maybe log it.
         }
     }
 
@@ -90,6 +63,7 @@ async function grantToken(req: ExpressRequest, res: ExpressResponse) : Promise<a
         userId = user.id;
     }
 
+    /* istanbul ignore next */
     if (typeof userId === 'undefined') {
         const userAccount = await grantTokenWithMasterProvider(username, password);
         if (typeof userAccount !== 'undefined') {
@@ -121,7 +95,37 @@ async function grantToken(req: ExpressRequest, res: ExpressResponse) : Promise<a
 
 // ---------------------------------------------------------------------------------
 
-async function revokeToken(req: ExpressRequest, res: ExpressResponse) {
+async function revokeToken(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     res.cookie('auth_token', null, { maxAge: 0 });
-    return res.respond();
+    return res.respondDeleted();
+}
+
+// ---------------------------------------------------------------------------------
+
+type Token = {
+    /* @IsInt */
+    expires_in: number,
+    token: string
+};
+
+@SwaggerTags('auth')
+@Controller('/token')
+export class TokenController {
+    @Post('')
+    @ResponseExample<Token>({ expires_in: 3600, token: '20f81b13d51c65798f05' })
+    async addToken(
+        @Body() credentials: { username: string, password: string, provider?: string },
+            @Request() req: any,
+            @Response() res: any,
+    ) : Promise<Token> {
+        return grantToken(req, res);
+    }
+
+    @Delete('')
+    async dropToken(
+        @Request() req: any,
+            @Response() res: any,
+    ) : Promise<void> {
+        return revokeToken(req, res);
+    }
 }

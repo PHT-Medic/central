@@ -6,7 +6,7 @@
   -->
 <script>
 import Vue from 'vue';
-import { getPermissions, mergeDeep } from '@personalhealthtrain/ui-common';
+import { getAPIPermissions, mergeDeep } from '@personalhealthtrain/ui-common';
 import Pagination from '../../Pagination';
 
 export default {
@@ -75,7 +75,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getPermissions(mergeDeep({
+                const response = await getAPIPermissions(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,

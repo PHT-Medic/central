@@ -22,7 +22,7 @@ export class Realm {
     @PrimaryColumn({ type: 'varchar', length: 36 })
         id: string;
 
-    @Column({ type: 'varchar', length: 100 })
+    @Column({ type: 'varchar', length: 128 })
     @Index({ unique: true })
         name: string;
 

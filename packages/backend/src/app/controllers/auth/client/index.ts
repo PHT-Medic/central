@@ -15,33 +15,12 @@ import {
 import { getRepository } from 'typeorm';
 import { check, matchedData, validationResult } from 'express-validator';
 import {
-    BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
+    ConflictError, ForbiddenError, NotFoundError,
 } from '@typescript-error/http';
 import { doAuthClientCommand } from './command';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
-
-@SwaggerTags('auth')
-@Controller('/clients')
-export class ClientController {
-    @Post('', [ForceLoggedInMiddleware])
-    async add(
-        @Request() req: any,
-            @Response() res: any,
-    ): Promise<Client[]> {
-        return addRoute(req, res);
-    }
-
-    @Post('/:id/command', [ForceLoggedInMiddleware])
-    async runCommand(
-    @Body() data: {command: AuthClientCommand},
-        @Request() req: any,
-        @Response() res: any,
-    ) {
-        return doAuthClientCommand(req, res);
-    }
-}
 
 async function addRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
@@ -71,8 +50,9 @@ async function addRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any
     const repository = getRepository(Client);
     let entity : Client | undefined;
 
+    // eslint-disable-next-line default-case
     switch (clientType) {
-        case AuthClientType.SERVICE:
+        case AuthClientType.SERVICE: {
             if (!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
                 throw new ForbiddenError('You are not allowed to add service-clients.');
             }
@@ -81,14 +61,14 @@ async function addRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any
                 throw new NotFoundError();
             }
 
-            const serviceId : SERVICE_ID = clientTargetId;
+            const serviceId: SERVICE_ID = clientTargetId;
 
             entity = await repository.findOne({
                 service_id: serviceId,
             });
 
             if (typeof entity !== 'undefined') {
-                throw new BadRequestError('A client already exists for that service.');
+                throw new ConflictError('A client already exists for that service.');
             }
 
             entity = repository.create({
@@ -97,11 +77,50 @@ async function addRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any
                 type: clientType,
             });
             break;
+        }
         case AuthClientType.USER:
-            throw new NotImplementedError('Not implemented yet... ^^');
+            if (clientTargetId !== req.userId) {
+                throw new ForbiddenError('You can only create a client for yourself.');
+            }
+
+            entity = await repository.findOne({
+                user_id: clientTargetId,
+            });
+
+            if (typeof entity !== 'undefined') {
+                throw new ConflictError('You have already created a client.');
+            }
+
+            entity = repository.create({
+                user_id: clientTargetId,
+                type: clientType,
+                realm_id: req.realmId,
+            });
+            break;
     }
 
     await repository.save(entity);
 
     return res.respondCreated({ data: entity });
+}
+
+@SwaggerTags('auth')
+@Controller('/clients')
+export class ClientController {
+    @Post('', [ForceLoggedInMiddleware])
+    async add(
+        @Request() req: any,
+            @Response() res: any,
+    ): Promise<Client[]> {
+        return addRoute(req, res);
+    }
+
+    @Post('/:id/command', [ForceLoggedInMiddleware])
+    async runCommand(
+    @Body() data: {command: AuthClientCommand},
+        @Request() req: any,
+        @Response() res: any,
+    ) {
+        return doAuthClientCommand(req, res);
+    }
 }

@@ -9,7 +9,7 @@ import { BuildInput, buildQuery } from '@trapi/query';
 import { APIType, SingleResourceResponse, useAPI } from '../../../modules';
 import { Permission } from './entity';
 
-export async function getPermissions(data?: BuildInput<Permission>) {
+export async function getAPIPermissions(data?: BuildInput<Permission>) {
     const response = await useAPI(APIType.DEFAULT).get(`permissions${buildQuery(data)}`);
     return response.data;
 }

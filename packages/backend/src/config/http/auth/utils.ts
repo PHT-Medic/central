@@ -84,22 +84,33 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
                 secret: value.password,
             });
 
-            console.log(value);
+            if (typeof client !== 'undefined') {
+                if (!client.service_id) {
+                    // only allow services for now... ^^
+                    return;
+                }
 
-            if (typeof client === 'undefined') {
+                request.serviceId = client.service_id;
+                // SERVICES are always central services ;)
+                request.realmId = MASTER_REALM_ID;
+
+                request.ability = new AbilityManager([]);
+            }
+
+            const userRepository = getCustomRepository<UserRepository>(UserRepository);
+            const user = await userRepository.verifyCredentials(value.username, value.password);
+
+            if (typeof user === 'undefined') {
                 throw new UnauthorizedError();
             }
 
-            if (!client.service_id) {
-                // only allow services for now... ^^
-                return;
-            }
+            const permissions = await userRepository.getOwnedPermissions(user.id);
 
-            request.serviceId = client.service_id;
-            // SERVICES are always central services ;)
-            request.realmId = MASTER_REALM_ID;
+            request.user = user;
+            request.userId = user.id;
+            request.realmId = user.realm_id;
 
-            request.ability = new AbilityManager([]);
+            request.ability = new AbilityManager(permissions);
             break;
         }
     }

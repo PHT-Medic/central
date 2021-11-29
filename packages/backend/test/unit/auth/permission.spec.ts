@@ -5,10 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Permission } from '@personalhealthtrain/ui-common';
+import { getPermissions } from '../../../src/config/permissions';
 import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
 
-describe('src/app/auth/realm', () => {
+describe('src/app/auth/permission', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
@@ -19,59 +21,31 @@ describe('src/app/auth/realm', () => {
         await dropTestDatabase();
     });
 
+    const details : Partial<Permission> = {
+        id: 'test_add',
+    };
+
     it('should read collection', async () => {
         const response = await superTest
-            .get('/realms');
+            .get('/permissions')
+            .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
         expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(1);
+        expect(response.body.data.length).toEqual(getPermissions().length);
     });
 
-    it('should create, read, update, delete resource', async () => {
-        const details = {
-            name: 'Test',
-        };
-
+    it('should create, read resource', async () => {
         let response = await superTest
-            .post('/realms')
-            .send({
-                ...details,
-                id: 'test',
-            })
-            .auth('admin', 'start123');
-
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-
-        let keys : string[] = Object.keys(details);
-        for (let i = 0; i < keys.length; i++) {
-            expect(response.body[keys[i]]).toEqual(details[keys[i]]);
-        }
-
-        // ---------------------------------------------------------
-
-        response = await superTest
-            .get(`/realms/${response.body.id}`)
-            .auth('admin', 'start123');
-
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-
-        // ---------------------------------------------------------
-
-        details.name = 'TestA';
-
-        response = await superTest
-            .post(`/realms/${response.body.id}`)
+            .post('/permissions')
             .send(details)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
 
-        keys = Object.keys(details);
+        const keys : string[] = Object.keys(details);
         for (let i = 0; i < keys.length; i++) {
             expect(response.body[keys[i]]).toEqual(details[keys[i]]);
         }
@@ -79,9 +53,10 @@ describe('src/app/auth/realm', () => {
         // ---------------------------------------------------------
 
         response = await superTest
-            .delete(`/realms/${response.body.id}`)
+            .get(`/permissions/${response.body.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
+        expect(response.body).toBeDefined();
     });
 });

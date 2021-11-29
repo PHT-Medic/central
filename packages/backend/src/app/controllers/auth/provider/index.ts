@@ -19,77 +19,6 @@ import { authorizeCallbackRoute, authorizeUrlRoute } from './authorize';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 
-@SwaggerTags('auth')
-@Controller('/providers')
-export class ProviderController {
-    @Get('', [])
-    async getProviders(
-        @Request() req: any,
-            @Response() res: any,
-    ): Promise<OAuth2Provider[]> {
-        return getProvidersRoute(req, res);
-    }
-
-    @Get('/:id', [])
-    async getProvider(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<OAuth2Provider> {
-        return getProviderRoute(req, res);
-    }
-
-    @Post('/:id', [ForceLoggedInMiddleware])
-    async editProvider(
-        @Params('id') id: string,
-            @Body() user: NonNullable<OAuth2Provider>,
-            @Request() req: any,
-            @Response() res: any,
-    ) : Promise<OAuth2Provider> {
-        return editProviderRoute(req, res);
-    }
-
-    @Delete('/:id', [ForceLoggedInMiddleware])
-    async dropProvider(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ) : Promise<OAuth2Provider> {
-        return dropProviderRoute(req, res);
-    }
-
-    @Post('', [ForceLoggedInMiddleware])
-    async addProvider(
-        @Body() user: NonNullable<OAuth2Provider>,
-            @Request() req: any,
-            @Response() res: any,
-    ) : Promise<OAuth2Provider> {
-        return addProviderRoute(req, res);
-    }
-
-    // ------------------------------------------------------------
-
-    @Get('/:id/authorize-url')
-    @SwaggerHidden()
-    async getAuthorizeUrl(
-    @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ) {
-        return authorizeUrlRoute(req, res);
-    }
-
-    @Get('/:id/authorize-callback')
-    @SwaggerHidden()
-    async getAuthorizeCallback(
-    @Params('id') id: string,
-        @Request() req: any,
-        @Response() res: any,
-    ) {
-        return authorizeCallbackRoute(req, res);
-    }
-}
-
 export async function getProvidersRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { page, filter, fields } = req.query;
 
@@ -117,17 +46,7 @@ export async function getProvidersRoute(req: ExpressRequest, res: ExpressRespons
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });
 
-    // tslint:disable-next-line:prefer-const
-    let [entities, total] = await query.getManyAndCount();
-
-    // todo: allow realm owner view of client_secret
-    entities = entities.map((provider: OAuth2Provider) => {
-        if (!req.user || !req.ability.can('edit', 'realm')) {
-            delete provider.client_secret;
-        }
-
-        return provider;
-    });
+    const [entities, total] = await query.getManyAndCount();
 
     return res.respond({
         data: {
@@ -305,4 +224,77 @@ export async function dropProviderRoute(req: ExpressRequest, res: ExpressRespons
     await userRepository.delete(id);
 
     return res.respondDeleted();
+}
+
+// ---------------------------------------------------------------------------------
+
+@SwaggerTags('auth')
+@Controller('/providers')
+export class ProviderController {
+    @Get('', [])
+    async getProviders(
+        @Request() req: any,
+            @Response() res: any,
+    ): Promise<OAuth2Provider[]> {
+        return getProvidersRoute(req, res);
+    }
+
+    @Get('/:id', [])
+    async getProvider(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<OAuth2Provider> {
+        return getProviderRoute(req, res);
+    }
+
+    @Post('/:id', [ForceLoggedInMiddleware])
+    async editProvider(
+        @Params('id') id: string,
+            @Body() user: NonNullable<OAuth2Provider>,
+            @Request() req: any,
+            @Response() res: any,
+    ) : Promise<OAuth2Provider> {
+        return editProviderRoute(req, res);
+    }
+
+    @Delete('/:id', [ForceLoggedInMiddleware])
+    async dropProvider(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ) : Promise<OAuth2Provider> {
+        return dropProviderRoute(req, res);
+    }
+
+    @Post('', [ForceLoggedInMiddleware])
+    async addProvider(
+        @Body() user: NonNullable<OAuth2Provider>,
+            @Request() req: any,
+            @Response() res: any,
+    ) : Promise<OAuth2Provider> {
+        return addProviderRoute(req, res);
+    }
+
+    // ------------------------------------------------------------
+
+    @Get('/:id/authorize-url')
+    @SwaggerHidden()
+    async getAuthorizeUrl(
+    @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any,
+    ) {
+        return authorizeUrlRoute(req, res);
+    }
+
+    @Get('/:id/authorize-callback')
+    @SwaggerHidden()
+    async getAuthorizeCallback(
+    @Params('id') id: string,
+        @Request() req: any,
+        @Response() res: any,
+    ) {
+        return authorizeCallbackRoute(req, res);
+    }
 }

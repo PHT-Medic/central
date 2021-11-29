@@ -17,95 +17,14 @@ import { ResponseExample, SwaggerTags } from 'typescript-swagger';
 
 import {
     PermissionID,
-    Realm, Station, User, isPermittedForResourceRealm, onlyRealmPermittedQueryResources,
+    Realm, User, isPermittedForResourceRealm, onlyRealmPermittedQueryResources,
 } from '@personalhealthtrain/ui-common';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { UserRepository } from '../../../../domains/auth/user/repository';
-import { getUserStationRouteHandler } from './station';
-import { useLogger } from '../../../../modules/log';
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
 import env from '../../../../env';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
-
-// ---------------------------------------------------------------------------------
-
-type PartialUser = Partial<User>;
-
-@SwaggerTags('user')
-@Controller('/users')
-export class UserController {
-    @Get('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialUser[]>([
-        { name: 'admin', email: 'admin@example.com' },
-        { name: 'moderator', email: 'moderator@example.com' },
-    ])
-    async getMany(
-        @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialUser[]> {
-        return getUsersRouteHandler(req, res);
-    }
-
-    @Post('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com', realm_id: 'master' })
-    async add(
-        @Body() user: NonNullable<User>/* Pick<User, 'name' | 'email' | 'password' | 'realm_id'> */,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialUser | undefined> {
-        return addUserRouteHandler(req, res);
-    }
-
-    @Get('/me', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com' })
-    async getMe(
-        @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialUser | undefined> {
-        return getMeRouteHandler(req, res);
-    }
-
-    @Get('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com' })
-    async get(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialUser | undefined> {
-        return getUserRouteHandler(req, res);
-    }
-
-    @Get('/:id/station', [])
-    async getStation(
-        @Params('id') id: number,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<Station> {
-        return getUserStationRouteHandler(req, res);
-    }
-
-    @Post('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com' })
-    async edit(
-        @Params('id') id: string,
-            @Body() user: PartialUser,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialUser | undefined> {
-        return editUserRouteHandler(req, res);
-    }
-
-    @Delete('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com' })
-    async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialUser | undefined> {
-        return dropUserRouteHandler(req, res);
-    }
-}
 
 export async function getUsersRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {
@@ -251,15 +170,11 @@ export async function addUserRouteHandler(req: ExpressRequest, res: ExpressRespo
         user.password = await userRepository.hashPassword(user.password);
     }
 
-    const result = await userRepository.save(user);
+    await userRepository.save(user);
 
-    useLogger().info(`user "${data.name}" created...`);
+    delete user.password;
 
-    return res.respondCreated({
-        data: {
-            id: result.id,
-        },
-    });
+    return res.respondCreated({ data: user });
 }
 
 export async function editUserRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
@@ -291,7 +206,7 @@ export async function editUserRouteHandler(req: ExpressRequest, res: ExpressResp
     }
 
     if (
-        data.hasOwnProperty('password')
+        typeof data.password !== 'undefined'
         && env.userPasswordImmutable
         && !req.ability.hasPermission(PermissionID.USER_EDIT)
     ) {
@@ -321,14 +236,14 @@ export async function editUserRouteHandler(req: ExpressRequest, res: ExpressResp
 
     user = userRepository.merge(user, data);
 
-    const result = await userRepository.save(user);
+    await userRepository.save(user);
 
-    if (typeof result.realm_id !== 'undefined') {
-        result.realm = await getRepository(Realm).findOne(result.realm_id);
+    if (typeof user.realm_id !== 'undefined') {
+        user.realm = await getRepository(Realm).findOne(user.realm_id);
     }
 
     return res.respond({
-        data: result,
+        data: user,
     });
 }
 
@@ -359,4 +274,74 @@ export async function dropUserRouteHandler(req: ExpressRequest, res: ExpressResp
     await userRepository.delete(id);
 
     return res.respondDeleted();
+}
+
+// ---------------------------------------------------------------------------------
+
+type PartialUser = Partial<User>;
+
+@SwaggerTags('user')
+@Controller('/users')
+export class UserController {
+    @Get('', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialUser[]>([
+        { name: 'admin', email: 'admin@example.com' },
+        { name: 'moderator', email: 'moderator@example.com' },
+    ])
+    async getMany(
+        @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialUser[]> {
+        return getUsersRouteHandler(req, res);
+    }
+
+    @Post('', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com', realm_id: 'master' })
+    async add(
+        @Body() user: NonNullable<User>/* Pick<User, 'name' | 'email' | 'password' | 'realm_id'> */,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialUser | undefined> {
+        return addUserRouteHandler(req, res);
+    }
+
+    @Get('/me', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com' })
+    async getMe(
+        @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialUser | undefined> {
+        return getMeRouteHandler(req, res);
+    }
+
+    @Get('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com' })
+    async get(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialUser | undefined> {
+        return getUserRouteHandler(req, res);
+    }
+
+    @Post('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com' })
+    async edit(
+        @Params('id') id: string,
+            @Body() user: PartialUser,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialUser | undefined> {
+        return editUserRouteHandler(req, res);
+    }
+
+    @Delete('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialUser>({ name: 'admin', email: 'admin@example.com' })
+    async drop(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialUser | undefined> {
+        return dropUserRouteHandler(req, res);
+    }
 }

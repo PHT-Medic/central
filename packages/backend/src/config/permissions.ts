@@ -5,41 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getPHTPermissions } from './pht/permissions';
+import { PermissionID } from '@personalhealthtrain/ui-common';
 
-const permissions : string[] = [
-    'admin_ui_use',
-
-    'service_manage',
-
-    'realm_add',
-    'realm_drop',
-    'realm_edit',
-
-    'provider_add',
-    'provider_drop',
-    'provider_edit',
-
-    'user_add',
-    'user_drop',
-    'user_edit',
-
-    'user_role_add',
-    'user_role_drop',
-    'user_role_edit',
-
-    'role_add',
-    'role_drop',
-    'role_edit',
-
-    'role_permission_add',
-    'role_permission_drop',
-];
-
-export function getPermissions(includePHT = true) : string[] {
-    if (includePHT) {
-        return [...permissions, ...getPHTPermissions()];
-    }
-
-    return [...permissions];
+export function getPermissions() : string[] {
+    return Object.values(PermissionID);
 }

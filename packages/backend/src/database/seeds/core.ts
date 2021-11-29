@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Connection } from 'typeorm';
+import { Connection, In } from 'typeorm';
 import { Factory, Seeder } from 'typeorm-seeding';
 
 import {
@@ -16,33 +16,39 @@ import { getPermissions } from '../../config/permissions';
 import { UserRepository } from '../../domains/auth/user/repository';
 import { RoleRepository } from '../../domains/auth/role/repository';
 
-export default class CreateCore implements Seeder {
+export default class DatabaseCoreSeeder implements Seeder {
     public async run(factory: Factory, connection: Connection) : Promise<any> {
         /**
          * Create default realm
          */
         const realmRepository = connection.getRepository(Realm);
+        let realm = await realmRepository.findOne({ name: MASTER_REALM_ID });
+        if (typeof realm === 'undefined') {
+            realm = realmRepository.create({
+                id: MASTER_REALM_ID,
+                name: 'Master',
+                drop_able: false,
+            });
+        }
 
-        const masterRealm = realmRepository.create({
-            id: MASTER_REALM_ID,
-            name: 'Master',
-            drop_able: false,
-        });
-
-        await realmRepository.save(masterRealm);
+        await realmRepository.save(realm);
 
         // -------------------------------------------------
 
         /**
          * Create default role
          */
-        const repository = connection.getCustomRepository(RoleRepository);
-
-        const adminRole = repository.create({
+        const roleRepository = connection.getCustomRepository(RoleRepository);
+        let role = await roleRepository.findOne({
             name: 'admin',
         });
+        if (typeof role === 'undefined') {
+            role = roleRepository.create({
+                name: 'admin',
+            });
+        }
 
-        await repository.save(adminRole);
+        await roleRepository.save(role);
 
         // -------------------------------------------------
 
@@ -50,25 +56,39 @@ export default class CreateCore implements Seeder {
          * Create default user
          */
         const userRepository = connection.getCustomRepository(UserRepository);
-        const adminUser = userRepository.create({
+        let user = await userRepository.findOne({
             name: 'admin',
-            password: await userRepository.hashPassword('start123'),
-            email: 'peter.placzek1996@gmail.com',
-            realm: masterRealm,
         });
 
-        await userRepository.save(adminUser);
+        if (typeof user === 'undefined') {
+            user = userRepository.create({
+                name: 'admin',
+                password: await userRepository.hashPassword('start123'),
+                email: 'peter.placzek1996@gmail.com',
+                realm_id: MASTER_REALM_ID,
+            });
+        }
+
+        await userRepository.save(user);
 
         // -------------------------------------------------
 
         /**
          * Create default user - role association
          */
+        const userRoleData : Partial<UserRole> = {
+            role_id: role.id,
+            user_id: user.id,
+        };
+
         const userRoleRepository = connection.getRepository(UserRole);
-        await userRoleRepository.insert({
-            role_id: adminRole.id,
-            user_id: adminUser.id,
-        });
+        let userRole = await userRoleRepository.findOne(userRoleData);
+
+        if (typeof userRole === 'undefined') {
+            userRole = userRoleRepository.create(userRoleData);
+        }
+
+        await userRoleRepository.save(userRole);
 
         // -------------------------------------------------
 
@@ -76,7 +96,19 @@ export default class CreateCore implements Seeder {
          * Create all permissions
          */
         const permissionRepository = connection.getRepository(Permission);
-        const ids : string[] = getPermissions();
+        let ids : string[] = getPermissions();
+
+        const existingPermissions = await permissionRepository.find({
+            id: In(ids),
+        });
+
+        for (let i = 0; i < existingPermissions.length; i++) {
+            const index = ids.indexOf(existingPermissions[i].id);
+            if (index !== -1) {
+                ids = ids.splice(index, 1);
+            }
+        }
+
         const permissions : Permission[] = ids.map((id: string) => permissionRepository.create({ id }));
 
         await permissionRepository.save(permissions);
@@ -87,11 +119,24 @@ export default class CreateCore implements Seeder {
          * Assign all permissions to default role.
          */
         const rolePermissionRepository = connection.getRepository(RolePermission);
+
+        const existingRolePermissions = await rolePermissionRepository.find({
+            permission_id: In(ids),
+            role_id: role.id,
+        });
+
+        for (let i = 0; i < existingPermissions.length; i++) {
+            const index = ids.indexOf(existingRolePermissions[i].permission_id);
+            if (index !== -1) {
+                ids = ids.splice(index, 1);
+            }
+        }
+
         const rolePermissions : RolePermission[] = [];
-        for (let j = 0; j < permissions.length; j++) {
+        for (let j = 0; j < ids.length; j++) {
             rolePermissions.push(rolePermissionRepository.create({
-                role_id: adminRole.id,
-                permission_id: permissions[j].id,
+                role_id: role.id,
+                permission_id: ids[j],
             }));
         }
 

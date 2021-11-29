@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-    testSequencer: './test/test-sequencer.js',
+    testSequencer: './test/utils/test-sequencer.js',
     testEnvironment: 'node',
     transform: {
         '^.+\\.tsx?$': 'ts-jest',

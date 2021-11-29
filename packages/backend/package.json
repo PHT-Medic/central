@@ -60,6 +60,7 @@
         "@types/module-alias": "^2.0.1",
         "@types/mysql": "^2.15.17",
         "@types/node": "^16.11.9",
+        "@types/supertest": "^2.0.11",
         "@types/swagger-stats": "^0.95.3",
         "@types/swagger-ui-express": "^4.1.2",
         "@types/tar": "^6.1.1",
@@ -85,8 +86,9 @@
         "start": "node dist/index.js",
         "setup": "ts-node src/cli/index.ts setup",
         "reset": "ts-node src/cli/index.ts reset",
-        "test": " cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=test jest --config ./test/jest.config.js --detectOpenHandles --runInBand --testTimeout=6000",
-        "test:coverage": "npm run test -- --coverage"
+        "test": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=test jest --config ./test/jest.config.js --detectOpenHandles --runInBand --testTimeout=6000",
+        "test:coverage": "npm run test -- --coverage",
+        "test:watch": "npm run test -- --watch"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
     "publishConfig": {
