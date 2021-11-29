@@ -32,7 +32,7 @@
         "winston": "^3.3.3"
     },
     "devDependencies": {
-        "@tada5hi/eslint-config-typescript": "^0.0.18",
+        "@tada5hi/eslint-config-typescript": "^0.0.20",
         "@types/cookie-parser": "^1.4.2",
         "@types/cors": "^2.8.8",
         "@types/dockerode": "^3.3.0",
