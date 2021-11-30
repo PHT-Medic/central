@@ -24,6 +24,6 @@ export {
     Role,
     RolePermission,
     User,
-    UserKeyRing,
+    UserSecret,
     UserRole,
 } from '@personalhealthtrain/ui-common';

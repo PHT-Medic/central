@@ -7,7 +7,6 @@
 
 import { SecretStorageEngineSecretPayload } from '../../../extra';
 
-export type UserSecretEngineSecretPayload = SecretStorageEngineSecretPayload<{
-    rsa_public_key: string,
-    paillier_public_key: string
+export type StationSecretEngineSecretPayload = SecretStorageEngineSecretPayload<{
+    rsa_station_public_key: string
 }>;

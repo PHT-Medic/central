@@ -39,8 +39,8 @@ export async function addAPIUser(data: Partial<User>) : Promise<SingleResourceRe
     return response.data;
 }
 
-export async function editAPIUser(userId: typeof User.prototype.id, data: Partial<User> & {password_repeat: typeof User.prototype.password}) : Promise<SingleResourceResponse<User>> {
-    const response = await useAPI(APIType.DEFAULT).post(`users/${userId}`, nullifyEmptyObjectProperties(data));
+export async function editAPIUser(id: typeof User.prototype.id, data: Partial<User> & {password_repeat: typeof User.prototype.password}) : Promise<SingleResourceResponse<User>> {
+    const response = await useAPI(APIType.DEFAULT).post(`users/${id}`, nullifyEmptyObjectProperties(data));
 
     return response.data;
 }

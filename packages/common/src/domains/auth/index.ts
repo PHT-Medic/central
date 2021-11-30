@@ -14,5 +14,5 @@ export * from './role';
 export * from './role-permission';
 export * from './token';
 export * from './user';
-export * from './user-key-ring';
+export * from './user-secret';
 export * from './user-role';

@@ -9,7 +9,7 @@ import {
     addAPIUserKeyRing,
     dropAPIUserKeyRing,
     editAPIUserKeyRing,
-    getAPIUserKeyRing,
+    getAPIUserSecrets,
 } from '@personalhealthtrain/ui-common';
 import { maxLength, minLength, numeric } from 'vuelidate/lib/validators';
 import AlertMessage from '../../alert/AlertMessage';
@@ -70,7 +70,7 @@ export default {
             this.busy = true;
 
             try {
-                this.item = await getAPIUserKeyRing();
+                this.item = await getAPIUserSecrets();
 
                 this.form.public_key = this.item.public_key;
                 this.form.he_key = this.item.he_key;

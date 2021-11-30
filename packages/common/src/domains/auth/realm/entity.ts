@@ -14,7 +14,7 @@ import {
     PrimaryColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Proposal, Train } from '../../pht';
+import { Proposal, Train } from '../../core';
 import { OAuth2Provider } from '../oauth2-provider';
 
 @Entity({ name: 'realms' })

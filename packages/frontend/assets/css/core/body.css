@@ -88,18 +88,21 @@ Content
 
     border-radius: 4px;
 
-    padding: 0rem 0.25rem;
+    padding: 0.25rem 0.25rem;
     display: flex;
     flex-direction: column;
+    vertical-align: middle;
 }
 
+.c-list .c-list-header,
 .c-list .c-list-content,
 .c-list .c-list-footer {
     display: flex;
     flex-direction: row;
+    word-break: break-all;
 }
 
 .c-list .c-list-icon {
-    font-size: 1.5rem;
+    font-size: 1rem;
     padding-right: 0.5rem;
 }

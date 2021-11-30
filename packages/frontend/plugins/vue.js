@@ -9,3 +9,13 @@ import Vue from 'vue';
 import Gravatar from 'vue-gravatar';
 
 Vue.component('VGravatar', Gravatar);
+
+Vue.filter('str_length_limit', (value, size) => {
+    if (!value) return '';
+    value = value.toString();
+
+    if (value.length <= size) {
+        return value;
+    }
+    return `${value.substr(0, size)}...`;
+});

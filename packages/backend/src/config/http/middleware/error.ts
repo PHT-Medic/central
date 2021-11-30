@@ -7,8 +7,7 @@
 
 import { hasOwnProperty } from 'typeorm-extension';
 import {
-    BadRequestError,
-    ClientError,
+    ClientError, ConflictError,
     InsufficientStorageError,
     InternalServerError,
     ServerError, ServerErrorSettings,
@@ -31,14 +30,12 @@ export function errorMiddleware(
     // eslint-disable-next-line default-case
     switch (code) {
         case 'ER_DUP_ENTRY':
-            error = new BadRequestError('An entry with some unique attributes already exist.', { previous: error });
+            error = new ConflictError('An entry with some unique attributes already exist.', { previous: error });
             break;
         case 'ER_DISK_FULL':
             error = new InsufficientStorageError('No database operation possible, due the leak of free disk space.', { previous: error });
             break;
     }
-
-    console.log(error);
 
     const baseError : ServerError | ClientError = error instanceof ClientError || error instanceof ServerError
         ? error

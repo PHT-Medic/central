@@ -86,13 +86,13 @@ export async function getUserRouteHandler(req: ExpressRequest, res: ExpressRespo
         allowed: ['realm', 'user_roles'],
     });
 
-    const result = await query.getOne();
+    const entity = await query.getOne();
 
-    if (typeof result === 'undefined') {
+    if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
-    return res.respond({ data: result });
+    return res.respond({ data: entity });
 }
 
 export async function getMeRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {

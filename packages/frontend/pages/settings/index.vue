@@ -48,13 +48,13 @@ export default {
             sidebar: {
                 items: [
                     {
-                        name: 'Account', routeName: 'settings-id', icon: 'fas fa-bars', urlSuffix: '',
+                        name: 'Account', icon: 'fas fa-bars', urlSuffix: '',
                     },
                     {
-                        name: 'Security', routeName: 'settings-id-security', icon: 'fa fa-lock', urlSuffix: '/security',
+                        name: 'Security', icon: 'fa fa-lock', urlSuffix: '/security',
                     },
                     {
-                        name: 'Keys', routeName: 'settings-id-key-ring', icon: 'fa fa-key', urlSuffix: '/key-ring',
+                        name: 'Secrets', icon: 'fa fa-key', urlSuffix: '/secrets',
                     },
                 ],
             },

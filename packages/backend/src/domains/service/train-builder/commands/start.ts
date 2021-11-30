@@ -7,7 +7,7 @@
 
 import { getRepository } from 'typeorm';
 import {
-    MasterImage, MasterImageGroup, Train, TrainFile, TrainStation, TrainStationApprovalStatus, UserKeyRing,
+    MasterImage, MasterImageGroup, Train, TrainFile, TrainStation, TrainStationApprovalStatus,
 } from '@personalhealthtrain/ui-common';
 
 export async function buildTrainBuilderStartCommandPayload(train: Train) {
@@ -45,18 +45,6 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) {
     message.entrypointCommandArguments = masterImage.command_arguments
         ? masterImage.command_arguments
         : masterImageGroup.command_arguments;
-
-    // ----------------------------------------------------
-
-    const keyRingRepository = getRepository(UserKeyRing);
-    const keyRing = await keyRingRepository.findOne({
-        user_id: train.user_id,
-    });
-    if (typeof keyRing === 'undefined') {
-        throw new Error();
-    }
-
-    message.user_he_key = keyRing ? keyRing.he_key : null;
 
     // ----------------------------------------------------
 

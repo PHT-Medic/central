@@ -88,7 +88,8 @@
         "reset": "ts-node src/cli/index.ts reset",
         "test": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=test jest --config ./test/jest.config.js --detectOpenHandles --runInBand --testTimeout=6000",
         "test:coverage": "npm run test -- --coverage",
-        "test:watch": "npm run test -- --watch"
+        "test:watch": "npm run test -- --watch",
+        "migration:create": "typeorm migration:create -n"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
     "publishConfig": {

@@ -13,11 +13,14 @@ import {
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
     SERVICE_ID,
+    SERVICE_SECRET_ENGINE_KEY,
     Station,
+    buildSecretStorageServicePayload,
     ensureHarborProjectWebHook,
-    saveServiceSecretsToSecretEngine,
+    saveToSecretEngine,
 } from '@personalhealthtrain/ui-common';
-import { IsNull, Not, getRepository } from 'typeorm';
+
+import { getRepository } from 'typeorm';
 import env from '../../env';
 import { AuthClientSecurityQueueMessagePayload } from '../../domains/service/queue';
 
@@ -29,12 +32,11 @@ export async function syncAuthClientSecurity(message: Message) {
             switch (payload.id) {
                 case SERVICE_ID.RESULT_SERVICE:
                 case SERVICE_ID.TRAIN_BUILDER:
-                case SERVICE_ID.TRAIN_ROUTER:
-                    await saveServiceSecretsToSecretEngine(payload.id, {
-                        id: payload.clientId,
-                        secret: payload.clientSecret,
-                    });
+                case SERVICE_ID.TRAIN_ROUTER: {
+                    const data = buildSecretStorageServicePayload(payload.clientId, payload.clientSecret);
+                    await saveToSecretEngine(SERVICE_SECRET_ENGINE_KEY, payload.id, data);
                     break;
+                }
                 case SERVICE_ID.REGISTRY: {
                     const stationRepository = getRepository(Station);
                     const queryBuilder = stationRepository.createQueryBuilder('station');

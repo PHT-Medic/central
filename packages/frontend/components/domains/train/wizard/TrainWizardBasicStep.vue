@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { TrainType, getAPIUserKeyRing } from '@personalhealthtrain/ui-common';
+import { TrainType, getAPIUserSecrets } from '@personalhealthtrain/ui-common';
 
 export default {
     props: {
@@ -45,7 +45,7 @@ export default {
             this.public_key.busy = true;
 
             try {
-                this.public_key = await getAPIUserKeyRing();
+                this.public_key = await getAPIUserSecrets();
             } catch (e) {
 
             }

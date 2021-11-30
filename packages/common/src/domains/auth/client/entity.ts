@@ -14,7 +14,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../user';
-import { SERVICE_ID } from '../../other';
+import { SERVICE_ID } from '../../extra';
 import { AuthClientType } from './type';
 import { createAuthClientSecret } from './utils';
 import { MASTER_REALM_ID, Realm } from '../realm';
