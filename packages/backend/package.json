@@ -36,7 +36,7 @@
         "node-cron": "^3.0.0",
         "reflect-metadata": "^0.1.13",
         "swagger-stats": "^0.99.1",
-        "swagger-ui-express": "^4.1.6",
+        "swagger-ui-express": "^4.2.0",
         "tar": "^6.1.2",
         "tar-stream": "^2.1.4",
         "typeorm": "^0.2.41",
