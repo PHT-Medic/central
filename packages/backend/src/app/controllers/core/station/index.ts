@@ -15,10 +15,10 @@ import {
     PermissionID,
     STATION_SECRET_ENGINE_KEY,
     Station,
+    buildSecretStorageStationKey,
     buildSecretStorageStationPayload,
     deleteFromSecretEngine,
-    deleteStationHarborProject,
-    saveToSecretEngine,
+    deleteStationHarborProject, saveToSecretEngine,
 } from '@personalhealthtrain/ui-common';
 
 import {
@@ -256,7 +256,8 @@ export async function editStationRouteHandler(req: ExpressRequest, res: ExpressR
         .run(req);
     await check('email').isLength({ min: 5, max: 256 }).exists().optional({ nullable: true })
         .run(req);
-    await check('sync_public_key').isBoolean().optional().run(req);
+    await check('sync_public_key').isBoolean().optional({ nullable: true }).default(true)
+        .run(req);
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
@@ -303,7 +304,17 @@ export async function editStationRouteHandler(req: ExpressRequest, res: ExpressR
     if (typeof data.secure_id === 'string') {
         // secure id changed -> remove vault project
         if (data.secure_id !== station.secure_id) {
-            await deleteStationHarborProject(station.secure_id);
+            try {
+                await deleteStationHarborProject(station.secure_id);
+            } catch (e) {
+                // ...
+            }
+
+            try {
+                await deleteFromSecretEngine(STATION_SECRET_ENGINE_KEY, station.secure_id);
+            } catch (e) {
+                // ...
+            }
         }
     }
 

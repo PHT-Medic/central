@@ -41,7 +41,7 @@ export default {
                 email: null,
                 realm_id: '',
                 secure_id: '',
-                syncPublicKey: true,
+                sync_public_key: true,
                 vault_public_key_saved: false,
             },
 
@@ -353,7 +353,7 @@ export default {
                 <div class="form-check">
                     <input
                         id="sync-public-key"
-                        v-model="formData.syncPublicKey"
+                        v-model="formData.sync_public_key"
                         class="form-check-input"
                         type="checkbox"
                         required

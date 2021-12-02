@@ -45,7 +45,7 @@ export function buildSecretStorageUserPayload(context: {
             paillier_public_key: context[SecretType.PAILLIER_PUBLIC_KEY],
         },
         options: {
-            cas: 0,
+            cas: 1,
         },
     };
 }

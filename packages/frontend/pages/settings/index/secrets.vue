@@ -5,6 +5,11 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import {
+    SecretStorageCommand,
+    buildSecretStorageUserKey,
+    executeAPISecretStorageServiceCommand,
+} from '@personalhealthtrain/ui-common';
 import UserSecretForm from '../../../components/domains/user-secret/UserSecretForm';
 import UserSecretList from '../../../components/domains/user-secret/UserSecretList';
 
@@ -27,14 +32,29 @@ export default {
     methods: {
         handleCreated(item) {
             this.$refs.itemsList.addArrayItem(item, true);
+
+            this.$bvToast.toast('The secret was successfully created.', {
+                variant: 'success',
+                toaster: 'b-toaster-top-center',
+            });
         },
         handleUpdated(item) {
             this.$refs.itemsList.editArrayItem(item);
+
+            this.$bvToast.toast('The secret was successfully updated.', {
+                variant: 'info',
+                toaster: 'b-toaster-top-center',
+            });
         },
         handleDeleted(item) {
             if (item.id === this.itemId) {
                 this.triggerEdit(this.item);
             }
+
+            this.$bvToast.toast('The secret was successfully deleted.', {
+                variant: 'danger',
+                toaster: 'b-toaster-top-center',
+            });
         },
 
         triggerEdit(item) {
@@ -47,6 +67,29 @@ export default {
             this.$nextTick(() => {
                 this.$refs.itemForm.resetFormData();
             });
+        },
+        async triggerSync() {
+            if (this.busy) return;
+
+            this.busy = true;
+
+            try {
+                await executeAPISecretStorageServiceCommand(
+                    SecretStorageCommand.ENGINE_KEY_SAVE,
+                    {
+                        name: buildSecretStorageUserKey(this.$store.getters['auth/userId']),
+                    },
+                );
+
+                this.$bvToast.toast('The secret was successfully synced.', {
+                    variant: 'success',
+                    toaster: 'b-toaster-top-center',
+                });
+            } catch (e) {
+                // ...
+            }
+
+            this.busy = false;
         },
     },
 };
@@ -72,12 +115,20 @@ export default {
                     <div class="ml-1">
                         <button
                             type="button"
+                            class="btn btn-xs btn-primary"
+                            @click.prevent="triggerSync(props.item)"
+                        >
+                            <i class="fas fa-sync" />
+                        </button>
+                        <button
+                            type="button"
                             class="btn btn-xs"
                             :class="{'btn-primary': itemId !== props.item.id, 'btn-dark': itemId === props.item.id}"
                             @click.prevent="triggerEdit(props.item)"
                         >
-                            <i class="fas"
-                               :class="{'fas fa-pen-alt': itemId !== props.item.id, 'fa fa-eject': itemId === props.item.id}"
+                            <i
+                                class="fas"
+                                :class="{'fas fa-pen-alt': itemId !== props.item.id, 'fa fa-eject': itemId === props.item.id}"
                             />
                         </button>
                     </div>

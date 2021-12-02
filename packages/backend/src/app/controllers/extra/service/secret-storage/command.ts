@@ -11,10 +11,12 @@ import {
     Client,
     PermissionID,
     SERVICE_ID,
+    SERVICE_SECRET_ENGINE_KEY,
     STATION_SECRET_ENGINE_KEY,
     SecretStorageCommand,
     SecretType,
     Station,
+    USER_SECRET_ENGINE_KEY,
     User,
     UserSecret,
     buildSecretStorageServiceKey,
@@ -27,14 +29,13 @@ import {
     getSecretStorageStationKey,
     getSecretStorageUserKey,
     isSecretStorageServiceKey,
-    isSecretStorageStationKey,
-    isSecretStorageUserKey,
-    isService, saveToSecretEngine, useAPI,
+    isSecretStorageStationKey, isSecretStorageUserKey, isService, saveToSecretEngine, useAPI,
 } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
 import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
 } from '@typescript-error/http';
+import { stat } from 'fs';
 import { ExpressRequest, ExpressResponse } from '../../../../../config/http/type';
 import { ExpressValidationError } from '../../../../../config/http/error/validation';
 
@@ -149,7 +150,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
         case SecretStorageCommand.ENGINE_KEY_PULL: {
             try {
                 const data: {
-                    [K in SecretType]?: string
+                    [K in SecretType | 'rsa_station_public_key']?: string
                 } = {};
 
                 switch (type) {
@@ -157,7 +158,16 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                         const { data: responseData } = await useAPI(APIType.VAULT)
                             .get(buildSecretStorageStationKey(id));
 
-                        data[SecretType.RSA_PUBLIC_KEY] = responseData.data.data[SecretType.RSA_PUBLIC_KEY];
+                        data.rsa_station_public_key = responseData.data.data.rsa_station_public_key;
+
+                        if (station && station.id) {
+                            await getRepository(Station)
+                                .update({
+                                    id: station.id,
+                                }, {
+                                    public_key: data.rsa_station_public_key,
+                                });
+                        }
                         break;
                     }
 
@@ -186,6 +196,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
             switch (type) {
                 case TargetEntity.STATION:
                     payload = buildSecretStorageStationPayload(station.public_key);
+                    await saveToSecretEngine(STATION_SECRET_ENGINE_KEY, id.toString(), payload);
                     break;
                 case TargetEntity.USER: {
                     const userSecrets = await getRepository(UserSecret)
@@ -194,6 +205,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                         });
 
                     payload = buildSecretStorageUserPayload(userSecrets);
+                    await saveToSecretEngine(USER_SECRET_ENGINE_KEY, id.toString(), payload);
                     break;
                 }
                 case TargetEntity.SERVICE: {
@@ -203,10 +215,9 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                         });
 
                     payload = buildSecretStorageServicePayload(serviceClient.id, serviceClient.secret);
+                    await saveToSecretEngine(SERVICE_SECRET_ENGINE_KEY, id.toString(), payload);
                 }
             }
-
-            await saveToSecretEngine(STATION_SECRET_ENGINE_KEY, id.toString(), payload);
 
             return res.respondCreated();
         }

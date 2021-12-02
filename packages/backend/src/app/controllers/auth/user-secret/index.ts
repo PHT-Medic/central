@@ -123,13 +123,19 @@ async function extendSecretEnginePayload(
 ) {
     const keyPath = buildSecretStorageUserKey(id);
 
-    let payload : UserSecretEngineSecretPayload;
+    const payload : UserSecretEngineSecretPayload = {
+        data: {
+
+        },
+        options: {
+            cas: 1,
+        },
+    };
 
     try {
         const { data: responseData } = await useAPI(APIType.VAULT)
             .get(keyPath);
-
-        payload = responseData.data.data;
+        payload.data = responseData.data.data;
     } catch (e) {
         // ...
     }
@@ -165,7 +171,7 @@ async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
 
     await repository.save(entity);
 
-    await extendSecretEnginePayload(entity.id, entity.type, entity.content);
+    await extendSecretEnginePayload(entity.user_id, entity.type, entity.content);
 
     return res.respond({ data: entity });
 }
@@ -197,7 +203,7 @@ async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
 
     await repository.save(entity);
 
-    await extendSecretEnginePayload(entity.id, entity.type, entity.content);
+    await extendSecretEnginePayload(entity.user_id, entity.type, entity.content);
 
     return res.respond({ data: entity });
 }

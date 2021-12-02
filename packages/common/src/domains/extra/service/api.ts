@@ -8,6 +8,7 @@
 import { APIType, SingleResourceResponse, useAPI } from '../../../modules';
 import { RegistryCommandType } from './harbor';
 import { SERVICE_ID, ServiceIDType } from './type';
+import { SecretStorageCommand } from '../secret-engine';
 
 export async function executeAPIServiceTask(
     id: ServiceIDType,
@@ -27,7 +28,7 @@ export async function executeAPIRegistryServiceCommand(
 }
 
 export async function executeAPISecretStorageServiceCommand(
-    command: RegistryCommandType,
+    command: SecretStorageCommand,
     data: Record<string, any>,
 ) : Promise<SingleResourceResponse<Record<string, any>>> {
     return executeAPIServiceTask(SERVICE_ID.SECRET_STORAGE, command, data);

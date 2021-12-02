@@ -82,8 +82,7 @@ export class VaultAPI extends BaseAPI {
         options.version ??= VaultKVVersion.ONE;
 
         const response = await this.post(buildVaultKeyValueURLPath(options.version, engine, key), value);
-
-        return response.data?.data;
+        return response.data;
     }
 
     async findKeyValuePair(engine: string, key: string, options?: VaultKVOptions) : Promise<Record<string, any> | undefined> {

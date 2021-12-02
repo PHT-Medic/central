@@ -61,5 +61,5 @@ export async function doAuthClientCommand(req: any, res: any) {
 
     await repository.save(entity);
 
-    return res._respondAccepted({ data: entity });
+    return res.respondAccepted({ data: entity });
 }
