@@ -7,6 +7,7 @@
         "extraFileExtensions": [".vue"]
     },
     "rules": {
+        "default-case": "off",
         "no-underscore-dangle": "off",
         "no-shadow": "off",
 

@@ -15,6 +15,7 @@ import swaggerUi from 'swagger-ui-express';
 import { existsSync } from 'fs';
 import { setupAuthMiddleware } from '@typescript-auth/server';
 import { AuthorizationHeader } from '@typescript-auth/core';
+import promBundle from 'express-prom-bundle';
 import { getPublicDirPath, getWritableDirPath } from '../paths';
 import env from '../../env';
 import { useLogger } from '../../modules/log';
@@ -83,6 +84,13 @@ function createExpressApp() : ExpressAppInterface {
             }));
         }
     }
+
+    const metricsMiddleware = promBundle({
+        includeMethod: true,
+        includePath: true,
+    });
+
+    expressApp.use(metricsMiddleware);
 
     registerControllers(expressApp);
 
