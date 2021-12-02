@@ -118,15 +118,13 @@ async function runValidationRules(req: ExpressRequest) {
 
 async function extendSecretEnginePayload(
     id: typeof User.prototype.id,
-    type: SecretType,
+    key: string,
     value: string,
 ) {
     const keyPath = buildSecretStorageUserKey(id);
 
     const payload : UserSecretEngineSecretPayload = {
-        data: {
-
-        },
+        data: {},
         options: {
             cas: 1,
         },
@@ -140,14 +138,7 @@ async function extendSecretEnginePayload(
         // ...
     }
 
-    switch (type) {
-        case SecretType.PAILLIER_PUBLIC_KEY:
-            payload.data.paillier_public_key = value;
-            break;
-        case SecretType.RSA_PUBLIC_KEY:
-            payload.data.rsa_public_key = value;
-            break;
-    }
+    payload.data[key] = value;
 
     await saveToSecretEngine(USER_SECRET_ENGINE_KEY, id.toString(), payload);
 }
@@ -171,7 +162,7 @@ async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
 
     await repository.save(entity);
 
-    await extendSecretEnginePayload(entity.user_id, entity.type, entity.content);
+    await extendSecretEnginePayload(entity.user_id, entity.key, entity.content);
 
     return res.respond({ data: entity });
 }
@@ -203,7 +194,7 @@ async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
 
     await repository.save(entity);
 
-    await extendSecretEnginePayload(entity.user_id, entity.type, entity.content);
+    await extendSecretEnginePayload(entity.user_id, entity.key, entity.content);
 
     return res.respond({ data: entity });
 }

@@ -185,8 +185,9 @@ export default {
                         <div class="c-list-icon">
                             <i class="fa fa-key" />
                         </div>
-                        <slot name="item-name"
-                              :item="item"
+                        <slot
+                            name="item-name"
+                            :item="item"
                         >
                             <div class="mb-0">
                                 <template v-if="item.type === secretType.constant.RSA_PUBLIC_KEY">
@@ -227,6 +228,7 @@ export default {
 
                     <div class="c-list-content">
                         <div class="">
+                            <strong>Key:</strong> {{ item.key | str_length_limit(50) }}<br>
                             <strong>Content:</strong> {{ item.content | str_length_limit(50) }}
                         </div>
                     </div>

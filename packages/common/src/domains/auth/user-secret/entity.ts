@@ -6,21 +6,42 @@
  */
 
 import {
+    BeforeInsert,
+    BeforeUpdate,
     Column,
     CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../user';
 import { SecretType } from './constants';
 
+@Unique('keyUserId', [
+    'key',
+    'user_id',
+])
 @Entity({ name: 'user_secrets' })
 export class UserSecret {
     @PrimaryGeneratedColumn()
         id: number;
+
+    @Column({ type: 'varchar', length: 100 })
+        key: string;
+
+    @BeforeUpdate()
+    @BeforeInsert()
+    setKey() {
+        switch (this.type) {
+            case SecretType.PAILLIER_PUBLIC_KEY:
+            case SecretType.RSA_PUBLIC_KEY:
+                this.key = this.type;
+                break;
+        }
+    }
 
     @Column({ type: 'enum', enum: SecretType })
         type: SecretType;

@@ -149,18 +149,20 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
             throw new NotImplementedError();
         case SecretStorageCommand.ENGINE_KEY_PULL: {
             try {
-                const data: {
-                    [K in SecretType | 'rsa_station_public_key']?: string
-                } = {};
+                let data: Record<string, string> = {};
 
                 switch (type) {
                     case TargetEntity.STATION: {
                         const { data: responseData } = await useAPI(APIType.VAULT)
                             .get(buildSecretStorageStationKey(id));
 
-                        data.rsa_station_public_key = responseData.data.data.rsa_station_public_key;
+                        data = responseData.data.data;
 
-                        if (station && station.id) {
+                        if (
+                            station
+                            && station.id
+                            && data.rsa_station_public_key
+                        ) {
                             await getRepository(Station)
                                 .update({
                                     id: station.id,
@@ -175,8 +177,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                         const { data: responseData } = await useAPI(APIType.VAULT)
                             .get(buildSecretStorageUserKey(id));
 
-                        data[SecretType.RSA_PUBLIC_KEY] = responseData.data.data[SecretType.RSA_PUBLIC_KEY];
-                        data[SecretType.PAILLIER_PUBLIC_KEY] = responseData.data.data[SecretType.PAILLIER_PUBLIC_KEY];
+                        data = responseData.data.data;
                         break;
                     }
                 }
