@@ -2,7 +2,7 @@ name: docker
 
 on:
     push:
-        branches: [ docker ]
+        branches: [ dev ]
         tags:
             - v*
 
@@ -42,19 +42,13 @@ jobs:
 
                   # Use Docker `latest` tag convention
                   LATEST=false
-                  [ $VERSION == "docker" ] && LATEST=true
-                  [[ $string != *"alpha"* && $string != *"pre"* ]] && LATEST=true
+                  [[ $VERSION != *"alpha"* && $VERSION != *"pre"* && $VERSION != *"dev"* ]] && LATEST=true
 
                   echo IMAGE_ID=$IMAGE_ID
                   echo VERSION=$VERSION
-                  [ $VERSION != "docker" ] && docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-                  [ $VERSION != "docker" ] && docker push $IMAGE_ID:$VERSION
+
+                  docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+                  docker push $IMAGE_ID:$VERSION
 
                   [ "${LATEST}" == true ] && echo "VERSION=${VERSION}" && docker tag $IMAGE_NAME $IMAGE_ID:latest && docker push $IMAGE_ID:latest
-
-            -   name: Webhook
-                uses: distributhor/workflow-webhook@v2
-                env:
-                    webhook_url: ${{ secrets.WEBHOOK_URL }}
-                    webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
 
