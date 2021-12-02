@@ -32,7 +32,7 @@ jobs:
                     path: |
                         node_modules
                         */*/node_modules
-                    key: ${{ runner.os }}-${{ hashFiles('**/package.json.lock') }}
+                    key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
             - name: Build and install packages
               run: |
