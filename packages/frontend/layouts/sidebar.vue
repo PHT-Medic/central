@@ -14,8 +14,8 @@ export default {
         docsUrl() {
             return new URL('docs/', this.$config.apiUrl).href;
         },
-        statsUrl() {
-            return new URL('stats/', this.$config.apiUrl).href;
+        metricsUrl() {
+            return new URL('metrics', this.$config.apiUrl).href;
         },
         generalDocsUrl() {
             return 'https://pht-medic.github.io/documentation/';
@@ -49,10 +49,10 @@ export default {
                 <li class="nav-item">
                     <a
                         class="nav-link"
-                        :href="statsUrl"
+                        :href="metricsUrl"
                         target="_blank"
                     >
-                        <i class="fa fa-chart-bar" /> <span class="nav-link-text">Stats</span>
+                        <i class="fa fa-chart-bar" /> <span class="nav-link-text">Metrics</span>
                     </a>
                 </li>
                 <li class="nav-item">

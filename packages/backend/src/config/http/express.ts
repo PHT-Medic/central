@@ -13,7 +13,6 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import { existsSync } from 'fs';
-import { getMiddleware } from 'swagger-stats';
 import { setupAuthMiddleware } from '@typescript-auth/server';
 import { AuthorizationHeader } from '@typescript-auth/core';
 import { getPublicDirPath, getWritableDirPath } from '../paths';
@@ -81,12 +80,6 @@ function createExpressApp() : ExpressAppInterface {
                         }),
                     ],
                 },
-            }));
-
-            expressApp.use(getMiddleware({
-                uriPath: '/stats',
-                swaggerSpec: swaggerDocument,
-                name: 'stats',
             }));
         }
     }

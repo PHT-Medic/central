@@ -16,7 +16,7 @@ import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
 
-@SwaggerTags('service')
+@SwaggerTags('extra')
 @Controller('/service-clients')
 export class ServiceClientController {
     @Get('', [ForceLoggedInMiddleware])

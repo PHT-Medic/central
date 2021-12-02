@@ -19,7 +19,7 @@ import { doRegistryCommand } from './registry/command';
 import { doSecretStorageCommand } from './secret-storage/command';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 
-@SwaggerTags('service')
+@SwaggerTags('extra')
 @Controller('/services')
 export class ServiceController {
     @Post('/:id/hook', [ForceLoggedInMiddleware])

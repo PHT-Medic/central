@@ -27,6 +27,7 @@ import { ServiceClientController } from '../../app/controllers/extra/service-cli
 import { PermissionController } from '../../app/controllers/auth/permission';
 import { ClientController } from '../../app/controllers/auth/client';
 import { MasterImageGroupController } from '../../app/controllers/core/master-image-groups';
+import { MetricsController } from '../../app/controllers/extra/metrics';
 
 export function registerControllers(router: Application) {
     attachControllers(router, [
@@ -35,9 +36,10 @@ export function registerControllers(router: Application) {
         RealmController,
         ProviderController,
 
-        // Service
+        // Extra
         ServiceController,
         ServiceClientController,
+        MetricsController,
 
         ClientController,
         PermissionController,
