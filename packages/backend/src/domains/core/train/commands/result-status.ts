@@ -8,7 +8,7 @@
 import { Train } from '@personalhealthtrain/ui-common';
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
-import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../service/result-service';
+import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../extra/result-service';
 import { findTrain } from './utils';
 
 export async function triggerTrainResultStatus(

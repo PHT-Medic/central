@@ -8,7 +8,7 @@
 import { Train, TrainRunStatus } from '@personalhealthtrain/ui-common';
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
-import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../service/train-router';
+import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../extra/train-router';
 import { findTrain } from './utils';
 
 export async function stopTrain(train: Train | number | string) : Promise<Train> {

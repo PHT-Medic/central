@@ -12,7 +12,7 @@ import {
 } from '@personalhealthtrain/ui-common';
 import { Message, consumeQueue } from 'amqp-extension';
 import { getRepository } from 'typeorm';
-import { ResultServiceDataPayload } from '../domains/service/result-service';
+import { ResultServiceDataPayload } from '../domains/extra/result-service';
 import { MessageQueueResultServiceRoutingKey } from '../config/service/mq';
 
 export enum TrainResultEvent {

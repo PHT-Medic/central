@@ -18,7 +18,7 @@ import {
     stopBuildTrain,
     stopTrain,
     triggerTrainResultStart, triggerTrainResultStatus, triggerTrainResultStop,
-} from '../../../../../domains/pht/train/commands';
+} from '../../../../../domains/core/train/commands';
 import { ExpressRequest, ExpressResponse } from '../../../../../config/http/type';
 import { ExpressValidationError } from '../../../../../config/http/error/validation';
 

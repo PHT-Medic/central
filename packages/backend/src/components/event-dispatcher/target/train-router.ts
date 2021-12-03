@@ -7,8 +7,8 @@
 
 import { Message, publishMessage } from 'amqp-extension';
 import { isRegistryStationProjectName } from '@personalhealthtrain/ui-common';
-import { DispatcherHarborEventData } from '../../../domains/service/harbor/queue';
-import { TrainRouterHarborEvent, buildTrainRouterQueueMessage } from '../../../domains/service/train-router';
+import { DispatcherHarborEventData } from '../../../domains/extra/harbor/queue';
+import { TrainRouterHarborEvent, buildTrainRouterQueueMessage } from '../../../domains/extra/train-router';
 import { useLogger } from '../../../modules/log';
 
 export async function dispatchHarborEventToTrainRouter(

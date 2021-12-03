@@ -9,7 +9,7 @@ import { publishMessage } from 'amqp-extension';
 import { EntitySubscriberInterface, InsertEvent, UpdateEvent } from 'typeorm';
 import { AuthClientType, Client } from '@personalhealthtrain/ui-common';
 import { AuthClientSecurityComponentCommand } from '../../../components/auth-security';
-import { buildAuthClientSecurityQueueMessage } from '../../service/queue';
+import { buildAuthClientSecurityQueueMessage } from '../../extra/queue';
 
 export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
     // eslint-disable-next-line @typescript-eslint/ban-types,class-methods-use-this

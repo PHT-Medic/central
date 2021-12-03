@@ -8,8 +8,8 @@
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import { Train } from '@personalhealthtrain/ui-common';
-import { buildTrainBuilderQueueMessage } from '../../../service/train-builder/queue';
-import { TrainBuilderCommand } from '../../../service/train-builder/type';
+import { buildTrainBuilderQueueMessage } from '../../../extra/train-builder/queue';
+import { TrainBuilderCommand } from '../../../extra/train-builder/type';
 import { findTrain } from './utils';
 
 export async function detectTrainBuildStatus(train: Train | number | string, demo = false) : Promise<Train> {

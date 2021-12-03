@@ -10,8 +10,8 @@ import { Not, getRepository } from 'typeorm';
 import {
     Train, TrainBuildStatus, TrainConfigurationStatus, TrainResultStatus, TrainRunStatus, TrainStation, TrainStationApprovalStatus,
 } from '@personalhealthtrain/ui-common';
-import { buildTrainBuilderQueueMessage } from '../../../service/train-builder/queue';
-import { TrainBuilderCommand } from '../../../service/train-builder/type';
+import { buildTrainBuilderQueueMessage } from '../../../extra/train-builder/queue';
+import { TrainBuilderCommand } from '../../../extra/train-builder/type';
 import { findTrain } from './utils';
 
 export async function startBuildTrain(train: Train | number | string, demo = false) : Promise<Train> {

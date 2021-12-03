@@ -23,7 +23,7 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-erro
 import env from '../../../../env';
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
-import { DispatcherProposalEvent, emitDispatcherProposalEvent } from '../../../../domains/pht/proposal/queue';
+import { DispatcherProposalEvent, emitDispatcherProposalEvent } from '../../../../domains/core/proposal/queue';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 
 type PartialProposal = Partial<Proposal>;

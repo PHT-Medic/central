@@ -6,12 +6,21 @@
  */
 
 import { getRepository } from 'typeorm';
-import {
-    MasterImage, MasterImageGroup, Train, TrainFile, TrainStation, TrainStationApprovalStatus,
-} from '@personalhealthtrain/ui-common';
 
-export async function buildTrainBuilderStartCommandPayload(train: Train) {
-    const message : Record<string, any> = {
+import {
+    MasterImage,
+    MasterImageGroup,
+    SecretType,
+    Train,
+    TrainFile,
+    TrainStation,
+    TrainStationApprovalStatus,
+    UserSecret,
+} from '@personalhealthtrain/ui-common';
+import { TrainBuilderStartPayload } from '../type';
+
+export async function buildTrainBuilderStartCommandPayload(train: Train) : Promise<Partial<TrainBuilderStartPayload>> {
+    const message : Partial<TrainBuilderStartPayload> = {
         userId: train.user_id,
         trainId: train.id,
         buildId: train.build_id,
@@ -21,6 +30,18 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) {
         hashSigned: train.hash_signed,
         query: train.query,
     };
+
+    // ----------------------------------------------------
+
+    const userSecretRepository = getRepository(UserSecret);
+    const userSecret = await userSecretRepository.findOne({
+        user_id: train.user_id,
+        type: SecretType.PAILLIER_PUBLIC_KEY,
+    });
+
+    message.user_he_key = userSecret ? userSecret.content : null;
+
+    // ----------------------------------------------------
 
     const masterImageRepository = getRepository(MasterImage);
     const masterImage = await masterImageRepository.findOne(train.master_image_id);

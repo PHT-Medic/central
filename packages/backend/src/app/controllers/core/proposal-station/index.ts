@@ -18,7 +18,7 @@ import {
 } from '@decorators/express';
 import { ResponseExample, SwaggerTags } from 'typescript-swagger';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { DispatcherProposalEvent, emitDispatcherProposalEvent } from '../../../../domains/pht/proposal/queue';
+import { DispatcherProposalEvent, emitDispatcherProposalEvent } from '../../../../domains/core/proposal/queue';
 
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
 import env from '../../../../env';

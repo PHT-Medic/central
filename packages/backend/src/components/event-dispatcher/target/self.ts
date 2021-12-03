@@ -17,7 +17,7 @@ import {
 import { AggregatorMasterImagePushedEvent } from '../../../aggregators/dispatcher/handlers/master-image';
 import { AggregatorTrainEvent } from '../../../aggregators/dispatcher/handlers/train';
 
-import { DispatcherHarborEventData } from '../../../domains/service/harbor/queue';
+import { DispatcherHarborEventData } from '../../../domains/extra/harbor/queue';
 import { DispatcherHarborEventWithAdditionalData } from '../data/harbor';
 import { MessageQueueDispatcherRoutingKey } from '../../../config/service/mq';
 

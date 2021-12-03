@@ -22,7 +22,7 @@ import {
 
 import { getRepository } from 'typeorm';
 import env from '../../env';
-import { AuthClientSecurityQueueMessagePayload } from '../../domains/service/queue';
+import { AuthClientSecurityQueueMessagePayload } from '../../domains/extra/queue';
 
 export async function syncAuthClientSecurity(message: Message) {
     const payload : AuthClientSecurityQueueMessagePayload = message.data as AuthClientSecurityQueueMessagePayload;

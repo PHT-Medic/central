@@ -14,9 +14,9 @@ import {
 import {
     DispatcherProposalEvent,
     DispatcherProposalEventData,
-} from '../../../domains/pht/proposal/queue';
-import { DispatcherTrainEventData, DispatcherTrainEventType } from '../../../domains/pht/train/queue';
-import { DispatcherHarborEventData } from '../../../domains/service/harbor/queue';
+} from '../../../domains/core/proposal/queue';
+import { DispatcherTrainEventData, DispatcherTrainEventType } from '../../../domains/core/train/queue';
+import { DispatcherHarborEventData } from '../../../domains/extra/harbor/queue';
 import { DispatcherHarborEventWithAdditionalData } from '../data/harbor';
 import { MessageQueueEmailServiceRoutingKey } from '../../../config/service/mq';
 

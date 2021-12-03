@@ -8,7 +8,7 @@
 import { AuthClientCommand, AuthClientType, Client } from '@personalhealthtrain/ui-common';
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
-import { buildAuthClientSecurityQueueMessage } from '../../../../domains/service/queue';
+import { buildAuthClientSecurityQueueMessage } from '../../../../domains/extra/queue';
 import { AuthClientSecurityComponentCommand } from '../../../../components/auth-security';
 
 const commands = Object.values(AuthClientCommand);

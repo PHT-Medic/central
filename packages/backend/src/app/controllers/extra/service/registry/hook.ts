@@ -15,7 +15,7 @@ import {
 } from '@personalhealthtrain/ui-common';
 import { publishMessage } from 'amqp-extension';
 import { useLogger } from '../../../../../modules/log';
-import { DispatcherHarborEventType, buildDispatcherHarborEvent } from '../../../../../domains/service/harbor/queue';
+import { DispatcherHarborEventType, buildDispatcherHarborEvent } from '../../../../../domains/extra/harbor/queue';
 import { ExpressRequest, ExpressResponse } from '../../../../../config/http/type';
 
 let eventValidator : undefined | BaseSchema;

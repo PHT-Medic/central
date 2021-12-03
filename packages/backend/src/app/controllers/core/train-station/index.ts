@@ -24,7 +24,7 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-erro
 import env from '../../../../env';
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
-import { DispatcherTrainEventType, emitDispatcherTrainEvent } from '../../../../domains/pht/train/queue';
+import { DispatcherTrainEventType, emitDispatcherTrainEvent } from '../../../../domains/core/train/queue';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 
 type PartialTrainStation = Partial<TrainStation>;
