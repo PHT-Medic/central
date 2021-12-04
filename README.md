@@ -7,6 +7,14 @@ This repository contains all packages of the Central-UI in context of the Person
 
 ![](assets/ui.jpg)
 
+**Table of Contents**
+
+- [Installation](#installation)
+- [Build](#build)
+- [Configuration](#configuration)
+- [Run](#run)
+- [Credits](#credits)
+
 ## Installation
 Download the source code.
 
