@@ -7,7 +7,6 @@
         "extraFileExtensions": [".vue"]
     },
     "rules": {
-        "default-case": "off",
         "no-underscore-dangle": "off",
         "no-shadow": "off",
 
@@ -18,11 +17,7 @@
             "devDependencies": true,
             "optionalDependencies": false,
             "peerDependencies": false
-        }],
-
-        "@typescript-eslint/no-shadow": "off",
-
-        "vue/require-default-prop": "off"
+        }]
     },
     "ignorePatterns": ["**/dist/*", "**/*.d.ts", "**/writable/**"],
     "globals": {

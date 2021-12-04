@@ -103,10 +103,10 @@ export class NavigationProvider implements NavigationProviderInterface {
 
         // ------------------------
 
-        const secondaryDefaultItems = this.flatternNestedComponents(this.secondaryDefaultItems)
+        const secondaryDefaultItems = this.flattenNestedComponents(this.secondaryDefaultItems)
             .sort(sortFunc)
             .filter(filterFunc);
-        const secondaryAdminItems = this.flatternNestedComponents(this.secondaryAdminItems)
+        const secondaryAdminItems = this.flattenNestedComponents(this.secondaryAdminItems)
             .sort(sortFunc)
             .filter(filterFunc);
 
@@ -134,12 +134,12 @@ export class NavigationProvider implements NavigationProviderInterface {
 
     // ----------------------------------------------------
 
-    private flatternNestedComponents(components: NavigationComponentConfig[]) : NavigationComponentConfig[] {
+    private flattenNestedComponents(components: NavigationComponentConfig[]) : NavigationComponentConfig[] {
         const output = [...components];
 
         components.map((component) => {
             if (component.components) {
-                output.push(...this.flatternNestedComponents(component.components));
+                output.push(...this.flattenNestedComponents(component.components));
             }
         });
 

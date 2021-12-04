@@ -32,7 +32,7 @@ export type TrainBuilderStartPayload = {
     entrypointCommandArguments?: string | string[],
     entrypointPath: string,
 
-    files: string[], // todo: this might should be removed
+    files: string[],
 
     stations: typeof Station.prototype.secure_id[],
 
