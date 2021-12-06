@@ -6,5 +6,6 @@
  */
 
 export * from './has-own-property';
+export * from './hex-checker';
 export * from './merge-deep';
 export * from './nullify-properties';
