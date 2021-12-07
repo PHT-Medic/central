@@ -95,6 +95,8 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
                 request.realmId = MASTER_REALM_ID;
 
                 request.ability = new AbilityManager([]);
+
+                return;
             }
 
             const userRepository = getCustomRepository<UserRepository>(UserRepository);
