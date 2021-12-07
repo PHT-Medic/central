@@ -12,13 +12,11 @@ import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 
 import AlertMessage from '../../../alert/AlertMessage';
 import NotImplemented from '../../../NotImplemented';
-import { clearObjectProperties } from '../../../../modules/utils.ts';
 
 export default {
     name: 'ProviderForm',
     components: {
         AlertMessage,
-        NotImplemented,
     },
     props: {
         provider: {
@@ -26,7 +24,7 @@ export default {
             default: {},
         },
         realmId: {
-            type: String | Number,
+            type: String,
             default: null,
         },
     },
@@ -34,7 +32,7 @@ export default {
         return {
             formData: {
                 name: '',
-                openId: false,
+                open_id: false,
                 token_host: '',
                 token_path: '',
                 authorize_host: '',
@@ -151,7 +149,7 @@ export default {
                 let response;
 
                 if (this.isEditing) {
-                    response = await editAPIProvider(this.provider.id, clearObjectProperties(this.formData));
+                    response = await editAPIProvider(this.provider.id, this.formData);
 
                     this.message = {
                         isError: false,
@@ -160,7 +158,7 @@ export default {
 
                     this.$emit('updated', response);
                 } else {
-                    response = await addAPIProvider(clearObjectProperties(this.formData));
+                    response = await addAPIProvider(this.formData);
 
                     this.message = {
                         isError: false,
@@ -424,13 +422,15 @@ export default {
                         v-if="!$v.formData.authorize_host.minLength"
                         class="form-group-hint group-required"
                     >
-                        The length of the authorization host must be greater than <strong>{{ $v.formData.token_host.$params.minLength.min }}</strong> characters.
+                        The length of the authorization host must be greater than
+                        <strong>{{ $v.formData.token_host.$params.minLength.min }}</strong> characters.
                     </div>
                     <div
                         v-if="!$v.formData.authorize_host.maxLength"
                         class="form-group-hint group-required"
                     >
-                        The length of the authorization host must be less than  <strong>{{ $v.formData.authorize_host.$params.maxLength.max }}</strong> characters.
+                        The length of the authorization host must be less than
+                        <strong>{{ $v.formData.authorize_host.$params.maxLength.max }}</strong> characters.
                     </div>
                 </div>
 

@@ -79,7 +79,7 @@ const env : Environment = {
 
     userPasswordImmutable: requireFromEnv('USER_PASSWORD_IMMUTABLE', 'false').toLowerCase() !== 'false',
     userSecretsImmutable: requireFromEnv('USER_SECRETS_IMMUTABLE', 'false').toLowerCase() !== 'false',
-    httpProxyAPIs: requireFromEnv('HTTP_PROXY_APIS', undefined),
+    httpProxyAPIs: requireFromEnv('HTTP_PROXY_APIS', null),
 };
 
 export default env;
