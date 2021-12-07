@@ -17,7 +17,7 @@ export type ProxyConnectionConfig = {
 
 export function parseProxyConnectionString(connectionStr: string) : ProxyConnectionConfig | undefined {
     const match = connectionStr
-        .match(/(?:(https|http)?:\/\/)(?:(\w+)(?::(\w+))?@)?((?:\d{1,3})(?:\.\d{1,3}){3})(?::(\d{1,5}))?$/);
+        .match(/(?:(https|http):\/\/)(?:(\w+)(?::(\w+))?@)?(?:([^:]+))(?::(\d{1,5}))?$/);
 
     if (!match) {
         return undefined;
