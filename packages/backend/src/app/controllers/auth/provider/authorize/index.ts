@@ -5,7 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { OAuth2Provider, TokenPayload } from '@personalhealthtrain/ui-common';
+import {
+    OAuth2Provider,
+    ProxyConnectionConfig,
+    TokenPayload,
+    detectProxyConnectionConfig,
+} from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
 import { Oauth2Client, Oauth2TokenResponse } from '@typescript-auth/core';
 import { createToken } from '@typescript-auth/server';
@@ -56,6 +61,7 @@ export async function authorizeCallbackRoute(req: ExpressRequest, res: ExpressRe
     if (typeof provider === 'undefined') {
         throw new NotFoundError();
     }
+    const proxyConfig : ProxyConnectionConfig | undefined = detectProxyConnectionConfig();
 
     const oauth2Client = new Oauth2Client({
         client_id: provider.client_id,
@@ -65,7 +71,7 @@ export async function authorizeCallbackRoute(req: ExpressRequest, res: ExpressRe
         token_path: provider.token_path,
 
         redirect_uri: `${env.apiUrl}/providers/${provider.id}/authorize-callback`,
-    });
+    }, proxyConfig ? { proxy: proxyConfig } : {});
 
     const tokenResponse : Oauth2TokenResponse = await oauth2Client.getTokenWithAuthorizeGrant({
         code: code as string,

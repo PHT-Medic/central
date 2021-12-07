@@ -6,7 +6,7 @@
  */
 
 import {
-    APIType,
+    APIType, ProxyConnectionConfig, detectProxyConnectionConfig,
     setAPIConfig,
 } from '@personalhealthtrain/ui-common';
 import { setConfig } from 'amqp-extension';
@@ -28,8 +28,32 @@ export type Config = {
 };
 
 function createConfig({ env } : ConfigContext) : Config {
-    setAPIConfig(APIType.HARBOR, { type: APIType.HARBOR, connectionString: env.harborConnectionString });
-    setAPIConfig(APIType.VAULT, { type: APIType.VAULT, connectionString: env.vaultConnectionString });
+    let proxyAPis : string[] = [];
+    if (env.httpProxyAPIs) {
+        proxyAPis = env.httpProxyAPIs.split(',').map((api) => api.toLowerCase());
+    }
+
+    const proxyConfig : ProxyConnectionConfig | undefined = detectProxyConnectionConfig();
+
+    setAPIConfig(APIType.HARBOR, {
+        type: APIType.HARBOR,
+        connectionString: env.harborConnectionString,
+        driver: {
+            ...(proxyAPis.includes('harbor') && proxyConfig ? {
+                proxy: proxyConfig,
+            } : {}),
+        },
+    });
+
+    setAPIConfig(APIType.VAULT, {
+        type: APIType.VAULT,
+        connectionString: env.vaultConnectionString,
+        driver: {
+            ...(proxyAPis.includes('vault') && proxyConfig ? {
+                proxy: proxyConfig,
+            } : {}),
+        },
+    });
 
     setConfig({
         connection: env.rabbitMqConnectionString,

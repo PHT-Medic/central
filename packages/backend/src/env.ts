@@ -49,7 +49,9 @@ export interface Environment {
     skipTrainApprovalOperation: boolean,
 
     userPasswordImmutable: boolean,
-    userSecretsImmutable: boolean
+    userSecretsImmutable: boolean,
+
+    httpProxyAPIs: string | undefined
 }
 
 // tslint:disable-next-line:radix
@@ -77,6 +79,7 @@ const env : Environment = {
 
     userPasswordImmutable: requireFromEnv('USER_PASSWORD_IMMUTABLE', 'false').toLowerCase() !== 'false',
     userSecretsImmutable: requireFromEnv('USER_SECRETS_IMMUTABLE', 'false').toLowerCase() !== 'false',
+    httpProxyAPIs: requireFromEnv('HTTP_PROXY_APIS', undefined),
 };
 
 export default env;
