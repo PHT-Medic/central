@@ -14,9 +14,12 @@ export class AuthStorage extends BaseStorage {
         options = options ?? {};
 
         const defaultOptions : StorageOptionsInterface = {
-            cookie: process.env.NODE_ENV !== 'production' ? {
+            cookie: {
                 path: '/',
-            } : false,
+                ...(process.env.API_URL === 'production' ? {
+                    domain: new URL(process.env.API_URL).hostname,
+                } : {}),
+            },
             localStorage: true,
             sessionStorage: false,
             namespace: 'auth',

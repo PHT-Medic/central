@@ -16,6 +16,7 @@ import { Oauth2Client, Oauth2TokenResponse } from '@typescript-auth/core';
 import { createToken } from '@typescript-auth/server';
 
 import { BadRequestError, NotFoundError } from '@typescript-error/http';
+import { URL } from 'url';
 import env from '../../../../../env';
 import { getWritableDirPath } from '../../../../../config/paths';
 
@@ -99,11 +100,12 @@ export async function authorizeCallbackRoute(req: ExpressRequest, res: ExpressRe
         token_type: 'Bearer',
     };
 
-    if (env.env !== 'production') {
-        res.cookie('auth_token', JSON.stringify(cookie), {
-            maxAge: expiresIn * 1000,
-        });
-    }
+    res.cookie('auth_token', JSON.stringify(cookie), {
+        maxAge: expiresIn * 1000,
+        ...(env.env === 'production' ? {
+            domain: new URL(env.webAppUrl).hostname,
+        } : {}),
+    });
 
     return res.redirect(env.webAppUrl);
 }
