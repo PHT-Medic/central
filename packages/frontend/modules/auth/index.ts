@@ -6,7 +6,9 @@
  */
 
 import { Context } from '@nuxt/types';
-import { APIType, useAPI } from '@personalhealthtrain/ui-common';
+import {
+    APIType, detectProxyConnectionConfig, useAPI,
+} from '@personalhealthtrain/ui-common';
 import {
     AbilityManager,
     AbilityMeta,
@@ -15,7 +17,7 @@ import {
     PermissionItem,
     buildAbilityMetaFromName,
 } from '@typescript-auth/core';
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { Store } from 'vuex';
 import { AuthStoreToken } from '@/store/auth';
 
@@ -50,12 +52,23 @@ class AuthModule {
     constructor(ctx: Context, options: AuthModuleOptions) {
         this.ctx = ctx;
 
+        const proxyConfig = detectProxyConnectionConfig();
+
+        const httpClient : AxiosRequestConfig = {};
+
+        if (
+            process.server &&
+            proxyConfig
+        ) {
+            httpClient.proxy = proxyConfig;
+        }
+
         this.client = new Oauth2Client({
             token_host: options.tokenHost,
             token_path: options.tokenPath,
             user_info_path: options.userInfoPath,
             client_id: 'user-interface',
-        });
+        }, httpClient);
 
         this.abilityManager = new AbilityManager([]);
 
