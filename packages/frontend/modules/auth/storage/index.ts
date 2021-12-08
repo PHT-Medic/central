@@ -20,7 +20,7 @@ export class AuthStorage extends BaseStorage {
                     domain: new URL(process.env.API_URL).hostname,
                 } : {}),
             },
-            localStorage: true,
+            localStorage: false,
             sessionStorage: false,
             namespace: 'auth',
         };

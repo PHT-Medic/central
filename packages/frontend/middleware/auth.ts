@@ -73,6 +73,7 @@ export default async function ({
         try {
             await (<AuthModule> $auth).resolveMe();
         } catch (e) {
+            console.log(e);
             if (store.getters['auth/loggedIn']) {
                 await redirect({
                     path: '/logout',
@@ -88,8 +89,8 @@ export default async function ({
     }
 
     if (
-        Array.isArray(route.meta)
-        && route.meta.some((meta) => !!meta[LayoutKey.REQUIRED_LOGGED_IN])
+        Array.isArray(route.meta) &&
+        route.meta.some((meta) => !!meta[LayoutKey.REQUIRED_LOGGED_IN])
     ) {
         if (!store.getters['auth/loggedIn']) {
             await store.dispatch('auth/triggerLogout');
@@ -112,8 +113,8 @@ export default async function ({
     }
 
     if (
-        Array.isArray(route.meta)
-        && route.meta.some((meta) => meta[LayoutKey.REQUIRED_LOGGED_OUT])
+        Array.isArray(route.meta) &&
+        route.meta.some((meta) => meta[LayoutKey.REQUIRED_LOGGED_OUT])
     ) {
         if (store.getters['auth/loggedIn']) {
             await redirect({ path: redirectPath });

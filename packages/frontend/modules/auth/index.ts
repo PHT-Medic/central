@@ -156,7 +156,7 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public resolveMe() : Promise<Record<string, any> | undefined> {
+    public async resolveMe() : Promise<Record<string, any> | undefined> {
         if (typeof this.identifyPromise !== 'undefined') {
             return this.identifyPromise;
         }
