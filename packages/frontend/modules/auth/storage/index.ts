@@ -14,10 +14,10 @@ export class AuthStorage extends BaseStorage {
         options = options ?? {};
 
         const defaultOptions : StorageOptionsInterface = {
-            cookie: {
+            cookie: process.env.NODE_ENV !== 'production' ? {
                 path: '/',
-            },
-            localStorage: false,
+            } : false,
+            localStorage: true,
             sessionStorage: false,
             namespace: 'auth',
         };

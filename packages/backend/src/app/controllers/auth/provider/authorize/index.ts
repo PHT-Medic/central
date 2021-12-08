@@ -99,9 +99,11 @@ export async function authorizeCallbackRoute(req: ExpressRequest, res: ExpressRe
         token_type: 'Bearer',
     };
 
-    res.cookie('auth_token', JSON.stringify(cookie), {
-        maxAge: expiresIn * 1000,
-    });
+    if (env.env !== 'production') {
+        res.cookie('auth_token', JSON.stringify(cookie), {
+            maxAge: expiresIn * 1000,
+        });
+    }
 
     return res.redirect(env.webAppUrl);
 }
