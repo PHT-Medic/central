@@ -47,14 +47,15 @@ export async function authenticateWithAuthorizationHeader(request: any, value: A
 
             if (
                 // ipv4 + ipv6 local addresses
-                ['::1', '127.0.0.1'].indexOf(currentAddress) === -1
-                && tokenAddress !== currentAddress
+                ['::1', '127.0.0.1'].indexOf(currentAddress) === -1 &&
+                tokenAddress !== currentAddress &&
                 // allow private network addresses, maybe explicit whitelist possible frontend ip addresses instead.
-                && !isIp4InCidr(currentAddress, '10.0.0.0/8')
-                && !isIp4InCidr(currentAddress, '172.16.0.0/12')
-                && !isIp4InCidr(currentAddress, '192.168.0.0/16')
+                !isIp4InCidr(currentAddress, '10.0.0.0/8') &&
+                !isIp4InCidr(currentAddress, '172.16.0.0/12') &&
+                !isIp4InCidr(currentAddress, '192.168.0.0/16')
             ) {
-                throw new UnauthorizedError();
+                // todo: removed for dmz proxy setting
+                // throw new UnauthorizedError();
             }
 
             const userRepository = getCustomRepository<UserRepository>(UserRepository);
