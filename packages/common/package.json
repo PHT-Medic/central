@@ -17,7 +17,8 @@
     "devDependencies": {
         "@types/node": "^16.11.9",
         "rimraf": "^3.0.2",
-        "typescript": "^4.5.2"
+        "typescript": "^4.5.2",
+        "typeorm": "^0.2.41"
     },
     "dependencies": {
         "@trapi/query": "^2.0.1",
@@ -25,7 +26,7 @@
         "axios": "^0.24.0"
     },
     "peerDependencies": {
-        "typeorm": "^0.2.41"
+        "typeorm": "^0.2.x"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
     "publishConfig": {

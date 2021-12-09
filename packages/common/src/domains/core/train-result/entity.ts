@@ -15,6 +15,7 @@ import {
 } from 'typeorm';
 import { Train } from '../train';
 import { TrainResultStatus } from './status';
+import { User } from '../../auth';
 
 @Entity({ name: 'train_results' })
 export class TrainResult {
@@ -45,4 +46,13 @@ export class TrainResult {
     @ManyToOne(() => Train, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'train_id' })
         train: Train;
+
+    // ------------------------------------------------------------------
+
+    @Column({ type: 'int', unsigned: true })
+        user_id: number;
+
+    @ManyToOne(() => User, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'user_id' })
+        user: User;
 }
