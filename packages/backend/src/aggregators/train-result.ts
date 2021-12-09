@@ -9,6 +9,7 @@ import {
     Train,
     TrainResult,
     TrainResultStatus,
+    hasOwnProperty,
 } from '@personalhealthtrain/ui-common';
 import { Message, consumeQueue } from 'amqp-extension';
 import { getRepository } from 'typeorm';
@@ -47,16 +48,15 @@ const EventStatusMap : Record<TrainResultEvent, TrainResultStatus | null> = {
 };
 
 async function handleTrainResult(data: ResultServiceDataPayload, event: TrainResultEvent) {
-    if (!(EventStatusMap.hasOwnProperty(event))) {
+    if (!(hasOwnProperty(EventStatusMap, event))) {
         return;
     }
 
     const status : TrainResultStatus | null = EventStatusMap[event];
     const latest = typeof data.latest === 'boolean' ? data.latest : true;
 
+    const trainRepository = getRepository(Train);
     if (latest) {
-        const trainRepository = getRepository(Train);
-
         await trainRepository.update({
             id: data.trainId,
         }, {
@@ -71,6 +71,8 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: TrainRes
         return;
     }
 
+    const train = await trainRepository.findOne(data.trainId);
+
     const resultRepository = getRepository(TrainResult);
     let result = await resultRepository.findOne({
         id: data.id,
@@ -82,6 +84,7 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: TrainRes
             id: data.id,
             train_id: data.trainId,
             status,
+            user_id: train.user_id,
         });
     } else {
         result = resultRepository.merge(result, {
