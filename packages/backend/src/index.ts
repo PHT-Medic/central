@@ -21,6 +21,8 @@ import { initDemo } from './demo';
 
 dotenv.config();
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 (async () => {
     /*
     HTTP Server & Express App

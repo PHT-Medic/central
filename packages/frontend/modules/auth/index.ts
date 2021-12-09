@@ -19,6 +19,7 @@ import {
 } from '@typescript-auth/core';
 import axios, { AxiosRequestConfig } from 'axios';
 import { Store } from 'vuex';
+import https from 'https';
 import { AuthStoreToken } from '@/store/auth';
 
 export type AuthModuleOptions = {
@@ -54,7 +55,11 @@ class AuthModule {
 
         const proxyConfig = detectProxyConnectionConfig();
 
-        const httpClient : AxiosRequestConfig = {};
+        const httpClient : AxiosRequestConfig = {
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false,
+            }),
+        };
 
         if (
             process.server &&

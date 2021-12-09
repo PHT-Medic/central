@@ -10,6 +10,7 @@ import {
     setAPIConfig,
 } from '@personalhealthtrain/ui-common';
 import { setConfig } from 'amqp-extension';
+import https from 'https';
 import { buildDispatcherComponent } from './components/event-dispatcher';
 import { Environment } from './env';
 import { buildTrainBuilderAggregator } from './aggregators/train-builder';
@@ -44,6 +45,9 @@ function createConfig({ env } : ConfigContext) : Config {
             ...(proxyAPis.includes('harbor') && proxyConfig ? {
                 proxy: proxyConfig,
             } : {}),
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false,
+            }),
         },
     });
 
@@ -54,6 +58,9 @@ function createConfig({ env } : ConfigContext) : Config {
             ...(proxyAPis.includes('vault') && proxyConfig ? {
                 proxy: proxyConfig,
             } : {}),
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false,
+            }),
         },
     });
 

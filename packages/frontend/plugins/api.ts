@@ -7,6 +7,7 @@
 
 import { APIType, setAPIConfig, useAPI } from '@personalhealthtrain/ui-common';
 import { Context } from '@nuxt/types';
+import https from 'https';
 
 export default (ctx: Context) => {
     let apiUrl : string | undefined;
@@ -21,6 +22,9 @@ export default (ctx: Context) => {
         driver: {
             baseURL: apiUrl,
             withCredentials: true,
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false,
+            }),
         },
     });
 
