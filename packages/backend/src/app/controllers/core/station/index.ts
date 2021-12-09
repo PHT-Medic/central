@@ -100,8 +100,8 @@ export async function getStationRouteHandler(req: ExpressRequest, res: ExpressRe
     // todo: should be implemented by assigning permissions to a service.
     const isPermittedService : boolean = typeof req.serviceId !== 'undefined' && req.realmId === MASTER_REALM_ID;
     if (
-        req.ability.hasPermission(PermissionID.STATION_EDIT)
-        || isPermittedService
+        req.ability.hasPermission(PermissionID.STATION_EDIT) ||
+        isPermittedService
     ) {
         applyFields(query, fields, {
             allowed: [
@@ -148,8 +148,8 @@ export async function getStationsRouteHandler(req: ExpressRequest, res: ExpressR
     // todo: should be implemented by assigning permissions to a service.
     const isPermittedService : boolean = typeof req.serviceId !== 'undefined' && req.realmId === MASTER_REALM_ID;
     if (
-        req.ability.hasPermission(PermissionID.STATION_EDIT)
-        || isPermittedService
+        req.ability.hasPermission(PermissionID.STATION_EDIT) ||
+        isPermittedService
     ) {
         applyFields(query, fields, {
             allowed: [

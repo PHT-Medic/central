@@ -90,8 +90,8 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
             }
         } catch (e) {
             if (
-                typeof e?.response?.status === 'number'
-                && e.response.status === 404
+                typeof e?.response?.status === 'number' &&
+                e.response.status === 404
             ) {
                 continue;
             }

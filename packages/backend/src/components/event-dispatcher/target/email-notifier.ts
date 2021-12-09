@@ -121,8 +121,8 @@ export async function dispatchHarborEventToEmailNotifier(
     const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
     if (isStationProject) {
         if (
-            typeof data.station === 'undefined'
-            || typeof data.stationIndex === 'undefined'
+            typeof data.station === 'undefined' ||
+            typeof data.stationIndex === 'undefined'
         ) {
             return message;
         }

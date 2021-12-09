@@ -62,8 +62,8 @@ export default {
             }
 
             if (
-                this.id === TrainStationStatic.INCOMING
-                && this.departed
+                this.id === TrainStationStatic.INCOMING &&
+                this.departed
             ) {
                 return 'departed';
             }

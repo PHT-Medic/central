@@ -18,8 +18,8 @@ export async function doAuthClientCommand(req: any, res: any) {
     const { id } = req.params;
 
     if (
-        !req.body.command
-        || commands.indexOf(req.body.command) === -1
+        !req.body.command ||
+        commands.indexOf(req.body.command) === -1
     ) {
         return res._failBadRequest({ message: 'The client command is not valid.' });
     }

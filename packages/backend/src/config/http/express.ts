@@ -64,8 +64,8 @@ function createExpressApp() : ExpressAppInterface {
     }));
 
     if (
-        env.swaggerDocumentation
-        && env.env !== 'test'
+        env.swaggerDocumentation &&
+        env.env !== 'test'
     ) {
         const swaggerDocumentPath: string = path.join(getWritableDirPath(), 'swagger.json');
         if (existsSync(swaggerDocumentPath)) {

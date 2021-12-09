@@ -59,13 +59,13 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
         throw new Error();
     }
 
-    message.entrypointCommand = masterImage.command
-        ? masterImage.command
-        : masterImageGroup.command;
+    message.entrypointCommand = masterImage.command ?
+        masterImage.command :
+        masterImageGroup.command;
 
-    message.entrypointCommandArguments = masterImage.command_arguments
-        ? masterImage.command_arguments
-        : masterImageGroup.command_arguments;
+    message.entrypointCommandArguments = masterImage.command_arguments ?
+        masterImage.command_arguments :
+        masterImageGroup.command_arguments;
 
     // ----------------------------------------------------
 

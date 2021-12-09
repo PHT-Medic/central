@@ -44,8 +44,8 @@ export default {
     },
     computed: {
         isShown() {
-            return this.$auth.can('edit', 'train')
-                && (this.train.run_status === TrainRunStatus.FINISHED || this.command === FrontendTrainCommand.RESULT_STATUS);
+            return this.$auth.can('edit', 'train') &&
+                (this.train.run_status === TrainRunStatus.FINISHED || this.command === FrontendTrainCommand.RESULT_STATUS);
         },
         isEnabled() {
             if (
@@ -56,14 +56,14 @@ export default {
 
             switch (this.command) {
                 case FrontendTrainCommand.RESULT_START:
-                    return !this.train.result_last_status
-                        || [
+                    return !this.train.result_last_status ||
+                        [
                             TrainResultStatus.STOPPED,
                             TrainResultStatus.FAILED,
                         ].indexOf(this.train.result_last_status) !== -1;
                 case FrontendTrainCommand.RESULT_STOP:
-                    return this.train.result_last_status
-                        && [
+                    return this.train.result_last_status &&
+                        [
                             TrainResultStatus.STARTING,
                             TrainResultStatus.STARTED,
                             TrainResultStatus.FINISHED,

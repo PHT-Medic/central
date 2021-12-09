@@ -91,8 +91,8 @@ export class TrainFileController {
 
 export async function getTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (
-        !req.ability.hasPermission(PermissionID.TRAIN_ADD)
-        && !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
+        !req.ability.hasPermission(PermissionID.TRAIN_ADD) &&
+        !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
     ) {
         throw new ForbiddenError();
     }
@@ -148,8 +148,8 @@ export async function dropTrainFileRouteHandler(req: ExpressRequest, res: Expres
     }
 
     if (
-        !req.ability.hasPermission(PermissionID.TRAIN_ADD)
-        && !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
+        !req.ability.hasPermission(PermissionID.TRAIN_ADD) &&
+        !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
     ) {
         throw new ForbiddenError();
     }

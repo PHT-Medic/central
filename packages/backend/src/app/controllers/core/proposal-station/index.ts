@@ -131,8 +131,8 @@ export async function getProposalStationRouteHandler(req: ExpressRequest, res: E
     }
 
     if (
-        !isPermittedForResourceRealm(req.realmId, entity.station.realm_id)
-        && !isPermittedForResourceRealm(req.realmId, entity.proposal.realm_id)
+        !isPermittedForResourceRealm(req.realmId, entity.station.realm_id) &&
+        !isPermittedForResourceRealm(req.realmId, entity.proposal.realm_id)
     ) {
         throw new ForbiddenError();
     }
@@ -152,8 +152,8 @@ export async function addProposalStationRouteHandler(req: ExpressRequest, res: E
         .run(req);
 
     if (
-        !req.ability.hasPermission(PermissionID.PROPOSAL_EDIT)
-        && !req.ability.hasPermission(PermissionID.PROPOSAL_ADD)
+        !req.ability.hasPermission(PermissionID.PROPOSAL_EDIT) &&
+        !req.ability.hasPermission(PermissionID.PROPOSAL_ADD)
     ) {
         throw new ForbiddenError('You are not allowed to add a proposal station.');
     }
@@ -207,8 +207,8 @@ export async function editProposalStationRouteHandler(req: ExpressRequest, res: 
     const isAuthorizedForRealm = req.ability.can('edit', 'proposal');
 
     if (
-        !(isAuthorityOfStation && isAuthorizedForStation)
-        && !(isAuthorityOfRealm && isAuthorizedForRealm)
+        !(isAuthorityOfStation && isAuthorizedForStation) &&
+        !(isAuthorityOfRealm && isAuthorizedForRealm)
     ) {
         throw new ForbiddenError();
     }
@@ -239,9 +239,9 @@ export async function editProposalStationRouteHandler(req: ExpressRequest, res: 
     proposalStation = await repository.save(proposalStation);
 
     if (
-        data.approval_status
-        && data.approval_status !== entityStatus
-        && Object.values(ProposalStationApprovalStatus).includes(data.approval_status)
+        data.approval_status &&
+        data.approval_status !== entityStatus &&
+        Object.values(ProposalStationApprovalStatus).includes(data.approval_status)
     ) {
         await emitDispatcherProposalEvent({
             event: proposalStation.approval_status as unknown as DispatcherProposalEvent,
@@ -260,8 +260,8 @@ export async function dropProposalStationRouteHandler(req: ExpressRequest, res: 
     const { id } = req.params;
 
     if (
-        !req.ability.hasPermission(PermissionID.PROPOSAL_EDIT)
-        && !req.ability.hasPermission(PermissionID.PROPOSAL_ADD)
+        !req.ability.hasPermission(PermissionID.PROPOSAL_EDIT) &&
+        !req.ability.hasPermission(PermissionID.PROPOSAL_ADD)
     ) {
         throw new ForbiddenError('You are not allowed to drop a proposal station.');
     }
@@ -277,8 +277,8 @@ export async function dropProposalStationRouteHandler(req: ExpressRequest, res: 
     }
 
     if (
-        !isPermittedForResourceRealm(req.realmId, entity.station.realm_id)
-        && !isPermittedForResourceRealm(req.realmId, entity.proposal.realm_id)
+        !isPermittedForResourceRealm(req.realmId, entity.station.realm_id) &&
+        !isPermittedForResourceRealm(req.realmId, entity.proposal.realm_id)
     ) {
         throw new ForbiddenError('You are not authorized to drop this proposal station.');
     }

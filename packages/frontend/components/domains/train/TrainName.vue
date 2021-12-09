@@ -77,9 +77,10 @@ export default {
             >
         </template>
         <template v-else>
-            <slot name="text"
-                  :entity="entity"
-                  :display-text="displayText"
+            <slot
+                name="text"
+                :entity="entity"
+                :display-text="displayText"
             >
 
                 {{ displayText }}

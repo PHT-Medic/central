@@ -160,8 +160,8 @@ export default {
         dropFormFile(event) {
             const index = this.form.files.findIndex((file) => {
                 if (
-                    hasOwnProperty(file, 'webkitRelativePath')
-                    && hasOwnProperty(event, 'webkitRelativePath')
+                    hasOwnProperty(file, 'webkitRelativePath') &&
+                    hasOwnProperty(event, 'webkitRelativePath')
                 ) {
                     return file.webkitRelativePath === event.webkitRelativePath;
                 }

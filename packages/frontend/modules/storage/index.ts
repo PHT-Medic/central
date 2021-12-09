@@ -295,9 +295,9 @@ export default class BaseStorage {
     // Cookies
     // ------------------------------------
     getCookies() {
-        const cookieStr = process.client
-            ? document.cookie
-            : this.ctx.req.headers.cookie;
+        const cookieStr = process.client ?
+            document.cookie :
+            this.ctx.req.headers.cookie;
 
         const items : {[key: string] : any} = decodeValue(parseCookie(cookieStr || '') || {});
         for (const key in items) {

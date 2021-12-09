@@ -57,12 +57,12 @@ export default {
     },
     computed: {
         canView() {
-            return this.$auth.hasPermission(PermissionID.TRAIN_ADD)
-                    || this.$auth.hasPermission(PermissionID.TRAIN_EDIT)
-                    || this.$auth.hasPermission(PermissionID.TRAIN_DROP)
-                    || this.$auth.hasPermission(PermissionID.TRAIN_RESULT_READ)
-                    || this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_START)
-                    || this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_STOP);
+            return this.$auth.hasPermission(PermissionID.TRAIN_ADD) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_EDIT) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_DROP) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_RESULT_READ) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_START) ||
+                    this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_STOP);
         },
         canEdit() {
             return this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT);

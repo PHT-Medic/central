@@ -48,12 +48,12 @@ export default {
         isShown() {
             return (
                 (
-                    this.train.configuration_status === TrainConfigurationStatus.FINISHED
-                        && this.train.build_status === TrainBuildStatus.FINISHED
-                )
-                        || this.command === FrontendTrainCommand.RUN_STATUS
-            )
-                && this.$auth.can('edit', 'train');
+                    this.train.configuration_status === TrainConfigurationStatus.FINISHED &&
+                        this.train.build_status === TrainBuildStatus.FINISHED
+                ) ||
+                        this.command === FrontendTrainCommand.RUN_STATUS
+            ) &&
+                this.$auth.can('edit', 'train');
         },
         isEnabled() {
             switch (this.command) {

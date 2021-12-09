@@ -49,8 +49,8 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
     const { command } = req.body;
 
     if (
-        !command
-        || commands.indexOf(command) === -1
+        !command ||
+        commands.indexOf(command) === -1
     ) {
         throw new BadRequestError('The secret storage command is not valid.');
     }
@@ -109,8 +109,8 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
         const userId = parseInt(getSecretStorageUserKey(rawPath), 10);
 
         if (
-            !req.ability.hasPermission(PermissionID.USER_EDIT)
-            && userId !== req.userId
+            !req.ability.hasPermission(PermissionID.USER_EDIT) &&
+            userId !== req.userId
         ) {
             throw new ForbiddenError();
         }
@@ -157,9 +157,9 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                         data = responseData.data.data;
 
                         if (
-                            station
-                            && station.id
-                            && data.rsa_station_public_key
+                            station &&
+                            station.id &&
+                            data.rsa_station_public_key
                         ) {
                             await getRepository(Station)
                                 .update({

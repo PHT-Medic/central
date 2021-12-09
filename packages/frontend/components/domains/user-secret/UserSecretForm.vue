@@ -69,8 +69,8 @@ export default {
             const keys = Object.keys(this.formData);
             for (let i = 0; i < keys.length; i++) {
                 if (
-                    typeof this.entityProperty !== 'undefined'
-                    && this.entityProperty[keys[i]]
+                    typeof this.entityProperty !== 'undefined' &&
+                    this.entityProperty[keys[i]]
                 ) {
                     this.formData[keys[i]] = this.entityProperty[keys[i]];
                 } else {
@@ -153,8 +153,9 @@ export default {
         <alert-message :message="message" />
 
         <div>
-            <div class="form-group"
-                 :class="{ 'form-group-error': $v.formData.content.$error }"
+            <div
+                class="form-group"
+                :class="{ 'form-group-error': $v.formData.content.$error }"
             >
                 <label>Type</label>
                 <select
@@ -164,9 +165,10 @@ export default {
                     <option value="">
                         ---Select---
                     </option>
-                    <option v-for="(item,key) in typeOptions"
-                            :key="key"
-                            :value="item.id"
+                    <option
+                        v-for="(item,key) in typeOptions"
+                        :key="key"
+                        :value="item.id"
                     >
                         {{ item.name }}
                     </option>

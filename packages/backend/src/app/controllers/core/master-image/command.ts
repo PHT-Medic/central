@@ -19,8 +19,8 @@ import { getWritableDirPath } from '../../../../config/paths';
 
 export async function handleMasterImageCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) {
     if (
-        !req.body
-        || Object.values(MasterImageCommand).indexOf(req.body.command) === -1
+        !req.body ||
+        Object.values(MasterImageCommand).indexOf(req.body.command) === -1
     ) {
         throw new BadRequestError('The master image command is not valid.');
     }

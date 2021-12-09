@@ -47,9 +47,9 @@ export default {
     },
     computed: {
         rolePermissionIndex() {
-            return this.rolePermissions.findIndex((rolePermission) => (this.primaryParameter === 'permission'
-                ? rolePermission.permission_id === this.permissionId
-                : rolePermission.role_id === this.roleId));
+            return this.rolePermissions.findIndex((rolePermission) => (this.primaryParameter === 'permission' ?
+                rolePermission.permission_id === this.permissionId :
+                rolePermission.role_id === this.roleId));
         },
         isAssigned() {
             return this.rolePermissionIndex !== -1;

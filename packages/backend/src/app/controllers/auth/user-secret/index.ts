@@ -106,8 +106,8 @@ export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse)
 
 async function runValidationRules(req: ExpressRequest) {
     if (
-        env.userSecretsImmutable
-        && !req.ability.hasPermission(PermissionID.USER_EDIT)
+        env.userSecretsImmutable &&
+        !req.ability.hasPermission(PermissionID.USER_EDIT)
     ) {
         throw new BadRequestError('User secrets are immutable and can not be changed in this environment.');
     }

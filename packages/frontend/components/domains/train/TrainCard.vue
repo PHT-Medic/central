@@ -87,9 +87,10 @@ export default {
         <div
             class="train-card-content align-items-center"
         >
-            <train-name :entity="train"
-                        :with-edit="true"
-                        @updated="handleUpdated"
+            <train-name
+                :entity="train"
+                :with-edit="true"
+                @updated="handleUpdated"
             >
                 <template #text="props">
                     <nuxt-link :to="'/trains/'+props.entity.id">

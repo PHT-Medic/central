@@ -34,8 +34,8 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
     const { command } = req.body;
 
     if (
-        !command
-        || commands.indexOf(command) === -1
+        !command ||
+        commands.indexOf(command) === -1
     ) {
         throw new BadRequestError('The harbor command is not valid.');
     }

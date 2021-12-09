@@ -187,8 +187,8 @@ export async function editUserRouteHandler(req: ExpressRequest, res: ExpressResp
     }
 
     if (
-        !req.ability.hasPermission(PermissionID.USER_EDIT)
-        && req.user.id !== id
+        !req.ability.hasPermission(PermissionID.USER_EDIT) &&
+        req.user.id !== id
     ) {
         throw new ForbiddenError('You are not authorized to modify a user.');
     }
@@ -206,9 +206,9 @@ export async function editUserRouteHandler(req: ExpressRequest, res: ExpressResp
     }
 
     if (
-        typeof data.password !== 'undefined'
-        && env.userPasswordImmutable
-        && !req.ability.hasPermission(PermissionID.USER_EDIT)
+        typeof data.password !== 'undefined' &&
+        env.userPasswordImmutable &&
+        !req.ability.hasPermission(PermissionID.USER_EDIT)
     ) {
         throw new BadRequestError('User passwords are immutable and can not be changed in this environment.');
     }

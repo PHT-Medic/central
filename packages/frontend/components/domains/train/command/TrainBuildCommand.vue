@@ -53,14 +53,14 @@ export default {
 
             switch (this.command) {
                 case FrontendTrainCommand.BUILD_START:
-                    return !this.train.build_status
-                        || [
+                    return !this.train.build_status ||
+                        [
                             TrainBuildStatus.STOPPED,
                             TrainBuildStatus.FAILED,
                         ].indexOf(this.train.build_status) !== -1;
                 case FrontendTrainCommand.BUILD_STOP:
-                    return this.train.build_status
-                        && [
+                    return this.train.build_status &&
+                        [
                             TrainBuildStatus.STARTING,
                             TrainBuildStatus.STARTED,
                             TrainBuildStatus.FINISHED,

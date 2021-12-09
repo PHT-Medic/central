@@ -61,9 +61,9 @@ export class NavigationProvider implements NavigationProviderInterface {
                 items = this.primaryItems;
                 break;
             case 1:
-                const id = context.components.length >= 1
-                    ? context.components[0].id ?? 'default'
-                    : 'default';
+                const id = context.components.length >= 1 ?
+                    context.components[0].id ?? 'default' :
+                    'default';
 
                 switch (id) {
                     case 'default':
@@ -111,8 +111,8 @@ export class NavigationProvider implements NavigationProviderInterface {
             .filter(filterFunc);
 
         if (
-            secondaryDefaultItems.length === 0
-            && secondaryAdminItems.length === 0
+            secondaryDefaultItems.length === 0 &&
+            secondaryAdminItems.length === 0
         ) {
             return context;
         }

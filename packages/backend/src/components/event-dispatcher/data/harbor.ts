@@ -35,8 +35,8 @@ export async function extendDispatcherHarborData(message: Message) : Promise<Mes
     }
 
     if (
-        typeof data.station === 'undefined'
-        || typeof data.stations === 'undefined'
+        typeof data.station === 'undefined' ||
+        typeof data.stations === 'undefined'
     ) {
         const repository = getRepository(TrainStation);
         const query = repository.createQueryBuilder('trainStation')

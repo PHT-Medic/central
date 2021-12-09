@@ -127,8 +127,8 @@ export async function getTrainStationRouteHandler(req: ExpressRequest, res: Expr
     }
 
     if (
-        !isPermittedForResourceRealm(req.realmId, entity.train.realm_id)
-        && !isPermittedForResourceRealm(req.realmId, entity.station.realm_id)
+        !isPermittedForResourceRealm(req.realmId, entity.train.realm_id) &&
+        !isPermittedForResourceRealm(req.realmId, entity.station.realm_id)
     ) {
         throw new ForbiddenError();
     }
@@ -218,8 +218,8 @@ export async function editTrainStationRouteHandler(req: ExpressRequest, res: Exp
     const isAuthorizedForRealm = req.ability.can('edit', 'train');
 
     if (
-        !(isAuthorityOfStation && isAuthorizedForStation)
-        && !(isAuthorityOfRealm && isAuthorizedForRealm)
+        !(isAuthorityOfStation && isAuthorizedForStation) &&
+        !(isAuthorityOfRealm && isAuthorizedForRealm)
     ) {
         throw new ForbiddenError();
     }
@@ -258,9 +258,9 @@ export async function editTrainStationRouteHandler(req: ExpressRequest, res: Exp
     trainStation = await repository.save(trainStation);
 
     if (
-        data.approval_status
-        && data.approval_status !== entityStatus
-        && isTrainStationApprovalStatus(data.approval_status)
+        data.approval_status &&
+        data.approval_status !== entityStatus &&
+        isTrainStationApprovalStatus(data.approval_status)
     ) {
         await emitDispatcherTrainEvent({
             event: trainStation.approval_status as DispatcherTrainEventType,
@@ -279,8 +279,8 @@ export async function dropTrainStationRouteHandler(req: ExpressRequest, res: Exp
     const { id } = req.params;
 
     if (
-        !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
-        && !req.ability.hasPermission(PermissionID.TRAIN_APPROVE)
+        !req.ability.hasPermission(PermissionID.TRAIN_EDIT) &&
+        !req.ability.hasPermission(PermissionID.TRAIN_APPROVE)
     ) {
         throw new ForbiddenError();
     }
@@ -294,8 +294,8 @@ export async function dropTrainStationRouteHandler(req: ExpressRequest, res: Exp
     }
 
     if (
-        !isPermittedForResourceRealm(req.realmId, entity.station.realm_id)
-        && !isPermittedForResourceRealm(req.realmId, entity.train.realm_id)
+        !isPermittedForResourceRealm(req.realmId, entity.station.realm_id) &&
+        !isPermittedForResourceRealm(req.realmId, entity.train.realm_id)
     ) {
         throw new ForbiddenError();
     }

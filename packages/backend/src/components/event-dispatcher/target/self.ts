@@ -99,8 +99,8 @@ async function processOutgoingTrain(data: DispatcherHarborEventWithAdditionalDat
 
 async function processStationTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
     if (
-        typeof data.station === 'undefined'
-        || typeof data.stationIndex === 'undefined'
+        typeof data.station === 'undefined' ||
+        typeof data.stationIndex === 'undefined'
     ) {
         return;
     }

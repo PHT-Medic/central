@@ -45,9 +45,9 @@ export async function generateTrainHash(train: Train | number | string) : Promis
     const sessionId: Buffer = crypto.randomBytes(64);
     hash.update(sessionId);
 
-    const query: Buffer | undefined = !!train.query && train.query !== ''
-        ? Buffer.from(train.query, 'utf-8')
-        : undefined;
+    const query: Buffer | undefined = !!train.query && train.query !== '' ?
+        Buffer.from(train.query, 'utf-8') :
+        undefined;
 
     if (typeof query !== 'undefined') {
         hash.update(query);

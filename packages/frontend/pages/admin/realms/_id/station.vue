@@ -5,12 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { Realm, dropAPIStation, getAPIStations } from '@personalhealthtrain/ui-common';
+import { dropAPIStation, getAPIStations } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
-import StationForm from '../../../../components/domains/station/StationForm';
 
 export default {
-    components: { StationForm },
     props: {
         realm: Object,
     },

@@ -11,8 +11,8 @@ import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 
 export function forceLoggedIn(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) {
     if (
-        typeof req.userId === 'undefined'
-        && typeof req.serviceId === 'undefined'
+        typeof req.userId === 'undefined' &&
+        typeof req.serviceId === 'undefined'
     ) {
         throw new UnauthorizedError('You are not authenticated.');
     }

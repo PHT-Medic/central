@@ -19,8 +19,8 @@ export function mergeDeep<A extends Record<string, any>, B extends Record<string
     const source = sources.shift();
 
     if (
-        isObject(target)
-        && isObject(source)
+        isObject(target) &&
+        isObject(source)
     ) {
         const keys = Object.keys(source);
         for (let i = 0; i < keys.length; i++) {
