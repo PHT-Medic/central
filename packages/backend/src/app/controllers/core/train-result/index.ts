@@ -32,8 +32,7 @@ export async function getManyRouteHandler(req: ExpressRequest, res: ExpressRespo
 
     const repository = getRepository(TrainResult);
     const query = await repository.createQueryBuilder('trainResult')
-        .leftJoinAndSelect('trainResult.train', 'train')
-        .leftJoinAndSelect('trainResult.station', 'station');
+        .leftJoinAndSelect('trainResult.train', 'train');
 
     onlyRealmPermittedQueryResources(query, req.realmId, ['train.realm_id']);
 

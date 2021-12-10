@@ -44,7 +44,9 @@ function createConfig({ env } : ConfigContext) : Config {
         driver: {
             ...(proxyAPis.includes('harbor') && proxyConfig ? {
                 proxy: proxyConfig,
-            } : {}),
+            } : {
+                proxy: false,
+            }),
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false,
             }),
@@ -57,7 +59,9 @@ function createConfig({ env } : ConfigContext) : Config {
         driver: {
             ...(proxyAPis.includes('vault') && proxyConfig ? {
                 proxy: proxyConfig,
-            } : {}),
+            } : {
+                proxy: false,
+            }),
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false,
             }),
