@@ -24,6 +24,9 @@ export default (ctx: Context) => {
             withCredentials: true,
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false,
+                ...(process.server ? {
+                    proxy: false,
+                } : {}),
             }),
         },
     });
