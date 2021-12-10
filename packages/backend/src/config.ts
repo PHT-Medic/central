@@ -36,8 +36,6 @@ function createConfig({ env } : ConfigContext) : Config {
 
     const proxyConfig : ProxyConnectionConfig | undefined = detectProxyConnectionConfig();
 
-    console.log(proxyConfig, proxyAPis);
-
     setAPIConfig(APIType.HARBOR, {
         type: APIType.HARBOR,
         connectionString: env.harborConnectionString,

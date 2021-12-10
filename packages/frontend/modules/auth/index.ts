@@ -20,6 +20,7 @@ import {
 import axios, { AxiosRequestConfig } from 'axios';
 import { Store } from 'vuex';
 import https from 'https';
+import * as http from 'http';
 import { AuthStoreToken } from '@/store/auth';
 
 export type AuthModuleOptions = {
@@ -62,9 +63,10 @@ class AuthModule {
         };
 
         if (
-            process.server &&
-            proxyConfig
+            process.server
         ) {
+            httpClient.proxy = false;
+        } else {
             httpClient.proxy = proxyConfig;
         }
 
