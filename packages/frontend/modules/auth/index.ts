@@ -7,7 +7,7 @@
 
 import { Context } from '@nuxt/types';
 import {
-    APIType, detectProxyConnectionConfig, useAPI,
+    APIType, useAPI,
 } from '@personalhealthtrain/ui-common';
 import {
     AbilityManager,
@@ -52,8 +52,6 @@ class AuthModule {
 
     constructor(ctx: Context, options: AuthModuleOptions) {
         this.ctx = ctx;
-
-        const proxyConfig = detectProxyConnectionConfig();
 
         const httpClient : AxiosRequestConfig = {
             httpsAgent: new https.Agent({

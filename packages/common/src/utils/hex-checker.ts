@@ -6,6 +6,5 @@
  */
 
 export function isHex(value: string) : boolean {
-    const a = parseInt(value, 16);
-    return (a.toString(16) === value);
+    return /^[A-F0-9]+$/i.test(value);
 }

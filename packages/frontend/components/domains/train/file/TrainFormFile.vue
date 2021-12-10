@@ -34,7 +34,7 @@ export default {
 <template>
     <div class="card card-file d-flex flex-row align-items-center">
         <div class="card-heading">
-            <i class="fafa-file-upload text-info" />
+            <i class="fa fa-file-upload text-info" />
         </div>
         <div class="card-body">
             <span class="title">
