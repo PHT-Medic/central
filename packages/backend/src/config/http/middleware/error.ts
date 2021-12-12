@@ -44,7 +44,8 @@ export function errorMiddleware(
     const statusCode : number = baseError.getOption('statusCode') ?? ServerErrorSettings.InternalServerError.statusCode;
 
     if (baseError.getOption('logMessage')) {
-        useLogger().log({ level: 'error', message: `${baseError.message || baseError}` });
+        const isInspected = error instanceof ClientError || error instanceof ServerError;
+        useLogger().log({ level: 'error', message: `${!isInspected ? baseError : (baseError.message || baseError)}` });
     }
 
     if (baseError.getOption('decorateMessage')) {

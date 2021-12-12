@@ -74,30 +74,33 @@ export class SetupCommand implements CommandModule {
             await generateSwaggerDocumentation();
         }
 
-        /**
-         * Setup database with schema & seeder
-         */
-        const connectionOptions = await buildConnectionOptions();
+        if (args.database || args['database-seeder']) {
+            /**
+             * Setup database with schema & seeder
+             */
+            const connectionOptions = await buildConnectionOptions();
 
-        if (args.database) {
-            await createDatabase({ ifNotExist: true }, connectionOptions);
-        }
-
-        const connection = await createConnection(connectionOptions);
-        try {
-            await connection.synchronize();
-
-            if (args['database-seeder']) {
-                await runSeeder(connection);
+            if (args.database) {
+                await createDatabase({ ifNotExist: true }, connectionOptions);
             }
-        } catch (e) {
-            console.log(e);
-            await connection.close();
-            process.exit(1);
-            throw e;
-        } finally {
-            await connection.close();
-            process.exit(0);
+
+            const connection = await createConnection(connectionOptions);
+            try {
+                await connection.synchronize();
+
+                if (args['database-seeder']) {
+                    await runSeeder(connection);
+                }
+            } catch (e) {
+                console.log(e);
+                await connection.close();
+                process.exit(1);
+                throw e;
+            } finally {
+                await connection.close();
+            }
         }
+
+        process.exit(0);
     }
 }

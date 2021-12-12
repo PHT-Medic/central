@@ -12,11 +12,13 @@ import yargs from 'yargs';
 import { SetupCommand } from './commands/setup';
 import { UpgradeCommand } from './commands/upgrade';
 import { ResetCommand } from './commands/reset';
+import { CheckCommand } from './commands/check';
 
 // eslint-disable-next-line no-unused-expressions,@typescript-eslint/no-unused-expressions
 yargs
     .usage('Usage: $0 <command> [options]')
     .demandCommand(1)
+    .command(new CheckCommand())
     .command(new SetupCommand())
     .command(new UpgradeCommand())
     .command(new ResetCommand())
