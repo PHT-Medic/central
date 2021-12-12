@@ -72,6 +72,15 @@ class AuthModule {
             client_id: 'user-interface',
         }, httpClient);
 
+        this.client.httpClient.interceptors.response.use((r) => r, ((error) => {
+            if (typeof error?.response?.data?.message === 'string') {
+                error.message = error.response.data.message;
+                throw error;
+            }
+
+            throw new Error('A network error occurred.');
+        }));
+
         this.abilityManager = new AbilityManager([]);
 
         this.subscribeStore();

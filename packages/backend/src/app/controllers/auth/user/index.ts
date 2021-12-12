@@ -13,7 +13,7 @@ import {
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
-import { ResponseExample, SwaggerTags } from 'typescript-swagger';
+import { ResponseExample, SwaggerTags } from '@trapi/swagger';
 
 import {
     PermissionID,

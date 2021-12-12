@@ -60,7 +60,7 @@ function checkAbilityOrPermission({ route, $auth } : Context) {
     }
 }
 
-export default async function ({
+export default async function middleware({
     route, from, redirect, $auth, store,
 } : Context) : Promise<void> {
     let redirectPath = '/';
@@ -104,8 +104,6 @@ export default async function ({
         try {
             checkAbilityOrPermission({ route, $auth } as Context);
         } catch (e) {
-            console.log('not permitted...');
-
             await redirect({
                 path: redirectPath,
             });

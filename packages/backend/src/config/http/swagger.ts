@@ -5,17 +5,38 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SwaggerConfig, generateDocumentation } from 'typescript-swagger';
+import {
+    MetadataConfig,
+    Specification,
+    SwaggerDocFormatData,
+    SwaggerDocFormatType,
+
+    createMetadataGenerator,
+    createSpecGenerator,
+} from '@trapi/swagger';
 import path from 'path';
 import { getRootDirPath, getWritableDirPath } from '../paths';
 import env from '../../env';
 
 // tslint:disable-next-line:no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const packageJson = require('../../../package.json');
 // tslint:disable-next-line:no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const tsConfig = require('../../../tsconfig.json');
 
-export const swaggerConfig : SwaggerConfig = {
+const metadataConfig : MetadataConfig = {
+    entryFile: path.join(getRootDirPath(), 'src', 'app', 'controllers', '**', '*.ts'),
+    ignore: ['**/node_modules/**'],
+    decorator: {
+        internal: true,
+        library: [
+            'decorators-express',
+        ],
+    },
+};
+
+export const swaggerConfig : Specification.Config = {
     yaml: true,
     host: env.apiUrl,
     name: 'Central UI - API Documentation',
@@ -23,8 +44,6 @@ export const swaggerConfig : SwaggerConfig = {
     basePath: '/',
     version: packageJson.version,
     outputDirectory: getWritableDirPath(),
-    entryFile: path.join(getRootDirPath(), 'src', 'app', 'controllers', '**', '*.ts'),
-    ignore: ['**/node_modules/**'],
     securityDefinitions: {
         bearer: {
             name: 'Bearer',
@@ -32,28 +51,29 @@ export const swaggerConfig : SwaggerConfig = {
             in: 'header',
         },
         oauth2: {
-            name: 'User',
             type: 'oauth2',
-            in: 'header',
-            flow: 'password',
-            tokenUrl: `${env.apiUrl}token`,
+            flows: {
+                password: {
+                    tokenUrl: `${env.apiUrl}token`,
+                },
+            },
         },
         basicAuth: {
-            name: 'basic',
-            type: 'basic',
-            in: 'header',
+            type: 'http',
+            schema: 'basic',
         },
-    },
-    decoratorConfig: {
-        useBuildIn: true,
-        useLibrary: [
-            '@decorators/express',
-        ],
     },
     consumes: ['application/json'],
     produces: ['application/json'],
 };
 
-export async function generateSwaggerDocumentation() : Promise<string> {
-    return generateDocumentation(swaggerConfig, tsConfig);
+export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDocFormatType, SwaggerDocFormatData>> {
+    const metadataGenerator = createMetadataGenerator(metadataConfig, tsConfig);
+
+    const metadata = metadataGenerator.generate();
+
+    const specGenerator = createSpecGenerator(metadata, swaggerConfig);
+
+    specGenerator.build();
+    return specGenerator.save();
 }

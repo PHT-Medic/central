@@ -24,7 +24,7 @@ import {
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
-import { ResponseExample, SwaggerTags } from 'typescript-swagger';
+import { ResponseExample, SwaggerTags } from '@trapi/swagger';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';

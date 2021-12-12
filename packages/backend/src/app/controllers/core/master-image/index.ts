@@ -12,7 +12,7 @@ import { MasterImage, MasterImageCommand, PermissionID } from '@personalhealthtr
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
-import { SwaggerTags } from 'typescript-swagger';
+import { SwaggerTags } from '@trapi/swagger';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
 import { handleMasterImageCommandRouteHandler } from './command';

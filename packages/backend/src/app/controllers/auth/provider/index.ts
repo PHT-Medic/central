@@ -11,7 +11,7 @@ import { check, matchedData, validationResult } from 'express-validator';
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
-import { SwaggerHidden, SwaggerTags } from 'typescript-swagger';
+import { SwaggerHidden, SwaggerTags } from '@trapi/swagger';
 import { OAuth2Provider, PermissionID, Realm } from '@personalhealthtrain/ui-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';

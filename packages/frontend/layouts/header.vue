@@ -36,7 +36,7 @@ export default {
                     </button>
                 </div>
                 <div class="logo">
-                    <span>P</span>H<span>T</span>
+                    <span>U</span>I
                     <span class="info-text">{{ infoText }}</span>
                 </div>
             </div>

@@ -8,7 +8,7 @@
 import { getRepository } from 'typeorm';
 import { applyFilters, applyPagination } from 'typeorm-extension';
 import { check, matchedData, validationResult } from 'express-validator';
-import { SwaggerTags } from 'typescript-swagger';
+import { SwaggerTags } from '@trapi/swagger';
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';

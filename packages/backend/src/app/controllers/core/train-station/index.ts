@@ -19,7 +19,7 @@ import {
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
-import { ResponseExample, SwaggerTags } from 'typescript-swagger';
+import { ResponseExample, SwaggerTags } from '@trapi/swagger';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import env from '../../../../env';
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';

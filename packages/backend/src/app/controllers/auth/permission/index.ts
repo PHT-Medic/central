@@ -8,7 +8,7 @@
 import { Permission, PermissionID } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
 import { applyFilters, applyPagination } from 'typeorm-extension';
-import { SwaggerTags } from 'typescript-swagger';
+import { SwaggerTags } from '@trapi/swagger';
 
 import {
     Body, Controller, Get, Params, Post, Request, Response,

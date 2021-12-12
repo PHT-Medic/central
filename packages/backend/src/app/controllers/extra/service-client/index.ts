@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SwaggerTags } from 'typescript-swagger';
+import { SwaggerTags } from '@trapi/swagger';
 import {
     Controller, Get, Params, Request, Response,
 } from '@decorators/express';

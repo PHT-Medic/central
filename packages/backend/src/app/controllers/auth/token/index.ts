@@ -10,7 +10,7 @@ import { getCustomRepository, getRepository } from 'typeorm';
 import {
     Body, Controller, Delete, Post, Request, Response,
 } from '@decorators/express';
-import { ResponseExample, SwaggerTags } from 'typescript-swagger';
+import { ResponseExample, SwaggerTags } from '@trapi/swagger';
 import {
     MASTER_REALM_ID, OAuth2Provider, Oauth2ProviderAccount, TokenPayload,
 } from '@personalhealthtrain/ui-common';

@@ -15,7 +15,7 @@ import fs from 'fs';
 import {
     Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
-import { ResponseExample, SwaggerTags } from 'typescript-swagger';
+import { ResponseExample, SwaggerTags } from '@trapi/swagger';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getTrainFileFilePath } from '../../../../config/pht/train-file/path';
 

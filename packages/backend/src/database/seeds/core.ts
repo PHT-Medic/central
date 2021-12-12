@@ -96,7 +96,7 @@ export default class DatabaseCoreSeeder implements Seeder {
          * Create all permissions
          */
         const permissionRepository = connection.getRepository(Permission);
-        let ids : string[] = getPermissions();
+        const ids : string[] = getPermissions();
 
         const existingPermissions = await permissionRepository.find({
             id: In(ids),
@@ -105,13 +105,14 @@ export default class DatabaseCoreSeeder implements Seeder {
         for (let i = 0; i < existingPermissions.length; i++) {
             const index = ids.indexOf(existingPermissions[i].id);
             if (index !== -1) {
-                ids = ids.splice(index, 1);
+                ids.splice(index, 1);
             }
         }
 
         const permissions : Permission[] = ids.map((id: string) => permissionRepository.create({ id }));
-
-        await permissionRepository.save(permissions);
+        if (permissions.length > 0) {
+            await permissionRepository.save(permissions);
+        }
 
         // -------------------------------------------------
 
@@ -125,10 +126,10 @@ export default class DatabaseCoreSeeder implements Seeder {
             role_id: role.id,
         });
 
-        for (let i = 0; i < existingPermissions.length; i++) {
+        for (let i = 0; i < existingRolePermissions.length; i++) {
             const index = ids.indexOf(existingRolePermissions[i].permission_id);
             if (index !== -1) {
-                ids = ids.splice(index, 1);
+                ids.splice(index, 1);
             }
         }
 

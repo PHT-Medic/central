@@ -13,10 +13,10 @@ import { getWritableDirPath } from '../../config/paths';
 import { generateSwaggerDocumentation } from '../../config/http/swagger';
 
 interface SetupArguments extends Arguments {
-    auth: 'yes' | 'no',
-    database: 'yes' | 'no',
-    documentation: 'yes' | 'no',
-    databaseSeeder: 'yes' | 'no'
+    auth: boolean,
+    database: boolean,
+    documentation: boolean,
+    'database-seeder': boolean
 }
 
 export class SetupCommand implements CommandModule {
@@ -28,43 +28,49 @@ export class SetupCommand implements CommandModule {
     builder(args: Argv) {
         return args
             .option('auth', {
-                default: 'yes',
                 describe: 'Setup auth module.',
-                choices: ['yes', 'no'],
+                type: 'boolean',
             })
 
             .option('database', {
                 alias: 'db',
-                default: 'yes',
                 describe: 'Setup database module.',
-                choices: ['yes', 'no'],
+                type: 'boolean',
             })
 
             .option('documentation', {
                 alias: 'docs',
-                default: 'yes',
                 describe: 'Setup documentation.',
-                choices: ['yes', 'no'],
+                type: 'boolean',
             })
 
-            .option('databaseSeeder', {
+            .option('database-seeder', {
                 alias: 'db:seed',
-                default: 'yes',
                 describe: 'Setup database seeds.',
-                choices: ['yes', 'no'],
+                type: 'boolean',
             });
     }
 
     // eslint-disable-next-line class-methods-use-this
     async handler(args: SetupArguments) {
+        if (
+            !args.auth &&
+            !args.database &&
+            !args['database-seeder'] &&
+            !args.documentation
+        ) {
+            // eslint-disable-next-line no-multi-assign
+            args.auth = args.database = args['database-seeder'] = args.documentation = true;
+        }
+
         /**
          * Setup auth module
          */
-        if (args.auth === 'yes') {
+        if (args.auth) {
             await createSecurityKeyPair({ directory: getWritableDirPath() });
         }
 
-        if (args.documentation === 'yes') {
+        if (args.documentation) {
             await generateSwaggerDocumentation();
         }
 
@@ -73,7 +79,7 @@ export class SetupCommand implements CommandModule {
          */
         const connectionOptions = await buildConnectionOptions();
 
-        if (args.database === 'yes') {
+        if (args.database) {
             await createDatabase({ ifNotExist: true }, connectionOptions);
         }
 
@@ -81,7 +87,7 @@ export class SetupCommand implements CommandModule {
         try {
             await connection.synchronize();
 
-            if (args.databaseSeeder === 'yes') {
+            if (args['database-seeder']) {
                 await runSeeder(connection);
             }
         } catch (e) {

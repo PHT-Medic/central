@@ -11,8 +11,8 @@
     list-style: none;
 }
 
-.nav-items .nav-link i {
-    padding-right: 4px;
+.nav-items .nav-link-text {
+    padding-left: 4px;
 }
 
 .nav-items .nav-link,

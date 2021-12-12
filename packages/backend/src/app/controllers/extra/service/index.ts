@@ -6,7 +6,7 @@
  */
 
 import { RegistryCommand, SERVICE_ID } from '@personalhealthtrain/ui-common';
-import { SwaggerTags } from 'typescript-swagger';
+import { SwaggerTags } from '@trapi/swagger';
 import {
     Body, Controller, Post, Request, Response,
 } from '@decorators/express';
