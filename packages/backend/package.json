@@ -60,7 +60,7 @@
         "@types/jest": "^27.0.3",
         "@types/module-alias": "^2.0.1",
         "@types/mysql": "^2.15.17",
-        "@types/node": "^16.11.9",
+        "@types/node": "^16.11.12",
         "@types/supertest": "^2.0.11",
         "@types/swagger-ui-express": "^4.1.2",
         "@types/tar": "^6.1.1",
