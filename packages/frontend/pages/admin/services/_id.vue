@@ -7,14 +7,14 @@
 <script>
 import Vue from 'vue';
 import { SERVICE_ID } from '@personalhealthtrain/ui-common';
-import { LayoutNavigationAdminId } from '../../../config/layout';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 const services = Object.values(SERVICE_ID);
 
 export default {
     meta: {
-        requireLoggedIn: true,
-        navigationId: LayoutNavigationAdminId,
+        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
     },
     async asyncData(context) {
         const index = services.indexOf(context.params.id);

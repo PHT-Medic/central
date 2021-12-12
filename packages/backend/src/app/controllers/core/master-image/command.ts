@@ -5,12 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import rimraf from 'rimraf';
 import { MasterImage, MasterImageCommand, MasterImageGroup } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
 
 import path from 'path';
 import fs from 'fs';
-import { clone, pull } from 'isomorphic-git';
+import { clone } from 'isomorphic-git';
 import http from 'isomorphic-git/http/node';
 import { Group, Image, scanDirectory } from 'fs-docker';
 import { BadRequestError, NotFoundError } from '@typescript-error/http';
@@ -28,30 +29,45 @@ export async function handleMasterImageCommandRouteHandler(req: ExpressRequest, 
     const { command } = req.body;
 
     switch (command) {
-        case MasterImageCommand.GIT_REPOSITORY_SYNC:
+        case MasterImageCommand.GIT_REPOSITORY_SYNC: {
             const gitURL = 'https://github.com/PHT-Medic/master-images';
-            const directoryPath : string = path.join(getWritableDirPath(), 'master-images.git');
+            const directoryPath: string = path.join(getWritableDirPath(), 'master-images.git');
 
             try {
-                await fs.promises.access(directoryPath, fs.constants.F_OK | fs.constants.R_OK);
-                await pull({
-                    fs,
-                    http,
-                    dir: directoryPath,
-                    ref: 'master',
-                    author: {
-                        name: 'ui',
-                    },
-                });
+                await fs.promises.access(directoryPath);
+                await rimraf.sync(directoryPath);
             } catch (e) {
-                await clone({
-                    fs,
-                    http,
-                    url: gitURL,
-                    dir: directoryPath,
-                    ref: 'master',
-                });
+                // ...
             }
+
+            try {
+                await fs.promises.access(directoryPath);
+                await fs.promises.unlink(directoryPath);
+            } catch (e) {
+                // ...
+            }
+
+            await clone({
+                fs,
+                http,
+                url: gitURL,
+                dir: directoryPath,
+                ref: 'master',
+            });
+
+            /*
+            todo: use this again when forced merge is possible to encounter merge conflicts
+
+            await pull({
+                fs,
+                http,
+                dir: directoryPath,
+                ref: 'master',
+                author: {
+                    name: 'ui',
+                },
+            });
+             */
 
             const data = await scanDirectory(directoryPath);
 
@@ -67,6 +83,7 @@ export async function handleMasterImageCommandRouteHandler(req: ExpressRequest, 
                     images,
                 },
             });
+        }
     }
 
     throw new NotFoundError();

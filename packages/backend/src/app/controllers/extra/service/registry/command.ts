@@ -152,6 +152,7 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             let data : unknown[] = [];
 
             switch (projectName) {
+                /* @deprecated */
                 case REGISTRY_MASTER_IMAGE_PROJECT_NAME:
                     const repository = getRepository(MasterImage);
                     const existingEntities = await repository.find({

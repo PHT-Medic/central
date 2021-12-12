@@ -37,6 +37,8 @@ export function errorMiddleware(
             break;
     }
 
+    console.log(error);
+
     const baseError : ServerError | ClientError = error instanceof ClientError || error instanceof ServerError ?
         error :
         new InternalServerError(error, { decorateMessage: true });
@@ -45,7 +47,7 @@ export function errorMiddleware(
 
     if (baseError.getOption('logMessage')) {
         const isInspected = error instanceof ClientError || error instanceof ServerError;
-        useLogger().log({ level: 'error', message: `${!isInspected ? baseError : (baseError.message || baseError)}` });
+        useLogger().log({ level: 'error', message: `${!isInspected ? error.message : (baseError.message || baseError)}` });
     }
 
     if (baseError.getOption('decorateMessage')) {
