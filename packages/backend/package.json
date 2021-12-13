@@ -33,7 +33,7 @@
         "express-prom-bundle": "^6.4.1",
         "express-validator": "^6.13.0",
         "fs-docker": "^0.1.1",
-        "isomorphic-git": "^1.10.1",
+        "isomorphic-git": "^1.10.2",
         "mysql": "^2.18.1",
         "node-cron": "^3.0.0",
         "prom-client": "^13.2.0",
