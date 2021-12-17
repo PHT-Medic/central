@@ -10,7 +10,7 @@ import {
     Body, Controller, Post, Request, Response,
 } from '@decorators/express';
 import {
-    AuthClientCommand, AuthClientType, Client, PermissionID, SERVICE_ID,
+    AuthClientCommand, AuthClientType, Client, PermissionID, ServiceID,
 } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
 import { check, matchedData, validationResult } from 'express-validator';
@@ -57,11 +57,11 @@ async function addRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any
                 throw new ForbiddenError('You are not allowed to add service-clients.');
             }
 
-            if (Object.values(SERVICE_ID).indexOf(clientTargetId) === -1) {
+            if (Object.values(ServiceID).indexOf(clientTargetId) === -1) {
                 throw new NotFoundError();
             }
 
-            const serviceId: SERVICE_ID = clientTargetId;
+            const serviceId: ServiceID = clientTargetId;
 
             entity = await repository.findOne({
                 service_id: serviceId,

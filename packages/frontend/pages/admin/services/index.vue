@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID, SERVICE_ID } from '@personalhealthtrain/ui-common';
+import { PermissionID, ServiceID } from '@personalhealthtrain/ui-common';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {
@@ -26,19 +26,22 @@ export default {
             ],
             items: [
                 {
-                    id: SERVICE_ID.REGISTRY, name: 'Image Registry', icon: 'fab fa-docker', version: 'v2.3.0',
+                    id: ServiceID.REGISTRY, name: 'Image Registry', icon: 'fab fa-docker', version: 'v2.3.0',
                 },
                 {
-                    id: SERVICE_ID.RESULT_SERVICE, name: 'Result Service', icon: 'fa fa-file-export', version: 'v1.0.0-alpha.0',
+                    id: ServiceID.SECRET_STORAGE, name: 'Secret Storage', icon: 'fas fa-user-secret', version: 'v1.8.4',
                 },
                 {
-                    id: SERVICE_ID.SECRET_STORAGE, name: 'Secret Storage', icon: 'fas fa-user-secret', version: 'v1.8.4',
+                    id: ServiceID.GITHUB, name: 'Github', icon: 'fab fa-github', version: 'v1.0.0',
                 },
                 {
-                    id: SERVICE_ID.TRAIN_BUILDER, name: 'Train Builder', icon: 'fa fa-wrench', version: 'v1.0.0-alpha.0',
+                    id: ServiceID.RESULT_SERVICE, name: 'Result Service', icon: 'fa fa-file-export', version: 'v1.0.0-alpha.0',
                 },
                 {
-                    id: SERVICE_ID.TRAIN_ROUTER, name: 'Train Router', icon: 'fas fa-map-marked-alt', version: 'v1.0.0-alpha.0',
+                    id: ServiceID.TRAIN_BUILDER, name: 'Train Builder', icon: 'fa fa-wrench', version: 'v1.0.0-alpha.0',
+                },
+                {
+                    id: ServiceID.TRAIN_ROUTER, name: 'Train Router', icon: 'fas fa-map-marked-alt', version: 'v1.0.0-alpha.0',
                 },
             ],
         };
@@ -64,7 +67,7 @@ export default {
                 <div
                     v-for="(item,key) in items"
                     :key="key"
-                    class="col-md-4 col-lg-3 col-12 mb-3"
+                    class="col-md-4 col-12 mb-3"
                 >
                     <div
                         class="event-card p-2 d-flex flex-column text-center"

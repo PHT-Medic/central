@@ -7,7 +7,7 @@
 <script>
 import {
     AuthClientCommand,
-    SERVICE_ID,
+    ServiceID,
     addAPIClient,
     executeAPIClientCommand,
     getAPIServiceClient,
@@ -15,7 +15,7 @@ import {
 
 export default {
     props: {
-        serviceId: SERVICE_ID,
+        serviceId: ServiceID,
     },
     data() {
         return {

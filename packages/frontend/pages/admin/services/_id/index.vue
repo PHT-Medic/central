@@ -6,19 +6,19 @@
   -->
 <script>
 
-import { SERVICE_ID } from '@personalhealthtrain/ui-common';
+import { ServiceID } from '@personalhealthtrain/ui-common';
 import RegistryManagement from '../../../../components/domains/service/harbor/HarborManagement';
 
 export default {
     props: {
-        serviceId: SERVICE_ID,
+        serviceId: ServiceID,
     },
     render(createElement) {
         let template;
 
         // eslint-disable-next-line default-case
         switch (this.serviceId) {
-            case SERVICE_ID.REGISTRY:
+            case ServiceID.REGISTRY:
                 template = RegistryManagement;
                 break;
         }

@@ -9,7 +9,7 @@ import { stringifyAuthorizationHeader } from '@typescript-auth/core';
 
 import { Client } from '../../../../../auth';
 import { APIType, useAPI } from '../../../../../../modules';
-import { SERVICE_ID } from '../../../type';
+import { ServiceID } from '../../../constants';
 import { HarborProjectWebhook, HarborProjectWebhookOptions } from './type';
 
 const WEBHOOK_ID = 'UI';
@@ -61,7 +61,7 @@ export async function ensureHarborProjectWebHook(
                 auth_header: stringifyAuthorizationHeader({ type: 'Basic', username: client.id, password: client.secret }),
                 skip_cert_verify: true,
                 // todo: change this, if service not on same machine.
-                address: `${apiUrl}services/${SERVICE_ID.REGISTRY}/hook`,
+                address: `${apiUrl}services/${ServiceID.REGISTRY}/hook`,
                 type: 'http',
             },
         ],

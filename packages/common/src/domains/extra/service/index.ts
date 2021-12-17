@@ -8,5 +8,6 @@
 export * from './api';
 export * from './harbor';
 export * from './secret-engine';
+export * from './constants';
 export * from './type';
 export * from './utils';

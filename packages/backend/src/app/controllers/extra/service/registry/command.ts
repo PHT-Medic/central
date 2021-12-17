@@ -10,7 +10,7 @@ import { In, getRepository } from 'typeorm';
 import {
     Client, MasterImage,
     PermissionID,
-    REGISTRY_MASTER_IMAGE_PROJECT_NAME, RegistryCommand, SERVICE_ID,
+    REGISTRY_MASTER_IMAGE_PROJECT_NAME, RegistryCommand, ServiceID,
     Station, buildRegistryHarborProjectName, deleteHarborProject, dropHarborProjectAccount,
     dropHarborProjectWebHook, ensureHarborProject,
     ensureHarborProjectRobotAccount,
@@ -220,7 +220,7 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
 
             const client = await clientRepository.findOne({
                 where: {
-                    service_id: SERVICE_ID.REGISTRY,
+                    service_id: ServiceID.REGISTRY,
                 },
             });
 

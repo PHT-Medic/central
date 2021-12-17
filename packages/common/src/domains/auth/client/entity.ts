@@ -14,7 +14,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../user';
-import { SERVICE_ID } from '../../extra';
+import { ServiceID } from '../../extra';
 import { AuthClientType } from './type';
 import { createAuthClientSecret } from './utils';
 import { MASTER_REALM_ID, Realm } from '../realm';
@@ -46,8 +46,8 @@ export class Client {
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'enum', nullable: true, enum: SERVICE_ID })
-        service_id: SERVICE_ID | null;
+    @Column({ type: 'enum', nullable: true, enum: ServiceID })
+        service_id: ServiceID | null;
 
     @Column({ type: 'int', nullable: true })
         user_id: number | null;

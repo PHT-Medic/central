@@ -10,10 +10,10 @@ import {
     APIType,
     Client,
     PermissionID,
-    SERVICE_ID,
     SERVICE_SECRET_ENGINE_KEY,
     STATION_SECRET_ENGINE_KEY,
     SecretStorageCommand,
+    ServiceID,
     Station,
     USER_SECRET_ENGINE_KEY,
     User,
@@ -210,7 +210,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                 case TargetEntity.SERVICE: {
                     const serviceClient = await getRepository(Client)
                         .findOne({
-                            service_id: id as SERVICE_ID,
+                            service_id: id as ServiceID,
                         });
 
                     payload = buildSecretStorageServicePayload(serviceClient.id, serviceClient.secret);

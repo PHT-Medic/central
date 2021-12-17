@@ -6,7 +6,7 @@
   -->
 <script>
 
-import { SERVICE_ID } from '@personalhealthtrain/ui-common';
+import { ServiceID } from '@personalhealthtrain/ui-common';
 import HarborProjectManagement from './HarborProjectManagement';
 
 export default {
@@ -14,7 +14,7 @@ export default {
         HarborProjectManagement,
     },
     props: {
-        serviceId: SERVICE_ID,
+        serviceId: ServiceID,
     },
 };
 </script>

@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Client, SERVICE_ID } from '@personalhealthtrain/ui-common';
+import { Client, ServiceID } from '@personalhealthtrain/ui-common';
 import { Connection, getRepository } from 'typeorm';
 import { Factory, Seeder } from 'typeorm-seeding';
 
 export default class ServiceSeeder implements Seeder {
     public async run(factory: Factory, connection: Connection): Promise<any> {
-        const services : SERVICE_ID[] = Object.values(SERVICE_ID);
+        const services : ServiceID[] = Object.values(ServiceID);
 
         const clientRepository = getRepository(Client);
         const clients = services.map((service) => clientRepository.create({

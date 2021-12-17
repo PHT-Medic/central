@@ -10,7 +10,7 @@ import {
     MasterImageCommand,
     REGISTRY_INCOMING_PROJECT_NAME, REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME, RegistryCommand,
-    SERVICE_ID,
+    ServiceID,
     dropAPIMasterImage, executeAPIServiceTask, runAPITMasterImagesCommand,
 } from '@personalhealthtrain/ui-common';
 import MasterImageList from '../../master-image/MasterImageList';
@@ -18,7 +18,7 @@ import MasterImageList from '../../master-image/MasterImageList';
 export default {
     components: { MasterImageList },
     props: {
-        serviceId: SERVICE_ID,
+        serviceId: ServiceID,
     },
     data() {
         return {
@@ -81,7 +81,7 @@ export default {
             try {
                 switch (key) {
                     case REGISTRY_MASTER_IMAGE_PROJECT_NAME:
-                        const { images } = await runAPITMasterImagesCommand(MasterImageCommand.GIT_REPOSITORY_SYNC);
+                        const { images } = await runAPITMasterImagesCommand(MasterImageCommand.SYNC_GIT_REPOSITORY);
 
                         this.masterImagesMeta.executed = true;
 

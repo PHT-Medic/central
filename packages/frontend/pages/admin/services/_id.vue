@@ -6,10 +6,10 @@
   -->
 <script>
 import Vue from 'vue';
-import { SERVICE_ID } from '@personalhealthtrain/ui-common';
+import { ServiceID } from '@personalhealthtrain/ui-common';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
-const services = Object.values(SERVICE_ID);
+const services = Object.values(ServiceID);
 
 export default {
     meta: {

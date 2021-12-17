@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { RegistryCommand, SERVICE_ID } from '@personalhealthtrain/ui-common';
+import { RegistryCommand, ServiceID } from '@personalhealthtrain/ui-common';
 import { SwaggerTags } from '@trapi/swagger';
 import {
     Body, Controller, Post, Request, Response,
@@ -31,7 +31,7 @@ export class ServiceController {
         const { id } = req.params;
 
         switch (id) {
-            case SERVICE_ID.REGISTRY:
+            case ServiceID.REGISTRY:
                 return postHarborHookRouteHandler(req, res);
         }
 
@@ -47,9 +47,9 @@ export class ServiceController {
         const { id } = req.params;
 
         switch (id) {
-            case SERVICE_ID.REGISTRY:
+            case ServiceID.REGISTRY:
                 return doRegistryCommand(req, res);
-            case SERVICE_ID.SECRET_STORAGE:
+            case ServiceID.SECRET_STORAGE:
                 return doSecretStorageCommand(req, res);
         }
 

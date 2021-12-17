@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Client, SERVICE_ID, User } from '@personalhealthtrain/ui-common';
+import { Client, ServiceID, User } from '@personalhealthtrain/ui-common';
 import {
     Express, NextFunction, Request, Response,
 } from 'express';
@@ -21,7 +21,7 @@ export interface ExpressRequest extends Request {
     userId?: typeof User.prototype.id,
 
     clientId?: typeof Client.prototype.id,
-    serviceId?: SERVICE_ID,
+    serviceId?: ServiceID,
 
     realmId?: string,
 
