@@ -4,10 +4,8 @@
     ],
     "command": {
         "publish": {
-            "ignoreChanges": ["*.md"],
-            "message": "chore(release): publish"
+            "ignoreChanges": ["*.md"]
         }
     },
-    "version": "independent",
     "useWorkspaces": true
 }
