@@ -4,8 +4,11 @@
     ],
     "command": {
         "publish": {
-            "ignoreChanges": ["*.md"]
+            "ignoreChanges": [
+                "*.md"
+            ]
         }
     },
-    "useWorkspaces": true
+    "useWorkspaces": true,
+    "version": "1.0.1-alpha.0"
 }
