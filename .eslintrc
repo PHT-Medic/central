@@ -21,7 +21,12 @@
             "peerDependencies": false
         }]
     },
-    "ignorePatterns": ["**/dist/*", "**/*.d.ts", "**/writable/**"],
+    "ignorePatterns": [
+        "**/dist/*",
+        "**/*.d.ts",
+        "**/writable/**",
+        "**/packages/frontend/components/svg/**"
+    ],
     "globals": {
         "NodeJS": true
     }
