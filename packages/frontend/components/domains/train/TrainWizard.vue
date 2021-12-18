@@ -110,6 +110,13 @@ export default {
 
                 this.train[key] = this.trainProperty[key];
             }
+
+            if (
+                this.trainProperty.proposal.master_image_id &&
+                !this.trainProperty.master_image_id
+            ) {
+                this.train.master_image_id = this.trainProperty.proposal.master_image_id;
+            }
         },
         async updateTrain(data) {
             if (!this.wizard.initialized) return;
@@ -203,7 +210,9 @@ export default {
                         promise = this.canPassHashWizardStep();
                         break;
                     default:
-                        promise = new Promise((resolve, reject) => reject('This is step is not finished yet. Please fill out all required fields or make a choice of truth.'));
+                        promise = new Promise((resolve, reject) => {
+                            reject(new Error('This step is not finished yet. Please fill out all required fields or make a choice of truth.'));
+                        });
                         break;
                 }
 

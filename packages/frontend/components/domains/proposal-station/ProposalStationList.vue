@@ -242,13 +242,16 @@ export default {
             ref="form"
             size="lg"
             button-size="sm"
-            title-html="<i class='fa fa-hospital'></i>"
+            title-html="<i class='fa fa-hospital'></i> Stations"
             :no-close-on-backdrop="true"
             :no-close-on-esc="true"
             :hide-footer="true"
         >
-            <station-list :filter-items="notInItems">
-                <template #actions="props">
+            <station-list
+                :filter-items="notInItems"
+                :with-title="false"
+            >
+                <template #item-actions="props">
                     <button
                         v-if="canEdit"
                         type="button"

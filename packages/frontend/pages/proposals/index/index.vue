@@ -70,6 +70,9 @@ export default {
                 filter: {
                     realm_id: this.$store.getters['auth/userRealmId'],
                 },
+                sort: {
+                    updated_at: 'DESC',
+                },
             };
         },
     },

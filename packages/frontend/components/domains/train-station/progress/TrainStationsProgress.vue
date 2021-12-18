@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    Train, TrainBuildStatus, TrainRunStatus, TrainStationStatic, getAPITrainStations,
+    Train, TrainBuildStatus, TrainRunStatus, TrainStationRunStatus, TrainStationStatic, getAPITrainStations,
 } from '@personalhealthtrain/ui-common';
 import TrainStationRunStatusText from '../status/TrainStationRunStatusText';
 import TrainStationStaticRunStatusText from '../status/TrainStationStaticRunStatusText';
@@ -27,6 +27,7 @@ export default {
             busy: false,
 
             trainStationStatic: TrainStationStatic,
+            trainStationRunStatus: TrainStationRunStatus,
         };
     },
     computed: {
@@ -81,15 +82,26 @@ export default {
     <div>
         <!--
         <div class="progress-with-circle">
-            <div class="progress-bar" :style="{width: progressPercentage + '%'}" style="background-color: rgb(51, 51, 51); color: rgb(51, 51, 51);"></div>
+            <div
+            class="progress-bar"
+            :style="{width: progressPercentage + '%'}"
+            style="background-color: rgb(51, 51, 51); color: rgb(51, 51, 51);"
+            ></div>
         </div>
         -->
-        <div class="d-flex flex-row justify-content-between position-relative">
+        <div class="d-flex flex-row justify-content-around position-relative">
             <div class="icon-circle progress-step bg-dark text-light">
                 <span class="icon">Incoming Station</span>
             </div>
             <template v-for="(item,key) in items">
-                <div class="icon-circle progress-step bg-dark text-light">
+                <div
+                    class="icon-circle progress-step text-light"
+                    :class="{
+                        'bg-dark': !item.run_status,
+                        'bg-success': item.run_status === trainStationRunStatus.DEPARTED,
+                        'bg-primary': item.run_status === trainStationRunStatus.ARRIVED
+                    }"
+                >
                     <span class="icon">Station {{ key + 1 }}</span>
                 </div>
             </template>
@@ -97,7 +109,7 @@ export default {
                 <span class="icon">Outgoing Station</span>
             </div>
         </div>
-        <div class="d-flex flex-row justify-content-between position-relative mt-1">
+        <div class="d-flex flex-row justify-content-around position-relative mt-1">
             <div class="progress-step d-flex flex-column text-center">
                 <div class="">
                     <strong>Status</strong>

@@ -15,9 +15,11 @@ import {
 
 import MasterImagePicker from '../../../components/domains/master-image/MasterImagePicker';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
+import StationList from '../../../components/domains/station/StationList';
+import ToggleManyButton from '../../../components/ToggleManyButton';
 
 export default {
-    components: { MasterImagePicker },
+    components: { ToggleManyButton, StationList, MasterImagePicker },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -45,9 +47,9 @@ export default {
             },
 
             risks: [
-                { id: 'low', name: '(Low) Low risk' },
-                { id: 'mid', name: '(Mid) Mid risk' },
-                { id: 'high', name: '(High) High risk' },
+                { id: 'low', name: '(Low) Low risk', class: 'btn-success' },
+                { id: 'mid', name: '(Mid) Mid risk', class: 'btn-warning' },
+                { id: 'high', name: '(High) High risk', class: 'btn-danger' },
             ],
         };
     },
@@ -85,28 +87,9 @@ export default {
             },
         },
     },
-    created() {
-        Promise.resolve()
-            .then(this.loadStations);
-    },
     methods: {
         handleMasterImagePicker(id) {
             this.formData.master_image_id = id || '';
-        },
-        async loadStations() {
-            if (this.station.busy) return;
-
-            this.station.busy = true;
-
-            try {
-                const { data } = await getAPIStations();
-
-                this.station.items = data;
-            } catch (e) {
-                // ...
-            }
-
-            this.station.busy = false;
         },
         async handleSubmit(e) {
             e.preventDefault();
@@ -126,6 +109,27 @@ export default {
             }
 
             this.busy = false;
+        },
+        async toggleFormData(key, id) {
+            switch (key) {
+                case 'station_ids': {
+                    const index = this.formData.station_ids.indexOf(id);
+                    if (index === -1) {
+                        this.formData.station_ids.push(id);
+                    } else {
+                        this.formData.station_ids.splice(index, 1);
+                    }
+                    break;
+                }
+                default: {
+                    if (this.formData[key] === id) {
+                        this.formData[key] = null;
+                    } else {
+                        this.formData[key] = id;
+                    }
+                    break;
+                }
+            }
         },
     },
 };
@@ -157,7 +161,7 @@ export default {
                             v-if="!$v.formData.title.required"
                             class="form-group-hint group-required"
                         >
-                            Please provide a title for the train.
+                            Provide a title for the train.
                         </div>
                         <div
                             v-if="!$v.formData.title.minLength"
@@ -182,37 +186,44 @@ export default {
                             v-if="!$v.formData.master_image_id.required"
                             class="form-group-hint group-required"
                         >
-                            Please select a master image.
+                            Select a master image.
                         </div>
                     </div>
 
                     <hr>
 
-                    <div
-                        class="form-group"
-                        :class="{ 'form-group-error': $v.formData.risk.$error }"
-                    >
-                        <label>Risk</label>
-                        <select
-                            v-model="$v.formData.risk.$model"
-                            class="form-control"
+                    <div>
+                        <span>Risk</span>
+                        <div
+                            class="row mt-1 mb-2"
                         >
-                            <option value="">
-                                -- Please select --
-                            </option>
-                            <option
+                            <div
                                 v-for="(item,key) in risks"
                                 :key="key"
-                                :value="item.id"
+                                class="col"
                             >
-                                {{ item.name }}
-                            </option>
-                        </select>
+                                <button
+                                    class="btn btn-block"
+                                    :style="{
+                                        opacity: item.id === formData.risk ? 1 : 0.5
+                                    }"
+                                    :class="{
+                                        [item.class]: true,
+                                        'font-weight-bold': item.id === formData.risk
+                                    }"
+                                    type="button"
+                                    @click.prevent="toggleFormData('risk', item.id)"
+                                >
+                                    {{ item.name }}
+                                </button>
+                            </div>
+                        </div>
+
                         <div
                             v-if="!$v.formData.risk.required"
-                            class="form-group-hint group-required"
+                            class="alert alert-sm alert-warning"
                         >
-                            Please specify the risk for a station.
+                            Specify the possible risk for a station in general.
                         </div>
                     </div>
 
@@ -233,7 +244,7 @@ export default {
                             v-if="!$v.formData.risk_comment.required"
                             class="form-group-hint group-required"
                         >
-                            Please make a risk statement.
+                            Describe the risk in a few words.
                         </div>
                         <div
                             v-if="!$v.formData.risk_comment.minLength"
@@ -265,37 +276,31 @@ export default {
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div
-                        class="form-group"
-                        :class="{ 'form-group-error': $v.formData.station_ids.$anyError }"
-                    >
-                        <label>Stations</label>
-                        <select
-                            v-model="$v.formData.station_ids.$model"
-                            class="form-control"
-                            style="height:100px;"
-                            multiple
-                            :disabled="station.busy"
-                        >
-                            <option
-                                v-for="(item,key) in station.items"
-                                :key="key"
-                                :value="item.id"
-                            >
-                                {{ item.name }}
-                            </option>
-                        </select>
+                    <div>
+                        <station-list>
+                            <template #header-title>
+                                Stations
+                            </template>
+                            <template #item-actions="props">
+                                <toggle-many-button
+                                    :id="props.item.id"
+                                    :ids="formData.station_ids"
+                                    @toggle="toggleFormData('station_ids', props.item.id)"
+                                />
+                            </template>
+                        </station-list>
+
                         <div
                             v-if="!$v.formData.station_ids.required"
-                            class="form-group-hint group-required"
+                            class="alert alert-warning alert-sm"
                         >
-                            Please select one or more stations.
+                            Select one or more stations.
                         </div>
                         <div
                             v-if="!$v.formData.station_ids.minLength"
-                            class="form-group-hint"
+                            class="alert alert-warning alert-sm"
                         >
-                            Please select at least <strong>{{ $v.formData.station_ids.$params.minLength.min }}</strong> stations.
+                            Select at least <strong>{{ $v.formData.station_ids.$params.minLength.min }}</strong> stations.
                         </div>
                     </div>
 
@@ -317,7 +322,7 @@ export default {
                             v-if="!$v.formData.requested_data.required"
                             class="form-group-hint group-required"
                         >
-                            Please describe in few words, what kind of data you request for your algorithms.
+                            Describe in a few words, what kind of data is required for the algorithm.
                         </div>
                         <div
                             v-if="!$v.formData.requested_data.minLength"

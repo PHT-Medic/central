@@ -187,14 +187,10 @@ export default {
                 v-if="!proposalFixed"
                 class="col"
             >
-                <div
-                    v-if="!$v.formData.proposal_id.required && !$v.formData.proposal_id.$model"
-                    class="alert alert-sm alert-warning"
-                >
-                    Choose a proposal as base of your train
-                </div>
-
                 <proposal-list :query="proposalQuery">
+                    <template #header-title>
+                        Proposals
+                    </template>
                     <template #item-actions="props">
                         <button
                             :disabled="props.busy"
@@ -215,6 +211,13 @@ export default {
                         </button>
                     </template>
                 </proposal-list>
+
+                <div
+                    v-if="!$v.formData.proposal_id.required && !$v.formData.proposal_id.$model"
+                    class="alert alert-sm alert-warning"
+                >
+                    Choose a proposal as base of your train
+                </div>
             </div>
         </div>
     </form>

@@ -77,11 +77,11 @@ export default {
             );
         },
         masterImageId() {
-            if (typeof this.train.master_image_id !== 'undefined') {
+            if (this.train.master_image_id) {
                 return this.train.master_image_id;
             }
 
-            if (typeof this.train.proposal !== 'undefined') {
+            if (this.train.proposal) {
                 return this.train.proposal.master_image_id;
             }
 
