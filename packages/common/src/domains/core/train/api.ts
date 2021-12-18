@@ -45,13 +45,18 @@ export async function addAPITrain(data: Partial<Train>) : Promise<SingleResource
     return response;
 }
 
-export async function runAPITrainCommand(id: typeof Train.prototype.id, command: TrainCommand, data: Record<string, any> = {}) : Promise<SingleResourceResponse<Train>> {
+export async function runAPITrainCommand(
+    id: typeof Train.prototype.id,
+    command: TrainCommand,
+    data: Record<string, any> = {},
+) : Promise<SingleResourceResponse<Train>> {
     const actionData = {
         command,
         ...data,
     };
 
-    const { data: response } = await useAPI(APIType.DEFAULT).post(`trains/${id}/command`, actionData);
+    const { data: response } = await useAPI(APIType.DEFAULT)
+        .post(`trains/${id}/command`, actionData);
 
     return response;
 }

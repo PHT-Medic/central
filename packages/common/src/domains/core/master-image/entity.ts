@@ -9,13 +9,10 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    Index, ManyToOne,
+    Index,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-
-import { MasterImageGroup } from '../master-image-group';
-import { MasterImageGroupType } from './type';
 
 @Entity({ name: 'master_images' })
 export class MasterImage {

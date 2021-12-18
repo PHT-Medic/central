@@ -5,13 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { v4 } from 'uuid';
 import {
     Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
+import { nanoid } from 'nanoid';
 import { ProposalStation } from '../proposal-station';
 import { Realm } from '../../auth';
 import { TrainStation } from '../train-station';
+import { createNanoID } from '../../../utils/nanoid';
 
 @Entity({ name: 'stations' })
 export class Station {
@@ -20,7 +21,7 @@ export class Station {
 
     @Index()
     @Column({
-        type: 'varchar', length: 100, select: false, default: v4(),
+        type: 'varchar', length: 100, select: false, default: createNanoID(),
     })
         secure_id: string;
 

@@ -24,7 +24,9 @@ export enum APIType {
     VAULT = 'vault',
 }
 
-export type APIConnectionType<T extends APIType> = T extends APIType.VAULT ? APIServiceVaultConfig : T extends APIType.HARBOR ? APIServiceHarborConfig : never;
+export type APIConnectionType<T extends APIType> = T extends APIType.VAULT ?
+    APIServiceVaultConfig :
+    T extends APIType.HARBOR ? APIServiceHarborConfig : never;
 
 export type APIConfigType = APIType.DEFAULT | APIType.VAULT | APIType.HARBOR;
 export type APIConfig<T extends APIConfigType> = {

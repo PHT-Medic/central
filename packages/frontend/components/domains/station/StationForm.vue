@@ -6,23 +6,16 @@
   -->
 <script>
 import {
-    Station, addAPIStation, editAPIStation, getAPIRealms,
+    addAPIStation, createNanoID, editAPIStation,
+    getAPIRealms,
 } from '@personalhealthtrain/ui-common';
-import { v4 } from 'uuid';
 import {
     email, helpers, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 
-import AlertMessage from '../../alert/AlertMessage';
-import NotImplemented from '../../NotImplemented';
-
-const safeStr = helpers.regex('safeStr', /^[a-zA-Z0-9-]*$/);
+const safeStr = helpers.regex('safeStr', /^[a-zA-Z0-9]*$/);
 
 export default {
-    components: {
-        AlertMessage,
-        NotImplemented,
-    },
     props: {
         stationProperty: {
             type: Object,
@@ -102,6 +95,7 @@ export default {
     },
     created() {
         if (typeof this.stationProperty !== 'undefined') {
+            // eslint-disable-next-line no-restricted-syntax
             for (const key in this.formData) {
                 if (!this.stationProperty.hasOwnProperty(key)) continue;
 
@@ -171,7 +165,7 @@ export default {
         },
 
         generateSecureId() {
-            this.formData.secure_id = v4();
+            this.formData.secure_id = createNanoID();
         },
         resetSecureId() {
             this.formData.secure_id = this.stationProperty.secure_id;
@@ -280,19 +274,21 @@ export default {
                     v-if="!$v.formData.secure_id.minLength"
                     class="form-group-hint group-required"
                 >
-                    The length of the secure identifier must be greater than <strong>{{ $v.formData.secure_id.$params.minLength.min }}</strong> characters.
+                    The length of the secure identifier must be greater than
+                    <strong>{{ $v.formData.secure_id.$params.minLength.min }}</strong> characters.
                 </div>
                 <div
                     v-if="!$v.formData.secure_id.maxLength"
                     class="form-group-hint group-required"
                 >
-                    The length of the secure identifier must be less than <strong>{{ $v.formData.secure_id.$params.maxLength.max }}</strong> characters.
+                    The length of the secure identifier must be less than
+                    <strong>{{ $v.formData.secure_id.$params.maxLength.max }}</strong> characters.
                 </div>
                 <div
                     v-if="!$v.formData.secure_id.safeStr"
                     class="form-group-hint group-required"
                 >
-                    The secure identifier is only allowed to consist of the following characters: [0-9a-zA-Z-]+
+                    The secure identifier is only allowed to consist of the following characters: [0-9a-zA-Z]+
                 </div>
             </div>
 

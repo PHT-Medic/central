@@ -11,29 +11,42 @@ import {
 import { Train } from '../train';
 import { TrainFile } from './entity';
 
-export function getAPITrainFilesDownloadUri(trainId: typeof Train.prototype.id): string {
+export function getAPITrainFilesDownloadUri(
+    trainId: typeof Train.prototype.id,
+): string {
     return `trains/${trainId}/files/download`;
 }
 
-export async function getApiTrainFiles(trainId: typeof Train.prototype.id) : Promise<CollectionResourceResponse<TrainFile>> {
+export async function getApiTrainFiles(
+    trainId: typeof Train.prototype.id,
+) : Promise<CollectionResourceResponse<TrainFile>> {
     const response = await useAPI(APIType.DEFAULT).get(`trains/${trainId}/files`);
 
     return response.data;
 }
 
-export async function getApiTrainFile(trainId: typeof Train.prototype.id, fileId: typeof TrainFile.prototype.id) : Promise<SingleResourceResponse<TrainFile>> {
+export async function getApiTrainFile(
+    trainId: typeof Train.prototype.id,
+    fileId: typeof TrainFile.prototype.id,
+) : Promise<SingleResourceResponse<TrainFile>> {
     const response = await useAPI(APIType.DEFAULT).get(`trains/${trainId}/files${fileId}`);
 
     return response.data;
 }
 
-export async function dropApiTrainFile(trainId: typeof Train.prototype.id, fileId: typeof Train.prototype.id) : Promise<SingleResourceResponse<TrainFile>> {
+export async function dropApiTrainFile(
+    trainId: typeof Train.prototype.id,
+    fileId: typeof Train.prototype.id,
+) : Promise<SingleResourceResponse<TrainFile>> {
     const response = await useAPI(APIType.DEFAULT).delete(`trains/${trainId}/files/${fileId}`);
 
     return response.data;
 }
 
-export async function uploadTrainFiles(trainId: typeof Train.prototype.id, formData: any) : Promise<CollectionResourceResponse<TrainFile>> {
+export async function uploadTrainFiles(
+    trainId: typeof Train.prototype.id,
+    formData: any,
+) : Promise<CollectionResourceResponse<TrainFile>> {
     const response = await useAPI(APIType.DEFAULT).post(`trains/${trainId}/files`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',

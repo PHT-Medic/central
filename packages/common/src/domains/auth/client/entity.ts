@@ -9,15 +9,14 @@ import {
     BeforeInsert,
     Column,
     CreateDateColumn,
-    Entity, JoinColumn, ManyToOne, OneToOne,
+    Entity,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../user';
 import { ServiceID } from '../../extra';
 import { AuthClientType } from './type';
 import { createAuthClientSecret } from './utils';
-import { MASTER_REALM_ID, Realm } from '../realm';
+import { MASTER_REALM_ID } from '../realm';
 
 @Entity({ name: 'auth_clients' })
 export class Client {

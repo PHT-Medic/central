@@ -17,7 +17,10 @@ export type HarborRobotAccount = {
     expires_at: number
 };
 
-export async function findHarborRobotAccount(name: string, withSecret = true) : Promise<HarborRobotAccount | undefined> {
+export async function findHarborRobotAccount(
+    name: string,
+    withSecret = true,
+) : Promise<HarborRobotAccount | undefined> {
     const { data } = await useAPI(APIType.HARBOR).get(`robots?q=name%3D${name}&page_size=1`);
 
     const accounts = Array.isArray(data) ? data.filter((account) => account.name === `robot$${name}`) : [];
@@ -51,7 +54,10 @@ export async function findHarborRobotAccount(name: string, withSecret = true) : 
  * @param robotId
  * @param record
  */
-export async function patchHarborProjectRobotAccount(robotId: string | number, record: Record<string, any> = {}) : Promise<Pick<HarborRobotAccount, 'secret'>> {
+export async function patchHarborProjectRobotAccount(
+    robotId: string | number,
+    record: Record<string, any> = {},
+) : Promise<Pick<HarborRobotAccount, 'secret'>> {
     const robot : Record<string, any> = {
         ...record,
     };
