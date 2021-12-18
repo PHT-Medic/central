@@ -22,7 +22,8 @@ import {
     buildSecretStorageUserKey,
     isHex,
     onlyRealmPermittedQueryResources,
-    saveToSecretEngine, useAPI,
+    saveToSecretEngine,
+    useAPI,
 } from '@personalhealthtrain/ui-common';
 import { BadRequestError, NotFoundError } from '@typescript-error/http';
 import {
@@ -154,7 +155,10 @@ async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
 
     const data = matchedData(req, { includeOptionals: false });
 
-    if (!isHex(data.content)) {
+    if (
+        data.type !== SecretType.PAILLIER_PUBLIC_KEY &&
+        !isHex(data.content)
+    ) {
         data.content = Buffer.from(data.content, 'utf-8').toString('hex');
     }
 
@@ -196,6 +200,7 @@ async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
     }
 
     if (
+        data.type !== SecretType.PAILLIER_PUBLIC_KEY &&
         data.content !== entity.content &&
         !isHex(data.content)
     ) {
