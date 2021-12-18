@@ -12,7 +12,8 @@ RUN npm ci
 RUN npm run bootstrap
 RUN npm run build
 
-RUN touch .env
+RUN touch packages/backend/.env
+RUN touch packages/frontend/.env
 
 COPY ./entrypoint.sh ./entrypoint.sh
 
