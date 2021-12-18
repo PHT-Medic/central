@@ -6,5 +6,5 @@
  */
 
 export function isHex(value: string) : boolean {
-    return /^[A-F0-9]+$/i.test(value);
+    return /^[A-Fa-f0-9]+$/i.test(value);
 }

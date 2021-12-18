@@ -15,10 +15,9 @@ import {
     PermissionID,
     STATION_SECRET_ENGINE_KEY,
     Station,
-    buildSecretStorageStationKey,
     buildSecretStorageStationPayload,
     deleteFromSecretEngine,
-    deleteStationHarborProject, saveToSecretEngine,
+    deleteStationHarborProject, isHex, saveToSecretEngine,
 } from '@personalhealthtrain/ui-common';
 
 import {
@@ -30,66 +29,7 @@ import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 
-type PartialStation = Partial<Station>;
-const stationExample = { name: 'University Tuebingen', realm_id: 'tuebingen', id: 1 };
-
-@SwaggerTags('pht')
-@Controller('/stations')
-export class StationController {
-    @Get('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialStation[]>([
-        stationExample,
-    ])
-    async getMany(
-        @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialStation[]> {
-        return await getStationsRouteHandler(req, res) as PartialStation[];
-    }
-
-    @Post('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialStation>(stationExample)
-    async add(
-        @Body() data: PartialStation,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialStation | undefined> {
-        return await addStationRouteHandler(req, res) as PartialStation | undefined;
-    }
-
-    @Get('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialStation>(stationExample)
-    async getOne(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialStation | undefined> {
-        return await getStationRouteHandler(req, res) as PartialStation | undefined;
-    }
-
-    @Post('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialStation>(stationExample)
-    async edit(
-        @Params('id') id: string,
-            @Body() data: PartialStation,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialStation | undefined> {
-        return await editStationRouteHandler(req, res) as PartialStation | undefined;
-    }
-
-    @Delete('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialStation>(stationExample)
-    async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialStation | undefined> {
-        return await dropStationRouteHandler(req, res) as PartialStation | undefined;
-    }
-}
-
-export async function getStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
     const { fields } = req.query;
 
@@ -127,7 +67,7 @@ export async function getStationRouteHandler(req: ExpressRequest, res: ExpressRe
     return res.respond({ data: entity });
 }
 
-export async function getStationsRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {
         filter, page, fields, includes,
     } = req.query;
@@ -181,7 +121,7 @@ export async function getStationsRouteHandler(req: ExpressRequest, res: ExpressR
     });
 }
 
-export async function addStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.STATION_ADD)) {
         throw new ForbiddenError();
     }
@@ -204,12 +144,11 @@ export async function addStationRouteHandler(req: ExpressRequest, res: ExpressRe
 
     const data = matchedData(req, { includeOptionals: false });
 
-    if (data.public_key) {
-        const hexChecker = new RegExp('^[0-9a-fA-F]+$');
-
-        if (!hexChecker.test(data.public_key)) {
-            data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
-        }
+    if (
+        data.public_key &&
+        !isHex(data.public_key)
+    ) {
+        data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
     }
 
     const syncPublicKey: boolean | undefined = data.sync_public_key;
@@ -239,7 +178,7 @@ export async function addStationRouteHandler(req: ExpressRequest, res: ExpressRe
     return res.respond({ data: entity });
 }
 
-export async function editStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if (!req.ability.hasPermission(PermissionID.STATION_EDIT)) {
@@ -281,12 +220,12 @@ export async function editStationRouteHandler(req: ExpressRequest, res: ExpressR
         throw new NotFoundError();
     }
 
-    if (data.public_key && data.public_key !== station.public_key) {
-        const hexChecker = new RegExp('^[0-9a-fA-F]+$');
-
-        if (!hexChecker.test(data.public_key)) {
-            data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
-        }
+    if (
+        data.public_key &&
+        data.public_key !== station.public_key &&
+        !isHex(data.public_key)
+    ) {
+        data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
     }
 
     const syncPublicKey : boolean | undefined = data.sync_public_key;
@@ -335,11 +274,11 @@ export async function editStationRouteHandler(req: ExpressRequest, res: ExpressR
     });
 }
 
-export async function dropStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id: idStr } = req.params;
 
     // tslint:disable-next-line:radix
-    const id = parseInt(idStr);
+    const id = parseInt(idStr, 10);
 
     if (typeof id !== 'number' || Number.isNaN(id)) {
         throw new BadRequestError();
@@ -363,4 +302,63 @@ export async function dropStationRouteHandler(req: ExpressRequest, res: ExpressR
     await deleteFromSecretEngine(STATION_SECRET_ENGINE_KEY, entity.secure_id);
 
     return res.respondDeleted({ data: entity });
+}
+
+type PartialStation = Partial<Station>;
+const stationExample = { name: 'University Tuebingen', realm_id: 'tuebingen', id: 1 };
+
+@SwaggerTags('pht')
+@Controller('/stations')
+export class StationController {
+    @Get('', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation[]>([
+        stationExample,
+    ])
+    async getMany(
+        @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialStation[]> {
+        return await getManyRouteHandler(req, res) as PartialStation[];
+    }
+
+    @Post('', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async add(
+        @Body() data: PartialStation,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialStation | undefined> {
+        return await addRouteHandler(req, res) as PartialStation | undefined;
+    }
+
+    @Get('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async getOne(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialStation | undefined> {
+        return await getRouteHandler(req, res) as PartialStation | undefined;
+    }
+
+    @Post('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async edit(
+        @Params('id') id: string,
+            @Body() data: PartialStation,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialStation | undefined> {
+        return await editRouteHandler(req, res) as PartialStation | undefined;
+    }
+
+    @Delete('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialStation>(stationExample)
+    async drop(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialStation | undefined> {
+        return await dropRouteHandler(req, res) as PartialStation | undefined;
+    }
 }

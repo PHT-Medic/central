@@ -20,14 +20,15 @@ import {
     UserSecret,
     UserSecretEngineSecretPayload,
     buildSecretStorageUserKey,
+    isHex,
     onlyRealmPermittedQueryResources,
-    saveToSecretEngine,
-    useAPI,
+    saveToSecretEngine, useAPI,
 } from '@personalhealthtrain/ui-common';
 import { BadRequestError, NotFoundError } from '@typescript-error/http';
 import {
     applyFields, applyFilters, applyPagination, applyRelations, applySort,
 } from 'typeorm-extension';
+import { Buffer } from 'buffer';
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
 import env from '../../../../env';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
@@ -153,6 +154,10 @@ async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
 
     const data = matchedData(req, { includeOptionals: false });
 
+    if (!isHex(data.content)) {
+        data.content = Buffer.from(data.content, 'utf-8').toString('hex');
+    }
+
     const repository = getRepository(UserSecret);
 
     const entity = repository.create({
@@ -188,6 +193,13 @@ async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
 
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
+    }
+
+    if (
+        data.content !== entity.content &&
+        !isHex(data.content)
+    ) {
+        data.content = Buffer.from(data.content, 'utf-8').toString('hex');
     }
 
     entity = repository.merge(entity, data);
