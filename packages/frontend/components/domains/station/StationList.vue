@@ -56,7 +56,7 @@ export default {
             return this.items.filter(this.filterItems);
         },
         canDrop() {
-            return this.$auth.hasPermission(PermissionID.PROPOSAL_DROP);
+            return this.$auth.hasPermission(PermissionID.STATION_DROP);
         },
     },
     watch: {
