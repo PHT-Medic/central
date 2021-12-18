@@ -7,19 +7,25 @@
 <script>
 import { TrainType, addAPITrain, getProposals } from '@personalhealthtrain/ui-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
+import ProposalList from '../proposal/ProposalList';
 
 export default {
+    components: { ProposalList },
     props: {
         proposalId: {
             type: Number,
+            default: undefined,
+        },
+        realmId: {
+            type: String,
             default: undefined,
         },
     },
     data() {
         return {
             busy: false,
-            form: {
-                type: 'discovery',
+            formData: {
+                type: TrainType.DISCOVERY,
                 proposal_id: '',
                 name: '',
             },
@@ -33,9 +39,33 @@ export default {
             ],
         };
     },
+    computed: {
+        isDiscoveryTrain() {
+            return this.formData.type === TrainType.DISCOVERY;
+        },
+        isAnalyseTrain() {
+            return this.formData.type === TrainType.ANALYSE;
+        },
+
+        proposalFixed() {
+            return typeof this.proposalId !== 'undefined';
+        },
+        proposalQuery() {
+            return {
+                filter: {
+                    ...(this.realmId ? { realm_id: this.realmId } : {}),
+                },
+            };
+        },
+    },
+    created() {
+        if (this.proposalId) {
+            this.formData.proposal_id = this.proposalId;
+        }
+    },
     validations() {
         return {
-            form: {
+            formData: {
                 type: {
                     required,
                 },
@@ -49,41 +79,7 @@ export default {
             },
         };
     },
-    computed: {
-        isDiscoveryTrain() {
-            return this.form.type === 'discovery';
-        },
-        isAnalyseTrain() {
-            return this.form.type === 'analyse';
-        },
-        fixedProposal() {
-            return typeof this.proposalId !== 'undefined';
-        },
-    },
-    created() {
-        this.loadProposals().then(() => {
-            if (typeof this.proposalId !== 'undefined') {
-                const index = this.proposal.items.findIndex((proposal) => proposal.id === this.proposalId);
-                if (index !== -1) {
-                    this.form.proposal_id = this.proposalId;
-                }
-            }
-        });
-    },
     methods: {
-        async loadProposals() {
-            this.proposal.busy = true;
-
-            try {
-                // pagination handle multiple pages
-                const { data } = await getProposals();
-                this.proposal.items = data;
-            } catch (e) {
-                // ...
-            }
-
-            this.proposal.busy = false;
-        },
         async add() {
             if (this.busy) return;
 
@@ -91,7 +87,7 @@ export default {
 
             try {
                 const train = await addAPITrain({
-                    ...this.form,
+                    ...this.formData,
                 });
                 this.$emit('created', train);
             } catch (e) {
@@ -100,114 +96,126 @@ export default {
 
             this.busy = false;
         },
+        async toggleFormData(key, id) {
+            if (this.formData[key] === id) {
+                this.formData[key] = null;
+            } else {
+                this.formData[key] = id;
+            }
+        },
     },
 };
 </script>
 <template>
     <form @submit.prevent="add">
-        <div
-            class="form-group"
-            :class="{ 'form-group-error': $v.form.name.$error }"
-        >
-            <label>Name <small class="text-muted">(optional)</small></label>
-            <input
-                v-model="$v.form.name.$model"
-                type="text"
-                class="form-control"
-                placeholder="..."
-            >
-
-            <div
-                v-if="!$v.form.name.minLength"
-                class="form-group-hint group-required"
-            >
-                The length of the name must be greater than <strong>{{ $v.form.name.$params.minLength.min }}</strong> characters.
-            </div>
-            <div
-                v-if="!$v.form.name.maxLength"
-                class="form-group-hint group-required"
-            >
-                The length of the name must be less than <strong>{{ $v.form.name.$params.maxLength.max }}</strong> characters.
-            </div>
-        </div>
-
-        <hr>
-
-        <div class="form-group">
-            <label>Type</label>
-            <select
-                v-model="$v.form.type.$model"
-                class="form-control"
-            >
-                <option
-                    v-for="(value,key) in types"
-                    :key="key"
-                    :value="value.id"
+        <div class="row">
+            <div class="col">
+                <div
+                    class="form-group"
+                    :class="{ 'form-group-error': $v.formData.name.$error }"
                 >
-                    {{ value.name }}
-                </option>
-            </select>
+                    <label>Name <small class="text-muted">(optional)</small></label>
+                    <input
+                        v-model="$v.formData.name.$model"
+                        type="text"
+                        class="form-control"
+                        placeholder="..."
+                    >
 
-            <div
-                v-if="!$v.form.type.required && !$v.form.type.$model"
-                class="form-group-hint group-required"
-            >
-                Choose one of the available train types...
-            </div>
-        </div>
-        <div
-            v-if="$v.form.type.$model"
-            class="alert alert-secondary alert-sm"
-        >
-            <template v-if="$v.form.type.$model === 'analyse'">
-                An analyse train should be created on base of the knowledge achieved during the discovery phase.
-            </template>
-            <template v-else>
-                ⚡ A discovery train can be used to get to know about the availability of data at the targeted stations.
-            </template>
-        </div>
+                    <div
+                        v-if="!$v.formData.name.minLength"
+                        class="form-group-hint group-required"
+                    >
+                        The length of the name must be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters.
+                    </div>
+                    <div
+                        v-if="!$v.formData.name.maxLength"
+                        class="form-group-hint group-required"
+                    >
+                        The length of the name must be less than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
+                    </div>
+                </div>
 
-        <hr>
+                <hr>
 
-        <div
-            v-if="!fixedProposal"
-            class="form-group"
-        >
-            <label>Proposal</label>
-            <select
-                v-model="$v.form.proposal_id.$model"
-                class="form-control"
-                :disabled="proposal.busy"
-            >
-                <option value="">
-                    --- Select ---
-                </option>
-                <option
-                    v-for="(value,key) in proposal.items"
-                    :key="key"
-                    :value="value.id"
+                <div class="form-group">
+                    <label>Type</label>
+                    <select
+                        v-model="$v.formData.type.$model"
+                        class="form-control"
+                    >
+                        <option
+                            v-for="(value,key) in types"
+                            :key="key"
+                            :value="value.id"
+                        >
+                            {{ value.name }}
+                        </option>
+                    </select>
+
+                    <div
+                        v-if="!$v.formData.type.required && !$v.formData.type.$model"
+                        class="form-group-hint group-required"
+                    >
+                        Choose one of the available train types...
+                    </div>
+                </div>
+                <div
+                    v-if="$v.formData.type.$model"
+                    class="alert alert-secondary alert-sm"
                 >
-                    {{ value.title }}
-                </option>
-            </select>
+                    <template v-if="$v.formData.type.$model === 'analyse'">
+                        An analyse train should be created on base of the knowledge achieved during the discovery phase.
+                    </template>
+                    <template v-else>
+                        ⚡ A discovery train can be used to get to know about the availability of data at the targeted stations.
+                    </template>
+                </div>
 
-            <div
-                v-if="!$v.form.proposal_id.required && !$v.form.proposal_id.$model"
-                class="form-group-hint group-required"
-            >
-                Choose a proposal as base of your train
+                <div>
+                    <button
+                        type="submit"
+                        class="btn btn-xs btn-primary"
+                        :disabled="$v.formData.$invalid || busy"
+                        @click.prevent="add"
+                    >
+                        <i class="fa fa-plus" /> create
+                    </button>
+                </div>
             </div>
-        </div>
-
-        <div>
-            <button
-                type="submit"
-                class="btn btn-xs btn-primary"
-                :disabled="$v.form.$invalid || busy"
-                @click.prevent="add"
+            <div
+                v-if="!proposalFixed"
+                class="col"
             >
-                <i class="fa fa-plus" /> create
-            </button>
+                <div
+                    v-if="!$v.formData.proposal_id.required && !$v.formData.proposal_id.$model"
+                    class="alert alert-sm alert-warning"
+                >
+                    Choose a proposal as base of your train
+                </div>
+
+                <proposal-list :query="proposalQuery">
+                    <template #item-actions="props">
+                        <button
+                            :disabled="props.busy"
+                            type="button"
+                            class="btn btn-xs"
+                            :class="{
+                                'btn-dark': formData.proposal_id !== props.item.id,
+                                'btn-warning': formData.proposal_id === props.item.id
+                            }"
+                            @click.prevent="toggleFormData('proposal_id', props.item.id)"
+                        >
+                            <i
+                                :class="{
+                                    'fa fa-plus': formData.proposal_id !== props.item.id,
+                                    'fa fa-minus': formData.proposal_id === props.item.id
+                                }"
+                            />
+                        </button>
+                    </template>
+                </proposal-list>
+            </div>
         </div>
     </form>
 </template>

@@ -103,6 +103,10 @@ export default {
             }
         }
 
+        if (!this.formData.secure_id || this.formData.secure_id.length === 0) {
+            this.formData.secure_id = createNanoID();
+        }
+
         if (!this.realmLocked) {
             this.loadRealms();
         }

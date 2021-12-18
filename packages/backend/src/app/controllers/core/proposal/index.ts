@@ -6,7 +6,9 @@
  */
 
 import { In, getRepository } from 'typeorm';
-import { applyFilters, applyPagination, applyRelations } from 'typeorm-extension';
+import {
+    applyFilters, applyPagination, applyRelations, applySort,
+} from 'typeorm-extension';
 import {
     MasterImage,
     PermissionID, Proposal,
@@ -40,7 +42,7 @@ export class ProposalController {
         @Request() req: any,
             @Response() res: any,
     ): Promise<PartialProposal[]> {
-        return await getProposalsRouteHandler(req, res) as PartialProposal[];
+        return await getManyRouteHandler(req, res) as PartialProposal[];
     }
 
     @Get('/:id', [ForceLoggedInMiddleware])
@@ -114,8 +116,8 @@ export async function getProposalRouteHandler(req: ExpressRequest, res: ExpressR
     return res.respond({ data: entity });
 }
 
-export async function getProposalsRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { filter, page } = req.query;
+export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    const { filter, page, sort } = req.query;
 
     const repository = getRepository(Proposal);
     const query = repository.createQueryBuilder('proposal');
@@ -124,12 +126,15 @@ export async function getProposalsRouteHandler(req: ExpressRequest, res: Express
 
     applyFilters(query, filter, {
         defaultAlias: 'proposal',
-        allowed: ['id', 'name', 'realm_id'],
+        allowed: ['id', 'title', 'realm_id'],
+    });
+
+    applySort(query, sort, {
+        defaultAlias: 'proposal',
+        allowed: ['id', 'updated_at', 'created_at'],
     });
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });
-
-    query.orderBy('proposal.updated_at', 'DESC');
 
     const [entities, total] = await query.getManyAndCount();
 

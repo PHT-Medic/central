@@ -164,7 +164,7 @@ export default {
             your station can be used by inherited trains.
         </div>
         <div class="d-flex flex-row">
-            <div>
+            <div class="ml-auto">
                 <button
                     type="button"
                     class="btn btn-xs btn-dark"

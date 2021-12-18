@@ -14,6 +14,11 @@ export default {
             proposal_id: undefined,
         };
     },
+    computed: {
+        realmId() {
+            return this.$store.getters['auth/userRealmId'];
+        },
+    },
     created() {
         if (typeof this.$route.query.proposal_id !== 'undefined') {
             const proposalId = parseInt(this.$route.query.proposal_id, 10);
@@ -32,6 +37,7 @@ export default {
 <template>
     <train-basic-form
         :proposal-id="proposal_id"
+        :realm-id="realmId"
         @created="handleCreated"
     />
 </template>
