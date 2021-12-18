@@ -93,66 +93,103 @@ export const LayoutSideDefaultNavigation : NavigationComponentConfig[] = [
 
 export const LayoutSideAdminNavigation : NavigationComponentConfig[] = [
     {
-        name: 'Realms',
+        name: 'Auth',
         type: 'link',
-        url: '/admin/realms',
-        icon: 'fas fa-university',
+        icon: 'fas fa-lock',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.REALM_ADD,
             PermissionID.REALM_EDIT,
             PermissionID.REALM_DROP,
 
-            PermissionID.PROVIDER_ADD,
-            PermissionID.PROVIDER_DROP,
-            PermissionID.PROPOSAL_EDIT,
-        ],
-    },
-    {
-        name: 'Users',
-        type: 'link',
-        url: '/admin/users',
-        icon: 'fas fa-user',
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.USER_ADD,
             PermissionID.USER_EDIT,
             PermissionID.USER_DROP,
-        ],
-    },
-    {
-        name: 'Roles',
-        type: 'link',
-        url: '/admin/roles',
-        icon: 'fas fa-users',
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
+
             PermissionID.ROLE_ADD,
             PermissionID.ROLE_EDIT,
             PermissionID.ROLE_DROP,
-
             PermissionID.ROLE_PERMISSION_ADD,
             PermissionID.ROLE_PERMISSION_DROP,
-        ],
-    },
-    {
-        name: 'Permissions',
-        type: 'link',
-        url: '/admin/permissions',
-        icon: 'fas fa-key',
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
+
             PermissionID.PERMISSION_MANAGE,
         ],
+        components: [
+            {
+                name: 'Realms',
+                type: 'link',
+                url: '/admin/realms',
+                icon: 'fas fa-university',
+                [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                [LayoutKey.REQUIRED_PERMISSIONS]: [
+                    PermissionID.REALM_ADD,
+                    PermissionID.REALM_EDIT,
+                    PermissionID.REALM_DROP,
+
+                    PermissionID.PROVIDER_ADD,
+                    PermissionID.PROVIDER_DROP,
+                    PermissionID.PROPOSAL_EDIT,
+                ],
+            },
+            {
+                name: 'Users',
+                type: 'link',
+                url: '/admin/users',
+                icon: 'fas fa-user',
+                [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                [LayoutKey.REQUIRED_PERMISSIONS]: [
+                    PermissionID.USER_ADD,
+                    PermissionID.USER_EDIT,
+                    PermissionID.USER_DROP,
+                ],
+            },
+            {
+                name: 'Roles',
+                type: 'link',
+                url: '/admin/roles',
+                icon: 'fas fa-users',
+                [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                [LayoutKey.REQUIRED_PERMISSIONS]: [
+                    PermissionID.ROLE_ADD,
+                    PermissionID.ROLE_EDIT,
+                    PermissionID.ROLE_DROP,
+
+                    PermissionID.ROLE_PERMISSION_ADD,
+                    PermissionID.ROLE_PERMISSION_DROP,
+                ],
+            },
+            {
+                name: 'Permissions',
+                type: 'link',
+                url: '/admin/permissions',
+                icon: 'fas fa-key',
+                [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                [LayoutKey.REQUIRED_PERMISSIONS]: [
+                    PermissionID.PERMISSION_MANAGE,
+                ],
+            },
+        ],
     },
     {
-        name: 'Services',
+        name: 'General',
         type: 'link',
-        url: '/admin/services',
-        icon: 'fas fa-concierge-bell',
+        icon: 'fas fa-globe',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.SERVICE_MANAGE,
         ],
+        components: [
+            {
+                name: 'Services',
+                type: 'link',
+                url: '/admin/services',
+                icon: 'fas fa-concierge-bell',
+                [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                [LayoutKey.REQUIRED_PERMISSIONS]: [
+                    PermissionID.SERVICE_MANAGE,
+                ],
+            },
+        ],
     },
+
 ];
