@@ -35,7 +35,7 @@ export default {
                     id: ServiceID.GITHUB, name: 'Github', icon: 'fab fa-github', version: 'v1.0.0',
                 },
                 {
-                    id: ServiceID.RESULT_SERVICE, name: 'Result Service', icon: 'fa fa-file-export', version: 'v1.0.0-alpha.0',
+                    id: ServiceID.RESULT_SERVICE, name: 'Result Service', icon: 'fa fa-download', version: 'v1.0.0-alpha.0',
                 },
                 {
                     id: ServiceID.TRAIN_BUILDER, name: 'Train Builder', icon: 'fa fa-wrench', version: 'v1.0.0-alpha.0',

@@ -62,7 +62,7 @@ export default {
                 </div>
                 <div class="text-center">
                     <img
-                        src="/services.png"
+                        src="/architecture.png"
                         class="img-fluid w-75"
                     >
                 </div>

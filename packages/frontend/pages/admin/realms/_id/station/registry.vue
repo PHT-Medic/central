@@ -214,7 +214,7 @@ export default {
 
                 <div class="mb-2">
                     <b-form-checkbox
-                        :value="station.registry_project_webhook_exists"
+                        :v-model="station.registry_project_webhook_exists"
                         button-variant="success"
                         switch
                         :disabled="true"

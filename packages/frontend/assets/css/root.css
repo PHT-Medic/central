@@ -91,8 +91,11 @@ h5.title:before {
 }
 
 .title.no-border:before {
-    width:0px;
-    padding-right: 0px;
+    content: none;
+    width:0;
+    height: 0;
+    padding-right: 0;
+    margin-right: 0;
 }
 
 .title .sub-title {
