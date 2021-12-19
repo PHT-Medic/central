@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Group, Image } from 'fs-docker';
+import { Group, Image } from 'docker-scan';
 import { MasterImage, MasterImageGroup } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
 

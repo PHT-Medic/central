@@ -10,7 +10,7 @@ import path from 'path';
 import fs from 'fs';
 import { clone } from 'isomorphic-git';
 import http from 'isomorphic-git/http/node';
-import { scanDirectory } from 'fs-docker';
+import { scanDirectory } from 'docker-scan';
 import { getWritableDirPath } from '../../../../config/paths';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
