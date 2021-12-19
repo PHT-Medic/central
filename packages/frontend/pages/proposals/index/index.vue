@@ -34,18 +34,23 @@ export default {
         return {
             fields: [
                 {
-                    key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+                    key: 'id', label: 'ID', thClass: 'text-center', tdClass: 'text-center',
                 },
                 {
                     key: 'title', label: 'Title', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
+                    key: 'creator', label: 'Creator', thClass: 'text-center', tdClass: 'text-center',
+                },
+                {
                     key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
                 },
                 {
-                    key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+                    key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center',
                 },
-                { key: 'options', label: '', tdClass: 'text-left' },
+                {
+                    key: 'options', label: '', tdClass: 'text-left',
+                },
             ],
         };
     },
@@ -67,6 +72,9 @@ export default {
 
         query() {
             return {
+                include: {
+                    user: true,
+                },
                 filter: {
                     realm_id: this.$store.getters['auth/userRealmId'],
                 },
@@ -96,6 +104,9 @@ export default {
                         head-variant="'dark'"
                         outlined
                     >
+                        <template #cell(creator)="data">
+                            {{ data.item.user.name }}
+                        </template>
                         <template #cell(created_at)="data">
                             <timeago :datetime="data.item.created_at" />
                         </template>

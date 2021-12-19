@@ -98,8 +98,13 @@ export async function getProposalStationsRouteHandler(req: ExpressRequest, res: 
         'proposal.realm_id',
     ]);
 
+    // todo: relation definition should not be required, undefined -> allow all
     applyFilters(query, filter, {
-        allowed: ['proposal_id', 'station_id'],
+        relations: [{
+            key: 'proposalStation.station',
+            value: 'station',
+        }],
+        allowed: ['proposal_id', 'station_id', 'station.name', 'station.realm_id', 'proposal.id'],
         defaultAlias: 'proposalStation',
     });
 
@@ -121,9 +126,7 @@ export async function getProposalStationsRouteHandler(req: ExpressRequest, res: 
 export async function getProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    let repository;
-
-    repository = getRepository(ProposalStation);
+    const repository = getRepository(ProposalStation);
     const entity = await repository.findOne(id, { relations: ['station', 'proposal'] });
 
     if (typeof entity === 'undefined') {

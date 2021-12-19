@@ -12,7 +12,10 @@ import {
 import {
     MasterImage,
     PermissionID, Proposal,
-    ProposalStation, ProposalStationApprovalStatus, Station, isPermittedForResourceRealm,
+    ProposalStation,
+    ProposalStationApprovalStatus,
+    Station,
+    isPermittedForResourceRealm,
     onlyRealmPermittedQueryResources,
 } from '@personalhealthtrain/ui-common';
 import { check, matchedData, validationResult } from 'express-validator';
@@ -21,73 +24,14 @@ import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
 import { ResponseExample, SwaggerTags } from '@trapi/swagger';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import env from '../../../../env';
 import { ForceLoggedInMiddleware } from '../../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { DispatcherProposalEvent, emitDispatcherProposalEvent } from '../../../../domains/core/proposal/queue';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 
-type PartialProposal = Partial<Proposal>;
-const simpleExample = {
-    title: 'An example Proposal', risk: 'low', risk_comment: 'The risk is low', requested_data: 'all', realm_id: 'master',
-};
-
-@SwaggerTags('pht')
-@Controller('/proposals')
-export class ProposalController {
-    @Get('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposal[]>([simpleExample])
-    async getMany(
-        @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialProposal[]> {
-        return await getManyRouteHandler(req, res) as PartialProposal[];
-    }
-
-    @Get('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposal>(simpleExample)
-    async getOne(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialProposal | undefined> {
-        return await getProposalRouteHandler(req, res) as PartialProposal | undefined;
-    }
-
-    @Post('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposal>(simpleExample)
-    async update(
-        @Params('id') id: string,
-            @Body() data: Proposal,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialProposal | undefined> {
-        return await editProposalRouteHandler(req, res) as PartialProposal | undefined;
-    }
-
-    @Post('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposal>(simpleExample)
-    async add(
-        @Body() data: Proposal,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialProposal | undefined> {
-        return await addProposalRouteHandler(req, res) as PartialProposal | undefined;
-    }
-
-    @Delete('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposal>(simpleExample)
-    async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialProposal | undefined> {
-        return await dropProposalRouteHandler(req, res) as PartialProposal | undefined;
-    }
-}
-
-export async function getProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
     const { include } = req.query;
 
@@ -117,7 +61,9 @@ export async function getProposalRouteHandler(req: ExpressRequest, res: ExpressR
 }
 
 export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { filter, page, sort } = req.query;
+    const {
+        filter, page, sort, include,
+    } = req.query;
 
     const repository = getRepository(Proposal);
     const query = repository.createQueryBuilder('proposal');
@@ -132,6 +78,11 @@ export async function getManyRouteHandler(req: ExpressRequest, res: ExpressRespo
     applySort(query, sort, {
         defaultAlias: 'proposal',
         allowed: ['id', 'updated_at', 'created_at'],
+    });
+
+    applyRelations(query, include, {
+        defaultAlias: 'proposal',
+        allowed: ['user', 'realm'],
     });
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });
@@ -149,7 +100,7 @@ export async function getManyRouteHandler(req: ExpressRequest, res: ExpressRespo
     });
 }
 
-export async function addProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.PROPOSAL_ADD)) {
         throw new ForbiddenError();
     }
@@ -191,7 +142,7 @@ export async function addProposalRouteHandler(req: ExpressRequest, res: ExpressR
 
     const validationData = matchedData(req, { includeOptionals: false });
 
-    const { station_ids, ...data } = validationData;
+    const { station_ids: stationIds, ...data } = validationData;
 
     const repository = getRepository(Proposal);
     const entity = repository.create({
@@ -202,7 +153,7 @@ export async function addProposalRouteHandler(req: ExpressRequest, res: ExpressR
     await repository.save(entity);
 
     const proposalStationRepository = getRepository(ProposalStation);
-    const proposalStations = station_ids.map((stationId: number) => proposalStationRepository.create({
+    const proposalStations = stationIds.map((stationId: number) => proposalStationRepository.create({
         proposal_id: entity.id,
         station_id: stationId,
         approval_status: env.skipProposalApprovalOperation ? ProposalStationApprovalStatus.APPROVED : null,
@@ -210,7 +161,7 @@ export async function addProposalRouteHandler(req: ExpressRequest, res: ExpressR
 
     await proposalStationRepository.save(proposalStations);
 
-    const proposalStationPromise = Promise.all(station_ids.map((stationId: string | number) => emitDispatcherProposalEvent({
+    const proposalStationPromise = Promise.all(stationIds.map((stationId: string | number) => emitDispatcherProposalEvent({
         event: DispatcherProposalEvent.ASSIGNED,
         id: entity.id,
         stationId,
@@ -222,7 +173,7 @@ export async function addProposalRouteHandler(req: ExpressRequest, res: ExpressR
     return res.respond({ data: entity });
 }
 
-export async function editProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if (!req.ability.hasPermission(PermissionID.PROPOSAL_EDIT)) {
@@ -287,22 +238,14 @@ export async function editProposalRouteHandler(req: ExpressRequest, res: Express
     });
 }
 
-export async function dropProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id: idStr } = req.params;
-
-    // tslint:disable-next-line:radix
-    const id = parseInt(idStr, 10);
-
-    if (typeof id !== 'number' || Number.isNaN(id)) {
-        throw new BadRequestError();
-    }
+async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    const { id } = req.params;
 
     if (!req.ability.hasPermission(PermissionID.PROPOSAL_DROP)) {
         throw new ForbiddenError();
     }
 
     const repository = getRepository(Proposal);
-
     const entity = await repository.findOne(id);
 
     if (typeof entity === 'undefined') {
@@ -316,4 +259,63 @@ export async function dropProposalRouteHandler(req: ExpressRequest, res: Express
     await repository.delete(entity.id);
 
     return res.respondDeleted({ data: entity });
+}
+
+type PartialProposal = Partial<Proposal>;
+const simpleExample = {
+    title: 'An example Proposal', risk: 'low', risk_comment: 'The risk is low', requested_data: 'all', realm_id: 'master',
+};
+
+@SwaggerTags('pht')
+@Controller('/proposals')
+export class ProposalController {
+    @Get('', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposal[]>([simpleExample])
+    async getMany(
+        @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposal[]> {
+        return await getManyRouteHandler(req, res) as PartialProposal[];
+    }
+
+    @Get('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposal>(simpleExample)
+    async getOne(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposal | undefined> {
+        return await getRouteHandler(req, res) as PartialProposal | undefined;
+    }
+
+    @Post('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposal>(simpleExample)
+    async update(
+        @Params('id') id: string,
+            @Body() data: Proposal,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposal | undefined> {
+        return await editRouteHandler(req, res) as PartialProposal | undefined;
+    }
+
+    @Post('', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposal>(simpleExample)
+    async add(
+        @Body() data: Proposal,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposal | undefined> {
+        return await addRouteHandler(req, res) as PartialProposal | undefined;
+    }
+
+    @Delete('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialProposal>(simpleExample)
+    async drop(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialProposal | undefined> {
+        return await dropRouteHandler(req, res) as PartialProposal | undefined;
+    }
 }

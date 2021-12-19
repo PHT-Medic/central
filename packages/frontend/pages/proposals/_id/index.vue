@@ -106,53 +106,18 @@ export default {
         </div>
         <div class="mt-5">
             <div class="row">
-                <div class="col-3">
+                <div class="col">
                     <h6>Risk Comment</h6>
                     <p>{{ proposal.risk_comment }}</p>
 
                     <h6>RequestedData</h6>
                     <p>{{ proposal.requested_data }}</p>
                 </div>
-                <div class="col-3">
+                <div class="col">
                     <h6>Created At</h6>
                     <p><timeago :datetime="proposal.created_at" /></p>
                     <h6>Updated At</h6>
                     <p><timeago :datetime="proposal.updated_at" /></p>
-                </div>
-                <div class="col-6">
-                    <proposal-station-list
-                        ref="proposalStationList"
-                        :proposal-id="proposal.id"
-                    >
-                        <template #header-actions>
-                            <template v-if="visitorProposalStation">
-                                <b-dropdown
-                                    class="dropdown-xs"
-                                    :no-caret="true"
-                                >
-                                    <template #button-content>
-                                        <i class="fa fa-bars" /> Options
-                                    </template>
-                                    <proposal-station-action
-                                        :proposal-station-id="visitorProposalStation.id"
-                                        :approval-status="visitorProposalStation.approval_status"
-                                        :with-icon="true"
-                                        action-type="dropDownItem"
-                                        action="approve"
-                                        @done="handleUpdated"
-                                    />
-                                    <proposal-station-action
-                                        :proposal-station-id="visitorProposalStation.id"
-                                        :approval-status="visitorProposalStation.approval_status"
-                                        :with-icon="true"
-                                        action-type="dropDownItem"
-                                        action="reject"
-                                        @done="handleUpdated"
-                                    />
-                                </b-dropdown>
-                            </template>
-                        </template>
-                    </proposal-station-list>
                 </div>
             </div>
         </div>

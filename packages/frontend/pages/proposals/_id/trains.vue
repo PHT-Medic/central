@@ -8,10 +8,6 @@
     <div>
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
-                <div class="text-center">
-                    <proposal-svg width="100%" />
-                </div>
-
                 <b-nav
                     pills
                     vertical
@@ -39,10 +35,7 @@
     </div>
 </template>
 <script>
-import ProposalSvg from '../../../components/svg/ProposalSvg';
-
 export default {
-    components: { ProposalSvg },
     props: {
         proposal: Object,
         visitorStation: {

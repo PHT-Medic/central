@@ -8,7 +8,7 @@
 import {
     PermissionID,
     addApiProposalStation,
-    dropApiProposalStation, getApiProposalStations,
+    dropApiProposalStation, getApiProposalStations, mergeDeep,
 } from '@personalhealthtrain/ui-common';
 
 import Vue from 'vue';
@@ -17,15 +17,26 @@ import StationList from '../station/StationList';
 import ProposalStationApprovalStatusText from './ProposalStationApprovalStatusText';
 
 export default {
-    components: { ProposalStationApprovalStatusText, StationList, Pagination },
+    components: {
+        ProposalStationApprovalStatusText,
+        StationList,
+        Pagination,
+    },
     props: {
         proposalId: Number | String,
         filter: Function,
+        query: {
+            type: Object,
+            default() {
+                return {};
+            },
+        },
     },
     data() {
         return {
             busy: false,
             items: [],
+            q: '',
             meta: {
                 limit: 10,
                 offset: 0,
@@ -53,6 +64,19 @@ export default {
             return this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT);
         },
     },
+    watch: {
+        q(val, oldVal) {
+            if (val === oldVal) return;
+
+            if (val.length === 1 && val.length > oldVal.length) {
+                return;
+            }
+
+            this.meta.offset = 0;
+
+            this.load();
+        },
+    },
     created() {
         this.load();
     },
@@ -63,34 +87,28 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getApiProposalStations({
+                const response = await getApiProposalStations(mergeDeep({
                     filter: {
                         proposal_id: this.proposalId,
+                        station: {
+                            name: this.q.length > 0 ? `~${this.q}` : this.q,
+                        },
                     },
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
                     },
-                });
+                }, this.query));
 
                 this.items = response.data;
                 const { total } = response.meta;
 
                 this.meta.total = total;
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;
-        },
-        goTo(options, resolve, reject) {
-            if (options.offset === this.meta.offset) return;
-
-            this.meta.offset = options.offset;
-
-            this.load()
-                .then(resolve)
-                .catch(reject);
         },
         async drop(id) {
             if (this.itemBusy) return;
@@ -99,10 +117,9 @@ export default {
 
             try {
                 await dropApiProposalStation(id);
-                const index = this.items.findIndex((item) => item.id === id);
-                if (index !== -1) this.items.splice(index, 1);
+                this.dropArrayItem({ id });
 
-                this.$emit('dropped', id);
+                this.$emit('deleted', id);
             } catch (e) {
                 console.log(e);
             }
@@ -124,7 +141,7 @@ export default {
 
                 this.items.push(proposalStation);
 
-                this.$emit('added', proposalStation);
+                this.$emit('created', proposalStation);
             } catch (e) {
                 console.log(e);
             }
@@ -132,7 +149,17 @@ export default {
             this.itemBusy = false;
         },
 
-        showStations() {
+        goTo(options, resolve, reject) {
+            if (options.offset === this.meta.offset) return;
+
+            this.meta.offset = options.offset;
+
+            this.load()
+                .then(resolve)
+                .catch(reject);
+        },
+
+        showModal() {
             this.$refs.form.show();
         },
 
@@ -149,6 +176,13 @@ export default {
                 for (const key in item) {
                     Vue.set(this.items[index], key, item[key]);
                 }
+            }
+        },
+        dropArrayItem(item) {
+            const index = this.items.findIndex((el) => el.id === item.id);
+            if (index !== -1) {
+                this.items.splice(index, 1);
+                this.meta.total--;
             }
         },
     },
@@ -171,7 +205,7 @@ export default {
                             v-if="isProposalOwner && canEdit"
                             type="button"
                             class="btn btn-success btn-xs"
-                            @click.prevent="showStations"
+                            @click.prevent="showModal"
                         >
                             <i class="fa fa-plus" />
                         </button>
@@ -179,6 +213,21 @@ export default {
                 </div>
             </div>
         </slot>
+        <div class="form-group">
+            <div class="input-group">
+                <label />
+                <input
+                    v-model="q"
+                    type="text"
+                    name="q"
+                    class="form-control"
+                    placeholder="..."
+                >
+                <div class="input-group-append">
+                    <span class="input-group-text"><i class="fa fa-search" /></span>
+                </div>
+            </div>
+        </div>
         <div class="c-list">
             <div
                 v-for="(item,key) in formattedItems"
@@ -227,7 +276,7 @@ export default {
             slot="no-more"
         >
             <div class="alert alert-sm alert-info">
-                No (more) stations available anymore.
+                No (more) stations available.
             </div>
         </div>
 
