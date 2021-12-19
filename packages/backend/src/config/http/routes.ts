@@ -7,27 +7,27 @@
 
 import { Application } from 'express';
 import { attachControllers } from '@decorators/express';
-import { TokenController } from '../../app/controllers/auth/token';
-import { RealmController } from '../../app/controllers/auth/realm';
-import { ProviderController } from '../../app/controllers/auth/provider';
-import { UserController } from '../../app/controllers/auth/user';
-import { UserKeyController } from '../../app/controllers/auth/user-secret';
-import { MasterImageController } from '../../app/controllers/core/master-image';
-import { ProposalController } from '../../app/controllers/core/proposal';
-import { ProposalStationController } from '../../app/controllers/core/proposal-station';
-import { StationController } from '../../app/controllers/core/station';
-import { TrainController } from '../../app/controllers/core/train';
-import { TrainFileController } from '../../app/controllers/core/train-file';
-import { TrainStationController } from '../../app/controllers/core/train-station';
-import { UserRoleController } from '../../app/controllers/auth/user-role';
-import { RoleController } from '../../app/controllers/auth/role';
-import { RolePermissionController } from '../../app/controllers/auth/role-permission';
-import { ServiceController } from '../../app/controllers/extra/service';
-import { ServiceClientController } from '../../app/controllers/extra/service-client';
-import { PermissionController } from '../../app/controllers/auth/permission';
-import { ClientController } from '../../app/controllers/auth/client';
-import { MasterImageGroupController } from '../../app/controllers/core/master-image-groups';
-import { TrainResultController } from '../../app/controllers/core/train-result';
+import { TokenController } from '../../controllers/auth/token';
+import { RealmController } from '../../controllers/auth/realm';
+import { ProviderController } from '../../controllers/auth/provider';
+import { UserController } from '../../controllers/auth/user';
+import { UserKeyController } from '../../controllers/auth/user-secret';
+import { MasterImageController } from '../../controllers/core/master-image';
+import { ProposalController } from '../../controllers/core/proposal';
+import { ProposalStationController } from '../../controllers/core/proposal-station';
+import { StationController } from '../../controllers/core/station';
+import { TrainController } from '../../controllers/core/train';
+import { TrainFileController } from '../../controllers/core/train-file';
+import { TrainStationController } from '../../controllers/core/train-station';
+import { UserRoleController } from '../../controllers/auth/user-role';
+import { RoleController } from '../../controllers/auth/role';
+import { RolePermissionController } from '../../controllers/auth/role-permission';
+import { ServiceController } from '../../controllers/extra/service';
+import { ServiceClientController } from '../../controllers/extra/service-client';
+import { PermissionController } from '../../controllers/auth/permission';
+import { ClientController } from '../../controllers/auth/client';
+import { MasterImageGroupController } from '../../controllers/core/master-image-groups';
+import { TrainResultController } from '../../controllers/core/train-result';
 
 export function registerControllers(router: Application) {
     attachControllers(router, [

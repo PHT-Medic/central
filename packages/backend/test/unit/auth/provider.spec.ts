@@ -11,7 +11,7 @@ import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
 import env from '../../../src/env';
 
-describe('src/app/auth/provider', () => {
+describe('src/controllers/auth/provider', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {

@@ -10,7 +10,7 @@ import { getPermissions } from '../../../src/config/permissions';
 import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
 
-describe('src/app/auth/permission', () => {
+describe('src/controllers/auth/permission', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {

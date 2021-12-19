@@ -23,7 +23,7 @@ export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDoc
     const tsConfig = require(path.join(getRootDirPath(), 'tsconfig.json'));
 
     const metadataConfig : MetadataConfig = {
-        entryFile: path.join(getRootDirPath(), 'src', 'app', 'controllers', '**', '*.ts'),
+        entryFile: path.join(getRootDirPath(), 'src', 'controllers', '**', '*.ts'),
         ignore: ['**/node_modules/**'],
         decorator: {
             internal: true,

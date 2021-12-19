@@ -9,7 +9,7 @@ import { SecretType, UserSecret } from '@personalhealthtrain/ui-common';
 import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
 
-describe('src/app/auth/user-secret', () => {
+describe('src/controllers/auth/user-secret', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {

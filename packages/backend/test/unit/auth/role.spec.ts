@@ -9,7 +9,7 @@ import { Role } from '@personalhealthtrain/ui-common';
 import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
 
-describe('src/app/auth/role', () => {
+describe('src/controllers/auth/role', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {

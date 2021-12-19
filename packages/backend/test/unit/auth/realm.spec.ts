@@ -8,7 +8,7 @@
 import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
 
-describe('src/app/auth/realm', () => {
+describe('src/controllers/auth/realm', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
