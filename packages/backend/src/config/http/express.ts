@@ -26,6 +26,7 @@ import { registerControllers } from './routes';
 import { authenticateWithAuthorizationHeader, parseCookie } from './auth/utils';
 import { errorMiddleware } from './middleware/error';
 import { ExpressRequest } from './type';
+import { useRateLimiter } from './middleware/rate-limiter';
 
 export interface ExpressAppInterface extends Express{
 
@@ -34,6 +35,8 @@ export interface ExpressAppInterface extends Express{
 function createExpressApp() : ExpressAppInterface {
     useLogger().debug('setup express app...', { service: 'express' });
     const expressApp : Express = express();
+
+    expressApp.set('trust proxy', 1);
 
     expressApp.use(cors({
         origin(origin, callback) {
@@ -51,8 +54,10 @@ function createExpressApp() : ExpressAppInterface {
 
     expressApp.use('/public', expressStatic(getPublicDirPath()));
 
-    // Loading routes
+    // Rate Limiter
+    expressApp.use(useRateLimiter);
 
+    // Loading routes
     expressApp.use(responseMiddleware);
 
     expressApp.use(setupAuthMiddleware({
