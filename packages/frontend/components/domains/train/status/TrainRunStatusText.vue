@@ -29,8 +29,8 @@ export default {
             switch (this.status) {
                 case TrainRunStatus.STARTING:
                     return 'starting...';
-                case TrainRunStatus.STARTED:
-                    return 'started';
+                case TrainRunStatus.RUNNING:
+                    return 'running...';
                 case TrainRunStatus.STOPPING:
                     return 'stopping...';
                 case TrainRunStatus.STOPPED:
@@ -47,7 +47,7 @@ export default {
             switch (this.status) {
                 case TrainRunStatus.STARTING:
                 case TrainRunStatus.STOPPING:
-                case TrainRunStatus.STARTED:
+                case TrainRunStatus.RUNNING:
                     return 'primary';
                 case TrainRunStatus.STOPPED:
                     return 'warning';

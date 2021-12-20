@@ -6,20 +6,21 @@
  */
 
 import { check, matchedData, validationResult } from 'express-validator';
-import { In, getRepository } from 'typeorm';
+import { getRepository } from 'typeorm';
 import {
-    Client, MasterImage,
+    Client,
     PermissionID,
-    REGISTRY_MASTER_IMAGE_PROJECT_NAME, RegistryCommand, ServiceID,
+    RegistryCommand, ServiceID,
     Station, buildRegistryHarborProjectName, deleteHarborProject, dropHarborProjectAccount,
     dropHarborProjectWebHook, ensureHarborProject,
     ensureHarborProjectRobotAccount,
     ensureHarborProjectWebHook,
     findHarborRobotAccount,
-    getHarborProjectRepositories,
     getRegistryStationProjectNameId, isRegistryStationProjectName, isSpecialRegistryProjectName, pullProject,
 } from '@personalhealthtrain/ui-common';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import {
+    BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
+} from '@typescript-error/http';
 import env from '../../../../env';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
@@ -85,7 +86,7 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
 
     switch (command as RegistryCommand) {
         // Project
-        case RegistryCommand.PROJECT_PULL:
+        case RegistryCommand.PROJECT_PULL: {
             const project = await pullProject(projectName, true);
 
             if (typeof project === 'undefined') {
@@ -111,7 +112,8 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             }
 
             return res.respond({ data: project });
-        case RegistryCommand.PROJECT_CREATE:
+        }
+        case RegistryCommand.PROJECT_CREATE: {
             const entity = await ensureHarborProject(projectName);
 
             if (typeof station !== 'undefined') {
@@ -123,7 +125,8 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             }
 
             return res.respondCreated({ data: entity });
-        case RegistryCommand.PROJECT_DROP:
+        }
+        case RegistryCommand.PROJECT_DROP: {
             await deleteHarborProject(projectName, true);
 
             if (typeof station !== 'undefined') {
@@ -138,62 +141,13 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             }
 
             return res.respondDeleted();
-
-            // Repositories
-        case RegistryCommand.PROJECT_REPOSITORIES_SYNC:
-            const meta : { created: number, deleted: number } = {
-                created: 0,
-                deleted: 0,
-            };
-
-            const harborRepositories = await getHarborProjectRepositories(projectName);
-            const harborRepositoryPaths : string[] = harborRepositories.map((harborRepository) => harborRepository.fullName);
-
-            let data : unknown[] = [];
-
-            switch (projectName) {
-                /* @deprecated */
-                case REGISTRY_MASTER_IMAGE_PROJECT_NAME:
-                    const repository = getRepository(MasterImage);
-                    const existingEntities = await repository.find({
-                        where: {
-                            path: In(harborRepositoryPaths),
-                        },
-                    });
-
-                    const existingEntityPaths : string[] = existingEntities.map((entity) => entity.path);
-
-                    const nonExistingHarborRepositories = harborRepositories.filter((harborRepository) => !existingEntityPaths.includes(harborRepository.fullName));
-                    if (nonExistingHarborRepositories.length === 0) {
-                        return res.respond({
-                            data: {
-                                meta,
-                            },
-                        });
-                    }
-
-                    const entities : MasterImage[] = nonExistingHarborRepositories.map((harborRepository) => repository.create({
-                        path: harborRepository.fullName,
-                        name: harborRepository.name,
-                    }) as MasterImage);
-
-                    await repository.insert(entities);
-
-                    meta.created = entities.length;
-
-                    data = entities;
-                    break;
-            }
-
-            return res.respond({
-                data: {
-                    data: [...data],
-                    meta,
-                },
-            });
-
-            // Robot Account
-        case RegistryCommand.PROJECT_ROBOT_ACCOUNT_CREATE:
+        }
+        // Repositories
+        case RegistryCommand.PROJECT_REPOSITORIES_SYNC: {
+            throw new NotImplementedError();
+        }
+        // Robot Account
+        case RegistryCommand.PROJECT_ROBOT_ACCOUNT_CREATE: {
             const robotAccount = await ensureHarborProjectRobotAccount(projectName, projectName);
 
             if (typeof station !== 'undefined') {
@@ -206,16 +160,17 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             }
 
             return res.respondCreated({ data: robotAccount });
-        case RegistryCommand.PROJECT_ROBOT_ACCOUNT_DROP:
+        }
+        case RegistryCommand.PROJECT_ROBOT_ACCOUNT_DROP: {
             const { id } = await findHarborRobotAccount(projectName, false);
             if (id) {
                 await dropHarborProjectAccount(id);
             }
 
             return res.respondDeleted();
-
-            // Webhook
-        case RegistryCommand.PROJECT_WEBHOOK_CREATE:
+        }
+        // Webhook
+        case RegistryCommand.PROJECT_WEBHOOK_CREATE: {
             const clientRepository = await getRepository(Client);
 
             const client = await clientRepository.findOne({
@@ -237,8 +192,8 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             }
 
             return res.respondCreated({ data: webhook });
-
-        case RegistryCommand.PROJECT_WEBHOOK_DROP:
+        }
+        case RegistryCommand.PROJECT_WEBHOOK_DROP: {
             await dropHarborProjectWebHook(projectName, true);
 
             if (typeof station !== 'undefined') {
@@ -250,5 +205,6 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             }
 
             return res.respondDeleted();
+        }
     }
 }

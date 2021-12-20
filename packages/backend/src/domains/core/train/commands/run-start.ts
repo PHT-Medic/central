@@ -23,7 +23,7 @@ export async function startTrain(train: Train | number | string) : Promise<Train
 
     if (
         !!train.run_status &&
-        [TrainRunStatus.STARTING, TrainRunStatus.STARTED].indexOf(train.run_status) !== -1
+        [TrainRunStatus.STARTING, TrainRunStatus.RUNNING].indexOf(train.run_status) !== -1
     ) {
         // todo: make it a ClientError.BadRequest
         throw new Error('The train has already been started...');

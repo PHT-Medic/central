@@ -39,8 +39,9 @@ export function createDispatcherAggregatorTrainHandlers() : ConsumeHandlers {
             await repository.update({
                 id: message.data.id,
             }, {
-                run_status: TrainRunStatus.STARTED,
+                run_status: TrainRunStatus.RUNNING,
                 run_station_id: null,
+                run_station_index: 0,
             });
         },
         [AggregatorTrainEvent.MOVED]: async (message: Message) => {
@@ -49,8 +50,9 @@ export function createDispatcherAggregatorTrainHandlers() : ConsumeHandlers {
             await repository.update({
                 id: message.data.id,
             }, {
-                run_status: TrainRunStatus.STARTED,
+                run_status: TrainRunStatus.RUNNING,
                 run_station_id: message.data.stationId,
+                run_station_index: message.data.stationIndex,
             });
 
             const trainStationRepository = getRepository(TrainStation);

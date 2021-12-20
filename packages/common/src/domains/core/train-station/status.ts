@@ -21,7 +21,10 @@ export function isTrainStationApprovalStatus(type: any) : type is TrainStationAp
 
 export enum TrainStationRunStatus {
     ARRIVED = 'arrived',
+    PULLED = 'pulled',
+    PUSHED = 'pushed',
     DEPARTED = 'departed',
+    FAILED = 'failed',
 }
 
 export type TrainStationRunStatusType = `${TrainStationRunStatus}`;

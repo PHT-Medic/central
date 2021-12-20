@@ -45,6 +45,8 @@ export enum TrainRunStatus {
     STARTING = 'starting',
     STARTED = 'started',
 
+    RUNNING = 'running',
+
     STOPPING = 'stopping',
     STOPPED = 'stopped',
 

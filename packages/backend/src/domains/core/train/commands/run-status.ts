@@ -81,7 +81,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
                     build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
                     configuration_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
                     run_station_id: trainStations[i].station_id,
-                    run_status: TrainRunStatus.STARTED,
+                    run_status: TrainRunStatus.RUNNING,
                 });
 
                 await repository.save(train);

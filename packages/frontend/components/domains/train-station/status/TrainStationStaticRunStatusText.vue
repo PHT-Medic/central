@@ -51,7 +51,7 @@ export default {
         departed() {
             switch (this.id) {
                 case TrainStationStatic.INCOMING:
-                    return this.trainRunStatus === TrainRunStatus.STARTED && !Number.isNaN(this.trainRunStationIndex);
+                    return this.trainRunStatus === TrainRunStatus.RUNNING;
             }
 
             return false;

@@ -127,7 +127,10 @@ async function processStationTrain(data: DispatcherHarborEventWithAdditionalData
         data: {
             id: data.repositoryName,
             stationId: data.station.id,
-            status: data.operator === REGISTRY_SYSTEM_USER_NAME ? TrainStationRunStatus.ARRIVED : TrainStationRunStatus.DEPARTED,
+            stationIndex: data.stationIndex,
+            status: data.operator === REGISTRY_SYSTEM_USER_NAME ?
+                TrainStationRunStatus.ARRIVED :
+                TrainStationRunStatus.DEPARTED,
         },
     }));
 }

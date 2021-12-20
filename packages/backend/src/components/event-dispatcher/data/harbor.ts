@@ -10,6 +10,7 @@ import { getRepository } from 'typeorm';
 import {
     Station,
     TrainStation,
+    TrainStationRunStatus,
     buildRegistryHarborProjectName,
     isRegistryStationProjectName,
 } from '@personalhealthtrain/ui-common';
@@ -46,13 +47,17 @@ export async function extendDispatcherHarborData(message: Message) : Promise<Mes
             .orderBy('trainStation.position', 'ASC');
 
         const entities = await query.getMany();
+
         data.stations = entities.map((entity) => entity.station);
 
-        const index = data.stations.findIndex((entity) => buildRegistryHarborProjectName(entity.secure_id) === data.namespace);
+        const matchedIndex : number = data.stations.findIndex((entity) => buildRegistryHarborProjectName(entity.secure_id) === data.namespace);
+        data.station = matchedIndex !== -1 ? data.stations[matchedIndex] : undefined;
 
-        data.station = index !== -1 ? data.stations[index] : undefined;
+        // -----
 
-        data.stationIndex = index;
+        const passedEntities = entities.filter((entity) => entity.run_status &&
+            entity.run_status === TrainStationRunStatus.DEPARTED);
+        data.stationIndex = passedEntities.length; // length - 1 + 1
 
         message.data = data;
     }
