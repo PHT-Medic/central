@@ -40,8 +40,10 @@ export async function extendDispatcherHarborData(message: Message) : Promise<Mes
     ) {
         const repository = getRepository(TrainStation);
         const query = repository.createQueryBuilder('trainStation')
+            .addSelect('station.secure_id')
             .leftJoinAndSelect('trainStation.station', 'station')
-            .where('trainStation.train_id = :trainId', { trainId: data.repositoryName });
+            .where('trainStation.train_id = :trainId', { trainId: data.repositoryName })
+            .orderBy('trainStation.position', 'ASC');
 
         const entities = await query.getMany();
         data.stations = entities.map((entity) => entity.station);
@@ -50,7 +52,6 @@ export async function extendDispatcherHarborData(message: Message) : Promise<Mes
 
         data.station = index !== -1 ? data.stations[index] : undefined;
 
-        // todo: be aware of sorting :), keep station.position in mind.
         data.stationIndex = index;
 
         message.data = data;
