@@ -6,7 +6,11 @@
   -->
 <script>
 import {
-    dropApiTrainFile, getApiTrainFiles, hasOwnProperty, uploadTrainFiles,
+    dropApiTrainFile,
+    getAPIMasterImage, getAPIMasterImageGroup, getAPIMasterImageGroups,
+    getApiTrainFiles,
+    hasOwnProperty,
+    uploadTrainFiles,
 } from '@personalhealthtrain/ui-common';
 import { required } from 'vuelidate/lib/validators';
 import TrainFile from './TrainFile';
@@ -38,6 +42,8 @@ export default {
                 path: '',
                 files: [],
             },
+
+            entryPointFile: null,
         };
     },
     computed: {
@@ -62,7 +68,8 @@ export default {
             this.form.entrypoint_file_id = this.train.entrypoint_file_id;
         }
 
-        this.load().then((r) => r);
+        Promise.resolve()
+            .then(this.load);
     },
     methods: {
         async load() {
@@ -182,12 +189,12 @@ export default {
         },
 
         changeEntryPointFile(file) {
-            if (!this.form.entrypoint_file_id) {
-                this.form.entrypoint_file_id = file.id;
-            } else if (this.form.entrypoint_file_id === file.id) {
+            if (this.form.entrypoint_file_id === file.id) {
                 this.form.entrypoint_file_id = undefined;
+                this.entryPointFile = null;
             } else {
                 this.form.entrypoint_file_id = file.id;
+                this.entryPointFile = file;
             }
 
             if (this.form.entrypoint_file_id) {
@@ -197,7 +204,7 @@ export default {
                 }
             }
 
-            this.$emit('setEntrypointFile', this.form.entrypoint_file_id);
+            this.$emit('setEntrypointFile', this.entryPointFile);
         },
 
         getParentPath(path) {
@@ -381,6 +388,7 @@ export default {
     </div>
 </template>
 <style>
+
 .file-man-box {
     padding: 8px;
     border: 1px solid #e3eaef;

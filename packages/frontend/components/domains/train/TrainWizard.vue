@@ -7,19 +7,20 @@
 <script>
 import Vue from 'vue';
 import {
-    TrainCommand, TrainConfigurationStatus,
+    TrainConfigurationStatus,
     editAPITrain,
     getAPITrainStations,
-    runAPITrainCommand,
 } from '@personalhealthtrain/ui-common';
 import TrainWizardConfiguratorStep from './wizard/TrainWizardConfiguratorStep';
 import TrainFileManager from './file/TrainFileManager';
 import TrainWizardHashStep from './wizard/TrainWizardHashStep';
 import TrainWizardFinalStep from './wizard/TrainWizardFinalStep';
 import TrainWizardExtraStep from './wizard/TrainWizardExtraStep';
+import TrainImageCommand from './TrainImageCommand';
 
 export default {
     components: {
+        TrainImageCommand,
         TrainWizardExtraStep,
         TrainWizardFinalStep,
         TrainWizardHashStep,
@@ -194,8 +195,6 @@ export default {
                 const step = this.wizard.steps[this.wizard.index];
                 let promise;
 
-                console.log(step);
-
                 switch (step) {
                     case 'configuration':
                         promise = this.canPassConfigurationWizardStep();
@@ -216,7 +215,7 @@ export default {
                         break;
                 }
 
-                return promise
+                promise
                     .then(() => {
                         this.wizard.valid = true;
                         this.wizard.message = undefined;
@@ -290,12 +289,16 @@ export default {
             }
         },
         setTrainFiles(files) {
-            console.log(files);
-
             this.train.files = files;
         },
-        setMasterImage(id) {
-            this.train.master_image_id = id;
+        setMasterImage(item) {
+            if (item) {
+                this.train.master_image_id = item.id;
+                this.$refs.imageCommand.setMasterImage(item);
+            } else {
+                this.train.master_image_id = '';
+                this.$refs.imageCommand.setMasterImage(null);
+            }
         },
         setFhirQuery(query) {
             this.train.query = query;
@@ -303,8 +306,16 @@ export default {
         setStations(stations) {
             this.trainStation.items = stations;
         },
-        setEntrypointFileId(id) {
-            this.train.entrypoint_file_id = id;
+        setEntrypointFile(item) {
+            if (item) {
+                this.train.entrypoint_file_id = item.id;
+            } else {
+                this.train.entrypoint_file_id = null;
+            }
+
+            this.$nextTick(() => {
+                this.$refs.imageCommand.setTrainFile(item);
+            });
         },
         setHash(hash) {
             const data = {
@@ -318,8 +329,8 @@ export default {
 
             this.$emit('updated', data);
         },
-        setHashSigned(hash_signed) {
-            this.train.hash_signed = hash_signed;
+        setHashSigned(val) {
+            this.train.hash_signed = val;
         },
 
         //----------------------------------
@@ -377,6 +388,22 @@ export default {
                 :start-index="wizard.startIndex"
                 @on-change="handleWizardChange"
             >
+                <template #title>
+                    <h4 class="wizard-title">
+                        <i class="fa fa-hat-wizard" /> Train Wizard
+                    </h4>
+                    <p class="category">
+                        Configure your {{ trainProperty.type }} train step by step
+                    </p>
+
+                    <train-image-command
+                        ref="imageCommand"
+                        class="mt-2 mb-2"
+                        :master-image-id-prop="train.master_image_id"
+                        :train-file-id-prop="train.entrypoint_file_id"
+                        :train-id-prop="trainProperty.id"
+                    />
+                </template>
                 <template
                     slot="footer"
                     slot-scope="props"
@@ -437,7 +464,7 @@ export default {
                         :train="train"
                         @uploaded="handleFilesUploaded"
                         @deleted="handleFilesDeleted"
-                        @setEntrypointFile="setEntrypointFileId"
+                        @setEntrypointFile="setEntrypointFile"
                     />
                 </tab-content>
 

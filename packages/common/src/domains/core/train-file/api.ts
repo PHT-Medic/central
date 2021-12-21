@@ -29,7 +29,7 @@ export async function getApiTrainFile(
     trainId: typeof Train.prototype.id,
     fileId: typeof TrainFile.prototype.id,
 ) : Promise<SingleResourceResponse<TrainFile>> {
-    const response = await useAPI(APIType.DEFAULT).get(`trains/${trainId}/files${fileId}`);
+    const response = await useAPI(APIType.DEFAULT).get(`trains/${trainId}/files/${fileId}`);
 
     return response.data;
 }

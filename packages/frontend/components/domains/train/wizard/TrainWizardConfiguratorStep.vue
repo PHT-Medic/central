@@ -113,14 +113,16 @@ export default {
             }
         },
 
-        handleMasterImageSelected(id) {
-            this.form.master_image_id = id || '';
-            this.setTrainMasterImage();
+        handleMasterImageSelected(item) {
+            if (item) {
+                this.form.master_image_id = item.id;
+            } else {
+                this.form.master_image_id = '';
+            }
+
+            this.$emit('setTrainMasterImage', item);
         },
 
-        setTrainMasterImage() {
-            this.$emit('setTrainMasterImage', this.form.master_image_id);
-        },
         setTrainStations() {
             this.$emit('setTrainStations', this.trainStation.items);
         },

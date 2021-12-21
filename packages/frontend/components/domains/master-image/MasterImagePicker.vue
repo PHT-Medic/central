@@ -33,6 +33,7 @@ export default {
             group: {
                 items: [],
                 busy: false,
+                item: null,
             },
         };
     },
@@ -50,8 +51,6 @@ export default {
         async init() {
             if (this.masterImageId) {
                 this.loading = true;
-
-                console.log(this.masterImageId);
 
                 try {
                     const data = await getAPIMasterImage(this.masterImageId, {
@@ -111,9 +110,13 @@ export default {
             if (!virtualPath || virtualPath === '') {
                 this.image.items = [];
                 this.groupVirtualPath = null;
+                this.group.item = null;
             } else {
                 if (this.image.busy) return;
                 this.groupVirtualPath = virtualPath;
+
+                const index = this.group.items.findIndex((item) => item.virtual_path === virtualPath);
+                this.group.item = index !== -1 ? this.group.items[index] : null;
             }
 
             await this.selectImage(null);
@@ -126,14 +129,27 @@ export default {
             await this.selectImage(event.target.value);
         },
         async selectImage(id) {
-            if (!id || id === '') {
-                this.image.items = [];
+            if (!id || id.length === 0) {
                 this.imageId = null;
+
+                this.$emit('selected', null);
             } else {
                 this.imageId = id;
-            }
+                const index = this.image.items.findIndex((item) => item.id === id);
+                if (index !== -1) {
+                    const item = this.image.items[index];
+                    if (this.group.item) {
+                        item.command = item.command || this.group.item.command;
+                        item.command_arguments = item.command_arguments || this.group.item.command_arguments;
+                    }
 
-            this.$emit('selected', this.imageId);
+                    this.$emit('selected', item);
+                } else {
+                    this.$emit('selected', {
+                        id,
+                    });
+                }
+            }
         },
     },
 };

@@ -58,6 +58,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     const trainStationRepository = getRepository(TrainStation);
     const trainStationQueryBuilder = trainStationRepository
         .createQueryBuilder('trainStation')
+        .addSelect('station.secure_id')
         .leftJoinAndSelect('trainStation.station', 'station')
         .orderBy({
             'trainStation.position': 'DESC',
@@ -67,7 +68,9 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     const trainStations = await trainStationQueryBuilder.getMany();
 
     for (let i = 0; i < trainStations.length; i++) {
-        const stationId : string | number | undefined = trainStations[i].station.secure_id ?? trainStations[i].station.id;
+        const stationId : string | number | undefined = trainStations[i].station.secure_id ??
+            trainStations[i].station.id;
+
         if (!stationId) continue;
 
         const stationName : string = buildRegistryHarborProjectName(stationId);
@@ -91,8 +94,9 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
         } catch (e) {
             if (
                 typeof e?.response?.status === 'number' &&
-                e.response.status === 404
+                [404, 403].indexOf(e.response.status) !== -1
             ) {
+                // eslint-disable-next-line no-continue
                 continue;
             }
 

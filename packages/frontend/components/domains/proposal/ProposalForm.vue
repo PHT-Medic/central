@@ -118,8 +118,12 @@ export default {
         };
     },
     methods: {
-        handleMasterImagePicker(id) {
-            this.formData.master_image_id = id || '';
+        handleMasterImagePicker(item) {
+            if (item) {
+                this.formData.master_image_id = item.id;
+            } else {
+                this.formData.master_image_id = '';
+            }
         },
         async handleSubmit() {
             if (this.busy || this.$v.$invalid) {

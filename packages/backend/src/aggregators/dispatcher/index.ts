@@ -14,7 +14,6 @@ import { MessageQueueDispatcherRoutingKey } from '../../config/service/mq';
 export function buildDispatcherAggregator() {
     function start() {
         return consumeQueue({ routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN }, {
-            ...createDispatcherAggregatorMasterImageHandlers(),
             ...createDispatcherAggregatorProposalHandlers(),
             ...createDispatcherAggregatorTrainHandlers(),
         });

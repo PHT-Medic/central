@@ -14,7 +14,6 @@ import {
     TrainStationRunStatus,
     isRegistryStationProjectName,
 } from '@personalhealthtrain/ui-common';
-import { AggregatorMasterImagePushedEvent } from '../../../aggregators/dispatcher/handlers/master-image';
 import { AggregatorTrainEvent } from '../../../aggregators/dispatcher/handlers/train';
 
 import { DispatcherHarborEventData } from '../../../domains/extra/harbor/queue';
@@ -33,7 +32,6 @@ export async function dispatchHarborEventToSelf(
     // master Image project
     const isLibraryProject : boolean = data.namespace === REGISTRY_MASTER_IMAGE_PROJECT_NAME;
     if (isLibraryProject) {
-        await processMasterImage(data);
         return message;
     }
 
@@ -58,19 +56,6 @@ export async function dispatchHarborEventToSelf(
     }
 
     return message;
-}
-
-async function processMasterImage(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
-    await publishMessage(buildMessage({
-        options: {
-            routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN,
-        },
-        type: AggregatorMasterImagePushedEvent,
-        data: {
-            path: data.repositoryFullName,
-            name: data.repositoryName,
-        },
-    }));
 }
 
 async function processIncomingTrain(data: DispatcherHarborEventWithAdditionalData) : Promise<void> {
