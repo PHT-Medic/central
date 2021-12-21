@@ -9,6 +9,7 @@
     "rules": {
         "class-methods-use-this": "off",
 
+        "no-continue": "off",
         "no-underscore-dangle": "off",
         "no-shadow": "off",
 

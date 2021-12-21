@@ -21,6 +21,7 @@ import {
 import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
 } from '@typescript-error/http';
+import { stat } from 'fs';
 import env from '../../../../env';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
@@ -114,7 +115,10 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             return res.respond({ data: project });
         }
         case RegistryCommand.PROJECT_CREATE: {
-            const entity = await ensureHarborProject(projectName);
+            const entity = await ensureHarborProject({
+                project_name: projectName,
+                public: !station,
+            });
 
             if (typeof station !== 'undefined') {
                 station = stationRepository.merge(station, {

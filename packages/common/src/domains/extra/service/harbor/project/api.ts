@@ -6,15 +6,9 @@
  */
 
 import { APIType, useAPI } from '../../../../../modules';
-import { HarborProjectWebhook, findHarborProjectWebHook } from './web-hook';
-import { HarborRobotAccount, findHarborRobotAccount } from '../robot-account';
-
-export type HarborProject = {
-    name: string,
-    id: number,
-    webhook?: HarborProjectWebhook,
-    robot_account?: HarborRobotAccount
-};
+import { findHarborProjectWebHook } from './web-hook';
+import { findHarborRobotAccount } from '../robot-account';
+import { HarborProject, HarborProjectCreateContext } from './type';
 
 export async function findHarborProject(id: string | number, isProjectName = false) : Promise<HarborProject> {
     const headers : Record<string, any> = {};
@@ -40,18 +34,15 @@ export async function findHarborProject(id: string | number, isProjectName = fal
     }
 }
 
-export async function ensureHarborProject(name: string) {
+export async function ensureHarborProject(data: HarborProjectCreateContext) {
     try {
         await useAPI(APIType.HARBOR)
-            .post('projects', {
-                project_name: name,
-                public: true,
-            });
+            .post('projects', data);
 
-        return await findHarborProject(name, true);
+        return await findHarborProject(data.project_name, true);
     } catch (e) {
         if (e.response.status === 409) {
-            return findHarborProject(name, true);
+            return findHarborProject(data.project_name, true);
         }
 
         throw e;
@@ -69,7 +60,10 @@ export async function deleteHarborProject(id: string | number, isProjectName = f
         .delete(`projects/${id}`, headers);
 }
 
-export async function pullProject(id: string | number, isProjectName = false) : Promise<HarborProject | undefined> {
+export async function pullProject(
+    id: string | number,
+    isProjectName = false,
+) : Promise<HarborProject | undefined> {
     const project = await findHarborProject(id, isProjectName);
 
     if (!project) {

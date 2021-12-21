@@ -11,7 +11,7 @@ import {
     deleteHarborProject,
     ensureHarborProject,
     findHarborProject,
-} from '../../../extra/service';
+} from '../../../extra';
 
 export async function findStationHarborProject(id: string | number): Promise<HarborProject | undefined> {
     const projectName: string = buildRegistryHarborProjectName(id);
@@ -28,5 +28,5 @@ export async function deleteStationHarborProject(id: string | number): Promise<v
 export async function ensureStationHarborProject(id: string | number): Promise<HarborProject> {
     const name: string = buildRegistryHarborProjectName(id);
 
-    return ensureHarborProject(name);
+    return ensureHarborProject({ project_name: name, public: false });
 }
