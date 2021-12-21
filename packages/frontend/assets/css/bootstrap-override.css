@@ -123,3 +123,7 @@ a:focus{
     padding: .5rem;
 }
 
+
+.vue-form-wizard .wizard-icon-circle .wizard-icon-container {
+    border-radius: 50%;
+}

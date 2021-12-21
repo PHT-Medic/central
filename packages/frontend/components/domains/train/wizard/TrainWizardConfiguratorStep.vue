@@ -6,9 +6,12 @@
   -->
 <script>
 import {
-    ProposalStationApprovalStatus, addAPITrainStation,
+    ProposalStationApprovalStatus,
+    addAPITrainStation,
     dropAPITrainStation,
-    editAPITrainStation, getAPITrainStations, getApiProposalStations,
+    editAPITrainStation,
+    getAPITrainStations,
+    getApiProposalStations,
 } from '@personalhealthtrain/ui-common';
 import { minLength, numeric, required } from 'vuelidate/lib/validators';
 import ProposalStationList from '../../proposal-station/ProposalStationList';
@@ -21,7 +24,6 @@ export default {
             type: Object,
             default: undefined,
         },
-        trainStations: Array,
     },
     data() {
         return {
@@ -89,21 +91,16 @@ export default {
         },
     },
     created() {
-        this.initTrain();
-
-        this.loadProposalStations();
+        Promise.resolve()
+            .then(this.initTrain)
+            .then(this.loadTrainStations)
+            .then(this.loadProposalStations);
     },
     methods: {
         proposalStationFilter(item) {
             return this.trainStation.items.findIndex((trainStation) => trainStation.station_id === item.station_id) === -1;
         },
         initTrain() {
-            if (this.trainStations) {
-                this.trainStation.items = this.trainStations;
-            } else {
-                this.loadTrainStations();
-            }
-
             if (this.train.master_image_id) {
                 this.form.master_image_id = this.train.master_image_id;
             }
@@ -125,9 +122,6 @@ export default {
 
         setTrainStations() {
             this.$emit('setTrainStations', this.trainStation.items);
-        },
-        setQuery() {
-            this.$emit('setTrainQuery', this.form.query);
         },
 
         async loadProposalStations() {
@@ -162,6 +156,9 @@ export default {
                 const response = await getAPITrainStations({
                     filter: {
                         train_id: this.train.id,
+                    },
+                    sort: {
+                        position: 'ASC',
                     },
                 });
 

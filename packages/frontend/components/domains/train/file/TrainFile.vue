@@ -66,7 +66,10 @@ export default {
                 >
             </div>
             <div>
-                <i class="fa fa-file text-success ml-1" />
+                <i
+                    :class="{'fas fa-terminal text-warning': isIdleFile, 'fa fa-file-alt': !isIdleFile}"
+                    class="ml-1"
+                />
             </div>
         </div>
         <div class="card-body">

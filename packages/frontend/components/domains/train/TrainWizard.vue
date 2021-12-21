@@ -16,11 +16,9 @@ import TrainFileManager from './file/TrainFileManager';
 import TrainWizardHashStep from './wizard/TrainWizardHashStep';
 import TrainWizardFinalStep from './wizard/TrainWizardFinalStep';
 import TrainWizardExtraStep from './wizard/TrainWizardExtraStep';
-import TrainImageCommand from './TrainImageCommand';
 
 export default {
     components: {
-        TrainImageCommand,
         TrainWizardExtraStep,
         TrainWizardFinalStep,
         TrainWizardHashStep,
@@ -119,6 +117,7 @@ export default {
                 this.train.master_image_id = this.trainProperty.proposal.master_image_id;
             }
         },
+
         async updateTrain(data) {
             if (!this.wizard.initialized) return;
 
@@ -126,37 +125,29 @@ export default {
 
             if (keys.length === 0) return;
 
-            try {
-                const train = await editAPITrain(this.trainProperty.id, data);
+            const train = await editAPITrain(this.trainProperty.id, data);
 
-                const updateData = {
-                    configuration_status: train.configuration_status,
-                    ...data,
-                };
+            const updateData = {
+                configuration_status: train.configuration_status,
+                ...data,
+            };
 
-                this.$emit('updated', updateData);
-            } catch (e) {
-                throw e;
-            }
+            this.$emit('updated', updateData);
         },
         async loadTrainStations() {
-            if (this.trainStation.busy || !this.trainId) return;
-
-            this.trainStation.busy = true;
+            if (!this.trainId) return;
 
             try {
                 const { data } = await getAPITrainStations({
-                    filters: {
+                    filter: {
                         train_id: this.trainId,
                     },
                 });
 
                 this.trainStation.items = data;
             } catch (e) {
-                console.log(e);
+                // ...
             }
-
-            this.trainStation.busy = false;
         },
 
         //----------------------------------
@@ -229,7 +220,7 @@ export default {
             });
         },
         async canPassConfigurationWizardStep() {
-            if (this.train.master_image_id === '' || typeof this.train.master_image_id === 'undefined') {
+            if (!this.train.master_image_id || this.train.master_image_id.length === 0) {
                 throw new Error('A master image must be selected...');
             }
 
@@ -294,10 +285,8 @@ export default {
         setMasterImage(item) {
             if (item) {
                 this.train.master_image_id = item.id;
-                this.$refs.imageCommand.setMasterImage(item);
             } else {
                 this.train.master_image_id = '';
-                this.$refs.imageCommand.setMasterImage(null);
             }
         },
         setFhirQuery(query) {
@@ -312,10 +301,6 @@ export default {
             } else {
                 this.train.entrypoint_file_id = null;
             }
-
-            this.$nextTick(() => {
-                this.$refs.imageCommand.setTrainFile(item);
-            });
         },
         setHash(hash) {
             const data = {
@@ -395,14 +380,6 @@ export default {
                     <p class="category">
                         Configure your {{ trainProperty.type }} train step by step
                     </p>
-
-                    <train-image-command
-                        ref="imageCommand"
-                        class="mt-2 mb-2"
-                        :master-image-id-prop="train.master_image_id"
-                        :train-file-id-prop="train.entrypoint_file_id"
-                        :train-id-prop="trainProperty.id"
-                    />
                 </template>
                 <template
                     slot="footer"
@@ -449,7 +426,6 @@ export default {
                 >
                     <train-wizard-configurator-step
                         :train="trainProperty"
-                        :train-stations="trainStation.items"
                         @setTrainMasterImage="setMasterImage"
                         @setTrainStations="setStations"
                         @setTrainQuery="setFhirQuery"

@@ -41,7 +41,6 @@ export default {
             tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
                 { name: 'Configuration', icon: 'fa fa-cog', urlSuffix: '/wizard' },
-                { name: 'Stations', icon: 'fa fa-city', urlSuffix: '/stations' },
             ],
         };
     },
@@ -66,40 +65,42 @@ export default {
             </span>
         </h1>
 
-        <div class="content-wrapper">
-            <div class="content-sidebar flex-column">
-                <b-nav
-                    pills
-                    vertical
-                >
-                    <b-nav-item
-                        :to="'/trains'"
-                        exact
-                        exact-active-class="active"
-                    >
-                        <i class="fa fa-arrow-left" />
-                    </b-nav-item>
+        <div class="m-b-20 m-t-10">
+            <div class="panel-card">
+                <div class="panel-card-body">
+                    <div class="flex-wrap flex-row d-flex align-items-center">
+                        <div>
+                            <b-nav pills>
+                                <b-nav-item
+                                    :to="'/trains'"
+                                    exact
+                                    exact-active-class="active"
+                                >
+                                    <i class="fa fa-arrow-left" />
+                                </b-nav-item>
 
-                    <b-nav-item
-                        v-for="(navItem,key) in tabs"
-                        :key="key"
-                        :disabled="navItem.active"
-                        :to="'/trains/' +item.id + navItem.urlSuffix"
-                        :active="$route.path.startsWith('/trains/'+item.id + navItem.urlSuffix) && navItem.urlSuffix.length !== 0"
-                        exact-active-class="active"
-                        exact
-                    >
-                        <i :class="navItem.icon" />
-                        {{ navItem.name }}
-                    </b-nav-item>
-                </b-nav>
-            </div>
-            <div class="content-container">
-                <nuxt-child
-                    :train="item"
-                    @updated="updateTrain"
-                />
+                                <b-nav-item
+                                    v-for="(tab,key) in tabs"
+                                    :key="key"
+                                    :disabled="tab.active"
+                                    :to="'/trains/' + item.id + tab.urlSuffix"
+                                    :active="$route.path.startsWith('/trains/'+item.id + tab.urlSuffix) && tab.urlSuffix.length !== 0"
+                                    exact-active-class="active"
+                                    exact
+                                >
+                                    <i :class="tab.icon" />
+                                    {{ tab.name }}
+                                </b-nav-item>
+                            </b-nav>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <nuxt-child
+            :train="item"
+            @updated="updateTrain"
+        />
     </div>
 </template>

@@ -29,7 +29,7 @@ export default {
 
 <template>
     <div class="row">
-        <div class="col-6">
+        <div class="col-12 col-md-6">
             <div class="panel-box mb-3">
                 <h6><i class="fa fa-list" /> Pipeline</h6>
 
@@ -40,13 +40,13 @@ export default {
                 />
             </div>
 
-            <div class="panel-box">
+            <div class="panel-box mb-3">
                 <h6><i class="fa fa-city" /> Stations</h6>
 
                 <train-stations-progress :train="train" />
             </div>
         </div>
-        <div class="col-6">
+        <div class="col-12 col-md-6">
             <div class="panel-box">
                 <h6><i class="fa fa-history" /> Logs</h6>
 

@@ -57,9 +57,16 @@ export default {
             }
 
             let fileDirectoryPath = item.directory || '.';
-            if (fileDirectoryPath === '.') fileDirectoryPath = './';
+            if (fileDirectoryPath === '.') fileDirectoryPath = '';
 
             return `${fileDirectoryPath}${item.name}`;
+        },
+    },
+    watch: {
+        masterImageId(val, oldVal) {
+            if (val && val !== oldVal) {
+                this.loadMasterImage();
+            }
         },
     },
     created() {
@@ -96,7 +103,7 @@ export default {
                 // ...
             }
 
-            this.masterImage.busy = true;
+            this.masterImage.busy = false;
         },
         setMasterImage(item) {
             this.masterImage.item = item;
@@ -115,7 +122,7 @@ export default {
                 // ...
             }
 
-            this.trainFile.busy = true;
+            this.trainFile.busy = false;
         },
         setTrainFile(item) {
             this.trainFile.item = item;

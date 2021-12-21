@@ -15,9 +15,10 @@ import {
 import { required } from 'vuelidate/lib/validators';
 import TrainFile from './TrainFile';
 import TrainFormFile from './TrainFormFile';
+import TrainImageCommand from '../TrainImageCommand';
 
 export default {
-    components: { TrainFormFile, TrainFile },
+    components: { TrainImageCommand, TrainFormFile, TrainFile },
     props: {
         train: {
             type: Object,
@@ -197,6 +198,9 @@ export default {
                 this.entryPointFile = file;
             }
 
+            this.$refs.imageCommand.setTrainFile(this.entryPointFile);
+
+            // do not allow deletion of entrypoint file.
             if (this.form.entrypoint_file_id) {
                 const index = this.selected.findIndex((file) => file === this.form.entrypoint_file_id);
                 if (index !== -1) {
@@ -231,7 +235,7 @@ export default {
     <div>
         <div class="row">
             <div class="col">
-                <h6>Upload</h6>
+                <h6><i class="fa fa-upload" /> Upload</h6>
                 <div class="form-group">
                     <label>Directories / Files</label>
                     <div class="custom-file">
@@ -268,7 +272,7 @@ export default {
                             Files
                             <span style="font-size: 0.65rem">
                                 <span class="text-info">
-                                    <i class="fa fa-file-upload" /> not uploaded
+                                    <i class="fa fa-memory" /> in Memory
                                 </span>
                             </span>
                         </h6>
@@ -320,16 +324,17 @@ export default {
                 </div>
             </div>
             <div class="col">
-                <h6>Manage</h6>
-                <div class="form-group">
-                    <label>Entrypoint File</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        :value="entrypointFileId"
-                        :disabled="true"
-                    >
-                </div>
+                <h6><i class="fa fa-bars" /> Manage</h6>
+
+                <span>Entrypoint Command</span>
+                <br>
+                <train-image-command
+                    ref="imageCommand"
+                    class="mt-2 mb-2"
+                    :master-image-id="train.master_image_id"
+                    :train-file-id="train.entrypoint_file_id"
+                    :train-id="train.id"
+                />
 
                 <div
                     v-if="!entrypointFileId"
@@ -349,7 +354,9 @@ export default {
                     </span>
                 </h6>
 
-                <div class="form-check">
+                <div
+                    class="form-check"
+                >
                     <input
                         id="selectAllFiles"
                         v-model="selectAll"
@@ -358,6 +365,7 @@ export default {
                         @change="selectAllFiles"
                     >
                     <label for="selectAllFiles">Select all</label>
+                    </i>
                 </div>
 
                 <div class="d-flex flex-column">

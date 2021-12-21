@@ -6,7 +6,6 @@
  */
 
 import { consumeQueue } from 'amqp-extension';
-import { createDispatcherAggregatorMasterImageHandlers } from './handlers/master-image';
 import { createDispatcherAggregatorProposalHandlers } from './handlers/proposal';
 import { createDispatcherAggregatorTrainHandlers } from './handlers/train';
 import { MessageQueueDispatcherRoutingKey } from '../../config/service/mq';
