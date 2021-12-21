@@ -45,7 +45,7 @@ export async function ensureHarborProject(name: string) {
         await useAPI(APIType.HARBOR)
             .post('projects', {
                 project_name: name,
-                public: true,
+                public: false,
             });
 
         return await findHarborProject(name, true);
