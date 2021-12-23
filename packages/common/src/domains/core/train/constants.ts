@@ -23,6 +23,10 @@ export function isTrainBuildStatus(type: any) : type is TrainBuildStatusType {
     return TrainBuildStatusValues.indexOf(type) !== -1;
 }
 
+export enum TrainBuildErrorCode {
+    TRAIN_NOT_FOUND = 0,
+}
+
 // -------------------------------------------------------------------------
 
 export enum TrainConfigurationStatus {
@@ -60,3 +64,9 @@ const TrainRunStatusValues = Object.values(TrainRunStatus);
 export function isTrainRunStatus(type: any) : type is TrainRunStatusType {
     return TrainRunStatusValues.indexOf(type) !== -1;
 }
+
+export enum TrainRunErrorCode {
+    TRAIN_NOT_FOUND = 0,
+}
+
+// -------------------------------------------------------------------------

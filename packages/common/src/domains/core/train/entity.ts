@@ -25,7 +25,10 @@ import { Proposal } from '../proposal';
 import { TrainFile } from '../train-file';
 import { TrainResultStatus } from '../train-result';
 import { TrainStation } from '../train-station';
-import { TrainBuildStatus, TrainConfigurationStatus, TrainRunStatus } from './constants';
+import {
+    TrainBuildErrorCode,
+    TrainBuildStatus, TrainConfigurationStatus, TrainRunErrorCode, TrainRunStatus,
+} from './constants';
 
 @Entity()
 export class Train {
@@ -99,6 +102,11 @@ export class Train {
     @Column({ type: 'uuid', nullable: true, default: null })
         build_id: string;
 
+    @Column({
+        type: 'enum', enum: TrainBuildErrorCode, default: null, nullable: true,
+    })
+        build_error_code: TrainBuildErrorCode | null;
+
     // ------------------------------------------------------------------
 
     @Column({
@@ -115,6 +123,11 @@ export class Train {
         type: 'integer', unsigned: true, nullable: true, default: null,
     })
         run_station_index: number | null;
+
+    @Column({
+        type: 'enum', enum: TrainRunErrorCode, default: null, nullable: true,
+    })
+        run_error_code: TrainRunErrorCode | null;
 
     // ------------------------------------------------------------------
 

@@ -8,9 +8,8 @@
 import { Context } from '@nuxt/types';
 import { Inject } from '@nuxt/types/app';
 
-import BaseStorage from '~/modules/storage';
-import AuthStorage from '~/modules/auth/storage';
-import AppStorage from '~/modules/app/storage';
+import { BrowserStorageAdapter } from 'browser-storage-adapter';
+
 import { NavigationProvider } from '../config/layout/module';
 
 declare module '@nuxt/types' {
@@ -18,8 +17,8 @@ declare module '@nuxt/types' {
 // nuxtContext.$myInjectedFunction
     // eslint-disable-next-line no-unused-vars
     interface Context {
-        $warehouse: BaseStorage,
-        $authWarehouse: BaseStorage
+        $warehouse: BrowserStorageAdapter,
+        $authWarehouse: BrowserStorageAdapter
     }
 }
 
@@ -28,19 +27,64 @@ declare module 'vuex/types/index' {
 
     // eslint-disable-next-line no-unused-vars
     interface Store<S> {
-        $warehouse: BaseStorage,
-        $authWarehouse: BaseStorage,
+        $warehouse: BrowserStorageAdapter,
+        $authWarehouse: BrowserStorageAdapter,
         $layoutNavigationProvider: NavigationProvider
     }
 }
 
 export default (ctx : Context, inject : Inject) => {
-    const appWarehouse = new AppStorage(ctx);
+    const setServerCookie = (value: string) => {
+        let cookies = ctx.res.getHeader('Set-Cookie') || [];
+        if (typeof cookies === 'number' || typeof cookies === 'string') {
+            if (typeof cookies === 'number') {
+                cookies = cookies.toString();
+            }
+            cookies = [cookies];
+        }
+
+        cookies.unshift(value);
+
+        ctx.res.setHeader(
+            'Set-Cookie',
+            cookies.filter((v, i, arr) => arr.findIndex((val) => val.startsWith(v.substr(0, v.indexOf('=')))) === i),
+        );
+    };
+
+    const getServerCookies = () => ctx.req.headers.cookie;
+
+    const appWarehouse = new BrowserStorageAdapter({
+        driver: {
+            cookie: {
+                path: '/',
+                ...(process.env.API_URL === 'production' ? {
+                    domain: new URL(process.env.API_URL).hostname,
+                } : {}),
+            },
+        },
+        namespace: 'app',
+        isServer: () => process.server,
+        setServerCookie,
+        getServerCookies,
+    });
     inject('warehouse', appWarehouse);
 
     //--------------------------------------------------------------------
 
-    const authWarehouse = new AuthStorage(ctx);
+    const authWarehouse = new BrowserStorageAdapter({
+        driver: {
+            cookie: {
+                path: '/',
+                ...(process.env.API_URL === 'production' ? {
+                    domain: new URL(process.env.API_URL).hostname,
+                } : {}),
+            },
+        },
+        namespace: 'auth',
+        isServer: () => process.server,
+        setServerCookie,
+        getServerCookies,
+    });
     inject('authWarehouse', authWarehouse);
 
     //--------------------------------------------------------------------
