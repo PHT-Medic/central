@@ -5,32 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import express, { Express, static as expressStatic } from 'express';
+import express, { Express } from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 
-import path from 'path';
-import swaggerUi from 'swagger-ui-express';
-import { existsSync } from 'fs';
 import { setupAuthMiddleware } from '@typescript-auth/server';
 import { AuthorizationHeader } from '@typescript-auth/core';
-import promBundle from 'express-prom-bundle';
-import { getPublicDirPath, getWritableDirPath } from '../paths';
-import env from '../../env';
 import { useLogger } from '../../modules/log';
 import responseMiddleware from './middleware/response';
 
-import { registerControllers } from './routes';
-
 import { errorMiddleware } from './middleware/error';
-import { ExpressRequest } from './type';
+import { ExpressAppInterface, ExpressRequest } from './type';
 import { useRateLimiter } from './middleware/rate-limiter';
 import { authenticateWithAuthorizationHeader, parseCookie } from './middleware/auth';
-
-export interface ExpressAppInterface extends Express{
-
-}
 
 export function createExpressApp() : ExpressAppInterface {
     useLogger().debug('setup express app...', { service: 'express' });
@@ -53,8 +41,6 @@ export function createExpressApp() : ExpressAppInterface {
     // Cookie parser
     expressApp.use(cookieParser());
 
-    expressApp.use('/public', expressStatic(getPublicDirPath()));
-
     // Rate Limiter
     expressApp.use(useRateLimiter);
 
@@ -68,37 +54,6 @@ export function createExpressApp() : ExpressAppInterface {
             value: AuthorizationHeader,
         ) => authenticateWithAuthorizationHeader(request, value),
     }));
-
-    if (
-        env.swaggerDocumentation &&
-        env.env !== 'test'
-    ) {
-        const swaggerDocumentPath: string = path.join(getWritableDirPath(), 'swagger.json');
-        if (existsSync(swaggerDocumentPath)) {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require, import/no-dynamic-require
-            const swaggerDocument = require(swaggerDocumentPath);
-
-            expressApp.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
-                swaggerOptions: {
-                    withCredentials: true,
-                    plugins: [
-                        () => ({
-                            components: { Topbar: (): any => null },
-                        }),
-                    ],
-                },
-            }));
-        }
-    }
-
-    const metricsMiddleware = promBundle({
-        includeMethod: true,
-        includePath: true,
-    });
-
-    expressApp.use(metricsMiddleware);
-
-    registerControllers(expressApp);
 
     expressApp.use(errorMiddleware);
 

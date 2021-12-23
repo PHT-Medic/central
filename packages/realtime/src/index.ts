@@ -8,16 +8,13 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 
-import { createConnection } from 'typeorm';
-import { buildConnectionOptions } from 'typeorm-extension';
 import env from './env';
 
 import { createConfig } from './config';
 import { createExpressApp } from './config/http/express';
 import { createHttpServer } from './config/http/server';
 import { useLogger } from './modules/log';
-
-import { initDemo } from './demo';
+import { createSocketServer } from './config/socket/server';
 
 dotenv.config();
 
@@ -30,6 +27,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     const config = createConfig({ env });
     const expressApp = createExpressApp();
     const httpServer = createHttpServer({ expressApp });
+    const socketServer = createSocketServer({ httpServer, config, env });
 
     function signalStart() {
         useLogger().debug(`Startup on 127.0.0.1:${env.port} (${env.env}) completed.`, { service: 'system' });
@@ -42,15 +40,8 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
         config.components.forEach((c) => c.start());
         config.aggregators.forEach((a) => a.start());
 
-        httpServer.listen(env.port, '0.0.0.0', signalStart);
-
-        initDemo();
-    }
-
-    const connectionOptions = await buildConnectionOptions();
-    const connection = await createConnection(connectionOptions);
-    if (env.env === 'development') {
-        await connection.synchronize();
+        socketServer.listen(env.port);
+        signalStart();
     }
 
     start();

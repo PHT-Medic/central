@@ -27,6 +27,7 @@
         "lint:fix": "npm run lint -- --fix",
         "frontend": "npm run dev --workspace=packages/frontend",
         "backend": "npm run dev --workspace=packages/backend",
+        "realtime": "npm run dev --workspace=packages/realtime",
         "common": "npm run build-watch --workspace=packages/common"
     }
 }

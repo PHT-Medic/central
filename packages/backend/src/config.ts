@@ -28,7 +28,7 @@ export type Config = {
     components: {start: () => void}[]
 };
 
-function createConfig({ env } : ConfigContext) : Config {
+export function createConfig({ env } : ConfigContext) : Config {
     let proxyAPis : string[] = [];
     if (env.httpProxyAPIs) {
         proxyAPis = env.httpProxyAPIs.split(',').map((api) => api.toLowerCase());
@@ -91,5 +91,3 @@ function createConfig({ env } : ConfigContext) : Config {
         components,
     };
 }
-
-export default createConfig;

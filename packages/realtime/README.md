@@ -1,6 +1,6 @@
-# UI - Realtime 🌠
-This repository contains the Central UI Backend API of the Personal Health Train (PHT).
-It communicates with some services of the PHT and need therefore to be configured properly, like described 
+# UI - Realtime 👻
+This repository contains the Realtime Application of the Central UI for the Personal Health Train (PHT).
+It communicates with some services of the PHT and need therefore to be configured properly, like described
 in the following sections.
 
 ## Configuration
@@ -10,16 +10,11 @@ PORT=<port>
 NODE_ENV=<development|production>
 
 API_URL=http://localhost:<port>/
-INTERNAL_API_URL=http://localhost:<port>/
-WEB_APP_URL=http://localhost:<ui port>/
 
-VAULT_CONNECTION_STRING=<token>@<api url>
+REDIS_CONNECTION_STRING=redis://<username>:<password>@<host>
 RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
-HARBOR_CONNECTION_STRING=<user>:<password>@<api url>
 
 ```
 
 ## Credits
 If you have any questions, feel free to contact the author [Peter Placzek](https://github.com/Tada5hi) of the project.
-The project was initially developed during his bachelor thesis, and he worked after that as employee
-on the project.
