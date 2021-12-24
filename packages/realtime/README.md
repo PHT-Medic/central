@@ -1,4 +1,4 @@
-# UI - Realtime 👻
+# UI - Realtime 👾
 This repository contains the Realtime Application of the Central UI for the Personal Health Train (PHT).
 It communicates with some services of the PHT and need therefore to be configured properly, like described
 in the following sections.
