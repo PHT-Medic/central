@@ -29,6 +29,7 @@
         "express-rate-limit": "^5.5.1",
         "ioredis": "^4.28.2",
         "node-cron": "^3.0.0",
+        "redis-extension": "^0.0.4",
         "reflect-metadata": "^0.1.13",
         "socket.io": "^4.4.0",
         "winston": "^3.3.3"

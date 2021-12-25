@@ -8,15 +8,15 @@
 import { getCustomRepository, getRepository } from 'typeorm';
 
 import {
-    Body, Controller, Delete, Post, Request, Response,
+    Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
 import { ResponseExample, SwaggerTags } from '@trapi/swagger';
 import {
-    MASTER_REALM_ID, OAuth2Provider, Oauth2ProviderAccount, TokenPayload,
+    MASTER_REALM_ID, OAuth2Provider, Oauth2ProviderAccount, TokenPayload, TokenVerificationPayload,
 } from '@personalhealthtrain/ui-common';
-import { createToken } from '@typescript-auth/server';
-import { Oauth2Client } from '@typescript-auth/core';
-import { BadRequestError } from '@typescript-error/http';
+import { createToken, verifyToken } from '@typescript-auth/server';
+import { Oauth2Client, Oauth2TokenResponse } from '@typescript-auth/core';
+import { BadRequestError, UnauthorizedError } from '@typescript-error/http';
 import { getWritableDirPath } from '../../../config/paths';
 import { createOauth2ProviderAccountWithToken } from '../../../domains/auth/oauth2-provider-account/utils';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
@@ -50,7 +50,7 @@ async function grantTokenWithMasterProvider(username: string, password: string) 
     return undefined;
 }
 
-async function grantToken(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function grantTokenHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { username, password } = req.body;
 
     let userId: number | undefined;
@@ -89,36 +89,71 @@ async function grantToken(req: ExpressRequest, res: ExpressResponse) : Promise<a
         data: {
             access_token: token,
             expires_in: expiresIn,
-        },
+        } as Oauth2TokenResponse,
     });
 }
 
 // ---------------------------------------------------------------------------------
 
-async function revokeToken(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function revokeTokenHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     res.cookie('auth_token', null, { maxAge: 0 });
     return res.respondDeleted();
 }
 
 // ---------------------------------------------------------------------------------
 
-type Token = {
-    /* @IsInt */
-    expires_in: number,
-    token: string
-};
+async function verifyTokenHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    const { id } = req.params;
+
+    let tokenPayload : TokenPayload;
+
+    try {
+        tokenPayload = await verifyToken(id, {
+            directory: getWritableDirPath(),
+        });
+    } catch (e) {
+        throw new BadRequestError('The token is not valid....');
+    }
+
+    // todo: sub can also be client i.g.
+
+    const userRepository = getCustomRepository<UserRepository>(UserRepository);
+    const userQuery = userRepository.createQueryBuilder('user')
+        .addSelect('user.email')
+        .where('user.id = :id', { id: tokenPayload.sub });
+
+    const user = await userQuery.getOne();
+
+    if (typeof user === 'undefined') {
+        throw new UnauthorizedError();
+    }
+
+    const permissions = await userRepository.getOwnedPermissions(user.id);
+
+    return res.respond({
+        data: {
+            token: tokenPayload,
+            target: {
+                type: 'user',
+                data: {
+                    ...user,
+                    permissions,
+                },
+            },
+        } as TokenVerificationPayload,
+    });
+}
 
 @SwaggerTags('auth')
 @Controller('/token')
 export class TokenController {
     @Post('')
-    @ResponseExample<Token>({ expires_in: 3600, token: '20f81b13d51c65798f05' })
     async addToken(
         @Body() credentials: { username: string, password: string, provider?: string },
             @Request() req: any,
             @Response() res: any,
-    ) : Promise<Token> {
-        return grantToken(req, res);
+    ) : Promise<Oauth2TokenResponse> {
+        return grantTokenHandler(req, res);
     }
 
     @Delete('')
@@ -126,6 +161,15 @@ export class TokenController {
         @Request() req: any,
             @Response() res: any,
     ) : Promise<void> {
-        return revokeToken(req, res);
+        return revokeTokenHandler(req, res);
+    }
+
+    @Get('/:id')
+    async verifyToken(
+        @Request() req: any,
+            @Response() res: any,
+            @Params() id: string,
+    ) : Promise<Oauth2TokenResponse> {
+        return verifyTokenHandler(req, res);
     }
 }

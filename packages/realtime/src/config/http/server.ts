@@ -6,15 +6,10 @@
  */
 
 import http, { Server } from 'http';
-import { ExpressAppInterface } from './type';
 import { useLogger } from '../../modules/log';
 
-interface HttpServerContext {
-    expressApp: ExpressAppInterface
-}
-
-export function createHttpServer({ expressApp } : HttpServerContext) : Server {
+export function createHttpServer() : Server {
     useLogger().debug('setup http server...', { service: 'http' });
 
-    return new http.Server(expressApp);
+    return new http.Server();
 }

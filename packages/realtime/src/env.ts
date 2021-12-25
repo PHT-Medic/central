@@ -35,9 +35,7 @@ export interface Environment {
     redisConnectionString: string,
     rabbitMqConnectionString: string,
 
-    apiUrl: string,
-    internalApiUrl: string,
-    webAppUrl: string,
+    apiUrl: string
 }
 
 const env : Environment = {
@@ -48,8 +46,6 @@ const env : Environment = {
     rabbitMqConnectionString: requireFromEnv('RABBITMQ_CONNECTION_STRING'),
 
     apiUrl: requireFromEnv('API_URL'),
-    internalApiUrl: requireFromEnv('INTERNAL_API_URL', requireFromEnv('API_URL')),
-    webAppUrl: requireFromEnv('WEB_APP_URL'),
 };
 
 export default env;

@@ -11,13 +11,21 @@ const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin');
 const config = {
     publicRuntimeConfig() {
         return {
-            apiUrl: process.env.API_URL || 'https://pht-ui.personalhealthtrain.de/api/',
-            resultServiceApiUrl: process.env.RESULT_SERVICE_API_URL || 'https://pht-ui.personalhealthtrain.de/vapi/',
+            apiUrl: process.env.API_URL ||
+                'https://pht-medic.medizin.uni-tuebingen.de.de/api/',
+            resultServiceApiUrl: process.env.RESULT_SERVICE_API_URL ||
+                'https://pht-medic.medizin.uni-tuebingen.de.de/result-service/',
+            realtimeUrl: process.env.REALTIME_URL ||
+                'https://pht-medic.medizin.uni-tuebingen.de.de/realtime/',
         };
     },
     env: {
-        apiUrl: process.env.API_URL || 'https://pht-ui.personalhealthtrain.de/api/',
-        resultServiceApiUrl: process.env.RESULT_SERVICE_API_URL || 'https://pht-ui.personalhealthtrain.de/vapi/',
+        apiUrl: process.env.API_URL ||
+            'https://pht-medic.medizin.uni-tuebingen.de.de/api/',
+        resultServiceApiUrl: process.env.RESULT_SERVICE_API_URL ||
+            'https://pht-medic.medizin.uni-tuebingen.de.de/result-service/',
+        realtimeUrl: process.env.REALTIME_URL ||
+            'https://pht-medic.medizin.uni-tuebingen.de.de/realtime/',
     },
     telemetry: false,
     ssr: true,
@@ -25,7 +33,7 @@ const config = {
     ** Headers of the page
     */
     head: {
-        title: 'PHT - Personal Health Train',
+        title: 'PHT - User Interface (UI)',
         meta: [
             { charset: 'utf-8' },
             { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -69,6 +77,7 @@ const config = {
         '@/plugins/store',
         '@/plugins/auth',
         '@/plugins/layout',
+        '@/plugins/socket',
         '@/plugins/vuelidate',
         '@/plugins/vueScroll',
         '@/plugins/vueFormWizard',
@@ -107,7 +116,7 @@ const config = {
     },
 
     build: {
-        extend(config, ctx) {
+        extend(config) {
             if (!config.resolve) {
                 config.resolve = {};
             }
@@ -122,11 +131,11 @@ const config = {
 
             config.resolve.plugins.push(new TsconfigPathsPlugin({ configFile: './tsconfig.json' }));
 
-            if (config.resolve.alias.hasOwnProperty('~')) {
+            if (Object.prototype.hasOwnProperty.call(config.resolve.alias, '~')) {
                 delete config.resolve.alias['~'];
             }
 
-            if (config.resolve.alias.hasOwnProperty('@')) {
+            if (Object.prototype.hasOwnProperty.call(config.resolve.alias, '@')) {
                 delete config.resolve.alias['@'];
             }
 

@@ -5,6 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import { BaseError } from '@typescript-error/core';
 import { mapGetters } from 'vuex';
 import WorldSvg from '../components/svg/WorldSvg';
 import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';
@@ -20,6 +21,29 @@ export default {
             'loggedIn',
             'user',
         ]),
+    },
+    data() {
+        return {
+            socket: null,
+        };
+    },
+    created() {
+        const socket = this.$socket.use();
+        socket.on('connect', this.handleConnected);
+
+        socket.emit('trainsSubscribe', undefined, (err) => {
+
+        });
+
+        this.socket = socket;
+    },
+    beforeDestroy() {
+        this.socket.off(this.handleConnected);
+    },
+    methods: {
+        handleConnected() {
+            console.log('connected');
+        },
     },
 };
 </script>

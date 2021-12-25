@@ -11,7 +11,6 @@ import dotenv from 'dotenv';
 import env from './env';
 
 import { createConfig } from './config';
-import { createExpressApp } from './config/http/express';
 import { createHttpServer } from './config/http/server';
 import { useLogger } from './modules/log';
 import { createSocketServer } from './config/socket/server';
@@ -25,8 +24,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     HTTP Server & Express App
     */
     const config = createConfig({ env });
-    const expressApp = createExpressApp();
-    const httpServer = createHttpServer({ expressApp });
+    const httpServer = createHttpServer();
     const socketServer = createSocketServer({ httpServer, config, env });
 
     function signalStart() {

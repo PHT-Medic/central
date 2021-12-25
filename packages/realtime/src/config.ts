@@ -5,10 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { APIType, setAPIConfig } from '@personalhealthtrain/ui-common';
 import { Redis } from 'ioredis';
 import { setConfig } from 'amqp-extension';
+import { setRedisConfig, useRedisInstance } from 'redis-extension';
 import { Environment } from './env';
-import { createRedisClient } from './config/redis';
 
 interface ConfigContext {
     env: Environment
@@ -24,15 +25,24 @@ export type Config = {
 };
 
 export function createConfig({ env } : ConfigContext) : Config {
-    const redisDatabase = createRedisClient({ connectionString: env.redisConnectionString });
-    const redisPub = createRedisClient({ connectionString: env.redisConnectionString });
-    const redisSub = createRedisClient({ connectionString: env.redisConnectionString });
+    setRedisConfig('default', { connectionString: env.redisConnectionString });
+
+    const redisDatabase = useRedisInstance('default');
+    const redisPub = redisDatabase.duplicate();
+    const redisSub = redisDatabase.duplicate();
 
     setConfig({
         connection: env.rabbitMqConnectionString,
         exchange: {
             name: 'pht',
             type: 'topic',
+        },
+    });
+
+    setAPIConfig(APIType.DEFAULT, {
+        driver: {
+            baseURL: env.apiUrl,
+            withCredentials: true,
         },
     });
 

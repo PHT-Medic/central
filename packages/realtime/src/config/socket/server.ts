@@ -9,12 +9,11 @@ import { Server as HTTPServer } from 'http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { useLogger } from '../../modules/log';
-import { useRateLimiter } from '../http/middleware/rate-limiter';
-import { errorMiddleware } from '../http/middleware/error';
-import { socketAuthMiddleware } from './middleware/auth';
+import { useAuthMiddleware } from './middleware/auth';
 import { registerSocketHandlers } from './handlers';
 import { Environment } from '../../env';
 import { Config } from '../../config';
+import { SocketServerInterface } from './type';
 
 interface SocketServerContext {
     httpServer: HTTPServer,
@@ -22,12 +21,10 @@ interface SocketServerContext {
     config: Config
 }
 
-const wrap = (middleware) => (socket, next) => middleware(socket.request, {}, next);
-
 export function createSocketServer(context : SocketServerContext) : Server {
     useLogger().debug('setup socket server...', { service: 'socket' });
 
-    const server = new Server(context.httpServer, {
+    const server : SocketServerInterface = new Server(context.httpServer, {
         adapter: createAdapter(context.config.redisPub, context.config.redisSub),
         cors: {
             origin(origin, callback) {
@@ -39,17 +36,11 @@ export function createSocketServer(context : SocketServerContext) : Server {
         // ...
     });
 
-    // limit incoming traffic (req p. sec)
-    server.use(wrap(useRateLimiter));
-
     // receive user
-    server.use(socketAuthMiddleware);
+    server.use(useAuthMiddleware(context.config));
 
     // register handlers
     registerSocketHandlers(server);
-
-    // handle errors
-    server.use(wrap(errorMiddleware));
 
     return server;
 }

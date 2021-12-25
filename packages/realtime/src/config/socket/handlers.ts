@@ -5,10 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Server, Socket } from 'socket.io';
+import { registerTrainSocketHandlers } from '../../domains/train/handlers';
+import { registerUserHandlers } from '../../domains/user/handlers';
+import { SocketServerInterface } from './type';
 
-export function registerSocketHandlers(io: Server) {
-    io.on('connection', (socket: Socket) => {
-        console.log(socket.id);
+export function registerSocketHandlers(io: SocketServerInterface) {
+    io.on('connection', (socket) => {
+        registerUserHandlers(io, socket);
+        registerTrainSocketHandlers(io, socket);
     });
 }
