@@ -32,9 +32,12 @@ export default {
         socket.on('connect', this.handleConnected);
 
         socket.emit('trainsSubscribe', undefined, (err) => {
-
+            console.log(err);
         });
 
+        socket.on('trainCreated', (train) => {
+            console.log(train);
+        });
         this.socket = socket;
     },
     beforeDestroy() {

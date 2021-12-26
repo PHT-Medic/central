@@ -50,6 +50,7 @@ export function useAuthMiddleware(config: Config) {
 
             const { permissions, ...user } = cacheData.target.data;
 
+            socket.data.token = token;
             socket.data.userId = user.id;
             socket.data.user = user;
             socket.data.permissions = permissions;

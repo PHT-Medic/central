@@ -35,6 +35,7 @@ export interface Environment {
 
     jwtMaxAge: number,
 
+    redisConnectionString: string,
     rabbitMqConnectionString: string,
     harborConnectionString: string,
     vaultConnectionString: string,
@@ -64,6 +65,7 @@ const env : Environment = {
 
     jwtMaxAge: Number.isNaN(jwtMaxAge) ? 3600 : jwtMaxAge,
 
+    redisConnectionString: requireFromEnv('REDIS_CONNECTION_STRING'),
     rabbitMqConnectionString: requireFromEnv('RABBITMQ_CONNECTION_STRING'),
     harborConnectionString: requireFromEnv('HARBOR_CONNECTION_STRING'),
     vaultConnectionString: requireFromEnv('VAULT_CONNECTION_STRING'),

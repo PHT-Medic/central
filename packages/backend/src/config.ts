@@ -11,6 +11,7 @@ import {
 } from '@personalhealthtrain/ui-common';
 import { setConfig } from 'amqp-extension';
 import https from 'https';
+import { Redis, setRedisConfig, useRedisInstance } from 'redis-extension';
 import { buildDispatcherComponent } from './components/event-dispatcher';
 import { Environment } from './env';
 import { buildTrainBuilderAggregator } from './aggregators/train-builder';
@@ -24,6 +25,10 @@ interface ConfigContext {
 }
 
 export type Config = {
+    redisDatabase: Redis,
+    redisPub: Redis,
+    redisSub: Redis,
+
     aggregators: {start: () => void}[]
     components: {start: () => void}[]
 };
@@ -66,6 +71,12 @@ export function createConfig({ env } : ConfigContext) : Config {
         },
     });
 
+    setRedisConfig('default', { connectionString: env.redisConnectionString });
+
+    const redisDatabase = useRedisInstance('default');
+    const redisPub = redisDatabase.duplicate();
+    const redisSub = redisDatabase.duplicate();
+
     setConfig({
         connection: env.rabbitMqConnectionString,
         exchange: {
@@ -87,6 +98,10 @@ export function createConfig({ env } : ConfigContext) : Config {
     ];
 
     return {
+        redisDatabase,
+        redisPub,
+        redisSub,
+
         aggregators,
         components,
     };

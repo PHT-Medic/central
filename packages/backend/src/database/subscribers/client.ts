@@ -6,11 +6,14 @@
  */
 
 import { publishMessage } from 'amqp-extension';
-import { EntitySubscriberInterface, InsertEvent, UpdateEvent } from 'typeorm';
+import {
+    EntitySubscriberInterface, EventSubscriber, InsertEvent, UpdateEvent,
+} from 'typeorm';
 import { AuthClientType, Client } from '@personalhealthtrain/ui-common';
-import { AuthClientSecurityComponentCommand } from '../../../components/auth-security';
-import { buildAuthClientSecurityQueueMessage } from '../../extra/queue';
+import { AuthClientSecurityComponentCommand } from '../../components/auth-security';
+import { buildAuthClientSecurityQueueMessage } from '../../domains/extra/queue';
 
+@EventSubscriber()
 export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
     // eslint-disable-next-line @typescript-eslint/ban-types,class-methods-use-this
     listenTo(): Function | string {

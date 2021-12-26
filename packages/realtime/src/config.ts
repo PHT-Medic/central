@@ -6,9 +6,8 @@
  */
 
 import { APIType, setAPIConfig } from '@personalhealthtrain/ui-common';
-import { Redis } from 'ioredis';
 import { setConfig } from 'amqp-extension';
-import { setRedisConfig, useRedisInstance } from 'redis-extension';
+import { Redis, setRedisConfig, useRedisInstance } from 'redis-extension';
 import { Environment } from './env';
 
 interface ConfigContext {

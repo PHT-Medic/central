@@ -8,6 +8,7 @@
 import { BuildInput, buildQuery } from '@trapi/query';
 import {
     APIType,
+    ApiRequestConfig,
     CollectionResourceResponse,
     SingleResourceResponse,
     useAPI,
@@ -21,8 +22,13 @@ export async function getAPITrains(options?: BuildInput<Train>) : Promise<Collec
     return response;
 }
 
-export async function getAPITrain(id: typeof Train.prototype.id, options?: BuildInput<Train>) : Promise<SingleResourceResponse<Train>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).get(`trains/${id}${buildQuery(options)}`);
+export async function getAPITrain(
+    id: typeof Train.prototype.id,
+    options?: BuildInput<Train>,
+    requestConfig?: ApiRequestConfig,
+) : Promise<SingleResourceResponse<Train>> {
+    const { data: response } = await useAPI(APIType.DEFAULT)
+        .get(`trains/${id}${buildQuery(options)}`, requestConfig);
 
     return response;
 }
