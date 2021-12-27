@@ -8,4 +8,5 @@
 export * from './api';
 export * from './entity';
 export * from './constants';
+export * from './socket';
 export * from './type';

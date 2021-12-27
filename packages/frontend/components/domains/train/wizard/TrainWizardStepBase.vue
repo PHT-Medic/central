@@ -18,7 +18,10 @@ import ProposalStationList from '../../proposal-station/ProposalStationList';
 import MasterImagePicker from '../../master-image/MasterImagePicker';
 
 export default {
-    components: { MasterImagePicker, ProposalStationList },
+    components: {
+        MasterImagePicker,
+        ProposalStationList,
+    },
     props: {
         train: {
             type: Object,

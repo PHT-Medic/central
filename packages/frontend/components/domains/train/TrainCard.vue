@@ -27,6 +27,8 @@ export default {
             busy: false,
 
             extendView: false,
+
+            socketLockId: null,
         };
     },
     computed: {
@@ -40,7 +42,36 @@ export default {
     created() {
         this.train = this.trainProperty;
     },
+    mounted() {
+        const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
+        socket.emit('trainsSubscribe', { id: this.trainProperty.id });
+        socket.on('trainUpdated', this.handleSocketUpdated);
+        socket.on('trainDeleted', this.handleSocketDeleted);
+    },
+    beforeDestroy() {
+        const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
+        socket.emit('trainsUnsubscribe', { id: this.trainProperty.id });
+        socket.off('trainUpdated', this.handleSocketUpdated);
+        socket.off('trainDeleted', this.handleSocketDeleted);
+    },
     methods: {
+        handleSocketUpdated(context) {
+            if (
+                this.trainProperty.id !== context.data.id ||
+                context.meta.roomId !== this.trainProperty.id
+            ) return;
+
+            this.handleUpdated(context.data);
+        },
+        handleSocketDeleted(context) {
+            if (
+                this.trainProperty.id !== context.data.id ||
+                this.socketLockId === context.data.id ||
+                context.meta.roomId !== this.trainProperty.id
+            ) return;
+
+            this.handleDeleted({ ...context.data });
+        },
         handleUpdated(train) {
             // eslint-disable-next-line no-restricted-syntax
             for (const key in train) {
@@ -70,7 +101,9 @@ export default {
             this.busy = true;
 
             try {
+                this.socketLockId = this.train.id;
                 await dropAPITrain(this.train.id);
+                this.socketLockId = null;
 
                 this.$emit('deleted', this.train);
             } catch (e) {
@@ -88,12 +121,13 @@ export default {
             class="train-card-content align-items-center"
         >
             <train-name
-                :entity="train"
+                :train-id="train.id"
+                :train-name="train.name"
                 :with-edit="true"
                 @updated="handleUpdated"
             >
                 <template #text="props">
-                    <nuxt-link :to="'/trains/'+props.entity.id">
+                    <nuxt-link :to="'/trains/'+props.trainId">
                         {{ props.displayText }}
                     </nuxt-link>
                 </template>

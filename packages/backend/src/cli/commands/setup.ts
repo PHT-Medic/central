@@ -11,6 +11,8 @@ import { createConnection } from 'typeorm';
 import { createSecurityKeyPair } from '@typescript-auth/server';
 import { getWritableDirPath } from '../../config/paths';
 import { generateSwaggerDocumentation } from '../../config/http/swagger';
+import { createConfig } from '../../config';
+import env from '../../env';
 
 interface SetupArguments extends Arguments {
     auth: boolean,
@@ -89,6 +91,9 @@ export class SetupCommand implements CommandModule {
                 await connection.synchronize();
 
                 if (args['database-seeder']) {
+                    const config = createConfig({ env });
+                    await config.redisDatabase.connect();
+
                     await runSeeder(connection);
                 }
             } catch (e) {

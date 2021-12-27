@@ -6,5 +6,6 @@
  */
 
 export * from './api';
+export * from './socket';
 export * from './status';
 export * from './entity';

@@ -5,9 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AuthClientCommand, AuthClientType, Client } from '@personalhealthtrain/ui-common';
-import { publishMessage } from 'amqp-extension';
+import {
+    AuthClientCommand, AuthClientType, Client, PermissionID,
+} from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
+import { publishMessage } from 'amqp-extension';
 import { buildAuthClientSecurityQueueMessage } from '../../../domains/extra/queue';
 import { AuthClientSecurityComponentCommand } from '../../../components/auth-security';
 
@@ -34,29 +36,37 @@ export async function doAuthClientCommand(req: any, res: any) {
     }
 
     if (typeof entity.service_id === 'string') {
-        if (!req.ability.can('manage', 'service')) {
+        if (!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
             return res._failForbidden({ message: 'You are not allowed to manage service clients.' });
         }
     }
 
     switch (command) {
-        case AuthClientCommand.SECRET_REFRESH:
-            entity.refreshSecret();
-            break;
         case AuthClientCommand.SECRET_SYNC: {
-            const queueMessage = buildAuthClientSecurityQueueMessage(
-                AuthClientSecurityComponentCommand.SYNC,
-                {
-                    id: entity.service_id,
-                    type: AuthClientType.SERVICE,
-                    clientId: entity.id,
-                    clientSecret: entity.secret,
-                },
-            );
+            entity.synced = false;
 
-            await publishMessage(queueMessage);
+            switch (entity.type) {
+                case AuthClientType.SERVICE: {
+                    const queueMessage = buildAuthClientSecurityQueueMessage(
+                        AuthClientSecurityComponentCommand.SYNC,
+                        {
+                            id: entity.service_id,
+                            type: AuthClientType.SERVICE,
+                            clientId: entity.id,
+                            clientSecret: entity.secret,
+                        },
+                    );
+
+                    await publishMessage(queueMessage);
+                    break;
+                }
+            }
             break;
         }
+        case AuthClientCommand.SECRET_REFRESH:
+            entity.refreshSecret();
+            entity.synced = false;
+            break;
     }
 
     await repository.save(entity);

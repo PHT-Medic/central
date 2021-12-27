@@ -23,7 +23,7 @@ export async function revokeAPIToken() : Promise<void> {
 }
 
 export async function grantAPIToken(data: TokenGrantPayload) : Promise<SingleResourceResponse<Oauth2TokenResponse>> {
-    const response = await useAPI(APIType.DEFAULT).post('roles', nullifyEmptyObjectProperties(data));
+    const response = await useAPI(APIType.DEFAULT).post('token', nullifyEmptyObjectProperties(data));
 
     return response.data;
 }

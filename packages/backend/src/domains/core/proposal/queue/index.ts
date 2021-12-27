@@ -25,12 +25,7 @@ export type DispatcherProposalEventData = {
 export async function emitDispatcherProposalEvent(
     data: DispatcherProposalEventData,
     metaData: Record<string, any> = {},
-    options?: {
-        templateOnly?: boolean
-    },
 ) {
-    options = options ?? {};
-
     const message = buildMessage({
         options: {
             routingKey: MessageQueueDispatcherRoutingKey.EVENT_OUT,
@@ -39,10 +34,6 @@ export async function emitDispatcherProposalEvent(
         data,
         metadata: metaData,
     });
-
-    if (options.templateOnly) {
-        return message;
-    }
 
     await publishMessage(message);
 

@@ -8,14 +8,16 @@
 import { TokenVerificationPayload, verifyAPIToken } from '@personalhealthtrain/ui-common';
 import { AbilityManager } from '@typescript-auth/core';
 import { BadRequestError, UnauthorizedError } from '@typescript-error/http';
-import { EntityCache } from 'redis-extension';
+import { RedisCache } from 'redis-extension';
 import { Socket } from 'socket.io';
 import { Config } from '../../../config';
 
 export function useAuthMiddleware(config: Config) {
-    const tokenCache = new EntityCache<undefined, string>({
-        redisDatabase: config.redisDatabase,
-    }, {});
+    const tokenCache = new RedisCache<string>({
+        redis: config.redisDatabase,
+    }, {
+        prefix: 'token',
+    });
 
     tokenCache.startScheduler();
 

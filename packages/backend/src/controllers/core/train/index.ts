@@ -247,7 +247,7 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
         throw new ForbiddenError();
     }
 
-    await repository.delete(entity.id);
+    await repository.remove(entity);
 
     return res.respondDeleted({ data: entity });
 }

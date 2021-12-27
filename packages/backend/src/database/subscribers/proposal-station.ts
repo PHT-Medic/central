@@ -9,58 +9,59 @@ import {
     EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import {
-    Train,
+    ProposalStation,
+    buildSocketProposalStationRoomName,
     buildSocketRealmNamespaceName,
-    buildSocketTrainRoomName,
 } from '@personalhealthtrain/ui-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
 
 type Operator = 'create' | 'update' | 'delete';
-type Event = 'trainCreated' | 'trainUpdated' | 'trainDeleted';
+type Event = 'proposalStationCreated' | 'proposalStationUpdated' | 'proposalStationDeleted';
 
 const OperatorEventMap : Record<Operator, Event> = {
-    create: 'trainCreated',
-    update: 'trainUpdated',
-    delete: 'trainDeleted',
+    create: 'proposalStationCreated',
+    update: 'proposalStationUpdated',
+    delete: 'proposalStationDeleted',
 };
 
 function publish(
     operation: Operator,
-    item: Train,
+    item: ProposalStation,
 ) {
     useSocketEmitter()
-        .in(buildSocketTrainRoomName())
+        .in(buildSocketProposalStationRoomName())
         .emit(OperatorEventMap[operation], {
             data: item,
             meta: {
-                roomName: buildSocketTrainRoomName(),
+                roomName: buildSocketProposalStationRoomName(),
             },
         });
 
     if (operation !== 'create') {
         useSocketEmitter()
-            .in(buildSocketTrainRoomName(item.id))
+            .in(buildSocketProposalStationRoomName(item.id))
             .emit(OperatorEventMap[operation], {
                 data: item,
                 meta: {
-                    roomName: buildSocketTrainRoomName(item.id),
+                    roomName: buildSocketProposalStationRoomName(item.id),
                     roomId: item.id,
                 },
             });
     }
 
     const workspaces = [
-        buildSocketRealmNamespaceName(item.realm_id),
+        buildSocketRealmNamespaceName(item.station_realm_id),
+        buildSocketRealmNamespaceName(item.proposal_realm_id),
     ];
 
     for (let i = 0; i < workspaces.length; i++) {
         useSocketEmitter()
             .of(workspaces[i])
-            .in(buildSocketTrainRoomName())
+            .in(buildSocketProposalStationRoomName())
             .emit(OperatorEventMap[operation], {
                 data: item,
                 meta: {
-                    roomName: buildSocketTrainRoomName(),
+                    roomName: buildSocketProposalStationRoomName(),
                 },
             });
     }
@@ -69,11 +70,11 @@ function publish(
         for (let i = 0; i < workspaces.length; i++) {
             useSocketEmitter()
                 .of(workspaces[i])
-                .in(buildSocketTrainRoomName(item.id))
+                .in(buildSocketProposalStationRoomName(item.id))
                 .emit(OperatorEventMap[operation], {
                     data: item,
                     meta: {
-                        roomName: buildSocketTrainRoomName(item.id),
+                        roomName: buildSocketProposalStationRoomName(item.id),
                         roomId: item.id,
                     },
                 });
@@ -82,21 +83,21 @@ function publish(
 }
 
 @EventSubscriber()
-export class TrainSubscriber implements EntitySubscriberInterface<Train> {
+export class ProposalStationSubscriber implements EntitySubscriberInterface<ProposalStation> {
     listenTo(): CallableFunction | string {
-        return Train;
+        return ProposalStation;
     }
 
-    afterInsert(event: InsertEvent<Train>): Promise<any> | void {
+    afterInsert(event: InsertEvent<ProposalStation>): Promise<any> | void {
         publish('create', event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<Train>): Promise<any> | void {
-        publish('update', event.entity as Train);
+    afterUpdate(event: UpdateEvent<ProposalStation>): Promise<any> | void {
+        publish('update', event.entity as ProposalStation);
         return undefined;
     }
 
-    beforeRemove(event: RemoveEvent<Train>): Promise<any> | void {
+    beforeRemove(event: RemoveEvent<ProposalStation>): Promise<any> | void {
         publish('delete', event.entity);
 
         return undefined;

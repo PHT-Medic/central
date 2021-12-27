@@ -9,38 +9,41 @@ import {
     MASTER_REALM_ID, PermissionID, Train, getAPITrain,
 } from '@personalhealthtrain/ui-common';
 import { UnauthorizedError } from '@typescript-error/http';
-import { EntityCache, useRedisInstance } from 'redis-extension';
-import { SocketInterface, SocketServerInterface } from '../../config/socket/type';
+import { RedisCache, useRedisInstance } from 'redis-extension';
+import { stringifyAuthorizationHeader } from '@typescript-auth/core';
+import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
 
-let trainCache : EntityCache<undefined, string> | undefined;
+let trainCache : RedisCache<string> | undefined;
 
 function useTrainCache() {
     if (typeof trainCache !== 'undefined') {
         return trainCache;
     }
 
-    trainCache = new EntityCache<undefined, string>({
-        redisDatabase: useRedisInstance('default'),
-    }, {});
+    trainCache = new RedisCache<string>({
+        redis: useRedisInstance('default'),
+    }, {
+        prefix: 'train',
+    });
 
     trainCache.startScheduler();
 
     return trainCache;
 }
 export function registerTrainSocketHandlers(
-    io: SocketServerInterface,
+    io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
     if (!socket.data.user) return;
 
-    const { ability, user } = socket.data;
+    socket.on('trainsSubscribe', async (context, cb) => {
+        context ??= {};
 
-    socket.on('trainsSubscribe', async (id, cb) => {
         if (
-            !ability.hasPermission(PermissionID.TRAIN_DROP) &&
-            !ability.hasPermission(PermissionID.TRAIN_EDIT) &&
-            !ability.hasPermission(PermissionID.TRAIN_EXECUTION_START) &&
-            !ability.hasPermission(PermissionID.TRAIN_EXECUTION_STOP)
+            !socket.data.ability.hasPermission(PermissionID.TRAIN_DROP) &&
+            !socket.data.ability.hasPermission(PermissionID.TRAIN_EDIT) &&
+            !socket.data.ability.hasPermission(PermissionID.TRAIN_EXECUTION_START) &&
+            !socket.data.ability.hasPermission(PermissionID.TRAIN_EXECUTION_STOP)
         ) {
             if (typeof cb === 'function') {
                 cb(new UnauthorizedError());
@@ -49,49 +52,59 @@ export function registerTrainSocketHandlers(
             return;
         }
 
-        if (id) {
+        if (context.id) {
             try {
                 const trainCache = useTrainCache();
-                let train : Train | undefined = await trainCache.get(id);
+                let train : Train | undefined = await trainCache.get(context.id);
                 if (!train) {
-                    train = await getAPITrain(id);
+                    train = await getAPITrain(context.id, {}, {
+                        headers: {
+                            Authorization: stringifyAuthorizationHeader({
+                                type: 'Bearer',
+                                token: socket.data.token,
+                            }),
+                        },
+                    });
 
-                    await trainCache.set(id, train);
+                    await trainCache.set(context.id, train);
                 }
 
                 if (
-                    train.realm_id !== user.realm_id &&
-                    user.realm_id !== MASTER_REALM_ID
+                    train.realm_id !== socket.data.user.realm_id &&
+                    socket.data.user.realm_id !== MASTER_REALM_ID
                 ) {
                     cb(new UnauthorizedError());
                     return;
                 }
 
-                socket.join(`trains:${train.id}`);
-                cb();
+                socket.join(`trains#${train.id}`);
+
+                if (typeof cb === 'function') {
+                    cb();
+                }
             } catch (e) {
-                cb(e);
-            }
-        } else {
-            if (user.realm_id === MASTER_REALM_ID) {
-                socket.join('global-trains');
+                if (typeof cb === 'function') {
+                    cb(e);
+                }
             }
 
-            socket.join(`${user.realm_id}-trains`);
+            return;
         }
 
-        cb();
+        socket.join('trains');
+
+        if (typeof cb === 'function') {
+            cb();
+        }
     });
 
-    socket.on('trainsUnsubscribe', (id) => {
-        if (id) {
-            socket.leave(`trains:${id}`);
-        } else {
-            if (user.realm_id === MASTER_REALM_ID) {
-                socket.leave('global-trains');
-            }
+    socket.on('trainsUnsubscribe', (context) => {
+        context ??= {};
 
-            socket.leave(`${user.realm_id}-trains`);
+        if (context.id) {
+            socket.leave(`trains#${context.id}`);
+        } else {
+            socket.leave('trains');
         }
     });
 }

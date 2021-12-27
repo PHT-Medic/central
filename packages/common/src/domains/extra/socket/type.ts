@@ -6,42 +6,75 @@
  */
 
 import {
-    Proposal, ProposalStation, Train, TrainResult,
+    Proposal, ProposalStation, Train, TrainResult, TrainStation,
 } from '../../core';
 
 type SimpleOperation = 'Created' | 'Updated' | 'Deleted';
 
+type SocketServerToClientEventContext<T> = {
+    meta: {
+        roomName?: string,
+        roomId?: string | number
+    },
+    data: T
+};
+
 export type SocketServerToClientEvents = {
     // permitted for (proposal-owner)
-    [K in `proposal${SimpleOperation}`]: (data: Proposal) => void
+    [K in `proposal${SimpleOperation}`]: (data: SocketServerToClientEventContext<Proposal>) => void
 } & {
     // permitted for (proposal-owner, proposal-target)
-    [T in `proposalStation${SimpleOperation}`]: (data: ProposalStation) => void
+    [T in `proposalStation${SimpleOperation}`]: (data: SocketServerToClientEventContext<ProposalStation>) => void
 } & {
     // permitted for (train-owner)
-    [T in `train${SimpleOperation}`]: (data: Train) => void
+    [T in `train${SimpleOperation}`]: (data: SocketServerToClientEventContext<Train>) => void
 } & {
     // permitted for (train-owner, train-result-owner)
-    [T in `trainResult${SimpleOperation}`]: (data: TrainResult) => void
+    [T in `trainResult${SimpleOperation}`]: (data: SocketServerToClientEventContext<TrainResult>) => void
 } & {
     // permitted for (train-owner, train-station-owner)
-    [T in `trainStation${SimpleOperation}`]: (data: Train) => void
+    [T in `trainStation${SimpleOperation}`]: (data: SocketServerToClientEventContext<TrainStation>) => void
 };
 
 type SubUnsubOperation = 'Subscribe' | 'Unsubscribe';
 
 export type SocketClientToServerEvents = {
-    [K in `proposals${SubUnsubOperation}`]: (id?: typeof Proposal.prototype.id) => void
+    [K in `proposals${SubUnsubOperation}`]: (
+        context: {
+            id?: typeof Proposal.prototype.id
+        },
+        cb?: (error?: Error) => void) => void
 } & {
-    [K in `proposalStations${SubUnsubOperation}`]: (id?: typeof ProposalStation.prototype.id) => void
+    [K in `proposalStations${SubUnsubOperation}`]: (
+        context: {
+            id?: typeof ProposalStation.prototype.id
+        },
+        cb?: (error?: Error) => void) => void
 } & {
-    [K in `trains${SubUnsubOperation}`]: (id?: typeof Train.prototype.id, cb?: (error?: Error) => void) => void
+    [K in `trains${SubUnsubOperation}`]: (
+        context: {
+            id?: typeof Train.prototype.id
+        },
+        cb?: (error?: Error) => void
+    ) => void
 } & {
-    [K in `trainResults${SubUnsubOperation}`]: (id?: typeof Train.prototype.id) => void
+    [K in `trainResults${SubUnsubOperation}`]: (
+        context: {
+            id?: typeof TrainResult.prototype.id
+        },
+        cb?: (error?: Error) => void
+    ) => void
 } & {
-    [K in `trainStations${SubUnsubOperation}`]: (id?: typeof Train.prototype.id) => void
+    [K in `trainStations${SubUnsubOperation}`]: (
+        context: {
+            id?: typeof TrainStation.prototype.id
+        },
+        cb?: (error?: Error) => void
+    ) => void
 };
 
 export interface SocketInterServerEvents {
 
 }
+
+// -----------------------------------

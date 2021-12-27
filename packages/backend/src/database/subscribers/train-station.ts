@@ -9,58 +9,59 @@ import {
     EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import {
-    Train,
+    TrainStation,
     buildSocketRealmNamespaceName,
-    buildSocketTrainRoomName,
+    buildSocketTrainStationRoomName,
 } from '@personalhealthtrain/ui-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
 
 type Operator = 'create' | 'update' | 'delete';
-type Event = 'trainCreated' | 'trainUpdated' | 'trainDeleted';
+type Event = 'trainStationCreated' | 'trainStationUpdated' | 'trainStationDeleted';
 
 const OperatorEventMap : Record<Operator, Event> = {
-    create: 'trainCreated',
-    update: 'trainUpdated',
-    delete: 'trainDeleted',
+    create: 'trainStationCreated',
+    update: 'trainStationUpdated',
+    delete: 'trainStationDeleted',
 };
 
 function publish(
     operation: Operator,
-    item: Train,
+    item: TrainStation,
 ) {
     useSocketEmitter()
-        .in(buildSocketTrainRoomName())
+        .in(buildSocketTrainStationRoomName())
         .emit(OperatorEventMap[operation], {
             data: item,
             meta: {
-                roomName: buildSocketTrainRoomName(),
+                roomName: buildSocketTrainStationRoomName(),
             },
         });
 
     if (operation !== 'create') {
         useSocketEmitter()
-            .in(buildSocketTrainRoomName(item.id))
+            .in(buildSocketTrainStationRoomName(item.id))
             .emit(OperatorEventMap[operation], {
                 data: item,
                 meta: {
-                    roomName: buildSocketTrainRoomName(item.id),
+                    roomName: buildSocketTrainStationRoomName(item.id),
                     roomId: item.id,
                 },
             });
     }
 
     const workspaces = [
-        buildSocketRealmNamespaceName(item.realm_id),
+        buildSocketRealmNamespaceName(item.station_realm_id),
+        buildSocketRealmNamespaceName(item.train_realm_id),
     ];
 
     for (let i = 0; i < workspaces.length; i++) {
         useSocketEmitter()
             .of(workspaces[i])
-            .in(buildSocketTrainRoomName())
+            .in(buildSocketTrainStationRoomName())
             .emit(OperatorEventMap[operation], {
                 data: item,
                 meta: {
-                    roomName: buildSocketTrainRoomName(),
+                    roomName: buildSocketTrainStationRoomName(),
                 },
             });
     }
@@ -69,11 +70,11 @@ function publish(
         for (let i = 0; i < workspaces.length; i++) {
             useSocketEmitter()
                 .of(workspaces[i])
-                .in(buildSocketTrainRoomName(item.id))
+                .in(buildSocketTrainStationRoomName(item.id))
                 .emit(OperatorEventMap[operation], {
                     data: item,
                     meta: {
-                        roomName: buildSocketTrainRoomName(item.id),
+                        roomName: buildSocketTrainStationRoomName(item.id),
                         roomId: item.id,
                     },
                 });
@@ -82,21 +83,21 @@ function publish(
 }
 
 @EventSubscriber()
-export class TrainSubscriber implements EntitySubscriberInterface<Train> {
+export class TrainStationSubscriber implements EntitySubscriberInterface<TrainStation> {
     listenTo(): CallableFunction | string {
-        return Train;
+        return TrainStation;
     }
 
-    afterInsert(event: InsertEvent<Train>): Promise<any> | void {
+    afterInsert(event: InsertEvent<TrainStation>): Promise<any> | void {
         publish('create', event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<Train>): Promise<any> | void {
-        publish('update', event.entity as Train);
+    afterUpdate(event: UpdateEvent<TrainStation>): Promise<any> | void {
+        publish('update', event.entity as TrainStation);
         return undefined;
     }
 
-    beforeRemove(event: RemoveEvent<Train>): Promise<any> | void {
+    beforeRemove(event: RemoveEvent<TrainStation>): Promise<any> | void {
         publish('delete', event.entity);
 
         return undefined;

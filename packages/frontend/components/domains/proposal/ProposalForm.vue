@@ -7,6 +7,7 @@
 
 <script>
 import {
+    addApiProposalStation,
     addProposal, editProposal,
 } from '@personalhealthtrain/ui-common';
 import {
@@ -38,7 +39,6 @@ export default {
             formData: {
                 title: '',
                 requested_data: '',
-                station_ids: [],
                 master_image_id: '',
                 risk: '',
                 risk_comment: '',
@@ -48,6 +48,7 @@ export default {
             message: null,
 
             station: {
+                selectedIds: [],
                 items: [],
                 busy: false,
             },
@@ -61,7 +62,7 @@ export default {
     },
     computed: {
         isEditing() {
-            return this.entityProperty && this.entityProperty.hasOwnProperty('id');
+            return this.entityProperty && Object.prototype.hasOwnProperty.call(this.entityProperty, 'id');
         },
         masterImageId() {
             return this.isEditing ? this.entityProperty.master_image_id : undefined;
@@ -69,9 +70,10 @@ export default {
     },
     created() {
         if (typeof this.entityProperty !== 'undefined') {
-            for (const key in this.formData) {
-                if (this.entityProperty.hasOwnProperty(key)) {
-                    this.formData[key] = this.entityProperty[key];
+            const keys = Object.keys(this.formData);
+            for (let i = 0; i < keys.length; i++) {
+                if (Object.prototype.hasOwnProperty.call(this.entityProperty, keys[i])) {
+                    this.formData[keys[i]] = this.entityProperty[keys[i]];
                 }
             }
         }
@@ -102,19 +104,23 @@ export default {
             },
         };
 
-        if (!this.isEditing) {
-            formData.station_ids = {
-                required,
-                minLength: minLength(1),
-                $each: {
-                    required,
-                    integer,
-                },
-            };
-        }
-
         return {
             formData,
+            ...(this.isEditing ?
+                {} :
+                {
+                    station: {
+                        selectedIds: {
+                            required,
+                            minLength: minLength(1),
+                            $each: {
+                                required,
+                                integer,
+                            },
+                        },
+                    },
+                }
+            ),
         };
     },
     methods: {
@@ -147,6 +153,13 @@ export default {
                 } else {
                     response = await addProposal(this.formData);
 
+                    for (let i = 0; i < this.station.selectedIds.length; i++) {
+                        await addApiProposalStation({
+                            proposal_id: response.id,
+                            station_id: this.station.selectedIds[i],
+                        });
+                    }
+
                     this.message = {
                         isError: false,
                         data: 'The proposal was successfully created',
@@ -163,25 +176,19 @@ export default {
 
             this.busy = false;
         },
+        async toggleStationIds(id) {
+            const index = this.station.selectedIds.indexOf(id);
+            if (index === -1) {
+                this.station.selectedIds.push(id);
+            } else {
+                this.station.selectedIds.splice(index, 1);
+            }
+        },
         async toggleFormData(key, id) {
-            switch (key) {
-                case 'station_ids': {
-                    const index = this.formData.station_ids.indexOf(id);
-                    if (index === -1) {
-                        this.formData.station_ids.push(id);
-                    } else {
-                        this.formData.station_ids.splice(index, 1);
-                    }
-                    break;
-                }
-                default: {
-                    if (this.formData[key] === id) {
-                        this.formData[key] = null;
-                    } else {
-                        this.formData[key] = id;
-                    }
-                    break;
-                }
+            if (this.formData[key] === id) {
+                this.formData[key] = null;
+            } else {
+                this.formData[key] = id;
             }
         },
     },
@@ -343,23 +350,23 @@ export default {
                                 <template #item-actions="props">
                                     <toggle-many-button
                                         :id="props.item.id"
-                                        :ids="formData.station_ids"
-                                        @toggle="toggleFormData('station_ids', props.item.id)"
+                                        :ids="station.selectedIds"
+                                        @toggle="toggleStationIds(props.item.id)"
                                     />
                                 </template>
                             </station-list>
 
                             <div
-                                v-if="!$v.formData.station_ids.required"
+                                v-if="!$v.station.selectedIds.required"
                                 class="alert alert-warning alert-sm"
                             >
                                 Select one or more stations.
                             </div>
                             <div
-                                v-if="!$v.formData.station_ids.minLength"
+                                v-if="!$v.station.selectedIds.minLength"
                                 class="alert alert-warning alert-sm"
                             >
-                                Select at least <strong>{{ $v.formData.station_ids.$params.minLength.min }}</strong> stations.
+                                Select at least <strong>{{ $v.station.selectedIds.$params.minLength.min }}</strong> stations.
                             </div>
                         </template>
                     </div>

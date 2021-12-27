@@ -47,37 +47,73 @@ export default {
         };
     },
     computed: {
+        queryFinal() {
+            return mergeDeep({
+                page: {
+                    limit: this.meta.limit,
+                    offset: this.meta.offset,
+                },
+                sort: {
+                    created_at: 'DESC',
+                },
+                include: {
+                    result: true,
+                    user: true,
+                },
+                filter: {
+                    ...(this.proposalId ? { proposal_id: this.proposalId } : {}),
+                },
+            }, this.query);
+        },
     },
     created() {
         this.load();
     },
+    mounted() {
+        const socket = this.$socket.useRealmWorkspace(this.queryFinal.filter.realm_id);
+        socket.emit('trainsSubscribe');
+
+        socket.on('trainCreated', this.handleSocketCreated);
+    },
+    beforeDestroy() {
+        const socket = this.$socket.useRealmWorkspace(this.queryFinal.filter.realm_id);
+        socket.emit('trainsUnsubscribe');
+
+        socket.off('trainCreated', this.handleSocketCreated);
+    },
     methods: {
+        handleSocketCreated(context) {
+            if (context.meta.roomName !== 'trains') return;
+
+            if (
+                this.queryFinal.sort.created_at === 'DESC' &&
+                this.meta.offset === 0
+            ) {
+                this.items.unshift(context.data);
+
+                if (this.items.length > this.meta.total) {
+                    this.items.splice(this.meta.length, 1);
+                }
+
+                this.meta.total++;
+
+                this.$forceUpdate();
+            }
+        },
         async load() {
             if (this.busy) return;
 
             this.busy = true;
 
             try {
-                const response = await getAPITrains(mergeDeep({
-                    page: {
-                        limit: this.meta.limit,
-                        offset: this.meta.offset,
-                    },
-                    include: {
-                        result: true,
-                        user: true,
-                    },
-                    filter: {
-                        ...(this.proposalId ? { proposal_id: this.proposalId } : {}),
-                    },
-                }, this.query));
+                const response = await getAPITrains(this.queryFinal);
 
                 this.items = response.data;
                 const { total } = response.meta;
 
                 this.meta.total = total;
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;
@@ -96,24 +132,6 @@ export default {
             this.load()
                 .then(resolve)
                 .catch(reject);
-        },
-        async drop(train) {
-            if (this.actionBusy) return;
-
-            this.actionBusy = true;
-
-            try {
-                await dropAPITrain(train.id);
-
-                const index = this.items.findIndex((item) => item.id === train.id);
-                if (index !== -1) {
-                    this.items.splice(index, 1);
-                }
-            } catch (e) {
-                console.log(e);
-            }
-
-            this.actionBusy = false;
         },
     },
 };
@@ -142,17 +160,17 @@ export default {
 
         <alert-message :message="message" />
 
-        <div class="row mb-2">
-            <div
-                v-for="(item, key) in items"
-                :key="key"
-                class="col-12 mb-2"
+        <div class="d-flex flex-column">
+            <template
+                v-for="item in items"
             >
                 <train-card
+                    :key="item.id"
+                    class="mb-2 d-block"
                     :train-property="item"
                     @deleted="handleDeleted"
                 />
-            </div>
+            </template>
         </div>
 
         <div

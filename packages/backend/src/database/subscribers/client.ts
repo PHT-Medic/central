@@ -7,7 +7,7 @@
 
 import { publishMessage } from 'amqp-extension';
 import {
-    EntitySubscriberInterface, EventSubscriber, InsertEvent, UpdateEvent,
+    EntitySubscriberInterface, EventSubscriber, InsertEvent,
 } from 'typeorm';
 import { AuthClientType, Client } from '@personalhealthtrain/ui-common';
 import { AuthClientSecurityComponentCommand } from '../../components/auth-security';
@@ -15,13 +15,14 @@ import { buildAuthClientSecurityQueueMessage } from '../../domains/extra/queue';
 
 @EventSubscriber()
 export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
-    // eslint-disable-next-line @typescript-eslint/ban-types,class-methods-use-this
-    listenTo(): Function | string {
+    listenTo(): CallableFunction | string {
         return Client;
     }
 
     async afterInsert(event: InsertEvent<Client>): Promise<any | void> {
-        if (typeof event.entity.service_id === 'string') {
+        if (
+            typeof event.entity.service_id === 'string'
+        ) {
             const queueMessage = buildAuthClientSecurityQueueMessage(
                 AuthClientSecurityComponentCommand.SYNC,
                 {
@@ -31,22 +32,6 @@ export class AuthClientSubscriber implements EntitySubscriberInterface<Client> {
                     clientSecret: event.entity.secret,
                 },
             );
-            await publishMessage(queueMessage);
-        }
-    }
-
-    async afterUpdate(event: UpdateEvent<Client>): Promise<any | void> {
-        if (typeof event.entity.service_id === 'string') {
-            const queueMessage = buildAuthClientSecurityQueueMessage(
-                AuthClientSecurityComponentCommand.SYNC,
-                {
-                    id: event.entity.service_id,
-                    type: AuthClientType.SERVICE,
-                    clientId: event.entity.id,
-                    clientSecret: event.entity.secret,
-                },
-            );
-
             await publishMessage(queueMessage);
         }
     }

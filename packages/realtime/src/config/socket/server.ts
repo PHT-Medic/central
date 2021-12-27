@@ -8,12 +8,14 @@
 import { Server as HTTPServer } from 'http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
+import { ForbiddenError, UnauthorizedError } from '@typescript-error/http';
+import { MASTER_REALM_ID } from '@personalhealthtrain/ui-common';
 import { useLogger } from '../../modules/log';
 import { useAuthMiddleware } from './middleware/auth';
-import { registerSocketHandlers } from './handlers';
+import { registerSocketHandlers, registerSocketNamespaceHandlers } from './handlers';
 import { Environment } from '../../env';
 import { Config } from '../../config';
-import { SocketServerInterface } from './type';
+import { SocketInterface, SocketServerInterface } from './type';
 
 interface SocketServerContext {
     httpServer: HTTPServer,
@@ -41,6 +43,29 @@ export function createSocketServer(context : SocketServerContext) : Server {
 
     // register handlers
     registerSocketHandlers(server);
+
+    // build & register realm workspaces
+    const realmWorkspaces = server.of(/^\/realm#[a-z0-9]+$/);
+    realmWorkspaces.use(useAuthMiddleware(context.config));
+    realmWorkspaces.use((socket: SocketInterface, next) => {
+        if (!socket.data.userId) {
+            next(new UnauthorizedError());
+            return;
+        }
+
+        const matches = socket.nsp.name.match(/^\/realm#([a-z0-9]+)$/);
+
+        if (
+            matches[1] === socket.data.user.realm_id ||
+            socket.data.user.realm_id === MASTER_REALM_ID
+        ) {
+            next();
+        } else {
+            next(new ForbiddenError());
+        }
+    });
+
+    registerSocketNamespaceHandlers(realmWorkspaces);
 
     return server;
 }

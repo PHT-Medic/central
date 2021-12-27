@@ -73,7 +73,7 @@ export class Train {
     setConfigurationStatus() {
         this.configuration_status = null;
 
-        if (this.entrypoint_file_id) {
+        if (this.master_image_id || this.entrypoint_file_id) {
             this.configuration_status = TrainConfigurationStatus.RESOURCE_CONFIGURED;
         }
 

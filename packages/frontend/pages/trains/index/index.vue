@@ -14,9 +14,6 @@ export default {
     data() {
         return {
             query: {
-                sort: {
-                    created_at: 'DESC',
-                },
             },
         };
     },

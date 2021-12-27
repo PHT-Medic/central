@@ -11,6 +11,7 @@ import {
 import { Proposal } from '../proposal';
 import { Station } from '../station';
 import { ProposalStationApprovalStatus } from './status';
+import { Realm } from '../../auth';
 
 @Entity({ name: 'proposal_stations' })
 export class ProposalStation {
@@ -41,9 +42,23 @@ export class ProposalStation {
         proposal: Proposal;
 
     @Column()
+        proposal_realm_id: string;
+
+    @ManyToOne(() => Realm, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'proposal_realm_id' })
+        proposal_realm: Realm;
+
+    @Column()
         station_id: number;
 
     @ManyToOne(() => Station, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'station_id' })
         station: Station;
+
+    @Column()
+        station_realm_id: string;
+
+    @ManyToOne(() => Realm, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'station_realm_id' })
+        station_realm: Realm;
 }

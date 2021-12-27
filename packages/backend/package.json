@@ -39,7 +39,7 @@
         "mysql": "^2.18.1",
         "node-cron": "^3.0.0",
         "prom-client": "^14.0.1",
-        "redis-extension": "^0.0.6",
+        "redis-extension": "^0.0.8",
         "reflect-metadata": "^0.1.13",
         "rimraf": "^3.0.2",
         "swagger-ui-express": "^4.3.0",

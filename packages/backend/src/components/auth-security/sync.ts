@@ -8,6 +8,7 @@
 import { Message } from 'amqp-extension';
 import {
     AuthClientType,
+    Client,
     HarborProjectWebhook,
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
@@ -16,8 +17,7 @@ import {
     ServiceID,
     Station,
     buildSecretStorageServicePayload,
-    ensureHarborProjectWebHook,
-    saveToSecretEngine,
+    ensureHarborProjectWebHook, saveToSecretEngine,
 } from '@personalhealthtrain/ui-common';
 
 import { getRepository } from 'typeorm';
@@ -71,5 +71,13 @@ export async function syncAuthClientSecurity(message: Message) {
                 }
             }
             break;
+    }
+
+    const repository = getRepository(Client);
+    const entity = await repository.findOne(payload.clientId);
+    if (typeof entity !== 'undefined') {
+        entity.synced = true;
+
+        await repository.save(entity);
     }
 }

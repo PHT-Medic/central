@@ -35,7 +35,7 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
 
     const trainFileRepository = getRepository(TrainFile);
 
-    const instance = new BusBoy({ headers: req.headers as BusBoy.BusboyHeaders, preservePath: true });
+    const instance = BusBoy({ headers: req.headers as BusBoy.BusboyHeaders, preservePath: true });
 
     const files: TrainFile[] = [];
 
@@ -49,11 +49,12 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
 
     const promises : Promise<void>[] = [];
 
-    instance.on('file', (filename, file, fullFileName) => {
+    instance.on('file', (filename, file, info: Record<string, any>) => {
         const hash = crypto.createHash('sha256');
 
         hash.update(entity.id);
-        hash.update(fullFileName);
+
+        hash.update(info.filename);
 
         const destinationFileName = hash.digest('hex');
         const destinationFilePath = `${trainDirectoryPath}/${destinationFileName}.file`;
@@ -69,19 +70,19 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
             handler.cleanup();
             req.unpipe(instance);
 
-            throw new BadRequestError(`Size of file ${fullFileName} is too large...`);
+            throw new BadRequestError(`Size of file ${info.filename} is too large...`);
         });
 
         file.on('end', () => {
-            if (!fullFileName && handler.getFileSize() === 0) {
+            if (!info.filename && handler.getFileSize() === 0) {
                 handler.cleanup();
                 return;
             }
 
             handler.complete();
 
-            const fileName: string = path.basename(fullFileName);
-            const filePath: string = path.dirname(fullFileName);
+            const fileName: string = path.basename(info.filename);
+            const filePath: string = path.dirname(info.filename);
 
             files.push(trainFileRepository.create({
                 hash: destinationFileName,

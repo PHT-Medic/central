@@ -9,7 +9,11 @@ import { editAPITrain } from '@personalhealthtrain/ui-common';
 
 export default {
     props: {
-        entity: Object,
+        trainId: String,
+        trainName: {
+            type: String,
+            default: undefined,
+        },
 
         withEdit: Boolean,
     },
@@ -24,16 +28,21 @@ export default {
     },
     computed: {
         displayText() {
-            if (this.form.name && this.form.name.length > 0) {
-                return this.form.name;
+            return this.trainName ?? this.trainId;
+        },
+    },
+    watch: {
+        trainName(val, oldVal) {
+            if (val && val !== oldVal) {
+                if (val) {
+                    this.form.name = val;
+                }
             }
-
-            return this.entity.name ?? this.entity.id;
         },
     },
     created() {
-        if (this.entity.name) {
-            this.form.name = this.entity.name;
+        if (this.trainName) {
+            this.form.name = this.trainName;
         }
     },
     methods: {
@@ -46,7 +55,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await editAPITrain(this.entity.id, {
+                const train = await editAPITrain(this.trainId, {
                     name: this.form.name,
                 });
 
@@ -79,7 +88,8 @@ export default {
         <template v-else>
             <slot
                 name="text"
-                :entity="entity"
+                :trainId="trainId"
+                :trainName="trainName"
                 :display-text="displayText"
             >
 

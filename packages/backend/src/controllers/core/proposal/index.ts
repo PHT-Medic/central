@@ -12,8 +12,6 @@ import {
 import {
     MasterImage,
     PermissionID, Proposal,
-    ProposalStation,
-    ProposalStationApprovalStatus,
     Station,
     isPermittedForResourceRealm,
     onlyRealmPermittedQueryResources,
@@ -25,10 +23,8 @@ import {
 } from '@decorators/express';
 import { ResponseExample, SwaggerTags } from '@trapi/swagger';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import env from '../../../env';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
-import { DispatcherProposalEvent, emitDispatcherProposalEvent } from '../../../domains/core/proposal/queue';
 import { ExpressValidationError } from '../../../config/http/error/validation';
 
 export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
@@ -125,13 +121,7 @@ export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse)
         .exists()
         .isString()
         .custom((value) => getRepository(MasterImage).findOne(value).then((masterImageResult) => {
-            if (typeof masterImageResult === 'undefined') throw new Error('The provided master image does not exist.');
-        }))
-        .run(req);
-    await check('station_ids')
-        .isArray()
-        .custom((value: any[]) => getRepository(Station).find({ id: In(value) }).then((stationResult) => {
-            if (!stationResult || stationResult.length !== value.length) throw new Error('The provided stations are not valid.');
+            if (typeof masterImageResult === 'undefined') throw new Error('The referenced master image does not exist.');
         }))
         .run(req);
 
@@ -140,9 +130,7 @@ export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse)
         throw new ExpressValidationError(validation);
     }
 
-    const validationData = matchedData(req, { includeOptionals: false });
-
-    const { station_ids: stationIds, ...data } = validationData;
+    const data : Partial<Proposal> = matchedData(req, { includeOptionals: false });
 
     const repository = getRepository(Proposal);
     const entity = repository.create({
@@ -151,24 +139,6 @@ export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse)
         ...data,
     });
     await repository.save(entity);
-
-    const proposalStationRepository = getRepository(ProposalStation);
-    const proposalStations = stationIds.map((stationId: number) => proposalStationRepository.create({
-        proposal_id: entity.id,
-        station_id: stationId,
-        approval_status: env.skipProposalApprovalOperation ? ProposalStationApprovalStatus.APPROVED : null,
-    }));
-
-    await proposalStationRepository.save(proposalStations);
-
-    const proposalStationPromise = Promise.all(stationIds.map((stationId: string | number) => emitDispatcherProposalEvent({
-        event: DispatcherProposalEvent.ASSIGNED,
-        id: entity.id,
-        stationId,
-        operatorRealmId: req.realmId,
-    })));
-
-    await proposalStationPromise;
 
     return res.respond({ data: entity });
 }

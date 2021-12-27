@@ -9,11 +9,11 @@ import { getRepository } from 'typeorm';
 import { applyFilters, applyPagination } from 'typeorm-extension';
 import { check, matchedData, validationResult } from 'express-validator';
 import {
-    PermissionID, Train, TrainStation,
+    PermissionID, Station, Train,
+    TrainStation,
     TrainStationApprovalStatus,
     isPermittedForResourceRealm,
-    isTrainStationApprovalStatus,
-    onlyRealmPermittedQueryResources,
+    isTrainStationApprovalStatus, onlyRealmPermittedQueryResources,
 } from '@personalhealthtrain/ui-common';
 
 import {
@@ -27,66 +27,7 @@ import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { DispatcherTrainEventType, emitDispatcherTrainEvent } from '../../../domains/core/train/queue';
 import { ExpressValidationError } from '../../../config/http/error/validation';
 
-type PartialTrainStation = Partial<TrainStation>;
-const simpleExample = {
-    train_id: 'xxx', station_id: 1, comment: 'Looks good to me', status: TrainStationApprovalStatus.APPROVED,
-};
-
-@SwaggerTags('pht')
-@Controller('/train-stations')
-export class TrainStationController {
-    @Get('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrainStation[]>([simpleExample])
-    async getMany(
-        @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrainStation[]> {
-        return await getTrainStationsRouteHandler(req, res) as PartialTrainStation[];
-    }
-
-    @Get('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrainStation>(simpleExample)
-    async getOne(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrainStation | undefined> {
-        return await getTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
-    }
-
-    @Post('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrainStation>(simpleExample)
-    async edit(
-        @Params('id') id: string,
-            @Body() data: TrainStation,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrainStation | undefined> {
-        return await editTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
-    }
-
-    @Post('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrainStation>(simpleExample)
-    async add(
-        @Body() data: TrainStation,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrainStation | undefined> {
-        return await addTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
-    }
-
-    @Delete('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrainStation>(simpleExample)
-    async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrainStation | undefined> {
-        return await dropTrainStationRouteHandler(req, res) as PartialTrainStation | undefined;
-    }
-}
-
-export async function getTrainStationsRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page } = req.query;
 
     const repository = getRepository(TrainStation);
@@ -116,7 +57,7 @@ export async function getTrainStationsRouteHandler(req: ExpressRequest, res: Exp
     });
 }
 
-export async function getTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     const repository = getRepository(TrainStation);
@@ -136,7 +77,7 @@ export async function getTrainStationRouteHandler(req: ExpressRequest, res: Expr
     return res.respond({ data: entity });
 }
 
-export async function addTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     await check('station_id')
         .exists()
         .isInt()
@@ -164,16 +105,29 @@ export async function addTrainStationRouteHandler(req: ExpressRequest, res: Expr
 
     const data = matchedData(req, { includeOptionals: false });
 
+    // train
     const trainRepository = getRepository(Train);
     const train = await trainRepository.findOne(data.train_id);
 
     if (typeof train === 'undefined') {
-        throw new NotFoundError();
+        throw new NotFoundError('The referenced train was not found.');
     }
 
     if (!isPermittedForResourceRealm(req.realmId, train.realm_id)) {
         throw new ForbiddenError();
     }
+
+    data.train_realm_id = train.realm_id;
+
+    // station
+    const stationRepository = getRepository(Station);
+    const station = await stationRepository.findOne(data.station_id);
+
+    if (typeof station === 'undefined') {
+        throw new NotFoundError('The referenced station was not found.');
+    }
+
+    data.station_realm_id = station.realm_id;
 
     const repository = getRepository(TrainStation);
 
@@ -197,7 +151,7 @@ export async function addTrainStationRouteHandler(req: ExpressRequest, res: Expr
     });
 }
 
-export async function editTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if (typeof id !== 'string') {
@@ -205,16 +159,16 @@ export async function editTrainStationRouteHandler(req: ExpressRequest, res: Exp
     }
 
     const repository = getRepository(TrainStation);
-    let trainStation = await repository.findOne(id, { relations: ['station', 'train'] });
+    let trainStation = await repository.findOne(id);
 
     if (typeof trainStation === 'undefined') {
         throw new NotFoundError();
     }
 
-    const isAuthorityOfStation = isPermittedForResourceRealm(req.realmId, trainStation.station.realm_id);
+    const isAuthorityOfStation = isPermittedForResourceRealm(req.realmId, trainStation.station_realm_id);
     const isAuthorizedForStation = req.ability.can('approve', 'train');
 
-    const isAuthorityOfRealm = isPermittedForResourceRealm(req.realmId, trainStation.train.realm_id);
+    const isAuthorityOfRealm = isPermittedForResourceRealm(req.realmId, trainStation.train_realm_id);
     const isAuthorizedForRealm = req.ability.can('edit', 'train');
 
     if (
@@ -275,7 +229,7 @@ export async function editTrainStationRouteHandler(req: ExpressRequest, res: Exp
     });
 }
 
-export async function dropTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if (
@@ -287,15 +241,15 @@ export async function dropTrainStationRouteHandler(req: ExpressRequest, res: Exp
 
     const repository = getRepository(TrainStation);
 
-    const entity : TrainStation | undefined = await repository.findOne(id, { relations: ['train', 'station'] });
+    const entity : TrainStation | undefined = await repository.findOne(id);
 
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
     if (
-        !isPermittedForResourceRealm(req.realmId, entity.station.realm_id) &&
-        !isPermittedForResourceRealm(req.realmId, entity.train.realm_id)
+        !isPermittedForResourceRealm(req.realmId, entity.station_realm_id) &&
+        !isPermittedForResourceRealm(req.realmId, entity.train_realm_id)
     ) {
         throw new ForbiddenError();
     }
@@ -303,4 +257,63 @@ export async function dropTrainStationRouteHandler(req: ExpressRequest, res: Exp
     await repository.delete(entity.id);
 
     return res.respondDeleted({ data: entity });
+}
+
+type PartialTrainStation = Partial<TrainStation>;
+const simpleExample = {
+    train_id: 'xxx', station_id: 1, comment: 'Looks good to me', status: TrainStationApprovalStatus.APPROVED,
+};
+
+@SwaggerTags('pht')
+@Controller('/train-stations')
+export class TrainStationController {
+    @Get('', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrainStation[]>([simpleExample])
+    async getMany(
+        @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainStation[]> {
+        return await getManyRouteHandler(req, res) as PartialTrainStation[];
+    }
+
+    @Get('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrainStation>(simpleExample)
+    async getOne(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainStation | undefined> {
+        return await getRouteHandler(req, res) as PartialTrainStation | undefined;
+    }
+
+    @Post('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrainStation>(simpleExample)
+    async edit(
+        @Params('id') id: string,
+            @Body() data: TrainStation,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainStation | undefined> {
+        return await editRouteHandler(req, res) as PartialTrainStation | undefined;
+    }
+
+    @Post('', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrainStation>(simpleExample)
+    async add(
+        @Body() data: TrainStation,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainStation | undefined> {
+        return await addRouteHandler(req, res) as PartialTrainStation | undefined;
+    }
+
+    @Delete('/:id', [ForceLoggedInMiddleware])
+    @ResponseExample<PartialTrainStation>(simpleExample)
+    async drop(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainStation | undefined> {
+        return await dropRouteHandler(req, res) as PartialTrainStation | undefined;
+    }
 }

@@ -10,6 +10,8 @@ import {
     buildConnectionOptions, createDatabase, dropDatabase, runSeeder,
 } from 'typeorm-extension';
 import { createConnection } from 'typeorm';
+import { createConfig } from '../../config';
+import env from '../../env';
 
 interface ResetArguments extends Arguments {
 
@@ -25,6 +27,9 @@ export class ResetCommand implements CommandModule {
     }
 
     async handler(args: ResetArguments) {
+        const config = createConfig({ env });
+        await config.redisDatabase.connect();
+
         const connectionOptions = await buildConnectionOptions();
 
         await dropDatabase({ ifExist: true });
@@ -37,9 +42,15 @@ export class ResetCommand implements CommandModule {
             await connection.runMigrations({ transaction: 'all' });
             await runSeeder(connection);
         } catch (e) {
-            throw e;
+            if (e instanceof Error) {
+                console.log(e.message);
+            }
+
+            process.exit(1);
         } finally {
             await connection.close();
         }
+
+        process.exit(0);
     }
 }

@@ -17,6 +17,7 @@ import {
 import { Station } from '../station';
 import { Train } from '../train';
 import { TrainStationApprovalStatus, TrainStationRunStatus } from './status';
+import { Realm } from '../../auth';
 
 @Entity({ name: 'train_stations' })
 export class TrainStation {
@@ -57,9 +58,23 @@ export class TrainStation {
         train: Train;
 
     @Column()
+        train_realm_id: string;
+
+    @ManyToOne(() => Realm, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'train_realm_id' })
+        train_realm: Realm;
+
+    @Column()
         station_id: number;
 
     @ManyToOne(() => Station, (station) => station.train_stations, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'station_id' })
         station: Station;
+
+    @Column()
+        station_realm_id: string;
+
+    @ManyToOne(() => Realm, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'station_realm_id' })
+        station_realm: Realm;
 }

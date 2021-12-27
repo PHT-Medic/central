@@ -11,11 +11,11 @@ import {
     editAPITrain,
     getAPITrainStations,
 } from '@personalhealthtrain/ui-common';
-import TrainWizardConfiguratorStep from './wizard/TrainWizardConfiguratorStep';
-import TrainFileManager from './file/TrainFileManager';
-import TrainWizardHashStep from './wizard/TrainWizardHashStep';
-import TrainWizardFinalStep from './wizard/TrainWizardFinalStep';
-import TrainWizardExtraStep from './wizard/TrainWizardExtraStep';
+import TrainWizardConfiguratorStep from './TrainWizardStepBase';
+import TrainFileManager from '../file/TrainFileManager';
+import TrainWizardHashStep from './TrainWizardStepHash';
+import TrainWizardFinalStep from './TrainWizardStepFinal';
+import TrainWizardExtraStep from './TrainWizardStepQuery';
 
 export default {
     components: {
@@ -88,6 +88,13 @@ export default {
             return this.train ? this.train.id : undefined;
         },
     },
+    watch: {
+        trainProperty(val, oldVal) {
+            if (val && val !== oldVal) {
+                this.initTrainFromProperty();
+            }
+        },
+    },
     created() {
         if (this.isConfigured) return;
 
@@ -104,10 +111,11 @@ export default {
         initTrainFromProperty() {
             if (typeof this.trainProperty === 'undefined') return;
 
-            for (const key in this.train) {
-                if (!this.trainProperty.hasOwnProperty(key)) continue;
+            const keys = Object.keys(this.train);
+            for (let i = 0; i < keys.length; i++) {
+                if (!Object.prototype.hasOwnProperty.call(this.trainProperty, keys[i])) continue;
 
-                this.train[key] = this.trainProperty[key];
+                this.train[keys[i]] = this.trainProperty[keys[i]];
             }
 
             if (
@@ -425,7 +433,7 @@ export default {
                     :before-change="passWizardStep"
                 >
                     <train-wizard-configurator-step
-                        :train="trainProperty"
+                        :train="train"
                         @setTrainMasterImage="setMasterImage"
                         @setTrainStations="setStations"
                         @setTrainQuery="setFhirQuery"

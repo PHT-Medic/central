@@ -12,7 +12,7 @@ import {
     User,
 } from '@personalhealthtrain/ui-common';
 import { AbilityManager, PermissionItem } from '@typescript-auth/core';
-import { Server, Socket } from 'socket.io';
+import { Namespace, Server, Socket } from 'socket.io';
 
 export type SocketDataInterface = {
     token?: string,
@@ -23,6 +23,13 @@ export type SocketDataInterface = {
 };
 
 export type SocketServerInterface = Server<
+SocketClientToServerEvents,
+SocketServerToClientEvents,
+SocketInterServerEvents,
+SocketDataInterface
+>;
+
+export type SocketNamespaceInterface = Namespace<
 SocketClientToServerEvents,
 SocketServerToClientEvents,
 SocketInterServerEvents,

@@ -5,9 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SocketInterface, SocketServerInterface } from '../../config/socket/type';
+import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
 
-export function registerUserHandlers(io: SocketServerInterface, socket: SocketInterface) {
+export function registerUserHandlers(
+    io: SocketServerInterface | SocketNamespaceInterface,
+    socket: SocketInterface,
+) {
     if (!socket.data.user) return;
 
     const { user } = socket.data;

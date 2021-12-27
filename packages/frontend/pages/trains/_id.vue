@@ -44,8 +44,36 @@ export default {
             ],
         };
     },
+    created() {
+        const socket = this.$socket.useRealmWorkspace(this.item.realm_id);
+        socket.emit('trainsSubscribe', { id: this.item.id });
+        socket.on('trainUpdated', this.handleSocketUpdated);
+        socket.on('trainDeleted', this.handleSocketDeleted);
+    },
+    beforeDestroy() {
+        const socket = this.$socket.useRealmWorkspace(this.item.realm_id);
+        socket.emit('trainsUnsubscribe', { id: this.item.id });
+        socket.off('trainUpdated', this.handleSocketUpdated);
+        socket.off('trainDeleted', this.handleSocketDeleted);
+    },
     methods: {
-        updateTrain(train) {
+        handleSocketUpdated(context) {
+            if (
+                this.item.id !== context.data.id ||
+                context.meta.roomId !== this.item.id
+            ) return;
+
+            this.handleUpdated(context.data);
+        },
+        async handleSocketDeleted(context) {
+            if (
+                this.item.id !== context.data.id ||
+                context.meta.roomId !== this.item.id
+            ) return;
+
+            await this.$nuxt.$router.push('/trains');
+        },
+        handleUpdated(train) {
             // eslint-disable-next-line no-restricted-syntax
             for (const key in train) {
                 Vue.set(this.item, key, train[key]);
@@ -60,7 +88,8 @@ export default {
             🚊 Train
             <span class="sub-title">
                 <train-name
-                    :entity="item"
+                    :train-id="item.id"
+                    :train-name="item.name"
                 />
             </span>
         </h1>
@@ -100,7 +129,7 @@ export default {
 
         <nuxt-child
             :train="item"
-            @updated="updateTrain"
+            @updated="handleUpdated"
         />
     </div>
 </template>

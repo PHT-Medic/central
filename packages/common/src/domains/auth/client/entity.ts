@@ -56,6 +56,11 @@ export class Client {
 
     // ------------------------------------------------------------------
 
+    @Column({ type: 'boolean', default: false })
+        synced: boolean;
+
+    // ------------------------------------------------------------------
+
     @BeforeInsert()
     createSecret() {
         if (typeof this.secret === 'undefined') {

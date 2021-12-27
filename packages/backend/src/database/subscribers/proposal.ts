@@ -9,41 +9,41 @@ import {
     EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import {
-    Train,
+    Proposal,
+    buildSocketProposalRoomName,
     buildSocketRealmNamespaceName,
-    buildSocketTrainRoomName,
 } from '@personalhealthtrain/ui-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
 
 type Operator = 'create' | 'update' | 'delete';
-type Event = 'trainCreated' | 'trainUpdated' | 'trainDeleted';
+type Event = 'proposalCreated' | 'proposalUpdated' | 'proposalDeleted';
 
 const OperatorEventMap : Record<Operator, Event> = {
-    create: 'trainCreated',
-    update: 'trainUpdated',
-    delete: 'trainDeleted',
+    create: 'proposalCreated',
+    update: 'proposalUpdated',
+    delete: 'proposalDeleted',
 };
 
 function publish(
     operation: Operator,
-    item: Train,
+    item: Proposal,
 ) {
     useSocketEmitter()
-        .in(buildSocketTrainRoomName())
+        .in(buildSocketProposalRoomName())
         .emit(OperatorEventMap[operation], {
             data: item,
             meta: {
-                roomName: buildSocketTrainRoomName(),
+                roomName: buildSocketProposalRoomName(),
             },
         });
 
     if (operation !== 'create') {
         useSocketEmitter()
-            .in(buildSocketTrainRoomName(item.id))
+            .in(buildSocketProposalRoomName(item.id))
             .emit(OperatorEventMap[operation], {
                 data: item,
                 meta: {
-                    roomName: buildSocketTrainRoomName(item.id),
+                    roomName: buildSocketProposalRoomName(item.id),
                     roomId: item.id,
                 },
             });
@@ -56,11 +56,11 @@ function publish(
     for (let i = 0; i < workspaces.length; i++) {
         useSocketEmitter()
             .of(workspaces[i])
-            .in(buildSocketTrainRoomName())
+            .in(buildSocketProposalRoomName())
             .emit(OperatorEventMap[operation], {
                 data: item,
                 meta: {
-                    roomName: buildSocketTrainRoomName(),
+                    roomName: buildSocketProposalRoomName(),
                 },
             });
     }
@@ -69,11 +69,11 @@ function publish(
         for (let i = 0; i < workspaces.length; i++) {
             useSocketEmitter()
                 .of(workspaces[i])
-                .in(buildSocketTrainRoomName(item.id))
+                .in(buildSocketProposalRoomName(item.id))
                 .emit(OperatorEventMap[operation], {
                     data: item,
                     meta: {
-                        roomName: buildSocketTrainRoomName(item.id),
+                        roomName: buildSocketProposalRoomName(item.id),
                         roomId: item.id,
                     },
                 });
@@ -82,21 +82,21 @@ function publish(
 }
 
 @EventSubscriber()
-export class TrainSubscriber implements EntitySubscriberInterface<Train> {
+export class ProposalSubscriber implements EntitySubscriberInterface<Proposal> {
     listenTo(): CallableFunction | string {
-        return Train;
+        return Proposal;
     }
 
-    afterInsert(event: InsertEvent<Train>): Promise<any> | void {
+    afterInsert(event: InsertEvent<Proposal>): Promise<any> | void {
         publish('create', event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<Train>): Promise<any> | void {
-        publish('update', event.entity as Train);
+    afterUpdate(event: UpdateEvent<Proposal>): Promise<any> | void {
+        publish('update', event.entity as Proposal);
         return undefined;
     }
 
-    beforeRemove(event: RemoveEvent<Train>): Promise<any> | void {
+    beforeRemove(event: RemoveEvent<Proposal>): Promise<any> | void {
         publish('delete', event.entity);
 
         return undefined;

@@ -6,13 +6,20 @@
  */
 
 import {
-    Column, CreateDateColumn, Entity, Index, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn,
+    Column,
+    CreateDateColumn,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
-import { nanoid } from 'nanoid';
 import { ProposalStation } from '../proposal-station';
 import { Realm } from '../../auth';
 import { TrainStation } from '../train-station';
-import { createNanoID } from '../../../utils/nanoid';
+import { createNanoID } from '../../../utils';
 
 @Entity({ name: 'stations' })
 export class Station {
@@ -68,7 +75,7 @@ export class Station {
     @Column()
         realm_id: string;
 
-    @OneToOne(() => Realm, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Realm, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'realm_id' })
         realm: Realm;
 
