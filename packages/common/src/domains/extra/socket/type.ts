@@ -20,19 +20,14 @@ type SocketServerToClientEventContext<T> = {
 };
 
 export type SocketServerToClientEvents = {
-    // permitted for (proposal-owner)
     [K in `proposal${SimpleOperation}`]: (data: SocketServerToClientEventContext<Proposal>) => void
 } & {
-    // permitted for (proposal-owner, proposal-target)
     [T in `proposalStation${SimpleOperation}`]: (data: SocketServerToClientEventContext<ProposalStation>) => void
 } & {
-    // permitted for (train-owner)
     [T in `train${SimpleOperation}`]: (data: SocketServerToClientEventContext<Train>) => void
 } & {
-    // permitted for (train-owner, train-result-owner)
     [T in `trainResult${SimpleOperation}`]: (data: SocketServerToClientEventContext<TrainResult>) => void
 } & {
-    // permitted for (train-owner, train-station-owner)
     [T in `trainStation${SimpleOperation}`]: (data: SocketServerToClientEventContext<TrainStation>) => void
 };
 

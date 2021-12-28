@@ -10,10 +10,10 @@ import { applyFilters, applyPagination, applyQueryRelations } from 'typeorm-exte
 import {
     MasterImage,
     PermissionID, Proposal, Train, TrainCommand, TrainFile,
-    TrainType, isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources,
+    TrainType,
+    isPermittedForResourceRealm, onlyRealmPermittedQueryResources,
 } from '@personalhealthtrain/ui-common';
-import { check, matchedData, validationResult } from 'express-validator';
+import { check, validationResult } from 'express-validator';
 
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
@@ -24,6 +24,7 @@ import { handleTrainCommandRouteHandler } from './action';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { ExpressValidationError } from '../../../config/http/error/validation';
+import { matchedValidationData } from '../../../modules/express-validator';
 
 export async function getOneRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { include } = req.query;
@@ -97,13 +98,6 @@ async function runValidations(req: ExpressRequest, mode: 'create' | 'update') {
         await check('proposal_id')
             .exists()
             .isInt()
-            .custom((value) => getRepository(Proposal).findOne(value).then((proposal) => {
-                if (typeof proposal === 'undefined') throw new Error('The referenced proposal does not exist.');
-
-                if (proposal.realm_id !== req.realmId) {
-                    throw new Error('You are not permitted to create a train for that realm.');
-                }
-            }))
             .run(req);
 
         await check('type')
@@ -115,43 +109,37 @@ async function runValidations(req: ExpressRequest, mode: 'create' | 'update') {
     }
 
     await check('name')
-        .exists()
         .notEmpty()
         .optional({ nullable: true })
         .isLength({ min: 1, max: 128 })
         .run(req);
 
     await check('entrypoint_file_id')
-        .exists()
-        .optional()
         .custom((value) => getRepository(TrainFile).findOne(value).then((res) => {
             if (typeof res === 'undefined') throw new Error('The entrypoint file is not valid.');
         }))
+        .optional({ nullable: true })
         .run(req);
 
     await check('hash_signed')
-        .exists()
         .notEmpty()
         .isLength({ min: 10, max: 8096 })
         .optional({ nullable: true })
         .run(req);
 
-    const masterImagePromise = check('master_image_id')
-        .exists()
+    await check('master_image_id')
         .optional({ nullable: true })
         .isString()
         .custom((value) => getRepository(MasterImage).findOne(value).then((res) => {
             if (typeof res === 'undefined') throw new Error('The master image is not valid.');
-        }));
-
-    await check('query')
-        .exists()
-        .notEmpty()
-        .optional({ nullable: true })
-        .isLength({ min: 1, max: 4096 })
+        }))
         .run(req);
 
-    await masterImagePromise.run(req);
+    await check('query')
+        .isString()
+        .isLength({ min: 1, max: 4096 })
+        .optional({ nullable: true })
+        .run(req);
 }
 
 async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
@@ -166,7 +154,22 @@ async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
         throw new ExpressValidationError(validation);
     }
 
-    const validationData = matchedData(req, { includeOptionals: true });
+    const validationData : Partial<Train> = matchedValidationData(req, { includeOptionals: true });
+
+    // proposal
+    const proposalRepository = getRepository(Proposal);
+    const proposal = await proposalRepository.findOne(validationData.proposal_id);
+    if (typeof proposal === 'undefined') {
+        throw new BadRequestError('The referenced proposal does not exist.');
+    }
+
+    if (proposal.realm_id !== req.realmId) {
+        throw new Error('You are not permitted to create a train for that realm.');
+    }
+
+    if (!validationData.master_image_id) {
+        validationData.master_image_id = proposal.master_image_id;
+    }
 
     const repository = getRepository(Train);
 
@@ -199,7 +202,7 @@ export async function editRouteHandler(req: ExpressRequest, res: ExpressResponse
         throw new ExpressValidationError(validation);
     }
 
-    const data = matchedData(req, { includeOptionals: true });
+    const data = matchedValidationData(req, { includeOptionals: true });
     if (!data) {
         return res.respondAccepted();
     }

@@ -19,6 +19,18 @@ export default {
             },
         };
     },
+    computed: {
+        query() {
+            return this.train.query;
+        },
+    },
+    watch: {
+        query(val, oldVal) {
+            if (val && val !== oldVal) {
+                this.init();
+            }
+        },
+    },
     validations() {
         return {
             form: {
@@ -28,7 +40,15 @@ export default {
             },
         };
     },
+    created() {
+        this.init();
+    },
     methods: {
+        init() {
+            if (this.query) {
+                this.form.query = this.query;
+            }
+        },
         select() {
             this.$emit('querySelected', this.form.query);
         },

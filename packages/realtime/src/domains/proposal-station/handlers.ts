@@ -6,26 +6,25 @@
  */
 
 import {
-    MASTER_REALM_ID, PermissionID, Train, buildSocketProposalStationRoomName, buildSocketTrainRoomName, getAPITrain,
+    PermissionID, buildSocketProposalStationRoomName,
 } from '@personalhealthtrain/ui-common';
 import { UnauthorizedError } from '@typescript-error/http';
-import { stringifyAuthorizationHeader } from '@typescript-auth/core';
 import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
 
-export function registerTrainSocketHandlers(
+export function registerProposalStationSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
     if (!socket.data.user) return;
 
-    socket.on('trainsSubscribe', async (context, cb) => {
+    socket.on('proposalStationsSubscribe', async (context, cb) => {
         context ??= {};
 
         if (
-            !socket.data.ability.hasPermission(PermissionID.TRAIN_DROP) &&
-            !socket.data.ability.hasPermission(PermissionID.TRAIN_EDIT) &&
-            !socket.data.ability.hasPermission(PermissionID.TRAIN_EXECUTION_START) &&
-            !socket.data.ability.hasPermission(PermissionID.TRAIN_EXECUTION_STOP)
+            !socket.data.ability.hasPermission(PermissionID.PROPOSAL_APPROVE) &&
+            !socket.data.ability.hasPermission(PermissionID.PROPOSAL_ADD) &&
+            !socket.data.ability.hasPermission(PermissionID.PROPOSAL_EDIT) &&
+            !socket.data.ability.hasPermission(PermissionID.PROPOSAL_DROP)
         ) {
             if (typeof cb === 'function') {
                 cb(new UnauthorizedError());
@@ -34,16 +33,16 @@ export function registerTrainSocketHandlers(
             return;
         }
 
-        socket.join(buildSocketTrainRoomName(context.id));
+        socket.join(buildSocketProposalStationRoomName(context.id));
 
         if (typeof cb === 'function') {
             cb();
         }
     });
 
-    socket.on('trainsUnsubscribe', (context) => {
+    socket.on('proposalStationsUnsubscribe', (context) => {
         context ??= {};
 
-        socket.leave(buildSocketTrainRoomName(context.id));
+        socket.leave(buildSocketProposalStationRoomName(context.id));
     });
 }

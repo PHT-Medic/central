@@ -5,12 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { Train, TrainCommand, runAPITrainCommand } from '@personalhealthtrain/ui-common';
-import AlertMessage from '../../../alert/AlertMessage';
-import { FrontendTrainCommand } from '../../../../domains/train/type';
+import { TrainCommand, runAPITrainCommand } from '@personalhealthtrain/ui-common';
 
 export default {
-    components: { AlertMessage },
+    components: { },
     props: {
         train: {
             type: Object,
@@ -33,16 +31,38 @@ export default {
         hashExists() {
             return !!this.form.hash && this.form.hash !== '';
         },
+        hash() {
+            return this.train.hash;
+        },
+        hashSigned() {
+            return this.train.hashSigned;
+        },
+    },
+    watch: {
+        hash(val, oldVal) {
+            if (val && val !== oldVal) {
+                this.init();
+            }
+        },
+        hashSigned(val, oldVal) {
+            if (val && val !== oldVal) {
+                this.init();
+            }
+        },
     },
     created() {
-        if (typeof this.train.hash !== 'undefined' && this.train.hash) {
-            this.form.hash = this.train.hash;
-        }
-        if (typeof this.train.hash_signed !== 'undefined' && this.train.hash_signed) {
-            this.form.hash_signed = this.train.hash_signed;
-        }
+        this.init();
     },
     methods: {
+        init() {
+            if (this.train.hash) {
+                this.form.hash = this.train.hash;
+            }
+
+            if (this.train.hash_signed) {
+                this.form.hash_signed = this.train.hash_signed;
+            }
+        },
         async generate() {
             if (this.busy) return;
 

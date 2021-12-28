@@ -6,15 +6,9 @@
   -->
 <script>
 import { ProposalStationApprovalStatus } from '@personalhealthtrain/ui-common';
-import ProposalStationList from '../../../components/domains/proposal-station/ProposalStationList';
-import ProposalStationAction from '../../../components/domains/proposal-station/ProposalStationAction';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {
-    components: {
-        ProposalStationAction,
-        ProposalStationList,
-    },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,

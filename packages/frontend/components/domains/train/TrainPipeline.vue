@@ -6,18 +6,17 @@
   -->
 <script>
 import {
+    PermissionID,
     TrainBuildStatus,
     TrainConfigurationStatus,
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/ui-common';
-import Vue from 'vue';
 import TrainResultCommand from './command/TrainResultCommand';
 import TrainBuildStatusText from './status/TrainBuildStatusText';
 import TrainBuildCommand from './command/TrainBuildCommand';
 import TrainRunStatusText from './status/TrainRunStatusText';
 import TrainRunCommand from './command/TrainRunCommand';
-import TrainResultStatusIcon from '../train-result/status/TrainResultStatusIcon';
 import TrainResultStatusText from '../train-result/status/TrainResultStatusText';
 
 import { FrontendTrainCommand } from '../../../domains/train/type';
@@ -28,7 +27,6 @@ export default {
         TrainResultCommand,
         TrainConfigurationStatusText,
         TrainResultStatusText,
-        TrainResultStatusIcon,
         TrainRunCommand,
         TrainRunStatusText,
         TrainBuildCommand,
@@ -43,12 +41,10 @@ export default {
             type: Boolean,
             default: true,
         },
-        trainProperty: Object,
+        entity: Object,
     },
     data() {
         return {
-            train: null,
-
             trainBuildStatus: TrainBuildStatus,
             trainConfigurationStatus: TrainConfigurationStatus,
             trainRunStatus: TrainRunStatus,
@@ -60,25 +56,19 @@ export default {
     },
     computed: {
         canEdit() {
-            return this.$auth.can('edit', 'train');
+            return this.$auth.hasPermission(PermissionID.TRAIN_EDIT);
         },
 
         // ---------------------------------------------------------
 
         canConfigure() {
-            return this.canEdit && this.train.configuration_status !== TrainConfigurationStatus.FINISHED;
+            return this.canEdit &&
+                this.entity.configuration_status !== TrainConfigurationStatus.FINISHED;
         },
     },
-    created() {
-        this.train = this.trainProperty;
-    },
     methods: {
-        handleDone(train) {
-            for (const key in train) {
-                Vue.set(this.train, key, train[key]);
-            }
-
-            this.$emit('done', train);
+        handleUpdated(item) {
+            this.$emit('updated', item);
         },
         handleFailed(e) {
             this.$emit('failed', e);
@@ -105,7 +95,7 @@ export default {
                 <strong>1. Config</strong>
             </div>
             <div>
-                Status: <train-configuration-status-text :status="train.configuration_status" />
+                Status: <train-configuration-status-text :status="entity.configuration_status" />
             </div>
             <div
                 v-if="withCommand"
@@ -115,7 +105,7 @@ export default {
                     v-if="canConfigure"
                     class="btn btn-xs btn-primary"
                     type="button"
-                    :to="'/trains/'+train.id+'/wizard'"
+                    :to="'/trains/'+entity.id+'/wizard'"
                 >
                     <i class="fas fa-cog pr-1" /> setup
                 </nuxt-link>
@@ -133,15 +123,15 @@ export default {
                 <strong>2. Build</strong>
             </div>
             <div>
-                Status: <train-build-status-text :status="train.build_status" />
+                Status: <train-build-status-text :status="entity.build_status" />
                 <train-build-command
                     class="ml-1"
                     :command="trainCommand.BUILD_STATUS"
                     :element-type="'link'"
                     :with-text="false"
                     :with-icon="true"
-                    :train="train"
-                    @done="handleDone"
+                    :train="entity"
+                    @done="handleUpdated"
                     @failed="handleFailed"
                 />
             </div>
@@ -153,15 +143,15 @@ export default {
                     class="mr-1"
                     :command="trainCommand.BUILD_START"
                     :with-icon="true"
-                    :train="train"
-                    @done="handleDone"
+                    :train="entity"
+                    @done="handleUpdated"
                     @failed="handleFailed"
                 />
                 <train-build-command
                     :command="trainCommand.BUILD_STOP"
                     :with-icon="true"
-                    :train="train"
-                    @done="handleDone"
+                    :train="entity"
+                    @done="handleUpdated"
                     @failed="handleFailed"
                 />
             </div>
@@ -178,15 +168,15 @@ export default {
                 <strong>3. Run</strong>
             </div>
             <div>
-                Status: <train-run-status-text :status="train.run_status" />
+                Status: <train-run-status-text :status="entity.run_status" />
                 <train-run-command
                     class="ml-1"
                     :command="trainCommand.RUN_STATUS"
                     :with-text="false"
                     :with-icon="true"
                     :element-type="'link'"
-                    :train="train"
-                    @done="handleDone"
+                    :train="entity"
+                    @done="handleUpdated"
                     @failed="handleFailed"
                 />
             </div>
@@ -198,15 +188,15 @@ export default {
                     class="mr-1"
                     :command="trainCommand.RUN_START"
                     :with-icon="true"
-                    :train="train"
-                    @done="handleDone"
+                    :train="entity"
+                    @done="handleUpdated"
                     @failed="handleFailed"
                 />
                 <train-run-command
                     :command="trainCommand.RUN_STOP"
                     :with-icon="true"
-                    :train="train"
-                    @done="handleDone"
+                    :train="entity"
+                    @done="handleUpdated"
                     @failed="handleFailed"
                 />
             </div>
@@ -219,15 +209,15 @@ export default {
                 <strong>4. Result</strong>
             </div>
             <div>
-                Status: <train-result-status-text :status="train.result_last_status" />
+                Status: <train-result-status-text :status="entity.result_last_status" />
                 <train-result-command
                     class="ml-1"
                     :command="trainCommand.RESULT_STATUS"
                     :with-text="false"
                     :with-icon="true"
                     :element-type="'link'"
-                    :train="train"
-                    @done="handleDone"
+                    :train="entity"
+                    @done="handleUpdated"
                     @failed="handleFailed"
                 />
             </div>
@@ -238,25 +228,25 @@ export default {
                 <train-result-command
                     class="mr-1"
                     :command="trainCommand.RESULT_DOWNLOAD"
-                    :train-result-id="train.result_last_id"
+                    :train-result-id="entity.result_last_id"
                     :with-icon="true"
-                    :train="train"
-                    @done="handleDone"
+                    :train="entity"
+                    @done="handleUpdated"
                     @failed="handleFailed"
                 />
                 <train-result-command
                     class="mr-1"
                     :command="trainCommand.RESULT_START"
                     :with-icon="true"
-                    :train="train"
-                    @done="handleDone"
+                    :train="entity"
+                    @done="handleUpdated"
                     @failed="handleFailed"
                 />
                 <train-result-command
                     :command="trainCommand.RESULT_STOP"
                     :with-icon="true"
-                    :train="train"
-                    @done="handleDone"
+                    :train="entity"
+                    @done="handleUpdated"
                     @failed="handleFailed"
                 />
             </div>

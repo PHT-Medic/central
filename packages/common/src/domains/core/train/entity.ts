@@ -27,7 +27,10 @@ import { TrainResultStatus } from '../train-result';
 import { TrainStation } from '../train-station';
 import {
     TrainBuildErrorCode,
-    TrainBuildStatus, TrainConfigurationStatus, TrainRunErrorCode, TrainRunStatus,
+    TrainBuildStatus,
+    TrainConfigurationStatus,
+    TrainRunErrorCode,
+    TrainRunStatus,
 } from './constants';
 
 @Entity()
@@ -61,6 +64,9 @@ export class Train {
     @JoinColumn({ name: 'entrypoint_file_id' })
         entrypoint_file: TrainFile;
 
+    @Column({ type: 'int', unsigned: true, default: 0 })
+        stations: number;
+
     // ------------------------------------------------------------------
 
     @Column({
@@ -73,7 +79,15 @@ export class Train {
     setConfigurationStatus() {
         this.configuration_status = null;
 
-        if (this.master_image_id || this.entrypoint_file_id) {
+        if (this.stations > 0) {
+            this.configuration_status = TrainConfigurationStatus.BASE_CONFIGURED;
+        } else {
+            this.entrypoint_file_id = null;
+            this.hash = null;
+            this.hash_signed = null;
+        }
+
+        if (this.entrypoint_file_id) {
             this.configuration_status = TrainConfigurationStatus.RESOURCE_CONFIGURED;
         }
 
@@ -88,6 +102,8 @@ export class Train {
         // check if all conditions are met
         if (this.hash_signed && this.hash) {
             this.configuration_status = TrainConfigurationStatus.FINISHED;
+
+            this.build_status = null;
             this.run_status = null;
         }
     }

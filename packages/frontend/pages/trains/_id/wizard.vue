@@ -24,7 +24,7 @@ export default {
 </script>
 <template>
     <train-wizard
-        :train-property="train"
+        :entity="train"
         @updated="handleUpdated"
     />
 </template>

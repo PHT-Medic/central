@@ -6,7 +6,7 @@
  */
 
 import { getRepository } from 'typeorm';
-import { applyFilters, applyPagination } from 'typeorm-extension';
+import { applyFilters, applyPagination, applyRelations } from 'typeorm-extension';
 import { check, matchedData, validationResult } from 'express-validator';
 import {
     PermissionID, Proposal,
@@ -16,7 +16,7 @@ import {
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
-import { ResponseExample, SwaggerTags } from '@trapi/swagger';
+import { SwaggerTags } from '@trapi/swagger';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { DispatcherProposalEvent, emitDispatcherProposalEvent } from '../../../domains/core/proposal/queue';
 
@@ -27,25 +27,32 @@ import { ExpressValidationError } from '../../../config/http/error/validation';
 
 export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     // tslint:disable-next-line:prefer-const
-    const { filter, page } = req.query;
+    const { filter, page, include } = req.query;
 
     const repository = getRepository(ProposalStation);
-    const query = await repository.createQueryBuilder('proposalStation')
-        .leftJoinAndSelect('proposalStation.station', 'station')
-        .leftJoinAndSelect('proposalStation.proposal', 'proposal');
+    const query = await repository.createQueryBuilder('proposalStation');
 
     onlyRealmPermittedQueryResources(query, req.realmId, [
-        'station.realm_id',
-        'proposal.realm_id',
+        'proposalStation.station_realm_id',
+        'proposalStation.proposal_realm_id',
     ]);
 
-    // todo: relation definition should not be required, undefined -> allow all
+    const relations = applyRelations(query, include, {
+        allowed: ['station', 'proposal'],
+        defaultAlias: 'proposalStation',
+    });
+
     applyFilters(query, filter, {
-        relations: [{
-            key: 'proposalStation.station',
-            value: 'station',
-        }],
-        allowed: ['proposal_id', 'station_id', 'station.name', 'station.realm_id', 'proposal.id'],
+        relations,
+        allowed: [
+            'proposal_id',
+            'proposal.id',
+            'proposal.title',
+
+            'station_id',
+            'station.name',
+            'station.realm_id',
+        ],
         defaultAlias: 'proposalStation',
     });
 
@@ -66,17 +73,26 @@ export async function getManyRouteHandler(req: ExpressRequest, res: ExpressRespo
 
 export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
+    const { include } = req.query;
 
     const repository = getRepository(ProposalStation);
-    const entity = await repository.findOne(id, { relations: ['station', 'proposal'] });
+    const query = repository.createQueryBuilder('proposalStation')
+        .where('proposalStation.id = :id', { id });
+
+    applyRelations(query, include, {
+        allowed: ['station', 'proposal'],
+        defaultAlias: 'proposalStation',
+    });
+
+    const entity = await query.getOne();
 
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
     if (
-        !isPermittedForResourceRealm(req.realmId, entity.station.realm_id) &&
-        !isPermittedForResourceRealm(req.realmId, entity.proposal.realm_id)
+        !isPermittedForResourceRealm(req.realmId, entity.station_realm_id) &&
+        !isPermittedForResourceRealm(req.realmId, entity.proposal_realm_id)
     ) {
         throw new ForbiddenError();
     }
@@ -169,14 +185,14 @@ export async function editRouteHandler(req: ExpressRequest, res: ExpressResponse
     }
 
     const isAuthorityOfStation = isPermittedForResourceRealm(req.realmId, proposalStation.station_realm_id);
-    const isAuthorizedForStation = req.ability.can('approve', 'proposal');
+    const isAuthorizedForStation = req.ability.hasPermission(PermissionID.PROPOSAL_APPROVE);
 
-    const isAuthorityOfRealm = isPermittedForResourceRealm(req.realmId, proposalStation.proposal_realm_id);
-    const isAuthorizedForRealm = req.ability.can('edit', 'proposal');
+    const isAuthorityOfProposal = isPermittedForResourceRealm(req.realmId, proposalStation.proposal_realm_id);
+    const isAuthorizedForProposal = req.ability.hasPermission(PermissionID.PROPOSAL_EDIT);
 
     if (
         !(isAuthorityOfStation && isAuthorizedForStation) &&
-        !(isAuthorityOfRealm && isAuthorizedForRealm)
+        !(isAuthorityOfProposal && isAuthorizedForProposal)
     ) {
         throw new ForbiddenError();
     }
@@ -255,15 +271,11 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
 }
 
 type PartialProposalStation = Partial<ProposalStation>;
-const simpleExample = {
-    proposal_id: 1, station_id: 1, comment: 'Looks good to me', status: ProposalStationApprovalStatus.APPROVED,
-};
 
 @SwaggerTags('pht')
 @Controller('/proposal-stations')
 export class ProposalStationController {
     @Get('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposalStation[]>([simpleExample])
     async getMany(
         @Request() req: any,
             @Response() res: any,
@@ -272,7 +284,6 @@ export class ProposalStationController {
     }
 
     @Post('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposalStation>(simpleExample)
     async add(
         @Body() data: Pick<ProposalStation, 'station_id' | 'proposal_id'>,
             @Request() req: any,
@@ -282,7 +293,6 @@ export class ProposalStationController {
     }
 
     @Get('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposalStation>(simpleExample)
     async getOne(
         @Params('id') id: string,
             @Request() req: any,
@@ -292,10 +302,9 @@ export class ProposalStationController {
     }
 
     @Post('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposalStation>(simpleExample)
     async edit(
         @Params('id') id: string,
-            @Body() data: Pick<ProposalStation, 'station_id' | 'proposal_id' | 'comment'>,
+            @Body() data: Pick<ProposalStation, 'station_id' | 'proposal_id' | 'comment' | 'approval_status'>,
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialProposalStation | undefined> {
@@ -303,7 +312,6 @@ export class ProposalStationController {
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposalStation>(simpleExample)
     async drop(
         @Params('id') id: string,
             @Request() req: any,

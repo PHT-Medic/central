@@ -5,18 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { In, getRepository } from 'typeorm';
+import { getRepository } from 'typeorm';
 import {
     applyFilters, applyPagination, applyRelations, applySort,
 } from 'typeorm-extension';
 import {
     MasterImage,
     PermissionID, Proposal,
-    Station,
-    isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources,
+    isPermittedForResourceRealm, onlyRealmPermittedQueryResources,
 } from '@personalhealthtrain/ui-common';
-import { check, matchedData, validationResult } from 'express-validator';
+import { check, validationResult } from 'express-validator';
 
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
@@ -26,6 +24,7 @@ import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { ExpressValidationError } from '../../../config/http/error/validation';
+import { matchedValidationData } from '../../../modules/express-validator';
 
 export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -130,7 +129,7 @@ export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse)
         throw new ExpressValidationError(validation);
     }
 
-    const data : Partial<Proposal> = matchedData(req, { includeOptionals: false });
+    const data : Partial<Proposal> = matchedValidationData(req);
 
     const repository = getRepository(Proposal);
     const entity = repository.create({
@@ -183,7 +182,7 @@ async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
         throw new ExpressValidationError(validation);
     }
 
-    const data = matchedData(req);
+    const data = matchedValidationData(req);
     if (!data) {
         return res.respondAccepted();
     }
@@ -226,7 +225,7 @@ async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
         throw new ForbiddenError();
     }
 
-    await repository.delete(entity.id);
+    await repository.remove(entity);
 
     return res.respondDeleted({ data: entity });
 }

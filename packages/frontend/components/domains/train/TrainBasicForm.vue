@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { TrainType, addAPITrain, getProposals } from '@personalhealthtrain/ui-common';
+import { TrainType, addAPITrain } from '@personalhealthtrain/ui-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 import ProposalList from '../proposal/ProposalList';
 
@@ -40,16 +40,6 @@ export default {
         };
     },
     computed: {
-        isDiscoveryTrain() {
-            return this.formData.type === TrainType.DISCOVERY;
-        },
-        isAnalyseTrain() {
-            return this.formData.type === TrainType.ANALYSE;
-        },
-
-        proposalFixed() {
-            return typeof this.proposalId !== 'undefined';
-        },
         proposalQuery() {
             return {
                 filter: {
@@ -184,7 +174,7 @@ export default {
                 </div>
             </div>
             <div
-                v-if="!proposalFixed"
+                v-if="!proposalId"
                 class="col"
             >
                 <proposal-list :query="proposalQuery">

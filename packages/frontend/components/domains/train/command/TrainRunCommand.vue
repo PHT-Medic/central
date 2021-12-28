@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    Train, TrainBuildStatus,
+    TrainBuildStatus,
     TrainConfigurationStatus,
     TrainRunStatus,
     runAPITrainCommand,
@@ -58,9 +58,11 @@ export default {
         isEnabled() {
             switch (this.command) {
                 case FrontendTrainCommand.RUN_START:
-                    return !this.train.run_status || [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.train.run_status) !== -1;
+                    return !this.train.run_status ||
+                        [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.train.run_status) !== -1;
                 case FrontendTrainCommand.RUN_STOP:
-                    return this.train.run_status && [TrainRunStatus.STOPPED, TrainRunStatus.FINISHED].indexOf(this.train.run_status) === -1;
+                    return this.train.run_status &&
+                        [TrainRunStatus.STOPPED, TrainRunStatus.FINISHED].indexOf(this.train.run_status) === -1;
                 case FrontendTrainCommand.RUN_STATUS:
                     return true;
             }
@@ -158,6 +160,7 @@ export default {
                 break;
             case 'link':
                 rootElement = 'a';
+                // eslint-disable-next-line no-script-url
                 attributes.domProps.href = 'javascript:void(0)';
                 iconClasses.push(`text-${this.classSuffix}`);
                 break;

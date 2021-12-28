@@ -6,7 +6,12 @@
   -->
 <script>
 import {
-    Train, TrainBuildStatus, TrainRunStatus, TrainStationRunStatus, TrainStationStatic, getAPITrainStations,
+    TrainBuildStatus,
+    TrainRunStatus,
+    TrainStationRunStatus,
+    TrainStationStatic,
+    buildSocketTrainStationRoomName,
+    getAPITrainStations,
 } from '@personalhealthtrain/ui-common';
 import TrainStationRunStatusText from '../status/TrainStationRunStatusText';
 import TrainStationStaticRunStatusText from '../status/TrainStationStaticRunStatusText';
@@ -15,6 +20,10 @@ export default {
     components: { TrainStationStaticRunStatusText, TrainStationRunStatusText },
     props: {
         train: Object,
+        withHeader: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
@@ -53,7 +62,51 @@ export default {
     created() {
         this.load().then((r) => r);
     },
+    mounted() {
+        const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
+        socket.emit('trainStationsSubscribe');
+        socket.on('trainStationCreated', this.handleSocketCreated);
+        socket.on('trainStationDeleted', this.handleSocketDeleted);
+    },
+    beforeDestroy() {
+        const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
+        socket.emit('trainStationsUnsubscribe');
+        socket.off('trainStationCreated', this.handleSocketCreated);
+        socket.off('trainStationDeleted', this.handleSocketDeleted);
+    },
     methods: {
+        handleSocketCreated(context) {
+            if (
+                context.meta.roomName !== buildSocketTrainStationRoomName() ||
+                context.data.train_id !== this.train.id
+            ) return;
+
+            this.handleTrainStationCreated(context.data);
+        },
+        handleSocketDeleted(context) {
+            if (
+                context.meta.roomName !== buildSocketTrainStationRoomName() ||
+                context.data.train_id !== this.train.id
+            ) return;
+
+            this.handleTrainStationDeleted(context.data);
+        },
+
+        handleTrainStationCreated(item) {
+            const index = this.items.findIndex((trainStation) => trainStation.id === item.id);
+            if (index === -1) {
+                this.items.push(item);
+                this.meta.total++;
+            }
+        },
+        handleTrainStationDeleted(item) {
+            const index = this.items.findIndex((trainStation) => trainStation.id === item.id);
+            if (index !== -1) {
+                this.items.splice(index, 1);
+                this.meta.total--;
+            }
+        },
+
         async load() {
             if (this.busy) return;
 

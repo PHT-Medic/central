@@ -27,6 +27,8 @@ export default {
     computed: {
         statusText() {
             switch (this.status) {
+                case TrainConfigurationStatus.BASE_CONFIGURED:
+                    return 'base configured';
                 case TrainConfigurationStatus.RESOURCE_CONFIGURED:
                     return 'files uploaded';
                 case TrainConfigurationStatus.HASH_GENERATED:
@@ -41,9 +43,10 @@ export default {
         },
         classSuffix() {
             switch (this.status) {
+                case TrainConfigurationStatus.BASE_CONFIGURED:
                 case TrainConfigurationStatus.RESOURCE_CONFIGURED:
-                case TrainConfigurationStatus.HASH_GENERATED:
                 case TrainConfigurationStatus.HASH_SIGNED:
+                case TrainConfigurationStatus.HASH_GENERATED:
                     return 'primary';
                 case TrainConfigurationStatus.FINISHED:
                     return 'success';

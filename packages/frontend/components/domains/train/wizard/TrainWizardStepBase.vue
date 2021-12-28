@@ -8,10 +8,8 @@
 import {
     ProposalStationApprovalStatus,
     addAPITrainStation,
-    dropAPITrainStation,
-    editAPITrainStation,
-    getAPITrainStations,
-    getApiProposalStations,
+    buildSocketTrainStationRoomName,
+    dropAPITrainStation, editAPITrainStation, getAPITrainStations,
 } from '@personalhealthtrain/ui-common';
 import { minLength, numeric, required } from 'vuelidate/lib/validators';
 import ProposalStationList from '../../proposal-station/ProposalStationList';
@@ -49,6 +47,9 @@ export default {
                 items: [],
                 busy: false,
             },
+
+            socketLockedId: null,
+            socketLockedStationId: null,
         };
     },
     validations() {
@@ -74,82 +75,68 @@ export default {
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             return this.trainStation.items.sort((a, b) => (a.position > b.position ? 1 : -1));
         },
-        availableProposalStations() {
-            return this.proposalStation.items.filter(
-                (item) => this.trainStation.items.findIndex(
-                    (trainStation) => trainStation.station_id === item.station_id,
-                ) === -1,
-            );
-        },
-        masterImageId() {
-            if (this.train.master_image_id) {
-                return this.train.master_image_id;
-            }
-
-            if (this.train.proposal) {
-                return this.train.proposal.master_image_id;
-            }
-
-            return undefined;
-        },
     },
     created() {
         Promise.resolve()
-            .then(this.initTrain)
-            .then(this.loadTrainStations)
-            .then(this.loadProposalStations);
+            .then(this.loadTrainStations);
+    },
+    mounted() {
+        const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
+        socket.emit('trainStationsSubscribe');
+        socket.on('trainStationCreated', this.handleSocketCreated);
+        socket.on('trainStationDeleted', this.handleSocketDeleted);
+    },
+    beforeDestroy() {
+        const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
+        socket.emit('trainStationsUnsubscribe');
+        socket.off('trainStationCreated', this.handleSocketCreated);
+        socket.off('trainStationDeleted', this.handleSocketDeleted);
     },
     methods: {
+        handleSocketCreated(context) {
+            if (
+                context.meta.roomName !== buildSocketTrainStationRoomName() ||
+                context.data.train_id !== this.train.id ||
+                context.data.station_id === this.socketLockedStationId
+            ) return;
+
+            this.handleTrainStationCreated(context.data);
+        },
+        handleSocketDeleted(context) {
+            if (
+                context.meta.roomName !== buildSocketTrainStationRoomName() ||
+                context.data.train_id !== this.train.id ||
+                context.data.id === this.socketLockedId
+            ) return;
+
+            this.handleTrainStationDeleted(context.data);
+        },
         proposalStationFilter(item) {
             return this.trainStation.items.findIndex((trainStation) => trainStation.station_id === item.station_id) === -1;
         },
-        initTrain() {
-            if (this.train.master_image_id) {
-                this.form.master_image_id = this.train.master_image_id;
-            }
-
-            if (this.train.query) {
-                this.form.query = this.train.query;
-            }
-        },
 
         handleMasterImageSelected(item) {
-            if (item) {
-                this.form.master_image_id = item.id;
-            } else {
-                this.form.master_image_id = '';
-            }
-
             this.$emit('setTrainMasterImage', item);
         },
-
-        setTrainStations() {
-            this.$emit('setTrainStations', this.trainStation.items);
+        handleTrainStationCreated(item) {
+            const index = this.trainStation.items.findIndex((trainStation) => trainStation.id === item.id);
+            if (index === -1) {
+                this.trainStation.items.push(item);
+            }
+        },
+        handleTrainStationDeleted(item) {
+            const index = this.trainStation.items.findIndex((trainStation) => trainStation.id === item.id);
+            if (index !== -1) {
+                this.trainStation.items.splice(index, 1);
+            }
+        },
+        handleProposalStationDeleted(item) {
+            const index = this.trainStation.items.findIndex((trainStation) => trainStation.station_id === item.station_id);
+            if (index !== -1) {
+                this.trainStation.items.splice(index, 1);
+            }
         },
 
-        async loadProposalStations() {
-            if (this.proposalStation.busy) return;
-
-            if (typeof this.train.proposal_id === 'undefined') {
-                return;
-            }
-
-            this.proposalStation.busy = true;
-
-            try {
-                const response = await getApiProposalStations({
-                    filter: {
-                        proposal_id: this.train.proposal_id,
-                    },
-                });
-
-                this.proposalStation.items = response.data;
-            } catch (e) {
-                console.log(e);
-            }
-
-            this.proposalStation.busy = false;
-        },
         async loadTrainStations() {
             if (this.trainStation.busy) return;
 
@@ -166,7 +153,6 @@ export default {
                 });
 
                 this.trainStation.items = response.data;
-                this.setTrainStations();
             } catch (e) {
                 // ...
             }
@@ -179,37 +165,34 @@ export default {
             this.trainStation.busy = true;
 
             try {
+                this.socketLockedStationId = stationId;
+
                 const trainStation = await addAPITrainStation({
                     train_id: this.train.id,
                     station_id: stationId,
                     position: this.trainStation.items.length,
                 });
 
-                const index = this.proposalStation.items.findIndex((proposalStation) => proposalStation.station_id === stationId);
-                if (index !== -1) {
-                    trainStation.station = this.proposalStation.items[index].station;
-                    this.trainStation.items.push(trainStation);
-                    this.setTrainStations();
-                }
+                this.socketLockedStationId = null;
+
+                this.handleTrainStationCreated(trainStation);
             } catch (e) {
                 // ...
             }
 
             this.trainStation.busy = false;
         },
-        async dropTrainStation(trainStationId) {
+        async dropTrainStation(item) {
             if (this.trainStation.busy) return;
 
             this.trainStation.busy = true;
 
             try {
-                await dropAPITrainStation(trainStationId);
+                this.socketLockedId = item.id;
+                await dropAPITrainStation(item.id);
 
-                const index = this.trainStation.items.findIndex((trainStation) => trainStation.id === trainStationId);
-                if (index !== -1) {
-                    this.trainStation.items.splice(index, 1);
-                }
-                this.setTrainStations();
+                this.handleTrainStationDeleted(item);
+                this.socketLockedId = null;
             } catch (e) {
                 console.log(e);
             }
@@ -266,8 +249,6 @@ export default {
                     default:
                         return;
                 }
-
-                this.setTrainStations();
             } catch (e) {
                 console.log(e);
             }
@@ -283,12 +264,12 @@ export default {
             <h6>MasterImage</h6>
             <div class="mb-2">
                 <master-image-picker
-                    :master-image-id="masterImageId"
+                    :master-image-id="train.master_image_id"
                     @selected="handleMasterImageSelected"
                 />
 
                 <div
-                    v-if="!$v.form.master_image_id.required"
+                    v-if="!train.master_image_id"
                     class="form-group-hint group-required"
                 >
                     Please select a master image.
@@ -304,7 +285,9 @@ export default {
                 <div class="col-12 col-xl-6">
                     <proposal-station-list
                         :proposal-id="train.proposal_id"
+                        :realm-id="train.realm_id"
                         :filter="proposalStationFilter"
+                        @deleted="handleProposalStationDeleted"
                     >
                         <template #header>
                             <span>Stations <span class="text-info">available</span></span>
@@ -327,20 +310,27 @@ export default {
 
                     <div class="c-list">
                         <div
-                            v-for="(item,key) in selectedTrainStations"
-                            :key="key"
+                            v-for="(item, key) in selectedTrainStations"
+                            :key="item.id"
                             class="c-list-item mb-2"
                         >
                             <div class="c-list-content align-items-center">
                                 <div class="c-list-icon">
                                     <i class="fa fa-hospital" />
                                 </div>
-                                <span class="mb-0">{{ item.station.name }}</span>
+                                <span class="mb-0">
+                                    <template v-if="item.station">
+                                        {{ item.station.name }}
+                                    </template>
+                                    <template v-else>
+                                        Station #{{ item.station_id }}
+                                    </template>
+                                </span>
                                 <div class="ml-auto">
                                     <button
                                         type="button"
                                         class="btn btn-danger btn-xs"
-                                        @click.prevent="dropTrainStation(item.id)"
+                                        @click.prevent="dropTrainStation(item)"
                                     >
                                         <i class="fa fa-minus" />
                                     </button>

@@ -20,8 +20,8 @@ export async function getApiProposalStations(data?: BuildInput<ProposalStation>)
     return response.data;
 }
 
-export async function getApiProposalStation(id: number | string) : Promise<SingleResourceResponse<ProposalStation>> {
-    const response = await useAPI(APIType.DEFAULT).get(`proposal-stations/${id}`);
+export async function getApiProposalStation(id: number | string, data?: BuildInput<ProposalStation>) : Promise<SingleResourceResponse<ProposalStation>> {
+    const response = await useAPI(APIType.DEFAULT).get(`proposal-stations/${id}${buildQuery(data)}`);
 
     return response.data;
 }

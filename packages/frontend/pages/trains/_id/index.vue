@@ -17,7 +17,7 @@ export default {
         },
     },
     methods: {
-        handleDone(train) {
+        handleUpdated(train) {
             this.$emit('updated', train);
         },
         handleFailed(e) {
@@ -34,8 +34,8 @@ export default {
                 <h6><i class="fa fa-list" /> Pipeline</h6>
 
                 <train-pipeline
-                    :train-property="train"
-                    @done="handleDone"
+                    :entity="train"
+                    @updated="handleUpdated"
                     @failed="handleFailed"
                 />
             </div>

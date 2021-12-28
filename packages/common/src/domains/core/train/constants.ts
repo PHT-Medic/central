@@ -30,6 +30,7 @@ export enum TrainBuildErrorCode {
 // -------------------------------------------------------------------------
 
 export enum TrainConfigurationStatus {
+    BASE_CONFIGURED = 'base',
     RESOURCE_CONFIGURED = 'resource_configured',
     HASH_GENERATED = 'hash_generated',
     HASH_SIGNED = 'hash_signed',

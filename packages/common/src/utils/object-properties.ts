@@ -18,3 +18,15 @@ export function nullifyEmptyObjectProperties(data) {
 
     return data;
 }
+
+export function deleteUndefinedObjectProperties<T extends Record<string, any>>(data: T) : T {
+    const keys : string[] = Object.keys(data);
+
+    for (let i = 0; i < keys.length; i++) {
+        if (typeof data[keys[i]] === 'undefined') {
+            delete data[keys[i]];
+        }
+    }
+
+    return data;
+}

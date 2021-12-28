@@ -9,5 +9,5 @@ export * from './has-own-property';
 export * from './hex-checker';
 export * from './merge-deep';
 export * from './nanoid';
-export * from './nullify-properties';
+export * from './object-properties';
 export * from './proxy-connection-string';

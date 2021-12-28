@@ -42,6 +42,15 @@ export default {
             return !!this.groupVirtualPath;
         },
     },
+    watch: {
+        async masterImageId(val, oldVal) {
+            if (this.loading) return;
+
+            if (val && val !== oldVal) {
+                await this.init();
+            }
+        },
+    },
     created() {
         Promise.resolve()
             .then(this.loadGroups)
@@ -49,24 +58,24 @@ export default {
     },
     methods: {
         async init() {
-            if (this.masterImageId) {
-                this.loading = true;
+            if (!this.masterImageId) return;
 
-                try {
-                    const data = await getAPIMasterImage(this.masterImageId, {
-                        relations: {
-                            group: true,
-                        },
-                    });
+            this.loading = true;
 
-                    await this.selectGroup(data.group_virtual_path);
-                    await this.selectImage(data.id);
-                } catch (e) {
-                    // ...
-                }
+            try {
+                const data = await getAPIMasterImage(this.masterImageId, {
+                    relations: {
+                        group: true,
+                    },
+                });
 
-                this.loading = false;
+                await this.selectGroup(data.group_virtual_path);
+                await this.selectImage(data.id);
+            } catch (e) {
+                // ...
             }
+
+            this.loading = false;
         },
         async loadImages() {
             if (this.image.busy) return;

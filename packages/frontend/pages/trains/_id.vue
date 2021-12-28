@@ -44,7 +44,7 @@ export default {
             ],
         };
     },
-    created() {
+    mounted() {
         const socket = this.$socket.useRealmWorkspace(this.item.realm_id);
         socket.emit('trainsSubscribe', { id: this.item.id });
         socket.on('trainUpdated', this.handleSocketUpdated);

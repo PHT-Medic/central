@@ -167,9 +167,9 @@ export default {
         </div>
 
         <train-pipeline
-            :train-property="train"
+            :entity="train"
             :with-command="extendView"
-            @done="handleUpdated"
+            @updated="handleUpdated"
             @failed="handleFailed"
             @deleted="handleDeleted"
         />

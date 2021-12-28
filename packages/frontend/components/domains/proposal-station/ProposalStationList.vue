@@ -8,7 +8,11 @@
 import {
     PermissionID,
     addApiProposalStation,
-    dropApiProposalStation, getApiProposalStations, mergeDeep,
+    buildSocketProposalStationRoomName,
+    dropApiProposalStation,
+    getApiProposalStation,
+    getApiProposalStations,
+    mergeDeep,
 } from '@personalhealthtrain/ui-common';
 
 import Vue from 'vue';
@@ -23,13 +27,17 @@ export default {
         Pagination,
     },
     props: {
-        proposalId: Number | String,
+        proposalId: Number,
         filter: Function,
         query: {
             type: Object,
             default() {
                 return {};
             },
+        },
+        realmId: {
+            type: String,
+            default: undefined,
         },
     },
     data() {
@@ -43,6 +51,9 @@ export default {
                 total: 0,
             },
             itemBusy: false,
+
+            socketLockedId: null,
+            socketLockedStationId: null,
         };
     },
     computed: {
@@ -52,13 +63,6 @@ export default {
             }
 
             return this.items.filter(this.filter);
-        },
-        isProposalOwner() {
-            if (this.formattedItems.length === 0) {
-                return false;
-            }
-
-            return this.$store.getters['auth/userRealmId'] === this.formattedItems[0].proposal.realm_id;
         },
         canEdit() {
             return this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT);
@@ -80,7 +84,57 @@ export default {
     created() {
         this.load();
     },
+    mounted() {
+        const socket = this.$socket.useRealmWorkspace(this.realmId);
+        socket.emit('proposalStationsSubscribe');
+        socket.on('proposalStationCreated', this.handleSocketCreated);
+        socket.on('proposalStationDeleted', this.handleSocketDeleted);
+    },
+    beforeDestroy() {
+        const socket = this.$socket.useRealmWorkspace(this.realmId);
+        socket.emit('proposalStationsUnsubscribe');
+        socket.off('proposalStationCreated', this.handleSocketCreated);
+        socket.off('proposalStationDeleted', this.handleSocketDeleted);
+    },
     methods: {
+        async handleSocketCreated(context) {
+            if (
+                context.meta.roomName !== buildSocketProposalStationRoomName() ||
+                context.data.proposal_id !== this.proposalId ||
+                context.data.station_id === this.socketLockedStationId
+            ) return;
+
+            const index = this.items.findIndex((item) => item.id === context.data.id);
+            if (index === -1) {
+                this.items.push(context.data);
+                this.meta.total++;
+
+                const data = await getApiProposalStation(context.data.id, {
+                    include: {
+                        station: true,
+                    },
+                });
+
+                this.editArrayItem(data);
+            }
+
+            this.$emit('created', context.data);
+        },
+        handleSocketDeleted(context) {
+            if (
+                context.meta.roomName !== buildSocketProposalStationRoomName() ||
+                context.data.proposal_id !== this.proposalId ||
+                context.data.id === this.socketLockedId
+            ) return;
+
+            const index = this.items.findIndex((item) => item.id === context.data.id);
+            if (index !== -1) {
+                this.items.splice(index, 1);
+                this.meta.total--;
+            }
+
+            this.$emit('deleted', context.data);
+        },
         async load() {
             if (this.busy) return;
 
@@ -93,6 +147,9 @@ export default {
                         station: {
                             name: this.q.length > 0 ? `~${this.q}` : this.q,
                         },
+                    },
+                    include: {
+                        station: true,
                     },
                     page: {
                         limit: this.meta.limit,
@@ -116,10 +173,14 @@ export default {
             this.itemBusy = true;
 
             try {
+                this.socketLockedId = id;
+
                 await dropApiProposalStation(id);
                 this.dropArrayItem({ id });
 
                 this.$emit('deleted', id);
+
+                this.socketLockedId = null;
             } catch (e) {
                 console.log(e);
             }
@@ -132,6 +193,8 @@ export default {
             this.itemBusy = true;
 
             try {
+                this.socketLockedStationId = station.id;
+
                 const proposalStation = await addApiProposalStation({
                     proposal_id: this.proposalId,
                     station_id: station.id,
@@ -142,6 +205,8 @@ export default {
                 this.items.push(proposalStation);
 
                 this.$emit('created', proposalStation);
+
+                this.socketLockedStationId = null;
             } catch (e) {
                 console.log(e);
             }
@@ -202,7 +267,7 @@ export default {
                 <div class="ml-auto">
                     <slot name="header-actions">
                         <button
-                            v-if="isProposalOwner && canEdit"
+                            v-if="canEdit"
                             type="button"
                             class="btn btn-success btn-xs"
                             @click.prevent="showModal"
@@ -230,15 +295,22 @@ export default {
         </div>
         <div class="c-list">
             <div
-                v-for="(item,key) in formattedItems"
-                :key="key"
+                v-for="(item) in formattedItems"
+                :key="item.id"
                 class="c-list-item mb-2"
             >
                 <div class="c-list-content align-items-center">
                     <div class="c-list-icon">
                         <i class="fa fa-hospital" />
                     </div>
-                    <span class="mb-0">{{ item.station.name }}</span>
+                    <span class="mb-0">
+                        <template v-if="item.station">
+                            {{ item.station.name }}
+                        </template>
+                        <template v-else>
+                            Station #{{ item.station_id }}
+                        </template>
+                    </span>
                     <proposal-station-approval-status-text
                         v-slot="slotProps"
                         :status="item.approval_status"
@@ -259,7 +331,7 @@ export default {
                             :drop="drop"
                         >
                             <button
-                                v-if="isProposalOwner && canEdit"
+                                v-if="canEdit"
                                 type="button"
                                 class="btn btn-danger btn-xs"
                                 @click.prevent="drop(item.id)"

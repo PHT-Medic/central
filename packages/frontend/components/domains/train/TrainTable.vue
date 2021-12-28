@@ -5,7 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { dropAPITrain, getAPITrains, mergeDeep } from '@personalhealthtrain/ui-common';
+import {
+    buildSocketTrainRoomName, getAPITrains, mergeDeep,
+} from '@personalhealthtrain/ui-common';
 import AlertMessage from '../../alert/AlertMessage';
 import Pagination from '../../Pagination';
 import TrainCard from './TrainCard';
@@ -83,21 +85,19 @@ export default {
     },
     methods: {
         handleSocketCreated(context) {
-            if (context.meta.roomName !== 'trains') return;
+            if (context.meta.roomName !== buildSocketTrainRoomName()) return;
 
             if (
                 this.queryFinal.sort.created_at === 'DESC' &&
                 this.meta.offset === 0
             ) {
-                this.items.unshift(context.data);
+                this.items.splice(0, 0, context.data);
 
                 if (this.items.length > this.meta.total) {
                     this.items.splice(this.meta.length, 1);
                 }
 
                 this.meta.total++;
-
-                this.$forceUpdate();
             }
         },
         async load() {
