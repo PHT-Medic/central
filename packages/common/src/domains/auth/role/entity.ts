@@ -25,11 +25,6 @@ export class Role {
     @Index({ unique: true })
         name: string;
 
-    @Column({
-        type: 'varchar', length: 100, nullable: true, default: null,
-    })
-        provider_role_id: string;
-
     @CreateDateColumn()
         created_at: string;
 

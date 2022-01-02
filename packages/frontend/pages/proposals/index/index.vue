@@ -5,8 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID, dropProposal, getProposals } from '@personalhealthtrain/ui-common';
-import Pagination from '../../../components/Pagination';
+import { PermissionID } from '@personalhealthtrain/ui-common';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 import ProposalList from '../../../components/domains/proposal/ProposalList';
 

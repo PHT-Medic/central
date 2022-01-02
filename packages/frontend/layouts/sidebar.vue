@@ -5,12 +5,23 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import Countdown from '../components/Countdown';
+
 export default {
-    components: {},
+    components: { Countdown },
     computed: {
         loggedIn(vm) {
             return vm.$store.getters['auth/loggedIn'];
         },
+        token() {
+            return this.$store.getters['auth/token'];
+        },
+        tokenExpiresIn() {
+            if (!this.token) return 0;
+
+            return (new Date(this.token.expire_date)).getTime() - (new Date()).getTime();
+        },
+
         docsUrl() {
             return new URL('docs/', this.$config.apiUrl).href;
         },
@@ -31,6 +42,24 @@ export default {
         />
 
         <div class="mt-auto">
+            <div
+                v-if="loggedIn"
+                class="font-weight-light d-flex flex-column ml-3 mr-3 mb-1 mt-auto"
+            >
+                <small
+                    class="text-muted"
+                >
+                    <countdown
+                        :time="tokenExpiresIn"
+                    >
+                        <template slot-scope="props">
+                            <i class="fa fa-clock pr-1" /> The session expires in
+                            <span class="text-success">{{ props.minutes }} minute(s), {{ props.seconds }} second(s)</span>.
+                        </template>
+                    </countdown>
+                </small>
+            </div>
+
             <ul class="sidebar-menu nav-items navbar-nav">
                 <li class="nav-item">
                     <div class="nav-separator">

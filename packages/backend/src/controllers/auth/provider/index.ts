@@ -6,34 +6,48 @@
  */
 
 import { getRepository } from 'typeorm';
-import { applyFields, applyFilters, applyPagination } from 'typeorm-extension';
-import { check, matchedData, validationResult } from 'express-validator';
+import {
+    applyFields, applyFilters, applyPagination, applyRelations,
+} from 'typeorm-extension';
+import { check, validationResult } from 'express-validator';
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
 import { SwaggerHidden, SwaggerTags } from '@trapi/swagger';
-import { OAuth2Provider, PermissionID, Realm } from '@personalhealthtrain/ui-common';
-import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import {
+    MASTER_REALM_ID, OAuth2Provider, PermissionID, Realm,
+} from '@personalhealthtrain/ui-common';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { authorizeCallbackRoute, authorizeUrlRoute } from './authorize';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { ExpressValidationError } from '../../../config/http/error/validation';
+import { matchedValidationData } from '../../../modules/express-validator';
 
-export async function getProvidersRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { page, filter, fields } = req.query;
+export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    const {
+        page, filter, fields, include,
+    } = req.query;
 
     const repository = getRepository(OAuth2Provider);
 
-    const query = repository.createQueryBuilder('provider')
-        .leftJoinAndSelect('provider.realm', 'realm');
+    const query = repository.createQueryBuilder('provider');
 
-    applyFilters(query, filter, {
+    const relations = applyRelations(query, include, {
         defaultAlias: 'provider',
-        allowed: ['realm_id'],
+        allowed: ['realm'],
     });
 
-    // todo: allow realm owner view of client_secret
-    if (!req.user || !req.ability.can('edit', 'realm')) {
+    applyFilters(query, filter, {
+        relations,
+        defaultAlias: 'provider',
+        allowed: ['realm_id', 'realm.name'],
+    });
+
+    if (
+        req.ability &&
+        req.ability.hasPermission(PermissionID.REALM_EDIT)
+    ) {
         applyFields(
             query,
             fields,
@@ -61,18 +75,24 @@ export async function getProvidersRoute(req: ExpressRequest, res: ExpressRespons
 
 // ---------------------------------------------------------------------------------
 
-export async function getProviderRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { fields } = req.query;
+export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+    const { fields, include } = req.query;
     const { id } = req.params;
 
     const repository = getRepository(OAuth2Provider);
 
     const query = repository.createQueryBuilder('provider')
-        .leftJoinAndSelect('provider.realm', 'realm')
         .where('provider.id = :id', { id });
 
-    // todo: allow realm owner view of client_secret
-    if (!req.user || !req.ability.hasPermission(PermissionID.REALM_EDIT)) {
+    applyRelations(query, include, {
+        defaultAlias: 'provider',
+        allowed: ['realm'],
+    });
+
+    if (
+        req.ability &&
+        req.ability.hasPermission(PermissionID.REALM_EDIT)
+    ) {
         applyFields(
             query,
             fields,
@@ -96,76 +116,130 @@ export async function getProviderRoute(req: ExpressRequest, res: ExpressResponse
 
 // ---------------------------------------------------------------------------------
 
-async function runValidation(req: ExpressRequest) {
-    await check('name').exists().notEmpty().isString()
+async function runValidation(req: ExpressRequest, operation: 'create' | 'update') {
+    await check('name')
+        .exists()
+        .notEmpty()
+        .isString()
         .isLength({ min: 5, max: 30 })
         .run(req);
-    await check('open_id').exists().notEmpty().isBoolean()
+
+    await check('open_id')
+        .exists()
+        .notEmpty()
+        .isBoolean()
         .run(req);
-    await check('token_host').exists().notEmpty().isString()
+
+    await check('token_host')
+        .exists()
+        .notEmpty()
+        .isString()
         .isLength({ min: 5, max: 512 })
         .run(req);
-    await check('token_path').exists().notEmpty().isString()
+
+    await check('token_path')
+        .exists()
+        .notEmpty()
+        .isString()
         .isLength({ min: 5, max: 256 })
         .optional({ nullable: true })
         .run(req);
-    await check('token_revoke_path').exists().notEmpty().isString()
+    await check('token_revoke_path')
+        .exists()
+        .notEmpty()
+        .isString()
         .isLength({ min: 5, max: 256 })
         .optional({ nullable: true })
         .run(req);
-    await check('authorize_host').exists().notEmpty().isString()
+
+    await check('authorize_host')
+        .exists()
+        .notEmpty()
+        .isString()
         .isLength({ min: 5, max: 512 })
         .optional({ nullable: true })
         .run(req);
-    await check('authorize_path').exists().notEmpty().isString()
+
+    await check('authorize_path')
+        .exists()
+        .notEmpty()
+        .isString()
         .isLength({ min: 5, max: 256 })
         .optional({ nullable: true })
         .run(req);
-    await check('scope').exists().notEmpty().isString()
+
+    await check('scope')
+        .exists()
+        .notEmpty()
+        .isString()
         .isLength({ min: 3, max: 512 })
         .optional({ nullable: true })
         .run(req);
-    await check('client_id').exists().notEmpty().isString()
+
+    await check('client_id')
+        .exists()
+        .notEmpty()
+        .isString()
         .isLength({ min: 3, max: 128 })
         .run(req);
-    await check('client_secret').exists().notEmpty().isString()
+
+    await check('client_secret')
+        .exists()
+        .notEmpty()
+        .isString()
         .isLength({ min: 3, max: 128 })
         .optional({ nullable: true })
         .run(req);
-    await check('realm_id').exists().notEmpty().custom((value: any) => getRepository(Realm).findOne(value).then((realm: Realm | undefined) => {
-        if (typeof realm === 'undefined') {
-            throw new Error('Der Realm wurde nicht gefunden.');
-        }
-    }))
-        .run(req);
+
+    if (operation === 'create') {
+        await check('realm_id')
+            .exists()
+            .notEmpty()
+            .isString()
+            .run(req);
+    }
 }
 
 // ---------------------------------------------------------------------------------
 
-export async function addProviderRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.PROVIDER_ADD)) {
         throw new ForbiddenError();
     }
 
-    await runValidation(req);
+    await runValidation(req, 'create');
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
         throw new ExpressValidationError(validation);
     }
 
-    const data = matchedData(req, { includeOptionals: true });
+    const data : Partial<OAuth2Provider> = matchedValidationData(req, { includeOptionals: true });
     if (!data) {
         return res.respondAccepted();
     }
 
-    const providerRepository = getRepository(OAuth2Provider);
+    if (data.realm_id) {
+        const realmRepository = getRepository(Realm);
+        const realm = await realmRepository.findOne(data.realm_id);
 
-    const provider = providerRepository.create(data);
+        if (typeof realm === 'undefined') {
+            throw new BadRequestError('The referenced realm does not exist');
+        }
 
-    await providerRepository.save(provider);
+        if (
+            req.realmId !== data.realm_id &&
+            req.realmId !== MASTER_REALM_ID
+        ) {
+            throw new ForbiddenError('You are not permitted to the create an authentication provider for that realm.');
+        }
+    }
 
-    provider.realm = await getRepository(Realm).findOne(provider.realm_id);
+    const repository = getRepository(OAuth2Provider);
+
+    const provider = repository.create(data);
+
+    await repository.save(provider);
 
     return res.respond({
         data: provider,
@@ -174,54 +248,53 @@ export async function addProviderRoute(req: ExpressRequest, res: ExpressResponse
 
 // ---------------------------------------------------------------------------------
 
-export async function editProviderRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.PROPOSAL_EDIT)) {
+    if (!req.ability.hasPermission(PermissionID.PROVIDER_EDIT)) {
         throw new ForbiddenError();
     }
 
-    await runValidation(req);
+    await runValidation(req, 'update');
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
         throw new ExpressValidationError(validation);
     }
 
-    const data = matchedData(req, { includeOptionals: true });
+    const data : Partial<OAuth2Provider> = matchedValidationData(req, { includeOptionals: true });
     if (!data) {
         return res.respondAccepted();
     }
 
-    const providerRepository = getRepository(OAuth2Provider);
+    const repository = getRepository(OAuth2Provider);
 
-    let provider = await providerRepository.findOne(id);
-    if (typeof provider === 'undefined') {
+    let entity = await repository.findOne(id);
+    if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
-    provider = providerRepository.merge(provider, data);
+    entity = repository.merge(entity, data);
 
-    await providerRepository.save(provider);
-
-    provider.realm = await getRepository(Realm).findOne(provider.realm_id);
+    await repository.save(entity);
 
     return res.respond({
-        data: provider,
+        data: entity,
     });
 }
 
 // ---------------------------------------------------------------------------------
 
-export async function dropProviderRoute(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if (!req.ability.hasPermission(PermissionID.PROVIDER_DROP)) {
         throw new ForbiddenError();
     }
 
-    const userRepository = getRepository(OAuth2Provider);
-    await userRepository.delete(id);
+    const repository = getRepository(OAuth2Provider);
+    const entity = await repository.findOne(id);
+    await repository.remove(entity);
 
     return res.respondDeleted();
 }
@@ -236,7 +309,7 @@ export class ProviderController {
         @Request() req: any,
             @Response() res: any,
     ): Promise<OAuth2Provider[]> {
-        return getProvidersRoute(req, res);
+        return getManyRouteHandler(req, res);
     }
 
     @Get('/:id', [])
@@ -245,7 +318,7 @@ export class ProviderController {
             @Request() req: any,
             @Response() res: any,
     ): Promise<OAuth2Provider> {
-        return getProviderRoute(req, res);
+        return getRouteHandler(req, res);
     }
 
     @Post('/:id', [ForceLoggedInMiddleware])
@@ -255,7 +328,7 @@ export class ProviderController {
             @Request() req: any,
             @Response() res: any,
     ) : Promise<OAuth2Provider> {
-        return editProviderRoute(req, res);
+        return editRouteHandler(req, res);
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
@@ -264,7 +337,7 @@ export class ProviderController {
             @Request() req: any,
             @Response() res: any,
     ) : Promise<OAuth2Provider> {
-        return dropProviderRoute(req, res);
+        return dropRouteHandler(req, res);
     }
 
     @Post('', [ForceLoggedInMiddleware])
@@ -273,7 +346,7 @@ export class ProviderController {
             @Request() req: any,
             @Response() res: any,
     ) : Promise<OAuth2Provider> {
-        return addProviderRoute(req, res);
+        return addRouteHandler(req, res);
     }
 
     // ------------------------------------------------------------

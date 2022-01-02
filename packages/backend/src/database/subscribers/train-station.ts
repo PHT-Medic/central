@@ -11,7 +11,7 @@ import {
 import {
     TrainStation,
     buildSocketRealmNamespaceName,
-    buildSocketTrainStationRoomName,
+    buildSocketTrainStationInRoomName, buildSocketTrainStationOutRoomName, buildSocketTrainStationRoomName,
 } from '@personalhealthtrain/ui-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
 
@@ -55,26 +55,34 @@ function publish(
     ];
 
     for (let i = 0; i < workspaces.length; i++) {
+        const roomName = workspaces[i] === buildSocketRealmNamespaceName(item.station_realm_id) ?
+            buildSocketTrainStationInRoomName() :
+            buildSocketTrainStationOutRoomName();
+
         useSocketEmitter()
             .of(workspaces[i])
-            .in(buildSocketTrainStationRoomName())
+            .in(roomName)
             .emit(OperatorEventMap[operation], {
                 data: item,
                 meta: {
-                    roomName: buildSocketTrainStationRoomName(),
+                    roomName,
                 },
             });
     }
 
     if (operation !== 'create') {
         for (let i = 0; i < workspaces.length; i++) {
+            const roomName = workspaces[i] === buildSocketRealmNamespaceName(item.station_realm_id) ?
+                buildSocketTrainStationInRoomName(item.id) :
+                buildSocketTrainStationOutRoomName(item.id);
+
             useSocketEmitter()
                 .of(workspaces[i])
-                .in(buildSocketTrainStationRoomName(item.id))
+                .in(roomName)
                 .emit(OperatorEventMap[operation], {
                     data: item,
                     meta: {
-                        roomName: buildSocketTrainStationRoomName(item.id),
+                        roomName,
                         roomId: item.id,
                     },
                 });

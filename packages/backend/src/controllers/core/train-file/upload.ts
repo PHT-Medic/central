@@ -15,6 +15,7 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-erro
 import { getWritableDirPath } from '../../../config/paths';
 import { createFileStreamHandler } from '../../../modules/file-system/utils';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
+import { getTrainFilesDirectoryPath } from '../../../config/pht/train-file/path';
 
 export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: ExpressResponse) {
     const { id } = req.params;
@@ -28,7 +29,7 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
 
     const repository = getRepository(Train);
 
-    const entity = await repository.findOne(id);
+    let entity = await repository.findOne(id);
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
@@ -39,12 +40,13 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
 
     const files: TrainFile[] = [];
 
-    const trainDirectoryPath = path.resolve(`${getWritableDirPath()}/train-files`);
+    // Group files in a directory to group delete ;)
+    const trainDirectoryPath = getTrainFilesDirectoryPath(entity.id);
 
     try {
         await fs.promises.access(trainDirectoryPath, fs.constants.R_OK | fs.constants.W_OK);
     } catch (e) {
-        fs.mkdirSync(trainDirectoryPath, { mode: 0o770 });
+        await fs.promises.mkdir(trainDirectoryPath, { mode: 0o770, recursive: true });
     }
 
     const promises : Promise<void>[] = [];
@@ -53,7 +55,6 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
         const hash = crypto.createHash('sha256');
 
         hash.update(entity.id);
-
         hash.update(info.filename);
 
         const destinationFileName = hash.digest('hex');
@@ -113,11 +114,12 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
 
         await trainFileRepository.save(files);
 
-        await repository.save(repository.merge(entity, {
-            configuration_status: null,
+        entity = repository.merge(entity, {
             hash: null,
             hash_signed: null,
-        }));
+        });
+
+        await repository.save(entity);
 
         return res.respond({
             data: {

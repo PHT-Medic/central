@@ -15,7 +15,6 @@ export default {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.REALM_ADD,
             PermissionID.REALM_EDIT,
             PermissionID.REALM_DROP,
         ],
@@ -26,6 +25,9 @@ export default {
             mode: 'add',
             isBusy: false,
             fields: [
+                {
+                    key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+                },
                 {
                     key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
                 },
@@ -40,34 +42,12 @@ export default {
             items: [],
         };
     },
-    methods: {
-        async drop(item) {
-            const l = this.$createElement;
-
-            await this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-info m-b-0' }, [
-                l('p', null, [
-                    'Are you sure that you want to delete the realm  ',
-                    l('b', null, [item.name]),
-                    '?',
-                ]),
-            ]), {
-                size: 'sm',
-                buttonSize: 'xs',
-                cancelTitle: 'Abbrechen',
-            })
-                .then((value) => {
-                    if (value) {
-                        return dropAPIRealm(item.id)
-                            .then(() => {
-                                this.$refs['items-list'].dropArrayItem(item);
-                                return value;
-                            });
-                    }
-
-                    return value;
-                }).catch((e) => {
-                    throw e;
-                });
+    computed: {
+        canEdit() {
+            return this.$auth.hasPermission(PermissionID.REALM_EDIT);
+        },
+        canDrop() {
+            return this.$auth.hasPermission(PermissionID.REALM_DROP);
         },
     },
 };
@@ -101,19 +81,20 @@ export default {
             >
                 <template #cell(options)="data">
                     <nuxt-link
-                        v-if="$auth.can('edit','realm')"
+                        v-if="canEdit"
+                        v-b-tooltip="'Overview'"
                         :to="'/admin/realms/'+data.item.id"
                         class="btn btn-xs btn-outline-primary"
-                        @click.prevent="edit(data.item.id)"
                     >
-                        <i class="fa fa-arrow-right" />
+                        <i class="fa fa-bars" />
                     </nuxt-link>
                     <button
-                        v-if="$auth.can('drop','realm') && data.item.drop_able"
+                        v-if="canDrop"
+                        v-b-tooltip="'Delete'"
+                        :disabled="!data.item.drop_able || props.itemBusy"
                         type="button"
                         class="btn btn-xs btn-outline-danger"
-                        title="Löschen"
-                        @click.prevent="drop(data.item)"
+                        @click.prevent="props.drop(data.item)"
                     >
                         <i class="fa fa-times" />
                     </button>

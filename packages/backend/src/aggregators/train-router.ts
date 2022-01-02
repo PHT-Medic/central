@@ -22,12 +22,14 @@ const EventStatusMap : Record<TrainRouterEvent, TrainRunStatus> = {
 
 async function updateTrain(trainId: string, event: TrainRouterEvent) {
     const repository = getRepository(Train);
+    const entity = await repository.findOne(trainId);
+    if (typeof entity === 'undefined') {
+        return;
+    }
 
-    await repository.update({
-        id: trainId,
-    }, {
-        run_status: EventStatusMap[event],
-    });
+    entity.run_status = EventStatusMap[event];
+
+    await repository.save(entity);
 }
 
 export function buildTrainRouterAggregator() {

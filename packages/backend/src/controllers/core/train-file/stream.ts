@@ -7,14 +7,13 @@
 
 import { getRepository } from 'typeorm';
 import tar from 'tar-stream';
-import path from 'path';
 import fs from 'fs';
 import {
     Train, TrainFile, TrainStation, isPermittedForResourceRealm,
 } from '@personalhealthtrain/ui-common';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
-import { getWritableDirPath } from '../../../config/paths';
+import { getTrainFilesDirectoryPath } from '../../../config/pht/train-file/path';
 
 export async function getTrainFileStreamRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -65,7 +64,7 @@ export async function getTrainFileStreamRouteHandler(req: ExpressRequest, res: E
         res.end();
     });
 
-    const trainDirectoryPath = path.resolve(`${getWritableDirPath()}/train-files`);
+    const trainDirectoryPath = getTrainFilesDirectoryPath(train.id);
 
     const files = await getRepository(TrainFile).find({
         train_id: train.id,

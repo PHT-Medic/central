@@ -40,19 +40,19 @@ export default {
             item: undefined,
             tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-                { name: 'Configuration', icon: 'fa fa-cog', urlSuffix: '/wizard' },
+                { name: 'Setup', icon: 'fa fa-wrench', urlSuffix: '/setup' },
             ],
         };
     },
     mounted() {
         const socket = this.$socket.useRealmWorkspace(this.item.realm_id);
-        socket.emit('trainsSubscribe', { id: this.item.id });
+        socket.emit('trainsSubscribe', { data: { id: this.item.id } });
         socket.on('trainUpdated', this.handleSocketUpdated);
         socket.on('trainDeleted', this.handleSocketDeleted);
     },
     beforeDestroy() {
         const socket = this.$socket.useRealmWorkspace(this.item.realm_id);
-        socket.emit('trainsUnsubscribe', { id: this.item.id });
+        socket.emit('trainsUnsubscribe', { data: { id: this.item.id } });
         socket.off('trainUpdated', this.handleSocketUpdated);
         socket.off('trainDeleted', this.handleSocketDeleted);
     },

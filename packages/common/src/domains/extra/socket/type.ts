@@ -33,37 +33,46 @@ export type SocketServerToClientEvents = {
 
 type SubUnsubOperation = 'Subscribe' | 'Unsubscribe';
 
+export type SocketClientToServerEventContext<K extends Record<string, any>> = {
+    data?: {
+        [T in keyof K]?: K[T]
+    },
+    meta?: Record<string, any>
+};
+
 export type SocketClientToServerEvents = {
     [K in `proposals${SubUnsubOperation}`]: (
-        context: {
-            id?: typeof Proposal.prototype.id
-        },
-        cb?: (error?: Error) => void) => void
+        context?: SocketClientToServerEventContext<Proposal>,
+        cb?: (error?: Error) => void
+    ) => void
 } & {
-    [K in `proposalStations${SubUnsubOperation}`]: (
-        context: {
-            id?: typeof ProposalStation.prototype.id
-        },
-        cb?: (error?: Error) => void) => void
+    [K in `proposalStationsIn${SubUnsubOperation}`]: (
+        context?: SocketClientToServerEventContext<ProposalStation>,
+        cb?: (error?: Error) => void
+    ) => void
+} & {
+    [K in `proposalStationsOut${SubUnsubOperation}`]: (
+        context?: SocketClientToServerEventContext<ProposalStation>,
+        cb?: (error?: Error) => void
+    ) => void
 } & {
     [K in `trains${SubUnsubOperation}`]: (
-        context: {
-            id?: typeof Train.prototype.id
-        },
+        context?: SocketClientToServerEventContext<Train>,
         cb?: (error?: Error) => void
     ) => void
 } & {
     [K in `trainResults${SubUnsubOperation}`]: (
-        context: {
-            id?: typeof TrainResult.prototype.id
-        },
+        context?: SocketClientToServerEventContext<TrainResult>,
         cb?: (error?: Error) => void
     ) => void
 } & {
-    [K in `trainStations${SubUnsubOperation}`]: (
-        context: {
-            id?: typeof TrainStation.prototype.id
-        },
+    [K in `trainStationsIn${SubUnsubOperation}`]: (
+        context?: SocketClientToServerEventContext<TrainStation>,
+        cb?: (error?: Error) => void
+    ) => void
+} & {
+    [K in `trainStationsOut${SubUnsubOperation}`]: (
+        context?: SocketClientToServerEventContext<TrainStation>,
         cb?: (error?: Error) => void
     ) => void
 };

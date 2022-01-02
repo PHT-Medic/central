@@ -33,13 +33,13 @@ export async function dropAPIRole(roleId: number) : Promise<SingleResourceRespon
     return response.data;
 }
 
-export async function addAPIRole(data: Pick<Role, 'name' | 'provider_role_id'>) : Promise<SingleResourceResponse<Role>> {
+export async function addAPIRole(data: Pick<Role, 'name'>) : Promise<SingleResourceResponse<Role>> {
     const response = await useAPI(APIType.DEFAULT).post('roles', nullifyEmptyObjectProperties(data));
 
     return response.data;
 }
 
-export async function editAPIRole(id: number, data: Pick<Role, 'name' | 'provider_role_id'>) : Promise<SingleResourceResponse<Role>> {
+export async function editAPIRole(id: number, data: Pick<Role, 'name'>) : Promise<SingleResourceResponse<Role>> {
     const response = await useAPI(APIType.DEFAULT).post(`roles/${id}`, nullifyEmptyObjectProperties(data));
 
     return response.data;

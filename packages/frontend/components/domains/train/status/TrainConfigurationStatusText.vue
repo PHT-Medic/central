@@ -10,7 +10,7 @@
             :classSuffix="classSuffix"
             :statusText="statusText"
         >
-            <span :class="'text-'+classSuffix">{{ statusText }}</span>
+            <span :class="'text-'+classSuffix"> {{ statusText }}</span>
         </slot>
     </span>
 </template>
@@ -52,6 +52,22 @@ export default {
                     return 'success';
                 default:
                     return 'info';
+            }
+        },
+        iconClass() {
+            switch (this.status) {
+                case TrainConfigurationStatus.BASE_CONFIGURED:
+                    return 'fas fa-cog';
+                case TrainConfigurationStatus.RESOURCE_CONFIGURED:
+                    return 'fa fa-clone';
+                case TrainConfigurationStatus.HASH_GENERATED:
+                    return 'fa fa-signature';
+                case TrainConfigurationStatus.HASH_SIGNED:
+                    return 'fa fa-signature';
+                case TrainConfigurationStatus.FINISHED:
+                    return 'fa fa-sign';
+                default:
+                    return '';
             }
         },
     },

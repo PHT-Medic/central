@@ -105,9 +105,9 @@ export default {
                     v-if="canConfigure"
                     class="btn btn-xs btn-primary"
                     type="button"
-                    :to="'/trains/'+entity.id+'/wizard'"
+                    :to="'/trains/'+entity.id+'/setup'"
                 >
-                    <i class="fas fa-cog pr-1" /> setup
+                    <i class="fas fa-wrench pr-1" /> setup
                 </nuxt-link>
             </div>
         </div>

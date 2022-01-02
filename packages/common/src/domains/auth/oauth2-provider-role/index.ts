@@ -5,10 +5,5 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ConsumeHandlers } from 'amqp-extension';
-
-export function createDispatcherAggregatorProposalHandlers() : ConsumeHandlers {
-    return {
-
-    };
-}
+export * from './api';
+export * from './entity';

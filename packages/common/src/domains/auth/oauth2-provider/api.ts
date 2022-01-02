@@ -26,8 +26,11 @@ export async function getAPIProviders(record?: BuildInput<OAuth2Provider>) : Pro
     return response.data;
 }
 
-export async function getAPIProvider(id: typeof OAuth2Provider.prototype.id) : Promise<SingleResourceResponse<OAuth2Provider>> {
-    const response = await useAPI(APIType.DEFAULT).get(`providers/${id}`);
+export async function getAPIProvider(
+    id: typeof OAuth2Provider.prototype.id,
+    record?: BuildInput<OAuth2Provider>,
+) : Promise<SingleResourceResponse<OAuth2Provider>> {
+    const response = await useAPI(APIType.DEFAULT).get(`providers/${id}${buildQuery(record)}`);
 
     return response.data;
 }

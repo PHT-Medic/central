@@ -16,10 +16,14 @@ import { Namespace, Server, Socket } from 'socket.io';
 
 export type SocketDataInterface = {
     token?: string,
+
     user?: User,
     userId?: typeof User.prototype.id,
+
     permissions?: PermissionItem<any>[],
     ability?: AbilityManager,
+
+    roomConnections: Record<string, number>
 };
 
 export type SocketServerInterface = Server<

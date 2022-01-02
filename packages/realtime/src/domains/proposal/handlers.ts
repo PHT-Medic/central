@@ -6,10 +6,14 @@
  */
 
 import {
-    PermissionID, buildSocketProposalRoomName,
+    PermissionID,
+    buildSocketProposalRoomName,
+    extendSocketClientToServerEventCallback,
+    extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/ui-common';
 import { UnauthorizedError } from '@typescript-error/http';
 import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
+import { decrSocketRoomConnections, incrSocketRoomConnections } from '../../config/socket/utils';
 
 export function registerProposalSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
@@ -18,7 +22,8 @@ export function registerProposalSocketHandlers(
     if (!socket.data.user) return;
 
     socket.on('proposalsSubscribe', async (context, cb) => {
-        context ??= {};
+        context = extendSocketClientToServerEventContext(context);
+        cb = extendSocketClientToServerEventCallback(cb);
 
         if (
             !socket.data.ability.hasPermission(PermissionID.PROPOSAL_DROP) &&
@@ -31,7 +36,7 @@ export function registerProposalSocketHandlers(
             return;
         }
 
-        socket.join(buildSocketProposalRoomName(context.id));
+        incrSocketRoomConnections(socket, buildSocketProposalRoomName(context.data.id));
 
         if (typeof cb === 'function') {
             cb();
@@ -41,6 +46,6 @@ export function registerProposalSocketHandlers(
     socket.on('proposalsUnsubscribe', (context) => {
         context ??= {};
 
-        socket.leave(buildSocketProposalRoomName(context.id));
+        decrSocketRoomConnections(socket, buildSocketProposalRoomName(context.data.id));
     });
 }

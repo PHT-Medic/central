@@ -5,15 +5,15 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { getAPIProviders, getProviderAuthorizeUri } from '@personalhealthtrain/ui-common';
+import { getProviderAuthorizeUri } from '@personalhealthtrain/ui-common';
 import { mapActions, mapGetters } from 'vuex';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 import MedicineWorker from '../components/svg/MedicineWorker';
-import Pagination from '../components/Pagination';
 import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';
+import ProviderList from '../components/domains/provider/ProviderList';
 
 export default {
-    components: { Pagination, MedicineWorker },
+    components: { ProviderList, MedicineWorker },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_OUT]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -56,57 +56,27 @@ export default {
             'loggedIn',
         ]),
 
-        providerItems() {
-            return this.provider.items.map((provider) => {
-                provider.authorizeUrl = getProviderAuthorizeUri(provider.id);
-                return provider;
-            });
+        providerQuery() {
+            return {
+                include: {
+                    realm: true,
+                },
+                filter: {
+                    realm_id: {
+                        operator: '!',
+                        value: 'master',
+                    },
+                },
+                sort: {
+                    created_at: 'DESC',
+                },
+            };
         },
-    },
-    created() {
-        this.loadProviders().then((r) => r);
     },
     methods: {
         ...mapActions('auth', [
             'triggerLogin',
         ]),
-
-        async loadProviders() {
-            this.provider.busy = true;
-
-            try {
-                const response = await getAPIProviders({
-                    page: {
-                        limit: this.provider.meta.limit,
-                        offset: this.provider.meta.offset,
-                    },
-                    filter: {
-                        realm_id: {
-                            operator: '!',
-                            value: 'master',
-                        },
-                    },
-                });
-
-                this.provider.items = response.data;
-                const { total } = response.meta;
-
-                this.provider.meta.total = total;
-            } catch (e) {
-                // don't handle ^^ :)
-            }
-
-            this.provider.busy = false;
-        },
-        goTo(options, resolve, reject) {
-            if (options.offset === this.provider.meta.offset) return;
-
-            this.provider.meta.offset = options.offset;
-
-            this.loadProviders()
-                .then(resolve)
-                .catch(reject);
-        },
 
         async submit() {
             if (this.busy) return;
@@ -125,6 +95,11 @@ export default {
             }
 
             this.busy = false;
+        },
+
+        setProviderAuthorizeURL(provider) {
+            provider.url = getProviderAuthorizeUri(provider.id);
+            return provider;
         },
     },
 };
@@ -246,43 +221,42 @@ export default {
                 <h6 class="title">
                     Station Realms
                 </h6>
-                <ul class="list-unstyled">
-                    <li
-                        v-for="(item,key) in providerItems"
-                        :key="key"
-                        class="mb-1"
-                    >
-                        <div class="card-header">
-                            <div class="d-flex flex-wrap flex-row">
-                                <div>
-                                    <strong>Realm</strong> {{ item.realm.name }} - {{ item.name }}
-                                </div>
-                                <div class="ml-auto">
-                                    <a
-                                        :href="item.authorizeUrl"
-                                        type="button"
-                                        class="btn btn-success btn-xs"
-                                    >
-                                        Login
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-                <div
-                    v-if="!provider.busy && providerItems.length === 0"
-                    class="alert alert-sm alert-info"
+
+                <provider-list
+                    :query="providerQuery"
+                    :with-search="false"
+                    :map-items="setProviderAuthorizeURL"
                 >
-                    No authentication provider available for any station.
-                </div>
-                <pagination
-                    v-if="providerItems.length !== 0"
-                    :total="provider.meta.total"
-                    :offset="provider.meta.offset"
-                    :limit="provider.meta.limit"
-                    @to="goTo"
-                />
+                    <template #header-title>
+                        <span />
+                    </template>
+                    <template #items="props">
+                        <ul class="list-unstyled">
+                            <li
+                                v-for="(item,key) in props.items"
+                                :key="key"
+                                class="mb-1"
+                            >
+                                <div class="card-header">
+                                    <div class="d-flex flex-wrap flex-row">
+                                        <div>
+                                            <strong>{{ item.realm.name }}</strong> - {{ item.name }}
+                                        </div>
+                                        <div class="ml-auto">
+                                            <a
+                                                :href="item.url"
+                                                type="button"
+                                                class="btn btn-success btn-xs"
+                                            >
+                                                Login
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </template>
+                </provider-list>
             </div>
         </div>
     </div>

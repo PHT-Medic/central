@@ -44,13 +44,14 @@ export default {
     },
     mounted() {
         const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
-        socket.emit('trainsSubscribe', { id: this.trainProperty.id });
+        socket.emit('trainsSubscribe', { data: { id: this.trainProperty.id } });
+
         socket.on('trainUpdated', this.handleSocketUpdated);
         socket.on('trainDeleted', this.handleSocketDeleted);
     },
     beforeDestroy() {
         const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
-        socket.emit('trainsUnsubscribe', { id: this.trainProperty.id });
+        socket.emit('trainsUnsubscribe', { data: { id: this.trainProperty.id } });
         socket.off('trainUpdated', this.handleSocketUpdated);
         socket.off('trainDeleted', this.handleSocketDeleted);
     },
@@ -127,7 +128,7 @@ export default {
                 @updated="handleUpdated"
             >
                 <template #text="props">
-                    <nuxt-link :to="'/trains/'+props.trainId">
+                    🚊 <nuxt-link :to="'/trains/'+props.trainId">
                         {{ props.displayText }}
                     </nuxt-link>
                 </template>

@@ -128,7 +128,7 @@ async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
 
     await check('name').isLength({ min: 5, max: 100 }).exists().notEmpty()
         .run(req);
-    await check('secure_id').isLength({ min: 1, max: 100 }).exists().matches(/^[a-zA-Z0-9]*$/)
+    await check('secure_id').isLength({ min: 1, max: 100 }).exists().matches(/^[a-z0-9]*$/)
         .run(req);
     await check('public_key').isLength({ min: 5, max: 4096 }).exists().optional({ nullable: true })
         .run(req);

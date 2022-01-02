@@ -19,7 +19,7 @@ type PermissionOptions = {
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-    async syncRoles(userId: number, roles: Role[]) {
+    async syncRoles(userId: number, roleIds: typeof Role.prototype.id[]) {
         const userRoleRepository = this.manager.getRepository(UserRole);
 
         const userRoles = await userRoleRepository.createQueryBuilder('userRole')
@@ -27,7 +27,7 @@ export class UserRepository extends Repository<User> {
             .getMany();
 
         const userRoleIdsToDrop : number[] = userRoles
-            .filter((userRole: UserRole) => roles.findIndex((item: Role) => item.id === userRole.role_id) === -1)
+            .filter((userRole: UserRole) => roleIds.indexOf(userRole.role_id) === -1)
             .map((userRole: UserRole) => userRole.id);
 
         if (userRoleIdsToDrop.length > 0) {
@@ -36,12 +36,9 @@ export class UserRepository extends Repository<User> {
             });
         }
 
-        const userRolesToAdd : Partial<UserRole>[] = roles
-            .filter((role: Role) => userRoles.findIndex((userRole: UserRole) => userRole.role_id === role.id) === -1)
-            .map((role: Role) => ({
-                role_id: role.id,
-                user_id: userId,
-            }));
+        const userRolesToAdd : Partial<UserRole>[] = roleIds
+            .filter((roleId) => userRoles.findIndex((userRole: UserRole) => userRole.role_id === roleId) === -1)
+            .map((roleId) => userRoleRepository.create({ role_id: roleId, user_id: userId }));
 
         if (userRolesToAdd.length > 0) {
             await userRoleRepository.insert(userRolesToAdd);

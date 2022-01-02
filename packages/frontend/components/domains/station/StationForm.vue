@@ -13,7 +13,7 @@ import {
     email, helpers, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 
-const safeStr = helpers.regex('safeStr', /^[a-zA-Z0-9]*$/);
+const safeStr = helpers.regex('safeStr', /^[a-z0-9]*$/);
 
 export default {
     props: {
@@ -292,7 +292,7 @@ export default {
                     v-if="!$v.formData.secure_id.safeStr"
                     class="form-group-hint group-required"
                 >
-                    The secure identifier is only allowed to consist of the following characters: [0-9a-zA-Z]+
+                    The secure identifier is only allowed to consist of the following characters: [0-9a-z]+
                 </div>
             </div>
 

@@ -26,7 +26,7 @@ import env from '../../../env';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { ExpressValidationError } from '../../../config/http/error/validation';
 
-export async function getUsersRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {
         filter, page, include, fields,
     } = req.query;
@@ -66,7 +66,7 @@ export async function getUsersRouteHandler(req: ExpressRequest, res: ExpressResp
     });
 }
 
-export async function getUserRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
     const { include, fields } = req.query;
 
@@ -145,7 +145,7 @@ async function runValidations(req: ExpressRequest, mode: 'create' | 'update') {
     }
 }
 
-export async function addUserRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.USER_ADD)) {
         throw new ForbiddenError('You are not authorized to add a user.');
     }
@@ -271,7 +271,7 @@ export async function dropUserRouteHandler(req: ExpressRequest, res: ExpressResp
         throw new ForbiddenError(`You are not authorized to drop a user fo the realm ${user.realm_id}`);
     }
 
-    await userRepository.delete(id);
+    await userRepository.remove(user);
 
     return res.respondDeleted();
 }
@@ -292,7 +292,7 @@ export class UserController {
         @Request() req: any,
             @Response() res: any,
     ): Promise<PartialUser[]> {
-        return getUsersRouteHandler(req, res);
+        return getManyRouteHandler(req, res);
     }
 
     @Post('', [ForceLoggedInMiddleware])
@@ -302,7 +302,7 @@ export class UserController {
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialUser | undefined> {
-        return addUserRouteHandler(req, res);
+        return addRouteHandler(req, res);
     }
 
     @Get('/me', [ForceLoggedInMiddleware])
@@ -321,7 +321,7 @@ export class UserController {
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialUser | undefined> {
-        return getUserRouteHandler(req, res);
+        return getRouteHandler(req, res);
     }
 
     @Post('/:id', [ForceLoggedInMiddleware])

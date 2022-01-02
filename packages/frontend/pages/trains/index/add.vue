@@ -29,7 +29,7 @@ export default {
     },
     methods: {
         handleCreated(train) {
-            this.$router.push(`/trains/${train.id}/wizard`);
+            this.$router.push(`/trains/${train.id}/setup`);
         },
     },
 };

@@ -18,13 +18,15 @@ import { check, validationResult } from 'express-validator';
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
-import { ResponseExample, SwaggerTags } from '@trapi/swagger';
+import { SwaggerTags } from '@trapi/swagger';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import fs from 'fs';
 import { handleTrainCommandRouteHandler } from './action';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { ExpressValidationError } from '../../../config/http/error/validation';
 import { matchedValidationData } from '../../../modules/express-validator';
+import { getTrainFilesDirectoryPath } from '../../../config/pht/train-file/path';
 
 export async function getOneRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { include } = req.query;
@@ -252,23 +254,24 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
 
     await repository.remove(entity);
 
+    try {
+        await fs.promises.access(getTrainFilesDirectoryPath(entity.id), fs.constants.R_OK | fs.constants.W_OK);
+        await fs.promises.unlink(getTrainFilesDirectoryPath(entity.id));
+    } catch (e) {
+        // do nothing ;), we tried hard :P
+    }
+
+    // todo: delete train result :/ maybe message queue
+
     return res.respondDeleted({ data: entity });
 }
 
 type PartialTrain = Partial<Train>;
-const simpleExample = {
-    user_id: 1,
-    proposal_id: 1,
-    hash: 'xxx',
-    hash_signed: 'xxx',
-    session_id: 'xxx',
-};
 
 @SwaggerTags('pht')
 @Controller('/trains')
 export class TrainController {
     @Get('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrain[]>([simpleExample])
     async getMany(
         @Request() req: any,
             @Response() res: any,
@@ -277,7 +280,6 @@ export class TrainController {
     }
 
     @Get('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrain>(simpleExample)
     async getOne(
         @Params('id') id: string,
             @Request() req: any,
@@ -287,7 +289,6 @@ export class TrainController {
     }
 
     @Post('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrain>(simpleExample)
     async edit(
         @Params('id') id: string,
             @Body() data: PartialTrain,
@@ -298,7 +299,6 @@ export class TrainController {
     }
 
     @Post('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrain>(simpleExample)
     async add(
         @Body() data: PartialTrain,
             @Request() req: any,
@@ -308,7 +308,6 @@ export class TrainController {
     }
 
     @Post('/:id/command', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrain>(simpleExample)
     async doTask(
         @Params('id') id: string,
             @Body() data: {
@@ -321,7 +320,6 @@ export class TrainController {
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrain>(simpleExample)
     async drop(
         @Params('id') id: string,
             @Request() req: any,

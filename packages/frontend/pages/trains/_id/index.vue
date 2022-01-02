@@ -41,7 +41,7 @@ export default {
             </div>
 
             <div class="panel-box mb-3">
-                <h6><i class="fa fa-city" /> Stations</h6>
+                <h6><i class="fa fa-city" /> <span class="text-info">{{ train.stations }}</span> Station(s)</h6>
 
                 <train-stations-progress :train="train" />
             </div>

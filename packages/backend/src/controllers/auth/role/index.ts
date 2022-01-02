@@ -13,7 +13,7 @@ import { applyFilters, applyPagination } from 'typeorm-extension';
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
-import { ResponseExample, SwaggerTags } from '@trapi/swagger';
+import { SwaggerTags } from '@trapi/swagger';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
@@ -21,7 +21,7 @@ import { ExpressValidationError } from '../../../config/http/error/validation';
 
 // ---------------------------------------------------------------------------------
 
-async function getRoles(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page } = req.query;
 
     const roleRepository = getRepository(Role);
@@ -47,7 +47,7 @@ async function getRoles(req: ExpressRequest, res: ExpressResponse) : Promise<any
     });
 }
 
-async function getOne(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function getOneRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     const roleRepository = getRepository(Role);
@@ -60,17 +60,15 @@ async function getOne(req: ExpressRequest, res: ExpressResponse) : Promise<any> 
     return res.respond({ data: result });
 }
 
-async function addOne(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.ROLE_ADD)) {
         throw new ForbiddenError();
     }
 
-    await check('name').exists().notEmpty().isLength({ min: 3, max: 30 })
-        .run(req);
-    await check('provider_role_id').exists().notEmpty().isLength({ min: 3, max: 100 })
-        .optional({
-            nullable: true,
-        })
+    await check('name')
+        .exists()
+        .notEmpty()
+        .isLength({ min: 3, max: 30 })
         .run(req);
 
     const validation = validationResult(req);
@@ -85,23 +83,25 @@ async function addOne(req: ExpressRequest, res: ExpressResponse) : Promise<any> 
 
     await roleRepository.save(role);
 
-    return res.respondCreated({ data: role });
+    return res.respondCreated({
+        data: {
+            id: role.id,
+        },
+    });
 }
 
-async function editRole(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if (!req.ability.hasPermission(PermissionID.ROLE_EDIT)) {
-        throw new ForbiddenError();
+        throw new NotFoundError();
     }
 
-    await check('name').exists().notEmpty().isLength({ min: 3, max: 30 })
+    await check('name')
+        .exists()
+        .notEmpty()
+        .isLength({ min: 3, max: 30 })
         .optional()
-        .run(req);
-    await check('provider_role_id').exists().notEmpty().isLength({ min: 3, max: 100 })
-        .optional({
-            nullable: true,
-        })
         .run(req);
 
     const validation = validationResult(req);
@@ -132,72 +132,68 @@ async function editRole(req: ExpressRequest, res: ExpressResponse) : Promise<any
 
 // ---------------------------------------------------------------------------------
 
-async function dropRole(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if (!req.ability.hasPermission(PermissionID.ROLE_DROP)) {
         throw new ForbiddenError();
     }
 
-    const roleRepository = getRepository(Role);
-    await roleRepository.delete(id);
+    const repository = getRepository(Role);
+    const entity = await repository.findOne(id);
+
+    await repository.remove(entity);
 
     return res.respondDeleted();
 }
 
 type PartialRole = Partial<Role>;
-const simpleExample = { name: 'admin' };
 
 @SwaggerTags('auth')
 @Controller('/roles')
 export class RoleController {
     @Get('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialRole[]>([simpleExample])
     async getMany(
         @Request() req: any,
             @Response() res: any,
     ): Promise<PartialRole[]> {
-        return await getRoles(req, res) as PartialRole[];
+        return await getManyRouteHandler(req, res) as PartialRole[];
     }
 
     @Post('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialRole>(simpleExample)
     async add(
         @Body() data: Pick<Role, 'name'>,
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialRole> {
-        return await addOne(req, res) as PartialRole;
+        return await addRouteHandler(req, res) as PartialRole;
     }
 
     @Get('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialRole>(simpleExample)
     async getOne(
         @Params('id') id: string,
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialRole> {
-        return await getOne(req, res) as PartialRole;
+        return await getOneRouteHandler(req, res) as PartialRole;
     }
 
     @Post('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialRole>(simpleExample)
     async edit(
         @Params('id') id: string,
             @Body() data: Pick<Role, 'name'>,
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialRole> {
-        return await editRole(req, res) as PartialRole;
+        return await editRouteHandler(req, res) as PartialRole;
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialRole>(simpleExample)
     async drop(
         @Params('id') id: string,
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialRole> {
-        return await dropRole(req, res) as PartialRole;
+        return await dropRouteHandler(req, res) as PartialRole;
     }
 }

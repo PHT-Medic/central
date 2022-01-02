@@ -15,8 +15,8 @@ import { Realm } from '../../auth';
 
 @Entity({ name: 'proposal_stations' })
 export class ProposalStation {
-    @PrimaryGeneratedColumn({ unsigned: true })
-        id: number;
+    @PrimaryGeneratedColumn('uuid')
+        id: string;
 
     @Column({ default: null })
         approval_status: ProposalStationApprovalStatus | null;

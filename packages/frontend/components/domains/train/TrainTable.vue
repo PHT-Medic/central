@@ -93,7 +93,7 @@ export default {
             ) {
                 this.items.splice(0, 0, context.data);
 
-                if (this.items.length > this.meta.total) {
+                if (this.items.length > this.meta.limit) {
                     this.items.splice(this.meta.length, 1);
                 }
 

@@ -6,17 +6,14 @@
   -->
 <script>
 import {
-    addAPIProvider, editAPIProvider, getAPIRealms, hasOwnProperty,
+    addAPIProvider, createNanoID, editAPIProvider, getAPIRealms, hasOwnProperty,
 } from '@personalhealthtrain/ui-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
-
-import AlertMessage from '../../../alert/AlertMessage';
+import ProviderRoleList from './ProviderRoleList';
 
 export default {
     name: 'ProviderForm',
-    components: {
-        AlertMessage,
-    },
+    components: { ProviderRoleList },
     props: {
         provider: {
             type: Object,
@@ -58,7 +55,6 @@ export default {
             },
 
             busy: false,
-            message: null,
         };
     },
     validations: {
@@ -66,7 +62,7 @@ export default {
             name: {
                 required,
                 minLength: minLength(5),
-                maxLength: maxLength(30),
+                maxLength: maxLength(36),
             },
             open_id: {
                 required,
@@ -110,6 +106,9 @@ export default {
         isEditing() {
             return typeof this.provider.id !== 'undefined';
         },
+        isNameEmpty() {
+            return !this.formData.name || this.formData.name.length === 0;
+        },
     },
     created() {
         if (this.realmId) {
@@ -121,6 +120,10 @@ export default {
             if (hasOwnProperty(this.provider, key)) {
                 this.formData[key] = this.provider[key];
             }
+        }
+
+        if (this.isNameEmpty) {
+            this.generateID();
         }
 
         this.loadRealms();
@@ -142,7 +145,6 @@ export default {
                 return;
             }
 
-            this.message = null;
             this.busy = true;
 
             try {
@@ -151,41 +153,42 @@ export default {
                 if (this.isEditing) {
                     response = await editAPIProvider(this.provider.id, this.formData);
 
-                    this.message = {
-                        isError: false,
-                        data: 'Der Provider wurde erfolgreich editiert.',
-                    };
+                    this.$bvToast.toast('The realm was successfully updated.', {
+                        variant: 'success',
+                        toaster: 'b-toaster-top-center',
+                    });
 
                     this.$emit('updated', response);
                 } else {
                     response = await addAPIProvider(this.formData);
 
-                    this.message = {
-                        isError: false,
-                        data: 'Die Provider wurde erfolgreich erstellt.',
-                    };
+                    this.$bvToast.toast('The realm was successfully created.', {
+                        variant: 'success',
+                        toaster: 'b-toaster-top-center',
+                    });
 
                     this.$emit('created', response);
                 }
             } catch (e) {
-                this.message = {
-                    data: e.message,
-                    isError: true,
-                };
+                this.$bvToast.toast(e.message, {
+                    variant: 'warning',
+                    toaster: 'b-toaster-top-center',
+                });
             }
 
             this.busy = false;
+        },
+        generateID() {
+            this.formData.name = createNanoID();
         },
     },
 };
 </script>
 <template>
     <div>
-        <alert-message :message="message" />
-
         <div class="row">
             <div class="col">
-                <h5><i class="fa fa-bars" /> General</h5>
+                <h6><i class="fa fa-wrench" /> Configuration</h6>
 
                 <div
                     class="form-group"
@@ -204,7 +207,7 @@ export default {
                         v-if="!$v.formData.name.required && !$v.formData.name.$model"
                         class="form-group-hint group-required"
                     >
-                        Please provide a name for the provider.
+                        Provide a name for the provider.
                     </div>
                     <div
                         v-if="!$v.formData.name.minLength"
@@ -218,6 +221,23 @@ export default {
                     >
                         The length of the password must be less than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
                     </div>
+                </div>
+                <div
+                    class="alert alert-sm"
+                    :class="{
+                        'alert-warning': isNameEmpty,
+                        'alert-success': !isNameEmpty
+                    }"
+                >
+                    <div class="mb-1">
+                        If you don't want to chose an identifier by your own, you can generate one.
+                    </div>
+                    <button
+                        class="btn btn-dark btn-xs"
+                        @click.prevent="generateID"
+                    >
+                        <i class="fa fa-wrench" /> Generate
+                    </button>
                 </div>
 
                 <div
@@ -275,7 +295,7 @@ export default {
                 </div>
             </div>
             <div class="col">
-                <h5><i class="fa fa-key" /> Security</h5>
+                <h6><i class="fa fa-lock" /> Security</h6>
 
                 <div
                     class="form-group"
@@ -343,7 +363,7 @@ export default {
 
         <hr>
 
-        <h5><i class="fa fa-wrench" /> Configuration</h5>
+        <h6><i class="fas fa-link" /> URLs / Paths</h6>
         <div class="row">
             <div class="col">
                 <div
@@ -471,6 +491,16 @@ export default {
                     </div>
                 </div>
             </div>
+        </div>
+
+        <hr>
+
+        <div v-if="isEditing">
+            <h6><i class="fas fa-users" /> Roles</h6>
+
+            <provider-role-list
+                :provider-id="provider.id"
+            />
         </div>
 
         <hr>

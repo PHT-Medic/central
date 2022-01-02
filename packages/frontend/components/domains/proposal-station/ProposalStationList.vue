@@ -8,11 +8,11 @@
 import {
     PermissionID,
     addApiProposalStation,
+    buildSocketProposalStationInRoomName,
+    buildSocketProposalStationOutRoomName,
     buildSocketProposalStationRoomName,
     dropApiProposalStation,
-    getApiProposalStation,
-    getApiProposalStations,
-    mergeDeep,
+    getApiProposalStation, getApiProposalStations, mergeDeep,
 } from '@personalhealthtrain/ui-common';
 
 import Vue from 'vue';
@@ -67,6 +67,11 @@ export default {
         canEdit() {
             return this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT);
         },
+        direction() {
+            return this.realmId === this.$store.getters['auth/userRealmId'] ?
+                'out' :
+                'in';
+        },
     },
     watch: {
         q(val, oldVal) {
@@ -86,20 +91,45 @@ export default {
     },
     mounted() {
         const socket = this.$socket.useRealmWorkspace(this.realmId);
-        socket.emit('proposalStationsSubscribe');
+        switch (this.direction) {
+            case 'in':
+                socket.emit('proposalStationsInSubscribe');
+                break;
+            case 'out':
+                socket.emit('proposalStationsOutSubscribe');
+                break;
+        }
+
         socket.on('proposalStationCreated', this.handleSocketCreated);
         socket.on('proposalStationDeleted', this.handleSocketDeleted);
     },
     beforeDestroy() {
         const socket = this.$socket.useRealmWorkspace(this.realmId);
-        socket.emit('proposalStationsUnsubscribe');
+        switch (this.direction) {
+            case 'in':
+                socket.emit('proposalStationsInUnsubscribe');
+                break;
+            case 'out':
+                socket.emit('proposalStationsOutUnsubscribe');
+                break;
+        }
         socket.off('proposalStationCreated', this.handleSocketCreated);
         socket.off('proposalStationDeleted', this.handleSocketDeleted);
     },
     methods: {
+        isSameSocketRoom(room) {
+            switch (this.direction) {
+                case 'in':
+                    return room === buildSocketProposalStationInRoomName();
+                case 'out':
+                    return room === buildSocketProposalStationOutRoomName();
+            }
+
+            return false;
+        },
         async handleSocketCreated(context) {
             if (
-                context.meta.roomName !== buildSocketProposalStationRoomName() ||
+                !this.isSameSocketRoom(context.meta.roomName) ||
                 context.data.proposal_id !== this.proposalId ||
                 context.data.station_id === this.socketLockedStationId
             ) return;
@@ -122,7 +152,7 @@ export default {
         },
         handleSocketDeleted(context) {
             if (
-                context.meta.roomName !== buildSocketProposalStationRoomName() ||
+                !this.isSameSocketRoom(context.meta.roomName) ||
                 context.data.proposal_id !== this.proposalId ||
                 context.data.id === this.socketLockedId
             ) return;

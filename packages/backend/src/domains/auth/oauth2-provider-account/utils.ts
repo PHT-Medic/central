@@ -7,8 +7,9 @@
 
 import { Oauth2TokenResponse } from '@typescript-auth/core';
 import { getCustomRepository, getRepository } from 'typeorm';
-import { OAuth2Provider, Oauth2ProviderAccount, Role } from '@personalhealthtrain/ui-common';
-import { RoleRepository } from '../role/repository';
+import {
+    OAuth2Provider, Oauth2ProviderAccount, Oauth2ProviderRole,
+} from '@personalhealthtrain/ui-common';
 import { UserRepository } from '../user/repository';
 
 export async function createOauth2ProviderAccountWithToken(
@@ -60,14 +61,18 @@ export async function createOauth2ProviderAccountWithToken(
     await accountRepository.save(account);
 
     if (typeof tokenResponse.access_token_payload?.realm_access?.roles !== 'undefined') {
-        const roleRepository = getCustomRepository(RoleRepository);
+        const providerRoleRepository = getRepository(Oauth2ProviderRole);
 
-        const roles: Role[] = await roleRepository
-            .createQueryBuilder('role')
-            .where('role.provider_role_id in (:...id)', { id: tokenResponse.access_token_payload?.realm_access?.roles })
+        const providerRoles = await providerRoleRepository
+            .createQueryBuilder('providerRole')
+            .leftJoinAndSelect('providerRole.provider', 'provider')
+            .where('providerRole.external_id in (:...id)', { id: tokenResponse.access_token_payload?.realm_access?.roles })
+            .andWhere('provider.realm_id = :realmId', { realmId: provider.realm_id })
             .getMany();
 
-        await userRepository.syncRoles(account.user.id, roles);
+        if (providerRoles.length > 0) {
+            await userRepository.syncRoles(account.user.id, providerRoles.map((providerRole) => providerRole.role_id));
+        }
     }
 
     return account;

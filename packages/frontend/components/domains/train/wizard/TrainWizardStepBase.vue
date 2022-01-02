@@ -8,8 +8,11 @@
 import {
     ProposalStationApprovalStatus,
     addAPITrainStation,
-    buildSocketTrainStationRoomName,
-    dropAPITrainStation, editAPITrainStation, getAPITrainStations,
+    buildSocketTrainStationInRoomName,
+    buildSocketTrainStationOutRoomName,
+    dropAPITrainStation,
+    editAPITrainStation,
+    getAPITrainStations,
 } from '@personalhealthtrain/ui-common';
 import { minLength, numeric, required } from 'vuelidate/lib/validators';
 import ProposalStationList from '../../proposal-station/ProposalStationList';
@@ -75,6 +78,11 @@ export default {
             // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             return this.trainStation.items.sort((a, b) => (a.position > b.position ? 1 : -1));
         },
+        direction() {
+            return this.train.realm_id === this.$store.getters['auth/userRealmId'] ?
+                'out' :
+                'in';
+        },
     },
     created() {
         Promise.resolve()
@@ -82,20 +90,44 @@ export default {
     },
     mounted() {
         const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
-        socket.emit('trainStationsSubscribe');
+        switch (this.direction) {
+            case 'in':
+                socket.emit('trainStationsInSubscribe');
+                break;
+            case 'out':
+                socket.emit('trainStationsOutSubscribe');
+                break;
+        }
         socket.on('trainStationCreated', this.handleSocketCreated);
         socket.on('trainStationDeleted', this.handleSocketDeleted);
     },
     beforeDestroy() {
         const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
-        socket.emit('trainStationsUnsubscribe');
+        switch (this.direction) {
+            case 'in':
+                socket.emit('trainStationsInUnsubscribe');
+                break;
+            case 'out':
+                socket.emit('trainStationsOutUnsubscribe');
+                break;
+        }
         socket.off('trainStationCreated', this.handleSocketCreated);
         socket.off('trainStationDeleted', this.handleSocketDeleted);
     },
     methods: {
+        isSameSocketRoom(room) {
+            switch (this.direction) {
+                case 'in':
+                    return room === buildSocketTrainStationInRoomName();
+                case 'out':
+                    return room === buildSocketTrainStationOutRoomName();
+            }
+
+            return false;
+        },
         handleSocketCreated(context) {
             if (
-                context.meta.roomName !== buildSocketTrainStationRoomName() ||
+                !this.isSameSocketRoom(context.meta.roomName) ||
                 context.data.train_id !== this.train.id ||
                 context.data.station_id === this.socketLockedStationId
             ) return;
@@ -104,7 +136,7 @@ export default {
         },
         handleSocketDeleted(context) {
             if (
-                context.meta.roomName !== buildSocketTrainStationRoomName() ||
+                !this.isSameSocketRoom(context.meta.roomName) ||
                 context.data.train_id !== this.train.id ||
                 context.data.id === this.socketLockedId
             ) return;

@@ -26,12 +26,14 @@ const EventStatusMap : Record<TrainBuilderEvent, TrainBuildStatus> = {
 
 async function updateTrain(trainId: string, event: TrainBuilderEvent) {
     const repository = getRepository(Train);
+    const entity = await repository.findOne(trainId);
+    if (typeof entity === 'undefined') {
+        return;
+    }
 
-    await repository.update({
-        id: trainId,
-    }, {
-        build_status: EventStatusMap[event],
-    });
+    entity.build_status = EventStatusMap[event];
+
+    await repository.save(entity);
 }
 
 export function buildTrainBuilderAggregator() {

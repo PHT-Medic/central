@@ -6,14 +6,12 @@
  */
 
 import { consumeQueue } from 'amqp-extension';
-import { createDispatcherAggregatorProposalHandlers } from './handlers/proposal';
 import { createDispatcherAggregatorTrainHandlers } from './handlers/train';
 import { MessageQueueDispatcherRoutingKey } from '../../config/service/mq';
 
 export function buildDispatcherAggregator() {
     function start() {
         return consumeQueue({ routingKey: MessageQueueDispatcherRoutingKey.EVENT_IN }, {
-            ...createDispatcherAggregatorProposalHandlers(),
             ...createDispatcherAggregatorTrainHandlers(),
         });
     }

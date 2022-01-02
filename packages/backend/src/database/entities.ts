@@ -19,6 +19,7 @@ export {
     Client,
     OAuth2Provider,
     Oauth2ProviderAccount,
+    Oauth2ProviderRole,
     Permission,
     Realm,
     Role,

@@ -28,6 +28,7 @@ import { PermissionController } from '../../controllers/auth/permission';
 import { ClientController } from '../../controllers/auth/client';
 import { MasterImageGroupController } from '../../controllers/core/master-image-groups';
 import { TrainResultController } from '../../controllers/core/train-result';
+import { ProviderRoleController } from '../../controllers/auth/provider-role';
 
 export function registerControllers(router: Application) {
     attachControllers(router, [
@@ -35,6 +36,7 @@ export function registerControllers(router: Application) {
         TokenController,
         RealmController,
         ProviderController,
+        ProviderRoleController,
 
         // Extra
         ServiceController,

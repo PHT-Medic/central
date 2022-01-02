@@ -10,7 +10,8 @@ import {
     TrainRunStatus,
     TrainStationRunStatus,
     TrainStationStatic,
-    buildSocketTrainStationRoomName,
+    buildSocketTrainStationInRoomName,
+    buildSocketTrainStationOutRoomName,
     getAPITrainStations,
 } from '@personalhealthtrain/ui-common';
 import TrainStationRunStatusText from '../status/TrainStationRunStatusText';
@@ -58,26 +59,55 @@ export default {
 
             return 100 * ((this.train.run_station_index + 1) / total);
         },
+        direction() {
+            return this.train.realm_id === this.$store.getters['auth/userRealmId'] ?
+                'out' :
+                'in';
+        },
     },
     created() {
         this.load().then((r) => r);
     },
     mounted() {
         const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
-        socket.emit('trainStationsSubscribe');
+        switch (this.direction) {
+            case 'in':
+                socket.emit('trainStationsInSubscribe');
+                break;
+            case 'out':
+                socket.emit('trainStationsOutSubscribe');
+                break;
+        }
         socket.on('trainStationCreated', this.handleSocketCreated);
         socket.on('trainStationDeleted', this.handleSocketDeleted);
     },
     beforeDestroy() {
         const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
-        socket.emit('trainStationsUnsubscribe');
+        switch (this.direction) {
+            case 'in':
+                socket.emit('trainStationsInUnsubscribe');
+                break;
+            case 'out':
+                socket.emit('trainStationsOutUnsubscribe');
+                break;
+        }
         socket.off('trainStationCreated', this.handleSocketCreated);
         socket.off('trainStationDeleted', this.handleSocketDeleted);
     },
     methods: {
+        isSameSocketRoom(room) {
+            switch (this.direction) {
+                case 'in':
+                    return room === buildSocketTrainStationInRoomName();
+                case 'out':
+                    return room === buildSocketTrainStationOutRoomName();
+            }
+
+            return false;
+        },
         handleSocketCreated(context) {
             if (
-                context.meta.roomName !== buildSocketTrainStationRoomName() ||
+                !this.isSameSocketRoom(context.meta.roomName) ||
                 context.data.train_id !== this.train.id
             ) return;
 
@@ -85,7 +115,7 @@ export default {
         },
         handleSocketDeleted(context) {
             if (
-                context.meta.roomName !== buildSocketTrainStationRoomName() ||
+                !this.isSameSocketRoom(context.meta.roomName) ||
                 context.data.train_id !== this.train.id
             ) return;
 

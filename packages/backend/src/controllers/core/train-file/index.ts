@@ -15,7 +15,7 @@ import fs from 'fs';
 import {
     Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
-import { ResponseExample, SwaggerTags } from '@trapi/swagger';
+import { SwaggerTags } from '@trapi/swagger';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getTrainFileFilePath } from '../../../config/pht/train-file/path';
 
@@ -23,71 +23,6 @@ import { getTrainFileStreamRouteHandler } from './stream';
 import { uploadTrainFilesRouteHandler } from './upload';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
-
-type PartialTrainFile = Partial<TrainFile>;
-const simpleExample : PartialTrainFile = {
-    name: 'model.py',
-    directory: '/',
-    train_id: 'xxx',
-};
-
-@SwaggerTags('pht')
-@Controller('/trains')
-export class TrainFileController {
-    @Get('/:id/files', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrainFile[]>([simpleExample])
-    async getMany(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrainFile[]> {
-        return await getTrainFilesRouteHandler(req, res) as PartialTrainFile[];
-    }
-
-    @Get('/:id/files/download', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrainFile>(simpleExample)
-    async download(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<Buffer> {
-        return await getTrainFileStreamRouteHandler(req, res) as Buffer;
-    }
-
-    @Get('/:id/files/:fileId', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrainFile>(simpleExample)
-    async getOne(
-        @Params('id') id: string,
-            @Params('fileId') fileId: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrainFile | undefined> {
-        return await getTrainFileRouteHandler(req, res) as PartialTrainFile | undefined;
-    }
-
-    @Delete('/:id/files/:fileId', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrainFile>(simpleExample)
-    async drop(
-        @Params('id') id: string,
-            @Params('fileId') fileId: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrainFile | undefined> {
-        return await dropTrainFileRouteHandler(req, res) as PartialTrainFile | undefined;
-    }
-
-    @Post('/:id/files', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialTrainFile[]>([
-        simpleExample,
-    ])
-    async add(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-    ): Promise<PartialTrainFile | undefined> {
-        return await uploadTrainFilesRouteHandler(req, res) as PartialTrainFile | undefined;
-    }
-}
 
 export async function getTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (
@@ -166,16 +101,71 @@ export async function dropTrainFileRouteHandler(req: ExpressRequest, res: Expres
         throw new ForbiddenError();
     }
 
-    fs.unlinkSync(getTrainFileFilePath(entity));
+    await fs.promises.unlink(getTrainFileFilePath(entity));
 
+    await repository.remove(entity);
+
+    // train
     const trainRepository = getRepository(Train);
-    await trainRepository.update({ id: entity.train_id }, {
-        configuration_status: null,
+    let train = await trainRepository.findOne(entity.train_id);
+    train = trainRepository.merge(train, {
         hash: null,
         hash_signed: null,
     });
-
-    await repository.delete(entity.id);
+    await repository.save(train);
 
     return res.respondDeleted({ data: entity });
+}
+
+type PartialTrainFile = Partial<TrainFile>;
+
+@SwaggerTags('pht')
+@Controller('/trains')
+export class TrainFileController {
+    @Get('/:id/files', [ForceLoggedInMiddleware])
+    async getMany(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainFile[]> {
+        return await getTrainFilesRouteHandler(req, res) as PartialTrainFile[];
+    }
+
+    @Get('/:id/files/download', [ForceLoggedInMiddleware])
+    async download(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<Buffer> {
+        return await getTrainFileStreamRouteHandler(req, res) as Buffer;
+    }
+
+    @Get('/:id/files/:fileId', [ForceLoggedInMiddleware])
+    async getOne(
+        @Params('id') id: string,
+            @Params('fileId') fileId: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainFile | undefined> {
+        return await getTrainFileRouteHandler(req, res) as PartialTrainFile | undefined;
+    }
+
+    @Delete('/:id/files/:fileId', [ForceLoggedInMiddleware])
+    async drop(
+        @Params('id') id: string,
+            @Params('fileId') fileId: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainFile | undefined> {
+        return await dropTrainFileRouteHandler(req, res) as PartialTrainFile | undefined;
+    }
+
+    @Post('/:id/files', [ForceLoggedInMiddleware])
+    async add(
+        @Params('id') id: string,
+            @Request() req: any,
+            @Response() res: any,
+    ): Promise<PartialTrainFile | undefined> {
+        return await uploadTrainFilesRouteHandler(req, res) as PartialTrainFile | undefined;
+    }
 }

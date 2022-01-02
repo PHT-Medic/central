@@ -339,6 +339,7 @@ export default {
                         <template v-if="isEditing">
                             <proposal-station-list
                                 ref="proposalStationList"
+                                :realm-id="entityProperty.realm_id"
                                 :proposal-id="entityProperty.id"
                             />
                         </template>

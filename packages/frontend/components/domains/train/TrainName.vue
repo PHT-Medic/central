@@ -103,7 +103,7 @@ export default {
                 :disabled="busy"
                 @click.prevent="toggleEditView"
             >
-                <i class="fas fa-toggle-off" />
+                <i class="fas fa-pencil-alt" />
             </a>
         </template>
     </span>

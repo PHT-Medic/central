@@ -15,7 +15,14 @@ export default {
                 hide: false,
                 items: [
                     {
-                        name: 'OAuth2', urlSuffix: '', componentName: 'chat-rooms-index', icon: 'fa fa-info-circle',
+                        name: 'Overview',
+                        urlSuffix: '',
+                        icon: 'fa fa-info-circle',
+                    },
+                    {
+                        name: 'Add',
+                        urlSuffix: '/add',
+                        icon: 'fa fa-plus',
                     },
                 ],
             },
@@ -50,7 +57,7 @@ export default {
             </b-nav>
         </div>
         <div class="content-container">
-            <nuxt-child :realm="realm" />
+            <nuxt-child :parent-item="realm" />
         </div>
     </div>
 </template>

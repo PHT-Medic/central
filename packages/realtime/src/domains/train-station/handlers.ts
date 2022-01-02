@@ -6,10 +6,15 @@
  */
 
 import {
-    PermissionID, buildSocketTrainStationRoomName,
+    PermissionID,
+    buildSocketTrainStationInRoomName,
+    buildSocketTrainStationOutRoomName,
+    extendSocketClientToServerEventCallback,
+    extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/ui-common';
 import { UnauthorizedError } from '@typescript-error/http';
 import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
+import { decrSocketRoomConnections, incrSocketRoomConnections } from '../../config/socket/utils';
 
 export function registerTrainStationSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
@@ -17,14 +22,12 @@ export function registerTrainStationSocketHandlers(
 ) {
     if (!socket.data.user) return;
 
-    socket.on('trainStationsSubscribe', async (context, cb) => {
-        context ??= {};
+    socket.on('trainStationsInSubscribe', async (context, cb) => {
+        context = extendSocketClientToServerEventContext(context);
+        cb = extendSocketClientToServerEventCallback(cb);
 
         if (
-            !socket.data.ability.hasPermission(PermissionID.PROPOSAL_APPROVE) &&
-            !socket.data.ability.hasPermission(PermissionID.PROPOSAL_ADD) &&
-            !socket.data.ability.hasPermission(PermissionID.PROPOSAL_EDIT) &&
-            !socket.data.ability.hasPermission(PermissionID.PROPOSAL_DROP)
+            !socket.data.ability.hasPermission(PermissionID.TRAIN_APPROVE)
         ) {
             if (typeof cb === 'function') {
                 cb(new UnauthorizedError());
@@ -33,16 +36,45 @@ export function registerTrainStationSocketHandlers(
             return;
         }
 
-        socket.join(buildSocketTrainStationRoomName(context.id));
+        incrSocketRoomConnections(socket, buildSocketTrainStationInRoomName(context.data.id));
 
         if (typeof cb === 'function') {
             cb();
         }
     });
 
-    socket.on('trainStationsUnsubscribe', (context) => {
-        context ??= {};
+    socket.on('trainStationsInUnsubscribe', (context) => {
+        context = extendSocketClientToServerEventContext(context);
 
-        socket.leave(buildSocketTrainStationRoomName(context.id));
+        decrSocketRoomConnections(socket, buildSocketTrainStationInRoomName(context.data.id));
+    });
+
+    // ----------------------------------------------------------
+
+    socket.on('trainStationsOutSubscribe', async (context, cb) => {
+        context = extendSocketClientToServerEventContext(context);
+        cb = extendSocketClientToServerEventCallback(cb);
+
+        if (
+            !socket.data.ability.hasPermission(PermissionID.TRAIN_EDIT)
+        ) {
+            if (typeof cb === 'function') {
+                cb(new UnauthorizedError());
+            }
+
+            return;
+        }
+
+        incrSocketRoomConnections(socket, buildSocketTrainStationOutRoomName(context.data.id));
+
+        if (typeof cb === 'function') {
+            cb();
+        }
+    });
+
+    socket.on('trainStationsOutUnsubscribe', (context) => {
+        context = extendSocketClientToServerEventContext(context);
+
+        decrSocketRoomConnections(socket, buildSocketTrainStationOutRoomName(context.data.id));
     });
 }

@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { getAPIRealms, mergeDeep } from '@personalhealthtrain/ui-common';
+import { dropAPIRealm, getAPIRealms, mergeDeep } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import Pagination from '../../Pagination';
 
@@ -94,6 +94,39 @@ export default {
             }
 
             this.busy = false;
+        },
+        async drop(item) {
+            if (this.itemBusy) return;
+
+            this.itemBusy = true;
+
+            const l = this.$createElement;
+
+            await this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-dark m-b-0' }, [
+                l('p', null, [
+                    'Are you sure that you want to delete the realm  ',
+                    l('b', null, [item.name]),
+                    '?',
+                ]),
+            ]), {
+                size: 'md',
+                buttonSize: 'xs',
+            })
+                .then((value) => {
+                    if (value) {
+                        return dropAPIRealm(item.id)
+                            .then(() => {
+                                this.dropArrayItem(item);
+                                return value;
+                            });
+                    }
+
+                    this.itemBusy = false;
+
+                    return value;
+                }).catch(() => {
+                    // ...
+                });
         },
         goTo(options, resolve, reject) {
             if (options.offset === this.meta.offset) return;
@@ -187,6 +220,8 @@ export default {
         <slot
             name="items"
             :items="formattedItems"
+            :item-busy="itemBusy"
+            :drop="drop"
             :busy="busy"
         >
             <div class="c-list">
@@ -207,6 +242,8 @@ export default {
                             <slot
                                 name="item-actions"
                                 :item="item"
+                                :item-busy="itemBusy"
+                                :drop="drop"
                             />
                         </div>
                     </div>
@@ -219,7 +256,7 @@ export default {
             slot="no-more"
         >
             <div class="alert alert-sm alert-info">
-                No (more) realms available anymore.
+                No (more) realms available.
             </div>
         </div>
 

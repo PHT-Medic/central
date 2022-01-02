@@ -22,56 +22,60 @@ export enum AggregatorTrainEvent {
     FINISHED = 'trainFinished',
 }
 
+async function handle(message: Message) {
+    const repository = getRepository(Train);
+    const entity = await repository.findOne(message.data.id);
+
+    switch (message.type) {
+        case AggregatorTrainEvent.BUILD_FINISHED:
+            entity.build_status = TrainBuildStatus.FINISHED;
+            break;
+        case AggregatorTrainEvent.STARTED:
+            entity.run_status = TrainRunStatus.RUNNING;
+            entity.run_station_id = null;
+            entity.run_station_index = null;
+            break;
+        case AggregatorTrainEvent.MOVED:
+            entity.run_status = TrainRunStatus.RUNNING;
+            entity.run_station_id = message.data.stationId;
+            entity.run_station_index = message.data.stationIndex;
+            break;
+        case AggregatorTrainEvent.FINISHED:
+            entity.run_status = TrainRunStatus.FINISHED;
+            entity.run_station_id = null;
+            entity.run_station_index = null;
+            break;
+    }
+
+    await repository.save(entity);
+
+    if (message.type === AggregatorTrainEvent.MOVED) {
+        const trainStationRepository = getRepository(TrainStation);
+        const trainStation = await trainStationRepository.findOne({
+            train_id: message.data.id,
+            station_id: message.data.stationId,
+        });
+
+        if (typeof trainStation !== 'undefined') {
+            trainStation.run_status = message.data.status as TrainStationRunStatus;
+            await trainStationRepository.save(trainStation);
+        }
+    }
+}
+
 export function createDispatcherAggregatorTrainHandlers() : ConsumeHandlers {
     return {
         [AggregatorTrainEvent.BUILD_FINISHED]: async (message: Message) => {
-            const repository = getRepository(Train);
-
-            await repository.update({
-                id: message.data.id,
-            }, {
-                build_status: TrainBuildStatus.FINISHED,
-            });
+            await handle(message);
         },
         [AggregatorTrainEvent.STARTED]: async (message: Message) => {
-            const repository = getRepository(Train);
-
-            await repository.update({
-                id: message.data.id,
-            }, {
-                run_status: TrainRunStatus.RUNNING,
-                run_station_id: null,
-                run_station_index: 0,
-            });
+            await handle(message);
         },
         [AggregatorTrainEvent.MOVED]: async (message: Message) => {
-            const repository = getRepository(Train);
-
-            await repository.update({
-                id: message.data.id,
-            }, {
-                run_status: TrainRunStatus.RUNNING,
-                run_station_id: message.data.stationId,
-                run_station_index: message.data.stationIndex,
-            });
-
-            const trainStationRepository = getRepository(TrainStation);
-            await trainStationRepository.update({
-                train_id: message.data.id,
-                station_id: message.data.stationId,
-            }, {
-                run_status: message.data.status as TrainStationRunStatus,
-            });
+            await handle(message);
         },
         [AggregatorTrainEvent.FINISHED]: async (message: Message) => {
-            const repository = getRepository(Train);
-
-            await repository.update({
-                id: message.data.id,
-            }, {
-                run_status: TrainRunStatus.FINISHED,
-                run_station_id: null,
-            });
+            await handle(message);
         },
     };
 }

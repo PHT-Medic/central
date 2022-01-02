@@ -9,12 +9,10 @@ import { Role, addAPIRole, editAPIRole } from '@personalhealthtrain/ui-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 
 import AlertMessage from '../../alert/AlertMessage';
-import NotImplemented from '../../NotImplemented';
 
 export default {
     components: {
         AlertMessage,
-        NotImplemented,
     },
     props: {
         roleProperty: {
@@ -26,7 +24,6 @@ export default {
         return {
             formData: {
                 name: '',
-                provider_role_id: '',
             },
 
             busy: false,
@@ -40,10 +37,6 @@ export default {
                 minLength: minLength(3),
                 maxLength: maxLength(30),
             },
-            provider_role_id: {
-                minLength: minLength(3),
-                maxLength: maxLength(100),
-            },
         },
     },
     computed: {
@@ -53,7 +46,6 @@ export default {
     },
     created() {
         this.formData.name = this.roleProperty?.name ?? '';
-        this.formData.provider_role_id = this.roleProperty?.provider_role_id ?? '';
     },
     methods: {
         async handleSubmit(e) {
@@ -135,35 +127,6 @@ export default {
                     class="form-group-hint group-required"
                 >
                     The length of the name must be greater than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
-                </div>
-            </div>
-
-            <hr>
-
-            <div
-                class="form-group"
-                :class="{ 'form-group-error': $v.formData.provider_role_id.$error }"
-            >
-                <label>Provider Role-ID</label>
-                <input
-                    v-model="$v.formData.provider_role_id.$model"
-                    type="text"
-                    name="name"
-                    class="form-control"
-                    placeholder="Provider Role-ID..."
-                >
-
-                <div
-                    v-if="!$v.formData.provider_role_id.minLength"
-                    class="form-group-hint group-required"
-                >
-                    The length of the provide-role-id must be greater than <strong>{{ $v.formData.provider_role_id.$params.minLength.min }}</strong> characters
-                </div>
-                <div
-                    v-if="!$v.formData.provider_role_id.maxLength"
-                    class="form-group-hint group-required"
-                >
-                    The length of the provider-role-id must be greater than <strong>{{ $v.formData.provider_role_id.$params.maxLength.max }}</strong> characters
                 </div>
             </div>
 

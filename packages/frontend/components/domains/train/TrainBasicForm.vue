@@ -29,10 +29,6 @@ export default {
                 proposal_id: '',
                 name: '',
             },
-            proposal: {
-                items: [],
-                busy: false,
-            },
             types: [
                 { id: TrainType.ANALYSE, name: 'Analyse' },
                 { id: TrainType.DISCOVERY, name: 'Discovery' },

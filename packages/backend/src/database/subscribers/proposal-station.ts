@@ -10,8 +10,8 @@ import {
 } from 'typeorm';
 import {
     ProposalStation,
-    buildSocketProposalStationRoomName,
-    buildSocketRealmNamespaceName,
+    buildSocketProposalStationInRoomName,
+    buildSocketProposalStationOutRoomName, buildSocketProposalStationRoomName, buildSocketRealmNamespaceName,
 } from '@personalhealthtrain/ui-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
 
@@ -55,26 +55,34 @@ function publish(
     ];
 
     for (let i = 0; i < workspaces.length; i++) {
+        const roomName = workspaces[i] === buildSocketRealmNamespaceName(item.station_realm_id) ?
+            buildSocketProposalStationInRoomName() :
+            buildSocketProposalStationOutRoomName();
+
         useSocketEmitter()
             .of(workspaces[i])
-            .in(buildSocketProposalStationRoomName())
+            .in(roomName)
             .emit(OperatorEventMap[operation], {
                 data: item,
                 meta: {
-                    roomName: buildSocketProposalStationRoomName(),
+                    roomName,
                 },
             });
     }
 
     if (operation !== 'create') {
         for (let i = 0; i < workspaces.length; i++) {
+            const roomName = workspaces[i] === buildSocketRealmNamespaceName(item.station_realm_id) ?
+                buildSocketProposalStationInRoomName(item.id) :
+                buildSocketProposalStationOutRoomName(item.id);
+
             useSocketEmitter()
                 .of(workspaces[i])
-                .in(buildSocketProposalStationRoomName(item.id))
+                .in(roomName)
                 .emit(OperatorEventMap[operation], {
                     data: item,
                     meta: {
-                        roomName: buildSocketProposalStationRoomName(item.id),
+                        roomName,
                         roomId: item.id,
                     },
                 });

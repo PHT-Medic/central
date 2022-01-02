@@ -8,7 +8,7 @@
 import {
     Column,
     CreateDateColumn,
-    Entity,
+    Entity, Index,
     JoinColumn,
     ManyToOne,
     OneToMany,
@@ -18,11 +18,12 @@ import { Oauth2ProviderAccount } from '../oauth2-provider-account';
 import { Realm } from '../realm';
 
 @Entity({ name: 'oauth2_providers' })
+@Index(['name', 'realm_id'], { unique: true })
 export class OAuth2Provider {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
-    @Column({ type: 'varchar', length: 128 })
+    @Column({ type: 'varchar', length: 36 })
         name: string;
 
     @Column({ type: 'boolean', default: false })

@@ -27,10 +27,7 @@ export default class CreatePHT implements Seeder {
 
         const roleRepository = connection.getCustomRepository(RoleRepository);
 
-        const roles : Role[] = roleNames.map((role: string) => roleRepository.create({
-            name: role,
-            provider_role_id: role,
-        }));
+        const roles : Role[] = roleNames.map((role: string) => roleRepository.create({ name: role }));
 
         await roleRepository.save(roles);
 
@@ -55,9 +52,9 @@ export default class CreatePHT implements Seeder {
          * Create PHT default realms
          */
         const realms : Partial<Realm>[] = [
-            { id: 'station_1', name: 'University Augsburg' },
-            { id: 'station_2', name: 'University Munich' },
-            { id: 'station_3', name: 'University Tuebingen' },
+            { id: 'station1', name: 'University Augsburg' },
+            { id: 'station2', name: 'University Munich' },
+            { id: 'station3', name: 'University Tuebingen' },
         ];
         const realmRepository = connection.getRepository(Realm);
         await realmRepository.insert(realms);

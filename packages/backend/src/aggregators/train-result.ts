@@ -56,13 +56,14 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: TrainRes
     const latest = typeof data.latest === 'boolean' ? data.latest : true;
 
     const trainRepository = getRepository(Train);
+    const train = await trainRepository.findOne(data.trainId);
     if (latest) {
-        await trainRepository.update({
-            id: data.trainId,
-        }, {
-            result_last_status: status,
-            ...(data.id ? { result_last_id: data.id } : {}),
-        });
+        train.result_last_status = status;
+        if (data.id) {
+            train.result_last_id = data.id;
+        }
+
+        await trainRepository.save(train);
     }
 
     // If an id is available, than the progress succeeded :) ^^
@@ -71,13 +72,8 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: TrainRes
         return;
     }
 
-    const train = await trainRepository.findOne(data.trainId);
-
     const resultRepository = getRepository(TrainResult);
-    let result = await resultRepository.findOne({
-        id: data.id,
-        train_id: data.trainId,
-    });
+    let result = await resultRepository.findOne(data.id);
 
     if (typeof result === 'undefined') {
         result = resultRepository.create({

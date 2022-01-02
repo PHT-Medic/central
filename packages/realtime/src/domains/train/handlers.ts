@@ -6,11 +6,14 @@
  */
 
 import {
-    MASTER_REALM_ID, PermissionID, Train, buildSocketProposalStationRoomName, buildSocketTrainRoomName, getAPITrain,
+    PermissionID,
+    buildSocketTrainRoomName,
+    extendSocketClientToServerEventCallback,
+    extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/ui-common';
 import { UnauthorizedError } from '@typescript-error/http';
-import { stringifyAuthorizationHeader } from '@typescript-auth/core';
 import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
+import { decrSocketRoomConnections, incrSocketRoomConnections } from '../../config/socket/utils';
 
 export function registerTrainSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
@@ -19,10 +22,10 @@ export function registerTrainSocketHandlers(
     if (!socket.data.user) return;
 
     socket.on('trainsSubscribe', async (context, cb) => {
-        context ??= {};
+        context = extendSocketClientToServerEventContext(context);
+        cb = extendSocketClientToServerEventCallback(cb);
 
         if (
-            !socket.data.ability.hasPermission(PermissionID.TRAIN_DROP) &&
             !socket.data.ability.hasPermission(PermissionID.TRAIN_EDIT) &&
             !socket.data.ability.hasPermission(PermissionID.TRAIN_EXECUTION_START) &&
             !socket.data.ability.hasPermission(PermissionID.TRAIN_EXECUTION_STOP)
@@ -34,7 +37,7 @@ export function registerTrainSocketHandlers(
             return;
         }
 
-        socket.join(buildSocketTrainRoomName(context.id));
+        incrSocketRoomConnections(socket, buildSocketTrainRoomName(context.data.id));
 
         if (typeof cb === 'function') {
             cb();
@@ -42,8 +45,8 @@ export function registerTrainSocketHandlers(
     });
 
     socket.on('trainsUnsubscribe', (context) => {
-        context ??= {};
+        context = extendSocketClientToServerEventContext(context);
 
-        socket.leave(buildSocketTrainRoomName(context.id));
+        decrSocketRoomConnections(socket, buildSocketTrainRoomName(context.data.id));
     });
 }

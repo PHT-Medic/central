@@ -5,17 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { addAPIRealm, editAPIRealm } from '@personalhealthtrain/ui-common';
-import { maxLength, minLength, required } from 'vuelidate/lib/validators';
+import { addAPIRealm, createNanoID, editAPIRealm } from '@personalhealthtrain/ui-common';
+import {
+    helpers, maxLength, minLength, required,
+} from 'vuelidate/lib/validators';
 
-import AlertMessage from '../../alert/AlertMessage';
-import NotImplemented from '../../NotImplemented';
+const validId = helpers.regex('validId', /^[a-z0-9-_]*$/);
 
 export default {
-    components: {
-        AlertMessage,
-        NotImplemented,
-    },
     props: {
         itemProperty: {
             type: Object,
@@ -29,6 +26,7 @@ export default {
             formData: {
                 id: '',
                 name: '',
+                description: '',
             },
 
             busy: false,
@@ -38,6 +36,8 @@ export default {
     validations: {
         formData: {
             id: {
+                required,
+                validId,
                 minLength: minLength(5),
                 maxLength: maxLength(36),
             },
@@ -46,70 +46,84 @@ export default {
                 minLength: minLength(5),
                 maxLength: maxLength(100),
             },
+            description: {
+                minLength: minLength(5),
+                maxLength: maxLength(4096),
+            },
         },
     },
     computed: {
         isEditing() {
-            return this.itemProperty && this.itemProperty.hasOwnProperty('id');
+            return this.itemProperty && Object.prototype.hasOwnProperty.call(this.itemProperty, 'id');
+        },
+        isIDEmpty() {
+            return !this.formData.id || this.formData.id.length === 0;
         },
     },
     created() {
-        if (typeof this.itemProperty !== 'undefined') {
-            this.formData.id = this.itemProperty.id ?? '';
-            this.formData.name = this.itemProperty.name ?? '';
-        }
+        this.initFromProperties();
     },
     methods: {
+        initFromProperties() {
+            if (this.itemProperty) {
+                const keys = Object.keys(this.formData);
+                for (let i = 0; i < keys.length; i++) {
+                    if (Object.prototype.hasOwnProperty.call(this.itemProperty, keys[i])) {
+                        this.formData[keys[i]] = this.itemProperty[keys[i]];
+                    }
+                }
+            }
+
+            if (this.formData.id.length === 0) {
+                this.generateID();
+            }
+        },
         async handleSubmit() {
             if (this.busy || this.$v.$invalid) {
                 return;
             }
 
-            this.message = null;
             this.busy = true;
 
             try {
                 let response;
-                const formData = {
-                    name: this.formData.name,
-                    id: this.formData.id,
-                };
-
                 if (this.isEditing) {
-                    response = await editAPIRealm(this.itemProperty.id, { name: formData.name });
+                    response = await editAPIRealm(this.itemProperty.id, this.formData);
 
-                    this.message = {
-                        isError: false,
-                        data: 'The realm was successfully updated.',
-                    };
+                    this.$bvToast.toast('The realm was successfully updated.', {
+                        variant: 'success',
+                        toaster: 'b-toaster-top-center',
+                    });
 
                     this.$emit('updated', response);
                 } else {
-                    response = await addAPIRealm(formData);
+                    response = await addAPIRealm(this.formData);
 
-                    this.message = {
-                        isError: false,
-                        data: 'The realm was successfully created.',
-                    };
+                    this.$bvToast.toast('The realm was successfully created.', {
+                        variant: 'success',
+                        toaster: 'b-toaster-top-center',
+                    });
 
                     this.$emit('created', response);
                 }
             } catch (e) {
-                this.message = {
-                    data: e.message,
-                    isError: true,
-                };
+                this.$bvToast.toast(e.message, {
+                    variant: 'warning',
+                    toaster: 'b-toaster-top-center',
+                });
             }
 
             this.busy = false;
+        },
+
+        generateID() {
+            this.formData.id = createNanoID();
         },
     },
 };
 </script>
 <template>
     <div>
-        <alert-message :message="message" />
-
         <div class="form-group">
             <div
                 class="form-group"
@@ -129,7 +143,13 @@ export default {
                     v-if="!$v.formData.id.required && !$v.formData.id.$model"
                     class="form-group-hint group-required"
                 >
-                    Enter an Identifier.
+                    Enter an identifier.
+                </div>
+                <div
+                    v-if="!$v.formData.id.validId"
+                    class="form-group-hint group-required"
+                >
+                    The identifier is only allowed to consist of the following characters: [0-9a-z-_]+
                 </div>
                 <div
                     v-if="!$v.formData.id.minLength"
@@ -143,6 +163,24 @@ export default {
                 >
                     The length of the ID must be less than <strong>{{ $v.formData.id.$params.maxLength.max }}</strong> characters.
                 </div>
+            </div>
+            <div
+                v-if="!isEditing"
+                class="alert alert-sm"
+                :class="{
+                    'alert-warning': isIDEmpty,
+                    'alert-success': !isIDEmpty
+                }"
+            >
+                <div class="mb-1">
+                    If you don't want to chose an identifier by your own, you can generate one.
+                </div>
+                <button
+                    class="btn btn-dark btn-xs"
+                    @click.prevent="generateID"
+                >
+                    <i class="fa fa-wrench" /> Generate
+                </button>
             </div>
 
             <hr>
@@ -170,13 +208,43 @@ export default {
                     v-if="!$v.formData.name.minLength"
                     class="form-group-hint group-required"
                 >
-                    The length of the ID must be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters.
+                    The length of the name must be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters.
                 </div>
                 <div
                     v-if="!$v.formData.name.maxLength"
                     class="form-group-hint group-required"
                 >
-                    The length of the ID must be less than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
+                    The length of the name must be less than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
+                </div>
+            </div>
+
+            <hr>
+
+            <div
+                class="form-group"
+                :class="{ 'form-group-error': $v.formData.description.$error }"
+            >
+                <label>Description</label>
+                <textarea
+                    v-model="$v.formData.description.$model"
+                    class="form-control"
+                    rows="4"
+                    placeholder="..."
+                />
+
+                <div
+                    v-if="!$v.formData.description.minLength"
+                    class="form-group-hint group-required"
+                >
+                    The length of the description must be greater than
+                    <strong>{{ $v.formData.description.$params.minLength.min }}</strong> characters.
+                </div>
+                <div
+                    v-if="!$v.formData.description.maxLength"
+                    class="form-group-hint group-required"
+                >
+                    The length of the description must be less than
+                    <strong>{{ $v.formData.description.$params.maxLength.max }}</strong> characters.
                 </div>
             </div>
 

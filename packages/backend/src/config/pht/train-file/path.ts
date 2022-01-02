@@ -5,18 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainFile } from '@personalhealthtrain/ui-common';
+import { Train, TrainFile } from '@personalhealthtrain/ui-common';
 import path from 'path';
 import { getWritableDirPath } from '../../paths';
-
-export function getTrainFileFilePath(file: TrainFile) {
-    return `${getTrainFileDirectoryPath(file)}/${getTrainFileFileName(file)}`;
-}
 
 export function getTrainFileFileName(file: TrainFile) {
     return `${file.hash}.file`;
 }
 
-export function getTrainFileDirectoryPath(file: TrainFile) {
-    return path.resolve(`${getWritableDirPath()}/train-files`);
+export function getTrainFilesDirectoryPath(trainId: typeof Train.prototype.id) {
+    return path.join(getWritableDirPath(), 'train-files', trainId);
+}
+
+export function getTrainFileFilePath(file: TrainFile) {
+    return path.join(getTrainFilesDirectoryPath(file.train_id), getTrainFileFileName(file));
 }
