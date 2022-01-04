@@ -29,15 +29,11 @@ export function buildDispatcherComponent() {
             [DispatcherEvent.PROPOSAL]: async (message: Message) => {
                 // assigned, approved, rejected
 
-                console.log(message);
-
                 await Promise.resolve(message)
                     .then(dispatchProposalEventToEmailNotifier);
             },
             [DispatcherEvent.TRAIN]: async (message: Message) => {
                 // assigned, approved, rejected
-
-                console.log(message);
 
                 await Promise.resolve(message)
                     .then(dispatchTrainEventToEmailNotifier);
@@ -45,8 +41,6 @@ export function buildDispatcherComponent() {
 
             [DispatcherEvent.HARBOR]: async (message: Message) => {
                 // PUSH_ARTIFACT
-
-                console.log(message);
 
                 await Promise.resolve(message)
                     .then(extendDispatcherHarborData)

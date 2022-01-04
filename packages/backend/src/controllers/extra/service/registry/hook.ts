@@ -46,13 +46,6 @@ function useHookEventDataValidator() : BaseSchema {
     return eventValidator;
 }
 
-export type HarborHook = {
-    type: string,
-    occur_at?: string,
-    operator: string,
-    event_data: HarborHookEvent
-};
-
 type HarborHookEvent = {
     repository: {
         name: string,
@@ -66,6 +59,13 @@ type HarborHookEvent = {
         resource_url: string
     }[],
     [key: string]: any
+};
+
+export type HarborHook = {
+    type: string,
+    occur_at?: string,
+    operator: string,
+    event_data: HarborHookEvent
 };
 
 export async function postHarborHookRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
@@ -97,8 +97,6 @@ export async function postHarborHookRouteHandler(req: ExpressRequest, res: Expre
         repositoryFullName: hook.event_data.repository.repo_full_name,
         artifactTag: hook.event_data.resources[0]?.tag,
     });
-
-    console.log(message);
 
     await publishMessage(message);
 

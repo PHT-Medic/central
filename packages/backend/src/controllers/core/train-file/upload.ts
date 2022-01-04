@@ -116,8 +116,6 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
 
         await Promise.all(promises);
 
-        console.log(files);
-
         await trainFileRepository.save(files, { listeners: true });
 
         entity = repository.merge(entity, {
