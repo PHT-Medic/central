@@ -92,7 +92,9 @@ export class SetupCommand implements CommandModule {
 
                 if (args['database-seeder']) {
                     const config = createConfig({ env });
-                    await config.redisDatabase.connect();
+                    if (config.redisDatabase.status !== 'connecting') {
+                        await config.redisDatabase.connect();
+                    }
 
                     await runSeeder(connection);
                 }

@@ -7,11 +7,8 @@
 
 import { Arguments, Argv, CommandModule } from 'yargs';
 import {
-    buildConnectionOptions, createDatabase, dropDatabase, runSeeder,
+    buildConnectionOptions, dropDatabase,
 } from 'typeorm-extension';
-import { createConnection } from 'typeorm';
-import { createConfig } from '../../config';
-import env from '../../env';
 
 interface ResetArguments extends Arguments {
 
@@ -27,29 +24,8 @@ export class ResetCommand implements CommandModule {
     }
 
     async handler(args: ResetArguments) {
-        const config = createConfig({ env });
-        await config.redisDatabase.connect();
-
         const connectionOptions = await buildConnectionOptions();
-
-        await dropDatabase({ ifExist: true });
-        await createDatabase({ ifNotExist: true });
-
-        const connection = await createConnection(connectionOptions);
-
-        try {
-            await connection.synchronize(true);
-            await connection.runMigrations({ transaction: 'all' });
-            await runSeeder(connection);
-        } catch (e) {
-            if (e instanceof Error) {
-                console.log(e.message);
-            }
-
-            process.exit(1);
-        } finally {
-            await connection.close();
-        }
+        await dropDatabase({ ifExist: true }, connectionOptions);
 
         process.exit(0);
     }
