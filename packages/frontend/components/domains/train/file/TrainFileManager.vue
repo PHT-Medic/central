@@ -6,13 +6,14 @@
   -->
 <script>
 import {
+    buildSocketTrainFileRoomName,
     dropApiTrainFile,
-    getAPIMasterImage, getAPIMasterImageGroup, getAPIMasterImageGroups,
     getApiTrainFiles,
     hasOwnProperty,
     uploadTrainFiles,
 } from '@personalhealthtrain/ui-common';
 import { required } from 'vuelidate/lib/validators';
+import Vue from 'vue';
 import TrainFile from './TrainFile';
 import TrainFormFile from './TrainFormFile';
 import TrainImageCommand from '../TrainImageCommand';
@@ -28,7 +29,14 @@ export default {
     data() {
         return {
             items: [],
+            meta: {
+                limit: 10,
+                offset: 0,
+                total: 0,
+            },
             busy: false,
+
+            socketLocked: false,
 
             selected: [],
             selectAll: false,
@@ -63,16 +71,100 @@ export default {
 
             return `${this.items[index].directory}/${this.items[index].name}`;
         },
+        updatedAt() {
+            return this.train?.updated_at ? this.train.updated_at : undefined;
+        },
+    },
+    watch: {
+        updatedAt(val, oldVal) {
+            if (val && val !== oldVal) {
+                this.initFromProperties();
+            }
+        },
     },
     created() {
-        if (typeof this.train.entrypoint_file_id !== 'undefined') {
-            this.form.entrypoint_file_id = this.train.entrypoint_file_id;
-        }
+        this.initFromProperties();
 
         Promise.resolve()
             .then(this.load);
     },
+    mounted() {
+        const socket = this.$socket.useRealmWorkspace(this.query?.filter?.realm_id ?? this.query?.filters?.realm_id);
+        socket.emit('trainFilesSubscribe');
+
+        socket.on('trainFileCreated', this.handleSocketCreated);
+    },
+    beforeDestroy() {
+        const socket = this.$socket.useRealmWorkspace(this.query?.filter?.realm_id ?? this.query?.filters?.realm_id);
+        socket.emit('trainFilesSubscribe');
+
+        socket.off('trainFileCreated', this.handleSocketCreated);
+    },
     methods: {
+        initFromProperties() {
+            if (!this.train) return;
+
+            if (!!this.train.entrypoint_file_id && this.train.entrypoint_file_id.length > 0) {
+                this.form.entrypoint_file_id = this.train.entrypoint_file_id;
+            }
+        },
+        handleSocketCreated(context) {
+            if (
+                this.socketLocked ||
+                context.meta.roomName !== buildSocketTrainFileRoomName() ||
+                context.data.train_id !== this.train.id
+            ) return;
+
+            this.handleCreated(context.data);
+        },
+        handleCreated(item, withCheck = true) {
+            let exists = false;
+            if (withCheck) {
+                const index = this.items.findIndex((el) => el.id === item.id);
+                exists = index !== -1;
+            }
+
+            if (!exists) {
+                this.items.push(item);
+
+                if (this.items.length > this.meta.limit) {
+                    this.items.splice(this.meta.limit, 1);
+                }
+
+                this.meta.total++;
+
+                this.$emit('created', item);
+            }
+        },
+        handleUpdated(item) {
+            const index = this.items.findIndex((el) => el.id === item.id);
+            if (index !== -1) {
+                const keys = Object.keys(item);
+                for (let i = 0; i < keys.length; i++) {
+                    Vue.set(this.items[index], keys[i], item[keys[i]]);
+                }
+            }
+
+            this.$emit('updated', item);
+        },
+        handleDeleted(item) {
+            const index = this.items.findIndex((el) => el.id === item.id);
+            if (index !== -1) {
+                if (this.form.entrypoint_file_id === this.items[index].id) {
+                    this.changeEntryPointFile(this.items[index]);
+                }
+
+                this.items.splice(index, 1);
+                this.meta.total--;
+
+                this.$emit('deleted', item);
+            }
+
+            const selectedIndex = this.selected.indexOf(item.id);
+            if (selectedIndex !== -1) {
+                this.selected.splice(selectedIndex, 1);
+            }
+        },
         async load() {
             if (this.busy) return;
 
@@ -99,15 +191,15 @@ export default {
                     formData.append(`files[${i}]`, this.form.files[i]);
                 }
 
+                this.socketLocked = true;
                 const response = await uploadTrainFiles(this.train.id, formData);
-                this.form.files = [];
-
-                for (let i = 0; i < response.data.length; i++) {
-                    this.items.push(response.data[i]);
-                }
+                response.data.map((item) => this.handleCreated(item, false));
+                this.socketLocked = false;
 
                 this.$emit('uploaded', this.form.files);
+                this.form.files = [];
             } catch (e) {
+                this.socketLocked = false;
                 this.$emit('failed', e.message);
             }
 
@@ -125,16 +217,11 @@ export default {
 
             try {
                 for (let i = 0; i < this.selected.length; i++) {
-                    await dropApiTrainFile(this.train.id, this.selected[i]);
-
-                    const index = this.items.findIndex((file) => file.id === this.selected[i]);
-                    if (index !== -1) {
-                        this.items.splice(index, 1);
-                    }
-
-                    this.$emit('deleted', this.selected[i]);
+                    const file = await dropApiTrainFile(this.train.id, this.selected[i]);
+                    this.handleDeleted(file);
                 }
             } catch (e) {
+                console.log(e);
                 // ...
             }
 
@@ -147,7 +234,7 @@ export default {
                 this.selected = [];
             }
         },
-        selectFile(event) {
+        toggleFile(event) {
             const index = this.selected.findIndex((file) => file === event.id);
             if (index === -1) {
                 this.selected.push(event.id);
@@ -179,14 +266,6 @@ export default {
             if (index !== -1) {
                 this.form.files.splice(index, 1);
             }
-        },
-        handleFileDeleted(id) {
-            const index = this.items.findIndex((file) => file.id === id);
-            if (index !== -1) {
-                this.items.splice(index, 1);
-            }
-
-            this.$emit('deleted', id);
         },
 
         changeEntryPointFile(file) {
@@ -365,18 +444,19 @@ export default {
                         @change="selectAllFiles"
                     >
                     <label for="selectAllFiles">Select all</label>
-                    </i>
                 </div>
 
                 <div class="d-flex flex-column">
                     <train-file
-                        v-for="(file,key) in items"
-                        :key="key"
+                        v-for="file in items"
+                        :key="file.id"
                         class="mr-1"
                         :file="file"
                         :files-selected="selected"
                         :file-selected-id="form.entrypoint_file_id"
-                        @check="selectFile"
+                        @check="toggleFile"
+                        @updated="handleUpdated"
+                        @deleted="handleDeleted"
                         @toggle="changeEntryPointFile"
                     />
                 </div>
@@ -388,48 +468,10 @@ export default {
                         :disabled="actionBusy || selected.length === 0"
                         @click.prevent="dropSelected"
                     >
-                        Delete
+                        <i class="fa fa-trash" /> Delete
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </template>
-<style>
-
-.file-man-box {
-    padding: 8px;
-    border: 1px solid #e3eaef;
-    border-radius: 5px;
-    position: relative;
-}
-
-.file-man-box .file-close {
-    color: #f1556c;
-    line-height: 24px;
-    font-size: 24px;
-    right: 10px;
-    top: 10px;
-}
-
-.file-man-box .file-img-box {
-    text-align: center;
-}
-
-.file-man-box .file-img-box img {
-    height: 32px;
-}
-
-.file-man-box .file-img-box i {
-    font-size: 32px;
-}
-
-.file-man-box .file-download {
-    font-size: 32px;
-    color: #98a6ad;
-}
-
-.file-man-box .file-man-title {
-    padding-right: 25px;
-}
-</style>

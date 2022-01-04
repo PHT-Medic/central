@@ -100,8 +100,6 @@ export default {
             ) {
                 this.handleCreated(context.data, true);
             }
-
-            this.$emit('created', context.data);
         },
         async load() {
             if (this.busy) return;

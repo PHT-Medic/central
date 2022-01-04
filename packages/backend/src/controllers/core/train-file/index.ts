@@ -78,10 +78,6 @@ export async function getTrainFilesRouteHandler(req: ExpressRequest, res: Expres
 export async function dropTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { fileId } = req.params;
 
-    if (typeof fileId !== 'string' || !fileId.length) {
-        throw new BadRequestError();
-    }
-
     if (
         !req.ability.hasPermission(PermissionID.TRAIN_ADD) &&
         !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
@@ -112,7 +108,7 @@ export async function dropTrainFileRouteHandler(req: ExpressRequest, res: Expres
         hash: null,
         hash_signed: null,
     });
-    await repository.save(train);
+    await trainRepository.save(train);
 
     return res.respondDeleted({ data: entity });
 }

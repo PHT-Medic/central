@@ -11,6 +11,7 @@ import { SocketNamespaceInterface, SocketServerInterface } from './type';
 import { registerProposalSocketHandlers } from '../../domains/proposal/handlers';
 import { registerProposalStationSocketHandlers } from '../../domains/proposal-station/handlers';
 import { registerTrainStationSocketHandlers } from '../../domains/train-station/handlers';
+import { registerTrainFileSocketHandlers } from '../../domains/train-file/handlers';
 
 export function registerSocketHandlers(io: SocketServerInterface) {
     io.on('connection', (socket) => {
@@ -25,6 +26,7 @@ export function registerSocketNamespaceHandlers(io: SocketNamespaceInterface) {
         registerProposalSocketHandlers(io, socket);
         registerProposalStationSocketHandlers(io, socket);
         registerTrainSocketHandlers(io, socket);
+        registerTrainFileSocketHandlers(io, socket);
         registerTrainStationSocketHandlers(io, socket);
     });
 }

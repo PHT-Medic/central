@@ -75,7 +75,11 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
         });
 
         file.on('end', () => {
-            if (!info.filename && handler.getFileSize() === 0) {
+            if (
+                !info.filename ||
+                info.filename.length === 0 ||
+                handler.getFileSize() === 0
+            ) {
                 handler.cleanup();
                 return;
             }
@@ -112,7 +116,9 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
 
         await Promise.all(promises);
 
-        await trainFileRepository.save(files);
+        console.log(files);
+
+        await trainFileRepository.save(files, { listeners: true });
 
         entity = repository.merge(entity, {
             hash: null,

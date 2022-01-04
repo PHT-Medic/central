@@ -32,24 +32,21 @@ export default {
 };
 </script>
 <template>
-    <div class="card card-file d-flex flex-row align-items-center">
+    <div class="card card-file d-flex flex-row align-items-center p-1">
         <div class="card-heading">
-            <i class="fa fa-file-upload text-info" />
-        </div>
-        <div class="card-body">
             <span class="title">
                 {{ path }}
-                <small class="text-muted">{{ file.size }} Bytes</small>
+                <small class="text-muted ml-1">{{ file.size }} Bytes</small>
             </span>
         </div>
         <div class="ml-auto">
-            <a
-                href="javascript:void(0)"
-                style="margin-right: .75rem"
+            <button
+                type="button"
+                class="btn btn-dark btn-xs"
                 @click.prevent="drop"
             >
-                <i class="fa fa-times" />
-            </a>
+                <i class="fa fa fa-trash" />
+            </button>
         </div>
     </div>
 </template>

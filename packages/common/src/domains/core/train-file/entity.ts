@@ -25,7 +25,7 @@ export class TrainFile {
     @Column({ type: 'varchar', length: 256 })
         name: string;
 
-    @Column({ type: 'varchar', length: 2048 })
+    @Column({ type: 'varchar', length: 4096 })
         hash: string;
 
     @Column({ nullable: true })

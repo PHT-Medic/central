@@ -6,7 +6,7 @@
  */
 
 import {
-    Proposal, ProposalStation, Train, TrainResult, TrainStation,
+    Proposal, ProposalStation, Train, TrainFile, TrainResult, TrainStation,
 } from '../../core';
 
 type SimpleOperation = 'Created' | 'Updated' | 'Deleted';
@@ -25,6 +25,8 @@ export type SocketServerToClientEvents = {
     [T in `proposalStation${SimpleOperation}`]: (data: SocketServerToClientEventContext<ProposalStation>) => void
 } & {
     [T in `train${SimpleOperation}`]: (data: SocketServerToClientEventContext<Train>) => void
+} & {
+    [T in `trainFile${SimpleOperation}`]: (data: SocketServerToClientEventContext<TrainFile>) => void
 } & {
     [T in `trainResult${SimpleOperation}`]: (data: SocketServerToClientEventContext<TrainResult>) => void
 } & {
@@ -58,6 +60,11 @@ export type SocketClientToServerEvents = {
 } & {
     [K in `trains${SubUnsubOperation}`]: (
         context?: SocketClientToServerEventContext<Train>,
+        cb?: (error?: Error) => void
+    ) => void
+} & {
+    [K in `trainFiles${SubUnsubOperation}`]: (
+        context?: SocketClientToServerEventContext<TrainFile>,
         cb?: (error?: Error) => void
     ) => void
 } & {

@@ -226,10 +226,26 @@ Card
     line-height: 1.75rem;
 }
 
+.card-file.checked {
+    background-color: rgb(43, 43, 43);
+    color: rgb(184, 186, 160);
+}
+
+.card-file.checked .card-heading i {
+    color: rgb(166, 89, 45);
+}
+
 .card.card-file .card-heading {
     margin-left: 0.3rem;
     font-size: 1em;
     background: none;
+    cursor: pointer;
+}
+
+
+.card.card-file .card-heading .title {
+    font-size: .8125em;
+    font-weight: 600;
 }
 
 .card.card-file .card-body {
@@ -239,11 +255,6 @@ Card
     text-overflow: ellipsis;
     flex: none;
     padding: 0 0 0 10px;
-}
-
-.card.card-file .card-body .title {
-    font-size: .8125em;
-    font-weight: 600;
 }
 
 .card.card-file .train-card-footer {

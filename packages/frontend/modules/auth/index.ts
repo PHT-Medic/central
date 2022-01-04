@@ -135,7 +135,10 @@ class AuthModule {
                         if (typeof this.ctx !== 'undefined') {
                             this.ctx.store.dispatch('auth/triggerTokenExpired')
                                 .then((r: any) => r)
-                                .catch(() => this.ctx.redirect('/logout'));
+                                .catch(() => this.ctx.redirect({
+                                    path: '/logout',
+                                    query: { redirect: this.ctx.route.fullPath },
+                                }));
                         }
                     };
 
