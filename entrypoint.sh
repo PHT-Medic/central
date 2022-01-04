@@ -16,6 +16,7 @@ cd "${BASE_DIR}"
 case "${1}" in
     backend) PACKAGE=backend;;
     frontend) PACKAGE=frontend;;
+    realtime) PACKAGE=realtime;;
     cli) PACKAGE=cli;;
     *) echo "Unknown package: ${1}";;
 esac
