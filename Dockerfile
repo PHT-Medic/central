@@ -14,6 +14,7 @@ RUN npm run build
 
 RUN touch packages/backend/.env
 RUN touch packages/frontend/.env
+RUN touch packages/realtime/.env
 
 COPY ./entrypoint.sh ./entrypoint.sh
 

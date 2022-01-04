@@ -39,6 +39,9 @@ case "${PACKAGE}" in
         export NUXT_PORT=3000
         exec npm run "$1" --workspace=packages/frontend
         ;;
+    realtime)
+        exec npm run "$1" --workspace=packages/realtime
+        ;;
     cli)
         exec npm run cli --workspace=packages/backend -- "$@"
         ;;
