@@ -11,9 +11,9 @@ import { TooManyRequestsError } from '@typescript-error/http';
 import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 
 export function useRateLimiter(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) {
-    const config : Options = {
+    const limiter : RequestHandler = rateLimit({
         // 1/3 req p. sec
-        windowMs: 15 * 60 * 1000, // 15 Minuten = 900 sec
+        windowMs: 15 * 60 * 1000, // 15 minutes = 900 sec
 
         max(req: ExpressRequest) {
             if (req.serviceId || req.userId) {
@@ -26,9 +26,7 @@ export function useRateLimiter(req: ExpressRequest, res: ExpressResponse, next: 
         handler(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction): any {
             next(new TooManyRequestsError());
         },
-    };
-
-    const limiter : RequestHandler = rateLimit(config);
+    });
 
     return limiter(req, res, next);
 }
