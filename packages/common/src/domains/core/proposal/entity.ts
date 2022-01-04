@@ -9,8 +9,7 @@ import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import { Realm, User } from '../../auth';
-import { MasterImage } from '../master-image/entity';
-import { Train } from '../train';
+import { MasterImage } from '../master-image';
 import { ProposalStation } from '../proposal-station';
 
 @Entity({ name: 'proposals' })
@@ -18,7 +17,7 @@ export class Proposal {
     @PrimaryGeneratedColumn()
         id: number;
 
-    @Column({ type: 'varchar' })
+    @Column({ type: 'varchar', length: 256 })
         title: string;
 
     @Column({ type: 'varchar' })
@@ -27,8 +26,11 @@ export class Proposal {
     @Column({ type: 'varchar' })
         risk: string;
 
-    @Column({ type: 'varchar' })
+    @Column({ type: 'varchar', length: 4096 })
         risk_comment: string;
+
+    @Column({ type: 'int', unsigned: true, default: 0 })
+        trains: number;
 
     // ------------------------------------------------------------------
 
@@ -53,9 +55,6 @@ export class Proposal {
     @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'user_id' })
         user: User;
-
-    @OneToMany(() => Train, (train) => train.proposal)
-        trains: Train[];
 
     @Column({ nullable: true })
         master_image_id: string | null;

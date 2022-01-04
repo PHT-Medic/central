@@ -44,7 +44,7 @@ export function registerProposalSocketHandlers(
     });
 
     socket.on('proposalsUnsubscribe', (context) => {
-        context ??= {};
+        context = extendSocketClientToServerEventContext(context);
 
         decrSocketRoomConnections(socket, buildSocketProposalRoomName(context.data.id));
     });

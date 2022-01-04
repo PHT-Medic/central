@@ -73,10 +73,10 @@ export default {
 
             await this.$nuxt.$router.push('/trains');
         },
-        handleUpdated(train) {
-            // eslint-disable-next-line no-restricted-syntax
-            for (const key in train) {
-                Vue.set(this.item, key, train[key]);
+        handleUpdated(data) {
+            const keys = Object.keys(data);
+            for (let i = 0; i < keys.length; i++) {
+                Vue.set(this.item, keys[i], data[keys[i]]);
             }
         },
     },

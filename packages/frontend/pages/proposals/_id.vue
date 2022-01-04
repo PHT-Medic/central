@@ -8,6 +8,7 @@
 import {
     PermissionID, getAPIStations, getApiProposalStations, getProposal,
 } from '@personalhealthtrain/ui-common';
+import Vue from 'vue';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
 
 export default {
@@ -59,7 +60,7 @@ export default {
             }
 
             return {
-                proposal,
+                entity: proposal,
                 visitorStation,
                 visitorProposalStation,
             };
@@ -73,7 +74,7 @@ export default {
     },
     data() {
         return {
-            proposal: null,
+            entity: null,
 
             visitorStation: null,
             visitorProposalStation: null,
@@ -88,7 +89,7 @@ export default {
     },
     computed: {
         isProposalOwner() {
-            return this.$store.getters['auth/user'].realm_id === this.proposal.realm_id;
+            return this.$store.getters['auth/user'].realm_id === this.entity.realm_id;
         },
         isStationAuthority() {
             return !!this.visitorStation;
@@ -104,7 +105,35 @@ export default {
     created() {
         this.fillSidebar();
     },
+    mounted() {
+        const socket = this.$socket.useRealmWorkspace(this.entity.realm_id);
+        socket.emit('proposalsSubscribe', { data: { id: this.entity.id } });
+        socket.on('proposalUpdated', this.handleSocketUpdated);
+        socket.on('proposalDeleted', this.handleSocketDeleted);
+    },
+    beforeDestroy() {
+        const socket = this.$socket.useRealmWorkspace(this.entity.realm_id);
+        socket.emit('proposalsSubscribe', { data: { id: this.entity.id } });
+        socket.off('proposalUpdated', this.handleSocketUpdated);
+        socket.off('proposalDeleted', this.handleSocketDeleted);
+    },
     methods: {
+        handleSocketUpdated(context) {
+            if (
+                this.entity.id !== context.data.id ||
+                context.meta.roomId !== this.entity.id
+            ) return;
+
+            this.handleUpdated(context.data);
+        },
+        async handleSocketDeleted(context) {
+            if (
+                this.entity.id !== context.data.id ||
+                context.meta.roomId !== this.entity.id
+            ) return;
+
+            this.handleDeleted(context.data);
+        },
         fillSidebar() {
             const items = [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
@@ -128,7 +157,13 @@ export default {
         },
 
         handleUpdated(data) {
-            Object.assign(this.proposal, data);
+            const keys = Object.keys(data);
+            for (let i = 0; i < keys.length; i++) {
+                Vue.set(this.entity, keys[i], data[keys[i]]);
+            }
+        },
+        async handleDeleted(data) {
+            await this.$nuxt.$router.push('/proposals');
         },
         handleProposalStationUpdated(item) {
             if (typeof this.visitorProposalStation !== 'undefined' && this.visitorProposalStation.id === item.id) {
@@ -141,7 +176,7 @@ export default {
 <template>
     <div>
         <h1 class="title no-border mb-3">
-            📜 {{ proposal.title }}
+            📜 {{ entity.title }}
         </h1>
 
         <div class="m-b-20 m-t-10">
@@ -159,16 +194,16 @@ export default {
                                 </b-nav-item>
 
                                 <b-nav-item
-                                    v-for="(item,key) in sidebar.items"
+                                    v-for="(tab,key) in sidebar.items"
                                     :key="key"
-                                    :disabled="item.active"
-                                    :to="'/proposals/' + proposal.id + item.urlSuffix"
-                                    :active="$route.path.startsWith('/proposals/'+proposal.id + item.urlSuffix) && item.urlSuffix.length !== 0"
+                                    :disabled="tab.active"
+                                    :to="'/proposals/' + entity.id + tab.urlSuffix"
+                                    :active="$route.path.startsWith('/proposals/'+entity.id + tab.urlSuffix) && tab.urlSuffix.length !== 0"
                                     exact-active-class="active"
                                     exact
                                 >
-                                    <i :class="item.icon" />
-                                    {{ item.name }}
+                                    <i :class="tab.icon" />
+                                    {{ tab.name }}
                                 </b-nav-item>
                             </b-nav>
                         </div>
@@ -178,9 +213,10 @@ export default {
         </div>
 
         <nuxt-child
-            :proposal="proposal"
+            :proposal="entity"
             :visitor-station="visitorStation"
             :visitor-proposal-station="visitorProposalStation"
+            @deleted="handleDeleted"
             @updated="handleUpdated"
             @proposalStationUpdated="handleProposalStationUpdated"
         />

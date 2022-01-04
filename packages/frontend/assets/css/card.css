@@ -45,56 +45,22 @@
     color: #7F828B;
 }
 
-
-.card.card-file {
-    padding: 0;
-    margin-bottom: 0.4rem;
-    height: 1.75rem;
-    line-height: 1.75rem;
-}
-
-.card.card-file .card-heading {
-    margin-left: 0.3rem;
-    font-size: 1em;
-    background: none;
-}
-
-.card.card-file .card-body {
-    max-height: 40px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: none;
-    padding: 0 0 0 10px;
-}
-
-.card.card-file .card-body .title {
-    font-size: .8125em;
-    font-weight: 600;
-}
-
-.card.card-file .train-card-footer {
-    background: none;
-    padding: 0;
-    margin-right: 0rem;
-    margin-left: auto;
-    border: none;
-}
+/*
+Card
+ */
 
 .card {
     border-radius: 5px;
     -webkit-box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
     box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
     border: none;
-    margin-bottom: 30px;
     -webkit-transition: all 0.3s ease-in-out;
     transition: all 0.3s ease-in-out;
 }
 
-.card .train-card-footer {
-    border-top: none;
-    padding: 15px 20px;
-    border-radius: 0 0 5px 5px;
+.card-grey {
+    background-color: #ececec;
+    border: 1px solid #dedede;
 }
 
 .card .card-header {
@@ -133,12 +99,14 @@
     line-height: 2;
 }
 
-
-
 .card .card-header span {
     display: block;
     font-size: 13px;
     margin-top: 5px;
+}
+
+.card a {
+    text-decoration: none;
 }
 
 .card .card-header h5 {
@@ -250,8 +218,40 @@
     padding: 15px;
 }
 
-.train-card-footer {
-    background: transparent;
+
+.card.card-file {
+    padding: 0;
+    margin-bottom: 0.4rem;
+    height: 1.75rem;
+    line-height: 1.75rem;
+}
+
+.card.card-file .card-heading {
+    margin-left: 0.3rem;
+    font-size: 1em;
+    background: none;
+}
+
+.card.card-file .card-body {
+    max-height: 40px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: none;
+    padding: 0 0 0 10px;
+}
+
+.card.card-file .card-body .title {
+    font-size: .8125em;
+    font-weight: 600;
+}
+
+.card.card-file .train-card-footer {
+    background: none;
+    padding: 0;
+    margin-right: 0rem;
+    margin-left: auto;
+    border: none;
 }
 
 .pcoded .card.full-card {
@@ -297,13 +297,4 @@
     margin: 0 auto;
     color: #448aff;
     font-size: 20px;
-}
-
-.card-header-text {
-    margin-bottom: 0;
-    font-size: 1rem;
-    color: rgba(51, 51, 51, 0.85);
-    font-weight: 500;
-    display: inline-block;
-    vertical-align: middle;
 }

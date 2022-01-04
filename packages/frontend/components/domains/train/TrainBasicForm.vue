@@ -8,9 +8,10 @@
 import { TrainType, addAPITrain } from '@personalhealthtrain/ui-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 import ProposalList from '../proposal/ProposalList';
+import ProposalListItem from '../proposal/ProposalListItem';
 
 export default {
-    components: { ProposalList },
+    components: { ProposalListItem, ProposalList },
     props: {
         proposalId: {
             type: Number,
@@ -40,6 +41,9 @@ export default {
             return {
                 filter: {
                     ...(this.realmId ? { realm_id: this.realmId } : {}),
+                },
+                include: {
+                    user: true,
                 },
             };
         },
@@ -177,24 +181,32 @@ export default {
                     <template #header-title>
                         Proposals
                     </template>
-                    <template #item-actions="props">
-                        <button
-                            :disabled="props.busy"
-                            type="button"
-                            class="btn btn-xs"
-                            :class="{
-                                'btn-dark': formData.proposal_id !== props.item.id,
-                                'btn-warning': formData.proposal_id === props.item.id
-                            }"
-                            @click.prevent="toggleFormData('proposal_id', props.item.id)"
+                    <template #item="props">
+                        <proposal-list-item
+                            :entity-property="props.item"
+                            @updated="props.handleUpdated"
+                            @deleted="props.handleDeleted"
                         >
-                            <i
-                                :class="{
-                                    'fa fa-plus': formData.proposal_id !== props.item.id,
-                                    'fa fa-minus': formData.proposal_id === props.item.id
-                                }"
-                            />
-                        </button>
+                            <template #item-actions="itemActionProps">
+                                <button
+                                    :disabled="itemActionProps.busy"
+                                    type="button"
+                                    class="btn btn-xs"
+                                    :class="{
+                                        'btn-dark': formData.proposal_id !== itemActionProps.item.id,
+                                        'btn-warning': formData.proposal_id === itemActionProps.item.id
+                                    }"
+                                    @click.prevent="toggleFormData('proposal_id', itemActionProps.item.id)"
+                                >
+                                    <i
+                                        :class="{
+                                            'fa fa-plus': formData.proposal_id !== itemActionProps.item.id,
+                                            'fa fa-minus': formData.proposal_id === itemActionProps.item.id
+                                        }"
+                                    />
+                                </button>
+                            </template>
+                        </proposal-list-item>
                     </template>
                 </proposal-list>
 

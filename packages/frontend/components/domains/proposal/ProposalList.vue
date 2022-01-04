@@ -6,13 +6,14 @@
   -->
 <script>
 import {
-    PermissionID, dropProposal, getProposals, mergeDeep,
+    PermissionID, buildSocketProposalRoomName, getProposals, mergeDeep,
 } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import Pagination from '../../Pagination';
+import ProposalListItem from './ProposalListItem';
 
 export default {
-    components: { Pagination },
+    components: { ProposalListItem, Pagination },
     props: {
         filterItems: Function,
         query: {
@@ -48,7 +49,7 @@ export default {
         };
     },
     computed: {
-        formattedItems() {
+        itemsFinal() {
             if (typeof this.filterItems === 'undefined') {
                 return this.items;
             }
@@ -77,7 +78,31 @@ export default {
             this.load();
         }
     },
+    mounted() {
+        const socket = this.$socket.useRealmWorkspace(this.query?.filter?.realm_id ?? this.query?.filters?.realm_id);
+        socket.emit('proposalsSubscribe');
+
+        socket.on('proposalCreated', this.handleSocketCreated);
+    },
+    beforeDestroy() {
+        const socket = this.$socket.useRealmWorkspace(this.query?.filter?.realm_id ?? this.query?.filters?.realm_id);
+        socket.emit('proposalsUnsubscribe');
+
+        socket.off('proposalCreated', this.handleSocketCreated);
+    },
     methods: {
+        handleSocketCreated(context) {
+            if (context.meta.roomName !== buildSocketProposalRoomName()) return;
+
+            if (
+                (this.query.sort.created_at === 'DESC' || this.query.sort.updated_at === 'DESC') &&
+                this.meta.offset === 0
+            ) {
+                this.handleCreated(context.data, true);
+            }
+
+            this.$emit('created', context.data);
+        },
         async load() {
             if (this.busy) return;
 
@@ -104,21 +129,6 @@ export default {
 
             this.busy = false;
         },
-        async drop(id) {
-            if (this.itemBusy) return;
-
-            this.itemBusy = true;
-
-            try {
-                await dropProposal(id);
-
-                this.dropArrayItem({ id });
-            } catch (e) {
-                // ...
-            }
-
-            this.itemBusy = false;
-        },
         goTo(options, resolve, reject) {
             if (options.offset === this.meta.offset) return;
 
@@ -129,22 +139,42 @@ export default {
                 .catch(reject);
         },
 
-        addArrayItem(item) {
-            this.items.push(item);
-        },
-        editArrayItem(item) {
+        handleCreated(item, atStart = false) {
             const index = this.items.findIndex((el) => el.id === item.id);
-            if (index !== -1) {
-                for (const key in item) {
-                    Vue.set(this.items[index], key, item[key]);
+            if (index === -1) {
+                if (atStart) {
+                    this.items.splice(0, 0, item);
+                } else {
+                    this.items.push(item);
                 }
+
+                if (this.items.length > this.meta.limit) {
+                    this.items.splice(this.meta.limit, 1);
+                }
+
+                this.meta.total++;
+
+                this.$emit('created', item);
             }
         },
-        dropArrayItem(item) {
+        handleUpdated(item) {
+            const index = this.items.findIndex((el) => el.id === item.id);
+            if (index !== -1) {
+                const keys = Object.keys(item);
+                for (let i = 0; i < keys.length; i++) {
+                    Vue.set(this.items[index], keys[i], item[keys[i]]);
+                }
+            }
+
+            this.$emit('updated', item);
+        },
+        handleDeleted(item) {
             const index = this.items.findIndex((el) => el.id === item.id);
             if (index !== -1) {
                 this.items.splice(index, 1);
                 this.meta.total--;
+
+                this.$emit('deleted', item);
             }
         },
     },
@@ -209,57 +239,37 @@ export default {
         </div>
         <slot
             name="items"
-            :items="formattedItems"
+            :items="itemsFinal"
             :busy="busy"
             :item-busy="itemBusy"
-            :drop="drop"
+            :handle-updated="handleUpdated"
+            :handle-deleted="handleDeleted"
         >
             <div class="c-list">
-                <div
-                    v-for="(item,key) in formattedItems"
-                    :key="key"
-                    class="c-list-item mb-2"
+                <template
+                    v-for="item in itemsFinal"
                 >
-                    <div class="c-list-content align-items-center">
-                        <div class="c-list-icon">
-                            📜
-                        </div>
-                        <slot name="item-name">
-                            <span class="mb-0">{{ item.title }}</span>
-                        </slot>
-
-                        <div class="ml-auto">
-                            <slot
-                                name="item-actions"
-                                :item="item"
-                            >
-                                <div class="d-flex flex-row">
-                                    <div>
-                                        <button
-                                            type="button"
-                                            class="btn btn-xs btn-danger"
-                                            :disabled="itemBusy"
-                                            @click.prevent="drop(item.id)"
-                                        >
-                                            <i class="fas fa-trash" />
-                                        </button>
-                                    </div>
-                                    <slot
-                                        name="item-actions-extra"
-                                        :busy="busy"
-                                        :item-busy="itemBusy"
-                                        :item="item"
-                                    />
-                                </div>
-                            </slot>
-                        </div>
-                    </div>
-                </div>
+                    <slot
+                        name="item"
+                        :item="item"
+                        :busy="itemBusy"
+                        :handle-updated="handleUpdated"
+                        :handle-deleted="handleDeleted"
+                    >
+                        <proposal-list-item
+                            :key="item.id"
+                            class="mb-2"
+                            :entity-property="item"
+                            @updated="handleUpdated"
+                            @deleted="handleDeleted"
+                        />
+                    </slot>
+                </template>
             </div>
         </slot>
 
         <div
-            v-if="!busy && formattedItems.length === 0"
+            v-if="!busy && itemsFinal.length === 0"
             slot="no-more"
         >
             <div class="alert alert-sm alert-info">

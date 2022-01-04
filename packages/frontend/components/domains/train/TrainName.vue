@@ -94,6 +94,9 @@ export default {
             >
 
                 {{ displayText }}
+                <template v-if="trainName">
+                    <small class="text-muted">{{ trainId }}</small>
+                </template>
             </slot>
 
             <a

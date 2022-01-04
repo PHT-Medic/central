@@ -182,7 +182,7 @@ export default {
                     .catch((e) => {
                         if (e instanceof Error) {
                             this.$bvToast.toast(e.message, {
-                                variant: 'danger',
+                                variant: 'warning',
                                 toaster: 'b-toaster-top-center',
                             });
                         }

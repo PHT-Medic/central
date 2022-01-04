@@ -8,13 +8,14 @@
 import {
     buildSocketTrainRoomName, getAPITrains, mergeDeep,
 } from '@personalhealthtrain/ui-common';
+import Vue from 'vue';
 import AlertMessage from '../../alert/AlertMessage';
 import Pagination from '../../Pagination';
-import TrainCard from './TrainCard';
+import TrainListItem from './TrainListItem';
 
 export default {
     components: {
-        TrainCard,
+        TrainListItem,
         Pagination,
         AlertMessage,
     },
@@ -88,16 +89,13 @@ export default {
             if (context.meta.roomName !== buildSocketTrainRoomName()) return;
 
             if (
-                this.queryFinal.sort.created_at === 'DESC' &&
+                (
+                    this.queryFinal.sort.created_at === 'DESC' ||
+                    this.queryFinal.sort.updated_at === 'DESC'
+                ) &&
                 this.meta.offset === 0
             ) {
-                this.items.splice(0, 0, context.data);
-
-                if (this.items.length > this.meta.limit) {
-                    this.items.splice(this.meta.length, 1);
-                }
-
-                this.meta.total++;
+                this.handleCreated(context.data, true);
             }
         },
         async load() {
@@ -118,10 +116,42 @@ export default {
 
             this.busy = false;
         },
-        handleDeleted(train) {
-            const index = this.items.findIndex((item) => item.id === train.id);
+        handleCreated(item, atStart = false) {
+            const index = this.items.findIndex((el) => el.id === item.id);
+            if (index === -1) {
+                if (atStart) {
+                    this.items.splice(0, 0, item);
+                } else {
+                    this.items.push(item);
+                }
+
+                if (this.items.length > this.meta.limit) {
+                    this.items.splice(this.meta.limit, 1);
+                }
+
+                this.meta.total++;
+
+                this.$emit('created', item);
+            }
+        },
+        handleUpdated(item) {
+            const index = this.items.findIndex((el) => el.id === item.id);
+            if (index !== -1) {
+                const keys = Object.keys(item);
+                for (let i = 0; i < keys.length; i++) {
+                    Vue.set(this.items[index], keys[i], item[keys[i]]);
+                }
+            }
+
+            this.$emit('updated', item);
+        },
+        handleDeleted(item) {
+            const index = this.items.findIndex((el) => el.id === item.id);
             if (index !== -1) {
                 this.items.splice(index, 1);
+                this.meta.total--;
+
+                this.$emit('deleted', item);
             }
         },
         goTo(options, resolve, reject) {
@@ -164,10 +194,11 @@ export default {
             <template
                 v-for="item in items"
             >
-                <train-card
+                <train-list-item
                     :key="item.id"
                     class="mb-2 d-block"
-                    :train-property="item"
+                    :entity-property="item"
+                    @updated="handleUpdated"
                     @deleted="handleDeleted"
                 />
             </template>

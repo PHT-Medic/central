@@ -29,46 +29,7 @@ export default {
             PermissionID.TRAIN_EXECUTION_STOP,
         ],
     },
-    data() {
-        return {
-            fields: [
-                {
-                    key: 'id', label: 'ID', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'title', label: 'Title', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'creator', label: 'Creator', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'options', label: '', tdClass: 'text-left',
-                },
-            ],
-        };
-    },
     computed: {
-        canView() {
-            return this.$auth.hasPermission(PermissionID.TRAIN_ADD) ||
-                    this.$auth.hasPermission(PermissionID.TRAIN_EDIT) ||
-                    this.$auth.hasPermission(PermissionID.TRAIN_DROP) ||
-                    this.$auth.hasPermission(PermissionID.TRAIN_RESULT_READ) ||
-                    this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_START) ||
-                    this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_STOP);
-        },
-        canEdit() {
-            return this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT);
-        },
-        canDrop() {
-            return this.$auth.hasPermission(PermissionID.PROPOSAL_DROP);
-        },
-
         query() {
             return {
                 include: {
@@ -94,61 +55,7 @@ export default {
             <proposal-list
                 :with-title="false"
                 :query="query"
-            >
-                <template #items="props">
-                    <b-table
-                        :items="props.items"
-                        :fields="fields"
-                        :busy="props.busy"
-                        head-variant="'dark'"
-                        outlined
-                    >
-                        <template #cell(creator)="data">
-                            {{ data.item.user.name }}
-                        </template>
-                        <template #cell(created_at)="data">
-                            <timeago :datetime="data.item.created_at" />
-                        </template>
-                        <template #cell(updated_at)="data">
-                            <timeago :datetime="data.item.updated_at" />
-                        </template>
-
-                        <template #cell(options)="data">
-                            <nuxt-link
-                                v-if="canEdit"
-                                :to="'/proposals/' + data.item.id "
-                                title="View"
-                                class="btn btn-outline-primary btn-xs"
-                            >
-                                <i class="fa fa-arrow-right" />
-                            </nuxt-link>
-                            <nuxt-link
-                                v-if="canView"
-                                :to="'/proposals/' + data.item.id + '/trains'"
-                                title="Zug Verwaltung"
-                                class="btn btn-outline-dark btn-xs"
-                            >
-                                <i class="fa fa-train" />
-                            </nuxt-link>
-                            <a
-                                v-if="canDrop"
-                                class="btn btn-outline-danger btn-xs"
-                                title="Delete"
-                                @click="props.drop(data.item.id)"
-                            >
-                                <i class="fas fa-trash-alt" />
-                            </a>
-                        </template>
-
-                        <template #table-busy>
-                            <div class="text-center text-danger my-2">
-                                <b-spinner class="align-middle" />
-                                <strong>Loading...</strong>
-                            </div>
-                        </template>
-                    </b-table>
-                </template>
-            </proposal-list>
+            />
         </div>
     </div>
 </template>

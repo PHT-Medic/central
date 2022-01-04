@@ -18,7 +18,7 @@ export default {
         TrainPipeline,
     },
     props: {
-        trainProperty: Object,
+        entityProperty: Object,
     },
     data() {
         return {
@@ -36,39 +36,39 @@ export default {
             return this.$auth.can('drop', 'train');
         },
         userName() {
-            return typeof this.trainProperty.user === 'undefined' ? this.trainProperty.user_id : this.trainProperty.user.name;
+            return typeof this.entityProperty.user === 'undefined' ? this.entityProperty.user_id : this.entityProperty.user.name;
         },
     },
     created() {
-        this.train = this.trainProperty;
+        this.train = this.entityProperty;
     },
     mounted() {
         const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
-        socket.emit('trainsSubscribe', { data: { id: this.trainProperty.id } });
+        socket.emit('trainsSubscribe', { data: { id: this.entityProperty.id } });
 
         socket.on('trainUpdated', this.handleSocketUpdated);
         socket.on('trainDeleted', this.handleSocketDeleted);
     },
     beforeDestroy() {
         const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
-        socket.emit('trainsUnsubscribe', { data: { id: this.trainProperty.id } });
+        socket.emit('trainsUnsubscribe', { data: { id: this.entityProperty.id } });
         socket.off('trainUpdated', this.handleSocketUpdated);
         socket.off('trainDeleted', this.handleSocketDeleted);
     },
     methods: {
         handleSocketUpdated(context) {
             if (
-                this.trainProperty.id !== context.data.id ||
-                context.meta.roomId !== this.trainProperty.id
+                this.entityProperty.id !== context.data.id ||
+                context.meta.roomId !== this.entityProperty.id
             ) return;
 
             this.handleUpdated(context.data);
         },
         handleSocketDeleted(context) {
             if (
-                this.trainProperty.id !== context.data.id ||
+                this.entityProperty.id !== context.data.id ||
                 this.socketLockId === context.data.id ||
-                context.meta.roomId !== this.trainProperty.id
+                context.meta.roomId !== this.entityProperty.id
             ) return;
 
             this.handleDeleted({ ...context.data });
@@ -131,6 +131,10 @@ export default {
                     🚊 <nuxt-link :to="'/trains/'+props.trainId">
                         {{ props.displayText }}
                     </nuxt-link>
+
+                    <template v-if="props.trainName">
+                        <small class="text-muted">{{ props.trainId }}</small>
+                    </template>
                 </template>
             </train-name>
 
@@ -147,6 +151,13 @@ export default {
                         }"
                     />
                 </button>
+                <nuxt-link
+                    class="btn btn-dark btn-xs"
+                    type="button"
+                    :to="'/trains/'+train.id"
+                >
+                    <i class="fa fa-bars" />
+                </nuxt-link>
                 <button
                     v-if="canDrop"
                     class="btn btn-danger btn-xs"
@@ -177,10 +188,10 @@ export default {
 
         <div class="train-card-footer">
             <div>
-                <small><span class="text-muted">created by </span><span>{{ userName }}</span></small>
+                <small><span class="text-muted">updated</span> <timeago :datetime="train.created_at" /></small>
             </div>
             <div class="ml-auto">
-                <small><span class="text-muted">updated</span> <timeago :datetime="train.created_at" /></small>
+                <small><span class="text-muted">created by </span><span>{{ userName }}</span></small>
             </div>
         </div>
     </div>

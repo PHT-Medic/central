@@ -17,13 +17,11 @@ import {
 import MasterImagePicker from '../../../components/domains/master-image/MasterImagePicker';
 import StationList from '../../../components/domains/station/StationList';
 import ToggleManyButton from '../../../components/ToggleManyButton';
-import AlertMessage from '../../alert/AlertMessage';
 import ProposalStationList from '../proposal-station/ProposalStationList';
 
 export default {
     components: {
         ProposalStationList,
-        AlertMessage,
         ToggleManyButton,
         StationList,
         MasterImagePicker,
@@ -45,7 +43,6 @@ export default {
             },
 
             busy: false,
-            message: null,
 
             station: {
                 selectedIds: [],
@@ -67,16 +64,19 @@ export default {
         masterImageId() {
             return this.isEditing ? this.entityProperty.master_image_id : undefined;
         },
+        updatedAt() {
+            return this.isEditing ? this.entityProperty.updated_at : undefined;
+        },
+    },
+    watch: {
+        updatedAt(val, oldVal) {
+            if (val && val !== oldVal) {
+                this.initFromProperties();
+            }
+        },
     },
     created() {
-        if (typeof this.entityProperty !== 'undefined') {
-            const keys = Object.keys(this.formData);
-            for (let i = 0; i < keys.length; i++) {
-                if (Object.prototype.hasOwnProperty.call(this.entityProperty, keys[i])) {
-                    this.formData[keys[i]] = this.entityProperty[keys[i]];
-                }
-            }
-        }
+        this.initFromProperties();
     },
     validations() {
         const formData = {
@@ -124,6 +124,16 @@ export default {
         };
     },
     methods: {
+        initFromProperties() {
+            if (typeof this.entityProperty === 'undefined') return;
+
+            const keys = Object.keys(this.formData);
+            for (let i = 0; i < keys.length; i++) {
+                if (Object.prototype.hasOwnProperty.call(this.entityProperty, keys[i])) {
+                    this.formData[keys[i]] = this.entityProperty[keys[i]];
+                }
+            }
+        },
         handleMasterImagePicker(item) {
             if (item) {
                 this.formData.master_image_id = item.id;
@@ -144,10 +154,10 @@ export default {
                 if (this.isEditing) {
                     response = await editProposal(this.entityProperty.id, this.formData);
 
-                    this.message = {
-                        isError: false,
-                        data: 'The proposal was successfully updated.',
-                    };
+                    this.$bvToast.toast('The proposal was successfully updated.', {
+                        variant: 'success',
+                        toaster: 'b-toaster-top-center',
+                    });
 
                     this.$emit('updated', response);
                 } else {
@@ -160,18 +170,18 @@ export default {
                         });
                     }
 
-                    this.message = {
-                        isError: false,
-                        data: 'The proposal was successfully created',
-                    };
+                    this.$bvToast.toast('The realm was successfully created.', {
+                        variant: 'success',
+                        toaster: 'b-toaster-top-center',
+                    });
 
                     this.$emit('created', response);
                 }
             } catch (e) {
-                this.message = {
-                    data: e.message,
-                    isError: true,
-                };
+                this.$bvToast.toast(e.message, {
+                    variant: 'danger',
+                    toaster: 'b-toaster-top-center',
+                });
             }
 
             this.busy = false;
@@ -196,8 +206,6 @@ export default {
 </script>
 <template>
     <div>
-        <alert-message :message="message" />
-
         <form>
             <div class="row">
                 <div class="col-md-6">

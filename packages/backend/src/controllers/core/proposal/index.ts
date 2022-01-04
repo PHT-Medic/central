@@ -20,7 +20,7 @@ import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
 import { ResponseExample, SwaggerTags } from '@trapi/swagger';
-import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { ExpressValidationError } from '../../../config/http/error/validation';
@@ -223,6 +223,10 @@ async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
 
     if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
         throw new ForbiddenError();
+    }
+
+    if (entity.trains > 0) {
+        throw new BadRequestError('Remove all trains associated to the proposal before removing it.');
     }
 
     await repository.remove(entity);

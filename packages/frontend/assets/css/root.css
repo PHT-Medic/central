@@ -150,36 +150,3 @@ body
     width: 100%;
     background: #fafafa;
 }
-
-/*
-Login
- */
-.login-container {
-    width: 100%;
-    min-height: 100%;
-}
-
-.login-container .login-box {
-    width: 400px;
-    margin: 0px auto;
-    padding-top: 100px;
-}
-
-.login-container .login-box .login-body {
-    width: 100%;
-    float: left;
-    background: #f5f5f5;
-    padding: 20px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.login-container .login-box .login-body .login-title {
-    color: #FFF;
-    font-size: 19px;
-    font-weight: 300;
-    margin-bottom: 20px;
-    text-align: center;
-    color: #33414e;
-}

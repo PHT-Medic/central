@@ -183,6 +183,9 @@ async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
 
     await repository.save(entity);
 
+    proposal.trains++;
+    await proposalRepository.save(proposal);
+
     return res.respond({ data: entity });
 }
 
@@ -242,7 +245,7 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
 
     const repository = getRepository(Train);
 
-    const entity = await repository.findOne(id);
+    const entity = await repository.findOne(id, { relations: ['proposal'] });
 
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
@@ -252,7 +255,13 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
         throw new ForbiddenError();
     }
 
+    const { proposal } = entity;
+
     await repository.remove(entity);
+
+    proposal.trains--;
+    const proposalRepository = getRepository(Proposal);
+    await proposalRepository.save(proposal);
 
     try {
         await fs.promises.access(getTrainFilesDirectoryPath(entity.id), fs.constants.R_OK | fs.constants.W_OK);
