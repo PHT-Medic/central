@@ -10,12 +10,12 @@ import { getCustomRepository, getRepository } from 'typeorm';
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
-import { ResponseExample, SwaggerTags } from '@trapi/swagger';
+import { SwaggerTags } from '@trapi/swagger';
 import {
-    MASTER_REALM_ID, OAuth2Provider, Oauth2ProviderAccount, TokenPayload, TokenVerificationPayload,
+    MASTER_REALM_ID, OAuth2Provider, Oauth2ProviderAccount, Oauth2TokenResponse, TokenPayload, TokenVerificationPayload,
 } from '@personalhealthtrain/ui-common';
 import { createToken, verifyToken } from '@typescript-auth/server';
-import { Oauth2Client, Oauth2TokenResponse } from '@typescript-auth/core';
+import { Oauth2Client } from '@typescript-auth/core';
 import { BadRequestError, UnauthorizedError } from '@typescript-error/http';
 import { getWritableDirPath } from '../../../config/paths';
 import { createOauth2ProviderAccountWithToken } from '../../../domains/auth/oauth2-provider-account/utils';

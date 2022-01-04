@@ -8,16 +8,50 @@
 import { PermissionItem } from '@typescript-auth/core';
 import { User } from '../user';
 
-export type TokenPayload = {
+type AccessTokenPayload = {
     /**
-     * owner id
+     * Subject (user id)
      */
-    sub: number | string,
+    sub: string | number;
+    /**
+     * Issuer (token endpoint, f.e "https://...")
+     */
+    iss: string;
+    /**
+     * client id
+     */
+    cid: string;
+    /**
+     * Issued At
+     */
+    iat: number;
+    /**
+     * Expires At
+     */
+    exp: number;
+    /**
+     * Scopes (f.e: "scope1 scope2")
+     */
+    scope: string;
+    /**
+     * Additional parameters
+     */
+    [key: string]: any;
+};
 
-    /**
-     * issuer (api address)
-     */
-    iss: string,
+export type Oauth2TokenResponse = {
+    access_token: string;
+    access_token_payload?: AccessTokenPayload;
+    refresh_token?: string;
+    expires_in: number;
+    token_type: string;
+    id_token?: string;
+    id_token_payload?: Record<string, any>;
+    mac_key?: string;
+    mac_algorithm?: string;
+};
+
+export type TokenPayload = Partial<AccessTokenPayload> & {
     /**
      * remote address
      */
