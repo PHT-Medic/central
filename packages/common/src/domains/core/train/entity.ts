@@ -102,9 +102,6 @@ export class Train {
         // check if all conditions are met
         if (this.hash_signed && this.hash) {
             this.configuration_status = TrainConfigurationStatus.FINISHED;
-
-            this.build_status = null;
-            this.run_status = null;
         }
     }
 

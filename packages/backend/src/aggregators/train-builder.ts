@@ -37,8 +37,6 @@ async function updateTrain(trainId: string, event: string) {
 
     entity.build_status = EventStatusMap[event];
 
-    console.log(entity);
-
     await repository.save(entity);
 }
 
