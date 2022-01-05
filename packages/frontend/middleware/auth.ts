@@ -24,7 +24,7 @@ function checkAbilityOrPermission({ route, $auth } : Context) {
         for (let j = 0; j < route.meta.length; j++) {
             const matchedRecordMeta = route.meta[j];
 
-            if (!matchedRecordMeta.hasOwnProperty(layoutKey)) {
+            if (!Object.prototype.hasOwnProperty.call(matchedRecordMeta, layoutKey)) {
                 continue;
             }
 
@@ -58,6 +58,8 @@ function checkAbilityOrPermission({ route, $auth } : Context) {
         parts.pop();
         throw new Error(parts.join('/'));
     }
+
+    return true;
 }
 
 export default async function middleware({
@@ -69,11 +71,13 @@ export default async function middleware({
         redirectPath = from.fullPath;
     }
 
-    if (!route.path.includes('/logout')) {
+    if (
+        !route.path.includes('logout') &&
+        !route.fullPath.includes('logout')
+    ) {
         try {
             await (<AuthModule> $auth).resolveMe();
         } catch (e) {
-            console.log(e);
             if (store.getters['auth/loggedIn']) {
                 await redirect({
                     path: '/logout',
@@ -85,6 +89,8 @@ export default async function middleware({
                     query: { redirect: route.fullPath },
                 });
             }
+
+            return;
         }
     }
 
@@ -99,6 +105,8 @@ export default async function middleware({
                 path: '/login',
                 query: { redirect: route.fullPath },
             });
+
+            return;
         }
 
         try {
@@ -107,6 +115,8 @@ export default async function middleware({
             await redirect({
                 path: redirectPath,
             });
+
+            return;
         }
     }
 
