@@ -24,7 +24,11 @@ const EventStatusMap : Record<TrainBuilderEvent, TrainBuildStatus> = {
     [TrainBuilderEvent.FINISHED]: TrainBuildStatus.FINISHED,
 };
 
-async function updateTrain(trainId: string, event: TrainBuilderEvent) {
+async function updateTrain(trainId: string, event: string) {
+    if (!EventStatusMap[event]) {
+        return;
+    }
+
     const repository = getRepository(Train);
     const entity = await repository.findOne(trainId);
     if (typeof entity === 'undefined') {
@@ -33,23 +37,17 @@ async function updateTrain(trainId: string, event: TrainBuilderEvent) {
 
     entity.build_status = EventStatusMap[event];
 
+    console.log(entity);
+
     await repository.save(entity);
 }
 
 export function buildTrainBuilderAggregator() {
     function start() {
         return consumeQueue({ routingKey: MessageQueueTrainBuilderRoutingKey.EVENT_IN }, {
-            [TrainBuilderEvent.FINISHED]: async (message: Message) => {
-                await updateTrain(message.data.trainId, TrainBuilderEvent.FINISHED);
-            },
-            [TrainBuilderEvent.FAILED]: async (message: Message) => {
-                await updateTrain(message.data.trainId, TrainBuilderEvent.FAILED);
-            },
-            [TrainBuilderEvent.STOPPED]: async (message: Message) => {
-                await updateTrain(message.data.trainId, TrainBuilderEvent.STOPPED);
-            },
-            [TrainBuilderEvent.STARTED]: async (message: Message) => {
-                await updateTrain(message.data.trainId, TrainBuilderEvent.STARTED);
+            $any: async (message: Message) => {
+                console.log(message);
+                await updateTrain(message.data.trainId, message.type);
             },
         });
     }
