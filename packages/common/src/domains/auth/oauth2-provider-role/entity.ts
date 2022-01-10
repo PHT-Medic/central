@@ -21,7 +21,7 @@ import { Role } from '../role';
 @Entity({ name: 'oauth2_provider_roles' })
 @Index(['provider_id', 'role_id'], { unique: true })
 @Index(['provider_id', 'external_id'], { unique: true })
-export class Oauth2ProviderRole {
+export class OAuth2ProviderRole {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 

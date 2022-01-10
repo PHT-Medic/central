@@ -14,7 +14,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Oauth2ProviderAccount } from '../oauth2-provider-account';
+import { OAuth2ProviderAccount } from '../oauth2-provider-account';
 import { Realm } from '../realm';
 import { UserRole } from '../user-role';
 
@@ -60,8 +60,8 @@ export class User {
     @OneToMany(() => UserRole, (userRole) => userRole.user)
         user_roles: UserRole[];
 
-    @OneToMany(() => Oauth2ProviderAccount, (userAccount) => userAccount.user)
-        oauth2_provider_accounts: Oauth2ProviderAccount[];
+    @OneToMany(() => OAuth2ProviderAccount, (userAccount) => userAccount.user)
+        oauth2_provider_accounts: OAuth2ProviderAccount[];
 
     // ------------------------------------------------------------------
 

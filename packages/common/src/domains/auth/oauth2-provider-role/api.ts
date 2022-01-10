@@ -12,36 +12,36 @@ import {
     SingleResourceResponse,
     useAPI,
 } from '../../../modules';
-import { Oauth2ProviderRole } from './entity';
+import { OAuth2ProviderRole } from './entity';
 
-export async function getApiOauth2ProviderRoles(data: BuildInput<Oauth2ProviderRole>) : Promise<CollectionResourceResponse<Oauth2ProviderRole>> {
+export async function getApiOauth2ProviderRoles(data: BuildInput<OAuth2ProviderRole>) : Promise<CollectionResourceResponse<OAuth2ProviderRole>> {
     const response = await useAPI(APIType.DEFAULT).get(`provider-roles${buildQuery(data)}`);
 
     return response.data;
 }
 
-export async function getApiOauth2ProviderRole(id: typeof Oauth2ProviderRole.prototype.id) : Promise<SingleResourceResponse<Oauth2ProviderRole>> {
+export async function getApiOauth2ProviderRole(id: typeof OAuth2ProviderRole.prototype.id) : Promise<SingleResourceResponse<OAuth2ProviderRole>> {
     const response = await useAPI(APIType.DEFAULT).get(`provider-roles/${id}`);
 
     return response.data;
 }
 
-export async function dropAPIOauth2ProviderRole(id: typeof Oauth2ProviderRole.prototype.id) : Promise<SingleResourceResponse<Oauth2ProviderRole>> {
+export async function dropAPIOauth2ProviderRole(id: typeof OAuth2ProviderRole.prototype.id) : Promise<SingleResourceResponse<OAuth2ProviderRole>> {
     const response = await useAPI(APIType.DEFAULT).delete(`provider-roles/${id}`);
 
     return response.data;
 }
 
-export async function addAPIOauth2ProviderRole(data: Partial<Oauth2ProviderRole>) : Promise<SingleResourceResponse<Oauth2ProviderRole>> {
+export async function addAPIOauth2ProviderRole(data: Partial<OAuth2ProviderRole>) : Promise<SingleResourceResponse<OAuth2ProviderRole>> {
     const response = await useAPI(APIType.DEFAULT).post('provider-roles', data);
 
     return response.data;
 }
 
 export async function editAPIOauth2ProviderRole(
-    id: typeof Oauth2ProviderRole.prototype.id,
-    data: Partial<Oauth2ProviderRole>,
-) : Promise<SingleResourceResponse<Oauth2ProviderRole>> {
+    id: typeof OAuth2ProviderRole.prototype.id,
+    data: Partial<OAuth2ProviderRole>,
+) : Promise<SingleResourceResponse<OAuth2ProviderRole>> {
     const response = await useAPI(APIType.DEFAULT).post(`provider-roles/${id}`, data);
 
     return response.data;

@@ -12,7 +12,7 @@ import {
 } from '@decorators/express';
 import { SwaggerTags } from '@trapi/swagger';
 import {
-    MASTER_REALM_ID, OAuth2Provider, Oauth2ProviderAccount, Oauth2TokenResponse, TokenPayload, TokenVerificationPayload,
+    MASTER_REALM_ID, OAuth2Provider, OAuth2ProviderAccount, Oauth2TokenResponse, TokenPayload, TokenVerificationPayload,
 } from '@personalhealthtrain/ui-common';
 import { createToken, verifyToken } from '@typescript-auth/server';
 import { Oauth2Client } from '@typescript-auth/core';
@@ -24,7 +24,7 @@ import env from '../../../env';
 import { UserRepository } from '../../../domains/auth/user/repository';
 
 /* istanbul ignore next */
-async function grantTokenWithMasterProvider(username: string, password: string) : Promise<Oauth2ProviderAccount | undefined> {
+async function grantTokenWithMasterProvider(username: string, password: string) : Promise<OAuth2ProviderAccount | undefined> {
     const providerRepository = getRepository(OAuth2Provider);
     const providers = await providerRepository.createQueryBuilder('provider')
         .leftJoinAndSelect('provider.realm', 'realm')

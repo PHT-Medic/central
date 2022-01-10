@@ -6,7 +6,7 @@
  */
 
 import { getRepository } from 'typeorm';
-import { Oauth2ProviderRole, PermissionID } from '@personalhealthtrain/ui-common';
+import { OAuth2ProviderRole, PermissionID } from '@personalhealthtrain/ui-common';
 import { applyFilters, applyPagination } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { check, matchedData, validationResult } from 'express-validator';
@@ -21,7 +21,7 @@ import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { page, filter } = req.query;
 
-    const repository = getRepository(Oauth2ProviderRole);
+    const repository = getRepository(OAuth2ProviderRole);
 
     const query = repository.createQueryBuilder('providerRole');
 
@@ -50,7 +50,7 @@ export async function getManyRouteHandler(req: ExpressRequest, res: ExpressRespo
 export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    const repository = getRepository(Oauth2ProviderRole);
+    const repository = getRepository(OAuth2ProviderRole);
 
     const query = repository.createQueryBuilder('providerRole')
         .where('providerRole.id = :id', { id });
@@ -103,12 +103,12 @@ export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse)
         throw new ExpressValidationError(validation);
     }
 
-    const data : Partial<Oauth2ProviderRole> = matchedData(req, { includeOptionals: true });
+    const data : Partial<OAuth2ProviderRole> = matchedData(req, { includeOptionals: true });
     if (!data) {
         return res.respondAccepted();
     }
 
-    const repository = getRepository(Oauth2ProviderRole);
+    const repository = getRepository(OAuth2ProviderRole);
 
     const entity = repository.create(data);
 
@@ -135,12 +135,12 @@ export async function editRouteHandler(req: ExpressRequest, res: ExpressResponse
         throw new ExpressValidationError(validation);
     }
 
-    const data : Partial<Oauth2ProviderRole> = matchedData(req, { includeOptionals: true });
+    const data : Partial<OAuth2ProviderRole> = matchedData(req, { includeOptionals: true });
     if (!data) {
         return res.respondAccepted();
     }
 
-    const repository = getRepository(Oauth2ProviderRole);
+    const repository = getRepository(OAuth2ProviderRole);
 
     let provider = await repository.findOne(id);
     if (typeof provider === 'undefined') {
@@ -165,7 +165,7 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(Oauth2ProviderRole);
+    const repository = getRepository(OAuth2ProviderRole);
     const entity = await repository.findOne(id);
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
@@ -185,7 +185,7 @@ export class ProviderRoleController {
     async getProviders(
         @Request() req: any,
             @Response() res: any,
-    ): Promise<Oauth2ProviderRole[]> {
+    ): Promise<OAuth2ProviderRole[]> {
         return getManyRouteHandler(req, res);
     }
 
@@ -194,17 +194,17 @@ export class ProviderRoleController {
         @Params('id') id: string,
             @Request() req: any,
             @Response() res: any,
-    ): Promise<Oauth2ProviderRole> {
+    ): Promise<OAuth2ProviderRole> {
         return getRouteHandler(req, res);
     }
 
     @Post('/:id', [ForceLoggedInMiddleware])
     async editProvider(
         @Params('id') id: string,
-            @Body() user: NonNullable<Oauth2ProviderRole>,
+            @Body() user: NonNullable<OAuth2ProviderRole>,
             @Request() req: any,
             @Response() res: any,
-    ): Promise<Oauth2ProviderRole> {
+    ): Promise<OAuth2ProviderRole> {
         return editRouteHandler(req, res);
     }
 
@@ -213,16 +213,16 @@ export class ProviderRoleController {
         @Params('id') id: string,
             @Request() req: any,
             @Response() res: any,
-    ): Promise<Oauth2ProviderRole> {
+    ): Promise<OAuth2ProviderRole> {
         return dropRouteHandler(req, res);
     }
 
     @Post('', [ForceLoggedInMiddleware])
     async addProvider(
-        @Body() user: NonNullable<Oauth2ProviderRole>,
+        @Body() user: NonNullable<OAuth2ProviderRole>,
             @Request() req: any,
             @Response() res: any,
-    ): Promise<Oauth2ProviderRole> {
+    ): Promise<OAuth2ProviderRole> {
         return addRouteHandler(req, res);
     }
 }
