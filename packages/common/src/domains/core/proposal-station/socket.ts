@@ -7,14 +7,14 @@
 
 import { ProposalStation } from './entity';
 
-export function buildSocketProposalStationRoomName(id?: typeof ProposalStation.prototype.id) {
+export function buildSocketProposalStationRoomName(id?: ProposalStation['id']) {
     return `proposal-stations${id ? `#${id}` : ''}`;
 }
 
-export function buildSocketProposalStationInRoomName(id?: typeof ProposalStation.prototype.id) {
+export function buildSocketProposalStationInRoomName(id?: ProposalStation['id']) {
     return `proposal-stations-in${id ? `#${id}` : ''}`;
 }
 
-export function buildSocketProposalStationOutRoomName(id?: typeof ProposalStation.prototype.id) {
+export function buildSocketProposalStationOutRoomName(id?: ProposalStation['id']) {
     return `proposal-stations-out${id ? `#${id}` : ''}`;
 }

@@ -16,15 +16,7 @@ export {
     Model,
     TrainResult,
     TrainStation,
+    // deprecated
     Client,
-    OAuth2Provider,
-    OAuth2ProviderAccount,
-    OAuth2ProviderRole,
-    Permission,
-    Realm,
-    Role,
-    RolePermission,
-    User,
     UserSecret,
-    UserRole,
 } from '@personalhealthtrain/ui-common';

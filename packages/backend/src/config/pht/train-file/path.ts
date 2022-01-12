@@ -13,7 +13,7 @@ export function getTrainFileFileName(file: TrainFile) {
     return `${file.hash}.file`;
 }
 
-export function getTrainFilesDirectoryPath(trainId: typeof Train.prototype.id) {
+export function getTrainFilesDirectoryPath(trainId: Train['id']) {
     return path.join(getWritableDirPath(), 'train-files', trainId);
 }
 

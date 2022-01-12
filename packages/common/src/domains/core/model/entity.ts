@@ -5,37 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    Column,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    OneToOne,
-    PrimaryGeneratedColumn,
-} from 'typeorm';
-import { User } from '../../auth';
+import { User } from '@typescript-auth/domains';
 import { TrainFile } from '../train-file';
 
-@Entity({ name: 'models' })
-export class Model {
-    @PrimaryGeneratedColumn('uuid')
-        id: string;
+export interface Model {
+    id: string;
 
-    @Column({ type: 'varchar' })
-        type: string;
+    type: string;
 
-    @Column({ type: 'varchar' })
-        name: string;
+    name: string;
 
-    @OneToOne(() => TrainFile)
-        src: TrainFile;
+    src: TrainFile;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'int', unsigned: true })
-        user_id: number;
+    user_id: string;
 
-    @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'user_id' })
-        user: User;
+    user: User;
 }

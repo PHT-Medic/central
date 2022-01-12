@@ -11,7 +11,6 @@ import {
 } from 'typeorm-extension';
 import { check, matchedData, validationResult } from 'express-validator';
 import {
-    MASTER_REALM_ID,
     PermissionID,
     STATION_SECRET_ENGINE_KEY,
     Station,
@@ -25,15 +24,17 @@ import {
 } from '@decorators/express';
 import { ResponseExample, SwaggerTags } from '@trapi/swagger';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { MASTER_REALM_ID } from '@typescript-auth/domains';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { ExpressValidationError } from '../../../config/http/error/validation';
+import { StationEntity } from '../../../domains/core/station/entity';
 
 async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
     const { fields } = req.query;
 
-    const repository = getRepository(Station);
+    const repository = getRepository(StationEntity);
     const query = repository.createQueryBuilder('station')
         .where('station.id = :id', { id });
 
@@ -72,7 +73,7 @@ async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : 
         filter, page, fields, includes,
     } = req.query;
 
-    const repository = getRepository(Station);
+    const repository = getRepository(StationEntity);
     const query = repository.createQueryBuilder('station');
 
     applyRelations(query, includes, {
@@ -157,7 +158,7 @@ async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
         delete data.sync_public_key;
     }
 
-    const repository = getRepository(Station);
+    const repository = getRepository(StationEntity);
 
     const entity = repository.create(data);
 
@@ -208,7 +209,7 @@ async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
         return res.respondAccepted();
     }
 
-    const repository = getRepository(Station);
+    const repository = getRepository(StationEntity);
     const query = repository.createQueryBuilder('station')
         .addSelect('station.secure_id')
         .addSelect('station.public_key')
@@ -288,7 +289,7 @@ async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(Station);
+    const repository = getRepository(StationEntity);
 
     const entity = await repository.findOne(id);
 

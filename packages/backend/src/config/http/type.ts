@@ -5,39 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Client, ServiceID, User } from '@personalhealthtrain/ui-common';
+import { ServiceID } from '@personalhealthtrain/ui-common';
 import {
-    Express, NextFunction, Request, Response,
+    Express, NextFunction,
 } from 'express';
-import { AbilityManager } from '@typescript-auth/core';
-import { RespondMessage } from './middleware/response';
+import {
+    ExpressRequest as AuthExpressRequest,
+    ExpressResponse as AuthExpressResponse,
+} from '@typescript-auth/server';
 
 export interface ExpressAppInterface extends Express {
 
 }
 
-export interface ExpressRequest extends Request {
-    user?: User,
-    userId?: typeof User.prototype.id,
-
-    clientId?: typeof Client.prototype.id,
+export interface ExpressRequest extends AuthExpressRequest {
     serviceId?: ServiceID,
-
-    realmId?: string,
-
-    token?: string,
-
-    ability: AbilityManager
 }
 
-export interface ExpressResponse extends Response {
-    respond(message?: RespondMessage): void,
-
-    respondDeleted(message?: RespondMessage): void,
-
-    respondCreated(message?: RespondMessage): void,
-
-    respondAccepted(message?: RespondMessage): void
+export interface ExpressResponse extends AuthExpressResponse {
 }
 
 export interface ExpressNextFunction extends NextFunction {

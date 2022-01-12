@@ -5,45 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    Index,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
+export interface MasterImage {
+    id: string;
 
-@Entity({ name: 'master_images' })
-export class MasterImage {
-    @PrimaryGeneratedColumn('uuid')
-        id: string;
+    path: string | null;
 
-    @Column({ type: 'varchar', nullable: true })
-        path: string | null;
+    virtual_path: string;
 
-    @Index({ unique: true })
-    @Column({ type: 'varchar', length: 256 })
-        virtual_path: string;
+    group_virtual_path: string;
 
-    @Index()
-    @Column({ type: 'varchar', length: 256 })
-        group_virtual_path: string;
+    name: string;
 
-    @Column({ type: 'varchar' })
-        name: string;
+    command: string | null;
 
-    @Column({ type: 'text', nullable: true })
-        command: string | null;
-
-    @Column({ type: 'json', nullable: true })
-        command_arguments: any | null;
+    command_arguments: any | null;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
-    @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 }

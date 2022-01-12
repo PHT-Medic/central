@@ -9,8 +9,6 @@ import { getRepository } from 'typeorm';
 import { applyFilters, applyPagination } from 'typeorm-extension';
 import {
     PermissionID, TrainResult,
-    isPermittedForResourceRealm,
-    onlyRealmPermittedQueryResources,
 } from '@personalhealthtrain/ui-common';
 
 import {
@@ -18,8 +16,11 @@ import {
 } from '@decorators/express';
 import { SwaggerTags } from '@trapi/swagger';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { onlyRealmPermittedQueryResources } from '@typescript-auth/server';
+import { isPermittedForResourceRealm } from '@typescript-auth/domains';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
+import { TrainResultEntity } from '../../../domains/core/train-result/entity';
 
 export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page } = req.query;
@@ -30,7 +31,7 @@ export async function getManyRouteHandler(req: ExpressRequest, res: ExpressRespo
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(TrainResult);
+    const repository = getRepository(TrainResultEntity);
     const query = await repository.createQueryBuilder('trainResult')
         .leftJoinAndSelect('trainResult.train', 'train');
 
@@ -65,7 +66,7 @@ export async function getOneRouteHandler(req: ExpressRequest, res: ExpressRespon
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(TrainResult);
+    const repository = getRepository(TrainResultEntity);
     const entity = await repository.findOne(id, { relations: ['train'] });
 
     if (typeof entity === 'undefined') {
@@ -91,7 +92,7 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(TrainResult);
+    const repository = getRepository(TrainResultEntity);
 
     const entity : TrainResult | undefined = await repository.findOne(id, { relations: ['train'] });
 

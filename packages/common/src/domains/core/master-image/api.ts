@@ -20,14 +20,14 @@ export async function getAPIMasterImages(data?: BuildInput<MasterImage>) : Promi
 }
 
 export async function getAPIMasterImage(
-    id: typeof MasterImage.prototype.id,
+    id: MasterImage['id'],
     data?: BuildInput<MasterImage>,
 ) : Promise<SingleResourceResponse<MasterImage>> {
     const response = await useAPI(APIType.DEFAULT).get(`master-images/${id}${buildQuery(data)}`);
     return response.data;
 }
 
-export async function dropAPIMasterImage(id: typeof MasterImage.prototype.id) : Promise<SingleResourceResponse<MasterImage>> {
+export async function dropAPIMasterImage(id: MasterImage['id']) : Promise<SingleResourceResponse<MasterImage>> {
     const response = await useAPI(APIType.DEFAULT).delete(`master-images/${id}`);
     return response.data;
 }

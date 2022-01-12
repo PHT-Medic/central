@@ -6,7 +6,6 @@
  */
 
 import {
-    Train,
     TrainBuildStatus,
     TrainRunStatus,
     TrainStation,
@@ -14,6 +13,8 @@ import {
 } from '@personalhealthtrain/ui-common';
 import { ConsumeHandlers, Message } from 'amqp-extension';
 import { getRepository } from 'typeorm';
+import { TrainEntity } from '../../../domains/core/train/entity';
+import { TrainStationEntity } from '../../../domains/core/train-station/entity';
 
 export enum AggregatorTrainEvent {
     BUILD_FINISHED = 'trainBuilt',
@@ -23,7 +24,7 @@ export enum AggregatorTrainEvent {
 }
 
 async function handle(message: Message) {
-    const repository = getRepository(Train);
+    const repository = getRepository(TrainEntity);
     const entity = await repository.findOne(message.data.id);
 
     switch (message.type) {
@@ -50,7 +51,7 @@ async function handle(message: Message) {
     await repository.save(entity);
 
     if (message.type === AggregatorTrainEvent.MOVED) {
-        const trainStationRepository = getRepository(TrainStation);
+        const trainStationRepository = getRepository(TrainStationEntity);
         const trainStation = await trainStationRepository.findOne({
             train_id: message.data.id,
             station_id: message.data.stationId,

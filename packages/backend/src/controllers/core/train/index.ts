@@ -8,10 +8,10 @@
 import { getRepository } from 'typeorm';
 import { applyFilters, applyPagination, applyQueryRelations } from 'typeorm-extension';
 import {
-    MasterImage,
-    PermissionID, Proposal, Train, TrainCommand, TrainFile,
+    PermissionID,
+    Train,
+    TrainCommand,
     TrainType,
-    isPermittedForResourceRealm, onlyRealmPermittedQueryResources,
 } from '@personalhealthtrain/ui-common';
 import { check, validationResult } from 'express-validator';
 
@@ -21,12 +21,18 @@ import {
 import { SwaggerTags } from '@trapi/swagger';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import fs from 'fs';
+import { onlyRealmPermittedQueryResources } from '@typescript-auth/server';
+import { isPermittedForResourceRealm } from '@typescript-auth/domains';
 import { handleTrainCommandRouteHandler } from './action';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { ExpressValidationError } from '../../../config/http/error/validation';
 import { matchedValidationData } from '../../../modules/express-validator';
 import { getTrainFilesDirectoryPath } from '../../../config/pht/train-file/path';
+import { TrainEntity } from '../../../domains/core/train/entity';
+import { TrainFileEntity } from '../../../domains/core/train-file/entity';
+import { MasterImageEntity } from '../../../domains/core/master-image/entity';
+import { ProposalEntity } from '../../../domains/core/proposal/entity';
 
 export async function getOneRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { include } = req.query;
@@ -36,7 +42,7 @@ export async function getOneRouteHandler(req: ExpressRequest, res: ExpressRespon
         throw new BadRequestError();
     }
 
-    const repository = getRepository(Train);
+    const repository = getRepository(TrainEntity);
     const query = repository.createQueryBuilder('train')
         .where('train.id = :id', { id });
 
@@ -63,7 +69,7 @@ export async function getOneRouteHandler(req: ExpressRequest, res: ExpressRespon
 async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page, include } = req.query;
 
-    const repository = getRepository(Train);
+    const repository = getRepository(TrainEntity);
     const query = repository.createQueryBuilder('train');
 
     onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
@@ -117,7 +123,7 @@ async function runValidations(req: ExpressRequest, mode: 'create' | 'update') {
         .run(req);
 
     await check('entrypoint_file_id')
-        .custom((value) => getRepository(TrainFile).findOne(value).then((res) => {
+        .custom((value) => getRepository(TrainFileEntity).findOne(value).then((res) => {
             if (typeof res === 'undefined') throw new Error('The entrypoint file is not valid.');
         }))
         .optional({ nullable: true })
@@ -132,7 +138,7 @@ async function runValidations(req: ExpressRequest, mode: 'create' | 'update') {
     await check('master_image_id')
         .optional({ nullable: true })
         .isString()
-        .custom((value) => getRepository(MasterImage).findOne(value).then((res) => {
+        .custom((value) => getRepository(MasterImageEntity).findOne(value).then((res) => {
             if (typeof res === 'undefined') throw new Error('The master image is not valid.');
         }))
         .run(req);
@@ -159,7 +165,7 @@ async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
     const validationData : Partial<Train> = matchedValidationData(req, { includeOptionals: true });
 
     // proposal
-    const proposalRepository = getRepository(Proposal);
+    const proposalRepository = getRepository(ProposalEntity);
     const proposal = await proposalRepository.findOne(validationData.proposal_id);
     if (typeof proposal === 'undefined') {
         throw new BadRequestError('The referenced proposal does not exist.');
@@ -173,7 +179,7 @@ async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
         validationData.master_image_id = proposal.master_image_id;
     }
 
-    const repository = getRepository(Train);
+    const repository = getRepository<Train>(TrainEntity);
 
     const entity = repository.create({
         realm_id: req.realmId,
@@ -212,7 +218,7 @@ export async function editRouteHandler(req: ExpressRequest, res: ExpressResponse
         return res.respondAccepted();
     }
 
-    const repository = getRepository(Train);
+    const repository = getRepository(TrainEntity);
     let train = await repository.findOne(id);
 
     if (typeof train === 'undefined') {
@@ -243,7 +249,7 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(Train);
+    const repository = getRepository(TrainEntity);
 
     const entity = await repository.findOne(id, { relations: ['proposal'] });
 
@@ -260,7 +266,7 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
     await repository.remove(entity);
 
     proposal.trains--;
-    const proposalRepository = getRepository(Proposal);
+    const proposalRepository = getRepository(ProposalEntity);
     await proposalRepository.save(proposal);
 
     try {

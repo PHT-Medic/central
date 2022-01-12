@@ -6,8 +6,11 @@
  */
 
 import {
-    MasterImage, Station, Train, User,
+    MasterImage, Station, Train,
 } from '@personalhealthtrain/ui-common';
+import {
+    UserEntity,
+} from '@typescript-auth/server';
 
 export enum TrainBuilderCommand {
     START = 'trainBuildStart',
@@ -16,7 +19,7 @@ export enum TrainBuilderCommand {
 }
 
 export type TrainBuilderStartPayload = {
-    userId: typeof User.prototype.id,
+    userId: typeof UserEntity.prototype.id,
 
     trainId: typeof Train.prototype.id,
     buildId: typeof Train.prototype.build_id,

@@ -20,7 +20,7 @@ export async function getApiProposalStations(data?: BuildInput<ProposalStation>)
     return response.data;
 }
 
-export async function getApiProposalStation(id: number | string, data?: BuildInput<ProposalStation>) : Promise<SingleResourceResponse<ProposalStation>> {
+export async function getApiProposalStation(id: ProposalStation['id'], data?: BuildInput<ProposalStation>) : Promise<SingleResourceResponse<ProposalStation>> {
     const response = await useAPI(APIType.DEFAULT).get(`proposal-stations/${id}${buildQuery(data)}`);
 
     return response.data;
@@ -32,13 +32,13 @@ export async function addApiProposalStation(data: Partial<ProposalStation>) : Pr
     return response.data;
 }
 
-export async function editApiProposalStation(id: number | string, data: Record<string, any>) : Promise<SingleResourceResponse<ProposalStation>> {
+export async function editApiProposalStation(id: ProposalStation['id'], data: Record<string, any>) : Promise<SingleResourceResponse<ProposalStation>> {
     const response = await useAPI(APIType.DEFAULT).post(`proposal-stations/${id}`, data);
 
     return response.data;
 }
 
-export async function dropApiProposalStation(id: number | string): Promise<SingleResourceResponse<ProposalStation>> {
+export async function dropApiProposalStation(id: ProposalStation['id']): Promise<SingleResourceResponse<ProposalStation>> {
     const response = await useAPI(APIType.DEFAULT).delete(`proposal-stations/${id}`);
 
     return response.data;

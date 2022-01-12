@@ -7,8 +7,9 @@
 
 import { check, matchedData, validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
-import { Train, TrainCommand, isPermittedForResourceRealm } from '@personalhealthtrain/ui-common';
+import { Train, TrainCommand } from '@personalhealthtrain/ui-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { isPermittedForResourceRealm } from '@typescript-auth/domains';
 import {
     detectTrainBuildStatus,
     detectTrainRunStatus,
@@ -21,6 +22,7 @@ import {
 } from '../../../../domains/core/train/commands';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
+import { TrainEntity } from '../../../../domains/core/train/entity';
 
 /**
  * Execute a train command (start, stop, build).
@@ -47,7 +49,7 @@ export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: E
 
     const validationData = matchedData(req, { includeOptionals: true });
 
-    const repository = getRepository(Train);
+    const repository = getRepository<Train>(TrainEntity);
 
     let entity = await repository.findOne(id);
 

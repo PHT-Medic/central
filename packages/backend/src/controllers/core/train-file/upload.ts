@@ -5,17 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, Train, TrainFile } from '@personalhealthtrain/ui-common';
+import { PermissionID, TrainFile } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
 import BusBoy from 'busboy';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { getWritableDirPath } from '../../../config/paths';
 import { createFileStreamHandler } from '../../../modules/file-system/utils';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { getTrainFilesDirectoryPath } from '../../../config/pht/train-file/path';
+import { TrainEntity } from '../../../domains/core/train/entity';
+import { TrainFileEntity } from '../../../domains/core/train-file/entity';
 
 export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: ExpressResponse) {
     const { id } = req.params;
@@ -27,14 +28,14 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(Train);
+    const repository = getRepository(TrainEntity);
 
     let entity = await repository.findOne(id);
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
-    const trainFileRepository = getRepository(TrainFile);
+    const trainFileRepository = getRepository<TrainFile>(TrainFileEntity);
 
     const instance = BusBoy({ headers: req.headers as BusBoy.BusboyHeaders, preservePath: true });
 

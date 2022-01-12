@@ -91,6 +91,7 @@ export default {
 
                 await this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
             } catch (e) {
+                console.log(e);
                 this.error = e.message;
             }
 

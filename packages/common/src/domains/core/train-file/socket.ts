@@ -7,6 +7,6 @@
 
 import { TrainFile } from './entity';
 
-export function buildSocketTrainFileRoomName(id?: typeof TrainFile.prototype.id) {
+export function buildSocketTrainFileRoomName(id?: TrainFile['id']) {
     return `train-files${id ? `#${id}` : ''}`;
 }

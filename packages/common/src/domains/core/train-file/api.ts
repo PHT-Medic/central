@@ -12,13 +12,13 @@ import { Train } from '../train';
 import { TrainFile } from './entity';
 
 export function getAPITrainFilesDownloadUri(
-    trainId: typeof Train.prototype.id,
+    trainId: Train['id'],
 ): string {
     return `trains/${trainId}/files/download`;
 }
 
 export async function getApiTrainFiles(
-    trainId: typeof Train.prototype.id,
+    trainId: Train['id'],
 ) : Promise<CollectionResourceResponse<TrainFile>> {
     const response = await useAPI(APIType.DEFAULT).get(`trains/${trainId}/files`);
 
@@ -26,8 +26,8 @@ export async function getApiTrainFiles(
 }
 
 export async function getApiTrainFile(
-    trainId: typeof Train.prototype.id,
-    fileId: typeof TrainFile.prototype.id,
+    trainId: Train['id'],
+    fileId: TrainFile['id'],
 ) : Promise<SingleResourceResponse<TrainFile>> {
     const response = await useAPI(APIType.DEFAULT).get(`trains/${trainId}/files/${fileId}`);
 
@@ -35,8 +35,8 @@ export async function getApiTrainFile(
 }
 
 export async function dropApiTrainFile(
-    trainId: typeof Train.prototype.id,
-    fileId: typeof Train.prototype.id,
+    trainId: Train['id'],
+    fileId: TrainFile['id'],
 ) : Promise<SingleResourceResponse<TrainFile>> {
     const response = await useAPI(APIType.DEFAULT).delete(`trains/${trainId}/files/${fileId}`);
 
@@ -44,7 +44,7 @@ export async function dropApiTrainFile(
 }
 
 export async function uploadTrainFiles(
-    trainId: typeof Train.prototype.id,
+    trainId: Train['id'],
     formData: any,
 ) : Promise<CollectionResourceResponse<TrainFile>> {
     const response = await useAPI(APIType.DEFAULT).post(`trains/${trainId}/files`, formData, {

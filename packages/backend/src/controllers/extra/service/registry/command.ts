@@ -8,7 +8,6 @@
 import { check, matchedData, validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
 import {
-    Client,
     PermissionID,
     RegistryCommand, ServiceID,
     Station, buildRegistryHarborProjectName, deleteHarborProject, dropHarborProjectAccount,
@@ -21,10 +20,11 @@ import {
 import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
 } from '@typescript-error/http';
-import { stat } from 'fs';
+import { RobotEntity } from '@typescript-auth/server';
 import env from '../../../../env';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
+import { StationEntity } from '../../../../domains/core/station/entity';
 
 const commands = Object.values(RegistryCommand);
 
@@ -57,7 +57,7 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
 
     let projectName : string = createData.name;
 
-    const stationRepository = getRepository(Station);
+    const stationRepository = getRepository<Station>(StationEntity);
     let station : Station | undefined;
     if (isRegistryStationProjectName(projectName)) {
         const stationId : string = getRegistryStationProjectNameId(projectName);
@@ -175,15 +175,15 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
         }
         // Webhook
         case RegistryCommand.PROJECT_WEBHOOK_CREATE: {
-            const clientRepository = await getRepository(Client);
+            const clientRepository = await getRepository(RobotEntity);
 
-            const client = await clientRepository.findOne({
+            const robot = await clientRepository.findOne({
                 where: {
-                    service_id: ServiceID.REGISTRY,
+                    name: ServiceID.REGISTRY,
                 },
             });
 
-            const webhook = await ensureHarborProjectWebHook(projectName, client, {
+            const webhook = await ensureHarborProjectWebHook(projectName, robot, {
                 internalAPIUrl: env.internalApiUrl,
             }, true);
 

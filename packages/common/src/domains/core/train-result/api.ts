@@ -20,7 +20,7 @@ export async function getAPITrainResults(options?: BuildInput<TrainResult>) : Pr
 }
 
 export async function getAPITrainResult(
-    id: typeof TrainResult.prototype.id,
+    id: TrainResult['id'],
     options?: BuildInput<TrainResult>,
 ) : Promise<SingleResourceResponse<TrainResult>> {
     const { data: response } = await useAPI(APIType.DEFAULT).get(`train-results/${id}${buildQuery(options)}`);
@@ -29,7 +29,7 @@ export async function getAPITrainResult(
 }
 
 export async function dropAPITrainResult(
-    id: typeof TrainResult.prototype.id,
+    id: TrainResult['id'],
 ) : Promise<SingleResourceResponse<TrainResult>> {
     const { data: response } = await useAPI(APIType.DEFAULT).delete(`train-results/${id}`);
 

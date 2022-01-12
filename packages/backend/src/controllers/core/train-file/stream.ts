@@ -8,12 +8,13 @@
 import { getRepository } from 'typeorm';
 import tar from 'tar-stream';
 import fs from 'fs';
-import {
-    Train, TrainFile, TrainStation, isPermittedForResourceRealm,
-} from '@personalhealthtrain/ui-common';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { isPermittedForResourceRealm } from '@typescript-auth/domains';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { getTrainFilesDirectoryPath } from '../../../config/pht/train-file/path';
+import { TrainStationEntity } from '../../../domains/core/train-station/entity';
+import { TrainEntity } from '../../../domains/core/train/entity';
+import { TrainFileEntity } from '../../../domains/core/train-file/entity';
 
 export async function getTrainFileStreamRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -22,7 +23,7 @@ export async function getTrainFileStreamRouteHandler(req: ExpressRequest, res: E
         throw new BadRequestError();
     }
 
-    const repository = getRepository(Train);
+    const repository = getRepository(TrainEntity);
 
     const train = await repository.findOne(id);
 
@@ -31,7 +32,7 @@ export async function getTrainFileStreamRouteHandler(req: ExpressRequest, res: E
     }
 
     if (!isPermittedForResourceRealm(req.realmId, train.realm_id)) {
-        const proposalStations = await getRepository(TrainStation).find({
+        const proposalStations = await getRepository(TrainStationEntity).find({
             where: {
                 train_id: train.id,
             },
@@ -66,7 +67,7 @@ export async function getTrainFileStreamRouteHandler(req: ExpressRequest, res: E
 
     const trainDirectoryPath = getTrainFilesDirectoryPath(train.id);
 
-    const files = await getRepository(TrainFile).find({
+    const files = await getRepository(TrainFileEntity).find({
         train_id: train.id,
     });
 

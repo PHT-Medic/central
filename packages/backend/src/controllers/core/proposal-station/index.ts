@@ -9,27 +9,32 @@ import { getRepository } from 'typeorm';
 import { applyFilters, applyPagination, applyRelations } from 'typeorm-extension';
 import { check, matchedData, validationResult } from 'express-validator';
 import {
-    PermissionID, Proposal,
+    PermissionID,
     ProposalStation, ProposalStationApprovalStatus,
-    Station, isPermittedForResourceRealm, isProposalStationApprovalStatus, onlyRealmPermittedQueryResources,
+    isProposalStationApprovalStatus,
 } from '@personalhealthtrain/ui-common';
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
 import { SwaggerTags } from '@trapi/swagger';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { onlyRealmPermittedQueryResources } from '@typescript-auth/server';
+import { isPermittedForResourceRealm } from '@typescript-auth/domains';
 import { DispatcherProposalEvent, emitDispatcherProposalEvent } from '../../../domains/core/proposal/queue';
 
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import env from '../../../env';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { ExpressValidationError } from '../../../config/http/error/validation';
+import { ProposalStationEntity } from '../../../domains/core/proposal-station/entity';
+import { ProposalEntity } from '../../../domains/core/proposal/entity';
+import { StationEntity } from '../../../domains/core/station/entity';
 
 export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     // tslint:disable-next-line:prefer-const
     const { filter, page, include } = req.query;
 
-    const repository = getRepository(ProposalStation);
+    const repository = getRepository(ProposalStationEntity);
     const query = await repository.createQueryBuilder('proposalStation');
 
     onlyRealmPermittedQueryResources(query, req.realmId, [
@@ -75,7 +80,7 @@ export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse)
     const { id } = req.params;
     const { include } = req.query;
 
-    const repository = getRepository(ProposalStation);
+    const repository = getRepository(ProposalStationEntity);
     const query = repository.createQueryBuilder('proposalStation')
         .where('proposalStation.id = :id', { id });
 
@@ -123,10 +128,10 @@ export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse)
         throw new ExpressValidationError(validation);
     }
 
-    const data : Partial<ProposalStation> = matchedData(req, { includeOptionals: false });
+    const data : Partial<ProposalStationEntity> = matchedData(req, { includeOptionals: false });
 
     // proposal
-    const proposalRepository = getRepository(Proposal);
+    const proposalRepository = getRepository(ProposalEntity);
     const proposal = await proposalRepository.findOne(data.proposal_id);
 
     if (typeof proposal === 'undefined') {
@@ -140,7 +145,7 @@ export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse)
     }
 
     // station
-    const stationRepository = getRepository(Station);
+    const stationRepository = getRepository(StationEntity);
     const station = await stationRepository.findOne(data.station_id);
 
     if (typeof station === 'undefined') {
@@ -149,7 +154,7 @@ export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse)
 
     data.station_realm_id = station.realm_id;
 
-    const repository = getRepository(ProposalStation);
+    const repository = getRepository(ProposalStationEntity);
     let entity = repository.create(data);
 
     if (env.skipProposalApprovalOperation) {
@@ -177,7 +182,7 @@ export async function editRouteHandler(req: ExpressRequest, res: ExpressResponse
         throw new BadRequestError('The proposal-station id is not valid.');
     }
 
-    const repository = getRepository(ProposalStation);
+    const repository = getRepository(ProposalStationEntity);
     let proposalStation = await repository.findOne(id);
 
     if (typeof proposalStation === 'undefined') {
@@ -250,9 +255,9 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
         throw new ForbiddenError('You are not allowed to drop a proposal station.');
     }
 
-    const repository = getRepository(ProposalStation);
+    const repository = getRepository(ProposalStationEntity);
 
-    const entity : ProposalStation | undefined = await repository.findOne(id);
+    const entity : ProposalStationEntity | undefined = await repository.findOne(id);
 
     if (typeof entity === 'undefined') {
         throw new NotFoundError();

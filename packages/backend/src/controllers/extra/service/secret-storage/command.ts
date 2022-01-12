@@ -16,7 +16,6 @@ import {
     ServiceID,
     Station,
     USER_SECRET_ENGINE_KEY,
-    User,
     UserSecret,
     buildSecretStorageServiceKey,
     buildSecretStorageServicePayload,
@@ -34,6 +33,7 @@ import { getRepository } from 'typeorm';
 import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
 } from '@typescript-error/http';
+import { UserEntity } from '@typescript-auth/server';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 
@@ -68,7 +68,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
 
     const validationData = matchedData(req, { includeOptionals: true });
 
-    let user : User | undefined;
+    let user : UserEntity | undefined;
     let station : Station | undefined;
 
     const rawPath : string = validationData.name;
@@ -106,7 +106,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
     }
 
     if (isSecretStorageUserKey(rawPath)) {
-        const userId = parseInt(getSecretStorageUserKey(rawPath), 10);
+        const userId = getSecretStorageUserKey(rawPath);
 
         if (
             !req.ability.hasPermission(PermissionID.USER_EDIT) &&
@@ -115,7 +115,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
             throw new ForbiddenError();
         }
 
-        const userRepository = getRepository(User);
+        const userRepository = getRepository(UserEntity);
 
         user = await userRepository.findOne(userId);
 

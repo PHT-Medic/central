@@ -23,7 +23,7 @@ export async function getAPITrains(options?: BuildInput<Train>) : Promise<Collec
 }
 
 export async function getAPITrain(
-    id: typeof Train.prototype.id,
+    id: Train['id'],
     options?: BuildInput<Train>,
     requestConfig?: ApiRequestConfig,
 ) : Promise<SingleResourceResponse<Train>> {
@@ -33,13 +33,13 @@ export async function getAPITrain(
     return response;
 }
 
-export async function dropAPITrain(id: typeof Train.prototype.id) : Promise<SingleResourceResponse<Train>> {
+export async function dropAPITrain(id: Train['id']) : Promise<SingleResourceResponse<Train>> {
     const { data: response } = await useAPI(APIType.DEFAULT).delete(`trains/${id}`);
 
     return response;
 }
 
-export async function editAPITrain(id: typeof Train.prototype.id, data: Partial<Train>) : Promise<SingleResourceResponse<Train>> {
+export async function editAPITrain(id: Train['id'], data: Partial<Train>) : Promise<SingleResourceResponse<Train>> {
     const { data: response } = await useAPI(APIType.DEFAULT).post(`trains/${id}`, nullifyEmptyObjectProperties(data));
 
     return response;
@@ -52,7 +52,7 @@ export async function addAPITrain(data: Partial<Train>) : Promise<SingleResource
 }
 
 export async function runAPITrainCommand(
-    id: typeof Train.prototype.id,
+    id: Train['id'],
     command: TrainCommand,
     data: Record<string, any> = {},
 ) : Promise<SingleResourceResponse<Train>> {

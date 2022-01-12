@@ -195,7 +195,7 @@ class AuthModule {
     }
 
     private async handleUserInfoResponse(userInfo: Record<string, any>) : Promise<Record<string, any>> {
-        const { permissions, ...user } = userInfo;
+        const { permissions, ...user } = userInfo.target.data;
 
         await this.ctx.store.commit('auth/setPermissionsResolved', true);
         await this.ctx.store.dispatch('auth/triggerSetUser', user);
@@ -220,6 +220,8 @@ class AuthModule {
     }
 
     public setPermissions(permissions: PermissionItem<any>[]) {
+        if (!Array.isArray(permissions)) return;
+
         this.abilityManager.setPermissions(permissions);
     }
 

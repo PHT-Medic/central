@@ -5,76 +5,47 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
+import { Realm } from '@typescript-auth/domains';
 import { Station } from '../station';
 import { Train } from '../train';
 import { TrainStationApprovalStatus, TrainStationRunStatus } from './status';
-import { Realm } from '../../auth';
 
-@Entity({ name: 'train_stations' })
-export class TrainStation {
-    @PrimaryGeneratedColumn('uuid')
-        id: string;
+export interface TrainStation {
+    id: string;
 
     // ------------------------------------------------------------------
 
-    @Column({ default: null })
-        approval_status: TrainStationApprovalStatus | null;
+    approval_status: TrainStationApprovalStatus | null;
 
-    @Column({ type: 'varchar', nullable: true, default: null })
-        run_status: TrainStationRunStatus | null;
+    run_status: TrainStationRunStatus | null;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'text', nullable: true })
-        comment: string;
+    comment: string;
 
-    @Column({ type: 'int', unsigned: true, nullable: true })
-        position: number;
+    position: number;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
-    @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
-    @Column()
-        train_id: string;
+    train_id: string;
 
-    @ManyToOne(() => Train, (train) => train.train_stations, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'train_id' })
-        train: Train;
+    train: Train;
 
-    @Column()
-        train_realm_id: string;
+    train_realm_id: string;
 
-    @ManyToOne(() => Realm, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'train_realm_id' })
-        train_realm: Realm;
+    train_realm: Realm;
 
-    @Column()
-        station_id: number;
+    station_id: number;
 
-    @ManyToOne(() => Station, (station) => station.train_stations, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'station_id' })
-        station: Station;
+    station: Station;
 
-    @Column()
-        station_realm_id: string;
+    station_realm_id: string;
 
-    @ManyToOne(() => Realm, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'station_realm_id' })
-        station_realm: Realm;
+    station_realm: Realm;
 }

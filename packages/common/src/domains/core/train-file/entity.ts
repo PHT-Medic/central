@@ -5,63 +5,37 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
-import { Realm, User } from '../../auth';
+import { Realm, User } from '@typescript-auth/domains';
 import { Train } from '../train';
 
-@Entity({ name: 'train_files' })
-export class TrainFile {
-    @PrimaryGeneratedColumn('uuid')
-        id: string;
+export interface TrainFile {
+    id: string;
 
-    @Column({ type: 'varchar', length: 256 })
-        name: string;
+    name: string;
 
-    @Column({ type: 'varchar', length: 4096 })
-        hash: string;
+    hash: string;
 
-    @Column({ nullable: true })
-        directory: string;
+    directory: string | null;
 
-    @Column({ type: 'int', unsigned: true, nullable: true })
-        size: number | null;
+    size: number | null;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
-    @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'int', unsigned: true })
-        user_id: number;
+    user_id: string;
 
-    @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'user_id' })
-        user: User;
+    user: User;
 
-    @Column()
-        train_id: string;
+    train_id: string;
 
-    @ManyToOne(() => Train, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'train_id' })
-        train: Train;
+    train: Train;
 
-    @Column({ nullable: true })
-        realm_id: string;
+    realm_id: string;
 
-    @ManyToOne(() => Realm, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'realm_id' })
-        realm: Realm;
+    realm: Realm;
 }

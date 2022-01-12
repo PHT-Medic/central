@@ -5,60 +5,39 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
-} from 'typeorm';
+import { Realm } from '@typescript-auth/domains';
 import { Proposal } from '../proposal';
 import { Station } from '../station';
 import { ProposalStationApprovalStatus } from './status';
-import { Realm } from '../../auth';
 
-@Entity({ name: 'proposal_stations' })
-export class ProposalStation {
-    @PrimaryGeneratedColumn('uuid')
-        id: string;
+export interface ProposalStation {
+    id: string;
 
-    @Column({ default: null })
-        approval_status: ProposalStationApprovalStatus | null;
+    approval_status: ProposalStationApprovalStatus | null;
 
-    @Column({ type: 'text', nullable: true })
-        comment: string;
+    comment: string | null;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
-    @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
-    @Column()
-        proposal_id: number;
+    proposal_id: number;
 
-    @ManyToOne(() => Proposal, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'proposal_id' })
-        proposal: Proposal;
+    proposal: Proposal;
 
-    @Column()
-        proposal_realm_id: string;
+    proposal_realm_id: string;
 
-    @ManyToOne(() => Realm, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'proposal_realm_id' })
-        proposal_realm: Realm;
+    proposal_realm: Realm;
 
-    @Column()
-        station_id: number;
+    station_id: number;
 
-    @ManyToOne(() => Station, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'station_id' })
-        station: Station;
+    station: Station;
 
-    @Column()
-        station_realm_id: string;
+    station_realm_id: string;
 
-    @ManyToOne(() => Realm, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'station_realm_id' })
-        station_realm: Realm;
+    station_realm: Realm;
 }

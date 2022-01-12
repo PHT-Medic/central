@@ -5,60 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    BeforeInsert,
-    BeforeUpdate,
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    Unique,
-    UpdateDateColumn,
-} from 'typeorm';
-import { User } from '../user';
+import { User } from '@typescript-auth/domains';
 import { SecretType } from './constants';
 
-@Unique('keyUserId', [
-    'key',
-    'user_id',
-])
-@Entity({ name: 'user_secrets' })
-export class UserSecret {
-    @PrimaryGeneratedColumn()
-        id: number;
+export interface UserSecret {
+    id: number;
 
-    @Column({ type: 'varchar', length: 100 })
-        key: string;
+    key: string;
 
-    @BeforeUpdate()
-    @BeforeInsert()
-    setKey() {
-        switch (this.type) {
-            case SecretType.PAILLIER_PUBLIC_KEY:
-            case SecretType.RSA_PUBLIC_KEY:
-                this.key = this.type;
-                break;
-        }
-    }
+    type: SecretType;
 
-    @Column({ type: 'enum', enum: SecretType })
-        type: SecretType;
+    content: string;
 
-    @Column({ type: 'text', nullable: true })
-        content: string;
+    user_id: string;
 
-    @Column({ type: 'int', unsigned: true })
-        user_id: number;
+    user: User;
 
-    @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'user_id' })
-        user: User;
+    created_at: Date;
 
-    @CreateDateColumn()
-        created_at: string;
-
-    @UpdateDateColumn()
-        updated_at: string;
+    updated_at: Date;
 }

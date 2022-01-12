@@ -16,6 +16,7 @@ import { SwaggerTags } from '@trapi/swagger';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
+import { MasterImageGroupEntity } from '../../../domains/core/master-image-group/entity';
 
 type PartialMasterImageGroup = Partial<MasterImageGroup>;
 
@@ -52,7 +53,7 @@ export class MasterImageGroupController {
 export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    const repository = getRepository(MasterImageGroup);
+    const repository = getRepository(MasterImageGroupEntity);
 
     const entity = await repository.findOne(id);
 
@@ -66,7 +67,7 @@ export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse)
 export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { page, filter } = req.query;
 
-    const repository = getRepository(MasterImageGroup);
+    const repository = getRepository(MasterImageGroupEntity);
     const query = repository.createQueryBuilder('imageGroup');
 
     applyFilters(query, filter, {
@@ -96,7 +97,7 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(MasterImageGroup);
+    const repository = getRepository(MasterImageGroupEntity);
 
     const entity = await repository.findOne(id);
 

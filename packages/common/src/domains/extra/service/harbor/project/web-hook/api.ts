@@ -7,7 +7,7 @@
 
 import { stringifyAuthorizationHeader } from '@typescript-auth/core';
 
-import { Client } from '../../../../../auth';
+import { Robot } from '@typescript-auth/domains';
 import { APIType, useAPI } from '../../../../../../modules';
 import { ServiceID } from '../../../constants';
 import { HarborProjectWebhook, HarborProjectWebhookOptions } from './type';
@@ -38,7 +38,7 @@ export async function findHarborProjectWebHook(
 
 export async function ensureHarborProjectWebHook(
     projectIdOrName: number | string,
-    client: Pick<Client, 'id' | 'secret'>,
+    client: Pick<Robot, 'id' | 'secret'>,
     options: HarborProjectWebhookOptions,
     isProjectName = false,
 ) : Promise<HarborProjectWebhook> {

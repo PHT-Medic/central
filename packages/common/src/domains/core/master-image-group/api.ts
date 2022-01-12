@@ -12,13 +12,14 @@ import {
 } from '../../../modules';
 
 import { MasterImageGroup } from './entity';
+import { MasterImage } from '../master-image';
 
 export async function getAPIMasterImageGroups(data?: BuildInput<MasterImageGroup>) : Promise<CollectionResourceResponse<MasterImageGroup>> {
     const response = await useAPI(APIType.DEFAULT).get(`master-image-groups${buildQuery(data)}`);
     return response.data;
 }
 
-export async function getAPIMasterImageGroup(id: string) : Promise<SingleResourceResponse<MasterImageGroup>> {
+export async function getAPIMasterImageGroup(id: MasterImageGroup['id']) : Promise<SingleResourceResponse<MasterImageGroup>> {
     const response = await useAPI(APIType.DEFAULT).delete(`master-image-groups/${id}`);
     return response.data;
 }

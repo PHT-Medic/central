@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID } from '@personalhealthtrain/ui-common';
 import { NavigationComponentConfig } from 'vue-layout-navigation';
+import { PermissionID } from '@personalhealthtrain/ui-common';
 import { LayoutKey, LayoutNavigationID } from './contants';
 
 export const LayoutTopNavigation : NavigationComponentConfig[] = [
@@ -20,7 +20,7 @@ export const LayoutTopNavigation : NavigationComponentConfig[] = [
         name: 'Admin',
         icon: 'fas fa-cog',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [PermissionID.ADMIN_UI_USE],
+        [LayoutKey.REQUIRED_PERMISSIONS]: [],
     },
 ];
 
@@ -112,7 +112,9 @@ export const LayoutSideAdminNavigation : NavigationComponentConfig[] = [
             PermissionID.ROLE_PERMISSION_ADD,
             PermissionID.ROLE_PERMISSION_DROP,
 
-            PermissionID.PERMISSION_MANAGE,
+            PermissionID.PERMISSION_ADD,
+            PermissionID.PERMISSION_EDIT,
+            PermissionID.PERMISSION_DROP,
         ],
         components: [
             {
@@ -165,7 +167,9 @@ export const LayoutSideAdminNavigation : NavigationComponentConfig[] = [
                 icon: 'fas fa-key',
                 [LayoutKey.REQUIRED_LOGGED_IN]: true,
                 [LayoutKey.REQUIRED_PERMISSIONS]: [
-                    PermissionID.PERMISSION_MANAGE,
+                    PermissionID.PERMISSION_ADD,
+                    PermissionID.PERMISSION_EDIT,
+                    PermissionID.PERMISSION_DROP,
                 ],
             },
         ],

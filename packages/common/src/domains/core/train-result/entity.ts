@@ -5,54 +5,32 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryColumn, UpdateDateColumn,
-} from 'typeorm';
+import { User } from '@typescript-auth/domains';
 import { Train } from '../train';
 import { TrainResultStatus } from './status';
-import { User } from '../../auth';
 
-@Entity({ name: 'train_results' })
-export class TrainResult {
-    @PrimaryColumn({ type: 'uuid' })
-        id: string;
+export interface TrainResult {
+    id: string;
 
-    @Column({ nullable: true, default: null })
-        image: string;
+    image: string;
 
-    @Column({
-        type: 'enum', nullable: true, default: null, enum: TrainResultStatus,
-    })
-        status: TrainResultStatus | null;
+    status: TrainResultStatus | null;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
-    @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
-    @Column()
-        train_id: string;
+    train_id: string;
 
-    @ManyToOne(() => Train, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'train_id' })
-        train: Train;
+    train: Train;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'int', unsigned: true })
-        user_id: number;
+    user_id: string;
 
-    @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'user_id' })
-        user: User;
+    user: User;
 }

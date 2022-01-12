@@ -10,6 +10,7 @@ import dotenv from 'dotenv';
 
 import { createConnection } from 'typeorm';
 import { buildConnectionOptions } from 'typeorm-extension';
+import { modifyDatabaseConnectionOptions } from '@typescript-auth/server';
 import env from './env';
 
 import { createConfig } from './config';
@@ -47,7 +48,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
         initDemo();
     }
 
-    const connectionOptions = await buildConnectionOptions();
+    const connectionOptions = modifyDatabaseConnectionOptions(await buildConnectionOptions(), true);
     const connection = await createConnection(connectionOptions);
     if (env.env === 'development') {
         await connection.synchronize();

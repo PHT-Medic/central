@@ -5,83 +5,46 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    Index,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
+import { Realm } from '@typescript-auth/domains';
 import { ProposalStation } from '../proposal-station';
-import { Realm } from '../../auth';
 import { TrainStation } from '../train-station';
-import { createNanoID } from '../../../utils';
 
-@Entity({ name: 'stations' })
-export class Station {
-    @PrimaryGeneratedColumn()
-        id: number;
+export interface Station {
+    id: number;
 
-    @Index()
-    @Column({
-        type: 'varchar', length: 100, select: false, default: createNanoID(),
-    })
-        secure_id: string;
+    secure_id: string;
 
-    @Column({ type: 'varchar', length: 128 })
-        name: string;
+    name: string;
 
-    @Column({ type: 'text', nullable: true, select: false })
-        public_key: string;
+    public_key: string | null;
 
-    @Column({
-        type: 'varchar', length: 256, nullable: true, select: false,
-    })
-        email: string | null;
+    email: string | null;
 
     // ------------------------------------------------------------------
 
-    @Column({ nullable: true, default: null, select: false })
-        registry_project_id: number | null;
+    registry_project_id: number | null;
 
-    @Column({ nullable: true, default: null, select: false })
-        registry_project_account_name: string | null;
+    registry_project_account_name: string | null;
 
-    @Column({
-        type: 'text', nullable: true, default: null, select: false,
-    })
-        registry_project_account_token: string | null;
+    registry_project_account_token: string | null;
 
-    @Column({ default: false, select: false })
-        registry_project_webhook_exists: boolean;
+    registry_project_webhook_exists: boolean;
 
-    @Column({ default: false, select: false })
-        vault_public_key_saved: boolean;
+    vault_public_key_saved: boolean;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
-    @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
-    @Column()
-        realm_id: string;
+    realm_id: string;
 
-    @ManyToOne(() => Realm, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'realm_id' })
-        realm: Realm;
+    realm: Realm;
 
-    @OneToMany(() => TrainStation, (trainStation) => trainStation.station)
-        train_stations: TrainStation[];
+    train_stations: TrainStation[];
 
-    @OneToMany(() => ProposalStation, (proposalStation) => proposalStation.station)
-        proposal_stations: ProposalStation[];
+    proposal_stations: ProposalStation[];
 }

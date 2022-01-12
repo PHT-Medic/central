@@ -15,6 +15,8 @@ import { Message, consumeQueue } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import { ResultServiceDataPayload } from '../domains/extra/result-service';
 import { MessageQueueResultServiceRoutingKey } from '../config/service/mq';
+import { TrainEntity } from '../domains/core/train/entity';
+import { TrainResultEntity } from '../domains/core/train-result/entity';
 
 export enum TrainResultEvent {
     STARTING = 'starting', // ui trigger
@@ -55,7 +57,7 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: TrainRes
     const status : TrainResultStatus | null = EventStatusMap[event];
     const latest = typeof data.latest === 'boolean' ? data.latest : true;
 
-    const trainRepository = getRepository(Train);
+    const trainRepository = getRepository(TrainEntity);
     const train = await trainRepository.findOne(data.trainId);
     if (latest) {
         train.result_last_status = status;
@@ -72,7 +74,7 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: TrainRes
         return;
     }
 
-    const resultRepository = getRepository(TrainResult);
+    const resultRepository = getRepository(TrainResultEntity);
     let result = await resultRepository.findOne(data.id);
 
     if (typeof result === 'undefined') {

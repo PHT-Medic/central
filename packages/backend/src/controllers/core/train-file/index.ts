@@ -9,20 +9,24 @@ import { getRepository } from 'typeorm';
 import { applyFilters } from 'typeorm-extension';
 import {
     PermissionID,
-    Train, TrainFile, isPermittedForResourceRealm, onlyRealmPermittedQueryResources,
+    Train, TrainFile,
 } from '@personalhealthtrain/ui-common';
 import fs from 'fs';
 import {
     Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
 import { SwaggerTags } from '@trapi/swagger';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { isPermittedForResourceRealm } from '@typescript-auth/domains';
+import { onlyRealmPermittedQueryResources } from '@typescript-auth/server';
 import { getTrainFileFilePath } from '../../../config/pht/train-file/path';
 
 import { getTrainFileStreamRouteHandler } from './stream';
 import { uploadTrainFilesRouteHandler } from './upload';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
+import { TrainFileEntity } from '../../../domains/core/train-file/entity';
+import { TrainEntity } from '../../../domains/core/train/entity';
 
 export async function getTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (
@@ -34,7 +38,7 @@ export async function getTrainFileRouteHandler(req: ExpressRequest, res: Express
 
     const { fileId } = req.params;
 
-    const repository = getRepository(TrainFile);
+    const repository = getRepository(TrainFileEntity);
 
     const entity = await repository.findOne({
         id: fileId,
@@ -55,7 +59,7 @@ export async function getTrainFilesRouteHandler(req: ExpressRequest, res: Expres
     const { id } = req.params;
     const { filter } = req.query;
 
-    const repository = getRepository(TrainFile);
+    const repository = getRepository(TrainFileEntity);
     const query = repository.createQueryBuilder('trainFile')
         .where('trainFile.train_id = :trainId', { trainId: id });
 
@@ -85,7 +89,7 @@ export async function dropTrainFileRouteHandler(req: ExpressRequest, res: Expres
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(TrainFile);
+    const repository = getRepository(TrainFileEntity);
 
     const entity = await repository.findOne(fileId);
 
@@ -102,7 +106,7 @@ export async function dropTrainFileRouteHandler(req: ExpressRequest, res: Expres
     await repository.remove(entity);
 
     // train
-    const trainRepository = getRepository(Train);
+    const trainRepository = getRepository(TrainEntity);
     let train = await trainRepository.findOne(entity.train_id);
     train = trainRepository.merge(train, {
         hash: null,

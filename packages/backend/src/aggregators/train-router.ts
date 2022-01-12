@@ -9,6 +9,7 @@ import { Train, TrainRunStatus } from '@personalhealthtrain/ui-common';
 import { Message, consumeQueue } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import { MessageQueueTrainRouterRoutingKey } from '../config/service/mq';
+import { TrainEntity } from '../domains/core/train/entity';
 
 export enum TrainRouterEvent {
     STOPPED = 'trainStopped',
@@ -21,7 +22,7 @@ const EventStatusMap : Record<TrainRouterEvent, TrainRunStatus> = {
 };
 
 async function updateTrain(trainId: string, event: TrainRouterEvent) {
-    const repository = getRepository(Train);
+    const repository = getRepository(TrainEntity);
     const entity = await repository.findOne(trainId);
     if (typeof entity === 'undefined') {
         return;

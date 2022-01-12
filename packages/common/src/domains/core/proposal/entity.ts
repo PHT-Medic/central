@@ -5,64 +5,42 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
-} from 'typeorm';
-import { Realm, User } from '../../auth';
+import { Realm, User } from '@typescript-auth/domains';
 import { MasterImage } from '../master-image';
 import { ProposalStation } from '../proposal-station';
 
-@Entity({ name: 'proposals' })
-export class Proposal {
-    @PrimaryGeneratedColumn()
-        id: number;
+export interface Proposal {
+    id: number;
 
-    @Column({ type: 'varchar', length: 256 })
-        title: string;
+    title: string;
 
-    @Column({ type: 'varchar' })
-        requested_data: string;
+    requested_data: string;
 
-    @Column({ type: 'varchar' })
-        risk: string;
+    risk: string;
 
-    @Column({ type: 'varchar', length: 4096 })
-        risk_comment: string;
+    risk_comment: string;
 
-    @Column({ type: 'int', unsigned: true, default: 0 })
-        trains: number;
+    trains: number;
 
     // ------------------------------------------------------------------
 
-    @CreateDateColumn()
-        created_at: Date;
+    created_at: Date;
 
-    @UpdateDateColumn()
-        updated_at: Date;
+    updated_at: Date;
 
     // ------------------------------------------------------------------
 
-    @Column()
-        realm_id: string;
+    realm_id: string;
 
-    @ManyToOne(() => Realm, (realm) => realm.proposals, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'realm_id' })
-        realm: Realm;
+    realm: Realm;
 
-    @Column({ type: 'int', unsigned: true, nullable: true })
-        user_id: number;
+    user_id: string;
 
-    @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
-    @JoinColumn({ name: 'user_id' })
-        user: User;
+    user: User;
 
-    @Column({ nullable: true })
-        master_image_id: string | null;
+    master_image_id: string | null;
 
-    @ManyToOne(() => MasterImage, { onDelete: 'SET NULL', nullable: true })
-    @JoinColumn({ name: 'master_image_id' })
-        master_image: MasterImage;
+    master_image: MasterImage;
 
-    @OneToMany(() => ProposalStation, (proposalStation) => proposalStation.proposal)
-        proposal_stations: ProposalStation[];
+    proposal_stations: ProposalStation[];
 }

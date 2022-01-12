@@ -7,6 +7,6 @@
 
 import { Proposal } from './entity';
 
-export function buildSocketProposalRoomName(id?: typeof Proposal.prototype.id) {
+export function buildSocketProposalRoomName(id?: Proposal['id']) {
     return `proposals${id ? `#${id}` : ''}`;
 }

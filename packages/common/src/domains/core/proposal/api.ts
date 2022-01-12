@@ -14,6 +14,7 @@ import {
 } from '../../../modules';
 import { Proposal } from './entity';
 import { nullifyEmptyObjectProperties } from '../../../utils';
+import { MasterImage } from '../master-image';
 
 export async function addProposal(data: Record<string, any>) : Promise<SingleResourceResponse<Proposal>> {
     const response = await useAPI(APIType.DEFAULT).post('proposals', nullifyEmptyObjectProperties(data));
@@ -21,18 +22,18 @@ export async function addProposal(data: Record<string, any>) : Promise<SingleRes
     return response.data;
 }
 
-export async function getProposal(id: number, requestRecord?: BuildInput<Proposal>) : Promise<SingleResourceResponse<Proposal>> {
+export async function getProposal(id: Proposal['id'], requestRecord?: BuildInput<Proposal>) : Promise<SingleResourceResponse<Proposal>> {
     const response = await useAPI(APIType.DEFAULT).get(`proposals/${id}${buildQuery(requestRecord)}`);
 
     return response.data;
 }
 
-export async function dropProposal(id: number): Promise<SingleResourceResponse<Proposal>> {
+export async function dropProposal(id: Proposal['id']): Promise<SingleResourceResponse<Proposal>> {
     const response = await useAPI(APIType.DEFAULT).delete(`proposals/${id}`);
     return response.data;
 }
 
-export async function editProposal(id: number, data: Record<string, any>): Promise<SingleResourceResponse<Proposal>> {
+export async function editProposal(id: Proposal['id'], data: Record<string, any>): Promise<SingleResourceResponse<Proposal>> {
     const response = await useAPI(APIType.DEFAULT).post(`proposals/${id}`, nullifyEmptyObjectProperties(data));
     return response.data;
 }

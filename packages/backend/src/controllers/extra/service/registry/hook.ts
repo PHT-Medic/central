@@ -11,12 +11,13 @@ import {
 } from 'yup';
 
 import {
-    REGISTRY_MASTER_IMAGE_PROJECT_NAME, Train,
+    REGISTRY_MASTER_IMAGE_PROJECT_NAME,
 } from '@personalhealthtrain/ui-common';
 import { publishMessage } from 'amqp-extension';
 import { useLogger } from '../../../../modules/log';
 import { DispatcherHarborEventType, buildDispatcherHarborEvent } from '../../../../domains/extra/harbor/queue';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
+import { TrainEntity } from '../../../../domains/core/train/entity';
 
 let eventValidator : undefined | BaseSchema;
 function useHookEventDataValidator() : BaseSchema {
@@ -71,7 +72,7 @@ export type HarborHook = {
 export async function postHarborHookRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     useLogger().debug('hook received', { service: 'api-harbor-hook' });
 
-    const repository = getRepository(Train);
+    const repository = getRepository(TrainEntity);
 
     const hook : HarborHook = await useHookEventDataValidator().validate(req.body);
 

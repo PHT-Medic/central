@@ -6,10 +6,10 @@
  */
 
 import { Arguments, Argv, CommandModule } from 'yargs';
-import { buildConnectionOptions, createDatabase, runSeeder } from 'typeorm-extension';
+import { buildConnectionOptions, createDatabase } from 'typeorm-extension';
 import { createConnection } from 'typeorm';
-import { createSecurityKeyPair } from '@typescript-auth/server';
-import { getWritableDirPath } from '../../config/paths';
+import { modifyDatabaseConnectionOptions, setupCommand } from '@typescript-auth/server';
+import { PermissionID, PermissionKey } from '@personalhealthtrain/ui-common';
 import { generateSwaggerDocumentation } from '../../config/http/swagger';
 import { createConfig } from '../../config';
 import env from '../../env';
@@ -18,7 +18,7 @@ interface SetupArguments extends Arguments {
     auth: boolean,
     database: boolean,
     documentation: boolean,
-    'database-seeder': boolean
+    databaseSeeder: boolean
 }
 
 export class SetupCommand implements CommandModule {
@@ -46,7 +46,7 @@ export class SetupCommand implements CommandModule {
                 type: 'boolean',
             })
 
-            .option('database-seeder', {
+            .option('databaseSeeder', {
                 alias: 'db:seed',
                 describe: 'Setup database seeds.',
                 type: 'boolean',
@@ -58,45 +58,56 @@ export class SetupCommand implements CommandModule {
         if (
             !args.auth &&
             !args.database &&
-            !args['database-seeder'] &&
+            !args.databaseSeeder &&
             !args.documentation
         ) {
             // eslint-disable-next-line no-multi-assign
-            args.auth = args.database = args['database-seeder'] = args.documentation = true;
+            args.auth = args.database = args.databaseSeeder = args.documentation = true;
         }
 
         /**
          * Setup auth module
          */
         if (args.auth) {
-            await createSecurityKeyPair({ directory: getWritableDirPath() });
+            await setupCommand({
+                database: true,
+                databaseSeeder: true,
+                documentation: args.documentation,
+                keyPair: true,
+                databaseSeederOptions: {
+                    permissions: Object.values(PermissionKey),
+                    userName: 'admin',
+                    userPassword: 'start123',
+                },
+            });
         }
 
         if (args.documentation) {
             await generateSwaggerDocumentation();
         }
 
-        if (args.database || args['database-seeder']) {
+        if (args.database || args.databaseSeeder) {
             /**
              * Setup database with schema & seeder
              */
-            const connectionOptions = await buildConnectionOptions();
+            const connectionOptions = modifyDatabaseConnectionOptions(await buildConnectionOptions({ buildForCommand: true }), true);
 
             if (args.database) {
                 await createDatabase({ ifNotExist: true }, connectionOptions);
             }
 
+            console.log(connectionOptions);
+
             const connection = await createConnection(connectionOptions);
+
             try {
                 await connection.synchronize();
 
-                if (args['database-seeder']) {
+                if (args.databaseSeeder) {
                     const config = createConfig({ env });
                     if (config.redisDatabase.status !== 'connecting') {
                         await config.redisDatabase.connect();
                     }
-
-                    await runSeeder(connection);
                 }
             } catch (e) {
                 console.log(e);

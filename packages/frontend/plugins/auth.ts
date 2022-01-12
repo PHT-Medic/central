@@ -30,7 +30,7 @@ export default (context: Context, inject: Inject) => {
     const auth = new AuthModule(context, {
         tokenHost: context.$config.apiUrl,
         tokenPath: 'token',
-        userInfoPath: 'users/me',
+        userInfoPath: 'token',
     });
 
     inject('auth', auth);

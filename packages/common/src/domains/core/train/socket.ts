@@ -7,6 +7,6 @@
 
 import { Train } from './entity';
 
-export function buildSocketTrainRoomName(id?: typeof Train.prototype.id) {
+export function buildSocketTrainRoomName(id?: Train['id']) {
     return `trains${id ? `#${id}` : ''}`;
 }

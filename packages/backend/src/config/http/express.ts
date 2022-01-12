@@ -5,28 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import express, { Express, static as expressStatic } from 'express';
+import express, { Express } from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
 
 import path from 'path';
-import swaggerUi from 'swagger-ui-express';
-import { existsSync } from 'fs';
-import { setupAuthMiddleware } from '@typescript-auth/server';
-import { AuthorizationHeader } from '@typescript-auth/core';
+import { registerControllers as registerAuthControllers, registerMiddlewares } from '@typescript-auth/server';
 import promBundle from 'express-prom-bundle';
-import { getPublicDirPath, getWritableDirPath } from '../paths';
-import env from '../../env';
 import { useLogger } from '../../modules/log';
-import responseMiddleware from './middleware/response';
 
 import { registerControllers } from './routes';
 
 import { errorMiddleware } from './middleware/error';
-import { ExpressRequest } from './type';
 import { useRateLimiter } from './middleware/rate-limiter';
-import { authenticateWithAuthorizationHeader, parseCookie } from './middleware/auth';
+import env from '../../env';
+import { getWritableDirPath } from '../paths';
 
 export interface ExpressAppInterface extends Express{
 
@@ -46,50 +38,18 @@ export function createExpressApp() : ExpressAppInterface {
         credentials: true,
     }));
 
-    // Payload parser
-    expressApp.use(bodyParser.urlencoded({ extended: false }));
-    expressApp.use(bodyParser.json());
-
-    // Cookie parser
-    expressApp.use(cookieParser());
-
-    expressApp.use('/public', expressStatic(getPublicDirPath()));
+    registerMiddlewares(expressApp, {
+        bodyParser: true,
+        cookieParser: true,
+        response: true,
+        auth: {
+            writableDirectoryPath: path.join(process.cwd(), 'writable'),
+        },
+        swaggerDocumentation: false,
+    });
 
     // Rate Limiter
     expressApp.use(useRateLimiter);
-
-    // Loading routes
-    expressApp.use(responseMiddleware);
-
-    expressApp.use(setupAuthMiddleware({
-        parseCookie: (request: ExpressRequest) => parseCookie(request),
-        authenticateWithAuthorizationHeader: (
-            request: ExpressRequest,
-            value: AuthorizationHeader,
-        ) => authenticateWithAuthorizationHeader(request, value),
-    }));
-
-    if (
-        env.swaggerDocumentation &&
-        env.env !== 'test'
-    ) {
-        const swaggerDocumentPath: string = path.join(getWritableDirPath(), 'swagger.json');
-        if (existsSync(swaggerDocumentPath)) {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require, import/no-dynamic-require
-            const swaggerDocument = require(swaggerDocumentPath);
-
-            expressApp.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
-                swaggerOptions: {
-                    withCredentials: true,
-                    plugins: [
-                        () => ({
-                            components: { Topbar: (): any => null },
-                        }),
-                    ],
-                },
-            }));
-        }
-    }
 
     const metricsMiddleware = promBundle({
         includeMethod: true,
@@ -99,6 +59,18 @@ export function createExpressApp() : ExpressAppInterface {
     expressApp.use(metricsMiddleware);
 
     registerControllers(expressApp);
+    registerAuthControllers(expressApp, {
+        controller: {
+            token: {
+                maxAge: env.jwtMaxAge,
+            },
+            oauth2Provider: {
+                redirectUrl: env.webAppUrl,
+            },
+        },
+        selfUrl: env.apiUrl,
+        writableDirectoryPath: getWritableDirPath(),
+    });
 
     expressApp.use(errorMiddleware);
 

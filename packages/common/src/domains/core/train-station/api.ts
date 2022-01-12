@@ -19,13 +19,13 @@ export async function getAPITrainStations(options?: BuildInput<TrainStation>) : 
     return response;
 }
 
-export async function getAPITrainStation(id: typeof TrainStation.prototype.id) : Promise<SingleResourceResponse<TrainStation>> {
+export async function getAPITrainStation(id: TrainStation['id']) : Promise<SingleResourceResponse<TrainStation>> {
     const { data: response } = await useAPI(APIType.DEFAULT).get(`train-stations/${id}`);
 
     return response;
 }
 
-export async function dropAPITrainStation(id: typeof TrainStation.prototype.id) : Promise<SingleResourceResponse<TrainStation>> {
+export async function dropAPITrainStation(id: TrainStation['id']) : Promise<SingleResourceResponse<TrainStation>> {
     const { data: response } = await useAPI(APIType.DEFAULT).delete(`train-stations/${id}`);
 
     return response;

@@ -8,6 +8,8 @@
 import { Group, Image } from 'docker-scan';
 import { MasterImage, MasterImageGroup } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
+import { MasterImageEntity } from '../../../../domains/core/master-image/entity';
+import { MasterImageGroupEntity } from '../../../../domains/core/master-image-group/entity';
 
 type ReturnContext<T> = {
     updated: T[],
@@ -28,7 +30,7 @@ export async function mergeMasterImagesWithDatabase(
 
     const virtualPaths : string[] = entities.map((entity) => entity.virtualPath);
 
-    const repository = getRepository(MasterImage);
+    const repository = getRepository(MasterImageEntity);
     const dbEntities = await repository.createQueryBuilder()
         .getMany();
 
@@ -98,7 +100,7 @@ export async function mergeMasterImageGroupsWithDatabase(
 
     const dirVirtualPaths : string[] = entities.map((entity) => entity.virtualPath);
 
-    const repository = getRepository(MasterImageGroup);
+    const repository = getRepository(MasterImageGroupEntity);
     const dbEntities = await repository.createQueryBuilder()
         .getMany();
 

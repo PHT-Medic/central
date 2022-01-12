@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { UserEntity, onlyRealmPermittedQueryResources } from '@typescript-auth/server';
 import { FindConditions, getRepository } from 'typeorm';
 import { check, matchedData, validationResult } from 'express-validator';
 import {
@@ -16,12 +17,10 @@ import {
     PermissionID,
     SecretType,
     USER_SECRET_ENGINE_KEY,
-    User,
     UserSecret,
     UserSecretEngineSecretPayload,
     buildSecretStorageUserKey,
     isHex,
-    onlyRealmPermittedQueryResources,
     saveToSecretEngine,
     useAPI,
 } from '@personalhealthtrain/ui-common';
@@ -34,13 +33,14 @@ import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import env from '../../../env';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { ExpressValidationError } from '../../../config/http/error/validation';
+import { UserSecretEntity } from '../../../domains/auth/user-secret/entity';
 
 export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {
         include, fields, filter, page, sort,
     } = req.query;
 
-    const repository = getRepository(UserSecret);
+    const repository = getRepository(UserSecretEntity);
     const query = await repository.createQueryBuilder('entity');
 
     onlyRealmPermittedQueryResources(query, req.realmId);
@@ -87,7 +87,7 @@ export async function getManyRouteHandler(req: ExpressRequest, res: ExpressRespo
 export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    const repository = getRepository(UserSecret);
+    const repository = getRepository(UserSecretEntity);
     const query = await repository.createQueryBuilder('entity')
         .where('entity.id = :id', { id });
 
@@ -119,7 +119,7 @@ async function runValidationRules(req: ExpressRequest) {
 }
 
 async function extendSecretEnginePayload(
-    id: typeof User.prototype.id,
+    id: typeof UserEntity.prototype.id,
     key: string,
     value: string,
 ) {
@@ -162,7 +162,7 @@ async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
         data.content = Buffer.from(data.content, 'utf-8').toString('hex');
     }
 
-    const repository = getRepository(UserSecret);
+    const repository = getRepository(UserSecretEntity);
 
     const entity = repository.create({
         user_id: req.user.id,
@@ -188,7 +188,7 @@ async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
 
     const data = matchedData(req, { includeOptionals: false });
 
-    const repository = getRepository(UserSecret);
+    const repository = getRepository(UserSecretEntity);
 
     let entity = await repository.findOne({
         id: parseInt(id, 10),
@@ -219,7 +219,7 @@ async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
 async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    const repository = getRepository(UserSecret);
+    const repository = getRepository(UserSecretEntity);
 
     const conditions : FindConditions<UserSecret> = {
         id: parseInt(id, 10),
@@ -242,7 +242,7 @@ async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
 
 @SwaggerTags('user', 'pht')
 @Controller('/user-secrets')
-export class UserKeyController {
+export class UserSecretController {
     @Get('', [ForceLoggedInMiddleware])
     async getMany(
         @Request() req: any,

@@ -6,18 +6,20 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import { Client } from '../../auth';
 import {
     APIType, CollectionResourceResponse, SingleResourceResponse, useAPI,
 } from '../../../modules';
 
-export async function getAPIServiceClients(options?: BuildInput<Client>): Promise<CollectionResourceResponse<Client>> {
+export async function getAPIServiceClients(options?: BuildInput<Record<string, any>>): Promise<CollectionResourceResponse<Record<string, any>>> {
     const { data } = await useAPI(APIType.DEFAULT).get(`service-clients${buildQuery(options)}`);
 
     return data;
 }
 
-export async function getAPIServiceClient(id: string, options?: BuildInput<Client>): Promise<SingleResourceResponse<Client>> {
+export async function getAPIServiceClient(
+    id: string,
+    options?: BuildInput<Record<string, any>>,
+): Promise<SingleResourceResponse<Record<string, any>>> {
     const { data } = await useAPI(APIType.DEFAULT).get(`service-clients/${id}${buildQuery(options)}`);
 
     return data;
