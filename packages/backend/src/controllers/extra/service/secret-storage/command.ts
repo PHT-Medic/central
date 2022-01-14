@@ -7,16 +7,13 @@
 
 import { check, matchedData, validationResult } from 'express-validator';
 import {
-    APIType,
-    Client,
     PermissionID,
     SERVICE_SECRET_ENGINE_KEY,
     STATION_SECRET_ENGINE_KEY,
     SecretStorageCommand,
     ServiceID,
-    Station,
     USER_SECRET_ENGINE_KEY,
-    UserSecret,
+    VaultAPI,
     buildSecretStorageServiceKey,
     buildSecretStorageServicePayload,
     buildSecretStorageStationKey,
@@ -25,17 +22,19 @@ import {
     buildSecretStorageUserPayload,
     getSecretStorageServiceKey,
     getSecretStorageStationKey,
-    getSecretStorageUserKey,
-    isSecretStorageServiceKey,
-    isSecretStorageStationKey, isSecretStorageUserKey, isService, saveToSecretEngine, useAPI,
+    getSecretStorageUserKey, isSecretStorageServiceKey, isSecretStorageStationKey, isSecretStorageUserKey, isService,
 } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
+import { useTrapiClient } from '@trapi/client';
 import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
 } from '@typescript-error/http';
-import { UserEntity } from '@typescript-auth/server';
+import { RobotEntity, UserEntity } from '@typescript-auth/server';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
+import { StationEntity } from '../../../../domains/core/station/entity';
+import { UserSecretEntity } from '../../../../domains/auth/user-secret/entity';
+import { ApiKey } from '../../../../config/api';
 
 const commands = Object.values(SecretStorageCommand);
 
@@ -69,7 +68,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
     const validationData = matchedData(req, { includeOptionals: true });
 
     let user : UserEntity | undefined;
-    let station : Station | undefined;
+    let station : StationEntity | undefined;
 
     const rawPath : string = validationData.name;
 
@@ -83,7 +82,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
 
         const stationId : string = getSecretStorageStationKey(rawPath);
 
-        const stationRepository = getRepository(Station);
+        const stationRepository = getRepository(StationEntity);
         const query = stationRepository.createQueryBuilder('station');
 
         const addSelection : string[] = [
@@ -151,7 +150,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
 
                 switch (type) {
                     case TargetEntity.STATION: {
-                        const { data: responseData } = await useAPI(APIType.VAULT)
+                        const { data: responseData } = await useTrapiClient(ApiKey.VAULT)
                             .get(buildSecretStorageStationKey(id));
 
                         data = responseData.data.data;
@@ -161,7 +160,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                             station.id &&
                             data.rsa_station_public_key
                         ) {
-                            await getRepository(Station)
+                            await getRepository(StationEntity)
                                 .update({
                                     id: station.id,
                                 }, {
@@ -172,7 +171,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                     }
 
                     case TargetEntity.USER: {
-                        const { data: responseData } = await useAPI(APIType.VAULT)
+                        const { data: responseData } = await useTrapiClient(ApiKey.VAULT)
                             .get(buildSecretStorageUserKey(id));
 
                         data = responseData.data.data;
@@ -195,26 +194,26 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
             switch (type) {
                 case TargetEntity.STATION:
                     payload = buildSecretStorageStationPayload(station.public_key);
-                    await saveToSecretEngine(STATION_SECRET_ENGINE_KEY, id.toString(), payload);
+                    await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(STATION_SECRET_ENGINE_KEY, id.toString(), payload);
                     break;
                 case TargetEntity.USER: {
-                    const userSecrets = await getRepository(UserSecret)
+                    const userSecrets = await getRepository(UserSecretEntity)
                         .find({
                             user_id: user.id,
                         });
 
                     payload = buildSecretStorageUserPayload(userSecrets);
-                    await saveToSecretEngine(USER_SECRET_ENGINE_KEY, id.toString(), payload);
+                    await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(USER_SECRET_ENGINE_KEY, id.toString(), payload);
                     break;
                 }
                 case TargetEntity.SERVICE: {
-                    const serviceClient = await getRepository(Client)
+                    const serviceClient = await getRepository(RobotEntity)
                         .findOne({
-                            service_id: id as ServiceID,
+                            name: id as ServiceID,
                         });
 
                     payload = buildSecretStorageServicePayload(serviceClient.id, serviceClient.secret);
-                    await saveToSecretEngine(SERVICE_SECRET_ENGINE_KEY, id.toString(), payload);
+                    await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(SERVICE_SECRET_ENGINE_KEY, id.toString(), payload);
                 }
             }
 
@@ -224,17 +223,17 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
             try {
                 switch (type) {
                     case TargetEntity.STATION: {
-                        await useAPI(APIType.VAULT)
+                        await useTrapiClient(ApiKey.VAULT)
                             .delete(buildSecretStorageStationKey(id));
                         break;
                     }
                     case TargetEntity.USER: {
-                        await useAPI(APIType.VAULT)
+                        await useTrapiClient(ApiKey.VAULT)
                             .delete(buildSecretStorageUserKey(id));
                         break;
                     }
                     case TargetEntity.SERVICE: {
-                        await useAPI(APIType.VAULT)
+                        await useTrapiClient(ApiKey.VAULT)
                             .delete(buildSecretStorageServiceKey(id));
                     }
                 }

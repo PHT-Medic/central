@@ -9,7 +9,7 @@ import { Server as HTTPServer } from 'http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { ForbiddenError, UnauthorizedError } from '@typescript-error/http';
-import { MASTER_REALM_ID } from '@personalhealthtrain/ui-common';
+import { MASTER_REALM_ID } from '@typescript-auth/domains';
 import { useLogger } from '../../modules/log';
 import { useAuthMiddleware } from './middleware/auth';
 import { registerSocketHandlers, registerSocketNamespaceHandlers } from './handlers';

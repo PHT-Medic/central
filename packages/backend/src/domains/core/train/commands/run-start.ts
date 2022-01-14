@@ -10,9 +10,10 @@ import { getRepository } from 'typeorm';
 import { Train, TrainRunStatus } from '@personalhealthtrain/ui-common';
 import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../extra/train-router';
 import { findTrain } from './utils';
+import { TrainEntity } from '../entity';
 
 export async function startTrain(train: Train | number | string) : Promise<Train> {
-    const repository = getRepository(Train);
+    const repository = getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 

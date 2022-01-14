@@ -11,10 +11,14 @@ import {
     Station,
     TrainStation,
     TrainStationRunStatus,
-    buildRegistryHarborProjectName,
-    isRegistryStationProjectName,
+
 } from '@personalhealthtrain/ui-common';
+import {
+    buildRegistryStationProjectName,
+    isRegistryStationProjectName,
+} from '@personalhealthtrain/ui-common/src/domains/core/station/registry';
 import { DispatcherHarborEventData } from '../../../domains/extra/harbor/queue';
+import { TrainStationEntity } from '../../../domains/core/train-station/entity';
 
 export type DispatcherHarborEventWithAdditionalData = DispatcherHarborEventData & {
     station?: Station,
@@ -39,7 +43,7 @@ export async function extendDispatcherHarborData(message: Message) : Promise<Mes
         typeof data.station === 'undefined' ||
         typeof data.stations === 'undefined'
     ) {
-        const repository = getRepository(TrainStation);
+        const repository = getRepository(TrainStationEntity);
         const query = repository.createQueryBuilder('trainStation')
             .addSelect('station.secure_id')
             .leftJoinAndSelect('trainStation.station', 'station')
@@ -50,7 +54,7 @@ export async function extendDispatcherHarborData(message: Message) : Promise<Mes
 
         data.stations = entities.map((entity) => entity.station);
 
-        const matchedIndex : number = data.stations.findIndex((entity) => buildRegistryHarborProjectName(entity.secure_id) === data.namespace);
+        const matchedIndex : number = data.stations.findIndex((entity) => buildRegistryStationProjectName(entity.secure_id) === data.namespace);
         data.station = matchedIndex !== -1 ? data.stations[matchedIndex] : undefined;
 
         // -----

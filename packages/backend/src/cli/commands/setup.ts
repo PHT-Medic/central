@@ -6,13 +6,14 @@
  */
 
 import { Arguments, Argv, CommandModule } from 'yargs';
-import { buildConnectionOptions, createDatabase } from 'typeorm-extension';
+import { createDatabase } from 'typeorm-extension';
 import { createConnection } from 'typeorm';
-import { modifyDatabaseConnectionOptions, setupCommand } from '@typescript-auth/server';
-import { PermissionID, PermissionKey } from '@personalhealthtrain/ui-common';
-import { generateSwaggerDocumentation } from '../../config/http/swagger';
+import { setupCommand } from '@typescript-auth/server';
+import { PermissionKey } from '@personalhealthtrain/ui-common';
 import { createConfig } from '../../config';
 import env from '../../env';
+import { buildDatabaseConnectionOptions } from '../../database/utils';
+import { generateSwaggerDocumentation } from '../../config/http/swagger';
 
 interface SetupArguments extends Arguments {
     auth: boolean,
@@ -72,7 +73,7 @@ export class SetupCommand implements CommandModule {
             await setupCommand({
                 database: true,
                 databaseSeeder: true,
-                documentation: args.documentation,
+                documentation: true,
                 keyPair: true,
                 databaseSeederOptions: {
                     permissions: Object.values(PermissionKey),
@@ -90,13 +91,11 @@ export class SetupCommand implements CommandModule {
             /**
              * Setup database with schema & seeder
              */
-            const connectionOptions = modifyDatabaseConnectionOptions(await buildConnectionOptions({ buildForCommand: true }), true);
+            const connectionOptions = await buildDatabaseConnectionOptions();
 
             if (args.database) {
                 await createDatabase({ ifNotExist: true }, connectionOptions);
             }
-
-            console.log(connectionOptions);
 
             const connection = await createConnection(connectionOptions);
 
@@ -108,6 +107,12 @@ export class SetupCommand implements CommandModule {
                     if (config.redisDatabase.status !== 'connecting') {
                         await config.redisDatabase.connect();
                     }
+
+                    /*
+                    const { default: CoreSeeder } = await import('../../database/seeds/core');
+                    const seeder = new CoreSeeder();
+                    await seeder.run(connection);
+                     */
                 }
             } catch (e) {
                 console.log(e);

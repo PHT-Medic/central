@@ -6,5 +6,6 @@
  */
 
 export * from './permission';
+export * from './realm';
 export * from './user';
 export * from './user-secret';

@@ -5,54 +5,61 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    APIType, CollectionResourceResponse, SingleResourceResponse, useAPI,
-} from '../../../modules';
+import { AxiosInstance } from 'axios';
 import { Train } from '../train';
 import { TrainFile } from './entity';
+import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
-export function getAPITrainFilesDownloadUri(
-    trainId: Train['id'],
-): string {
-    return `trains/${trainId}/files/download`;
-}
+export class TrainFileAPI {
+    protected client: AxiosInstance;
 
-export async function getApiTrainFiles(
-    trainId: Train['id'],
-) : Promise<CollectionResourceResponse<TrainFile>> {
-    const response = await useAPI(APIType.DEFAULT).get(`trains/${trainId}/files`);
+    constructor(client: AxiosInstance) {
+        this.client = client;
+    }
 
-    return response.data;
-}
+    getDownloadURI(
+        trainId: Train['id'],
+    ): string {
+        return `trains/${trainId}/files/download`;
+    }
 
-export async function getApiTrainFile(
-    trainId: Train['id'],
-    fileId: TrainFile['id'],
-) : Promise<SingleResourceResponse<TrainFile>> {
-    const response = await useAPI(APIType.DEFAULT).get(`trains/${trainId}/files/${fileId}`);
+    async getMany(
+        trainId: Train['id'],
+    ): Promise<CollectionResourceResponse<TrainFile>> {
+        const response = await this.client.get(`trains/${trainId}/files`);
 
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function dropApiTrainFile(
-    trainId: Train['id'],
-    fileId: TrainFile['id'],
-) : Promise<SingleResourceResponse<TrainFile>> {
-    const response = await useAPI(APIType.DEFAULT).delete(`trains/${trainId}/files/${fileId}`);
+    async getOne(
+        trainId: Train['id'],
+        fileId: TrainFile['id'],
+    ): Promise<SingleResourceResponse<TrainFile>> {
+        const response = await this.client.get(`trains/${trainId}/files/${fileId}`);
 
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function uploadTrainFiles(
-    trainId: Train['id'],
-    formData: any,
-) : Promise<CollectionResourceResponse<TrainFile>> {
-    const response = await useAPI(APIType.DEFAULT).post(`trains/${trainId}/files`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-        timeout: 10000,
-    });
+    async delete(
+        trainId: Train['id'],
+        fileId: TrainFile['id'],
+    ): Promise<SingleResourceResponse<TrainFile>> {
+        const response = await this.client.delete(`trains/${trainId}/files/${fileId}`);
 
-    return response.data;
+        return response.data;
+    }
+
+    async upload(
+        trainId: Train['id'],
+        formData: any,
+    ): Promise<CollectionResourceResponse<TrainFile>> {
+        const response = await this.client.post(`trains/${trainId}/files`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            timeout: 10000,
+        });
+
+        return response.data;
+    }
 }

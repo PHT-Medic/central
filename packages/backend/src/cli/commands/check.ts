@@ -34,10 +34,6 @@ export class CheckCommand implements CommandModule {
         try {
             await connection.synchronize();
 
-            const { default: RootSeeder } = await import('../../database/seeds/core');
-            const baseSeeder = new RootSeeder();
-            await baseSeeder.run(null, connection);
-
             const authConfig = useConfig();
             const authSeeder = new DatabaseRootSeeder({
                 userName: authConfig.adminUsername,

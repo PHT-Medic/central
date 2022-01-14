@@ -17,6 +17,7 @@ import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { handleMasterImageCommandRouteHandler } from './command';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
+import { MasterImageEntity } from '../../../domains/core/master-image/entity';
 
 type PartialMasterImage = Partial<MasterImage>;
 
@@ -64,7 +65,7 @@ export class MasterImageController {
 export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    const repository = getRepository(MasterImage);
+    const repository = getRepository(MasterImageEntity);
 
     const entity = await repository.findOne(id);
 
@@ -78,7 +79,7 @@ export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse)
 export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { page, filter } = req.query;
 
-    const repository = getRepository(MasterImage);
+    const repository = getRepository(MasterImageEntity);
     const query = repository.createQueryBuilder('image');
 
     applyFilters(query, filter, {
@@ -109,7 +110,7 @@ export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(MasterImage);
+    const repository = getRepository(MasterImageEntity);
 
     const entity = await repository.findOne(id);
 

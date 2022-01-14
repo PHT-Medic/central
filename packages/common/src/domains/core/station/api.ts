@@ -6,46 +6,50 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import {
-    APIType,
-    CollectionResourceResponse,
-    SingleResourceResponse,
-    useAPI,
-} from '../../../modules';
+import { AxiosInstance } from 'axios';
 import { Station } from './entity';
+import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
-export async function getAPIStations(options?: BuildInput<Station>) : Promise<CollectionResourceResponse<Station>> {
-    const response = await useAPI(APIType.DEFAULT).get(`stations${buildQuery(options)}`);
+export class StationAPI {
+    protected client: AxiosInstance;
 
-    return response.data;
-}
+    constructor(client: AxiosInstance) {
+        this.client = client;
+    }
 
-export async function getAPIStation(id: number) : Promise<SingleResourceResponse<Station>> {
-    const response = await useAPI(APIType.DEFAULT).get(`stations/${id}`);
+    async getMany(options?: BuildInput<Station>): Promise<CollectionResourceResponse<Station>> {
+        const response = await this.client.get(`stations${buildQuery(options)}`);
 
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function addAPIStation(data: Record<string, any>) : Promise<SingleResourceResponse<Station>> {
-    const response = await useAPI(APIType.DEFAULT).post('stations', data);
+    async getOne(id: number): Promise<SingleResourceResponse<Station>> {
+        const response = await this.client.get(`stations/${id}`);
 
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function editAPIStation(id: number, data: Record<string, any>) : Promise<SingleResourceResponse<Station>> {
-    const response = await useAPI(APIType.DEFAULT).post(`stations/${id}`, data);
+    async create(data: Record<string, any>): Promise<SingleResourceResponse<Station>> {
+        const response = await this.client.post('stations', data);
 
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function dropAPIStation(id: number) : Promise<SingleResourceResponse<Station>> {
-    const response = await useAPI(APIType.DEFAULT).delete(`stations/${id}`);
+    async update(id: number, data: Record<string, any>): Promise<SingleResourceResponse<Station>> {
+        const response = await this.client.post(`stations/${id}`, data);
 
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function doAPIStationTask(id: number, task: string, data: Record<string, any>) : Promise<SingleResourceResponse<Station>> {
-    const response = await useAPI(APIType.DEFAULT).post(`stations/${id}/task`, { task, ...data });
+    async delete(id: number): Promise<SingleResourceResponse<Station>> {
+        const response = await this.client.delete(`stations/${id}`);
 
-    return response.data;
+        return response.data;
+    }
+
+    async runCommand(id: number, task: string, data: Record<string, any>): Promise<SingleResourceResponse<Station>> {
+        const response = await this.client.post(`stations/${id}/task`, { task, ...data });
+
+        return response.data;
+    }
 }

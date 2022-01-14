@@ -6,63 +6,69 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import {
-    APIType,
-    ApiRequestConfig,
-    CollectionResourceResponse,
-    SingleResourceResponse,
-    useAPI,
-} from '../../../modules';
+import { AxiosInstance } from 'axios';
+import { TrapiClientRequestConfig } from '@trapi/client';
 import { Train } from './entity';
 import { TrainCommand } from './type';
 import { nullifyEmptyObjectProperties } from '../../../utils';
+import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
-export async function getAPITrains(options?: BuildInput<Train>) : Promise<CollectionResourceResponse<Train>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).get(`trains${buildQuery(options)}`);
-    return response;
-}
+export class TrainAPI {
+    protected client: AxiosInstance;
 
-export async function getAPITrain(
-    id: Train['id'],
-    options?: BuildInput<Train>,
-    requestConfig?: ApiRequestConfig,
-) : Promise<SingleResourceResponse<Train>> {
-    const { data: response } = await useAPI(APIType.DEFAULT)
-        .get(`trains/${id}${buildQuery(options)}`, requestConfig);
+    constructor(client: AxiosInstance) {
+        this.client = client;
+    }
 
-    return response;
-}
+    async getMany(
+        options?: BuildInput<Train>,
+    ): Promise<CollectionResourceResponse<Train>> {
+        const { data: response } = await this.client.get(`trains${buildQuery(options)}`);
+        return response;
+    }
 
-export async function dropAPITrain(id: Train['id']) : Promise<SingleResourceResponse<Train>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).delete(`trains/${id}`);
+    async getOne(
+        id: Train['id'],
+        options?: BuildInput<Train>,
+        requestConfig?: TrapiClientRequestConfig,
+    ): Promise<SingleResourceResponse<Train>> {
+        const { data: response } = await this.client
+            .get(`trains/${id}${buildQuery(options)}`, requestConfig);
 
-    return response;
-}
+        return response;
+    }
 
-export async function editAPITrain(id: Train['id'], data: Partial<Train>) : Promise<SingleResourceResponse<Train>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).post(`trains/${id}`, nullifyEmptyObjectProperties(data));
+    async delete(id: Train['id']): Promise<SingleResourceResponse<Train>> {
+        const { data: response } = await this.client.delete(`trains/${id}`);
 
-    return response;
-}
+        return response;
+    }
 
-export async function addAPITrain(data: Partial<Train>) : Promise<SingleResourceResponse<Train>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).post('trains', nullifyEmptyObjectProperties(data));
+    async update(id: Train['id'], data: Partial<Train>): Promise<SingleResourceResponse<Train>> {
+        const { data: response } = await this.client.post(`trains/${id}`, nullifyEmptyObjectProperties(data));
 
-    return response;
-}
+        return response;
+    }
 
-export async function runAPITrainCommand(
-    id: Train['id'],
-    command: TrainCommand,
-    data: Record<string, any> = {},
-) : Promise<SingleResourceResponse<Train>> {
-    const actionData = {
-        command,
-        ...data,
-    };
+    async create(data: Partial<Train>): Promise<SingleResourceResponse<Train>> {
+        const { data: response } = await this.client.post('trains', nullifyEmptyObjectProperties(data));
 
-    const { data: response } = await useAPI(APIType.DEFAULT)
-        .post(`trains/${id}/command`, actionData);
+        return response;
+    }
 
-    return response;
+    async runCommand(
+        id: Train['id'],
+        command: TrainCommand,
+        data: Record<string, any> = {},
+    ): Promise<SingleResourceResponse<Train>> {
+        const actionData = {
+            command,
+            ...data,
+        };
+
+        const { data: response } = await this.client
+            .post(`trains/${id}/command`, actionData);
+
+        return response;
+    }
 }

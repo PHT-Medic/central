@@ -6,20 +6,25 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import {
-    APIType,
-    CollectionResourceResponse, SingleResourceResponse, useAPI,
-} from '../../../modules';
+import { AxiosInstance } from 'axios';
 
 import { MasterImageGroup } from './entity';
-import { MasterImage } from '../master-image';
+import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
-export async function getAPIMasterImageGroups(data?: BuildInput<MasterImageGroup>) : Promise<CollectionResourceResponse<MasterImageGroup>> {
-    const response = await useAPI(APIType.DEFAULT).get(`master-image-groups${buildQuery(data)}`);
-    return response.data;
-}
+export class MasterImageGroupAPI {
+    protected client: AxiosInstance;
 
-export async function getAPIMasterImageGroup(id: MasterImageGroup['id']) : Promise<SingleResourceResponse<MasterImageGroup>> {
-    const response = await useAPI(APIType.DEFAULT).delete(`master-image-groups/${id}`);
-    return response.data;
+    constructor(client: AxiosInstance) {
+        this.client = client;
+    }
+
+    async getMany(data?: BuildInput<MasterImageGroup>): Promise<CollectionResourceResponse<MasterImageGroup>> {
+        const response = await this.client.get(`master-image-groups${buildQuery(data)}`);
+        return response.data;
+    }
+
+    async getOne(id: MasterImageGroup['id']): Promise<SingleResourceResponse<MasterImageGroup>> {
+        const response = await this.client.delete(`master-image-groups/${id}`);
+        return response.data;
+    }
 }

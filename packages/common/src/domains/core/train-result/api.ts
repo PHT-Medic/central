@@ -6,32 +6,36 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import {
-    APIType,
-    CollectionResourceResponse,
-    SingleResourceResponse,
-    useAPI,
-} from '../../../modules';
+import { AxiosInstance } from 'axios';
 import { TrainResult } from './entity';
+import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
-export async function getAPITrainResults(options?: BuildInput<TrainResult>) : Promise<CollectionResourceResponse<TrainResult>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).get(`train-results${buildQuery(options)}`);
-    return response;
-}
+export class TrainResultAPI {
+    protected client: AxiosInstance;
 
-export async function getAPITrainResult(
-    id: TrainResult['id'],
-    options?: BuildInput<TrainResult>,
-) : Promise<SingleResourceResponse<TrainResult>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).get(`train-results/${id}${buildQuery(options)}`);
+    constructor(client: AxiosInstance) {
+        this.client = client;
+    }
 
-    return response;
-}
+    async getMany(options?: BuildInput<TrainResult>): Promise<CollectionResourceResponse<TrainResult>> {
+        const { data: response } = await this.client.get(`train-results${buildQuery(options)}`);
+        return response;
+    }
 
-export async function dropAPITrainResult(
-    id: TrainResult['id'],
-) : Promise<SingleResourceResponse<TrainResult>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).delete(`train-results/${id}`);
+    async getOne(
+        id: TrainResult['id'],
+        options?: BuildInput<TrainResult>,
+    ): Promise<SingleResourceResponse<TrainResult>> {
+        const { data: response } = await this.client.get(`train-results/${id}${buildQuery(options)}`);
 
-    return response;
+        return response;
+    }
+
+    async delete(
+        id: TrainResult['id'],
+    ): Promise<SingleResourceResponse<TrainResult>> {
+        const { data: response } = await this.client.delete(`train-results/${id}`);
+
+        return response;
+    }
 }

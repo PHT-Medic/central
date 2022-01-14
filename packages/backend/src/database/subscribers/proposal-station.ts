@@ -9,11 +9,11 @@ import {
     EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import {
-    ProposalStation,
     buildSocketProposalStationInRoomName,
     buildSocketProposalStationOutRoomName, buildSocketProposalStationRoomName, buildSocketRealmNamespaceName,
 } from '@personalhealthtrain/ui-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
+import { ProposalStationEntity } from '../../domains/core/proposal-station/entity';
 
 type Operator = 'create' | 'update' | 'delete';
 type Event = 'proposalStationCreated' | 'proposalStationUpdated' | 'proposalStationDeleted';
@@ -26,7 +26,7 @@ const OperatorEventMap : Record<Operator, Event> = {
 
 function publish(
     operation: Operator,
-    item: ProposalStation,
+    item: ProposalStationEntity,
 ) {
     useSocketEmitter()
         .in(buildSocketProposalStationRoomName())
@@ -91,21 +91,21 @@ function publish(
 }
 
 @EventSubscriber()
-export class ProposalStationSubscriber implements EntitySubscriberInterface<ProposalStation> {
+export class ProposalStationSubscriber implements EntitySubscriberInterface<ProposalStationEntity> {
     listenTo(): CallableFunction | string {
-        return ProposalStation;
+        return ProposalStationEntity;
     }
 
-    afterInsert(event: InsertEvent<ProposalStation>): Promise<any> | void {
+    afterInsert(event: InsertEvent<ProposalStationEntity>): Promise<any> | void {
         publish('create', event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<ProposalStation>): Promise<any> | void {
-        publish('update', event.entity as ProposalStation);
+    afterUpdate(event: UpdateEvent<ProposalStationEntity>): Promise<any> | void {
+        publish('update', event.entity as ProposalStationEntity);
         return undefined;
     }
 
-    beforeRemove(event: RemoveEvent<ProposalStation>): Promise<any> | void {
+    beforeRemove(event: RemoveEvent<ProposalStationEntity>): Promise<any> | void {
         publish('delete', event.entity);
 
         return undefined;

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { APIType, setAPIConfig } from '@personalhealthtrain/ui-common';
+import { setTrapiClientConfig } from '@trapi/client';
 import { setConfig } from 'amqp-extension';
 import { Redis, setRedisConfig, useRedisInstance } from 'redis-extension';
 import { Environment } from './env';
@@ -38,7 +38,7 @@ export function createConfig({ env } : ConfigContext) : Config {
         },
     });
 
-    setAPIConfig(APIType.DEFAULT, {
+    setTrapiClientConfig('default', {
         driver: {
             baseURL: env.apiUrl,
             withCredentials: true,

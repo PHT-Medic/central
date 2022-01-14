@@ -6,7 +6,6 @@
   -->
 <script>
 import {
-    SecretStorageCommand,
     buildSecretStorageUserKey,
     executeAPISecretStorageServiceCommand,
 } from '@personalhealthtrain/ui-common';

@@ -8,9 +8,10 @@
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
 import {
     REGISTRY_INCOMING_PROJECT_NAME,
-    REGISTRY_OUTGOING_PROJECT_NAME, isRegistryStationProjectName,
+    REGISTRY_OUTGOING_PROJECT_NAME,
 } from '@personalhealthtrain/ui-common';
 
+import { isRegistryStationProjectName } from '@personalhealthtrain/ui-common/src/domains/core/station/registry';
 import {
     DispatcherProposalEvent,
     DispatcherProposalEventData,

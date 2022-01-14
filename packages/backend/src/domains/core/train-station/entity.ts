@@ -14,9 +14,8 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { TrainStation } from '@personalhealthtrain/ui-common';
+import { TrainStation, TrainStationApprovalStatus, TrainStationRunStatus } from '@personalhealthtrain/ui-common';
 import { RealmEntity } from '@typescript-auth/server';
-import { TrainStationApprovalStatus, TrainStationRunStatus } from './status';
 import { TrainEntity } from '../train/entity';
 import { StationEntity } from '../station/entity';
 

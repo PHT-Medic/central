@@ -8,16 +8,17 @@
 import { getRepository } from 'typeorm';
 
 import {
-    MasterImage,
-    MasterImageGroup,
     SecretType,
     Train,
     TrainFile,
-    TrainStation,
     TrainStationApprovalStatus,
-    UserSecret,
 } from '@personalhealthtrain/ui-common';
 import { TrainBuilderStartPayload } from '../type';
+import { UserSecretEntity } from '../../../auth/user-secret/entity';
+import { MasterImageEntity } from '../../../core/master-image/entity';
+import { MasterImageGroupEntity } from '../../../core/master-image-group/entity';
+import { TrainFileEntity } from '../../../core/train-file/entity';
+import { TrainStationEntity } from '../../../core/train-station/entity';
 
 export async function buildTrainBuilderStartCommandPayload(train: Train) : Promise<Partial<TrainBuilderStartPayload>> {
     const message : Partial<TrainBuilderStartPayload> = {
@@ -33,7 +34,7 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
 
     // ----------------------------------------------------
 
-    const userSecretRepository = getRepository(UserSecret);
+    const userSecretRepository = getRepository(UserSecretEntity);
     const userSecret = await userSecretRepository.findOne({
         user_id: train.user_id,
         type: SecretType.PAILLIER_PUBLIC_KEY,
@@ -43,7 +44,7 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
 
     // ----------------------------------------------------
 
-    const masterImageRepository = getRepository(MasterImage);
+    const masterImageRepository = getRepository(MasterImageEntity);
     const masterImage = await masterImageRepository.findOne(train.master_image_id);
     if (typeof masterImage === 'undefined') {
         throw new Error();
@@ -51,7 +52,7 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
 
     message.masterImage = masterImage.virtual_path;
 
-    const masterImageGroupRepository = getRepository(MasterImageGroup);
+    const masterImageGroupRepository = getRepository(MasterImageGroupEntity);
     const masterImageGroup = await masterImageGroupRepository.findOne({
         virtual_path: masterImage.group_virtual_path,
     });
@@ -69,7 +70,7 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
 
     // ----------------------------------------------------
 
-    const filesRepository = getRepository(TrainFile);
+    const filesRepository = getRepository(TrainFileEntity);
     const files: TrainFile[] = await filesRepository
         .createQueryBuilder('file')
         .where('file.train_id = :id', { id: train.id })
@@ -87,7 +88,7 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
 
     // ----------------------------------------------------
 
-    const trainStationRepository = getRepository(TrainStation);
+    const trainStationRepository = getRepository(TrainStationEntity);
     const trainStations = await trainStationRepository
         .createQueryBuilder('trainStation')
         .leftJoinAndSelect('trainStation.station', 'station')

@@ -7,7 +7,7 @@
 
 import { Application } from 'express';
 import { attachControllers } from '@decorators/express';
-import { UserSecretController } from '../../controllers/auth/user-secret';
+import { UserSecretController } from '../../controllers/core/user-secret';
 import { MasterImageController } from '../../controllers/core/master-image';
 import { ProposalController } from '../../controllers/core/proposal';
 import { ProposalStationController } from '../../controllers/core/proposal-station';
@@ -16,22 +16,14 @@ import { TrainController } from '../../controllers/core/train';
 import { TrainFileController } from '../../controllers/core/train-file';
 import { TrainStationController } from '../../controllers/core/train-station';
 import { ServiceController } from '../../controllers/extra/service';
-import { ClientController } from '../../controllers/auth/client';
 import { MasterImageGroupController } from '../../controllers/core/master-image-groups';
 import { TrainResultController } from '../../controllers/core/train-result';
 
 export function registerControllers(router: Application) {
     attachControllers(router, [
-        // Extra
-        ServiceController,
-
-        ClientController,
-        UserSecretController,
-
-        // PHT Controllers
+        // Core
         MasterImageController,
         MasterImageGroupController,
-
         ProposalController,
         ProposalStationController,
         StationController,
@@ -39,6 +31,10 @@ export function registerControllers(router: Application) {
         TrainFileController,
         TrainResultController,
         TrainStationController,
+        UserSecretController,
+
+        // Extra
+        ServiceController,
     ]);
 
     return router;

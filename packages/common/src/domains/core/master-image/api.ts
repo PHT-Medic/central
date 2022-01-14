@@ -6,42 +6,48 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import {
-    APIType,
-    CollectionResourceResponse, SingleResourceResponse, useAPI,
-} from '../../../modules';
 
+import { AxiosInstance } from 'axios';
 import { MasterImage } from './entity';
 import { MasterImageCommand } from './type';
+import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
-export async function getAPIMasterImages(data?: BuildInput<MasterImage>) : Promise<CollectionResourceResponse<MasterImage>> {
-    const response = await useAPI(APIType.DEFAULT).get(`master-images${buildQuery(data)}`);
-    return response.data;
-}
+export class MasterImageAPI {
+    protected client: AxiosInstance;
 
-export async function getAPIMasterImage(
-    id: MasterImage['id'],
-    data?: BuildInput<MasterImage>,
-) : Promise<SingleResourceResponse<MasterImage>> {
-    const response = await useAPI(APIType.DEFAULT).get(`master-images/${id}${buildQuery(data)}`);
-    return response.data;
-}
+    constructor(client: AxiosInstance) {
+        this.client = client;
+    }
 
-export async function dropAPIMasterImage(id: MasterImage['id']) : Promise<SingleResourceResponse<MasterImage>> {
-    const response = await useAPI(APIType.DEFAULT).delete(`master-images/${id}`);
-    return response.data;
-}
+    async getMany(data?: BuildInput<MasterImage>): Promise<CollectionResourceResponse<MasterImage>> {
+        const response = await this.client.get(`master-images${buildQuery(data)}`);
+        return response.data;
+    }
 
-export async function runAPITMasterImagesCommand(
-    command: MasterImageCommand,
-    data: Record<string, any> = {},
-) : Promise<SingleResourceResponse<Record<string, any>>> {
-    const actionData = {
-        command,
-        ...data,
-    };
+    async getOne(
+        id: MasterImage['id'],
+        data?: BuildInput<MasterImage>,
+    ): Promise<SingleResourceResponse<MasterImage>> {
+        const response = await this.client.get(`master-images/${id}${buildQuery(data)}`);
+        return response.data;
+    }
 
-    const { data: response } = await useAPI(APIType.DEFAULT).post('master-images/command', actionData);
+    async delete(id: MasterImage['id']): Promise<SingleResourceResponse<MasterImage>> {
+        const response = await this.client.delete(`master-images/${id}`);
+        return response.data;
+    }
 
-    return response;
+    async runCommand(
+        command: MasterImageCommand,
+        data: Record<string, any> = {},
+    ): Promise<SingleResourceResponse<Record<string, any>>> {
+        const actionData = {
+            command,
+            ...data,
+        };
+
+        const { data: response } = await this.client.post('master-images/command', actionData);
+
+        return response;
+    }
 }

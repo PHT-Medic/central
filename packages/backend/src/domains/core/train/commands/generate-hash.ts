@@ -5,15 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainConfigurationStatus, TrainFile } from '@personalhealthtrain/ui-common';
+import { Train, TrainConfigurationStatus } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
 import crypto from 'crypto';
 import fs from 'fs';
 import { getTrainFileFilePath } from '../../../../config/pht/train-file/path';
 import { findTrain } from './utils';
+import { TrainEntity } from '../entity';
+import { TrainFileEntity } from '../../train-file/entity';
 
 export async function generateTrainHash(train: Train | number | string) : Promise<Train> {
-    const repository = getRepository(Train);
+    const repository = getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 
@@ -27,7 +29,7 @@ export async function generateTrainHash(train: Train | number | string) : Promis
     hash.update(Buffer.from(train.user_id.toString(), 'utf-8'));
 
     // Files
-    const trainFilesRepository = getRepository(TrainFile);
+    const trainFilesRepository = getRepository(TrainFileEntity);
     const trainFiles = await trainFilesRepository.createQueryBuilder('trainFiles')
         .where('trainFiles.train_id = :id', { id: train.id })
         .getMany();

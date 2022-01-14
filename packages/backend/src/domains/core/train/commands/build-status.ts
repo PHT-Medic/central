@@ -11,9 +11,10 @@ import { Train } from '@personalhealthtrain/ui-common';
 import { buildTrainBuilderQueueMessage } from '../../../extra/train-builder/queue';
 import { TrainBuilderCommand } from '../../../extra/train-builder/type';
 import { findTrain } from './utils';
+import { TrainEntity } from '../entity';
 
 export async function detectTrainBuildStatus(train: Train | number | string, demo = false) : Promise<Train> {
-    const repository = getRepository(Train);
+    const repository = getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 

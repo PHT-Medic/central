@@ -36,15 +36,3 @@ export function isSpecialRegistryProjectName(name: string) : boolean {
         REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     ].indexOf(name) !== -1;
 }
-
-export function isRegistryStationProjectName(name: string) : boolean {
-    return name.startsWith('station_');
-}
-
-export function getRegistryStationProjectNameId(name: string) : string {
-    return name.replace('station_', '');
-}
-
-export function buildRegistryHarborProjectName(id: string | number) : string {
-    return `station_${id}`;
-}

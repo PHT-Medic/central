@@ -10,10 +10,10 @@ import {
 } from 'typeorm';
 import {
     Proposal,
-    buildSocketProposalRoomName,
-    buildSocketRealmNamespaceName,
+    buildSocketProposalRoomName, buildSocketRealmNamespaceName,
 } from '@personalhealthtrain/ui-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
+import { ProposalEntity } from '../../domains/core/proposal/entity';
 
 type Operator = 'create' | 'update' | 'delete';
 type Event = 'proposalCreated' | 'proposalUpdated' | 'proposalDeleted';
@@ -82,21 +82,21 @@ function publish(
 }
 
 @EventSubscriber()
-export class ProposalSubscriber implements EntitySubscriberInterface<Proposal> {
+export class ProposalSubscriber implements EntitySubscriberInterface<ProposalEntity> {
     listenTo(): CallableFunction | string {
-        return Proposal;
+        return ProposalEntity;
     }
 
-    afterInsert(event: InsertEvent<Proposal>): Promise<any> | void {
+    afterInsert(event: InsertEvent<ProposalEntity>): Promise<any> | void {
         publish('create', event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<Proposal>): Promise<any> | void {
-        publish('update', event.entity as Proposal);
+    afterUpdate(event: UpdateEvent<ProposalEntity>): Promise<any> | void {
+        publish('update', event.entity as ProposalEntity);
         return undefined;
     }
 
-    beforeRemove(event: RemoveEvent<Proposal>): Promise<any> | void {
+    beforeRemove(event: RemoveEvent<ProposalEntity>): Promise<any> | void {
         publish('delete', event.entity);
 
         return undefined;

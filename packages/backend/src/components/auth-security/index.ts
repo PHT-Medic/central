@@ -6,16 +6,13 @@
  */
 
 import { ConsumeHandler, Message } from 'amqp-extension';
-import { syncAuthClientSecurity } from './sync';
+import { syncRobotSecret } from './handlers/robot-secret-sync';
+import { ServiceCommand } from '../../domains/extra/service/constants';
 
-export enum AuthClientSecurityComponentCommand {
-    SYNC = 'syncClientSecurity',
-}
-
-export function createAuthSecurityComponentHandlers() : Record<AuthClientSecurityComponentCommand, ConsumeHandler> {
+export function createServiceComponentHandlers() : Record<ServiceCommand, ConsumeHandler> {
     return {
-        [AuthClientSecurityComponentCommand.SYNC]: async (message: Message) => {
-            await syncAuthClientSecurity(message);
+        [ServiceCommand.ROBOT_SECRET_SYNC]: async (message: Message) => {
+            await syncRobotSecret(message);
         },
     };
 }

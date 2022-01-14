@@ -131,7 +131,7 @@ export async function addRouteHandler(req: ExpressRequest, res: ExpressResponse)
         throw new ExpressValidationError(validation);
     }
 
-    const data : Partial<Proposal> = matchedValidationData(req);
+    const data : Partial<ProposalEntity> = matchedValidationData(req);
 
     const repository = getRepository(ProposalEntity);
     const entity = repository.create({

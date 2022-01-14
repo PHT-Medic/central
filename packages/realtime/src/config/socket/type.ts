@@ -9,16 +9,19 @@ import {
     SocketClientToServerEvents,
     SocketInterServerEvents,
     SocketServerToClientEvents,
-    User,
 } from '@personalhealthtrain/ui-common';
 import { AbilityManager, PermissionItem } from '@typescript-auth/core';
 import { Namespace, Server, Socket } from 'socket.io';
+import { Robot, User } from '@typescript-auth/domains';
 
 export type SocketDataInterface = {
     token?: string,
 
     user?: User,
-    userId?: typeof User.prototype.id,
+    userId?: User['id'],
+
+    robot?: Robot,
+    robotId?: Robot['id'],
 
     permissions?: PermissionItem<any>[],
     ability?: AbilityManager,

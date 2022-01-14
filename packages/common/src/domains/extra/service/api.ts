@@ -5,32 +5,41 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { APIType, SingleResourceResponse, useAPI } from '../../../modules';
+import { AxiosInstance } from 'axios';
 import { RegistryCommandType } from './harbor';
 import { ServiceID } from './constants';
-import { SecretStorageCommand } from '../secret-engine';
 import { ServiceIDType } from './type';
+import { SingleResourceResponse } from '../../type';
+import { SecretStorageCommand } from './secret-engine';
 
-export async function executeAPIServiceTask(
-    id: ServiceIDType,
-    command: string,
-    data: Record<string, any>,
-) : Promise<SingleResourceResponse<Record<string, any>>> {
-    const { data: resultData } = await useAPI(APIType.DEFAULT).post(`services/${id}/command`, { command, ...data });
+export class ServiceAPI {
+    protected client: AxiosInstance;
 
-    return resultData;
-}
+    constructor(client: AxiosInstance) {
+        this.client = client;
+    }
 
-export async function executeAPIRegistryServiceCommand(
-    command: RegistryCommandType,
-    data: Record<string, any>,
-) : Promise<SingleResourceResponse<Record<string, any>>> {
-    return executeAPIServiceTask(ServiceID.REGISTRY, command, data);
-}
+    async runCommand(
+        id: ServiceIDType,
+        command: string,
+        data: Record<string, any>,
+    ): Promise<SingleResourceResponse<Record<string, any>>> {
+        const { data: resultData } = await this.client.post(`services/${id}/command`, { command, ...data });
 
-export async function executeAPISecretStorageServiceCommand(
-    command: SecretStorageCommand,
-    data: Record<string, any>,
-) : Promise<SingleResourceResponse<Record<string, any>>> {
-    return executeAPIServiceTask(ServiceID.SECRET_STORAGE, command, data);
+        return resultData;
+    }
+
+    async runRegistryCommand(
+        command: RegistryCommandType,
+        data: Record<string, any>,
+    ): Promise<SingleResourceResponse<Record<string, any>>> {
+        return this.runCommand(ServiceID.REGISTRY, command, data);
+    }
+
+    async runSecretStorageCommand(
+        command: SecretStorageCommand,
+        data: Record<string, any>,
+    ): Promise<SingleResourceResponse<Record<string, any>>> {
+        return this.runCommand(ServiceID.SECRET_STORAGE, command, data);
+    }
 }

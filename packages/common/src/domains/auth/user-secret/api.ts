@@ -6,44 +6,51 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import {
-    APIType, CollectionResourceResponse, SingleResourceResponse, useAPI,
-} from '../../../modules';
+import { AxiosInstance } from 'axios';
 import { nullifyEmptyObjectProperties } from '../../../utils';
 import { UserSecret } from './entity';
+import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
-export async function getAPIUserSecrets(options?: BuildInput<UserSecret>) : Promise<CollectionResourceResponse<UserSecret>> {
-    const response = await useAPI(APIType.DEFAULT).get(`user-secrets${buildQuery(options)}`);
+export class UserSecretAPI {
+    protected client: AxiosInstance;
 
-    return response.data;
-}
+    constructor(client: AxiosInstance) {
+        this.client = client;
+    }
 
-export async function getAPIUserSecret(
-    id: UserSecret['id'],
-    options?: BuildInput<UserSecret>,
-) : Promise<SingleResourceResponse<UserSecret>> {
-    const response = await useAPI(APIType.DEFAULT).get(`user-secrets/${id}${buildQuery(options)}`);
+    async getMany(options?: BuildInput<UserSecret>): Promise<CollectionResourceResponse<UserSecret>> {
+        const response = await this.client.get(`user-secrets${buildQuery(options)}`);
 
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function dropAPIUserSecret(id: UserSecret['id']) : Promise<SingleResourceResponse<UserSecret>> {
-    const response = await useAPI(APIType.DEFAULT).delete(`user-secrets/${id}`);
+    async getOne(
+        id: UserSecret['id'],
+        options?: BuildInput<UserSecret>,
+    ): Promise<SingleResourceResponse<UserSecret>> {
+        const response = await this.client.get(`user-secrets/${id}${buildQuery(options)}`);
 
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function addAPIUserSecret(data: Partial<UserSecret>) : Promise<SingleResourceResponse<UserSecret>> {
-    const response = await useAPI(APIType.DEFAULT).post('user-secrets', nullifyEmptyObjectProperties(data));
+    async delete(id: UserSecret['id']): Promise<SingleResourceResponse<UserSecret>> {
+        const response = await this.client.delete(`user-secrets/${id}`);
 
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function editAPIUserSecret(
-    id: UserSecret['id'],
-    data: Partial<UserSecret>,
-) : Promise<SingleResourceResponse<UserSecret>> {
-    const response = await useAPI(APIType.DEFAULT).post(`user-secrets/${id}`, nullifyEmptyObjectProperties(data));
+    async create(data: Partial<UserSecret>): Promise<SingleResourceResponse<UserSecret>> {
+        const response = await this.client.post('user-secrets', nullifyEmptyObjectProperties(data));
 
-    return response.data;
+        return response.data;
+    }
+
+    async update(
+        id: UserSecret['id'],
+        data: Partial<UserSecret>,
+    ): Promise<SingleResourceResponse<UserSecret>> {
+        const response = await this.client.post(`user-secrets/${id}`, nullifyEmptyObjectProperties(data));
+
+        return response.data;
+    }
 }

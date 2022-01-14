@@ -10,11 +10,12 @@ import { getRepository } from 'typeorm';
 import { Train, TrainResultStatus, TrainRunStatus } from '@personalhealthtrain/ui-common';
 import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../extra/result-service';
 import { findTrain } from './utils';
+import { TrainEntity } from '../entity';
 
 export async function triggerTrainResultStop(
     train: string | Train,
 ) : Promise<Train> {
-    const repository = getRepository(Train);
+    const repository = getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 

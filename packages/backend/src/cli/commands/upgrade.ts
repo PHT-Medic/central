@@ -8,7 +8,8 @@
 import { Argv, CommandModule } from 'yargs';
 import { buildConnectionOptions } from 'typeorm-extension';
 import { createConnection } from 'typeorm';
-import { modifyDatabaseConnectionOptions } from '@typescript-auth/server';
+import { modifyDatabaseConnectionOptions, upgradeCommand } from '@typescript-auth/server';
+import { buildDatabaseConnectionOptions } from '../../database/utils';
 
 export class UpgradeCommand implements CommandModule {
     command = 'upgrade';
@@ -22,7 +23,9 @@ export class UpgradeCommand implements CommandModule {
 
     // eslint-disable-next-line class-methods-use-this
     async handler() {
-        const connectionOptions = modifyDatabaseConnectionOptions(await buildConnectionOptions(), true);
+        const connectionOptions = await buildDatabaseConnectionOptions();
+
+        await upgradeCommand({});
 
         const connection = await createConnection(connectionOptions);
 

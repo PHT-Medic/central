@@ -11,12 +11,10 @@ import {
 } from 'typeorm-extension';
 import { check, matchedData, validationResult } from 'express-validator';
 import {
+    HarborAPI,
     PermissionID,
     STATION_SECRET_ENGINE_KEY,
-    Station,
-    buildSecretStorageStationPayload,
-    deleteFromSecretEngine,
-    deleteStationHarborProject, isHex, saveToSecretEngine,
+    Station, VaultAPI, buildSecretStorageStationPayload, isHex,
 } from '@personalhealthtrain/ui-common';
 
 import {
@@ -25,10 +23,13 @@ import {
 import { ResponseExample, SwaggerTags } from '@trapi/swagger';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { MASTER_REALM_ID } from '@typescript-auth/domains';
+import { useTrapiClient } from '@trapi/client';
+import { buildRegistryStationProjectName } from '@personalhealthtrain/ui-common/dist/domains/core/station/registry';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 import { ExpressValidationError } from '../../../config/http/error/validation';
 import { StationEntity } from '../../../domains/core/station/entity';
+import { ApiKey } from '../../../config/api';
 
 async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -167,7 +168,7 @@ async function addRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
     if (syncPublicKey) {
         const payload = buildSecretStorageStationPayload(entity.public_key);
 
-        await saveToSecretEngine(STATION_SECRET_ENGINE_KEY, entity.secure_id, payload);
+        await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(STATION_SECRET_ENGINE_KEY, entity.secure_id, payload);
 
         await repository.update({
             id: entity.id,
@@ -215,15 +216,15 @@ async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
         .addSelect('station.public_key')
         .where('station.id = :id', { id });
 
-    let station = await query.getOne();
+    let entity = await query.getOne();
 
-    if (typeof station === 'undefined') {
+    if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
     if (
         data.public_key &&
-        data.public_key !== station.public_key &&
+        data.public_key !== entity.public_key &&
         !isHex(data.public_key)
     ) {
         data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
@@ -236,39 +237,40 @@ async function editRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
 
     // If public key changes, than the key is not saved to vault.
     if (typeof data.public_key === 'string') {
-        if (data.public_key !== station.public_key) {
-            station.vault_public_key_saved = false;
+        if (data.public_key !== entity.public_key) {
+            entity.vault_public_key_saved = false;
         }
     }
 
     if (typeof data.secure_id === 'string') {
         // secure id changed -> remove vault project
-        if (data.secure_id !== station.secure_id) {
+        if (data.secure_id !== entity.secure_id) {
             try {
-                await deleteStationHarborProject(station.secure_id);
+                const name = buildRegistryStationProjectName(entity.secure_id);
+                await useTrapiClient<HarborAPI>(ApiKey.HARBOR).project.delete(name, true);
             } catch (e) {
                 // ...
             }
 
             try {
-                await deleteFromSecretEngine(STATION_SECRET_ENGINE_KEY, station.secure_id);
+                await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(STATION_SECRET_ENGINE_KEY, entity.secure_id);
             } catch (e) {
                 // ...
             }
         }
     }
 
-    station = repository.merge(station, data);
+    entity = repository.merge(entity, data);
 
     if (syncPublicKey) {
-        const payload = buildSecretStorageStationPayload(station.public_key);
+        const payload = buildSecretStorageStationPayload(entity.public_key);
 
-        await saveToSecretEngine(STATION_SECRET_ENGINE_KEY, station.secure_id, payload);
+        await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(STATION_SECRET_ENGINE_KEY, entity.secure_id, payload);
 
-        station.vault_public_key_saved = true;
+        entity.vault_public_key_saved = true;
     }
 
-    const result = await repository.save(station);
+    const result = await repository.save(entity);
 
     return res.respondAccepted({
         data: result,
@@ -299,8 +301,10 @@ async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Pro
 
     await repository.remove(entity);
 
-    await deleteStationHarborProject(entity.secure_id);
-    await deleteFromSecretEngine(STATION_SECRET_ENGINE_KEY, entity.secure_id);
+    const name = buildRegistryStationProjectName(entity.secure_id);
+    await useTrapiClient<HarborAPI>(ApiKey.HARBOR).project.delete(name, true);
+
+    await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(STATION_SECRET_ENGINE_KEY, entity.secure_id);
 
     return res.respondDeleted({ data: entity });
 }

@@ -8,3 +8,4 @@
 export * from './auth';
 export * from './core';
 export * from './extra';
+export * from './type';

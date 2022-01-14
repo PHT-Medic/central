@@ -9,11 +9,11 @@ import {
     EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import {
-    TrainFile,
     buildSocketRealmNamespaceName,
     buildSocketTrainFileRoomName,
 } from '@personalhealthtrain/ui-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
+import { TrainFileEntity } from '../../domains/core/train-file/entity';
 
 type Operator = 'create' | 'update' | 'delete';
 type Event = 'trainFileCreated' | 'trainFileUpdated' | 'trainFileDeleted';
@@ -26,7 +26,7 @@ const OperatorEventMap : Record<Operator, Event> = {
 
 function publish(
     operation: Operator,
-    item: TrainFile,
+    item: TrainFileEntity,
 ) {
     useSocketEmitter()
         .in(buildSocketTrainFileRoomName())
@@ -86,21 +86,21 @@ function publish(
 }
 
 @EventSubscriber()
-export class TrainFileSubscriber implements EntitySubscriberInterface<TrainFile> {
+export class TrainFileSubscriber implements EntitySubscriberInterface<TrainFileEntity> {
     listenTo(): CallableFunction | string {
-        return TrainFile;
+        return TrainFileEntity;
     }
 
-    afterInsert(event: InsertEvent<TrainFile>): Promise<any> | void {
+    afterInsert(event: InsertEvent<TrainFileEntity>): Promise<any> | void {
         publish('create', event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<TrainFile>): Promise<any> | void {
-        publish('update', event.entity as TrainFile);
+    afterUpdate(event: UpdateEvent<TrainFileEntity>): Promise<any> | void {
+        publish('update', event.entity as TrainFileEntity);
         return undefined;
     }
 
-    beforeRemove(event: RemoveEvent<TrainFile>): Promise<any> | void {
+    beforeRemove(event: RemoveEvent<TrainFileEntity>): Promise<any> | void {
         publish('delete', event.entity);
 
         return undefined;

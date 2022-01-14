@@ -8,14 +8,19 @@
 import { publishMessage } from 'amqp-extension';
 import { Not, getRepository } from 'typeorm';
 import {
-    Train, TrainBuildStatus, TrainConfigurationStatus, TrainResultStatus, TrainRunStatus, TrainStation, TrainStationApprovalStatus,
+    Train, TrainBuildStatus, TrainConfigurationStatus, TrainResultStatus, TrainRunStatus, TrainStationApprovalStatus,
 } from '@personalhealthtrain/ui-common';
 import { buildTrainBuilderQueueMessage } from '../../../extra/train-builder/queue';
 import { TrainBuilderCommand } from '../../../extra/train-builder/type';
 import { findTrain } from './utils';
+import { TrainStationEntity } from '../../train-station/entity';
+import { TrainEntity } from '../entity';
 
-export async function startBuildTrain(train: Train | number | string, demo = false) : Promise<Train> {
-    const repository = getRepository(Train);
+export async function startBuildTrain(
+    train: Train | number | string,
+    demo = false,
+) : Promise<Train> {
+    const repository = getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 
@@ -29,7 +34,7 @@ export async function startBuildTrain(train: Train | number | string, demo = fal
         throw new Error('The train can not longer be build...');
     } else {
         if (!demo) {
-            const trainStationRepository = getRepository(TrainStation);
+            const trainStationRepository = getRepository(TrainStationEntity);
             const trainStations = await trainStationRepository.find({
                 train_id: train.id,
                 approval_status: Not(TrainStationApprovalStatus.APPROVED),

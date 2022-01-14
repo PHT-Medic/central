@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { Proposal } from '@personalhealthtrain/ui-common';
 import { RealmEntity, UserEntity } from '@typescript-auth/server';
-import { ProposalStation } from '../proposal-station';
+import { ProposalStationEntity } from '../proposal-station/entity';
 import { MasterImageEntity } from '../master-image/entity';
 
 @Entity({ name: 'proposals' })
@@ -64,6 +64,6 @@ export class ProposalEntity implements Proposal {
     @JoinColumn({ name: 'master_image_id' })
         master_image: MasterImageEntity;
 
-    @OneToMany(() => ProposalStation, (proposalStation) => proposalStation.proposal)
-        proposal_stations: ProposalStation[];
+    @OneToMany(() => ProposalStationEntity, (proposalStation) => proposalStation.proposal)
+        proposal_stations: ProposalStationEntity[];
 }

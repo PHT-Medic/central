@@ -7,9 +7,9 @@
 <script>
 import {
     RegistryCommand,
-    buildRegistryHarborProjectName,
     executeAPIRegistryServiceCommand,
 } from '@personalhealthtrain/ui-common';
+import { buildRegistryStationProjectName } from '@personalhealthtrain/ui-common/domains/core/station/registry';
 
 export default {
     props: {
@@ -24,7 +24,7 @@ export default {
     },
     computed: {
         projectName() {
-            return buildRegistryHarborProjectName(this.station.secure_id);
+            return buildRegistryStationProjectName(this.station.secure_id);
         },
     },
     methods: {
@@ -58,7 +58,7 @@ export default {
 
             try {
                 const data = await executeAPIRegistryServiceCommand(command, {
-                    name: buildRegistryHarborProjectName(this.station.id),
+                    name: buildRegistryStationProjectName(this.station.id),
                 });
 
                 // eslint-disable-next-line default-case

@@ -9,11 +9,13 @@ import {
     EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import {
-    TrainStation,
     buildSocketRealmNamespaceName,
-    buildSocketTrainStationInRoomName, buildSocketTrainStationOutRoomName, buildSocketTrainStationRoomName,
+    buildSocketTrainStationInRoomName,
+    buildSocketTrainStationOutRoomName,
+    buildSocketTrainStationRoomName,
 } from '@personalhealthtrain/ui-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
+import { TrainStationEntity } from '../../domains/core/train-station/entity';
 
 type Operator = 'create' | 'update' | 'delete';
 type Event = 'trainStationCreated' | 'trainStationUpdated' | 'trainStationDeleted';
@@ -26,7 +28,7 @@ const OperatorEventMap : Record<Operator, Event> = {
 
 function publish(
     operation: Operator,
-    item: TrainStation,
+    item: TrainStationEntity,
 ) {
     useSocketEmitter()
         .in(buildSocketTrainStationRoomName())
@@ -91,21 +93,21 @@ function publish(
 }
 
 @EventSubscriber()
-export class TrainStationSubscriber implements EntitySubscriberInterface<TrainStation> {
+export class TrainStationSubscriber implements EntitySubscriberInterface<TrainStationEntity> {
     listenTo(): CallableFunction | string {
-        return TrainStation;
+        return TrainStationEntity;
     }
 
-    afterInsert(event: InsertEvent<TrainStation>): Promise<any> | void {
+    afterInsert(event: InsertEvent<TrainStationEntity>): Promise<any> | void {
         publish('create', event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<TrainStation>): Promise<any> | void {
-        publish('update', event.entity as TrainStation);
+    afterUpdate(event: UpdateEvent<TrainStationEntity>): Promise<any> | void {
+        publish('update', event.entity as TrainStationEntity);
         return undefined;
     }
 
-    beforeRemove(event: RemoveEvent<TrainStation>): Promise<any> | void {
+    beforeRemove(event: RemoveEvent<TrainStationEntity>): Promise<any> | void {
         publish('delete', event.entity);
 
         return undefined;

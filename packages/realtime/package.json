@@ -12,9 +12,11 @@
     "dependencies": {
         "@personalhealthtrain/ui-common": "^1.0.1-alpha.2",
         "@socket.io/redis-adapter": "^7.1.0",
+        "@trapi/client": "^1.0.4",
         "@trapi/query": "^2.0.3",
         "@trapi/swagger": "^0.2.12",
         "@typescript-auth/core": "^1.0.5",
+        "@typescript-auth/domains": "^0.0.4",
         "@typescript-error/http": "^1.0.3",
         "amqp-extension": "^1.0.0",
         "axios": "^0.24.0",

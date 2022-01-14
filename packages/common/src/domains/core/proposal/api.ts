@@ -6,39 +6,42 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import {
-    APIType,
-    CollectionResourceResponse,
-    SingleResourceResponse,
-    useAPI,
-} from '../../../modules';
+import { AxiosInstance } from 'axios';
 import { Proposal } from './entity';
 import { nullifyEmptyObjectProperties } from '../../../utils';
-import { MasterImage } from '../master-image';
+import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
-export async function addProposal(data: Record<string, any>) : Promise<SingleResourceResponse<Proposal>> {
-    const response = await useAPI(APIType.DEFAULT).post('proposals', nullifyEmptyObjectProperties(data));
+export class UserAPI {
+    protected client: AxiosInstance;
 
-    return response.data;
-}
+    constructor(client: AxiosInstance) {
+        this.client = client;
+    }
 
-export async function getProposal(id: Proposal['id'], requestRecord?: BuildInput<Proposal>) : Promise<SingleResourceResponse<Proposal>> {
-    const response = await useAPI(APIType.DEFAULT).get(`proposals/${id}${buildQuery(requestRecord)}`);
+    async getMany(record?: BuildInput<Proposal>): Promise<CollectionResourceResponse<Proposal>> {
+        const response = await this.client.get(`proposals${buildQuery(record)}`);
+        return response.data;
+    }
 
-    return response.data;
-}
+    async getOne(id: Proposal['id'], requestRecord?: BuildInput<Proposal>): Promise<SingleResourceResponse<Proposal>> {
+        const response = await this.client.get(`proposals/${id}${buildQuery(requestRecord)}`);
 
-export async function dropProposal(id: Proposal['id']): Promise<SingleResourceResponse<Proposal>> {
-    const response = await useAPI(APIType.DEFAULT).delete(`proposals/${id}`);
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function editProposal(id: Proposal['id'], data: Record<string, any>): Promise<SingleResourceResponse<Proposal>> {
-    const response = await useAPI(APIType.DEFAULT).post(`proposals/${id}`, nullifyEmptyObjectProperties(data));
-    return response.data;
-}
+    async create(data: Record<string, any>): Promise<SingleResourceResponse<Proposal>> {
+        const response = await this.client.post('proposals', nullifyEmptyObjectProperties(data));
 
-export async function getProposals(record?: BuildInput<Proposal>): Promise<CollectionResourceResponse<Proposal>> {
-    const response = await useAPI(APIType.DEFAULT).get(`proposals${buildQuery(record)}`);
-    return response.data;
+        return response.data;
+    }
+
+    async delete(id: Proposal['id']): Promise<SingleResourceResponse<Proposal>> {
+        const response = await this.client.delete(`proposals/${id}`);
+        return response.data;
+    }
+
+    async update(id: Proposal['id'], data: Record<string, any>): Promise<SingleResourceResponse<Proposal>> {
+        const response = await this.client.post(`proposals/${id}`, nullifyEmptyObjectProperties(data));
+        return response.data;
+    }
 }

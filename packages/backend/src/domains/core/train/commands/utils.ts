@@ -7,11 +7,12 @@
 
 import { Train } from '@personalhealthtrain/ui-common';
 import { Repository, getRepository } from 'typeorm';
+import { TrainEntity } from '../entity';
 
 export async function findTrain(
     train: Train | number | string,
     repository?: Repository<Train>,
 ) : Promise<Train | undefined> {
-    repository ??= getRepository(Train);
+    repository ??= getRepository(TrainEntity);
     return typeof train === 'number' || typeof train === 'string' ? repository.findOne(train) : train;
 }

@@ -6,40 +6,44 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import {
-    APIType,
-    CollectionResourceResponse,
-    SingleResourceResponse,
-    useAPI,
-} from '../../../modules';
+import { AxiosInstance } from 'axios';
 import { ProposalStation } from './entity';
+import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
-export async function getApiProposalStations(data?: BuildInput<ProposalStation>) : Promise<CollectionResourceResponse<ProposalStation>> {
-    const response = await useAPI(APIType.DEFAULT).get(`proposal-stations${buildQuery(data)}`);
+export class ProposalStationAPI {
+    protected client: AxiosInstance;
 
-    return response.data;
-}
+    constructor(client: AxiosInstance) {
+        this.client = client;
+    }
 
-export async function getApiProposalStation(id: ProposalStation['id'], data?: BuildInput<ProposalStation>) : Promise<SingleResourceResponse<ProposalStation>> {
-    const response = await useAPI(APIType.DEFAULT).get(`proposal-stations/${id}${buildQuery(data)}`);
+    async getMany(data?: BuildInput<ProposalStation>): Promise<CollectionResourceResponse<ProposalStation>> {
+        const response = await this.client.get(`proposal-stations${buildQuery(data)}`);
 
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function addApiProposalStation(data: Partial<ProposalStation>) : Promise<SingleResourceResponse<ProposalStation>> {
-    const response = await useAPI(APIType.DEFAULT).post('proposal-stations', data);
+    async getOne(id: ProposalStation['id'], data?: BuildInput<ProposalStation>): Promise<SingleResourceResponse<ProposalStation>> {
+        const response = await this.client.get(`proposal-stations/${id}${buildQuery(data)}`);
 
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function editApiProposalStation(id: ProposalStation['id'], data: Record<string, any>) : Promise<SingleResourceResponse<ProposalStation>> {
-    const response = await useAPI(APIType.DEFAULT).post(`proposal-stations/${id}`, data);
+    async create(data: Partial<ProposalStation>): Promise<SingleResourceResponse<ProposalStation>> {
+        const response = await this.client.post('proposal-stations', data);
 
-    return response.data;
-}
+        return response.data;
+    }
 
-export async function dropApiProposalStation(id: ProposalStation['id']): Promise<SingleResourceResponse<ProposalStation>> {
-    const response = await useAPI(APIType.DEFAULT).delete(`proposal-stations/${id}`);
+    async update(id: ProposalStation['id'], data: Record<string, any>): Promise<SingleResourceResponse<ProposalStation>> {
+        const response = await this.client.post(`proposal-stations/${id}`, data);
 
-    return response.data;
+        return response.data;
+    }
+
+    async delete(id: ProposalStation['id']): Promise<SingleResourceResponse<ProposalStation>> {
+        const response = await this.client.delete(`proposal-stations/${id}`);
+
+        return response.data;
+    }
 }

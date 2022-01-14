@@ -23,15 +23,14 @@ import {
     Train,
     TrainBuildErrorCode,
     TrainBuildStatus,
-    TrainConfigurationStatus, TrainRunErrorCode,
+    TrainConfigurationStatus, TrainResultStatus, TrainRunErrorCode,
     TrainRunStatus,
 } from '@personalhealthtrain/ui-common';
 import { RealmEntity, UserEntity } from '@typescript-auth/server';
-import { TrainResultStatus } from '../train-result';
 import { ProposalEntity } from '../proposal/entity';
-import { TrainStationEntity } from '../train-station/entity';
 import { MasterImageEntity } from '../master-image/entity';
 import { TrainFileEntity } from '../train-file/entity';
+import { TrainStationEntity } from '../train-station/entity';
 
 @Entity()
 export class TrainEntity implements Train {

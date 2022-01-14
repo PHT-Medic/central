@@ -15,7 +15,7 @@ import {
 } from 'typeorm';
 import { Model } from '@personalhealthtrain/ui-common';
 import { UserEntity } from '@typescript-auth/server';
-import { TrainFile } from '../train-file';
+import { TrainFileEntity } from '../train-file/entity';
 
 @Entity({ name: 'models' })
 export class ModelEntity implements Model {
@@ -28,8 +28,8 @@ export class ModelEntity implements Model {
     @Column({ type: 'varchar' })
         name: string;
 
-    @OneToOne(() => TrainFile)
-        src: TrainFile;
+    @OneToOne(() => TrainFileEntity)
+        src: TrainFileEntity;
 
     // ------------------------------------------------------------------
 

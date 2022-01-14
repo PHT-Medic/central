@@ -6,6 +6,7 @@
  */
 
 import {
+    HarborAPI,
     HarborRepository,
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
@@ -13,16 +14,18 @@ import {
     TrainBuildStatus,
     TrainConfigurationStatus,
     TrainRunStatus,
-    TrainStation,
-    buildRegistryHarborProjectName,
-    findHarborProjectRepository,
 } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
+import { buildRegistryStationProjectName } from '@personalhealthtrain/ui-common/src/domains/core/station/registry';
+import { useTrapiClient } from '@trapi/client';
 import { findTrain } from './utils';
 import { triggerTrainResultStart } from './result-start';
+import { TrainEntity } from '../entity';
+import { TrainStationEntity } from '../../train-station/entity';
+import { ApiKey } from '../../../../config/api';
 
 export async function detectTrainRunStatus(train: Train | number | string) : Promise<Train> {
-    const repository = getRepository(Train);
+    const repository = getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 
@@ -31,7 +34,9 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     }
 
     // 1. Check PHT outgoing ( -> TrainFinished )
-    let harborRepository: HarborRepository | undefined = await findHarborProjectRepository(REGISTRY_OUTGOING_PROJECT_NAME, train.id);
+    let harborRepository: HarborRepository | undefined = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).projectRepository
+        .find(REGISTRY_OUTGOING_PROJECT_NAME, train.id);
+
     if (typeof harborRepository !== 'undefined') {
         train = repository.merge(train, {
             build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
@@ -55,7 +60,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     }
 
     // 2. Check any Station Repository on route ( -> TrainRunning )
-    const trainStationRepository = getRepository(TrainStation);
+    const trainStationRepository = getRepository(TrainStationEntity);
     const trainStationQueryBuilder = trainStationRepository
         .createQueryBuilder('trainStation')
         .addSelect('station.secure_id')
@@ -73,10 +78,12 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
 
         if (!stationId) continue;
 
-        const stationName : string = buildRegistryHarborProjectName(stationId);
+        const stationName : string = buildRegistryStationProjectName(stationId);
 
         try {
-            harborRepository = await findHarborProjectRepository(stationName, train.id);
+            harborRepository = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).projectRepository
+                .find(stationName, train.id);
+
             if (typeof harborRepository !== 'undefined') {
                 // update train station status
 
@@ -105,7 +112,9 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     }
 
     // 3. Check PHT incoming ( -> TrainBuilt )
-    harborRepository = await findHarborProjectRepository(REGISTRY_INCOMING_PROJECT_NAME, train.id);
+    harborRepository = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).projectRepository
+        .find(REGISTRY_INCOMING_PROJECT_NAME, train.id);
+
     if (typeof harborRepository !== 'undefined') {
         train = repository.merge(train, {
             build_status: TrainBuildStatus.FINISHED, // optional, just to ensure

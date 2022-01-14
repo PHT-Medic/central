@@ -6,9 +6,9 @@
  */
 
 import {
-    APIType, ProxyConnectionConfig, detectProxyConnectionConfig,
-    setAPIConfig,
+    HarborAPI, ProxyConnectionConfig, VaultAPI, detectProxyConnectionConfig,
 } from '@personalhealthtrain/ui-common';
+import { setTrapiClientConfig } from '@trapi/client';
 import { setConfig } from 'amqp-extension';
 import https from 'https';
 import { Redis, setRedisConfig, useRedisInstance } from 'redis-extension';
@@ -19,6 +19,7 @@ import { buildTrainResultAggregator } from './aggregators/train-result';
 import { buildDispatcherAggregator } from './aggregators/dispatcher';
 import { buildCommandRouterComponent } from './components/command-router';
 import { buildTrainRouterAggregator } from './aggregators/train-router';
+import { ApiKey } from './config/api';
 
 interface ConfigContext {
     env: Environment
@@ -41,8 +42,8 @@ export function createConfig({ env } : ConfigContext) : Config {
 
     const proxyConfig : ProxyConnectionConfig | undefined = detectProxyConnectionConfig();
 
-    setAPIConfig(APIType.HARBOR, {
-        type: APIType.HARBOR,
+    setTrapiClientConfig(ApiKey.HARBOR, {
+        clazz: HarborAPI,
         connectionString: env.harborConnectionString,
         driver: {
             ...(proxyAPis.includes('harbor') && proxyConfig ? {
@@ -56,8 +57,8 @@ export function createConfig({ env } : ConfigContext) : Config {
         },
     });
 
-    setAPIConfig(APIType.VAULT, {
-        type: APIType.VAULT,
+    setTrapiClientConfig(ApiKey.VAULT, {
+        clazz: VaultAPI,
         connectionString: env.vaultConnectionString,
         driver: {
             ...(proxyAPis.includes('vault') && proxyConfig ? {

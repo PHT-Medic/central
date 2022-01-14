@@ -8,23 +8,25 @@
 import { check, matchedData, validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
 import {
-    PermissionID,
-    RegistryCommand, ServiceID,
-    Station, buildRegistryHarborProjectName, deleteHarborProject, dropHarborProjectAccount,
-    dropHarborProjectWebHook, ensureHarborProject,
-    ensureHarborProjectRobotAccount,
-    ensureHarborProjectWebHook,
-    findHarborRobotAccount,
-    getRegistryStationProjectNameId, isRegistryStationProjectName, isSpecialRegistryProjectName, pullProject,
+    HarborAPI,
+    PermissionID, RegistryCommand,
+    ServiceID,
+    Station, isSpecialRegistryProjectName,
 } from '@personalhealthtrain/ui-common';
 import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
 } from '@typescript-error/http';
 import { RobotEntity } from '@typescript-auth/server';
+import {
+    buildRegistryStationProjectName,
+    getRegistryStationProjectNameId, isRegistryStationProjectName,
+} from '@personalhealthtrain/ui-common/src/domains/core/station/registry';
+import { useTrapiClient } from '@trapi/client';
 import env from '../../../../env';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 import { StationEntity } from '../../../../domains/core/station/entity';
+import { ApiKey } from '../../../../config/api';
 
 const commands = Object.values(RegistryCommand);
 
@@ -82,30 +84,35 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             throw new NotFoundError();
         }
 
-        projectName = buildRegistryHarborProjectName(station.secure_id);
+        projectName = buildRegistryStationProjectName(station.secure_id);
     }
 
     switch (command as RegistryCommand) {
         // Project
         case RegistryCommand.PROJECT_PULL: {
-            const project = await pullProject(projectName, true);
+            const project = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).project.find(projectName, true);
 
             if (typeof project === 'undefined') {
                 throw new NotFoundError();
             }
 
-            if (
-                typeof station !== 'undefined'
-            ) {
+            if (typeof station !== 'undefined') {
                 station = stationRepository.merge(station, {
                     registry_project_id: project.id,
-                    registry_project_webhook_exists: !!project.webhook,
                 });
 
-                if (typeof project.robot_account !== 'undefined') {
+                const webhook = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.find(projectName, true);
+                if (webhook) {
                     station = stationRepository.merge(station, {
-                        registry_project_account_name: project.robot_account.name,
-                        registry_project_account_token: project.robot_account.secret,
+                        registry_project_webhook_exists: !!webhook,
+                    });
+                }
+
+                const robotAccount = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).robotAccount.find(projectName, true);
+                if (robotAccount) {
+                    station = stationRepository.merge(station, {
+                        registry_project_account_name: robotAccount.name,
+                        registry_project_account_token: robotAccount.secret,
                     });
                 }
 
@@ -115,7 +122,7 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             return res.respond({ data: project });
         }
         case RegistryCommand.PROJECT_CREATE: {
-            const entity = await ensureHarborProject({
+            const entity = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).project.save({
                 project_name: projectName,
                 public: !station,
             });
@@ -131,7 +138,7 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             return res.respondCreated({ data: entity });
         }
         case RegistryCommand.PROJECT_DROP: {
-            await deleteHarborProject(projectName, true);
+            await useTrapiClient<HarborAPI>(ApiKey.HARBOR).project.delete(projectName, true);
 
             if (typeof station !== 'undefined') {
                 station = stationRepository.merge(station, {
@@ -152,7 +159,7 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
         }
         // Robot Account
         case RegistryCommand.PROJECT_ROBOT_ACCOUNT_CREATE: {
-            const robotAccount = await ensureHarborProjectRobotAccount(projectName, projectName);
+            const robotAccount = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).robotAccount.ensure(projectName, projectName);
 
             if (typeof station !== 'undefined') {
                 station = stationRepository.merge(station, {
@@ -166,9 +173,9 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             return res.respondCreated({ data: robotAccount });
         }
         case RegistryCommand.PROJECT_ROBOT_ACCOUNT_DROP: {
-            const { id } = await findHarborRobotAccount(projectName, false);
+            const { id } = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).robotAccount.find(projectName, false);
             if (id) {
-                await dropHarborProjectAccount(id);
+                await useTrapiClient<HarborAPI>(ApiKey.HARBOR).robotAccount.delete(id);
             }
 
             return res.respondDeleted();
@@ -183,7 +190,7 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
                 },
             });
 
-            const webhook = await ensureHarborProjectWebHook(projectName, robot, {
+            const webhook = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.ensure(projectName, robot, {
                 internalAPIUrl: env.internalApiUrl,
             }, true);
 
@@ -198,7 +205,7 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             return res.respondCreated({ data: webhook });
         }
         case RegistryCommand.PROJECT_WEBHOOK_DROP: {
-            await dropHarborProjectWebHook(projectName, true);
+            await useTrapiClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.delete(projectName, true);
 
             if (typeof station !== 'undefined') {
                 station = stationRepository.merge(station, {
@@ -211,4 +218,6 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             return res.respondDeleted();
         }
     }
+
+    throw new BadRequestError();
 }

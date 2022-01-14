@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TokenVerificationPayload, verifyAPIToken } from '@personalhealthtrain/ui-common';
 import { AbilityManager } from '@typescript-auth/core';
 import { BadRequestError, UnauthorizedError } from '@typescript-error/http';
 import { RedisCache } from 'redis-extension';
 import { Socket } from 'socket.io';
+import { useTrapiClient } from '@trapi/client';
+import { TokenAPI, TokenVerificationPayload } from '@typescript-auth/domains';
 import { Config } from '../../../config';
 
 export function useAuthMiddleware(config: Config) {
@@ -18,6 +19,8 @@ export function useAuthMiddleware(config: Config) {
     }, {
         prefix: 'token',
     });
+
+    const tokenApi = new TokenAPI(useTrapiClient('default').driver);
 
     tokenCache.startScheduler();
 
@@ -34,33 +37,44 @@ export function useAuthMiddleware(config: Config) {
             return next();
         }
 
-        try {
-            let cacheData : TokenVerificationPayload | undefined = await tokenCache.get(token);
-            if (!cacheData) {
-                const data = await verifyAPIToken(token);
+        let cacheData : TokenVerificationPayload | undefined = await tokenCache.get(token);
+        if (!cacheData) {
+            let payload : TokenVerificationPayload;
 
-                let secondsDiff : number = data.token.exp - (new Date().getTime() / 1000);
-                secondsDiff = parseInt(secondsDiff.toString(), 10);
-
-                if (secondsDiff <= 0) {
-                    throw new BadRequestError('The token has been expired.');
-                }
-
-                await tokenCache.set(token, data, { seconds: secondsDiff });
-                cacheData = data;
+            try {
+                payload = await tokenApi.verify(token);
+            } catch (e) {
+                return next(new UnauthorizedError());
             }
 
-            const { permissions, ...user } = cacheData.target.data;
+            let secondsDiff : number = payload.token.exp - (new Date().getTime() / 1000);
+            secondsDiff = parseInt(secondsDiff.toString(), 10);
 
-            socket.data.token = token;
-            socket.data.userId = user.id;
-            socket.data.user = user;
-            socket.data.permissions = permissions;
-            socket.data.ability = new AbilityManager(permissions);
+            if (secondsDiff <= 0) {
+                return next(new BadRequestError('The token has been expired.'));
+            }
 
-            return next();
-        } catch (e) {
-            return next(new UnauthorizedError());
+            await tokenCache.set(token, payload, { seconds: secondsDiff });
+            cacheData = payload;
         }
+
+        const { permissions, ...entity } = cacheData.entity.data;
+
+        switch (cacheData.entity.type) {
+            case 'robot':
+                socket.data.robotId = entity.id;
+                socket.data.robot = entity;
+                break;
+            case 'user':
+                socket.data.userId = entity.id;
+                socket.data.user = entity;
+                break;
+        }
+
+        socket.data.token = token;
+        socket.data.permissions = permissions;
+        socket.data.ability = new AbilityManager(permissions);
+
+        return next();
     };
 }

@@ -6,39 +6,43 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import {
-    APIType,
-    CollectionResourceResponse,
-    SingleResourceResponse,
-    useAPI,
-} from '../../../modules';
+import { AxiosInstance } from 'axios';
 import { TrainStation } from './entity';
+import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
-export async function getAPITrainStations(options?: BuildInput<TrainStation>) : Promise<CollectionResourceResponse<TrainStation>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).get(`train-stations${buildQuery(options)}`);
-    return response;
-}
+export class TrainStationAPI {
+    protected client: AxiosInstance;
 
-export async function getAPITrainStation(id: TrainStation['id']) : Promise<SingleResourceResponse<TrainStation>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).get(`train-stations/${id}`);
+    constructor(client: AxiosInstance) {
+        this.client = client;
+    }
 
-    return response;
-}
+    async getAPITrainStations(options?: BuildInput<TrainStation>): Promise<CollectionResourceResponse<TrainStation>> {
+        const { data: response } = await this.client.get(`train-stations${buildQuery(options)}`);
+        return response;
+    }
 
-export async function dropAPITrainStation(id: TrainStation['id']) : Promise<SingleResourceResponse<TrainStation>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).delete(`train-stations/${id}`);
+    async getAPITrainStation(id: TrainStation['id']): Promise<SingleResourceResponse<TrainStation>> {
+        const { data: response } = await this.client.get(`train-stations/${id}`);
 
-    return response;
-}
+        return response;
+    }
 
-export async function editAPITrainStation(id: number, data: Partial<TrainStation>) : Promise<SingleResourceResponse<TrainStation>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).post(`train-stations/${id}`, data);
+    async dropAPITrainStation(id: TrainStation['id']): Promise<SingleResourceResponse<TrainStation>> {
+        const { data: response } = await this.client.delete(`train-stations/${id}`);
 
-    return response;
-}
+        return response;
+    }
 
-export async function addAPITrainStation(data: Partial<TrainStation>) : Promise<SingleResourceResponse<TrainStation>> {
-    const { data: response } = await useAPI(APIType.DEFAULT).post('train-stations', data);
+    async editAPITrainStation(id: number, data: Partial<TrainStation>): Promise<SingleResourceResponse<TrainStation>> {
+        const { data: response } = await this.client.post(`train-stations/${id}`, data);
 
-    return response;
+        return response;
+    }
+
+    async addAPITrainStation(data: Partial<TrainStation>): Promise<SingleResourceResponse<TrainStation>> {
+        const { data: response } = await this.client.post('train-stations', data);
+
+        return response;
+    }
 }

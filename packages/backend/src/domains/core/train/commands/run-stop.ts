@@ -10,9 +10,10 @@ import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../extra/train-router';
 import { findTrain } from './utils';
+import { TrainEntity } from '../entity';
 
 export async function stopTrain(train: Train | number | string) : Promise<Train> {
-    const repository = getRepository(Train);
+    const repository = getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 

@@ -21,15 +21,15 @@ export enum TrainBuilderCommand {
 export type TrainBuilderStartPayload = {
     userId: typeof UserEntity.prototype.id,
 
-    trainId: typeof Train.prototype.id,
-    buildId: typeof Train.prototype.build_id,
-    proposalId: typeof Train.prototype.proposal_id,
-    sessionId: typeof Train.prototype.session_id,
-    hash: typeof Train.prototype.hash,
-    hashSigned: typeof Train.prototype.hash_signed,
-    query: typeof Train.prototype.query,
+    trainId: Train['id'],
+    buildId: Train['build_id'],
+    proposalId: Train['proposal_id'],
+    sessionId: Train['session_id'],
+    hash: Train['hash']
+    hashSigned: Train['hash_signed'],
+    query: Train['query'],
 
-    masterImage: typeof MasterImage.prototype.virtual_path,
+    masterImage: MasterImage['virtual_path'],
 
     entrypointCommand?: string,
     entrypointCommandArguments?: string | string[],
@@ -37,7 +37,7 @@ export type TrainBuilderStartPayload = {
 
     files: string[],
 
-    stations: typeof Station.prototype.secure_id[],
+    stations: Station['secure_id'][],
 
     user_he_key: string // todo: this should be camelcase and be removed
 };
