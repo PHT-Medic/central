@@ -7,9 +7,6 @@
 
 import { Context } from '@nuxt/types';
 import {
-    APIType, useAPI,
-} from '@personalhealthtrain/ui-common';
-import {
     AbilityManager,
     AbilityMeta,
     Oauth2Client,
@@ -36,6 +33,8 @@ class AuthModule {
     protected refreshTokenJob: undefined | ReturnType<typeof setTimeout>;
 
     protected responseInterceptorId : number | undefined;
+
+    protected authResponseInterceptorId : number | undefined;
 
     protected storeKeys : string[] = [
         'token',
@@ -195,7 +194,7 @@ class AuthModule {
     }
 
     private async handleUserInfoResponse(userInfo: Record<string, any>) : Promise<Record<string, any>> {
-        const { permissions, ...user } = userInfo.target.data;
+        const { permissions, ...user } = userInfo.entity.data;
 
         await this.ctx.store.commit('auth/setPermissionsResolved', true);
         await this.ctx.store.dispatch('auth/triggerSetUser', user);
@@ -228,44 +227,60 @@ class AuthModule {
     // --------------------------------------------------------------------
 
     public setRequestToken(token: string) {
-        useAPI(APIType.DEFAULT).setAuthorizationHeader({
+        this.ctx.$api.setAuthorizationHeader({
             type: 'Bearer',
             token,
         });
 
-        this.responseInterceptorId = useAPI(APIType.DEFAULT)
-            .mountResponseInterceptor((data) => data, (error: any) => {
-                if (typeof this.ctx === 'undefined') return;
+        this.ctx.$authApi.setAuthorizationHeader({
+            type: 'Bearer',
+            token,
+        });
 
-                if (typeof error !== 'undefined' && error && typeof error.response !== 'undefined') {
-                    if (error.response.status === 401) {
-                        // Refresh the access accessToken
-                        try {
-                            this.ctx.store.dispatch('auth/triggerRefreshToken').then(() => axios({
-                                method: error.config.method,
-                                url: error.config.url,
-                                data: error.config.data,
-                            }));
-                        } catch (e) {
-                            // this.ctx.store.dispatch('triggerSetLoginRequired', true).then(r => r);
-                            this.ctx.redirect('/logout');
+        const interceptor = (error: any) => {
+            if (typeof this.ctx === 'undefined') return;
 
-                            throw error;
-                        }
+            if (typeof error !== 'undefined' && error && typeof error.response !== 'undefined') {
+                if (error.response.status === 401) {
+                    // Refresh the access accessToken
+                    try {
+                        this.ctx.store.dispatch('auth/triggerRefreshToken').then(() => axios({
+                            method: error.config.method,
+                            url: error.config.url,
+                            data: error.config.data,
+                        }));
+                    } catch (e) {
+                        // this.ctx.store.dispatch('triggerSetLoginRequired', true).then(r => r);
+                        this.ctx.redirect('/logout');
+
+                        throw error;
                     }
-
-                    throw error;
                 }
-            });
+
+                throw error;
+            }
+        };
+
+        this.responseInterceptorId = this.ctx.$api
+            .mountResponseInterceptor((data) => data, interceptor);
+
+        this.authResponseInterceptorId = this.ctx.$authApi
+            .mountResponseInterceptor((data) => data, interceptor);
     }
 
     public unsetRequestToken = () => {
         if (this.responseInterceptorId) {
-            useAPI(APIType.DEFAULT).unmountRequestInterceptor(this.responseInterceptorId);
+            this.ctx.$api.unmountRequestInterceptor(this.responseInterceptorId);
             this.responseInterceptorId = undefined;
         }
 
-        useAPI(APIType.DEFAULT).unsetAuthorizationHeader();
+        if (this.authResponseInterceptorId) {
+            this.ctx.$authApi.unmountRequestInterceptor(this.authResponseInterceptorId);
+            this.authResponseInterceptorId = undefined;
+        }
+
+        this.ctx.$api.unsetAuthorizationHeader();
+        this.ctx.$authApi.unsetAuthorizationHeader();
     };
 
     // --------------------------------------------------------------------

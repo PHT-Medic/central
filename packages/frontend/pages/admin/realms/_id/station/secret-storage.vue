@@ -6,8 +6,7 @@
   -->
 <script>
 import {
-    buildSecretStorageStationKey,
-    executeAPISecretStorageServiceCommand,
+    SecretStorageCommand, buildSecretStorageStationKey,
 } from '@personalhealthtrain/ui-common';
 
 export default {
@@ -37,7 +36,7 @@ export default {
             let variant = 'success';
 
             try {
-                const station = await executeAPISecretStorageServiceCommand(action, {
+                const station = await this.$api.service.runSecretStorageCommand(action, {
                     name: buildSecretStorageStationKey(this.station.id),
                 });
 

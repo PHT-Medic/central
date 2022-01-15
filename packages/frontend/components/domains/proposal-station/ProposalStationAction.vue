@@ -6,17 +6,15 @@
   -->
 <script>
 import {
-    Permission,
     PermissionID,
     ProposalStationApprovalStatus,
-    TrainConfigurationStatus, editApiProposalStation,
 } from '@personalhealthtrain/ui-common';
 import { BDropdownItem } from 'bootstrap-vue';
 
 export default {
     name: 'ProposalStationAction',
     props: {
-        proposalStationId: Number,
+        proposalStationId: String,
         approvalStatus: String,
         action: String,
         actionType: {
@@ -112,7 +110,7 @@ export default {
             }
 
             try {
-                const item = await editApiProposalStation(this.proposalStationId, {
+                const item = await this.$api.proposalStation.update(this.proposalStationId, {
                     approval_status: status,
                 });
 
@@ -124,7 +122,7 @@ export default {
             this.itemBusy = false;
         },
     },
-    render(createElement, context) {
+    render(createElement) {
         if (!this.isShown) {
             return createElement('span', {}, ['']);
         }

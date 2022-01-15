@@ -7,8 +7,6 @@
 <script>
 import {
     SecretType,
-    addAPIUserSecret,
-    editAPIUserSecret,
 } from '@personalhealthtrain/ui-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 
@@ -118,7 +116,7 @@ export default {
                 let response;
 
                 if (this.isEditing) {
-                    response = await editAPIUserSecret(this.entityProperty.id, { ...this.formData });
+                    response = await this.$api.userSecret.update(this.entityProperty.id, { ...this.formData });
 
                     this.message = {
                         isError: false,
@@ -127,7 +125,7 @@ export default {
 
                     this.$emit('updated', response);
                 } else {
-                    response = await addAPIUserSecret({ ...this.formData });
+                    response = await this.$api.userSecret.create({ ...this.formData });
 
                     this.message = {
                         isError: false,

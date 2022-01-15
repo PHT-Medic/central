@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { TrainStationApprovalStatus, editAPITrainStation } from '@personalhealthtrain/ui-common';
+import { TrainStationApprovalStatus } from '@personalhealthtrain/ui-common';
 import { BDropdownItem } from 'bootstrap-vue';
 
 export default {
@@ -104,7 +104,7 @@ export default {
             }
 
             try {
-                const item = await editAPITrainStation(this.trainStationId, {
+                const item = await this.$api.trainStation.update(this.trainStationId, {
                     approval_status: status,
                 });
 

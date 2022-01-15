@@ -5,11 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {
-    getAPIMasterImage,
-    getAPIMasterImageGroups,
-    getAPIMasterImages,
-} from '@personalhealthtrain/ui-common';
 
 export default {
     name: 'MasterImagePicker',
@@ -63,7 +58,7 @@ export default {
             this.loading = true;
 
             try {
-                const data = await getAPIMasterImage(this.masterImageId, {
+                const data = await this.$api.masterImage.getOne(this.masterImageId, {
                     relations: {
                         group: true,
                     },
@@ -83,7 +78,7 @@ export default {
             this.image.busy = true;
 
             try {
-                const { data } = await getAPIMasterImages({
+                const { data } = await this.$api.masterImage.getMany({
                     filters: {
                         ...(this.groupVirtualPath !== '' ? { group_virtual_path: this.groupVirtualPath } : {}),
                     },
@@ -102,7 +97,7 @@ export default {
             this.group.busy = true;
 
             try {
-                const { data } = await getAPIMasterImageGroups();
+                const { data } = await this.$api.masterImageGroup.getMany();
 
                 this.group.items = data;
             } catch (e) {

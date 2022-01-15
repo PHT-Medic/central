@@ -1,8 +1,4 @@
 <script>
-import {
-    addAPIOauth2ProviderRole,
-    dropAPIOauth2ProviderRole, editAPIOauth2ProviderRole, getApiOauth2ProviderRole, getApiOauth2ProviderRoles,
-} from '@personalhealthtrain/ui-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 
 export default {
@@ -71,7 +67,7 @@ export default {
             this.resolved = false;
 
             try {
-                const { data } = await getApiOauth2ProviderRoles({
+                const { data } = await this.$authApi.oauth2ProviderRole.getMany({
                     filter: {
                         role_id: this.role.id,
                         provider_id: this.providerId,
@@ -79,6 +75,7 @@ export default {
                 });
 
                 if (data.length === 1) {
+                    // eslint-disable-next-line prefer-destructuring
                     this.item = data[0];
                 } else {
                     this.item = null;
@@ -99,7 +96,7 @@ export default {
                 let response;
 
                 if (this.item) {
-                    response = await editAPIOauth2ProviderRole(this.item.id, {
+                    response = await this.$authApi.oauth2ProviderRole.update(this.item.id, {
                         ...this.formData,
                     });
 
@@ -110,7 +107,7 @@ export default {
 
                     this.$emit('updated', response);
                 } else {
-                    response = await addAPIOauth2ProviderRole({
+                    response = await this.$authApi.oauth2ProviderRole.create({
                         ...this.formData,
                         role_id: this.role.id,
                         provider_id: this.providerId,
@@ -142,7 +139,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await dropAPIOauth2ProviderRole(this.item.id);
+                const response = await this.$authApi.oauth2ProviderRole.delete(this.item.id);
 
                 this.$bvToast.toast('The provider-role was successfully deleted.', {
                     variant: 'warning',

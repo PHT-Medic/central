@@ -10,8 +10,8 @@ import {
     EntitySubscriberInterface, EventSubscriber, InsertEvent, UpdateEvent,
 } from 'typeorm';
 import { RobotEntity } from '@typescript-auth/server';
-import { buildServiceSecurityQueueMessage } from '../../domains/extra/service/queue';
-import { ServiceCommand } from '../../domains/extra/service/constants';
+import { buildRobotQueueMessage } from '../../domains/auth/service/queue';
+import { RobotQueueCommand } from '../../domains/auth/service/constants';
 
 @EventSubscriber()
 export class RobotSubscriber implements EntitySubscriberInterface<RobotEntity> {
@@ -20,8 +20,8 @@ export class RobotSubscriber implements EntitySubscriberInterface<RobotEntity> {
     }
 
     async afterInsert(event: InsertEvent<RobotEntity>): Promise<any | void> {
-        const queueMessage = buildServiceSecurityQueueMessage(
-            ServiceCommand.ROBOT_SECRET_SYNC,
+        const queueMessage = buildRobotQueueMessage(
+            RobotQueueCommand.SECRET_STORAGE_SYNC,
             {
                 id: event.entity.name,
                 robotId: event.entity.id,
@@ -33,8 +33,8 @@ export class RobotSubscriber implements EntitySubscriberInterface<RobotEntity> {
     }
 
     async afterUpdate(event: UpdateEvent<RobotEntity>): Promise<any | void> {
-        const queueMessage = buildServiceSecurityQueueMessage(
-            ServiceCommand.ROBOT_SECRET_SYNC,
+        const queueMessage = buildRobotQueueMessage(
+            RobotQueueCommand.SECRET_STORAGE_SYNC,
             {
                 id: event.entity.name,
                 robotId: event.entity.id,

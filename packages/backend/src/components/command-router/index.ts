@@ -6,7 +6,7 @@
  */
 
 import { consumeQueue } from 'amqp-extension';
-import { createServiceComponentHandlers } from '../auth-security';
+import { createServiceComponentHandlers } from '../robot';
 import { MessageQueueSelfRoutingKey } from '../../config/service/mq';
 
 export function buildCommandRouterComponent() {

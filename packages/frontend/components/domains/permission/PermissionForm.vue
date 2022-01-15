@@ -5,16 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { addAPIPermission, editAPIPermission } from '@personalhealthtrain/ui-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 
 import AlertMessage from '../../alert/AlertMessage';
-import NotImplemented from '../../NotImplemented';
 
 export default {
     components: {
         AlertMessage,
-        NotImplemented,
     },
     props: {
         permissionProperty: {
@@ -64,7 +61,7 @@ export default {
                 let response;
 
                 if (this.isEditing) {
-                    response = await editAPIPermission(this.permissionProperty.id, this.formData);
+                    response = await this.$api.permission.update(this.permissionProperty.id, this.formData);
 
                     this.message = {
                         isError: false,
@@ -73,7 +70,7 @@ export default {
 
                     this.$emit('updated', response);
                 } else {
-                    response = await addAPIPermission(this.formData);
+                    response = await this.$api.permission.create(this.formData);
 
                     this.message = {
                         isError: false,

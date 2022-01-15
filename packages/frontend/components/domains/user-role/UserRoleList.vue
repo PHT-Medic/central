@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { User, getApiUserRoles } from '@personalhealthtrain/ui-common';
 import RoleList from '../role/RoleList';
 import UserRoleListItemActions from './UserRoleListItemActions';
 
@@ -37,7 +36,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getApiUserRoles({
+                const response = await this.$authApi.userRole.getMany({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,

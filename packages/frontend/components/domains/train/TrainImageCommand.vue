@@ -5,8 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { getAPIMasterImage, getAPIMasterImageGroups, getApiTrainFile } from '@personalhealthtrain/ui-common';
-
 export default {
     props: {
         trainId: {
@@ -84,8 +82,8 @@ export default {
             this.masterImage.busy = true;
 
             try {
-                const item = await getAPIMasterImage(this.masterImageId);
-                const { data } = await getAPIMasterImageGroups({
+                const item = await this.$api.masterImage.getOne(this.masterImageId);
+                const { data } = await this.$api.masterImageGroup.getMany({
                     filter: {
                         virtual_path: item.group_virtual_path,
                     },
@@ -114,7 +112,7 @@ export default {
             this.trainFile.busy = true;
 
             try {
-                this.trainFile.item = await getApiTrainFile(this.trainId, this.trainFileId);
+                this.trainFile.item = await this.$api.trainFile.getOne(this.trainId, this.trainFileId);
 
                 this.trainFile.loaded = true;
             } catch (e) {

@@ -19,7 +19,7 @@ import TrainRunStatusText from './status/TrainRunStatusText';
 import TrainRunCommand from './command/TrainRunCommand';
 import TrainResultStatusText from '../train-result/status/TrainResultStatusText';
 
-import { FrontendTrainCommand } from '../../../domains/train/type';
+import { FrontendTrainCommand } from '../../../domains/train/constants';
 import TrainConfigurationStatusText from './status/TrainConfigurationStatusText';
 
 export default {

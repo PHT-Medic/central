@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { getAPIRoles, mergeDeep } from '@personalhealthtrain/ui-common';
+import { mergeDeep } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import Pagination from '../../Pagination';
 
@@ -79,7 +79,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getAPIRoles(mergeDeep({
+                const response = await this.$authApi.role.getMany(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,

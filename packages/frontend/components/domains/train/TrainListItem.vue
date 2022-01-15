@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { dropAPITrain } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import TrainPipeline from './TrainPipeline';
 import TrainStationsProgress from '../train-station/progress/TrainStationsProgress';
@@ -103,7 +102,7 @@ export default {
 
             try {
                 this.socketLockId = this.train.id;
-                await dropAPITrain(this.train.id);
+                await this.$api.train.delete(this.train.id);
                 this.socketLockId = null;
 
                 this.$emit('deleted', this.train);

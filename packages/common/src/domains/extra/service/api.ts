@@ -6,7 +6,7 @@
  */
 
 import { AxiosInstance } from 'axios';
-import { RegistryCommandType } from './harbor';
+import { RegistryCommandType } from './registry';
 import { ServiceID } from './constants';
 import { ServiceIDType } from './type';
 import { SingleResourceResponse } from '../../type';

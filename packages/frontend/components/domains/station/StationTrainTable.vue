@@ -7,8 +7,6 @@
 <script>
 import {
     TrainStationApprovalStatus,
-    getAPITrainFilesDownloadUri,
-    getAPITrainStations,
 } from '@personalhealthtrain/ui-common';
 import AlertMessage from '../../alert/AlertMessage';
 import Pagination from '../../Pagination';
@@ -75,7 +73,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getAPITrainStations({
+                const response = await this.$api.trainStation.getMany({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
@@ -90,7 +88,7 @@ export default {
 
                 this.meta.total = total;
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;
@@ -105,7 +103,7 @@ export default {
                 .catch(reject);
         },
         download(item) {
-            window.open(this.$config.apiUrl + getAPITrainFilesDownloadUri(item.train_id), '_blank');
+            window.open(this.$config.apiUrl + this.$api.trainFile.getDownloadURI(item.train_id), '_blank');
         },
         handleUpdated(item) {
             const index = this.items.findIndex((i) => i.id === item.id);

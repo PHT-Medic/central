@@ -8,8 +8,8 @@
 import { SecretStorageCommand } from './constants';
 
 export type ServiceSecretEngineSecretPayload = {
-    clientId: string,
-    clientSecret: string
+    id: string,
+    secret: string
 };
 export type SecretStorageCommandType = `${SecretStorageCommand}`;
 export type SecretStorageEngineSecretPayload<T extends Record<string, any>> = {

@@ -6,10 +6,10 @@
   -->
 <script>
 import {
-    Train, TrainBuildStatus, TrainConfigurationStatus, runAPITrainCommand,
+    TrainBuildStatus, TrainConfigurationStatus,
 } from '@personalhealthtrain/ui-common';
 import { BDropdownItem } from 'bootstrap-vue';
-import { FrontendTrainCommand } from '../../../../domains/train/type';
+import { FrontendTrainCommand } from '../../../../domains/train/constants';
 
 export default {
     props: {
@@ -121,7 +121,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runAPITrainCommand(this.train.id, this.command);
+                const train = await this.$api.train.runCommand(this.train.id, this.command);
 
                 const message = `Successfully executed build command ${this.commandText}`;
                 this.$bvToast.toast(message, { toaster: 'b-toaster-top-center', variant: 'success' });
@@ -163,6 +163,7 @@ export default {
                 break;
             case 'link':
                 rootElement = 'a';
+                // eslint-disable-next-line no-script-url
                 attributes.domProps.href = 'javascript:void(0)';
                 iconClasses.push(`text-${this.classSuffix}`);
                 break;

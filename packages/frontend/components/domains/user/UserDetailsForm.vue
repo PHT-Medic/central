@@ -6,9 +6,6 @@
   -->
 <script>
 import {
-    User, addAPIUser, editAPIUser, getAPIRealms,
-} from '@personalhealthtrain/ui-common';
-import {
     email, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 
@@ -70,7 +67,7 @@ export default {
             return typeof this.realmId !== 'undefined';
         },
         isExistingUser() {
-            return typeof this.userProperty !== 'undefined' && this.userProperty.hasOwnProperty('id');
+            return typeof this.userProperty !== 'undefined' && Object.prototype.hasOwnProperty.call(this.userProperty, 'id');
         },
     },
     created() {
@@ -81,7 +78,7 @@ export default {
         const keys = Object.keys(this.form);
         if (typeof this.userProperty !== 'undefined') {
             for (let i = 0; i < keys.length; i++) {
-                if (this.userProperty.hasOwnProperty(keys[i])) {
+                if (Object.prototype.hasOwnProperty.call(this.userProperty, keys[i])) {
                     this.form[keys[i]] = this.userProperty[keys[i]];
                 }
             }
@@ -92,7 +89,7 @@ export default {
     methods: {
         async loadRealms() {
             try {
-                const response = await getAPIRealms();
+                const response = await this.$authApi.realm.getMany();
                 this.realm.items = response.data;
 
                 this.realm.busy = false;
@@ -109,7 +106,7 @@ export default {
             const fields = {};
 
             for (const property in this.form) {
-                if (!this.form.hasOwnProperty(property)) {
+                if (!Object.prototype.hasOwnProperty.call(this.form, property)) {
                     continue;
                 }
 
@@ -124,7 +121,7 @@ export default {
             if (this.userProperty.id !== this.$store.getters['auth/user'].id) return;
 
             for (const key in fields) {
-                if (!fields.hasOwnProperty(key)) continue;
+                if (!Object.prototype.hasOwnProperty.call(fields, key)) continue;
                 await this.$store.dispatch('auth/triggerSetUserProperty', { property: key, value: fields[key] });
             }
         },
@@ -141,7 +138,7 @@ export default {
 
                 if (fieldsCount > 0) {
                     if (this.isExistingUser) {
-                        const user = await editAPIUser(this.userProperty.id, fields);
+                        const user = await this.$authApi.user.update(this.userProperty.id, { ...fields });
 
                         this.$emit('updated', user);
 
@@ -150,13 +147,13 @@ export default {
                             data: 'The user was successfully updated.',
                         };
 
-                        if (fields.hasOwnProperty('realm_id')) {
+                        if (Object.prototype.hasOwnProperty.call(fields, 'realm_id')) {
                             fields.realm = user.realm;
                         }
 
                         await this.updateSessionUser(fields);
                     } else {
-                        const user = await addAPIUser(fields);
+                        const user = await this.$authApi.user.create(fields);
 
                         this.$emit('created', user);
                     }

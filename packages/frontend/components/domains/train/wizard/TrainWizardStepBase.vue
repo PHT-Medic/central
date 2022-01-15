@@ -7,12 +7,8 @@
 <script>
 import {
     ProposalStationApprovalStatus,
-    addAPITrainStation,
     buildSocketTrainStationInRoomName,
     buildSocketTrainStationOutRoomName,
-    dropAPITrainStation,
-    editAPITrainStation,
-    getAPITrainStations,
 } from '@personalhealthtrain/ui-common';
 import { minLength, numeric, required } from 'vuelidate/lib/validators';
 import ProposalStationList from '../../proposal-station/ProposalStationList';
@@ -154,12 +150,20 @@ export default {
             const index = this.trainStation.items.findIndex((trainStation) => trainStation.id === item.id);
             if (index === -1) {
                 this.trainStation.items.push(item);
+
+                this.$emit('updated', {
+                    stations: this.trainStation.items.length,
+                });
             }
         },
         handleTrainStationDeleted(item) {
             const index = this.trainStation.items.findIndex((trainStation) => trainStation.id === item.id);
             if (index !== -1) {
                 this.trainStation.items.splice(index, 1);
+
+                this.$emit('updated', {
+                    stations: this.trainStation.items.length,
+                });
             }
         },
         handleProposalStationDeleted(item) {
@@ -175,7 +179,7 @@ export default {
             this.trainStation.busy = true;
 
             try {
-                const response = await getAPITrainStations({
+                const response = await this.$api.trainStation.getMany({
                     filter: {
                         train_id: this.train.id,
                     },
@@ -199,7 +203,7 @@ export default {
             try {
                 this.socketLockedStationId = stationId;
 
-                const trainStation = await addAPITrainStation({
+                const trainStation = await this.$api.trainStation.create({
                     train_id: this.train.id,
                     station_id: stationId,
                     position: this.trainStation.items.length,
@@ -221,11 +225,12 @@ export default {
 
             try {
                 this.socketLockedId = item.id;
-                await dropAPITrainStation(item.id);
+                await this.$api.trainStation.delete(item.id);
 
                 this.handleTrainStationDeleted(item);
                 this.socketLockedId = null;
             } catch (e) {
+                // ...
                 console.log(e);
             }
 
@@ -249,11 +254,11 @@ export default {
                             return;
                         }
 
-                        await editAPITrainStation(this.trainStation.items[index].id, {
+                        await this.$api.trainStation.update(this.trainStation.items[index].id, {
                             position: index - 1,
                         });
 
-                        await editAPITrainStation(this.trainStation.items[index - 1].id, {
+                        await this.$api.trainStation.update(this.trainStation.items[index - 1].id, {
                             position: index,
                         });
 
@@ -265,11 +270,11 @@ export default {
                         break;
                     // 3 -> 4
                     case 'down':
-                        await editAPITrainStation(this.trainStation.items[index].id, {
+                        await this.$api.trainStation.update(this.trainStation.items[index].id, {
                             position: index + 1,
                         });
 
-                        await editAPITrainStation(this.trainStation.items[index + 1].id, {
+                        await this.$api.trainStation.update(this.trainStation.items[index + 1].id, {
                             position: index,
                         });
 

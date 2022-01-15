@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { getAPIUser } from '@personalhealthtrain/ui-common';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
 
 export default {
@@ -17,7 +16,7 @@ export default {
         let user;
 
         try {
-            user = await getAPIUser(context.params.id);
+            user = await context.$authApi.user.getOne(context.params.id);
 
             return {
                 user,

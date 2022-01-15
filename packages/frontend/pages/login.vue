@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { getProviderAuthorizeUri } from '@personalhealthtrain/ui-common';
 import { mapActions, mapGetters } from 'vuex';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 import MedicineWorker from '../components/svg/MedicineWorker';
@@ -99,7 +98,7 @@ export default {
         },
 
         setProviderAuthorizeURL(provider) {
-            provider.url = getProviderAuthorizeUri(provider.id);
+            provider.url = this.$authApi.oauth2Provider.getAuthorizeUri(this.$config.apiUrl, provider.id);
             return provider;
         },
     },

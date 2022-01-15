@@ -12,7 +12,6 @@ import {
     TrainStationStatic,
     buildSocketTrainStationInRoomName,
     buildSocketTrainStationOutRoomName,
-    getAPITrainStations,
 } from '@personalhealthtrain/ui-common';
 import TrainStationRunStatusText from '../status/TrainStationRunStatusText';
 import TrainStationStaticRunStatusText from '../status/TrainStationStaticRunStatusText';
@@ -143,7 +142,7 @@ export default {
             this.busy = false;
 
             try {
-                const response = await getAPITrainStations({
+                const response = await this.$api.trainStation.getMany({
                     filter: {
                         train_id: this.train.id,
                     },

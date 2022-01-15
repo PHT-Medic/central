@@ -9,10 +9,9 @@ import {
     TrainBuildStatus,
     TrainConfigurationStatus,
     TrainRunStatus,
-    runAPITrainCommand,
 } from '@personalhealthtrain/ui-common';
 import { BDropdownItem } from 'bootstrap-vue';
-import { FrontendTrainCommand } from '../../../../domains/train/type';
+import { FrontendTrainCommand } from '../../../../domains/train/constants';
 
 export default {
     props: {
@@ -118,7 +117,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runAPITrainCommand(this.train.id, this.command);
+                const train = await this.$api.train.runCommand(this.train.id, this.command);
 
                 const message = `Successfully executed run command ${this.commandText}.`;
                 this.$bvToast.toast(message, { toaster: 'b-toaster-top-center', variant: 'success' });

@@ -11,7 +11,7 @@ import { Proposal } from './entity';
 import { nullifyEmptyObjectProperties } from '../../../utils';
 import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
-export class UserAPI {
+export class ProposalAPI {
     protected client: AxiosInstance;
 
     constructor(client: AxiosInstance) {

@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { TrainCommand, runAPITrainCommand } from '@personalhealthtrain/ui-common';
+import { TrainCommand } from '@personalhealthtrain/ui-common';
 
 export default {
     components: { },
@@ -69,7 +69,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await runAPITrainCommand(this.train.id, TrainCommand.GENERATE_HASH);
+                const train = await this.$api.train.runCommand(this.train.id, TrainCommand.GENERATE_HASH);
 
                 this.setHash(train.hash);
                 this.$emit('hashGenerated', this.form.hash);

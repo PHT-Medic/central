@@ -22,7 +22,11 @@ export default {
             await this.$store.dispatch('auth/triggerLogout');
 
             const query = {};
-            if (this.$route.query && Object.prototype.hasOwnProperty.call(this.$route.query, 'redirect')) {
+            if (
+                this.$route.query &&
+                Object.prototype.hasOwnProperty.call(this.$route.query, 'redirect') &&
+                !this.$route.query.redirect.includes('logout')
+            ) {
                 query.redirect = this.$route.query.redirect;
             }
 

@@ -6,11 +6,7 @@
   -->
 <script>
 import {
-    AuthClientCommand,
     ServiceID,
-    addAPIClient,
-    executeAPIClientCommand,
-    getAPIServiceClient,
 } from '@personalhealthtrain/ui-common';
 
 export default {
@@ -19,67 +15,44 @@ export default {
     },
     data() {
         return {
-            client: {
-                busy: false,
-                item: null,
-            },
+            item: null,
             busy: false,
         };
     },
     computed: {
         clientId() {
-            return this.client.item ? this.client.item.id : '???';
+            return this.item ? this.item.id : '???';
         },
         clientSecret() {
-            return this.client.item ? this.client.item.secret : '???';
+            return this.item ? this.item.secret : '???';
         },
     },
     created() {
-        this.getClient().then((r) => r);
+        Promise.resolve(this.find);
     },
     methods: {
-        async getClient() {
-            this.client.busy = true;
-
-            try {
-                this.client.item = await getAPIServiceClient(this.serviceId);
-            } catch (e) {
-
-            }
-
-            this.client.busy = false;
-        },
-        async doClientCommand(task) {
-            if (this.busy || !this.clientId) return;
+        async find() {
+            if (this.busy) return;
 
             this.busy = true;
 
             try {
-                this.client.item = await executeAPIClientCommand(this.clientId, task, {});
+                this.client.item = await this.$authApi.robot.getOne(this.serviceId);
             } catch (e) {
-                this.$bvToast.toast(e.message, {
-                    toaster: 'b-toaster-top-center',
-                });
+                // ...
             }
 
             this.busy = false;
         },
-        async refreshSecret() {
-            await this.doClientCommand(AuthClientCommand.SECRET_REFRESH);
-        },
-        async syncSecret() {
-            await this.doClientCommand(AuthClientCommand.SECRET_SYNC);
-        },
 
         async add() {
-            if (this.busy || this.client.item) return;
+            if (this.busy || this.item) return;
 
             this.busy = true;
 
             try {
-                this.client.item = await addAPIClient({
-                    type: 'service',
-                    id: this.serviceId,
+                this.item = await this.$authApi.robot.create({
+                    name: this.serviceId,
                 });
             } catch (e) {
                 console.log(e);
@@ -88,7 +61,17 @@ export default {
             this.busy = false;
         },
         async drop() {
+            if (this.busy || !this.item) return;
 
+            this.busy = true;
+
+            try {
+                await this.$authApi.robot.delete(this.client.item.id);
+            } catch (e) {
+                console.log(e);
+            }
+
+            this.busy = false;
         },
         close() {
             this.$emit('close');
@@ -104,27 +87,25 @@ export default {
         </p>
 
         <div class="mb-2">
-            <template v-if="!client.busy">
-                <template v-if="client.item">
-                    <button
-                        type="button"
-                        class="btn btn-danger btn-xs"
-                        :disabled="busy"
-                        @click.prevent="drop"
-                    >
-                        <i class="fa fa-minus" /> Drop
-                    </button>
-                </template>
-                <template v-else>
-                    <button
-                        type="button"
-                        class="btn btn-success btn-xs"
-                        :disabled="busy"
-                        @click.prevent="add"
-                    >
-                        <i class="fa fa-plus" /> Add
-                    </button>
-                </template>
+            <template v-if="item">
+                <button
+                    type="button"
+                    class="btn btn-danger btn-xs"
+                    :disabled="busy"
+                    @click.prevent="drop"
+                >
+                    <i class="fa fa-trash" /> Delete
+                </button>
+            </template>
+            <template v-else>
+                <button
+                    type="button"
+                    class="btn btn-success btn-xs"
+                    :disabled="busy"
+                    @click.prevent="add"
+                >
+                    <i class="fa fa-plus" /> Add
+                </button>
             </template>
         </div>
 

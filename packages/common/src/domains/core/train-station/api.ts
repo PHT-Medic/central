@@ -17,30 +17,30 @@ export class TrainStationAPI {
         this.client = client;
     }
 
-    async getAPITrainStations(options?: BuildInput<TrainStation>): Promise<CollectionResourceResponse<TrainStation>> {
+    async getMany(options?: BuildInput<TrainStation>): Promise<CollectionResourceResponse<TrainStation>> {
         const { data: response } = await this.client.get(`train-stations${buildQuery(options)}`);
         return response;
     }
 
-    async getAPITrainStation(id: TrainStation['id']): Promise<SingleResourceResponse<TrainStation>> {
+    async getOne(id: TrainStation['id']): Promise<SingleResourceResponse<TrainStation>> {
         const { data: response } = await this.client.get(`train-stations/${id}`);
 
         return response;
     }
 
-    async dropAPITrainStation(id: TrainStation['id']): Promise<SingleResourceResponse<TrainStation>> {
+    async delete(id: TrainStation['id']): Promise<SingleResourceResponse<TrainStation>> {
         const { data: response } = await this.client.delete(`train-stations/${id}`);
 
         return response;
     }
 
-    async editAPITrainStation(id: number, data: Partial<TrainStation>): Promise<SingleResourceResponse<TrainStation>> {
+    async update(id: number, data: Partial<TrainStation>): Promise<SingleResourceResponse<TrainStation>> {
         const { data: response } = await this.client.post(`train-stations/${id}`, data);
 
         return response;
     }
 
-    async addAPITrainStation(data: Partial<TrainStation>): Promise<SingleResourceResponse<TrainStation>> {
+    async create(data: Partial<TrainStation>): Promise<SingleResourceResponse<TrainStation>> {
         const { data: response } = await this.client.post('train-stations', data);
 
         return response;

@@ -11,7 +11,6 @@ import {
     REGISTRY_INCOMING_PROJECT_NAME, REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME, RegistryCommand,
     ServiceID,
-    dropAPIMasterImage, executeAPIServiceTask, runAPITMasterImagesCommand,
 } from '@personalhealthtrain/ui-common';
 import MasterImageList from '../../master-image/MasterImageList';
 
@@ -43,15 +42,13 @@ export default {
             this.busy = true;
 
             try {
-                const data = await executeAPIServiceTask(this.serviceId, task, taskData);
+                await this.$api.service.runCommand(this.serviceId, task, taskData);
 
                 this.$bvToast.toast('You successfully executed the harbor command.', {
                     toaster: 'b-toaster-top-center',
                 });
 
                 this.busy = false;
-
-                return data;
             } catch (e) {
                 this.busy = false;
 
@@ -80,8 +77,8 @@ export default {
         async syncProjectRepositories(key) {
             try {
                 switch (key) {
-                    case REGISTRY_MASTER_IMAGE_PROJECT_NAME:
-                        const { images } = await runAPITMasterImagesCommand(MasterImageCommand.SYNC_GIT_REPOSITORY);
+                    case REGISTRY_MASTER_IMAGE_PROJECT_NAME: {
+                        const { images } = await this.$api.masterImage.runCommand(MasterImageCommand.SYNC_GIT_REPOSITORY);
 
                         this.masterImagesMeta.executed = true;
 
@@ -91,10 +88,12 @@ export default {
 
                         await this.$refs['master-image-list'].load();
                         break;
-                    default:
-                        const { data, meta } = await this.executeTask(RegistryCommand.PROJECT_REPOSITORIES_SYNC, {
+                    }
+                    default: {
+                        await this.executeTask(RegistryCommand.PROJECT_REPOSITORIES_SYNC, {
                             name: key,
                         });
+                    }
                 }
             } catch (e) {
                 this.$bvToast.toast(e.message, {
@@ -105,11 +104,11 @@ export default {
         },
         async dropMasterImage(id) {
             try {
-                await dropAPIMasterImage(id);
+                await this.$api.masterImage.delete(id);
 
                 this.$refs['master-image-list'].dropArrayItem(id);
             } catch (e) {
-
+                // ...
             }
         },
     },

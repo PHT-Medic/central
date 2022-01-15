@@ -7,10 +7,7 @@
 <script>
 import {
     buildSocketTrainFileRoomName,
-    dropApiTrainFile,
-    getApiTrainFiles,
     hasOwnProperty,
-    uploadTrainFiles,
 } from '@personalhealthtrain/ui-common';
 import { required } from 'vuelidate/lib/validators';
 import Vue from 'vue';
@@ -171,7 +168,7 @@ export default {
             this.busy = true;
 
             try {
-                this.items = await getApiTrainFiles(this.train.id);
+                this.items = await this.$api.trainFile.getMany(this.train.id);
             } catch (e) {
                 // ...
             }
@@ -192,7 +189,7 @@ export default {
                 }
 
                 this.socketLocked = true;
-                const response = await uploadTrainFiles(this.train.id, formData);
+                const response = await this.$api.trainFile.upload(this.train.id, formData);
                 response.data.map((item) => this.handleCreated(item, false));
                 this.socketLocked = false;
 
@@ -217,7 +214,7 @@ export default {
 
             try {
                 for (let i = 0; i < this.selected.length; i++) {
-                    const file = await dropApiTrainFile(this.train.id, this.selected[i]);
+                    const file = await this.$api.trainFile.delete(this.train.id, this.selected[i]);
                     this.handleDeleted(file);
                 }
             } catch (e) {

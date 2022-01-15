@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { addAPIRealm, createNanoID, editAPIRealm } from '@personalhealthtrain/ui-common';
+import { createNanoID } from '@personalhealthtrain/ui-common';
 import {
     helpers, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
@@ -88,7 +88,7 @@ export default {
             try {
                 let response;
                 if (this.isEditing) {
-                    response = await editAPIRealm(this.itemProperty.id, this.formData);
+                    response = await this.$authApi.realm.update(this.itemProperty.id, this.formData);
 
                     this.$bvToast.toast('The realm was successfully updated.', {
                         variant: 'success',
@@ -97,7 +97,7 @@ export default {
 
                     this.$emit('updated', response);
                 } else {
-                    response = await addAPIRealm(this.formData);
+                    response = await this.$authApi.realm.create(this.formData);
 
                     this.$bvToast.toast('The realm was successfully created.', {
                         variant: 'success',

@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { dropAPIRealm, getAPIRealms, mergeDeep } from '@personalhealthtrain/ui-common';
+import { mergeDeep } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import Pagination from '../../Pagination';
 
@@ -75,7 +75,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getAPIRealms(mergeDeep({
+                const response = await this.$authApi.realm.getMany(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
@@ -90,7 +90,7 @@ export default {
 
                 this.meta.total = total;
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;
@@ -114,7 +114,7 @@ export default {
             })
                 .then((value) => {
                     if (value) {
-                        return dropAPIRealm(item.id)
+                        return this.$authApi.realm.delete(item.id)
                             .then(() => {
                                 this.dropArrayItem(item);
                                 return value;

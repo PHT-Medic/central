@@ -8,7 +8,7 @@
 import { check, matchedData, validationResult } from 'express-validator';
 import {
     PermissionID,
-    SERVICE_SECRET_ENGINE_KEY,
+    ROBOT_SECRET_ENGINE_KEY,
     STATION_SECRET_ENGINE_KEY,
     SecretStorageCommand,
     ServiceID,
@@ -22,7 +22,11 @@ import {
     buildSecretStorageUserPayload,
     getSecretStorageServiceKey,
     getSecretStorageStationKey,
-    getSecretStorageUserKey, isSecretStorageServiceKey, isSecretStorageStationKey, isSecretStorageUserKey, isService,
+    getSecretStorageUserKey,
+    isSecretStorageServiceKey,
+    isSecretStorageStationKey,
+    isSecretStorageUserKey,
+    isService,
 } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
 import { useTrapiClient } from '@trapi/client';
@@ -213,7 +217,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
                         });
 
                     payload = buildSecretStorageServicePayload(serviceClient.id, serviceClient.secret);
-                    await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(SERVICE_SECRET_ENGINE_KEY, id.toString(), payload);
+                    await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(ROBOT_SECRET_ENGINE_KEY, id.toString(), payload);
                 }
             }
 

@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { getAPIMasterImages } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import Pagination from '../../Pagination';
 
@@ -38,6 +37,7 @@ export default {
     },
     computed: {
         formattedItems() {
+            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
             const items = this.items.sort((a, b) => a.path.toLocaleString().localeCompare(b.path));
 
             if (typeof this.filterItems === 'undefined') {
@@ -83,19 +83,20 @@ export default {
                 };
 
                 if (typeof this.requestFilters !== 'undefined') {
-                    for (const key in this.requestFilters) {
-                        data.filter[key] = this.requestFilters[key];
+                    const keys = Object.keys(this.requestFilters);
+                    for (let i = 0; i < keys.length; i++) {
+                        data.filter[keys[i]] = this.requestFilters[keys[i]];
                     }
                 }
 
-                const response = await getAPIMasterImages(data);
+                const response = await this.$api.masterImage.getMany(data);
 
                 this.items = response.data;
                 const { total } = response.meta;
 
                 this.meta.total = total;
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;
@@ -122,8 +123,9 @@ export default {
         editArrayItem(item) {
             const index = this.items.findIndex((el) => el.id === item.id);
             if (index !== -1) {
-                for (const key in item) {
-                    Vue.set(this.items[index], key, item[key]);
+                const keys = Object.keys(item);
+                for (let i = 0; i < keys.length; i++) {
+                    Vue.set(this.items[index], keys[i], item[keys[i]]);
                 }
             }
         },

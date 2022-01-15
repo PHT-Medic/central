@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    SecretType, dropAPIUserSecret, getAPIUserSecrets, mergeDeep,
+    SecretType, mergeDeep,
 } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import Pagination from '../../Pagination';
@@ -64,7 +64,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getAPIUserSecrets(mergeDeep({
+                const response = await this.$api.userSecret.getMany(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
@@ -87,7 +87,7 @@ export default {
             this.itemBusy = true;
 
             try {
-                await dropAPIUserSecret(id);
+                await this.$api.userSecret.delete(id);
 
                 this.dropArrayItem({ id });
 

@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { getAPIUsers, mergeDeep } from '@personalhealthtrain/ui-common';
+import { mergeDeep } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import Pagination from '../../Pagination';
 
@@ -75,7 +75,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getAPIUsers(mergeDeep({
+                const response = await this.$api.user.getMany(mergeDeep({
                     include: {
                         realm: true,
                     },
@@ -93,7 +93,7 @@ export default {
 
                 this.meta.total = total;
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;

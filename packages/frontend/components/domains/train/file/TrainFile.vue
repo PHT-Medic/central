@@ -5,8 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { dropApiTrainFile } from '@personalhealthtrain/ui-common';
-
 export default {
     props: {
         file: {
@@ -89,7 +87,7 @@ export default {
             this.busy = true;
 
             try {
-                const file = await dropApiTrainFile(this.file.train_id, this.file.id);
+                const file = await this.$api.trainFile.delete(this.file.train_id, this.file.id);
                 this.handleDeleted(file);
             } catch (e) {
                 this.$emit('failed', e);

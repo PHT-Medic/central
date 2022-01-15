@@ -6,8 +6,7 @@
   -->
 <script>
 import {
-    addAPIStation, createNanoID, editAPIStation,
-    getAPIRealms,
+    createNanoID,
 } from '@personalhealthtrain/ui-common';
 import {
     email, helpers, maxLength, minLength, required,
@@ -97,7 +96,7 @@ export default {
         if (typeof this.stationProperty !== 'undefined') {
             // eslint-disable-next-line no-restricted-syntax
             for (const key in this.formData) {
-                if (!this.stationProperty.hasOwnProperty(key)) continue;
+                if (!Object.prototype.hasOwnProperty.call(this.stationProperty, key)) continue;
 
                 this.formData[key] = this.stationProperty[key];
             }
@@ -114,7 +113,7 @@ export default {
     methods: {
         async loadRealms() {
             try {
-                const response = await getAPIRealms();
+                const response = await this.$authApi.realm.getMany();
                 this.realm.items = response.data;
                 this.realm.busy = false;
             } catch (e) {
@@ -132,7 +131,7 @@ export default {
             try {
                 let station;
                 if (this.isEditing) {
-                    station = await editAPIStation(this.stationProperty.id, this.formData);
+                    station = await this.$api.station.update(this.stationProperty.id, this.formData);
 
                     this.$bvToast.toast('The station was successfully updated.', {
                         variant: 'success',
@@ -141,7 +140,7 @@ export default {
 
                     this.$emit('updated', station);
                 } else {
-                    station = await addAPIStation(this.formData);
+                    station = await this.$api.station.create(this.formData);
 
                     this.$emit('created', station);
 
@@ -152,7 +151,7 @@ export default {
                 }
 
                 for (const key in this.formData) {
-                    if (station.hasOwnProperty(key)) {
+                    if (Object.prototype.hasOwnProperty.call(station, key)) {
                         this.formData[key] = station[key];
                     }
                 }

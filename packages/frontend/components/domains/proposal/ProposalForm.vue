@@ -7,10 +7,6 @@
 
 <script>
 import {
-    addApiProposalStation,
-    addProposal, editProposal,
-} from '@personalhealthtrain/ui-common';
-import {
     alpha, integer, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 
@@ -152,7 +148,7 @@ export default {
                 let response;
 
                 if (this.isEditing) {
-                    response = await editProposal(this.entityProperty.id, this.formData);
+                    response = await this.$api.proposal.update(this.entityProperty.id, this.formData);
 
                     this.$bvToast.toast('The proposal was successfully updated.', {
                         variant: 'success',
@@ -161,10 +157,10 @@ export default {
 
                     this.$emit('updated', response);
                 } else {
-                    response = await addProposal(this.formData);
+                    response = await this.$api.proposal.create(this.formData);
 
                     for (let i = 0; i < this.station.selectedIds.length; i++) {
-                        await addApiProposalStation({
+                        await this.$api.proposalStation.create({
                             proposal_id: response.id,
                             station_id: this.station.selectedIds[i],
                         });

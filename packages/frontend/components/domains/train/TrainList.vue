@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    buildSocketTrainRoomName, getAPITrains, mergeDeep,
+    buildSocketTrainRoomName, mergeDeep,
 } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import AlertMessage from '../../alert/AlertMessage';
@@ -104,7 +104,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getAPITrains(this.queryFinal);
+                const response = await this.$api.train.getMany(this.queryFinal);
 
                 this.items = response.data;
                 const { total } = response.meta;

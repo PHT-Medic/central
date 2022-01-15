@@ -8,7 +8,6 @@
 import Vue from 'vue';
 import {
     TrainConfigurationStatus,
-    editAPITrain,
 } from '@personalhealthtrain/ui-common';
 import TrainWizardConfiguratorStep from './TrainWizardStepBase';
 import TrainFileManager from '../file/TrainFileManager';
@@ -115,7 +114,7 @@ export default {
 
             if (keys.length === 0) return;
 
-            const item = await editAPITrain(this.entity.id, data);
+            const item = await this.$api.train.update(this.entity.id, data);
             this.handleUpdated(item);
         },
 

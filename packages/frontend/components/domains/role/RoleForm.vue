@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { Role, addAPIRole, editAPIRole } from '@personalhealthtrain/ui-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 
 import AlertMessage from '../../alert/AlertMessage';
@@ -16,7 +15,7 @@ export default {
     },
     props: {
         roleProperty: {
-            type: Role,
+            type: Object,
             default: undefined,
         },
     },
@@ -62,7 +61,7 @@ export default {
                 let response;
 
                 if (this.isEditing) {
-                    response = await editAPIRole(this.roleProperty.id, this.formData);
+                    response = await this.$authApi.role.update(this.roleProperty.id, this.formData);
 
                     this.message = {
                         isError: false,
@@ -71,7 +70,7 @@ export default {
 
                     this.$emit('updated', response);
                 } else {
-                    response = await addAPIRole(this.formData);
+                    response = await this.$authApi.role.create(this.formData);
 
                     this.message = {
                         isError: false,

@@ -12,29 +12,21 @@ import {
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
-    SERVICE_SECRET_ENGINE_KEY,
-    ServiceID,
-    Station, VaultAPI, buildSecretStorageServicePayload,
+    ROBOT_SECRET_ENGINE_KEY,
+    ServiceID, Station, VaultAPI, buildSecretStorageServicePayload,
 } from '@personalhealthtrain/ui-common';
 
 import { getRepository } from 'typeorm';
 import { useTrapiClient } from '@trapi/client';
 import env from '../../../env';
-import { ServiceQueueMessagePayload } from '../../../domains/extra/service/type';
+import { ServiceQueueMessagePayload } from '../../../domains/auth/service/type';
 import { StationEntity } from '../../../domains/core/station/entity';
 import { ApiKey } from '../../../config/api';
 
-export async function syncRobotSecret(message: Message) {
+export async function syncRobotToSecretStorage(message: Message) {
     const payload : ServiceQueueMessagePayload = message.data as ServiceQueueMessagePayload;
 
     switch (payload.id) {
-        case ServiceID.RESULT_SERVICE:
-        case ServiceID.TRAIN_BUILDER:
-        case ServiceID.TRAIN_ROUTER: {
-            const data = buildSecretStorageServicePayload(payload.robotId, payload.robotSecret);
-            await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(SERVICE_SECRET_ENGINE_KEY, payload.id, data);
-            break;
-        }
         case ServiceID.REGISTRY: {
             const stationRepository = getRepository(StationEntity);
             const queryBuilder = stationRepository.createQueryBuilder('station');
@@ -72,6 +64,11 @@ export async function syncRobotSecret(message: Message) {
             });
 
             await Promise.all(promises);
+            break;
+        }
+        default: {
+            const data = buildSecretStorageServicePayload(payload.robotId, payload.robotSecret);
+            await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(ROBOT_SECRET_ENGINE_KEY, `${payload.id}`, data);
             break;
         }
     }

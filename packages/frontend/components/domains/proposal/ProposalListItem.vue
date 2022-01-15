@@ -5,8 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID, dropProposal, editProposal } from '@personalhealthtrain/ui-common';
-import Vue from 'vue';
+import { PermissionID } from '@personalhealthtrain/ui-common';
 
 export default {
     props: {
@@ -80,7 +79,7 @@ export default {
 
             try {
                 this.socketLockId = this.entityProperty.id;
-                const response = await editProposal(this.entityProperty.id, item);
+                const response = await this.$api.proposal.update(this.entityProperty.id, item);
                 this.socketLockId = null;
 
                 this.handleUpdated(response);
@@ -111,7 +110,7 @@ export default {
             })
                 .then((value) => {
                     if (value) {
-                        return dropProposal(this.entityProperty.id)
+                        return this.$api.proposal.delete(this.entityProperty.id)
                             .then(() => {
                                 this.socketLockId = null;
 

@@ -6,7 +6,6 @@
   -->
 <script>
 import Vue from 'vue';
-import { getAPIProvider } from '@personalhealthtrain/ui-common';
 import ProviderForm from '../../../../../components/domains/provider/ProviderForm';
 
 export default {
@@ -19,7 +18,7 @@ export default {
     },
     async asyncData(context) {
         try {
-            const item = await getAPIProvider(context.params.provider_id, {
+            const item = await this.$authApi.oauth2Provider.getOne(context.params.provider_id, {
                 fields: ['+client_secret'],
             });
 

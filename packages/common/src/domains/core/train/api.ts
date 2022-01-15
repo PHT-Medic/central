@@ -58,7 +58,7 @@ export class TrainAPI {
 
     async runCommand(
         id: Train['id'],
-        command: TrainCommand,
+        command: `${TrainCommand}`,
         data: Record<string, any> = {},
     ): Promise<SingleResourceResponse<Train>> {
         const actionData = {

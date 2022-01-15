@@ -7,11 +7,11 @@
 
 import { Message, buildMessage } from 'amqp-extension';
 import { MessageQueueSelfRoutingKey } from '../../../config/service/mq';
-import { ServiceCommand } from './constants';
 import { ServiceQueueMessagePayload } from './type';
+import { RobotQueueCommand } from './constants';
 
-export function buildServiceSecurityQueueMessage(
-    type: ServiceCommand,
+export function buildRobotQueueMessage(
+    type: RobotQueueCommand,
     context: ServiceQueueMessagePayload,
 ) : Message {
     return buildMessage({

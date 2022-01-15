@@ -5,29 +5,29 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SERVICE_SECRET_ENGINE_KEY } from './constants';
 import { ServiceSecretEngineSecretPayload } from './type';
+import { ROBOT_SECRET_ENGINE_KEY } from '../../../auth';
 
 export function isSecretStorageServiceKey(name: string): boolean {
-    return name.startsWith(`${SERVICE_SECRET_ENGINE_KEY}/`);
+    return name.startsWith(`${ROBOT_SECRET_ENGINE_KEY}/`);
 }
 
 export function getSecretStorageServiceKey(name: string): string {
-    return name.replace(`${SERVICE_SECRET_ENGINE_KEY}/`, '');
+    return name.replace(`${ROBOT_SECRET_ENGINE_KEY}/`, '');
 }
 
 export function buildSecretStorageServiceKey(id: string | number): string {
-    return `${SERVICE_SECRET_ENGINE_KEY}/${id}`;
+    return `${ROBOT_SECRET_ENGINE_KEY}/${id}`;
 }
 
 // -----------------------------------------------------------
 
 export function buildSecretStorageServicePayload(
-    clientId: string,
-    clientSecret: string,
+    id: string,
+    secret: string,
 ) : ServiceSecretEngineSecretPayload {
     return {
-        clientId,
-        clientSecret,
+        id,
+        secret,
     };
 }

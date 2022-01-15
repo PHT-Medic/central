@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    dropAPIProvider, getAPIProviders, mergeDeep,
+    mergeDeep,
 } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import Pagination from '../../Pagination';
@@ -88,7 +88,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getAPIProviders(mergeDeep({
+                const response = await this.$api.oauth2Provider.getMany(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
@@ -127,7 +127,7 @@ export default {
             })
                 .then((value) => {
                     if (value) {
-                        return dropAPIProvider(item.id)
+                        return this.$authApi.oauth2Provider.delete(item.id)
                             .then(() => {
                                 this.dropArrayItem(item);
                                 return value;

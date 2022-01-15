@@ -6,7 +6,7 @@
  */
 
 export * from './api';
-export * from './harbor';
+export * from './registry';
 export * from './secret-engine';
 export * from './constants';
 export * from './type';

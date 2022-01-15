@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID, getAPIStations } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/ui-common';
 import StationTrainTable from '../../../components/domains/station/StationTrainTable';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
@@ -20,7 +20,7 @@ export default {
     },
     async asyncData(ctx) {
         try {
-            const { data: stations } = await getAPIStations({
+            const { data: stations } = await this.$api.station.getMany({
                 filter: {
                     realm_id: ctx.store.getters['auth/userRealmId'],
                 },

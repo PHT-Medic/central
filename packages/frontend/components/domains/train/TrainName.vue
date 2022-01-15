@@ -5,8 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { editAPITrain } from '@personalhealthtrain/ui-common';
-
 export default {
     props: {
         trainId: String,
@@ -55,7 +53,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await editAPITrain(this.trainId, {
+                const train = await this.$api.train.update(this.trainId, {
                     name: this.form.name,
                 });
 

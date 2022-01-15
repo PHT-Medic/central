@@ -14,7 +14,9 @@ export default {
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.PERMISSION_MANAGE,
+            PermissionID.PERMISSION_ADD,
+            PermissionID.PERMISSION_EDIT,
+            PermissionID.PERMISSION_DROP,
         ],
     },
     data() {

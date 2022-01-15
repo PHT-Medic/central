@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    PermissionID, getAPIStations, getApiProposalStations, getProposal,
+    PermissionID,
 } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
@@ -18,7 +18,7 @@ export default {
     },
     async asyncData(context) {
         try {
-            const proposal = await getProposal(context.params.id, {
+            const proposal = await context.$api.proposal.getOne(context.params.id, {
                 include: {
                     master_image: true,
                     user: true,
@@ -32,7 +32,7 @@ export default {
 
             if (proposal.realm_id !== realmId) {
                 try {
-                    const { data: stations } = await getAPIStations({
+                    const { data: stations } = await context.$api.station.getMany({
                         filter: {
                             realm_id: proposal.realm_id,
                         },
@@ -42,7 +42,7 @@ export default {
                         // eslint-disable-next-line prefer-destructuring
                         visitorStation = stations[0];
 
-                        const response = await getApiProposalStations({
+                        const response = await context.$api.proposalStation.getMany({
                             filter: {
                                 proposal_id: proposal.id,
                                 station_id: stations[0].id,
@@ -65,6 +65,7 @@ export default {
                 visitorProposalStation,
             };
         } catch (e) {
+            console.log(e);
             await context.redirect('/proposals');
 
             return {
@@ -132,7 +133,7 @@ export default {
                 context.meta.roomId !== this.entity.id
             ) return;
 
-            this.handleDeleted(context.data);
+            await this.handleDeleted(context.data);
         },
         fillSidebar() {
             const items = [

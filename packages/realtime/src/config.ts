@@ -5,9 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setTrapiClientConfig } from '@trapi/client';
+import { setTrapiClientConfig, useTrapiClient } from '@trapi/client';
 import { setConfig } from 'amqp-extension';
 import { Redis, setRedisConfig, useRedisInstance } from 'redis-extension';
+import { ROBOT_SECRET_ENGINE_KEY, VaultAPI } from '@personalhealthtrain/ui-common';
+import https from 'https';
 import { Environment } from './env';
 
 interface ConfigContext {
@@ -38,12 +40,47 @@ export function createConfig({ env } : ConfigContext) : Config {
         },
     });
 
+    setTrapiClientConfig('vault', {
+        clazz: VaultAPI,
+        connectionString: env.vaultConnectionString,
+        driver: {
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false,
+            }),
+        },
+    });
+
     setTrapiClientConfig('default', {
         driver: {
             baseURL: env.apiUrl,
             withCredentials: true,
         },
     });
+
+    useTrapiClient('default').mountResponseInterceptor(
+        (value) => value,
+        async (err) => {
+            const { config } = err;
+
+            if (
+                err.response.status === 401 ||
+                err.response.status === 403
+            ) {
+                const robot = await useTrapiClient<VaultAPI>('vault').keyValue.find(ROBOT_SECRET_ENGINE_KEY, 'system');
+                if (robot) {
+                    useTrapiClient('default').setAuthorizationHeader({
+                        type: 'Basic',
+                        username: robot.id,
+                        password: robot.secret,
+                    });
+
+                    return useTrapiClient('default').request(config);
+                }
+            }
+
+            return Promise.reject(err);
+        },
+    );
 
     const aggregators : {start: () => void}[] = [
     ];

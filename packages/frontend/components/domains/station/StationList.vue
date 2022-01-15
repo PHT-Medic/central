@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    PermissionID, dropAPIStation, getAPIStations, mergeDeep,
+    PermissionID, mergeDeep,
 } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import Pagination from '../../Pagination';
@@ -84,7 +84,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getAPIStations(mergeDeep({
+                const response = await this.$api.station.getMany(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
@@ -113,7 +113,7 @@ export default {
             this.itemBusy = true;
 
             try {
-                await dropAPIStation(id);
+                await this.$api.station.delete(id);
 
                 this.dropArrayItem({ id });
             } catch (e) {

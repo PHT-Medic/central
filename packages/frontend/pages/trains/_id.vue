@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { getAPITrain } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
 import TrainName from '../../components/domains/train/TrainName';
@@ -18,7 +17,7 @@ export default {
     },
     async asyncData(context) {
         try {
-            const item = await getAPITrain(context.params.id, {
+            const item = await context.$api.train.getOne(context.params.id, {
                 relations: {
                     proposal: true,
                 },

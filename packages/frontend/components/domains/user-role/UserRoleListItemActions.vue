@@ -1,6 +1,4 @@
 <script>
-import { addAPIUserRole, dropAPIUserRole } from '@personalhealthtrain/ui-common';
-
 export default {
     props: {
         userRoles: {
@@ -34,14 +32,14 @@ export default {
             this.busy = true;
 
             try {
-                const userRole = await addAPIUserRole({
+                const userRole = await this.$authApi.userRole.getMany({
                     role_id: this.roleId,
                     user_id: this.userId,
                 });
 
                 this.$emit('added', userRole);
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;
@@ -52,7 +50,7 @@ export default {
             this.busy = true;
 
             try {
-                const userRole = await dropAPIUserRole(this.userRoles[this.userRoleIndex].id);
+                const userRole = await this.$authApi.userRole.delete(this.userRoles[this.userRoleIndex].id);
 
                 this.$emit('dropped', userRole);
             } catch (e) {

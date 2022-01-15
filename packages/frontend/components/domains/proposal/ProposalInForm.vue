@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { ProposalStationApprovalStatus, editApiProposalStation } from '@personalhealthtrain/ui-common';
+import { ProposalStationApprovalStatus } from '@personalhealthtrain/ui-common';
 import {
-    email, maxLength, minLength, required,
+    maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 
 import AlertMessage from '../../alert/AlertMessage';
@@ -70,7 +70,7 @@ export default {
 
             try {
                 if (this.isEditing) {
-                    const stationProposal = await editApiProposalStation(this.proposalStationProperty.id, this.formData);
+                    const stationProposal = await this.$api.proposalStation.update(this.proposalStationProperty.id, this.formData);
 
                     this.message = {
                         isError: false,

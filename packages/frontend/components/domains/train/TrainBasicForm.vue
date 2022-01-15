@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { TrainType, addAPITrain } from '@personalhealthtrain/ui-common';
+import { TrainType } from '@personalhealthtrain/ui-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 import ProposalList from '../proposal/ProposalList';
 import ProposalListItem from '../proposal/ProposalListItem';
@@ -76,7 +76,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await addAPITrain({
+                const train = await this.$api.train.create({
                     ...this.formData,
                 });
                 this.$emit('created', train);

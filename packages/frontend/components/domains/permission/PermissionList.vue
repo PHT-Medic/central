@@ -6,7 +6,7 @@
   -->
 <script>
 import Vue from 'vue';
-import { getAPIPermissions, mergeDeep } from '@personalhealthtrain/ui-common';
+import { mergeDeep } from '@personalhealthtrain/ui-common';
 import Pagination from '../../Pagination';
 
 export default {
@@ -75,7 +75,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getAPIPermissions(mergeDeep({
+                const response = await this.$api.permission.getMany(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
@@ -90,7 +90,7 @@ export default {
 
                 this.meta.total = total;
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;
@@ -111,8 +111,9 @@ export default {
         editArrayItem(item) {
             const index = this.items.findIndex((el) => el.id === item.id);
             if (index !== -1) {
-                for (const key in item) {
-                    Vue.set(this.items[index], key, item[key]);
+                const keys = Object.keys(item);
+                for (let i = 0; i < keys.length; i++) {
+                    Vue.set(this.items[index], keys[i], item[keys[i]]);
                 }
             }
         },

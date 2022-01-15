@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { User, editAPIUser } from '@personalhealthtrain/ui-common';
 import {
     maxLength, minLength, required, sameAs,
 } from 'vuelidate/lib/validators';
@@ -56,7 +55,7 @@ export default {
             this.form.busy = true;
 
             try {
-                const user = await editAPIUser(this.userProperty.id, {
+                const user = await this.$authApi.user.update(this.userProperty.id, {
                     password: this.form.password,
                     password_repeat: this.form.password_repeat,
                 });

@@ -7,12 +7,9 @@
 <script>
 import {
     PermissionID,
-    addApiProposalStation,
     buildSocketProposalStationInRoomName,
     buildSocketProposalStationOutRoomName,
-    buildSocketProposalStationRoomName,
-    dropApiProposalStation,
-    getApiProposalStation, getApiProposalStations, mergeDeep,
+    mergeDeep,
 } from '@personalhealthtrain/ui-common';
 
 import Vue from 'vue';
@@ -139,7 +136,7 @@ export default {
                 this.items.push(context.data);
                 this.meta.total++;
 
-                const data = await getApiProposalStation(context.data.id, {
+                const data = await this.$api.proposalStation.getOne(context.data.id, {
                     include: {
                         station: true,
                     },
@@ -171,7 +168,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getApiProposalStations(mergeDeep({
+                const response = await this.$api.proposalStation.getMany(mergeDeep({
                     filter: {
                         proposal_id: this.proposalId,
                         station: {
@@ -205,7 +202,7 @@ export default {
             try {
                 this.socketLockedId = id;
 
-                await dropApiProposalStation(id);
+                await this.$api.proposalStation.delete(id);
                 this.dropArrayItem({ id });
 
                 this.$emit('deleted', id);
@@ -225,7 +222,7 @@ export default {
             try {
                 this.socketLockedStationId = station.id;
 
-                const proposalStation = await addApiProposalStation({
+                const proposalStation = await this.$api.proposalStation.create({
                     proposal_id: this.proposalId,
                     station_id: station.id,
                 });

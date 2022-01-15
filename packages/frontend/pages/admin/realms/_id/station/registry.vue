@@ -7,9 +7,8 @@
 <script>
 import {
     RegistryCommand,
-    executeAPIRegistryServiceCommand,
+    buildRegistryStationProjectName,
 } from '@personalhealthtrain/ui-common';
-import { buildRegistryStationProjectName } from '@personalhealthtrain/ui-common/domains/core/station/registry';
 
 export default {
     props: {
@@ -57,7 +56,7 @@ export default {
             }
 
             try {
-                const data = await executeAPIRegistryServiceCommand(command, {
+                const data = await this.$api.service.runRegistryCommand(command, {
                     name: buildRegistryStationProjectName(this.station.id),
                 });
 

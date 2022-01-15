@@ -72,8 +72,8 @@ export default async function middleware({
     }
 
     if (
-        !route.path.includes('logout') &&
-        !route.fullPath.includes('logout')
+        !route.path.startsWith('/logout') &&
+        !route.fullPath.startsWith('/logout')
     ) {
         try {
             await (<AuthModule> $auth).resolveMe();

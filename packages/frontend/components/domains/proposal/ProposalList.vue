@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    PermissionID, buildSocketProposalRoomName, getProposals, mergeDeep,
+    PermissionID, buildSocketProposalRoomName, mergeDeep,
 } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import Pagination from '../../Pagination';
@@ -107,7 +107,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getProposals(mergeDeep({
+                const response = await this.$api.proposal.getMany(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,

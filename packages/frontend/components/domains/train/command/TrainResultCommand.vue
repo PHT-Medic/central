@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { TrainResultStatus, TrainRunStatus, runAPITrainCommand } from '@personalhealthtrain/ui-common';
+import { TrainResultStatus, TrainRunStatus } from '@personalhealthtrain/ui-common';
 import { BDropdownItem } from 'bootstrap-vue';
-import { FrontendTrainCommand } from '../../../../domains/train/type';
+import { FrontendTrainCommand } from '../../../../domains/train/constants';
 
 export default {
     props: {
@@ -138,7 +138,7 @@ export default {
                         window.open(`${this.$config.resultServiceApiUrl}train-results/${resultId}/download`);
                         break;
                     default:
-                        const train = await runAPITrainCommand(this.train.id, this.command);
+                        const train = await this.$api.train.runCommand(this.train.id, this.command);
                         this.$emit('done', train);
                         break;
                 }
@@ -181,6 +181,7 @@ export default {
                 break;
             case 'link':
                 rootElement = 'a';
+                // eslint-disable-next-line no-script-url
                 attributes.domProps.href = 'javascript:void(0)';
                 iconClasses.push(`text-${this.classSuffix}`);
                 break;
