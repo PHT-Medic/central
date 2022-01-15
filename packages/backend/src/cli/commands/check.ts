@@ -13,6 +13,7 @@ import {
     modifyDatabaseConnectionOptions,
 } from '@typescript-auth/server';
 import { useConfig } from '@typescript-auth/server/dist/config';
+import { PermissionKey } from '@personalhealthtrain/ui-common';
 
 interface SeedCheckArguments extends Arguments {
 
@@ -38,6 +39,7 @@ export class CheckCommand implements CommandModule {
             const authSeeder = new DatabaseRootSeeder({
                 userName: authConfig.adminUsername,
                 userPassword: authConfig.adminPassword,
+                permissions: Object.values(PermissionKey),
             });
             await authSeeder.run(connection);
         } catch (e) {

@@ -122,23 +122,25 @@ class AuthModule {
                 case 'auth/unsetPermissions':
                     this.setPermissions([]);
                     break;
-                case 'auth/setToken':
+                case 'auth/setToken': {
                     // eslint-disable-next-line no-case-declarations
-                    const token = <AuthStoreToken> mutation.payload;
+                    const token = <AuthStoreToken>mutation.payload;
                     if (this.refreshTokenJob) {
                         clearTimeout(this.refreshTokenJob);
                     }
 
-                    // eslint-disable-next-line no-case-declarations
                     const callback = () => {
-                        if (typeof this.ctx !== 'undefined') {
-                            this.ctx.store.dispatch('auth/triggerTokenExpired')
-                                .then((r: any) => r)
-                                .catch(() => this.ctx.redirect({
-                                    path: '/logout',
-                                    query: { redirect: this.ctx.route.fullPath },
-                                }));
-                        }
+                        if (
+                            typeof this.ctx === 'undefined' ||
+                            this.ctx.route.path.startsWith('/logout')
+                        ) return;
+
+                        this.ctx.store.dispatch('auth/triggerTokenExpired')
+                            .then((r: any) => r)
+                            .catch(() => this.ctx.redirect({
+                                path: '/logout',
+                                query: { redirect: this.ctx.route.fullPath },
+                            }));
                     };
 
                     callback.bind(this);
@@ -158,11 +160,13 @@ class AuthModule {
                         this.refreshTokenJob = setTimeout(callback, timeoutMilliSeconds);
                     }
                     break;
-                case 'auth/unsetToken':
+                }
+                case 'auth/unsetToken': {
                     if (this.refreshTokenJob) {
                         clearTimeout(this.refreshTokenJob);
                     }
                     break;
+                }
             }
         });
     }

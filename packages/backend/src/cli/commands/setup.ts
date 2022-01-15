@@ -8,7 +8,7 @@
 import { Arguments, Argv, CommandModule } from 'yargs';
 import { createDatabase } from 'typeorm-extension';
 import { createConnection } from 'typeorm';
-import { setupCommand } from '@typescript-auth/server';
+import { DatabaseRootSeeder, setupCommand } from '@typescript-auth/server';
 import { PermissionKey } from '@personalhealthtrain/ui-common';
 import { createConfig } from '../../config';
 import env from '../../env';
@@ -72,14 +72,9 @@ export class SetupCommand implements CommandModule {
         if (args.auth) {
             await setupCommand({
                 database: true,
-                databaseSeeder: true,
+                databaseSeeder: false, // false, to trigger own subscribers
                 documentation: true,
                 keyPair: true,
-                databaseSeederOptions: {
-                    permissions: Object.values(PermissionKey),
-                    userName: 'admin',
-                    userPassword: 'start123',
-                },
             });
         }
 
@@ -108,11 +103,16 @@ export class SetupCommand implements CommandModule {
                         await config.redisDatabase.connect();
                     }
 
-                    /*
+                    const authSeeder = new DatabaseRootSeeder({
+                        permissions: Object.values(PermissionKey),
+                        userName: 'admin',
+                        userPassword: 'start123',
+                    });
+                    await authSeeder.run(connection);
+
                     const { default: CoreSeeder } = await import('../../database/seeds/core');
                     const seeder = new CoreSeeder();
                     await seeder.run(connection);
-                     */
                 }
             } catch (e) {
                 console.log(e);
