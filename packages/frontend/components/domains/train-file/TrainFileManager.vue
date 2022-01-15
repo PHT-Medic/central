@@ -13,7 +13,7 @@ import { required } from 'vuelidate/lib/validators';
 import Vue from 'vue';
 import TrainFile from './TrainFile';
 import TrainFormFile from './TrainFormFile';
-import TrainImageCommand from '../TrainImageCommand';
+import TrainImageCommand from '../train/TrainImageCommand';
 
 export default {
     components: { TrainImageCommand, TrainFormFile, TrainFile },

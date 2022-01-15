@@ -9,7 +9,7 @@ import { mapActions, mapGetters } from 'vuex';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 import MedicineWorker from '../components/svg/MedicineWorker';
 import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';
-import ProviderList from '../components/domains/provider/ProviderList';
+import ProviderList from '../components/domains/auth/provider/ProviderList';
 
 export default {
     components: { ProviderList, MedicineWorker },

@@ -7,7 +7,7 @@
 <script>
 import Vue from 'vue';
 import { mergeDeep } from '@personalhealthtrain/ui-common';
-import Pagination from '../../Pagination';
+import Pagination from '../../../Pagination';
 
 export default {
     components: { Pagination },
@@ -75,13 +75,16 @@ export default {
             this.busy = true;
 
             try {
-                const response = await this.$api.permission.getMany(mergeDeep({
+                const response = await this.$authApi.permission.getMany(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
                     },
                     filter: {
                         id: this.q.length > 0 ? `~${this.q}` : this.q,
+                    },
+                    sort: {
+                        id: 'ASC',
                     },
                 }, this.query));
 

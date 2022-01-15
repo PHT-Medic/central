@@ -10,7 +10,7 @@ import {
     TrainConfigurationStatus,
 } from '@personalhealthtrain/ui-common';
 import TrainWizardConfiguratorStep from './TrainWizardStepBase';
-import TrainFileManager from '../file/TrainFileManager';
+import TrainFileManager from '../../train-file/TrainFileManager';
 import TrainWizardHashStep from './TrainWizardStepHash';
 import TrainWizardFinalStep from './TrainWizardStepFinal';
 import TrainWizardExtraStep from './TrainWizardStepQuery';

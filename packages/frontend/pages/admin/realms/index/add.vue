@@ -9,7 +9,7 @@
 </template>
 <script>
 import { PermissionID } from '@personalhealthtrain/ui-common';
-import RealmForm from '../../../../components/domains/realm/RealmForm';
+import RealmForm from '../../../../components/domains/auth/realm/RealmForm';
 import { LayoutKey } from '../../../../config/layout/contants';
 
 export default {

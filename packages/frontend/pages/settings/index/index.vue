@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserDetailsForm from '../../../components/domains/user/UserDetailsForm';
+import UserDetailsForm from '../../../components/domains/auth/user/UserDetailsForm';
 
 export default {
     meta: {

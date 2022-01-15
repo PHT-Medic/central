@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID, getAPIRole } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/ui-common';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {
@@ -20,7 +20,7 @@ export default {
     },
     async asyncData(context) {
         try {
-            const role = await getAPIRole(context.params.id);
+            const role = await context.$authApi.userRole.getOne(context.params.id);
 
             return {
                 role,

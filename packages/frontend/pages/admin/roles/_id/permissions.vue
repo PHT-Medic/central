@@ -6,7 +6,7 @@
   -->
 <script>
 import { Role } from '@personalhealthtrain/ui-common';
-import RolePermissionList from '../../../../components/domains/role-permission/RolePermissionList';
+import RolePermissionList from '../../../../components/domains/auth/role-permission/RolePermissionList';
 
 export default {
     components: {

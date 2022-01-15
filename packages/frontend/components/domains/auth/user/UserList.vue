@@ -7,7 +7,7 @@
 <script>
 import { mergeDeep } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
-import Pagination from '../../Pagination';
+import Pagination from '../../../Pagination';
 
 export default {
     components: { Pagination },
@@ -75,7 +75,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await this.$api.user.getMany(mergeDeep({
+                const response = await this.$authApi.user.getMany(mergeDeep({
                     include: {
                         realm: true,
                     },

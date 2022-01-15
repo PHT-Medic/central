@@ -5,21 +5,19 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { getAPIRealm } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
 import MedicineWorker from '../../../components/svg/MedicineWorker';
 import MedicineDoctors from '../../../components/svg/MedicineDoctors';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {
-    components: { MedicineDoctors, MedicineWorker },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
     },
     async asyncData(context) {
         try {
-            const realm = await getAPIRealm(context.params.id);
+            const realm = await context.$authApi.realm.getOne(context.params.id);
 
             return {
                 realm,

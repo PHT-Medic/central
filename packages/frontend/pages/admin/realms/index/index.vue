@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID, dropAPIRealm } from '@personalhealthtrain/ui-common';
-import RealmList from '../../../../components/domains/realm/RealmList';
+import { PermissionID } from '@personalhealthtrain/ui-common';
+import RealmList from '../../../../components/domains/auth/realm/RealmList';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {

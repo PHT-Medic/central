@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserRoleList from '../../../../components/domains/user-role/UserRoleList';
+import UserRoleList from '../../../../components/domains/auth/user-role/UserRoleList';
 
 export default {
     components: {

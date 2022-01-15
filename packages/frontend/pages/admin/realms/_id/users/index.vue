@@ -5,8 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { dropAPIUser } from '@personalhealthtrain/ui-common';
-import UserList from '../../../../../components/domains/user/UserList';
+import UserList from '../../../../../components/domains/auth/user/UserList';
 import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';
 
 export default {
@@ -60,7 +59,7 @@ export default {
 
                 if (proceed) {
                     try {
-                        await dropAPIUser(user.id);
+                        await this.$authApi.user.delete(user.id);
                         this.$refs.itemsList.dropArrayItem(user);
                     } catch (e) {
                         // ...

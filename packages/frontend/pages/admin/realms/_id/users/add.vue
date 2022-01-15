@@ -6,7 +6,7 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/ui-common';
-import UserDetailsForm from '../../../../../components/domains/user/UserDetailsForm';
+import UserDetailsForm from '../../../../../components/domains/auth/user/UserDetailsForm';
 import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';
 
 export default {

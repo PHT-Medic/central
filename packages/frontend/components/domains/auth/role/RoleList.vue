@@ -5,16 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import {
-    mergeDeep,
-} from '@personalhealthtrain/ui-common';
+import { mergeDeep } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
-import Pagination from '../../Pagination';
+import Pagination from '../../../Pagination';
 
 export default {
     components: { Pagination },
     props: {
-        mapItems: Function,
         filterItems: Function,
         query: {
             type: Object,
@@ -22,11 +19,11 @@ export default {
                 return {};
             },
         },
-        withSearch: {
+        withHeader: {
             type: Boolean,
             default: true,
         },
-        withHeader: {
+        withSearch: {
             type: Boolean,
             default: true,
         },
@@ -50,17 +47,11 @@ export default {
     },
     computed: {
         formattedItems() {
-            let { items } = this;
-
-            if (typeof this.filterItems === 'function') {
-                items = items.filter(this.filterItems);
+            if (typeof this.filterItems === 'undefined') {
+                return this.items;
             }
 
-            if (typeof this.mapItems === 'function') {
-                items = items.map(this.mapItems);
-            }
-
-            return items;
+            return this.items.filter(this.filterItems);
         },
     },
     watch: {
@@ -88,7 +79,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await this.$api.oauth2Provider.getMany(mergeDeep({
+                const response = await this.$authApi.role.getMany(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
@@ -103,43 +94,10 @@ export default {
 
                 this.meta.total = total;
             } catch (e) {
-                // ...
+
             }
 
             this.busy = false;
-        },
-        async drop(item) {
-            if (this.itemBusy) return;
-
-            this.itemBusy = true;
-
-            const l = this.$createElement;
-
-            await this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-dark m-b-0' }, [
-                l('p', null, [
-                    'Are you sure that you want to delete the provider  ',
-                    l('b', null, [item.name]),
-                    '?',
-                ]),
-            ]), {
-                size: 'md',
-                buttonSize: 'xs',
-            })
-                .then((value) => {
-                    if (value) {
-                        return this.$authApi.oauth2Provider.delete(item.id)
-                            .then(() => {
-                                this.dropArrayItem(item);
-                                return value;
-                            });
-                    }
-
-                    this.itemBusy = false;
-
-                    return value;
-                }).catch(() => {
-                    // ...
-                });
         },
         goTo(options, resolve, reject) {
             if (options.offset === this.meta.offset) return;
@@ -181,7 +139,7 @@ export default {
                 <div>
                     <slot name="header-title">
                         <h6 class="mb-0">
-                            Providers
+                            Roles
                         </h6>
                     </slot>
                 </div>
@@ -202,23 +160,31 @@ export default {
                                     <i class="fas fa-sync" /> Refresh
                                 </button>
                             </div>
+                            <div class="ml-2">
+                                <nuxt-link
+                                    to="/admin/roles/add"
+                                    type="button"
+                                    class="btn btn-xs btn-success"
+                                >
+                                    <i class="fa fa-plus" /> Add
+                                </nuxt-link>
+                            </div>
                         </div>
                     </slot>
                 </div>
             </div>
         </slot>
-        <div
-            v-if="withSearch"
-            class="form-group"
-        >
+        <div class="form-group">
             <div class="input-group">
-                <label />
+                <label for="permission-q" />
                 <input
+                    id="permission-q"
                     v-model="q"
                     type="text"
                     name="q"
                     class="form-control"
-                    placeholder="..."
+                    placeholder="Name..."
+                    autocomplete="new-password"
                 >
                 <div class="input-group-append">
                     <span class="input-group-text"><i class="fa fa-search" /></span>
@@ -228,8 +194,6 @@ export default {
         <slot
             name="items"
             :items="formattedItems"
-            :item-busy="itemBusy"
-            :drop="drop"
             :busy="busy"
         >
             <div class="c-list">
@@ -250,8 +214,6 @@ export default {
                             <slot
                                 name="item-actions"
                                 :item="item"
-                                :item-busy="itemBusy"
-                                :drop="drop"
                             />
                         </div>
                     </div>
@@ -264,7 +226,7 @@ export default {
             slot="no-more"
         >
             <div class="alert alert-sm alert-info">
-                No (more) providers available.
+                No (more) roles available anymore.
             </div>
         </div>
 

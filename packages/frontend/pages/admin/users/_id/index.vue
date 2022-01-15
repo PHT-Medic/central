@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserDetailsForm from '../../../../components/domains/user/UserDetailsForm';
-import UserPasswordForm from '../../../../components/domains/user/UserPasswordForm';
+import UserDetailsForm from '../../../../components/domains/auth/user/UserDetailsForm';
+import UserPasswordForm from '../../../../components/domains/auth/user/UserPasswordForm';
 
 export default {
     components: {

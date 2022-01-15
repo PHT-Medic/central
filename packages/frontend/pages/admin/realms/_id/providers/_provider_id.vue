@@ -6,7 +6,7 @@
   -->
 <script>
 import Vue from 'vue';
-import ProviderForm from '../../../../../components/domains/provider/ProviderForm';
+import ProviderForm from '../../../../../components/domains/auth/provider/ProviderForm';
 
 export default {
     components: { ProviderForm },
@@ -18,7 +18,7 @@ export default {
     },
     async asyncData(context) {
         try {
-            const item = await this.$authApi.oauth2Provider.getOne(context.params.provider_id, {
+            const item = await context.$authApi.oauth2Provider.getOne(context.params.provider_id, {
                 fields: ['+client_secret'],
             });
 

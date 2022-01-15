@@ -6,7 +6,7 @@
   -->
 <script>
 
-import ProviderForm from '../../../../../components/domains/provider/ProviderForm';
+import ProviderForm from '../../../../../components/domains/auth/provider/ProviderForm';
 
 export default {
     components: { ProviderForm },

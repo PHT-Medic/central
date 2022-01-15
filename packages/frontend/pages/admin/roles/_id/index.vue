@@ -6,7 +6,7 @@
   -->
 <script>
 import { Role } from '@personalhealthtrain/ui-common';
-import RoleForm from '../../../../components/domains/role/RoleForm';
+import RoleForm from '../../../../components/domains/auth/role/RoleForm';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {

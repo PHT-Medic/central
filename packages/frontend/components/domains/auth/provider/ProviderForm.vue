@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    addAPIProvider, createNanoID, editAPIProvider, getAPIRealms, hasOwnProperty,
+    createNanoID, hasOwnProperty,
 } from '@personalhealthtrain/ui-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 import ProviderRoleList from './ProviderRoleList';
@@ -133,7 +133,7 @@ export default {
             this.realm.busy = true;
 
             try {
-                const response = await getAPIRealms();
+                const response = await this.$authApi.realm.getMany();
                 this.realm.items = response.data;
                 this.realm.busy = false;
             } catch (e) {
@@ -151,7 +151,7 @@ export default {
                 let response;
 
                 if (this.isEditing) {
-                    response = await editAPIProvider(this.provider.id, this.formData);
+                    response = await this.$authApi.oauth2Provider.update(this.provider.id, this.formData);
 
                     this.$bvToast.toast('The realm was successfully updated.', {
                         variant: 'success',
@@ -160,7 +160,7 @@ export default {
 
                     this.$emit('updated', response);
                 } else {
-                    response = await addAPIProvider(this.formData);
+                    response = await this.$authApi.oauth2Provider.create(this.formData);
 
                     this.$bvToast.toast('The realm was successfully created.', {
                         variant: 'success',

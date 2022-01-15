@@ -6,7 +6,7 @@
   -->
 <script>
 import { PermissionID, dropAPIRole } from '@personalhealthtrain/ui-common';
-import RoleList from '../../../../components/domains/role/RoleList';
+import RoleList from '../../../../components/domains/auth/role/RoleList';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {

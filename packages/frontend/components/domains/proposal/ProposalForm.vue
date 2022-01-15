@@ -10,9 +10,9 @@ import {
     alpha, integer, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 
-import MasterImagePicker from '../../../components/domains/master-image/MasterImagePicker';
-import StationList from '../../../components/domains/station/StationList';
-import ToggleManyButton from '../../../components/ToggleManyButton';
+import MasterImagePicker from '../master-image/MasterImagePicker';
+import StationList from '../station/StationList';
+import ToggleManyButton from '../../ToggleManyButton';
 import ProposalStationList from '../proposal-station/ProposalStationList';
 
 export default {

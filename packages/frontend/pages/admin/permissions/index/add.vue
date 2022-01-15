@@ -6,7 +6,7 @@
   -->
 <script>
 import { PermissionID } from '@typescript-auth/domains';
-import PermissionForm from '../../../../components/domains/permission/PermissionForm';
+import PermissionForm from '../../../../components/domains/auth/permission/PermissionForm';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {

@@ -8,7 +8,7 @@ export default {
             default: () => [],
         },
         role: Object,
-        providerId: Number,
+        providerId: String,
     },
     data() {
         return {

@@ -7,7 +7,7 @@
 <script>
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 
-import AlertMessage from '../../alert/AlertMessage';
+import AlertMessage from '../../../alert/AlertMessage';
 
 export default {
     components: {
@@ -61,7 +61,7 @@ export default {
                 let response;
 
                 if (this.isEditing) {
-                    response = await this.$api.permission.update(this.permissionProperty.id, this.formData);
+                    response = await this.$authApi.permission.update(this.permissionProperty.id, this.formData);
 
                     this.message = {
                         isError: false,

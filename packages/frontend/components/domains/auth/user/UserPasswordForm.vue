@@ -8,7 +8,7 @@
 import {
     maxLength, minLength, required, sameAs,
 } from 'vuelidate/lib/validators';
-import AlertMessage from '../../alert/AlertMessage';
+import AlertMessage from '../../../alert/AlertMessage';
 
 export default {
     components: { AlertMessage },

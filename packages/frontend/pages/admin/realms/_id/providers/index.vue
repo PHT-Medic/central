@@ -9,7 +9,7 @@ import {
     PermissionID,
 } from '@personalhealthtrain/ui-common';
 import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';
-import ProviderList from '../../../../../components/domains/provider/ProviderList';
+import ProviderList from '../../../../../components/domains/auth/provider/ProviderList';
 
 export default {
     components: { ProviderList },

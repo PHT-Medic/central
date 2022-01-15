@@ -6,7 +6,7 @@
   -->
 <script>
 import { dropAPIUser } from '@personalhealthtrain/ui-common';
-import UserList from '../../../../components/domains/user/UserList';
+import UserList from '../../../../components/domains/auth/user/UserList';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
