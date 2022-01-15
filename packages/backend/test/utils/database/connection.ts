@@ -9,7 +9,13 @@ import {
     ConnectionWithSeederOptions, buildConnectionOptions, createDatabase, dropDatabase,
 } from 'typeorm-extension';
 import { ConnectionOptions, createConnection, getConnection } from 'typeorm';
-import DatabaseCoreSeeder from '../../../src/database/seeds/core';
+import {
+    DatabaseRootSeeder as AuthDatabaseRootSeeder,
+    modifyDatabaseConnectionOptions as modifyAuthDatabaseConnectionOptions,
+} from '@typescript-auth/server';
+import { PermissionKey } from '@personalhealthtrain/ui-common';
+import { DatabaseRootSeeder } from '../../../src/database/seeds/root';
+import { modifyDatabaseConnectionOptions } from '../../../src/database/utils';
 
 async function createConnectionOptions() {
     return {
@@ -19,15 +25,24 @@ async function createConnectionOptions() {
 }
 
 export async function useTestDatabase() {
-    const connectionOptions = await createConnectionOptions();
+    const connectionOptions = modifyDatabaseConnectionOptions(
+        modifyAuthDatabaseConnectionOptions(await createConnectionOptions(), false),
+    );
+
     await createDatabase({ ifNotExist: true }, connectionOptions);
 
     const connection = await createConnection(connectionOptions as ConnectionOptions);
     await connection.synchronize();
 
-    const core = new DatabaseCoreSeeder();
+    const authSeeder = new AuthDatabaseRootSeeder({
+        permissions: Object.values(PermissionKey),
+        userName: 'admin',
+        userPassword: 'start123',
+    });
+    await authSeeder.run(connection);
 
-    await core.run(null, connection);
+    const coreSeeder = new DatabaseRootSeeder();
+    await coreSeeder.run(connection);
 
     return connection;
 }

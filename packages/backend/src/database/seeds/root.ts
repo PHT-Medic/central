@@ -5,18 +5,43 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Connection } from 'typeorm';
+import { Connection, In, getRepository } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 import {
-    RealmEntity, RoleEntity, RolePermissionEntity, RoleRepository,
+    RealmEntity, RobotEntity, RoleEntity, RolePermissionEntity, RoleRepository,
 } from '@typescript-auth/server';
+import { ServiceID } from '@personalhealthtrain/ui-common';
+import { MASTER_REALM_ID, createNanoID } from '@typescript-auth/domains';
 import { PHTStationRole, getPHTStationRolePermissions } from '../../config/pht/permissions/station';
 import { StationEntity } from '../../domains/core/station/entity';
 
 // ----------------------------------------------
 
-export default class CreatePHT implements Seeder {
+export class DatabaseRootSeeder implements Seeder {
     public async run(connection: Connection): Promise<any> {
+        /**
+         * Create Robots
+         */
+
+        const services : ServiceID[] = Object.values(ServiceID);
+
+        const robotRepository = getRepository(RobotEntity);
+        let robots = await robotRepository.createQueryBuilder('robot')
+            .where({
+                name: In(services),
+            })
+            .getMany();
+
+        robots = services
+            .filter((service) => robots.findIndex((robot) => robot.name === service) === -1)
+            .map((service) => robotRepository.create({
+                name: service,
+                secret: createNanoID(undefined, 128),
+                realm_id: MASTER_REALM_ID,
+            }));
+
+        await robotRepository.save(robots);
+
         /**
          * Create PHT roles
          */

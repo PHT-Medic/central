@@ -8,12 +8,13 @@
 import { Arguments, Argv, CommandModule } from 'yargs';
 import { createDatabase } from 'typeorm-extension';
 import { createConnection } from 'typeorm';
-import { DatabaseRootSeeder, setupCommand } from '@typescript-auth/server';
+import { DatabaseRootSeeder as AuthDatabaseRootSeeder, setupCommand } from '@typescript-auth/server';
 import { PermissionKey } from '@personalhealthtrain/ui-common';
 import { createConfig } from '../../config';
 import env from '../../env';
 import { buildDatabaseConnectionOptions } from '../../database/utils';
 import { generateSwaggerDocumentation } from '../../config/http/swagger';
+import { DatabaseRootSeeder } from '../../database/seeds/root';
 
 interface SetupArguments extends Arguments {
     auth: boolean,
@@ -103,16 +104,15 @@ export class SetupCommand implements CommandModule {
                         await config.redisDatabase.connect();
                     }
 
-                    const authSeeder = new DatabaseRootSeeder({
+                    const authSeeder = new AuthDatabaseRootSeeder({
                         permissions: Object.values(PermissionKey),
                         userName: 'admin',
                         userPassword: 'start123',
                     });
                     await authSeeder.run(connection);
 
-                    const { default: CoreSeeder } = await import('../../database/seeds/core');
-                    const seeder = new CoreSeeder();
-                    await seeder.run(connection);
+                    const coreSeeder = new DatabaseRootSeeder();
+                    await coreSeeder.run(connection);
                 }
             } catch (e) {
                 console.log(e);
