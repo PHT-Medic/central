@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ServiceID } from '@personalhealthtrain/ui-common';
 import {
     Express, NextFunction,
 } from 'express';
@@ -19,7 +18,7 @@ export interface ExpressAppInterface extends Express {
 }
 
 export interface ExpressRequest extends AuthExpressRequest {
-    serviceId?: ServiceID,
+
 }
 
 export interface ExpressResponse extends AuthExpressResponse {

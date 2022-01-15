@@ -40,7 +40,7 @@ async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Prom
         .where('station.id = :id', { id });
 
     // todo: should be implemented by assigning permissions to a service.
-    const isPermittedService : boolean = typeof req.serviceId !== 'undefined' && req.realmId === MASTER_REALM_ID;
+    const isPermittedService : boolean = typeof req.robotId !== 'undefined' && req.realmId === MASTER_REALM_ID;
     if (
         req.ability.hasPermission(PermissionID.STATION_EDIT) ||
         isPermittedService
@@ -88,7 +88,7 @@ async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : 
     });
 
     // todo: should be implemented by assigning permissions to a service.
-    const isPermittedService : boolean = typeof req.serviceId !== 'undefined' && req.realmId === MASTER_REALM_ID;
+    const isPermittedService : boolean = typeof req.robotId !== 'undefined' && req.realmId === MASTER_REALM_ID;
     if (
         req.ability.hasPermission(PermissionID.STATION_EDIT) ||
         isPermittedService

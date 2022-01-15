@@ -7,11 +7,11 @@
 
 export enum ServiceID {
     // Core Service(s)
+    SYSTEM = 'SYSTEM',
     TRAIN_BUILDER = 'TRAIN_BUILDER',
     TRAIN_ROUTER = 'TRAIN_ROUTER',
-    RESULT_SERVICE = 'RESULT_SERVICE',
 
-    // Third Party Serice(s)
+    // Third Party Service(s)
     GITHUB = 'GITHUB',
     REGISTRY = 'REGISTRY',
     SECRET_STORAGE = 'SECRET_STORAGE',

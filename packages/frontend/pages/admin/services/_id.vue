@@ -32,7 +32,7 @@ export default {
             serviceId: undefined,
             tabs: [
                 { name: 'Tasks', icon: 'fas fa-bars', urlSuffix: '' },
-                { name: 'Client', icon: 'fa fa-robot', urlSuffix: '/client' },
+                { name: 'Robot', icon: 'fa fa-robot', urlSuffix: '/robot' },
                 { name: 'Settings', icon: 'fas fa-cog', urlSuffix: '/settings' },
             ],
         };

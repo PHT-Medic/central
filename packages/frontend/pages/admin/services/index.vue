@@ -26,22 +26,24 @@ export default {
             ],
             items: [
                 {
-                    id: ServiceID.REGISTRY, name: 'Image Registry', icon: 'fab fa-docker', version: 'v2.3.0',
-                },
-                {
-                    id: ServiceID.SECRET_STORAGE, name: 'Secret Storage', icon: 'fas fa-user-secret', version: 'v1.8.4',
-                },
-                {
-                    id: ServiceID.GITHUB, name: 'Github', icon: 'fab fa-github', version: 'v1.0.0',
-                },
-                {
-                    id: ServiceID.RESULT_SERVICE, name: 'Result Service', icon: 'fa fa-download', version: 'v1.0.0-alpha.0',
+                    id: ServiceID.SYSTEM, name: 'System', icon: 'fa fa-robot', version: 'v1.0.0-alpha.0',
                 },
                 {
                     id: ServiceID.TRAIN_BUILDER, name: 'Train Builder', icon: 'fa fa-wrench', version: 'v1.0.0-alpha.0',
                 },
                 {
                     id: ServiceID.TRAIN_ROUTER, name: 'Train Router', icon: 'fas fa-map-marked-alt', version: 'v1.0.0-alpha.0',
+                },
+            ],
+            thirdPartyItems: [
+                {
+                    id: ServiceID.REGISTRY, name: 'Image Registry', icon: 'fab fa-docker', version: 'v2.4.0',
+                },
+                {
+                    id: ServiceID.SECRET_STORAGE, name: 'Secret Storage', icon: 'fas fa-user-secret', version: 'v1.8.4',
+                },
+                {
+                    id: ServiceID.GITHUB, name: 'Github', icon: 'fab fa-github', version: 'v1.0.0',
                 },
             ],
         };
@@ -59,9 +61,9 @@ export default {
             Services <span class="sub-title">Management</span>
         </h1>
 
-        <p>
-            This is a slight overview of all services.
-        </p>
+        <h6>
+            Internal
+        </h6>
         <div class="m-t-10">
             <div class="row">
                 <div
@@ -70,7 +72,32 @@ export default {
                     class="col-md-4 col-12 mb-3"
                 >
                     <div
-                        class="event-card p-2 d-flex flex-column text-center"
+                        class="event-card p-3 d-flex flex-column text-center"
+                        @click.prevent="goTo(item.id)"
+                    >
+                        <div class="event-card-header">
+                            <h3>{{ item.name }}</h3>
+                        </div>
+                        <div class="event-card-body">
+                            <i :class="item.icon" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <h6>External</h6>
+        <div class="m-t-10">
+            <div class="row">
+                <div
+                    v-for="(item,key) in thirdPartyItems"
+                    :key="key"
+                    class="col-md-4 col-12 mb-3"
+                >
+                    <div
+                        class="event-card p-3 d-flex flex-column text-center"
                         @click.prevent="goTo(item.id)"
                     >
                         <div class="event-card-header">
@@ -96,6 +123,7 @@ export default {
 .event-card {
     background-color: #ececec;
     border: 1px solid #dedede;
+    box-shadow: 0 4px 25px 0 rgb(0 0 0 / 10%);
     border-radius: 4px;
     cursor: pointer;
 }

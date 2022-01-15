@@ -8,19 +8,31 @@
 import rateLimit, { Options } from 'express-rate-limit';
 import { RequestHandler } from 'express';
 import { TooManyRequestsError } from '@typescript-error/http';
+import { ServiceID } from '@personalhealthtrain/ui-common';
 import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 
 export function useRateLimiter(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) {
     const limiter : RequestHandler = rateLimit({
-        // 1/3 req p. sec
-        windowMs: 15 * 60 * 1000, // 15 minutes = 900 sec
+        windowMs: 10 * 60 * 1000, // 10 minutes = 600 sec
 
         max(req: ExpressRequest) {
-            if (req.serviceId || req.userId) {
-                return 150 * 60; // 9000 req
+            if (req.userId) {
+                return 100 * 60; // 6.000 req = 10 req p. sec
             }
 
-            return 5 * 60; // 300 req
+            if (req.robot) {
+                if (
+                    req.robot.name === ServiceID.SYSTEM ||
+                    req.robot.name === ServiceID.TRAIN_BUILDER ||
+                    req.robot.name === ServiceID.TRAIN_ROUTER
+                ) {
+                    return 0; // unlimited req p. sec
+                }
+
+                return 1000 * 60; // 60.000 req = 100 req p. sec
+            }
+
+            return 5 * 60; // 300 req = 1/2 req p. sec
         },
 
         handler(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction): any {

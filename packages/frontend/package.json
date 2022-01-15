@@ -29,7 +29,7 @@
         "@types/moment": "^2.13.0",
         "@types/vuelidate": "^0.7.13",
         "@typescript-auth/core": "^1.0.5",
-        "@typescript-auth/domains": "^0.0.6",
+        "@typescript-auth/domains": "^0.0.7",
         "@typescript-error/core": "^1.0.3",
         "axios": "^0.24.0",
         "babel-eslint": "^10.1.0",

@@ -6,10 +6,10 @@
   -->
 <script>
 import { ServiceID } from '@personalhealthtrain/ui-common';
-import ServiceClientDetails from '../../../../components/domains/service/ServiceClientDetails';
+import RobotForm from '../../../../components/domains/auth/robot/RobotForm';
 
 export default {
-    components: { ServiceClientDetails },
+    components: { RobotForm },
     props: {
         serviceId: ServiceID,
     },
@@ -19,15 +19,11 @@ export default {
         };
     },
     methods: {
-        handleUpdated(event) {
-            this.$emit('updated', event);
-        },
     },
 };
 </script>
 <template>
-    <service-client-details
-        :service-id="serviceId"
-        @updated="handleUpdated"
+    <robot-form
+        :name-property="serviceId"
     />
 </template>

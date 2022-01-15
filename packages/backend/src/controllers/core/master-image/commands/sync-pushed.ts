@@ -14,7 +14,7 @@ import { ExpressValidationError } from '../../../../config/http/error/validation
 import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
 
 export async function syncPushedMasterImages(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (req.serviceId !== ServiceID.GITHUB) {
+    if (!req.robot || req.robot.name !== ServiceID.GITHUB) {
         throw new ForbiddenError('Only the Github service is permitted to use this endpoint.');
     }
 

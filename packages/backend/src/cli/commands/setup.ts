@@ -71,7 +71,7 @@ export class SetupCommand implements CommandModule {
          */
         if (args.auth) {
             await setupCommand({
-                database: true,
+                database: false,
                 databaseSeeder: false, // false, to trigger own subscribers
                 documentation: true,
                 keyPair: true,
