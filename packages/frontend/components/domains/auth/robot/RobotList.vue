@@ -75,7 +75,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await this.$authApi.realm.getMany(mergeDeep({
+                const response = await this.$authApi.robot.getMany(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
@@ -104,7 +104,7 @@ export default {
 
             await this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-dark m-b-0' }, [
                 l('p', null, [
-                    'Are you sure that you want to delete the realm  ',
+                    'Are you sure that you want to delete the robot ',
                     l('b', null, [item.name]),
                     '?',
                 ]),
@@ -114,11 +114,12 @@ export default {
             })
                 .then((value) => {
                     if (value) {
-                        return this.$authApi.realm.delete(item.id)
+                        return this.$authApi.robot.delete(item.id)
                             .then(() => {
                                 this.dropArrayItem(item);
                                 return value;
-                            }).then((value) => {
+                            })
+                            .then((value) => {
                                 this.itemBusy = false;
                                 return value;
                             });
@@ -129,6 +130,7 @@ export default {
                     return value;
                 }).catch(() => {
                     // ...
+                    this.itemBusy = false;
                 });
         },
         goTo(options, resolve, reject) {
@@ -191,7 +193,7 @@ export default {
                             </div>
                             <div class="ml-2">
                                 <nuxt-link
-                                    to="/admin/realms/add"
+                                    to="/admin/robots/add"
                                     type="button"
                                     class="btn btn-xs btn-success"
                                 >
@@ -259,7 +261,7 @@ export default {
             slot="no-more"
         >
             <div class="alert alert-sm alert-info">
-                No (more) realms available.
+                No (more) robots available.
             </div>
         </div>
 

@@ -5,11 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserList from '../../../../components/domains/auth/user/UserList';
+import { PermissionID } from '@personalhealthtrain/ui-common';
+import RobotList from '../../../../components/domains/auth/robot/RobotList';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
-    components: { UserList },
+    components: { RobotList },
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -18,13 +19,10 @@ export default {
         return {
             fields: [
                 {
-                    key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
                     key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
                     key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
@@ -36,44 +34,30 @@ export default {
             ],
         };
     },
-    methods: {
-        async drop(user) {
-            const l = this.$createElement;
-
-            try {
-                const proceed = await this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-info m-b-0' }, [
-                    l('p', null, [
-                        'Are you sure, that you want to delete: ',
-                        l('b', null, [user.name]),
-                        '?',
-                    ]),
-                ]), {
-                    size: 'sm',
-                    buttonSize: 'xs',
-                });
-
-                if (proceed) {
-                    try {
-                        await this.$authApi.user.delete(user.id);
-                        this.$refs.userList.dropArrayItem(user);
-                    } catch (e) {
-                        // ...
-                    }
-                }
-            } catch (e) {
-                // ...
-            }
+    computed: {
+        query() {
+            return {
+                sort: {
+                    updated_at: 'DESC',
+                },
+            };
+        },
+        canEdit() {
+            return this.$auth.hasPermission(PermissionID.ROBOT_EDIT);
+        },
+        canDrop() {
+            return this.$auth.hasPermission(PermissionID.ROBOT_DROP);
         },
     },
 };
 </script>
 <template>
-    <user-list
-        ref="userList"
+    <robot-list
         :load-on-init="true"
+        :query="query"
     >
         <template #header-title>
-            This is a slight overview of all users.
+            This is a slight overview of all robots.
         </template>
         <template #items="props">
             <b-table
@@ -88,18 +72,20 @@ export default {
                 </template>
                 <template #cell(options)="data">
                     <nuxt-link
-                        v-if="$auth.can('edit','user') || $auth.can('edit','user_permissions') || $auth.can('drop','user_permissions')"
+                        v-if="canEdit"
+                        v-b-tooltip="'Overview'"
+                        :to="'/admin/robots/'+data.item.id"
                         class="btn btn-xs btn-outline-primary"
-                        :to="'/admin/users/'+data.item.id"
                     >
                         <i class="fa fa-bars" />
                     </nuxt-link>
                     <button
-                        v-if="$auth.can('drop','user')"
+                        v-if="canDrop"
+                        v-b-tooltip="'Delete'"
+                        :disabled="props.itemBusy"
                         type="button"
                         class="btn btn-xs btn-outline-danger"
-                        title="Löschen"
-                        @click.prevent="drop(data.item)"
+                        @click.prevent="props.drop(data.item)"
                     >
                         <i class="fa fa-times" />
                     </button>
@@ -118,5 +104,5 @@ export default {
                 </template>
             </b-table>
         </template>
-    </user-list>
+    </robot-list>
 </template>

@@ -134,6 +134,18 @@ export const LayoutSideAdminNavigation : NavigationComponentConfig[] = [
                 ],
             },
             {
+                name: 'Robots',
+                type: 'link',
+                url: '/admin/robots',
+                icon: 'fas fa-robot',
+                [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                [LayoutKey.REQUIRED_PERMISSIONS]: [
+                    PermissionID.ROBOT_ADD,
+                    PermissionID.ROBOT_EDIT,
+                    PermissionID.ROBOT_DROP,
+                ],
+            },
+            {
                 name: 'Users',
                 type: 'link',
                 url: '/admin/users',

@@ -9,7 +9,7 @@ import {
     createNanoID,
 } from '@typescript-auth/domains';
 import {
-    helpers, maxLength, minLength, required,
+    helpers, maxLength, minLength,
 } from 'vuelidate/lib/validators';
 
 const validId = helpers.regex('validId', /^[a-zA-Z0-9_-]*$/);
@@ -18,6 +18,10 @@ export default {
     props: {
         nameProperty: {
             type: String,
+            default: undefined,
+        },
+        entityProperty: {
+            type: Object,
             default: undefined,
         },
     },
@@ -29,13 +33,15 @@ export default {
             },
             item: null,
             busy: false,
+            loaded: false,
+
+            secretHashed: false,
         };
     },
     validations: {
         form: {
             name: {
                 validId,
-                required,
                 minLength: minLength(3),
                 maxLength: maxLength(128),
             },
@@ -56,13 +62,40 @@ export default {
         isSecretEmpty() {
             return !this.form.secret || this.form.secret.length === 0;
         },
+        updatedAt() {
+            return this.entityProperty ? this.entityProperty.updated_at : undefined;
+        },
+    },
+    watch: {
+        updatedAt(val, oldVal) {
+            if (val && val !== oldVal) {
+                this.initFromEntityProperties();
+                this.initFromProperties();
+            }
+        },
     },
     created() {
         Promise.resolve()
+            .then(this.initFromEntityProperties)
             .then(this.find)
             .then(this.initFromProperties);
     },
     methods: {
+        initFromEntityProperties() {
+            if (!this.entityProperty) return;
+
+            if (this.item) {
+                const keys = Object.keys(this.entityProperty);
+                for (let i = 0; i < keys.length; i++) {
+                    this.item[keys[i]] = this.entityProperty[keys[i]];
+                }
+            } else {
+                this.item = this.entityProperty;
+                this.secretHashed = true;
+            }
+
+            this.loaded = true;
+        },
         initFromProperties() {
             if (this.nameProperty) {
                 this.form.name = this.nameProperty;
@@ -82,10 +115,11 @@ export default {
             }
         },
         generateSecret() {
-            this.form.secret = createNanoID('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_', 128);
+            this.form.secret = createNanoID('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_!.', 64);
+            this.secretHashed = false;
         },
         async find() {
-            if (this.busy || !this.nameFixed) {
+            if (this.busy || !this.nameFixed || this.item) {
                 return;
             }
 
@@ -104,11 +138,11 @@ export default {
                     this.item = data[0];
                 }
             } catch (e) {
-                console.log(e);
                 // ...
             }
 
             this.busy = false;
+            this.loaded = true;
         },
 
         async save() {
@@ -120,11 +154,21 @@ export default {
                 let response;
 
                 if (this.isEditing) {
+                    const { secret, ...form } = this.form;
+
                     response = await this.$authApi.robot.update(this.item.id, {
-                        ...this.form,
+                        ...form,
+                        ...(!this.secretHashed ? { secret } : {}),
                     });
 
-                    this.item = response;
+                    if (response.secret) {
+                        this.secretHashed = false;
+                    }
+
+                    const keys = Object.keys(response);
+                    for (let i = 0; i < keys.length; i++) {
+                        this.item[keys[i]] = response[keys[i]];
+                    }
 
                     this.$bvToast.toast('The robot was successfully updated.', {
                         variant: 'success',
@@ -184,24 +228,9 @@ export default {
         <p>
             Robot Credentials (ID & Secret) are required to authenticate and authorize against the API.
         </p>
-
-        <div
-            v-if="!busy && !item"
-            class="mb-2"
-        >
-            <button
-                type="button"
-                class="btn btn-success btn-xs"
-                :disabled="busy"
-                @click.prevent="save"
-            >
-                <i class="fa fa-plus" /> Add
-            </button>
-        </div>
-
         <hr>
 
-        <template v-if="busy">
+        <template v-if="!loaded">
             <div class="text-center">
                 <div
                     class="spinner-border"
@@ -212,51 +241,43 @@ export default {
             </div>
         </template>
         <template v-else>
-            <template v-if="item">
-                <h6>Details</h6>
+            <div
+                class="form-group"
+                :class="{ 'form-group-error': $v.form.name.$error }"
+            >
+                <label>Name</label>
+                <input
+                    v-model="$v.form.name.$model"
+                    type="text"
+                    name="name"
+                    class="form-control"
+                    :disabled="nameFixed"
+                    placeholder="..."
+                >
 
                 <div
-                    class="form-group"
-                    :class="{ 'form-group-error': $v.form.name.$error }"
+                    v-if="!$v.form.name.validId"
+                    class="form-group-hint group-required"
                 >
-                    <label>Name</label>
-                    <input
-                        v-model="$v.form.name.$model"
-                        type="text"
-                        name="name"
-                        class="form-control"
-                        :disabled="nameFixed"
-                        placeholder="..."
-                    >
-
-                    <div
-                        v-if="!$v.form.name.required && !$v.form.name.$model"
-                        class="form-group-hint group-required"
-                    >
-                        Enter an identifier.
-                    </div>
-                    <div
-                        v-if="!$v.form.name.validId"
-                        class="form-group-hint group-required"
-                    >
-                        The name is only allowed to consist of the following characters: [0-9a-z]+
-                    </div>
-                    <div
-                        v-if="!$v.form.name.minLength"
-                        class="form-group-hint group-required"
-                    >
-                        The length of the name must be greater than <strong>{{ $v.form.name.$params.minLength.min }}</strong> characters.
-                    </div>
-                    <div
-                        v-if="!$v.form.name.maxLength"
-                        class="form-group-hint group-required"
-                    >
-                        The length of the name must be less than <strong>{{ $v.form.name.$params.maxLength.max }}</strong> characters.
-                    </div>
+                    The name is only allowed to consist of the following characters: [0-9a-zA-Z_-]+
                 </div>
+                <div
+                    v-if="!$v.form.name.minLength"
+                    class="form-group-hint group-required"
+                >
+                    The length of the name must be greater than <strong>{{ $v.form.name.$params.minLength.min }}</strong> characters.
+                </div>
+                <div
+                    v-if="!$v.form.name.maxLength"
+                    class="form-group-hint group-required"
+                >
+                    The length of the name must be less than <strong>{{ $v.form.name.$params.maxLength.max }}</strong> characters.
+                </div>
+            </div>
 
-                <hr>
+            <hr>
 
+            <template v-if="item">
                 <div class="form-group">
                     <label>ID</label>
                     <input
@@ -266,82 +287,84 @@ export default {
                         :value="item.id"
                     >
                 </div>
+            </template>
+
+            <div
+                class="form-group"
+                :class="{ 'form-group-error': $v.form.secret.$error }"
+            >
+                <label>
+                    Secret
+                    <span
+                        v-if="secretHashed"
+                        class="text-danger font-weight-bold"
+                    >Hashed <i class="fa fa-exclamation-triangle" />
+                    </span>
+                </label>
+                <input
+                    v-model="$v.form.secret.$model"
+                    type="text"
+                    name="secret"
+                    class="form-control"
+                    placeholder="..."
+                >
 
                 <div
-                    class="form-group"
-                    :class="{ 'form-group-error': $v.form.secret.$error }"
+                    v-if="!$v.form.secret.minLength"
+                    class="form-group-hint group-required"
                 >
-                    <label>Secret</label>
-                    <input
-                        v-model="$v.form.secret.$model"
-                        type="text"
-                        name="secret"
-                        class="form-control"
-                        placeholder="..."
-                    >
-
-                    <div
-                        v-if="!$v.form.secret.required && !$v.form.secret.$model"
-                        class="form-group-hint group-required"
-                    >
-                        Provide a secret for the robot.
-                    </div>
-                    <div
-                        v-if="!$v.form.secret.minLength"
-                        class="form-group-hint group-required"
-                    >
-                        The length of the secret must be greater than <strong>{{ $v.form.secret.$params.minLength.min }}</strong> characters.
-                    </div>
-                    <div
-                        v-if="!$v.form.secret.maxLength"
-                        class="form-group-hint group-required"
-                    >
-                        The length of the secret must be less than <strong>{{ $v.form.secret.$params.maxLength.max }}</strong> characters.
-                    </div>
+                    The length of the secret must be greater than <strong>{{ $v.form.secret.$params.minLength.min }}</strong> characters.
                 </div>
                 <div
-                    class="alert alert-sm"
-                    :class="{
-                        'alert-warning': isSecretEmpty,
-                        'alert-success': !isSecretEmpty
-                    }"
+                    v-if="!$v.form.secret.maxLength"
+                    class="form-group-hint group-required"
                 >
-                    <div class="mb-1">
-                        If you don't want to chose an secret by your own, you can generate one.
-                    </div>
+                    The length of the secret must be less than <strong>{{ $v.form.secret.$params.maxLength.max }}</strong> characters.
+                </div>
+            </div>
+            <div class="mb-1">
+                <button
+                    class="btn btn-dark btn-xs"
+
+                    @click.prevent="generateSecret"
+                >
+                    <i class="fa fa-wrench" /> Generate
+                </button>
+            </div>
+
+            <div class="alert alert-warning">
+                The secret <i class="fa fa-key" /> is stored as <strong>hash</strong> in the database. Therefore, it is
+                not possible to inspect it after specification or generation.
+            </div>
+
+            <hr>
+
+            <div class="d-flex flex-row">
+                <div>
                     <button
-                        class="btn btn-dark btn-xs"
-                        @click.prevent="generateSecret"
+                        type="button"
+                        class="btn btn-xs"
+                        :class="{
+                            'btn-dark': isEditing,
+                            'btn-success': !isEditing
+                        }"
+                        :disabled="busy"
+                        @click.prevent="save"
                     >
-                        <i class="fa fa-wrench" /> Generate
+                        <i class="fa fa-save" /> {{ isEditing ? 'Save' : 'Create' }}
                     </button>
                 </div>
-
-                <hr>
-
-                <div class="d-flex flex-row">
-                    <div>
-                        <button
-                            type="button"
-                            class="btn btn-dark btn-xs"
-                            :disabled="busy"
-                            @click.prevent="save"
-                        >
-                            <i class="fa fa-save" /> Save
-                        </button>
-                    </div>
-                    <div class="ml-auto">
-                        <button
-                            type="button"
-                            class="btn btn-danger btn-xs"
-                            :disabled="busy"
-                            @click.prevent="drop"
-                        >
-                            <i class="fa fa-trash" /> Delete
-                        </button>
-                    </div>
+                <div class="ml-auto">
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-xs"
+                        :disabled="busy"
+                        @click.prevent="drop"
+                    >
+                        <i class="fa fa-trash" /> Delete
+                    </button>
                 </div>
-            </template>
+            </div>
         </template>
     </div>
 </template>

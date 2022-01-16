@@ -14,17 +14,20 @@ import { ServiceID } from '@personalhealthtrain/ui-common';
 import { MASTER_REALM_ID, createNanoID } from '@typescript-auth/domains';
 import { PHTStationRole, getPHTStationRolePermissions } from '../../config/pht/permissions/station';
 import { StationEntity } from '../../domains/core/station/entity';
+import { buildRobotAggregator } from '../../aggregators/robot';
 
 // ----------------------------------------------
 
 export class DatabaseRootSeeder implements Seeder {
     public async run(connection: Connection): Promise<any> {
         /**
-         * Create Robots
+         * Create robot accounts for services.
          */
 
-        const services : ServiceID[] = Object.values(ServiceID);
+        const robotAggregator = buildRobotAggregator();
+        robotAggregator.start();
 
+        const services : ServiceID[] = Object.values(ServiceID);
         const robotRepository = getRepository(RobotEntity);
         let robots = await robotRepository.createQueryBuilder('robot')
             .where({
@@ -36,7 +39,7 @@ export class DatabaseRootSeeder implements Seeder {
             .filter((service) => robots.findIndex((robot) => robot.name === service) === -1)
             .map((service) => robotRepository.create({
                 name: service,
-                secret: createNanoID(undefined, 128),
+                secret: createNanoID(undefined, 64),
                 realm_id: MASTER_REALM_ID,
             }));
 

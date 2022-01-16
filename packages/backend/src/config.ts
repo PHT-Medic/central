@@ -20,6 +20,7 @@ import { buildDispatcherAggregator } from './aggregators/dispatcher';
 import { buildCommandRouterComponent } from './components/command-router';
 import { buildTrainRouterAggregator } from './aggregators/train-router';
 import { ApiKey } from './config/api';
+import { buildRobotAggregator } from './aggregators/robot';
 
 interface ConfigContext {
     env: Environment
@@ -87,6 +88,8 @@ export function createConfig({ env } : ConfigContext) : Config {
     });
 
     const aggregators : {start: () => void}[] = [
+        buildRobotAggregator(),
+
         buildDispatcherAggregator(),
         buildTrainBuilderAggregator(),
         buildTrainResultAggregator(),
