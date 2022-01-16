@@ -21,6 +21,9 @@ export default {
         handleUpdated(e) {
             this.$emit('updated', e);
         },
+        handleDeleted(e) {
+            this.$emit('deleted', e);
+        },
     },
 };
 </script>
@@ -29,6 +32,7 @@ export default {
         <robot-form
             :entity-property="entityProperty"
             @updated="handleUpdated"
+            @deleted="handleDeleted"
         />
     </div>
 </template>

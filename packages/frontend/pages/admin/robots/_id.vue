@@ -59,6 +59,9 @@ export default {
                 this.entity[key] = e[key];
             }
         },
+        async handleDeleted() {
+            await this.$nuxt.$router.push('/admin/robots');
+        },
     },
 };
 </script>
@@ -98,6 +101,7 @@ export default {
         <nuxt-child
             :entity-property="entity"
             @updated="handleUpdated"
+            @deleted="handleDeleted"
         />
     </div>
 </template>

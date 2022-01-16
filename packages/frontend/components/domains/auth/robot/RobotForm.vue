@@ -120,6 +120,7 @@ export default {
         },
         async find() {
             if (this.busy || !this.nameFixed || this.item) {
+                this.loaded = true;
                 return;
             }
 
