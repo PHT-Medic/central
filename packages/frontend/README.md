@@ -1,4 +1,4 @@
-# UI - Frontend 🚀
+# UI - Frontend 🍭
 This repository contains the Central UI Frontend Application of the Personal Health Train (PHT).
 It communicates with some APIs of the PHT and need therefore to be configured properly, like described
 in the following sections.

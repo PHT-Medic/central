@@ -1,21 +1,22 @@
+# User Interface (UI) 🚀
+This repository contains all packages of the Central-UI in context of the Personal Health Train (PHT).
+
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-common.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-common)
 [![main](https://github.com/Tada5hi/pht-central-ui/actions/workflows/main.yml/badge.svg)](https://github.com/Tada5hi/pht-central-ui/actions/workflows/main.yml)
 [![CodeQL](https://github.com/PHT-Medic/central-ui/actions/workflows/codeql.yml/badge.svg)](https://github.com/PHT-Medic/central-ui/actions/workflows/codeql.yml)
 [![Known Vulnerabilities](https://snyk.io/test/github/Tada5hi/pht-central-ui/badge.svg)](https://snyk.io/test/github/Tada5hi/pht-central-ui)
-
-# User Interface (UI) 🚀
-This repository contains all packages of the Central-UI in context of the Personal Health Train (PHT).
 
 ![](assets/ui.jpg)
 
 **Table of Contents**
 
-- [Installation](#installation)
-- [Build](#build)
+- [Installation & Build](#installation--build)
 - [Configuration](#configuration)
-- [Run](#run)
+- [Packages](#packages)
+- [Usage](#usage)
 - [Credits](#credits)
 
-## Installation
+## Installation & Build
 Download the source code.
 
 ```shell
@@ -30,24 +31,43 @@ Nodejs is also required to install all dependencies, with the following command.
 $ npm i
 ```
 
-## Build
-Build the packages.
+Build all packages.
 
 ```shell
 $ npm run build
-$ npm run setup --workspace=packages/backend
 ```
 
 ## Configuration
-Read the `Readme.md` in each package directory.
+Read the `Readme.md` in each package directory and configure each package individually.
 
-## Run
-Start the frontend- & backend application in a single terminal window (or as background process) with the following command:
+## Packages
+
+### @personalhealthtrain/ui-backend 🌠
+This repository contains the backend application with REST API, aggregators, components and many more.
+
+### @personalhealthtrain/ui-common 📦
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-common.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-common)
+
+This repository contains common constants, functions, types, ... of the Personal Health Train (PHT) UI.
+
+### @personalhealthtrain/ui-frontend 🍭
+This repository contains the frontend application. 
+
+### @personalhealthtrain/ui-realtime 🌠
+This repository contains the realtime application which connects the backend application with socket based clients.
+
+## Usage
+Start the frontend-, backend-, & realtime-application in a single terminal window (or as background process) with the following command:
 ```shell
-$ npm run start --workspace=packages/backend
+$ npm run backend
 ```
+
 ```shell
-$ npm run start --workspace=packages/frontend
+$ npm run frontend
+```
+
+```shell
+$ npm run realtime
 ```
 
 ## Credits

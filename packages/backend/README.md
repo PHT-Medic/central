@@ -19,6 +19,12 @@ HARBOR_CONNECTION_STRING=<user>:<password>@<api url>
 
 ```
 
+## Setup
+
+```shell
+$ npm run cli -- setup
+```
+
 ## Credits
 If you have any questions, feel free to contact the author [Peter Placzek](https://github.com/Tada5hi) of the project.
 The project was initially developed during his bachelor thesis, and he worked after that as employee
