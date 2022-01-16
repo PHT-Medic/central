@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './api';
 export * from './config';
 export * from './domains';
 export * from './modules';

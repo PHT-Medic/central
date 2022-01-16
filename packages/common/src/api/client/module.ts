@@ -10,15 +10,10 @@ import {
     MasterImageAPI,
     MasterImageGroupAPI,
     ProposalAPI,
-    ProposalStationAPI,
-    ServiceAPI,
+    ProposalStationAPI, ServiceAPI,
     StationAPI,
-    TrainAPI,
-    TrainFileAPI,
-    TrainResultAPI,
-    TrainStationAPI,
-    UserSecretAPI,
-} from '@personalhealthtrain/ui-common';
+    TrainAPI, TrainFileAPI, TrainResultAPI, TrainStationAPI, UserSecretAPI,
+} from '../../domains';
 
 export class APIClient extends TrapiClient {
     public readonly masterImage : MasterImageAPI;

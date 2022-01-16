@@ -5,8 +5,4 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { APIClient } from '@typescript-auth/domains';
-
-export class AuthAPIClient extends APIClient {
-
-}
+export * from './module';

@@ -11,8 +11,8 @@ import {
 import { Context } from '@nuxt/types';
 import https from 'https';
 import { Inject } from '@nuxt/types/app';
-import { APIClient } from '../modules/api';
-import { AuthAPIClient } from '../modules/api/auth';
+import { APIClient as AuthAPIClient } from '@typescript-auth/domains';
+import { APIClient } from '@personalhealthtrain/ui-common';
 
 declare module '@nuxt/types' {
     interface Context {
