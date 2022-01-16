@@ -199,7 +199,7 @@ export const LayoutSideAdminNavigation : NavigationComponentConfig[] = [
                 name: 'Services',
                 type: 'link',
                 url: '/admin/services',
-                icon: 'fas fa-concierge-bell',
+                icon: 'fa fa-map-signs',
                 [LayoutKey.REQUIRED_LOGGED_IN]: true,
                 [LayoutKey.REQUIRED_PERMISSIONS]: [
                     PermissionID.SERVICE_MANAGE,

@@ -10,6 +10,7 @@ import { setConfig } from 'amqp-extension';
 import { Redis, setRedisConfig, useRedisInstance } from 'redis-extension';
 import { ROBOT_SECRET_ENGINE_KEY, ServiceID, VaultAPI } from '@personalhealthtrain/ui-common';
 import https from 'https';
+import { ErrorCode } from '@typescript-auth/domains';
 import { Environment } from './env';
 
 interface ConfigContext {
@@ -64,7 +65,7 @@ export function createConfig({ env } : ConfigContext) : Config {
 
             if (
                 err.response.status === 401 ||
-                    err.response.status === 403
+                err.response.status === 403
             ) {
                 const robot = await useTrapiClient<VaultAPI>('vault').keyValue
                     .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM);

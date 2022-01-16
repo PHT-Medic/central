@@ -40,7 +40,7 @@ export default {
                     id: ServiceID.REGISTRY, name: 'Image Registry', icon: 'fab fa-docker', version: 'v2.4.0',
                 },
                 {
-                    id: ServiceID.SECRET_STORAGE, name: 'Secret Storage', icon: 'fas fa-user-secret', version: 'v1.8.4',
+                    id: ServiceID.SECRET_STORAGE, name: 'Secret Storage', icon: 'fas fa-key', version: 'v1.8.4',
                 },
                 {
                     id: ServiceID.GITHUB, name: 'Github', icon: 'fab fa-github', version: 'v1.0.0',
