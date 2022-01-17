@@ -14,8 +14,10 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { TrainFile } from '@personalhealthtrain/ui-common';
+import { Train, TrainFile } from '@personalhealthtrain/ui-common';
 import { RealmEntity, UserEntity } from '@typescript-auth/server';
+// eslint-disable-next-line import/no-cycle
+import { Realm, User } from '@typescript-auth/domains';
 import { TrainEntity } from '../train/entity';
 
 @Entity({ name: 'train_files' })
@@ -46,21 +48,21 @@ export class TrainFileEntity implements TrainFile {
     // ------------------------------------------------------------------
 
     @Column()
-        user_id: string;
+        user_id: User['id'];
 
     @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
         user: UserEntity;
 
     @Column()
-        train_id: string;
+        train_id: Train['id'];
 
     @ManyToOne(() => TrainEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'train_id' })
         train: TrainEntity;
 
     @Column({ nullable: true })
-        realm_id: string;
+        realm_id: Realm['id'];
 
     @ManyToOne(() => RealmEntity, { onDelete: 'SET NULL' })
     @JoinColumn({ name: 'realm_id' })

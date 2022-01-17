@@ -18,13 +18,14 @@ import {
 } from 'typeorm';
 import { Station, createNanoID } from '@personalhealthtrain/ui-common';
 import { RealmEntity } from '@typescript-auth/server';
+import { Realm } from '@typescript-auth/domains';
 import { TrainStationEntity } from '../train-station/entity';
 import { ProposalStationEntity } from '../proposal-station/entity';
 
 @Entity({ name: 'stations' })
 export class StationEntity implements Station {
-    @PrimaryGeneratedColumn()
-        id: number;
+    @PrimaryGeneratedColumn('uuid')
+        id: string;
 
     @Index()
     @Column({
@@ -59,9 +60,6 @@ export class StationEntity implements Station {
     @Column({ default: false, select: false })
         registry_project_webhook_exists: boolean;
 
-    @Column({ default: false, select: false })
-        vault_public_key_saved: boolean;
-
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
@@ -73,7 +71,7 @@ export class StationEntity implements Station {
     // ------------------------------------------------------------------
 
     @Column()
-        realm_id: string;
+        realm_id: Realm['id'];
 
     @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'realm_id' })

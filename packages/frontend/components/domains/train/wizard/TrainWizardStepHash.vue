@@ -72,7 +72,7 @@ export default {
                 const train = await this.$api.train.runCommand(this.train.id, TrainCommand.GENERATE_HASH);
 
                 this.setHash(train.hash);
-                this.$emit('hashGenerated', this.form.hash);
+                this.$emit('generated', this.form.hash);
             } catch (e) {
                 console.log(e);
             }
@@ -96,7 +96,7 @@ export default {
         //---------------------------------
 
         handleHashSigned() {
-            this.$emit('setHashSigned', this.form.hash_signed);
+            this.$emit('signed', this.form.hash_signed);
         },
     },
 };

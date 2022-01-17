@@ -14,8 +14,15 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { TrainStation, TrainStationApprovalStatus, TrainStationRunStatus } from '@personalhealthtrain/ui-common';
+import {
+    Station,
+    Train,
+    TrainStation,
+    TrainStationApprovalStatus,
+    TrainStationRunStatus,
+} from '@personalhealthtrain/ui-common';
 import { RealmEntity } from '@typescript-auth/server';
+import { Realm } from '@typescript-auth/domains';
 import { TrainEntity } from '../train/entity';
 import { StationEntity } from '../station/entity';
 
@@ -51,28 +58,28 @@ export class TrainStationEntity implements TrainStation {
     // ------------------------------------------------------------------
 
     @Column()
-        train_id: string;
+        train_id: Train['id'];
 
     @ManyToOne(() => TrainEntity, (train) => train.train_stations, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'train_id' })
         train: TrainEntity;
 
     @Column()
-        train_realm_id: string;
+        train_realm_id: Realm['id'];
 
     @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'train_realm_id' })
         train_realm: RealmEntity;
 
     @Column()
-        station_id: number;
+        station_id: Station['id'];
 
     @ManyToOne(() => StationEntity, (station) => station.train_stations, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'station_id' })
         station: StationEntity;
 
     @Column()
-        station_realm_id: string;
+        station_realm_id: Realm['id'];
 
     @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'station_realm_id' })

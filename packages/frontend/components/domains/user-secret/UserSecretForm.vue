@@ -18,7 +18,7 @@ export default {
     },
     props: {
         userId: {
-            type: Number,
+            type: String,
             default: undefined,
         },
         entityProperty: {

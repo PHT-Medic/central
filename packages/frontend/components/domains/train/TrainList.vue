@@ -21,7 +21,7 @@ export default {
     },
     props: {
         proposalId: {
-            type: Number,
+            type: String,
             default: undefined,
         },
         trainAddTo: {

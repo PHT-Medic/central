@@ -6,8 +6,8 @@
  */
 
 import { setTrapiClientConfig, useTrapiClient } from '@trapi/client';
-import { setConfig } from 'amqp-extension';
-import { Redis, setRedisConfig, useRedisInstance } from 'redis-extension';
+import { setConfig as setAmqpConfig } from 'amqp-extension';
+import { Client, setConfig as setRedisConfig, useClient } from 'redis-extension';
 import { ROBOT_SECRET_ENGINE_KEY, ServiceID, VaultAPI } from '@personalhealthtrain/ui-common';
 import https from 'https';
 import { ErrorCode } from '@typescript-auth/domains';
@@ -18,9 +18,9 @@ interface ConfigContext {
 }
 
 export type Config = {
-    redisDatabase: Redis,
-    redisPub: Redis,
-    redisSub: Redis,
+    redisDatabase: Client,
+    redisPub: Client,
+    redisSub: Client,
 
     aggregators: {start: () => void}[]
     components: {start: () => void}[]
@@ -29,11 +29,11 @@ export type Config = {
 export function createConfig({ env } : ConfigContext) : Config {
     setRedisConfig('default', { connectionString: env.redisConnectionString });
 
-    const redisDatabase = useRedisInstance('default');
+    const redisDatabase = useClient('default');
     const redisPub = redisDatabase.duplicate();
     const redisSub = redisDatabase.duplicate();
 
-    setConfig({
+    setAmqpConfig({
         connection: env.rabbitMqConnectionString,
         exchange: {
             name: 'pht',

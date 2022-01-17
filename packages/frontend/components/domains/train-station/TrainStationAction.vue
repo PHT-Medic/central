@@ -11,7 +11,7 @@ import { BDropdownItem } from 'bootstrap-vue';
 export default {
     name: 'TrainStationAction',
     props: {
-        trainStationId: String | Number,
+        trainStationId: String,
         approvalStatus: String,
         action: String,
         actionType: {

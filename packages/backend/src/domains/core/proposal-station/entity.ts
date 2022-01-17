@@ -8,8 +8,11 @@
 import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
-import { ProposalStation, ProposalStationApprovalStatus } from '@personalhealthtrain/ui-common';
+import {
+    Proposal, ProposalStation, ProposalStationApprovalStatus, Station,
+} from '@personalhealthtrain/ui-common';
 import { RealmEntity } from '@typescript-auth/server';
+import { Realm } from '@typescript-auth/domains';
 import { ProposalEntity } from '../proposal/entity';
 import { StationEntity } from '../station/entity';
 
@@ -35,21 +38,21 @@ export class ProposalStationEntity implements ProposalStation {
     // ------------------------------------------------------------------
 
     @Column()
-        proposal_id: number;
+        proposal_id: Proposal['id'];
 
     @ManyToOne(() => ProposalEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'proposal_id' })
         proposal: ProposalEntity;
 
     @Column()
-        proposal_realm_id: string;
+        proposal_realm_id: Realm['id'];
 
     @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'proposal_realm_id' })
         proposal_realm: RealmEntity;
 
     @Column()
-        station_id: number;
+        station_id: Station['id'];
 
     @ManyToOne(() => StationEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'station_id' })

@@ -17,8 +17,9 @@ import {
     Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import { UserEntity } from '@typescript-auth/server';
+import { RealmEntity, UserEntity } from '@typescript-auth/server';
 import { SecretType, UserSecret } from '@personalhealthtrain/ui-common';
+import { Realm, User } from '@typescript-auth/domains';
 
 @Unique('keyUserId', [
     'key',
@@ -26,8 +27,8 @@ import { SecretType, UserSecret } from '@personalhealthtrain/ui-common';
 ])
 @Entity({ name: 'user_secrets' })
 export class UserSecretEntity implements UserSecret {
-    @PrimaryGeneratedColumn()
-        id: number;
+    @PrimaryGeneratedColumn('uuid')
+        id: string;
 
     @Column({ type: 'varchar', length: 100 })
         key: string;
@@ -50,11 +51,18 @@ export class UserSecretEntity implements UserSecret {
         content: string;
 
     @Column()
-        user_id: string;
+        user_id: User['id'];
 
     @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
         user: UserEntity;
+
+    @Column()
+        realm_id: Realm['id'];
+
+    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'realm_id' })
+        realm: RealmEntity;
 
     @CreateDateColumn()
         created_at: Date;

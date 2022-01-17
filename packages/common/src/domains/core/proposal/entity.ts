@@ -10,7 +10,7 @@ import { MasterImage } from '../master-image';
 import { ProposalStation } from '../proposal-station';
 
 export interface Proposal {
-    id: number;
+    id: string;
 
     title: string;
 
@@ -30,15 +30,15 @@ export interface Proposal {
 
     // ------------------------------------------------------------------
 
-    realm_id: string;
+    realm_id: Realm['id'];
 
     realm: Realm;
 
-    user_id: string;
+    user_id: User['id'];
 
     user: User;
 
-    master_image_id: string | null;
+    master_image_id: MasterImage['id'] | null;
 
     master_image: MasterImage;
 

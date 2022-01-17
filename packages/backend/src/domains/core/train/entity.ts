@@ -20,17 +20,22 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import {
+    MasterImage,
+    Proposal,
+    Station,
     Train,
     TrainBuildErrorCode,
     TrainBuildStatus,
-    TrainConfigurationStatus, TrainResultStatus, TrainRunErrorCode,
-    TrainRunStatus,
+    TrainConfigurationStatus, TrainFile, TrainResult, TrainResultStatus, TrainRunErrorCode,
+    TrainRunStatus, UserSecret,
 } from '@personalhealthtrain/ui-common';
 import { RealmEntity, UserEntity } from '@typescript-auth/server';
+import { Realm, User } from '@typescript-auth/domains';
 import { ProposalEntity } from '../proposal/entity';
 import { MasterImageEntity } from '../master-image/entity';
 import { TrainFileEntity } from '../train-file/entity';
 import { TrainStationEntity } from '../train-station/entity';
+import { UserSecretEntity } from '../../auth/user-secret/entity';
 
 @Entity()
 export class TrainEntity implements Train {
@@ -57,7 +62,7 @@ export class TrainEntity implements Train {
         session_id: string;
 
     @Column({ nullable: true })
-        entrypoint_file_id: number;
+        entrypoint_file_id: TrainFile['id'];
 
     @OneToOne(() => TrainFileEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'entrypoint_file_id' })
@@ -129,7 +134,7 @@ export class TrainEntity implements Train {
     @Column({
         type: 'integer', unsigned: true, nullable: true, default: null,
     })
-        run_station_id: number | null;
+        run_station_id: Station['id'] | null;
 
     @Column({
         type: 'integer', unsigned: true, nullable: true, default: null,
@@ -152,23 +157,41 @@ export class TrainEntity implements Train {
     // ------------------------------------------------------------------
 
     @Column()
-        realm_id: string;
+        realm_id: Realm['id'];
 
     @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'realm_id' })
         realm: RealmEntity;
 
-    @Column()
-        user_id: string;
+    // ------------------------------------------------------------------
 
-    @ManyToOne(() => UserEntity, { nullable: true, onDelete: 'CASCADE' })
+    @Column({ nullable: true, type: 'uuid' })
+        user_rsa_secret_id: UserSecret['id'];
+
+    @ManyToOne(() => UserSecretEntity, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'user_rsa_secret_id' })
+        user_rsa_secret: UserSecretEntity | null;
+
+    @Column({ nullable: true, type: 'uuid' })
+        user_paillier_secret_id: UserSecret['id'];
+
+    @ManyToOne(() => UserSecretEntity, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'user_paillier_secret_id' })
+        user_paillier_secret_: UserSecretEntity | null;
+
+    // ------------------------------------------------------------------
+
+    @Column({ nullable: true, type: 'uuid' })
+        user_id: User['id'];
+
+    @ManyToOne(() => UserEntity, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'user_id' })
         user: UserEntity;
 
     // ------------------------------------------------------------------
 
     @Column({ type: 'uuid', nullable: true, default: null })
-        result_last_id: string;
+        result_last_id: TrainResult['id'];
 
     @Column({
         type: 'enum', nullable: true, default: null, enum: TrainResultStatus,
@@ -176,8 +199,8 @@ export class TrainEntity implements Train {
         result_last_status: TrainResultStatus | null;
 
     // ------------------------------------------------------------------
-    @Column()
-        proposal_id: number;
+    @Column({ type: 'uuid' })
+        proposal_id: Proposal['id'];
 
     @ManyToOne(() => ProposalEntity, (proposal) => proposal.trains, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'proposal_id' })
@@ -190,8 +213,8 @@ export class TrainEntity implements Train {
 
     // ------------------------------------------------------------------
 
-    @Column({ nullable: true })
-        master_image_id: string | null;
+    @Column({ nullable: true, type: 'uuid' })
+        master_image_id: MasterImage['id'] | null;
 
     @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'master_image_id' })

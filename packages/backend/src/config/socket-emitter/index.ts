@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useRedisInstance } from 'redis-extension';
+import { useClient } from 'redis-extension';
 import { Emitter } from '@socket.io/redis-emitter';
 import { SocketServerToClientEvents } from '@personalhealthtrain/ui-common';
 
@@ -16,7 +16,7 @@ export function useSocketEmitter() : Emitter<SocketServerToClientEvents> {
         return instance;
     }
 
-    instance = new Emitter<SocketServerToClientEvents>(useRedisInstance('default'));
+    instance = new Emitter<SocketServerToClientEvents>(useClient('default'));
 
     return instance;
 }

@@ -9,7 +9,7 @@ import { Realm, User } from '@typescript-auth/domains';
 import { MasterImage } from '../master-image';
 import { Proposal } from '../proposal';
 import { TrainFile } from '../train-file';
-import { TrainResultStatus } from '../train-result';
+import { TrainResult, TrainResultStatus } from '../train-result';
 import { TrainStation } from '../train-station';
 import {
     TrainBuildErrorCode,
@@ -18,6 +18,8 @@ import {
     TrainRunErrorCode,
     TrainRunStatus,
 } from './constants';
+import { UserSecret } from '../../auth';
+import { Station } from '../station';
 
 export interface Train {
     id: string;
@@ -34,7 +36,7 @@ export interface Train {
 
     session_id: string | null;
 
-    entrypoint_file_id: number | string;
+    entrypoint_file_id: TrainFile['id'];
 
     entrypoint_file: TrainFile;
 
@@ -56,7 +58,7 @@ export interface Train {
 
     run_status: TrainRunStatus | null;
 
-    run_station_id: number | null;
+    run_station_id: Station['id'] | null;
 
     run_station_index: number | null;
 
@@ -70,22 +72,32 @@ export interface Train {
 
     // ------------------------------------------------------------------
 
-    realm_id: string;
+    realm_id: Realm['id'];
 
     realm: Realm;
 
-    user_id: string;
+    user_id: User['id'];
 
     user: User;
 
     // ------------------------------------------------------------------
 
-    result_last_id: string;
+    user_rsa_secret_id: UserSecret['id'];
+
+    user_rsa_secret: UserSecret | null;
+
+    user_paillier_secret_id: UserSecret['id'];
+
+    user_paillier_secret_: UserSecret | null;
+
+    // ------------------------------------------------------------------
+
+    result_last_id: TrainResult['id'] | null;
 
     result_last_status: TrainResultStatus | null;
 
     // ------------------------------------------------------------------
-    proposal_id: number;
+    proposal_id: Proposal['id'];
 
     proposal: Proposal;
 
@@ -95,7 +107,7 @@ export interface Train {
 
     // ------------------------------------------------------------------
 
-    master_image_id: string | null;
+    master_image_id: MasterImage['id'] | null;
 
     master_image: MasterImage;
 }

@@ -6,11 +6,9 @@
  */
 
 import {
-    MasterImage, Station, Train,
+    MasterImage, Station, Train, UserSecret,
 } from '@personalhealthtrain/ui-common';
-import {
-    UserEntity,
-} from '@typescript-auth/server';
+import { User } from '@typescript-auth/domains';
 
 export enum TrainBuilderCommand {
     START = 'trainBuildStart',
@@ -19,9 +17,12 @@ export enum TrainBuilderCommand {
 }
 
 export type TrainBuilderStartPayload = {
-    userId: typeof UserEntity.prototype.id,
+    id: Train['id'],
 
-    trainId: Train['id'],
+    userId: User['id'],
+    userRSASecretId: UserSecret['id'],
+    userPaillierSecretId: UserSecret['id'],
+
     buildId: Train['build_id'],
     proposalId: Train['proposal_id'],
     sessionId: Train['session_id'],
@@ -37,7 +38,5 @@ export type TrainBuilderStartPayload = {
 
     files: string[],
 
-    stations: Station['secure_id'][],
-
-    user_he_key: string // todo: this should be camelcase and be removed
+    stations: Station['secure_id'][]
 };

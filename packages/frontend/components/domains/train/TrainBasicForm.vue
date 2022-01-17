@@ -14,7 +14,7 @@ export default {
     components: { ProposalListItem, ProposalList },
     props: {
         proposalId: {
-            type: Number,
+            type: String,
             default: undefined,
         },
         realmId: {

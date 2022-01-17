@@ -13,10 +13,10 @@ import {
 
 import { NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
-import { HarborHook, postHarborHookRouteHandler } from './registry/hook';
+import { HarborHook, postHarborHookRouteHandler } from './handlers/registry/hook';
 
-import { doRegistryCommand } from './registry/command';
-import { doSecretStorageCommand } from './secret-storage/command';
+import { doRegistryCommand } from './handlers/registry/command';
+import { doSecretStorageCommand } from './handlers/secret-storage/command';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 
 @SwaggerTags('extra')

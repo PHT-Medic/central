@@ -13,7 +13,7 @@ API_URL=http://localhost:<port>/
 
 REDIS_CONNECTION_STRING=redis://<username>:<password>@<host>
 RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
-
+VAULT_CONNECTION_STRING=<token>@<url>/v1/
 ```
 
 ## Credits

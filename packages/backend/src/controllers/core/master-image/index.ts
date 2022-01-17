@@ -4,20 +4,19 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-
-import { getRepository } from 'typeorm';
-import { applyFilters, applyPagination } from 'typeorm-extension';
-import { MasterImage, MasterImageCommand, PermissionID } from '@personalhealthtrain/ui-common';
+import { MasterImage, MasterImageCommand } from '@personalhealthtrain/ui-common';
 
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
 import { SwaggerTags } from '@trapi/swagger';
-import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
-import { handleMasterImageCommandRouteHandler } from './command';
-import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
-import { MasterImageEntity } from '../../../domains/core/master-image/entity';
+import { commandMasterImageRouteHandler } from './handlers/command';
+import {
+    deleteMasterImageRouteHandler,
+    getManyMasterImageRouteHandler,
+    getOneMasterImageRouteHandler,
+} from './handlers';
 
 type PartialMasterImage = Partial<MasterImage>;
 
@@ -29,7 +28,7 @@ export class MasterImageController {
         @Request() req: any,
             @Response() res: any,
     ): Promise<PartialMasterImage[]> {
-        return await getManyRouteHandler(req, res) as PartialMasterImage[];
+        return await getManyMasterImageRouteHandler(req, res) as PartialMasterImage[];
     }
 
     @Get('/:id', [ForceLoggedInMiddleware])
@@ -38,7 +37,7 @@ export class MasterImageController {
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialMasterImage | undefined> {
-        return await getRouteHandler(req, res) as PartialMasterImage | undefined;
+        return await getOneMasterImageRouteHandler(req, res) as PartialMasterImage | undefined;
     }
 
     @Post('/command', [ForceLoggedInMiddleware])
@@ -49,7 +48,7 @@ export class MasterImageController {
     @Request() req: any,
     @Response() res: any,
     ) {
-        return handleMasterImageCommandRouteHandler(req, res);
+        return commandMasterImageRouteHandler(req, res);
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
@@ -58,67 +57,6 @@ export class MasterImageController {
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialMasterImage | undefined> {
-        return dropRouteHandler(req, res);
+        return deleteMasterImageRouteHandler(req, res);
     }
-}
-
-export async function getRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
-
-    const repository = getRepository(MasterImageEntity);
-
-    const entity = await repository.findOne(id);
-
-    if (typeof entity === 'undefined') {
-        throw new NotFoundError();
-    }
-
-    return res.respond({ data: entity });
-}
-
-export async function getManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { page, filter } = req.query;
-
-    const repository = getRepository(MasterImageEntity);
-    const query = repository.createQueryBuilder('image');
-
-    applyFilters(query, filter, {
-        allowed: ['id', 'name', 'path', 'virtual_path', 'group_virtual_path'],
-    });
-
-    const pagination = applyPagination(query, page, { maxLimit: 50 });
-
-    query.addOrderBy('image.path', 'ASC');
-
-    const [entities, total] = await query.getManyAndCount();
-
-    return res.respond({
-        data: {
-            data: entities,
-            meta: {
-                total,
-                ...pagination,
-            },
-        },
-    });
-}
-
-export async function dropRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
-
-    if (!req.ability.hasPermission(PermissionID.MASTER_IMAGE_MANAGE)) {
-        throw new ForbiddenError();
-    }
-
-    const repository = getRepository(MasterImageEntity);
-
-    const entity = await repository.findOne(id);
-
-    if (typeof entity === 'undefined') {
-        throw new NotFoundError();
-    }
-
-    await repository.delete(entity.id);
-
-    return res.respondDeleted({ data: entity });
 }

@@ -27,15 +27,15 @@ export interface TrainFile {
 
     // ------------------------------------------------------------------
 
-    user_id: string;
+    user_id: User['id'];
 
     user: User;
 
-    train_id: string;
+    train_id: Train['id'];
 
     train: Train;
 
-    realm_id: string;
+    realm_id: Realm['id'];
 
     realm: Realm;
 }

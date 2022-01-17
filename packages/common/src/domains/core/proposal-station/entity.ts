@@ -25,19 +25,19 @@ export interface ProposalStation {
 
     // ------------------------------------------------------------------
 
-    proposal_id: number;
+    proposal_id: Proposal['id'];
 
     proposal: Proposal;
 
-    proposal_realm_id: string;
+    proposal_realm_id: Realm['id'];
 
     proposal_realm: Realm;
 
-    station_id: number;
+    station_id: Station['id'];
 
     station: Station;
 
-    station_realm_id: string;
+    station_realm_id: Realm['id'];
 
     station_realm: Realm;
 }

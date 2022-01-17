@@ -111,7 +111,6 @@ export default {
                             minLength: minLength(1),
                             $each: {
                                 required,
-                                integer,
                             },
                         },
                     },

@@ -22,8 +22,8 @@
     "dependencies": {
         "@trapi/client": "^1.0.4",
         "@trapi/query": "^2.0.3",
-        "@typescript-auth/core": "^1.0.5",
-        "@typescript-auth/domains": "^0.0.9",
+        "@typescript-auth/core": "^1.1.1",
+        "@typescript-auth/domains": "^0.0.11",
         "axios": "^0.24.0",
         "nanoid": "^3.1.30"
     },

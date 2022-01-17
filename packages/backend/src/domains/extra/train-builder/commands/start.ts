@@ -8,13 +8,10 @@
 import { getRepository } from 'typeorm';
 
 import {
-    SecretType,
     Train,
-    TrainFile,
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/ui-common';
 import { TrainBuilderStartPayload } from '../type';
-import { UserSecretEntity } from '../../../auth/user-secret/entity';
 import { MasterImageEntity } from '../../../core/master-image/entity';
 import { MasterImageGroupEntity } from '../../../core/master-image-group/entity';
 import { TrainFileEntity } from '../../../core/train-file/entity';
@@ -22,8 +19,13 @@ import { TrainStationEntity } from '../../../core/train-station/entity';
 
 export async function buildTrainBuilderStartCommandPayload(train: Train) : Promise<Partial<TrainBuilderStartPayload>> {
     const message : Partial<TrainBuilderStartPayload> = {
+        id: train.id,
+
         userId: train.user_id,
-        trainId: train.id,
+
+        userRSASecretId: train.user_rsa_secret_id,
+        userPaillierSecretId: train.user_paillier_secret_id,
+
         buildId: train.build_id,
         proposalId: train.proposal_id,
         sessionId: train.session_id,
@@ -31,16 +33,6 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
         hashSigned: train.hash_signed,
         query: train.query,
     };
-
-    // ----------------------------------------------------
-
-    const userSecretRepository = getRepository(UserSecretEntity);
-    const userSecret = await userSecretRepository.findOne({
-        user_id: train.user_id,
-        type: SecretType.PAILLIER_PUBLIC_KEY,
-    });
-
-    message.user_he_key = userSecret ? userSecret.content : null;
 
     // ----------------------------------------------------
 
@@ -71,11 +63,11 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
     // ----------------------------------------------------
 
     const filesRepository = getRepository(TrainFileEntity);
-    const files: TrainFile[] = await filesRepository
+    const files: TrainFileEntity[] = await filesRepository
         .createQueryBuilder('file')
         .where('file.train_id = :id', { id: train.id })
         .getMany();
-    message.files = files.map((file: TrainFile) => `${file.directory}/${file.name}`);
+    message.files = files.map((file: TrainFileEntity) => `${file.directory}/${file.name}`);
 
     // ----------------------------------------------------
 

@@ -33,19 +33,19 @@ export interface TrainStation {
 
     // ------------------------------------------------------------------
 
-    train_id: string;
+    train_id: Train['id'];
 
     train: Train;
 
-    train_realm_id: string;
+    train_realm_id: Realm['id'];
 
     train_realm: Realm;
 
-    station_id: number;
+    station_id: Station['id'];
 
     station: Station;
 
-    station_realm_id: string;
+    station_realm_id: Realm['id'];
 
     station_realm: Realm;
 }

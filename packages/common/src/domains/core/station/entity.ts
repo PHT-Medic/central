@@ -10,7 +10,7 @@ import { ProposalStation } from '../proposal-station';
 import { TrainStation } from '../train-station';
 
 export interface Station {
-    id: number;
+    id: string;
 
     secure_id: string;
 
@@ -30,8 +30,6 @@ export interface Station {
 
     registry_project_webhook_exists: boolean;
 
-    vault_public_key_saved: boolean;
-
     // ------------------------------------------------------------------
 
     created_at: Date;
@@ -40,7 +38,7 @@ export interface Station {
 
     // ------------------------------------------------------------------
 
-    realm_id: string;
+    realm_id: Realm['id'];
 
     realm: Realm;
 

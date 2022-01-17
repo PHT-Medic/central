@@ -8,15 +8,16 @@
 import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
-import { Proposal } from '@personalhealthtrain/ui-common';
+import { MasterImage, Proposal } from '@personalhealthtrain/ui-common';
 import { RealmEntity, UserEntity } from '@typescript-auth/server';
+import { Realm, User } from '@typescript-auth/domains';
 import { ProposalStationEntity } from '../proposal-station/entity';
 import { MasterImageEntity } from '../master-image/entity';
 
 @Entity({ name: 'proposals' })
 export class ProposalEntity implements Proposal {
-    @PrimaryGeneratedColumn()
-        id: number;
+    @PrimaryGeneratedColumn('uuid')
+        id: string;
 
     @Column({ type: 'varchar', length: 256 })
         title: string;
@@ -44,21 +45,21 @@ export class ProposalEntity implements Proposal {
     // ------------------------------------------------------------------
 
     @Column()
-        realm_id: string;
+        realm_id: Realm['id'];
 
     @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'realm_id' })
         realm: RealmEntity;
 
     @Column()
-        user_id: string;
+        user_id: User['id'];
 
     @ManyToOne(() => UserEntity, { onDelete: 'CASCADE', nullable: true })
     @JoinColumn({ name: 'user_id' })
         user: UserEntity;
 
     @Column({ nullable: true })
-        master_image_id: string | null;
+        master_image_id: MasterImage['id'] | null;
 
     @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'master_image_id' })

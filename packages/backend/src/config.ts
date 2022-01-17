@@ -9,9 +9,9 @@ import {
     HarborAPI, ProxyConnectionConfig, VaultAPI, detectProxyConnectionConfig,
 } from '@personalhealthtrain/ui-common';
 import { setTrapiClientConfig } from '@trapi/client';
-import { setConfig } from 'amqp-extension';
+import { setConfig as setAmqpConfig } from 'amqp-extension';
 import https from 'https';
-import { Redis, setRedisConfig, useRedisInstance } from 'redis-extension';
+import { Client, setConfig as setRedisConfig, useClient } from 'redis-extension';
 import { buildDispatcherComponent } from './components/event-dispatcher';
 import { Environment } from './env';
 import { buildTrainBuilderAggregator } from './aggregators/train-builder';
@@ -27,9 +27,9 @@ interface ConfigContext {
 }
 
 export type Config = {
-    redisDatabase: Redis,
-    redisPub: Redis,
-    redisSub: Redis,
+    redisDatabase: Client,
+    redisPub: Client,
+    redisSub: Client,
 
     aggregators: {start: () => void}[]
     components: {start: () => void}[]
@@ -75,11 +75,11 @@ export function createConfig({ env } : ConfigContext) : Config {
 
     setRedisConfig('default', { connectionString: env.redisConnectionString });
 
-    const redisDatabase = useRedisInstance('default');
+    const redisDatabase = useClient('default');
     const redisPub = redisDatabase.duplicate();
     const redisSub = redisDatabase.duplicate();
 
-    setConfig({
+    setAmqpConfig({
         connection: env.rabbitMqConnectionString,
         exchange: {
             name: 'pht',

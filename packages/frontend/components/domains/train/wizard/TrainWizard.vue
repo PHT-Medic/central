@@ -222,8 +222,8 @@ export default {
         },
         async canPassHashWizardStep() {
             if (
-                !this.entity.hash ||
-                this.entity.hash.length === 0
+                !this.form.hash ||
+                this.form.hash.length === 0
             ) {
                 throw new Error('The hash is not generated yet or is maybe still in process.');
             }
@@ -390,8 +390,8 @@ export default {
                     <train-wizard-hash-step
                         ref="wizard-hash-step"
                         :train="entity"
-                        @hashGenerated="setHash"
-                        @setHashSigned="setHashSigned"
+                        @generated="setHash"
+                        @signed="setHashSigned"
                     />
                 </tab-content>
 

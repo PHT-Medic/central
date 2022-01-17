@@ -22,7 +22,7 @@ export default {
     },
     props: {
         stationId: {
-            type: Number,
+            type: String,
             default: undefined,
         },
     },

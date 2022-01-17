@@ -5,117 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getRepository } from 'typeorm';
-import { applyFilters } from 'typeorm-extension';
 import {
-    PermissionID,
-    Train, TrainFile,
+    TrainFile,
 } from '@personalhealthtrain/ui-common';
-import fs from 'fs';
 import {
     Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
 import { SwaggerTags } from '@trapi/swagger';
-import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { isPermittedForResourceRealm } from '@typescript-auth/domains';
-import { onlyRealmPermittedQueryResources } from '@typescript-auth/server';
-import { getTrainFileFilePath } from '../../../config/pht/train-file/path';
 
-import { getTrainFileStreamRouteHandler } from './stream';
-import { uploadTrainFilesRouteHandler } from './upload';
+import {
+    deleteTrainFileRouteHandler,
+    getManyTrainFileGetManyRouteHandler,
+    getOneTrainFileRouteHandler,
+    streamTrainFileRouteHandler,
+    uploadTrainFilesRouteHandler,
+} from './handlers';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
-import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
-import { TrainFileEntity } from '../../../domains/core/train-file/entity';
-import { TrainEntity } from '../../../domains/core/train/entity';
-
-export async function getTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (
-        !req.ability.hasPermission(PermissionID.TRAIN_ADD) &&
-        !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
-    ) {
-        throw new ForbiddenError();
-    }
-
-    const { fileId } = req.params;
-
-    const repository = getRepository(TrainFileEntity);
-
-    const entity = await repository.findOne({
-        id: fileId,
-    });
-
-    if (typeof entity === 'undefined') {
-        throw new NotFoundError();
-    }
-
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
-        throw new ForbiddenError();
-    }
-
-    return res.respond({ data: entity });
-}
-
-export async function getTrainFilesRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
-    const { filter } = req.query;
-
-    const repository = getRepository(TrainFileEntity);
-    const query = repository.createQueryBuilder('trainFile')
-        .where('trainFile.train_id = :trainId', { trainId: id });
-
-    onlyRealmPermittedQueryResources(query, req.realmId);
-
-    applyFilters(query, filter, {
-        defaultAlias: 'trainFile',
-        allowed: ['id', 'name', 'realm_id'],
-    });
-
-    const entity = await query.getMany();
-
-    if (typeof entity === 'undefined') {
-        throw new NotFoundError();
-    }
-
-    return res.respond({ data: entity });
-}
-
-export async function dropTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { fileId } = req.params;
-
-    if (
-        !req.ability.hasPermission(PermissionID.TRAIN_ADD) &&
-        !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
-    ) {
-        throw new ForbiddenError();
-    }
-
-    const repository = getRepository(TrainFileEntity);
-
-    const entity = await repository.findOne(fileId);
-
-    if (typeof entity === 'undefined') {
-        throw new NotFoundError();
-    }
-
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
-        throw new ForbiddenError();
-    }
-
-    await fs.promises.unlink(getTrainFileFilePath(entity));
-
-    await repository.remove(entity);
-
-    // train
-    const trainRepository = getRepository(TrainEntity);
-    let train = await trainRepository.findOne(entity.train_id);
-    train = trainRepository.merge(train, {
-        hash: null,
-        hash_signed: null,
-    });
-    await trainRepository.save(train);
-
-    return res.respondDeleted({ data: entity });
-}
 
 type PartialTrainFile = Partial<TrainFile>;
 
@@ -128,7 +33,7 @@ export class TrainFileController {
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialTrainFile[]> {
-        return await getTrainFilesRouteHandler(req, res) as PartialTrainFile[];
+        return await getManyTrainFileGetManyRouteHandler(req, res) as PartialTrainFile[];
     }
 
     @Get('/:id/files/download', [ForceLoggedInMiddleware])
@@ -137,7 +42,7 @@ export class TrainFileController {
             @Request() req: any,
             @Response() res: any,
     ): Promise<Buffer> {
-        return await getTrainFileStreamRouteHandler(req, res) as Buffer;
+        return await streamTrainFileRouteHandler(req, res) as Buffer;
     }
 
     @Get('/:id/files/:fileId', [ForceLoggedInMiddleware])
@@ -147,7 +52,7 @@ export class TrainFileController {
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialTrainFile | undefined> {
-        return await getTrainFileRouteHandler(req, res) as PartialTrainFile | undefined;
+        return await getOneTrainFileRouteHandler(req, res) as PartialTrainFile | undefined;
     }
 
     @Delete('/:id/files/:fileId', [ForceLoggedInMiddleware])
@@ -157,7 +62,7 @@ export class TrainFileController {
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialTrainFile | undefined> {
-        return await dropTrainFileRouteHandler(req, res) as PartialTrainFile | undefined;
+        return await deleteTrainFileRouteHandler(req, res) as PartialTrainFile | undefined;
     }
 
     @Post('/:id/files', [ForceLoggedInMiddleware])

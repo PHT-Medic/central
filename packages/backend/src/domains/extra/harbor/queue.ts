@@ -6,8 +6,8 @@
  */
 
 import { buildMessage } from 'amqp-extension';
-import { DispatcherEvent } from '../../../components/event-dispatcher';
 import { MessageQueueDispatcherRoutingKey } from '../../../config/service/mq';
+import { DispatcherEvent } from '../../../components/event-dispatcher/constants';
 
 export type DispatcherHarborEventType = 'PUSH_ARTIFACT';
 

@@ -24,13 +24,13 @@ export interface TrainResult {
 
     // ------------------------------------------------------------------
 
-    train_id: string;
+    train_id: Train['id'];
 
     train: Train;
 
     // ------------------------------------------------------------------
 
-    user_id: string;
+    user_id: User['id'];
 
     user: User;
 }

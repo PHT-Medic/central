@@ -24,7 +24,7 @@ export default {
         Pagination,
     },
     props: {
-        proposalId: Number,
+        proposalId: String,
         filter: Function,
         query: {
             type: Object,
