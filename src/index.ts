@@ -11,7 +11,7 @@ dotenv.config();
 // HTTP Server & Express App
 //--------------------------------------------------------------------
 const config = createConfig({ env });
-const expressApp = createExpressApp();
+const expressApp = createExpressApp({ config, env });
 const httpServer = createHttpServer({ expressApp });
 
 //--------------------------------------------------------------------

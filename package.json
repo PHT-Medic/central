@@ -17,6 +17,11 @@
         "build": "rm -rf ./dist && tsc"
     },
     "dependencies": {
+        "@personalhealthtrain/ui-common": "^1.1.0-alpha.0",
+        "@trapi/client": "^1.0.4",
+        "@typescript-auth/domains": "^0.0.11",
+        "@typescript-auth/server-adapter": "^0.0.4",
+        "@typescript-error/http": "^1.1.2",
         "amqp-extension": "^1.0.0",
         "body-parser": "^1.19.0",
         "cookie-parser": "^1.4.6",
@@ -26,6 +31,7 @@
         "dotenv": "^10.0.0",
         "express": "^4.17.1",
         "module-alias": "^2.2.2",
+        "redis-extension": "^0.0.9",
         "reflect-metadata": "^0.1.13",
         "tar-stream": "^2.1.4",
         "uuid": "^8.3.2",

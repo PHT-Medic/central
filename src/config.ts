@@ -1,4 +1,9 @@
+import { setTrapiClientConfig, useTrapiClient } from '@trapi/client';
+import { ROBOT_SECRET_ENGINE_KEY, ServiceID, VaultAPI } from '@personalhealthtrain/ui-common';
+import { ErrorCode } from '@typescript-auth/domains';
 import { setConfig } from 'amqp-extension';
+import { Redis, setRedisConfig, useRedisInstance } from 'redis-extension';
+import https from 'https';
 import { buildCommandRouterComponent } from './components/command-router';
 import { Environment } from './env';
 
@@ -7,11 +12,21 @@ interface ConfigContext {
 }
 
 export type Config = {
+    redisDatabase: Redis,
+    redisPub: Redis,
+    redisSub: Redis,
+
     aggregators: {start: () => void}[]
     components: {start: () => void}[]
 };
 
 function createConfig({ env } : ConfigContext) : Config {
+    setRedisConfig('default', { connectionString: env.redisConnectionString });
+
+    const redisDatabase = useRedisInstance('default');
+    const redisPub = redisDatabase.duplicate();
+    const redisSub = redisDatabase.duplicate();
+
     setConfig({
         connection: env.rabbitMqConnectionString,
         exchange: {
@@ -19,6 +34,54 @@ function createConfig({ env } : ConfigContext) : Config {
             type: 'topic',
         },
     });
+
+    setTrapiClientConfig('vault', {
+        clazz: VaultAPI,
+        connectionString: env.vaultConnectionString,
+        driver: {
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false,
+            }),
+        },
+    });
+
+    setTrapiClientConfig('default', {
+        driver: {
+            baseURL: env.apiUrl,
+            withCredentials: true,
+        },
+    });
+
+    useTrapiClient('default').mountResponseInterceptor(
+        (value) => value,
+        async (err) => {
+            const { config } = err;
+
+            if (
+                err.response
+                && (
+                    err.response.status === 401 // Unauthorized
+                    || err.response.status === 403 // Forbidden
+                    || err.response?.data?.code === ErrorCode.CREDENTIALS_INVALID
+                )
+            ) {
+                const robot = await useTrapiClient<VaultAPI>('vault').keyValue
+                    .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM);
+
+                if (robot) {
+                    useTrapiClient('default').setAuthorizationHeader({
+                        type: 'Basic',
+                        username: robot.id,
+                        password: robot.secret,
+                    });
+
+                    return useTrapiClient('default').request(config);
+                }
+            }
+
+            return Promise.reject(err);
+        },
+    );
 
     const aggregators : {start: () => void}[] = [
     ];
@@ -28,6 +91,10 @@ function createConfig({ env } : ConfigContext) : Config {
     ];
 
     return {
+        redisDatabase,
+        redisPub,
+        redisSub,
+
         aggregators,
         components,
     };

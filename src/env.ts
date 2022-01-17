@@ -26,17 +26,24 @@ export interface Environment {
     env: string,
     port: number,
 
+    redisConnectionString: string,
     rabbitMqConnectionString: string,
     harborConnectionString: string,
+    vaultConnectionString: string,
+
+    apiUrl: string
 }
 
 const env : Environment = {
     env: requireFromEnv('NODE_ENV'),
     port: parseInt(requireFromEnv('PORT'), 10),
 
+    redisConnectionString: requireFromEnv('REDIS_CONNECTION_STRING'),
     rabbitMqConnectionString: requireFromEnv('RABBITMQ_CONNECTION_STRING'),
-    // eslint-disable-next-line sort-keys
     harborConnectionString: requireFromEnv('HARBOR_CONNECTION_STRING'),
+    vaultConnectionString: requireFromEnv('VAULT_CONNECTION_STRING'),
+
+    apiUrl: requireFromEnv('API_URL'),
 };
 
 export default env;

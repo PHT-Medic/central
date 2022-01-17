@@ -3,11 +3,13 @@ import cors from 'cors';
 
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import { setupHTTPMiddleware } from '@typescript-auth/server-adapter';
+import { useTrapiClient } from '@trapi/client';
 import { registerRoutes } from './routes';
+import { ExpressAppContext, ExpressAppInterface } from './type';
+import { errorMiddleware } from './middleware/error';
 
-export type ExpressAppInterface = Express;
-
-function createExpressApp() : ExpressAppInterface {
+function createExpressApp(context: ExpressAppContext) : ExpressAppInterface {
     const expressApp : Express = express();
     expressApp.use(cors());
 
@@ -18,8 +20,18 @@ function createExpressApp() : ExpressAppInterface {
     // Cookie parser
     expressApp.use(cookieParser());
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    expressApp.use(setupHTTPMiddleware({
+        redis: context.config.redisDatabase,
+        axios: useTrapiClient('default').driver,
+    }));
+
     // Loading routes
     registerRoutes(expressApp);
+
+    // registering error middleware
+    expressApp.use(errorMiddleware);
 
     return expressApp;
 }

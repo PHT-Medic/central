@@ -1,5 +1,5 @@
 import http, { Server } from 'http';
-import { ExpressAppInterface } from './express';
+import { ExpressAppInterface } from './type';
 
 interface HttpServerContext {
     expressApp: ExpressAppInterface
