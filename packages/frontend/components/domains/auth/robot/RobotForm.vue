@@ -36,6 +36,8 @@ export default {
             loaded: false,
 
             secretHashed: false,
+
+            secretChange: false,
         };
     },
     validations: {
@@ -91,9 +93,9 @@ export default {
                 }
             } else {
                 this.item = this.entityProperty;
-                this.secretHashed = true;
             }
 
+            this.secretHashed = true;
             this.loaded = true;
         },
         initFromProperties() {
@@ -137,6 +139,7 @@ export default {
                 if (meta.total === 1) {
                     // eslint-disable-next-line prefer-destructuring
                     this.item = data[0];
+                    this.secretHashed = true;
                 }
             } catch (e) {
                 // ...
@@ -159,7 +162,7 @@ export default {
 
                     response = await this.$authApi.robot.update(this.item.id, {
                         ...form,
-                        ...(!this.secretHashed ? { secret } : {}),
+                        ...(this.secretHashed || !this.secretChange ? { } : { secret }),
                     });
 
                     if (response.secret) {
@@ -290,53 +293,66 @@ export default {
                 </div>
             </template>
 
-            <div
-                class="form-group"
-                :class="{ 'form-group-error': $v.form.secret.$error }"
+            <hr>
+
+            <b-form-checkbox
+                v-if="isEditing"
+                v-model="secretChange"
+                switch
+                size="sm"
             >
-                <label>
-                    Secret
-                    <span
-                        v-if="secretHashed"
-                        class="text-danger font-weight-bold"
-                    >Hashed <i class="fa fa-exclamation-triangle" />
-                    </span>
-                </label>
-                <input
-                    v-model="$v.form.secret.$model"
-                    type="text"
-                    name="secret"
-                    class="form-control"
-                    placeholder="..."
-                >
+                Change secret?
+            </b-form-checkbox>
 
+            <template v-if="!isEditing || secretChange">
                 <div
-                    v-if="!$v.form.secret.minLength"
-                    class="form-group-hint group-required"
+                    class="form-group"
+                    :class="{ 'form-group-error': $v.form.secret.$error }"
                 >
-                    The length of the secret must be greater than <strong>{{ $v.form.secret.$params.minLength.min }}</strong> characters.
-                </div>
-                <div
-                    v-if="!$v.form.secret.maxLength"
-                    class="form-group-hint group-required"
-                >
-                    The length of the secret must be less than <strong>{{ $v.form.secret.$params.maxLength.max }}</strong> characters.
-                </div>
-            </div>
-            <div class="mb-1">
-                <button
-                    class="btn btn-dark btn-xs"
+                    <label>
+                        Secret
+                        <span
+                            v-if="secretHashed"
+                            class="text-danger font-weight-bold"
+                        >Hashed <i class="fa fa-exclamation-triangle" />
+                        </span>
+                    </label>
+                    <input
+                        v-model="$v.form.secret.$model"
+                        type="text"
+                        name="secret"
+                        class="form-control"
+                        placeholder="..."
+                    >
 
-                    @click.prevent="generateSecret"
-                >
-                    <i class="fa fa-wrench" /> Generate
-                </button>
-            </div>
+                    <div
+                        v-if="!$v.form.secret.minLength"
+                        class="form-group-hint group-required"
+                    >
+                        The length of the secret must be greater than <strong>{{ $v.form.secret.$params.minLength.min }}</strong> characters.
+                    </div>
+                    <div
+                        v-if="!$v.form.secret.maxLength"
+                        class="form-group-hint group-required"
+                    >
+                        The length of the secret must be less than <strong>{{ $v.form.secret.$params.maxLength.max }}</strong> characters.
+                    </div>
+                </div>
+                <div class="mb-1">
+                    <button
+                        class="btn btn-dark btn-xs"
 
-            <div class="alert alert-warning">
-                The secret <i class="fa fa-key" /> is stored as <strong>hash</strong> in the database. Therefore, it is
-                not possible to inspect it after specification or generation.
-            </div>
+                        @click.prevent="generateSecret"
+                    >
+                        <i class="fa fa-wrench" /> Generate
+                    </button>
+                </div>
+
+                <div class="alert alert-warning">
+                    The secret <i class="fa fa-key" /> is stored as <strong>hash</strong> in the database. Therefore, it is
+                    not possible to inspect it after specification or generation.
+                </div>
+            </template>
 
             <hr>
 
