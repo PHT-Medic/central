@@ -58,11 +58,11 @@ function createConfig({ env } : ConfigContext) : Config {
             const { config } = err;
 
             if (
-                err.response
-                && (
-                    err.response.status === 401 // Unauthorized
-                    || err.response.status === 403 // Forbidden
-                    || err.response?.data?.code === ErrorCode.CREDENTIALS_INVALID
+                err.response &&
+                (
+                    err.response.status === 401 || // Unauthorized
+                    err.response.status === 403 || // Forbidden
+                    err.response?.data?.code === ErrorCode.CREDENTIALS_INVALID
                 )
             ) {
                 const robot = await useTrapiClient<VaultAPI>('vault').keyValue

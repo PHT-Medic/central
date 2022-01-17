@@ -10,8 +10,8 @@ import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 
 export function forceLoggedIn(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) {
     if (
-        typeof req.userId === 'undefined'
-        && typeof req.robotId === 'undefined'
+        typeof req.userId === 'undefined' &&
+        typeof req.robotId === 'undefined'
     ) {
         throw new UnauthorizedError();
     }

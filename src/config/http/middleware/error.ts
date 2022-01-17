@@ -22,9 +22,9 @@ export function errorMiddleware(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars,no-unused-vars
     next: ExpressNextFunction,
 ) {
-    const code : string | undefined = hasOwnProperty(error, 'code') && typeof error.code === 'string'
-        ? error.code
-        : undefined;
+    const code : string | undefined = hasOwnProperty(error, 'code') && typeof error.code === 'string' ?
+        error.code :
+        undefined;
 
     // catch and decorate some mysql errors :)
     // eslint-disable-next-line default-case
@@ -37,9 +37,9 @@ export function errorMiddleware(
             break;
     }
 
-    const baseError : ServerError | ClientError = error instanceof ClientError || error instanceof ServerError
-        ? error
-        : new InternalServerError(error, { decorateMessage: true });
+    const baseError : ServerError | ClientError = error instanceof ClientError || error instanceof ServerError ?
+        error :
+        new InternalServerError(error, { decorateMessage: true });
 
     const statusCode : number = baseError.getOption('statusCode') ?? ServerErrorSettings.InternalServerError.statusCode;
 
