@@ -23,6 +23,7 @@
         "build": "lerna run build",
         "test": "lerna run test",
         "pub": "lerna publish",
+        "prepublishOnly": "npm run build",
         "lint": "eslint --ext .ts,.vue,.js ./packages/",
         "lint:fix": "npm run lint -- --fix",
         "frontend": "npm run dev --workspace=packages/frontend",
