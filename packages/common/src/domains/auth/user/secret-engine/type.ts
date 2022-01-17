@@ -7,4 +7,7 @@
 
 import { SecretStorageEngineSecretPayload } from '../../../extra';
 
-export type UserSecretEngineSecretPayload = SecretStorageEngineSecretPayload<Record<string, any>>;
+export type UserSecretEngineSecretPayload = SecretStorageEngineSecretPayload<{
+    rsa_public_key?: string,
+    paillier_public_key?: string,
+} & Record<string, any>>;

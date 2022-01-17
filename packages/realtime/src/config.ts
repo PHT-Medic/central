@@ -64,8 +64,12 @@ export function createConfig({ env } : ConfigContext) : Config {
             const { config } = err;
 
             if (
-                err.response.status === 401 ||
-                err.response.status === 403
+                err.response &&
+                (
+                    err.response.status === 401 || // Unauthorized
+                    err.response.status === 403 || // Forbidden
+                    err.response?.data?.code === ErrorCode.CREDENTIALS_INVALID
+                )
             ) {
                 const robot = await useTrapiClient<VaultAPI>('vault').keyValue
                     .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM);
