@@ -1,12 +1,17 @@
 import fs from 'fs';
+import { NotFoundError } from '@typescript-error/http';
 import { getTrainResultFilePath } from '../../../config/paths';
+import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 
-export async function getTrainResultRouteHandler(req: any, res: any) {
+export async function streamTrainResultRouteHandler(
+    req: ExpressRequest,
+    res: ExpressResponse,
+) {
     const { downloadId } = req.query;
     const { id } = req.params;
 
     if (typeof id !== 'string') {
-        return res._failNotFound();
+        throw new NotFoundError();
     }
 
     let resultFileId : string = id;
@@ -21,7 +26,7 @@ export async function getTrainResultRouteHandler(req: any, res: any) {
     // eslint-disable-next-line consistent-return
     return fs.access(trainResultFilePath, fs.constants.F_OK | fs.constants.R_OK, (err) => {
         if (err) {
-            return res._failNotFound({ message: 'A train result which is identified by the provided identifier doesn\'t exist' });
+            throw new NotFoundError('A train result which is identified by the provided identifier doesn\'t exist');
         }
         const stream = fs.createReadStream(trainResultFilePath);
 

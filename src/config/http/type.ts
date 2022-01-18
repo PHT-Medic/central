@@ -28,7 +28,18 @@ export type ExpressAppContext = {
 
 export type ExpressRequest = AuthExpressRequest & Request;
 
-export type ExpressResponse = AuthExpressResponse & Response;
+export declare type ExpressResponseMessage = {
+    statusMessage?: string;
+    statusCode?: number;
+    data?: any;
+};
+
+export type ExpressResponse = AuthExpressResponse & Response & {
+    respond(message?: ExpressResponseMessage): void;
+    respondDeleted(message?: ExpressResponseMessage): void;
+    respondCreated(message?: ExpressResponseMessage): void;
+    respondAccepted(message?: ExpressResponseMessage): void;
+};
 
 export interface ExpressNextFunction extends NextFunction {
 
