@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    SecretStorageCommand, buildSecretStorageStationKey,
+    SecretStorageCommand, buildStationSecretStorageKey,
 } from '@personalhealthtrain/ui-common';
 
 export default {
@@ -22,7 +22,7 @@ export default {
     },
     computed: {
         pathName() {
-            return buildSecretStorageStationKey(this.station.secure_id);
+            return buildStationSecretStorageKey(this.station.secure_id);
         },
     },
     methods: {
@@ -37,7 +37,7 @@ export default {
 
             try {
                 const station = await this.$api.service.runSecretStorageCommand(action, {
-                    name: buildSecretStorageStationKey(this.station.id),
+                    name: buildStationSecretStorageKey(this.station.id),
                 });
 
                 // eslint-disable-next-line default-case

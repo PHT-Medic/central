@@ -7,12 +7,16 @@
 
 import { Message, buildMessage } from 'amqp-extension';
 import { MessageQueueSelfRoutingKey } from '../../../config/service/mq';
-import { ServiceQueueMessagePayload } from './type';
-import { RobotQueueCommand } from './constants';
+import { SecretStorageQueueCommand } from './constants';
+import {
+    SecretStorageDeleteQueuePayload,
+    SecretStorageSaveQueuePayload,
+} from './type';
 
-export function buildRobotQueueMessage(
-    type: RobotQueueCommand,
-    context: ServiceQueueMessagePayload,
+export function buildSecretStorageQueueMessage(
+    type: SecretStorageQueueCommand,
+    context: SecretStorageSaveQueuePayload |
+    SecretStorageDeleteQueuePayload,
 ) : Message {
     return buildMessage({
         options: {

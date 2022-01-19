@@ -5,21 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-// eslint-disable-next-line import/no-cycle
-import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
-
-export type RespondMessage = {
-    statusMessage?: string,
-    statusCode?: number,
-    data?: any
-};
+import {
+    ExpressNextFunction, ExpressRequest, ExpressResponse, ExpressResponseMessage,
+} from '../type';
 
 export default function responseMiddleware(
     request: ExpressRequest,
     response: ExpressResponse,
     next: ExpressNextFunction,
 ) {
-    response.respond = (message?: RespondMessage) => {
+    response.respond = (message?: ExpressResponseMessage) => {
         if (typeof message !== 'undefined') {
             if (message.data == null) {
                 message.statusCode ??= 204;
@@ -41,19 +36,19 @@ export default function responseMiddleware(
 
     // --------------------------------------------------------------------
 
-    response.respondDeleted = (message?: RespondMessage) => response.respond({
+    response.respondDeleted = (message?: ExpressResponseMessage) => response.respond({
         statusCode: 200,
         statusMessage: 'Deleted',
         ...(message || {}),
     });
 
-    response.respondCreated = (message?: RespondMessage) => response.respond({
+    response.respondCreated = (message?: ExpressResponseMessage) => response.respond({
         statusCode: 201,
         statusMessage: 'Created',
         ...(message || {}),
     });
 
-    response.respondAccepted = (message?: RespondMessage) => response.respond({
+    response.respondAccepted = (message?: ExpressResponseMessage) => response.respond({
         statusCode: 202,
         statusMessage: 'Accepted',
         ...(message || {}),

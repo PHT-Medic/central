@@ -5,10 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Robot } from '@typescript-auth/domains';
-
-export type ServiceQueueMessagePayload = {
-    id: string | number,
-    robotId: Robot['id'],
-    robotSecret: Robot['secret']
+export type RobotSecretEnginePayload = {
+    id: string,
+    secret: string
 };

@@ -9,18 +9,24 @@ import {
     PermissionID,
     STATION_SECRET_ENGINE_KEY,
     VaultAPI,
-    buildSecretStorageStationPayload,
+    buildStationSecretStoragePayload,
     isHex,
 } from '@personalhealthtrain/ui-common';
 import { ForbiddenError } from '@typescript-error/http';
 import { validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
 import { useTrapiClient } from '@trapi/client';
+import { publishMessage } from 'amqp-extension';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 import { runStationValidation } from './utils';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { StationEntity } from '../../../../domains/core/station/entity';
 import { ApiKey } from '../../../../config/api';
+import { buildSecretStorageQueueMessage } from '../../../../domains/extra/secret-storage/queue';
+import {
+    SecretStorageQueueCommand,
+    SecretStorageQueueEntityType,
+} from '../../../../domains/extra/secret-storage/constants';
 
 export async function createStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.STATION_ADD)) {
@@ -48,8 +54,14 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
     await repository.save(entity);
 
     if (entity.public_key) {
-        const payload = buildSecretStorageStationPayload(entity.public_key);
-        await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(STATION_SECRET_ENGINE_KEY, entity.secure_id, payload);
+        const queueMessage = buildSecretStorageQueueMessage(
+            SecretStorageQueueCommand.SAVE,
+            {
+                type: SecretStorageQueueEntityType.STATION,
+                id: entity.id,
+            },
+        );
+        await publishMessage(queueMessage);
     }
 
     return res.respond({ data: entity });

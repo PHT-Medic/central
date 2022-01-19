@@ -35,8 +35,6 @@ export default {
             busy: false,
             loaded: false,
 
-            secretHashed: false,
-
             secretChange: false,
         };
     },
@@ -63,6 +61,11 @@ export default {
         },
         isSecretEmpty() {
             return !this.form.secret || this.form.secret.length === 0;
+        },
+        isSecretHashed() {
+            return this.item &&
+                this.item.secret === this.form.secret &&
+                this.form.secret.startsWith('$');
         },
         updatedAt() {
             return this.entityProperty ? this.entityProperty.updated_at : undefined;
@@ -95,7 +98,6 @@ export default {
                 this.item = this.entityProperty;
             }
 
-            this.secretHashed = true;
             this.loaded = true;
         },
         initFromProperties() {
@@ -118,7 +120,6 @@ export default {
         },
         generateSecret() {
             this.form.secret = createNanoID('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_!.', 64);
-            this.secretHashed = false;
         },
         async find() {
             if (this.busy || !this.nameFixed || this.item) {
@@ -139,7 +140,6 @@ export default {
                 if (meta.total === 1) {
                     // eslint-disable-next-line prefer-destructuring
                     this.item = data[0];
-                    this.secretHashed = true;
                 }
             } catch (e) {
                 // ...
@@ -162,12 +162,8 @@ export default {
 
                     response = await this.$authApi.robot.update(this.item.id, {
                         ...form,
-                        ...(this.secretHashed || !this.secretChange ? { } : { secret }),
+                        ...(this.isSecretHashed || !this.secretChange ? { } : { secret }),
                     });
-
-                    if (response.secret) {
-                        this.secretHashed = false;
-                    }
 
                     const keys = Object.keys(response);
                     for (let i = 0; i < keys.length; i++) {
@@ -223,6 +219,9 @@ export default {
         },
         close() {
             this.$emit('close');
+        },
+        handleSecretChanged() {
+            this.secretHashed = this.item && this.form.secret === this.item.secret;
         },
     },
 };
@@ -312,7 +311,7 @@ export default {
                     <label>
                         Secret
                         <span
-                            v-if="secretHashed"
+                            v-if="isSecretHashed"
                             class="text-danger font-weight-bold"
                         >Hashed <i class="fa fa-exclamation-triangle" />
                         </span>
@@ -323,6 +322,7 @@ export default {
                         name="secret"
                         class="form-control"
                         placeholder="..."
+                        @change.prevent="handleSecretChanged"
                     >
 
                     <div

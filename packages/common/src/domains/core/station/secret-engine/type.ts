@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SecretStorageEngineSecretPayload } from '../../../extra';
-
-export type StationSecretEngineSecretPayload = SecretStorageEngineSecretPayload<{
-    rsa_station_public_key: string
-}>;
+export type StationSecretStoragePayload = {
+    rsa_public_key: string,
+    registry_robot_id?: string,
+    registry_robot_secret?: string
+};

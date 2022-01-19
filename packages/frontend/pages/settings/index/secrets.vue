@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    SecretStorageCommand, buildSecretStorageUserKey,
+    SecretStorageCommand, buildUserSecretsSecretStorageKey,
 } from '@personalhealthtrain/ui-common';
 import UserSecretForm from '../../../components/domains/user-secret/UserSecretForm';
 import UserSecretList from '../../../components/domains/user-secret/UserSecretList';
@@ -75,7 +75,7 @@ export default {
                 await this.$api.service.runSecretStorageCommand(
                     SecretStorageCommand.ENGINE_KEY_SAVE,
                     {
-                        name: buildSecretStorageUserKey(this.$store.getters['auth/userId']),
+                        name: buildUserSecretsSecretStorageKey(this.$store.getters['auth/userId']),
                     },
                 );
 

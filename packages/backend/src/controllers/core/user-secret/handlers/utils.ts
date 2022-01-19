@@ -9,17 +9,13 @@ import { check, validationResult } from 'express-validator';
 import {
     PermissionID,
     SecretType,
-    USER_SECRET_ENGINE_KEY,
-    UserSecret, UserSecretEngineSecretPayload, VaultAPI, buildSecretStorageUserKey,
+    UserSecret,
 } from '@personalhealthtrain/ui-common';
 import { BadRequestError } from '@typescript-error/http';
-import { UserEntity } from '@typescript-auth/server';
-import { useTrapiClient } from '@trapi/client';
 import { ExpressRequest } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 import { matchedValidationData } from '../../../../modules/express-validator';
 import env from '../../../../env';
-import { ApiKey } from '../../../../config/api';
 
 export async function runUserSecretValidation(
     req: ExpressRequest,
@@ -61,31 +57,4 @@ export async function runUserSecretValidation(
     }
 
     return matchedValidationData(req, { includeOptionals: true });
-}
-
-export async function extendUserSecretEnginePayload(
-    id: typeof UserEntity.prototype.id,
-    key: string,
-    value: string,
-) {
-    const keyPath = buildSecretStorageUserKey(id);
-
-    const payload : UserSecretEngineSecretPayload = {
-        data: {},
-        options: {
-            cas: 1,
-        },
-    };
-
-    try {
-        const { data: responseData } = await useTrapiClient(ApiKey.VAULT)
-            .get(keyPath);
-        payload.data = responseData.data.data;
-    } catch (e) {
-        // ...
-    }
-
-    payload.data[key] = value;
-
-    await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(USER_SECRET_ENGINE_KEY, id.toString(), payload);
 }

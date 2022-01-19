@@ -6,29 +6,27 @@
  */
 
 import { STATION_SECRET_ENGINE_KEY } from './constants';
-import { StationSecretEngineSecretPayload } from './type';
+import { StationSecretStoragePayload } from './type';
+import { Station } from '../entity';
 
-export function isSecretStorageStationKey(name: string): boolean {
+export function isStationSecretStorageKey(name: string): boolean {
     return name.startsWith(`${STATION_SECRET_ENGINE_KEY}/`);
 }
 
-export function getSecretStorageStationKey(name: string): string {
+export function getStationSecretStorageKey(name: string): string {
     return name.replace(`${STATION_SECRET_ENGINE_KEY}/`, '');
 }
 
-export function buildSecretStorageStationKey(id: string | number): string {
+export function buildStationSecretStorageKey(id: string | number): string {
     return `${STATION_SECRET_ENGINE_KEY}/${id}`;
 }
 
 // -----------------------------------------------------------
 
-export function buildSecretStorageStationPayload(publicKey: string) : StationSecretEngineSecretPayload {
+export function buildStationSecretStoragePayload(station: Partial<Station>) : StationSecretStoragePayload {
     return {
-        data: {
-            rsa_station_public_key: publicKey,
-        },
-        options: {
-            cas: 1,
-        },
+        rsa_public_key: station.public_key,
+        registry_robot_id: station.registry_project_account_name,
+        registry_robot_secret: station.registry_project_account_token,
     };
 }

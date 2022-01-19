@@ -34,6 +34,9 @@ export default {
                 {
                     id: ServiceID.TRAIN_ROUTER, name: 'Train Router', icon: 'fas fa-map-marked-alt', version: 'v1.0.0-alpha.0',
                 },
+                {
+                    id: ServiceID.EMAIL_SERVICE, name: 'E-Mail Service', icon: 'fas fa-envelope', version: 'v1.0.0-alpha.0',
+                },
             ],
             thirdPartyItems: [
                 {

@@ -21,6 +21,12 @@ export interface ExpressRequest extends AuthExpressRequest {
 
 }
 
+export type ExpressResponseMessage = {
+    statusMessage?: string;
+    statusCode?: number;
+    data?: any;
+};
+
 export interface ExpressResponse extends AuthExpressResponse {
 }
 

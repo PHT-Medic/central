@@ -5,4 +5,4 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export const USER_SECRET_ENGINE_KEY = 'user_pks';
+export const USER_SECRETS_SECRET_ENGINE_KEY = 'user-secrets';

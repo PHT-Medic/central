@@ -10,6 +10,7 @@ export enum ServiceID {
     SYSTEM = 'SYSTEM',
     TRAIN_BUILDER = 'TRAIN_BUILDER',
     TRAIN_ROUTER = 'TRAIN_ROUTER',
+    EMAIL_SERVICE = 'EMAIL_SERVICE',
 
     // Third Party Service(s)
     GITHUB = 'GITHUB',

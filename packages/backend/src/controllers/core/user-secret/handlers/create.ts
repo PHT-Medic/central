@@ -8,9 +8,15 @@
 import { SecretType, isHex } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
 import { Buffer } from 'buffer';
+import { publishMessage } from 'amqp-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
-import { extendUserSecretEnginePayload, runUserSecretValidation } from './utils';
+import { runUserSecretValidation } from './utils';
 import { UserSecretEntity } from '../../../../domains/auth/user-secret/entity';
+import { buildSecretStorageQueueMessage } from '../../../../domains/extra/secret-storage/queue';
+import {
+    SecretStorageQueueCommand,
+    SecretStorageQueueEntityType,
+} from '../../../../domains/extra/secret-storage/constants';
 
 export async function createUserSecretRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const data = await runUserSecretValidation(req, 'create');
@@ -32,7 +38,15 @@ export async function createUserSecretRouteHandler(req: ExpressRequest, res: Exp
 
     await repository.save(entity);
 
-    await extendUserSecretEnginePayload(entity.user_id, entity.key, entity.content);
+    const queueMessage = buildSecretStorageQueueMessage(
+        SecretStorageQueueCommand.SAVE,
+        {
+            type: SecretStorageQueueEntityType.USER_SECRETS,
+            id: entity.user_id,
+        },
+    );
+
+    await publishMessage(queueMessage);
 
     return res.respond({ data: entity });
 }

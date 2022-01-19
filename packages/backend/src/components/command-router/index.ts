@@ -6,13 +6,13 @@
  */
 
 import { consumeQueue } from 'amqp-extension';
-import { createServiceComponentHandlers } from '../robot';
 import { MessageQueueSelfRoutingKey } from '../../config/service/mq';
+import { createSecretStorageComponentHandlers } from '../secret-storage';
 
 export function buildCommandRouterComponent() {
     function start() {
         return consumeQueue({ routingKey: MessageQueueSelfRoutingKey.COMMAND }, {
-            ...createServiceComponentHandlers(),
+            ...createSecretStorageComponentHandlers(),
         });
     }
 

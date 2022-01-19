@@ -7,19 +7,20 @@
 
 import { useRobotEventEmitter } from '@typescript-auth/server';
 import { publishMessage } from 'amqp-extension';
-import { buildRobotQueueMessage } from '../domains/auth/service/queue';
-import { RobotQueueCommand } from '../domains/auth/service/constants';
+import { buildSecretStorageQueueMessage } from '../domains/extra/secret-storage/queue';
+import { SecretStorageQueueCommand, SecretStorageQueueEntityType } from '../domains/extra/secret-storage/constants';
 
 export function buildRobotAggregator() {
     function start() {
         useRobotEventEmitter()
             .on('credentials', async (robot) => {
-                const queueMessage = buildRobotQueueMessage(
-                    RobotQueueCommand.SECRET_STORAGE_SYNC,
+                const queueMessage = buildSecretStorageQueueMessage(
+                    SecretStorageQueueCommand.SAVE,
                     {
-                        id: robot.name,
-                        robotId: robot.id,
-                        robotSecret: robot.secret,
+                        type: SecretStorageQueueEntityType.ROBOT,
+                        name: robot.name,
+                        id: robot.id,
+                        secret: robot.secret,
                     },
                 );
 

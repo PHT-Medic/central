@@ -1,11 +1,10 @@
 /*
- * Copyright (c) 2021-2022.
+ * Copyright (c) 2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Message } from 'amqp-extension';
 import {
     HarborAPI,
     HarborProjectWebhook,
@@ -13,20 +12,24 @@ import {
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
     ROBOT_SECRET_ENGINE_KEY,
-    ServiceID, Station, VaultAPI, buildSecretStorageServicePayload,
-} from '@personalhealthtrain/ui-common';
+    ServiceID,
+    Station,
+    VaultAPI,
+    buildRobotSecretStoragePayload,
 
+} from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
 import { useTrapiClient } from '@trapi/client';
-import env from '../../../env';
-import { ServiceQueueMessagePayload } from '../../../domains/auth/service/type';
-import { StationEntity } from '../../../domains/core/station/entity';
-import { ApiKey } from '../../../config/api';
+import { StationEntity } from '../../../../domains/core/station/entity';
+import { ApiKey } from '../../../../config/api';
+import env from '../../../../env';
+import {
+    SecretStorageDeleteRobotQueuePayload,
+    SecretStorageSaveRobotQueuePayload,
+} from '../../../../domains/extra/secret-storage/type';
 
-export async function syncRobotToSecretStorage(message: Message) {
-    const payload : ServiceQueueMessagePayload = message.data as ServiceQueueMessagePayload;
-
-    switch (payload.id) {
+export async function saveRobotToSecretStorage(payload: SecretStorageSaveRobotQueuePayload) {
+    switch (payload.name) {
         case ServiceID.REGISTRY: {
             const stationRepository = getRepository(StationEntity);
             const queryBuilder = stationRepository.createQueryBuilder('station');
@@ -39,8 +42,8 @@ export async function syncRobotToSecretStorage(message: Message) {
                 const promise = useTrapiClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.ensure(
                     station.registry_project_id,
                     {
-                        id: payload.robotId,
-                        secret: payload.robotSecret,
+                        id: payload.id,
+                        secret: payload.secret,
                     },
                     { internalAPIUrl: env.internalApiUrl },
                 );
@@ -56,8 +59,8 @@ export async function syncRobotToSecretStorage(message: Message) {
 
             specialProjects.map((repository) => {
                 promises.push(useTrapiClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.ensure(repository, {
-                    id: payload.robotId,
-                    secret: payload.robotSecret,
+                    id: payload.id,
+                    secret: payload.secret,
                 }, { internalAPIUrl: env.internalApiUrl }, true));
 
                 return repository;
@@ -67,9 +70,17 @@ export async function syncRobotToSecretStorage(message: Message) {
             break;
         }
         default: {
-            const data = buildSecretStorageServicePayload(payload.robotId, payload.robotSecret);
-            await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(ROBOT_SECRET_ENGINE_KEY, `${payload.id}`, data);
+            const data = buildRobotSecretStoragePayload(payload.id, payload.secret);
+            await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(ROBOT_SECRET_ENGINE_KEY, `${payload.name}`, data);
             break;
         }
+    }
+}
+
+export async function deleteRobotFromSecretStorage(payload: SecretStorageDeleteRobotQueuePayload) {
+    try {
+        await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(ROBOT_SECRET_ENGINE_KEY, `${payload.name}`);
+    } catch (e) {
+        // ...
     }
 }
