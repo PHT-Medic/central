@@ -6,5 +6,3 @@
  */
 
 export * from './connection-string';
-export * from '../domains/harbor/module';
-export * from '../domains/vault';

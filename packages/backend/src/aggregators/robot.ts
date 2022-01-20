@@ -7,8 +7,8 @@
 
 import { useRobotEventEmitter } from '@typescript-auth/server';
 import { publishMessage } from 'amqp-extension';
-import { buildSecretStorageQueueMessage } from '../domains/extra/secret-storage/queue';
-import { SecretStorageQueueCommand, SecretStorageQueueEntityType } from '../domains/extra/secret-storage/constants';
+import { buildSecretStorageQueueMessage } from '../domains/special/secret-storage/queue';
+import { SecretStorageQueueCommand, SecretStorageQueueEntityType } from '../domains/special/secret-storage/constants';
 
 export function buildRobotAggregator() {
     function start() {

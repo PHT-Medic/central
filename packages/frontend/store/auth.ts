@@ -26,7 +26,7 @@ export type AuthStoreToken = Oauth2TokenResponse & {
 export interface AuthState {
     user: User | undefined,
 
-    permissions: PermissionItem<any>[],
+    permissions: PermissionItem[],
     permissionsResolved: boolean,
 
     token: AuthStoreToken | undefined,

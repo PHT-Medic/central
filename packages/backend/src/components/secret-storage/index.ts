@@ -8,7 +8,7 @@
 import { ConsumeHandler, Message } from 'amqp-extension';
 import { saveToSecretStorage } from './handlers/save';
 import { deleteFromSecretStorage } from './handlers/delete';
-import { SecretStorageQueueCommand } from '../../domains/extra/secret-storage/constants';
+import { SecretStorageQueueCommand } from '../../domains/special/secret-storage/constants';
 
 export function createSecretStorageComponentHandlers() : Record<SecretStorageQueueCommand, ConsumeHandler> {
     return {

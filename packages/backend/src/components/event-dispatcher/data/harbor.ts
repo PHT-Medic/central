@@ -17,7 +17,7 @@ import {
     buildRegistryStationProjectName,
     isRegistryStationProjectName,
 } from '@personalhealthtrain/ui-common/src/domains/core/station/registry';
-import { DispatcherHarborEventData } from '../../../domains/extra/harbor/queue';
+import { DispatcherHarborEventData } from '../../../domains/special/harbor/queue';
 import { TrainStationEntity } from '../../../domains/core/train-station/entity';
 
 export type DispatcherHarborEventWithAdditionalData = DispatcherHarborEventData & {

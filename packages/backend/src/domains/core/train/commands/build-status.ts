@@ -8,8 +8,8 @@
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import { Train } from '@personalhealthtrain/ui-common';
-import { buildTrainBuilderQueueMessage } from '../../../extra/train-builder/queue';
-import { TrainBuilderCommand } from '../../../extra/train-builder/type';
+import { buildTrainBuilderQueueMessage } from '../../../special/train-builder/queue';
+import { TrainBuilderCommand } from '../../../special/train-builder/type';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 

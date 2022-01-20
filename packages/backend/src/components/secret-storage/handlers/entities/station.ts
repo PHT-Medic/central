@@ -13,12 +13,11 @@ import { getRepository } from 'typeorm';
 import { NotFoundError } from '@typescript-error/http';
 import { ApiKey } from '../../../../config/api';
 import {
-    SecretStorageDeleteStationQueuePayload,
-    SecretStorageSaveStationQueuePayload,
-} from '../../../../domains/extra/secret-storage/type';
+    SecretStorageStationQueuePayload,
+} from '../../../../domains/special/secret-storage/type';
 import { StationEntity } from '../../../../domains/core/station/entity';
 
-export async function saveStationToSecretStorage(payload: SecretStorageSaveStationQueuePayload) {
+export async function saveStationToSecretStorage(payload: SecretStorageStationQueuePayload) {
     const repository = await getRepository(StationEntity);
     const query = repository.createQueryBuilder('station')
         .addSelect([
@@ -43,7 +42,7 @@ export async function saveStationToSecretStorage(payload: SecretStorageSaveStati
     );
 }
 
-export async function deleteStationFromSecretStorage(payload: SecretStorageDeleteStationQueuePayload) {
+export async function deleteStationFromSecretStorage(payload: SecretStorageStationQueuePayload) {
     const repository = await getRepository(StationEntity);
     const query = repository.createQueryBuilder('station')
         .addSelect([

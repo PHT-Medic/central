@@ -18,17 +18,33 @@ import {
     buildRobotSecretStoragePayload,
 
 } from '@personalhealthtrain/ui-common';
-import { getRepository } from 'typeorm';
+import { getCustomRepository, getRepository } from 'typeorm';
 import { useTrapiClient } from '@trapi/client';
+import { RobotRepository } from '@typescript-auth/server';
 import { StationEntity } from '../../../../domains/core/station/entity';
 import { ApiKey } from '../../../../config/api';
 import env from '../../../../env';
 import {
-    SecretStorageDeleteRobotQueuePayload,
-    SecretStorageSaveRobotQueuePayload,
-} from '../../../../domains/extra/secret-storage/type';
+    SecretStorageRobotQueuePayload,
+} from '../../../../domains/special/secret-storage/type';
 
-export async function saveRobotToSecretStorage(payload: SecretStorageSaveRobotQueuePayload) {
+export async function saveRobotToSecretStorage(payload: SecretStorageRobotQueuePayload) {
+    if (!payload.id || !payload.secret) {
+        const repository = getCustomRepository(RobotRepository);
+        const query = repository.createQueryBuilder('robot')
+            .addSelect('robot.secret')
+            .where('robot.name = :name', { name: payload.name });
+
+        const entity = await query.getOne();
+
+        if (typeof entity === 'undefined') {
+            return;
+        }
+
+        payload.id = entity.id;
+        payload.secret = entity.secret;
+    }
+
     switch (payload.name) {
         case ServiceID.REGISTRY: {
             const stationRepository = getRepository(StationEntity);
@@ -77,7 +93,7 @@ export async function saveRobotToSecretStorage(payload: SecretStorageSaveRobotQu
     }
 }
 
-export async function deleteRobotFromSecretStorage(payload: SecretStorageDeleteRobotQueuePayload) {
+export async function deleteRobotFromSecretStorage(payload: SecretStorageRobotQueuePayload) {
     try {
         await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(ROBOT_SECRET_ENGINE_KEY, `${payload.name}`);
     } catch (e) {

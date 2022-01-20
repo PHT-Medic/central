@@ -7,8 +7,11 @@
 
 import { AxiosInstance } from 'axios';
 import { buildVaultKeyValueURLPath } from './utils';
-import { VaultKVOptions, VaultKVVersion, VaultKeyValueContext } from './type';
+import {
+    VaultKVOptions, VaultKVVersion, VaultKeyValueContext,
+} from './type';
 import { VaultMountAPI, VaultMountPayload } from '../mount';
+import { VaultResourceResponse } from '../type';
 
 export class VaultKeyValueAPI {
     protected client: AxiosInstance;
@@ -38,18 +41,18 @@ export class VaultKeyValueAPI {
         }
     }
 
-    async find(
+    async find<T extends Record<string, any> = Record<string, any>>(
         engine: string,
         key: string,
         options?: VaultKVOptions,
-    ) : Promise<Record<string, any> | undefined> {
+    ) : Promise<VaultResourceResponse<T> | undefined> {
         options ??= {};
         options.version ??= VaultKVVersion.ONE;
 
         try {
             const { data } = await this.client.get(buildVaultKeyValueURLPath(options.version, engine, key));
 
-            return data.data;
+            return data;
         } catch (e) {
             if (e.response.status === 404) {
                 return undefined;

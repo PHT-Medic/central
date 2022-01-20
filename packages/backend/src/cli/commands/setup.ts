@@ -15,6 +15,7 @@ import env from '../../env';
 import { buildDatabaseConnectionOptions } from '../../database/utils';
 import { generateSwaggerDocumentation } from '../../config/http/swagger';
 import { DatabaseRootSeeder } from '../../database/seeds/root';
+import { buildRobotAggregator } from '../../aggregators/robot';
 
 interface SetupArguments extends Arguments {
     auth: boolean,
@@ -103,6 +104,9 @@ export class SetupCommand implements CommandModule {
                     if (config.redisDatabase.status !== 'connecting') {
                         await config.redisDatabase.connect();
                     }
+
+                    const aggregator = buildRobotAggregator();
+                    aggregator.start();
 
                     const authSeeder = new AuthDatabaseRootSeeder({
                         permissions: Object.values(PermissionKey),

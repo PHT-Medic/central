@@ -17,7 +17,7 @@ import {
 import { isRegistryStationProjectName } from '@personalhealthtrain/ui-common/src/domains/core/station/registry';
 import { AggregatorTrainEvent } from '../../../aggregators/dispatcher/handlers/train';
 
-import { DispatcherHarborEventData } from '../../../domains/extra/harbor/queue';
+import { DispatcherHarborEventData } from '../../../domains/special/harbor/queue';
 import { DispatcherHarborEventWithAdditionalData } from '../data/harbor';
 import { MessageQueueDispatcherRoutingKey } from '../../../config/service/mq';
 

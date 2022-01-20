@@ -9,14 +9,12 @@ import { Message, buildMessage } from 'amqp-extension';
 import { MessageQueueSelfRoutingKey } from '../../../config/service/mq';
 import { SecretStorageQueueCommand } from './constants';
 import {
-    SecretStorageDeleteQueuePayload,
-    SecretStorageSaveQueuePayload,
+    SecretStorageQueuePayload,
 } from './type';
 
 export function buildSecretStorageQueueMessage(
     type: SecretStorageQueueCommand,
-    context: SecretStorageSaveQueuePayload |
-    SecretStorageDeleteQueuePayload,
+    context: SecretStorageQueuePayload,
 ) : Message {
     return buildMessage({
         options: {

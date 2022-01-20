@@ -8,11 +8,11 @@
 import { Message, publishMessage } from 'amqp-extension';
 
 import { REGISTRY_OUTGOING_PROJECT_NAME } from '@personalhealthtrain/ui-common';
-import { DispatcherHarborEventData } from '../../../domains/extra/harbor/queue';
+import { DispatcherHarborEventData } from '../../../domains/special/harbor/queue';
 import {
     ResultServiceCommand,
     buildResultServiceQueueMessage,
-} from '../../../domains/extra/result-service';
+} from '../../../domains/special/result-service';
 import { useLogger } from '../../../modules/log';
 
 export async function dispatchHarborEventToResultService(

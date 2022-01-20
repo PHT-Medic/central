@@ -7,11 +7,12 @@
 
 import { TrapiClient, TrapiClientConfig } from '@trapi/client';
 
-import { APIConnectionStringError, VaultKeyValueAPI } from '../../error';
+import { APIConnectionStringError } from '../../error';
 import {
     APIServiceVaultConfig,
 } from './type';
 import { VaultMountAPI } from './mount';
+import { VaultKeyValueAPI } from './key-value';
 
 export function parseVaultConnectionString(connectionString: string) : APIServiceVaultConfig {
     const parts : string[] = connectionString.split('@');

@@ -6,7 +6,6 @@
  */
 
 import { setTrapiClientConfig, useTrapiClient } from '@trapi/client';
-import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { Client, setConfig as setRedisConfig, useClient } from 'redis-extension';
 import { ROBOT_SECRET_ENGINE_KEY, ServiceID, VaultAPI } from '@personalhealthtrain/ui-common';
 import https from 'https';
@@ -32,14 +31,6 @@ export function createConfig({ env } : ConfigContext) : Config {
     const redisDatabase = useClient('default');
     const redisPub = redisDatabase.duplicate();
     const redisSub = redisDatabase.duplicate();
-
-    setAmqpConfig({
-        connection: env.rabbitMqConnectionString,
-        exchange: {
-            name: 'pht',
-            type: 'topic',
-        },
-    });
 
     setTrapiClientConfig('vault', {
         clazz: VaultAPI,
@@ -71,14 +62,14 @@ export function createConfig({ env } : ConfigContext) : Config {
                     err.response?.data?.code === ErrorCode.CREDENTIALS_INVALID
                 )
             ) {
-                const robot = await useTrapiClient<VaultAPI>('vault').keyValue
+                const response = await useTrapiClient<VaultAPI>('vault').keyValue
                     .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM);
 
-                if (robot) {
+                if (response) {
                     useTrapiClient('default').setAuthorizationHeader({
                         type: 'Basic',
-                        username: robot.id,
-                        password: robot.secret,
+                        username: response.data.id,
+                        password: response.data.secret,
                     });
 
                     return useTrapiClient('default').request(config);

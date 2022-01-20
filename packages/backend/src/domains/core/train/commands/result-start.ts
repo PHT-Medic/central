@@ -16,7 +16,7 @@ import {
     TrainRunStatus,
 } from '@personalhealthtrain/ui-common';
 import { useTrapiClient } from '@trapi/client';
-import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../extra/result-service';
+import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../special/result-service';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 import { ApiKey } from '../../../../config/api';

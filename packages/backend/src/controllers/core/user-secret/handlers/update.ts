@@ -6,11 +6,13 @@ import { publishMessage } from 'amqp-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { runUserSecretValidation } from './utils';
 import { UserSecretEntity } from '../../../../domains/auth/user-secret/entity';
-import { buildSecretStorageQueueMessage } from '../../../../domains/extra/secret-storage/queue';
+import { buildSecretStorageQueueMessage } from '../../../../domains/special/secret-storage/queue';
 import {
     SecretStorageQueueCommand,
     SecretStorageQueueEntityType,
-} from '../../../../domains/extra/secret-storage/constants';
+} from '../../../../domains/special/secret-storage/constants';
+import env from '../../../../env';
+import { saveUserSecretsToSecretStorage } from '../../../../components/secret-storage/handlers/entities/user';
 
 export async function updateUserSecretRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -41,15 +43,22 @@ export async function updateUserSecretRouteHandler(req: ExpressRequest, res: Exp
 
     await repository.save(entity);
 
-    const queueMessage = buildSecretStorageQueueMessage(
-        SecretStorageQueueCommand.SAVE,
-        {
+    if (env.env === 'test') {
+        await saveUserSecretsToSecretStorage({
             type: SecretStorageQueueEntityType.USER_SECRETS,
             id: entity.user_id,
-        },
-    );
+        });
+    } else {
+        const queueMessage = buildSecretStorageQueueMessage(
+            SecretStorageQueueCommand.SAVE,
+            {
+                type: SecretStorageQueueEntityType.USER_SECRETS,
+                id: entity.user_id,
+            },
+        );
 
-    await publishMessage(queueMessage);
+        await publishMessage(queueMessage);
+    }
 
     return res.respond({ data: entity });
 }

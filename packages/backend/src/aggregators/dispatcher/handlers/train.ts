@@ -8,7 +8,6 @@
 import {
     TrainBuildStatus,
     TrainRunStatus,
-    TrainStation,
     TrainStationRunStatus,
 } from '@personalhealthtrain/ui-common';
 import { ConsumeHandlers, Message } from 'amqp-extension';

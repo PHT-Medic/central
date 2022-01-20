@@ -29,7 +29,7 @@ export function requireFromEnv(key : string, alt?: any) {
 }
 
 export interface Environment {
-    env: string,
+    env: 'development' | 'test' | 'production',
     port: number,
     swaggerDocumentation: boolean | null
 

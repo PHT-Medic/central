@@ -6,25 +6,40 @@
  */
 
 import {
-    STATION_SECRET_ENGINE_KEY, USER_SECRETS_SECRET_ENGINE_KEY,
+    USER_SECRETS_SECRET_ENGINE_KEY,
     VaultAPI,
 } from '@personalhealthtrain/ui-common';
 import { useTrapiClient } from '@trapi/client';
 import { getRepository } from 'typeorm';
 import { ApiKey } from '../../../../config/api';
 import {
-    SecretStorageDeleteUserSecretsQueuePayload,
-    SecretStorageSaveUserSecretsQueuePayload,
-} from '../../../../domains/extra/secret-storage/type';
+    SecretStorageUserSecretsQueuePayload,
+} from '../../../../domains/special/secret-storage/type';
 import { UserSecretEntity } from '../../../../domains/auth/user-secret/entity';
 
-export async function saveUserSecretsToSecretStorage(payload: SecretStorageSaveUserSecretsQueuePayload) {
+export async function deleteUserSecretsFromSecretStorage(payload: SecretStorageUserSecretsQueuePayload) {
+    try {
+        await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(
+            USER_SECRETS_SECRET_ENGINE_KEY,
+            `${payload.id}`,
+        );
+    } catch (e) {
+        // ...
+    }
+}
+
+export async function saveUserSecretsToSecretStorage(payload: SecretStorageUserSecretsQueuePayload) {
     const repository = await getRepository(UserSecretEntity);
     const query = repository.createQueryBuilder('secret')
         .where('secret.user_id = :id', { id: payload.id })
         .orderBy('secret.created_at', 'DESC');
 
     const entities = await query.getMany();
+
+    if (entities.length === 0) {
+        await deleteUserSecretsFromSecretStorage(payload);
+        return;
+    }
 
     const secrets : Record<string, string> = {};
 
@@ -37,14 +52,4 @@ export async function saveUserSecretsToSecretStorage(payload: SecretStorageSaveU
         `${payload.id}`,
         secrets,
     );
-}
-export async function deleteUserSecretsFromSecretStorage(payload: SecretStorageDeleteUserSecretsQueuePayload) {
-    try {
-        await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(
-            USER_SECRETS_SECRET_ENGINE_KEY,
-            `${payload.id}`,
-        );
-    } catch (e) {
-        // ...
-    }
 }

@@ -23,8 +23,6 @@
     </div>
 </template>
 <script>
-import { addRolePermission, dropRolePermission } from '@personalhealthtrain/ui-common';
-
 export default {
     props: {
         rolePermissions: {
@@ -62,14 +60,14 @@ export default {
             this.busy = true;
 
             try {
-                const item = await addRolePermission({
+                const item = await this.$authApi.rolePermission.create({
                     role_id: this.roleId,
                     permission_id: this.permissionId,
                 });
 
                 this.$emit('added', item);
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;
@@ -80,11 +78,11 @@ export default {
             this.busy = true;
 
             try {
-                await dropRolePermission(this.rolePermissions[this.rolePermissionIndex].id);
+                await this.$authApi.rolePermission.delete(this.rolePermissions[this.rolePermissionIndex].id);
 
                 this.$emit('dropped', this.rolePermissions[this.rolePermissionIndex]);
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;

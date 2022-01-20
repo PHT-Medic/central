@@ -8,8 +8,16 @@
 import { PermissionID, UserSecret } from '@personalhealthtrain/ui-common';
 import { NotFoundError } from '@typescript-error/http';
 import { FindConditions, getRepository } from 'typeorm';
+import { publishMessage } from 'amqp-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { UserSecretEntity } from '../../../../domains/auth/user-secret/entity';
+import env from '../../../../env';
+import { saveUserSecretsToSecretStorage } from '../../../../components/secret-storage/handlers/entities/user';
+import {
+    SecretStorageQueueCommand,
+    SecretStorageQueueEntityType,
+} from '../../../../domains/special/secret-storage/constants';
+import { buildSecretStorageQueueMessage } from '../../../../domains/special/secret-storage/queue';
 
 export async function deleteUserSecretRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -32,6 +40,23 @@ export async function deleteUserSecretRouteHandler(req: ExpressRequest, res: Exp
     }
 
     await repository.remove(entity);
+
+    if (env.env === 'test') {
+        await saveUserSecretsToSecretStorage({
+            type: SecretStorageQueueEntityType.USER_SECRETS,
+            id: entity.user_id,
+        });
+    } else {
+        const queueMessage = buildSecretStorageQueueMessage(
+            SecretStorageQueueCommand.SAVE,
+            {
+                type: SecretStorageQueueEntityType.USER_SECRETS,
+                id: entity.user_id,
+            },
+        );
+
+        await publishMessage(queueMessage);
+    }
 
     return res.respondDeleted({ data: entity });
 }

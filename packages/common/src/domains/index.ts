@@ -7,5 +7,5 @@
 
 export * from './auth';
 export * from './core';
-export * from './extra';
+export * from './special';
 export * from './type';

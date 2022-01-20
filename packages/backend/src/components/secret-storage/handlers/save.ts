@@ -7,13 +7,13 @@
 
 import { Message } from 'amqp-extension';
 import { saveRobotToSecretStorage } from './entities/robot';
-import { SecretStorageQueueEntityType } from '../../../domains/extra/secret-storage/constants';
-import { SecretStorageSaveQueuePayload } from '../../../domains/extra/secret-storage/type';
+import { SecretStorageQueueEntityType } from '../../../domains/special/secret-storage/constants';
+import { SecretStorageQueuePayload } from '../../../domains/special/secret-storage/type';
 import { saveStationToSecretStorage } from './entities/station';
 import { saveUserSecretsToSecretStorage } from './entities/user';
 
 export async function saveToSecretStorage(message: Message) {
-    const payload : SecretStorageSaveQueuePayload = message.data as SecretStorageSaveQueuePayload;
+    const payload : SecretStorageQueuePayload = message.data as SecretStorageQueuePayload;
 
     switch (payload.type) {
         case SecretStorageQueueEntityType.ROBOT:

@@ -58,6 +58,12 @@ export function createConfig({ env } : ConfigContext) : Config {
         },
     });
 
+    setRedisConfig('default', { connectionString: env.redisConnectionString });
+
+    const redisDatabase = useClient('default');
+    const redisPub = redisDatabase.duplicate();
+    const redisSub = redisDatabase.duplicate();
+
     setTrapiClientConfig(ApiKey.VAULT, {
         clazz: VaultAPI,
         connectionString: env.vaultConnectionString,
@@ -72,12 +78,6 @@ export function createConfig({ env } : ConfigContext) : Config {
             }),
         },
     });
-
-    setRedisConfig('default', { connectionString: env.redisConnectionString });
-
-    const redisDatabase = useClient('default');
-    const redisPub = redisDatabase.duplicate();
-    const redisSub = redisDatabase.duplicate();
 
     setAmqpConfig({
         connection: env.rabbitMqConnectionString,

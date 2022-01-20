@@ -14,11 +14,13 @@ import { runStationValidation } from './utils';
 import { StationEntity } from '../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { ApiKey } from '../../../../config/api';
-import { buildSecretStorageQueueMessage } from '../../../../domains/extra/secret-storage/queue';
+import { buildSecretStorageQueueMessage } from '../../../../domains/special/secret-storage/queue';
 import {
     SecretStorageQueueCommand,
     SecretStorageQueueEntityType,
-} from '../../../../domains/extra/secret-storage/constants';
+} from '../../../../domains/special/secret-storage/constants';
+import env from '../../../../env';
+import { saveStationToSecretStorage } from '../../../../components/secret-storage/handlers/entities/station';
 
 export async function updateStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -73,14 +75,21 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
     entity = repository.merge(entity, data);
 
     if (entity.public_key) {
-        const queueMessage = buildSecretStorageQueueMessage(
-            SecretStorageQueueCommand.SAVE,
-            {
+        if (env.env === 'test') {
+            await saveStationToSecretStorage({
                 type: SecretStorageQueueEntityType.STATION,
                 id: entity.id,
-            },
-        );
-        await publishMessage(queueMessage);
+            });
+        } else {
+            const queueMessage = buildSecretStorageQueueMessage(
+                SecretStorageQueueCommand.SAVE,
+                {
+                    type: SecretStorageQueueEntityType.STATION,
+                    id: entity.id,
+                },
+            );
+            await publishMessage(queueMessage);
+        }
     }
 
     const result = await repository.save(entity);

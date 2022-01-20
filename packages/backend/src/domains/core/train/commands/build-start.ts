@@ -10,8 +10,8 @@ import { Not, getRepository } from 'typeorm';
 import {
     Train, TrainBuildStatus, TrainConfigurationStatus, TrainResultStatus, TrainRunStatus, TrainStationApprovalStatus,
 } from '@personalhealthtrain/ui-common';
-import { buildTrainBuilderQueueMessage } from '../../../extra/train-builder/queue';
-import { TrainBuilderCommand } from '../../../extra/train-builder/type';
+import { buildTrainBuilderQueueMessage } from '../../../special/train-builder/queue';
+import { TrainBuilderCommand } from '../../../special/train-builder/type';
 import { findTrain } from './utils';
 import { TrainStationEntity } from '../../train-station/entity';
 import { TrainEntity } from '../entity';

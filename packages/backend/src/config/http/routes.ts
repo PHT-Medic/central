@@ -15,7 +15,7 @@ import { StationController } from '../../controllers/core/station';
 import { TrainController } from '../../controllers/core/train';
 import { TrainFileController } from '../../controllers/core/train-file';
 import { TrainStationController } from '../../controllers/core/train-station';
-import { ServiceController } from '../../controllers/extra/service';
+import { ServiceController } from '../../controllers/special/service';
 import { MasterImageGroupController } from '../../controllers/core/master-image-groups';
 import { TrainResultController } from '../../controllers/core/train-result';
 

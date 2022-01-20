@@ -9,3 +9,14 @@ export type APIServiceVaultConfig = {
     host: string,
     token: string
 };
+
+export type VaultResourceResponse<T extends Record<string, any> = Record<string, any>> = {
+    auth: null,
+    data: T,
+    lease_duration: number,
+    lease_id: string,
+    renewable: boolean,
+    request_id: string,
+    warnings: null,
+    wrap_info: null
+};

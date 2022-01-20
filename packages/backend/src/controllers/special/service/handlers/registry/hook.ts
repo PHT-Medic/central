@@ -15,7 +15,7 @@ import {
 } from '@personalhealthtrain/ui-common';
 import { publishMessage } from 'amqp-extension';
 import { useLogger } from '../../../../../modules/log';
-import { DispatcherHarborEventType, buildDispatcherHarborEvent } from '../../../../../domains/extra/harbor/queue';
+import { DispatcherHarborEventType, buildDispatcherHarborEvent } from '../../../../../domains/special/harbor/queue';
 import { ExpressRequest, ExpressResponse } from '../../../../../config/http/type';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 

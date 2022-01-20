@@ -13,7 +13,7 @@ import {
 } from '@personalhealthtrain/ui-common';
 import { Message, consumeQueue } from 'amqp-extension';
 import { getRepository } from 'typeorm';
-import { ResultServiceDataPayload } from '../domains/extra/result-service';
+import { ResultServiceDataPayload } from '../domains/special/result-service';
 import { MessageQueueResultServiceRoutingKey } from '../config/service/mq';
 import { TrainEntity } from '../domains/core/train/entity';
 import { TrainResultEntity } from '../domains/core/train-result/entity';
