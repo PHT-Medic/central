@@ -9,8 +9,7 @@ import { Arguments, Argv, CommandModule } from 'yargs';
 import { createConnection } from 'typeorm';
 import { buildConnectionOptions } from 'typeorm-extension';
 import {
-    DatabaseRootSeeder,
-    modifyDatabaseConnectionOptions,
+    DatabaseRootSeeder, setEntitiesForConnectionOptions,
 } from '@typescript-auth/server';
 import { useConfig } from '@typescript-auth/server/dist/config';
 import { PermissionKey } from '@personalhealthtrain/ui-common';
@@ -29,7 +28,7 @@ export class CheckCommand implements CommandModule {
     }
 
     async handler(args: SeedCheckArguments) {
-        const connectionOptions = modifyDatabaseConnectionOptions(await buildConnectionOptions(), true);
+        const connectionOptions = setEntitiesForConnectionOptions(await buildConnectionOptions(), true);
         const connection = await createConnection(connectionOptions);
 
         try {

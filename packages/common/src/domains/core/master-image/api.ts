@@ -7,15 +7,15 @@
 
 import { BuildInput, buildQuery } from '@trapi/query';
 
-import { AxiosInstance } from 'axios';
+import { ClientDriverInstance } from '@trapi/client';
 import { MasterImage } from './entity';
 import { MasterImageCommand } from './type';
 import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
 export class MasterImageAPI {
-    protected client: AxiosInstance;
+    protected client: ClientDriverInstance;
 
-    constructor(client: AxiosInstance) {
+    constructor(client: ClientDriverInstance) {
         this.client = client;
     }
 

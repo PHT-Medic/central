@@ -6,17 +6,16 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import { AxiosInstance } from 'axios';
-import { TrapiClientRequestConfig } from '@trapi/client';
+import { ClientDriverInstance, ClientRequestConfig } from '@trapi/client';
 import { Train } from './entity';
 import { TrainCommand } from './type';
 import { nullifyEmptyObjectProperties } from '../../../utils';
 import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
 export class TrainAPI {
-    protected client: AxiosInstance;
+    protected client: ClientDriverInstance;
 
-    constructor(client: AxiosInstance) {
+    constructor(client: ClientDriverInstance) {
         this.client = client;
     }
 
@@ -30,7 +29,7 @@ export class TrainAPI {
     async getOne(
         id: Train['id'],
         options?: BuildInput<Train>,
-        requestConfig?: TrapiClientRequestConfig,
+        requestConfig?: ClientRequestConfig,
     ): Promise<SingleResourceResponse<Train>> {
         const { data: response } = await this.client
             .get(`trains/${id}${buildQuery(options)}`, requestConfig);

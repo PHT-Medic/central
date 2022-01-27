@@ -6,14 +6,15 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import { AxiosInstance } from 'axios';
+import { ClientDriverInstance } from '@trapi/client';
 import { Station } from './entity';
 import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
+import { nullifyEmptyObjectProperties } from '../../../utils';
 
 export class StationAPI {
-    protected client: AxiosInstance;
+    protected client: ClientDriverInstance;
 
-    constructor(client: AxiosInstance) {
+    constructor(client: ClientDriverInstance) {
         this.client = client;
     }
 
@@ -30,13 +31,13 @@ export class StationAPI {
     }
 
     async create(data: Record<string, any>): Promise<SingleResourceResponse<Station>> {
-        const response = await this.client.post('stations', data);
+        const response = await this.client.post('stations', nullifyEmptyObjectProperties(data));
 
         return response.data;
     }
 
     async update(id: number, data: Record<string, any>): Promise<SingleResourceResponse<Station>> {
-        const response = await this.client.post(`stations/${id}`, data);
+        const response = await this.client.post(`stations/${id}`, nullifyEmptyObjectProperties(data));
 
         return response.data;
     }

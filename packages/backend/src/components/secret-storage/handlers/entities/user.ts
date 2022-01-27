@@ -9,7 +9,7 @@ import {
     USER_SECRETS_SECRET_ENGINE_KEY,
     VaultAPI,
 } from '@personalhealthtrain/ui-common';
-import { useTrapiClient } from '@trapi/client';
+import { useClient } from '@trapi/client';
 import { getRepository } from 'typeorm';
 import { ApiKey } from '../../../../config/api';
 import {
@@ -19,7 +19,7 @@ import { UserSecretEntity } from '../../../../domains/auth/user-secret/entity';
 
 export async function deleteUserSecretsFromSecretStorage(payload: SecretStorageUserSecretsQueuePayload) {
     try {
-        await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(
+        await useClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(
             USER_SECRETS_SECRET_ENGINE_KEY,
             `${payload.id}`,
         );
@@ -47,7 +47,7 @@ export async function saveUserSecretsToSecretStorage(payload: SecretStorageUserS
         secrets[entities[i].id] = entities[i].content;
     }
 
-    await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(
+    await useClient<VaultAPI>(ApiKey.VAULT).keyValue.save(
         USER_SECRETS_SECRET_ENGINE_KEY,
         `${payload.id}`,
         secrets,

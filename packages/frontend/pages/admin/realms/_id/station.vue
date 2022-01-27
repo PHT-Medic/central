@@ -5,22 +5,24 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { dropAPIStation, getAPIStations } from '@personalhealthtrain/ui-common';
 import Vue from 'vue';
+import StationForm from '../../../../components/domains/station/StationForm';
 
 export default {
+    components: { StationForm },
     props: {
         realm: Object,
     },
-    async asyncData(ctx) {
+    async asyncData(context) {
         try {
-            const { data: stations } = await getAPIStations({
+            const { data: stations } = await context.$api.station.getMany({
                 filter: {
-                    realm_id: ctx.params.id,
+                    realm_id: context.params.id,
                 },
                 fields: {
                     station: [
                         '+registry_project_id',
+                        '+registry_project_account_id',
                         '+registry_project_account_name',
                         '+registry_project_account_token',
                         '+registry_project_webhook_exists',
@@ -32,7 +34,7 @@ export default {
                 },
             });
 
-            if (stations.length !== 1) {
+            if (stations.length === 0) {
                 return {
                     station: undefined,
                 };
@@ -67,76 +69,88 @@ export default {
             busy: false,
         };
     },
+    mounted() {
+        this.subscribeRealtimeServer();
+    },
+    beforeDestroy() {
+        this.unsubscribeRealtimeServer();
+    },
     methods: {
+        subscribeRealtimeServer() {
+            if (!this.station) return;
+            const socket = this.$socket.useRealmWorkspace(this.station.realm_id);
+            socket.emit('stationsSubscribe', { data: { id: this.station.id } });
+            socket.on('stationUpdated', this.handleSocketUpdated);
+            socket.on('stationDeleted', this.handleSocketDeleted);
+        },
+        unsubscribeRealtimeServer() {
+            if (!this.station) return;
+
+            const socket = this.$socket.useRealmWorkspace(this.station.realm_id);
+            socket.emit('stationsUnsubscribe', { data: { id: this.station.id } });
+            socket.off('stationUpdated', this.handleSocketUpdated);
+            socket.off('stationDeleted', this.handleSocketDeleted);
+        },
+
+        handleSocketUpdated(context) {
+            if (
+                this.station.id !== context.data.id ||
+                context.meta.roomId !== this.station.id
+            ) return;
+
+            this.handleUpdated(context.data);
+        },
+        async handleSocketDeleted(context) {
+            if (
+                this.station.id !== context.data.id ||
+                context.meta.roomId !== this.station.id
+            ) return;
+
+            await this.handleDeleted();
+        },
+
         handleCreated(station) {
             this.station = station;
+            this.subscribeRealtimeServer();
         },
         handleUpdated(station) {
-            for (const key in station) {
-                Vue.set(this.station, key, station[key]);
+            const keys = Object.keys(station);
+            for (let i = 0; i < keys.length; i++) {
+                Vue.set(this.station, keys[i], station[keys[i]]);
             }
         },
-        handleDeleted() {
-            this.station = undefined;
-        },
-
-        async dropStation() {
-            if (this.busy || !this.station) return;
-
-            this.busy = true;
-
-            try {
-                await dropAPIStation(this.station.id);
-
-                this.$emit('deleted', this.station);
-            } catch (e) {
-                // ...
-            }
-
-            this.busy = false;
+        async handleDeleted() {
+            await this.$nuxt.$router.push(`/admin/realms/${this.station.realm_id}`);
         },
     },
 };
 </script>
 <template>
-    <div class="content-wrapper">
-        <div class="content-sidebar">
-            <b-nav
-                pills
-                vertical
-            >
-                <b-nav-item
-                    v-for="(item,key) in sidebar.items"
-                    v-if="!item.stationRequired || (item.stationRequired && station)"
-                    :key="key"
-                    :disabled="item.active"
-                    :to="'/admin/realms/' +realm.id + '/station'+ item.urlSuffix"
-                    exact
-                    exact-active-class="active"
-                >
-                    <i :class="item.icon" />
-                    {{ item.name }}
-                </b-nav-item>
-            </b-nav>
-        </div>
-        <div class="content-container">
-            <div class="d-flex">
-                <div class="ml-auto">
-                    <button
-                        class="btn btn-danger btn-xs"
-                        @click.prevent="dropStation"
-                    >
-                        <i class="fa fa-trash" /> Drop
-                    </button>
-                </div>
+    <div>
+        <template v-if="station">
+            <div>
+                <station-form
+                    :entity-property="station"
+                    @created="handleCreated"
+                    @updated="handleUpdated"
+                    @deleted="handleDeleted"
+                />
             </div>
-            <nuxt-child
-                :realm="realm"
-                :station="station"
+        </template>
+        <template v-else>
+            <p class="mb-2">
+                No station is associated to the  <strong>{{ realm.name }}</strong> realm yet.
+            </p>
+
+            <hr>
+
+            <station-form
+                :realm-id-property="realm.id"
+                :realm-name-property="realm.name"
                 @created="handleCreated"
                 @updated="handleUpdated"
                 @deleted="handleDeleted"
             />
-        </div>
+        </template>
     </div>
 </template>

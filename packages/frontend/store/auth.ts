@@ -8,20 +8,11 @@
 import Vue from 'vue';
 import { ActionTree, GetterTree, MutationTree } from 'vuex';
 
-import { Oauth2TokenResponse, PermissionItem } from '@typescript-auth/core';
-import { User } from '@typescript-auth/domains';
-import { RootState } from '~/store/index';
-
-export const AuthStoreKey = {
-    user: 'user',
-    permissions: 'permissions',
-    token: 'token',
-    provider: 'provider',
-};
-
-export type AuthStoreToken = Oauth2TokenResponse & {
-    expire_date: string
-};
+import {
+    OAuth2TokenKind, PermissionItem, User,
+} from '@typescript-auth/domains';
+import { RootState } from './index';
+import { AuthBrowserStorageKey } from '@/modules/auth/constants';
 
 export interface AuthState {
     user: User | undefined,
@@ -29,7 +20,10 @@ export interface AuthState {
     permissions: PermissionItem[],
     permissionsResolved: boolean,
 
-    token: AuthStoreToken | undefined,
+    accessToken: string | undefined,
+    accessTokenExpireDate: Date | undefined,
+    refreshToken: string | undefined,
+
     tokenPromise: Promise<any> | undefined,
 
     required: boolean,
@@ -42,7 +36,10 @@ const state = () : AuthState => ({
     permissions: [],
     permissionsResolved: false,
 
-    token: undefined,
+    accessToken: undefined,
+    accessTokenExpireDate: undefined,
+    refreshToken: undefined,
+
     tokenPromise: undefined,
 
     required: false,
@@ -52,8 +49,8 @@ const state = () : AuthState => ({
 
 export const getters : GetterTree<AuthState, RootState> = {
     user: (state: AuthState) => state.user,
-    userId: (state: AuthState) : User['id'] => (state.user ? state.user.id : undefined),
-    userRealmId: (state: AuthState) : User['realm_id'] => (state.user ? state.user.realm_id : undefined),
+    userId: (state: AuthState) => (state.user ? state.user.id : undefined),
+    userRealmId: (state: AuthState) => (state.user ? state.user.realm_id : undefined),
     permissions: (state: AuthState) => state.permissions,
     permissionsResolved: (state: AuthState) => state.permissionsResolved,
     permission: (state: AuthState) => (id: number | string) => {
@@ -66,8 +63,11 @@ export const getters : GetterTree<AuthState, RootState> = {
 
         return items.length === 1 ? items[0] : undefined;
     },
-    loggedIn: (state : AuthState) => !!state.token,
-    token: (state: AuthState) => state.token,
+    loggedIn: (state : AuthState) => !!state.accessToken,
+
+    accessToken: (state: AuthState) => state.accessToken,
+    accessTokenExpireDate: (state: AuthState) => state.accessTokenExpireDate,
+    refreshToken: (state: AuthState) => state.refreshToken,
 };
 
 export const actions : ActionTree<AuthState, RootState> = {
@@ -79,41 +79,52 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     // --------------------------------------------------------------------
 
-    triggerSetToken({ commit }, token) {
-        this.$authWarehouse.set(AuthStoreKey.token, token);
-
-        if (typeof token === 'object' && Object.prototype.hasOwnProperty.call(token, 'accessToken')) {
-            this.$auth.setRequestToken(token.accessToken);
+    triggerSetToken({ commit }, { kind, token }) {
+        switch (kind) {
+            case OAuth2TokenKind.ACCESS:
+                this.$authWarehouse.set(AuthBrowserStorageKey.ACCESS_TOKEN, token);
+                this.$auth.setRequestToken(token);
+                break;
+            case OAuth2TokenKind.REFRESH:
+                this.$authWarehouse.set(AuthBrowserStorageKey.REFRESH_TOKEN, token);
+                break;
         }
 
-        commit('setToken', token);
+        commit('setToken', { kind, token });
     },
-    triggerUnsetToken({ commit }) {
-        this.$authWarehouse.remove(AuthStoreKey.token);
-        this.$auth.unsetRequestToken();
+    triggerUnsetToken({ commit }, kind) {
+        switch (kind) {
+            case OAuth2TokenKind.ACCESS:
+                this.$authWarehouse.remove(AuthBrowserStorageKey.ACCESS_TOKEN);
+                this.$auth.unsetRequestToken();
+                break;
+            case OAuth2TokenKind.REFRESH:
+                this.$authWarehouse.remove(AuthBrowserStorageKey.REFRESH_TOKEN);
+                break;
+        }
 
-        commit('unsetToken');
+        commit('unsetToken', kind);
     },
 
     // --------------------------------------------------------------------
 
     triggerSetUser({ commit }, user) {
-        this.$authWarehouse.set(AuthStoreKey.user, user);
+        this.$authWarehouse.set(AuthBrowserStorageKey.USER, user);
         commit('setUser', user);
     },
     triggerUnsetUser({ commit }) {
-        this.$authWarehouse.remove(AuthStoreKey.user);
+        this.$authWarehouse.remove(AuthBrowserStorageKey.USER);
         commit('unsetUser');
     },
 
     // --------------------------------------------------------------------
 
     triggerSetPermissions({ commit }, permissions) {
-        this.$authWarehouse.setLocalStorageItem(AuthStoreKey.permissions, permissions);
+        this.$authWarehouse.setLocalStorageItem(AuthBrowserStorageKey.PERMISSIONS, permissions);
         commit('setPermissions', permissions);
     },
     triggerUnsetPermissions({ commit }) {
-        this.$authWarehouse.removeLocalStorageItem(AuthStoreKey.permissions);
+        this.$authWarehouse.removeLocalStorageItem(AuthBrowserStorageKey.PERMISSIONS);
         commit('unsetPermissions');
     },
 
@@ -128,11 +139,11 @@ export const actions : ActionTree<AuthState, RootState> = {
      * @returns {Promise<boolean>}
      */
     async triggerRefreshMe({ state, dispatch }) {
-        const { token } = state;
+        const { accessToken } = state;
 
-        if (token) {
+        if (accessToken) {
             try {
-                const { permissions, ...user } = await this.$auth.getUserInfo(token.access_token);
+                const { permissions, ...user } = await this.$auth.getUserInfo(accessToken);
 
                 dispatch('triggerUnsetUser');
 
@@ -157,20 +168,17 @@ export const actions : ActionTree<AuthState, RootState> = {
         try {
             const token = await this.$auth.getTokenWithPassword(name, password);
 
-            const extendedToken : AuthStoreToken = {
-                ...token,
-                expire_date: new Date(Date.now() + token.expires_in * 1000).toString(),
-            };
-
             commit('loginSuccess');
+            commit('setTokenExpireDate', { kind: OAuth2TokenKind.ACCESS, date: new Date(Date.now() + token.expires_in * 1000) });
 
-            dispatch('triggerSetToken', extendedToken);
+            dispatch('triggerSetToken', { kind: OAuth2TokenKind.ACCESS, token: token.access_token });
+            dispatch('triggerSetToken', { kind: OAuth2TokenKind.REFRESH, token: token.refresh_token });
 
             await dispatch('triggerRefreshMe');
-
             await dispatch('layout/initNavigation', undefined, { root: true });
         } catch (e) {
-            dispatch('triggerUnsetToken');
+            await dispatch('triggerUnsetToken', OAuth2TokenKind.ACCESS);
+            await dispatch('triggerUnsetToken', OAuth2TokenKind.REFRESH);
 
             throw e;
         }
@@ -180,7 +188,7 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     triggerRefreshToken({ commit, state, dispatch }) {
         if (
-            typeof state.token?.refresh_token !== 'string'
+            typeof state.refreshToken !== 'string'
         ) {
             throw new Error('It is not possible to receive a new access token');
         }
@@ -189,7 +197,7 @@ export const actions : ActionTree<AuthState, RootState> = {
             commit('loginRequest');
 
             try {
-                const p = this.$auth.getTokenWithRefreshToken(state.token.refresh_token);
+                const p = this.$auth.getTokenWithRefreshToken(state.refreshToken);
 
                 commit('setTokenPromise', p);
 
@@ -198,12 +206,11 @@ export const actions : ActionTree<AuthState, RootState> = {
                         commit('setTokenPromise', null);
                         commit('loginSuccess');
 
-                        const extendedToken : AuthStoreToken = {
-                            ...token,
-                            expire_date: new Date(Date.now() + token.expires_in * 1000).toString(),
-                        };
+                        commit('setTokenExpireDate', { kind: OAuth2TokenKind.ACCESS, date: new Date(Date.now() + token.expires_in * 1000) });
 
-                        dispatch('triggerSetToken', extendedToken);
+                        dispatch('triggerSetToken', { kind: OAuth2TokenKind.ACCESS, token: token.access_token });
+                        dispatch('triggerSetToken', { kind: OAuth2TokenKind.REFRESH, token: token.refresh_token });
+
                         dispatch('triggerRefreshMe');
                     },
                     () => {
@@ -212,7 +219,9 @@ export const actions : ActionTree<AuthState, RootState> = {
                 );
             } catch (e) {
                 commit('setTokenPromise', null);
-                dispatch('triggerAuthError', e.message);
+                if (e instanceof Error) {
+                    dispatch('triggerAuthError', e.message);
+                }
 
                 throw new Error('An error occurred on the token refresh request.');
             }
@@ -240,7 +249,8 @@ export const actions : ActionTree<AuthState, RootState> = {
      * @param commit
      */
     async triggerLogout({ dispatch }) {
-        await dispatch('triggerUnsetToken');
+        await dispatch('triggerUnsetToken', OAuth2TokenKind.ACCESS);
+        await dispatch('triggerUnsetToken', OAuth2TokenKind.REFRESH);
         await dispatch('triggerUnsetUser');
         await dispatch('triggerUnsetPermissions');
 
@@ -274,8 +284,8 @@ export const actions : ActionTree<AuthState, RootState> = {
      */
     triggerSetUserProperty({ commit, state }, { property, value }) {
         commit('setUserProperty', { property, value });
-        this.$authWarehouse.remove(AuthStoreKey.user);
-        this.$authWarehouse.set(AuthStoreKey.user, state.user);
+        this.$authWarehouse.remove(AuthBrowserStorageKey.USER);
+        this.$authWarehouse.set(AuthBrowserStorageKey.USER, state.user);
     },
 };
 
@@ -339,11 +349,32 @@ export const mutations : MutationTree<AuthState> = {
     },
 
     // --------------------------------------------------------------------
-    setToken(state, token) {
-        state.token = token;
+    setToken(state, { kind, token }) {
+        switch (kind) {
+            case OAuth2TokenKind.ACCESS:
+                state.accessToken = token;
+                break;
+            case OAuth2TokenKind.REFRESH:
+                state.refreshToken = token;
+                break;
+        }
     },
-    unsetToken(state) {
-        state.token = undefined;
+    unsetToken(state, kind) {
+        switch (kind) {
+            case OAuth2TokenKind.ACCESS:
+                state.accessToken = undefined;
+                break;
+            case OAuth2TokenKind.REFRESH:
+                state.refreshToken = undefined;
+                break;
+        }
+    },
+    setTokenExpireDate(state, { kind, date }) {
+        switch (kind) {
+            case OAuth2TokenKind.ACCESS:
+                state.accessTokenExpireDate = date;
+                break;
+        }
     },
 };
 

@@ -11,10 +11,9 @@ import {
     SocketServerToClientEvents,
     buildSocketRealmNamespaceName,
 } from '@personalhealthtrain/ui-common';
-import { Oauth2TokenResponse } from '@typescript-auth/core';
 import { BaseError } from '@typescript-error/core';
 import { Manager, ManagerOptions, Socket } from 'socket.io-client';
-import { AuthStoreKey } from '@/store/auth';
+import { AuthBrowserStorageKey } from '@/modules/auth/constants';
 
 type SocketModuleManagerConfiguration = {
     url: string,
@@ -70,7 +69,7 @@ export class SocketModule {
             realmId = this.ctx.store.getters['auth/userRealmId'];
         }
         if (!realmId) {
-            const user = this.ctx.$authWarehouse.get(AuthStoreKey.user);
+            const user = this.ctx.$authWarehouse.get(AuthBrowserStorageKey.USER);
             if (user.realm_id) {
                 realmId = user.realm_id;
             }
@@ -92,13 +91,13 @@ export class SocketModule {
         }
 
         const getToken = (cb) => {
-            let token : Oauth2TokenResponse | undefined = this.ctx.$authWarehouse.get(AuthStoreKey.token);
+            let token : string | undefined = this.ctx.$authWarehouse.get(AuthBrowserStorageKey.ACCESS_TOKEN);
             if (typeof token === 'undefined') {
-                token = this.ctx.store.getters['auth/token'];
+                token = this.ctx.store.getters['auth/accessToken'];
             }
 
             if (typeof token !== 'undefined') {
-                return cb({ token: token.access_token });
+                return cb({ token });
             }
 
             return cb();

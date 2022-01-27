@@ -6,7 +6,8 @@
   -->
 <script>
 import {
-    createNanoID,
+    RegistryCommand,
+    SecretStorageCommand, buildRegistryStationProjectName, buildStationSecretStorageKey, createNanoID, isHex,
 } from '@personalhealthtrain/ui-common';
 import {
     email, helpers, maxLength, minLength, required,
@@ -15,26 +16,30 @@ import {
 const safeStr = helpers.regex('safeStr', /^[a-z0-9]*$/);
 
 export default {
+    components: {},
+
     props: {
-        stationProperty: {
+        entityProperty: {
             type: Object,
             default: undefined,
         },
-        realmLocked: {
-            type: Boolean,
-            default: false,
+        realmIdProperty: {
+            type: String,
+            default: undefined,
+        },
+        realmNameProperty: {
+            type: String,
+            default: undefined,
         },
     },
     data() {
         return {
             formData: {
                 name: '',
-                public_key: null,
-                email: null,
+                public_key: '',
+                email: '',
                 realm_id: '',
                 secure_id: '',
-                sync_public_key: true,
-                vault_public_key_saved: false,
             },
 
             busy: false,
@@ -74,44 +79,82 @@ export default {
     },
     computed: {
         isEditing() {
-            return typeof this.stationProperty?.id === 'number';
+            return this.entityProperty &&
+                Object.prototype.hasOwnProperty.call(this.entityProperty, 'id');
         },
-        public_key() {
-            return this.stationProperty.public_key;
+        isRealmLocked() {
+            return this.realmIdProperty || (this.entityProperty && this.entityProperty.realm_id);
         },
-        secure_idChanged() {
-            if (typeof this.stationProperty?.secure_id === 'undefined') {
+        isHexPublicKey() {
+            return this.formData.public_key && isHex(this.formData.public_key);
+        },
+        hasSecureIdChanged() {
+            if (typeof this.entityProperty?.secure_id === 'undefined') {
                 return false;
             }
 
-            return this.stationProperty.secure_id !== this.formData.secure_id;
+            return this.entityProperty.secure_id !== this.formData.secure_id;
+        },
+
+        updatedAt() {
+            return this.isEditing ? this.entityProperty.updated_at : undefined;
+        },
+
+        pathName() {
+            return this.formData.name ?
+                buildStationSecretStorageKey(this.formData.name) :
+                '';
+        },
+        projectName() {
+            return this.formData.name ?
+                buildRegistryStationProjectName(this.entityProperty.secure_id) :
+                '';
         },
     },
     watch: {
-        public_key(val) {
-            this.formData.public_key = val;
+        updatedAt(val, oldVal) {
+            if (val && val !== oldVal) {
+                this.initFromProperties();
+            }
         },
     },
     created() {
-        if (typeof this.stationProperty !== 'undefined') {
-            // eslint-disable-next-line no-restricted-syntax
-            for (const key in this.formData) {
-                if (!Object.prototype.hasOwnProperty.call(this.stationProperty, key)) continue;
-
-                this.formData[key] = this.stationProperty[key];
-            }
-        }
-
-        if (!this.formData.secure_id || this.formData.secure_id.length === 0) {
-            this.formData.secure_id = createNanoID();
-        }
-
-        if (!this.realmLocked) {
-            this.loadRealms();
-        }
+        Promise.resolve()
+            .then(this.initFromProperties)
+            .then(this.loadRealms);
     },
     methods: {
+        initFromProperties() {
+            if (typeof this.entityProperty !== 'undefined') {
+                const keys = Object.keys(this.formData);
+                for (let i = 0; i < keys.length; i++) {
+                    if (!Object.prototype.hasOwnProperty.call(this.entityProperty, keys[i])) continue;
+
+                    this.formData[keys[i]] = this.entityProperty[keys[i]];
+                }
+            }
+
+            if (
+                !this.formData.realm_id &&
+                this.realmIdProperty
+            ) {
+                this.formData.realm_id = this.realmIdProperty;
+            }
+
+            if (
+                !this.formData.name &&
+                (this.realmIdProperty || this.realmNameProperty)
+            ) {
+                this.formData.name = this.realmNameProperty || this.realmIdProperty;
+            }
+
+            if (!this.formData.secure_id) {
+                this.formData.secure_id = createNanoID();
+            }
+        },
         async loadRealms() {
+            if (this.isRealmLocked) return;
+
             try {
                 const response = await this.$authApi.realm.getMany();
                 this.realm.items = response.data;
@@ -131,7 +174,7 @@ export default {
             try {
                 let station;
                 if (this.isEditing) {
-                    station = await this.$api.station.update(this.stationProperty.id, this.formData);
+                    station = await this.$api.station.update(this.entityProperty.id, this.formData);
 
                     this.$bvToast.toast('The station was successfully updated.', {
                         variant: 'success',
@@ -149,12 +192,33 @@ export default {
                         toaster: 'b-toaster-top-center',
                     });
                 }
+            } catch (e) {
+                this.$bvToast.toast(e.message, {
+                    variant: 'danger',
+                    toaster: 'b-toaster-top-center',
+                });
 
-                for (const key in this.formData) {
-                    if (Object.prototype.hasOwnProperty.call(station, key)) {
-                        this.formData[key] = station[key];
-                    }
-                }
+                this.$emit('failed', e.message);
+            }
+
+            this.busy = false;
+        },
+        async drop() {
+            if (this.busy || !this.isEditing) {
+                return;
+            }
+
+            this.busy = true;
+
+            try {
+                const entity = await this.$api.station.delete(this.entityProperty.id);
+
+                this.$emit('deleted', entity);
+
+                this.$bvToast.toast('The station was successfully deleted.', {
+                    variant: 'success',
+                    toaster: 'b-toaster-top-center',
+                });
             } catch (e) {
                 this.$bvToast.toast(e.message, {
                     variant: 'danger',
@@ -171,7 +235,7 @@ export default {
             this.formData.secure_id = createNanoID();
         },
         resetSecureId() {
-            this.formData.secure_id = this.stationProperty.secure_id;
+            this.formData.secure_id = this.entityProperty.secure_id;
         },
 
         handleRealmChanged() {
@@ -182,77 +246,175 @@ export default {
                 this.formData.name = this.realm.items[index].name;
             }
         },
+
+        async runSecretStorageEngineKeySave() {
+            await this.runSecretStorageCommand(SecretStorageCommand.ENGINE_KEY_SAVE);
+        },
+        async runSecretStorageEngineKeyDelete() {
+            await this.runSecretStorageCommand(SecretStorageCommand.ENGINE_KEY_DROP);
+        },
+        async runSecretStorageCommand(action) {
+            if (this.busy || !this.isEditing) return;
+
+            this.busy = true;
+
+            const title = 'Secret Storage';
+            let message = 'Succeeded...';
+            let variant = 'success';
+
+            try {
+                const station = await this.$api.service.runSecretStorageCommand(action, {
+                    name: buildStationSecretStorageKey(this.entityProperty.id),
+                });
+
+                // eslint-disable-next-line default-case
+                switch (action) {
+                    case SecretStorageCommand.ENGINE_KEY_SAVE:
+                        message = 'Successfully saved secrets to storage engine.';
+                        break;
+                    case SecretStorageCommand.ENGINE_KEY_DROP:
+                        message = 'Successfully deleted secrets from storage engine.';
+                        break;
+                }
+
+                this.$emit('updated', station);
+            } catch (e) {
+                variant = 'danger';
+                message = e.message;
+            }
+
+            this.$bvToast.toast(message, {
+                title,
+                autoHideDelay: 5000,
+                variant,
+                toaster: 'b-toaster-top-center',
+            });
+
+            this.busy = false;
+        },
+        async runRegistryProjectCreate() {
+            await this.runRegistryCommand(RegistryCommand.STATION_SAVE);
+        },
+        async runRegistryProjectDelete() {
+            await this.runRegistryCommand(RegistryCommand.STATION_DELETE);
+        },
+        async runRegistryCommand(command) {
+            if (this.busy || !this.isEditing) return;
+
+            this.busy = true;
+
+            const title = 'Registry';
+            let message = 'Succeeded...';
+            let variant = 'success';
+
+            try {
+                await this.$api.service.runRegistryCommand(command, {
+                    id: this.entityProperty.id,
+                });
+
+                // eslint-disable-next-line default-case
+                switch (command) {
+                    case RegistryCommand.STATION_SAVE:
+                        message = 'Successfully ensured existence of station registry, robot-account & webhook.';
+                        break;
+                    case RegistryCommand.STATION_DELETE:
+                        message = 'Successfully removed station related entities from registry.';
+
+                        this.$emit('updated', {
+                            registry_project_id: null,
+                            registry_project_account_id: null,
+                            registry_project_account_name: null,
+                            registry_project_account_token: null,
+                            registry_project_webhook_exists: null,
+                        });
+                        break;
+                }
+            } catch (e) {
+                variant = 'danger';
+                message = e.message;
+            }
+
+            this.$bvToast.toast(message, {
+                title,
+                autoHideDelay: 5000,
+                variant,
+                toaster: 'b-toaster-top-center',
+            });
+
+            this.busy = false;
+        },
     },
 };
 </script>
 <template>
-    <div>
-        <div class="form-group">
-            <div
-                v-if="!realmLocked"
-                class="form-group"
-                :class="{ 'form-group-error': $v.formData.realm_id.$error }"
-            >
-                <label>Realm</label>
-                <select
-                    v-model="$v.formData.realm_id.$model"
-                    class="form-control"
-                    :disabled="realm.busy"
-                    @change="handleRealmChanged"
+    <div class="row">
+        <div class="col">
+            <h6><i class="fa fa-bars" /> General</h6>
+            <template v-if="!isRealmLocked">
+                <div
+                    class="form-group"
+                    :class="{ 'form-group-error': $v.formData.realm_id.$error }"
                 >
-                    <option value="">
-                        --- Please select ---
-                    </option>
-                    <option
-                        v-for="(item,key) in realm.items"
-                        :key="key"
-                        :value="item.id"
+                    <label>Realm</label>
+                    <select
+                        v-model="$v.formData.realm_id.$model"
+                        class="form-control"
+                        :disabled="realm.busy"
+                        @change="handleRealmChanged"
                     >
-                        {{ item.name }}
-                    </option>
-                </select>
+                        <option value="">
+                            --- Please select ---
+                        </option>
+                        <option
+                            v-for="(item,key) in realm.items"
+                            :key="key"
+                            :value="item.id"
+                        >
+                            {{ item.name }}
+                        </option>
+                    </select>
+
+                    <div
+                        v-if="!$v.formData.realm_id.required && !$v.formData.realm_id.$model"
+                        class="form-group-hint group-required"
+                    >
+                        Please select a realm...
+                    </div>
+                </div>
 
                 <div
-                    v-if="!$v.formData.realm_id.required && !$v.formData.realm_id.$model"
-                    class="form-group-hint group-required"
+                    class="form-group"
+                    :class="{ 'form-group-error': $v.formData.name.$error }"
                 >
-                    Please select a realm...
-                </div>
-            </div>
+                    <label>Name</label>
+                    <input
+                        v-model="$v.formData.name.$model"
+                        type="text"
+                        name="name"
+                        class="form-control"
+                        placeholder="Name..."
+                    >
 
-            <div
-                v-if="!realmLocked"
-                class="form-group"
-                :class="{ 'form-group-error': $v.formData.name.$error }"
-            >
-                <label>Name</label>
-                <input
-                    v-model="$v.formData.name.$model"
-                    type="text"
-                    name="name"
-                    class="form-control"
-                    placeholder="Name..."
-                >
-
-                <div
-                    v-if="!$v.formData.name.required"
-                    class="form-group-hint group-required"
-                >
-                    Please enter a name.
+                    <div
+                        v-if="!$v.formData.name.required"
+                        class="form-group-hint group-required"
+                    >
+                        Please enter a name.
+                    </div>
+                    <div
+                        v-if="!$v.formData.name.minLength"
+                        class="form-group-hint group-required"
+                    >
+                        The length of the name must be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters.
+                    </div>
+                    <div
+                        v-if="!$v.formData.name.maxLength"
+                        class="form-group-hint group-required"
+                    >
+                        The length of the name must be less than<strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
+                    </div>
                 </div>
-                <div
-                    v-if="!$v.formData.name.minLength"
-                    class="form-group-hint group-required"
-                >
-                    The length of the name must be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters.
-                </div>
-                <div
-                    v-if="!$v.formData.name.maxLength"
-                    class="form-group-hint group-required"
-                >
-                    The length of the name must be less than<strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
-                </div>
-            </div>
+            </template>
 
             <div
                 class="form-group"
@@ -297,10 +459,10 @@ export default {
 
             <div
                 class="alert alert-sm"
-                :class="{'alert-danger': secure_idChanged, 'alert-info': !secure_idChanged}"
+                :class="{'alert-danger': hasSecureIdChanged, 'alert-info': !hasSecureIdChanged}"
             >
                 <div class="mb-1">
-                    <template v-if="secure_idChanged">
+                    <template v-if="hasSecureIdChanged">
                         If you change the Secure ID, a new representation for the station will be created in Harbor & Vault.
                     </template>
                     <template v-else>
@@ -314,7 +476,7 @@ export default {
                     <i class="fa fa-wrench" /> Generate
                 </button>
                 <button
-                    v-if="secure_idChanged"
+                    v-if="hasSecureIdChanged"
                     class="btn btn-dark btn-xs"
                     @click.prevent="resetSecureId"
                 >
@@ -326,7 +488,13 @@ export default {
                 class="form-group"
                 :class="{ 'form-group-error': $v.formData.public_key.$error }"
             >
-                <label>PublicKey</label>
+                <label>
+                    PublicKey
+                    <span
+                        v-if="isHexPublicKey"
+                        class="text-danger font-weight-bold"
+                    >Hex <i class="fa fa-exclamation-triangle" /></span>
+                </label>
                 <textarea
                     v-model="$v.formData.public_key.$model"
                     class="form-control"
@@ -345,30 +513,6 @@ export default {
                     class="form-group-hint group-required"
                 >
                     The length of the public key must be less than <strong>{{ $v.formData.public_key.$params.maxLength.max }}</strong> characters.
-                </div>
-            </div>
-
-            <div class="d-flex mb-2">
-                <div class="form-check">
-                    <input
-                        id="sync-public-key"
-                        v-model="formData.sync_public_key"
-                        class="form-check-input"
-                        type="checkbox"
-                        required
-                    >
-                    <label
-                        class="form-check-label"
-                        for="sync-public-key"
-                    >
-                        Push public key to Vault?
-                    </label>
-                </div>
-                <div class="ml-auto">
-                    Pushed: <i
-                        class="fa"
-                        :class="{'fa-check text-success': formData.vault_public_key_saved, 'fa-times text-danger': !formData.vault_public_key_saved}"
-                    />
                 </div>
             </div>
 
@@ -407,21 +551,152 @@ export default {
 
             <hr>
 
-            <div class="form-group">
-                <button
-                    type="submit"
-                    class="btn btn-outline-primary btn-sm"
-                    :disabled="$v.$invalid || busy"
-                    @click.prevent="submit"
-                >
-                    {{ isEditing ? 'Update' : 'Create' }}
-                </button>
+            <div class="d-flex">
+                <div>
+                    <button
+                        type="submit"
+                        class="btn btn-outline-primary btn-sm"
+                        :disabled="$v.$invalid || busy"
+                        @click.prevent="submit"
+                    >
+                        {{ isEditing ? 'Update' : 'Create' }}
+                    </button>
+                </div>
+
+                <div class="ml-auto">
+                    <button
+                        class="btn btn-danger btn-sm"
+                        @click.prevent="drop"
+                    >
+                        <i class="fa fa-trash" /> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div
+            v-if="isEditing"
+            class="col"
+        >
+            <div class="alert alert-warning">
+                The tasks for the <strong>secret-storage</strong> and <strong>registry</strong> are performed
+                asynchronously and therefore might take a while, till the view will be updated.
+            </div>
+            <div class="mb-3">
+                <h6><i class="fa fa-key" /> Secret Storage</h6>
+
+                <p class="mb-2">
+                    To keep the data between the secret key storage engine and the ui in sync, you can
+                    either <strong>pull</strong> existing secrets from the storage engine or <strong>push</strong> local secrets against it.
+                </p>
+
+                <p>
+                    <strong>Path: </strong> {{ pathName }}
+                </p>
+
+                <div class="d-flex flex-row">
+                    <div>
+                        <button
+                            type="button"
+                            class="btn btn-primary btn-xs"
+                            :disabled="busy"
+                            @click.prevent="runSecretStorageEngineKeySave"
+                        >
+                            <i
+                                class="fa fa-save"
+                                aria-hidden="true"
+                            /> Save
+                        </button>
+                    </div>
+                    <div class="ml-auto">
+                        <button
+                            type="button"
+                            class="btn btn-danger btn-xs"
+                            :disabled="busy"
+                            @click.prevent="runSecretStorageEngineKeyDelete"
+                        >
+                            <i class="fa fa-trash" /> Delete
+                        </button>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="mb-3">
+                    <h6><i class="fa fa-folder-open" /> Registry</h6>
+
+                    <p class="mb-2">
+                        To keep the data between the registry and the ui in sync, you can pull all available information about the
+                        project, webhook, robot-account,... of a station or create them.
+                    </p>
+
+                    <div class="mb-2 d-flex flex-column">
+                        <div>
+                            <strong>Namespace: </strong>
+                            {{ projectName }}
+
+                            <i
+                                :class="{
+                                    'fa fa-check text-success': entityProperty.registry_project_id,
+                                    'fa fa-times text-danger': !entityProperty.registry_project_id
+                                }"
+                            />
+                        </div>
+                        <div>
+                            <strong>Webhook: </strong>
+                            <i
+                                :class="{
+                                    'fa fa-check text-success': entityProperty.registry_project_webhook_exists,
+                                    'fa fa-times text-danger': !entityProperty.registry_project_webhook_exists
+                                }"
+                            />
+                        </div>
+                        <div>
+                            <strong>Robot: </strong>
+                            <i
+                                :class="{
+                                    'fa fa-check text-success': entityProperty.registry_project_account_id,
+                                    'fa fa-times text-danger': !entityProperty.registry_project_account_id
+                                }"
+                            />
+                            <template v-if="entityProperty.registry_project_account_name || entityProperty.registry_project_account_token">
+                                <br>
+                                <template v-if="entityProperty.registry_project_account_name">
+                                    {{ entityProperty.registry_project_account_name }}
+                                </template>
+                                <br>
+                                <template v-if="entityProperty.registry_project_account_token">
+                                    {{ entityProperty.registry_project_account_token }}
+                                </template>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-row">
+                        <div>
+                            <button
+                                type="button"
+                                class="btn btn-primary btn-xs"
+                                :disabled="busy"
+                                @click.prevent="runRegistryProjectCreate"
+                            >
+                                <i class="fas fa-save" /> Save
+                            </button>
+                        </div>
+                        <div class="ml-auto">
+                            <div v-if="entityProperty.registry_project_id">
+                                <button
+                                    type="button"
+                                    class="btn btn-danger btn-xs"
+                                    :disabled="busy"
+                                    @click.prevent="runRegistryProjectDelete"
+                                >
+                                    <i class="fa fa-trash" /> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </template>
-<style>
-.list-group-item {
-    padding: .45rem .65rem;
-}
-</style>

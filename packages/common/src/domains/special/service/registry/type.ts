@@ -6,16 +6,10 @@
  */
 
 export enum RegistryCommand {
-    PROJECT_PULL = 'harborProjectPull',
-    PROJECT_CREATE = 'harborProjectCreate',
-    PROJECT_DROP = 'harborProjectDrop',
-    PROJECT_REPOSITORIES_SYNC = 'harborProjectSync',
+    SETUP = 'setup',
 
-    PROJECT_ROBOT_ACCOUNT_CREATE = 'harborProjectRobotAccountCreate',
-    PROJECT_ROBOT_ACCOUNT_DROP = 'harborProjectRobotAccountDrop',
-
-    PROJECT_WEBHOOK_CREATE = 'harborProjectWebHookCreate',
-    PROJECT_WEBHOOK_DROP = 'harborProjectWebhookDrop',
+    STATION_SAVE = 'stationSave',
+    STATION_DELETE = 'stationDelete',
 }
 
 export type RegistryCommandType = `${RegistryCommand}`;

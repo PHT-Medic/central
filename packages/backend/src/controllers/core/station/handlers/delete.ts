@@ -6,14 +6,11 @@
  */
 
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { HarborAPI, PermissionID } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
-import { buildRegistryStationProjectName } from '@personalhealthtrain/ui-common/dist/domains/core/station/registry';
-import { useTrapiClient } from '@trapi/client';
 import { publishMessage } from 'amqp-extension';
 import { StationEntity } from '../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
-import { ApiKey } from '../../../../config/api';
 import { buildSecretStorageQueueMessage } from '../../../../domains/special/secret-storage/queue';
 import {
     SecretStorageQueueCommand,
@@ -21,6 +18,9 @@ import {
 } from '../../../../domains/special/secret-storage/constants';
 import env from '../../../../env';
 import { deleteStationFromSecretStorage } from '../../../../components/secret-storage/handlers/entities/station';
+import { deleteStationFromRegistry } from '../../../../components/registry/handlers/entities/station';
+import { RegistryQueueCommand, RegistryQueueEntityType } from '../../../../domains/special/registry/constants';
+import { buildRegistryQueueMessage } from '../../../../domains/special/registry/queue';
 
 export async function deleteStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -39,8 +39,21 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
 
     await repository.remove(entity);
 
-    const name = buildRegistryStationProjectName(entity.secure_id);
-    await useTrapiClient<HarborAPI>(ApiKey.HARBOR).project.delete(name, true);
+    if (env.env === 'test') {
+        await deleteStationFromRegistry({
+            type: RegistryQueueEntityType.STATION,
+            id: entity.id,
+        });
+    } else {
+        const queueMessage = buildRegistryQueueMessage(
+            RegistryQueueCommand.DELETE,
+            {
+                type: RegistryQueueEntityType.STATION,
+                id: entity.id,
+            },
+        );
+        await publishMessage(queueMessage);
+    }
 
     if (env.env === 'test') {
         await deleteStationFromSecretStorage({

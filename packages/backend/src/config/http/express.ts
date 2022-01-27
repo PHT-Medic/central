@@ -11,6 +11,7 @@ import cors from 'cors';
 import path from 'path';
 import { registerControllers as registerAuthControllers, registerMiddlewares } from '@typescript-auth/server';
 import promBundle from 'express-prom-bundle';
+import { Client } from 'redis-extension';
 import { useLogger } from '../../modules/log';
 
 import { registerControllers } from './routes';
@@ -24,7 +25,7 @@ export interface ExpressAppInterface extends Express{
 
 }
 
-export function createExpressApp() : ExpressAppInterface {
+export function createExpressApp(redis?: Client | boolean | string) : ExpressAppInterface {
     useLogger().debug('setup express app...', { service: 'express' });
 
     const expressApp : Express = express();
@@ -39,13 +40,13 @@ export function createExpressApp() : ExpressAppInterface {
     }));
 
     registerMiddlewares(expressApp, {
-        bodyParser: true,
-        cookieParser: true,
-        response: true,
-        auth: {
-            writableDirectoryPath: path.join(process.cwd(), 'writable'),
-        },
-        swaggerDocumentation: false,
+        bodyParserMiddleware: true,
+        cookieParserMiddleware: true,
+        responseMiddleware: true,
+        swaggerMiddleware: false,
+
+        writableDirectoryPath: path.join(process.cwd(), 'writable'),
+        redis,
     });
 
     // Rate Limiter
@@ -60,15 +61,9 @@ export function createExpressApp() : ExpressAppInterface {
 
     registerControllers(expressApp);
     registerAuthControllers(expressApp, {
-        controller: {
-            token: {
-                maxAge: env.jwtMaxAge,
-            },
-            oauth2Provider: {
-                redirectUrl: env.webAppUrl,
-            },
-        },
+        tokenMaxAge: env.jwtMaxAge,
         selfUrl: env.apiUrl,
+        selfAuthorizeRedirectUrl: env.webAppUrl,
         writableDirectoryPath: getWritableDirPath(),
     });
 

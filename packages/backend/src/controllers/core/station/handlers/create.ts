@@ -7,21 +7,16 @@
 
 import {
     PermissionID,
-    STATION_SECRET_ENGINE_KEY,
-    VaultAPI,
-    buildStationSecretStoragePayload,
     isHex,
 } from '@personalhealthtrain/ui-common';
 import { ForbiddenError } from '@typescript-error/http';
 import { validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
-import { useTrapiClient } from '@trapi/client';
 import { publishMessage } from 'amqp-extension';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 import { runStationValidation } from './utils';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { StationEntity } from '../../../../domains/core/station/entity';
-import { ApiKey } from '../../../../config/api';
 import { buildSecretStorageQueueMessage } from '../../../../domains/special/secret-storage/queue';
 import {
     SecretStorageQueueCommand,
@@ -29,6 +24,11 @@ import {
 } from '../../../../domains/special/secret-storage/constants';
 import env from '../../../../env';
 import { saveStationToSecretStorage } from '../../../../components/secret-storage/handlers/entities/station';
+import {
+    saveStationToRegistry,
+} from '../../../../components/registry/handlers/entities/station';
+import { RegistryQueueCommand, RegistryQueueEntityType } from '../../../../domains/special/registry/constants';
+import { buildRegistryQueueMessage } from '../../../../domains/special/registry/queue';
 
 export async function createStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.STATION_ADD)) {
@@ -71,6 +71,22 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
             );
             await publishMessage(queueMessage);
         }
+    }
+
+    if (env.env === 'test') {
+        await saveStationToRegistry({
+            type: RegistryQueueEntityType.STATION,
+            id: entity.id,
+        });
+    } else {
+        const queueMessage = buildRegistryQueueMessage(
+            RegistryQueueCommand.SAVE,
+            {
+                type: RegistryQueueEntityType.STATION,
+                id: entity.id,
+            },
+        );
+        await publishMessage(queueMessage);
     }
 
     return res.respond({ data: entity });

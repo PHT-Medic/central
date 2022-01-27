@@ -8,7 +8,7 @@
 import path from 'path';
 import { ConnectionWithAdditionalOptions, buildConnectionOptions } from 'typeorm-extension';
 import {
-    modifyDatabaseConnectionOptions as modifyAuthDatabaseConnectionOptions,
+    setEntitiesForConnectionOptions,
 } from '@typescript-auth/server';
 import { MasterImageEntity } from '../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../domains/core/master-image-group/entity';
@@ -25,6 +25,8 @@ import { UserSecretEntity } from '../domains/auth/user-secret/entity';
 export function modifyDatabaseConnectionOptions(
     connectionOptions: ConnectionWithAdditionalOptions,
 ) {
+    connectionOptions = setEntitiesForConnectionOptions(connectionOptions);
+
     connectionOptions = {
         ...connectionOptions,
         entities: [
@@ -47,7 +49,14 @@ export function modifyDatabaseConnectionOptions(
         ...connectionOptions,
         migrations: [
             path.join(__dirname, 'migrations', '*{.ts,.js}'),
-            ...(connectionOptions.migrations ? connectionOptions.migrations : []),
+        ],
+    };
+
+    connectionOptions = {
+        ...connectionOptions,
+        subscribers: [
+            ...(connectionOptions.subscribers ? connectionOptions.subscribers : []),
+            path.join(__dirname, 'subscribers', '*{.ts,.js}'),
         ],
     };
 
@@ -55,10 +64,7 @@ export function modifyDatabaseConnectionOptions(
 }
 
 export async function buildDatabaseConnectionOptions() {
-    return modifyDatabaseConnectionOptions(
-        modifyAuthDatabaseConnectionOptions(
-            await buildConnectionOptions(),
-            false,
-        ),
-    );
+    const baseOptions = await buildConnectionOptions();
+
+    return modifyDatabaseConnectionOptions(baseOptions);
 }

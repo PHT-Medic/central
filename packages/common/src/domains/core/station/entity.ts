@@ -24,6 +24,8 @@ export interface Station {
 
     registry_project_id: number | null;
 
+    registry_project_account_id: number | null;
+
     registry_project_account_name: string | null;
 
     registry_project_account_token: string | null;

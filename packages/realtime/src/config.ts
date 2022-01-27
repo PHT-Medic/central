@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setTrapiClientConfig, useTrapiClient } from '@trapi/client';
-import { Client, setConfig as setRedisConfig, useClient } from 'redis-extension';
+import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
+import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import { ROBOT_SECRET_ENGINE_KEY, ServiceID, VaultAPI } from '@personalhealthtrain/ui-common';
 import https from 'https';
 import { ErrorCode } from '@typescript-auth/domains';
@@ -26,30 +26,32 @@ export type Config = {
 };
 
 export function createConfig({ env } : ConfigContext) : Config {
-    setRedisConfig('default', { connectionString: env.redisConnectionString });
+    setRedisConfig({ connectionString: env.redisConnectionString });
 
-    const redisDatabase = useClient('default');
+    const redisDatabase = useRedisClient();
     const redisPub = redisDatabase.duplicate();
     const redisSub = redisDatabase.duplicate();
 
-    setTrapiClientConfig('vault', {
+    setHTTPConfig({
         clazz: VaultAPI,
-        connectionString: env.vaultConnectionString,
         driver: {
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false,
             }),
         },
-    });
+        extra: {
+            connectionString: env.vaultConnectionString,
+        },
+    }, 'vault');
 
-    setTrapiClientConfig('default', {
+    setHTTPConfig({
         driver: {
             baseURL: env.apiUrl,
             withCredentials: true,
         },
     });
 
-    useTrapiClient('default').mountResponseInterceptor(
+    useHTTPClient().mountResponseInterceptor(
         (value) => value,
         async (err) => {
             const { config } = err;
@@ -62,17 +64,17 @@ export function createConfig({ env } : ConfigContext) : Config {
                     err.response?.data?.code === ErrorCode.CREDENTIALS_INVALID
                 )
             ) {
-                const response = await useTrapiClient<VaultAPI>('vault').keyValue
+                const response = await useHTTPClient<VaultAPI>('vault').keyValue
                     .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM);
 
                 if (response) {
-                    useTrapiClient('default').setAuthorizationHeader({
+                    useHTTPClient().setAuthorizationHeader({
                         type: 'Basic',
                         username: response.data.id,
                         password: response.data.secret,
                     });
 
-                    return useTrapiClient('default').request(config);
+                    return useHTTPClient().request(config);
                 }
             }
 

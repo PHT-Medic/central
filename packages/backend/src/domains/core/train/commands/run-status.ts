@@ -17,7 +17,7 @@ import {
 } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
 import { buildRegistryStationProjectName } from '@personalhealthtrain/ui-common/src/domains/core/station/registry';
-import { useTrapiClient } from '@trapi/client';
+import { useClient } from '@trapi/client';
 import { findTrain } from './utils';
 import { triggerTrainResultStart } from './result-start';
 import { TrainEntity } from '../entity';
@@ -34,7 +34,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     }
 
     // 1. Check PHT outgoing ( -> TrainFinished )
-    let harborRepository: HarborRepository | undefined = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).projectRepository
+    let harborRepository: HarborRepository | undefined = await useClient<HarborAPI>(ApiKey.HARBOR).projectRepository
         .find(REGISTRY_OUTGOING_PROJECT_NAME, train.id);
 
     if (typeof harborRepository !== 'undefined') {
@@ -81,7 +81,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
         const stationName : string = buildRegistryStationProjectName(stationId);
 
         try {
-            harborRepository = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).projectRepository
+            harborRepository = await useClient<HarborAPI>(ApiKey.HARBOR).projectRepository
                 .find(stationName, train.id);
 
             if (typeof harborRepository !== 'undefined') {
@@ -112,7 +112,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     }
 
     // 3. Check PHT incoming ( -> TrainBuilt )
-    harborRepository = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).projectRepository
+    harborRepository = await useClient<HarborAPI>(ApiKey.HARBOR).projectRepository
         .find(REGISTRY_INCOMING_PROJECT_NAME, train.id);
 
     if (typeof harborRepository !== 'undefined') {

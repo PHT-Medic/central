@@ -17,7 +17,7 @@ import {
     isStationSecretStorageKey, isUserSecretsSecretStorageKey,
 } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
-import { useTrapiClient } from '@trapi/client';
+import { useClient } from '@trapi/client';
 import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
 } from '@typescript-error/http';
@@ -85,6 +85,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
 
         const stationRepository = getRepository(StationEntity);
         const query = stationRepository.createQueryBuilder('station')
+            .addSelect('station.secure_id')
             .where('id = :id', { id: stationId });
 
         const data = await query.getOne();
@@ -126,7 +127,7 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
 
     switch (command as SecretStorageCommand) {
         case SecretStorageCommand.ENGINE_CREATE: {
-            await useTrapiClient<VaultAPI>(ApiKey.VAULT)
+            await useClient<VaultAPI>(ApiKey.VAULT)
                 .keyValue.createMount({
                     path: rawPath,
                 });
@@ -136,20 +137,21 @@ export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressRe
         case SecretStorageCommand.ENGINE_KEY_PULL: {
             switch (entity.type) {
                 case TargetEntity.STATION: {
-                    const response = await useTrapiClient<VaultAPI>(ApiKey.VAULT)
+                    const response = await useClient<VaultAPI>(ApiKey.VAULT)
                         .keyValue.find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, entity.data.secure_id);
 
                     if (response) {
                         const { data } = response;
 
+                        entity.data = getRepository(StationEntity).merge(entity.data, {
+                            ...(data.rsa_public_key ? { public_key: data.rsa_public_key } : {}),
+                            ...(data.registry_robot_id ? { registry_project_account_id: data.registry_robot_id } : {}),
+                            ...(data.registry_robot_name ? { registry_project_account_name: data.registry_robot_name } : {}),
+                            ...(data.registry_robot_secret ? { registry_project_account_token: data.registry_robot_secret } : {}),
+                        });
+
                         await getRepository(StationEntity)
-                            .update({
-                                id: entity.data.id,
-                            }, {
-                                ...(data.rsa_public_key ? { public_key: data.rsa_public_key } : {}),
-                                ...(data.registry_robot_id ? { registry_project_account_name: data.registry_robot_id } : {}),
-                                ...(data.registry_robot_secret ? { registry_project_account_token: data.registry_robot_secret } : {}),
-                            });
+                            .save(entity.data);
                     }
                     break;
                 }

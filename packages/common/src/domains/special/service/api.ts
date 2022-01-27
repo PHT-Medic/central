@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AxiosInstance } from 'axios';
+import { ClientDriverInstance } from '@trapi/client';
 import { RegistryCommandType } from './registry';
 import { ServiceID } from './constants';
 import { ServiceIDType } from './type';
@@ -13,9 +13,9 @@ import { SingleResourceResponse } from '../../type';
 import { SecretStorageCommand } from './secret-engine';
 
 export class ServiceAPI {
-    protected client: AxiosInstance;
+    protected client: ClientDriverInstance;
 
-    constructor(client: AxiosInstance) {
+    constructor(client: ClientDriverInstance) {
         this.client = client;
     }
 

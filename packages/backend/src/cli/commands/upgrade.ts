@@ -6,9 +6,8 @@
  */
 
 import { Argv, CommandModule } from 'yargs';
-import { buildConnectionOptions } from 'typeorm-extension';
 import { createConnection } from 'typeorm';
-import { modifyDatabaseConnectionOptions, upgradeCommand } from '@typescript-auth/server';
+import { upgradeCommand } from '@typescript-auth/server';
 import { buildDatabaseConnectionOptions } from '../../database/utils';
 
 export class UpgradeCommand implements CommandModule {

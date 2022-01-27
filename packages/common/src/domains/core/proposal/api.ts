@@ -6,15 +6,15 @@
  */
 
 import { BuildInput, buildQuery } from '@trapi/query';
-import { AxiosInstance } from 'axios';
+import { ClientDriverInstance } from '@trapi/client';
 import { Proposal } from './entity';
 import { nullifyEmptyObjectProperties } from '../../../utils';
 import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
 export class ProposalAPI {
-    protected client: AxiosInstance;
+    protected client: ClientDriverInstance;
 
-    constructor(client: AxiosInstance) {
+    constructor(client: ClientDriverInstance) {
         this.client = client;
     }
 

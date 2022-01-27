@@ -49,6 +49,11 @@ export class StationEntity implements Station {
     @Column({ nullable: true, default: null, select: false })
         registry_project_id: number | null;
 
+    @Column({
+        nullable: true, default: null, select: false, type: 'int',
+    })
+        registry_project_account_id: number | null;
+
     @Column({ nullable: true, default: null, select: false })
         registry_project_account_name: string | null;
 

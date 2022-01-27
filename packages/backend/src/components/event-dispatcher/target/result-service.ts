@@ -8,7 +8,7 @@
 import { Message, publishMessage } from 'amqp-extension';
 
 import { REGISTRY_OUTGOING_PROJECT_NAME } from '@personalhealthtrain/ui-common';
-import { DispatcherHarborEventData } from '../../../domains/special/harbor/queue';
+import { DispatcherHarborEventData } from '../../../domains/special/registry/queue';
 import {
     ResultServiceCommand,
     buildResultServiceQueueMessage,

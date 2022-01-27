@@ -26,7 +26,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     HTTP Server & Express App
     */
     const config = createConfig({ env });
-    const expressApp = createExpressApp();
+    const expressApp = createExpressApp(config.redisDatabase);
     const httpServer = createHttpServer({ expressApp });
 
     function signalStart() {

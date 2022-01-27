@@ -15,7 +15,7 @@ export default {
     created() {
         this.doLogout();
 
-        // setTimeout(this.doLogout,0);
+        setTimeout(() => this.doLogout, 0);
     },
     methods: {
         async doLogout() {

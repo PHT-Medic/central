@@ -7,6 +7,7 @@
 
 export type StationSecretStoragePayload = {
     rsa_public_key: string,
-    registry_robot_id?: string,
+    registry_robot_name?: string,
+    registry_robot_id?: number,
     registry_robot_secret?: string
 };

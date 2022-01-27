@@ -8,7 +8,7 @@
 import {
     HarborAPI, ProxyConnectionConfig, VaultAPI, detectProxyConnectionConfig,
 } from '@personalhealthtrain/ui-common';
-import { setTrapiClientConfig } from '@trapi/client';
+import { setConfig as setHTTPConfig } from '@trapi/client';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import https from 'https';
 import { Client, setConfig as setRedisConfig, useClient } from 'redis-extension';
@@ -43,9 +43,8 @@ export function createConfig({ env } : ConfigContext) : Config {
 
     const proxyConfig : ProxyConnectionConfig | undefined = detectProxyConnectionConfig();
 
-    setTrapiClientConfig(ApiKey.HARBOR, {
+    setHTTPConfig({
         clazz: HarborAPI,
-        connectionString: env.harborConnectionString,
         driver: {
             ...(proxyAPis.includes('harbor') && proxyConfig ? {
                 proxy: proxyConfig,
@@ -56,17 +55,19 @@ export function createConfig({ env } : ConfigContext) : Config {
                 rejectUnauthorized: false,
             }),
         },
-    });
+        extra: {
+            connectionString: env.harborConnectionString,
+        },
+    }, ApiKey.HARBOR);
 
-    setRedisConfig('default', { connectionString: env.redisConnectionString });
+    setRedisConfig({ connectionString: env.redisConnectionString });
 
-    const redisDatabase = useClient('default');
+    const redisDatabase = useClient();
     const redisPub = redisDatabase.duplicate();
     const redisSub = redisDatabase.duplicate();
 
-    setTrapiClientConfig(ApiKey.VAULT, {
+    setHTTPConfig({
         clazz: VaultAPI,
-        connectionString: env.vaultConnectionString,
         driver: {
             ...(proxyAPis.includes('vault') && proxyConfig ? {
                 proxy: proxyConfig,
@@ -77,7 +78,10 @@ export function createConfig({ env } : ConfigContext) : Config {
                 rejectUnauthorized: false,
             }),
         },
-    });
+        extra: {
+            connectionString: env.vaultConnectionString,
+        },
+    }, ApiKey.VAULT);
 
     setAmqpConfig({
         connection: env.rabbitMqConnectionString,

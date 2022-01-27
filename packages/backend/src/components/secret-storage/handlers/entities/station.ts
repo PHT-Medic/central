@@ -6,9 +6,14 @@
  */
 
 import {
-    STATION_SECRET_ENGINE_KEY, VaultAPI, buildStationSecretStoragePayload,
+    STATION_SECRET_ENGINE_KEY,
+    StationSecretStoragePayload,
+    VaultAPI,
+    buildStationFromSecretStoragePayload,
+    buildStationSecretStoragePayload,
+    mergeDeep,
 } from '@personalhealthtrain/ui-common';
-import { useTrapiClient } from '@trapi/client';
+import { useClient } from '@trapi/client';
 import { getRepository } from 'typeorm';
 import { NotFoundError } from '@typescript-error/http';
 import { ApiKey } from '../../../../config/api';
@@ -21,25 +26,41 @@ export async function saveStationToSecretStorage(payload: SecretStorageStationQu
     const repository = await getRepository(StationEntity);
     const query = repository.createQueryBuilder('station')
         .addSelect([
+            'station.registry_project_id',
+            'station.registry_project_account_id',
             'station.registry_project_account_name',
             'station.registry_project_account_token',
+            'station.registry_project_webhook_exists',
             'station.public_key',
             'station.secure_id',
+            'station.email',
         ])
         .where('station.id = :id', { id: payload.id });
 
-    const entity = await query.getOne();
+    let entity = await query.getOne();
 
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
-    const data = buildStationSecretStoragePayload(entity);
-    await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.save(
+    const response = await useClient<VaultAPI>(ApiKey.VAULT)
+        .keyValue
+        .find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, `${entity.secure_id}`);
+
+    const data : StationSecretStoragePayload = mergeDeep(
+        buildStationSecretStoragePayload(entity),
+        (response ? response.data : {}),
+    );
+
+    await useClient<VaultAPI>(ApiKey.VAULT).keyValue.save(
         STATION_SECRET_ENGINE_KEY,
         `${entity.secure_id}`,
         data,
     );
+
+    entity = repository.merge(entity, buildStationFromSecretStoragePayload(data));
+
+    await repository.save(entity);
 }
 
 export async function deleteStationFromSecretStorage(payload: SecretStorageStationQueuePayload) {
@@ -53,7 +74,7 @@ export async function deleteStationFromSecretStorage(payload: SecretStorageStati
     const entity = await query.getOne();
 
     try {
-        await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(STATION_SECRET_ENGINE_KEY, `${entity.secure_id}`);
+        await useClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(STATION_SECRET_ENGINE_KEY, `${entity.secure_id}`);
     } catch (e) {
         // ...
     }

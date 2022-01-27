@@ -3,12 +3,12 @@ import {
     PermissionID,
     STATION_SECRET_ENGINE_KEY,
     VaultAPI,
+    buildRegistryStationProjectName,
     isHex,
 } from '@personalhealthtrain/ui-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
-import { buildRegistryStationProjectName } from '@personalhealthtrain/ui-common/dist/domains/core/station/registry';
-import { useTrapiClient } from '@trapi/client';
+import { useClient } from '@trapi/client';
 import { publishMessage } from 'amqp-extension';
 import { runStationValidation } from './utils';
 import { StationEntity } from '../../../../domains/core/station/entity';
@@ -36,8 +36,15 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
 
     const repository = getRepository(StationEntity);
     const query = repository.createQueryBuilder('station')
-        .addSelect('station.secure_id')
-        .addSelect('station.public_key')
+        .addSelect([
+            'station.registry_project_id',
+            'station.registry_project_account_id',
+            'station.registry_project_account_name',
+            'station.registry_project_account_token',
+            'station.registry_project_webhook_exists',
+            'station.public_key',
+            'station.secure_id',
+        ])
         .where('station.id = :id', { id });
 
     let entity = await query.getOne();
@@ -55,17 +62,19 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
     }
 
     if (typeof data.secure_id === 'string') {
-        // secure id changed -> remove vault project
+        // secure id changed -> remove vault- & harbor-project
         if (data.secure_id !== entity.secure_id) {
             try {
                 const name = buildRegistryStationProjectName(entity.secure_id);
-                await useTrapiClient<HarborAPI>(ApiKey.HARBOR).project.delete(name, true);
+                await useClient<HarborAPI>(ApiKey.HARBOR).project
+                    .delete(name, true);
             } catch (e) {
                 // ...
             }
 
             try {
-                await useTrapiClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(STATION_SECRET_ENGINE_KEY, entity.secure_id);
+                await useClient<VaultAPI>(ApiKey.VAULT).keyValue
+                    .delete(STATION_SECRET_ENGINE_KEY, entity.secure_id);
             } catch (e) {
                 // ...
             }
@@ -92,9 +101,9 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
         }
     }
 
-    const result = await repository.save(entity);
+    await repository.save(entity);
 
     return res.respondAccepted({
-        data: result,
+        data: entity,
     });
 }

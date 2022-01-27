@@ -8,4 +8,5 @@
 export * from './api';
 export * from './entity';
 export * from './registry';
+export * from './socket';
 export * from './secret-engine';

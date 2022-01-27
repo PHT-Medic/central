@@ -6,25 +6,25 @@
  */
 
 import {
-    TrapiClientConfig, setTrapiClient,
+    Config, setClient,
 } from '@trapi/client';
 import { Context } from '@nuxt/types';
 import https from 'https';
 import { Inject } from '@nuxt/types/app';
-import { APIClient as AuthAPIClient } from '@typescript-auth/domains';
-import { APIClient } from '@personalhealthtrain/ui-common';
+import { HTTPClient as AuthHTTPClient } from '@typescript-auth/domains';
+import { HTTPClient } from '@personalhealthtrain/ui-common';
 
 declare module '@nuxt/types' {
     interface Context {
-        $api: APIClient,
-        $authApi: AuthAPIClient
+        $api: HTTPClient,
+        $authApi: AuthHTTPClient
     }
 }
 
 declare module 'vuex/types/index' {
     interface Store<S> {
-        $api: APIClient,
-        $authApi: AuthAPIClient
+        $api: HTTPClient,
+        $authApi: AuthHTTPClient
     }
 }
 
@@ -37,7 +37,7 @@ export default (ctx: Context, inject : Inject) => {
         apiUrl = ctx.$config.apiUrl;
     }
 
-    const config : TrapiClientConfig = {
+    const config : Config = {
         driver: {
             baseURL: apiUrl,
             withCredentials: true,
@@ -50,8 +50,8 @@ export default (ctx: Context, inject : Inject) => {
         },
     };
 
-    const resourceAPI = new APIClient(config);
-    const authAPI = new AuthAPIClient(config);
+    const resourceAPI = new HTTPClient(config);
+    const authAPI = new AuthHTTPClient(config);
 
     const interceptor = (error) => {
         if (typeof error?.response?.data?.message === 'string') {
@@ -65,8 +65,8 @@ export default (ctx: Context, inject : Inject) => {
     resourceAPI.mountResponseInterceptor((r) => r, interceptor);
     authAPI.mountResponseInterceptor((r) => r, interceptor);
 
-    setTrapiClient('default', resourceAPI);
-    setTrapiClient('auth', authAPI);
+    setClient('default', resourceAPI);
+    setClient('auth', authAPI);
 
     inject('api', resourceAPI);
     inject('authApi', authAPI);

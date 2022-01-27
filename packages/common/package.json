@@ -20,11 +20,9 @@
         "typescript": "^4.5.2"
     },
     "dependencies": {
-        "@trapi/client": "^1.0.4",
+        "@trapi/client": "^2.0.2",
         "@trapi/query": "^2.0.3",
-        "@typescript-auth/core": "^1.1.1",
-        "@typescript-auth/domains": "^0.0.11",
-        "axios": "^0.24.0",
+        "@typescript-auth/domains": "^0.0.16",
         "nanoid": "^3.1.30"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",

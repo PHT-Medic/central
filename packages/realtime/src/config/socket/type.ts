@@ -10,9 +10,10 @@ import {
     SocketInterServerEvents,
     SocketServerToClientEvents,
 } from '@personalhealthtrain/ui-common';
-import { AbilityManager, PermissionItem } from '@typescript-auth/core';
+import {
+    AbilityManager, PermissionItem, Robot, User,
+} from '@typescript-auth/domains';
 import { Namespace, Server, Socket } from 'socket.io';
-import { Robot, User } from '@typescript-auth/domains';
 
 export type SocketDataInterface = {
     token?: string,

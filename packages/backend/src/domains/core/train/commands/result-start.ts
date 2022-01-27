@@ -15,7 +15,7 @@ import {
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/ui-common';
-import { useTrapiClient } from '@trapi/client';
+import { useClient } from '@trapi/client';
 import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../special/result-service';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
@@ -35,7 +35,7 @@ export async function triggerTrainResultStart(
     }
 
     if (typeof harborRepository === 'undefined') {
-        harborRepository = await useTrapiClient<HarborAPI>(ApiKey.HARBOR).projectRepository.find(REGISTRY_OUTGOING_PROJECT_NAME, train.id);
+        harborRepository = await useClient<HarborAPI>(ApiKey.HARBOR).projectRepository.find(REGISTRY_OUTGOING_PROJECT_NAME, train.id);
         if (typeof harborRepository === 'undefined') {
             throw new Error('The train has not arrived at the outgoing station yet...');
         }

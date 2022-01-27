@@ -11,7 +11,7 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import { ForbiddenError, UnauthorizedError } from '@typescript-error/http';
 import { MASTER_REALM_ID } from '@typescript-auth/domains';
 import { setupSocketMiddleware } from '@typescript-auth/server-adapter';
-import { useTrapiClient } from '@trapi/client';
+import { useClient } from '@trapi/client';
 import { useLogger } from '../../modules/log';
 import { registerSocketHandlers, registerSocketNamespaceHandlers } from './handlers';
 import { Environment } from '../../env';
@@ -42,7 +42,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
     // receive user
     server.use(setupSocketMiddleware({
         redis: context.config.redisDatabase,
-        axios: useTrapiClient('default').driver,
+        http: useClient('default').driver,
     }));
 
     // register handlers
@@ -52,7 +52,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
     const realmWorkspaces = server.of(/^\/realm#[a-z0-9]+$/);
     realmWorkspaces.use(setupSocketMiddleware({
         redis: context.config.redisDatabase,
-        axios: useTrapiClient('default').driver,
+        http: useClient('default').driver,
     }));
     realmWorkspaces.use((socket: SocketInterface, next) => {
         if (!socket.data.userId) {

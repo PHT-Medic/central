@@ -13,13 +13,13 @@ export default {
         loggedIn(vm) {
             return vm.$store.getters['auth/loggedIn'];
         },
-        token() {
-            return this.$store.getters['auth/token'];
+        tokenExpireDate() {
+            return this.$store.getters['auth/accessTokenExpireDate'];
         },
         tokenExpiresIn() {
-            if (!this.token) return 0;
+            if (!this.tokenExpireDate) return 0;
 
-            return (new Date(this.token.expire_date)).getTime() - (new Date()).getTime();
+            return this.tokenExpireDate.getTime() - Date.now();
         },
 
         docsUrl() {
