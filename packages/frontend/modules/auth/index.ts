@@ -13,8 +13,8 @@ import {
     HTTPOAuth2Client,
     OAuth2TokenKind,
     OAuth2TokenResponse,
-    PermissionItem,
-    TokenVerificationPayload, buildAbilityMetaFromName,
+    OAuth2TokenSubKind,
+    PermissionItem, Robot, TokenVerificationPayload, User, buildAbilityMetaFromName,
 } from '@typescript-auth/domains';
 import { Config, createClient } from '@trapi/client';
 import { AuthBrowserStorageKey } from './constants';
@@ -38,7 +38,7 @@ class AuthModule {
 
     protected abilityManager!: AbilityManager;
 
-    protected identifyPromise : Promise<Record<string, any>> | undefined;
+    protected identifyPromise : Promise<User | Robot | undefined>;
 
     // --------------------------------------------------------------------
 
@@ -106,6 +106,12 @@ class AuthModule {
                         token: value,
                     });
                     break;
+                case AuthBrowserStorageKey.ACCESS_TOKEN_EXPIRE_DATE:
+                    this.ctx.store.commit('auth/setTokenExpireDate', {
+                        kind: OAuth2TokenKind.ACCESS,
+                        date: new Date(value),
+                    });
+                    break;
                 case AuthBrowserStorageKey.REFRESH_TOKEN:
                     this.ctx.store.commit('auth/setToken', {
                         kind: OAuth2TokenKind.REFRESH,
@@ -154,10 +160,11 @@ class AuthModule {
                     const callback = () => {
                         if (
                             typeof this.ctx === 'undefined' ||
-                            this.ctx.route.path.startsWith('/logout')
+                            this.ctx.route.path.startsWith('/logout') ||
+                            this.ctx.route.path.startsWith('/login')
                         ) return;
 
-                        this.ctx.store.dispatch('auth/triggerTokenExpired')
+                        this.ctx.store.dispatch('auth/triggerRefreshToken')
                             .then((r: any) => r)
                             .catch(() => this.ctx.redirect({
                                 path: '/logout',
@@ -190,7 +197,7 @@ class AuthModule {
 
     // --------------------------------------------------------------------
 
-    public async resolveMe() : Promise<Record<string, any> | undefined> {
+    public async resolveMe() : Promise<User | Robot | undefined> {
         if (typeof this.identifyPromise !== 'undefined') {
             return this.identifyPromise;
         }
@@ -198,30 +205,30 @@ class AuthModule {
         const token : string | undefined = this.ctx.store.getters['auth/accessToken'];
         if (!token) return Promise.resolve(undefined);
 
-        const resolved = this.ctx.store.getters['auth/permissionsResolved'];
-        if (typeof resolved !== 'undefined' && resolved) {
-            const userInfo : Record<string, any> = {
-                permissions: this.ctx.store.getters['auth/permissions'],
-                ...this.ctx.store.getters['auth/user'],
-            };
-
-            return Promise.resolve(userInfo);
+        const permissionsResolved = this.ctx.store.getters['auth/resolved'];
+        if (permissionsResolved) {
+            return Promise.resolve(this.ctx.store.getters['auth/user']);
         }
 
-        this.identifyPromise = this.getUserInfo(token)
-            .then(this.handleUserInfoResponse.bind(this));
+        this.identifyPromise = this.verifyToken(token)
+            .then(async (token) => {
+                await this.ctx.store.commit('auth/setResolved', true);
+                await this.ctx.store.dispatch('auth/triggerSetPermissions', token.target.permissions);
+                await this.ctx.store.dispatch('auth/triggerSetUser', token.target.entity);
+
+                switch (token.target.kind) {
+                    case OAuth2TokenSubKind.USER:
+                        await this.ctx.store.dispatch('auth/triggerSetUser', token.target.entity);
+                        break;
+                    case OAuth2TokenSubKind.ROBOT:
+                        await this.ctx.store.dispatch('auth/triggerSetRobot', token.target.entity);
+                        break;
+                }
+
+                return token.target.entity;
+            });
 
         return this.identifyPromise;
-    }
-
-    private async handleUserInfoResponse(userInfo: TokenVerificationPayload) : Promise<Record<string, any>> {
-        const { permissions, ...user } = userInfo.target.data;
-
-        await this.ctx.store.commit('auth/setPermissionsResolved', true);
-        await this.ctx.store.dispatch('auth/triggerSetUser', user);
-        await this.ctx.store.dispatch('auth/triggerSetPermissions', permissions);
-
-        return user;
     }
 
     // --------------------------------------------------------------------
@@ -342,7 +349,7 @@ class AuthModule {
      *
      * @param token
      */
-    public async getUserInfo(token: string) : Promise<Record<string, any>> {
+    public async verifyToken(token: string) : Promise<TokenVerificationPayload> {
         return this.client.getUserInfo(token);
     }
 }

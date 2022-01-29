@@ -9,6 +9,7 @@ import 'reflect-metadata';
 import dotenv from 'dotenv';
 
 import { createConnection } from 'typeorm';
+import { UserEntity, buildTokenAggregator } from '@typescript-auth/server';
 import env from './env';
 
 import { createConfig } from './config';
@@ -48,6 +49,9 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     if (env.env === 'development') {
         await connection.synchronize();
     }
+
+    const { start: startTokenAggregator } = buildTokenAggregator(config.redisDatabase);
+    await startTokenAggregator();
 
     start();
 })();

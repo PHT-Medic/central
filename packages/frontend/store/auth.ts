@@ -9,16 +9,17 @@ import Vue from 'vue';
 import { ActionTree, GetterTree, MutationTree } from 'vuex';
 
 import {
-    OAuth2TokenKind, PermissionItem, User,
+    OAuth2TokenKind, OAuth2TokenSubKind, PermissionItem, Robot, User,
 } from '@typescript-auth/domains';
 import { RootState } from './index';
 import { AuthBrowserStorageKey } from '@/modules/auth/constants';
 
 export interface AuthState {
     user: User | undefined,
+    robot: Robot | undefined,
 
     permissions: PermissionItem[],
-    permissionsResolved: boolean,
+    resolved: boolean,
 
     accessToken: string | undefined,
     accessTokenExpireDate: Date | undefined,
@@ -32,9 +33,10 @@ export interface AuthState {
 }
 const state = () : AuthState => ({
     user: undefined,
+    robot: undefined,
 
     permissions: [],
-    permissionsResolved: false,
+    resolved: false,
 
     accessToken: undefined,
     accessTokenExpireDate: undefined,
@@ -51,8 +53,13 @@ export const getters : GetterTree<AuthState, RootState> = {
     user: (state: AuthState) => state.user,
     userId: (state: AuthState) => (state.user ? state.user.id : undefined),
     userRealmId: (state: AuthState) => (state.user ? state.user.realm_id : undefined),
+
+    robot: (state: AuthState) => state.robot,
+    robotId: (state: AuthState) => (state.robot ? state.robot.id : undefined),
+    robotRealmId: (state: AuthState) => (state.robot ? state.robot.realm_id : undefined),
+
     permissions: (state: AuthState) => state.permissions,
-    permissionsResolved: (state: AuthState) => state.permissionsResolved,
+    resolved: (state: AuthState) => state.resolved,
     permission: (state: AuthState) => (id: number | string) => {
         const items = state.permissions.filter((item: Record<string, any>) => {
             if (typeof id === 'number') {
@@ -92,6 +99,15 @@ export const actions : ActionTree<AuthState, RootState> = {
 
         commit('setToken', { kind, token });
     },
+    triggerSetTokenExpireDate({ commit }, { kind, date }) {
+        switch (kind) {
+            case OAuth2TokenKind.ACCESS:
+                this.$authWarehouse.set(AuthBrowserStorageKey.ACCESS_TOKEN_EXPIRE_DATE, date);
+                break;
+        }
+
+        commit('setTokenExpireDate', { kind, date });
+    },
     triggerUnsetToken({ commit }, kind) {
         switch (kind) {
             case OAuth2TokenKind.ACCESS:
@@ -108,13 +124,24 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     // --------------------------------------------------------------------
 
-    triggerSetUser({ commit }, user) {
-        this.$authWarehouse.set(AuthBrowserStorageKey.USER, user);
-        commit('setUser', user);
+    triggerSetUser({ commit }, entity) {
+        this.$authWarehouse.set(AuthBrowserStorageKey.USER, entity);
+        commit('setUser', entity);
     },
     triggerUnsetUser({ commit }) {
         this.$authWarehouse.remove(AuthBrowserStorageKey.USER);
         commit('unsetUser');
+    },
+
+    // --------------------------------------------------------------------
+
+    triggerSetRobot({ commit }, entity) {
+        this.$authWarehouse.set(AuthBrowserStorageKey.ROBOT, entity);
+        commit('setRobot', entity);
+    },
+    triggerUnsetRobot({ commit }) {
+        this.$authWarehouse.remove(AuthBrowserStorageKey.ROBOT);
+        commit('unsetRobot');
     },
 
     // --------------------------------------------------------------------
@@ -142,17 +169,18 @@ export const actions : ActionTree<AuthState, RootState> = {
         const { accessToken } = state;
 
         if (accessToken) {
-            try {
-                const { permissions, ...user } = await this.$auth.getUserInfo(accessToken);
+            const { target } = await this.$auth.verifyToken(accessToken);
 
-                dispatch('triggerUnsetUser');
-
-                dispatch('triggerSetUser', user);
-                dispatch('triggerSetPermissions', permissions);
-            } catch (e) {
-                dispatch('triggerLogout');
-                throw e;
+            switch (target.kind) {
+                case OAuth2TokenSubKind.USER:
+                    dispatch('triggerSetUser', target.entity);
+                    break;
+                case OAuth2TokenSubKind.ROBOT:
+                    dispatch('triggerSetRobot', target.entity);
+                    break;
             }
+
+            dispatch('triggerSetPermissions', target.permissions);
         }
     },
     // --------------------------------------------------------------------
@@ -169,8 +197,8 @@ export const actions : ActionTree<AuthState, RootState> = {
             const token = await this.$auth.getTokenWithPassword(name, password);
 
             commit('loginSuccess');
-            commit('setTokenExpireDate', { kind: OAuth2TokenKind.ACCESS, date: new Date(Date.now() + token.expires_in * 1000) });
 
+            dispatch('triggerSetTokenExpireDate', { kind: OAuth2TokenKind.ACCESS, date: new Date(Date.now() + token.expires_in * 1000) });
             dispatch('triggerSetToken', { kind: OAuth2TokenKind.ACCESS, token: token.access_token });
             dispatch('triggerSetToken', { kind: OAuth2TokenKind.REFRESH, token: token.refresh_token });
 
@@ -206,8 +234,7 @@ export const actions : ActionTree<AuthState, RootState> = {
                         commit('setTokenPromise', null);
                         commit('loginSuccess');
 
-                        commit('setTokenExpireDate', { kind: OAuth2TokenKind.ACCESS, date: new Date(Date.now() + token.expires_in * 1000) });
-
+                        dispatch('triggerSetTokenExpireDate', { kind: OAuth2TokenKind.ACCESS, date: new Date(Date.now() + token.expires_in * 1000) });
                         dispatch('triggerSetToken', { kind: OAuth2TokenKind.ACCESS, token: token.access_token });
                         dispatch('triggerSetToken', { kind: OAuth2TokenKind.REFRESH, token: token.refresh_token });
 
@@ -232,18 +259,6 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     // --------------------------------------------------------------------
 
-    async triggerTokenExpired({ dispatch }) {
-        try {
-            await dispatch('triggerRefreshToken');
-        } catch (e) {
-            dispatch('triggerSetLoginRequired', true);
-
-            throw e;
-        }
-    },
-
-    // --------------------------------------------------------------------
-
     /**
      * Try to logout the user.
      * @param commit
@@ -252,6 +267,7 @@ export const actions : ActionTree<AuthState, RootState> = {
         await dispatch('triggerUnsetToken', OAuth2TokenKind.ACCESS);
         await dispatch('triggerUnsetToken', OAuth2TokenKind.REFRESH);
         await dispatch('triggerUnsetUser');
+        await dispatch('triggerUnsetRobot');
         await dispatch('triggerUnsetPermissions');
 
         await dispatch('triggerSetLoginRequired', false);
@@ -329,6 +345,15 @@ export const mutations : MutationTree<AuthState> = {
 
     // --------------------------------------------------------------------
 
+    setRobot(state, robot) {
+        state.robot = robot;
+    },
+    unsetRobot(state) {
+        state.robot = undefined;
+    },
+
+    // --------------------------------------------------------------------
+
     setUserProperty(state, { property, value }) {
         if (typeof state.user === 'undefined') return;
 
@@ -344,11 +369,14 @@ export const mutations : MutationTree<AuthState> = {
         state.permissions = [];
     },
 
-    setPermissionsResolved(state, resolved) {
-        state.permissionsResolved = !!resolved;
+    // --------------------------------------------------------------------
+
+    setResolved(state, resolved) {
+        state.resolved = !!resolved;
     },
 
     // --------------------------------------------------------------------
+
     setToken(state, { kind, token }) {
         switch (kind) {
             case OAuth2TokenKind.ACCESS:

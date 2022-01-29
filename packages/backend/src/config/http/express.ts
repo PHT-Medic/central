@@ -9,7 +9,10 @@ import express, { Express } from 'express';
 import cors from 'cors';
 
 import path from 'path';
-import { registerControllers as registerAuthControllers, registerMiddlewares } from '@typescript-auth/server';
+import {
+    registerControllers as registerAuthControllers,
+    registerMiddlewares,
+} from '@typescript-auth/server';
 import promBundle from 'express-prom-bundle';
 import { Client } from 'redis-extension';
 import { useLogger } from '../../modules/log';
@@ -65,6 +68,7 @@ export function createExpressApp(redis?: Client | boolean | string) : ExpressApp
         selfUrl: env.apiUrl,
         selfAuthorizeRedirectUrl: env.webAppUrl,
         writableDirectoryPath: getWritableDirPath(),
+        redis,
     });
 
     expressApp.use(errorMiddleware);
