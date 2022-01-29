@@ -4,7 +4,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import { setupHTTPMiddleware } from '@typescript-auth/server-adapter';
-import { useTrapiClient } from '@trapi/client';
+import { useClient } from '@trapi/client';
 import { registerRoutes } from './routes';
 import { ExpressAppContext, ExpressAppInterface } from './type';
 import { errorMiddleware } from './middleware/error';
@@ -23,8 +23,8 @@ function createExpressApp(context: ExpressAppContext) : ExpressAppInterface {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     expressApp.use(setupHTTPMiddleware({
-        redis: context.config.redisDatabase,
-        axios: useTrapiClient('default').driver,
+        redis: context.config.redis,
+        http: useClient().driver,
     }));
 
     // Loading routes

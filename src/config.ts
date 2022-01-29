@@ -1,8 +1,8 @@
-import { setTrapiClientConfig, useTrapiClient } from '@trapi/client';
+import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
 import { ROBOT_SECRET_ENGINE_KEY, ServiceID, VaultAPI } from '@personalhealthtrain/ui-common';
-import { ErrorCode } from '@typescript-auth/domains';
+import { ErrorCode, OAuth2TokenGrant, TokenAPI } from '@typescript-auth/domains';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
-import { Client, setConfig as setRedisConfig, useClient } from 'redis-extension';
+import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import https from 'https';
 import { buildCommandRouterComponent } from './components/command-router';
 import { Environment } from './env';
@@ -12,20 +12,16 @@ interface ConfigContext {
 }
 
 export type Config = {
-    redisDatabase: Client,
-    redisPub: Client,
-    redisSub: Client,
+    redis: Client,
 
     aggregators: {start: () => void}[]
     components: {start: () => void}[]
 };
 
 function createConfig({ env } : ConfigContext) : Config {
-    setRedisConfig('default', { connectionString: env.redisConnectionString });
+    setRedisConfig({ connectionString: env.redisConnectionString });
 
-    const redisDatabase = useClient('default');
-    const redisPub = redisDatabase.duplicate();
-    const redisSub = redisDatabase.duplicate();
+    const redis = useRedisClient();
 
     setAmqpConfig({
         connection: env.rabbitMqConnectionString,
@@ -35,24 +31,26 @@ function createConfig({ env } : ConfigContext) : Config {
         },
     });
 
-    setTrapiClientConfig('vault', {
+    setHTTPConfig({
         clazz: VaultAPI,
-        connectionString: env.vaultConnectionString,
         driver: {
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false,
             }),
         },
-    });
+        extra: {
+            connectionString: env.vaultConnectionString,
+        },
+    }, 'vault');
 
-    setTrapiClientConfig('default', {
+    setHTTPConfig({
         driver: {
             baseURL: env.apiUrl,
             withCredentials: true,
         },
     });
 
-    useTrapiClient('default').mountResponseInterceptor(
+    useHTTPClient().mountResponseInterceptor(
         (value) => value,
         async (err) => {
             const { config } = err;
@@ -62,20 +60,27 @@ function createConfig({ env } : ConfigContext) : Config {
                 (
                     err.response.status === 401 || // Unauthorized
                     err.response.status === 403 || // Forbidden
-                    err.response?.data?.code === ErrorCode.CREDENTIALS_INVALID
+                    err.response?.data?.code === ErrorCode.TOKEN_EXPIRED
                 )
             ) {
-                const robot = await useTrapiClient<VaultAPI>('vault').keyValue
+                const response = await useHTTPClient<VaultAPI>('vault').keyValue
                     .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM);
 
-                if (robot) {
-                    useTrapiClient('default').setAuthorizationHeader({
-                        type: 'Basic',
-                        username: robot.id,
-                        password: robot.secret,
+                if (response) {
+                    const tokenApi = new TokenAPI(useHTTPClient().driver);
+
+                    const token = await tokenApi.create({
+                        id: response.data.id,
+                        secret: response.data.secret,
+                        grant_type: OAuth2TokenGrant.ROBOT_CREDENTIALS,
                     });
 
-                    return useTrapiClient('default').request(config);
+                    useHTTPClient().setAuthorizationHeader({
+                        type: 'Bearer',
+                        token: token.access_token,
+                    });
+
+                    return useHTTPClient().request(config);
                 }
             }
 
@@ -91,9 +96,7 @@ function createConfig({ env } : ConfigContext) : Config {
     ];
 
     return {
-        redisDatabase,
-        redisPub,
-        redisSub,
+        redis,
 
         aggregators,
         components,
