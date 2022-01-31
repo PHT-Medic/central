@@ -7,8 +7,12 @@
 
 import supertest, { SuperTest, Test } from 'supertest';
 import { createExpressApp } from '../../src/config/http/express';
+import { createConfig } from '../../src/config';
+import env from '../../src/env';
 
 export function useSuperTest() : SuperTest<Test> {
+    createConfig({ env });
+
     const expressApp = createExpressApp();
     return supertest(expressApp);
 }

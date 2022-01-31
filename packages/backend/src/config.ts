@@ -11,7 +11,7 @@ import {
 import { setConfig as setHTTPConfig } from '@trapi/client';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import https from 'https';
-import { Client, setConfig as setRedisConfig, useClient } from 'redis-extension';
+import { setConfig as setRedisConfig } from 'redis-extension';
 import { buildDispatcherComponent } from './components/event-dispatcher';
 import { Environment } from './env';
 import { buildTrainBuilderAggregator } from './aggregators/train-builder';
@@ -27,10 +27,6 @@ interface ConfigContext {
 }
 
 export type Config = {
-    redisDatabase: Client,
-    redisPub: Client,
-    redisSub: Client,
-
     aggregators: {start: () => void}[]
     components: {start: () => void}[]
 };
@@ -61,10 +57,6 @@ export function createConfig({ env } : ConfigContext) : Config {
     }, ApiKey.HARBOR);
 
     setRedisConfig({ connectionString: env.redisConnectionString });
-
-    const redisDatabase = useClient();
-    const redisPub = redisDatabase.duplicate();
-    const redisSub = redisDatabase.duplicate();
 
     setHTTPConfig({
         clazz: VaultAPI,
@@ -106,10 +98,6 @@ export function createConfig({ env } : ConfigContext) : Config {
     ];
 
     return {
-        redisDatabase,
-        redisPub,
-        redisSub,
-
         aggregators,
         components,
     };

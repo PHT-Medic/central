@@ -31,18 +31,28 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
 
     const repository = getRepository(StationEntity);
 
-    const entity = await repository.findOne(id);
+    const query = repository.createQueryBuilder('station')
+        .addSelect('station.secure_id')
+        .addSelect('station.registry_project_id')
+        .addSelect('station.registry_project_account_id')
+        .where({
+            id,
+        })
+        .getOne();
+
+    const entity = await query;
 
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
-    await repository.remove(entity);
-
     if (env.env === 'test') {
         await deleteStationFromRegistry({
             type: RegistryQueueEntityType.STATION,
             id: entity.id,
+            secure_id: entity.secure_id,
+            registry_project_id: entity.registry_project_id,
+            registry_project_account_id: entity.registry_project_account_id,
         });
     } else {
         const queueMessage = buildRegistryQueueMessage(
@@ -50,6 +60,9 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
             {
                 type: RegistryQueueEntityType.STATION,
                 id: entity.id,
+                secure_id: entity.secure_id,
+                registry_project_id: entity.registry_project_id,
+                registry_project_account_id: entity.registry_project_account_id,
             },
         );
         await publishMessage(queueMessage);
@@ -59,6 +72,7 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
         await deleteStationFromSecretStorage({
             type: SecretStorageQueueEntityType.STATION,
             id: entity.id,
+            secure_id: entity.secure_id,
         });
     } else {
         const queueMessage = buildSecretStorageQueueMessage(
@@ -66,10 +80,13 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
             {
                 type: SecretStorageQueueEntityType.STATION,
                 id: entity.id,
+                secure_id: entity.secure_id,
             },
         );
         await publishMessage(queueMessage);
     }
+
+    await repository.remove(entity);
 
     return res.respondDeleted({ data: entity });
 }

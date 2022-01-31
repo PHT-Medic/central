@@ -29,8 +29,6 @@ export interface ExpressAppInterface extends Express{
 }
 
 export function createExpressApp(redis?: Client | boolean | string) : ExpressAppInterface {
-    useLogger().debug('setup express app...', { service: 'express' });
-
     const expressApp : Express = express();
 
     expressApp.set('trust proxy', 1);
@@ -52,15 +50,18 @@ export function createExpressApp(redis?: Client | boolean | string) : ExpressApp
         redis,
     });
 
-    // Rate Limiter
-    expressApp.use(useRateLimiter);
+    if (env.env !== 'test') {
+        // Rate Limiter
+        expressApp.use(useRateLimiter);
 
-    const metricsMiddleware = promBundle({
-        includeMethod: true,
-        includePath: true,
-    });
+        // Metrics
+        const metricsMiddleware = promBundle({
+            includeMethod: true,
+            includePath: true,
+        });
 
-    expressApp.use(metricsMiddleware);
+        expressApp.use(metricsMiddleware);
+    }
 
     registerControllers(expressApp);
     registerAuthControllers(expressApp, {

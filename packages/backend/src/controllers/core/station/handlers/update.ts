@@ -61,7 +61,7 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
         data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
     }
 
-    if (typeof data.secure_id === 'string') {
+    if (data.secure_id) {
         // secure id changed -> remove vault- & harbor-project
         if (data.secure_id !== entity.secure_id) {
             try {
@@ -83,6 +83,8 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
 
     entity = repository.merge(entity, data);
 
+    await repository.save(entity);
+
     if (entity.public_key) {
         if (env.env === 'test') {
             await saveStationToSecretStorage({
@@ -100,8 +102,6 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
             await publishMessage(queueMessage);
         }
     }
-
-    await repository.save(entity);
 
     return res.respondAccepted({
         data: entity,

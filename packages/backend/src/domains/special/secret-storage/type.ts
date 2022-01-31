@@ -7,6 +7,7 @@
 
 import { Robot, User } from '@typescript-auth/domains';
 import { Station } from '@personalhealthtrain/ui-common';
+import { Stat } from 'isomorphic-git';
 import { SecretStorageQueueEntityType } from './constants';
 
 export type SecretStorageRobotQueuePayload = {
@@ -24,7 +25,7 @@ export type SecretStorageUserSecretsQueuePayload = {
 export type SecretStorageStationQueuePayload = {
     type: SecretStorageQueueEntityType.STATION,
     id: Station['id']
-};
+} & Partial<Station>;
 
 export type SecretStorageQueuePayload =
     SecretStorageRobotQueuePayload |

@@ -12,7 +12,7 @@ import {
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';
-import { ResponseExample, SwaggerTags } from '@trapi/swagger';
+import { SwaggerTags } from '@trapi/swagger';
 import { ForceLoggedInMiddleware } from '../../../config/http/middleware/auth';
 import {
     createProposalRouteHandler,
@@ -23,15 +23,11 @@ import {
 } from './handlers';
 
 type PartialProposal = Partial<Proposal>;
-const simpleExample = {
-    title: 'An example Proposal', risk: 'low', risk_comment: 'The risk is low', requested_data: 'all', realm_id: 'master',
-};
 
 @SwaggerTags('pht')
 @Controller('/proposals')
 export class ProposalController {
     @Get('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposal[]>([simpleExample])
     async getMany(
         @Request() req: any,
             @Response() res: any,
@@ -40,7 +36,6 @@ export class ProposalController {
     }
 
     @Get('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposal>(simpleExample)
     async getOne(
         @Params('id') id: string,
             @Request() req: any,
@@ -50,7 +45,6 @@ export class ProposalController {
     }
 
     @Post('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposal>(simpleExample)
     async update(
         @Params('id') id: string,
             @Body() data: Proposal,
@@ -61,7 +55,6 @@ export class ProposalController {
     }
 
     @Post('', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposal>(simpleExample)
     async add(
         @Body() data: Proposal,
             @Request() req: any,
@@ -71,7 +64,6 @@ export class ProposalController {
     }
 
     @Delete('/:id', [ForceLoggedInMiddleware])
-    @ResponseExample<PartialProposal>(simpleExample)
     async drop(
         @Params('id') id: string,
             @Request() req: any,

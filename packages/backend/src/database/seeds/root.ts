@@ -8,13 +8,17 @@
 import { Connection, In, getRepository } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 import {
-    RealmEntity, RobotEntity, RoleEntity, RolePermissionEntity, RoleRepository,
+    RealmEntity,
+    RobotEntity,
+    RoleEntity,
+    RolePermissionEntity,
+    RoleRepository,
+    useRobotEventEmitter,
 } from '@typescript-auth/server';
 import { ServiceID } from '@personalhealthtrain/ui-common';
 import { MASTER_REALM_ID, createNanoID } from '@typescript-auth/domains';
 import { PHTStationRole, getPHTStationRolePermissions } from '../../config/pht/permissions/station';
 import { StationEntity } from '../../domains/core/station/entity';
-import { buildRobotAggregator } from '../../aggregators/robot';
 
 // ----------------------------------------------
 
@@ -24,9 +28,6 @@ export class DatabaseRootSeeder implements Seeder {
          * Create robot accounts for services.
          */
 
-        const robotAggregator = buildRobotAggregator();
-        robotAggregator.start();
-
         const services : ServiceID[] = Object.values(ServiceID);
         const robotRepository = getRepository(RobotEntity);
         let robots = await robotRepository.createQueryBuilder('robot')
@@ -35,15 +36,33 @@ export class DatabaseRootSeeder implements Seeder {
             })
             .getMany();
 
+        const serviceSecrets : {[K in ServiceID]?: string} = {};
+
         robots = services
             .filter((service) => robots.findIndex((robot) => robot.name === service) === -1)
-            .map((service) => robotRepository.create({
-                name: service,
-                secret: createNanoID(undefined, 64),
-                realm_id: MASTER_REALM_ID,
-            }));
+            .map((service) => {
+                const secret = createNanoID(undefined, 64);
+                serviceSecrets[service] = secret;
+
+                return robotRepository.create({
+                    name: service,
+                    secret,
+                    realm_id: MASTER_REALM_ID,
+                });
+            });
 
         await robotRepository.save(robots);
+
+        for (let i = 0; i < robots.length; i++) {
+            useRobotEventEmitter()
+                .emit('credentials', {
+                    id: robots[i].id,
+                    name: robots[i].name,
+                    secret: serviceSecrets[robots[i].name] || robots[i].secret,
+                });
+        }
+
+        // -------------------------------------------------
 
         /**
          * Create PHT roles

@@ -31,7 +31,7 @@ import {
     TrainResult,
     TrainResultStatus,
     TrainRunErrorCode,
-    TrainRunStatus,
+    TrainRunStatus, TrainType,
     UserSecret,
 } from '@personalhealthtrain/ui-common';
 import { RealmEntity, UserEntity } from '@typescript-auth/server';
@@ -40,15 +40,15 @@ import { ProposalEntity } from '../proposal/entity';
 import { MasterImageEntity } from '../master-image/entity';
 import { TrainFileEntity } from '../train-file/entity';
 import { TrainStationEntity } from '../train-station/entity';
-import { UserSecretEntity } from '../../auth/user-secret/entity';
+import { UserSecretEntity } from '../user-secret/entity';
 
 @Entity()
 export class TrainEntity implements Train {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
-    @Column({ length: 10 })
-        type: string;
+    @Column({ type: 'enum', enum: TrainType, default: TrainType.ANALYSE })
+        type: TrainType;
 
     @Index()
     @Column({ type: 'varchar', length: 128, nullable: true })

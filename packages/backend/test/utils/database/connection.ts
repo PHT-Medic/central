@@ -11,11 +11,12 @@ import {
 import { ConnectionOptions, createConnection, getConnection } from 'typeorm';
 import {
     DatabaseRootSeeder as AuthDatabaseRootSeeder,
-    modifyDatabaseConnectionOptions as modifyAuthDatabaseConnectionOptions,
+    setEntitiesForConnectionOptions,
 } from '@typescript-auth/server';
 import { PermissionKey } from '@personalhealthtrain/ui-common';
 import { DatabaseRootSeeder } from '../../../src/database/seeds/root';
 import { modifyDatabaseConnectionOptions } from '../../../src/database/utils';
+import { buildRobotAggregator } from '../../../src/aggregators/robot';
 
 async function createConnectionOptions() {
     return {
@@ -26,13 +27,16 @@ async function createConnectionOptions() {
 
 export async function useTestDatabase() {
     const connectionOptions = modifyDatabaseConnectionOptions(
-        modifyAuthDatabaseConnectionOptions(await createConnectionOptions(), false),
+        setEntitiesForConnectionOptions(await createConnectionOptions(), true),
     );
 
     await createDatabase({ ifNotExist: true }, connectionOptions);
 
     const connection = await createConnection(connectionOptions as ConnectionOptions);
     await connection.synchronize();
+
+    const { start } = buildRobotAggregator();
+    start();
 
     const authSeeder = new AuthDatabaseRootSeeder({
         permissions: Object.values(PermissionKey),

@@ -20,6 +20,7 @@
         "@trapi/swagger": "^0.2.12",
         "@typescript-auth/domains": "^0.0.18",
         "@typescript-auth/server": "^2.0.0-alpha.29",
+        "@typescript-auth/server-utils": "^0.0.5",
         "@typescript-error/http": "^1.0.3",
         "amqp-extension": "^1.0.1",
         "body-parser": "^1.19.1",

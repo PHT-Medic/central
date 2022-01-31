@@ -8,7 +8,7 @@
 import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
-import { MasterImage, Proposal } from '@personalhealthtrain/ui-common';
+import { MasterImage, Proposal, ProposalRisk } from '@personalhealthtrain/ui-common';
 import { RealmEntity, UserEntity } from '@typescript-auth/server';
 import { Realm, User } from '@typescript-auth/domains';
 import { ProposalStationEntity } from '../proposal-station/entity';
@@ -25,8 +25,8 @@ export class ProposalEntity implements Proposal {
     @Column({ type: 'varchar' })
         requested_data: string;
 
-    @Column({ type: 'varchar' })
-        risk: string;
+    @Column({ type: 'enum', enum: ProposalRisk })
+        risk: ProposalRisk;
 
     @Column({ type: 'varchar', length: 4096 })
         risk_comment: string;
@@ -58,12 +58,12 @@ export class ProposalEntity implements Proposal {
     @JoinColumn({ name: 'user_id' })
         user: UserEntity;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, default: null })
         master_image_id: MasterImage['id'] | null;
 
     @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'master_image_id' })
-        master_image: MasterImageEntity;
+        master_image: MasterImageEntity | null;
 
     @OneToMany(() => ProposalStationEntity, (proposalStation) => proposalStation.proposal)
         proposal_stations: ProposalStationEntity[];

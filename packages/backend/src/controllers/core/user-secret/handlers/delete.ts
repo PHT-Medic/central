@@ -10,7 +10,7 @@ import { NotFoundError } from '@typescript-error/http';
 import { FindConditions, getRepository } from 'typeorm';
 import { publishMessage } from 'amqp-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
-import { UserSecretEntity } from '../../../../domains/auth/user-secret/entity';
+import { UserSecretEntity } from '../../../../domains/core/user-secret/entity';
 import env from '../../../../env';
 import { saveUserSecretsToSecretStorage } from '../../../../components/secret-storage/handlers/entities/user';
 import {

@@ -12,6 +12,5 @@ export * from './proposal-station';
 export * from './station';
 export * from './train';
 export * from './train-file';
-export * from './model';
 export * from './train-result';
 export * from './train-station';

@@ -5,7 +5,7 @@ import { Buffer } from 'buffer';
 import { publishMessage } from 'amqp-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
 import { runUserSecretValidation } from './utils';
-import { UserSecretEntity } from '../../../../domains/auth/user-secret/entity';
+import { UserSecretEntity } from '../../../../domains/core/user-secret/entity';
 import { buildSecretStorageQueueMessage } from '../../../../domains/special/secret-storage/queue';
 import {
     SecretStorageQueueCommand,

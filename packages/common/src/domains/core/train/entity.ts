@@ -20,11 +20,12 @@ import {
 } from './constants';
 import { UserSecret } from '../../auth';
 import { Station } from '../station';
+import { TrainType } from './type';
 
 export interface Train {
     id: string;
 
-    type: string;
+    type: TrainType;
 
     name: string | null;
 

@@ -7,6 +7,7 @@
 
 import { check, validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
+import { ProposalRisk } from '@personalhealthtrain/ui-common';
 import { ExpressRequest } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 import { matchedValidationData } from '../../../../modules/express-validator';
@@ -44,7 +45,7 @@ export async function runProposalValidation(
     const riskChain = check('risk')
         .exists()
         .isString()
-        .isIn(['low', 'mid', 'high']);
+        .isIn(Object.values(ProposalRisk));
 
     if (operation === 'update') {
         riskChain.optional();
@@ -54,18 +55,14 @@ export async function runProposalValidation(
 
     // ----------------------------------------------
 
-    const masterImageChain = check('master_image_id')
+    await check('master_image_id')
         .exists()
-        .isString()
+        .isUUID()
         .custom((value) => getRepository(MasterImageEntity).findOne(value).then((masterImageResult) => {
             if (typeof masterImageResult === 'undefined') throw new Error('The referenced master image does not exist.');
-        }));
-
-    if (operation === 'update') {
-        masterImageChain.optional();
-    }
-
-    await masterImageChain.run(req);
+        }))
+        .optional({ nullable: true })
+        .run(req);
 
     // ----------------------------------------------
 

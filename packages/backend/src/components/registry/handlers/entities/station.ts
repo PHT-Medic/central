@@ -136,24 +136,9 @@ export async function saveStationToRegistry(payload: RegistryStationQueuePayload
 }
 
 export async function deleteStationFromRegistry(payload: RegistryStationQueuePayload) {
-    const repository = await getRepository(StationEntity);
-    const query = repository.createQueryBuilder('station')
-        .addSelect([
-            'station.public_key',
-            'station.secure_id',
-            'station.email',
-        ])
-        .where('station.id = :id', { id: payload.id });
-
-    const entity = await query.getOne();
-
-    if (typeof entity === 'undefined') {
-        return;
-    }
-
     try {
-        const isProjectName = !entity.registry_project_id;
-        const id = isProjectName ? buildRegistryStationProjectName(entity.secure_id) : entity.registry_project_id;
+        const isProjectName = !payload.registry_project_id;
+        const id = isProjectName ? buildRegistryStationProjectName(payload.secure_id) : payload.registry_project_id;
 
         await useClient<HarborAPI>(ApiKey.HARBOR).project
             .delete(id, isProjectName);
@@ -161,20 +146,12 @@ export async function deleteStationFromRegistry(payload: RegistryStationQueuePay
         // ...
     }
 
-    if (entity.registry_project_account_id) {
+    if (payload.registry_project_account_id) {
         try {
             await useClient<HarborAPI>(ApiKey.HARBOR).robotAccount
-                .delete(entity.registry_project_account_id);
+                .delete(payload.registry_project_account_id);
         } catch (e) {
             // ...
         }
     }
-
-    entity.registry_project_id = null;
-    entity.registry_project_webhook_exists = false;
-    entity.registry_project_account_id = null;
-    entity.registry_project_account_name = null;
-    entity.registry_project_account_token = null;
-
-    await repository.save(entity);
 }

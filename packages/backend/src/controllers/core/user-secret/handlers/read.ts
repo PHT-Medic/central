@@ -6,7 +6,7 @@ import {
 import { NotFoundError } from '@typescript-error/http';
 import { PermissionID } from '@personalhealthtrain/ui-common';
 import { ExpressRequest, ExpressResponse } from '../../../../config/http/type';
-import { UserSecretEntity } from '../../../../domains/auth/user-secret/entity';
+import { UserSecretEntity } from '../../../../domains/core/user-secret/entity';
 
 export async function getOneUserSecretRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;

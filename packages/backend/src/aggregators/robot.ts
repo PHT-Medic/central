@@ -26,6 +26,20 @@ export function buildRobotAggregator() {
 
                 await publishMessage(queueMessage);
             });
+
+        useRobotEventEmitter()
+            .on('deleted', async (robot) => {
+                const queueMessage = buildSecretStorageQueueMessage(
+                    SecretStorageQueueCommand.DELETE,
+                    {
+                        type: SecretStorageQueueEntityType.ROBOT,
+                        name: robot.name,
+                        id: robot.id,
+                    },
+                );
+
+                await publishMessage(queueMessage);
+            });
     }
 
     return {
