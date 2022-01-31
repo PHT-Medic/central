@@ -15,7 +15,7 @@ import { ApiKey } from '../../../../config/api';
 import {
     SecretStorageUserSecretsQueuePayload,
 } from '../../../../domains/special/secret-storage/type';
-import { UserSecretEntity } from '../../../../domains/auth/user-secret/entity';
+import { UserSecretEntity } from '../../../../domains/core/user-secret/entity';
 
 export async function deleteUserSecretsFromSecretStorage(payload: SecretStorageUserSecretsQueuePayload) {
     try {

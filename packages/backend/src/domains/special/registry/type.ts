@@ -9,9 +9,8 @@ import { Station } from '@personalhealthtrain/ui-common';
 import { RegistryQueueEntityType } from './constants';
 
 export type RegistryStationQueuePayload = {
-    type: RegistryQueueEntityType.STATION,
-    id: Station['id']
-};
+    type: RegistryQueueEntityType.STATION
+} & Partial<Station>;
 
 export type RegistryQueuePayload =
     RegistryStationQueuePayload;

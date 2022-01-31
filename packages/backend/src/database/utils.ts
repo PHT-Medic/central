@@ -17,10 +17,9 @@ import { TrainEntity } from '../domains/core/train/entity';
 import { StationEntity } from '../domains/core/station/entity';
 import { ProposalStationEntity } from '../domains/core/proposal-station/entity';
 import { TrainFileEntity } from '../domains/core/train-file/entity';
-import { ModelEntity } from '../domains/core/model';
 import { TrainResultEntity } from '../domains/core/train-result/entity';
 import { TrainStationEntity } from '../domains/core/train-station/entity';
-import { UserSecretEntity } from '../domains/auth/user-secret/entity';
+import { UserSecretEntity } from '../domains/core/user-secret/entity';
 
 export function modifyDatabaseConnectionOptions(
     connectionOptions: ConnectionWithAdditionalOptions,
@@ -38,7 +37,6 @@ export function modifyDatabaseConnectionOptions(
             StationEntity,
             TrainEntity,
             TrainFileEntity,
-            ModelEntity,
             TrainResultEntity,
             TrainStationEntity,
             UserSecretEntity,

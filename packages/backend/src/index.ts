@@ -9,7 +9,8 @@ import 'reflect-metadata';
 import dotenv from 'dotenv';
 
 import { createConnection } from 'typeorm';
-import { UserEntity, buildTokenAggregator } from '@typescript-auth/server';
+import { buildTokenAggregator } from '@typescript-auth/server';
+import { useClient } from 'redis-extension';
 import env from './env';
 
 import { createConfig } from './config';
@@ -27,7 +28,8 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     HTTP Server & Express App
     */
     const config = createConfig({ env });
-    const expressApp = createExpressApp(config.redisDatabase);
+    const redis = useClient();
+    const expressApp = createExpressApp(redis);
     const httpServer = createHttpServer({ expressApp });
 
     function signalStart() {
@@ -50,7 +52,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
         await connection.synchronize();
     }
 
-    const { start: startTokenAggregator } = buildTokenAggregator(config.redisDatabase);
+    const { start: startTokenAggregator } = buildTokenAggregator(redis);
     await startTokenAggregator();
 
     start();

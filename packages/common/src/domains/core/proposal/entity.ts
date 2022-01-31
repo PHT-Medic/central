@@ -8,6 +8,7 @@
 import { Realm, User } from '@typescript-auth/domains';
 import { MasterImage } from '../master-image';
 import { ProposalStation } from '../proposal-station';
+import { ProposalRisk } from './constants';
 
 export interface Proposal {
     id: string;
@@ -16,7 +17,7 @@ export interface Proposal {
 
     requested_data: string;
 
-    risk: string;
+    risk: ProposalRisk;
 
     risk_comment: string;
 
@@ -40,7 +41,7 @@ export interface Proposal {
 
     master_image_id: MasterImage['id'] | null;
 
-    master_image: MasterImage;
+    master_image: MasterImage | null;
 
     proposal_stations: ProposalStation[];
 }

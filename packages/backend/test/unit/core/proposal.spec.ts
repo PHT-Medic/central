@@ -5,11 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SecretType, UserSecret } from '@personalhealthtrain/ui-common';
+import { Proposal } from '@personalhealthtrain/ui-common';
+import { MASTER_REALM_ID } from '@typescript-auth/domains';
 import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
+import { TEST_DEFAULT_PROPOSAL, createSuperTestProposal } from '../../utils/domains/proposal';
+import { expectPropertiesEqualToSrc } from '../../utils/properties';
 
-describe('src/controllers/auth/user-secret', () => {
+describe('src/controllers/core/proposal', () => {
     const superTest = useSuperTest();
 
     beforeAll(async () => {
@@ -20,15 +23,13 @@ describe('src/controllers/auth/user-secret', () => {
         await dropTestDatabase();
     });
 
-    const details : Partial<UserSecret> = {
-        content: 'xxx',
-        user_id: 1,
-        type: SecretType.RSA_PUBLIC_KEY,
+    const details : Partial<Proposal> = {
+        ...TEST_DEFAULT_PROPOSAL,
     };
 
-    it('should read collection', async () => {
+    it('should get collection', async () => {
         const response = await superTest
-            .get('/user-secrets')
+            .get('/proposals')
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -38,49 +39,39 @@ describe('src/controllers/auth/user-secret', () => {
     });
 
     it('should create, read, update, delete resource', async () => {
-        let response = await superTest
-            .post('/user-secrets')
+        let response = await createSuperTestProposal(superTest, details);
+
+        expect(response.status).toEqual(200);
+        expect(response.body).toBeDefined();
+        expect(response.body.trains).toEqual(0);
+        expectPropertiesEqualToSrc(details, response.body);
+
+        // ---------------------------------------------------------
+
+        response = await superTest
+            .get(`/proposals/${response.body.id}`)
+            .auth('admin', 'start123');
+
+        expect(response.status).toEqual(200);
+        expect(response.body).toBeDefined();
+
+        // ---------------------------------------------------------
+
+        details.title = 'TestA';
+
+        response = await superTest
+            .post(`/proposals/${response.body.id}`)
             .send(details)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
-
-        let keys : string[] = Object.keys(details);
-        for (let i = 0; i < keys.length; i++) {
-            expect(response.body[keys[i]]).toEqual(details[keys[i]]);
-        }
+        expectPropertiesEqualToSrc(details, response.body);
 
         // ---------------------------------------------------------
 
         response = await superTest
-            .get(`/user-secrets/${response.body.id}`)
-            .auth('admin', 'start123');
-
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-
-        // ---------------------------------------------------------
-
-        details.content = 'TestA';
-
-        response = await superTest
-            .post(`/user-secrets/${response.body.id}`)
-            .send(details)
-            .auth('admin', 'start123');
-
-        expect(response.status).toEqual(200);
-        expect(response.body).toBeDefined();
-
-        keys = Object.keys(details);
-        for (let i = 0; i < keys.length; i++) {
-            expect(response.body[keys[i]]).toEqual(details[keys[i]]);
-        }
-
-        // ---------------------------------------------------------
-
-        response = await superTest
-            .delete(`/user-secrets/${response.body.id}`)
+            .delete(`/proposals/${response.body.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);

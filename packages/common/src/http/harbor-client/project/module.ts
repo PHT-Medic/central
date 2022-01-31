@@ -31,7 +31,7 @@ export class HarborProjectAPI {
                 id: data.project_id,
             };
         } catch (e) {
-            if (e.response.status === 404) {
+            if (e.response.status === 404 || e.response.status === 403) {
                 return undefined;
             }
 

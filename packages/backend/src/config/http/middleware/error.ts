@@ -52,6 +52,8 @@ export function errorMiddleware(
         baseError.message = 'An error occurred.';
     }
 
+    console.log(error);
+
     return response
         .status(statusCode)
         .json({

@@ -10,6 +10,7 @@ import { createDatabase } from 'typeorm-extension';
 import { createConnection } from 'typeorm';
 import { DatabaseRootSeeder as AuthDatabaseRootSeeder, setupCommand } from '@typescript-auth/server';
 import { PermissionKey } from '@personalhealthtrain/ui-common';
+import { useClient } from 'redis-extension';
 import { createConfig } from '../../config';
 import env from '../../env';
 import { buildDatabaseConnectionOptions } from '../../database/utils';
@@ -100,9 +101,11 @@ export class SetupCommand implements CommandModule {
                 await connection.synchronize();
 
                 if (args.databaseSeeder) {
-                    const config = createConfig({ env });
-                    if (config.redisDatabase.status !== 'connecting') {
-                        await config.redisDatabase.connect();
+                    createConfig({ env });
+
+                    const redis = useClient();
+                    if (redis.status !== 'connecting') {
+                        await redis.connect();
                     }
 
                     const aggregator = buildRobotAggregator();

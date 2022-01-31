@@ -6,33 +6,30 @@
  */
 
 import {
-    ConnectionWithSeederOptions, buildConnectionOptions, createDatabase, dropDatabase,
+    buildConnectionOptions, createDatabase, dropDatabase,
 } from 'typeorm-extension';
 import { ConnectionOptions, createConnection, getConnection } from 'typeorm';
 import {
     DatabaseRootSeeder as AuthDatabaseRootSeeder,
-    modifyDatabaseConnectionOptions as modifyAuthDatabaseConnectionOptions,
+    setEntitiesForConnectionOptions,
 } from '@typescript-auth/server';
 import { PermissionKey } from '@personalhealthtrain/ui-common';
 import { DatabaseRootSeeder } from '../../../src/database/seeds/root';
 import { modifyDatabaseConnectionOptions } from '../../../src/database/utils';
-
-async function createConnectionOptions() {
-    return {
-        ...await buildConnectionOptions(),
-        database: 'test',
-    } as ConnectionWithSeederOptions;
-}
+import { buildRobotAggregator } from '../../../src/aggregators/robot';
 
 export async function useTestDatabase() {
     const connectionOptions = modifyDatabaseConnectionOptions(
-        modifyAuthDatabaseConnectionOptions(await createConnectionOptions(), false),
+        setEntitiesForConnectionOptions(await buildConnectionOptions(), true),
     );
 
     await createDatabase({ ifNotExist: true }, connectionOptions);
 
     const connection = await createConnection(connectionOptions as ConnectionOptions);
     await connection.synchronize();
+
+    const { start } = buildRobotAggregator();
+    start();
 
     const authSeeder = new AuthDatabaseRootSeeder({
         permissions: Object.values(PermissionKey),
@@ -48,7 +45,7 @@ export async function useTestDatabase() {
 }
 
 export async function dropTestDatabase() {
-    const connectionOptions = await createConnectionOptions();
+    const connectionOptions = await buildConnectionOptions();
 
     await getConnection()
         .close();

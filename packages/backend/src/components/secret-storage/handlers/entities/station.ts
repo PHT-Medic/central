@@ -48,8 +48,8 @@ export async function saveStationToSecretStorage(payload: SecretStorageStationQu
         .find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, `${entity.secure_id}`);
 
     const data : StationSecretStoragePayload = mergeDeep(
-        buildStationSecretStoragePayload(entity),
         (response ? response.data : {}),
+        buildStationSecretStoragePayload(entity),
     );
 
     await useClient<VaultAPI>(ApiKey.VAULT).keyValue.save(
@@ -64,17 +64,8 @@ export async function saveStationToSecretStorage(payload: SecretStorageStationQu
 }
 
 export async function deleteStationFromSecretStorage(payload: SecretStorageStationQueuePayload) {
-    const repository = await getRepository(StationEntity);
-    const query = repository.createQueryBuilder('station')
-        .addSelect([
-            'station.secure_id',
-        ])
-        .where('station.id = :id', { id: payload.id });
-
-    const entity = await query.getOne();
-
     try {
-        await useClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(STATION_SECRET_ENGINE_KEY, `${entity.secure_id}`);
+        await useClient<VaultAPI>(ApiKey.VAULT).keyValue.delete(STATION_SECRET_ENGINE_KEY, `${payload.secure_id}`);
     } catch (e) {
         // ...
     }

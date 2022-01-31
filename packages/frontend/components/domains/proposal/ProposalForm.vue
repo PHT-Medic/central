@@ -10,6 +10,7 @@ import {
     alpha, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 
+import { ProposalRisk } from '@personalhealthtrain/ui-common';
 import MasterImagePicker from '../master-image/MasterImagePicker';
 import StationList from '../station/StationList';
 import ToggleManyButton from '../../ToggleManyButton';
@@ -47,9 +48,9 @@ export default {
             },
 
             risks: [
-                { id: 'low', name: '(Low) Low risk', class: 'btn-success' },
-                { id: 'mid', name: '(Mid) Mid risk', class: 'btn-warning' },
-                { id: 'high', name: '(High) High risk', class: 'btn-danger' },
+                { id: ProposalRisk.LOW, name: '(Low) Low risk', class: 'btn-success' },
+                { id: ProposalRisk.MID, name: '(Mid) Mid risk', class: 'btn-warning' },
+                { id: ProposalRisk.HIGH, name: '(High) High risk', class: 'btn-danger' },
             ],
         };
     },

@@ -25,10 +25,10 @@ export function buildStationSecretStorageKey(id: string | number): string {
 
 export function buildStationSecretStoragePayload(station: Partial<Station>) : StationSecretStoragePayload {
     return {
-        rsa_public_key: station.public_key,
-        registry_robot_id: station.registry_project_account_id,
-        registry_robot_name: station.registry_project_account_name,
-        registry_robot_secret: station.registry_project_account_token,
+        ...(station.public_key ? { rsa_public_key: station.public_key } : {}),
+        ...(station.registry_project_account_id ? { registry_robot_id: station.registry_project_account_id } : {}),
+        ...(station.registry_project_account_name ? { registry_robot_name: station.registry_project_account_name } : {}),
+        ...(station.registry_project_account_token ? { registry_robot_secret: station.registry_project_account_token } : {}),
     };
 }
 
