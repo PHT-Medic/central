@@ -37,7 +37,7 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
 
     const trainFileRepository = getRepository<TrainFile>(TrainFileEntity);
 
-    const instance = BusBoy({ headers: req.headers as BusBoy.BusboyHeaders, preservePath: true });
+    const instance = BusBoy({ headers: req.headers, preservePath: true });
 
     const files: TrainFile[] = [];
 
