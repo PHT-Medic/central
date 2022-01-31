@@ -164,7 +164,7 @@ export default {
 
                 switch (step) {
                     case 'configuration':
-                        promise = this.canPassConfigurationWizardStep();
+                        promise = this.canPassBaseWizardStep();
                         break;
                     case 'security':
                         promise = this.canPassSecurityWizardStep();
@@ -200,18 +200,14 @@ export default {
                     });
             });
         },
-        async canPassConfigurationWizardStep() {
-            if (!this.form.master_image_id || this.form.master_image_id.length === 0) {
+        async canPassBaseWizardStep() {
+            if (!this.form.master_image_id) {
                 throw new Error('A master image must be selected...');
             }
 
             if (this.entity.stations <= 0) {
                 throw new Error('One or more stations have to be selected...');
             }
-
-            await this.update({
-                master_image_id: this.form.master_image_id,
-            });
 
             return true;
         },
@@ -277,9 +273,6 @@ export default {
             for (let i = 0; i < keys.length; i++) {
                 Vue.set(this.form, keys[i], item[keys[i]]);
             }
-        },
-        setMasterImage(item) {
-            this.handleFormUpdated({ master_image_id: item ? item.id : null });
         },
         setFhirQuery(query) {
             this.handleFormUpdated({ query });
@@ -374,7 +367,6 @@ export default {
                 >
                     <train-wizard-step-base
                         :train="entity"
-                        @setTrainMasterImage="setMasterImage"
                         @updated="handleUpdated"
                     />
                 </tab-content>

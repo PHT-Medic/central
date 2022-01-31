@@ -28,7 +28,6 @@ export default {
     data() {
         return {
             form: {
-                master_image_id: '',
                 station_ids: [],
             },
 
@@ -49,9 +48,6 @@ export default {
     validations() {
         return {
             form: {
-                master_image_id: {
-                    required,
-                },
                 station_ids: {
                     required,
                     minLength: minLength(1),
@@ -136,8 +132,16 @@ export default {
             return this.trainStation.items.findIndex((trainStation) => trainStation.station_id === item.station_id) === -1;
         },
 
-        handleMasterImageSelected(item) {
-            this.$emit('setTrainMasterImage', item);
+        async handleMasterImageSelected(item) {
+            try {
+                const response = await this.$api.train.update(this.train.id, {
+                    master_image_id: item ? item.id : null,
+                });
+
+                this.$emit('updated', response);
+            } catch (e) {
+                // ...
+            }
         },
         handleTrainStationCreated(item) {
             const index = this.trainStation.items.findIndex((trainStation) => trainStation.id === item.id);
