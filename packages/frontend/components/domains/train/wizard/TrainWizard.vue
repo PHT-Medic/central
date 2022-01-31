@@ -9,19 +9,21 @@ import Vue from 'vue';
 import {
     TrainConfigurationStatus,
 } from '@personalhealthtrain/ui-common';
-import TrainWizardConfiguratorStep from './TrainWizardStepBase';
+import TrainWizardStepBase from './TrainWizardStepBase';
 import TrainFileManager from '../../train-file/TrainFileManager';
-import TrainWizardHashStep from './TrainWizardStepHash';
-import TrainWizardFinalStep from './TrainWizardStepFinal';
-import TrainWizardExtraStep from './TrainWizardStepQuery';
+import TrainWizardStepHash from './TrainWizardStepHash';
+import TrainWizardStepFinal from './TrainWizardStepFinal';
+import TrainWizardStepQuery from './TrainWizardStepQuery';
+import TrainWizardStepSecurity from './TrainWizardStepSecurity';
 
 export default {
     components: {
-        TrainWizardExtraStep,
-        TrainWizardFinalStep,
-        TrainWizardHashStep,
+        TrainWizardStepSecurity,
+        TrainWizardStepQuery,
+        TrainWizardStepFinal,
+        TrainWizardStepHash,
         TrainFileManager,
-        TrainWizardConfiguratorStep,
+        TrainWizardStepBase,
     },
     props: {
         entity: {
@@ -39,6 +41,7 @@ export default {
                 index: 0,
                 steps: [
                     'configuration',
+                    'security',
                     'files',
                     'extra',
                     'hash',
@@ -49,6 +52,9 @@ export default {
                 query: null,
                 master_image_id: null,
                 station_ids: [],
+
+                user_rsa_secret_id: null,
+                user_paillier_secret_id: null,
 
                 entrypoint_file_id: null,
                 files: [],
@@ -73,8 +79,10 @@ export default {
         },
     },
     watch: {
-        trainUpdatedAt() {
-            this.initFromProperties();
+        trainUpdatedAt(val, oldVal) {
+            if (val && val !== oldVal) {
+                this.initFromProperties();
+            }
         },
     },
     created() {
@@ -158,6 +166,9 @@ export default {
                     case 'configuration':
                         promise = this.canPassConfigurationWizardStep();
                         break;
+                    case 'security':
+                        promise = this.canPassSecurityWizardStep();
+                        break;
                     case 'files':
                         promise = this.canPassFilesWizardStep();
                         break;
@@ -201,6 +212,13 @@ export default {
             await this.update({
                 master_image_id: this.form.master_image_id,
             });
+
+            return true;
+        },
+        async canPassSecurityWizardStep() {
+            if (!this.form.user_rsa_secret_id) {
+                throw new Error('A RSA key must be selected...');
+            }
 
             return true;
         },
@@ -354,9 +372,19 @@ export default {
                     title="Base"
                     :before-change="passWizardStep"
                 >
-                    <train-wizard-configurator-step
+                    <train-wizard-step-base
                         :train="entity"
                         @setTrainMasterImage="setMasterImage"
+                        @updated="handleUpdated"
+                    />
+                </tab-content>
+
+                <tab-content
+                    title="Security"
+                    :before-change="passWizardStep"
+                >
+                    <train-wizard-step-security
+                        :train="entity"
                         @updated="handleUpdated"
                     />
                 </tab-content>
@@ -377,7 +405,7 @@ export default {
                     title="Extra"
                     :before-change="passWizardStep"
                 >
-                    <train-wizard-extra-step
+                    <train-wizard-step-query
                         :train="entity"
                         @querySelected="setFhirQuery"
                     />
@@ -387,7 +415,7 @@ export default {
                     title="Hash"
                     :before-change="passWizardStep"
                 >
-                    <train-wizard-hash-step
+                    <train-wizard-step-hash
                         ref="wizard-hash-step"
                         :train="entity"
                         @generated="setHash"
@@ -396,7 +424,7 @@ export default {
                 </tab-content>
 
                 <tab-content title="Finish">
-                    <train-wizard-final-step />
+                    <train-wizard-step-final />
                 </tab-content>
             </form-wizard>
         </div>

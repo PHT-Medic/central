@@ -10,7 +10,7 @@ import {
     buildSocketTrainStationInRoomName,
     buildSocketTrainStationOutRoomName,
 } from '@personalhealthtrain/ui-common';
-import { minLength, numeric, required } from 'vuelidate/lib/validators';
+import { minLength, required } from 'vuelidate/lib/validators';
 import ProposalStationList from '../../proposal-station/ProposalStationList';
 import MasterImagePicker from '../../master-image/MasterImagePicker';
 
@@ -42,11 +42,6 @@ export default {
                 busy: false,
             },
 
-            master_image: {
-                items: [],
-                busy: false,
-            },
-
             socketLockedId: null,
             socketLockedStationId: null,
         };
@@ -56,14 +51,12 @@ export default {
             form: {
                 master_image_id: {
                     required,
-                    numeric,
                 },
                 station_ids: {
                     required,
                     minLength: minLength(1),
                     $each: {
                         required,
-                        numeric,
                     },
                 },
             },
@@ -298,7 +291,7 @@ export default {
 <template>
     <div>
         <div class="mb-2">
-            <h6>MasterImage</h6>
+            <h6><i class="fa fa-compact-disc" /> MasterImage</h6>
             <div class="mb-2">
                 <master-image-picker
                     :master-image-id="train.master_image_id"
@@ -317,7 +310,7 @@ export default {
         <hr>
 
         <div>
-            <h6>Stations</h6>
+            <h6><i class="fa fa-city" /> Stations</h6>
             <div class="row">
                 <div class="col-12 col-xl-6">
                     <proposal-station-list

@@ -29,6 +29,8 @@ export default {
             switch (this.status) {
                 case TrainConfigurationStatus.BASE_CONFIGURED:
                     return 'base configured';
+                case TrainConfigurationStatus.SECURITY_CONFIGURED:
+                    return 'security configured';
                 case TrainConfigurationStatus.RESOURCE_CONFIGURED:
                     return 'files uploaded';
                 case TrainConfigurationStatus.HASH_GENERATED:
@@ -44,6 +46,7 @@ export default {
         classSuffix() {
             switch (this.status) {
                 case TrainConfigurationStatus.BASE_CONFIGURED:
+                case TrainConfigurationStatus.SECURITY_CONFIGURED:
                 case TrainConfigurationStatus.RESOURCE_CONFIGURED:
                 case TrainConfigurationStatus.HASH_SIGNED:
                 case TrainConfigurationStatus.HASH_GENERATED:
@@ -58,6 +61,8 @@ export default {
             switch (this.status) {
                 case TrainConfigurationStatus.BASE_CONFIGURED:
                     return 'fas fa-cog';
+                case TrainConfigurationStatus.SECURITY_CONFIGURED:
+                    return 'fa fa-key';
                 case TrainConfigurationStatus.RESOURCE_CONFIGURED:
                     return 'fa fa-clone';
                 case TrainConfigurationStatus.HASH_GENERATED:

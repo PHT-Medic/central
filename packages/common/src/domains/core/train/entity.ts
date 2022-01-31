@@ -82,11 +82,11 @@ export interface Train {
 
     // ------------------------------------------------------------------
 
-    user_rsa_secret_id: UserSecret['id'];
+    user_rsa_secret_id: UserSecret['id'] | null;
 
     user_rsa_secret: UserSecret | null;
 
-    user_paillier_secret_id: UserSecret['id'];
+    user_paillier_secret_id: UserSecret['id'] | null;
 
     user_paillier_secret_: UserSecret | null;
 

@@ -31,6 +31,7 @@ export enum TrainBuildErrorCode {
 
 export enum TrainConfigurationStatus {
     BASE_CONFIGURED = 'base',
+    SECURITY_CONFIGURED = 'security_configured',
     RESOURCE_CONFIGURED = 'resource_configured',
     HASH_GENERATED = 'hash_generated',
     HASH_SIGNED = 'hash_signed',

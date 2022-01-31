@@ -164,8 +164,8 @@ class AuthModule {
                             this.ctx.route.path.startsWith('/login')
                         ) return;
 
-                        this.ctx.store.dispatch('auth/triggerRefreshToken')
-                            .then((r: any) => r)
+                        Promise.resolve()
+                            .then(() => this.ctx.store.dispatch('auth/triggerRefreshToken'))
                             .catch(() => this.ctx.redirect({
                                 path: '/logout',
                                 query: { redirect: this.ctx.route.fullPath },
@@ -268,21 +268,23 @@ class AuthModule {
         const interceptor = (error: any) => {
             if (typeof this.ctx === 'undefined') return;
 
-            if (typeof error !== 'undefined' && error && typeof error.response !== 'undefined') {
-                if (error.response.status === 401) {
-                    // Refresh the access accessToken
-                    try {
-                        this.ctx.store.dispatch('auth/triggerRefreshToken').then(() => createClient().request({
+            if (
+                error &&
+                error.response &&
+                error.response.status === 401
+            ) {
+                // Refresh the access accessToken
+                try {
+                    this.ctx.store.dispatch('auth/triggerRefreshToken')
+                        .then(() => createClient().request({
                             method: error.config.method,
                             url: error.config.url,
                             data: error.config.data,
                         }));
-                    } catch (e) {
-                        // this.ctx.store.dispatch('triggerSetLoginRequired', true).then(r => r);
-                        this.ctx.redirect('/logout');
+                } catch (e) {
+                    this.ctx.redirect('/logout');
 
-                        throw error;
-                    }
+                    throw error;
                 }
 
                 throw error;

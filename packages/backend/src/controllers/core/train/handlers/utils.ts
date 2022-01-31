@@ -8,6 +8,7 @@
 import { Train, TrainType } from '@personalhealthtrain/ui-common';
 import { check, validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
+import { NotFoundError } from '@typescript-error/http';
 import { ExpressRequest } from '../../../../config/http/type';
 import { ExpressValidationError } from '../../../../config/http/error/validation';
 import { matchedValidationData } from '../../../../modules/express-validator';
@@ -26,22 +27,38 @@ export async function runTrainValidation(
 
         await check('type')
             .exists()
-            .notEmpty()
             .isString()
             .custom((value) => Object.values(TrainType).includes(value))
             .run(req);
     }
 
+    await check('user_rsa_secret_id')
+        .notEmpty()
+        .isUUID()
+        .optional({ nullable: true })
+        .run(req);
+
+    await check('user_paillier_secret_id')
+        .notEmpty()
+        .isUUID()
+        .optional({ nullable: true })
+        .run(req);
+
     await check('name')
         .notEmpty()
-        .optional({ nullable: true })
         .isLength({ min: 1, max: 128 })
+        .optional({ nullable: true })
         .run(req);
 
     await check('entrypoint_file_id')
-        .custom((value) => getRepository(TrainFileEntity).findOne(value).then((res) => {
-            if (typeof res === 'undefined') throw new Error('The entrypoint file is not valid.');
-        }))
+        .isUUID()
+        .custom(async (value) => {
+            const repository = getRepository(TrainFileEntity);
+            const entity = await repository.findOne(value);
+            if (!entity) {
+                throw new NotFoundError('The referenced entrypoint file is invalid.');
+            }
+        })
         .optional({ nullable: true })
         .run(req);
 
@@ -52,11 +69,15 @@ export async function runTrainValidation(
         .run(req);
 
     await check('master_image_id')
+        .isUUID()
+        .custom(async (value) => {
+            const repository = getRepository(MasterImageEntity);
+            const entity = await repository.findOne(value);
+            if (!entity) {
+                throw new Error('The referenced master image is invalid.');
+            }
+        })
         .optional({ nullable: true })
-        .isString()
-        .custom((value) => getRepository(MasterImageEntity).findOne(value).then((res) => {
-            if (typeof res === 'undefined') throw new Error('The master image is not valid.');
-        }))
         .run(req);
 
     await check('query')

@@ -199,6 +199,7 @@ export const actions : ActionTree<AuthState, RootState> = {
             commit('loginSuccess');
 
             dispatch('triggerSetTokenExpireDate', { kind: OAuth2TokenKind.ACCESS, date: new Date(Date.now() + token.expires_in * 1000) });
+
             dispatch('triggerSetToken', { kind: OAuth2TokenKind.ACCESS, token: token.access_token });
             dispatch('triggerSetToken', { kind: OAuth2TokenKind.REFRESH, token: token.refresh_token });
 
@@ -215,9 +216,7 @@ export const actions : ActionTree<AuthState, RootState> = {
     // --------------------------------------------------------------------
 
     triggerRefreshToken({ commit, state, dispatch }) {
-        if (
-            typeof state.refreshToken !== 'string'
-        ) {
+        if (!state.refreshToken) {
             throw new Error('It is not possible to receive a new access token');
         }
 
@@ -225,32 +224,31 @@ export const actions : ActionTree<AuthState, RootState> = {
             commit('loginRequest');
 
             try {
-                const p = this.$auth.getTokenWithRefreshToken(state.refreshToken);
+                const tokenPromise = this.$auth.getTokenWithRefreshToken(state.refreshToken);
 
-                commit('setTokenPromise', p);
+                commit('setTokenPromise', tokenPromise);
 
-                p.then(
-                    (token) => {
-                        commit('setTokenPromise', null);
-                        commit('loginSuccess');
+                tokenPromise
+                    .then(
+                        (token) => {
+                            commit('loginSuccess');
 
-                        dispatch('triggerSetTokenExpireDate', { kind: OAuth2TokenKind.ACCESS, date: new Date(Date.now() + token.expires_in * 1000) });
-                        dispatch('triggerSetToken', { kind: OAuth2TokenKind.ACCESS, token: token.access_token });
-                        dispatch('triggerSetToken', { kind: OAuth2TokenKind.REFRESH, token: token.refresh_token });
+                            dispatch('triggerSetTokenExpireDate', { kind: OAuth2TokenKind.ACCESS, date: new Date(Date.now() + token.expires_in * 1000) });
+                            dispatch('triggerSetToken', { kind: OAuth2TokenKind.ACCESS, token: token.access_token });
+                            dispatch('triggerSetToken', { kind: OAuth2TokenKind.REFRESH, token: token.refresh_token });
 
-                        dispatch('triggerRefreshMe');
-                    },
-                    () => {
-                        commit('setTokenPromise', null);
-                    },
-                );
+                            dispatch('triggerRefreshMe');
+                        },
+                    )
+                    .then(
+                        () => {
+                            commit('setTokenPromise', null);
+                        },
+                    );
             } catch (e) {
                 commit('setTokenPromise', null);
-                if (e instanceof Error) {
-                    dispatch('triggerAuthError', e.message);
-                }
 
-                throw new Error('An error occurred on the token refresh request.');
+                throw e;
             }
         }
 

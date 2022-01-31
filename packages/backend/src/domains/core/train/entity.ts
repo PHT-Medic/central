@@ -26,8 +26,13 @@ import {
     Train,
     TrainBuildErrorCode,
     TrainBuildStatus,
-    TrainConfigurationStatus, TrainFile, TrainResult, TrainResultStatus, TrainRunErrorCode,
-    TrainRunStatus, UserSecret,
+    TrainConfigurationStatus,
+    TrainFile,
+    TrainResult,
+    TrainResultStatus,
+    TrainRunErrorCode,
+    TrainRunStatus,
+    UserSecret,
 } from '@personalhealthtrain/ui-common';
 import { RealmEntity, UserEntity } from '@typescript-auth/server';
 import { Realm, User } from '@typescript-auth/domains';
@@ -86,27 +91,35 @@ export class TrainEntity implements Train {
         if (this.stations > 0) {
             this.configuration_status = TrainConfigurationStatus.BASE_CONFIGURED;
         } else {
-            this.entrypoint_file_id = null;
-            this.hash = null;
-            this.hash_signed = null;
+            return;
+        }
+
+        if (this.user_rsa_secret_id) {
+            this.configuration_status = TrainConfigurationStatus.SECURITY_CONFIGURED;
+        } else {
+            return;
         }
 
         if (this.entrypoint_file_id) {
             this.configuration_status = TrainConfigurationStatus.RESOURCE_CONFIGURED;
+        } else {
+            return;
         }
 
         if (this.hash) {
             this.configuration_status = TrainConfigurationStatus.HASH_GENERATED;
+        } else {
+            return;
+        }
 
-            if (this.hash_signed) {
-                this.configuration_status = TrainConfigurationStatus.HASH_SIGNED;
-            }
+        if (this.hash_signed) {
+            this.configuration_status = TrainConfigurationStatus.HASH_SIGNED;
+        } else {
+            return;
         }
 
         // check if all conditions are met
-        if (this.hash_signed && this.hash) {
-            this.configuration_status = TrainConfigurationStatus.FINISHED;
-        }
+        this.configuration_status = TrainConfigurationStatus.FINISHED;
     }
 
     // ------------------------------------------------------------------
@@ -166,14 +179,14 @@ export class TrainEntity implements Train {
     // ------------------------------------------------------------------
 
     @Column({ nullable: true, type: 'uuid' })
-        user_rsa_secret_id: UserSecret['id'];
+        user_rsa_secret_id: UserSecret['id'] | null;
 
     @ManyToOne(() => UserSecretEntity, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'user_rsa_secret_id' })
         user_rsa_secret: UserSecretEntity | null;
 
     @Column({ nullable: true, type: 'uuid' })
-        user_paillier_secret_id: UserSecret['id'];
+        user_paillier_secret_id: UserSecret['id'] | null;
 
     @ManyToOne(() => UserSecretEntity, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'user_paillier_secret_id' })
