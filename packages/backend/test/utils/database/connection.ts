@@ -6,7 +6,7 @@
  */
 
 import {
-    ConnectionWithSeederOptions, buildConnectionOptions, createDatabase, dropDatabase,
+    buildConnectionOptions, createDatabase, dropDatabase,
 } from 'typeorm-extension';
 import { ConnectionOptions, createConnection, getConnection } from 'typeorm';
 import {
@@ -18,16 +18,9 @@ import { DatabaseRootSeeder } from '../../../src/database/seeds/root';
 import { modifyDatabaseConnectionOptions } from '../../../src/database/utils';
 import { buildRobotAggregator } from '../../../src/aggregators/robot';
 
-async function createConnectionOptions() {
-    return {
-        ...await buildConnectionOptions(),
-        database: 'test',
-    } as ConnectionWithSeederOptions;
-}
-
 export async function useTestDatabase() {
     const connectionOptions = modifyDatabaseConnectionOptions(
-        setEntitiesForConnectionOptions(await createConnectionOptions(), true),
+        setEntitiesForConnectionOptions(await buildConnectionOptions(), true),
     );
 
     await createDatabase({ ifNotExist: true }, connectionOptions);
@@ -52,7 +45,7 @@ export async function useTestDatabase() {
 }
 
 export async function dropTestDatabase() {
-    const connectionOptions = await createConnectionOptions();
+    const connectionOptions = await buildConnectionOptions();
 
     await getConnection()
         .close();
