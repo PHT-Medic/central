@@ -6,10 +6,10 @@
  */
 
 import {
+    HarborAPI,
     STATION_SECRET_ENGINE_KEY,
     Station,
-    StationSecretStoragePayload,
-    VaultAPI, buildRegistryStationProjectName,
+    StationSecretStoragePayload, VaultAPI, buildRegistryStationProjectName,
 } from '@personalhealthtrain/ui-common';
 import { useClient } from '@trapi/client';
 import { useSuperTest } from '../../utils/supertest';
@@ -65,6 +65,20 @@ describe('src/controllers/core/station', () => {
         expect(stationSecret.data.registry_robot_name).toEqual(`robot$${buildRegistryStationProjectName(secureId)}`);
         expect(stationSecret.data.registry_robot_id).toBeDefined();
         expect(stationSecret.data.registry_robot_secret).toBeDefined();
+
+        let registryProject = await useClient<HarborAPI>(ApiKey.HARBOR).project
+            .find(buildRegistryStationProjectName(secureId), true);
+
+        expect(registryProject).toBeDefined();
+        expect(registryProject.id).toBeDefined();
+        expect(registryProject.name).toEqual(buildRegistryStationProjectName(secureId));
+
+        let registryRobotAccount = await useClient<HarborAPI>(ApiKey.HARBOR).robotAccount
+            .find(buildRegistryStationProjectName(secureId));
+
+        expect(registryRobotAccount).toBeDefined();
+        expect(registryRobotAccount.id).toBeDefined();
+        expect(registryRobotAccount.name).toEqual(`robot$${buildRegistryStationProjectName(secureId)}`);
 
         // ---------------------------------------------------------
 
@@ -125,14 +139,20 @@ describe('src/controllers/core/station', () => {
         response = await superTest
             .delete(`/stations/${entityId}`)
             .auth('admin', 'start123');
-
         expect(response.status).toEqual(200);
 
         // ---------------------------------------------------------
 
         stationSecret = await useClient<VaultAPI>(ApiKey.VAULT).keyValue
             .find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, secureId);
-
         expect(stationSecret).toBeUndefined();
+
+        registryProject = await useClient<HarborAPI>(ApiKey.HARBOR).project
+            .find(buildRegistryStationProjectName(secureId), true);
+        expect(registryProject).toBeUndefined();
+
+        registryRobotAccount = await useClient<HarborAPI>(ApiKey.HARBOR).robotAccount
+            .find(buildRegistryStationProjectName(secureId));
+        expect(registryRobotAccount).toBeUndefined();
     });
 });
