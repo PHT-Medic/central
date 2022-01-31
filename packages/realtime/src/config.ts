@@ -96,7 +96,7 @@ export function createConfig({ env } : ConfigContext) : Config {
     ];
 
     return {
-        redisDatabase: redis,
+        redisDatabase,
         redisPub,
         redisSub,
 

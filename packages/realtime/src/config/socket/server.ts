@@ -41,7 +41,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
 
     // receive user
     server.use(setupSocketMiddleware({
-        redis: context.config.redis,
+        redis: context.config.redisDatabase,
         http: useClient('default').driver,
     }));
 
@@ -51,7 +51,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
     // build & register realm workspaces
     const realmWorkspaces = server.of(/^\/realm#[a-z0-9]+$/);
     realmWorkspaces.use(setupSocketMiddleware({
-        redis: context.config.redis,
+        redis: context.config.redisDatabase,
         http: useClient('default').driver,
     }));
     realmWorkspaces.use((socket: SocketInterface, next) => {
