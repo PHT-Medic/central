@@ -6,13 +6,27 @@
   -->
 <script>
 import Vue from 'vue';
+import { PermissionID, mergeDeep } from '@personalhealthtrain/ui-common';
 import Pagination from '../../Pagination';
 
 export default {
     components: { Pagination },
     props: {
         filterItems: Function,
-        requestFilters: Object,
+        query: {
+            type: Object,
+            default() {
+                return {};
+            },
+        },
+        withHeader: {
+            type: Boolean,
+            default: true,
+        },
+        withTitle: {
+            type: Boolean,
+            default: true,
+        },
         withSearch: {
             type: Boolean,
             default: true,
@@ -36,15 +50,18 @@ export default {
         };
     },
     computed: {
-        formattedItems() {
-            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-            const items = this.items.sort((a, b) => a.path.toLocaleString().localeCompare(b.path));
+        itemsFinal() {
+            const { items } = this;
+            items.sort((a, b) => a.path.toLocaleString().localeCompare(b.path));
 
             if (typeof this.filterItems === 'undefined') {
                 return items;
             }
 
             return items.filter(this.filterItems);
+        },
+        canDrop() {
+            return this.$auth.hasPermission(PermissionID.PROPOSAL_DROP);
         },
     },
     watch: {
@@ -72,7 +89,7 @@ export default {
             this.busy = true;
 
             try {
-                const data = {
+                const response = await this.$api.masterImage.getMany(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
@@ -80,16 +97,7 @@ export default {
                     filter: {
                         path: this.q.length > 0 ? `~${this.q}` : this.q,
                     },
-                };
-
-                if (typeof this.requestFilters !== 'undefined') {
-                    const keys = Object.keys(this.requestFilters);
-                    for (let i = 0; i < keys.length; i++) {
-                        data.filter[keys[i]] = this.requestFilters[keys[i]];
-                    }
-                }
-
-                const response = await this.$api.masterImage.getMany(data);
+                }, this.query));
 
                 this.items = response.data;
                 const { total } = response.meta;
@@ -134,12 +142,15 @@ export default {
 </script>
 <template>
     <div>
-        <slot name="header">
+        <slot
+            v-if="withHeader"
+            name="header"
+        >
             <div class="d-flex flex-row mb-2">
-                <div>
+                <div v-if="withTitle">
                     <slot name="header-title">
                         <h6 class="mb-0">
-                            Master Images
+                            <i class="fa fa-compact-disc" /> MasterImages
                         </h6>
                     </slot>
                 </div>
@@ -165,7 +176,10 @@ export default {
                 </div>
             </div>
         </slot>
-        <div class="form-group">
+        <div
+            v-if="withSearch"
+            class="form-group"
+        >
             <div class="input-group">
                 <label for="q" />
                 <input
@@ -183,36 +197,46 @@ export default {
         </div>
         <slot
             name="items"
-            :items="formattedItems"
+            :items="itemsFinal"
             :busy="busy"
+            :item-busy="itemBusy"
         >
             <div class="c-list">
-                <div
-                    v-for="(item,key) in formattedItems"
-                    :key="key"
-                    class="c-list-item mb-2"
+                <template
+                    v-for="(item) in itemsFinal"
                 >
-                    <div class="c-list-content align-items-center">
-                        <div class="c-list-icon">
-                            <i class="fa fa-group" />
-                        </div>
-                        <slot name="item-name">
-                            <span class="mb-0">{{ item.name }} <small class="text-primary">{{ item.path }}</small></span>
-                        </slot>
+                    <slot
+                        name="item"
+                        :item="item"
+                        :busy="itemBusy"
+                    >
+                        <div
+                            :key="item.id"
+                            class="c-list-item mb-2"
+                        >
+                            <div class="c-list-content align-items-center">
+                                <div class="c-list-icon">
+                                    <i class="fa fa-group" />
+                                </div>
+                                <slot name="item-name">
+                                    <span class="mb-0">{{ item.name }} <small class="text-primary">{{ item.path }}</small></span>
+                                </slot>
 
-                        <div class="ml-auto">
-                            <slot
-                                name="item-actions"
-                                :item="item"
-                            />
+                                <div class="ml-auto">
+                                    <slot
+                                        name="item-actions"
+                                        :item="item"
+                                    />
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </slot>
+                </template>
             </div>
         </slot>
 
         <div
-            v-if="!busy && formattedItems.length === 0"
+            v-if="!busy && itemsFinal.length === 0"
             slot="no-more"
         >
             <div class="alert alert-sm alert-info">

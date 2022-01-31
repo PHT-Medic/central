@@ -7,7 +7,7 @@
 
 <script>
 import {
-    alpha, integer, maxLength, minLength, required,
+    alpha, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 
 import MasterImagePicker from '../master-image/MasterImagePicker';
@@ -240,7 +240,7 @@ export default {
 
                     <div>
                         <master-image-picker
-                            :master-image-id="masterImageId"
+                            :master-image-id="formData.master_image_id"
                             @selected="handleMasterImagePicker"
                         />
 

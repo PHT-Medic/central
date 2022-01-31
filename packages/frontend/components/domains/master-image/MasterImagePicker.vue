@@ -6,8 +6,11 @@
   -->
 <script>
 
+import MasterImageList from './MasterImageList';
+
 export default {
     name: 'MasterImagePicker',
+    components: { MasterImageList },
     props: {
         masterImageId: {
             type: String,
@@ -19,12 +22,7 @@ export default {
             loading: false,
 
             groupVirtualPath: null,
-            imageId: null,
 
-            image: {
-                items: [],
-                busy: false,
-            },
             group: {
                 items: [],
                 busy: false,
@@ -35,6 +33,21 @@ export default {
     computed: {
         showImages() {
             return !!this.groupVirtualPath;
+        },
+        imageQuery() {
+            return {
+                filters: {
+                    ...(this.groupVirtualPath !== '' ? { group_virtual_path: this.groupVirtualPath } : {}),
+                },
+            };
+        },
+        isInImageList() {
+            if (!this.$refs.itemList || !this.masterImageId) {
+                return false;
+            }
+
+            const index = this.$refs.itemList.items.findIndex((el) => el.id === this.masterImageId);
+            return index !== -1;
         },
     },
     watch: {
@@ -58,38 +71,14 @@ export default {
             this.loading = true;
 
             try {
-                const data = await this.$api.masterImage.getOne(this.masterImageId, {
-                    relations: {
-                        group: true,
-                    },
-                });
+                const data = await this.$api.masterImage.getOne(this.masterImageId);
 
                 await this.selectGroup(data.group_virtual_path);
-                await this.selectImage(data.id);
             } catch (e) {
                 // ...
             }
 
             this.loading = false;
-        },
-        async loadImages() {
-            if (this.image.busy) return;
-
-            this.image.busy = true;
-
-            try {
-                const { data } = await this.$api.masterImage.getMany({
-                    filters: {
-                        ...(this.groupVirtualPath !== '' ? { group_virtual_path: this.groupVirtualPath } : {}),
-                    },
-                });
-
-                this.image.items = data;
-            } catch (e) {
-                // ...
-            }
-
-            this.image.busy = false;
         },
         async loadGroups() {
             if (this.group.busy) return;
@@ -111,47 +100,46 @@ export default {
             await this.selectGroup(event.target.value);
         },
         async selectGroup(virtualPath) {
-            if (!virtualPath || virtualPath === '') {
-                this.image.items = [];
+            if (!virtualPath) {
                 this.groupVirtualPath = null;
                 this.group.item = null;
             } else {
-                if (this.image.busy) return;
                 this.groupVirtualPath = virtualPath;
 
                 const index = this.group.items.findIndex((item) => item.virtual_path === virtualPath);
                 this.group.item = index !== -1 ? this.group.items[index] : null;
             }
 
-            await this.selectImage(null);
-
-            // eslint-disable-next-line no-unused-expressions, @typescript-eslint/no-unused-expressions
-            this.groupVirtualPath && await this.loadImages();
+            if (this.groupVirtualPath && this.$refs.itemList) {
+                await this.$refs.itemList.load();
+            }
         },
 
         async selectImageByEvent(event) {
-            await this.selectImage(event.target.value);
+            await this.toggleImage({ id: event.target.value });
         },
-        async selectImage(id) {
-            if (!id || id.length === 0) {
-                this.imageId = null;
-
+        async toggleImage(item) {
+            if (!item) {
                 this.$emit('selected', null);
             } else {
-                this.imageId = id;
-                const index = this.image.items.findIndex((item) => item.id === id);
-                if (index !== -1) {
-                    const item = this.image.items[index];
-                    if (this.group.item) {
-                        item.command = item.command || this.group.item.command;
-                        item.command_arguments = item.command_arguments || this.group.item.command_arguments;
+                if (typeof item === 'string') {
+                    const index = this.$refs.itemList.items.findIndex((el) => el.id === item);
+                    if (index !== -1) {
+                        item = this.$refs.itemList.items[index];
+                    } else {
+                        item = {
+                            id: item,
+                        };
                     }
+                }
 
+                if (this.group.item) {
+                    item.command = item.command || this.group.item.command;
+                    item.command_arguments = item.command_arguments || this.group.item.command_arguments;
+                }
+
+                if (item.id !== this.masterImageId) {
                     this.$emit('selected', item);
-                } else {
-                    this.$emit('selected', {
-                        id,
-                    });
                 }
             }
         },
@@ -189,42 +177,38 @@ export default {
                 class="col"
             >
                 <label>Image <span
-                    v-if="imageId"
+                    v-if="masterImageId"
                     class="ml-1"
-                ><i class="fa fa-check text-success" /></span></label>
-                <select
-                    :value="imageId"
-                    class="form-control"
-                    :disabled="image.busy"
-                    @change.prevent="selectImageByEvent"
+                ><i class="fa fa-check text-success" /></span>
+                </label>
+                <master-image-list
+                    ref="itemList"
+                    :with-header="false"
+                    :with-search="false"
+                    :query="imageQuery"
                 >
-                    <option value="">
-                        -- Please select --
-                    </option>
-                    <option
-                        v-for="(item,key) in image.items"
-                        :key="key"
-                        :value="item.id"
-                    >
-                        {{ item.name }}
-                    </option>
-                </select>
+                    <template #items="{items, busy}">
+                        <select
+                            :value="masterImageId"
+                            class="form-control mb-2"
+                            :disabled="busy"
+                            @change.prevent="selectImageByEvent"
+                        >
+                            <option value="">
+                                -- Please select --
+                            </option>
+                            <option
+                                v-for="item in items"
+                                :key="item.id"
+                                :value="item.id"
+                                :selected="item.id === masterImageId"
+                            >
+                                {{ item.name }}
+                            </option>
+                        </select>
+                    </template>
+                </master-image-list>
             </div>
         </div>
     </div>
 </template>
-<style>
-.click-box {
-    text-align: center;
-    background: #ececec;
-    border-radius: 4px;
-    padding: 1rem 3rem;
-}
-
-.click-box:hover,
-.click-box.active {
-    color: #FF5B5B;
-    background: #32333B;
-    cursor: pointer;
-}
-</style>
