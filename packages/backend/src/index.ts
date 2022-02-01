@@ -14,8 +14,8 @@ import { useClient } from 'redis-extension';
 import env from './env';
 
 import { createConfig } from './config';
-import { createExpressApp } from './config/http/express';
-import { createHttpServer } from './config/http/server';
+import { createExpressApp } from './http/express';
+import { createHttpServer } from './http/server';
 import { useLogger } from './modules/log';
 import { buildDatabaseConnectionOptions } from './database/utils';
 

@@ -7,7 +7,7 @@
 
 import { deleteUndefinedObjectProperties } from '@personalhealthtrain/ui-common';
 import { MatchedDataOptions, matchedData } from 'express-validator';
-import { ExpressRequest } from '../../config/http/type';
+import { ExpressRequest } from '../../http/type';
 
 export function matchedValidationData(req: ExpressRequest, options?: Partial<MatchedDataOptions>) : Record<string, any> {
     return deleteUndefinedObjectProperties(matchedData(req, options));

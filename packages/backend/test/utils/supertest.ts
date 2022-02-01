@@ -6,7 +6,7 @@
  */
 
 import supertest, { SuperTest, Test } from 'supertest';
-import { createExpressApp } from '../../src/config/http/express';
+import { createExpressApp } from '../../src/http/express';
 import { createConfig } from '../../src/config';
 import env from '../../src/env';
 

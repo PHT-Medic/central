@@ -14,7 +14,7 @@ import { useClient } from 'redis-extension';
 import { createConfig } from '../../config';
 import env from '../../env';
 import { buildDatabaseConnectionOptions } from '../../database/utils';
-import { generateSwaggerDocumentation } from '../../config/http/swagger';
+import { generateSwaggerDocumentation } from '../../http/swagger';
 import { DatabaseRootSeeder } from '../../database/seeds/root';
 import { buildRobotAggregator } from '../../aggregators/robot';
 

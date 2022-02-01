@@ -14,7 +14,6 @@ import {
     setEntitiesForConnectionOptions,
 } from '@typescript-auth/server';
 import { PermissionKey } from '@personalhealthtrain/ui-common';
-import { DatabaseRootSeeder } from '../../../src/database/seeds/root';
 import { modifyDatabaseConnectionOptions } from '../../../src/database/utils';
 import { buildRobotAggregator } from '../../../src/aggregators/robot';
 
@@ -37,9 +36,6 @@ export async function useTestDatabase() {
         userPassword: 'start123',
     });
     await authSeeder.run(connection);
-
-    const coreSeeder = new DatabaseRootSeeder();
-    await coreSeeder.run(connection);
 
     return connection;
 }

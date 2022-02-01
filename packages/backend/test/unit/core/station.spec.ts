@@ -89,7 +89,7 @@ describe('src/controllers/core/station', () => {
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
         expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(4);
+        expect(response.body.data.length).toEqual(1);
 
         // ---------------------------------------------------------
 
