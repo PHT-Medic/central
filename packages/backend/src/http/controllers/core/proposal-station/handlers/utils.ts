@@ -11,20 +11,18 @@ import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError } from '../../../../error/validation';
 import { matchedValidationData } from '../../../../../modules/express-validator';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
+import { createRequestProposalIdValidation } from '../../proposal/utils';
+import { createRequestStationIdValidation } from '../../station/utils';
 
 export async function runProposalStationValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
 ) : Promise<Partial<ProposalStationEntity>> {
     if (operation === 'create') {
-        await check('proposal_id')
-            .exists()
-            .isUUID()
+        await createRequestProposalIdValidation()
             .run(req);
 
-        await check('station_id')
-            .exists()
-            .isUUID()
+        await createRequestStationIdValidation({ permittedForRealm: false })
             .run(req);
     }
 

@@ -13,6 +13,7 @@ import { ExpressValidationError } from '../../../../error/validation';
 import { matchedValidationData } from '../../../../../modules/express-validator';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
+import { createRequestMasterImageIdValidation } from '../../master-image/utils';
 
 export async function runProposalValidation(
     req: ExpressRequest,
@@ -55,16 +56,7 @@ export async function runProposalValidation(
 
     // ----------------------------------------------
 
-    await check('master_image_id')
-        .exists()
-        .isUUID()
-        .custom(async (value) => {
-            const repository = getRepository(MasterImageEntity);
-            const entity = await repository.findOne(value);
-            if (typeof entity === 'undefined') {
-                throw new Error('The referenced master image does not exist.');
-            }
-        })
+    await createRequestMasterImageIdValidation()
         .optional({ nullable: true })
         .run(req);
 

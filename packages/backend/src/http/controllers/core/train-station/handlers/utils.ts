@@ -11,20 +11,20 @@ import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError } from '../../../../error/validation';
 import { matchedValidationData } from '../../../../../modules/express-validator';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
+import { createRequestTrainIdValidation } from '../../train/utils';
+import { createRequestStationIdValidation } from '../../station/utils';
 
 export async function runTrainStationValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
 ) : Promise<Partial<TrainStationEntity>> {
     if (operation === 'create') {
-        await check('station_id')
-            .exists()
-            .isUUID()
+        await createRequestStationIdValidation({ permittedForRealm: false })
             .run(req);
 
-        await check('train_id')
-            .exists()
-            .isUUID()
+        // todo: check if station is also proposal station
+
+        await createRequestTrainIdValidation()
             .run(req);
     }
 

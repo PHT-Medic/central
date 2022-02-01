@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SecretType, Train, TrainType } from '@personalhealthtrain/ui-common';
+import { Train, TrainType } from '@personalhealthtrain/ui-common';
 import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
 import { TEST_DEFAULT_TRAIN, createSuperTestTrain } from '../../utils/domains/train';
@@ -82,7 +82,7 @@ describe('src/controllers/core/train', () => {
         expect(response.status).toEqual(200);
     });
 
-    fit('should not create resource with invalid parameters', async () => {
+    it('should not create resource with invalid parameters', async () => {
         const proposal = await createSuperTestProposal(superTest);
         const response = await createSuperTestTrain(superTest, {
             ...details,

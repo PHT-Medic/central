@@ -14,28 +14,16 @@ import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, ExpressValidatorMeta } from '../../../../error/validation';
 import { matchedValidationData } from '../../../../../modules/express-validator';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
-import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
+import { createRequestMasterImageIdValidation } from '../../master-image/utils';
+import { createRequestProposalIdValidation } from '../../proposal/utils';
 
 export async function runTrainValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
 ) : Promise<Partial<Train>> {
     if (operation === 'create') {
-        await check('proposal_id')
-            .exists()
-            .isUUID()
-            .custom(async (value, meta: ExpressValidatorMeta) => {
-                const repository = getRepository(ProposalEntity);
-                const entity = await repository.findOne(value);
-                if (!entity) {
-                    throw new NotFoundError('The referenced proposal is invalid.');
-                }
-
-                if (!isPermittedForResourceRealm(meta.req.realmId, entity.realm_id)) {
-                    throw new NotFoundError('The referenced proposal is not permitted.');
-                }
-            })
+        await createRequestProposalIdValidation()
             .run(req);
 
         await check('type')
@@ -81,15 +69,7 @@ export async function runTrainValidation(
         .optional({ nullable: true })
         .run(req);
 
-    await check('master_image_id')
-        .isUUID()
-        .custom(async (value) => {
-            const repository = getRepository(MasterImageEntity);
-            const entity = await repository.findOne(value);
-            if (!entity) {
-                throw new Error('The referenced master image is invalid.');
-            }
-        })
+    await createRequestMasterImageIdValidation()
         .optional({ nullable: true })
         .run(req);
 
