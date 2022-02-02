@@ -8,11 +8,15 @@
 import { Train, TrainType } from '@personalhealthtrain/ui-common';
 import { SuperTest, Test } from 'supertest';
 import { MASTER_REALM_ID } from '@typescript-auth/domains';
+import { randomBytes } from 'crypto';
 
 export const TEST_DEFAULT_TRAIN : Partial<Train> = {
     name: 'development',
     realm_id: MASTER_REALM_ID,
     type: TrainType.DISCOVERY,
+    hash: randomBytes(20).toString('hex'),
+    hash_signed: randomBytes(40).toString('hex'),
+    query: '{"key": "value"}',
 };
 
 export async function createSuperTestTrain(superTest: SuperTest<Test>, entity?: Partial<Train>) {

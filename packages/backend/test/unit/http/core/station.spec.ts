@@ -12,10 +12,10 @@ import {
     StationSecretStoragePayload, VaultAPI, buildRegistryStationProjectName,
 } from '@personalhealthtrain/ui-common';
 import { useClient } from '@trapi/client';
-import { useSuperTest } from '../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
-import { TEST_DEFAULT_STATION, createSuperTestStation } from '../../utils/domains/station';
-import { ApiKey } from '../../../src/config/api';
+import { useSuperTest } from '../../../utils/supertest';
+import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
+import { TEST_DEFAULT_STATION, createSuperTestStation } from '../../../utils/domains/station';
+import { ApiKey } from '../../../../src/config/api';
 
 describe('src/controllers/core/station', () => {
     const superTest = useSuperTest();

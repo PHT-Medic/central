@@ -8,7 +8,7 @@
 import { check, validationResult } from 'express-validator';
 import { isProposalStationApprovalStatus } from '@personalhealthtrain/ui-common';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError } from '../../../../error/validation';
+import { ExpressValidationError } from '../../../../express-validation';
 import { matchedValidationData } from '../../../../../modules/express-validator';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { createRequestProposalIdValidation } from '../../proposal/utils';

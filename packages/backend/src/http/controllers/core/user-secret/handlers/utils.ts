@@ -13,7 +13,7 @@ import {
 } from '@personalhealthtrain/ui-common';
 import { BadRequestError } from '@typescript-error/http';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError } from '../../../../error/validation';
+import { ExpressValidationError } from '../../../../express-validation';
 import { matchedValidationData } from '../../../../../modules/express-validator';
 import env from '../../../../../env';
 

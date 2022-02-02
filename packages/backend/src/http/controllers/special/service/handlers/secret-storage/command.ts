@@ -24,7 +24,7 @@ import {
 import { UserEntity } from '@typescript-auth/server';
 import { publishMessage } from 'amqp-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
-import { ExpressValidationError } from '../../../../../error/validation';
+import { ExpressValidationError } from '../../../../../express-validation';
 import { StationEntity } from '../../../../../../domains/core/station/entity';
 import { ApiKey } from '../../../../../../config/api';
 import { buildSecretStorageQueueMessage } from '../../../../../../domains/special/secret-storage/queue';

@@ -9,7 +9,7 @@ import { check } from 'express-validator';
 import { getRepository } from 'typeorm';
 import { NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@typescript-auth/domains';
-import { ExpressValidatorMeta } from '../../../../error/validation';
+import { ExpressValidatorMeta } from '../../../../express-validation';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 
 export function createRequestProposalIdValidation() {

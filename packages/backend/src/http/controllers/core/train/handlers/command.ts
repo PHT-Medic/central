@@ -21,7 +21,7 @@ import {
     triggerTrainResultStart, triggerTrainResultStatus, triggerTrainResultStop,
 } from '../../../../../domains/core/train/commands';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { ExpressValidationError } from '../../../../error/validation';
+import { ExpressValidationError } from '../../../../express-validation';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 
 /**

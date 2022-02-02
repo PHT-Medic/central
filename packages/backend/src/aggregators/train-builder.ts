@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainBuildStatus } from '@personalhealthtrain/ui-common';
+import { TrainBuildStatus } from '@personalhealthtrain/ui-common';
 import { Message, consumeQueue } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import { MessageQueueTrainBuilderRoutingKey } from '../config/service/mq';

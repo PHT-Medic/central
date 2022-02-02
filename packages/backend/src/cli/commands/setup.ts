@@ -109,7 +109,7 @@ export class SetupCommand implements CommandModule {
                     }
 
                     const aggregator = buildRobotAggregator();
-                    aggregator.start();
+                    aggregator.start({ synchronous: true });
 
                     const authSeeder = new AuthDatabaseRootSeeder({
                         permissions: Object.values(PermissionKey),

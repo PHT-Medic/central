@@ -13,7 +13,7 @@ import { ForbiddenError } from '@typescript-error/http';
 import { validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
 import { publishMessage } from 'amqp-extension';
-import { ExpressValidationError } from '../../../../error/validation';
+import { ExpressValidationError } from '../../../../express-validation';
 import { runStationValidation } from './utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { StationEntity } from '../../../../../domains/core/station/entity';

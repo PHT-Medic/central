@@ -6,12 +6,12 @@
  */
 
 import { Train, TrainType } from '@personalhealthtrain/ui-common';
-import { useSuperTest } from '../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
-import { TEST_DEFAULT_TRAIN, createSuperTestTrain } from '../../utils/domains/train';
-import { createSuperTestProposal } from '../../utils/domains/proposal';
-import { expectPropertiesEqualToSrc } from '../../utils/properties';
-import { buildExpressValidationErrorMessage } from '../../../src/http/error/validation';
+import { useSuperTest } from '../../../utils/supertest';
+import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
+import { TEST_DEFAULT_TRAIN, createSuperTestTrain } from '../../../utils/domains/train';
+import { createSuperTestProposal } from '../../../utils/domains/proposal';
+import { expectPropertiesEqualToSrc } from '../../../utils/properties';
+import { buildExpressValidationErrorMessage } from '../../../../src/http/express-validation';
 
 describe('src/controllers/core/train', () => {
     const superTest = useSuperTest();

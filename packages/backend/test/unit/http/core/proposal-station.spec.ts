@@ -6,11 +6,11 @@
  */
 
 import { ProposalStation } from '@personalhealthtrain/ui-common';
-import { useSuperTest } from '../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
-import { createSuperTestProposal } from '../../utils/domains/proposal';
-import { createSuperTestStation } from '../../utils/domains/station';
-import { expectPropertiesEqualToSrc } from '../../utils/properties';
+import { useSuperTest } from '../../../utils/supertest';
+import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
+import { createSuperTestProposal } from '../../../utils/domains/proposal';
+import { createSuperTestStation } from '../../../utils/domains/station';
+import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 
 describe('src/controllers/core/proposal-station', () => {
     const superTest = useSuperTest();

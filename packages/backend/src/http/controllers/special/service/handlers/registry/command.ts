@@ -15,7 +15,7 @@ import {
 import { publishMessage } from 'amqp-extension';
 import env from '../../../../../../env';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
-import { ExpressValidationError } from '../../../../../error/validation';
+import { ExpressValidationError } from '../../../../../express-validation';
 import { setupRegistry } from '../../../../../../components/registry/handlers/setup';
 import { RegistryQueueCommand, RegistryQueueEntityType } from '../../../../../../domains/special/registry/constants';
 import { buildRegistryQueueMessage } from '../../../../../../domains/special/registry/queue';

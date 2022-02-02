@@ -11,7 +11,7 @@ import { getRepository } from 'typeorm';
 import { NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@typescript-auth/domains';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError, ExpressValidatorMeta } from '../../../../error/validation';
+import { ExpressValidationError, ExpressValidatorMeta } from '../../../../express-validation';
 import { matchedValidationData } from '../../../../../modules/express-validator';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';

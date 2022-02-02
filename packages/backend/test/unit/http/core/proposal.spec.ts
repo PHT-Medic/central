@@ -7,10 +7,10 @@
 
 import { Proposal } from '@personalhealthtrain/ui-common';
 import { MASTER_REALM_ID } from '@typescript-auth/domains';
-import { useSuperTest } from '../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
-import { TEST_DEFAULT_PROPOSAL, createSuperTestProposal } from '../../utils/domains/proposal';
-import { expectPropertiesEqualToSrc } from '../../utils/properties';
+import { useSuperTest } from '../../../utils/supertest';
+import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
+import { TEST_DEFAULT_PROPOSAL, createSuperTestProposal } from '../../../utils/domains/proposal';
+import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 
 describe('src/controllers/core/proposal', () => {
     const superTest = useSuperTest();

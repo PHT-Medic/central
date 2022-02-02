@@ -9,36 +9,58 @@ import { useRobotEventEmitter } from '@typescript-auth/server';
 import { publishMessage } from 'amqp-extension';
 import { buildSecretStorageQueueMessage } from '../domains/special/secret-storage/queue';
 import { SecretStorageQueueCommand, SecretStorageQueueEntityType } from '../domains/special/secret-storage/constants';
+import env from '../env';
+import {
+    deleteRobotFromSecretStorage,
+    saveRobotToSecretStorage,
+} from '../components/secret-storage/handlers/entities/robot';
+import { SecretStorageRobotQueuePayload } from '../domains/special/secret-storage/type';
 
 export function buildRobotAggregator() {
-    function start() {
+    function start(options?: {synchronous?: boolean}) {
+        options ??= {};
+        options.synchronous = env.env === 'test' ?
+            true :
+            options.synchronous;
+
         useRobotEventEmitter()
             .on('credentials', async (robot) => {
-                const queueMessage = buildSecretStorageQueueMessage(
-                    SecretStorageQueueCommand.SAVE,
-                    {
-                        type: SecretStorageQueueEntityType.ROBOT,
-                        name: robot.name,
-                        id: robot.id,
-                        secret: robot.secret,
-                    },
-                );
+                const payload : SecretStorageRobotQueuePayload = {
+                    type: SecretStorageQueueEntityType.ROBOT,
+                    name: robot.name,
+                    id: robot.id,
+                    secret: robot.secret,
+                };
 
-                await publishMessage(queueMessage);
+                if (options.synchronous) {
+                    await saveRobotToSecretStorage(payload);
+                } else {
+                    const queueMessage = buildSecretStorageQueueMessage(
+                        SecretStorageQueueCommand.SAVE,
+                        payload,
+                    );
+
+                    await publishMessage(queueMessage);
+                }
             });
 
         useRobotEventEmitter()
             .on('deleted', async (robot) => {
-                const queueMessage = buildSecretStorageQueueMessage(
-                    SecretStorageQueueCommand.DELETE,
-                    {
-                        type: SecretStorageQueueEntityType.ROBOT,
-                        name: robot.name,
-                        id: robot.id,
-                    },
-                );
+                const payload : SecretStorageRobotQueuePayload = {
+                    type: SecretStorageQueueEntityType.ROBOT,
+                    name: robot.name,
+                };
 
-                await publishMessage(queueMessage);
+                if (options.synchronous) {
+                    await deleteRobotFromSecretStorage(payload);
+                } else {
+                    const queueMessage = buildSecretStorageQueueMessage(
+                        SecretStorageQueueCommand.DELETE,
+                        payload,
+                    );
+
+                    await publishMessage(queueMessage);
+                }
             });
     }
 

@@ -13,9 +13,9 @@ import {
     VaultAPI,
 } from '@personalhealthtrain/ui-common';
 import { useClient } from '@trapi/client';
-import { useSuperTest } from '../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../utils/database/connection';
-import { ApiKey } from '../../../src/config/api';
+import { useSuperTest } from '../../../utils/supertest';
+import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
+import { ApiKey } from '../../../../src/config/api';
 
 describe('src/controllers/core/user-secret', () => {
     const superTest = useSuperTest();

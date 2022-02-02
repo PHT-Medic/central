@@ -11,6 +11,7 @@ import {
     Train,
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/ui-common';
+import path from 'path';
 import { TrainBuilderStartPayload } from '../type';
 import { MasterImageEntity } from '../../../core/master-image/entity';
 import { MasterImageGroupEntity } from '../../../core/master-image-group/entity';
@@ -32,6 +33,10 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
         hash: train.hash,
         hashSigned: train.hash_signed,
         query: train.query,
+
+        entrypointCommand: null,
+        entrypointCommandArguments: [],
+        entrypointPath: null,
     };
 
     // ----------------------------------------------------
@@ -43,22 +48,17 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
     }
 
     message.masterImage = masterImage.virtual_path;
+    message.entrypointCommand = message.entrypointCommand || masterImage.command;
+    message.entrypointCommandArguments = message.entrypointCommandArguments || masterImage.command_arguments;
 
     const masterImageGroupRepository = getRepository(MasterImageGroupEntity);
     const masterImageGroup = await masterImageGroupRepository.findOne({
         virtual_path: masterImage.group_virtual_path,
     });
-    if (typeof masterImageGroup === 'undefined') {
-        throw new Error();
+    if (typeof masterImageGroup !== 'undefined') {
+        message.entrypointCommand = message.entrypointCommand || masterImageGroup.command;
+        message.entrypointCommandArguments = message.entrypointCommandArguments || masterImageGroup.command_arguments;
     }
-
-    message.entrypointCommand = masterImage.command ?
-        masterImage.command :
-        masterImageGroup.command;
-
-    message.entrypointCommandArguments = masterImage.command_arguments ?
-        masterImage.command_arguments :
-        masterImageGroup.command_arguments;
 
     // ----------------------------------------------------
 
@@ -76,7 +76,7 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
         throw new Error();
     }
 
-    message.entrypointPath = `${entryPointFile.directory}/${entryPointFile.name}`;
+    message.entrypointPath = path.join(entryPointFile.directory, entryPointFile.name);
 
     // ----------------------------------------------------
 

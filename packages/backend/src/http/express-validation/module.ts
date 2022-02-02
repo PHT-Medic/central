@@ -1,26 +1,13 @@
 /*
- * Copyright (c) 2021-2021.
+ * Copyright (c) 2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
 import { BadRequestError } from '@typescript-error/http';
-import { Meta, Result, ValidationError } from 'express-validator';
-import { ExpressRequest } from '../type';
-
-export type ExpressValidatorMeta = Meta & {
-    req: ExpressRequest
-};
-
-export function buildExpressValidationErrorMessage<
-    T extends Record<string, any> = Record<string, any>,
->(names: (keyof T)[]) {
-    if (names.length > 1) {
-        return `The parameters ${names.join(', ')} is invalid.`;
-    }
-    return `The parameter ${names[0]} is invalid.`;
-}
+import { Result, ValidationError } from 'express-validator';
+import { buildExpressValidationErrorMessage } from './utils';
 
 export class ExpressValidationError extends BadRequestError {
     constructor(validation: Result<ValidationError>) {
@@ -35,7 +22,7 @@ export class ExpressValidationError extends BadRequestError {
 
             message = buildExpressValidationErrorMessage(parameterNames);
         } else {
-            message = 'An unknown validation error occurred.';
+            message = 'An unexpected validation error occurred.';
         }
 
         super({

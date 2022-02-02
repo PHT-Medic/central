@@ -10,7 +10,7 @@ import { ScanResult } from 'docker-scan';
 import { ServiceID } from '@personalhealthtrain/ui-common';
 import { ForbiddenError } from '@typescript-error/http';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
-import { ExpressValidationError } from '../../../../../error/validation';
+import { ExpressValidationError } from '../../../../../express-validation';
 import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
 
 export async function syncPushedMasterImages(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
