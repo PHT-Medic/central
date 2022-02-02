@@ -8,8 +8,7 @@
 import { check, validationResult } from 'express-validator';
 import { isTrainStationApprovalStatus } from '@personalhealthtrain/ui-common';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError } from '../../../../express-validation';
-import { matchedValidationData } from '../../../../../modules/express-validator';
+import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { createRequestTrainIdValidation } from '../../train/utils';
 import { createRequestStationIdValidation } from '../../station/utils';

@@ -8,8 +8,7 @@
 import { Proposal, Station } from '@personalhealthtrain/ui-common';
 import { check, validationResult } from 'express-validator';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError } from '../../../../express-validation';
-import { matchedValidationData } from '../../../../../modules/express-validator';
+import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
 
 export async function runStationValidation(
     req: ExpressRequest,

@@ -13,8 +13,7 @@ import {
 } from '@personalhealthtrain/ui-common';
 import { BadRequestError } from '@typescript-error/http';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError } from '../../../../express-validation';
-import { matchedValidationData } from '../../../../../modules/express-validator';
+import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
 import env from '../../../../../env';
 
 export async function runUserSecretValidation(

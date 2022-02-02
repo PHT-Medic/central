@@ -5,6 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { MatchedDataOptions, matchedData } from 'express-validator';
+import { deleteUndefinedObjectProperties } from '@personalhealthtrain/ui-common';
+import { ExpressRequest } from '../type';
+
 export function buildExpressValidationErrorMessage<
     T extends Record<string, any> = Record<string, any>,
     >(names: (keyof T)[]) {
@@ -12,4 +16,8 @@ export function buildExpressValidationErrorMessage<
         return `The parameters ${names.join(', ')} is invalid.`;
     }
     return `The parameter ${names[0]} is invalid.`;
+}
+
+export function matchedValidationData(req: ExpressRequest, options?: Partial<MatchedDataOptions>): Record<string, any> {
+    return deleteUndefinedObjectProperties(matchedData(req, options));
 }

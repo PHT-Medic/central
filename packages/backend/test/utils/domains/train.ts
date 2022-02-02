@@ -14,7 +14,6 @@ export const TEST_DEFAULT_TRAIN : Partial<Train> = {
     name: 'development',
     realm_id: MASTER_REALM_ID,
     type: TrainType.DISCOVERY,
-    hash: randomBytes(20).toString('hex'),
     hash_signed: randomBytes(40).toString('hex'),
     query: '{"key": "value"}',
 };

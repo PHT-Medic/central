@@ -153,7 +153,7 @@ describe('src/domains/train-builder', () => {
         expect(trainMessage.buildId).toBeNull();
         expect(trainMessage.proposalId).toEqual(proposal.id);
         expect(trainMessage.sessionId).toBeNull();
-        expect(trainMessage.hash).toEqual(train.hash);
+        expect(trainMessage.hash).toBeNull();
         expect(trainMessage.hashSigned).toEqual(train.hash_signed);
         expect(trainMessage.query).toEqual(train.query);
         expect(trainMessage.entrypointCommand).toBeNull();
