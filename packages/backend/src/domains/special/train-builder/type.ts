@@ -19,22 +19,21 @@ export enum TrainBuilderCommand {
 export type TrainBuilderStartPayload = {
     id: Train['id'],
 
-    userId: User['id'],
-    userRSASecretId: UserSecret['id'],
-    userPaillierSecretId: UserSecret['id'],
+    user_id: User['id'],
+    user_rsa_secret_id: UserSecret['id'],
+    user_paillier_secret_id: UserSecret['id'],
 
-    buildId: Train['build_id'],
-    proposalId: Train['proposal_id'],
-    sessionId: Train['session_id'],
+    proposal_id: Train['proposal_id'],
+    session_id: Train['session_id'],
     hash: Train['hash']
-    hashSigned: Train['hash_signed'],
+    hash_signed: Train['hash_signed'],
     query: Train['query'],
 
-    masterImage: MasterImage['virtual_path'],
+    master_image: MasterImage['virtual_path'],
 
-    entrypointCommand?: string,
-    entrypointCommandArguments?: string | string[],
-    entrypointPath: string,
+    entrypoint_command?: string,
+    entrypoint_command_arguments?: string | string[],
+    entrypoint_path: string,
 
     files: string[],
 

@@ -22,21 +22,20 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
     const message : Partial<TrainBuilderStartPayload> = {
         id: train.id,
 
-        userId: train.user_id,
+        user_id: train.user_id,
 
-        userRSASecretId: train.user_rsa_secret_id,
-        userPaillierSecretId: train.user_paillier_secret_id,
+        user_rsa_secret_id: train.user_rsa_secret_id,
+        user_paillier_secret_id: train.user_paillier_secret_id,
 
-        buildId: train.build_id,
-        proposalId: train.proposal_id,
-        sessionId: train.session_id,
+        proposal_id: train.proposal_id,
+        session_id: train.session_id,
         hash: train.hash,
-        hashSigned: train.hash_signed,
+        hash_signed: train.hash_signed,
         query: train.query,
 
-        entrypointCommand: null,
-        entrypointCommandArguments: [],
-        entrypointPath: null,
+        entrypoint_command: null,
+        entrypoint_command_arguments: [],
+        entrypoint_path: null,
     };
 
     // ----------------------------------------------------
@@ -47,17 +46,17 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
         throw new Error();
     }
 
-    message.masterImage = masterImage.virtual_path;
-    message.entrypointCommand = message.entrypointCommand || masterImage.command;
-    message.entrypointCommandArguments = message.entrypointCommandArguments || masterImage.command_arguments;
+    message.master_image = masterImage.virtual_path;
+    message.entrypoint_command = message.entrypoint_command || masterImage.command;
+    message.entrypoint_command_arguments = message.entrypoint_command_arguments || masterImage.command_arguments;
 
     const masterImageGroupRepository = getRepository(MasterImageGroupEntity);
     const masterImageGroup = await masterImageGroupRepository.findOne({
         virtual_path: masterImage.group_virtual_path,
     });
     if (typeof masterImageGroup !== 'undefined') {
-        message.entrypointCommand = message.entrypointCommand || masterImageGroup.command;
-        message.entrypointCommandArguments = message.entrypointCommandArguments || masterImageGroup.command_arguments;
+        message.entrypoint_command = message.entrypoint_command || masterImageGroup.command;
+        message.entrypoint_command_arguments = message.entrypoint_command_arguments || masterImageGroup.command_arguments;
     }
 
     // ----------------------------------------------------
@@ -76,7 +75,7 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
         throw new Error();
     }
 
-    message.entrypointPath = path.join(entryPointFile.directory, entryPointFile.name);
+    message.entrypoint_path = path.join(entryPointFile.directory, entryPointFile.name);
 
     // ----------------------------------------------------
 
