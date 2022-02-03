@@ -19,7 +19,7 @@ const dockerOptions : DockerPullOptions = {
 
 export async function downloadImage(message: Message) {
     const data : ResultServiceDataPayload = message.data as ResultServiceDataPayload;
-    const repositoryTag = getHarborFQRepositoryPath(data.trainId);
+    const repositoryTag = getHarborFQRepositoryPath(data.train_id);
 
     await pullDockerRegistryImage(repositoryTag, dockerOptions);
 

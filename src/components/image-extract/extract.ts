@@ -27,7 +27,7 @@ export async function extractImage(message: Message) {
         // do nothing :)
     }
 
-    const repositoryPath : string = getHarborFQRepositoryPath(data.trainId);
+    const repositoryPath : string = getHarborFQRepositoryPath(data.train_id);
 
     await saveDockerContainerPathsTo(
         repositoryPath,

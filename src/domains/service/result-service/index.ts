@@ -7,6 +7,6 @@ export enum ResultServiceCommand {
 }
 
 export type ResultServiceDataPayload = {
-    trainId: string,
+    train_id: string,
     id?: string,
 };
