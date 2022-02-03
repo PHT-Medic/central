@@ -1,12 +1,12 @@
 {
-    "name": "@personalhealthtrain/result-service",
+    "name": "@personalhealthtrain/ui-result-service",
     "author": {
         "name": "Peter Placzek",
         "email": "tadashi@animesu.net",
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "1.1.0-0",
+    "version": "1.1.0-alpha.4",
     "description": "This project contains the Central UI Result Service of PHT.",
     "main": "dist/index.js",
     "scripts": {
@@ -15,14 +15,13 @@
         "start": "node dist/index.js",
         "dev": "ts-node src/index.ts",
         "dev-watch": "ts-node-dev src/index.ts --respawn --transpileOnly",
-        "build": "rm -rf ./dist && tsc",
-        "test": ""
+        "build": "rm -rf ./dist && tsc"
     },
     "dependencies": {
         "@personalhealthtrain/ui-common": "^1.1.0-alpha.4",
         "@trapi/client": "2.0.2",
-        "@typescript-auth/domains": "^0.0.18",
-        "@typescript-auth/server-adapter": "^0.0.14",
+        "@typescript-auth/domains": "^0.0.19",
+        "@typescript-auth/server-adapter": "^0.0.15",
         "@typescript-error/http": "^1.1.2",
         "amqp-extension": "^1.0.1",
         "body-parser": "^1.19.1",
@@ -32,9 +31,7 @@
         "dockerode": "^3.2.1",
         "dotenv": "^15.0.0",
         "express": "^4.17.2",
-        "module-alias": "^2.2.2",
         "redis-extension": "^1.0.0-4",
-        "reflect-metadata": "^0.1.13",
         "tar-stream": "^2.1.4",
         "uuid": "^8.3.2",
         "winston": "^3.5.1"
@@ -50,11 +47,12 @@
         "@types/tar-stream": "^2.2.2",
         "@types/uuid": "^8.3.4",
         "@types/winston": "^2.4.4",
-        "eslint": "^8.8.0",
         "nodemon": "^2.0.15",
-        "np": "^7.6.0",
         "ts-node": "^10.4.0",
         "ts-node-dev": "^1.1.6",
         "typescript": "^4.5.5"
+    },
+    "publishConfig": {
+        "access": "public"
     }
 }

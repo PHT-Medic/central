@@ -43,6 +43,8 @@ Read the `Readme.md` in each package directory and configure each package indivi
 ## Packages
 
 ### @personalhealthtrain/ui-backend 🌠
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-backend.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-backend)
+
 This repository contains the backend application with REST API, aggregators, components and many more.
 
 ### @personalhealthtrain/ui-common 📦
@@ -51,10 +53,23 @@ This repository contains the backend application with REST API, aggregators, com
 This repository contains common constants, functions, types, ... of the Personal Health Train (PHT) UI.
 
 ### @personalhealthtrain/ui-frontend 🍭
-This repository contains the frontend application. 
+
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-frontend.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-frontend)
+
+This repository contains the frontend application.
+
 
 ### @personalhealthtrain/ui-realtime 🌠
+
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-realtime.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-realtime)
+
 This repository contains the realtime application which connects the backend application with socket based clients.
+
+### @personalhealthtrain/ui-result-service 🏭
+
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-result-service.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-result-service)
+
+This repository contains the Result Service of the Personal Health Train.
 
 ## Usage
 Start the frontend-, backend-, & realtime-application in a single terminal window (or as background process) with the following command:
@@ -68,6 +83,10 @@ $ npm run frontend
 
 ```shell
 $ npm run realtime
+```
+
+```shell
+$ npm run result-service
 ```
 
 ## Credits

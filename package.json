@@ -29,6 +29,7 @@
         "frontend": "npm run dev --workspace=packages/frontend",
         "backend": "npm run dev --workspace=packages/backend",
         "realtime": "npm run dev --workspace=packages/realtime",
+        "result-service": "npm run dev --workspace=packages/result-service",
         "common": "npm run build-watch --workspace=packages/common"
     }
 }

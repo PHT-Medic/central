@@ -43,6 +43,9 @@ case "${PACKAGE}" in
     realtime)
         exec npm run "$1" --workspace=packages/realtime
         ;;
+    result-service)
+        exec npm run "$1" --workspace=packages/result-service
+        ;;
     cli)
         exec npm run cli --workspace=packages/backend -- "$@"
         ;;

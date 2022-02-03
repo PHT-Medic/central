@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import dotenv from 'dotenv';
 import env from './env';
 import createConfig from './config';

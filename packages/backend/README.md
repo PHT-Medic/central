@@ -1,4 +1,7 @@
 # UI - Backend 🌠
+
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-backend.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-backend)
+
 This repository contains the Central UI Backend API of the Personal Health Train (PHT).
 It communicates with some services of the PHT and need therefore to be configured properly, like described 
 in the following sections.
