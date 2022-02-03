@@ -9,8 +9,8 @@ export default {
             type: String,
             default: 'role',
         },
-        roleId: Number,
-        userId: Number,
+        roleId: String,
+        userId: String,
     },
     data() {
         return {
