@@ -20,7 +20,7 @@ export default {
     },
     async asyncData(context) {
         try {
-            const role = await context.$authApi.userRole.getOne(context.params.id);
+            const role = await context.$authApi.role.getOne(context.params.id);
 
             return {
                 role,

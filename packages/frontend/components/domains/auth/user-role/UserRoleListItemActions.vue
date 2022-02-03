@@ -1,7 +1,7 @@
 <script>
 export default {
     props: {
-        userRoles: {
+        items: {
             type: Array,
             default: () => [],
         },
@@ -15,29 +15,63 @@ export default {
     data() {
         return {
             busy: false,
+            item: null,
+
+            initialized: false,
         };
     },
-    computed: {
-        userRoleIndex() {
-            return this.userRoles.findIndex((userRole) => (this.primaryParameter === 'role' ? userRole.role_id === this.roleId : userRole.user_id === this.userId));
-        },
-        isInUserRoles() {
-            return this.userRoleIndex !== -1;
-        },
+    created() {
+        Promise.resolve()
+            .then(() => this.initFromProperties())
+            .then(() => this.init())
+            .then(() => {
+                this.initialized = true;
+            });
     },
     methods: {
+        initFromProperties() {
+            if (!Array.isArray(this.items)) return;
+
+            const index = this.items.findIndex((userRole) => userRole.role_id === this.roleId && userRole.user_id === this.userId);
+            if (index !== -1) {
+                this.item = this.items[index];
+            }
+        },
+        async init() {
+            try {
+                const response = await this.$authApi.userRole.getMany({
+                    filters: {
+                        role_id: this.roleId,
+                        user_id: this.userId,
+                    },
+                    page: {
+                        limit: 1,
+                    },
+                });
+
+                if (response.meta.total === 1) {
+                    const { 0: item } = response.data;
+
+                    this.item = item;
+                }
+            } catch (e) {
+                // ...
+            }
+        },
         async add() {
-            if (this.busy) return;
+            if (this.busy || this.item) return;
 
             this.busy = true;
 
             try {
-                const userRole = await this.$authApi.userRole.getMany({
+                const userRole = await this.$authApi.userRole.create({
                     role_id: this.roleId,
                     user_id: this.userId,
                 });
 
-                this.$emit('added', userRole);
+                this.item = userRole;
+
+                this.$emit('created', userRole);
             } catch (e) {
                 // ...
             }
@@ -45,16 +79,18 @@ export default {
             this.busy = false;
         },
         async drop() {
-            if (this.busy || this.userRoleIndex === -1) return;
+            if (this.busy || !this.item) return;
 
             this.busy = true;
 
             try {
-                const userRole = await this.$authApi.userRole.delete(this.userRoles[this.userRoleIndex].id);
+                const userRole = await this.$authApi.userRole.delete(this.item.id);
 
-                this.$emit('dropped', userRole);
+                this.item = null;
+
+                this.$emit('deleted', userRole);
             } catch (e) {
-
+                // ...
             }
 
             this.busy = false;
@@ -65,14 +101,14 @@ export default {
 <template>
     <div>
         <button
-            v-if="!isInUserRoles"
+            v-if="!item && initialized"
             class="btn btn-xs btn-success"
             @click.prevent="add"
         >
             <i class="fa fa-plus" />
         </button>
         <button
-            v-if="isInUserRoles"
+            v-if="item && initialized"
             class="btn btn-xs btn-danger"
             @click.prevent="drop"
         >

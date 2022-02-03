@@ -11,94 +11,12 @@ import UserList from '../user/UserList';
 export default {
     components: { UserList, UserRoleListItemActions },
     props: {
-        roleId: Number,
+        roleId: String,
     },
     data() {
         return {
-            meta: {
-                limit: 50,
-                offset: 0,
-                total: 0,
-            },
-            busy: false,
-            items: [],
-            assignedOnly: true,
-            query: {},
+
         };
-    },
-    created() {
-        this.load();
-    },
-    methods: {
-        async load() {
-            if (this.busy) return;
-
-            this.busy = true;
-
-            try {
-                const response = await this.$authApi.userRole.getMany({
-                    page: {
-                        limit: this.meta.limit,
-                        offset: this.meta.offset,
-                    },
-                    filter: {
-                        role_id: this.roleId,
-                    },
-                });
-
-                this.items = response.data;
-
-                this.$nextTick(() => {
-                    this.buildRoleRequestFilter();
-                });
-            } catch (e) {
-                // ...
-            }
-
-            this.busy = false;
-        },
-
-        buildRoleRequestFilter(build) {
-            const ids = this.items.map((item) => item.user_id);
-            let additionFilter;
-
-            build = build ?? this.assignedOnly;
-
-            if (build) {
-                additionFilter = {
-                    id: ids.join(','),
-                };
-            }
-
-            this.query = {
-                ...(additionFilter ? { filters: additionFilter } : {}),
-            };
-
-            this.$nextTick(() => {
-                this.$refs.roleList.load();
-            });
-        },
-
-        filterItems(item) {
-            if (!this.assignedOnly) {
-                return true;
-            }
-
-            return this.items.findIndex((userRole) => userRole.user_id === item.id) !== -1;
-        },
-
-        handleAdded(item) {
-            const index = this.items.findIndex((userRole) => userRole.id === item.id);
-            if (index === -1) {
-                this.items.push(item);
-            }
-        },
-        handleDropped(item) {
-            const index = this.items.findIndex((userRole) => userRole.id === item.id);
-            if (index !== -1) {
-                this.items.splice(index, 1);
-            }
-        },
     },
 };
 </script>
@@ -106,36 +24,11 @@ export default {
     <div>
         <user-list
             ref="roleList"
-            :query="query"
-            :filter-items="filterItems"
-            :load-on-init="false"
         >
-            <template #header-title>
-                <template v-if="assignedOnly">
-                    Slight overview of all assigned users.
-                </template>
-                <template v-else>
-                    Slight overview of all assigned and available users.
-                </template>
-            </template>
-            <template #header-actions>
-                <b-form-checkbox
-                    v-model="assignedOnly"
-                    :disabled="busy"
-                    switch
-                    @change="buildRoleRequestFilter"
-                >
-                    Show only assigned users
-                </b-form-checkbox>
-            </template>
             <template #item-actions="props">
                 <user-role-list-item-actions
                     :role-id="roleId"
                     :user-id="props.item.id"
-                    :user-roles="items"
-                    :primary-parameter="'user'"
-                    @added="handleAdded"
-                    @dropped="handleDropped"
                 />
             </template>
         </user-list>
