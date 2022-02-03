@@ -17,6 +17,7 @@ case "${1}" in
     backend) PACKAGE=backend;;
     frontend) PACKAGE=frontend;;
     realtime) PACKAGE=realtime;;
+    result-service) PACKAGE=result-service;;
     cli) PACKAGE=cli;;
     *) echo "Unknown package: ${1}";;
 esac
@@ -25,8 +26,10 @@ shift
 
 if [[ -z "${PACKAGE}" ]]; then
     printf 'Usage:\n'
-    printf '  frontend <command>\n    Start or run the frontend app in dev mode.\n'
-    printf '  backend <command>\n    Start or run the back app in dev mode.\n'
+    printf '  backend <command>\n    Start or run the backend in dev mode.\n'
+    printf '  frontend <command>\n    Start or run the frontend in dev mode.\n'
+    printf '  realtime<command>\n    Start or run the realtime server in dev mode.\n'
+    printf '  result-service<command>\n    Start or run the result-service in dev mode.\n'
     printf '  cli <command>\n    Run a CLI command.\n'
     exit 0
 fi
