@@ -15,7 +15,8 @@
         "start": "node dist/index.js",
         "dev": "ts-node src/index.ts",
         "dev-watch": "ts-node-dev src/index.ts --respawn --transpileOnly",
-        "build": "rm -rf ./dist && tsc"
+        "build": "rm -rf ./dist && tsc",
+        "test": ""
     },
     "dependencies": {
         "@personalhealthtrain/ui-common": "^1.1.0-alpha.1",
