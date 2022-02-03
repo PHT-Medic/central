@@ -79,7 +79,7 @@
     "scripts": {
         "dev": "ts-node src/index.ts",
         "dev-watch": "nodemon --legacy-watch --watch 'src/**/*.ts' --exec 'ts-node src/index.ts'",
-        "build": "tsc -p tsconfig.build.json",
+        "build": "rimraf dist/ && tsc -p tsconfig.build.json",
         "start": "node dist/index.js",
         "cli": "ts-node src/cli/index.ts",
         "test": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=test jest --config ./test/jest.config.js --detectOpenHandles --runInBand --testTimeout=6000 --forceExit",

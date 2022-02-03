@@ -6,7 +6,7 @@
  */
 
 import { Message, publishMessage } from 'amqp-extension';
-import { isRegistryStationProjectName } from '@personalhealthtrain/ui-common/src/domains/core/station/registry';
+import { isRegistryStationProjectName } from '@personalhealthtrain/ui-common';
 import { DispatcherHarborEventData } from '../../../domains/special/registry/queue';
 import { TrainRouterHarborEvent, buildTrainRouterQueueMessage } from '../../../domains/special/train-router';
 import { useLogger } from '../../../config/log';

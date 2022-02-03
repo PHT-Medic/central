@@ -13,8 +13,8 @@ import {
     REGISTRY_SYSTEM_USER_NAME,
     TrainStationRunStatus,
 
+    isRegistryStationProjectName,
 } from '@personalhealthtrain/ui-common';
-import { isRegistryStationProjectName } from '@personalhealthtrain/ui-common/src/domains/core/station/registry';
 import { AggregatorTrainEvent } from '../../../aggregators/dispatcher/handlers/train';
 
 import { DispatcherHarborEventData } from '../../../domains/special/registry/queue';

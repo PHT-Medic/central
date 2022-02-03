@@ -9,14 +9,11 @@ import { Message } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import {
     Station,
-    TrainStation,
     TrainStationRunStatus,
 
-} from '@personalhealthtrain/ui-common';
-import {
     buildRegistryStationProjectName,
     isRegistryStationProjectName,
-} from '@personalhealthtrain/ui-common/src/domains/core/station/registry';
+} from '@personalhealthtrain/ui-common';
 import { DispatcherHarborEventData } from '../../../domains/special/registry/queue';
 import { TrainStationEntity } from '../../../domains/core/train-station/entity';
 

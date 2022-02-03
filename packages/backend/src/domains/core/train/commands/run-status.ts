@@ -14,9 +14,9 @@ import {
     TrainBuildStatus,
     TrainConfigurationStatus,
     TrainRunStatus,
+    buildRegistryStationProjectName,
 } from '@personalhealthtrain/ui-common';
 import { getRepository } from 'typeorm';
-import { buildRegistryStationProjectName } from '@personalhealthtrain/ui-common/src/domains/core/station/registry';
 import { useClient } from '@trapi/client';
 import { findTrain } from './utils';
 import { triggerTrainResultStart } from './result-start';
