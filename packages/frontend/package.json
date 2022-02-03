@@ -28,7 +28,7 @@
         "@types/cookie": "^0.4.0",
         "@types/moment": "^2.13.0",
         "@types/vuelidate": "^0.7.13",
-        "@typescript-auth/domains": "^0.0.18",
+        "@typescript-auth/domains": "^0.0.19",
         "@typescript-error/core": "^1.0.3",
         "babel-eslint": "^10.1.0",
         "bootstrap": "^4.5.3",

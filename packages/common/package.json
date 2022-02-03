@@ -22,7 +22,7 @@
     "dependencies": {
         "@trapi/client": "^2.0.2",
         "@trapi/query": "^2.0.3",
-        "@typescript-auth/domains": "^0.0.18",
+        "@typescript-auth/domains": "^0.0.19",
         "nanoid": "^3.1.30"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",

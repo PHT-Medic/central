@@ -76,7 +76,7 @@ export class SetupCommand implements CommandModule {
             await setupCommand({
                 database: false,
                 databaseSeeder: false, // false, to trigger own subscribers
-                documentation: true,
+                documentation: false, // todo: make true again if external dependencies can be used to generate swagger docs.
                 keyPair: true,
             });
         }
