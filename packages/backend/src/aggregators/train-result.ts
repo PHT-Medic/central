@@ -58,7 +58,7 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: TrainRes
     const latest = typeof data.latest === 'boolean' ? data.latest : true;
 
     const trainRepository = getRepository(TrainEntity);
-    const train = await trainRepository.findOne(data.trainId);
+    const train = await trainRepository.findOne(data.train_id);
     if (latest) {
         train.result_last_status = status;
         if (data.id) {
@@ -80,7 +80,7 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: TrainRes
     if (typeof result === 'undefined') {
         result = resultRepository.create({
             id: data.id,
-            train_id: data.trainId,
+            train_id: data.train_id,
             status,
             user_id: train.user_id,
         });

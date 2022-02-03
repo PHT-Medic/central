@@ -12,7 +12,7 @@ import { ForbiddenError, UnauthorizedError } from '@typescript-error/http';
 import { MASTER_REALM_ID } from '@typescript-auth/domains';
 import { setupSocketMiddleware } from '@typescript-auth/server-adapter';
 import { useClient } from '@trapi/client';
-import { useLogger } from '../../modules/log';
+import { useLogger } from '../log';
 import { registerSocketHandlers, registerSocketNamespaceHandlers } from './handlers';
 import { Environment } from '../../env';
 import { Config } from '../../config';

@@ -27,7 +27,7 @@ export async function triggerTrainResultStop(
     if (train.result_last_status !== TrainResultStatus.STOPPING) {
         // send queue message
         await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.STOP, {
-            trainId: train.id,
+            train_id: train.id,
             latest: true,
             ...(train.result_last_id ? { id: train.result_last_id } : {}),
         }));

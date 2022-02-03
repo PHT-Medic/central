@@ -43,7 +43,7 @@ export async function triggerTrainResultStart(
 
     // send queue message
     await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.START, {
-        trainId: train.id,
+        train_id: train.id,
         latest: true,
     }));
 

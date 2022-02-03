@@ -6,7 +6,7 @@
  */
 
 import http, { Server } from 'http';
-import { useLogger } from '../modules/log';
+import { useLogger } from '../config/log';
 import { ExpressAppInterface } from './type';
 
 interface HttpServerContext {

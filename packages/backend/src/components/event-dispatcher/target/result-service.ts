@@ -13,7 +13,7 @@ import {
     ResultServiceCommand,
     buildResultServiceQueueMessage,
 } from '../../../domains/special/result-service';
-import { useLogger } from '../../../modules/log';
+import { useLogger } from '../../../config/log';
 
 export async function dispatchHarborEventToResultService(
     message: Message,
@@ -27,7 +27,7 @@ export async function dispatchHarborEventToResultService(
     }
 
     await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.START, {
-        trainId: data.repositoryName,
+        train_id: data.repositoryName,
         latest: true,
     }));
 

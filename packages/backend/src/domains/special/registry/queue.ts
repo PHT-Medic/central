@@ -8,8 +8,6 @@
 import { Message, buildMessage } from 'amqp-extension';
 import { MessageQueueDispatcherRoutingKey, MessageQueueSelfRoutingKey } from '../../../config/service/mq';
 import { DispatcherEvent } from '../../../components/event-dispatcher/constants';
-import { SecretStorageQueueCommand } from '../secret-storage/constants';
-import { SecretStorageQueuePayload } from '../secret-storage/type';
 import { RegistryQueuePayload } from './type';
 import { RegistryQueueCommand } from './constants';
 

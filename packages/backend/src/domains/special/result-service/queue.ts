@@ -6,6 +6,7 @@
  */
 
 import { Message, buildMessage } from 'amqp-extension';
+import { Train, TrainResult } from '@personalhealthtrain/ui-common';
 import { MessageQueueResultServiceRoutingKey } from '../../../config/service/mq';
 
 export enum ResultServiceCommand {
@@ -15,8 +16,8 @@ export enum ResultServiceCommand {
 }
 
 export type ResultServiceDataPayload = {
-    id?: string,
-    trainId: string,
+    id?: TrainResult['id'],
+    train_id: Train['id'],
     latest?: boolean
 };
 

@@ -29,7 +29,7 @@ export async function startTrain(train: Train | number | string) : Promise<Train
         // todo: make it a ClientError.BadRequest
         throw new Error('The train has already been started...');
     } else {
-        const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.START, { trainId: train.id });
+        const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.START, { train_id: train.id });
 
         await publishMessage(queueMessage);
 

@@ -8,7 +8,8 @@
 import {
     Logger, createLogger, format, transports,
 } from 'winston';
-import { getWritableDirPath } from '../../config/paths';
+import path from 'path';
+import { getWritableDirPath } from '../paths';
 
 let logger : undefined | any;
 
@@ -26,7 +27,7 @@ Levels
  */
 
 const includeNamespaceInMessage = format((info) => {
-    if (typeof info.meta?.namespace === 'string') {
+    if (info.meta?.namespace) {
         info.message = `${info.namespace}: ${info.message}`;
     }
 
@@ -41,17 +42,14 @@ export function useLogger() : Logger {
     logger = createLogger({
         format: format.combine(
             includeNamespaceInMessage(),
-            format.colorize(),
+            format.colorize({ all: true }),
             format.json(),
             format.timestamp(),
         ),
-        level: 'debug',
         transports: [
-            new transports.Console({
-                level: 'debug',
-            }),
+            new transports.Console(),
             new transports.File({
-                filename: `${getWritableDirPath()}/error.log`,
+                filename: path.join(getWritableDirPath(), 'error.log'),
                 level: 'warn',
             }),
         ],

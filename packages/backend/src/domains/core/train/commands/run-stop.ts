@@ -27,7 +27,7 @@ export async function stopTrain(train: Train | number | string) : Promise<Train>
         throw new Error('The train has already been terminated...');
     } else {
         if (train.run_status !== TrainRunStatus.STOPPING) {
-            const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.STOP, { trainId: train.id });
+            const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.STOP, { train_id: train.id });
 
             await publishMessage(queueMessage);
         }

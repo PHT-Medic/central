@@ -12,7 +12,7 @@ import env from './env';
 
 import { createConfig } from './config';
 import { createHttpServer } from './config/http/server';
-import { useLogger } from './modules/log';
+import { useLogger } from './config/log';
 import { createSocketServer } from './config/socket/server';
 
 dotenv.config();

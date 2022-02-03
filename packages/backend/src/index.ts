@@ -16,7 +16,7 @@ import env from './env';
 import { createConfig } from './config';
 import { createExpressApp } from './http/express';
 import { createHttpServer } from './http/server';
-import { useLogger } from './modules/log';
+import { useLogger } from './config/log';
 import { buildDatabaseConnectionOptions } from './database/utils';
 
 dotenv.config();

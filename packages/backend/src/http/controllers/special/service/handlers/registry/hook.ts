@@ -14,7 +14,7 @@ import {
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
 } from '@personalhealthtrain/ui-common';
 import { publishMessage } from 'amqp-extension';
-import { useLogger } from '../../../../../../modules/log';
+import { useLogger } from '../../../../../../config/log';
 import { DispatcherHarborEventType, buildDispatcherHarborEvent } from '../../../../../../domains/special/registry/queue';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
 import { TrainEntity } from '../../../../../../domains/core/train/entity';

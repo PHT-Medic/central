@@ -6,7 +6,7 @@
  */
 
 import http, { Server } from 'http';
-import { useLogger } from '../../modules/log';
+import { useLogger } from '../log';
 
 export function createHttpServer() : Server {
     useLogger().debug('setup http server...', { service: 'http' });
