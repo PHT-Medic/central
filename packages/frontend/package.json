@@ -35,7 +35,7 @@
         "bootstrap-vue": "^2.18.1",
         "browser-storage-adapter": "^0.0.3",
         "change-case": "^4.1.1",
-        "cookie": "^0.4.1",
+        "cookie": "^0.4.2",
         "moment": "^2.29.1",
         "nuxt": "^2.15.7",
         "socket.io-client": "^4.4.1",
