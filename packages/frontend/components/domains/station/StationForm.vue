@@ -102,7 +102,7 @@ export default {
 
         pathName() {
             return this.formData.name ?
-                buildStationSecretStorageKey(this.formData.name) :
+                buildStationSecretStorageKey(this.entityProperty.secure_id) :
                 '';
         },
         projectName() {

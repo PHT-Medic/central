@@ -11,7 +11,7 @@ import UserRoleListItemActions from './UserRoleListItemActions';
 export default {
     components: { UserRoleListItemActions, RoleList },
     props: {
-        userId: User.prototype.id,
+        userId: String,
     },
     data() {
         return {

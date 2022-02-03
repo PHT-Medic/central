@@ -31,8 +31,6 @@ export default {
 </script>
 <template>
     <div>
-        <vue-scroll style="height:500px">
-            <user-role-list :user-id="userProperty.id" />
-        </vue-scroll>
+        <user-role-list :user-id="userProperty.id" />
     </div>
 </template>
