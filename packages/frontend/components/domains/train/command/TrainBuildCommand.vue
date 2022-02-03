@@ -6,7 +6,7 @@
   -->
 <script>
 import {
-    TrainBuildStatus, TrainConfigurationStatus,
+    TrainBuildStatus,
 } from '@personalhealthtrain/ui-common';
 import { BDropdownItem } from 'bootstrap-vue';
 import { FrontendTrainCommand } from '../../../../domains/train/constants';
@@ -42,7 +42,7 @@ export default {
     },
     computed: {
         isShown() {
-            return this.$auth.can('edit', 'train') && this.train.configuration_status === TrainConfigurationStatus.FINISHED;
+            return this.$auth.can('edit', 'train');
         },
         isEnabled() {
             if (
@@ -63,7 +63,6 @@ export default {
                         [
                             TrainBuildStatus.STARTING,
                             TrainBuildStatus.STARTED,
-                            TrainBuildStatus.FINISHED,
                             TrainBuildStatus.STOPPING,
                         ].indexOf(this.train.build_status) !== -1;
                 case FrontendTrainCommand.BUILD_STATUS:
