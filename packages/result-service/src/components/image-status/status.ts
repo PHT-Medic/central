@@ -1,6 +1,6 @@
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
 import fs from 'fs';
-import { getTrainResultFilePath } from '../../config/paths';
+import { buildTrainResultFilePath } from '../../config/paths';
 import { getHarborFQRepositoryPath } from '../../config/services/harbor';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { ResultServiceDataPayload } from '../../domains/service/result-service';
@@ -15,7 +15,7 @@ export async function statusImage(message: Message) {
     }
 
     // 1. Check if result already exists.
-    const trainResultPath : string = getTrainResultFilePath(data.id);
+    const trainResultPath : string = buildTrainResultFilePath(data.id);
 
     try {
         await fs.promises.access(trainResultPath, fs.constants.F_OK);

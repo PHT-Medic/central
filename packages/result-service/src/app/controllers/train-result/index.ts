@@ -1,6 +1,7 @@
 import fs from 'fs';
-import { NotFoundError } from '@typescript-error/http';
-import { getTrainResultFilePath } from '../../../config/paths';
+import { BadRequestError, NotFoundError } from '@typescript-error/http';
+import path from 'path';
+import { buildTrainResultFilePath } from '../../../config/paths';
 import { ExpressRequest, ExpressResponse } from '../../../config/http/type';
 
 export async function streamTrainResultRouteHandler(
@@ -8,33 +9,32 @@ export async function streamTrainResultRouteHandler(
     res: ExpressResponse,
 ) {
     const { downloadId } = req.query;
-    const { id } = req.params;
 
-    if (typeof id !== 'string') {
-        throw new NotFoundError();
+    let { id } = req.params;
+
+    if (downloadId) {
+        id = `${downloadId}`;
     }
 
-    let resultFileId : string = id;
-
-    if (typeof downloadId === 'string') {
-        resultFileId = downloadId;
+    if (!id) {
+        throw new BadRequestError('The result identifier is invalid.');
     }
 
-    const trainResultFilePath = getTrainResultFilePath(resultFileId);
-    const downloadFileName = `${id}.tar`;
+    const filePath = buildTrainResultFilePath(id);
+    const fileName = path.basename(filePath);
 
-    // eslint-disable-next-line consistent-return
-    return fs.access(trainResultFilePath, fs.constants.F_OK | fs.constants.R_OK, (err) => {
-        if (err) {
-            throw new NotFoundError('A train result which is identified by the provided identifier doesn\'t exist');
-        }
-        const stream = fs.createReadStream(trainResultFilePath);
+    try {
+        await fs.promises.access(filePath, fs.constants.F_OK | fs.constants.R_OK);
+
+        const stream = fs.createReadStream(filePath);
 
         res.set({
-            'Content-Disposition': `attachment; filename=${downloadFileName}`,
+            'Content-Disposition': `attachment; filename=${fileName}`,
             'Content-Type': 'application/pdf',
         });
 
         stream.pipe(res);
-    });
+    } catch (e) {
+        throw new NotFoundError('A train result which is identified by the provided identifier doesn\'t exist');
+    }
 }

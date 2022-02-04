@@ -8,6 +8,8 @@ import { useClient } from '@trapi/client';
 import { registerRoutes } from './routes';
 import { ExpressAppContext, ExpressAppInterface } from './type';
 import { errorMiddleware } from './middleware/error';
+import { useRateLimiter } from './middleware/rate-limiter';
+import env from '../../env';
 
 function createExpressApp(context: ExpressAppContext) : ExpressAppInterface {
     const expressApp : Express = express();
@@ -19,6 +21,11 @@ function createExpressApp(context: ExpressAppContext) : ExpressAppInterface {
 
     // Cookie parser
     expressApp.use(cookieParser());
+
+    if (env.env !== 'test') {
+        // Rate Limiter
+        expressApp.use(useRateLimiter);
+    }
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

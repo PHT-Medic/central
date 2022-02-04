@@ -22,9 +22,9 @@ export function getRootDirPath() {
 }
 
 export function getTrainResultDirectoryPath() {
-    return path.resolve(`${getWritableDirPath()}/train-results`);
+    return path.join(getWritableDirPath(), 'train-results');
 }
 
-export function getTrainResultFilePath(trainResultId: string) {
-    return path.resolve(`${getTrainResultDirectoryPath()}/${trainResultId}.tar`);
+export function buildTrainResultFilePath(trainResultId: string) {
+    return path.join(getTrainResultDirectoryPath(), `${path.basename(trainResultId, '.tar')}.tar`);
 }

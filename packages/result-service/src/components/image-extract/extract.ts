@@ -1,6 +1,6 @@
 import { Message } from 'amqp-extension';
 import fs from 'fs';
-import { getTrainResultDirectoryPath, getTrainResultFilePath } from '../../config/paths';
+import { buildTrainResultFilePath, getTrainResultDirectoryPath } from '../../config/paths';
 import { getHarborFQRepositoryPath } from '../../config/services/harbor';
 import { ResultServiceDataPayload } from '../../domains/service/result-service';
 import { generateResultId } from '../../domains/train-result/utils';
@@ -18,7 +18,7 @@ export async function extractImage(message: Message) {
     (message.data as ResultServiceDataPayload).id = resultId;
 
     // delete result file if it already exists.
-    const trainResultPath : string = getTrainResultFilePath(resultId);
+    const trainResultPath : string = buildTrainResultFilePath(resultId);
 
     try {
         await fs.promises.access(trainResultPath, fs.constants.F_OK);

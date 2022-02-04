@@ -12,10 +12,8 @@ The following settings need to be added to the environment file `.env` in the ro
 PORT=<port>
 NODE_ENV=development
 
-REDIS_CONNECTION_STRING=redis://<username>:<password>@<host>
 RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
 HARBOR_CONNECTION_STRING=<user>:<password>@<url>
-VAULT_CONNECTION_STRING=<token>@<url>/v1/
 ```
 
 ## Credits
