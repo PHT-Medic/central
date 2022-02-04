@@ -7,9 +7,11 @@
 
 import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
-import { ROBOT_SECRET_ENGINE_KEY, ServiceID, VaultAPI } from '@personalhealthtrain/ui-common';
+import {
+    VaultAPI,
+    refreshAuthRobotTokenOnResponseError,
+} from '@personalhealthtrain/ui-common';
 import https from 'https';
-import { ErrorCode, OAuth2TokenGrant, TokenAPI } from '@typescript-auth/domains';
 import { Environment } from './env';
 
 interface ConfigContext {
@@ -53,40 +55,7 @@ export function createConfig({ env } : ConfigContext) : Config {
 
     useHTTPClient().mountResponseInterceptor(
         (value) => value,
-        async (err) => {
-            const { config } = err;
-
-            if (
-                err.response &&
-                (
-                    err.response.status === 401 || // Unauthorized
-                    err.response.status === 403 || // Forbidden
-                    err.response?.data?.code === ErrorCode.TOKEN_EXPIRED
-                )
-            ) {
-                const response = await useHTTPClient<VaultAPI>('vault').keyValue
-                    .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM);
-
-                if (response) {
-                    const tokenApi = new TokenAPI(useHTTPClient().driver);
-
-                    const token = await tokenApi.create({
-                        id: response.data.id,
-                        secret: response.data.secret,
-                        grant_type: OAuth2TokenGrant.ROBOT_CREDENTIALS,
-                    });
-
-                    useHTTPClient().setAuthorizationHeader({
-                        type: 'Bearer',
-                        token: token.access_token,
-                    });
-
-                    return useHTTPClient().request(config);
-                }
-            }
-
-            return Promise.reject(err);
-        },
+        refreshAuthRobotTokenOnResponseError,
     );
 
     const aggregators : {start: () => void}[] = [
