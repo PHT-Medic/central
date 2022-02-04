@@ -33,7 +33,7 @@
         "express-prom-bundle": "^6.4.1",
         "express-rate-limit": "^6.0.4",
         "express-validator": "^6.14.0",
-        "isomorphic-git": "^1.10.3",
+        "isomorphic-git": "^1.11.2",
         "mysql": "^2.18.1",
         "prom-client": "^14.0.1",
         "redis-extension": "^1.0.0-4",
