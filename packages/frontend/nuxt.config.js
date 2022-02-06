@@ -56,41 +56,38 @@ const config = {
         '@fortawesome/fontawesome-free/css/all.css',
         'bootstrap/dist/css/bootstrap.min.css',
         'bootstrap-vue/dist/bootstrap-vue.css',
-        '@/assets/css/vue-layout-navigation.css',
-        '@/assets/css/root.css',
-        '@/assets/css/core/header.css',
-        '@/assets/css/core/navbar.css',
-        '@/assets/css/core/body.css',
-        '@/assets/css/core/sidebar.css',
-        '@/assets/css/core/footer.css',
-        '@/assets/css/card.css',
-        '@/assets/css/colors.css',
-        '@/assets/css/form.css',
+        './assets/css/vue-layout-navigation.css',
+        './assets/css/root.css',
+        './assets/css/core/header.css',
+        './assets/css/core/navbar.css',
+        './assets/css/core/body.css',
+        './assets/css/core/sidebar.css',
+        './assets/css/core/footer.css',
+        './assets/css/card.css',
+        './assets/css/colors.css',
+        './assets/css/form.css',
 
-        '@/assets/css/bootstrap-override.css',
+        './assets/css/bootstrap-override.css',
     ],
     /*
     ** Plugins to load before mounting the App
     */
     plugins: [
-        '@/plugins/api',
-        '@/plugins/store',
-        '@/plugins/auth',
-        '@/plugins/layout',
-        '@/plugins/socket',
-        '@/plugins/vuelidate',
-        '@/plugins/vueScroll',
-        '@/plugins/vueFormWizard',
-        '@/plugins/vueTimeAgo',
-        '@/plugins/vue',
+        './plugins/api',
+        './plugins/store',
+        './plugins/auth',
+        './plugins/layout',
+        './plugins/socket',
+        './plugins/vuelidate',
+        './plugins/vueFormWizard',
+        './plugins/vueTimeAgo',
+        './plugins/vue',
 
     ],
     /*
     ** Nuxt.js dev-modules
     */
     buildModules: [
-        // Doc: https://github.com/nuxt-community/eslint-module
-        // '@nuxtjs/eslint-module'
         '@nuxt/typescript-build',
         '@nuxtjs/google-fonts',
     ],

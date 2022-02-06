@@ -13,7 +13,7 @@ import {
 } from '@personalhealthtrain/ui-common';
 import { BaseError } from '@typescript-error/core';
 import { Manager, ManagerOptions, Socket } from 'socket.io-client';
-import { AuthBrowserStorageKey } from '@/modules/auth/constants';
+import { AuthBrowserStorageKey } from '../auth/constants';
 
 type SocketModuleManagerConfiguration = {
     url: string,

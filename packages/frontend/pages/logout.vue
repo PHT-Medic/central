@@ -4,7 +4,7 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
 import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';
 
 export default {
@@ -21,7 +21,10 @@ export default {
         async doLogout() {
             await this.$store.dispatch('auth/triggerLogout');
 
-            const query = {};
+            const query = {
+                redirect: '',
+            };
+
             if (
                 this.$route.query &&
                 Object.prototype.hasOwnProperty.call(this.$route.query, 'redirect') &&

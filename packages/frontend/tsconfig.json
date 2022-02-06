@@ -9,22 +9,8 @@
         "paths": {
             "@personalhealthtrain/ui-common": [
                 "./packages/common/src"
-            ],
-            "@/*": [
-                "./packages/frontend/*"
-            ],
-            "~/*": [
-                "./packages/frontend/*"
             ]
-        },
-        "typeRoots": [
-            "./node_modules/@types"
-        ],
-        "types": [
-            "@types/node",
-            "@nuxt/types",
-            "vue-router/types"
-        ]
+        }
     },
     "exclude": ["node_modules"],
     "include": ["**/*"]

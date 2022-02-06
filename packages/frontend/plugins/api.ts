@@ -14,20 +14,6 @@ import { Inject } from '@nuxt/types/app';
 import { HTTPClient as AuthHTTPClient } from '@typescript-auth/domains';
 import { HTTPClient } from '@personalhealthtrain/ui-common';
 
-declare module '@nuxt/types' {
-    interface Context {
-        $api: HTTPClient,
-        $authApi: AuthHTTPClient
-    }
-}
-
-declare module 'vuex/types/index' {
-    interface Store<S> {
-        $api: HTTPClient,
-        $authApi: AuthHTTPClient
-    }
-}
-
 export default (ctx: Context, inject : Inject) => {
     let apiUrl : string | undefined;
 
@@ -65,8 +51,8 @@ export default (ctx: Context, inject : Inject) => {
     resourceAPI.mountResponseInterceptor((r) => r, interceptor);
     authAPI.mountResponseInterceptor((r) => r, interceptor);
 
-    setClient('default', resourceAPI);
-    setClient('auth', authAPI);
+    setClient(resourceAPI);
+    setClient(authAPI, 'auth');
 
     inject('api', resourceAPI);
     inject('authApi', authAPI);

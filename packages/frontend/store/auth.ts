@@ -12,7 +12,7 @@ import {
     OAuth2TokenKind, OAuth2TokenSubKind, PermissionItem, Robot, User,
 } from '@typescript-auth/domains';
 import { RootState } from './index';
-import { AuthBrowserStorageKey } from '@/modules/auth/constants';
+import { AuthBrowserStorageKey } from '../config/auth/constants';
 
 export interface AuthState {
     user: User | undefined,

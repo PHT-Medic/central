@@ -4,12 +4,13 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import { mapActions, mapGetters } from 'vuex';
+<script lang="ts">
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
-import MedicineWorker from '../components/svg/MedicineWorker';
+import { OAuth2Provider } from '@typescript-auth/domains';
+import { BuildInput } from '@trapi/query';
+import MedicineWorker from '../components/svg/MedicineWorker.vue';
 import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';
-import ProviderList from '../components/domains/auth/provider/ProviderList';
+import ProviderList from '../components/domains/auth/provider/ProviderList.vue';
 
 export default {
     components: { ProviderList, MedicineWorker },
@@ -51,11 +52,7 @@ export default {
         },
     },
     computed: {
-        ...mapGetters('auth', [
-            'loggedIn',
-        ]),
-
-        providerQuery() {
+        providerQuery() : BuildInput<OAuth2Provider> {
             return {
                 include: {
                     realm: true,
@@ -73,10 +70,6 @@ export default {
         },
     },
     methods: {
-        ...mapActions('auth', [
-            'triggerLogin',
-        ]),
-
         async submit() {
             if (this.busy) return;
 
@@ -86,12 +79,13 @@ export default {
             try {
                 const { name, password } = this.formData;
 
-                await this.triggerLogin({ name, password });
+                await this.$store.dispatch('auth/triggerLogin', { name, password });
 
                 await this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
             } catch (e) {
-                console.log(e);
-                this.error = e.message;
+                if (e instanceof Error) {
+                    this.error = e.message;
+                }
             }
 
             this.busy = false;
@@ -144,6 +138,7 @@ export default {
                             class="form-control"
                             type="text"
                             placeholder="username or e-mail"
+                            autocomplete="username"
                             required
                             autofocus
                         >
@@ -179,6 +174,7 @@ export default {
                             class="form-control"
                             type="password"
                             placeholder="password"
+                            autocomplete="current-password"
                             required
                         >
 
@@ -261,16 +257,3 @@ export default {
         </div>
     </div>
 </template>
-<style>
-.slide-fade-enter-active {
-    transition: all .6s ease;
-}
-.slide-fade-leave-active {
-    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-}
-.slide-fade-enter, .slide-fade-leave-to
-    /* .slide-fade-leave-active below version 2.1.8 */ {
-    transform: translateX(10px);
-    opacity: 0;
-}
-</style>

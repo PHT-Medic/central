@@ -4,10 +4,9 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import { BaseError } from '@typescript-error/core';
+<script lang="ts">
 import { mapGetters } from 'vuex';
-import WorldSvg from '../components/svg/WorldSvg';
+import WorldSvg from '../components/svg/WorldSvg.vue';
 import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';
 
 export default {
@@ -65,6 +64,7 @@ export default {
                     <img
                         src="/architecture.png"
                         class="img-fluid w-75"
+                        alt=""
                     >
                 </div>
             </div>

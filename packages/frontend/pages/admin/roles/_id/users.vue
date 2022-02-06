@@ -22,8 +22,6 @@ export default {
 </script>
 <template>
     <div>
-        <vue-scroll style="height:500px">
-            <role-user-list :role-id="roleProperty.id" />
-        </vue-scroll>
+        <role-user-list :role-id="roleProperty.id" />
     </div>
 </template>

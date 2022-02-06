@@ -7,28 +7,7 @@
 
 import { Context } from '@nuxt/types';
 import { Inject } from '@nuxt/types/app';
-import { SocketModule } from '@/config/socket';
-
-declare module 'vue/types/vue' {
-    // this.$myInjectedFunction inside Vue components
-    interface Vue {
-        $socket: SocketModule
-    }
-}
-
-declare module '@nuxt/types' {
-    // nuxtContext.$myInjectedFunction
-    interface Context {
-        $socket: SocketModule
-    }
-}
-
-declare module 'vuex/types/index' {
-    // this.$myInjectedFunction inside Vuex stores
-    interface Store<S> {
-        $socket: SocketModule
-    }
-}
+import { SocketModule } from '../config/socket';
 
 export default (ctx: Context, inject: Inject) => {
     const url = ctx.$config.realtimeUrl ??

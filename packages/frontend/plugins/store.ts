@@ -12,27 +12,6 @@ import { BrowserStorageAdapter } from 'browser-storage-adapter';
 
 import { NavigationProvider } from '../config/layout/module';
 
-declare module '@nuxt/types' {
-    // nuxtContext.app.$myInjectedFunction inside asyncData, fetch, plugins, middleware, nuxtServerInit
-// nuxtContext.$myInjectedFunction
-    // eslint-disable-next-line no-unused-vars
-    interface Context {
-        $warehouse: BrowserStorageAdapter,
-        $authWarehouse: BrowserStorageAdapter
-    }
-}
-
-declare module 'vuex/types/index' {
-    // this.$myInjectedFunction inside Vuex stores
-
-    // eslint-disable-next-line no-unused-vars
-    interface Store<S> {
-        $warehouse: BrowserStorageAdapter,
-        $authWarehouse: BrowserStorageAdapter,
-        $layoutNavigationProvider: NavigationProvider
-    }
-}
-
 export default (ctx : Context, inject : Inject) => {
     const setServerCookie = (value: string) => {
         let cookies = ctx.res.getHeader('Set-Cookie') || [];
