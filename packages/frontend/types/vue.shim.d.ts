@@ -30,4 +30,15 @@ declare module 'vue/types/vue' {
 
         $socket: SocketModule
     }
+
+    interface Vue {
+        $api: HTTPClient,
+        $authApi: AuthHTTPClient,
+
+        $auth: AuthModule,
+
+        $store: Store<any>,
+
+        $socket: SocketModule
+    }
 }

@@ -54,18 +54,16 @@ export function createSocketServer(context : SocketServerContext) : Server {
         redis: context.config.redisDatabase,
         http: useClient('default').driver,
     }));
+
     realmWorkspaces.use((socket: SocketInterface, next) => {
-        if (!socket.data.userId) {
+        if (!socket.data.userId && !socket.data.robotId) {
             next(new UnauthorizedError());
             return;
         }
 
         const matches = socket.nsp.name.match(/^\/realm#([a-z0-9]+)$/);
 
-        if (
-            matches[1] === socket.data.user.realm_id ||
-            socket.data.user.realm_id === MASTER_REALM_ID
-        ) {
+        if (matches[1] === socket.data.realmId || socket.data.realmId === MASTER_REALM_ID) {
             next();
         } else {
             next(new ForbiddenError());

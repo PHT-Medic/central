@@ -17,13 +17,18 @@ import { registerStationSocketHandlers } from '../../domains/station/handlers';
 export function registerSocketHandlers(io: SocketServerInterface) {
     io.on('connection', (socket) => {
         // this will be the root namespace with all realm resources
+
+        registerUserHandlers(io, socket);
+        registerProposalSocketHandlers(io, socket);
+        registerStationSocketHandlers(io, socket);
+        registerTrainSocketHandlers(io, socket);
+        registerTrainFileSocketHandlers(io, socket);
     });
 }
 
 export function registerSocketNamespaceHandlers(io: SocketNamespaceInterface) {
     io.on('connection', (socket) => {
         registerUserHandlers(io, socket);
-
         registerProposalSocketHandlers(io, socket);
         registerProposalStationSocketHandlers(io, socket);
         registerStationSocketHandlers(io, socket);

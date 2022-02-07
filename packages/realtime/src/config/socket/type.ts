@@ -11,12 +11,14 @@ import {
     SocketServerToClientEvents,
 } from '@personalhealthtrain/ui-common';
 import {
-    AbilityManager, PermissionItem, Robot, User,
+    AbilityManager, PermissionItem, Realm, Robot, User,
 } from '@typescript-auth/domains';
 import { Namespace, Server, Socket } from 'socket.io';
 
 export type SocketDataInterface = {
     token?: string,
+
+    realmId?: Realm['id'],
 
     user?: User,
     userId?: User['id'],
