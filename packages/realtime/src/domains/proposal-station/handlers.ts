@@ -20,7 +20,7 @@ export function registerProposalStationSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
-    if (!socket.data.user) return;
+    if (!socket.data.user && !socket.data.robot) return;
 
     socket.on('proposalStationsInSubscribe', async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);

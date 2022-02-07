@@ -19,7 +19,7 @@ export function registerStationSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
-    if (!socket.data.user) return;
+    if (!socket.data.user && !socket.data.robot) return;
 
     socket.on('stationsSubscribe', async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);

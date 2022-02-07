@@ -18,7 +18,10 @@ export function registerSocketHandlers(io: SocketServerInterface) {
     io.on('connection', (socket) => {
         // this will be the root namespace with all realm resources
 
-        registerUserHandlers(io, socket);
+        if (socket.data.user) {
+            registerUserHandlers(io, socket);
+        }
+
         registerProposalSocketHandlers(io, socket);
         registerStationSocketHandlers(io, socket);
         registerTrainSocketHandlers(io, socket);
@@ -28,7 +31,10 @@ export function registerSocketHandlers(io: SocketServerInterface) {
 
 export function registerSocketNamespaceHandlers(io: SocketNamespaceInterface) {
     io.on('connection', (socket) => {
-        registerUserHandlers(io, socket);
+        if (socket.data.user) {
+            registerUserHandlers(io, socket);
+        }
+
         registerProposalSocketHandlers(io, socket);
         registerProposalStationSocketHandlers(io, socket);
         registerStationSocketHandlers(io, socket);

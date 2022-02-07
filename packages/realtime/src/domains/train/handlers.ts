@@ -19,7 +19,7 @@ export function registerTrainSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
-    if (!socket.data.user) return;
+    if (!socket.data.user && !socket.data.robot) return;
 
     socket.on('trainsSubscribe', async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);
