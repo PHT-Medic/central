@@ -11,13 +11,5 @@ export function registerUserHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
-    if (!socket.data.user) return;
 
-    const { user } = socket.data;
-
-    socket.join(`users:${user.id}`);
-
-    socket.on('disconnect', () => {
-        socket.join(`users:${user.id}`);
-    });
 }
