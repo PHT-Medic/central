@@ -38,7 +38,7 @@
         "@types/dotenv": "^8.2.0",
         "@types/express": "^4.17.4",
         "@types/express-rate-limit": "^6.0.0",
-        "@types/node": "^17.0.15",
+        "@types/node": "^17.0.16",
         "@types/winston": "^2.4.4",
         "cross-env": "^7.0.3",
         "typescript": "^4.5.2"
