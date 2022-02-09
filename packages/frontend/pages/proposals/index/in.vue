@@ -8,8 +8,6 @@
 import {
     PermissionID,
     ProposalStationApprovalStatus,
-    getAPIStations,
-    getApiProposalStations,
 } from '@personalhealthtrain/ui-common';
 import ProposalInForm from '../../../components/domains/proposal/ProposalInForm';
 import ProposalStationStatus from '../../../components/domains/proposal-station/ProposalStationStatus';
@@ -95,7 +93,7 @@ export default {
          * @return {Promise<void>}
          */
         async init() {
-            const response = await getAPIStations({
+            const response = await this.$api.station.getMany({
                 filter: {
                     realm_id: this.user.realm_id,
                 },
@@ -119,7 +117,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await getApiProposalStations({
+                const response = await this.$api.proposalStation.getMany({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,

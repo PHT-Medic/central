@@ -10,6 +10,12 @@ import { ErrorCode, OAuth2TokenGrant, TokenAPI } from '@typescript-auth/domains'
 import { VaultAPI } from '../../vault-client';
 import { ROBOT_SECRET_ENGINE_KEY, ServiceID } from '../../../domains';
 
+let lastChecked : number | undefined;
+
+function canVerifyCredentials() {
+    return !lastChecked || (Date.now() - (30 * 1000)) > lastChecked;
+}
+
 export async function refreshAuthRobotTokenOnResponseError(err?: any) {
     const { config } = err;
 
@@ -21,27 +27,35 @@ export async function refreshAuthRobotTokenOnResponseError(err?: any) {
             err.response.data?.code === ErrorCode.TOKEN_EXPIRED
         )
     ) {
-        const response = await useClient<VaultAPI>('vault').keyValue
-            .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM);
+        if (canVerifyCredentials()) {
+            lastChecked = Date.now();
 
-        if (response) {
-            const tokenApi = new TokenAPI(useClient().driver);
+            try {
+                const response = await useClient<VaultAPI>('vault').keyValue
+                    .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM);
 
-            const token = await tokenApi.create({
-                id: response.data.id,
-                secret: response.data.secret,
-                grant_type: OAuth2TokenGrant.ROBOT_CREDENTIALS,
-            });
+                if (response) {
+                    const tokenApi = new TokenAPI(useClient().driver);
 
-            useClient().setAuthorizationHeader({
-                type: 'Bearer',
-                token: token.access_token,
-            });
+                    const token = await tokenApi.create({
+                        id: response.data.id,
+                        secret: response.data.secret,
+                        grant_type: OAuth2TokenGrant.ROBOT_CREDENTIALS,
+                    });
 
-            return useClient().request(config);
+                    useClient().setAuthorizationHeader({
+                        type: 'Bearer',
+                        token: token.access_token,
+                    });
+
+                    return await useClient().request(config);
+                }
+
+                useClient().unsetAuthorizationHeader();
+            } catch (e) {
+                useClient().unsetAuthorizationHeader();
+            }
         }
-
-        useClient().unsetAuthorizationHeader();
     }
 
     return Promise.reject(err);

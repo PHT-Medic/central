@@ -224,6 +224,7 @@ export const actions : ActionTree<AuthState, RootState> = {
             commit('loginRequest');
 
             try {
+                this.dispatch('triggerUnsetToken', { kind: OAuth2TokenKind.ACCESS });
                 const tokenPromise = this.$auth.getTokenWithRefreshToken(state.refreshToken);
 
                 commit('setTokenPromise', tokenPromise);
