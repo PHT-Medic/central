@@ -14,10 +14,10 @@ import {
     detectTrainBuildStatus,
     detectTrainRunStatus,
     generateTrainHash,
+    resetTrain,
     startBuildTrain,
     startTrain,
     stopBuildTrain,
-    stopTrain,
     triggerTrainResultStart, triggerTrainResultStatus, triggerTrainResultStop,
 } from '../../../../../domains/core/train/commands';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
@@ -80,8 +80,8 @@ export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: E
         case TrainCommand.RUN_START:
             entity = await startTrain(entity);
             break;
-        case TrainCommand.RUN_STOP:
-            entity = await stopTrain(entity);
+        case TrainCommand.RUN_RESET:
+            entity = await resetTrain(entity);
             break;
 
         // Result Service

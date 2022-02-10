@@ -85,13 +85,14 @@ export default {
         }"
     >
         <div
-            class="d-flex flex-column flex-grow-1 align-items-center"
+            class="d-flex flex-grow-1 align-items-center"
             style="flex-basis: 0"
             :class="{
-                'mb-2': listDirection === 'column'
+                'mb-2 flex-row': listDirection === 'column',
+                'flex-column': listDirection === 'row'
             }"
         >
-            <div>
+            <div class="mr-1">
                 <strong>1. Config</strong>
             </div>
             <div>
@@ -99,7 +100,7 @@ export default {
             </div>
             <div
                 v-if="withCommand"
-                class="mt-1"
+                class="ml-auto"
             >
                 <nuxt-link
                     v-if="canConfigure"
@@ -113,31 +114,22 @@ export default {
         </div>
 
         <div
-            class="d-flex flex-column flex-grow-1 align-items-center"
+            class="d-flex flex-grow-1 align-items-center"
             style="flex-basis: 0"
             :class="{
-                'mb-2': listDirection === 'column'
+                'mb-2 flex-row': listDirection === 'column',
+                'flex-column': listDirection === 'row'
             }"
         >
-            <div>
+            <div class="mr-1">
                 <strong>2. Build</strong>
             </div>
             <div>
                 Status: <train-build-status-text :status="entity.build_status" />
-                <train-build-command
-                    class="ml-1"
-                    :command="trainCommand.BUILD_STATUS"
-                    :element-type="'link'"
-                    :with-text="false"
-                    :with-icon="true"
-                    :train="entity"
-                    @done="handleUpdated"
-                    @failed="handleFailed"
-                />
             </div>
             <div
                 v-if="withCommand"
-                class="mt-1 flex-row d-flex"
+                class="ml-auto flex-row d-flex"
             >
                 <train-build-command
                     class="mr-1"
@@ -147,42 +139,48 @@ export default {
                     @done="handleUpdated"
                     @failed="handleFailed"
                 />
-                <train-build-command
-                    :command="trainCommand.BUILD_STOP"
-                    :with-icon="true"
-                    :train="entity"
-                    @done="handleUpdated"
-                    @failed="handleFailed"
-                />
+                <b-dropdown
+                    variant="dark"
+                    size="xs"
+                    html="<i class='fa fa-bars' />"
+                >
+                    <train-build-command
+                        :command="trainCommand.BUILD_STATUS"
+                        :element-type="'dropDownItem'"
+                        :with-icon="true"
+                        :train="entity"
+                        @done="handleUpdated"
+                        @failed="handleFailed"
+                    />
+                    <train-build-command
+                        :command="trainCommand.BUILD_STOP"
+                        :element-type="'dropDownItem'"
+                        :with-icon="true"
+                        :train="entity"
+                        @done="handleUpdated"
+                        @failed="handleFailed"
+                    />
+                </b-dropdown>
             </div>
         </div>
 
         <div
-            class="d-flex flex-column flex-grow-1 align-items-center"
+            class="d-flex flex-grow-1 align-items-center"
             style="flex-basis: 0"
             :class="{
-                'mb-2': listDirection === 'column'
+                'mb-2 flex-row justify-content-between': listDirection === 'column',
+                'flex-column': listDirection === 'row'
             }"
         >
-            <div>
+            <div class="mr-1">
                 <strong>3. Run</strong>
             </div>
             <div>
                 Status: <train-run-status-text :status="entity.run_status" />
-                <train-run-command
-                    class="ml-1"
-                    :command="trainCommand.RUN_STATUS"
-                    :with-text="false"
-                    :with-icon="true"
-                    :element-type="'link'"
-                    :train="entity"
-                    @done="handleUpdated"
-                    @failed="handleFailed"
-                />
             </div>
             <div
                 v-if="withCommand"
-                class="mt-1 flex-row d-flex"
+                class="ml-auto flex-row d-flex"
             >
                 <train-run-command
                     class="mr-1"
@@ -192,38 +190,49 @@ export default {
                     @done="handleUpdated"
                     @failed="handleFailed"
                 />
-                <train-run-command
-                    :command="trainCommand.RUN_STOP"
-                    :with-icon="true"
-                    :train="entity"
-                    @done="handleUpdated"
-                    @failed="handleFailed"
-                />
+                <b-dropdown
+                    id="dropdown-1"
+                    text="Dropdown Button"
+                    variant="dark"
+                    size="xs"
+                    html="<i class='fa fa-bars' />"
+                >
+                    <train-run-command
+                        :command="trainCommand.RUN_STATUS"
+                        :with-icon="true"
+                        :element-type="'dropDownItem'"
+                        :train="entity"
+                        @done="handleUpdated"
+                        @failed="handleFailed"
+                    />
+                    <train-run-command
+                        :command="trainCommand.RUN_RESET"
+                        :element-type="'dropDownItem'"
+                        :with-icon="true"
+                        :train="entity"
+                        @done="handleUpdated"
+                        @failed="handleFailed"
+                    />
+                </b-dropdown>
             </div>
         </div>
         <div
-            class="d-flex flex-column flex-grow-1 align-items-center"
+            class="d-flex flex-grow-1 align-items-center"
             style="flex-basis: 0"
+            :class="{
+                'flex-row': listDirection === 'column',
+                'flex-column': listDirection === 'row'
+            }"
         >
-            <div>
+            <div class="mr-1">
                 <strong>4. Result</strong>
             </div>
             <div>
                 Status: <train-result-status-text :status="entity.result_last_status" />
-                <train-result-command
-                    class="ml-1"
-                    :command="trainCommand.RESULT_STATUS"
-                    :with-text="false"
-                    :with-icon="true"
-                    :element-type="'link'"
-                    :train="entity"
-                    @done="handleUpdated"
-                    @failed="handleFailed"
-                />
             </div>
             <div
                 v-if="withCommand"
-                class="mt-1 flex-row d-flex"
+                class="ml-auto flex-row d-flex"
             >
                 <train-result-command
                     class="mr-1"
@@ -242,13 +251,28 @@ export default {
                     @done="handleUpdated"
                     @failed="handleFailed"
                 />
-                <train-result-command
-                    :command="trainCommand.RESULT_STOP"
-                    :with-icon="true"
-                    :train="entity"
-                    @done="handleUpdated"
-                    @failed="handleFailed"
-                />
+                <b-dropdown
+                    variant="dark"
+                    size="xs"
+                    html="<i class='fa fa-bars' />"
+                >
+                    <train-result-command
+                        :command="trainCommand.RESULT_STATUS"
+                        :with-icon="true"
+                        :element-type="'dropDownItem'"
+                        :train="entity"
+                        @done="handleUpdated"
+                        @failed="handleFailed"
+                    />
+                    <train-result-command
+                        :command="trainCommand.RESULT_STOP"
+                        :element-type="'dropDownItem'"
+                        :with-icon="true"
+                        :train="entity"
+                        @done="handleUpdated"
+                        @failed="handleFailed"
+                    />
+                </b-dropdown>
             </div>
         </div>
     </div>

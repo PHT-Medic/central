@@ -168,21 +168,21 @@ export default {
             </div>
         </div>
 
-        <train-stations-progress
-            v-if="extendView"
-            :train="train"
-        />
-
-        <div>
-            <hr>
-        </div>
+        <hr class="mt-1 mb-1">
 
         <train-pipeline
             :entity="train"
             :with-command="extendView"
+            :list-direction="extendView ? 'column' : 'row'"
             @updated="handleUpdated"
             @failed="handleFailed"
             @deleted="handleDeleted"
+        />
+
+        <train-stations-progress
+            class="mt-1 mb-1 "
+            :train="train"
+            :element-type="'progress-bar'"
         />
 
         <div class="train-card-footer">

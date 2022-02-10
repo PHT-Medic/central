@@ -28,30 +28,32 @@ export default {
 </script>
 
 <template>
-    <div class="row">
-        <div class="col-12 col-md-6">
-            <div class="panel-box mb-3">
-                <h6><i class="fa fa-list" /> Pipeline</h6>
+    <div>
+        <div class="panel-box mb-3">
+            <h6><i class="fa fa-city" /> <span class="text-info">{{ train.stations }}</span> Station(s)</h6>
 
-                <train-pipeline
-                    :entity="train"
-                    @updated="handleUpdated"
-                    @failed="handleFailed"
-                />
-            </div>
-
-            <div class="panel-box mb-3">
-                <h6><i class="fa fa-city" /> <span class="text-info">{{ train.stations }}</span> Station(s)</h6>
-
-                <train-stations-progress :train="train" />
-            </div>
+            <train-stations-progress :train="train" />
         </div>
-        <div class="col-12 col-md-6">
-            <div class="panel-box">
-                <h6><i class="fa fa-history" /> Logs</h6>
+        <div class="row">
+            <div class="col-12 col-md-5">
+                <div class="panel-box mb-3">
+                    <h6><i class="fa fa-list" /> Pipeline</h6>
 
-                <div class="alert alert-info alert-sm mb-0">
-                    Coming soon...
+                    <train-pipeline
+                        :list-direction="'column'"
+                        :entity="train"
+                        @updated="handleUpdated"
+                        @failed="handleFailed"
+                    />
+                </div>
+            </div>
+            <div class="col-12 col-md-7">
+                <div class="panel-box">
+                    <h6><i class="fa fa-history" /> Logs</h6>
+
+                    <div class="alert alert-info alert-sm mb-0">
+                        Coming soon...
+                    </div>
                 </div>
             </div>
         </div>

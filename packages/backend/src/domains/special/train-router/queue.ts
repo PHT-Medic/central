@@ -23,7 +23,7 @@ export type TrainRouterHarborEventPayload = {
 
 export enum TrainRouterCommand {
     START = 'startTrain',
-    STOP = 'stopTrain',
+    RESET = 'resetTrain',
 }
 
 export type TrainRouterCommandPayload = {

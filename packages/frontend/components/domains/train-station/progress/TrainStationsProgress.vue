@@ -24,6 +24,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        elementType: {
+            type: String,
+            default: 'steps',
+        },
     },
     data() {
         return {
@@ -35,6 +39,7 @@ export default {
             items: [],
             busy: false,
 
+            trainRunStatus: TrainRunStatus,
             trainStationStatic: TrainStationStatic,
             trainStationRunStatus: TrainStationRunStatus,
         };
@@ -162,6 +167,84 @@ export default {
 </script>
 <template>
     <div>
+        <template v-if="elementType === 'steps'">
+            <div class="d-flex flex-row justify-content-around position-relative">
+                <div class="icon-circle progress-step bg-dark text-light">
+                    <span class="icon">Incoming Station</span>
+                </div>
+                <template v-for="(item,key) in items">
+                    <div
+                        class="icon-circle progress-step text-light"
+                        :class="{
+                            'bg-dark': !item.run_status,
+                            'bg-success': item.run_status === trainStationRunStatus.DEPARTED,
+                            'bg-primary': item.run_status === trainStationRunStatus.ARRIVED
+                        }"
+                    >
+                        <span class="icon">Station {{ key + 1 }}</span>
+                    </div>
+                </template>
+                <div class="icon-circle progress-step bg-dark text-light">
+                    <span class="icon">Outgoing Station</span>
+                </div>
+            </div>
+            <div class="d-flex flex-row justify-content-around position-relative mt-1">
+                <div class="progress-step d-flex flex-column text-center">
+                    <div class="">
+                        <strong>Status</strong>
+                    </div>
+                    <div>
+                        <train-station-static-run-status-text
+                            :id="trainStationStatic.INCOMING"
+                            :train-build-status="train.build_status"
+                            :train-run-status="train.run_status"
+                            :train-run-station-index="train.run_station_index"
+                        />
+                    </div>
+                </div>
+                <template v-for="(item) in items">
+                    <div class="progress-step d-flex flex-column text-center">
+                        <div class="">
+                            <strong>Status</strong>
+                        </div>
+                        <div>
+                            <train-station-run-status-text :status="item.run_status" />
+                        </div>
+                    </div>
+                </template>
+                <div class="progress-step d-flex flex-column text-center">
+                    <div class="">
+                        <strong>Status</strong>
+                    </div>
+                    <div>
+                        <train-station-static-run-status-text
+                            :id="trainStationStatic.OUTGOING"
+                            :train-build-status="train.build_status"
+                            :train-run-status="train.run_status"
+                            :train-run-station-index="train.run_station_index"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-warning alert-sm mt-2 mb-0">
+                The displayed station order, doesn't correspond to the actual route of the train.
+            </div>
+        </template>
+        <template v-else>
+            <div class="progress bg-white">
+                <div
+                    class="progress-bar"
+                    :class="{
+                        'bg-dark': train.run_status !== trainRunStatus.FINISHED,
+                        'bg-success': train.run_status === trainRunStatus.FINISHED
+                    }"
+                    :style="{width: progressPercentage + '%'}"
+                    :aria-valuenow="progressPercentage"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                />
+            </div>
+        </template>
         <!--
         <div class="progress-with-circle">
             <div
@@ -171,64 +254,6 @@ export default {
             ></div>
         </div>
         -->
-        <div class="d-flex flex-row justify-content-around position-relative">
-            <div class="icon-circle progress-step bg-dark text-light">
-                <span class="icon">Incoming Station</span>
-            </div>
-            <template v-for="(item,key) in items">
-                <div
-                    class="icon-circle progress-step text-light"
-                    :class="{
-                        'bg-dark': !item.run_status,
-                        'bg-success': item.run_status === trainStationRunStatus.DEPARTED,
-                        'bg-primary': item.run_status === trainStationRunStatus.ARRIVED
-                    }"
-                >
-                    <span class="icon">Station {{ key + 1 }}</span>
-                </div>
-            </template>
-            <div class="icon-circle progress-step bg-dark text-light">
-                <span class="icon">Outgoing Station</span>
-            </div>
-        </div>
-        <div class="d-flex flex-row justify-content-around position-relative mt-1">
-            <div class="progress-step d-flex flex-column text-center">
-                <div class="">
-                    <strong>Status</strong>
-                </div>
-                <div>
-                    <train-station-static-run-status-text
-                        :id="trainStationStatic.INCOMING"
-                        :train-build-status="train.build_status"
-                        :train-run-status="train.run_status"
-                        :train-run-station-index="train.run_station_index"
-                    />
-                </div>
-            </div>
-            <template v-for="(item) in items">
-                <div class="progress-step d-flex flex-column text-center">
-                    <div class="">
-                        <strong>Status</strong>
-                    </div>
-                    <div>
-                        <train-station-run-status-text :status="item.run_status" />
-                    </div>
-                </div>
-            </template>
-            <div class="progress-step d-flex flex-column text-center">
-                <div class="">
-                    <strong>Status</strong>
-                </div>
-                <div>
-                    <train-station-static-run-status-text
-                        :id="trainStationStatic.OUTGOING"
-                        :train-build-status="train.build_status"
-                        :train-run-status="train.run_status"
-                        :train-run-station-index="train.run_station_index"
-                    />
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 <style>

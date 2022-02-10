@@ -11,7 +11,7 @@ export * from './build-status';
 export * from './run-status';
 export * from './generate-hash';
 export * from './run-start';
-export * from './run-stop';
+export * from './run-reset';
 export * from './result-start';
 export * from './result-stop';
 export * from './result-status';

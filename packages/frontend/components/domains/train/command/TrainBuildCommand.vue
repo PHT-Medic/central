@@ -78,7 +78,7 @@ export default {
                 case FrontendTrainCommand.BUILD_STOP:
                     return 'stop';
                 case FrontendTrainCommand.BUILD_STATUS:
-                    return 'status';
+                    return 'check';
                 default:
                     return '';
             }
@@ -86,11 +86,11 @@ export default {
         iconClass() {
             switch (this.command) {
                 case FrontendTrainCommand.BUILD_START:
-                    return 'fa fa-wrench';
+                    return 'fa fa-play';
                 case FrontendTrainCommand.BUILD_STOP:
                     return 'fa fa-stop';
                 case FrontendTrainCommand.BUILD_STATUS:
-                    return 'fas fa-search';
+                    return 'fas fa-shield-alt';
                 default:
                     return '';
             }

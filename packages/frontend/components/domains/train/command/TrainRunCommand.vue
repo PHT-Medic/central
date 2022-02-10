@@ -59,7 +59,7 @@ export default {
                 case FrontendTrainCommand.RUN_START:
                     return !this.train.run_status ||
                         [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.train.run_status) !== -1;
-                case FrontendTrainCommand.RUN_STOP:
+                case FrontendTrainCommand.RUN_RESET:
                     return this.train.run_status &&
                         [TrainRunStatus.STOPPED, TrainRunStatus.FINISHED].indexOf(this.train.run_status) === -1;
                 case FrontendTrainCommand.RUN_STATUS:
@@ -72,10 +72,10 @@ export default {
             switch (this.command) {
                 case FrontendTrainCommand.RUN_START:
                     return 'start';
-                case FrontendTrainCommand.RUN_STOP:
-                    return 'stop';
+                case FrontendTrainCommand.RUN_RESET:
+                    return 'reset';
                 case FrontendTrainCommand.RUN_STATUS:
-                    return 'status';
+                    return 'check';
                 default:
                     return '';
             }
@@ -84,10 +84,10 @@ export default {
             switch (this.command) {
                 case FrontendTrainCommand.RUN_START:
                     return 'fa fa-play';
-                case FrontendTrainCommand.RUN_STOP:
-                    return 'fa fa-stop';
+                case FrontendTrainCommand.RUN_RESET:
+                    return 'fa-solid fa-retweet';
                 case FrontendTrainCommand.RUN_STATUS:
-                    return 'fas fa-search';
+                    return 'fas fa-shield-alt';
                 default:
                     return '';
             }
@@ -96,7 +96,7 @@ export default {
             switch (this.command) {
                 case FrontendTrainCommand.RUN_START:
                     return 'success';
-                case FrontendTrainCommand.RUN_STOP:
+                case FrontendTrainCommand.RUN_RESET:
                     return 'danger';
                 case FrontendTrainCommand.RUN_STATUS:
                     return 'primary';

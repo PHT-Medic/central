@@ -85,7 +85,7 @@ export default {
                 case FrontendTrainCommand.RESULT_STOP:
                     return 'stop';
                 case FrontendTrainCommand.RESULT_STATUS:
-                    return 'status';
+                    return 'check';
                 default:
                     return '';
             }
@@ -99,7 +99,7 @@ export default {
                 case FrontendTrainCommand.RESULT_STOP:
                     return 'fa fa-stop';
                 case FrontendTrainCommand.RESULT_STATUS:
-                    return 'fas fa-search';
+                    return 'fas fa-shield-alt';
                 default:
                     return '';
             }

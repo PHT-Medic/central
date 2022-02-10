@@ -5,21 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export enum FrontendTrainCommand {
-    BUILD_START = 'buildStart',
-    BUILD_STOP = 'buildStop',
-    BUILD_STATUS = 'buildStatus',
+import { TrainCommand } from '@personalhealthtrain/ui-common';
 
-    RUN_STATUS = 'runStatus',
-    RUN_START = 'runStart',
-    RUN_STOP = 'runStop',
-
-    RESULT_STATUS = 'resultStatus',
-    RESULT_START = 'resultStart',
-    RESULT_STOP = 'resultStop',
-
-    // special command
+export enum SpecialTrainCommand {
     RESULT_DOWNLOAD = 'resultDownload',
-
-    GENERATE_HASH = 'generateHash',
 }
+
+export const FrontendTrainCommand = {
+    ...TrainCommand,
+    ...SpecialTrainCommand,
+};

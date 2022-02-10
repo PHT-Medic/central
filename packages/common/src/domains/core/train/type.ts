@@ -16,7 +16,7 @@ export enum TrainCommand {
     BUILD_STATUS = 'buildStatus',
 
     RUN_START = 'runStart',
-    RUN_STOP = 'runStop',
+    RUN_RESET = 'runReset',
     RUN_STATUS = 'runStatus',
 
     RESULT_STATUS = 'resultStatus',

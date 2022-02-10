@@ -8,26 +8,25 @@
 import { Train, TrainRunStatus } from '@personalhealthtrain/ui-common';
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
+import { BadRequestError } from '@typescript-error/http';
 import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../special/train-router';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 
-export async function stopTrain(train: Train | number | string) : Promise<Train> {
+export async function resetTrain(train: Train | number | string) : Promise<Train> {
     const repository = getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 
     if (typeof train === 'undefined') {
-        // todo: make it a ClientError.BadRequest
-        throw new Error('The train could not be found.');
+        throw new BadRequestError('The train could not be found.');
     }
 
     if (train.run_status === TrainRunStatus.FINISHED) {
-        // todo: make it a ClientError.BadRequest
-        throw new Error('The train has already been terminated...');
+        throw new BadRequestError('The train has already been terminated...');
     } else {
         if (train.run_status !== TrainRunStatus.STOPPING) {
-            const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.STOP, { train_id: train.id });
+            const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.RESET, { train_id: train.id });
 
             await publishMessage(queueMessage);
         }
