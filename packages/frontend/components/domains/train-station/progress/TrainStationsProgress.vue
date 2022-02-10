@@ -250,7 +250,6 @@ export default {
                     aria-valuemax="100"
                 />
             </div>
-            {{ train }}
         </template>
         <!--
         <div class="progress-with-circle">
