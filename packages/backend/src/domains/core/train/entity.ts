@@ -145,7 +145,7 @@ export class TrainEntity implements Train {
         run_status: TrainRunStatus | null;
 
     @Column({
-        nullable: true, default: null,
+        type: 'uuid', nullable: true, default: null,
     })
         run_station_id: Station['id'] | null;
 
