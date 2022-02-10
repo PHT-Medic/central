@@ -58,10 +58,11 @@ export default {
                 if (this.train.run_status === TrainRunStatus.FINISHED) {
                     return 100;
                 }
+
                 return 100 * (1 / total);
             }
 
-            return 100 * ((this.train.run_station_index + 1) / total);
+            return 100 * ((this.train.run_station_index + 1) / (total - 2));
         },
         direction() {
             return this.train.realm_id === this.$store.getters['auth/userRealmId'] ?
@@ -156,8 +157,9 @@ export default {
                 this.meta = response.meta;
                 this.items = response.data;
             } catch (e) {
-                console.log(e);
-                this.$emit('failed', e);
+                if (e instanceof Error) {
+                    this.$emit('failed', e);
+                }
             }
 
             this.busy = false;
@@ -174,6 +176,7 @@ export default {
                 </div>
                 <template v-for="(item,key) in items">
                     <div
+                        :key="item.id"
                         class="icon-circle progress-step text-light"
                         :class="{
                             'bg-dark': !item.run_status,
@@ -203,7 +206,10 @@ export default {
                     </div>
                 </div>
                 <template v-for="(item) in items">
-                    <div class="progress-step d-flex flex-column text-center">
+                    <div
+                        :key="item.id"
+                        class="progress-step d-flex flex-column text-center"
+                    >
                         <div class="">
                             <strong>Status</strong>
                         </div>
@@ -244,6 +250,7 @@ export default {
                     aria-valuemax="100"
                 />
             </div>
+            {{ train }}
         </template>
         <!--
         <div class="progress-with-circle">

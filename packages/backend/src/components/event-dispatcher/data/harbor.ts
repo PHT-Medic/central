@@ -56,9 +56,10 @@ export async function extendDispatcherHarborData(message: Message) : Promise<Mes
 
         // -----
 
-        const passedEntities = entities.filter((entity) => entity.run_status &&
-            entity.run_status === TrainStationRunStatus.DEPARTED);
-        data.stationIndex = passedEntities.length; // length - 1 + 1
+        const passedEntities = entities.filter((entity) => !!entity.run_status);
+        if (passedEntities.length > 0) {
+            data.stationIndex = passedEntities.length - 1; // length - 1 + 1}
+        }
 
         message.data = data;
     }
