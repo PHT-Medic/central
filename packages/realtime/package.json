@@ -23,7 +23,7 @@
         "cors": "^2.8.5",
         "dotenv": "^16.0.0",
         "express": "^4.17.1",
-        "express-rate-limit": "^5.5.1",
+        "express-rate-limit": "^6.2.1",
         "node-cron": "^3.0.0",
         "redis-extension": "^1.0.0-4",
         "reflect-metadata": "^0.1.13",
