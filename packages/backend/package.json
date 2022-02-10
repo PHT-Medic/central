@@ -7,7 +7,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "1.1.0-alpha.14",
+    "version": "1.1.0-alpha.15",
     "description": "This package contains the Central UI backend application of PHT. It was initially developed as part of my Bachelor Thesis.",
     "main": "./dist/index.js",
     "dependencies": {
