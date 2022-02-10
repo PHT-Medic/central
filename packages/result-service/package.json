@@ -6,7 +6,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "1.1.0-alpha.14",
+    "version": "1.1.0-alpha.17",
     "description": "This project contains the Central UI Result Service of PHT.",
     "main": "dist/index.js",
     "scripts": {
@@ -18,7 +18,7 @@
         "build": "rm -rf ./dist && tsc -p tsconfig.build.json"
     },
     "dependencies": {
-        "@personalhealthtrain/ui-common": "^1.1.0-alpha.14",
+        "@personalhealthtrain/ui-common": "^1.1.0-alpha.17",
         "@trapi/client": "2.0.4",
         "@typescript-auth/domains": "^0.0.22",
         "@typescript-auth/server-adapter": "^0.0.19",
