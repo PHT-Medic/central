@@ -27,6 +27,17 @@ export async function runUserSecretValidation(
         throw new BadRequestError('User secrets are immutable and can not be changed in this environment.');
     }
 
+    const keyChain = check('key')
+        .isLength({ min: 3, max: 128 });
+
+    if (operation === 'update') {
+        keyChain.optional();
+    }
+
+    await keyChain.run(req);
+
+    // ----------------------------------------------
+
     const contentChain = check('content')
         .isLength({ min: 3, max: 8192 });
 

@@ -6,8 +6,6 @@
  */
 
 import {
-    BeforeInsert,
-    BeforeUpdate,
     Column,
     CreateDateColumn,
     Entity,
@@ -30,19 +28,8 @@ export class UserSecretEntity implements UserSecret {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
-    @Column({ type: 'varchar', length: 100 })
+    @Column({ type: 'varchar', length: 128 })
         key: string;
-
-    @BeforeUpdate()
-    @BeforeInsert()
-    setKey() {
-        switch (this.type) {
-            case SecretType.PAILLIER_PUBLIC_KEY:
-            case SecretType.RSA_PUBLIC_KEY:
-                this.key = this.type;
-                break;
-        }
-    }
 
     @Column({ type: 'enum', enum: SecretType })
         type: SecretType;

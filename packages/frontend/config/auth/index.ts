@@ -266,8 +266,6 @@ class AuthModule {
         });
 
         const interceptor = (error: any) => {
-            if (typeof this.ctx === 'undefined') return;
-
             if (
                 error &&
                 error.response &&
@@ -275,7 +273,7 @@ class AuthModule {
             ) {
                 // Refresh the access accessToken
                 try {
-                    this.ctx.store.dispatch('auth/triggerRefreshToken')
+                    return this.ctx.store.dispatch('auth/triggerRefreshToken')
                         .then(() => createClient().request({
                             method: error.config.method,
                             url: error.config.url,
@@ -283,12 +281,10 @@ class AuthModule {
                         }));
                 } catch (e) {
                     this.ctx.redirect('/logout');
-
-                    throw error;
                 }
-
-                throw error;
             }
+
+            return Promise.reject(error);
         };
 
         this.responseInterceptorId = this.ctx.$api

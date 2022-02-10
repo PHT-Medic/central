@@ -29,6 +29,7 @@ export default {
     data() {
         return {
             formData: {
+                key: '',
                 type: '',
                 content: '',
             },
@@ -44,6 +45,11 @@ export default {
     },
     validations: {
         formData: {
+            key: {
+                required,
+                minLength: minLength(3),
+                maxLength: maxLength(128),
+            },
             content: {
                 required,
                 minLength: minLength(3),
@@ -56,7 +62,8 @@ export default {
     },
     computed: {
         isEditing() {
-            return typeof this.entityProperty?.id === 'number';
+            return this.entityProperty &&
+                Object.prototype.hasOwnProperty.call(this.entityProperty, 'id');
         },
     },
     created() {
@@ -75,6 +82,11 @@ export default {
                     switch (keys[i]) {
                         case 'type':
                             this.formData[keys[i]] = SecretType.RSA_PUBLIC_KEY;
+                            this.handleTypeChanged({
+                                target: {
+                                    value: this.formData[keys[i]],
+                                },
+                            });
                             break;
                         default:
                             this.formData[keys[i]] = '';
@@ -143,6 +155,18 @@ export default {
 
             this.busy = false;
         },
+
+        handleTypeChanged(e) {
+            if (
+                this.formData.key &&
+                this.formData.key !== SecretType.PAILLIER_PUBLIC_KEY &&
+                this.formData.key !== SecretType.RSA_PUBLIC_KEY
+            ) {
+                return;
+            }
+
+            this.formData.key = e.target.value;
+        },
     },
 };
 </script>
@@ -153,12 +177,13 @@ export default {
         <div>
             <div
                 class="form-group"
-                :class="{ 'form-group-error': $v.formData.content.$error }"
+                :class="{ 'form-group-error': $v.formData.type.$error }"
             >
                 <label>Type</label>
                 <select
                     v-model="formData.type"
                     class="form-control"
+                    @change.prevent="handleTypeChanged"
                 >
                     <option value="">
                         ---Select---
@@ -171,6 +196,39 @@ export default {
                         {{ item.name }}
                     </option>
                 </select>
+            </div>
+
+            <div
+                class="form-group"
+                :class="{ 'form-group-error': $v.formData.key.$error }"
+            >
+                <label>Key</label>
+                <input
+                    v-model="$v.formData.key.$model"
+                    type="text"
+                    name="name"
+                    class="form-control"
+                    placeholder="..."
+                >
+
+                <div
+                    v-if="!$v.formData.key.required"
+                    class="form-group-hint group-required"
+                >
+                    Please enter a key.
+                </div>
+                <div
+                    v-if="!$v.formData.key.minLength"
+                    class="form-group-hint group-required"
+                >
+                    The length of the key must be greater than <strong>{{ $v.formData.key.$params.minLength.min }}</strong> characters.
+                </div>
+                <div
+                    v-if="!$v.formData.key.maxLength"
+                    class="form-group-hint group-required"
+                >
+                    The length of the key must be less than<strong>{{ $v.formData.key.$params.maxLength.max }}</strong> characters.
+                </div>
             </div>
 
             <hr>
