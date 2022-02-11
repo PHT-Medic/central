@@ -7,10 +7,10 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "1.1.0-alpha.17",
+    "version": "1.1.0-alpha.19",
     "description": "This package contains the Central UI realtime application of PHT.",
     "dependencies": {
-        "@personalhealthtrain/ui-common": "^1.1.0-alpha.17",
+        "@personalhealthtrain/ui-common": "^1.1.0-alpha.19",
         "@socket.io/redis-adapter": "^7.1.0",
         "@trapi/client": "^2.0.4",
         "@typescript-auth/domains": "^0.0.22",
