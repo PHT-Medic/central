@@ -26,7 +26,7 @@ export async function resetTrain(train: Train | number | string) : Promise<Train
         throw new BadRequestError('The train has already been terminated...');
     } else {
         if (train.run_status !== TrainRunStatus.STOPPING) {
-            const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.RESET, { train_id: train.id });
+            const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.RESET, { id: train.id });
 
             await publishMessage(queueMessage);
         }

@@ -27,7 +27,7 @@ export enum TrainRouterCommand {
 }
 
 export type TrainRouterCommandPayload = {
-    train_id: string
+    id: string
 };
 
 // -------------------------------------------
