@@ -14,7 +14,7 @@
     ],
     "devDependencies": {
         "@tada5hi/eslint-config-vue-typescript": "^0.0.25",
-        "eslint": "^8.5.0",
+        "eslint": "^8.9.0",
         "lerna": "^4.0.0"
     },
     "scripts": {
