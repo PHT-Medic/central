@@ -26,7 +26,7 @@
         "@trapi/query": "^2.0.5",
         "@types/moment": "^2.13.0",
         "@types/vuelidate": "^0.7.13",
-        "@typescript-auth/domains": "^0.0.22",
+        "@typescript-auth/domains": "^0.0.24",
         "@typescript-error/core": "^1.1.2",
         "babel-eslint": "^10.1.0",
         "bootstrap": "^4.5.3",
