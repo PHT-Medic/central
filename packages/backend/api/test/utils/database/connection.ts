@@ -19,7 +19,7 @@ import { buildRobotAggregator } from '../../../src/aggregators/robot';
 
 async function createConnectionOptions() {
     return {
-        ...await buildConnectionOptions({ buildForCommand: true }),
+        ...await buildConnectionOptions({ buildForCommand: false }),
         database: 'test',
     } as ConnectionWithSeederOptions;
 }

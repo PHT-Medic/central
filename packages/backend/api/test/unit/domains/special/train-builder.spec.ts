@@ -45,6 +45,7 @@ describe('src/domains/train-builder', () => {
 
         const userSecretRepository = getRepository(UserSecretEntity);
         const userRsaSecret = userSecretRepository.create({
+            key: SecretType.RSA_PUBLIC_KEY,
             type: SecretType.RSA_PUBLIC_KEY,
             content: 'foo',
             user_id: user.id,
@@ -52,6 +53,7 @@ describe('src/domains/train-builder', () => {
         });
 
         const userPaillierSecret = userSecretRepository.create({
+            key: SecretType.PAILLIER_PUBLIC_KEY,
             type: SecretType.PAILLIER_PUBLIC_KEY,
             content: 'bar',
             user_id: user.id,

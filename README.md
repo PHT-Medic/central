@@ -42,8 +42,8 @@ Read the `Readme.md` in each package directory and configure each package indivi
 
 ## Packages
 
-### @personalhealthtrain/ui-backend 🌠
-[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-backend.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-backend)
+### @personalhealthtrain/central-api 🌠
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-api.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-api)
 
 This repository contains the backend application with REST API, aggregators, components and many more.
 
@@ -52,33 +52,33 @@ This repository contains the backend application with REST API, aggregators, com
 
 This repository contains common constants, functions, types, ... of the Personal Health Train (PHT) UI.
 
-### @personalhealthtrain/ui-frontend 🍭
+### @personalhealthtrain/central-ui 🍭
 
-[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-frontend.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-frontend)
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-ui.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-ui)
 
 This repository contains the frontend application.
 
 
-### @personalhealthtrain/ui-realtime 🌠
+### @personalhealthtrain/central-realtime 🌠
 
-[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-realtime.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-realtime)
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-realtime.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-realtime)
 
 This repository contains the realtime application which connects the backend application with socket based clients.
 
-### @personalhealthtrain/ui-result-service 🏭
+### @personalhealthtrain/central-result 🏭
 
-[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-result-service.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-result-service)
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-result.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-result)
 
 This repository contains the Result Service of the Personal Health Train.
 
 ## Usage
-Start the frontend-, backend-, & realtime-application in a single terminal window (or as background process) with the following command:
+Start the ui-, api-, & realtime-application in a single terminal window (or as background process) with the following command:
 ```shell
-$ npm run backend
+$ npm run api
 ```
 
 ```shell
-$ npm run frontend
+$ npm run ui
 ```
 
 ```shell
@@ -86,7 +86,7 @@ $ npm run realtime
 ```
 
 ```shell
-$ npm run result-service
+$ npm run result
 ```
 
 ## Credits

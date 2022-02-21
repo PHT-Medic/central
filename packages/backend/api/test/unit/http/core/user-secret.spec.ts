@@ -29,6 +29,7 @@ describe('src/controllers/core/user-secret', () => {
     });
 
     const details : Partial<UserSecret> = {
+        key: SecretType.RSA_PUBLIC_KEY,
         content: 'foo-bar-baz',
         type: SecretType.RSA_PUBLIC_KEY,
     };
