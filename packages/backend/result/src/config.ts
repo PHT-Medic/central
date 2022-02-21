@@ -2,7 +2,7 @@ import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/c
 import {
     VaultAPI,
     refreshAuthRobotTokenOnResponseError,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import https from 'https';

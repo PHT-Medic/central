@@ -16,7 +16,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Station, createNanoID } from '@personalhealthtrain/ui-common';
+import { Station, createNanoID } from '@personalhealthtrain/central-common';
 import { RealmEntity } from '@typescript-auth/server';
 import { Realm } from '@typescript-auth/domains';
 import { TrainStationEntity } from '../train-station/entity';

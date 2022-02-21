@@ -13,7 +13,7 @@ import {
 
     buildRegistryStationProjectName,
     isRegistryStationProjectName,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { DispatcherHarborEventData } from '../../../domains/special/registry/queue';
 import { TrainStationEntity } from '../../../domains/core/train-station/entity';
 

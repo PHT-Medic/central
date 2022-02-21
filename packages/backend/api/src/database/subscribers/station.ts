@@ -8,7 +8,7 @@
 import {
     EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
-import { buildSocketRealmNamespaceName, buildSocketStationRoomName } from '@personalhealthtrain/ui-common';
+import { buildSocketRealmNamespaceName, buildSocketStationRoomName } from '@personalhealthtrain/central-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
 import { StationEntity } from '../../domains/core/station/entity';
 

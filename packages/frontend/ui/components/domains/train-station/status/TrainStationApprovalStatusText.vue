@@ -16,7 +16,7 @@
 </template>
 <script>
 
-import { TrainStationApprovalStatus } from '@personalhealthtrain/ui-common';
+import { TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
 
 export default {
     props: {

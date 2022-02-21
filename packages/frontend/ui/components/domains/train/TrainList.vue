@@ -7,7 +7,7 @@
 <script>
 import {
     buildSocketTrainRoomName, mergeDeep,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import Vue from 'vue';
 import AlertMessage from '../../alert/AlertMessage';
 import Pagination from '../../Pagination';

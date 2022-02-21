@@ -6,7 +6,7 @@
   -->
 <script>
 
-import { SecretType } from '@personalhealthtrain/ui-common';
+import { SecretType } from '@personalhealthtrain/central-common';
 import UserSecretList from '../user-secret/UserSecretList';
 
 export default {

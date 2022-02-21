@@ -7,7 +7,7 @@
 
 import {
     TrainResult,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 
 import {
     Controller, Delete, Get, Params, Request, Response,

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
 import { ExpressRequest, ExpressResponse } from '../../../../type';

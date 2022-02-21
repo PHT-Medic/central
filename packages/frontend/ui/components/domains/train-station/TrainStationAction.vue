@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { TrainStationApprovalStatus } from '@personalhealthtrain/ui-common';
+import { TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { BDropdownItem } from 'bootstrap-vue';
 
 export default {

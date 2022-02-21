@@ -5,7 +5,7 @@ import {
     VaultAPI,
     buildRegistryStationProjectName,
     isHex,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
 import { useClient } from '@trapi/client';

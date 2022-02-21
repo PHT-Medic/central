@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainCommand } from '@personalhealthtrain/ui-common';
+import { TrainCommand } from '@personalhealthtrain/central-common';
 
 export enum SpecialTrainCommand {
     RESULT_DOWNLOAD = 'resultDownload',

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainConfigurationStatus } from '@personalhealthtrain/ui-common';
+import { Train, TrainConfigurationStatus } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import crypto from 'crypto';
 import fs from 'fs';

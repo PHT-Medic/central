@@ -10,7 +10,7 @@ import {
     TrainResult,
     TrainResultStatus,
     hasOwnProperty,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { Message, consumeQueue } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import { ResultServiceDataPayload } from '../domains/special/result-service';

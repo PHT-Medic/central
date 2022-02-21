@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainType } from '@personalhealthtrain/ui-common';
+import { Train, TrainType } from '@personalhealthtrain/central-common';
 import { SuperTest, Test } from 'supertest';
 import { MASTER_REALM_ID } from '@typescript-auth/domains';
 import { randomBytes } from 'crypto';

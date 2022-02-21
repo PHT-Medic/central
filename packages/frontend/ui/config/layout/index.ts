@@ -6,7 +6,7 @@
  */
 
 import { NavigationComponentConfig } from 'vue-layout-navigation';
-import { PermissionID } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from './contants';
 
 export const LayoutTopNavigation : NavigationComponentConfig[] = [

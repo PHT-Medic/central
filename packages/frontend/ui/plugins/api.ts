@@ -12,7 +12,7 @@ import { Context } from '@nuxt/types';
 import https from 'https';
 import { Inject } from '@nuxt/types/app';
 import { HTTPClient as AuthHTTPClient } from '@typescript-auth/domains';
-import { HTTPClient } from '@personalhealthtrain/ui-common';
+import { HTTPClient } from '@personalhealthtrain/central-common';
 
 export default (ctx: Context, inject : Inject) => {
     let apiUrl : string | undefined;

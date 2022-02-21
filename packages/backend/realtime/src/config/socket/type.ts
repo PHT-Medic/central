@@ -9,7 +9,7 @@ import {
     SocketClientToServerEvents,
     SocketInterServerEvents,
     SocketServerToClientEvents,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import {
     AbilityManager, PermissionItem, Realm, Robot, User,
 } from '@typescript-auth/domains';

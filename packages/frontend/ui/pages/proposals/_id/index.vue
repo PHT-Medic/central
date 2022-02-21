@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { ProposalStationApprovalStatus } from '@personalhealthtrain/ui-common';
+import { ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {

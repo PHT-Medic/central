@@ -7,7 +7,7 @@
 
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
-import { Train } from '@personalhealthtrain/ui-common';
+import { Train } from '@personalhealthtrain/central-common';
 import { buildTrainBuilderQueueMessage } from '../../../special/train-builder/queue';
 import { TrainBuilderCommand } from '../../../special/train-builder/type';
 import { findTrain } from './utils';

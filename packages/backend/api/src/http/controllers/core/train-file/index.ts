@@ -7,7 +7,7 @@
 
 import {
     TrainFile,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import {
     Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';

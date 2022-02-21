@@ -7,7 +7,7 @@
 <script>
 import {
     mergeDeep,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import Vue from 'vue';
 import Pagination from '../../../Pagination';
 

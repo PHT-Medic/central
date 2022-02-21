@@ -16,7 +16,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { RealmEntity, UserEntity } from '@typescript-auth/server';
-import { SecretType, UserSecret } from '@personalhealthtrain/ui-common';
+import { SecretType, UserSecret } from '@personalhealthtrain/central-common';
 import { Realm, User } from '@typescript-auth/domains';
 
 @Unique('keyUserId', [

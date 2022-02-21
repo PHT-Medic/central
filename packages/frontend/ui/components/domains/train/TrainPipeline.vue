@@ -11,7 +11,7 @@ import {
     TrainConfigurationStatus,
     TrainResultStatus,
     TrainRunStatus,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import TrainResultCommand from './command/TrainResultCommand';
 import TrainBuildStatusText from './status/TrainBuildStatusText';
 import TrainBuildCommand from './command/TrainBuildCommand';

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 
 export function getPermissions() : string[] {
     return Object.values(PermissionID);

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train } from '@personalhealthtrain/ui-common';
+import { Train } from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../special/result-service';

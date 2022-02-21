@@ -12,7 +12,7 @@ import {
 
 import {
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
 import { useLogger } from '../../../../../../config/log';
 import { DispatcherHarborEventType, buildDispatcherHarborEvent } from '../../../../../../domains/special/registry/queue';

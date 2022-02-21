@@ -12,7 +12,7 @@ import {
     TrainStationStatic,
     buildSocketTrainStationInRoomName,
     buildSocketTrainStationOutRoomName,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import TrainStationRunStatusText from '../status/TrainStationRunStatusText';
 import TrainStationStaticRunStatusText from '../status/TrainStationStaticRunStatusText';
 

@@ -12,7 +12,7 @@ import {
     DatabaseRootSeeder, setEntitiesForConnectionOptions,
 } from '@typescript-auth/server';
 import { useConfig } from '@typescript-auth/server/dist/config';
-import { PermissionKey } from '@personalhealthtrain/ui-common';
+import { PermissionKey } from '@personalhealthtrain/central-common';
 
 interface SeedCheckArguments extends Arguments {
 

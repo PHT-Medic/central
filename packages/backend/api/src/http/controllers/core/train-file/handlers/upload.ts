@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, TrainFile } from '@personalhealthtrain/ui-common';
+import { PermissionID, TrainFile } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import BusBoy from 'busboy';
 import path from 'path';

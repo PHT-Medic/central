@@ -15,7 +15,7 @@ import {
     RoleRepository,
     useRobotEventEmitter,
 } from '@typescript-auth/server';
-import { ServiceID } from '@personalhealthtrain/ui-common';
+import { ServiceID } from '@personalhealthtrain/central-common';
 import { MASTER_REALM_ID, createNanoID } from '@typescript-auth/domains';
 import { PHTStationRole, getPHTStationRolePermissions } from '../../config/pht/permissions/station';
 import { StationEntity } from '../../domains/core/station/entity';

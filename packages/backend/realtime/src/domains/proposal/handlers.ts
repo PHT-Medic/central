@@ -10,7 +10,7 @@ import {
     buildSocketProposalRoomName,
     extendSocketClientToServerEventCallback,
     extendSocketClientToServerEventContext,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@typescript-error/http';
 import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
 import { decrSocketRoomConnections, incrSocketRoomConnections } from '../../config/socket/utils';

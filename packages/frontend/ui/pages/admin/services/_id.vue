@@ -6,7 +6,7 @@
   -->
 <script>
 import Vue from 'vue';
-import { ServiceID } from '@personalhealthtrain/ui-common';
+import { ServiceID } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 const services = Object.values(ServiceID);

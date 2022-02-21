@@ -7,7 +7,7 @@
 
 import { check, matchedData, validationResult } from 'express-validator';
 import { ScanResult } from 'docker-scan';
-import { ServiceID } from '@personalhealthtrain/ui-common';
+import { ServiceID } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@typescript-error/http';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
 import { ExpressValidationError } from '../../../../../express-validation';

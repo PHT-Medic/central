@@ -10,7 +10,7 @@ import {
     SocketClientToServerEvents,
     SocketServerToClientEvents,
     buildSocketRealmNamespaceName,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { BaseError } from '@typescript-error/core';
 import { Manager, ManagerOptions, Socket } from 'socket.io-client';
 import { AuthBrowserStorageKey } from '../auth/constants';

@@ -6,7 +6,7 @@
  */
 
 import { Group, Image } from 'docker-scan';
-import { MasterImage, MasterImageGroup } from '@personalhealthtrain/ui-common';
+import { MasterImage, MasterImageGroup } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { MasterImageEntity } from '../../../../../../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../../../../../../domains/core/master-image-group/entity';

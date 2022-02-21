@@ -13,7 +13,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { MasterImage } from '@personalhealthtrain/ui-common';
+import { MasterImage } from '@personalhealthtrain/central-common';
 
 @Entity({ name: 'master_images' })
 export class MasterImageEntity implements MasterImage {

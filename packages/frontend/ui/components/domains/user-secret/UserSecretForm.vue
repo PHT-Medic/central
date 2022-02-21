@@ -7,7 +7,7 @@
 <script>
 import {
     SecretType,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 
 import AlertMessage from '../../alert/AlertMessage';

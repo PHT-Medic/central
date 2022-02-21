@@ -11,7 +11,7 @@ import {
     REGISTRY_INCOMING_PROJECT_NAME, REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME, RegistryCommand,
     ServiceID,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import MasterImageList from '../../master-image/MasterImageList';
 
 export default {

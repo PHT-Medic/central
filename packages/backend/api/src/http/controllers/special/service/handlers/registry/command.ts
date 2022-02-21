@@ -8,7 +8,7 @@
 import { body, matchedData, validationResult } from 'express-validator';
 import {
     PermissionID, RegistryCommand,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import {
     ForbiddenError,
 } from '@typescript-error/http';

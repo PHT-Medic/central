@@ -4,7 +4,7 @@ import {
     applyFields, applyFilters, applyPagination, applyRelations, applySort,
 } from 'typeorm-extension';
 import { NotFoundError } from '@typescript-error/http';
-import { PermissionID } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
 

@@ -6,7 +6,7 @@
  */
 
 import { check, validationResult } from 'express-validator';
-import { isProposalStationApprovalStatus } from '@personalhealthtrain/ui-common';
+import { isProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';

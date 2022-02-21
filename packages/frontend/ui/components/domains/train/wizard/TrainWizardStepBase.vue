@@ -9,7 +9,7 @@ import {
     ProposalStationApprovalStatus,
     buildSocketTrainStationInRoomName,
     buildSocketTrainStationOutRoomName,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { minLength, required } from 'vuelidate/lib/validators';
 import ProposalStationList from '../../proposal-station/ProposalStationList';
 import MasterImagePicker from '../../master-image/MasterImagePicker';

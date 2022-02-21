@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MasterImageGroup } from '@personalhealthtrain/ui-common';
+import { MasterImageGroup } from '@personalhealthtrain/central-common';
 
 import {
     Controller, Delete, Get, Params, Request, Response,

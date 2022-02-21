@@ -7,7 +7,7 @@
 
 import {
     MasterImage, Station, Train, UserSecret,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { User } from '@typescript-auth/domains';
 
 export enum TrainBuilderCommand {

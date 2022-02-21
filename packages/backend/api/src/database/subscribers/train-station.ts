@@ -13,7 +13,7 @@ import {
     buildSocketTrainStationInRoomName,
     buildSocketTrainStationOutRoomName,
     buildSocketTrainStationRoomName,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
 import { TrainStationEntity } from '../../domains/core/train-station/entity';
 

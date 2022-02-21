@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, UserSecret } from '@personalhealthtrain/ui-common';
+import { PermissionID, UserSecret } from '@personalhealthtrain/central-common';
 import { NotFoundError } from '@typescript-error/http';
 import { FindConditions, getRepository } from 'typeorm';
 import { publishMessage } from 'amqp-extension';

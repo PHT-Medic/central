@@ -6,7 +6,7 @@
   -->
 <script>
 import Vue from 'vue';
-import { mergeDeep } from '@personalhealthtrain/ui-common';
+import { mergeDeep } from '@personalhealthtrain/central-common';
 import Pagination from '../../../Pagination';
 
 export default {

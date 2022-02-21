@@ -8,7 +8,7 @@
 import {
     PermissionID,
     ProposalStationApprovalStatus,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import ProposalInForm from '../../../components/domains/proposal/ProposalInForm';
 import ProposalStationStatus from '../../../components/domains/proposal-station/ProposalStationStatus';
 import Pagination from '../../../components/Pagination';

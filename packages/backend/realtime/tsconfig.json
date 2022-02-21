@@ -2,7 +2,7 @@
     "extends": "../../../tsconfig.json",
     "compilerOptions": {
         "paths": {
-            "@personalhealthtrain/ui-common": [
+            "@personalhealthtrain/central-common": [
                 "./packages/shared/common/src"
             ]
         }

@@ -15,7 +15,7 @@
     </span>
 </template>
 <script>
-import { ProposalStationApprovalStatus } from '@personalhealthtrain/ui-common';
+import { ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
 
 export default {
     props: {

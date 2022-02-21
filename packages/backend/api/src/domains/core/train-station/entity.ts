@@ -20,7 +20,7 @@ import {
     TrainStation,
     TrainStationApprovalStatus,
     TrainStationRunStatus,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { RealmEntity } from '@typescript-auth/server';
 import { Realm } from '@typescript-auth/domains';
 import { TrainEntity } from '../train/entity';

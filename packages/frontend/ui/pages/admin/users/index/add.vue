@@ -5,7 +5,7 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import UserDetailsForm from '../../../../components/domains/auth/user/UserDetailsForm';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 

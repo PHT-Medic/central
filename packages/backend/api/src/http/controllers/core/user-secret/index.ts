@@ -11,7 +11,7 @@ import {
 import { SwaggerTags } from '@trapi/swagger';
 import {
     UserSecret,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';
 import {
     createUserSecretRouteHandler,

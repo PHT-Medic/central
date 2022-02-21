@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train } from '@personalhealthtrain/ui-common';
+import { Train } from '@personalhealthtrain/central-common';
 import { Repository, getRepository } from 'typeorm';
 import { TrainEntity } from '../entity';
 

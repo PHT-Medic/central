@@ -6,7 +6,7 @@
   -->
 <script>
 
-import { ServiceID } from '@personalhealthtrain/ui-common';
+import { ServiceID } from '@personalhealthtrain/central-common';
 import HarborProjectManagement from './HarborProjectManagement';
 
 export default {

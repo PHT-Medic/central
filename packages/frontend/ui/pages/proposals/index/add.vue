@@ -7,7 +7,7 @@
 <script>
 import {
     PermissionID,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import {
     alpha, integer, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';

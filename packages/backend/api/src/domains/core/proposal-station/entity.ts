@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import {
     Proposal, ProposalStation, ProposalStationApprovalStatus, Station,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { RealmEntity } from '@typescript-auth/server';
 import { Realm } from '@typescript-auth/domains';
 import { ProposalEntity } from '../proposal/entity';

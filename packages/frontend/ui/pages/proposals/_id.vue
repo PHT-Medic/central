@@ -7,7 +7,7 @@
 <script>
 import {
     PermissionID,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import Vue from 'vue';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
 

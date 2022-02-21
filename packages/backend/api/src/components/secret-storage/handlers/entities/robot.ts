@@ -17,7 +17,7 @@ import {
     VaultAPI,
     buildRobotSecretStoragePayload,
 
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { useClient } from '@trapi/client';
 import { StationEntity } from '../../../../domains/core/station/entity';

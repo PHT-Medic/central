@@ -9,7 +9,7 @@ import {
     TrainBuildStatus,
     TrainRunStatus,
     TrainStationRunStatus,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { ConsumeHandlers, Message } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import { TrainEntity } from '../../../domains/core/train/entity';

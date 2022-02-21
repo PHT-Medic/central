@@ -7,7 +7,7 @@
 
 import {
     HarborAPI, ProxyConnectionConfig, VaultAPI, detectProxyConnectionConfig,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { setConfig as setHTTPConfig } from '@trapi/client';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import https from 'https';

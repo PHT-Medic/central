@@ -8,7 +8,7 @@
 import Vue from 'vue';
 import {
     TrainConfigurationStatus,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import TrainWizardStepBase from './TrainWizardStepBase';
 import TrainFileManager from '../../train-file/TrainFileManager';
 import TrainWizardStepHash from './TrainWizardStepHash';

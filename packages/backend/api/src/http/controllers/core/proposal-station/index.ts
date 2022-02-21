@@ -7,7 +7,7 @@
 
 import {
     ProposalStation,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,
 } from '@decorators/express';

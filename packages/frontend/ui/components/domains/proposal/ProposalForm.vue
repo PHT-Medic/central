@@ -10,7 +10,7 @@ import {
     alpha, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 
-import { ProposalRisk } from '@personalhealthtrain/ui-common';
+import { ProposalRisk } from '@personalhealthtrain/central-common';
 import MasterImagePicker from '../master-image/MasterImagePicker';
 import StationList from '../station/StationList';
 import ToggleManyButton from '../../ToggleManyButton';

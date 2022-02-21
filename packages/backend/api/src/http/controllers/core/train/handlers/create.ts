@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, Train } from '@personalhealthtrain/ui-common';
+import { PermissionID, Train } from '@personalhealthtrain/central-common';
 import { BadRequestError, ForbiddenError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
 import { runTrainValidation } from './utils';

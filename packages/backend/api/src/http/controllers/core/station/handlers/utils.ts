@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Proposal, Station } from '@personalhealthtrain/ui-common';
+import { Proposal, Station } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';

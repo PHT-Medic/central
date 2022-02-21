@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainType } from '@personalhealthtrain/ui-common';
+import { Train, TrainType } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
 import { NotFoundError } from '@typescript-error/http';

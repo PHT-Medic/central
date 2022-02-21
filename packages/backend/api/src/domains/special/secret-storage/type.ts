@@ -6,7 +6,7 @@
  */
 
 import { Robot, User } from '@typescript-auth/domains';
-import { Station } from '@personalhealthtrain/ui-common';
+import { Station } from '@personalhealthtrain/central-common';
 import { Stat } from 'isomorphic-git';
 import { SecretStorageQueueEntityType } from './constants';
 

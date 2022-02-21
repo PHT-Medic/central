@@ -8,7 +8,7 @@
 import rateLimit from 'express-rate-limit';
 import { RequestHandler } from 'express';
 import { TooManyRequestsError } from '@typescript-error/http';
-import { ServiceID } from '@personalhealthtrain/ui-common';
+import { ServiceID } from '@personalhealthtrain/central-common';
 import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 
 export function useRateLimiter(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) {

@@ -10,7 +10,7 @@ import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from
 import {
     VaultAPI,
     refreshAuthRobotTokenOnResponseError,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import https from 'https';
 import { Environment } from './env';
 

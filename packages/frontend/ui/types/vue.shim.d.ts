@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { HTTPClient } from '@personalhealthtrain/ui-common';
+import { HTTPClient } from '@personalhealthtrain/central-common';
 import { HTTPClient as AuthHTTPClient } from '@typescript-auth/domains';
 import {Store} from "vuex";
 import {SocketModule} from "../config/socket";

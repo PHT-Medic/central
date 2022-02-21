@@ -7,7 +7,7 @@
 
 import { check, validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
-import { ProposalRisk } from '@personalhealthtrain/ui-common';
+import { ProposalRisk } from '@personalhealthtrain/central-common';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';

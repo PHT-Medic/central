@@ -11,7 +11,7 @@ import {
 import {
     buildSocketRealmNamespaceName,
     buildSocketTrainFileRoomName,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
 import { TrainFileEntity } from '../../domains/core/train-file/entity';
 

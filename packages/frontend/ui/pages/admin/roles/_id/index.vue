@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { Role } from '@personalhealthtrain/ui-common';
+import { Role } from '@personalhealthtrain/central-common';
 import RoleForm from '../../../../components/domains/auth/role/RoleForm';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 

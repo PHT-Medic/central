@@ -8,7 +8,7 @@
 import {
     RegistryCommand,
     SecretStorageCommand, buildRegistryStationProjectName, buildStationSecretStorageKey, createNanoID, isHex,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import {
     email, helpers, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';

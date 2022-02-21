@@ -13,7 +13,7 @@ import {
     DatabaseRootSeeder as AuthDatabaseRootSeeder,
     setEntitiesForConnectionOptions,
 } from '@typescript-auth/server';
-import { PermissionKey } from '@personalhealthtrain/ui-common';
+import { PermissionKey } from '@personalhealthtrain/central-common';
 import { modifyDatabaseConnectionOptions } from '../../../src/database/utils';
 import { buildRobotAggregator } from '../../../src/aggregators/robot';
 

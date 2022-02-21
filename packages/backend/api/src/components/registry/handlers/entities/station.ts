@@ -16,7 +16,7 @@ import {
     StationSecretStoragePayload,
     VaultAPI,
     buildRegistryStationProjectName,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { getRepository } from 'typeorm';
 import { NotFoundError } from '@typescript-error/http';

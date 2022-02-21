@@ -1,6 +1,6 @@
 import { NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
-import { PermissionID, SecretType, isHex } from '@personalhealthtrain/ui-common';
+import { PermissionID, SecretType, isHex } from '@personalhealthtrain/central-common';
 import { Buffer } from 'buffer';
 import { publishMessage } from 'amqp-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';

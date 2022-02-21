@@ -7,7 +7,7 @@
 <script>
 import {
     TrainBuildStatus,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { BDropdownItem } from 'bootstrap-vue';
 import { FrontendTrainCommand } from '../../../../domains/train/constants';
 

@@ -8,7 +8,7 @@
 import {
     USER_SECRETS_SECRET_ENGINE_KEY,
     VaultAPI,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { getRepository } from 'typeorm';
 import { ApiKey } from '../../../../config/api';

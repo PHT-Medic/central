@@ -6,7 +6,7 @@
  */
 
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { PermissionID } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { publishMessage } from 'amqp-extension';
 import { StationEntity } from '../../../../../domains/core/station/entity';

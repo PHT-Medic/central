@@ -13,7 +13,7 @@ import {
     ManyToOne,
     PrimaryColumn, UpdateDateColumn,
 } from 'typeorm';
-import { TrainResult, TrainResultStatus } from '@personalhealthtrain/ui-common';
+import { TrainResult, TrainResultStatus } from '@personalhealthtrain/central-common';
 import { UserEntity } from '@typescript-auth/server';
 import { TrainEntity } from '../train/entity';
 

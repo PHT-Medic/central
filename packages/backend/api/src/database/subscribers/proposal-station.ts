@@ -11,7 +11,7 @@ import {
 import {
     buildSocketProposalStationInRoomName,
     buildSocketProposalStationOutRoomName, buildSocketProposalStationRoomName, buildSocketRealmNamespaceName,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
 import { ProposalStationEntity } from '../../domains/core/proposal-station/entity';
 

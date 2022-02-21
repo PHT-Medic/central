@@ -14,7 +14,7 @@ import {
     TrainStationRunStatus,
 
     isRegistryStationProjectName,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { AggregatorTrainEvent } from '../../../aggregators/dispatcher/handlers/train';
 
 import { DispatcherHarborEventData } from '../../../domains/special/registry/queue';

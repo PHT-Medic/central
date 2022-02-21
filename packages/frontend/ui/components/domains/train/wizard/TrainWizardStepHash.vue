@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { TrainCommand } from '@personalhealthtrain/ui-common';
+import { TrainCommand } from '@personalhealthtrain/central-common';
 
 export default {
     components: { },

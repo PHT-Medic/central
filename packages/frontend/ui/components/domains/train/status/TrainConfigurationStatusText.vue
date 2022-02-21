@@ -15,7 +15,7 @@
     </span>
 </template>
 <script>
-import { TrainConfigurationStatus } from '@personalhealthtrain/ui-common';
+import { TrainConfigurationStatus } from '@personalhealthtrain/central-common';
 
 export default {
     props: {

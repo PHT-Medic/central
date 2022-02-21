@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainRunStatus } from '@personalhealthtrain/ui-common';
+import { Train, TrainRunStatus } from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import { BadRequestError } from '@typescript-error/http';

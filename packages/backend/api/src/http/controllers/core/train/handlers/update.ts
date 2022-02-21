@@ -1,5 +1,5 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { PermissionID } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@typescript-auth/domains';
 import { runTrainValidation } from './utils';

@@ -6,7 +6,7 @@
  */
 
 import { Message, buildMessage } from 'amqp-extension';
-import { Train, TrainResult } from '@personalhealthtrain/ui-common';
+import { Train, TrainResult } from '@personalhealthtrain/central-common';
 import { MessageQueueResultServiceRoutingKey } from '../../../config/service/mq';
 
 export enum ResultServiceCommand {

@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { TrainResultStatus, TrainRunStatus } from '@personalhealthtrain/ui-common';
+import { TrainResultStatus, TrainRunStatus } from '@personalhealthtrain/central-common';
 import { BDropdownItem } from 'bootstrap-vue';
 import { FrontendTrainCommand } from '../../../../domains/train/constants';
 

@@ -1,7 +1,7 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@typescript-auth/domains';
-import { PermissionID } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { runTrainStationValidation } from './utils';

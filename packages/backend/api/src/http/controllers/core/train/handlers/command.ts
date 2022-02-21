@@ -7,7 +7,7 @@
 
 import { check, matchedData, validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
-import { Train, TrainCommand } from '@personalhealthtrain/ui-common';
+import { Train, TrainCommand } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@typescript-auth/domains';
 import {

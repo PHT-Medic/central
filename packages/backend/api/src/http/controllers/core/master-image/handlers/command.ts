@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MasterImageCommand } from '@personalhealthtrain/ui-common';
+import { MasterImageCommand } from '@personalhealthtrain/central-common';
 import { BadRequestError, NotFoundError } from '@typescript-error/http';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { syncGitRepository } from './commands/sync-git-repository';

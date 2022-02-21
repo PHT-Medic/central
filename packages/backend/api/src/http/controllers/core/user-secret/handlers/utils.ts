@@ -10,7 +10,7 @@ import {
     PermissionID,
     SecretType,
     UserSecret,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { BadRequestError } from '@typescript-error/http';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';

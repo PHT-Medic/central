@@ -10,7 +10,7 @@ import {
     STATION_SECRET_ENGINE_KEY,
     Station,
     StationSecretStoragePayload, VaultAPI, buildRegistryStationProjectName,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';

@@ -8,7 +8,7 @@
 import {
     buildSocketTrainFileRoomName,
     hasOwnProperty,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { required } from 'vuelidate/lib/validators';
 import Vue from 'vue';
 import TrainFile from './TrainFile';

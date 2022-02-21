@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID, dropAPIRole } from '@personalhealthtrain/ui-common';
+import { PermissionID, dropAPIRole } from '@personalhealthtrain/central-common';
 import RoleList from '../../../../components/domains/auth/role/RoleList';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 

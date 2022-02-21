@@ -6,7 +6,7 @@
  */
 
 import { MatchedDataOptions, matchedData } from 'express-validator';
-import { deleteUndefinedObjectProperties } from '@personalhealthtrain/ui-common';
+import { deleteUndefinedObjectProperties } from '@personalhealthtrain/central-common';
 import { ExpressRequest } from '../type';
 
 export function buildExpressValidationErrorMessage<

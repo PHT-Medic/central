@@ -7,7 +7,7 @@
 <script>
 import {
     SecretStorageCommand, buildUserSecretsSecretStorageKey,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import UserSecretForm from '../../../components/domains/user-secret/UserSecretForm';
 import UserSecretList from '../../../components/domains/user-secret/UserSecretList';
 

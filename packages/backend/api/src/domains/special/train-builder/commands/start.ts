@@ -10,7 +10,7 @@ import { getRepository } from 'typeorm';
 import {
     Train,
     TrainStationApprovalStatus,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import path from 'path';
 import { TrainBuilderStartPayload } from '../type';
 import { MasterImageEntity } from '../../../core/master-image/entity';

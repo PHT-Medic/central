@@ -14,7 +14,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Train, TrainFile } from '@personalhealthtrain/ui-common';
+import { Train, TrainFile } from '@personalhealthtrain/central-common';
 import { RealmEntity, UserEntity } from '@typescript-auth/server';
 // eslint-disable-next-line import/no-cycle
 import { Realm, User } from '@typescript-auth/domains';

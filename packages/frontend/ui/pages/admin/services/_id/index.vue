@@ -6,7 +6,7 @@
   -->
 <script>
 
-import { ServiceID } from '@personalhealthtrain/ui-common';
+import { ServiceID } from '@personalhealthtrain/central-common';
 import RegistryManagement from '../../../../components/domains/service/harbor/HarborManagement';
 
 export default {

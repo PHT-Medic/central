@@ -7,7 +7,7 @@
 <script>
 import {
     TrainStationApprovalStatus,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import AlertMessage from '../../alert/AlertMessage';
 import Pagination from '../../Pagination';
 import TrainStationAction from '../train-station/TrainStationAction';

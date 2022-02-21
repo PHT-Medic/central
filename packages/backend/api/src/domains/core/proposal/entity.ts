@@ -8,7 +8,7 @@
 import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
-import { MasterImage, Proposal, ProposalRisk } from '@personalhealthtrain/ui-common';
+import { MasterImage, Proposal, ProposalRisk } from '@personalhealthtrain/central-common';
 import { RealmEntity, UserEntity } from '@typescript-auth/server';
 import { Realm, User } from '@typescript-auth/domains';
 import { ProposalStationEntity } from '../proposal-station/entity';

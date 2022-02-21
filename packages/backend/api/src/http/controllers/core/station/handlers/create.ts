@@ -8,7 +8,7 @@
 import {
     PermissionID,
     isHex,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@typescript-error/http';
 import { validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';

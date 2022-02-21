@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { TrainType } from '@personalhealthtrain/ui-common';
+import { TrainType } from '@personalhealthtrain/central-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 import ProposalList from '../proposal/ProposalList';
 import ProposalListItem from '../proposal/ProposalListItem';

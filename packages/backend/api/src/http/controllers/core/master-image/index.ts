@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { MasterImage, MasterImageCommand } from '@personalhealthtrain/ui-common';
+import { MasterImage, MasterImageCommand } from '@personalhealthtrain/central-common';
 
 import {
     Body, Controller, Delete, Get, Params, Post, Request, Response,

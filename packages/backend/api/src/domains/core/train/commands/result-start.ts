@@ -14,7 +14,7 @@ import {
     Train,
     TrainResultStatus,
     TrainRunStatus,
-} from '@personalhealthtrain/ui-common';
+} from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../special/result-service';
 import { findTrain } from './utils';

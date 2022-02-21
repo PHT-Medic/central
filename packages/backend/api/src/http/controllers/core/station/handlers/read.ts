@@ -1,5 +1,5 @@
 import { getRepository } from 'typeorm';
-import { PermissionID } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import {
     applyFields, applyFilters, applyPagination, applyRelations,
 } from 'typeorm-extension';

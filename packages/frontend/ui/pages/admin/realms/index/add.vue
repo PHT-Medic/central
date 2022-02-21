@@ -8,7 +8,7 @@
     <realm-form @created="handleCreated" />
 </template>
 <script>
-import { PermissionID } from '@personalhealthtrain/ui-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import RealmForm from '../../../../components/domains/auth/realm/RealmForm';
 import { LayoutKey } from '../../../../config/layout/contants';
 

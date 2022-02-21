@@ -9,7 +9,7 @@ import { Arguments, Argv, CommandModule } from 'yargs';
 import { createDatabase } from 'typeorm-extension';
 import { createConnection } from 'typeorm';
 import { DatabaseRootSeeder as AuthDatabaseRootSeeder, setupCommand } from '@typescript-auth/server';
-import { PermissionKey } from '@personalhealthtrain/ui-common';
+import { PermissionKey } from '@personalhealthtrain/central-common';
 import { useClient } from 'redis-extension';
 import { createConfig } from '../../config';
 import env from '../../env';
