@@ -27,10 +27,10 @@
         "pub": "npm run build && lerna publish",
         "lint": "eslint --ext .ts,.vue,.js ./packages/",
         "lint:fix": "npm run lint -- --fix",
-        "frontend": "npm run dev --workspace=packages/frontend",
-        "backend": "npm run dev --workspace=packages/backend",
-        "realtime": "npm run dev --workspace=packages/realtime",
-        "result-service": "npm run dev --workspace=packages/result-service",
-        "common": "npm run build-watch --workspace=packages/common"
+        "frontend": "npm run dev --workspace=packages/frontend/ui",
+        "backend": "npm run dev --workspace=packages/backend/api",
+        "realtime": "npm run dev --workspace=packages/backend/realtime",
+        "result-service": "npm run dev --workspace=packages/backend/result",
+        "common": "npm run build-watch --workspace=packages/shared/common"
     }
 }

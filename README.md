@@ -1,10 +1,10 @@
-# User Interface (UI) 🚀
+# Central 🚀
 This repository contains all packages of the Central-UI in context of the Personal Health Train (PHT).
 
-[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-common.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-common)
-[![main](https://github.com/Tada5hi/pht-central-ui/actions/workflows/main.yml/badge.svg)](https://github.com/Tada5hi/pht-central-ui/actions/workflows/main.yml)
-[![CodeQL](https://github.com/PHT-Medic/central-ui/actions/workflows/codeql.yml/badge.svg)](https://github.com/PHT-Medic/central-ui/actions/workflows/codeql.yml)
-[![Known Vulnerabilities](https://snyk.io/test/github/Tada5hi/pht-central-ui/badge.svg)](https://snyk.io/test/github/Tada5hi/pht-central-ui)
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-common.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-common)
+[![main](https://github.com/PHT-Medic/central/actions/workflows/main.yml/badge.svg)](https://github.com/PHT-Medic/central/actions/workflows/main.yml)
+[![CodeQL](https://github.com/PHT-Medic/central/actions/workflows/codeql.yml/badge.svg)](https://github.com/PHT-Medic/central/actions/workflows/codeql.yml)
+[![Known Vulnerabilities](https://snyk.io/test/github/PHT-Medic/central/badge.svg)](https://snyk.io/test/github/PHT-Medic/central)
 
 ![](assets/ui.jpg)
 
@@ -20,8 +20,8 @@ This repository contains all packages of the Central-UI in context of the Person
 Download the source code.
 
 ```shell
-$ git clone https://github.com/PHT-Medic/central-ui
-$ cd central-ui
+$ git clone https://github.com/PHT-Medic/central
+$ cd central
 ```
 
 To start a package (frontend, backend), `nodejs` must be installed on the host machine.
@@ -47,8 +47,8 @@ Read the `Readme.md` in each package directory and configure each package indivi
 
 This repository contains the backend application with REST API, aggregators, components and many more.
 
-### @personalhealthtrain/ui-common 📦
-[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-common.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-common)
+### @personalhealthtrain/central-common 📦
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-common.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-common)
 
 This repository contains common constants, functions, types, ... of the Personal Health Train (PHT) UI.
 

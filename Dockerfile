@@ -6,16 +6,14 @@ WORKDIR /usr/src/project/
 
 COPY . .
 
-RUN rm -rf ./node-modules
-
-RUN npm ci
-RUN npm run bootstrap
-RUN npm run build
-
-RUN touch packages/backend/api/.env
-RUN touch packages/backend/realtime/.env
-RUN touch packages/backend/result/.env
-RUN touch packages/frontend/app/.env
+RUN rm -rf ./node-modules && \
+    npm ci && \
+    npm run bootstrap && \
+    npm run build && \
+    touch packages/backend/api/.env && \
+    touch packages/backend/realtime/.env && \
+    touch packages/backend/result/.env && \
+    touch packages/frontend/ui/.env
 
 COPY ./entrypoint.sh ./entrypoint.sh
 

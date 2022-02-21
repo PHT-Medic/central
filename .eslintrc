@@ -26,7 +26,7 @@
         "**/dist/*",
         "**/*.d.ts",
         "**/writable/**",
-        "**/packages/frontend/components/svg/**"
+        "**/packages/frontend/ui/components/svg/**"
     ],
     "globals": {
         "NodeJS": true
