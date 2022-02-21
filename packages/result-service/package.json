@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "@personalhealthtrain/ui-common": "^1.1.0-alpha.19",
-        "@trapi/client": "2.0.4",
+        "@trapi/client": "2.0.5",
         "@typescript-auth/domains": "^0.0.24",
         "@typescript-auth/server-adapter": "^0.0.21",
         "@typescript-error/http": "^1.1.3",

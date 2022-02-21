@@ -15,7 +15,7 @@
         "@decorators/express": "^2.4.0",
         "@personalhealthtrain/ui-common": "^1.1.0-alpha.19",
         "@socket.io/redis-emitter": "^4.1.1",
-        "@trapi/client": "^2.0.4",
+        "@trapi/client": "^2.0.5",
         "@trapi/swagger": "^0.2.15",
         "@typescript-auth/domains": "^0.0.24",
         "@typescript-auth/server": "^2.0.0-alpha.37",
