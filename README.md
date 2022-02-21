@@ -1,7 +1,6 @@
 # Central 🐋
-This repository contains all packages of the Central-UI in context of the Personal Health Train (PHT).
+This repository contains the main central packages of the Personal Health Train (PHT).
 
-[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-common.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-common)
 [![main](https://github.com/PHT-Medic/central/actions/workflows/main.yml/badge.svg)](https://github.com/PHT-Medic/central/actions/workflows/main.yml)
 [![CodeQL](https://github.com/PHT-Medic/central/actions/workflows/codeql.yml/badge.svg)](https://github.com/PHT-Medic/central/actions/workflows/codeql.yml)
 [![Known Vulnerabilities](https://snyk.io/test/github/PHT-Medic/central/badge.svg)](https://snyk.io/test/github/PHT-Medic/central)
