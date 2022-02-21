@@ -1,4 +1,4 @@
-# Central - API 🌠
+# Central - API 🌴
 
 [![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-api.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-api)
 
@@ -29,6 +29,6 @@ $ npm run cli -- setup
 ```
 
 ## Credits
-If you have any questions, feel free to contact the author [Peter Placzek](https://github.com/Tada5hi) of the project.
+If you have any questions, feel free to contact the author [Peter Placzek](https://github.com/tada5hi) of the project.
 The project was initially developed during his bachelor thesis, and he worked after that as employee
 on the project.

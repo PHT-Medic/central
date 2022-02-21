@@ -1,4 +1,4 @@
-# Central 🚀
+# Central 🐋
 This repository contains all packages of the Central-UI in context of the Personal Health Train (PHT).
 
 [![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-common.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-common)
@@ -24,52 +24,52 @@ $ git clone https://github.com/PHT-Medic/central
 $ cd central
 ```
 
-To start a package (frontend, backend), `nodejs` must be installed on the host machine.
-Nodejs is also required to install all dependencies, with the following command.
+In addition, `Node.js` must be installed on the host machine, to start packages and to install required dependencies.
+To install the dependencies, run:
 
 ```shell
 $ npm i
 ```
 
-Build all packages.
+To build all packages, run:
 
 ```shell
 $ npm run build
 ```
 
 ## Configuration
-Read the `Readme.md` in each package directory and configure each package individually.
+Read the `README.md` in each package directory. Each package must be configured individually.
 
 ## Packages
 
-### @personalhealthtrain/central-api 🌠
+### @personalhealthtrain/central-api 🌴
 [![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-api.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-api)
 
-This repository contains the backend application with REST API, aggregators, components and many more.
+This repository contains the central API. The API package contains aggregators, components and many more.
 
-### @personalhealthtrain/central-common 📦
+### @personalhealthtrain/central-common 🧱
 [![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-common.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-common)
 
-This repository contains common constants, functions, types, ... of the Personal Health Train (PHT) UI.
+This repository contains common constants, functions, types, ...
 
-### @personalhealthtrain/central-ui 🍭
+### @personalhealthtrain/central-ui 🧸
 
 [![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-ui.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-ui)
 
-This repository contains the frontend application.
+This repository contains the User Interface (UI).
 
 
-### @personalhealthtrain/central-realtime 🌠
+### @personalhealthtrain/central-realtime 🚄
 
 [![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-realtime.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-realtime)
 
-This repository contains the realtime application which connects the backend application with socket based clients.
+This repository contains the realtime application which connects the API with socket based clients.
 
 ### @personalhealthtrain/central-result 🏭
 
 [![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-result.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-result)
 
-This repository contains the Result Service of the Personal Health Train.
+This repository contains the Result-Service, to aggregate Results from the image registry
 
 ## Usage
 Start the ui-, api-, & realtime-application in a single terminal window (or as background process) with the following command:
@@ -90,6 +90,6 @@ $ npm run result
 ```
 
 ## Credits
-If you have any questions, feel free to contact the author & creator Peter Placzek of the project.
+If you have any questions, feel free to contact the author & creator [Peter Placzek](https://github.com/tada5hi)  of the project.
 The project was initial developed during this bachelor thesis, and he worked after that time as employee
 on the project.

@@ -1,8 +1,8 @@
-# UI - Realtime 👾
+# UI - Realtime 🚄
 
 [![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-realtime.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-realtime)
 
-This repository contains the Realtime Application of the Central UI for the Personal Health Train (PHT).
+This repository contains the Realtime Application of the Personal Health Train (PHT).
 It communicates with some services of the PHT and need therefore to be configured properly, like described
 in the following sections.
 
