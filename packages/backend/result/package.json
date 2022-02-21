@@ -21,7 +21,7 @@
         "@personalhealthtrain/central-common": "^1.1.0-alpha.19",
         "@trapi/client": "2.0.4",
         "@typescript-auth/domains": "^0.0.24",
-        "@typescript-auth/server-adapter": "^0.0.21",
+        "@typescript-auth/server-adapter": "^0.0.22",
         "@typescript-error/http": "^1.1.3",
         "amqp-extension": "^1.0.1",
         "body-parser": "^1.19.2",
