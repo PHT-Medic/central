@@ -6,7 +6,7 @@ on:
             - v*
 
 env:
-    IMAGE_NAME: central-ui
+    IMAGE_NAME: central
 
 jobs:
     # Push image to GitHub Packages.
