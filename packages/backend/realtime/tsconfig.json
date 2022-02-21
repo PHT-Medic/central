@@ -1,9 +1,9 @@
 {
-    "extends": "../../tsconfig.json",
+    "extends": "../../../tsconfig.json",
     "compilerOptions": {
         "paths": {
             "@personalhealthtrain/ui-common": [
-                "./packages/common/src"
+                "./packages/shared/common/src"
             ]
         }
     }

@@ -12,7 +12,7 @@ module.exports = {
     resolve: {
         // for WebStorm, remove this after refactoring
         alias: {
-            '@personalhealthtrain/ui-common': path.resolve(__dirname, 'packages/common/src'),
+            '@personalhealthtrain/common': path.resolve(__dirname, 'packages/shared/common/src'),
         },
     },
 };

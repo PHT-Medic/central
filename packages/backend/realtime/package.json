@@ -1,5 +1,5 @@
 {
-    "name": "@personalhealthtrain/ui-realtime",
+    "name": "@personalhealthtrain/central-realtime",
     "private": true,
     "author": {
         "name": "Peter Placzek",
@@ -8,7 +8,7 @@
     },
     "license": "MIT",
     "version": "1.1.0-alpha.19",
-    "description": "This package contains the Central UI realtime application of PHT.",
+    "description": "This package contains the central realtime application of the PHT.",
     "dependencies": {
         "@personalhealthtrain/ui-common": "^1.1.0-alpha.19",
         "@socket.io/redis-adapter": "^7.1.0",

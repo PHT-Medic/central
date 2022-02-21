@@ -1,0 +1,10 @@
+{
+    "extends": "../../../tsconfig.json",
+    "compilerOptions": {
+        "paths": {
+            "@personalhealthtrain/central-common": [
+                "./packages/shared/common/src"
+            ]
+        }
+    }
+}

@@ -1,5 +1,5 @@
 {
-    "name": "@personalhealthtrain/ui",
+    "name": "personalhealthtrain",
     "private": true,
     "author": {
         "name": "Peter Placzek",
@@ -10,7 +10,9 @@
     "version": "1.0.0",
     "description": "This package contains all packages of the Central UI. It was initially developed as part of my Bachelor Thesis.",
     "workspaces": [
-        "packages/*"
+        "packages/backend/*",
+        "packages/shared/*",
+        "packages/frontend/*"
     ],
     "devDependencies": {
         "@tada5hi/eslint-config-vue-typescript": "^0.0.25",

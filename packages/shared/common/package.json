@@ -1,5 +1,5 @@
 {
-    "name": "@personalhealthtrain/ui-common",
+    "name": "@personalhealthtrain/central-common",
     "version": "1.1.0-alpha.19",
     "description": "",
     "main": "./dist/index.js",

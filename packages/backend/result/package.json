@@ -1,5 +1,5 @@
 {
-    "name": "@personalhealthtrain/ui-result-service",
+    "name": "@personalhealthtrain/central-result-service",
     "author": {
         "name": "Peter Placzek",
         "email": "tadashi@animesu.net",
@@ -7,7 +7,7 @@
     },
     "license": "MIT",
     "version": "1.1.0-alpha.19",
-    "description": "This project contains the Central UI Result Service of PHT.",
+    "description": "This project contains the central Result-Service of the PHT.",
     "main": "dist/index.js",
     "scripts": {
         "lint": "eslint --ext .ts src/",
@@ -18,7 +18,7 @@
         "build": "rm -rf ./dist && tsc -p tsconfig.build.json"
     },
     "dependencies": {
-        "@personalhealthtrain/ui-common": "^1.1.0-alpha.19",
+        "@personalhealthtrain/central-common": "^1.1.0-alpha.19",
         "@trapi/client": "2.0.4",
         "@typescript-auth/domains": "^0.0.24",
         "@typescript-auth/server-adapter": "^0.0.21",

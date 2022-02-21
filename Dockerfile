@@ -12,10 +12,10 @@ RUN npm ci
 RUN npm run bootstrap
 RUN npm run build
 
-RUN touch packages/backend/.env
-RUN touch packages/frontend/.env
-RUN touch packages/realtime/.env
-RUN touch packages/result-service/.env
+RUN touch packages/backend/api/.env
+RUN touch packages/backend/realtime/.env
+RUN touch packages/backend/result/.env
+RUN touch packages/frontend/app/.env
 
 COPY ./entrypoint.sh ./entrypoint.sh
 

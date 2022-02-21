@@ -1,5 +1,5 @@
 {
-    "extends": "../../tsconfig.json",
+    "extends": "../../../tsconfig.json",
     "compilerOptions": {
         "target": "ESNext",
         "lib": [
@@ -7,8 +7,8 @@
             "DOM"
         ],
         "paths": {
-            "@personalhealthtrain/ui-common": [
-                "./packages/common/src"
+            "@personalhealthtrain/central-common": [
+                "./packages/shared/common/src"
             ]
         }
     },

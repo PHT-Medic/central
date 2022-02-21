@@ -26,28 +26,28 @@ shift
 
 if [[ -z "${PACKAGE}" ]]; then
     printf 'Usage:\n'
-    printf '  backend <command>\n    Start or run the backend in dev mode.\n'
-    printf '  frontend <command>\n    Start or run the frontend in dev mode.\n'
-    printf '  realtime<command>\n    Start or run the realtime server in dev mode.\n'
-    printf '  result-service<command>\n    Start or run the result-service in dev mode.\n'
+    printf '  api <command>\n    Start or run the api service in dev mode.\n'
+    printf '  app <command>\n    Start or run the app in dev mode.\n'
+    printf '  realtime<command>\n    Start or run the realtime service in dev mode.\n'
+    printf '  result<command>\n    Start or run the result service in dev mode.\n'
     printf '  cli <command>\n    Run a CLI command.\n'
     exit 0
 fi
 
 case "${PACKAGE}" in
-    backend)
-        exec npm run "$1" --workspace=packages/backend
+    api)
+        exec npm run "$1" --workspace=packages/backend/api
         ;;
-    frontend)
+    app)
         export NUXT_HOST=0.0.0.0
         export NUXT_PORT=3000
-        exec npm run "$1" --workspace=packages/frontend
+        exec npm run "$1" --workspace=packages/frontend/app
         ;;
     realtime)
-        exec npm run "$1" --workspace=packages/realtime
+        exec npm run "$1" --workspace=packages/backend/realtime
         ;;
-    result-service)
-        exec npm run "$1" --workspace=packages/result-service
+    result)
+        exec npm run "$1" --workspace=packages/backend/result
         ;;
     cli)
         exec npm run cli --workspace=packages/backend -- "$@"
