@@ -113,7 +113,7 @@ export default {
         <div class="row mt-3">
             <div class="col-12 col-sm-6 mb-sm-0 mb-3">
                 <h6 class="title">
-                    Master Realm
+                    Master
                 </h6>
 
                 <transition name="slide-fade">
@@ -214,7 +214,7 @@ export default {
                 title="Station"
             >
                 <h6 class="title">
-                    Station Realms
+                    Station
                 </h6>
 
                 <o-auth2-provider-list
@@ -222,9 +222,6 @@ export default {
                     :with-search="false"
                     :map-items="setProviderAuthorizeURL"
                 >
-                    <template #header-title>
-                        <span />
-                    </template>
                     <template #items="props">
                         <ul class="list-unstyled">
                             <li
