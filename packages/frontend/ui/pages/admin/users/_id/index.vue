@@ -5,23 +5,16 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserDetailsForm from '../../../../components/domains/auth/user/UserDetailsForm';
-import UserPasswordForm from '../../../../components/domains/auth/user/UserPasswordForm';
-
 export default {
-    components: {
-        UserPasswordForm,
-        UserDetailsForm,
-    },
     props: {
-        userProperty: {
+        entity: {
             type: Object,
             default: undefined,
         },
     },
     methods: {
-        handleUserUpdated(e) {
-            this.$emit('userUpdated', e);
+        handleUpdated(e) {
+            this.$emit('updated', e);
         },
     },
 };
@@ -31,16 +24,17 @@ export default {
         <div class="row">
             <div class="col-7">
                 <h6>General</h6>
-                <user-details-form
-                    :user-property="userProperty"
-                    @updated="handleUserUpdated"
+                <user-form
+                    :entity="entity"
+                    :realm-id="entity.realm_id"
+                    @updated="handleUpdated"
                 />
             </div>
             <div class="col-5">
                 <h6>Password</h6>
                 <user-password-form
-                    :user-property="userProperty"
-                    @updated="handleUserUpdated"
+                    :id="entity.id"
+                    @updated="handleUpdated"
                 />
             </div>
         </div>

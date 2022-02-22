@@ -6,7 +6,6 @@
   -->
 
 <script>
-
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
@@ -24,7 +23,7 @@ export default {
         ],
     },
     props: {
-        realm: Object,
+        entity: Object,
     },
     data() {
         return {
@@ -58,7 +57,7 @@ export default {
                     v-for="(item,key) in sidebar.items"
                     :key="key"
                     :disabled="item.active"
-                    :to="'/admin/realms/'+realm.id+'/users' + item.urlSuffix"
+                    :to="'/admin/realms/'+entity.id+'/users' + item.urlSuffix"
                     exact
                     exact-active-class="active"
                 >
@@ -68,7 +67,7 @@ export default {
             </b-nav>
         </div>
         <div class="content-container">
-            <nuxt-child :realm="realm" />
+            <nuxt-child :entity="entity" />
         </div>
     </div>
 </template>

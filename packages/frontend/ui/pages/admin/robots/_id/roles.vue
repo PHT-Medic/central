@@ -6,10 +6,8 @@
   -->
 <script>
 export default {
-    components: {
-    },
     props: {
-        entityProperty: {
+        entity: {
             type: Object,
             default: undefined,
         },
@@ -21,5 +19,7 @@ export default {
 };
 </script>
 <template>
-    <div />
+    <div>
+        <robot-role-list :entity-id="entity.id" />
+    </div>
 </template>

@@ -4,26 +4,25 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import Vue from 'vue';
-import ProviderForm from '../../../../../components/domains/auth/provider/ProviderForm';
+<script lang="ts">
+import Vue, { PropType } from 'vue';
+import { Realm } from '@typescript-auth/domains';
 
-export default {
-    components: { ProviderForm },
+export default Vue.extend({
     props: {
-        parentItem: {
-            type: Object,
+        entity: {
+            type: Object as PropType<Realm>,
             default: undefined,
         },
     },
     async asyncData(context) {
         try {
-            const item = await context.$authApi.oauth2Provider.getOne(context.params.provider_id, {
+            const childEntity = await context.$authApi.oauth2Provider.getOne(context.params.provider_id, {
                 fields: ['+client_secret'],
             });
 
             return {
-                item,
+                childEntity,
             };
         } catch (e) {
             await context.redirect(`/admin/realms/${this.parentItem.id}/providers`);
@@ -35,22 +34,28 @@ export default {
     },
     data() {
         return {
-            item: undefined,
+            childEntity: undefined,
         };
     },
     methods: {
         handleUpdated(item) {
-            for (const key in item) {
-                Vue.set(this.item, key, item[key]);
+            const keys = Object.keys(item);
+            for (let i = 0; i < keys.length; i++) {
+                Vue.set(this.childEntity, keys[i], item[keys[i]]);
             }
+
+            this.$bvToast.toast('The provider was successfully updated.', {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
         },
     },
-};
+});
 </script>
 <template>
-    <provider-form
-        :provider="item"
-        :realm-id="parentItem.id"
+    <o-auth2-provider-form
+        :entity="childEntity"
+        :realm-id="entity.id"
         @updated="handleUpdated"
     />
 </template>

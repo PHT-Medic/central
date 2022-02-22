@@ -6,11 +6,9 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import RealmList from '../../../../components/domains/auth/realm/RealmList';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
-    components: { RealmList },
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -50,10 +48,17 @@ export default {
             return this.$auth.hasPermission(PermissionID.REALM_DROP);
         },
     },
+    methods: {
+        handleDeleted(item) {
+            this.$emit('deleted', item);
+
+            this.$refs.itemsList.handleDeleted(item);
+        },
+    },
 };
 </script>
 <template>
-    <realm-list ref="items-list">
+    <realm-list ref="itemsList">
         <template #header-title>
             This is a slight overview of all realms.
         </template>
@@ -88,16 +93,14 @@ export default {
                     >
                         <i class="fa fa-bars" />
                     </nuxt-link>
-                    <button
-                        v-if="canDrop"
-                        v-b-tooltip="'Delete'"
-                        :disabled="!data.item.drop_able || props.itemBusy"
-                        type="button"
+                    <auth-entity-delete
+                        v-if="canDrop && data.item.drop_able"
                         class="btn btn-xs btn-outline-danger"
-                        @click.prevent="props.drop(data.item)"
-                    >
-                        <i class="fa fa-times" />
-                    </button>
+                        :entity-id="data.item.id"
+                        :entity-type="'realm'"
+                        :element-text="''"
+                        @done="handleDeleted"
+                    />
                 </template>
                 <template #cell(created_at)="data">
                     <timeago :datetime="data.item.created_at" />

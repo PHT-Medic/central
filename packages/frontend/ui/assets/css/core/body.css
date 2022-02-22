@@ -49,11 +49,13 @@ Content
     }
 }
 
+.list,
 .c-list {
     display: flex;
     flex-direction: column;
 }
 
+.list .list-item,
 .c-list .c-list-item {
     background-color: #ececec;
     border: 1px solid #dedede;
@@ -64,19 +66,17 @@ Content
     border-radius: 4px;
 
     padding: 0.25rem 0.25rem;
+    margin-bottom: 0.5rem;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     vertical-align: middle;
 }
 
-.c-list .c-list-header,
-.c-list .c-list-content,
-.c-list .c-list-footer {
-    display: flex;
-    flex-direction: row;
-    word-break: break-all;
+.list .list-item div:first-child {
+    margin-right: 0.5rem;
 }
 
+.list .list-icon,
 .c-list .c-list-icon {
     font-size: 1rem;
     padding-right: 0.5rem;

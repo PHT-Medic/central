@@ -5,21 +5,20 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserDetailsForm from '../../../components/domains/auth/user/UserDetailsForm';
+import { PermissionID } from '@personalhealthtrain/central-common';
 
 export default {
     meta: {
         requireLoggedIn: true,
     },
-    components: {
-        UserDetailsForm,
-    },
     computed: {
         user() {
             return this.$store.getters['auth/user'];
         },
+        canManage() {
+            return this.$auth.hasPermission(PermissionID.USER_EDIT);
+        },
     },
-
 };
 </script>
 <template>
@@ -30,13 +29,12 @@ export default {
                     General
                 </h6>
 
-                <hr>
-                <user-details-form
+                <user-form
+                    :can-manage="canManage"
                     :realm-id="user.realm_id"
-                    :user-property="user"
+                    :entity="user"
                 />
             </div>
-            <div class="col-6" />
         </div>
     </div>
 </template>

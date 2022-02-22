@@ -5,14 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import RobotForm from '../../../../components/domains/auth/robot/RobotForm';
 
 export default {
-    components: {
-        RobotForm,
-    },
     props: {
-        entityProperty: {
+        entity: {
             type: Object,
             default: undefined,
         },
@@ -30,7 +26,7 @@ export default {
 <template>
     <div>
         <robot-form
-            :entity-property="entityProperty"
+            :entity="entity"
             @updated="handleUpdated"
             @deleted="handleDeleted"
         />

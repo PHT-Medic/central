@@ -101,9 +101,15 @@ export default async function middleware({
         if (!store.getters['auth/loggedIn']) {
             await store.dispatch('auth/triggerLogout');
 
+            const query : Record<string, any> = {};
+
+            if (!route.fullPath.includes('logout')) {
+                query.redirect = route.fullPath;
+            }
+
             await redirect({
                 path: '/login',
-                query: { redirect: route.fullPath },
+                query,
             });
 
             return;

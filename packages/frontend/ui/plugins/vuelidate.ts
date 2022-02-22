@@ -11,3 +11,7 @@ import Vuelidate from 'vuelidate';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 Vue.use(Vuelidate);
+
+if (!process.server) {
+    (window as any).vuelidate = Vuelidate;
+}

@@ -5,9 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import AuthVue from '@typescript-auth/vue';
 import Vue from 'vue';
 import Gravatar from 'vue-gravatar';
 
+Vue.use(AuthVue);
 Vue.component('VGravatar', Gravatar);
 
 Vue.filter('str_length_limit', (value, size) => {

@@ -5,12 +5,11 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID, dropAPIRole } from '@personalhealthtrain/central-common';
-import RoleList from '../../../../components/domains/auth/role/RoleList';
+import { PermissionID } from '@personalhealthtrain/central-common';
+import { useHTTPClient } from '@typescript-auth/vue';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
-    components: { RoleList },
     meta: {
         meta: {
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -42,33 +41,28 @@ export default {
             ],
         };
     },
+    computed: {
+        canView() {
+            return this.$auth.hasPermission(PermissionID.ROLE_EDIT) ||
+                this.$auth.hasPermission(PermissionID.ROLE_PERMISSION_ADD) ||
+                this.$auth.hasPermission(PermissionID.ROLE_PERMISSION_DROP) ||
+                this.$auth.hasPermission(PermissionID.USER_ROLE_ADD) ||
+                this.$auth.hasPermission(PermissionID.USER_ROLE_DROP);
+        },
+        canDrop() {
+            return this.$auth.hasPermission(PermissionID.ROLE_DROP);
+        },
+        query: {
+            sort: {
+                updated_at: 'DESC',
+            },
+        },
+    },
     methods: {
-        async drop(role) {
-            const l = this.$createElement;
+        async handleDeleted(item) {
+            this.$emit('deleted', item);
 
-            try {
-                const proceed = await this.$bvModal.msgBoxConfirm(l('div', { class: 'alert alert-info m-b-0' }, [
-                    l('p', null, [
-                        'Are you sure, that you want to delete the role ',
-                        l('b', null, [role.name]),
-                        '?',
-                    ]),
-                ]), {
-                    size: 'sm',
-                    buttonSize: 'xs',
-                });
-
-                if (proceed) {
-                    try {
-                        await dropAPIRole(role.id);
-                        this.$refs.itemsList.dropArrayItem(role);
-                    } catch (e) {
-                        // ...
-                    }
-                }
-            } catch (e) {
-                // ...
-            }
+            this.$refs.itemsList.handleDeleted(item);
         },
     },
 };
@@ -77,6 +71,7 @@ export default {
     <role-list
         ref="itemsList"
         :load-on-init="true"
+        :query="query"
     >
         <template #header-title>
             This is a slight overview of all roles.
@@ -91,21 +86,20 @@ export default {
             >
                 <template #cell(options)="data">
                     <nuxt-link
-                        v-if="$auth.can('edit','role') || $auth.can('add','role_permission') || $auth.can('drop','role_permission')"
+                        v-if="canView"
                         class="btn btn-xs btn-outline-primary"
                         :to="'/admin/roles/'+data.item.id"
                     >
                         <i class="fa fa-bars" />
                     </nuxt-link>
-                    <button
-                        v-if="$auth.can('drop','role')"
-                        type="button"
+                    <auth-entity-delete
+                        v-if="canDrop"
                         class="btn btn-xs btn-outline-danger"
-                        title="Löschen"
-                        @click.prevent="drop(data.item)"
-                    >
-                        <i class="fa fa-times" />
-                    </button>
+                        :entity-id="data.item.id"
+                        :entity-type="'role'"
+                        :element-text="''"
+                        @done="handleDeleted"
+                    />
                 </template>
                 <template #cell(created_at)="data">
                     <timeago :datetime="data.item.created_at" />

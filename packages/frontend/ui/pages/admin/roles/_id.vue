@@ -20,10 +20,10 @@ export default {
     },
     async asyncData(context) {
         try {
-            const role = await context.$authApi.role.getOne(context.params.id);
+            const entity = await context.$authApi.role.getOne(context.params.id);
 
             return {
-                role,
+                entity,
             };
         } catch (e) {
             await context.redirect('/admin/roles');
@@ -35,26 +35,39 @@ export default {
     },
     data() {
         return {
-            role: null,
+            entity: null,
             tabs: [
                 {
-                    name: 'General', routeName: 'admin-roles-id', icon: 'fas fa-bars', urlSuffix: '',
+                    name: 'General', icon: 'fas fa-bars', urlSuffix: '',
                 },
                 {
-                    name: 'Permissions', routeName: 'admin-roles-id-permissions', icon: 'fas fa-user-secret', urlSuffix: 'permissions',
+                    name: 'Permissions', icon: 'fas fa-user-secret', urlSuffix: 'permissions',
                 },
                 {
-                    name: 'Users', routeName: 'admin-roles-id-users', icon: 'fa fa-users', urlSuffix: 'users',
+                    name: 'Users', icon: 'fa fa-users', urlSuffix: 'users',
                 },
             ],
         };
+    },
+    methods: {
+        handleUpdated(item) {
+            const keys = Object.keys(item);
+            for (let i = 0; i < keys.length; i++) {
+                this.entity[keys[i]] = item[keys[i]];
+            }
+
+            this.$bvToast.toast('The role was successfully updated.', {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
+        },
     },
 };
 </script>
 <template>
     <div class="container">
         <h1 class="title no-border mb-3">
-            {{ role.name }} <span class="sub-title">Details</span>
+            {{ entity.name }} <span class="sub-title">Details</span>
         </h1>
 
         <div class="m-b-20 m-t-10">
@@ -72,7 +85,7 @@ export default {
                             v-for="(item,key) in tabs"
                             :key="key"
                             :disabled="item.active"
-                            :to="'/admin/roles/' + role.id + '/' + item.urlSuffix"
+                            :to="'/admin/roles/' + entity.id + '/' + item.urlSuffix"
                             exact
                             exact-active-class="active"
                         >
@@ -84,6 +97,9 @@ export default {
             </div>
         </div>
 
-        <nuxt-child :role-property="role" />
+        <nuxt-child
+            :entity="entity"
+            @updated="handleUpdated"
+        />
     </div>
 </template>

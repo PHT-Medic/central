@@ -5,12 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserPasswordForm from '../../../components/domains/auth/user/UserPasswordForm';
-
 export default {
-    components: {
-        UserPasswordForm,
-    },
     meta: {
         requireLoggedIn: true,
     },
@@ -27,6 +22,6 @@ export default {
             Password
         </h6>
 
-        <user-password-form :user-property="user" />
+        <user-password-form :id="user.id" />
     </div>
 </template>

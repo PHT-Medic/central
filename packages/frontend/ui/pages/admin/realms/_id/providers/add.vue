@@ -6,10 +6,7 @@
   -->
 <script>
 
-import ProviderForm from '../../../../../components/domains/auth/provider/ProviderForm';
-
 export default {
-    components: { ProviderForm },
     props: {
         parentItem: Object,
     },
@@ -21,7 +18,7 @@ export default {
 };
 </script>
 <template>
-    <provider-form
+    <o-auth2-provider-form
         :realm-id="parentItem.id"
         @created="handleCreated"
     />

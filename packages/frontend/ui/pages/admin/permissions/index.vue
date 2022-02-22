@@ -38,6 +38,16 @@ export default {
             },
         };
     },
+    methods: {
+        async handleDeleted(item) {
+            this.$bvToast.toast(`The permission ${item.id} was successfully deleted.`, {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
+
+            await this.$nuxt.$router.push('/admin/users');
+        },
+    },
 };
 </script>
 <template>
@@ -66,7 +76,7 @@ export default {
                 </b-nav>
             </div>
             <div class="content-container">
-                <nuxt-child />
+                <nuxt-child @deleted="handleDeleted" />
             </div>
         </div>
     </div>

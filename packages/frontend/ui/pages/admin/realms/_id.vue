@@ -5,9 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import Vue from 'vue';
-import MedicineWorker from '../../../components/svg/MedicineWorker';
-import MedicineDoctors from '../../../components/svg/MedicineDoctors';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
 
 export default {
@@ -17,18 +14,21 @@ export default {
     },
     async asyncData(context) {
         try {
-            const realm = await context.$authApi.realm.getOne(context.params.id);
+            const entity = await context.$authApi.realm.getOne(context.params.id);
 
             return {
-                realm,
+                entity,
             };
         } catch (e) {
             await context.redirect('/admin/realms');
+            return {
+
+            };
         }
     },
     data() {
         return {
-            realm: undefined,
+            entity: undefined,
             tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
                 { name: 'Station', icon: 'fa fa-city', urlSuffix: '/station' },
@@ -38,10 +38,16 @@ export default {
         };
     },
     methods: {
-        updateRealm(realm) {
-            for (const key in realm) {
-                Vue.set(this.realm, key, realm[key]);
+        handleUpdated(item) {
+            const keys = Object.keys(item);
+            for (let i = 0; i < keys.length; i++) {
+                this.entity[keys[i]] = item[keys[i]];
             }
+
+            this.$bvToast.toast(`The realm ${item.name} was successfully updated.`, {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
         },
     },
 };
@@ -49,7 +55,7 @@ export default {
 <template>
     <div class="container">
         <h1 class="title no-border mb-3">
-            {{ realm.name }} <span class="sub-title">Details</span>
+            {{ entity.name }} <span class="sub-title">Details</span>
         </h1>
 
         <div class="m-b-20 m-t-10">
@@ -70,7 +76,7 @@ export default {
                                     v-for="(item,key) in tabs"
                                     :key="key"
                                     :disabled="item.active"
-                                    :to="'/admin/realms/' + realm.id + item.urlSuffix"
+                                    :to="'/admin/realms/' + entity.id + item.urlSuffix"
                                     exact
                                     exact-active-class="active"
                                 >
@@ -84,8 +90,8 @@ export default {
             </div>
         </div>
         <nuxt-child
-            :realm="realm"
-            @updated="updateRealm"
+            :entity="entity"
+            @updated="handleUpdated"
         />
     </div>
 </template>

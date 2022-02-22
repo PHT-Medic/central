@@ -5,22 +5,16 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { Role } from '@personalhealthtrain/central-common';
-import RolePermissionList from '../../../../components/domains/auth/role-permission/RolePermissionList';
-
 export default {
-    components: {
-        RolePermissionList,
-    },
     props: {
-        roleProperty: {
-            type: Role,
+        entity: {
+            type: Object,
         },
     },
 };
 </script>
 <template>
     <div>
-        <role-permission-list :role-id="roleProperty.id" />
+        <role-permission-list :entity-id="entity.id" />
     </div>
 </template>

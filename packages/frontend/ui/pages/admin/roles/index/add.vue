@@ -6,7 +6,6 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import RoleForm from '../../../../components/domains/auth/role/RoleForm';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
@@ -19,9 +18,6 @@ export default {
             ],
         },
     },
-    components: {
-        RoleForm,
-    },
     methods: {
         handleRoleCreated(e) {
             this.$router.push(`/admin/roles/${e.id}`);
@@ -31,7 +27,6 @@ export default {
 </script>
 <template>
     <role-form
-        :role-property="undefined"
         @created="handleRoleCreated"
     />
 </template>

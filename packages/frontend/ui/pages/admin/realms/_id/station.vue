@@ -11,7 +11,7 @@ import StationForm from '../../../../components/domains/station/StationForm';
 export default {
     components: { StationForm },
     props: {
-        realm: Object,
+        entity: Object,
     },
     async asyncData(context) {
         try {
@@ -36,16 +36,16 @@ export default {
 
             if (stations.length === 0) {
                 return {
-                    station: undefined,
+                    childEntity: undefined,
                 };
             }
 
             return {
-                station: stations[0],
+                childEntity: stations[0],
             };
         } catch (e) {
             return {
-                station: undefined,
+                childEntity: undefined,
             };
         }
     },
@@ -65,7 +65,7 @@ export default {
                     },
                 ],
             },
-            station: undefined,
+            childEntity: undefined,
             busy: false,
         };
     },
@@ -77,60 +77,60 @@ export default {
     },
     methods: {
         subscribeRealtimeServer() {
-            if (!this.station) return;
-            const socket = this.$socket.useRealmWorkspace(this.station.realm_id);
-            socket.emit('stationsSubscribe', { data: { id: this.station.id } });
+            if (!this.childEntity) return;
+            const socket = this.$socket.useRealmWorkspace(this.childEntity.realm_id);
+            socket.emit('stationsSubscribe', { data: { id: this.childEntity.id } });
             socket.on('stationUpdated', this.handleSocketUpdated);
             socket.on('stationDeleted', this.handleSocketDeleted);
         },
         unsubscribeRealtimeServer() {
-            if (!this.station) return;
+            if (!this.childEntity) return;
 
-            const socket = this.$socket.useRealmWorkspace(this.station.realm_id);
-            socket.emit('stationsUnsubscribe', { data: { id: this.station.id } });
+            const socket = this.$socket.useRealmWorkspace(this.childEntity.realm_id);
+            socket.emit('stationsUnsubscribe', { data: { id: this.childEntity.id } });
             socket.off('stationUpdated', this.handleSocketUpdated);
             socket.off('stationDeleted', this.handleSocketDeleted);
         },
 
         handleSocketUpdated(context) {
             if (
-                this.station.id !== context.data.id ||
-                context.meta.roomId !== this.station.id
+                this.childEntity.id !== context.data.id ||
+                context.meta.roomId !== this.childEntity.id
             ) return;
 
             this.handleUpdated(context.data);
         },
         async handleSocketDeleted(context) {
             if (
-                this.station.id !== context.data.id ||
-                context.meta.roomId !== this.station.id
+                this.childEntity.id !== context.data.id ||
+                context.meta.roomId !== this.childEntity.id
             ) return;
 
             await this.handleDeleted();
         },
 
         handleCreated(station) {
-            this.station = station;
+            this.childEntity = station;
             this.subscribeRealtimeServer();
         },
         handleUpdated(station) {
             const keys = Object.keys(station);
             for (let i = 0; i < keys.length; i++) {
-                Vue.set(this.station, keys[i], station[keys[i]]);
+                Vue.set(this.childEntity, keys[i], station[keys[i]]);
             }
         },
         async handleDeleted() {
-            await this.$nuxt.$router.push(`/admin/realms/${this.station.realm_id}`);
+            await this.$nuxt.$router.push(`/admin/realms/${this.childEntity.realm_id}`);
         },
     },
 };
 </script>
 <template>
     <div>
-        <template v-if="station">
+        <template v-if="childEntity">
             <div>
                 <station-form
-                    :entity-property="station"
+                    :entity-property="childEntity"
                     @created="handleCreated"
                     @updated="handleUpdated"
                     @deleted="handleDeleted"
@@ -139,14 +139,14 @@ export default {
         </template>
         <template v-else>
             <p class="mb-2">
-                No station is associated to the  <strong>{{ realm.name }}</strong> realm yet.
+                No station is associated to the  <strong>{{ entity.name }}</strong> realm yet.
             </p>
 
             <hr>
 
             <station-form
-                :realm-id-property="realm.id"
-                :realm-name-property="realm.name"
+                :realm-id-property="entity.id"
+                :realm-name-property="entity.name"
                 @created="handleCreated"
                 @updated="handleUpdated"
                 @deleted="handleDeleted"

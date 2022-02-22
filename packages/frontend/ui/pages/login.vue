@@ -10,10 +10,9 @@ import { OAuth2Provider } from '@typescript-auth/domains';
 import { BuildInput } from '@trapi/query';
 import MedicineWorker from '../components/svg/MedicineWorker.vue';
 import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';
-import ProviderList from '../components/domains/auth/provider/ProviderList.vue';
 
 export default {
-    components: { ProviderList, MedicineWorker },
+    components: { MedicineWorker },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_OUT]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -218,7 +217,7 @@ export default {
                     Station Realms
                 </h6>
 
-                <provider-list
+                <o-auth2-provider-list
                     :query="providerQuery"
                     :with-search="false"
                     :map-items="setProviderAuthorizeURL"
@@ -252,7 +251,7 @@ export default {
                             </li>
                         </ul>
                     </template>
-                </provider-list>
+                </o-auth2-provider-list>
             </div>
         </div>
     </div>

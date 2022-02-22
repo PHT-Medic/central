@@ -13,6 +13,7 @@ import https from 'https';
 import { Inject } from '@nuxt/types/app';
 import { HTTPClient as AuthHTTPClient } from '@typescript-auth/domains';
 import { HTTPClient } from '@personalhealthtrain/central-common';
+import { setHTTPClient } from '@typescript-auth/vue';
 
 export default (ctx: Context, inject : Inject) => {
     let apiUrl : string | undefined;
@@ -53,6 +54,8 @@ export default (ctx: Context, inject : Inject) => {
 
     setClient(resourceAPI);
     setClient(authAPI, 'auth');
+
+    setHTTPClient(authAPI);
 
     inject('api', resourceAPI);
     inject('authApi', authAPI);

@@ -6,24 +6,49 @@
   -->
 <script>
 import { ServiceID } from '@personalhealthtrain/central-common';
-import RobotForm from '../../../../components/domains/auth/robot/RobotForm';
+import { useHTTPClient } from '@typescript-auth/vue';
 
 export default {
-    components: { RobotForm },
     props: {
         serviceId: ServiceID,
     },
     data() {
         return {
-
+            item: null,
+            busy: false,
         };
     },
+    created() {
+        Promise.resolve()
+            .then(this.load);
+    },
     methods: {
+        async load() {
+            try {
+                const response = await useHTTPClient().robot.getMany({
+                    filter: {
+                        name: this.serviceId,
+                    },
+                    fields: ['+secret'],
+                });
+
+                if (response.meta.total === 1) {
+                    // eslint-disable-next-line prefer-destructuring
+                    this.item = response.data[0];
+                }
+            } catch (e) {
+                // ...
+            }
+        },
     },
 };
 </script>
 <template>
-    <robot-form
-        :name-property="serviceId"
-    />
+    <div>
+        <robot-form
+            v-if="item"
+            :name="serviceId"
+            :entity="item"
+        />
+    </div>
 </template>

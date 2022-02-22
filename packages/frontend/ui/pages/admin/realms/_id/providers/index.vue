@@ -9,12 +9,10 @@ import {
     PermissionID,
 } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';
-import ProviderList from '../../../../../components/domains/auth/provider/ProviderList';
 
 export default {
-    components: { ProviderList },
     props: {
-        parentItem: Object,
+        entity: Object,
     },
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -62,18 +60,25 @@ export default {
         query() {
             return {
                 filter: {
-                    realm_id: this.parentItem.id,
+                    realm_id: this.entity.id,
                 },
                 fields: ['+client_secret'],
             };
+        },
+    },
+    methods: {
+        async handleDeleted(item) {
+            this.$emit('deleted', item);
+
+            this.$refs.itemsList.handleDeleted(item);
         },
     },
 };
 </script>
 <template>
     <div class="container">
-        <provider-list
-            ref="items-list"
+        <o-auth2-provider-list
+            ref="itemsList"
             :query="query"
         >
             <template #items="props">
@@ -87,19 +92,18 @@ export default {
                     <template #cell(options)="data">
                         <nuxt-link
                             class="btn btn-xs btn-outline-primary"
-                            :to="'/admin/realms/'+parentItem.id+'/providers/'+data.item.id"
+                            :to="'/admin/realms/'+entity.id+'/providers/'+data.item.id"
                         >
                             <i class="fa fa-bars" />
                         </nuxt-link>
-                        <button
+                        <auth-entity-delete
                             v-if="canDrop"
-                            :disabled="props.itemBusy"
-                            type="button"
                             class="btn btn-xs btn-outline-danger"
-                            @click.prevent="props.drop(data.item)"
-                        >
-                            <i class="fa fa-times" />
-                        </button>
+                            :entity-id="data.item.id"
+                            :entity-type="'oauth2Provider'"
+                            :element-text="''"
+                            @done="handleDeleted"
+                        />
                     </template>
                     <template #cell(created_at)="data">
                         <timeago :datetime="data.item.created_at" />
@@ -124,6 +128,6 @@ export default {
                     </template>
                 </b-table>
             </template>
-        </provider-list>
+        </o-auth2-provider-list>
     </div>
 </template>

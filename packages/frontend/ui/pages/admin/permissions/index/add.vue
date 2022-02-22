@@ -6,7 +6,6 @@
   -->
 <script>
 import { PermissionID } from '@typescript-auth/domains';
-import PermissionForm from '../../../../components/domains/auth/permission/PermissionForm';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
@@ -14,9 +13,6 @@ export default {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [PermissionID.PERMISSION_ADD],
-    },
-    components: {
-        PermissionForm,
     },
     methods: {
         handleCreated() {
@@ -27,7 +23,6 @@ export default {
 </script>
 <template>
     <permission-form
-        :permission-property="undefined"
         @created="handleCreated"
     />
 </template>

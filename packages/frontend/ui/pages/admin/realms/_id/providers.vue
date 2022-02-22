@@ -7,7 +7,7 @@
 <script>
 export default {
     props: {
-        realm: Object,
+        entity: Object,
     },
     data() {
         return {
@@ -26,13 +26,16 @@ export default {
                     },
                 ],
             },
-            station: undefined,
-            busy: false,
         };
     },
 
     methods: {
-
+        async handleDeleted() {
+            this.$bvToast.toast('The provider was successfully deleted.', {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
+        },
     },
 };
 </script>
@@ -47,7 +50,7 @@ export default {
                     v-for="(item,key) in sidebar.items"
                     :key="key"
                     :disabled="item.active"
-                    :to="'/admin/realms/' +realm.id + '/providers'+ item.urlSuffix"
+                    :to="'/admin/realms/' +entity.id + '/providers'+ item.urlSuffix"
                     exact
                     exact-active-class="active"
                 >
@@ -57,7 +60,10 @@ export default {
             </b-nav>
         </div>
         <div class="content-container">
-            <nuxt-child :parent-item="realm" />
+            <nuxt-child
+                :entity="entity"
+                @deleted="handleDeleted"
+            />
         </div>
     </div>
 </template>

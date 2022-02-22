@@ -5,14 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import UserRoleList from '../../../../components/domains/auth/user-role/UserRoleList';
-
 export default {
-    components: {
-        UserRoleList,
-    },
     props: {
-        userProperty: {
+        entity: {
             type: Object,
             default: undefined,
         },
@@ -31,6 +26,6 @@ export default {
 </script>
 <template>
     <div>
-        <user-role-list :user-id="userProperty.id" />
+        <user-role-list :entity-id="entity.id" />
     </div>
 </template>

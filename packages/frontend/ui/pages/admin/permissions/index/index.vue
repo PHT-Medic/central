@@ -5,11 +5,9 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import PermissionList from '../../../../components/domains/auth/permission/PermissionList';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
-    components: { PermissionList },
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,

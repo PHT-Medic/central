@@ -55,13 +55,23 @@ export default {
         };
     },
     methods: {
-        handleUpdated(e) {
-            // eslint-disable-next-line no-restricted-syntax
-            for (const key in e) {
-                this.entity[key] = e[key];
+        handleUpdated(item) {
+            const keys = Object.keys(item);
+            for (let i = 0; i < keys.length; i++) {
+                this.entity[keys[i]] = item[keys[i]];
             }
+
+            this.$bvToast.toast('The robot was successfully updated.', {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
         },
         async handleDeleted() {
+            this.$bvToast.toast('The robot was successfully deleted.', {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
+
             await this.$nuxt.$router.push('/admin/robots');
         },
     },
@@ -101,7 +111,7 @@ export default {
         </div>
 
         <nuxt-child
-            :entity-property="entity"
+            :entity="entity"
             @updated="handleUpdated"
             @deleted="handleDeleted"
         />

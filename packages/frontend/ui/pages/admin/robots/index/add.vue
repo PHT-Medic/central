@@ -7,7 +7,6 @@
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
-import RobotForm from '../../../../components/domains/auth/robot/RobotForm';
 
 export default {
     meta: {
@@ -16,9 +15,6 @@ export default {
         [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.ROBOT_ADD,
         ],
-    },
-    components: {
-        RobotForm,
     },
     methods: {
         handleCreated(e) {

@@ -20,13 +20,13 @@ export default {
         ],
     },
     async asyncData(context) {
-        let user;
+        let entity;
 
         try {
-            user = await context.$authApi.user.getOne(context.params.id, { fields: ['+email'] });
+            entity = await context.$authApi.user.getOne(context.params.id, { fields: ['+email'] });
 
             return {
-                user,
+                entity,
             };
         } catch (e) {
             await context.redirect('/admin/users');
@@ -38,7 +38,7 @@ export default {
     },
     data() {
         return {
-            user: null,
+            entity: null,
             tabs: [
                 {
                     name: 'General', routeName: 'admin-users-id', icon: 'fas fa-bars', urlSuffix: '',
@@ -50,11 +50,24 @@ export default {
         };
     },
     methods: {
-        handleUserUpdated(e) {
-            // eslint-disable-next-line no-restricted-syntax
-            for (const key in e) {
-                this.user[key] = e[key];
+        handleUpdated(item) {
+            const keys = Object.keys(item);
+            for (let i = 0; i < keys.length; i++) {
+                this.entity[keys[i]] = item[keys[i]];
             }
+
+            this.$bvToast.toast('The user was successfully updated.', {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
+        },
+        async handleDeleted(item) {
+            this.$bvToast.toast(`The user ${item.name} was successfully deleted.`, {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
+
+            await this.$nuxt.$router.push('/admin/users');
         },
     },
 };
@@ -62,7 +75,7 @@ export default {
 <template>
     <div class="container">
         <h1 class="title no-border mb-3">
-            {{ user.name }} <span class="sub-title">Details</span>
+            {{ entity.name }} <span class="sub-title">Details</span>
         </h1>
 
         <div class="m-b-20 m-t-10">
@@ -80,7 +93,7 @@ export default {
                             v-for="(item,key) in tabs"
                             :key="key"
                             :disabled="item.active"
-                            :to="'/admin/users/' + user.id + '/' + item.urlSuffix"
+                            :to="'/admin/users/' + entity.id + '/' + item.urlSuffix"
                             exact
                             exact-active-class="active"
                         >
@@ -93,8 +106,9 @@ export default {
         </div>
 
         <nuxt-child
-            :user-property="user"
-            @userUpdated="handleUserUpdated"
+            :entity="entity"
+            @updated="handleUpdated"
+            @deleted="handleDeleted"
         />
     </div>
 </template>

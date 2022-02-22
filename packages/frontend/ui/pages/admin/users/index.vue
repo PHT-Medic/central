@@ -42,6 +42,14 @@ export default {
             },
         };
     },
+    methods: {
+        async handleDeleted(item) {
+            this.$bvToast.toast(`The user ${item.name} was successfully deleted.`, {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
+        },
+    },
 };
 </script>
 <template>
@@ -70,7 +78,7 @@ export default {
                 </b-nav>
             </div>
             <div class="content-container">
-                <nuxt-child />
+                <nuxt-child @deleted="handleDeleted" />
             </div>
         </div>
     </div>

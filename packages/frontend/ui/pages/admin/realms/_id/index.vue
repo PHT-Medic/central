@@ -7,7 +7,7 @@
 <script>
 export default {
     props: {
-        realm: Object,
+        entity: Object,
     },
 };
 </script>
@@ -20,7 +20,7 @@ export default {
                 This realm can than be the target for example of a proposal or a train.
             </p>
             <nuxt-link
-                :to="'/admin/realms/'+realm.id+'/station'"
+                :to="'/admin/realms/'+entity.id+'/station'"
                 class="btn btn-xs btn-dark"
             >
                 Manage
@@ -36,7 +36,7 @@ export default {
             </p>
 
             <nuxt-link
-                :to="'/admin/realms/'+realm.id+'/oauth-providers'"
+                :to="'/admin/realms/'+entity.id+'/oauth-providers'"
                 class="btn btn-xs btn-dark"
             >
                 Manage

@@ -6,7 +6,6 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import UserDetailsForm from '../../../../components/domains/auth/user/UserDetailsForm';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
@@ -17,9 +16,6 @@ export default {
             PermissionID.USER_ADD,
         ],
     },
-    components: {
-        UserDetailsForm,
-    },
     methods: {
         handleCreated(e) {
             this.$nuxt.$router.push(`/admin/users/${e.id}`);
@@ -28,5 +24,5 @@ export default {
 };
 </script>
 <template>
-    <user-details-form @created="handleCreated" />
+    <user-form @created="handleCreated" />
 </template>

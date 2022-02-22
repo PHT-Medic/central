@@ -4,16 +4,12 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<template>
-    <realm-form @created="handleCreated" />
-</template>
+
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import RealmForm from '../../../../components/domains/auth/realm/RealmForm';
 import { LayoutKey } from '../../../../config/layout/contants';
 
 export default {
-    components: { RealmForm },
     meta: {
         [LayoutKey.REQUIRED_PERMISSIONS]: [
             PermissionID.REALM_ADD,
@@ -26,3 +22,6 @@ export default {
     },
 };
 </script>
+<template>
+    <realm-form @created="handleCreated" />
+</template>
