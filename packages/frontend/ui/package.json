@@ -7,7 +7,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "1.1.0-alpha.19",
+    "version": "1.2.0-alpha.0",
     "description": "This package contains the Central UI frontend application of the PHT. It was initially developed as part of my Bachelor Thesis.",
     "scripts": {
         "dev": "nuxt",
@@ -21,7 +21,7 @@
         "@nuxt/typescript-build": "^2.1.0",
         "@nuxtjs/dotenv": "^1.4.0",
         "@nuxtjs/google-fonts": "^1.2.0",
-        "@personalhealthtrain/central-common": "^1.1.0-alpha.19",
+        "@personalhealthtrain/central-common": "^1.2.0-alpha.0",
         "@trapi/client": "^2.0.5",
         "@trapi/query": "^2.0.5",
         "@types/moment": "^2.13.0",
