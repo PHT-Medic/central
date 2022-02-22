@@ -179,9 +179,9 @@ export default {
                 <div
                     v-for="(item,key) in formattedItems"
                     :key="key"
-                    class="c-list-item mb-2"
+                    class="c-list-item flex-column mb-2"
                 >
-                    <div class="c-list-header align-items-center">
+                    <div class="d-flex align-items-center flex-row">
                         <div class="c-list-icon">
                             <i class="fa fa-key" />
                         </div>

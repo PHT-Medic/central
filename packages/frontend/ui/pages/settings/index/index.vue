@@ -30,7 +30,7 @@ export default {
                 </h6>
 
                 <user-form
-                    :can-manage="canManage"
+                    :can-manage="false"
                     :realm-id="user.realm_id"
                     :entity="user"
                 />

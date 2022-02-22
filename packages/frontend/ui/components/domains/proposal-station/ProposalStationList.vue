@@ -326,47 +326,45 @@ export default {
                 :key="item.id"
                 class="c-list-item mb-2"
             >
-                <div class="c-list-content align-items-center">
-                    <div class="c-list-icon">
-                        <i class="fa fa-hospital" />
-                    </div>
-                    <span class="mb-0">
-                        <template v-if="item.station">
-                            {{ item.station.name }}
-                        </template>
-                        <template v-else>
-                            Station #{{ item.station_id }}
-                        </template>
-                    </span>
-                    <proposal-station-approval-status-text
-                        v-slot="slotProps"
-                        :status="item.approval_status"
-                        class="ml-2"
+                <div class="c-list-icon">
+                    <i class="fa fa-hospital" />
+                </div>
+                <span class="mb-0">
+                    <template v-if="item.station">
+                        {{ item.station.name }}
+                    </template>
+                    <template v-else>
+                        Station #{{ item.station_id }}
+                    </template>
+                </span>
+                <proposal-station-approval-status-text
+                    v-slot="slotProps"
+                    :status="item.approval_status"
+                    class="ml-2"
+                >
+                    <span
+                        class="badge"
+                        :class="'badge-'+slotProps.classSuffix"
                     >
-                        <span
-                            class="badge"
-                            :class="'badge-'+slotProps.classSuffix"
-                        >
-                            {{ slotProps.statusText }}
-                        </span>
-                    </proposal-station-approval-status-text>
+                        {{ slotProps.statusText }}
+                    </span>
+                </proposal-station-approval-status-text>
 
-                    <div class="ml-auto">
-                        <slot
-                            name="actions"
-                            :item="item"
-                            :drop="drop"
+                <div class="ml-auto">
+                    <slot
+                        name="actions"
+                        :item="item"
+                        :drop="drop"
+                    >
+                        <button
+                            v-if="canEdit"
+                            type="button"
+                            class="btn btn-danger btn-xs"
+                            @click.prevent="drop(item.id)"
                         >
-                            <button
-                                v-if="canEdit"
-                                type="button"
-                                class="btn btn-danger btn-xs"
-                                @click.prevent="drop(item.id)"
-                            >
-                                <i class="fa fa-trash" />
-                            </button>
-                        </slot>
-                    </div>
+                            <i class="fa fa-trash" />
+                        </button>
+                    </slot>
                 </div>
             </div>
         </div>

@@ -214,20 +214,18 @@ export default {
                             :key="item.id"
                             class="c-list-item mb-2"
                         >
-                            <div class="c-list-content align-items-center">
-                                <div class="c-list-icon">
-                                    <i class="fa fa-group" />
-                                </div>
-                                <slot name="item-name">
-                                    <span class="mb-0">{{ item.name }} <small class="text-primary">{{ item.path }}</small></span>
-                                </slot>
+                            <div class="c-list-icon">
+                                <i class="fa fa-group" />
+                            </div>
+                            <slot name="item-name">
+                                <span class="mb-0">{{ item.name }} <small class="text-primary">{{ item.path }}</small></span>
+                            </slot>
 
-                                <div class="ml-auto">
-                                    <slot
-                                        name="item-actions"
-                                        :item="item"
-                                    />
-                                </div>
+                            <div class="ml-auto">
+                                <slot
+                                    name="item-actions"
+                                    :item="item"
+                                />
                             </div>
                         </div>
                     </slot>

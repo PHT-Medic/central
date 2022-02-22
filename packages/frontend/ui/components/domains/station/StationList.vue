@@ -214,39 +214,37 @@ export default {
                     :key="key"
                     class="c-list-item mb-2"
                 >
-                    <div class="c-list-content align-items-center">
-                        <div class="c-list-icon">
-                            <i class="fa fa-hospital" />
-                        </div>
-                        <slot name="item-name">
-                            <span class="mb-0">{{ item.name }}</span>
-                        </slot>
+                    <div class="c-list-icon">
+                        <i class="fa fa-hospital" />
+                    </div>
+                    <slot name="item-name">
+                        <span class="mb-0">{{ item.name }}</span>
+                    </slot>
 
-                        <div class="ml-auto">
-                            <slot
-                                name="item-actions"
-                                :item="item"
-                            >
-                                <div class="d-flex flex-row">
-                                    <div>
-                                        <button
-                                            type="button"
-                                            class="btn btn-xs btn-danger"
-                                            :disabled="itemBusy"
-                                            @click.prevent="drop(item.id)"
-                                        >
-                                            <i class="fas fa-trash" />
-                                        </button>
-                                    </div>
-                                    <slot
-                                        name="item-actions-extra"
-                                        :busy="busy"
-                                        :item-busy="itemBusy"
-                                        :item="item"
-                                    />
+                    <div class="ml-auto">
+                        <slot
+                            name="item-actions"
+                            :item="item"
+                        >
+                            <div class="d-flex flex-row">
+                                <div>
+                                    <button
+                                        type="button"
+                                        class="btn btn-xs btn-danger"
+                                        :disabled="itemBusy"
+                                        @click.prevent="drop(item.id)"
+                                    >
+                                        <i class="fas fa-trash" />
+                                    </button>
                                 </div>
-                            </slot>
-                        </div>
+                                <slot
+                                    name="item-actions-extra"
+                                    :busy="busy"
+                                    :item-busy="itemBusy"
+                                    :item="item"
+                                />
+                            </div>
+                        </slot>
                     </div>
                 </div>
             </div>
