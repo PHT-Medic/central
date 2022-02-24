@@ -15,16 +15,17 @@ import {
     isRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
 
-import { DispatcherHarborEventData } from '../../../domains/special/registry/queue';
+import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../../domains/special/registry';
 import { DispatcherHarborEventWithAdditionalData } from '../extend';
 import { AggregatorRegistryEvent, buildAggregatorRegistryQueueMessage } from '../../../domains/special/aggregator';
 
 export async function dispatchRegistryEventToSelf(
     message: Message,
 ) : Promise<Message> {
-    const data : DispatcherHarborEventWithAdditionalData = message.data as DispatcherHarborEventData;
+    const type : RegistryQueueEvent = message.type as RegistryQueueEvent;
+    const data : DispatcherHarborEventWithAdditionalData = message.data as RegistryEventQueuePayload;
 
-    if (data.event !== 'PUSH_ARTIFACT') {
+    if (type !== RegistryQueueEvent.PUSH_ARTIFACT) {
         return message;
     }
 

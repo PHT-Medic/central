@@ -12,10 +12,10 @@ import {
     buildRegistryStationProjectName,
     isRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
-import { DispatcherHarborEventData } from '../../domains/special/registry/queue';
 import { TrainStationEntity } from '../../domains/core/train-station/entity';
+import { RegistryEventQueuePayload } from '../../domains/special/registry';
 
-export type DispatcherHarborEventWithAdditionalData = DispatcherHarborEventData & {
+export type DispatcherHarborEventWithAdditionalData = RegistryEventQueuePayload & {
     station?: Station,
     stationIndex?: number,
     stations?: Station[]

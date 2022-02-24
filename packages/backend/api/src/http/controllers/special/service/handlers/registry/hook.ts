@@ -10,15 +10,16 @@ import {
     BaseSchema, array, object, string,
 } from 'yup';
 
-import {
-    REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-} from '@personalhealthtrain/central-common';
+import { REGISTRY_MASTER_IMAGE_PROJECT_NAME } from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
 import { useLogger } from '../../../../../../config/log';
-import { DispatcherHarborEventType, buildRegistryEventQueueMessage } from '../../../../../../domains/special/registry/queue';
+import {
+    RegistryHook,
+    RegistryQueueEvent,
+    buildRegistryEventQueueMessage,
+} from '../../../../../../domains/special/registry';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
 import { TrainEntity } from '../../../../../../domains/core/train/entity';
-import { RegistryQueueEvent } from '../../../../../../domains/special/registry/constants';
 
 let eventValidator : undefined | BaseSchema;
 function useHookEventDataValidator() : BaseSchema {
@@ -48,34 +49,12 @@ function useHookEventDataValidator() : BaseSchema {
     return eventValidator;
 }
 
-type HarborHookEvent = {
-    repository: {
-        name: string,
-        repo_full_name: string,
-        date_created: string | undefined,
-        namespace: string
-    },
-    resources: {
-        digest: string,
-        tag: string,
-        resource_url: string
-    }[],
-    [key: string]: any
-};
-
-export type HarborHook = {
-    type: string,
-    occur_at?: string,
-    operator: string,
-    event_data: HarborHookEvent
-};
-
 export async function postHarborHookRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     useLogger().debug('hook received', { service: 'api-harbor-hook' });
 
     const repository = getRepository(TrainEntity);
 
-    const hook : HarborHook = await useHookEventDataValidator().validate(req.body);
+    const hook : RegistryHook = await useHookEventDataValidator().validate(req.body);
 
     const isLibraryProject : boolean = hook.event_data.repository.namespace === REGISTRY_MASTER_IMAGE_PROJECT_NAME;
 
@@ -91,10 +70,17 @@ export async function postHarborHookRouteHandler(req: ExpressRequest, res: Expre
         }
     }
 
+    const hookTypes = Object
+        .values(RegistryQueueEvent)
+        .map((event) => event.substring('REGISTRY_'.length));
+
+    if (hookTypes.indexOf(hook.type) === -1) {
+        return res.status(200).end();
+    }
+
     const message = buildRegistryEventQueueMessage(
-        RegistryQueueEvent.PUSH_ARTIFACT,
+        `REGISTRY_${hook.type}` as RegistryQueueEvent,
         {
-            event: hook.type as DispatcherHarborEventType,
             operator: hook.operator,
             namespace: hook.event_data.repository.namespace,
             repositoryName: hook.event_data.repository.name,

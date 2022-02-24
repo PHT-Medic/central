@@ -13,11 +13,12 @@ import {
 
 import { NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';
-import { HarborHook, postHarborHookRouteHandler } from './handlers/registry/hook';
+import { postHarborHookRouteHandler } from './handlers/registry/hook';
 
 import { doRegistryCommand } from './handlers/registry/command';
 import { doSecretStorageCommand } from './handlers/secret-storage/command';
 import { ExpressRequest, ExpressResponse } from '../../../type';
+import { RegistryHook } from '../../../../domains/special/registry';
 
 @SwaggerTags('extra')
 @Controller('/services')
@@ -26,7 +27,7 @@ export class ServiceController {
     async handleHarborHook(
     @Request() req: ExpressRequest,
         @Response() res: ExpressResponse,
-        @Body() harborHook: HarborHook,
+        @Body() harborHook: RegistryHook,
     ) {
         const { id } = req.params;
 

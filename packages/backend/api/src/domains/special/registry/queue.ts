@@ -6,28 +6,13 @@
  */
 
 import { Message, buildMessage } from 'amqp-extension';
-import {
-    MessageQueueRoutingKey,
-} from '../../../config/mq';
-import { RegistryQueuePayload } from './type';
+import { MessageQueueRoutingKey } from '../../../config/mq';
+import { RegistryEventQueuePayload, RegistryQueuePayload } from './type';
 import { RegistryQueueCommand, RegistryQueueEvent } from './constants';
-
-export type DispatcherHarborEventType = 'PUSH_ARTIFACT';
-
-export type DispatcherHarborEventData = {
-    event: DispatcherHarborEventType,
-    operator: string,
-    namespace: string,
-    repositoryName: string,
-    repositoryFullName: string,
-    artifactTag?: string,
-    artifactDigest?: string,
-    [key: string]: string
-};
 
 export function buildRegistryEventQueueMessage(
     type: `${RegistryQueueEvent}`,
-    data: DispatcherHarborEventData,
+    data: RegistryEventQueuePayload,
     metaData: Record<string, any> = {},
 ) {
     return buildMessage({

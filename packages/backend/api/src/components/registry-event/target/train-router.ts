@@ -7,20 +7,21 @@
 
 import { Message, publishMessage } from 'amqp-extension';
 import { isRegistryStationProjectName } from '@personalhealthtrain/central-common';
-import { DispatcherHarborEventData } from '../../../domains/special/registry/queue';
+import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../../domains/special/registry';
 import { TrainRouterHarborEvent, buildTrainRouterQueueMessage } from '../../../domains/special/train-router';
 import { useLogger } from '../../../config/log';
 
 export async function dispatchRegistryEventToTrainRouter(
     message: Message,
 ) : Promise<Message> {
-    const data : DispatcherHarborEventData = message.data as DispatcherHarborEventData;
+    const type : RegistryQueueEvent = message.type as RegistryQueueEvent;
+    const data : RegistryEventQueuePayload = message.data as RegistryEventQueuePayload;
 
     // station project
     const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
 
     // only process station trains and the PUSH_ARTIFACT event
-    if (!isStationProject || data.event !== 'PUSH_ARTIFACT') {
+    if (!isStationProject || type !== RegistryQueueEvent.PUSH_ARTIFACT) {
         return message;
     }
 

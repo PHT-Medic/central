@@ -8,21 +8,22 @@
 import { Message, publishMessage } from 'amqp-extension';
 
 import { REGISTRY_OUTGOING_PROJECT_NAME } from '@personalhealthtrain/central-common';
-import { DispatcherHarborEventData } from '../../../domains/special/registry/queue';
 import {
     ResultServiceCommand,
     buildResultServiceQueueMessage,
 } from '../../../domains/special/result-service';
 import { useLogger } from '../../../config/log';
+import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../../domains/special/registry';
 
 export async function dispatchRegistryEventToResultService(
     message: Message,
 ) : Promise<Message> {
-    const data : DispatcherHarborEventData = message.data as DispatcherHarborEventData;
+    const type : RegistryQueueEvent = message.type as RegistryQueueEvent;
+    const data : RegistryEventQueuePayload = message.data as RegistryEventQueuePayload;
 
     const isOutgoingProject : boolean = data.namespace === REGISTRY_OUTGOING_PROJECT_NAME;
     // only process terminated trains and the PUSH_ARTIFACT event
-    if (!isOutgoingProject || data.event !== 'PUSH_ARTIFACT') {
+    if (!isOutgoingProject || type !== RegistryQueueEvent.PUSH_ARTIFACT) {
         return message;
     }
 

@@ -16,3 +16,37 @@ export type RegistryQueuePayload =
     RegistryStationQueuePayload;
 
 // ---------------------------------------------------
+
+export type RegistryEventQueuePayload = {
+    operator: string,
+    namespace: string,
+    repositoryName: string,
+    repositoryFullName: string,
+    artifactTag?: string,
+    artifactDigest?: string,
+    [key: string]: string
+};
+
+// ---------------------------------------------------
+
+type RegistryHookEvent = {
+    repository: {
+        name: string,
+        repo_full_name: string,
+        date_created: string | undefined,
+        namespace: string
+    },
+    resources: {
+        digest: string,
+        tag: string,
+        resource_url: string
+    }[],
+    [key: string]: any
+};
+
+export type RegistryHook = {
+    type: string,
+    occur_at?: string,
+    operator: string,
+    event_data: RegistryHookEvent
+};
