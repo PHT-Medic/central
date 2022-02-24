@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
 import { onlyRealmPermittedQueryResources } from '@typescript-auth/server';
 import {
+    applyFields,
     applyFilters, applyPagination, applyRelations, applySort,
 } from 'typeorm-extension';
 import { NotFoundError } from '@typescript-error/http';
@@ -38,7 +39,7 @@ export async function getOneProposalRouteHandler(req: ExpressRequest, res: Expre
 
 export async function getManyProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {
-        filter, page, sort, include,
+        filter, page, sort, include, fields,
     } = req.query;
 
     const repository = getRepository(ProposalEntity);
@@ -46,9 +47,14 @@ export async function getManyProposalRouteHandler(req: ExpressRequest, res: Expr
 
     onlyRealmPermittedQueryResources(query, req.realmId);
 
+    applyFields(query, fields, {
+        defaultAlias: 'proposal',
+        allowed: ['id', 'title'],
+    });
+
     applyFilters(query, filter, {
         defaultAlias: 'proposal',
-        allowed: ['id', 'title', 'realm_id'],
+        allowed: ['id', 'title', 'realm_id', 'user_id', 'realm_id'],
     });
 
     applySort(query, sort, {
@@ -58,7 +64,7 @@ export async function getManyProposalRouteHandler(req: ExpressRequest, res: Expr
 
     applyRelations(query, include, {
         defaultAlias: 'proposal',
-        allowed: ['user', 'realm'],
+        allowed: ['user', 'realm', 'master_image'],
     });
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });
