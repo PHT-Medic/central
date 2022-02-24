@@ -7,7 +7,7 @@
 
 import { Message, buildMessage } from 'amqp-extension';
 import { Train, TrainResult } from '@personalhealthtrain/central-common';
-import { MessageQueueResultServiceRoutingKey } from '../../../config/service/mq';
+import { MessageQueueRoutingKey } from '../../../config/mq';
 
 export enum ResultServiceCommand {
     START = 'start',
@@ -27,7 +27,7 @@ export function buildResultServiceQueueMessage(
 ) : Message {
     return buildMessage({
         options: {
-            routingKey: MessageQueueResultServiceRoutingKey.COMMAND_OUT,
+            routingKey: MessageQueueRoutingKey.RESULT_SERVICE_COMMAND,
         },
         type: command,
         data,

@@ -11,7 +11,7 @@ import { DispatcherHarborEventData } from '../../../domains/special/registry/que
 import { TrainRouterHarborEvent, buildTrainRouterQueueMessage } from '../../../domains/special/train-router';
 import { useLogger } from '../../../config/log';
 
-export async function dispatchHarborEventToTrainRouter(
+export async function dispatchRegistryEventToTrainRouter(
     message: Message,
 ) : Promise<Message> {
     const data : DispatcherHarborEventData = message.data as DispatcherHarborEventData;

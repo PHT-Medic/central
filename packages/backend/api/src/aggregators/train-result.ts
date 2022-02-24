@@ -5,51 +5,29 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    Train,
-    TrainResult,
-    TrainResultStatus,
-    hasOwnProperty,
-} from '@personalhealthtrain/central-common';
+import { TrainResultStatus, hasOwnProperty } from '@personalhealthtrain/central-common';
 import { Message, consumeQueue } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import { ResultServiceDataPayload } from '../domains/special/result-service';
-import { MessageQueueResultServiceRoutingKey } from '../config/service/mq';
+import { MessageQueueRoutingKey } from '../config/mq';
 import { TrainEntity } from '../domains/core/train/entity';
 import { TrainResultEntity } from '../domains/core/train-result/entity';
+import { AggregatorTrainResultEvent } from '../domains/special/aggregator';
 
-export enum TrainResultEvent {
-    STARTING = 'starting', // ui trigger
-    STARTED = 'started', // rs trigger
-
-    STOPPING = 'stopping', // ui trigger
-    STOPPED = 'stopped', // rs trigger
-
-    DOWNLOADING = 'downloading', // rs trigger
-    DOWNLOADED = 'downloaded', // rs trigger
-
-    EXTRACTING = 'extracting', // rs trigger
-    EXTRACTED = 'extracted', // rs trigger
-
-    FAILED = 'failed', // rs trigger
-
-    UNKNOWN = 'unknown', // rs trigger
-}
-
-const EventStatusMap : Record<TrainResultEvent, TrainResultStatus | null> = {
-    [TrainResultEvent.STARTING]: TrainResultStatus.STARTING,
-    [TrainResultEvent.STARTED]: TrainResultStatus.STARTED,
-    [TrainResultEvent.STOPPING]: TrainResultStatus.STOPPING,
-    [TrainResultEvent.STOPPED]: TrainResultStatus.STOPPED,
-    [TrainResultEvent.FAILED]: TrainResultStatus.FAILED,
-    [TrainResultEvent.DOWNLOADING]: TrainResultStatus.DOWNLOADING,
-    [TrainResultEvent.DOWNLOADED]: TrainResultStatus.DOWNLOADED,
-    [TrainResultEvent.EXTRACTING]: TrainResultStatus.EXTRACTING,
-    [TrainResultEvent.EXTRACTED]: TrainResultStatus.FINISHED,
-    [TrainResultEvent.UNKNOWN]: null,
+const EventStatusMap : Record<AggregatorTrainResultEvent, TrainResultStatus | null> = {
+    [AggregatorTrainResultEvent.STARTING]: TrainResultStatus.STARTING,
+    [AggregatorTrainResultEvent.STARTED]: TrainResultStatus.STARTED,
+    [AggregatorTrainResultEvent.STOPPING]: TrainResultStatus.STOPPING,
+    [AggregatorTrainResultEvent.STOPPED]: TrainResultStatus.STOPPED,
+    [AggregatorTrainResultEvent.FAILED]: TrainResultStatus.FAILED,
+    [AggregatorTrainResultEvent.DOWNLOADING]: TrainResultStatus.DOWNLOADING,
+    [AggregatorTrainResultEvent.DOWNLOADED]: TrainResultStatus.DOWNLOADED,
+    [AggregatorTrainResultEvent.EXTRACTING]: TrainResultStatus.EXTRACTING,
+    [AggregatorTrainResultEvent.EXTRACTED]: TrainResultStatus.FINISHED,
+    [AggregatorTrainResultEvent.UNKNOWN]: null,
 };
 
-async function handleTrainResult(data: ResultServiceDataPayload, event: TrainResultEvent) {
+async function handleTrainResult(data: ResultServiceDataPayload, event: AggregatorTrainResultEvent) {
     if (!(hasOwnProperty(EventStatusMap, event))) {
         return;
     }
@@ -95,11 +73,11 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: TrainRes
 
 export function buildTrainResultAggregator() {
     function start() {
-        return consumeQueue({ routingKey: MessageQueueResultServiceRoutingKey.EVENT_IN }, {
+        return consumeQueue({ routingKey: MessageQueueRoutingKey.AGGREGATOR_RESULT_SERVICE_EVENT }, {
             $any: async (message: Message) => {
                 await handleTrainResult(
                     message.data as ResultServiceDataPayload,
-                    message.type as TrainResultEvent,
+                    message.type as AggregatorTrainResultEvent,
                 );
             },
         });

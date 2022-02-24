@@ -12,15 +12,17 @@ import { setConfig as setHTTPConfig } from '@trapi/client';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import https from 'https';
 import { setConfig as setRedisConfig } from 'redis-extension';
-import { buildDispatcherComponent } from './components/event-dispatcher';
 import { Environment } from './env';
 import { buildTrainBuilderAggregator } from './aggregators/train-builder';
 import { buildTrainResultAggregator } from './aggregators/train-result';
-import { buildDispatcherAggregator } from './aggregators/dispatcher';
-import { buildCommandRouterComponent } from './components/command-router';
-import { buildTrainRouterAggregator } from './aggregators/train-router';
-import { ApiKey } from './config/api';
+import { buildRegistryAggregator } from './aggregators/registry';
 import { buildRobotAggregator } from './aggregators/robot';
+import { buildTrainRouterAggregator } from './aggregators/train-router';
+
+import { ApiKey } from './config/api';
+
+import { buildCommandRouterComponent } from './components/command-router';
+import { buildEventRouterComponent } from './components/event-router';
 
 interface ConfigContext {
     env: Environment
@@ -86,7 +88,7 @@ export function createConfig({ env } : ConfigContext) : Config {
     const aggregators : {start: () => void}[] = [
         buildRobotAggregator(),
 
-        buildDispatcherAggregator(),
+        buildRegistryAggregator(),
         buildTrainBuilderAggregator(),
         buildTrainResultAggregator(),
         buildTrainRouterAggregator(),
@@ -94,7 +96,7 @@ export function createConfig({ env } : ConfigContext) : Config {
 
     const components : {start: () => void}[] = [
         buildCommandRouterComponent(),
-        buildDispatcherComponent(),
+        buildEventRouterComponent(),
     ];
 
     return {

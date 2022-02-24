@@ -47,6 +47,12 @@ export class TrainStationEntity implements TrainStation {
     @Column({ type: 'int', unsigned: true, nullable: true })
         position: number;
 
+    @Column({ type: 'varchar', length: 32, nullable: true })
+        artifact_tag: string | null;
+
+    @Column({ type: 'varchar', length: 512, nullable: true })
+        artifact_digest: string | null;
+
     // ------------------------------------------------------------------
 
     @CreateDateColumn()

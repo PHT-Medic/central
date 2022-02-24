@@ -11,6 +11,10 @@ export enum RegistryQueueCommand {
     DELETE = 'REGISTRY_DELETE',
 }
 
+export enum RegistryQueueEvent {
+    PUSH_ARTIFACT = 'REGISTRY_PUSH_ARTIFACT',
+}
+
 export enum RegistryQueueEntityType {
     STATION = 'station',
 }

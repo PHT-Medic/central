@@ -15,7 +15,7 @@ import {
 } from '../../../domains/special/result-service';
 import { useLogger } from '../../../config/log';
 
-export async function dispatchHarborEventToResultService(
+export async function dispatchRegistryEventToResultService(
     message: Message,
 ) : Promise<Message> {
     const data : DispatcherHarborEventData = message.data as DispatcherHarborEventData;

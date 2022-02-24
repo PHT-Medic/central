@@ -27,6 +27,12 @@ export interface TrainStation {
 
     // ------------------------------------------------------------------
 
+    artifact_tag: string | null;
+
+    artifact_digest: string | null;
+
+    // ------------------------------------------------------------------
+
     created_at: Date;
 
     updated_at: Date;

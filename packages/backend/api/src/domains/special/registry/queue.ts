@@ -6,10 +6,11 @@
  */
 
 import { Message, buildMessage } from 'amqp-extension';
-import { MessageQueueDispatcherRoutingKey, MessageQueueSelfRoutingKey } from '../../../config/service/mq';
-import { DispatcherEvent } from '../../../components/event-dispatcher/constants';
+import {
+    MessageQueueRoutingKey,
+} from '../../../config/mq';
 import { RegistryQueuePayload } from './type';
-import { RegistryQueueCommand } from './constants';
+import { RegistryQueueCommand, RegistryQueueEvent } from './constants';
 
 export type DispatcherHarborEventType = 'PUSH_ARTIFACT';
 
@@ -20,35 +21,36 @@ export type DispatcherHarborEventData = {
     repositoryName: string,
     repositoryFullName: string,
     artifactTag?: string,
+    artifactDigest?: string,
     [key: string]: string
 };
 
-export function buildDispatcherHarborEvent(
+export function buildRegistryEventQueueMessage(
+    type: `${RegistryQueueEvent}`,
     data: DispatcherHarborEventData,
     metaData: Record<string, any> = {},
 ) {
     return buildMessage({
         options: {
-            routingKey: MessageQueueDispatcherRoutingKey.EVENT_OUT,
+            routingKey: MessageQueueRoutingKey.EVENT,
         },
-        type: DispatcherEvent.HARBOR,
+        type,
         data,
         metadata: metaData,
     });
 }
 
 export function buildRegistryQueueMessage(
-    type: RegistryQueueCommand,
-    context?: RegistryQueuePayload,
+    type: `${RegistryQueueCommand}`,
+    data?: RegistryQueuePayload,
+    metaData: Record<string, any> = {},
 ) : Message {
-    const data = context || {};
-
     return buildMessage({
         options: {
-            routingKey: MessageQueueSelfRoutingKey.COMMAND,
+            routingKey: MessageQueueRoutingKey.COMMAND,
         },
         type,
-        data,
-        metadata: {},
+        data: data || {},
+        metadata: metaData,
     });
 }

@@ -7,14 +7,12 @@
 
 import { consumeQueue } from 'amqp-extension';
 import { MessageQueueRoutingKey } from '../../config/mq';
-import { createSecretStorageComponentHandlers } from '../secret-storage';
-import { createRegistryComponentHandlers } from '../registry';
+import { createRegistryEventHandlers } from '../registry-event';
 
-export function buildCommandRouterComponent() {
+export function buildEventRouterComponent() {
     function start() {
-        return consumeQueue({ routingKey: MessageQueueRoutingKey.COMMAND }, {
-            ...createSecretStorageComponentHandlers(),
-            ...createRegistryComponentHandlers(),
+        return consumeQueue({ routingKey: MessageQueueRoutingKey.EVENT }, {
+            ...createRegistryEventHandlers(),
         });
     }
 

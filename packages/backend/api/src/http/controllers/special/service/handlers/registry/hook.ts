@@ -15,9 +15,10 @@ import {
 } from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
 import { useLogger } from '../../../../../../config/log';
-import { DispatcherHarborEventType, buildDispatcherHarborEvent } from '../../../../../../domains/special/registry/queue';
+import { DispatcherHarborEventType, buildRegistryEventQueueMessage } from '../../../../../../domains/special/registry/queue';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
 import { TrainEntity } from '../../../../../../domains/core/train/entity';
+import { RegistryQueueEvent } from '../../../../../../domains/special/registry/constants';
 
 let eventValidator : undefined | BaseSchema;
 function useHookEventDataValidator() : BaseSchema {
@@ -90,14 +91,18 @@ export async function postHarborHookRouteHandler(req: ExpressRequest, res: Expre
         }
     }
 
-    const message = buildDispatcherHarborEvent({
-        event: hook.type as DispatcherHarborEventType,
-        operator: hook.operator,
-        namespace: hook.event_data.repository.namespace,
-        repositoryName: hook.event_data.repository.name,
-        repositoryFullName: hook.event_data.repository.repo_full_name,
-        artifactTag: hook.event_data.resources[0]?.tag,
-    });
+    const message = buildRegistryEventQueueMessage(
+        RegistryQueueEvent.PUSH_ARTIFACT,
+        {
+            event: hook.type as DispatcherHarborEventType,
+            operator: hook.operator,
+            namespace: hook.event_data.repository.namespace,
+            repositoryName: hook.event_data.repository.name,
+            repositoryFullName: hook.event_data.repository.repo_full_name,
+            artifactTag: hook.event_data.resources[0]?.tag,
+            artifactDigest: hook.event_data.resources[0]?.digest,
+        },
+    );
 
     await publishMessage(message);
 

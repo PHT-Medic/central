@@ -9,7 +9,7 @@ import { Train } from '@personalhealthtrain/central-common';
 import { Message, buildMessage } from 'amqp-extension';
 import { buildTrainBuilderStartCommandPayload, buildTrainBuilderStatusCommandPayload, buildTrainBuilderStopCommandPayload } from './commands';
 import { TrainBuilderCommand } from './type';
-import { MessageQueueTrainBuilderRoutingKey } from '../../../config/service/mq';
+import { MessageQueueRoutingKey } from '../../../config/mq';
 
 export async function buildTrainBuilderQueueMessage(
     type: TrainBuilderCommand,
@@ -49,7 +49,7 @@ export async function buildTrainBuilderQueueMessage(
     return buildMessage({
         type,
         options: {
-            routingKey: MessageQueueTrainBuilderRoutingKey.COMMAND_OUT,
+            routingKey: MessageQueueRoutingKey.TRAIN_BUILDER_COMMAND,
         },
         data,
         metadata: metaData,

@@ -6,7 +6,7 @@
  */
 
 import { Message, buildMessage } from 'amqp-extension';
-import { MessageQueueSelfRoutingKey } from '../../../config/service/mq';
+import { MessageQueueRoutingKey } from '../../../config/mq';
 import { SecretStorageQueueCommand } from './constants';
 import {
     SecretStorageQueuePayload,
@@ -18,7 +18,7 @@ export function buildSecretStorageQueueMessage(
 ) : Message {
     return buildMessage({
         options: {
-            routingKey: MessageQueueSelfRoutingKey.COMMAND,
+            routingKey: MessageQueueRoutingKey.COMMAND,
         },
         type,
         data: context,

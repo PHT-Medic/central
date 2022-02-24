@@ -8,21 +8,15 @@
 import { TrainBuildStatus } from '@personalhealthtrain/central-common';
 import { Message, consumeQueue } from 'amqp-extension';
 import { getRepository } from 'typeorm';
-import { MessageQueueTrainBuilderRoutingKey } from '../config/service/mq';
+import { MessageQueueRoutingKey } from '../config/mq';
 import { TrainEntity } from '../domains/core/train/entity';
+import { AggregatorTrainBuilderEvent } from '../domains/special/aggregator';
 
-export enum TrainBuilderEvent {
-    STARTED = 'trainBuildStarted',
-    STOPPED = 'trainBuildStopped',
-    FAILED = 'trainBuildFailed',
-    FINISHED = 'trainBuildFinished',
-}
-
-const EventStatusMap : Record<TrainBuilderEvent, TrainBuildStatus> = {
-    [TrainBuilderEvent.STARTED]: TrainBuildStatus.STARTED,
-    [TrainBuilderEvent.STOPPED]: TrainBuildStatus.STOPPED,
-    [TrainBuilderEvent.FAILED]: TrainBuildStatus.FAILED,
-    [TrainBuilderEvent.FINISHED]: TrainBuildStatus.FINISHED,
+const EventStatusMap : Record<AggregatorTrainBuilderEvent, TrainBuildStatus> = {
+    [AggregatorTrainBuilderEvent.STARTED]: TrainBuildStatus.STARTED,
+    [AggregatorTrainBuilderEvent.STOPPED]: TrainBuildStatus.STOPPED,
+    [AggregatorTrainBuilderEvent.FAILED]: TrainBuildStatus.FAILED,
+    [AggregatorTrainBuilderEvent.FINISHED]: TrainBuildStatus.FINISHED,
 };
 
 async function updateTrain(trainId: string, event: string) {
@@ -43,7 +37,7 @@ async function updateTrain(trainId: string, event: string) {
 
 export function buildTrainBuilderAggregator() {
     function start() {
-        return consumeQueue({ routingKey: MessageQueueTrainBuilderRoutingKey.EVENT_IN }, {
+        return consumeQueue({ routingKey: MessageQueueRoutingKey.AGGREGATOR_TRAIN_BUILDER_EVENT }, {
             $any: async (message: Message) => {
                 await updateTrain(message.data.trainId, message.type);
             },
