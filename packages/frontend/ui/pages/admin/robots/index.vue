@@ -8,7 +8,7 @@
 <script>
 
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default {
     meta: {
