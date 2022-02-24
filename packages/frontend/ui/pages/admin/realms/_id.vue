@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default {
     meta: {
@@ -33,6 +33,7 @@ export default {
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
                 { name: 'Station', icon: 'fa fa-city', urlSuffix: '/station' },
                 { name: 'Users', icon: 'fa fa-users', urlSuffix: '/users' },
+                { name: 'Robots', icon: 'fa fa-robot', urlSuffix: '/robots' },
                 { name: 'Providers', icon: 'fas fa-boxes', urlSuffix: '/providers' },
             ],
         };

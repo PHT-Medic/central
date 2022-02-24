@@ -6,7 +6,7 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';
+import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
 
 export default {
     meta: {
@@ -36,20 +36,22 @@ export default {
                 {
                     key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
                 },
-                { key: 'options', label: '', tdClass: 'text-left' },
+                {
+                    key: 'options', label: '', tdClass: 'text-left',
+                },
             ],
         };
     },
     computed: {
         canView() {
-            return this.$auth.hasPermission(PermissionID.USER_EDIT) ||
-                this.$auth.hasPermission(PermissionID.USER_PERMISSION_ADD) ||
-                this.$auth.hasPermission(PermissionID.USER_PERMISSION_DROP) ||
-                this.$auth.hasPermission(PermissionID.USER_ROLE_ADD) ||
-                this.$auth.hasPermission(PermissionID.USER_ROLE_DROP);
+            return this.$auth.hasPermission(PermissionID.ROBOT_EDIT) ||
+                this.$auth.hasPermission(PermissionID.ROBOT_PERMISSION_ADD) ||
+                this.$auth.hasPermission(PermissionID.ROBOT_PERMISSION_DROP) ||
+                this.$auth.hasPermission(PermissionID.ROBOT_ROLE_ADD) ||
+                this.$auth.hasPermission(PermissionID.ROBOT_ROLE_DROP);
         },
         canDrop() {
-            return this.$auth.hasPermission(PermissionID.USER_DROP);
+            return this.$auth.hasPermission(PermissionID.ROBOT_DROP);
         },
     },
     methods: {
@@ -62,7 +64,7 @@ export default {
 };
 </script>
 <template>
-    <user-list
+    <robot-list
         ref="itemsList"
         :query="query"
         :load-on-init="true"
@@ -75,11 +77,15 @@ export default {
                 head-variant="'dark'"
                 outlined
             >
+                <template #cell(realm)="data">
+                    <span class="badge-dark badge">{{ data.item.realm_id }}</span>
+                </template>
                 <template #cell(options)="data">
                     <nuxt-link
                         v-if="canView"
+                        v-b-tooltip="'Overview'"
+                        :to="'/admin/realms/'+entity.id+'/robots/'+data.item.id"
                         class="btn btn-xs btn-outline-primary"
-                        :to="'/admin/realms/'+entity.id+'/users/'+data.item.id"
                     >
                         <i class="fa fa-bars" />
                     </nuxt-link>
@@ -87,7 +93,7 @@ export default {
                         v-if="canDrop"
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
-                        :entity-type="'user'"
+                        :entity-type="'robot'"
                         :element-text="''"
                         @done="handleDeleted"
                     />
@@ -106,5 +112,5 @@ export default {
                 </template>
             </b-table>
         </template>
-    </user-list>
+    </robot-list>
 </template>

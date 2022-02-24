@@ -17,15 +17,15 @@ export default Vue.extend({
     },
     async asyncData(context) {
         try {
-            const childEntity = await context.$authApi.oauth2Provider.getOne(context.params.provider_id, {
-                fields: ['+client_secret'],
+            const childEntity = await context.$authApi.robot.getOne(context.params.robot_id, {
+                fields: ['+secret'],
             });
 
             return {
                 childEntity,
             };
         } catch (e) {
-            await context.redirect(`/admin/realms/${context.params.id}/providers`);
+            await context.redirect(`/admin/realms/${context.params.id}/robots`);
 
             return {
 
@@ -44,7 +44,7 @@ export default Vue.extend({
                 Vue.set(this.childEntity, keys[i], item[keys[i]]);
             }
 
-            this.$bvToast.toast('The provider was successfully updated.', {
+            this.$bvToast.toast('The robot was successfully updated.', {
                 toaster: 'b-toaster-top-center',
                 variant: 'success',
             });
@@ -53,7 +53,7 @@ export default Vue.extend({
 });
 </script>
 <template>
-    <o-auth2-provider-form
+    <robot-form
         :entity="childEntity"
         :realm-id="entity.id"
         @updated="handleUpdated"
