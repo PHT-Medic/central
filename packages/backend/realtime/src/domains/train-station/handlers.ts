@@ -9,8 +9,8 @@ import {
     PermissionID,
     buildSocketTrainStationInRoomName,
     buildSocketTrainStationOutRoomName,
-    extendSocketClientToServerEventCallback,
-    extendSocketClientToServerEventContext,
+    buildSocketTrainStationRoomName,
+    extendSocketClientToServerEventCallback, extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@typescript-error/http';
 import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
@@ -21,6 +21,37 @@ export function registerTrainStationSocketHandlers(
     socket: SocketInterface,
 ) {
     if (!socket.data.user && !socket.data.robot) return;
+
+    // ------------------------------------------------------------
+
+    socket.on('trainStationsSubscribe', async (context, cb) => {
+        context = extendSocketClientToServerEventContext(context);
+        cb = extendSocketClientToServerEventCallback(cb);
+
+        if (
+            !socket.data.ability.hasPermission(PermissionID.TRAIN_APPROVE)
+        ) {
+            if (typeof cb === 'function') {
+                cb(new UnauthorizedError());
+            }
+
+            return;
+        }
+
+        incrSocketRoomConnections(socket, buildSocketTrainStationRoomName(context.data.id));
+
+        if (typeof cb === 'function') {
+            cb();
+        }
+    });
+
+    socket.on('trainStationsUnsubscribe', (context) => {
+        context = extendSocketClientToServerEventContext(context);
+
+        decrSocketRoomConnections(socket, buildSocketTrainStationRoomName(context.data.id));
+    });
+
+    // ------------------------------------------------------------
 
     socket.on('trainStationsInSubscribe', async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);

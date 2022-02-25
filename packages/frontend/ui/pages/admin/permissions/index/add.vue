@@ -5,8 +5,8 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID } from '@typescript-auth/domains';
-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
+import { PermissionID } from '@personalhealthtrain/central-common';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default {
     meta: {

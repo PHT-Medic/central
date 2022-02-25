@@ -23,9 +23,11 @@ export function registerSocketHandlers(io: SocketServerInterface) {
         }
 
         registerProposalSocketHandlers(io, socket);
+        registerProposalStationSocketHandlers(io, socket);
         registerStationSocketHandlers(io, socket);
         registerTrainSocketHandlers(io, socket);
         registerTrainFileSocketHandlers(io, socket);
+        registerTrainStationSocketHandlers(io, socket);
     });
 }
 

@@ -50,6 +50,11 @@ export type SocketClientToServerEvents = {
         cb?: (error?: Error) => void
     ) => void
 } & {
+    [K in `proposalStations${SubUnsubOperation}`]: (
+        context?: SocketClientToServerEventContext<ProposalStation>,
+        cb?: (error?: Error) => void
+    ) => void
+} & {
     [K in `proposalStationsIn${SubUnsubOperation}`]: (
         context?: SocketClientToServerEventContext<ProposalStation>,
         cb?: (error?: Error) => void
@@ -77,6 +82,11 @@ export type SocketClientToServerEvents = {
 } & {
     [K in `trainResults${SubUnsubOperation}`]: (
         context?: SocketClientToServerEventContext<TrainResult>,
+        cb?: (error?: Error) => void
+    ) => void
+} & {
+    [K in `trainStations${SubUnsubOperation}`]: (
+        context?: SocketClientToServerEventContext<TrainStation>,
         cb?: (error?: Error) => void
     ) => void
 } & {

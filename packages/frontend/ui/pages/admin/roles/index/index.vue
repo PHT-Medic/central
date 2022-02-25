@@ -32,10 +32,10 @@ export default {
                     key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
-                    key: 'created_at', label: 'Erstellt', thClass: 'text-center', tdClass: 'text-center',
+                    key: 'created_at', label: 'Created at', thClass: 'text-center', tdClass: 'text-center',
                 },
                 {
-                    key: 'updated_at', label: 'Aktualisiert', thClass: 'text-left', tdClass: 'text-left',
+                    key: 'updated_at', label: 'Updated at', thClass: 'text-left', tdClass: 'text-left',
                 },
                 { key: 'options', label: '', tdClass: 'text-left' },
             ],

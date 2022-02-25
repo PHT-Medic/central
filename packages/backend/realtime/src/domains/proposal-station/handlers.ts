@@ -9,8 +9,8 @@ import {
     PermissionID,
     buildSocketProposalStationInRoomName,
     buildSocketProposalStationOutRoomName,
-    extendSocketClientToServerEventCallback,
-    extendSocketClientToServerEventContext,
+    buildSocketProposalStationRoomName,
+    extendSocketClientToServerEventCallback, extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@typescript-error/http';
 import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
@@ -21,6 +21,37 @@ export function registerProposalStationSocketHandlers(
     socket: SocketInterface,
 ) {
     if (!socket.data.user && !socket.data.robot) return;
+
+    // ------------------------------------------------------------
+
+    socket.on('proposalStationsSubscribe', async (context, cb) => {
+        context = extendSocketClientToServerEventContext(context);
+        cb = extendSocketClientToServerEventCallback(cb);
+
+        if (
+            !socket.data.ability.hasPermission(PermissionID.PROPOSAL_APPROVE)
+        ) {
+            if (typeof cb === 'function') {
+                cb(new UnauthorizedError());
+            }
+
+            return;
+        }
+
+        incrSocketRoomConnections(socket, buildSocketProposalStationRoomName(context.data.id));
+
+        if (typeof cb === 'function') {
+            cb();
+        }
+    });
+
+    socket.on('proposalStationsUnsubscribe', (context) => {
+        context = extendSocketClientToServerEventContext(context);
+
+        decrSocketRoomConnections(socket, buildSocketProposalStationRoomName(context.data.id));
+    });
+
+    // ------------------------------------------------------------
 
     socket.on('proposalStationsInSubscribe', async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);
