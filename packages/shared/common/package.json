@@ -1,6 +1,6 @@
 {
     "name": "@personalhealthtrain/central-common",
-    "version": "1.2.0-alpha.1",
+    "version": "1.2.0-alpha.3",
     "description": "",
     "main": "./dist/index.js",
     "typings": "./dist/index.d.ts",
