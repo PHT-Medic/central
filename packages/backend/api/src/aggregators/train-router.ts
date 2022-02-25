@@ -33,10 +33,10 @@ export function buildTrainRouterAggregator() {
     function start() {
         return consumeQueue({ routingKey: MessageQueueRoutingKey.AGGREGATOR_TRAIN_ROUTER_EVENT }, {
             [AggregatorTrainRouterEvent.FAILED]: async (message: Message) => {
-                await updateTrain(message.data.trainId, AggregatorTrainRouterEvent.FAILED);
+                await updateTrain(message.data.id, AggregatorTrainRouterEvent.FAILED);
             },
             [AggregatorTrainRouterEvent.STOPPED]: async (message: Message) => {
-                await updateTrain(message.data.trainId, AggregatorTrainRouterEvent.STOPPED);
+                await updateTrain(message.data.id, AggregatorTrainRouterEvent.STOPPED);
             },
         });
     }

@@ -39,7 +39,7 @@ export function buildTrainBuilderAggregator() {
     function start() {
         return consumeQueue({ routingKey: MessageQueueRoutingKey.AGGREGATOR_TRAIN_BUILDER_EVENT }, {
             $any: async (message: Message) => {
-                await updateTrain(message.data.trainId, message.type);
+                await updateTrain(message.data.id, message.type);
             },
         });
     }
