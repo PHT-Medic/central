@@ -11,8 +11,8 @@ import dotenv from 'dotenv';
 import { createConnection } from 'typeorm';
 import { buildTokenAggregator } from '@typescript-auth/server';
 import { useClient } from 'redis-extension';
-import env from './env';
 
+import env from './env';
 import { createConfig } from './config';
 import { createExpressApp } from './http/express';
 import { createHttpServer } from './http/server';
