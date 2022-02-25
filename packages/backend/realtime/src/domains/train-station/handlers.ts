@@ -50,6 +50,13 @@ export function registerTrainStationSocketHandlers(
 
         decrSocketRoomConnections(socket, buildSocketTrainStationRoomName(context.data.id));
     });
+}
+
+export function registerTrainStationForRealmSocketHandlers(
+    io: SocketServerInterface | SocketNamespaceInterface,
+    socket: SocketInterface,
+) {
+    if (!socket.data.user && !socket.data.robot) return;
 
     // ------------------------------------------------------------
 

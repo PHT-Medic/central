@@ -9,8 +9,14 @@ import { registerTrainSocketHandlers } from '../../domains/train/handlers';
 import { registerUserHandlers } from '../../domains/user/handlers';
 import { SocketNamespaceInterface, SocketServerInterface } from './type';
 import { registerProposalSocketHandlers } from '../../domains/proposal/handlers';
-import { registerProposalStationSocketHandlers } from '../../domains/proposal-station/handlers';
-import { registerTrainStationSocketHandlers } from '../../domains/train-station/handlers';
+import {
+    registerProposalStationForRealmSocketHandlers,
+    registerProposalStationSocketHandlers,
+} from '../../domains/proposal-station/handlers';
+import {
+    registerTrainStationForRealmSocketHandlers,
+    registerTrainStationSocketHandlers,
+} from '../../domains/train-station/handlers';
 import { registerTrainFileSocketHandlers } from '../../domains/train-file/handlers';
 import { registerStationSocketHandlers } from '../../domains/station/handlers';
 
@@ -24,7 +30,9 @@ export function registerSocketHandlers(io: SocketServerInterface) {
 
         registerProposalSocketHandlers(io, socket);
         registerProposalStationSocketHandlers(io, socket);
+
         registerStationSocketHandlers(io, socket);
+
         registerTrainSocketHandlers(io, socket);
         registerTrainFileSocketHandlers(io, socket);
         registerTrainStationSocketHandlers(io, socket);
@@ -38,10 +46,12 @@ export function registerSocketNamespaceHandlers(io: SocketNamespaceInterface) {
         }
 
         registerProposalSocketHandlers(io, socket);
-        registerProposalStationSocketHandlers(io, socket);
+        registerProposalStationForRealmSocketHandlers(io, socket);
+
         registerStationSocketHandlers(io, socket);
+
         registerTrainSocketHandlers(io, socket);
         registerTrainFileSocketHandlers(io, socket);
-        registerTrainStationSocketHandlers(io, socket);
+        registerTrainStationForRealmSocketHandlers(io, socket);
     });
 }
