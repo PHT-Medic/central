@@ -14,10 +14,10 @@ BASE_DIR=/usr/src/project
 cd "${BASE_DIR}"
 
 case "${1}" in
-    backend) PACKAGE=backend;;
-    frontend) PACKAGE=frontend;;
+    api) PACKAGE=api;;
+    ui) PACKAGE=ui;;
     realtime) PACKAGE=realtime;;
-    result-service) PACKAGE=result-service;;
+    result) PACKAGE=result;;
     cli) PACKAGE=cli;;
     *) echo "Unknown package: ${1}";;
 esac
