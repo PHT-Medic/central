@@ -6,7 +6,7 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default {
     meta: {
@@ -98,7 +98,7 @@ export default {
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
                         :entity-type="'realm'"
-                        :element-text="''"
+                        :with-text="false"
                         @done="handleDeleted"
                     />
                 </template>

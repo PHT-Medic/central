@@ -73,6 +73,7 @@ const config = {
     ** Plugins to load before mounting the App
     */
     plugins: [
+        './plugins/ilingo',
         './plugins/api',
         './plugins/store',
         './plugins/auth',

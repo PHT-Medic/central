@@ -346,45 +346,43 @@ export default {
                         <div
                             v-for="(item, key) in selectedTrainStations"
                             :key="item.id"
-                            class="c-list-item mb-2"
+                            class="c-list-item mb-2 align-items-center"
                         >
-                            <div class="c-list-content align-items-center">
-                                <div class="c-list-icon">
-                                    <i class="fa fa-hospital" />
-                                </div>
-                                <span class="mb-0">
-                                    <template v-if="item.station">
-                                        {{ item.station.name }}
-                                    </template>
-                                    <template v-else>
-                                        Station #{{ item.station_id }}
-                                    </template>
-                                </span>
-                                <div class="ml-auto">
-                                    <button
-                                        type="button"
-                                        class="btn btn-danger btn-xs"
-                                        @click.prevent="dropTrainStation(item)"
-                                    >
-                                        <i class="fa fa-minus" />
-                                    </button>
-                                    <button
-                                        v-if="key !== 0"
-                                        type="button"
-                                        class="btn btn-primary btn-xs"
-                                        @click.prevent="moveStationPosition('up', item.id)"
-                                    >
-                                        <i class="fa fa-arrow-up" />
-                                    </button>
-                                    <button
-                                        v-if="key < trainStation.items.length -1"
-                                        type="button"
-                                        class="btn btn-primary btn-xs"
-                                        @click.prevent="moveStationPosition('down', item.id)"
-                                    >
-                                        <i class="fa fa-arrow-down" />
-                                    </button>
-                                </div>
+                            <div class="c-list-icon">
+                                <i class="fa fa-hospital" />
+                            </div>
+                            <span class="mb-0">
+                                <template v-if="item.station">
+                                    {{ item.station.name }}
+                                </template>
+                                <template v-else>
+                                    Station #{{ item.station_id }}
+                                </template>
+                            </span>
+                            <div class="ml-auto">
+                                <button
+                                    type="button"
+                                    class="btn btn-danger btn-xs"
+                                    @click.prevent="dropTrainStation(item)"
+                                >
+                                    <i class="fa fa-minus" />
+                                </button>
+                                <button
+                                    v-if="key !== 0"
+                                    type="button"
+                                    class="btn btn-primary btn-xs"
+                                    @click.prevent="moveStationPosition('up', item.id)"
+                                >
+                                    <i class="fa fa-arrow-up" />
+                                </button>
+                                <button
+                                    v-if="key < trainStation.items.length -1"
+                                    type="button"
+                                    class="btn btn-primary btn-xs"
+                                    @click.prevent="moveStationPosition('down', item.id)"
+                                >
+                                    <i class="fa fa-arrow-down" />
+                                </button>
                             </div>
                         </div>
                     </div>

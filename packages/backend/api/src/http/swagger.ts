@@ -24,7 +24,8 @@ export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDoc
 
     const metadataConfig : MetadataConfig = {
         entryFile: [
-            path.join(getRootDirPath(), 'src', 'controllers', '**', '*.ts'),
+            path.join(getRootDirPath(), 'src', 'http', 'controllers', '**', '*.ts'),
+            path.join(getRootDirPath(), '..', '..', '..', 'node_modules', '@typescript-auth', 'server', 'src', 'http', 'controllers', '**', '*{.ts,.js,.d.ts}'),
         ],
         ignore: ['**/node_modules/**'],
         allow: ['**/@typescript-auth/**'],

@@ -10,6 +10,7 @@ import { HTTPClient as AuthHTTPClient } from '@typescript-auth/domains';
 import {Store} from "vuex";
 import {SocketModule} from "../config/socket";
 import AuthModule from "../config/auth";
+import {Ilingo} from "ilingo";
 
 declare module '*.vue' {
     import Vue from 'vue';
@@ -25,6 +26,7 @@ declare module 'vue/types/vue' {
         $authApi: AuthHTTPClient,
 
         $auth: AuthModule,
+        $ilingo: Ilingo,
 
         $store: Store<any>,
 
@@ -36,6 +38,7 @@ declare module 'vue/types/vue' {
         $authApi: AuthHTTPClient,
 
         $auth: AuthModule,
+        $ilingo: Ilingo,
 
         $store: Store<any>,
 

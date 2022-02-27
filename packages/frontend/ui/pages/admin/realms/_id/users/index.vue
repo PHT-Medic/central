@@ -88,7 +88,7 @@ export default {
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
                         :entity-type="'user'"
-                        :element-text="''"
+                        :with-text="false"
                         @done="handleDeleted"
                     />
                 </template>

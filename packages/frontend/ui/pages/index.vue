@@ -5,21 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { mapGetters } from 'vuex';
 import WorldSvg from '../components/svg/WorldSvg.vue';
-import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';
+import { LayoutKey, LayoutNavigationID } from '../config/layout';
 
 export default {
     components: { WorldSvg },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-    },
-    computed: {
-        ...mapGetters('auth', [
-            'loggedIn',
-            'user',
-        ]),
     },
 };
 </script>

@@ -6,10 +6,12 @@
  */
 
 import AuthVue from '@typescript-auth/vue';
+import { Pagination } from '@vue-layout/utils';
 import Vue from 'vue';
 import Gravatar from 'vue-gravatar';
 
 Vue.use(AuthVue);
+Vue.component('Pagination', Pagination);
 Vue.component('VGravatar', Gravatar);
 
 Vue.filter('str_length_limit', (value, size) => {
