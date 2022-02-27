@@ -1,5 +1,5 @@
 import { getRepository } from 'typeorm';
-import { onlyRealmPermittedQueryResources } from '@typescript-auth/server';
+import { onlyRealmPermittedQueryResources } from '@typescript-auth/server-core';
 import {
     applyFields,
     applyFilters, applyPagination, applyRelations, applySort,

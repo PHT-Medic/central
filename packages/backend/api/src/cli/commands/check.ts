@@ -9,9 +9,10 @@ import { Arguments, Argv, CommandModule } from 'yargs';
 import { createConnection } from 'typeorm';
 import { buildConnectionOptions } from 'typeorm-extension';
 import {
-    DatabaseRootSeeder, setEntitiesForConnectionOptions,
-} from '@typescript-auth/server';
-import { useConfig } from '@typescript-auth/server/dist/config';
+    DatabaseRootSeeder,
+    setEntitiesForConnectionOptions,
+    useConfig,
+} from '@typescript-auth/server-core';
 import { PermissionKey } from '@personalhealthtrain/central-common';
 
 interface SeedCheckArguments extends Arguments {

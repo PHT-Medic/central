@@ -11,7 +11,7 @@ import {
 import {
     Proposal, ProposalStation, ProposalStationApprovalStatus, Station,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@typescript-auth/server';
+import { RealmEntity } from '@typescript-auth/server-core';
 import { Realm } from '@typescript-auth/domains';
 import { ProposalEntity } from '../proposal/entity';
 import { StationEntity } from '../station/entity';

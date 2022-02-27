@@ -6,7 +6,7 @@
  */
 
 import { Express, NextFunction } from 'express';
-import { ExpressRequest as AuthExpressRequest, ExpressResponse as AuthExpressResponse } from '@typescript-auth/server';
+import { ExpressRequest as AuthExpressRequest, ExpressResponse as AuthExpressResponse } from '@typescript-auth/server-core';
 
 export interface ExpressAppInterface extends Express {
 

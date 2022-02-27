@@ -9,7 +9,7 @@ import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import { MasterImage, Proposal, ProposalRisk } from '@personalhealthtrain/central-common';
-import { RealmEntity, UserEntity } from '@typescript-auth/server';
+import { RealmEntity, UserEntity } from '@typescript-auth/server-core';
 import { Realm, User } from '@typescript-auth/domains';
 import { ProposalStationEntity } from '../proposal-station/entity';
 import { MasterImageEntity } from '../master-image/entity';

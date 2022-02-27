@@ -1,6 +1,6 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
-import { onlyRealmPermittedQueryResources } from '@typescript-auth/server';
+import { onlyRealmPermittedQueryResources } from '@typescript-auth/server-core';
 import { applyFilters, applyPagination, applyQueryRelations } from 'typeorm-extension';
 import { isPermittedForResourceRealm } from '@typescript-auth/domains';
 import { TrainEntity } from '../../../../../domains/core/train/entity';

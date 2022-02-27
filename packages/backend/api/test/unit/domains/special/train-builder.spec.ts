@@ -6,7 +6,7 @@
  */
 
 import { getCustomRepository, getRepository } from 'typeorm';
-import { UserRepository } from '@typescript-auth/server';
+import { UserRepository } from '@typescript-auth/server-core';
 import { SecretType, TrainStationApprovalStatus, createNanoID } from '@personalhealthtrain/central-common';
 import path from 'path';
 import { ProposalEntity } from '../../../../src/domains/core/proposal/entity';

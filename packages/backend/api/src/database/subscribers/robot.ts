@@ -8,7 +8,7 @@
 import {
     EntitySubscriberInterface, EventSubscriber, RemoveEvent,
 } from 'typeorm';
-import { RobotEntity } from '@typescript-auth/server';
+import { RobotEntity } from '@typescript-auth/server-core';
 import { publishMessage } from 'amqp-extension';
 import { buildSecretStorageQueueMessage } from '../../domains/special/secret-storage/queue';
 import { SecretStorageQueueCommand, SecretStorageQueueEntityType } from '../../domains/special/secret-storage/constants';

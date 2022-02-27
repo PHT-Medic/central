@@ -1,7 +1,7 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
-import { onlyRealmPermittedQueryResources } from '@typescript-auth/server';
+import { onlyRealmPermittedQueryResources } from '@typescript-auth/server-core';
 import { applyFilters, applyPagination } from 'typeorm-extension';
 import { isPermittedForResourceRealm } from '@typescript-auth/domains';
 import { TrainResultEntity } from '../../../../../domains/core/train-result/entity';

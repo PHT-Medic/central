@@ -6,7 +6,7 @@
  */
 
 import { HTTPClient } from '@personalhealthtrain/central-common';
-import { HTTPClient as AuthHTTPClient } from '@typescript-auth/domains/dist/http/client/module';
+import { HTTPClient as AuthHTTPClient } from '@typescript-auth/domains';
 import AuthModule from '../config/auth';
 import {Store} from "vuex";
 import {SocketModule} from "../config/socket";

@@ -14,7 +14,7 @@ import {
     PrimaryColumn, UpdateDateColumn,
 } from 'typeorm';
 import { TrainResult, TrainResultStatus } from '@personalhealthtrain/central-common';
-import { UserEntity } from '@typescript-auth/server';
+import { UserEntity } from '@typescript-auth/server-core';
 import { TrainEntity } from '../train/entity';
 
 @Entity({ name: 'train_results' })

@@ -17,7 +17,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { Station, createNanoID } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@typescript-auth/server';
+import { RealmEntity } from '@typescript-auth/server-core';
 import { Realm } from '@typescript-auth/domains';
 import { TrainStationEntity } from '../train-station/entity';
 import { ProposalStationEntity } from '../proposal-station/entity';
