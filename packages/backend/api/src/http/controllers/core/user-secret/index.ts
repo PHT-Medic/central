@@ -21,7 +21,7 @@ import {
     updateUserSecretRouteHandler,
 } from './handlers';
 
-@SwaggerTags('user', 'pht')
+@SwaggerTags('user')
 @Controller('/user-secrets')
 export class UserSecretController {
     @Get('', [ForceLoggedInMiddleware])

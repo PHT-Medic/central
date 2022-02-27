@@ -10,6 +10,7 @@ import { ConnectionWithAdditionalOptions, buildConnectionOptions } from 'typeorm
 import {
     setEntitiesForConnectionOptions,
 } from '@typescript-auth/server-core';
+import { ConnectionOptions } from 'typeorm';
 import { MasterImageEntity } from '../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../domains/core/master-image-group/entity';
 import { ProposalEntity } from '../domains/core/proposal/entity';
@@ -61,8 +62,22 @@ export function modifyDatabaseConnectionOptions(
     return connectionOptions;
 }
 
-export async function buildDatabaseConnectionOptions() {
-    const baseOptions = await buildConnectionOptions();
+export async function buildDatabaseConnectionOptions(options?: ConnectionOptions) {
+    let connectionOptions;
 
-    return modifyDatabaseConnectionOptions(baseOptions);
+    try {
+        connectionOptions = await buildConnectionOptions(options);
+        connectionOptions.logging = ['error'];
+    } catch (e) {
+        connectionOptions = {
+            name: 'default',
+            type: 'better-sqlite3',
+            database: path.join(process.cwd(), 'writable', process.env.NODE_ENV === 'test' ? 'test.sql' : 'db.sql'),
+            subscribers: [],
+            migrations: [],
+            logging: ['error'],
+        };
+    }
+
+    return modifyDatabaseConnectionOptions(connectionOptions);
 }

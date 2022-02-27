@@ -137,10 +137,11 @@ export default {
                     case FrontendTrainCommand.RESULT_DOWNLOAD:
                         window.open(`${this.$config.resultServiceApiUrl}train-results/${resultId}/download`);
                         break;
-                    default:
+                    default: {
                         const train = await this.$api.train.runCommand(this.train.id, this.command);
                         this.$emit('done', train);
                         break;
+                    }
                 }
 
                 const message = `Successfully executed result command ${this.commandText}`;

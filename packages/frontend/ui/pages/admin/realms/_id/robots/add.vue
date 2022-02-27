@@ -20,7 +20,7 @@ export default {
         entity: Object,
     },
     methods: {
-        handleCreated(e) {
+        handleCreated() {
             this.$nuxt.$router.push(`/admin/realms/${this.entity.id}/robots`);
         },
     },

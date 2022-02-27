@@ -22,7 +22,7 @@ import {
 
 type PartialTrainResult = Partial<TrainResult>;
 
-@SwaggerTags('pht')
+@SwaggerTags('train')
 @Controller('/train-results')
 export class TrainResultController {
     @Get('', [ForceLoggedInMiddleware])

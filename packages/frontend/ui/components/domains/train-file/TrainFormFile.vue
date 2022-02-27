@@ -8,6 +8,7 @@
 export default {
     props: {
         file: {
+            type: Object,
             default: undefined,
         },
         pathSelected: {

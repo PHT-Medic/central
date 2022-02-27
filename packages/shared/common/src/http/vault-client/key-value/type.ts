@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AxiosInstance } from 'axios';
+import { ClientDriverInstance } from '@trapi/client';
 import { VaultMountAPI } from '../mount';
 
 export type VaultKeyValueContext = {
-    client: AxiosInstance,
+    client: ClientDriverInstance,
     mountAPI: VaultMountAPI
 };
 

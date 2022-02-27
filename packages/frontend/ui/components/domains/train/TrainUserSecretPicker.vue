@@ -70,10 +70,6 @@ export default {
                         ],
                     },
                 });
-
-                if (meta.total === 2) {
-
-                }
             } catch (e) {
                 // ...
             }

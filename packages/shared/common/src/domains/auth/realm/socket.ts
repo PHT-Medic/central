@@ -12,5 +12,7 @@ export function buildSocketRealmNamespaceName(realmId: Realm['id']) {
 }
 
 export function parseSocketRealmNamespaceName(name: string) : string | undefined {
-    return undefined;
+    return name.startsWith('/realm#') ?
+        name.substring('/realm#'.length) :
+        name;
 }

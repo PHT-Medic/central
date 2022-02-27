@@ -74,7 +74,7 @@ export default {
                 this.setHash(train.hash);
                 this.$emit('generated', this.form.hash);
             } catch (e) {
-                console.log(e);
+                // ...
             }
 
             this.busy = false;

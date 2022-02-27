@@ -6,7 +6,7 @@
  */
 
 import {
-    ConnectionWithSeederOptions, buildConnectionOptions, createDatabase, dropDatabase,
+    ConnectionWithSeederOptions, createDatabase, dropDatabase,
 } from 'typeorm-extension';
 import { ConnectionOptions, createConnection, getConnection } from 'typeorm';
 import {
@@ -14,12 +14,12 @@ import {
     setEntitiesForConnectionOptions,
 } from '@typescript-auth/server-core';
 import { PermissionKey } from '@personalhealthtrain/central-common';
-import { modifyDatabaseConnectionOptions } from '../../../src/database/utils';
+import { buildDatabaseConnectionOptions, modifyDatabaseConnectionOptions } from '../../../src/database/utils';
 import { buildRobotAggregator } from '../../../src/aggregators/robot';
 
 async function createConnectionOptions() {
     return {
-        ...await buildConnectionOptions({ buildForCommand: false }),
+        ...await buildDatabaseConnectionOptions(),
         database: 'test',
     } as ConnectionWithSeederOptions;
 }

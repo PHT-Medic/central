@@ -20,7 +20,7 @@ import {
 
 type PartialMasterImage = Partial<MasterImage>;
 
-@SwaggerTags('pht')
+@SwaggerTags('master-image')
 @Controller('/master-images')
 export class MasterImageController {
     @Get('', [ForceLoggedInMiddleware])

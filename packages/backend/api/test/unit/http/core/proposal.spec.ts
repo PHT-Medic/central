@@ -6,7 +6,6 @@
  */
 
 import { Proposal } from '@personalhealthtrain/central-common';
-import { MASTER_REALM_ID } from '@typescript-auth/domains';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
 import { TEST_DEFAULT_PROPOSAL, createSuperTestProposal } from '../../../utils/domains/proposal';

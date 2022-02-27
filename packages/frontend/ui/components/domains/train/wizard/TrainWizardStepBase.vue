@@ -228,7 +228,6 @@ export default {
                 this.socketLockedId = null;
             } catch (e) {
                 // ...
-                console.log(e);
             }
 
             this.trainStation.busy = false;
@@ -284,7 +283,7 @@ export default {
                         return;
                 }
             } catch (e) {
-                console.log(e);
+                // ...
             }
 
             this.trainStation.busy = false;

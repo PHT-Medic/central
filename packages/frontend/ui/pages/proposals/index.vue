@@ -5,15 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import ProposalSvg from '../../components/svg/ProposalSvg';
-import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
+import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default {
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
     },
-    components: { ProposalSvg },
     data() {
         return {
             sidebar: {

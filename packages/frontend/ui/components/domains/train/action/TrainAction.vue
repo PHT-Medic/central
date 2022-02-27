@@ -13,7 +13,7 @@
         <button
             class="btn btn-xs"
             :class="'btn-'+classSuffix"
-            :disabled="!isValidStatus || !isPermitted"
+            :disabled="!isPermitted"
             @click.prevent="doAction"
         >
             <slot name="text">
@@ -26,7 +26,7 @@
 export default {
     props: {
         trainId: String,
-        train_stations: Array,
+        trainStations: Array,
         task: String,
     },
     data() {
@@ -35,9 +35,6 @@ export default {
         };
     },
     computed: {
-        isValidStatus() {
-
-        },
         isPermitted() {
             switch (this.task) {
                 case '':
@@ -55,6 +52,8 @@ export default {
                 case 'stop':
                     return 'danger';
             }
+
+            return '';
         },
         iconClass() {
             switch (this.task) {
@@ -65,6 +64,8 @@ export default {
                 case 'stop':
                     return 'fa fa-stop';
             }
+
+            return '';
         },
     },
     methods: {

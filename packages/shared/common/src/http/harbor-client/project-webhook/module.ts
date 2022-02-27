@@ -86,11 +86,9 @@ export class HarborProjectWebHookAPI {
 
                 await this.client
                     .post(`projects/${projectIdOrName}/webhook/policies`, webhook, headers);
-
-                return;
+            } else {
+                throw e;
             }
-
-            throw e;
         }
 
         return webhook;

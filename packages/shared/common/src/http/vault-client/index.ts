@@ -6,8 +6,6 @@
  */
 
 export * from './module';
+export * from './mount';
 export * from './type';
 export * from './key-value';
-export { VaultMountPayload } from './mount';
-export { VaultKVOptions } from './key-value';
-export { VaultKVVersion } from './key-value';

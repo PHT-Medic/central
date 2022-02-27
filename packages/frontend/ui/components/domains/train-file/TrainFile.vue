@@ -13,7 +13,7 @@ export default {
         },
         filesSelected: {
             type: Array,
-            default: [],
+            default: () => [],
         },
         fileSelectedId: {
             type: String,

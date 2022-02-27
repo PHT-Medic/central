@@ -37,7 +37,7 @@ export function createExpressApp(redis?: Client | boolean | string) : ExpressApp
         bodyParserMiddleware: true,
         cookieParserMiddleware: true,
         responseMiddleware: true,
-        swaggerMiddleware: false,
+        swaggerMiddleware: true,
 
         writableDirectoryPath: path.join(process.cwd(), 'writable'),
         redis,

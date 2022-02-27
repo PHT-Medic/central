@@ -24,7 +24,7 @@ import {
 
 type PartialProposal = Partial<Proposal>;
 
-@SwaggerTags('pht')
+@SwaggerTags('proposal')
 @Controller('/proposals')
 export class ProposalController {
     @Get('', [ForceLoggedInMiddleware])

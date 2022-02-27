@@ -22,6 +22,7 @@ export function extendSocketClientToServerEventCallback(
         typeof cb !== 'function' ||
         cb.length !== 1
     ) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         cb = (error?) => {};
     }
 

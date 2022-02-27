@@ -81,10 +81,5 @@ export default {
             }
         },
     },
-    methods: {
-        hasArrived(id) {
-
-        },
-    },
 };
 </script>

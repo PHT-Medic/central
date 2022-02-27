@@ -20,7 +20,7 @@ import {
 
 type PartialMasterImageGroup = Partial<MasterImageGroup>;
 
-@SwaggerTags('pht')
+@SwaggerTags('master-image')
 @Controller('/master-image-groups')
 export class MasterImageGroupController {
     @Get('', [ForceLoggedInMiddleware])

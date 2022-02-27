@@ -24,7 +24,7 @@ import { ForceLoggedInMiddleware } from '../../../middleware/auth';
 
 type PartialTrainFile = Partial<TrainFile>;
 
-@SwaggerTags('pht')
+@SwaggerTags('train')
 @Controller('/trains')
 export class TrainFileController {
     @Get('/:id/files', [ForceLoggedInMiddleware])

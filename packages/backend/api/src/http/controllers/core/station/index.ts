@@ -24,7 +24,7 @@ import {
 
 type PartialStation = Partial<Station>;
 
-@SwaggerTags('pht')
+@SwaggerTags('station')
 @Controller('/stations')
 export class StationController {
     @Get('', [ForceLoggedInMiddleware])

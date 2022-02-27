@@ -218,7 +218,6 @@ export default {
                     this.handleDeleted(file);
                 }
             } catch (e) {
-                console.log(e);
                 // ...
             }
 

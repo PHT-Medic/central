@@ -65,7 +65,6 @@ export default {
                 visitorProposalStation,
             };
         } catch (e) {
-            console.log(e);
             await context.redirect('/proposals');
 
             return {
@@ -163,7 +162,7 @@ export default {
                 Vue.set(this.entity, keys[i], data[keys[i]]);
             }
         },
-        async handleDeleted(data) {
+        async handleDeleted() {
             await this.$nuxt.$router.push('/proposals');
         },
         handleProposalStationUpdated(item) {
