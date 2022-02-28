@@ -53,7 +53,9 @@ export async function saveDockerContainerPathsTo(
                 return reject();
             }
 
-            return resolve();
+            return Promise.resolve()
+                .then(() => container.remove())
+                .then(() => resolve());
         }));
 
         pack.finalize();

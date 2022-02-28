@@ -35,8 +35,12 @@ export async function extractImage(message: Message) {
         trainResultPath,
     );
 
-    // we are done here with the docker image :)
-    await removeLocalRegistryImage(repositoryPath);
+    try {
+        // we are done here with the docker image :)
+        await removeLocalRegistryImage(repositoryPath);
+    } catch (e) {
+        // we tried :P
+    }
 
     return message;
 }
