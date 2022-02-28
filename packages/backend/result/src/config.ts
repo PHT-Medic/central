@@ -1,7 +1,7 @@
 import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
 import {
-    VaultAPI,
-    refreshAuthRobotTokenOnResponseError,
+    HTTPClient,
+    VaultAPI, refreshAuthRobotTokenOnResponseError,
 } from '@personalhealthtrain/central-common';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
@@ -46,6 +46,7 @@ function createConfig({ env } : ConfigContext) : Config {
     }, 'vault');
 
     setHTTPConfig({
+        clazz: HTTPClient,
         driver: {
             baseURL: env.apiUrl,
             withCredentials: true,

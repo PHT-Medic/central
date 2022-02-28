@@ -14,7 +14,7 @@ import {
     PrimaryColumn, UpdateDateColumn,
 } from 'typeorm';
 import { TrainResult, TrainResultStatus } from '@personalhealthtrain/central-common';
-import { UserEntity } from '@typescript-auth/server-core';
+import { RealmEntity, UserEntity } from '@typescript-auth/server-core';
 import { TrainEntity } from '../train/entity';
 
 @Entity({ name: 'train_results' })
@@ -55,4 +55,13 @@ export class TrainResultEntity implements TrainResult {
     @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
         user: UserEntity;
+
+    // ------------------------------------------------------------------
+
+    @Column()
+        realm_id: string;
+
+    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'realm_id' })
+        realm: RealmEntity;
 }

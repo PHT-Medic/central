@@ -23,7 +23,7 @@ import { RegistryHook } from '../../../../domains/special/registry';
 @SwaggerTags('extra')
 @Controller('/services')
 export class ServiceController {
-    @Post('/:id/hook', [])
+    @Post('/:id/hook', [ForceLoggedInMiddleware])
     async handleHarborHook(
     @Request() req: ExpressRequest,
         @Response() res: ExpressResponse,

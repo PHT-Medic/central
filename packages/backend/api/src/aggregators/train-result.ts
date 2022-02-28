@@ -46,7 +46,7 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: Aggregat
         await trainRepository.save(train);
     }
 
-    // If an id is available, than the progress succeeded :) ^^
+    // If an id is available, then the progress succeeded :) ^^
     // This is nearly always the case, expect when no result id is generated.
     if (typeof data.id === 'undefined') {
         return;
@@ -61,6 +61,7 @@ async function handleTrainResult(data: ResultServiceDataPayload, event: Aggregat
             train_id: data.train_id,
             status,
             user_id: train.user_id,
+            realm_id: train.realm_id,
         });
     } else {
         result = resultRepository.merge(result, {

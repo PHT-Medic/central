@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { streamTrainResultRouteHandler } from '../../../app/controllers/train-result';
+import { streamTrainResultRouteHandler } from '../controllers/train-result';
 import { forceLoggedIn } from '../middleware/auth';
 import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 

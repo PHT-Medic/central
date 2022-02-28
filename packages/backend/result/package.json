@@ -1,5 +1,6 @@
 {
     "name": "@personalhealthtrain/central-result-service",
+    "private": true,
     "author": {
         "name": "Peter Placzek",
         "email": "tadashi@animesu.net",

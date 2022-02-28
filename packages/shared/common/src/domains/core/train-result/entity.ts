@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { User } from '@typescript-auth/domains';
+import { Realm, User } from '@typescript-auth/domains';
 import { Train } from '../train';
 import { TrainResultStatus } from './status';
 
@@ -33,4 +33,10 @@ export interface TrainResult {
     user_id: User['id'];
 
     user: User;
+
+    // ------------------------------------------------------------------
+
+    realm_id: Realm['id'];
+
+    realm: Realm;
 }
