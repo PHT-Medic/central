@@ -7,7 +7,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "description": "This project contains the central Result-Service of the PHT.",
     "main": "dist/index.js",
     "scripts": {
