@@ -27,7 +27,7 @@
         "@types/moment": "^2.13.0",
         "@types/vuelidate": "^0.7.13",
         "@typescript-auth/domains": "^0.0.28",
-        "@typescript-auth/vue": "^0.1.1",
+        "@typescript-auth/vue": "^0.1.2",
         "@typescript-error/core": "^1.1.2",
         "@vue-layout/navigation": "^1.0.3",
         "@vue-layout/utils": "^1.0.7",
