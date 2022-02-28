@@ -235,6 +235,7 @@ export default {
                 class="ml-auto flex-row d-flex"
             >
                 <train-result-command
+                    v-if="entity.result_last_id"
                     class="mr-1"
                     :command="trainCommand.RESULT_DOWNLOAD"
                     :train-result-id="entity.result_last_id"
