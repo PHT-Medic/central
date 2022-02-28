@@ -17,6 +17,7 @@ import { buildDatabaseConnectionOptions } from '../../database/utils';
 import { generateSwaggerDocumentation } from '../../http/swagger';
 import { DatabaseRootSeeder } from '../../database/seeds/root';
 import { buildRobotAggregator } from '../../aggregators/robot';
+import { useSpinner } from '../../config/spinner';
 
 interface SetupArguments extends Arguments {
     auth: boolean,
@@ -59,6 +60,8 @@ export class SetupCommand implements CommandModule {
 
     // eslint-disable-next-line class-methods-use-this
     async handler(args: SetupArguments) {
+        const spinner = useSpinner();
+
         if (
             !args.auth &&
             !args.database &&
@@ -74,6 +77,7 @@ export class SetupCommand implements CommandModule {
          */
         if (args.auth) {
             await setupCommand({
+                spinner,
                 database: false,
                 databaseSeeder: false, // false, to trigger own subscribers
                 documentation: false, // todo: make true again if external dependencies can be used to generate swagger docs.
@@ -82,7 +86,9 @@ export class SetupCommand implements CommandModule {
         }
 
         if (args.documentation) {
+            spinner.start('generating documentation...');
             await generateSwaggerDocumentation();
+            spinner.succeed('generated documentation.');
         }
 
         if (args.database || args.databaseSeeder) {
@@ -92,15 +98,20 @@ export class SetupCommand implements CommandModule {
             const connectionOptions = await buildDatabaseConnectionOptions();
 
             if (args.database) {
+                spinner.start('create database...');
                 await createDatabase({ ifNotExist: true }, connectionOptions);
+                spinner.succeed('created database.');
             }
 
             const connection = await createConnection(connectionOptions);
 
             try {
+                spinner.start('synchronize database...');
                 await connection.synchronize();
+                spinner.succeed('synchronized database...');
 
                 if (args.databaseSeeder) {
+                    spinner.start('seeding database...');
                     createConfig({ env });
 
                     const redis = useClient();
@@ -120,9 +131,10 @@ export class SetupCommand implements CommandModule {
 
                     const coreSeeder = new DatabaseRootSeeder();
                     await coreSeeder.run(connection);
+                    spinner.start('seeded database...');
                 }
             } catch (e) {
-                console.log(e);
+                spinner.start('seeding database failed...');
                 await connection.close();
                 process.exit(1);
                 throw e;

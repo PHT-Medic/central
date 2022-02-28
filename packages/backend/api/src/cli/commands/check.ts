@@ -14,6 +14,8 @@ import {
     useConfig,
 } from '@typescript-auth/server-core';
 import { PermissionKey } from '@personalhealthtrain/central-common';
+import { useSpinner } from '../../config/spinner';
+import env from '../../env';
 
 interface SeedCheckArguments extends Arguments {
 
@@ -29,12 +31,19 @@ export class CheckCommand implements CommandModule {
     }
 
     async handler(args: SeedCheckArguments) {
+        const spinner = useSpinner();
+
         const connectionOptions = setEntitiesForConnectionOptions(await buildConnectionOptions(), true);
         const connection = await createConnection(connectionOptions);
 
         try {
-            await connection.synchronize();
+            if (env.env !== 'production') {
+                spinner.start('synchronizing database...');
+                await connection.synchronize();
+                spinner.succeed('synchronized database.');
+            }
 
+            spinner.start('checking database integrity...');
             const authConfig = useConfig();
             const authSeeder = new DatabaseRootSeeder({
                 userName: authConfig.adminUsername,
@@ -42,8 +51,9 @@ export class CheckCommand implements CommandModule {
                 permissions: Object.values(PermissionKey),
             });
             await authSeeder.run(connection);
+            spinner.succeed('checked database integrity.');
         } catch (e) {
-            console.log(e);
+            spinner.fail('checking database integrity failed.');
             await connection.close();
             process.exit(1);
             throw e;

@@ -18,6 +18,7 @@ import {
 import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../../domains/special/registry';
 import { DispatcherHarborEventWithAdditionalData } from '../extend';
 import { AggregatorRegistryEvent, buildAggregatorRegistryQueueMessage } from '../../../domains/special/aggregator';
+import { useSpinner } from '../../../config/spinner';
 
 export async function dispatchRegistryEventToSelf(
     message: Message,
@@ -26,12 +27,16 @@ export async function dispatchRegistryEventToSelf(
     const data : DispatcherHarborEventWithAdditionalData = message.data as RegistryEventQueuePayload;
 
     if (type !== RegistryQueueEvent.PUSH_ARTIFACT) {
+        useSpinner()
+            .info(`skipping ${type} event distribution for self`);
         return message;
     }
 
     // master Image project
     const isLibraryProject : boolean = data.namespace === REGISTRY_MASTER_IMAGE_PROJECT_NAME;
     if (isLibraryProject) {
+        useSpinner()
+            .info(`skipping ${type} event distribution for self`);
         return message;
     }
 

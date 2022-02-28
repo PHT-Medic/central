@@ -5,21 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getRepository } from 'typeorm';
 import {
     BaseSchema, array, object, string,
 } from 'yup';
 
-import { REGISTRY_MASTER_IMAGE_PROJECT_NAME } from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
-import { useLogger } from '../../../../../../config/log';
 import {
     RegistryHook,
     RegistryQueueEvent,
     buildRegistryEventQueueMessage,
 } from '../../../../../../domains/special/registry';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
-import { TrainEntity } from '../../../../../../domains/core/train/entity';
+import { useSpinner } from '../../../../../../config/spinner';
 
 let eventValidator : undefined | BaseSchema;
 function useHookEventDataValidator() : BaseSchema {
@@ -50,36 +47,24 @@ function useHookEventDataValidator() : BaseSchema {
 }
 
 export async function postHarborHookRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    useLogger().debug('hook received', { service: 'api-harbor-hook' });
-
-    const repository = getRepository(TrainEntity);
+    const spinner = useSpinner();
+    spinner.info('receiving registry hook');
 
     const hook : RegistryHook = await useHookEventDataValidator().validate(req.body);
-
-    const isLibraryProject : boolean = hook.event_data.repository.namespace === REGISTRY_MASTER_IMAGE_PROJECT_NAME;
-
-    if (!isLibraryProject) {
-        /**
-         * Process train project
-         */
-        const train = await repository.findOne({ id: hook.event_data.repository.name });
-
-        if (typeof train === 'undefined') {
-            useLogger().warn(`hook could not proceeded, train: ${hook.event_data.repository.name} does not exist.`, { service: 'api-harbor-hook' });
-            return res.status(200).end();
-        }
-    }
 
     const hookTypes = Object
         .values(RegistryQueueEvent)
         .map((event) => event.substring('REGISTRY_'.length));
 
     if (hookTypes.indexOf(hook.type) === -1) {
+        spinner.fail('processing of registry hook failed');
         return res.status(200).end();
     }
 
+    const event : RegistryQueueEvent = `REGISTRY_${hook.type}` as RegistryQueueEvent;
+
     const message = buildRegistryEventQueueMessage(
-        `REGISTRY_${hook.type}` as RegistryQueueEvent,
+        event,
         {
             operator: hook.operator,
             namespace: hook.event_data.repository.namespace,
@@ -91,6 +76,10 @@ export async function postHarborHookRouteHandler(req: ExpressRequest, res: Expre
     );
 
     await publishMessage(message);
+
+    spinner.info(`publishing "${event}" event`);
+
+    spinner.clear();
 
     return res.status(200).end();
 }

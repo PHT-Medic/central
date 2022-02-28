@@ -9,7 +9,7 @@ import { Message, publishMessage } from 'amqp-extension';
 import { isRegistryStationProjectName } from '@personalhealthtrain/central-common';
 import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../../domains/special/registry';
 import { TrainRouterHarborEvent, buildTrainRouterQueueMessage } from '../../../domains/special/train-router';
-import { useLogger } from '../../../config/log';
+import { useSpinner } from '../../../config/spinner';
 
 export async function dispatchRegistryEventToTrainRouter(
     message: Message,
@@ -22,6 +22,8 @@ export async function dispatchRegistryEventToTrainRouter(
 
     // only process station trains and the PUSH_ARTIFACT event
     if (!isStationProject || type !== RegistryQueueEvent.PUSH_ARTIFACT) {
+        useSpinner()
+            .info(`skipping ${type} event distribution for train-router`);
         return message;
     }
 
@@ -32,8 +34,6 @@ export async function dispatchRegistryEventToTrainRouter(
             operator: data.operator,
         },
     ));
-
-    useLogger().debug('train event pushed to train router aggregator.', { service: 'api-harbor-hook' });
 
     return message;
 }

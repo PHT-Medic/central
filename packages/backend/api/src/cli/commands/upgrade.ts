@@ -9,6 +9,7 @@ import { Argv, CommandModule } from 'yargs';
 import { createConnection } from 'typeorm';
 import { upgradeCommand } from '@typescript-auth/server-core';
 import { buildDatabaseConnectionOptions } from '../../database/utils';
+import { useSpinner } from '../../config/spinner';
 
 export class UpgradeCommand implements CommandModule {
     command = 'upgrade';
@@ -22,9 +23,12 @@ export class UpgradeCommand implements CommandModule {
 
     // eslint-disable-next-line class-methods-use-this
     async handler() {
+        const spinner = useSpinner();
         const connectionOptions = await buildDatabaseConnectionOptions();
 
-        await upgradeCommand({});
+        await upgradeCommand({
+            spinner,
+        });
 
         const connection = await createConnection(connectionOptions);
 
