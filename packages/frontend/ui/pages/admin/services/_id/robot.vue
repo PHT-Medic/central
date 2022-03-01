@@ -48,6 +48,7 @@ export default {
         <robot-form
             v-if="item"
             :name="serviceId"
+            :realm-id="item.realm_id"
             :entity="item"
         />
     </div>

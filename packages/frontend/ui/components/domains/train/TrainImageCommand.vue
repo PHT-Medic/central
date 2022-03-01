@@ -55,7 +55,7 @@ export default {
             }
 
             let fileDirectoryPath = item.directory || '.';
-            if (fileDirectoryPath === '.') fileDirectoryPath = '';
+            if (fileDirectoryPath === '.') fileDirectoryPath = './';
 
             return `${fileDirectoryPath}${item.name}`;
         },

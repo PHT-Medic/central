@@ -36,15 +36,15 @@ export default {
         };
     },
     methods: {
-        async executeTask(task, taskData = {}) {
+        async setupProjects() {
             if (this.busy) return;
 
             this.busy = true;
 
             try {
-                await this.$api.service.runCommand(this.serviceId, task, taskData);
+                await this.$api.service.runCommand(this.serviceId, RegistryCommand.SETUP, {});
 
-                this.$bvToast.toast('You successfully executed the harbor command.', {
+                this.$bvToast.toast('You successfully executed the setup routine.', {
                     toaster: 'b-toaster-top-center',
                 });
 
@@ -58,43 +58,18 @@ export default {
                 });
             }
         },
-
-        async addProject(key) {
-            await this.executeTask(RegistryCommand.PROJECT_CREATE, {
-                name: key,
-            });
-        },
-        async addProjectWebhook(key) {
-            await this.executeTask(RegistryCommand.PROJECT_WEBHOOK_CREATE, {
-                name: key,
-            });
-        },
-        async addProjectRobotAccount(key) {
-            await this.executeTask(RegistryCommand.PROJECT_ROBOT_ACCOUNT_CREATE, {
-                name: key,
-            });
-        },
-        async syncProjectRepositories(key) {
+        async syncMasterImages() {
             try {
-                switch (key) {
-                    case REGISTRY_MASTER_IMAGE_PROJECT_NAME: {
-                        const { images } = await this.$api.masterImage.runCommand(MasterImageCommand.SYNC_GIT_REPOSITORY);
+                const { images } = await this.$api.masterImage
+                    .runCommand(MasterImageCommand.SYNC_GIT_REPOSITORY);
 
-                        this.masterImagesMeta.executed = true;
+                this.masterImagesMeta.executed = true;
 
-                        this.masterImagesMeta.created = images.created.length;
-                        this.masterImagesMeta.deleted = images.deleted.length;
-                        this.masterImagesMeta.updated = images.updated.length;
+                this.masterImagesMeta.created = images.created.length;
+                this.masterImagesMeta.deleted = images.deleted.length;
+                this.masterImagesMeta.updated = images.updated.length;
 
-                        await this.$refs['master-image-list'].load();
-                        break;
-                    }
-                    default: {
-                        await this.executeTask(RegistryCommand.PROJECT_REPOSITORIES_SYNC, {
-                            name: key,
-                        });
-                    }
-                }
+                await this.$refs['master-image-list'].load();
             } catch (e) {
                 this.$bvToast.toast(e.message, {
                     toaster: 'b-toaster-top-center',
@@ -118,7 +93,7 @@ export default {
     <div>
         <h4><i class="fas fa-archive" /> Projects</h4>
 
-        <div class="row mb-3">
+        <div class="row">
             <div class="col">
                 <h6><i class="fa fa-sign-in-alt" /> Incoming</h6>
 
@@ -128,24 +103,8 @@ export default {
                     From there the TrainRouter can move it to the first station project of the route.
                 </p>
 
-                <button
-                    type="button"
-                    class="btn btn-success btn-xs"
-                    :disabled="busy"
-                    @click.prevent="addProject(projectKey.INCOMING)"
-                >
-                    <i class="fa fa-plus" /> Create
-                </button>
-                <button
-                    type="button"
-                    class="btn btn-dark btn-xs"
-                    :disabled="busy"
-                    @click.prevent="addProjectWebhook(projectKey.INCOMING)"
-                >
-                    <i class="fas fa-chess-rook" /> Webhook
-                </button>
-            </div>
-            <div class="col">
+                <hr>
+
                 <h6><i class="fa fa-sign-out-alt" />Outgoing</h6>
 
                 <p class="mb-1">
@@ -153,30 +112,25 @@ export default {
                     outgoing project and extract the results of the journey.
                 </p>
 
-                <button
-                    type="button"
-                    class="btn btn-success btn-xs"
-                    :disabled="busy"
-                    @click.prevent="addProject(projectKey.OUTGOING)"
-                >
-                    <i class="fa fa-plus" /> Create
-                </button>
+                <hr>
+
+                <h6><i class="fa fa-info" />  Info</h6>
+
+                <p>
+                    To setup or ensure the existence of all projects (incoming, outgoing, ...) and the corresponding webhooks run the setup routine.
+                </p>
+
                 <button
                     type="button"
                     class="btn btn-dark btn-xs"
                     :disabled="busy"
-                    @click.prevent="addProjectWebhook(projectKey.OUTGOING)"
+                    @click.prevent="setupProjects()"
                 >
-                    <i class="fas fa-chess-rook" /> Webhook
+                    <i class="fa fa-cogs" /> Setup
                 </button>
             </div>
-        </div>
-
-        <hr>
-
-        <h6><i class="fas fa-sd-card" /> Master Images</h6>
-        <div class="row">
             <div class="col">
+                <h6><i class="fas fa-sd-card" /> Master Images</h6>
                 <p>
                     The creation of the master image project, will also register a webhook,
                     which will keep the master images between the harbor service and the UI in sync.
@@ -196,7 +150,7 @@ export default {
                         type="button"
                         class="btn btn-xs btn-primary"
                         :disabled="busy"
-                        @click.prevent="syncProjectRepositories(projectKey.MASTER_IMAGE)"
+                        @click.prevent="syncMasterImages(projectKey.MASTER_IMAGE)"
                     >
                         <i class="fa fa-sync" /> Sync
                     </button>
@@ -209,15 +163,13 @@ export default {
                     deleted <strong class="text-danger">{{ masterImagesMeta.deleted }}</strong>
                     master image(s).
                 </p>
-            </div>
-            <div class="col">
+
                 <master-image-list ref="master-image-list">
-                    <template slot="header-title">
+                    <template #header-title>
                         <strong>Overview</strong>
                     </template>
                     <template
-                        slot="item-actions"
-                        slot-scope="{ item }"
+                        #item-actions="{item}"
                     >
                         <button
                             type="button"

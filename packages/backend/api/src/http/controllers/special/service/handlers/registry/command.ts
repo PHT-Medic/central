@@ -5,20 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { body, matchedData, validationResult } from 'express-validator';
 import {
     PermissionID, RegistryCommand,
 } from '@personalhealthtrain/central-common';
 import {
+    BadRequestError,
     ForbiddenError,
 } from '@typescript-error/http';
 import { publishMessage } from 'amqp-extension';
 import env from '../../../../../../env';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
-import { ExpressValidationError } from '../../../../../express-validation';
 import { setupRegistry } from '../../../../../../components/registry/handlers/setup';
-import { RegistryQueueCommand, RegistryQueueEntityType } from '../../../../../../domains/special/registry/constants';
-import { buildRegistryQueueMessage } from '../../../../../../domains/special/registry/queue';
+import { RegistryQueueCommand, RegistryQueueEntityType, buildRegistryQueueMessage } from '../../../../../../domains/special/registry';
 import {
     deleteStationFromRegistry,
     saveStationToRegistry,
@@ -31,25 +29,22 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
         throw new ForbiddenError('You are not permitted to manage the registry service.');
     }
 
-    await body('id')
-        .exists()
-        .isString()
-        .isLength({ min: 1, max: 256 })
-        .run(req);
+    const { id, command } = req.body;
 
-    await body('command')
-        .exists()
-        .custom((value) => commands.indexOf(value) !== -1)
-        .run(req);
-
-    const createValidation = validationResult(req);
-    if (!createValidation.isEmpty()) {
-        throw new ExpressValidationError(createValidation);
+    if (commands.indexOf(command) === -1) {
+        throw new BadRequestError('The registry command is not valid.');
     }
 
-    const match = matchedData(req, { includeOptionals: true });
-
-    switch (match.command as RegistryCommand) {
+    if (
+        (
+            command === RegistryCommand.STATION_SAVE ||
+            command === RegistryCommand.STATION_DELETE
+        ) &&
+        typeof id !== 'string'
+    ) {
+        throw new BadRequestError(`An ID parameter is required for the registry command ${command}`);
+    }
+    switch (command) {
         case RegistryCommand.SETUP:
             if (env.env === 'test') {
                 await setupRegistry();
@@ -64,14 +59,14 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             if (env.env === 'test') {
                 await saveStationToRegistry({
                     type: RegistryQueueEntityType.STATION,
-                    id: match.id,
+                    id,
                 });
             } else {
                 const queueMessage = buildRegistryQueueMessage(
                     RegistryQueueCommand.SAVE,
                     {
                         type: RegistryQueueEntityType.STATION,
-                        id: match.id,
+                        id,
                     },
                 );
                 await publishMessage(queueMessage);
@@ -81,14 +76,14 @@ export async function doRegistryCommand(req: ExpressRequest, res: ExpressRespons
             if (env.env === 'test') {
                 await deleteStationFromRegistry({
                     type: RegistryQueueEntityType.STATION,
-                    id: match.id,
+                    id,
                 });
             } else {
                 const queueMessage = buildRegistryQueueMessage(
                     RegistryQueueCommand.DELETE,
                     {
                         type: RegistryQueueEntityType.STATION,
-                        id: match.id,
+                        id,
                     },
                 );
                 await publishMessage(queueMessage);
