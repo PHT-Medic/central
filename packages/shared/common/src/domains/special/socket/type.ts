@@ -11,7 +11,7 @@ import {
 
 type SimpleOperation = 'Created' | 'Updated' | 'Deleted';
 
-type SocketServerToClientEventContext<T> = {
+export type SocketServerToClientEventContext<T> = {
     meta: {
         roomName?: string,
         roomId?: string | number
@@ -38,9 +38,7 @@ export type SocketServerToClientEvents = {
 type SubUnsubOperation = 'Subscribe' | 'Unsubscribe';
 
 export type SocketClientToServerEventContext<K extends Record<string, any>> = {
-    data?: {
-        [T in keyof K]?: K[T]
-    },
+    data?: Partial<K>,
     meta?: Record<string, any>
 };
 

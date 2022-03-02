@@ -12,7 +12,7 @@ import {
     REGISTRY_OUTGOING_PROJECT_NAME, RegistryCommand,
     ServiceID,
 } from '@personalhealthtrain/central-common';
-import MasterImageList from '../../master-image/MasterImageList';
+import { MasterImageList } from '../../master-image/MasterImageList';
 
 export default {
     components: { MasterImageList },

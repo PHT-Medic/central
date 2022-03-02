@@ -12,19 +12,19 @@ import {
 
 import { ProposalRisk } from '@personalhealthtrain/central-common';
 import MasterImagePicker from '../master-image/MasterImagePicker';
-import StationList from '../station/StationList';
-import ToggleManyButton from '../../ToggleManyButton';
-import ProposalStationList from '../proposal-station/ProposalStationList';
+import { StationList } from '../station/StationList';
+import { AssignmentToggleButton } from '../../AssignmentToggleButton';
+import { ProposalStationAssignAction } from '../proposal-station/ProposalStationAssignAction';
 
 export default {
     components: {
-        ProposalStationList,
-        ToggleManyButton,
+        ProposalStationAssignAction,
+        AssignmentToggleButton,
         StationList,
         MasterImagePicker,
     },
     props: {
-        entityProperty: {
+        entity: {
             type: Object,
             default: undefined,
         },
@@ -56,13 +56,13 @@ export default {
     },
     computed: {
         isEditing() {
-            return this.entityProperty && Object.prototype.hasOwnProperty.call(this.entityProperty, 'id');
+            return this.entity && Object.prototype.hasOwnProperty.call(this.entity, 'id');
         },
         masterImageId() {
-            return this.isEditing ? this.entityProperty.master_image_id : undefined;
+            return this.isEditing ? this.entity.master_image_id : undefined;
         },
         updatedAt() {
-            return this.isEditing ? this.entityProperty.updated_at : undefined;
+            return this.isEditing ? this.entity.updated_at : undefined;
         },
     },
     watch: {
@@ -121,12 +121,12 @@ export default {
     },
     methods: {
         initFromProperties() {
-            if (typeof this.entityProperty === 'undefined') return;
+            if (typeof this.entity === 'undefined') return;
 
             const keys = Object.keys(this.formData);
             for (let i = 0; i < keys.length; i++) {
-                if (Object.prototype.hasOwnProperty.call(this.entityProperty, keys[i])) {
-                    this.formData[keys[i]] = this.entityProperty[keys[i]];
+                if (Object.prototype.hasOwnProperty.call(this.entity, keys[i])) {
+                    this.formData[keys[i]] = this.entity[keys[i]];
                 }
             }
         },
@@ -148,7 +148,7 @@ export default {
                 let response;
 
                 if (this.isEditing) {
-                    response = await this.$api.proposal.update(this.entityProperty.id, this.formData);
+                    response = await this.$api.proposal.update(this.entity.id, this.formData);
 
                     this.$bvToast.toast('The proposal was successfully updated.', {
                         variant: 'success',
@@ -340,27 +340,29 @@ export default {
                 </div>
                 <div class="col-md-6">
                     <div>
-                        <template v-if="isEditing">
-                            <proposal-station-list
-                                ref="proposalStationList"
-                                :realm-id="entityProperty.realm_id"
-                                :proposal-id="entityProperty.id"
-                            />
-                        </template>
-                        <template v-else>
-                            <station-list>
-                                <template #header-title>
-                                    Stations
+                        <station-list>
+                            <template #header-title>
+                                Stations
+                            </template>
+                            <template #item-actions="props">
+                                <template v-if="isEditing">
+                                    <proposal-station-assign-action
+                                        :station-id="props.item.id"
+                                        :proposal-id="entity.id"
+                                        :realm-id="entity.realm_id"
+                                    />
                                 </template>
-                                <template #item-actions="props">
-                                    <toggle-many-button
+                                <template v-else>
+                                    <assignment-toggle-button
                                         :id="props.item.id"
                                         :ids="station.selectedIds"
                                         @toggle="toggleStationIds(props.item.id)"
                                     />
                                 </template>
-                            </station-list>
+                            </template>
+                        </station-list>
 
+                        <template v-if="!isEditing">
                             <div
                                 v-if="!$v.station.selectedIds.required"
                                 class="alert alert-warning alert-sm"
@@ -374,41 +376,41 @@ export default {
                                 Select at least <strong>{{ $v.station.selectedIds.$params.minLength.min }}</strong> stations.
                             </div>
                         </template>
-                    </div>
 
-                    <hr>
-
-                    <div
-                        class="form-group"
-                        :class="{ 'form-group-error': $v.formData.requested_data.$error }"
-                    >
-                        <label>Data/Parameters</label>
-                        <textarea
-                            v-model="$v.formData.requested_data.$model"
-                            class="form-control"
-                            placeholder="..."
-                            rows="6"
-                        />
+                        <hr>
 
                         <div
-                            v-if="!$v.formData.requested_data.required"
-                            class="form-group-hint group-required"
+                            class="form-group"
+                            :class="{ 'form-group-error': $v.formData.requested_data.$error }"
                         >
-                            Describe in a few words, what kind of data is required for the algorithm.
-                        </div>
-                        <div
-                            v-if="!$v.formData.requested_data.minLength"
-                            class="form-group-hint group-required"
-                        >
-                            The length of the comment must be greater than
-                            <strong>{{ $v.formData.requested_data.$params.minLength.min }}</strong> characters.
-                        </div>
-                        <div
-                            v-if="!$v.formData.requested_data.maxLength"
-                            class="form-group-hint group-required"
-                        >
-                            The length of the comment must be less than
-                            <strong>{{ $v.formData.requested_data.$params.maxLength.max }}</strong> characters.
+                            <label>Data/Parameters</label>
+                            <textarea
+                                v-model="$v.formData.requested_data.$model"
+                                class="form-control"
+                                placeholder="..."
+                                rows="6"
+                            />
+
+                            <div
+                                v-if="!$v.formData.requested_data.required"
+                                class="form-group-hint group-required"
+                            >
+                                Describe in a few words, what kind of data is required for the algorithm.
+                            </div>
+                            <div
+                                v-if="!$v.formData.requested_data.minLength"
+                                class="form-group-hint group-required"
+                            >
+                                The length of the comment must be greater than
+                                <strong>{{ $v.formData.requested_data.$params.minLength.min }}</strong> characters.
+                            </div>
+                            <div
+                                v-if="!$v.formData.requested_data.maxLength"
+                                class="form-group-hint group-required"
+                            >
+                                The length of the comment must be less than
+                                <strong>{{ $v.formData.requested_data.$params.maxLength.max }}</strong> characters.
+                            </div>
                         </div>
                     </div>
                 </div>

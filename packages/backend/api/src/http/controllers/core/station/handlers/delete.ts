@@ -86,7 +86,11 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
         await publishMessage(queueMessage);
     }
 
+    const { id: entityId } = entity;
+
     await repository.remove(entity);
+
+    entity.id = entityId;
 
     return res.respondDeleted({ data: entity });
 }

@@ -6,11 +6,12 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
-import ProposalList from '../../../components/domains/proposal/ProposalList';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+import { ProposalList } from '../../../components/domains/proposal/ProposalList';
+import { ProposalItem } from '../../../components/domains/proposal/ProposalItem';
 
 export default {
-    components: { ProposalList },
+    components: { ProposalList, ProposalItem },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -53,9 +54,17 @@ export default {
         </div>
         <div class="m-t-10">
             <proposal-list
-                :with-title="false"
+                :with-header="false"
                 :query="query"
-            />
+            >
+                <template #item="props">
+                    <proposal-item
+                        :entity="props.item"
+                        @updated="props.handleUpdated"
+                        @deleted="props.handleDeleted"
+                    />
+                </template>
+            </proposal-list>
         </div>
     </div>
 </template>

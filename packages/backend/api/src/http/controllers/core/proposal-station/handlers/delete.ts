@@ -37,7 +37,11 @@ export async function deleteProposalStationRouteHandler(req: ExpressRequest, res
         throw new ForbiddenError('You are not authorized to drop this proposal station.');
     }
 
+    const { id: entityId } = entity;
+
     await repository.remove(entity);
+
+    entity.id = entityId;
 
     return res.respondDeleted({ data: entity });
 }

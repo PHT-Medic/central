@@ -7,19 +7,18 @@
 <script>
 import {
     PermissionID,
-    TrainBuildStatus,
+    TrainBuildStatus, TrainCommand,
     TrainConfigurationStatus,
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
-import TrainResultCommand from './command/TrainResultCommand';
+import { TrainResultCommand } from './command/TrainResultCommand';
 import TrainBuildStatusText from './status/TrainBuildStatusText';
-import TrainBuildCommand from './command/TrainBuildCommand';
+import { TrainBuildCommand } from './command/TrainBuildCommand';
 import TrainRunStatusText from './status/TrainRunStatusText';
-import TrainRunCommand from './command/TrainRunCommand';
+import { TrainRunCommand } from './command/TrainRunCommand';
 import TrainResultStatusText from '../train-result/status/TrainResultStatusText';
 
-import { FrontendTrainCommand } from '../../../domains/train/constants';
 import TrainConfigurationStatusText from './status/TrainConfigurationStatusText';
 
 export default {
@@ -49,7 +48,7 @@ export default {
             trainConfigurationStatus: TrainConfigurationStatus,
             trainRunStatus: TrainRunStatus,
             trainResultStatus: TrainResultStatus,
-            trainCommand: FrontendTrainCommand,
+            trainCommand: TrainCommand,
 
             busy: false,
         };
@@ -135,7 +134,7 @@ export default {
                     class="mr-1"
                     :command="trainCommand.BUILD_START"
                     :with-icon="true"
-                    :train="entity"
+                    :entity="entity"
                     @done="handleUpdated"
                     @failed="handleFailed"
                 />
@@ -148,7 +147,7 @@ export default {
                         :command="trainCommand.BUILD_STATUS"
                         :element-type="'dropDownItem'"
                         :with-icon="true"
-                        :train="entity"
+                        :entity="entity"
                         @done="handleUpdated"
                         @failed="handleFailed"
                     />
@@ -156,7 +155,7 @@ export default {
                         :command="trainCommand.BUILD_STOP"
                         :element-type="'dropDownItem'"
                         :with-icon="true"
-                        :train="entity"
+                        :entity="entity"
                         @done="handleUpdated"
                         @failed="handleFailed"
                     />
@@ -186,7 +185,7 @@ export default {
                     class="mr-1"
                     :command="trainCommand.RUN_START"
                     :with-icon="true"
-                    :train="entity"
+                    :entity="entity"
                     @done="handleUpdated"
                     @failed="handleFailed"
                 />
@@ -201,7 +200,7 @@ export default {
                         :command="trainCommand.RUN_STATUS"
                         :with-icon="true"
                         :element-type="'dropDownItem'"
-                        :train="entity"
+                        :entity="entity"
                         @done="handleUpdated"
                         @failed="handleFailed"
                     />
@@ -209,7 +208,7 @@ export default {
                         :command="trainCommand.RUN_RESET"
                         :element-type="'dropDownItem'"
                         :with-icon="true"
-                        :train="entity"
+                        :entity="entity"
                         @done="handleUpdated"
                         @failed="handleFailed"
                     />
@@ -235,12 +234,10 @@ export default {
                 class="ml-auto flex-row d-flex"
             >
                 <train-result-command
-                    v-if="entity.result_last_id"
                     class="mr-1"
-                    :command="trainCommand.RESULT_DOWNLOAD"
-                    :train-result-id="entity.result_last_id"
+                    :command="'resultDownload'"
                     :with-icon="true"
-                    :train="entity"
+                    :entity="entity"
                     @done="handleUpdated"
                     @failed="handleFailed"
                 />
@@ -248,7 +245,7 @@ export default {
                     class="mr-1"
                     :command="trainCommand.RESULT_START"
                     :with-icon="true"
-                    :train="entity"
+                    :entity="entity"
                     @done="handleUpdated"
                     @failed="handleFailed"
                 />
@@ -261,7 +258,7 @@ export default {
                         :command="trainCommand.RESULT_STATUS"
                         :with-icon="true"
                         :element-type="'dropDownItem'"
-                        :train="entity"
+                        :entity="entity"
                         @done="handleUpdated"
                         @failed="handleFailed"
                     />
@@ -269,7 +266,7 @@ export default {
                         :command="trainCommand.RESULT_STOP"
                         :element-type="'dropDownItem'"
                         :with-icon="true"
-                        :train="entity"
+                        :entity="entity"
                         @done="handleUpdated"
                         @failed="handleFailed"
                     />

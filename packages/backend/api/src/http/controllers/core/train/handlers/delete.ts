@@ -40,7 +40,11 @@ export async function deleteTrainRouteHandler(req: ExpressRequest, res: ExpressR
 
     const { proposal } = entity;
 
+    const { id: entityId } = entity;
+
     await repository.remove(entity);
+
+    entity.id = entityId;
 
     proposal.trains--;
     const proposalRepository = getRepository(ProposalEntity);

@@ -6,7 +6,7 @@
   -->
 <script>
 
-import MasterImageList from './MasterImageList';
+import { MasterImageList } from './MasterImageList';
 
 export default {
     name: 'MasterImagePicker',
@@ -185,6 +185,7 @@ export default {
                     ref="itemList"
                     :with-header="false"
                     :with-search="false"
+                    :with-pagination="false"
                     :query="imageQuery"
                 >
                     <template #items="{items, busy}">

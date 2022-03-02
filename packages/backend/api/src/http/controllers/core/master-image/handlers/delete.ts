@@ -28,7 +28,11 @@ export async function deleteMasterImageRouteHandler(req: ExpressRequest, res: Ex
         throw new NotFoundError();
     }
 
+    const { id: entityId } = entity;
+
     await repository.delete(entity.id);
+
+    entity.id = entityId;
 
     return res.respondDeleted({ data: entity });
 }

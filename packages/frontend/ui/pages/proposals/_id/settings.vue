@@ -36,7 +36,7 @@ export default {
 </script>
 <template>
     <proposal-form
-        :entity-property="proposal"
+        :entity="proposal"
         @updated="handleUpdated"
     />
 </template>

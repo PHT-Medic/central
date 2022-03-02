@@ -38,7 +38,11 @@ export async function deleteTrainStationRouteHandler(req: ExpressRequest, res: E
         throw new ForbiddenError();
     }
 
+    const { id: entityId } = entity;
+
     await repository.remove(entity);
+
+    entity.id = entityId;
 
     const trainRepository = getRepository(TrainEntity);
     const train = await trainRepository.findOne(entity.train_id);

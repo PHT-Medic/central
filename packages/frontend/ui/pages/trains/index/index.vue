@@ -6,17 +6,11 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import TrainTable from '../../../components/domains/train/TrainList';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
+import { TrainList } from '../../../components/domains/train/TrainList';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default {
-    components: { TrainTable },
-    data() {
-        return {
-            query: {
-            },
-        };
-    },
+    components: { TrainList },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -31,6 +25,15 @@ export default {
             PermissionID.TRAIN_EXECUTION_STOP,
         ],
     },
+    computed: {
+        query() {
+            return {
+                filter: {
+                    realm_id: this.$store.getters['auth/userRealmId'],
+                },
+            };
+        },
+    },
 };
 </script>
 <template>
@@ -40,7 +43,7 @@ export default {
         </div>
 
         <div class="m-t-10">
-            <train-table :query="query" />
+            <train-list :query="query" />
         </div>
     </div>
 </template>

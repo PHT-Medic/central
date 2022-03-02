@@ -39,7 +39,11 @@ export async function deleteTrainFileRouteHandler(req: ExpressRequest, res: Expr
 
     await fs.promises.unlink(getTrainFileFilePath(entity));
 
+    const { id: entityId } = entity;
+
     await repository.remove(entity);
+
+    entity.id = entityId;
 
     // train
     const trainRepository = getRepository(TrainEntity);

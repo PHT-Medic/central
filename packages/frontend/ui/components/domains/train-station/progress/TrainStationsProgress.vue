@@ -19,7 +19,7 @@ import TrainStationStaticRunStatusText from '../status/TrainStationStaticRunStat
 export default {
     components: { TrainStationStaticRunStatusText, TrainStationRunStatusText },
     props: {
-        train: Object,
+        entity: Object,
         withHeader: {
             type: Boolean,
             default: false,
@@ -46,26 +46,26 @@ export default {
     },
     computed: {
         progressPercentage() {
-            if (this.train.build_status !== TrainBuildStatus.FINISHED) {
+            if (this.entity.build_status !== TrainBuildStatus.FINISHED) {
                 return 0;
             }
 
             const total = this.meta.total + 2; // + 2 because incoming + outgoing
 
             // no index -> outgoing or incoming
-            if (!this.train.run_station_index) {
+            if (!this.entity.run_station_index) {
                 // outgoing, because train terminated
-                if (this.train.run_status === TrainRunStatus.FINISHED) {
+                if (this.entity.run_status === TrainRunStatus.FINISHED) {
                     return 100;
                 }
 
                 return 100 * (1 / total);
             }
 
-            return 100 * ((this.train.run_station_index + 1) / (total - 2));
+            return 100 * ((this.entity.run_station_index + 1) / (total - 2));
         },
         direction() {
-            return this.train.realm_id === this.$store.getters['auth/userRealmId'] ?
+            return this.entity.realm_id === this.$store.getters['auth/userRealmId'] ?
                 'out' :
                 'in';
         },
@@ -74,7 +74,7 @@ export default {
         this.load().then((r) => r);
     },
     mounted() {
-        const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
+        const socket = this.$socket.useRealmWorkspace(this.entity.realm_id);
         switch (this.direction) {
             case 'in':
                 socket.emit('trainStationsInSubscribe');
@@ -87,7 +87,7 @@ export default {
         socket.on('trainStationDeleted', this.handleSocketDeleted);
     },
     beforeDestroy() {
-        const socket = this.$socket.useRealmWorkspace(this.train.realm_id);
+        const socket = this.$socket.useRealmWorkspace(this.entity.realm_id);
         switch (this.direction) {
             case 'in':
                 socket.emit('trainStationsInUnsubscribe');
@@ -113,7 +113,7 @@ export default {
         handleSocketCreated(context) {
             if (
                 !this.isSameSocketRoom(context.meta.roomName) ||
-                context.data.train_id !== this.train.id
+                context.data.train_id !== this.entity.id
             ) return;
 
             this.handleTrainStationCreated(context.data);
@@ -121,7 +121,7 @@ export default {
         handleSocketDeleted(context) {
             if (
                 !this.isSameSocketRoom(context.meta.roomName) ||
-                context.data.train_id !== this.train.id
+                context.data.train_id !== this.entity.id
             ) return;
 
             this.handleTrainStationDeleted(context.data);
@@ -150,7 +150,7 @@ export default {
             try {
                 const response = await this.$api.trainStation.getMany({
                     filter: {
-                        train_id: this.train.id,
+                        train_id: this.entity.id,
                     },
                 });
 
@@ -199,9 +199,9 @@ export default {
                     <div>
                         <train-station-static-run-status-text
                             :id="trainStationStatic.INCOMING"
-                            :train-build-status="train.build_status"
-                            :train-run-status="train.run_status"
-                            :train-run-station-index="train.run_station_index"
+                            :train-build-status="entity.build_status"
+                            :train-run-status="entity.run_status"
+                            :train-run-station-index="entity.run_station_index"
                         />
                     </div>
                 </div>
@@ -225,9 +225,9 @@ export default {
                     <div>
                         <train-station-static-run-status-text
                             :id="trainStationStatic.OUTGOING"
-                            :train-build-status="train.build_status"
-                            :train-run-status="train.run_status"
-                            :train-run-station-index="train.run_station_index"
+                            :train-build-status="entity.build_status"
+                            :train-run-status="entity.run_status"
+                            :train-run-station-index="entity.run_station_index"
                         />
                     </div>
                 </div>
@@ -241,8 +241,8 @@ export default {
                 <div
                     class="progress-bar"
                     :class="{
-                        'bg-dark': train.run_status !== trainRunStatus.FINISHED,
-                        'bg-success': train.run_status === trainRunStatus.FINISHED
+                        'bg-dark': entity.run_status !== trainRunStatus.FINISHED,
+                        'bg-success': entity.run_status === trainRunStatus.FINISHED
                     }"
                     :style="{width: progressPercentage + '%'}"
                     :aria-valuenow="progressPercentage"
@@ -262,47 +262,3 @@ export default {
         -->
     </div>
 </template>
-<style>
-.progress-with-circle {
-    position: relative;
-    top: 40px;
-    height: 4px;
-}
-
-.progress-with-circle .progress-bar {
-    box-shadow: none;
-    -webkit-transition: width .3s ease;
-    -o-transition: width .3s ease;
-    transition: width .3s ease;
-    height: 100%;
-}
-
-.progress-step {
-    width: 70px;
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    text-align: center;
-
-}
-
-.icon-circle {
-    font-weight: 600;
-    height: 70px;
-    background-color: #ececec;
-    position: relative;
-    border-radius: 50%;
-}
-
-.icon-circle .icon {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-}
-</style>

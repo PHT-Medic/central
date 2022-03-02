@@ -9,10 +9,11 @@ import {
     SecretStorageCommand, buildUserSecretsSecretStorageKey,
 } from '@personalhealthtrain/central-common';
 import UserSecretForm from '../../../components/domains/user-secret/UserSecretForm';
-import UserSecretList from '../../../components/domains/user-secret/UserSecretList';
+import { UserSecretList } from '../../../components/domains/user-secret/UserSecretList';
+import EntityDelete from '../../../components/domains/EntityDelete';
 
 export default {
-    components: { UserSecretList, UserSecretForm },
+    components: { EntityDelete, UserSecretList, UserSecretForm },
     data() {
         return {
             item: undefined,
@@ -29,7 +30,7 @@ export default {
     },
     methods: {
         handleCreated(item) {
-            this.$refs.itemsList.addArrayItem(item, true);
+            this.$refs.itemsList.handleCreated(item);
 
             this.$bvToast.toast('The secret was successfully created.', {
                 variant: 'success',
@@ -37,7 +38,7 @@ export default {
             });
         },
         handleUpdated(item) {
-            this.$refs.itemsList.editArrayItem(item);
+            this.$refs.itemsList.handleUpdated(item);
 
             this.$bvToast.toast('The secret was successfully updated.', {
                 variant: 'info',
@@ -109,8 +110,15 @@ export default {
                 :query="{filters: {user_id: user.id}, sort: {created_at: 'DESC'}}"
                 @deleted="handleDeleted"
             >
-                <template #item-actions-extra="props">
+                <template #item-actions="props">
                     <div class="ml-1">
+                        <entity-delete
+                            :with-text="false"
+                            class="btn btn-xs btn-danger"
+                            :entity-id="props.item.id"
+                            :entity-type="'userSecret'"
+                            @done="props.handleDeleted"
+                        />
                         <button
                             type="button"
                             class="btn btn-xs btn-primary"

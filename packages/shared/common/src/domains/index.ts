@@ -9,3 +9,4 @@ export * from './auth';
 export * from './core';
 export * from './special';
 export * from './type';
+export * from './utils';

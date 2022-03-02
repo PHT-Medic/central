@@ -7,11 +7,11 @@
 <script>
 import { TrainType } from '@personalhealthtrain/central-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
-import ProposalList from '../proposal/ProposalList';
-import ProposalListItem from '../proposal/ProposalListItem';
+import { ProposalList } from '../proposal/ProposalList';
+import { ProposalItem } from '../proposal/ProposalItem';
 
 export default {
-    components: { ProposalListItem, ProposalList },
+    components: { ProposalList, ProposalItem },
     props: {
         proposalId: {
             type: String,
@@ -178,12 +178,12 @@ export default {
                 class="col"
             >
                 <proposal-list :query="proposalQuery">
-                    <template #header-title>
+                    <template #header>
                         Proposals
                     </template>
                     <template #item="props">
-                        <proposal-list-item
-                            :entity-property="props.item"
+                        <proposal-item
+                            :entity="props.item"
                             @updated="props.handleUpdated"
                             @deleted="props.handleDeleted"
                         >
@@ -206,7 +206,7 @@ export default {
                                     />
                                 </button>
                             </template>
-                        </proposal-list-item>
+                        </proposal-item>
                     </template>
                 </proposal-list>
 

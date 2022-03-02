@@ -6,8 +6,8 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import TrainTable from '../../../../components/domains/train/TrainList';
-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
+import { TrainList } from '../../../../components/domains/train/TrainList';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default {
     meta: {
@@ -24,7 +24,7 @@ export default {
             PermissionID.TRAIN_EXECUTION_STOP,
         ],
     },
-    components: { TrainTable },
+    components: { TrainList },
     props: {
         proposal: {
             type: Object,
@@ -41,6 +41,13 @@ export default {
         station_id() {
             return this.visitorStation ? this.visitorStation.id : undefined;
         },
+        query() {
+            return {
+                filter: {
+                    proposal_id: this.proposal.id,
+                },
+            };
+        },
     },
     methods: {
     },
@@ -50,13 +57,14 @@ export default {
     <div>
         <div class="m-t-10">
             <template v-if="visitorStation">
-                mmhhh station train table missing :) !!!
+                <div class="alert alert-sm alert-warning">
+                    You are not permitted to view the train list.
+                </div>
             </template>
             <template v-else>
-                <train-table
+                <train-list
                     ref="trainTable"
-                    :proposal-id="proposal.id"
-                    :train-add-to="'/proposals/'+proposal.id+'/trains/add'"
+                    :query="query"
                 />
             </template>
         </div>

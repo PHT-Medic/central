@@ -58,6 +58,7 @@ const config = {
         'bootstrap-vue/dist/bootstrap-vue.css',
         './assets/css/vue-layout-navigation.css',
         './assets/css/root.css',
+        './assets/css/domain.css',
         './assets/css/core/header.css',
         './assets/css/core/navbar.css',
         './assets/css/core/body.css',

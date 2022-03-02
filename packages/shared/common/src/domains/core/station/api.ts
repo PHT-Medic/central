@@ -24,7 +24,7 @@ export class StationAPI {
         return response.data;
     }
 
-    async getOne(id: number): Promise<SingleResourceResponse<Station>> {
+    async getOne(id: Station['id']): Promise<SingleResourceResponse<Station>> {
         const response = await this.client.get(`stations/${id}`);
 
         return response.data;
@@ -36,19 +36,19 @@ export class StationAPI {
         return response.data;
     }
 
-    async update(id: number, data: Record<string, any>): Promise<SingleResourceResponse<Station>> {
+    async update(id: Station['id'], data: Record<string, any>): Promise<SingleResourceResponse<Station>> {
         const response = await this.client.post(`stations/${id}`, nullifyEmptyObjectProperties(data));
 
         return response.data;
     }
 
-    async delete(id: number): Promise<SingleResourceResponse<Station>> {
+    async delete(id: Station['id']): Promise<SingleResourceResponse<Station>> {
         const response = await this.client.delete(`stations/${id}`);
 
         return response.data;
     }
 
-    async runCommand(id: number, task: string, data: Record<string, any>): Promise<SingleResourceResponse<Station>> {
+    async runCommand(id: Station['id'], task: string, data: Record<string, any>): Promise<SingleResourceResponse<Station>> {
         const response = await this.client.post(`stations/${id}/task`, { task, ...data });
 
         return response.data;

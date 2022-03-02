@@ -39,7 +39,11 @@ export async function deleteUserSecretRouteHandler(req: ExpressRequest, res: Exp
         throw new NotFoundError();
     }
 
+    const { id: entityId } = entity;
+
     await repository.remove(entity);
+
+    entity.id = entityId;
 
     if (env.env === 'test') {
         await saveUserSecretsToSecretStorage({
