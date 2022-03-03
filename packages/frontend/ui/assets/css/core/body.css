@@ -60,15 +60,13 @@ Content
     background-color: #ececec;
     border: 1px solid #dedede;
 
-    /* box-shadow: 0 4px 25px 0 rgba(0,0,0,.1); */
+    box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
     transition: all .3s ease-in-out;
 
     border-radius: 4px;
 
     padding: 0.25rem 0.25rem;
     margin-bottom: 0.5rem;
-    display: flex;
-    flex-direction: row;
     vertical-align: middle;
 }
 

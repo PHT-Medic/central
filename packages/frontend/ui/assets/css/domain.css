@@ -6,9 +6,6 @@
  */
 
 .train-card {
-    background-color: #ececec;
-    border: 1px solid #dedede;
-
     /* box-shadow: 0 4px 25px 0 rgba(0,0,0,.1); */
     transition: all .3s ease-in-out;
 
@@ -83,4 +80,20 @@ TrainStationProgress
     -webkit-box-pack: center;
     -ms-flex-pack: center;
     justify-content: center;
+}
+
+.command-box {
+    background-color: rgb(43, 43, 43);
+    border: 1px solid #dedede;
+    /* box-shadow: 0 4px 25px 0 rgb(0 0 0 / 10%); */
+    transition: all .3s ease-in-out;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    display: flex;
+    flex-direction: row;
+    color: rgb(184, 186, 160);
+}
+
+.command-box .shell-sign {
+    color: rgb(166, 89, 45);
 }

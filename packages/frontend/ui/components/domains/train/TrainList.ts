@@ -194,7 +194,6 @@ ComponentListProperties<Train>
             }
         },
         handleUpdated(item) {
-            console.log(item, this);
             const index = this.items.findIndex((el) => el.id === item.id);
             if (index !== -1) {
                 const keys = Object.keys(item);

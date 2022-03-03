@@ -8,7 +8,7 @@
 import { Realm } from '@typescript-auth/domains';
 import { Proposal } from '../proposal';
 import { Station } from '../station';
-import { ProposalStationApprovalStatus } from './status';
+import { ProposalStationApprovalStatus } from './constants';
 
 export interface ProposalStation {
     id: string;

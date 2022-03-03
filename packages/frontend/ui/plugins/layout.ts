@@ -19,7 +19,7 @@ export default async (ctx: Context) => {
 
     if (process.server) {
         (ctx.ssrContext.nuxt as Record<string, any>).navigation = getState();
-    } else {
+    } else if ((window as any).__NUXT__.navigation) {
         setState(Vue.observable((window as any).__NUXT__.navigation));
     }
 };

@@ -121,7 +121,7 @@ AuthEntityDeleteProperties
                     // @ts-ignore
                     const response = await domainApi.delete(this.entityId);
                     response.id = this.entityId;
-                    this.$emit('done', response);
+                    this.$emit('deleted', response);
                 } else {
                     this.$emit('canceled');
                 }

@@ -25,6 +25,15 @@ export default async (ctx: Context, inject: Inject) => {
             validator: {
                 alt: 'Die Bedingung des Operators {{validator}} ist nicht erfüllt.',
             },
+            validation: {
+                email: 'Die Eingabe muss eine gültige E-Mail sein.',
+                maxLength: 'Die Länge der Eingabe muss kleiner als {{max}} sein.',
+                minLength: 'Die Länge der Eingabe muss größer als {{max}} sein.',
+                required: 'Ein Eingabewert wird benötigt.',
+                sameAs: 'Der Eingabewert entspricht nicht dem Wert der Eingabe von {{eq}}',
+                alphaNumHyphenUnderscore: 'Der Eingabewert darf nur aus folgenden Zeichen bestehen: [0-9a-z-_]+',
+                alphaWithUpperNumHyphenUnderscore: 'Der Eingabewert darf nur aus folgenden Zeichen bestehen: [0-9a-zA-Z-_]+',
+            },
         },
         en: {
             app: {
@@ -37,6 +46,15 @@ export default async (ctx: Context, inject: Inject) => {
             },
             validator: {
                 alt: 'The {{validator}} operator condition is not fulfilled.',
+            },
+            validation: {
+                email: 'The input must be a valid email address.',
+                maxLength: 'The length of the input must be less than {{max}}.',
+                minLength: 'The length of the input must be greater than {{min}}.',
+                required: 'An input value is required.',
+                ssameAs: 'The input value is not equal to the value of {{eq}}',
+                alphaNumHyphenUnderscore: 'The input value is only allowed to consist of the following characters: [0-9a-z-_]+',
+                alphaWithUpperNumHyphenUnderscore: 'The input value is only allowed to consist of the following characters: [0-9a-zA-Z-_]+',
             },
         },
     });

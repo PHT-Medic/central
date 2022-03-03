@@ -27,7 +27,6 @@ import {
 } from '@vue-layout/utils';
 import { Realm, isPermittedForResourceRealm } from '@typescript-auth/domains';
 import { BuildInput } from '@trapi/query';
-import ProposalStationApprovalStatusText from './ProposalStationApprovalStatusText.vue';
 
 enum DomainType {
     Proposal = 'proposal',
@@ -45,9 +44,6 @@ ComponentListProperties<ProposalStation> & {
 }
 >({
     name: 'ProposalStationList',
-    components: {
-        ProposalStationApprovalStatusText,
-    },
     props: {
         loadOnInit: {
             type: Boolean,
@@ -349,10 +345,11 @@ ComponentListProperties<ProposalStation> & {
                 return createElement('span', [
                     vm.target === DomainType.Station ?
                         item.station.name :
-                        vm.proposal.title,
+                        item.proposal.title,
                 ]);
             },
             itemSlots: {
+                handleUpdated: vm.handleUpdated,
                 handleDeleted: vm.handleDeleted,
                 handleCreated: vm.handleCreated,
             },

@@ -145,7 +145,7 @@ export const TrainListItem = Vue.extend({
                 },
                 staticClass: 'btn btn-danger btn-xs ml-1',
                 on: {
-                    done(entity) {
+                    deleted(entity) {
                         vm.handleDeleted.call(null, entity);
                     },
                 },
@@ -169,8 +169,8 @@ export const TrainListItem = Vue.extend({
                                 TrainName,
                                 {
                                     props: {
-                                        trainId: vm.entity.id,
-                                        trainName: vm.entity.name,
+                                        entityId: vm.entity.id,
+                                        entityName: vm.entity.name,
                                         withEdit: true,
                                     },
                                     on: {
@@ -182,20 +182,20 @@ export const TrainListItem = Vue.extend({
                                         text: (props) => {
                                             let trainName = h();
 
-                                            if (props.trainName) {
+                                            if (props.entityName) {
                                                 trainName = h(
                                                     'span',
                                                     {
                                                         staticClass: 'text-muted ml-1',
                                                     },
-                                                    props.trainId,
+                                                    props.entityId,
                                                 );
                                             }
                                             return [
                                                 h('i', { staticClass: 'fa-solid fa-train-tram mr-1' }),
                                                 h('nuxt-link', {
                                                     props: {
-                                                        to: `/trains/${props.id}`,
+                                                        to: `/trains/${props.entityId}`,
                                                     },
                                                 }, [
                                                     props.displayText,

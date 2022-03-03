@@ -5,6 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export enum TrainStationApprovalCommand {
+    APPROVE = 'approve',
+    REJECT = 'reject',
+}
+
 export enum TrainStationApprovalStatus {
     REJECTED = 'rejected',
     APPROVED = 'approved',

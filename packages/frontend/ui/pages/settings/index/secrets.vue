@@ -117,7 +117,7 @@ export default {
                             class="btn btn-xs btn-danger"
                             :entity-id="props.item.id"
                             :entity-type="'userSecret'"
-                            @done="props.handleDeleted"
+                            @deleted="props.handleDeleted"
                         />
                         <button
                             type="button"

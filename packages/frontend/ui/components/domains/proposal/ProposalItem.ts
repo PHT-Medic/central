@@ -166,7 +166,7 @@ export const ProposalItem = Vue.extend({
 
         return h(
             'div',
-            { staticClass: 'card card-grey p-1 mb-2' },
+            { staticClass: 'p-1' },
             [
                 h(
                     'div',

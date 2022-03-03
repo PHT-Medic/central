@@ -13,10 +13,11 @@ import {
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
-import { TrainCommandMethods, TrainCommandProperties } from './type';
-import { renderTrainCommand } from './utils';
+import { TrainCommandProperties } from './type';
+import { renderActionCommand } from '../../../render/utils';
+import { ActionCommandMethods } from '../../../render/type';
 
-export const TrainResultCommand = Vue.extend<any, TrainCommandMethods, any, TrainCommandProperties>({
+export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, TrainCommandProperties>({
     props: {
         entity: {
             type: Object as PropType<Train>,
@@ -153,6 +154,6 @@ export const TrainResultCommand = Vue.extend<any, TrainCommandMethods, any, Trai
         },
     },
     render(createElement) {
-        return renderTrainCommand(this, createElement);
+        return renderActionCommand(this, createElement);
     },
 });

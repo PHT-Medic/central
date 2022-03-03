@@ -12,7 +12,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import { minLength, required } from 'vuelidate/lib/validators';
 import { ProposalStationList } from '../../proposal-station/ProposalStationList';
-import MasterImagePicker from '../../master-image/MasterImagePicker';
+import { MasterImagePicker } from '../../master-image/MasterImagePicker';
 import { TrainStationList } from '../../train-station/TrainStationList';
 import { TrainStationAssignAction } from '../../train-station/TrainStationAssignAction';
 
@@ -117,16 +117,9 @@ export default {
             <h6><i class="fa fa-compact-disc" /> MasterImage</h6>
             <div class="mb-2">
                 <master-image-picker
-                    :master-image-id="train.master_image_id"
+                    :entity-id="train.master_image_id"
                     @selected="handleMasterImageSelected"
                 />
-
-                <div
-                    v-if="!train.master_image_id"
-                    class="form-group-hint group-required"
-                >
-                    Please select a master image.
-                </div>
             </div>
         </div>
 

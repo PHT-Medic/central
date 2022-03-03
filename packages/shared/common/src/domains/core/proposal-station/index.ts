@@ -7,5 +7,5 @@
 
 export * from './api';
 export * from './socket';
-export * from './status';
+export * from './constants';
 export * from './entity';

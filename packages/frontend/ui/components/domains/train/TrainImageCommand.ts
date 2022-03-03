@@ -1,11 +1,13 @@
-<!--
-  Copyright (c) 2021.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
-<script>
-export default {
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import Vue, { CreateElement, VNode } from 'vue';
+
+export default Vue.extend({
     props: {
         trainId: {
             type: String,
@@ -103,9 +105,6 @@ export default {
 
             this.masterImage.busy = false;
         },
-        setMasterImage(item) {
-            this.masterImage.item = item;
-        },
         async loadTrainFile() {
             if (this.trainFile.busy || !this.trainFileId || !this.trainId) return;
 
@@ -116,8 +115,9 @@ export default {
 
                 this.trainFile.loaded = true;
             } catch (e) {
-                console.log(e);
-                // ...
+                if (e instanceof Error) {
+                    this.$emit('failed', e);
+                }
             }
 
             this.trainFile.busy = false;
@@ -126,27 +126,20 @@ export default {
             this.trainFile.item = item;
         },
     },
-};
-</script>
-<template>
-    <div class="command-box">
-        <strong class="pr-1 shell-sign">$</strong> {{ commandStr }} {{ fileStr }}
-    </div>
-</template>
-<style>
-.command-box {
-    background-color: rgb(43, 43, 43);
-    border: 1px solid #dedede;
-    /* box-shadow: 0 4px 25px 0 rgb(0 0 0 / 10%); */
-    transition: all .3s ease-in-out;
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
-    display: flex;
-    flex-direction: row;
-    color: rgb(184, 186, 160);
-}
+    render(h: CreateElement): VNode {
+        const vm = this;
 
-.command-box .shell-sign {
-    color: rgb(166, 89, 45);
-}
-</style>
+        return h(
+            'div',
+            { staticClass: 'command-box' },
+            [
+                h('strong', { staticClass: 'pr-1, shell-sign' }, [
+                    '$',
+                ]),
+                vm.commandStr,
+                ' ',
+                vm.fileStr,
+            ],
+        );
+    },
+});

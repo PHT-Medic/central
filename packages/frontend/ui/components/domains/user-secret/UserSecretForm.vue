@@ -10,12 +10,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 
-import AlertMessage from '../../alert/AlertMessage';
-
 export default {
-    components: {
-        AlertMessage,
-    },
     props: {
         userId: {
             type: String,
@@ -35,7 +30,6 @@ export default {
             },
 
             busy: false,
-            message: null,
 
             typeOptions: [
                 { id: SecretType.RSA_PUBLIC_KEY, name: 'RSA' },
@@ -121,7 +115,6 @@ export default {
                 return;
             }
 
-            this.message = null;
             this.busy = true;
 
             try {
@@ -130,27 +123,16 @@ export default {
                 if (this.isEditing) {
                     response = await this.$api.userSecret.update(this.entityProperty.id, { ...this.formData });
 
-                    this.message = {
-                        isError: false,
-                        data: 'The user secret was successfully updated.',
-                    };
-
                     this.$emit('updated', response);
                 } else {
                     response = await this.$api.userSecret.create({ ...this.formData });
 
-                    this.message = {
-                        isError: false,
-                        data: 'The user secret was successfully created.',
-                    };
-
                     this.$emit('created', response);
                 }
             } catch (e) {
-                this.message = {
-                    data: e.message,
-                    isError: true,
-                };
+                if (e instanceof Error) {
+                    this.$emit('failed', e);
+                }
             }
 
             this.busy = false;
@@ -172,8 +154,6 @@ export default {
 </script>
 <template>
     <div>
-        <alert-message :message="message" />
-
         <div>
             <div
                 class="form-group"

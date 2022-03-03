@@ -7,10 +7,9 @@
 
 import { Context } from '@nuxt/types';
 import {
-    buildWithRoute,
+    build,
 } from '@vue-layout/navigation';
-import { LayoutKey } from '../config/layout';
 
 export default async function layoutMiddleware({ route } : Context) {
-    await buildWithRoute({ route, metaKey: LayoutKey.NAVIGATION_ID });
+    await build({ url: route.fullPath });
 }

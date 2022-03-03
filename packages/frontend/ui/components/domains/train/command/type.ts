@@ -6,15 +6,9 @@
  */
 
 import { Train, TrainCommand } from '@personalhealthtrain/central-common';
+import { ActionCommandProperties } from '../../../render/type';
 
 export type TrainCommandProperties = {
     entity: Train,
     command: `${TrainCommand}` | 'resultDownload',
-    elementType: 'button' | 'link' | 'dropDownItem',
-    withIcon: boolean,
-    withText: boolean
-};
-
-export type TrainCommandMethods = {
-    do() : Promise<void>
-};
+} & ActionCommandProperties;

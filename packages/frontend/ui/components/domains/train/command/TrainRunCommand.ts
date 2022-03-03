@@ -12,10 +12,11 @@ import {
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import { BDropdownItem } from 'bootstrap-vue';
-import { TrainCommandMethods, TrainCommandProperties } from './type';
-import { renderTrainCommand } from './utils';
+import { TrainCommandProperties } from './type';
+import { renderActionCommand } from '../../../render/utils';
+import { ActionCommandMethods } from '../../../render/type';
 
-export const TrainRunCommand = Vue.extend<any, TrainCommandMethods, any, TrainCommandProperties>({
+export const TrainRunCommand = Vue.extend<any, ActionCommandMethods, any, TrainCommandProperties>({
     props: {
         entity: {
             type: Object,
@@ -123,6 +124,6 @@ export const TrainRunCommand = Vue.extend<any, TrainCommandMethods, any, TrainCo
         },
     },
     render(createElement) {
-        return renderTrainCommand(this, createElement);
+        return renderActionCommand(this, createElement);
     },
 });

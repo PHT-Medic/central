@@ -35,7 +35,7 @@ export class ProposalStationAPI {
         return response.data;
     }
 
-    async update(id: ProposalStation['id'], data: Record<string, any>): Promise<SingleResourceResponse<ProposalStation>> {
+    async update(id: ProposalStation['id'], data: Partial<ProposalStation>): Promise<SingleResourceResponse<ProposalStation>> {
         const response = await this.client.post(`proposal-stations/${id}`, data);
 
         return response.data;

@@ -1,11 +1,19 @@
-<script>
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import Vue from 'vue';
+
 const MILLISECONDS_SECOND = 1000;
 const MILLISECONDS_MINUTE = 60 * MILLISECONDS_SECOND;
 const MILLISECONDS_HOUR = 60 * MILLISECONDS_MINUTE;
 const MILLISECONDS_DAY = 24 * MILLISECONDS_HOUR;
 const EVENT_VISIBILITY_CHANGE = 'visibilitychange';
 
-export default {
+export default Vue.extend({
     name: 'Countdown',
 
     props: {
@@ -70,6 +78,7 @@ export default {
 
     data() {
         return {
+            requestId: null,
             /**
                  * It is counting down.
                  * @type {boolean}
@@ -276,7 +285,7 @@ export default {
              * @private
              */
         pause() {
-            if (window.requestAnimationFrame) {
+            if (window.requestAnimationFrame && this.requestId) {
                 cancelAnimationFrame(this.requestId);
             } else {
                 clearTimeout(this.timeoutId);
@@ -410,5 +419,4 @@ export default {
             })),
         ] : this.$slots.default);
     },
-};
-</script>
+});

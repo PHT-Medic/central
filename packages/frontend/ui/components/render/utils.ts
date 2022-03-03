@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022.
+ * Copyright (c) 2022-2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -7,10 +7,11 @@
 
 import { CreateElement, VNodeChildren, VNodeData } from 'vue';
 import { BDropdownItem } from 'bootstrap-vue';
-import { TrainCommandMethods, TrainCommandProperties } from './type';
+import { TrainCommandProperties } from '../domains/train/command/type';
+import { ActionCommandMethods } from './type';
 
-export function renderTrainCommand(
-    vm: TrainCommandProperties & TrainCommandMethods & {
+export function renderActionCommand(
+    vm: TrainCommandProperties & ActionCommandMethods & {
         isAllowed: boolean,
         isDisabled: boolean,
         commandText: string,

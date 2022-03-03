@@ -12,8 +12,8 @@ import {
     alpha, integer, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
-import ProposalForm from '../../../components/domains/proposal/ProposalForm';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+import { ProposalForm } from '../../../components/domains/proposal/ProposalForm';
 
 export default {
     components: {
@@ -88,6 +88,11 @@ export default {
     },
     methods: {
         async handleCreated(entity) {
+            this.$bvToast.toast('The proposal was successfully created.', {
+                variant: 'success',
+                toaster: 'b-toaster-top-center',
+            });
+
             await this.$nuxt.$router.push(`/proposals/${entity.id}`);
         },
     },

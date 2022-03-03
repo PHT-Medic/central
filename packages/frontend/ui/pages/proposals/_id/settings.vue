@@ -6,8 +6,8 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
-import ProposalForm from '../../../components/domains/proposal/ProposalForm';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+import { ProposalForm } from '../../../components/domains/proposal/ProposalForm';
 
 export default {
     meta: {
@@ -29,6 +29,11 @@ export default {
     },
     methods: {
         handleUpdated(entity) {
+            this.$bvToast.toast('The proposal was successfully updated.', {
+                variant: 'success',
+                toaster: 'b-toaster-top-center',
+            });
+
             this.$emit('updated', entity);
         },
     },

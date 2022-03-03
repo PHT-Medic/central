@@ -341,22 +341,23 @@ ComponentListProperties<TrainStation> & {
                 'Trains',
             iconClass: vm.target === DomainType.Station ?
                 'fa fa-hospital' :
-                'fa fa-train',
+                'fa-solid fa-train-tram',
         });
 
         const search = buildListSearch(this, createElement);
         const items = buildListItems<TrainStation>(this, createElement, {
             itemIconClass: vm.target === DomainType.Station ?
                 'fa fa-hospital' :
-                'fa fa-train',
+                'fa-solid fa-train-tram',
             itemTextFn(item) {
                 return createElement('span', [
                     vm.target === DomainType.Station ?
                         item.station.name :
-                        vm.train.name,
+                        item.train.name,
                 ]);
             },
             itemSlots: {
+                handleUpdated: vm.handleUpdated,
                 handleDeleted: vm.handleDeleted,
                 handleCreated: vm.handleCreated,
             },

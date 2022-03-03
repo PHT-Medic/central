@@ -34,7 +34,7 @@ export class TrainStationAPI {
         return response;
     }
 
-    async update(id: number, data: Partial<TrainStation>): Promise<SingleResourceResponse<TrainStation>> {
+    async update(id: TrainStation['id'], data: Partial<TrainStation>): Promise<SingleResourceResponse<TrainStation>> {
         const { data: response } = await this.client.post(`train-stations/${id}`, data);
 
         return response;

@@ -5,6 +5,7 @@ import {
     applyFilters, applyPagination, applyRelations, applySort,
 } from 'typeorm-extension';
 import { NotFoundError } from '@typescript-error/http';
+import { isPermittedForResourceRealm } from '@typescript-auth/domains';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 
@@ -45,7 +46,19 @@ export async function getManyProposalRouteHandler(req: ExpressRequest, res: Expr
     const repository = getRepository(ProposalEntity);
     const query = repository.createQueryBuilder('proposal');
 
-    onlyRealmPermittedQueryResources(query, req.realmId);
+    if (filter) {
+        let { realm_id: realmId } = filter as Record<string, any>;
+
+        if (!isPermittedForResourceRealm(req.realmId, realmId)) {
+            realmId = req.realmId;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        filter.realm_id = realmId;
+    } else {
+        onlyRealmPermittedQueryResources(query, req.realmId, 'proposal.realm_id');
+    }
 
     applyFields(query, fields, {
         defaultAlias: 'proposal',
@@ -54,7 +67,7 @@ export async function getManyProposalRouteHandler(req: ExpressRequest, res: Expr
 
     applyFilters(query, filter, {
         defaultAlias: 'proposal',
-        allowed: ['id', 'title', 'realm_id', 'user_id', 'realm_id'],
+        allowed: ['id', 'title', 'realm_id', 'user_id'],
     });
 
     applySort(query, sort, {

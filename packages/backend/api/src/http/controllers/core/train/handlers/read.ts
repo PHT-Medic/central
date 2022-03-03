@@ -44,7 +44,19 @@ export async function getManyTrainRouteHandler(req: ExpressRequest, res: Express
     const repository = getRepository(TrainEntity);
     const query = repository.createQueryBuilder('train');
 
-    onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
+    if (filter) {
+        let { realm_id: realmId } = filter as Record<string, any>;
+
+        if (!isPermittedForResourceRealm(req.realmId, realmId)) {
+            realmId = req.realmId;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        filter.realm_id = realmId;
+    } else {
+        onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
+    }
 
     applyQueryRelations(query, include, {
         defaultAlias: 'train',

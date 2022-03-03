@@ -251,14 +251,5 @@ export default {
                 />
             </div>
         </template>
-        <!--
-        <div class="progress-with-circle">
-            <div
-            class="progress-bar"
-            :style="{width: progressPercentage + '%'}"
-            style="background-color: rgb(51, 51, 51); color: rgb(51, 51, 51);"
-            ></div>
-        </div>
-        -->
     </div>
 </template>

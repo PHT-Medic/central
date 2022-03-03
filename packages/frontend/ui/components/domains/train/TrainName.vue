@@ -7,8 +7,8 @@
 <script>
 export default {
     props: {
-        trainId: String,
-        trainName: {
+        entityId: String,
+        entityName: {
             type: String,
             default: undefined,
         },
@@ -26,11 +26,11 @@ export default {
     },
     computed: {
         displayText() {
-            return this.trainName ?? this.trainId;
+            return this.entityName ?? this.entityId;
         },
     },
     watch: {
-        trainName(val, oldVal) {
+        entityName(val, oldVal) {
             if (val && val !== oldVal) {
                 if (val) {
                     this.form.name = val;
@@ -39,8 +39,8 @@ export default {
         },
     },
     created() {
-        if (this.trainName) {
-            this.form.name = this.trainName;
+        if (this.entityName) {
+            this.form.name = this.entityName;
         }
     },
     methods: {
@@ -53,7 +53,7 @@ export default {
             this.busy = true;
 
             try {
-                const train = await this.$api.train.update(this.trainId, {
+                const train = await this.$api.train.update(this.entityId, {
                     name: this.form.name,
                 });
 
@@ -86,14 +86,14 @@ export default {
         <template v-else>
             <slot
                 name="text"
-                :trainId="trainId"
-                :trainName="trainName"
+                :entity-id="entityId"
+                :entity-name="entityName"
                 :display-text="displayText"
             >
 
                 {{ displayText }}
-                <template v-if="trainName">
-                    <small class="text-muted">{{ trainId }}</small>
+                <template v-if="entityName">
+                    <small class="text-muted">{{ entityId }}</small>
                 </template>
             </slot>
 
