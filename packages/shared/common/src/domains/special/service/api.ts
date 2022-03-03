@@ -20,10 +20,12 @@ export class ServiceAPI {
     }
 
     async runCommand(
-        id: ServiceIDType,
+        id: ServiceIDType | ServiceID,
         command: string,
-        data: Record<string, any>,
+        data?: Record<string, any>,
     ): Promise<SingleResourceResponse<Record<string, any>>> {
+        data = data || {};
+
         const { data: resultData } = await this.client.post(`services/${id}/command`, { command, ...data });
 
         return resultData;

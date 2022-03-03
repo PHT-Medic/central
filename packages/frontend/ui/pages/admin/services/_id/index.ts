@@ -7,7 +7,7 @@
 
 import Vue, { PropType } from 'vue';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import RegistryManagement from '../../../../components/domains/service/harbor/HarborManagement.vue';
+import RegistryManagement from '../../../../components/domains/service/RegistryManagement';
 
 export default Vue.extend({
     props: {
