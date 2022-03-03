@@ -95,7 +95,7 @@ ComponentListProperties<TrainStation> & {
             default: DomainType.Station,
         },
         direction: {
-            type: Object as PropType<Direction>,
+            type: String as PropType<Direction>,
             default: Direction.OUT,
         },
     },

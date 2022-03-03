@@ -19,6 +19,14 @@ export default {
             return this.$auth.hasPermission(PermissionID.USER_EDIT);
         },
     },
+    methods: {
+        handleUpdated() {
+            this.$bvToast.toast('The account was successfully updated.', {
+                variant: 'success',
+                toaster: 'b-toaster-top-center',
+            });
+        },
+    },
 };
 </script>
 <template>
@@ -33,6 +41,7 @@ export default {
                     :can-manage="false"
                     :realm-id="user.realm_id"
                     :entity="user"
+                    @updated="handleUpdated"
                 />
             </div>
         </div>

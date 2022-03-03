@@ -14,6 +14,14 @@ export default {
             return this.$store.getters['auth/user'];
         },
     },
+    methods: {
+        handleUpdated() {
+            this.$bvToast.toast('The password was successfully updated.', {
+                variant: 'success',
+                toaster: 'b-toaster-top-center',
+            });
+        },
+    },
 };
 </script>
 <template>
@@ -22,6 +30,9 @@ export default {
             Password
         </h6>
 
-        <user-password-form :id="user.id" />
+        <user-password-form
+            :id="user.id"
+            @updated="handleUpdated"
+        />
     </div>
 </template>

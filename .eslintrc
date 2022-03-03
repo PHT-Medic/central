@@ -20,7 +20,9 @@
             "devDependencies": true,
             "optionalDependencies": false,
             "peerDependencies": false
-        }]
+        }],
+
+        "@typescript-eslint/no-this-alias": "off"
     },
     "ignorePatterns": [
         "**/dist/*",

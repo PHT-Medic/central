@@ -38,4 +38,6 @@ export type TrainBuilderStartPayload = {
     files: string[],
 
     stations: Station['secure_id'][]
+    // stations: ['stationa', 'stationb']
+    // stations: [{id: 'stationa', archtecture: 'tue'},..]
 };

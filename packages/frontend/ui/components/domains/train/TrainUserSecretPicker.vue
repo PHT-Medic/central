@@ -102,33 +102,9 @@ export default {
 <template>
     <div class="row">
         <div class="col">
-            <div class="d-flex flex-column">
-                <div class="form-group">
-                    <label>RSA SecretID</label>
-                    <input
-                        :value="userRsaSecretId"
-                        type="text"
-                        class="form-control"
-                        :disabled="true"
-                        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                    >
-                </div>
-                <div class="form-group">
-                    <label>Paillier SecretID</label>
-                    <input
-                        :value="userPaillierSecretId"
-                        type="text"
-                        class="form-control"
-                        :disabled="true"
-                        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                    >
-                </div>
-            </div>
-        </div>
-
-        <div class="col">
             <user-secret-list
                 ref="itemsList"
+                :with-header="false"
                 :query="{filter: {user_id: userId}, sort: {created_at: 'DESC'}}"
             >
                 <template #item-actions="{item}">
@@ -154,6 +130,30 @@ export default {
                     </div>
                 </template>
             </user-secret-list>
+        </div>
+        <div class="col">
+            <div class="d-flex flex-column">
+                <div class="form-group">
+                    <label>RSA SecretID</label>
+                    <input
+                        :value="userRsaSecretId"
+                        type="text"
+                        class="form-control"
+                        :disabled="true"
+                        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                    >
+                </div>
+                <div class="form-group">
+                    <label>Paillier SecretID</label>
+                    <input
+                        :value="userPaillierSecretId"
+                        type="text"
+                        class="form-control"
+                        :disabled="true"
+                        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                    >
+                </div>
+            </div>
         </div>
     </div>
 </template>

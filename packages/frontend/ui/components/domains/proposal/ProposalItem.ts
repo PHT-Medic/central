@@ -130,7 +130,7 @@ export const ProposalItem = Vue.extend({
                     },
                     staticClass: 'btn btn-xs btn-danger ml-1',
                     on: {
-                        done(data) {
+                        deleted(data) {
                             vm.handleDeleted.call(vm, data);
                         },
                     },

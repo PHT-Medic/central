@@ -53,7 +53,7 @@ export async function getManyUserSecretRouteHandler(req: ExpressRequest, res: Ex
 
     applyFilters(query, filter, {
         defaultAlias: 'entity',
-        allowed: ['id', 'type', 'user_id'],
+        allowed: ['id', 'type', 'user_id', 'key'],
     });
 
     applyRelations(query, include, {

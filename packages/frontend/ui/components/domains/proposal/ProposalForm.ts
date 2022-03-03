@@ -301,8 +301,6 @@ export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Pr
                         risk,
                         h('hr'),
                         riskComment,
-                        h('hr'),
-                        submit,
                     ],
                 ),
                 h(
@@ -312,6 +310,8 @@ export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Pr
                         stations,
                         h('hr'),
                         data,
+                        h('hr'),
+                        submit,
                     ],
                 ),
             ],

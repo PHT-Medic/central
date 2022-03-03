@@ -75,6 +75,19 @@ ComponentListProperties<UserSecret>
             return this.items.filter(this.filterItems);
         },
     },
+    watch: {
+        q(val, oldVal) {
+            if (val === oldVal) return;
+
+            if (val.length === 1 && val.length > oldVal.length) {
+                return;
+            }
+
+            this.meta.offset = 0;
+
+            this.load();
+        },
+    },
     created() {
         if (this.loadOnInit) {
             this.load();
@@ -91,6 +104,9 @@ ComponentListProperties<UserSecret>
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
+                    },
+                    filter: {
+                        key: this.q.length > 0 ? `~${this.q}` : this.q,
                     },
                 }, this.query));
 
