@@ -121,6 +121,7 @@ export default {
         <div class="m-t-10">
             <proposal-station-list
                 ref="itemList"
+                :direction="'in'"
                 :target="'proposal'"
                 :realm-id="realmId"
                 :source-id="stationId"

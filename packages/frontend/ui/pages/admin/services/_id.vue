@@ -7,7 +7,7 @@
 <script>
 import Vue from 'vue';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 const services = Object.values(ServiceID);
 
@@ -85,7 +85,7 @@ export default {
             </div>
         </div>
         <nuxt-child
-            :service-id="serviceId"
+            :entity-id="serviceId"
             @updated="update"
         />
     </div>

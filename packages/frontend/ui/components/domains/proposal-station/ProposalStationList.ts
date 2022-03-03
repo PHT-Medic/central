@@ -25,7 +25,7 @@ import {
     ComponentListProperties,
     buildListHeader, buildListItems, buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
-import { Realm, isPermittedForResourceRealm } from '@typescript-auth/domains';
+import { MASTER_REALM_ID, Realm } from '@typescript-auth/domains';
 import { BuildInput } from '@trapi/query';
 
 enum DomainType {
@@ -33,14 +33,20 @@ enum DomainType {
     Station = 'station',
 }
 
+enum Direction {
+    IN = 'in',
+    OUT = 'out',
+}
+
 export const ProposalStationList = Vue.extend<
 ComponentListData<ProposalStation>,
 ComponentListMethods<ProposalStation>,
 any,
 ComponentListProperties<ProposalStation> & {
-    realmId: Realm['id'],
+    realmId?: Realm['id'],
     sourceId: Train['id'] | Station['id'],
-    target: `${DomainType}`
+    target: `${DomainType}`,
+    direction: Direction
 }
 >({
     name: 'ProposalStationList',
@@ -74,6 +80,7 @@ ComponentListProperties<ProposalStation> & {
 
         realmId: {
             type: String,
+            default: undefined,
         },
         sourceId: {
             type: String,
@@ -81,6 +88,10 @@ ComponentListProperties<ProposalStation> & {
         target: {
             type: String as PropType<DomainType>,
             default: DomainType.Station,
+        },
+        direction: {
+            type: Object as PropType<Direction>,
+            default: Direction.OUT,
         },
     },
     data() {
@@ -105,16 +116,19 @@ ComponentListProperties<ProposalStation> & {
                 DomainType.Proposal :
                 DomainType.Station;
         },
-        direction() {
-            if (this.$store.getters['auth/userRealmId'] === this.realmId) {
-                return 'out';
+        userRealmId() {
+            return this.$store.getters['auth/userRealmId'];
+        },
+        socketRealmId() {
+            if (this.realmId) {
+                return this.realmId;
             }
 
-            if (isPermittedForResourceRealm(this.$store.getters['auth/userRealmId'], this.realmId)) {
-                return null;
+            if (this.userRealmId === MASTER_REALM_ID) {
+                return undefined;
             }
 
-            return 'in';
+            return this.userRealmId;
         },
     },
     watch: {
@@ -137,17 +151,19 @@ ComponentListProperties<ProposalStation> & {
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.realmId);
+        > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-        switch (this.direction) {
-            case 'in':
-                socket.emit('proposalStationsInSubscribe');
-                break;
-            case 'out':
-                socket.emit('proposalStationsOutSubscribe');
-                break;
-            default:
-                socket.emit('proposalStationsSubscribe');
+        if (this.socketRealmId) {
+            switch (this.direction) {
+                case Direction.IN:
+                    socket.emit('proposalStationsInSubscribe');
+                    break;
+                case Direction.OUT:
+                    socket.emit('proposalStationsOutSubscribe');
+                    break;
+            }
+        } else {
+            socket.emit('proposalStationsSubscribe');
         }
 
         socket.on('proposalStationCreated', this.handleSocketCreated);
@@ -157,32 +173,38 @@ ComponentListProperties<ProposalStation> & {
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.realmId);
+        > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-        switch (this.direction) {
-            case 'in':
-                socket.emit('proposalStationsInUnsubscribe');
-                break;
-            case 'out':
-                socket.emit('proposalStationsOutUnsubscribe');
-                break;
-            default:
-                socket.emit('proposalStationsUnsubscribe');
-                break;
+        if (this.socketRealmId) {
+            switch (this.direction) {
+                case Direction.IN:
+                    socket.emit('proposalStationsInSubscribe');
+                    break;
+                case Direction.OUT:
+                    socket.emit('proposalStationsOutSubscribe');
+                    break;
+            }
+        } else {
+            socket.emit('proposalStationsSubscribe');
         }
+
         socket.off('proposalStationCreated', this.handleSocketCreated);
         socket.off('proposalStationDeleted', this.handleSocketDeleted);
     },
     methods: {
         isSameSocketRoom(room) {
-            switch (this.direction) {
-                case 'in':
-                    return room === buildSocketProposalStationInRoomName();
-                case 'out':
-                    return room === buildSocketProposalStationOutRoomName();
-                default:
-                    return room === buildSocketProposalStationRoomName();
+            if (this.socketRealmId) {
+                switch (this.direction) {
+                    case Direction.IN:
+                        return room === buildSocketProposalStationInRoomName();
+                    case Direction.OUT:
+                        return room === buildSocketProposalStationOutRoomName();
+                }
+            } else {
+                return room === buildSocketProposalStationRoomName();
             }
+
+            return false;
         },
         isSocketEventForSource(item: ProposalStation) {
             switch (this.source) {
@@ -252,6 +274,14 @@ ComponentListProperties<ProposalStation> & {
                     query.include = query.include || {};
                     query.include.proposal = true;
                     break;
+            }
+
+            if (this.realmId) {
+                if (this.direction === Direction.IN) {
+                    query.filter.station_realm_id = this.realmId;
+                } else {
+                    query.filter.proposal_realm_id = this.realmId;
+                }
             }
 
             try {

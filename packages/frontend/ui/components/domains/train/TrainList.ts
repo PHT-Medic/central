@@ -241,6 +241,9 @@ ComponentListProperties<Train>
                         entity: item,
                     },
                     on: {
+                        deleted(e) {
+                            vm.handleDeleted.call(null, e);
+                        },
                         updated(e) {
                             vm.handleUpdated.call(null, e);
                         },

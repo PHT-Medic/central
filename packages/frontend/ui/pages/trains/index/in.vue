@@ -101,6 +101,7 @@ export default Vue.extend({
                     :target="'train'"
                     :realm-id="realmId"
                     :source-id="viewerStation.id"
+                    :direction="'in'"
                 >
                     <template #items="props">
                         <b-table

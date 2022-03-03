@@ -11,31 +11,22 @@ import RegistryManagement from '../../../../components/domains/service/harbor/Ha
 
 export default Vue.extend({
     props: {
-        serviceId: Object as PropType<ServiceID>,
+        entityId: String as PropType<ServiceID>,
     },
-    render(createElement) {
-        let template : any = createElement();
-
-        // eslint-disable-next-line default-case
-        switch (this.serviceId) {
-            case ServiceID.REGISTRY:
-                template = RegistryManagement;
-                break;
+    render(h) {
+        if (this.entityId === ServiceID.REGISTRY) {
+            return h(RegistryManagement, {
+                props: {
+                    entityId: this.entityId,
+                },
+                on: {
+                    updated: (event) => this.$emit('updated', event),
+                },
+            });
         }
 
-        if (!template) {
-            return createElement('div', {
-                class: 'alert alert-info alert-sm',
-            }, `You can not execute any task for the ${this.serviceId} service yet.`);
-        }
-
-        return createElement(template, {
-            props: {
-                serviceId: this.serviceId,
-            },
-            on: {
-                updated: (event) => this.$emit('updated', event),
-            },
-        });
+        return h('div', {
+            class: 'alert alert-info alert-sm',
+        }, `You can not execute any task for the ${this.entityId} service yet.`);
     },
 });

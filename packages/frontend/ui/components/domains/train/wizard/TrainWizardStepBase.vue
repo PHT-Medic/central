@@ -134,6 +134,8 @@ export default {
                         ref="proposalStationList"
                         :domain="'station'"
                         :realm-id="train.realm_id"
+                        :direction="'out'"
+                        :query="{filter: {proposal_id: train.proposal_id}}"
                     >
                         <template #header>
                             <span>Stations <span class="text-info">available</span></span>
@@ -155,6 +157,8 @@ export default {
                         ref="trainStationList"
                         :domain="'station'"
                         :realm-id="train.realm_id"
+                        :direction="'out'"
+                        :query="{filter: {train_id: train.id}}"
                     >
                         <template #header>
                             <span>Stations <span class="text-success">selected</span></span>

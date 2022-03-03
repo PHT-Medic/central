@@ -4,13 +4,14 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
 import { ServiceID } from '@personalhealthtrain/central-common';
 import { useHTTPClient } from '@typescript-auth/vue';
+import { PropType } from 'vue';
 
 export default {
     props: {
-        serviceId: ServiceID,
+        entityId: String as PropType<ServiceID>,
     },
     data() {
         return {
@@ -27,7 +28,7 @@ export default {
             try {
                 const response = await useHTTPClient().robot.getMany({
                     filter: {
-                        name: this.serviceId,
+                        name: this.entityId,
                     },
                     fields: ['+secret'],
                 });
@@ -47,7 +48,7 @@ export default {
     <div>
         <robot-form
             v-if="item"
-            :name="serviceId"
+            :name="entityId"
             :realm-id="item.realm_id"
             :entity="item"
         />

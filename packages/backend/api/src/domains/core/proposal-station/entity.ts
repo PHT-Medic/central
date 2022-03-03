@@ -6,7 +6,8 @@
  */
 
 import {
-    Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
+    Column,
+    CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn,
 } from 'typeorm';
 import {
     Proposal, ProposalStation, ProposalStationApprovalStatus, Station,
@@ -16,6 +17,7 @@ import { Realm } from '@typescript-auth/domains';
 import { ProposalEntity } from '../proposal/entity';
 import { StationEntity } from '../station/entity';
 
+@Unique(['proposal_id', 'station_id'])
 @Entity({ name: 'proposal_stations' })
 export class ProposalStationEntity implements ProposalStation {
     @PrimaryGeneratedColumn('uuid')

@@ -39,6 +39,7 @@ export async function getManyTrainStationRouteHandler(req: ExpressRequest, res: 
 
     const repository = getRepository(TrainStationEntity);
     const query = await repository.createQueryBuilder('trainStation');
+    query.distinctOn(['trainStation.id']);
 
     onlyRealmPermittedQueryResources(query, req.realmId, [
         'trainStation.train_realm_id',
@@ -55,13 +56,14 @@ export async function getManyTrainStationRouteHandler(req: ExpressRequest, res: 
         defaultAlias: 'trainStation',
         allowed: [
             'train_id',
+            'train_realm_id',
             'train.id',
+            'train.title',
 
             'station_id',
+            'station_realm_id',
             'station.name',
             'station.realm_id',
-
-            'train.title',
         ],
     });
 

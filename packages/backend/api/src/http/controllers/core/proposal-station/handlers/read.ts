@@ -40,6 +40,7 @@ export async function getManyProposalStationRouteHandler(req: ExpressRequest, re
 
     const repository = getRepository(ProposalStationEntity);
     const query = await repository.createQueryBuilder('proposalStation');
+    query.distinctOn(['proposalStation.id']);
 
     onlyRealmPermittedQueryResources(query, req.realmId, [
         'proposalStation.station_realm_id',
@@ -54,13 +55,14 @@ export async function getManyProposalStationRouteHandler(req: ExpressRequest, re
     applyFilters(query, filter, {
         relations,
         allowed: [
+            'proposal_realm_id',
             'proposal_id',
             'proposal.id',
             'proposal.title',
 
+            'station_realm_id',
             'station_id',
             'station.name',
-            'station.realm_id',
         ],
         defaultAlias: 'proposalStation',
     });

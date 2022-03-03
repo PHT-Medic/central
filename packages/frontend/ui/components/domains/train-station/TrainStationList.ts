@@ -12,6 +12,9 @@ import {
     Station,
     Train,
     TrainStation,
+    buildSocketProposalStationInRoomName,
+    buildSocketProposalStationOutRoomName,
+    buildSocketProposalStationRoomName,
     buildSocketTrainStationInRoomName,
     buildSocketTrainStationOutRoomName, buildSocketTrainStationRoomName, mergeDeep,
 } from '@personalhealthtrain/central-common';
@@ -28,7 +31,7 @@ import {
     buildListNoMore,
     buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
-import { Realm, isPermittedForResourceRealm } from '@typescript-auth/domains';
+import { MASTER_REALM_ID, Realm, isPermittedForResourceRealm } from '@typescript-auth/domains';
 import { BuildInput } from '@trapi/query';
 
 enum DomainType {
@@ -36,14 +39,20 @@ enum DomainType {
     Station = 'station',
 }
 
+enum Direction {
+    IN = 'in',
+    OUT = 'out',
+}
+
 export const TrainStationList = Vue.extend<
 ComponentListData<TrainStation>,
 ComponentListMethods<TrainStation>,
 any,
 ComponentListProperties<TrainStation> & {
-    realmId: Realm['id'],
+    realmId?: Realm['id'],
     sourceId: Train['id'] | Station['id'],
-    target: DomainType
+    target: DomainType,
+    direction: Direction
 }
 >({
     name: 'TrainStationList',
@@ -85,6 +94,10 @@ ComponentListProperties<TrainStation> & {
             type: String as PropType<DomainType>,
             default: DomainType.Station,
         },
+        direction: {
+            type: Object as PropType<Direction>,
+            default: Direction.OUT,
+        },
     },
     data() {
         return {
@@ -108,16 +121,19 @@ ComponentListProperties<TrainStation> & {
                 DomainType.Train :
                 DomainType.Station;
         },
-        direction() {
-            if (this.$store.getters['auth/userRealmId'] === this.realmId) {
-                return 'out';
+        userRealmId() {
+            return this.$store.getters['auth/userRealmId'];
+        },
+        socketRealmId() {
+            if (this.realmId) {
+                return this.realmId;
             }
 
-            if (isPermittedForResourceRealm(this.$store.getters['auth/userRealmId'], this.realmId)) {
-                return null;
+            if (this.userRealmId === MASTER_REALM_ID) {
+                return undefined;
             }
 
-            return 'in';
+            return this.userRealmId;
         },
     },
     watch: {
@@ -143,17 +159,19 @@ ComponentListProperties<TrainStation> & {
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.realmId);
+        > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-        switch (this.direction) {
-            case 'in':
-                socket.emit('trainStationsInSubscribe');
-                break;
-            case 'out':
-                socket.emit('trainStationsOutSubscribe');
-                break;
-            default:
-                socket.emit('trainStationsSubscribe');
+        if (this.socketRealmId) {
+            switch (this.direction) {
+                case Direction.IN:
+                    socket.emit('trainStationsInSubscribe');
+                    break;
+                case Direction.OUT:
+                    socket.emit('trainStationsOutSubscribe');
+                    break;
+            }
+        } else {
+            socket.emit('trainStationsSubscribe');
         }
 
         socket.on('trainStationCreated', this.handleSocketCreated);
@@ -163,18 +181,19 @@ ComponentListProperties<TrainStation> & {
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.realmId);
+        > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-        switch (this.direction) {
-            case 'in':
-                socket.emit('trainStationsInUnsubscribe');
-                break;
-            case 'out':
-                socket.emit('trainStationsOutUnsubscribe');
-                break;
-            default:
-                socket.emit('trainStationsUnsubscribe');
-                break;
+        if (this.socketRealmId) {
+            switch (this.direction) {
+                case Direction.IN:
+                    socket.emit('trainStationsInUnsubscribe');
+                    break;
+                case Direction.OUT:
+                    socket.emit('trainStationsOutUnsubscribe');
+                    break;
+            }
+        } else {
+            socket.emit('trainStationsUnsubscribe');
         }
 
         socket.off('trainStationCreated', this.handleSocketCreated);
@@ -182,14 +201,18 @@ ComponentListProperties<TrainStation> & {
     },
     methods: {
         isSameSocketRoom(room) {
-            switch (this.direction) {
-                case 'in':
-                    return room === buildSocketTrainStationInRoomName();
-                case 'out':
-                    return room === buildSocketTrainStationOutRoomName();
-                default:
-                    return room === buildSocketTrainStationRoomName();
+            if (this.socketRealmId) {
+                switch (this.direction) {
+                    case Direction.IN:
+                        return room === buildSocketTrainStationInRoomName();
+                    case Direction.OUT:
+                        return room === buildSocketTrainStationOutRoomName();
+                }
+            } else {
+                return room === buildSocketTrainStationRoomName();
             }
+
+            return false;
         },
         isSocketEventForSource(item: TrainStation) {
             switch (this.source) {
@@ -259,6 +282,14 @@ ComponentListProperties<TrainStation> & {
                     query.include = query.include || {};
                     query.include.train = true;
                     break;
+            }
+
+            if (this.realmId) {
+                if (this.direction === Direction.IN) {
+                    query.filter.station_realm_id = this.realmId;
+                } else {
+                    query.filter.train_realm_id = this.realmId;
+                }
             }
 
             try {

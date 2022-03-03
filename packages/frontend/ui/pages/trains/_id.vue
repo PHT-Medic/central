@@ -87,8 +87,8 @@ export default {
             🚊 Train
             <span class="sub-title">
                 <train-name
-                    :train-id="item.id"
-                    :train-name="item.name"
+                    :entity-id="item.id"
+                    :entity-name="item.name"
                 />
             </span>
         </h1>

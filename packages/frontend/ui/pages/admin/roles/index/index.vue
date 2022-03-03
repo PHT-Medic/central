@@ -51,10 +51,12 @@ export default {
         canDrop() {
             return this.$auth.hasPermission(PermissionID.ROLE_DROP);
         },
-        query: {
-            sort: {
-                updated_at: 'DESC',
-            },
+        query() {
+            return {
+                sort: {
+                    updated_at: 'DESC',
+                },
+            };
         },
     },
     methods: {

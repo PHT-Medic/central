@@ -12,6 +12,7 @@ import {
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import {
@@ -26,6 +27,7 @@ import { Realm } from '@typescript-auth/domains';
 import { TrainEntity } from '../train/entity';
 import { StationEntity } from '../station/entity';
 
+@Unique(['station_id', 'train_id'])
 @Entity({ name: 'train_stations' })
 export class TrainStationEntity implements TrainStation {
     @PrimaryGeneratedColumn('uuid')
