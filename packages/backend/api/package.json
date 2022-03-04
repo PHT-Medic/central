@@ -63,7 +63,7 @@
         "@types/tar": "^6.1.1",
         "@types/tar-stream": "^2.2.2",
         "@types/winston": "^2.4.4",
-        "@types/yargs": "^17.0.8",
+        "@types/yargs": "^17.0.9",
         "cross-env": "^7.0.3",
         "jest": "^27.5.1",
         "jest-serial-runner": "^1.2.0",
