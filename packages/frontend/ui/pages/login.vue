@@ -90,9 +90,8 @@ export default {
             this.busy = false;
         },
 
-        setProviderAuthorizeURL(provider) {
-            provider.url = this.$authApi.oauth2Provider.getAuthorizeUri(this.$config.apiUrl, provider.id);
-            return provider;
+        buildUrl(provider) {
+            return this.$authApi.oauth2Provider.getAuthorizeUri(this.$config.apiUrl, provider.id);
         },
     },
 };
@@ -220,7 +219,6 @@ export default {
                 <o-auth2-provider-list
                     :query="providerQuery"
                     :with-search="false"
-                    :map-items="setProviderAuthorizeURL"
                 >
                     <template #items="props">
                         <ul class="list-unstyled">
@@ -236,7 +234,7 @@ export default {
                                         </div>
                                         <div class="ml-auto">
                                             <a
-                                                :href="item.url"
+                                                :href="buildUrl(item)"
                                                 type="button"
                                                 class="btn btn-success btn-xs"
                                             >

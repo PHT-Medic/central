@@ -8,7 +8,7 @@
 import { Context } from '@nuxt/types';
 import { buildAbilityMetaFromName } from '@typescript-auth/domains';
 import AuthModule from '../config/auth';
-import { LayoutKey } from '../config/layout/contants';
+import { LayoutKey } from '../config/layout';
 
 function checkAbilityOrPermission({ route, $auth } : Context) {
     const layoutKeys : string[] = [
