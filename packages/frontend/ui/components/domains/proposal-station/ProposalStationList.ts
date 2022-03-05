@@ -23,7 +23,7 @@ import {
     ComponentListHandlerMethodOptions,
     ComponentListMethods,
     ComponentListProperties,
-    buildListHeader, buildListItems, buildListNoMore, buildListPagination, buildListSearch,
+    PaginationMeta, buildListHeader, buildListItems, buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
 import { MASTER_REALM_ID, Realm } from '@typescript-auth/domains';
 import { BuildInput } from '@trapi/query';
@@ -250,8 +250,12 @@ ComponentListProperties<ProposalStation> & {
 
             return item;
         },
-        async load() {
+        async load(options?: PaginationMeta) {
             if (this.busy) return;
+
+            if (options) {
+                this.meta.offset = options.offset;
+            }
 
             this.busy = true;
 
@@ -303,15 +307,6 @@ ComponentListProperties<ProposalStation> & {
             this.busy = false;
         },
 
-        goTo(options, resolve, reject) {
-            if (options.offset === this.meta.offset) return;
-
-            this.meta.offset = options.offset;
-
-            this.load()
-                .then(resolve)
-                .catch(reject);
-        },
         handleCreated(
             data: ProposalStation,
             options?: ComponentListHandlerMethodOptions<ProposalStation>,
@@ -362,7 +357,7 @@ ComponentListProperties<ProposalStation> & {
         const vm = this;
 
         const header = buildListHeader(this, createElement, {
-            title: vm.target === DomainType.Station ? 'Stations' : 'Proposals',
+            titleText: vm.target === DomainType.Station ? 'Stations' : 'Proposals',
             iconClass: vm.target === DomainType.Station ?
                 'fa fa-hospital' :
                 'fa fa-file',
@@ -386,7 +381,7 @@ ComponentListProperties<ProposalStation> & {
         });
 
         const noMore = buildListNoMore(this, createElement, {
-            hint: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
+            text: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
                 `There are no more ${vm.target}s available...`,
             ]),
         });

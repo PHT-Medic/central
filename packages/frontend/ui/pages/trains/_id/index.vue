@@ -6,7 +6,7 @@
   -->
 <script>
 import TrainPipeline from '../../../components/domains/train/TrainPipeline';
-import TrainStationsProgress from '../../../components/domains/train-station/progress/TrainStationsProgress';
+import TrainStationsProgress from '../../../components/domains/train-station/TrainStationsProgress';
 
 export default {
     components: { TrainStationsProgress, TrainPipeline },

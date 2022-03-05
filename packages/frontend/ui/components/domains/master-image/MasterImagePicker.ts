@@ -9,7 +9,7 @@ import Vue, { CreateElement, VNode } from 'vue';
 import { required } from 'vuelidate/lib/validators';
 import { buildFormSelect } from '@vue-layout/utils';
 import { MasterImageList } from './MasterImageList';
-import { FormGroup } from '../../FormGroup';
+import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 
 export const MasterImagePicker = Vue.extend({
     name: 'MasterImagePicker',
@@ -215,7 +215,7 @@ export const MasterImagePicker = Vue.extend({
                     scopedSlots: {
                         items(props) {
                             return buildFormSelect(vm, h, {
-                                formGroup: FormGroup,
+                                validationTranslator: buildVuelidateTranslator(this.$ilingo),
                                 options: props.items.map((item) => ({
                                     id: item.id,
                                     value: item.name,
@@ -253,7 +253,7 @@ export const MasterImagePicker = Vue.extend({
                     { staticClass: 'col' },
                     [
                         buildFormSelect(vm, h, {
-                            formGroup: FormGroup,
+                            validationTranslator: buildVuelidateTranslator(this.$ilingo),
                             options: groupOptions,
                             propName: 'group_virtual_path',
                             title: [

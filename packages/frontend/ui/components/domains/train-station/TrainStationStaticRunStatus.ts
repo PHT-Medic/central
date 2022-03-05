@@ -1,27 +1,19 @@
-<!--
-  Copyright (c) 2021-2021.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
-<template>
-    <span>
-        <slot
-            :classSuffix="classSuffix"
-            :statusText="statusText"
-        >
-            <span :class="'text-'+classSuffix">{{ statusText }}</span>
-        </slot>
-    </span>
-</template>
-<script>
-import { TrainBuildStatus, TrainRunStatus, TrainStationStatic } from '@personalhealthtrain/central-common';
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
 
-export default {
+import { TrainBuildStatus, TrainRunStatus, TrainStationStatic } from '@personalhealthtrain/central-common';
+import Vue, { CreateElement, PropType, VNode } from 'vue';
+import { SlotName, hasNormalizedSlot, normalizeSlot } from '@vue-layout/utils';
+
+export default Vue.extend({
     props: {
         id: {
             // incoming, outgoing
-            type: String,
+            type: String as PropType<'incoming' | 'outgoing'>,
             default: null,
         },
         trainBuildStatus: {
@@ -41,7 +33,7 @@ export default {
         arrived() {
             switch (this.id) {
                 case TrainStationStatic.INCOMING:
-                    return this.trainBuildStatus === TrainBuildStatus.FINISHED && !this.trainRunStationIndex;
+                    return this.trainBuildStatus === TrainBuildStatus.FINISHED;
                 case TrainStationStatic.OUTGOING:
                     return this.trainRunStatus === TrainRunStatus.FINISHED;
             }
@@ -61,10 +53,7 @@ export default {
                 return 'arrived';
             }
 
-            if (
-                this.id === TrainStationStatic.INCOMING &&
-                this.departed
-            ) {
+            if (this.departed) {
                 return 'departed';
             }
 
@@ -74,12 +63,26 @@ export default {
             switch (true) {
                 case this.arrived:
                     return 'success';
-                case this.id === TrainStationStatic.INCOMING && this.departed:
+                case this.departed:
                     return 'primary';
                 default:
                     return 'info';
             }
         },
     },
-};
-</script>
+    render(createElement: CreateElement): VNode {
+        const vm = this;
+        const h = createElement;
+
+        if (hasNormalizedSlot(SlotName.DEFAULT, vm.$scopedSlots, vm.$slots)) {
+            return normalizeSlot(SlotName.DEFAULT, {
+                classSuffix: vm.classSuffix,
+                statusText: vm.statusText,
+            }, vm.$scopedSlots, vm.$slots);
+        }
+
+        return h('span', {
+            staticClass: `text-${vm.classSuffix}`,
+        }, [vm.statusText]);
+    },
+});

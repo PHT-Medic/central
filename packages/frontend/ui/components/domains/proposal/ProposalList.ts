@@ -15,10 +15,10 @@ import {
 import Vue, { CreateElement, PropType, VNode } from 'vue';
 import {
     ComponentListData, ComponentListHandlerMethodOptions, ComponentListMethods, ComponentListProperties,
+    PaginationMeta,
     buildListHeader,
     buildListItems,
-    buildListNoMore,
-    buildListPagination, buildListSearch,
+    buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
 import { BuildInput } from '@trapi/query';
 import { Socket } from 'socket.io-client';
@@ -133,8 +133,12 @@ ComponentListProperties<Proposal>
                 this.handleCreated(context.data);
             }
         },
-        async load() {
+        async load(options?: PaginationMeta) {
             if (this.busy) return;
+
+            if (options) {
+                this.meta.offset = options.offset;
+            }
 
             this.busy = true;
 
@@ -158,15 +162,6 @@ ComponentListProperties<Proposal>
             }
 
             this.busy = false;
-        },
-        goTo(options, resolve, reject) {
-            if (options.offset === this.meta.offset) return;
-
-            this.meta.offset = options.offset;
-
-            this.load()
-                .then(resolve)
-                .catch(reject);
         },
 
         handleCreated(
@@ -203,7 +198,7 @@ ComponentListProperties<Proposal>
     },
     render(createElement: CreateElement): VNode {
         const vm = this;
-        const header = buildListHeader(this, createElement, { title: 'Proposals', iconClass: 'fa-solid fa-scroll' });
+        const header = buildListHeader(this, createElement, { titleText: 'Proposals', iconClass: 'fa-solid fa-scroll' });
         const search = buildListSearch(this, createElement);
         const items = buildListItems(this, createElement, {
             itemIconClass: 'fa-solid fa-scroll',
@@ -213,7 +208,7 @@ ComponentListProperties<Proposal>
             },
         });
         const noMore = buildListNoMore(this, createElement, {
-            hint: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
+            text: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
                 'There are no more proposals available...',
             ]),
         });

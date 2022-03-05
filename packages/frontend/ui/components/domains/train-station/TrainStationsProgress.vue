@@ -1,5 +1,5 @@
 <!--
-  Copyright (c) 2021-2021.
+  Copyright (c) 2021-2022.
   Author Peter Placzek (tada5hi)
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
@@ -13,8 +13,8 @@ import {
     buildSocketTrainStationInRoomName,
     buildSocketTrainStationOutRoomName,
 } from '@personalhealthtrain/central-common';
-import TrainStationRunStatusText from '../status/TrainStationRunStatusText';
-import TrainStationStaticRunStatusText from '../status/TrainStationStaticRunStatusText';
+import TrainStationRunStatusText from './TrainStationRunStatus';
+import TrainStationStaticRunStatusText from './TrainStationStaticRunStatus';
 
 export default {
     components: { TrainStationStaticRunStatusText, TrainStationRunStatusText },

@@ -11,10 +11,10 @@ import {
     ComponentListHandlerMethodOptions,
     ComponentListMethods,
     ComponentListProperties,
+    PaginationMeta,
     buildListHeader,
     buildListItems,
-    buildListNoMore,
-    buildListPagination, buildListSearch,
+    buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
 import { BuildInput } from '@trapi/query';
 
@@ -94,8 +94,12 @@ ComponentListProperties<UserSecret>
         }
     },
     methods: {
-        async load() {
+        async load(options?: PaginationMeta) {
             if (this.busy) return;
+
+            if (options) {
+                this.meta.offset = options.offset;
+            }
 
             this.busy = true;
 
@@ -139,15 +143,6 @@ ComponentListProperties<UserSecret>
 
             this.itemBusy = false;
         },
-        goTo(options, resolve, reject) {
-            if (options.offset === this.meta.offset) return;
-
-            this.meta.offset = options.offset;
-
-            this.load()
-                .then(resolve)
-                .catch(reject);
-        },
 
         handleCreated(
             item: UserSecret,
@@ -183,7 +178,7 @@ ComponentListProperties<UserSecret>
     },
     render(createElement: CreateElement): VNode {
         const vm = this;
-        const header = buildListHeader(this, createElement, { title: 'Secrets', iconClass: 'fa fa-key' });
+        const header = buildListHeader(this, createElement, { titleText: 'Secrets', iconClass: 'fa fa-key' });
         const search = buildListSearch(this, createElement);
         const items = buildListItems<UserSecret>(this, createElement, {
             itemIconClass: 'fa fa-key',
@@ -219,7 +214,7 @@ ComponentListProperties<UserSecret>
         });
 
         const noMore = buildListNoMore(this, createElement, {
-            hint: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
+            text: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
                 'There are no more secrets available...',
             ]),
         });

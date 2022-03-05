@@ -13,7 +13,7 @@ import {
     Train,
 } from '@personalhealthtrain/central-common';
 import TrainPipeline from './TrainPipeline.vue';
-import TrainStationsProgress from '../train-station/progress/TrainStationsProgress.vue';
+import TrainStationsProgress from '../train-station/TrainStationsProgress.vue';
 import TrainName from './TrainName.vue';
 import EntityDelete from '../EntityDelete';
 

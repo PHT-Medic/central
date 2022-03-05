@@ -12,10 +12,10 @@ import {
     ComponentListHandlerMethodOptions,
     ComponentListMethods,
     ComponentListProperties,
+    PaginationMeta,
     buildListHeader,
     buildListItems,
-    buildListNoMore,
-    buildListPagination, buildListSearch,
+    buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
 import { BuildInput } from '@trapi/query';
 
@@ -91,8 +91,12 @@ ComponentListProperties<MasterImage>
         }
     },
     methods: {
-        async load() {
+        async load(options?: PaginationMeta) {
             if (this.busy) return;
+
+            if (options) {
+                this.meta.offset = options.offset;
+            }
 
             this.busy = true;
 
@@ -163,7 +167,7 @@ ComponentListProperties<MasterImage>
         const vm = this;
 
         const header = buildListHeader(this, createElement, {
-            title: 'MasterImages',
+            titleText: 'MasterImages',
             iconClass: 'fa fa-compact-disc',
         });
 
@@ -193,7 +197,7 @@ ComponentListProperties<MasterImage>
         });
 
         const noMore = buildListNoMore(this, createElement, {
-            hint: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
+            text: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
                 'There are no more master-images available...',
             ]),
         });

@@ -18,11 +18,11 @@ import {
     ComponentListHandlerMethodOptions,
     ComponentListMethods,
     ComponentListProperties,
+    PaginationMeta,
     buildListHeader,
     buildListItems,
     buildListNoMore,
-    buildListPagination,
-    buildListSearch,
+    buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
 import { BuildInput } from '@trapi/query';
 import { Socket } from 'socket.io-client';
@@ -161,8 +161,12 @@ ComponentListProperties<Train>
                 this.handleCreated(context.data);
             }
         },
-        async load() {
+        async load(options?: PaginationMeta) {
             if (this.busy) return;
+
+            if (options) {
+                this.meta.offset = options.offset;
+            }
 
             this.busy = true;
 
@@ -213,21 +217,12 @@ ComponentListProperties<Train>
                 this.$emit('deleted', item);
             }
         },
-        goTo(options, resolve, reject) {
-            if (options.offset === this.meta.offset) return;
-
-            this.meta.offset = options.offset;
-
-            this.load()
-                .then(resolve)
-                .catch(reject);
-        },
     },
     render(createElement: CreateElement): VNode {
         const vm = this;
         const h = createElement;
 
-        const header = buildListHeader(this, createElement, { title: 'Trains', iconClass: 'fa-solid fa-train-tram' });
+        const header = buildListHeader(this, createElement, { titleText: 'Trains', iconClass: 'fa-solid fa-train-tram' });
         const search = buildListSearch(this, createElement);
         const items = buildListItems<Train>(this, createElement, {
             itemIconClass: 'fa-solid fa-train-tram',
@@ -255,7 +250,7 @@ ComponentListProperties<Train>
             },
         });
         const noMore = buildListNoMore(this, createElement, {
-            hint: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
+            text: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
                 'There are no more trains available...',
             ]),
         });

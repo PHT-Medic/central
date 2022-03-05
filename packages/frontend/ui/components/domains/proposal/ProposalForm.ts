@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import {
-    alpha, maxLength, minLength, required,
+    maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 import Vue, { CreateElement, VNode } from 'vue';
 
@@ -18,7 +18,7 @@ import { StationList } from '../station/StationList';
 import { AssignmentToggleButton } from '../../AssignmentToggleButton';
 import { ProposalStationAssignAction } from '../proposal-station/ProposalStationAssignAction';
 
-import { FormGroup } from '../../FormGroup';
+import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 
 type Properties = {
     entity: Proposal
@@ -179,9 +179,9 @@ export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Pr
         const h = createElement;
 
         const title = buildFormInput<Proposal>(vm, h, {
+            validationTranslator: buildVuelidateTranslator(this.$ilingo),
             title: 'Title',
             propName: 'title',
-            formGroup: FormGroup,
         });
 
         const masterImagePicker = h(MasterImagePicker, {
@@ -230,9 +230,9 @@ export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Pr
         ]);
 
         const riskComment = buildFormTextarea<Proposal>(vm, h, {
+            validationTranslator: buildVuelidateTranslator(this.$ilingo),
             title: 'Risk Comment',
             propName: 'risk_comment',
-            formGroup: FormGroup,
             attrs: {
                 rows: 6,
             },
@@ -278,9 +278,9 @@ export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Pr
         ]);
 
         const data = buildFormTextarea<Proposal>(vm, h, {
+            validationTranslator: buildVuelidateTranslator(this.$ilingo),
             title: 'Data/Parameters',
             propName: 'requested_data',
-            formGroup: FormGroup,
             attrs: {
                 rows: 6,
             },

@@ -10,10 +10,10 @@ import {
 } from '@personalhealthtrain/central-common';
 import {
     ComponentListData, ComponentListHandlerMethodOptions, ComponentListMethods, ComponentListProperties,
+    PaginationMeta,
     buildListHeader,
     buildListItems,
-    buildListNoMore,
-    buildListPagination, buildListSearch,
+    buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
 import Vue, { CreateElement, PropType, VNode } from 'vue';
 
@@ -85,8 +85,12 @@ ComponentListProperties<Station>
         }
     },
     methods: {
-        async load() {
+        async load(options?: PaginationMeta) {
             if (this.busy) return;
+
+            if (options) {
+                this.meta.offset = options.offset;
+            }
 
             this.busy = true;
 
@@ -115,15 +119,6 @@ ComponentListProperties<Station>
             }
 
             this.busy = false;
-        },
-        goTo(options, resolve, reject) {
-            if (options.offset === this.meta.offset) return;
-
-            this.meta.offset = options.offset;
-
-            this.load()
-                .then(resolve)
-                .catch(reject);
         },
 
         handleCreated(
@@ -159,11 +154,11 @@ ComponentListProperties<Station>
         },
     },
     render(createElement: CreateElement): VNode {
-        const header = buildListHeader(this, createElement, { title: 'Stations', iconClass: 'fa fa-hospital' });
+        const header = buildListHeader(this, createElement, { titleText: 'Stations', iconClass: 'fa fa-hospital' });
         const search = buildListSearch(this, createElement);
         const items = buildListItems(this, createElement, { itemIconClass: 'fa fa-hospital' });
         const noMore = buildListNoMore(this, createElement, {
-            hint: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
+            text: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
                 'There are no more stations available...',
             ]),
         });

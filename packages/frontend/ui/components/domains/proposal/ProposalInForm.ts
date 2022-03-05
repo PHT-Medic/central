@@ -18,6 +18,7 @@ import {
     initPropertiesFromSource,
 } from '@vue-layout/utils';
 import { FormGroup } from '../../FormGroup';
+import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 
 type Properties = {
     entity: ProposalStation
@@ -89,22 +90,22 @@ export const ProposalInForm = Vue.extend<ComponentFormData<ProposalStation>, any
         const h = createElement;
 
         const comment = buildFormInput<ProposalStation>(vm, h, {
+            validationTranslator: buildVuelidateTranslator(this.$ilingo),
             title: 'Comment',
             propName: 'comment',
             attrs: {
                 placeholder: 'Write a comment why you want to approve or either reject the proposal...',
             },
-            formGroup: FormGroup,
         });
 
         const status = buildFormSelect<ProposalStation>(vm, h, {
+            validationTranslator: buildVuelidateTranslator(this.$ilingo),
             title: 'Status',
             propName: 'approval_status',
             options: vm.statusOptions.map((option) => ({
                 id: option,
                 value: option,
             })),
-            formGroup: FormGroup,
         });
 
         const submit = buildFormSubmit<ProposalStation>(vm, h, {
