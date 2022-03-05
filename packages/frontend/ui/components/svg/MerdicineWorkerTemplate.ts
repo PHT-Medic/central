@@ -1,25 +1,12 @@
-<!--
-  Copyright (c) 2021-2021.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
-<script>
-export default {
-    props: {
-        width: {
-            type: [Number, String],
-            default: 750,
-        },
-        height: {
-            type: [Number, String],
-            default: 500,
-        },
-    },
-};
-</script>
-<template>
-    <svg
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+export const MedicineWorkerTemplate = `
+<svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 750 500"
         :width="width"
@@ -539,4 +526,4 @@ export default {
         />
         </g>
     </svg>
-</template>
+`;

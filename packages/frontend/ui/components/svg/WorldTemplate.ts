@@ -1,25 +1,12 @@
-<!--
-  Copyright (c) 2021-2021.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
-<script>
-export default {
-    props: {
-        width: {
-            type: [Number, String],
-            default: 750,
-        },
-        height: {
-            type: [Number, String],
-            default: 500,
-        },
-    },
-};
-</script>
-<template>
-    <svg
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+export const WorldTemplate = `
+<svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 750 500"
         :width="width"
@@ -1299,4 +1286,4 @@ export default {
         d="M94.39,232.05s-.16.25-.52.59a8.79,8.79,0,0,1-1.74,1.24,10.54,10.54,0,0,1-13-2.14A9.18,9.18,0,0,1,77.86,230c-.24-.44-.33-.7-.3-.72s.58,1,1.82,2.2A10.76,10.76,0,0,0,92,233.55C93.53,232.77,94.32,232,94.39,232.05Z"
         style="fill:#263238"
     /></g></svg>
-</template>
+`;
