@@ -19,7 +19,7 @@
         "rimraf": "^3.0.2"
     },
     "peerDependencies": {
-        "@typescript-auth/domains": "^0.2.x"
+        "@typescript-auth/domains": "^0.0.x"
     },
     "dependencies": {
         "@trapi/client": "^2.0.5",
