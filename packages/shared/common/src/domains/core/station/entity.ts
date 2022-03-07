@@ -6,8 +6,6 @@
  */
 
 import { Realm } from '@typescript-auth/domains';
-import { ProposalStation } from '../proposal-station';
-import { TrainStation } from '../train-station';
 
 export interface Station {
     id: string;
@@ -19,6 +17,8 @@ export interface Station {
     public_key: string | null;
 
     email: string | null;
+
+    architecture: string | null;
 
     // ------------------------------------------------------------------
 
@@ -34,17 +34,13 @@ export interface Station {
 
     // ------------------------------------------------------------------
 
-    created_at: Date;
-
-    updated_at: Date;
-
-    // ------------------------------------------------------------------
-
     realm_id: Realm['id'];
 
     realm: Realm;
 
-    train_stations: TrainStation[];
+    // ------------------------------------------------------------------
 
-    proposal_stations: ProposalStation[];
+    created_at: Date;
+
+    updated_at: Date;
 }

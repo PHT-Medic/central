@@ -137,11 +137,6 @@ const config = {
             if (Object.prototype.hasOwnProperty.call(config.resolve.alias, '@')) {
                 delete config.resolve.alias['@'];
             }
-
-            config.externals = {
-                ...config.externals,
-                'react-native-sqlite-storage': 'react-native-sqlite-storage',
-            };
         },
     },
 };

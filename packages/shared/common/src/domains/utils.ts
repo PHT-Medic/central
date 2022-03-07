@@ -9,6 +9,8 @@ import { HTTPClient } from '../http';
 
 export function useDomainAPI(client: HTTPClient, name: string) {
     switch (name) {
+        case 'architecture':
+            return client.architecture;
         case 'masterImage':
             return client.masterImage;
         case 'masterImageGroup':

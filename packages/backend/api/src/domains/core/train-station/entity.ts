@@ -68,7 +68,7 @@ export class TrainStationEntity implements TrainStation {
     @Column()
         train_id: Train['id'];
 
-    @ManyToOne(() => TrainEntity, (train) => train.train_stations, { onDelete: 'CASCADE' })
+    @ManyToOne(() => TrainEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'train_id' })
         train: TrainEntity;
 
@@ -82,7 +82,7 @@ export class TrainStationEntity implements TrainStation {
     @Column()
         station_id: Station['id'];
 
-    @ManyToOne(() => StationEntity, (station) => station.train_stations, { onDelete: 'CASCADE' })
+    @ManyToOne(() => StationEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'station_id' })
         station: StationEntity;
 

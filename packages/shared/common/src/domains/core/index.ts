@@ -5,10 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './architecture';
 export * from './master-image-group';
 export * from './master-image';
 export * from './proposal';
 export * from './proposal-station';
+export * from './settings-option';
 export * from './station';
 export * from './train';
 export * from './train-file';

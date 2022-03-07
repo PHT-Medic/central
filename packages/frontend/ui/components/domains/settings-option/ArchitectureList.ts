@@ -5,11 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import {
-    Proposal,
-    SocketClientToServerEvents,
-    SocketServerToClientEventContext,
-    SocketServerToClientEvents,
-    buildSocketProposalRoomName,
+    SettingsOption,
     mergeDeep,
 } from '@personalhealthtrain/central-common';
 import Vue, { CreateElement, PropType, VNode } from 'vue';
@@ -21,16 +17,12 @@ import {
     buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
 import { BuildInput } from '@trapi/query';
-import { Socket } from 'socket.io-client';
-import { MASTER_REALM_ID } from '@typescript-auth/domains';
 
-export const ProposalList = Vue.extend<
-ComponentListData<Proposal>,
-ComponentListMethods<Proposal>,
+export const ArchitectureList = Vue.extend<
+ComponentListData<SettingsOption>,
+ComponentListMethods<SettingsOption>,
 any,
-ComponentListProperties<Proposal> & {
-    realmId?: string
-}
+ComponentListProperties<SettingsOption>
 >({
     props: {
         loadOnInit: {
@@ -38,7 +30,7 @@ ComponentListProperties<Proposal> & {
             default: true,
         },
         query: {
-            type: Object as PropType<BuildInput<Proposal>>,
+            type: Object as PropType<BuildInput<SettingsOption>>,
             default() {
                 return {};
             },
@@ -59,10 +51,6 @@ ComponentListProperties<Proposal> & {
             type: Boolean,
             default: true,
         },
-        realmId: {
-            type: String,
-            default: undefined,
-        },
     },
     data() {
         return {
@@ -76,22 +64,6 @@ ComponentListProperties<Proposal> & {
             },
             itemBusy: false,
         };
-    },
-    computed: {
-        userRealmId() {
-            return this.$store.getters['auth/userRealmId'];
-        },
-        socketRealmId() {
-            if (this.realmId) {
-                return this.realmId;
-            }
-
-            if (this.userRealmId === MASTER_REALM_ID) {
-                return undefined;
-            }
-
-            return this.userRealmId;
-        },
     },
     watch: {
         q(val, oldVal) {
@@ -111,44 +83,7 @@ ComponentListProperties<Proposal> & {
             this.load();
         }
     },
-
-    mounted() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.socketRealmId);
-
-        socket.emit('proposalsSubscribe');
-        socket.on('proposalCreated', this.handleSocketCreated);
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.socketRealmId);
-
-        socket.emit('proposalsUnsubscribe');
-        socket.off('proposalCreated', this.handleSocketCreated);
-    },
     methods: {
-        handleSocketCreated(context: SocketServerToClientEventContext<Proposal>) {
-            if (context.meta.roomName !== buildSocketProposalRoomName()) return;
-
-            // todo: append item at beginning as well end of list... ^^
-            if (
-                (this.query.sort.created_at === 'DESC' || this.query.sort.updated_at === 'DESC') &&
-                this.meta.offset === 0
-            ) {
-                this.handleCreated(context.data, { unshift: true });
-                return;
-            }
-
-            if (
-                this.meta.total < this.meta.limit
-            ) {
-                this.handleCreated(context.data);
-            }
-        },
         async load(options?: PaginationMeta) {
             if (this.busy) return;
 
@@ -159,7 +94,7 @@ ComponentListProperties<Proposal> & {
             this.busy = true;
 
             try {
-                const response = await this.$api.proposal.getMany(mergeDeep({
+                const response = await this.$api.architecture.getMany(mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
@@ -181,12 +116,12 @@ ComponentListProperties<Proposal> & {
         },
 
         handleCreated(
-            item: Proposal,
-            options?: ComponentListHandlerMethodOptions<Proposal>,
+            item: SettingsOption,
+            options?: ComponentListHandlerMethodOptions<SettingsOption>,
         ) {
             options = options || {};
 
-            const index = this.items.findIndex((el: Proposal) => el.id === item.id);
+            const index = this.items.findIndex((el: SettingsOption) => el.id === item.id);
             if (index === -1) {
                 if (options.unshift) {
                     this.items.unshift(item);
@@ -195,17 +130,17 @@ ComponentListProperties<Proposal> & {
                 }
             }
         },
-        handleUpdated(item: Proposal) {
-            const index = this.items.findIndex((el: Proposal) => el.id === item.id);
+        handleUpdated(item: SettingsOption) {
+            const index = this.items.findIndex((el: SettingsOption) => el.id === item.id);
             if (index !== -1) {
-                const keys : (keyof Proposal)[] = Object.keys(item) as (keyof Proposal)[];
+                const keys : (keyof SettingsOption)[] = Object.keys(item) as (keyof SettingsOption)[];
                 for (let i = 0; i < keys.length; i++) {
                     Vue.set(this.items[index], keys[i], item[keys[i]]);
                 }
             }
         },
-        handleDeleted(item: Proposal) {
-            const index = this.items.findIndex((el: Proposal) => el.id === item.id);
+        handleDeleted(item: SettingsOption) {
+            const index = this.items.findIndex((el: SettingsOption) => el.id === item.id);
             if (index !== -1) {
                 this.items.splice(index, 1);
                 this.meta.total--;
@@ -214,10 +149,10 @@ ComponentListProperties<Proposal> & {
     },
     render(createElement: CreateElement): VNode {
         const vm = this;
-        const header = buildListHeader(this, createElement, { titleText: 'Proposals', iconClass: 'fa-solid fa-scroll' });
+        const header = buildListHeader(this, createElement, { titleText: 'Architectures', iconClass: 'fa-brands fa-unity' });
         const search = buildListSearch(this, createElement);
         const items = buildListItems(this, createElement, {
-            itemIconClass: 'fa-solid fa-scroll',
+            itemIconClass: 'fa-brands fa-unity',
             itemSlots: {
                 handleUpdated: vm.handleUpdated,
                 handleDeleted: vm.handleDeleted,
@@ -225,7 +160,7 @@ ComponentListProperties<Proposal> & {
         });
         const noMore = buildListNoMore(this, createElement, {
             text: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
-                'There are no more proposals available...',
+                'There are no more architectures available...',
             ]),
         });
         const pagination = buildListPagination(this, createElement);
@@ -244,4 +179,4 @@ ComponentListProperties<Proposal> & {
     },
 });
 
-export default ProposalList;
+export default ArchitectureList;

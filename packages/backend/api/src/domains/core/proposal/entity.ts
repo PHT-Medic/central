@@ -64,7 +64,4 @@ export class ProposalEntity implements Proposal {
     @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'master_image_id' })
         master_image: MasterImageEntity | null;
-
-    @OneToMany(() => ProposalStationEntity, (proposalStation) => proposalStation.proposal)
-        proposal_stations: ProposalStationEntity[];
 }

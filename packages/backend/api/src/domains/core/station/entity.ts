@@ -12,15 +12,12 @@ import {
     Index,
     JoinColumn,
     ManyToOne,
-    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Station, createNanoID } from '@personalhealthtrain/central-common';
+import { Architecture, Station, createNanoID } from '@personalhealthtrain/central-common';
 import { RealmEntity } from '@typescript-auth/server-core';
 import { Realm } from '@typescript-auth/domains';
-import { TrainStationEntity } from '../train-station/entity';
-import { ProposalStationEntity } from '../proposal-station/entity';
 
 @Entity({ name: 'stations' })
 export class StationEntity implements Station {
@@ -43,6 +40,11 @@ export class StationEntity implements Station {
         type: 'varchar', length: 256, nullable: true, select: false,
     })
         email: string | null;
+
+    @Column({
+        type: 'varchar', length: 32, nullable: true, default: Architecture.DEFAULT,
+    })
+        architecture: string | null;
 
     // ------------------------------------------------------------------
 
@@ -81,10 +83,4 @@ export class StationEntity implements Station {
     @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'realm_id' })
         realm: RealmEntity;
-
-    @OneToMany(() => TrainStationEntity, (trainStation) => trainStation.station)
-        train_stations: TrainStationEntity[];
-
-    @OneToMany(() => ProposalStationEntity, (proposalStation) => proposalStation.station)
-        proposal_stations: ProposalStationEntity[];
 }

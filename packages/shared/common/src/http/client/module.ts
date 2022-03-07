@@ -11,11 +11,14 @@ import {
     MasterImageGroupAPI,
     ProposalAPI,
     ProposalStationAPI, ServiceAPI,
-    StationAPI,
-    TrainAPI, TrainFileAPI, TrainResultAPI, TrainStationAPI, UserSecretAPI,
+    SettingsOptionAPI,
+    StationAPI, TrainAPI, TrainFileAPI, TrainResultAPI, TrainStationAPI,
+    UserSecretAPI,
 } from '../../domains';
 
 export class HTTPClient extends Client {
+    public readonly architecture: SettingsOptionAPI;
+
     public readonly masterImage : MasterImageAPI;
 
     public readonly masterImageGroup : MasterImageGroupAPI;
@@ -41,6 +44,7 @@ export class HTTPClient extends Client {
     constructor(config: Config) {
         super(config);
 
+        this.architecture = new SettingsOptionAPI(this.driver);
         this.masterImage = new MasterImageAPI(this.driver);
         this.masterImageGroup = new MasterImageGroupAPI(this.driver);
         this.proposal = new ProposalAPI(this.driver);

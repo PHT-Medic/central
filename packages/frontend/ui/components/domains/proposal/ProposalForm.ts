@@ -7,9 +7,9 @@
 import {
     maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
-import Vue, { CreateElement, VNode } from 'vue';
+import Vue, { CreateElement, PropType, VNode } from 'vue';
 
-import { Proposal, ProposalRisk, ProposalStation } from '@personalhealthtrain/central-common';
+import { Proposal, ProposalRisk } from '@personalhealthtrain/central-common';
 import {
     ComponentFormData, SlotName, buildFormInput, buildFormSubmit, buildFormTextarea,
 } from '@vue-layout/utils';
@@ -27,7 +27,7 @@ type Properties = {
 export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Properties>({
     props: {
         entity: {
-            type: Object,
+            type: Object as PropType<Proposal>,
             default: undefined,
         },
     },
@@ -238,7 +238,7 @@ export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Pr
             },
         });
 
-        const submit = buildFormSubmit<ProposalStation>(vm, h, {
+        const submit = buildFormSubmit<Proposal>(vm, h, {
             updateText: 'Update',
             createText: 'Create',
         });

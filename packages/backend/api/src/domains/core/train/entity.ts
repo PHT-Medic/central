@@ -221,11 +221,6 @@ export class TrainEntity implements Train {
 
     // ------------------------------------------------------------------
 
-    @OneToMany(() => TrainStationEntity, (trainStation) => trainStation.train)
-        train_stations: TrainStationEntity[];
-
-    // ------------------------------------------------------------------
-
     @Column({ nullable: true, type: 'uuid' })
         master_image_id: MasterImage['id'] | null;
 

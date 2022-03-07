@@ -10,8 +10,6 @@ import { Inject } from '@nuxt/types/app';
 
 import { BrowserStorageAdapter } from 'browser-storage-adapter';
 
-import { NavigationProvider } from '../config/layout/module';
-
 export default (ctx : Context, inject : Inject) => {
     const setServerCookie = (value: string) => {
         let cookies = ctx.res.getHeader('Set-Cookie') || [];
@@ -65,9 +63,4 @@ export default (ctx : Context, inject : Inject) => {
         getServerCookies,
     });
     inject('authWarehouse', authWarehouse);
-
-    //--------------------------------------------------------------------
-
-    const navigationProvider = new NavigationProvider(ctx);
-    inject('layoutNavigationProvider', navigationProvider);
 };

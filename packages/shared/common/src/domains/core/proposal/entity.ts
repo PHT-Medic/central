@@ -42,6 +42,4 @@ export interface Proposal {
     master_image_id: MasterImage['id'] | null;
 
     master_image: MasterImage | null;
-
-    proposal_stations: ProposalStation[];
 }

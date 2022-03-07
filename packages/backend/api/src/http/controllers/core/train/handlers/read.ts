@@ -22,7 +22,7 @@ export async function getOneTrainRouteHandler(req: ExpressRequest, res: ExpressR
 
     applyQueryRelations(query, include, {
         defaultAlias: 'train',
-        allowed: ['train_stations', 'user', 'proposal', 'master_image'],
+        allowed: ['user', 'proposal', 'master_image'],
     });
 
     const entity = await query.getOne();
@@ -60,7 +60,7 @@ export async function getManyTrainRouteHandler(req: ExpressRequest, res: Express
 
     applyQueryRelations(query, include, {
         defaultAlias: 'train',
-        allowed: ['train_stations', 'user', 'proposal', 'master_image'],
+        allowed: ['user', 'proposal', 'master_image'],
     });
 
     applyFilters(query, filter, {

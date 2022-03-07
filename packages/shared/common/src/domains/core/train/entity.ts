@@ -104,10 +104,6 @@ export interface Train {
 
     // ------------------------------------------------------------------
 
-    train_stations: TrainStation[];
-
-    // ------------------------------------------------------------------
-
     master_image_id: MasterImage['id'] | null;
 
     master_image: MasterImage;
