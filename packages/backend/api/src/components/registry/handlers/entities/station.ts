@@ -22,7 +22,7 @@ import { getRepository } from 'typeorm';
 import { NotFoundError } from '@typescript-error/http';
 import { ApiKey } from '../../../../config/api';
 import { StationEntity } from '../../../../domains/core/station/entity';
-import { RegistryStationQueuePayload } from '../../../../domains/special/registry/type';
+import { RegistryStationQueuePayload } from '../../../../domains/special/registry';
 import env from '../../../../env';
 import { saveStationToSecretStorage } from '../../../secret-storage/handlers/entities/station';
 import { SecretStorageQueueEntityType } from '../../../../domains/special/secret-storage/constants';
@@ -77,6 +77,7 @@ export async function saveStationToRegistry(payload: RegistryStationQueuePayload
                 const response = await useClient<VaultAPI>(ApiKey.VAULT)
                     .keyValue.find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, entity.secure_id);
 
+                // todo: create robot account or sync to vault if not available :)
                 if (response) {
                     entity.registry_project_account_id = response.data.registry_robot_id;
                     entity.registry_project_account_name = response.data.registry_robot_name;
@@ -117,6 +118,8 @@ export async function saveStationToRegistry(payload: RegistryStationQueuePayload
     ) {
         const response = await useClient<VaultAPI>(ApiKey.VAULT)
             .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
+
+        // todo: create robot account or sync to vault if not available :)
 
         if (response) {
             await useClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.ensure(projectName, response.data, {

@@ -9,8 +9,10 @@ import { PermissionID } from '@personalhealthtrain/central-common';
 import { PropType } from 'vue';
 import { Realm } from '@typescript-auth/domains';
 import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
+import { StationList } from '../../../../../components/domains/station/StationList';
 
 export default {
+    components: { StationList },
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -46,19 +48,16 @@ export default {
     },
     computed: {
         canView() {
-            return this.$auth.hasPermission(PermissionID.ROBOT_EDIT) ||
-                this.$auth.hasPermission(PermissionID.ROBOT_PERMISSION_ADD) ||
-                this.$auth.hasPermission(PermissionID.ROBOT_PERMISSION_DROP) ||
-                this.$auth.hasPermission(PermissionID.ROBOT_ROLE_ADD) ||
-                this.$auth.hasPermission(PermissionID.ROBOT_ROLE_DROP);
+            return this.$auth.hasPermission(PermissionID.STATION_EDIT) ||
+                this.$auth.hasPermission(PermissionID.STATION_DROP);
         },
         canDrop() {
-            return this.$auth.hasPermission(PermissionID.ROBOT_DROP);
+            return this.$auth.hasPermission(PermissionID.STATION_DROP);
         },
     },
     methods: {
         async handleDeleted(item) {
-            this.$bvToast.toast('The robot was successfully deleted.', {
+            this.$bvToast.toast('The station was successfully deleted.', {
                 toaster: 'b-toaster-top-center',
                 variant: 'success',
             });
@@ -69,7 +68,7 @@ export default {
 };
 </script>
 <template>
-    <robot-list
+    <station-list
         ref="itemsList"
         :query="query"
         :load-on-init="true"
@@ -82,15 +81,11 @@ export default {
                 head-variant="'dark'"
                 outlined
             >
-                <template #cell(realm)="data">
-                    <span class="badge-dark badge">{{ data.item.realm_id }}</span>
-                </template>
                 <template #cell(options)="data">
                     <nuxt-link
                         v-if="canView"
-                        v-b-tooltip="'Overview'"
-                        :to="'/admin/realms/'+entity.id+'/robots/'+data.item.id"
                         class="btn btn-xs btn-outline-primary"
+                        :to="'/admin/realms/'+entity.id+'/stations/'+data.item.id"
                     >
                         <i class="fa fa-bars" />
                     </nuxt-link>
@@ -98,7 +93,7 @@ export default {
                         v-if="canDrop"
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
-                        :entity-type="'robot'"
+                        :entity-type="'station'"
                         :with-text="false"
                         @done="handleDeleted"
                     />
@@ -117,5 +112,5 @@ export default {
                 </template>
             </b-table>
         </template>
-    </robot-list>
+    </station-list>
 </template>

@@ -31,7 +31,7 @@ export default {
             entity: undefined,
             tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-                { name: 'Station', icon: 'fa fa-city', urlSuffix: '/station' },
+                { name: 'Stations', icon: 'fa fa-city', urlSuffix: '/stations' },
                 { name: 'Users', icon: 'fa fa-users', urlSuffix: '/users' },
                 { name: 'Robots', icon: 'fa fa-robot', urlSuffix: '/robots' },
                 { name: 'Providers', icon: 'fas fa-boxes', urlSuffix: '/providers' },

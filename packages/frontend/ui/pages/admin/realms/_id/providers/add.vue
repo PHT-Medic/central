@@ -15,6 +15,11 @@ export default {
     },
     methods: {
         async handleCreated(e) {
+            this.$bvToast.toast('The provider was successfully created.', {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
+
             await this.$nuxt.$router.push(`/admin/realms/${this.entity.id}/providers/${e.id}`);
         },
     },

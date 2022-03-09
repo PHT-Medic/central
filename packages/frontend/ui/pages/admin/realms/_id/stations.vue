@@ -16,12 +16,9 @@ export default {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.USER_ADD,
-            PermissionID.USER_EDIT,
-            PermissionID.USER_DROP,
-            PermissionID.USER_ROLE_ADD,
-            PermissionID.USER_ROLE_EDIT,
-            PermissionID.USER_ROLE_DROP,
+            PermissionID.STATION_EDIT,
+            PermissionID.STATION_DROP,
+            PermissionID.STATION_ADD,
         ],
     },
     props: {
@@ -59,7 +56,7 @@ export default {
                     v-for="(item,key) in sidebar.items"
                     :key="key"
                     :disabled="item.active"
-                    :to="'/admin/realms/'+entity.id+'/users' + item.urlSuffix"
+                    :to="'/admin/realms/'+entity.id+'/stations' + item.urlSuffix"
                     exact
                     exact-active-class="active"
                 >

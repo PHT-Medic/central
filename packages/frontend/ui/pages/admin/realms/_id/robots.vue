@@ -5,8 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 
-<script>
+<script lang="ts">
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { PropType } from 'vue';
+import { Realm } from '@typescript-auth/domains';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default {
@@ -23,7 +25,7 @@ export default {
         ],
     },
     props: {
-        entity: Object,
+        entity: Object as PropType<Realm>,
     },
     data() {
         return {

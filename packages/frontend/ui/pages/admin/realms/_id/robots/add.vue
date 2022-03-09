@@ -21,6 +21,11 @@ export default {
     },
     methods: {
         handleCreated() {
+            this.$bvToast.toast('The robot was successfully created.', {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
+
             this.$nuxt.$router.push(`/admin/realms/${this.entity.id}/robots`);
         },
     },

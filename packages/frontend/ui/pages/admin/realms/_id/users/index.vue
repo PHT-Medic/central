@@ -4,8 +4,10 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { PropType } from 'vue';
+import { Realm } from '@typescript-auth/domains';
 import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';
 
 export default {
@@ -14,7 +16,7 @@ export default {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
     },
     props: {
-        entity: Object,
+        entity: Object as PropType<Realm>,
     },
     data() {
         return {
@@ -54,7 +56,10 @@ export default {
     },
     methods: {
         async handleDeleted(item) {
-            this.$emit('deleted', item);
+            this.$bvToast.toast('The user was successfully deleted.', {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
 
             this.$refs.itemsList.handleDeleted(item);
         },

@@ -5,10 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import {compileToFunctions} from "vue-template-compiler";
+import {WorldTemplate} from './WorldTemplate';
 import Vue from 'vue';
-import {WorldTemplate} from "./WorldTemplate";
 
-const compiled = Vue.compile(WorldTemplate);
+const templateCompiled = compileToFunctions(WorldTemplate);
 
 export default Vue.extend({
     props: {
@@ -21,6 +22,6 @@ export default Vue.extend({
             default: 500,
         },
     },
-    render: compiled.render,
-    staticRenderFns: compiled.staticRenderFns
+    render: templateCompiled.render,
+    staticRenderFns: templateCompiled.staticRenderFns
 });

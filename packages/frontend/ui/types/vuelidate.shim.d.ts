@@ -48,6 +48,8 @@ declare module 'vuelidate' {
 
 // the individual validators to import
 declare module 'vuelidate/lib/validators' {
+    const helpers : Record<string, any>
+
     /** Accepts only alphabet characters. */
     function alpha(value: any): boolean
     /** Accepts only alphanumerics. */

@@ -4,10 +4,13 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import { PropType } from 'vue';
+import { Realm } from '@typescript-auth/domains';
+
 export default {
     props: {
-        entity: Object,
+        entity: Object as PropType<Realm>,
     },
     data() {
         return {

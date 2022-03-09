@@ -5,10 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import {compileToFunctions} from "vue-template-compiler";
+import {MedicineWorkerTemplate} from './MedicineWorkerTemplate';
 import Vue from 'vue';
-import {MedicineWorkerTemplate} from "./MerdicineWorkerTemplate";
 
-const compiled = Vue.compile(MedicineWorkerTemplate);
+const templateCompiled = compileToFunctions(MedicineWorkerTemplate);
 
 export default Vue.extend({
     props: {
@@ -21,6 +22,6 @@ export default Vue.extend({
             default: 500,
         },
     },
-    render: compiled.render,
-    staticRenderFns: compiled.staticRenderFns
+    render: templateCompiled.render,
+    staticRenderFns: templateCompiled.staticRenderFns
 });
