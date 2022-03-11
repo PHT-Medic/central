@@ -7,7 +7,7 @@
 
 import { ConsumeHandler, Message } from 'amqp-extension';
 import { extendRegistryData } from './extend';
-import { dispatchRegistryEventToResultService } from './target/train-extractor';
+import { dispatchRegistryEventToTrainExtractor } from './target/train-extractor';
 import { dispatchRegistryEventToSelf } from './target/self';
 import { dispatchRegistryEventToTrainRouter } from './target/train-router';
 import { RegistryQueueEvent } from '../../domains/special/registry';
@@ -24,7 +24,7 @@ async function handleEvent(message: Message) {
         .then(extendRegistryData)
         .then(dispatchRegistryEventToSelf)
         .then(dispatchRegistryEventToTrainRouter)
-        .then(dispatchRegistryEventToResultService)
+        .then(dispatchRegistryEventToTrainExtractor)
         .then((message) => {
             spinner.succeed(`handled ${message.type}  event.`);
             return message;

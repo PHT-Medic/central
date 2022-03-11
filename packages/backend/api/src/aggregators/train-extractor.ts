@@ -31,7 +31,10 @@ const EventStatusMap : Record<AggregatorTrainExtractorEvent, TrainResultStatus |
     [AggregatorTrainExtractorEvent.UNKNOWN]: null,
 };
 
-async function handleTrainResult(data: TrainExtractorQueuePayload, event: AggregatorTrainExtractorEvent) {
+async function handleTrainExtractorEvent(
+    data: TrainExtractorQueuePayload,
+    event: AggregatorTrainExtractorEvent,
+) {
     if (!(hasOwnProperty(EventStatusMap, event))) {
         return;
     }
@@ -70,7 +73,7 @@ export function buildTrainResultAggregator() {
     function start() {
         return consumeQueue({ routingKey: MessageQueueRoutingKey.AGGREGATOR_RESULT_SERVICE_EVENT }, {
             $any: async (message: Message) => {
-                await handleTrainResult(
+                await handleTrainExtractorEvent(
                     message.data as TrainExtractorQueuePayload,
                     message.type as AggregatorTrainExtractorEvent,
                 );

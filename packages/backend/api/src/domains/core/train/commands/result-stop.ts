@@ -9,8 +9,7 @@ import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import {
     REGISTRY_OUTGOING_PROJECT_NAME,
-    Train, TrainExtractorMode,
-    TrainResultStatus,
+    Train, TrainExtractorMode, TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import { TrainExtractorQueueCommand, buildTrainExtractorQueueMessage } from '../../../special/train-extractor';
@@ -40,7 +39,9 @@ export async function triggerTrainResultStop(
     }
 
     train = repository.merge(train, {
-        result_status: train.result_status !== TrainResultStatus.STOPPING ? TrainResultStatus.STOPPING : TrainResultStatus.STOPPED,
+        result_status: train.result_status !== TrainResultStatus.STOPPING ?
+            TrainResultStatus.STOPPING :
+            TrainResultStatus.STOPPED,
     });
 
     await repository.save(train);

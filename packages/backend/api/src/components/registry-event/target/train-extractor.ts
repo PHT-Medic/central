@@ -16,7 +16,7 @@ import { TrainExtractorQueueCommand, buildTrainExtractorQueueMessage } from '../
 import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../../domains/special/registry';
 import { useLogger } from '../../../config/log';
 
-export async function dispatchRegistryEventToResultService(
+export async function dispatchRegistryEventToTrainExtractor(
     message: Message,
 ) : Promise<Message> {
     const type : RegistryQueueEvent = message.type as RegistryQueueEvent;

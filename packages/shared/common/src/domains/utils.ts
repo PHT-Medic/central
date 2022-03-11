@@ -25,8 +25,6 @@ export function useDomainAPI(client: HTTPClient, name: string) {
             return client.train;
         case 'trainFile':
             return client.trainFile;
-        case 'trainResult':
-            return client.trainResult;
         case 'trainStation':
             return client.trainStation;
         case 'service':

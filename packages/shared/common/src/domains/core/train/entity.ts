@@ -9,14 +9,12 @@ import { Realm, User } from '@typescript-auth/domains';
 import { MasterImage } from '../master-image';
 import { Proposal } from '../proposal';
 import { TrainFile } from '../train-file';
-import { TrainResult, TrainResultStatus } from '../train-result';
-import { TrainStation } from '../train-station';
 import {
-    TrainBuildErrorCode,
     TrainBuildStatus,
     TrainConfigurationStatus,
-    TrainRunErrorCode,
-    TrainRunStatus, TrainType,
+    TrainResultStatus,
+    TrainRunStatus,
+    TrainType,
 } from './constants';
 import { UserSecret } from '../../auth';
 import { Station } from '../station';
@@ -52,8 +50,6 @@ export interface Train {
 
     build_id: string | null;
 
-    build_error_code: TrainBuildErrorCode | null;
-
     // ------------------------------------------------------------------
 
     run_status: TrainRunStatus | null;
@@ -61,8 +57,6 @@ export interface Train {
     run_station_id: Station['id'] | null;
 
     run_station_index: number | null;
-
-    run_error_code: TrainRunErrorCode | null;
 
     // ------------------------------------------------------------------
 

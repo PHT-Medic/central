@@ -11,8 +11,7 @@ import {
     HarborAPI,
     HarborRepository,
     REGISTRY_OUTGOING_PROJECT_NAME,
-    Train, TrainContainerPath, TrainExtractorMode,
-    TrainResultStatus,
+    Train, TrainContainerPath, TrainExtractorMode, TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';

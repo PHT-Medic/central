@@ -21,12 +21,12 @@ export async function streamTrainResultRouteHandler(
         throw new ForbiddenError('You are not authorized to read the train-result file.');
     }
 
-    const trainResult = await useClient<HTTPClient>().trainResult.getOne(id);
-    if (!trainResult) {
+    const train = await useClient<HTTPClient>().train.getOne(id);
+    if (!train) {
         throw new NotFoundError('The referenced database entry does not exist.');
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, trainResult.realm_id)) {
+    if (!isPermittedForResourceRealm(req.realmId, train.realm_id)) {
         throw new ForbiddenError('You are not permitted to read the train-result file.');
     }
 

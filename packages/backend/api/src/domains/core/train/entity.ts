@@ -14,7 +14,6 @@ import {
     Index,
     JoinColumn,
     ManyToOne,
-    OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
@@ -24,13 +23,9 @@ import {
     Proposal,
     Station,
     Train,
-    TrainBuildErrorCode,
     TrainBuildStatus,
     TrainConfigurationStatus,
-    TrainFile,
-    TrainResult,
-    TrainResultStatus,
-    TrainRunErrorCode,
+    TrainFile, TrainResultStatus,
     TrainRunStatus, TrainType,
     UserSecret,
 } from '@personalhealthtrain/central-common';
@@ -39,7 +34,6 @@ import { Realm, User } from '@typescript-auth/domains';
 import { ProposalEntity } from '../proposal/entity';
 import { MasterImageEntity } from '../master-image/entity';
 import { TrainFileEntity } from '../train-file/entity';
-import { TrainStationEntity } from '../train-station/entity';
 import { UserSecretEntity } from '../user-secret/entity';
 
 @Entity()
@@ -132,11 +126,6 @@ export class TrainEntity implements Train {
     @Column({ type: 'uuid', nullable: true, default: null })
         build_id: string;
 
-    @Column({
-        type: 'enum', enum: TrainBuildErrorCode, default: null, nullable: true,
-    })
-        build_error_code: TrainBuildErrorCode | null;
-
     // ------------------------------------------------------------------
 
     @Column({
@@ -153,11 +142,6 @@ export class TrainEntity implements Train {
         type: 'integer', unsigned: true, nullable: true, default: null,
     })
         run_station_index: number | null;
-
-    @Column({
-        type: 'enum', enum: TrainRunErrorCode, default: null, nullable: true,
-    })
-        run_error_code: TrainRunErrorCode | null;
 
     // ------------------------------------------------------------------
 
@@ -202,9 +186,6 @@ export class TrainEntity implements Train {
         user: UserEntity;
 
     // ------------------------------------------------------------------
-
-    @Column({ type: 'uuid', nullable: true, default: null })
-        result_last_id: TrainResult['id'];
 
     @Column({
         type: 'enum', nullable: true, default: null, enum: TrainResultStatus,

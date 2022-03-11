@@ -12,7 +12,7 @@ import {
     ProposalAPI,
     ProposalStationAPI, ServiceAPI,
     SettingsOptionAPI,
-    StationAPI, TrainAPI, TrainFileAPI, TrainResultAPI, TrainStationAPI,
+    StationAPI, TrainAPI, TrainFileAPI, TrainStationAPI,
     UserSecretAPI,
 } from '../../domains';
 
@@ -33,8 +33,6 @@ export class HTTPClient extends Client {
 
     public readonly trainFile : TrainFileAPI;
 
-    public readonly trainResult : TrainResultAPI;
-
     public readonly trainStation : TrainStationAPI;
 
     public readonly service : ServiceAPI;
@@ -52,7 +50,6 @@ export class HTTPClient extends Client {
         this.station = new StationAPI(this.driver);
         this.train = new TrainAPI(this.driver);
         this.trainFile = new TrainFileAPI(this.driver);
-        this.trainResult = new TrainResultAPI(this.driver);
         this.trainStation = new TrainStationAPI(this.driver);
         this.service = new ServiceAPI(this.driver);
         this.userSecret = new UserSecretAPI(this.driver);

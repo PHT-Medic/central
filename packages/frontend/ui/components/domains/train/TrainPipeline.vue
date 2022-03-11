@@ -8,8 +8,7 @@
 import {
     PermissionID,
     TrainBuildStatus, TrainCommand,
-    TrainConfigurationStatus,
-    TrainResultStatus,
+    TrainConfigurationStatus, TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import { TrainResultCommand } from './command/TrainResultCommand';

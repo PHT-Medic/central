@@ -16,17 +16,6 @@ export enum TrainBuildStatus {
     FAILED = 'failed', // tb trigger
 }
 
-export type TrainBuildStatusType = `${TrainBuildStatus}`;
-
-const TrainBuildStatusValues = Object.values(TrainBuildStatus);
-export function isTrainBuildStatus(type: any) : type is TrainBuildStatusType {
-    return TrainBuildStatusValues.indexOf(type) !== -1;
-}
-
-export enum TrainBuildErrorCode {
-    TRAIN_NOT_FOUND = 0,
-}
-
 // -------------------------------------------------------------------------
 
 export enum TrainConfigurationStatus {
@@ -36,13 +25,6 @@ export enum TrainConfigurationStatus {
     HASH_GENERATED = 'hash_generated',
     HASH_SIGNED = 'hash_signed',
     FINISHED = 'finished',
-}
-
-export type TrainConfigurationStatusType = `${TrainConfigurationStatus}`;
-
-const TrainConfigurationStatusValues = Object.values(TrainConfigurationStatus);
-export function isTrainConfigurationStatus(type: any) : type is TrainConfigurationStatusType {
-    return TrainConfigurationStatusValues.indexOf(type) !== -1;
 }
 
 // -------------------------------------------------------------------------
@@ -60,15 +42,23 @@ export enum TrainRunStatus {
     FAILED = 'failed',
 }
 
-export type TrainRunStatusType = `${TrainRunStatus}`;
+// -------------------------------------------------------------------------
 
-const TrainRunStatusValues = Object.values(TrainRunStatus);
-export function isTrainRunStatus(type: any) : type is TrainRunStatusType {
-    return TrainRunStatusValues.indexOf(type) !== -1;
-}
+export enum TrainResultStatus {
+    STARTING = 'starting',
+    STARTED = 'started',
 
-export enum TrainRunErrorCode {
-    TRAIN_NOT_FOUND = 0,
+    STOPPING = 'stopping',
+    STOPPED = 'stopped',
+
+    DOWNLOADING = 'downloading',
+    DOWNLOADED = 'downloaded',
+
+    EXTRACTING = 'extracting',
+    EXTRACTED = 'extracted',
+
+    FINISHED = 'finished',
+    FAILED = 'failed',
 }
 
 // -------------------------------------------------------------------------
@@ -77,6 +67,8 @@ export enum TrainType {
     ANALYSE = 'analyse',
     DISCOVERY = 'discovery',
 }
+
+// -------------------------------------------------------------------------
 
 export enum TrainCommand {
     BUILD_START = 'buildStart',
