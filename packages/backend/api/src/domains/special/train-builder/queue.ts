@@ -10,6 +10,7 @@ import { Message, buildMessage } from 'amqp-extension';
 import { buildTrainBuilderStartCommandPayload, buildTrainBuilderStatusCommandPayload, buildTrainBuilderStopCommandPayload } from './commands';
 import { TrainBuilderCommand } from './type';
 import { MessageQueueRoutingKey } from '../../../config/mq';
+import { buildTrainBuilderMetaCommandPayload } from './commands/meta-build';
 
 export async function buildTrainBuilderQueueMessage(
     type: TrainBuilderCommand,
@@ -20,29 +21,16 @@ export async function buildTrainBuilderQueueMessage(
 
     switch (type) {
         case TrainBuilderCommand.START:
-            /**
-             * {
-             *     trainId: 'xyz',
-             *     ...
-             * }
-             */
             data = await buildTrainBuilderStartCommandPayload(train);
             break;
         case TrainBuilderCommand.STOP:
-            /**
-             * {
-             *     trainId: 'xyz'
-             * }
-             */
             data = await buildTrainBuilderStopCommandPayload(train);
             break;
         case TrainBuilderCommand.STATUS:
-            /**
-             * {
-             *     trainId: 'xyz'
-             * }
-             */
             data = await buildTrainBuilderStatusCommandPayload(train);
+            break;
+        case TrainBuilderCommand.META_BUILD:
+            data = await buildTrainBuilderMetaCommandPayload(train);
             break;
     }
 

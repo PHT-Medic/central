@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './architecture';
+export * from './ecosystem';
 export * from './master-image-group';
 export * from './master-image';
 export * from './proposal';
@@ -13,6 +13,7 @@ export * from './proposal-station';
 export * from './settings-option';
 export * from './station';
 export * from './train';
+export * from './train-config';
 export * from './train-file';
 export * from './train-result';
 export * from './train-station';

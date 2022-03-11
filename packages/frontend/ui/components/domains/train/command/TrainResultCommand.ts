@@ -56,14 +56,14 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
 
             if (
                 this.command === 'resultDownload' &&
-                !this.entity.result_last_id
+                !this.entity.result_status
             ) {
                 return true;
             }
 
             if (
                 this.command === TrainCommand.RESULT_START &&
-                this.entity.result_last_status &&
+                this.entity.result_status &&
                 [
                     TrainBuildStatus.STOPPED,
                     TrainBuildStatus.FAILED,
@@ -73,7 +73,7 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
             }
 
             return this.command === TrainCommand.RESULT_STOP &&
-                this.entity.result_last_status &&
+                this.entity.result_status &&
                 [
                     TrainResultStatus.STARTING,
                     TrainResultStatus.STARTED,
@@ -133,7 +133,7 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
             try {
                 switch (this.command) {
                     case 'resultDownload':
-                        window.open(`${this.$config.resultServiceApiUrl}train-results/${this.entity.result_last_id}/download`);
+                        window.open(`${this.$config.resultServiceApiUrl}train-results/${this.entity.id}/download`);
                         break;
                     default: {
                         const train = await this.$api.train.runCommand(this.entity.id, this.command);

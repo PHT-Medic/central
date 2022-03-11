@@ -21,10 +21,10 @@ export function getRootDirPath() {
     return rootDirPath;
 }
 
-export function getTrainResultDirectoryPath() {
+export function getImageOutputDirectoryPath() {
     return path.join(getWritableDirPath(), 'train-results');
 }
 
-export function buildTrainResultFilePath(trainResultId: string) {
-    return path.join(getTrainResultDirectoryPath(), `${path.basename(trainResultId, '.tar')}.tar`);
+export function buildImageOutputFilePath(id: string) {
+    return path.join(getImageOutputDirectoryPath(), `${path.basename(id, '.tar')}.tar`);
 }

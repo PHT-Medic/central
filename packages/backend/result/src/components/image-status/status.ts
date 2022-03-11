@@ -1,21 +1,16 @@
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
 import fs from 'fs';
-import { buildTrainResultFilePath } from '../../config/paths';
+import { TrainExtractorQueueEvent, TrainExtractorQueuePayload } from '@personalhealthtrain/central-common';
+import { buildImageOutputFilePath } from '../../config/paths';
 import { getHarborFQRepositoryPath } from '../../config/services/harbor';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
-import { ResultServiceDataPayload } from '../../domains/service/result-service';
-import { TrainResultEvent } from '../../domains/train-result/type';
 import { checkIfLocalRegistryImageExists } from '../../modules/docker';
 
 export async function statusImage(message: Message) {
-    const data : ResultServiceDataPayload = message.data as ResultServiceDataPayload;
-
-    if (typeof data.id === 'undefined') {
-        return;
-    }
+    const data : TrainExtractorQueuePayload = message.data as TrainExtractorQueuePayload;
 
     // 1. Check if result already exists.
-    const trainResultPath : string = buildTrainResultFilePath(data.id);
+    const trainResultPath : string = buildImageOutputFilePath(data.repositoryName);
 
     try {
         await fs.promises.access(trainResultPath, fs.constants.F_OK);
@@ -24,7 +19,7 @@ export async function statusImage(message: Message) {
             options: {
                 routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
             },
-            type: TrainResultEvent.EXTRACTED,
+            type: TrainExtractorQueueEvent.EXTRACTED,
             data: message.data,
         }));
 
@@ -35,7 +30,7 @@ export async function statusImage(message: Message) {
 
     // 2. Check if image exists locally
 
-    const repositoryTag = getHarborFQRepositoryPath(data.id);
+    const repositoryTag = getHarborFQRepositoryPath(data.projectName, data.repositoryName);
     const exists : boolean = await checkIfLocalRegistryImageExists(repositoryTag);
 
     if (exists) {
@@ -43,7 +38,7 @@ export async function statusImage(message: Message) {
             options: {
                 routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
             },
-            type: TrainResultEvent.DOWNLOADED,
+            type: TrainExtractorQueueEvent.DOWNLOADED,
             data: message.data,
             metadata: message.metadata,
         }));
@@ -57,7 +52,7 @@ export async function statusImage(message: Message) {
         options: {
             routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
         },
-        type: TrainResultEvent.UNKNOWN,
+        type: TrainExtractorQueueEvent.UNKNOWN,
         data: message.data,
         metadata: message.metadata,
     }));

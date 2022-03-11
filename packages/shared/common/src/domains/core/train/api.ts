@@ -8,9 +8,9 @@
 import { BuildInput, buildQuery } from '@trapi/query';
 import { ClientDriverInstance, ClientRequestConfig } from '@trapi/client';
 import { Train } from './entity';
-import { TrainCommand } from './type';
 import { nullifyEmptyObjectProperties } from '../../../utils';
 import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
+import { TrainCommand } from './constants';
 
 export class TrainAPI {
     protected client: ClientDriverInstance;

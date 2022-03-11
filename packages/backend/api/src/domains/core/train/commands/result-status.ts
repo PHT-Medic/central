@@ -5,10 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train } from '@personalhealthtrain/central-common';
+import {
+    REGISTRY_OUTGOING_PROJECT_NAME,
+    Train,
+    TrainContainerPath,
+    TrainExtractorMode,
+} from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
-import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../special/result-service';
+import { TrainExtractorQueueCommand, buildTrainExtractorQueueMessage } from '../../../special/train-extractor';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 
@@ -20,10 +25,11 @@ export async function triggerTrainResultStatus(
     train = await findTrain(train, repository);
 
     // send queue message
-    await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.STATUS, {
-        train_id: train.id,
-        latest: true,
-        ...(train.result_last_id ? { id: train.result_last_id } : {}),
+    await publishMessage(buildTrainExtractorQueueMessage(TrainExtractorQueueCommand.STATUS, {
+        repositoryName: train.id,
+        projectName: REGISTRY_OUTGOING_PROJECT_NAME,
+
+        mode: TrainExtractorMode.NONE,
     }));
 
     return train;

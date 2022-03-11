@@ -15,7 +15,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Architecture, Station, createNanoID } from '@personalhealthtrain/central-common';
+import { Ecosystem, Station, createNanoID } from '@personalhealthtrain/central-common';
 import { RealmEntity } from '@typescript-auth/server-core';
 import { Realm } from '@typescript-auth/domains';
 
@@ -42,9 +42,12 @@ export class StationEntity implements Station {
         email: string | null;
 
     @Column({
-        type: 'varchar', length: 32, nullable: true, default: Architecture.DEFAULT,
+        type: 'varchar', length: 32, nullable: true, default: Ecosystem.DEFAULT,
     })
-        architecture: string | null;
+        ecosystem: Ecosystem | null;
+
+    @Column({ type: 'boolean', default: false })
+        hidden: boolean;
 
     // ------------------------------------------------------------------
 

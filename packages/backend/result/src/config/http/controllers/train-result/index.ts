@@ -4,7 +4,7 @@ import path from 'path';
 import { HTTPClient, PermissionID } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { isPermittedForResourceRealm } from '@typescript-auth/domains';
-import { buildTrainResultFilePath } from '../../../paths';
+import { buildImageOutputFilePath } from '../../../paths';
 import { ExpressRequest, ExpressResponse } from '../../type';
 
 export async function streamTrainResultRouteHandler(
@@ -30,7 +30,7 @@ export async function streamTrainResultRouteHandler(
         throw new ForbiddenError('You are not permitted to read the train-result file.');
     }
 
-    const filePath = buildTrainResultFilePath(id);
+    const filePath = buildImageOutputFilePath(id);
     const fileName = path.basename(filePath);
 
     try {

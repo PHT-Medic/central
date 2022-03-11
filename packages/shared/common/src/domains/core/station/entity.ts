@@ -6,6 +6,7 @@
  */
 
 import { Realm } from '@typescript-auth/domains';
+import { Ecosystem } from '../ecosystem';
 
 export interface Station {
     id: string;
@@ -18,7 +19,9 @@ export interface Station {
 
     email: string | null;
 
-    architecture: string | null;
+    ecosystem: Ecosystem | null;
+
+    hidden: boolean;
 
     // ------------------------------------------------------------------
 

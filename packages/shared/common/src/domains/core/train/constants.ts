@@ -72,3 +72,31 @@ export enum TrainRunErrorCode {
 }
 
 // -------------------------------------------------------------------------
+
+export enum TrainType {
+    ANALYSE = 'analyse',
+    DISCOVERY = 'discovery',
+}
+
+export enum TrainCommand {
+    BUILD_START = 'buildStart',
+    BUILD_STOP = 'buildStop',
+    BUILD_STATUS = 'buildStatus',
+
+    RUN_START = 'runStart',
+    RUN_RESET = 'runReset',
+    RUN_STATUS = 'runStatus',
+
+    RESULT_STATUS = 'resultStatus',
+    RESULT_START = 'resultStart',
+    RESULT_STOP = 'resultStop',
+
+    GENERATE_HASH = 'generateHash',
+}
+
+// -------------------------------------------------------------------------
+
+export enum TrainContainerPath {
+    CONFIG = '/opt/train_config.json',
+    RESULTS = '/opt/pht_results',
+}

@@ -1,13 +1,13 @@
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
+import { TrainExtractorQueueEvent } from '@personalhealthtrain/central-common';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
-import { TrainResultEvent } from '../../domains/train-result/type';
 
 export async function writeFailedEvent(message: Message, error: Error) {
     await publishMessage(buildMessage({
         options: {
             routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
         },
-        type: TrainResultEvent.FAILED,
+        type: TrainExtractorQueueEvent.FAILED,
         data: {
             ...message.data,
             error: {

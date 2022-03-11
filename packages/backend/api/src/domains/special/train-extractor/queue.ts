@@ -6,24 +6,13 @@
  */
 
 import { Message, buildMessage } from 'amqp-extension';
-import { Train, TrainResult } from '@personalhealthtrain/central-common';
+import { TrainExtractorQueuePayload } from '@personalhealthtrain/central-common';
 import { MessageQueueRoutingKey } from '../../../config/mq';
+import { TrainExtractorQueueCommand } from './constants';
 
-export enum ResultServiceCommand {
-    START = 'start',
-    STOP = 'stop',
-    STATUS = 'status',
-}
-
-export type ResultServiceDataPayload = {
-    id?: TrainResult['id'],
-    train_id: Train['id'],
-    latest?: boolean
-};
-
-export function buildResultServiceQueueMessage(
-    command: ResultServiceCommand,
-    data: ResultServiceDataPayload,
+export function buildTrainExtractorQueueMessage(
+    command: TrainExtractorQueueCommand,
+    data: TrainExtractorQueuePayload,
 ) : Message {
     return buildMessage({
         options: {

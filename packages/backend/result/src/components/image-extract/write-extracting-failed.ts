@@ -1,18 +1,18 @@
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
+import { TrainExtractorQueueEvent, TrainExtractorStep } from '@personalhealthtrain/central-common';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
-import { TrainResultEvent, TrainResultStep } from '../../domains/train-result/type';
 
 export async function writeExtractingFailedEvent(message: Message, error: Error) {
     await publishMessage(buildMessage({
         options: {
             routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
         },
-        type: TrainResultEvent.FAILED,
+        type: TrainExtractorQueueEvent.FAILED,
         data: {
             ...message.data,
             error: {
                 message: error.message,
-                step: TrainResultStep.EXTRACT,
+                step: TrainExtractorStep.EXTRACT,
             },
         },
         metadata: message.metadata,

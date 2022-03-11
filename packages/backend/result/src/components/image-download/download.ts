@@ -1,8 +1,8 @@
 import { Message } from 'amqp-extension';
 import { URL } from 'url';
+import { TrainExtractorQueuePayload } from '@personalhealthtrain/central-common';
 import { getHarborFQRepositoryPath } from '../../config/services/harbor';
 import { parseHarborConnectionString } from '../../domains/service/harbor';
-import { ResultServiceDataPayload } from '../../domains/service/result-service';
 import env from '../../env';
 import { DockerPullOptions, pullDockerRegistryImage } from '../../modules/docker';
 
@@ -18,8 +18,8 @@ const dockerOptions : DockerPullOptions = {
 };
 
 export async function downloadImage(message: Message) {
-    const data : ResultServiceDataPayload = message.data as ResultServiceDataPayload;
-    const repositoryTag = getHarborFQRepositoryPath(data.train_id);
+    const data : TrainExtractorQueuePayload = message.data as TrainExtractorQueuePayload;
+    const repositoryTag = getHarborFQRepositoryPath(data.projectName, data.repositoryName);
 
     await pullDockerRegistryImage(repositoryTag, dockerOptions);
 

@@ -54,7 +54,7 @@ export async function startBuildTrain(
             configuration_status: TrainConfigurationStatus.FINISHED,
             run_status: demo ? TrainRunStatus.FINISHED : null,
             build_status: demo ? null : TrainBuildStatus.STARTING,
-            result_last_status: demo ? TrainResultStatus.FINISHED : null,
+            result_status: demo ? TrainResultStatus.FINISHED : null,
         });
 
         await repository.save(train);

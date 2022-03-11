@@ -8,6 +8,7 @@
 import { getRepository } from 'typeorm';
 
 import {
+    Ecosystem,
     Train,
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
@@ -17,6 +18,7 @@ import { MasterImageEntity } from '../../../core/master-image/entity';
 import { MasterImageGroupEntity } from '../../../core/master-image-group/entity';
 import { TrainFileEntity } from '../../../core/train-file/entity';
 import { TrainStationEntity } from '../../../core/train-station/entity';
+import { buildTrainBuilderStationsProperty } from './utils';
 
 export async function buildTrainBuilderStartCommandPayload(train: Train) : Promise<Partial<TrainBuilderStartPayload>> {
     const message : Partial<TrainBuilderStartPayload> = {
@@ -66,6 +68,7 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
         .createQueryBuilder('file')
         .where('file.train_id = :id', { id: train.id })
         .getMany();
+
     message.files = files.map((file: TrainFileEntity) => `${file.directory}/${file.name}`);
 
     // ----------------------------------------------------
@@ -79,16 +82,7 @@ export async function buildTrainBuilderStartCommandPayload(train: Train) : Promi
 
     // ----------------------------------------------------
 
-    const trainStationRepository = getRepository(TrainStationEntity);
-    const trainStations = await trainStationRepository
-        .createQueryBuilder('trainStation')
-        .leftJoinAndSelect('trainStation.station', 'station')
-        .addSelect('station.secure_id')
-        .where('trainStation.train_id = :trainId', { trainId: train.id })
-        .andWhere('trainStation.approval_status = :status', { status: TrainStationApprovalStatus.APPROVED })
-        .getMany();
-
-    message.stations = trainStations.map((trainStation) => trainStation.station.secure_id);
+    message.stations = await buildTrainBuilderStationsProperty(train.id);
 
     return message;
 }

@@ -19,7 +19,7 @@ export enum AggregatorTrainBuilderEvent {
     FINISHED = 'trainBuildFinished',
 }
 
-export enum AggregatorTrainResultEvent {
+export enum AggregatorTrainExtractorEvent {
     STARTING = 'starting', // ui trigger
     STARTED = 'started', // rs trigger
 

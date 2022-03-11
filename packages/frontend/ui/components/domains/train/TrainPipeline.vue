@@ -227,7 +227,7 @@ export default {
                 <strong>4. Result</strong>
             </div>
             <div>
-                Status: <train-result-status-text :status="entity.result_last_status" />
+                Status: <train-result-status-text :status="entity.result_status" />
             </div>
             <div
                 v-if="withCommand"

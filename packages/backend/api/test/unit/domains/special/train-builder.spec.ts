@@ -7,7 +7,9 @@
 
 import { getCustomRepository, getRepository } from 'typeorm';
 import { UserRepository } from '@typescript-auth/server-core';
-import { SecretType, TrainStationApprovalStatus, createNanoID } from '@personalhealthtrain/central-common';
+import {
+    Ecosystem, SecretType, TrainStationApprovalStatus, createNanoID,
+} from '@personalhealthtrain/central-common';
 import path from 'path';
 import { ProposalEntity } from '../../../../src/domains/core/proposal/entity';
 import { TEST_DEFAULT_PROPOSAL } from '../../../utils/domains/proposal';
@@ -25,6 +27,7 @@ import { TEST_DEFAULT_TRAIN_FILE } from '../../../utils/domains/train-file';
 import { StationEntity } from '../../../../src/domains/core/station/entity';
 import { TEST_DEFAULT_STATION } from '../../../utils/domains/station';
 import { TrainStationEntity } from '../../../../src/domains/core/train-station/entity';
+import { TrainBuilderStation } from '../../../../src/domains/special/train-builder/type';
 
 describe('src/domains/train-builder', () => {
     createConfig({ env });
@@ -138,6 +141,7 @@ describe('src/domains/train-builder', () => {
             station_id: stationB.id,
             station_realm_id: stationB.realm_id,
             approval_status: TrainStationApprovalStatus.APPROVED,
+            position: 0,
         });
 
         await trainStationRepository.save(trainStationA);
@@ -163,6 +167,6 @@ describe('src/domains/train-builder', () => {
         expect(trainMessage.master_image).toEqual(masterImage.virtual_path);
         expect(trainMessage.files.length).toEqual(1);
         expect(trainMessage.stations.length).toEqual(1);
-        expect(trainMessage.stations).toEqual([stationB.secure_id]);
+        expect(trainMessage.stations).toEqual([{ id: stationB.secure_id, index: 0, ecosystem: Ecosystem.DEFAULT }] as TrainBuilderStation[]);
     });
 });

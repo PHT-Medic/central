@@ -50,7 +50,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
             train = await triggerTrainResultStart(train.id, harborRepository);
         } else {
             train = repository.merge(train, {
-                result_last_status: null,
+                result_status: null,
             });
         }
 

@@ -16,11 +16,10 @@ import {
     TrainBuildStatus,
     TrainConfigurationStatus,
     TrainRunErrorCode,
-    TrainRunStatus,
+    TrainRunStatus, TrainType,
 } from './constants';
 import { UserSecret } from '../../auth';
 import { Station } from '../station';
-import { TrainType } from './type';
 
 export interface Train {
     id: string;
@@ -93,9 +92,7 @@ export interface Train {
 
     // ------------------------------------------------------------------
 
-    result_last_id: TrainResult['id'] | null;
-
-    result_last_status: TrainResultStatus | null;
+    result_status: TrainResultStatus | null;
 
     // ------------------------------------------------------------------
     proposal_id: Proposal['id'];

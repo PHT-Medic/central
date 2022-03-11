@@ -11,12 +11,12 @@ import {
     HarborAPI,
     HarborRepository,
     REGISTRY_OUTGOING_PROJECT_NAME,
-    Train,
+    Train, TrainContainerPath, TrainExtractorMode,
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
-import { ResultServiceCommand, buildResultServiceQueueMessage } from '../../../special/result-service';
+import { TrainExtractorQueueCommand, buildTrainExtractorQueueMessage } from '../../../special/train-extractor';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 import { ApiKey } from '../../../../config/api';
@@ -42,13 +42,20 @@ export async function triggerTrainResultStart(
     }
 
     // send queue message
-    await publishMessage(buildResultServiceQueueMessage(ResultServiceCommand.START, {
-        train_id: train.id,
-        latest: true,
+    await publishMessage(buildTrainExtractorQueueMessage(TrainExtractorQueueCommand.START, {
+        repositoryName: train.id,
+        projectName: REGISTRY_OUTGOING_PROJECT_NAME,
+
+        filePaths: [
+            TrainContainerPath.RESULTS,
+            TrainContainerPath.CONFIG,
+        ],
+
+        mode: TrainExtractorMode.WRITE,
     }));
 
     train = repository.merge(train, {
-        result_last_status: TrainResultStatus.STARTING,
+        result_status: TrainResultStatus.STARTING,
     });
 
     await repository.save(train);

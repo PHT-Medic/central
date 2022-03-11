@@ -1,39 +1,56 @@
 import { Message } from 'amqp-extension';
 import fs from 'fs';
-import { buildTrainResultFilePath, getTrainResultDirectoryPath } from '../../config/paths';
+import { TrainExtractorMode, TrainExtractorQueuePayload } from '@personalhealthtrain/central-common';
+import { buildImageOutputFilePath, getImageOutputDirectoryPath } from '../../config/paths';
 import { getHarborFQRepositoryPath } from '../../config/services/harbor';
-import { ResultServiceDataPayload } from '../../domains/service/result-service';
-import { generateResultId } from '../../domains/train-result/utils';
-import { removeLocalRegistryImage, saveDockerContainerPathsTo } from '../../modules/docker';
+import { readDockerContainerPaths, removeLocalRegistryImage, saveDockerContainerPathsTo } from '../../modules/docker';
 import { ensureDirectory } from '../../modules/fs';
 
 export async function extractImage(message: Message) {
-    const data : ResultServiceDataPayload = message.data as ResultServiceDataPayload;
+    const data : TrainExtractorQueuePayload = message.data as TrainExtractorQueuePayload;
 
-    // Create directory or do nothing...
-    const trainPath : string = getTrainResultDirectoryPath();
-    await ensureDirectory(trainPath);
-
-    const resultId : string = generateResultId();
-    (message.data as ResultServiceDataPayload).id = resultId;
-
-    // delete result file if it already exists.
-    const trainResultPath : string = buildTrainResultFilePath(resultId);
-
-    try {
-        await fs.promises.access(trainResultPath, fs.constants.F_OK);
-        await fs.promises.unlink(trainResultPath);
-    } catch (e) {
-        // do nothing :)
+    if (!data.filePaths || data.filePaths.length === 0) {
+        return {
+            ...message,
+            data,
+        };
     }
 
-    const repositoryPath : string = getHarborFQRepositoryPath(data.train_id);
+    const repositoryPath : string = getHarborFQRepositoryPath(data.projectName, data.repositoryName);
 
-    await saveDockerContainerPathsTo(
-        repositoryPath,
-        ['/opt/pht_results', '/opt/train_config.json'],
-        trainResultPath,
-    );
+    switch (data.mode) {
+        case TrainExtractorMode.READ: {
+            data.files = await readDockerContainerPaths(
+                repositoryPath,
+                data.filePaths,
+            );
+
+            break;
+        }
+        case TrainExtractorMode.WRITE: {
+            // Create directory or do nothing...
+            const destinationPath : string = getImageOutputDirectoryPath();
+            await ensureDirectory(destinationPath);
+
+            // delete result file if it already exists.
+            const outputFilePath : string = buildImageOutputFilePath(data.repositoryName);
+
+            try {
+                await fs.promises.access(outputFilePath, fs.constants.F_OK);
+                await fs.promises.unlink(outputFilePath);
+            } catch (e) {
+                // do nothing :)
+            }
+
+            await saveDockerContainerPathsTo(
+                repositoryPath,
+                data.filePaths,
+                outputFilePath,
+            );
+
+            break;
+        }
+    }
 
     try {
         // we are done here with the docker image :)
@@ -42,5 +59,8 @@ export async function extractImage(message: Message) {
         // we tried :P
     }
 
-    return message;
+    return {
+        ...message,
+        data,
+    };
 }

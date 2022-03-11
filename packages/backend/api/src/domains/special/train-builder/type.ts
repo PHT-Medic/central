@@ -6,6 +6,7 @@
  */
 
 import {
+    Ecosystem,
     MasterImage, Station, Train, UserSecret,
 } from '@personalhealthtrain/central-common';
 import { User } from '@typescript-auth/domains';
@@ -14,7 +15,14 @@ export enum TrainBuilderCommand {
     START = 'trainBuildStart',
     STOP = 'trainBuildStop',
     STATUS = 'trainBuildStatus',
+    META_BUILD = 'trainMetaBuild',
 }
+
+export type TrainBuilderStation = {
+    id: Station['secure_id'],
+    ecosystem: Ecosystem,
+    index: number
+};
 
 export type TrainBuilderStartPayload = {
     id: Train['id'],
@@ -37,7 +45,11 @@ export type TrainBuilderStartPayload = {
 
     files: string[],
 
-    stations: Station['secure_id'][]
-    // stations: ['stationa', 'stationb']
-    // stations: [{id: 'stationa', archtecture: 'tue'},..]
+    stations: TrainBuilderStation[]
+};
+
+export type TrainBuilderMetaPayload = {
+    id: Train['id'],
+
+    stations: TrainBuilderStation[],
 };

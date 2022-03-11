@@ -209,7 +209,7 @@ export class TrainEntity implements Train {
     @Column({
         type: 'enum', nullable: true, default: null, enum: TrainResultStatus,
     })
-        result_last_status: TrainResultStatus | null;
+        result_status: TrainResultStatus | null;
 
     // ------------------------------------------------------------------
     @Column({ type: 'uuid' })
