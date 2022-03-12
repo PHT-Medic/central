@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Robot, User } from '@typescript-auth/domains';
+import { Robot, User } from '@authelion/common';
 import { Station } from '@personalhealthtrain/central-common';
 import { Stat } from 'isomorphic-git';
 import { SecretStorageQueueEntityType } from './constants';

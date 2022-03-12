@@ -8,7 +8,7 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
-import { isPermittedForResourceRealm } from '@typescript-auth/domains';
+import { isPermittedForResourceRealm } from '@authelion/common';
 import fs from 'fs';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';

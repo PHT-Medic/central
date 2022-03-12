@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import Vue, { PropType } from 'vue';
-import { Realm } from '@typescript-auth/domains';
+import { Realm } from '@authelion/common';
 import { StationForm } from '../../../../../components/domains/station/StationForm';
 
 export default Vue.extend({

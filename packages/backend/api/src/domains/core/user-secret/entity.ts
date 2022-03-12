@@ -15,9 +15,9 @@ import {
     Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import { RealmEntity, UserEntity } from '@typescript-auth/server-core';
+import { RealmEntity, UserEntity } from '@authelion/api-core';
 import { SecretType, UserSecret } from '@personalhealthtrain/central-common';
-import { Realm, User } from '@typescript-auth/domains';
+import { Realm, User } from '@authelion/common';
 
 @Unique('keyUserId', [
     'key',

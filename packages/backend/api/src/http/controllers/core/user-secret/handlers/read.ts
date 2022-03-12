@@ -1,5 +1,5 @@
 import { getRepository } from 'typeorm';
-import { onlyRealmPermittedQueryResources } from '@typescript-auth/server-core';
+import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
 import {
     applyFields, applyFilters, applyPagination, applyRelations, applySort,
 } from 'typeorm-extension';

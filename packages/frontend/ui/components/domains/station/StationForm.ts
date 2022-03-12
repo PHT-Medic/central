@@ -14,7 +14,7 @@ import {
     createNanoID,
     isHex,
 } from '@personalhealthtrain/central-common';
-import { RealmList } from '@typescript-auth/vue';
+import { RealmList } from '@authelion/vue';
 import {
     email, helpers, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';

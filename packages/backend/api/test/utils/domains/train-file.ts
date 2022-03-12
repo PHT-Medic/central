@@ -7,7 +7,7 @@
 
 import { TrainFile } from '@personalhealthtrain/central-common';
 import { SuperTest, Test } from 'supertest';
-import { MASTER_REALM_ID } from '@typescript-auth/domains';
+import { MASTER_REALM_ID } from '@authelion/common';
 
 export const TEST_DEFAULT_TRAIN_FILE : Partial<TrainFile> = {
     directory: '.',

@@ -12,7 +12,7 @@ import {
     DatabaseRootSeeder,
     setEntitiesForConnectionOptions,
     useConfig,
-} from '@typescript-auth/server-core';
+} from '@authelion/api-core';
 import { PermissionKey } from '@personalhealthtrain/central-common';
 import { useSpinner } from '../../config/spinner';
 import env from '../../env';

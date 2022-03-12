@@ -6,7 +6,7 @@
  */
 
 import { getCustomRepository, getRepository } from 'typeorm';
-import { UserRepository } from '@typescript-auth/server-core';
+import { UserRepository } from '@authelion/api-core';
 import {
     Ecosystem, SecretType, TrainStationApprovalStatus, createNanoID,
 } from '@personalhealthtrain/central-common';

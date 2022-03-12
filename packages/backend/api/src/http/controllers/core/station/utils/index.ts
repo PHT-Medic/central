@@ -8,7 +8,7 @@
 import { check } from 'express-validator';
 import { getRepository } from 'typeorm';
 import { NotFoundError } from '@typescript-error/http';
-import { isPermittedForResourceRealm } from '@typescript-auth/domains';
+import { isPermittedForResourceRealm } from '@authelion/common';
 import { ExpressValidatorMeta } from '../../../../express-validation';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 

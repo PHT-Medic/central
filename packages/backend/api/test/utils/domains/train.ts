@@ -7,7 +7,7 @@
 
 import { Train, TrainType } from '@personalhealthtrain/central-common';
 import { SuperTest, Test } from 'supertest';
-import { MASTER_REALM_ID } from '@typescript-auth/domains';
+import { MASTER_REALM_ID } from '@authelion/common';
 import { randomBytes } from 'crypto';
 
 export const TEST_DEFAULT_TRAIN : Partial<Train> = {

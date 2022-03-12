@@ -3,7 +3,7 @@ import cors from 'cors';
 
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { setupHTTPMiddleware } from '@typescript-auth/server-adapter';
+import { setupHTTPMiddleware } from '@authelion/api-adapter';
 import { useClient } from '@trapi/client';
 import { registerRoutes } from './routes';
 import { ExpressAppContext, ExpressAppInterface } from './type';

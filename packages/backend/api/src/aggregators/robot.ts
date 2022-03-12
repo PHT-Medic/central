@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useRobotEventEmitter } from '@typescript-auth/server-core';
+import { useRobotEventEmitter } from '@authelion/api-core';
 import { publishMessage } from 'amqp-extension';
 import { buildSecretStorageQueueMessage } from '../domains/special/secret-storage/queue';
 import { SecretStorageQueueCommand, SecretStorageQueueEntityType } from '../domains/special/secret-storage/constants';

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Realm } from '@typescript-auth/domains';
+import { Realm } from '@authelion/common';
 import { Station } from '../station';
 import { Train } from '../train';
 import { TrainStationApprovalStatus, TrainStationRunStatus } from './constatnts';

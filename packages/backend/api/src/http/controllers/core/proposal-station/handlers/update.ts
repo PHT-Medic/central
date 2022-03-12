@@ -7,7 +7,7 @@
 
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
-import { isPermittedForResourceRealm } from '@typescript-auth/domains';
+import { isPermittedForResourceRealm } from '@authelion/common';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';

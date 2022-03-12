@@ -21,7 +21,7 @@ import { useClient } from '@trapi/client';
 import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
 } from '@typescript-error/http';
-import { UserEntity } from '@typescript-auth/server-core';
+import { UserEntity } from '@authelion/api-core';
 import { publishMessage } from 'amqp-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
 import { ExpressValidationError } from '../../../../../express-validation';

@@ -6,7 +6,7 @@
  */
 
 import { useClient } from '@trapi/client';
-import { ErrorCode, OAuth2TokenGrant, TokenAPI } from '@typescript-auth/domains';
+import { ErrorCode, OAuth2TokenGrant, TokenAPI } from '@authelion/common';
 import { VaultAPI } from '../../vault-client';
 import { ROBOT_SECRET_ENGINE_KEY, ServiceID } from '../../../domains';
 

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Robot } from '@typescript-auth/domains';
+import { Robot } from '@authelion/common';
 import { ClientDriverInstance, stringifyAuthorizationHeader } from '@trapi/client';
 import { HarborProjectWebhook, HarborProjectWebhookOptions } from './type';
 import { ServiceID } from '../../../domains';

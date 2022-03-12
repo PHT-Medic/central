@@ -9,8 +9,8 @@ import Vue from 'vue';
 import { ActionTree, GetterTree, MutationTree } from 'vuex';
 
 import {
-    OAuth2TokenKind, OAuth2TokenSubKind, PermissionItem, Robot, User,
-} from '@typescript-auth/domains';
+    OAuth2TokenKind, OAuth2TokenSubKind, PermissionMeta, Robot, User,
+} from '@authelion/common';
 import { RootState } from './index';
 import { AuthBrowserStorageKey } from '../config/auth/constants';
 
@@ -18,7 +18,7 @@ export interface AuthState {
     user: User | undefined,
     robot: Robot | undefined,
 
-    permissions: PermissionItem[],
+    permissions: PermissionMeta[],
     resolved: boolean,
 
     accessToken: string | undefined,

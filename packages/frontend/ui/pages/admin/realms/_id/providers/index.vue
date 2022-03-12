@@ -9,7 +9,7 @@ import {
     PermissionID,
 } from '@personalhealthtrain/central-common';
 import { PropType } from 'vue';
-import { Realm } from '@typescript-auth/domains';
+import { Realm } from '@authelion/common';
 import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';
 
 export default {

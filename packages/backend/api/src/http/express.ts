@@ -9,7 +9,7 @@ import express, { Express } from 'express';
 import cors from 'cors';
 
 import path from 'path';
-import { registerControllers as registerAuthControllers, registerMiddlewares } from '@typescript-auth/server-core';
+import { registerControllers as registerAuthControllers, registerMiddlewares } from '@authelion/api-core';
 import promBundle from 'express-prom-bundle';
 import { Client } from 'redis-extension';
 

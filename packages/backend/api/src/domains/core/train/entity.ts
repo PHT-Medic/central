@@ -29,8 +29,8 @@ import {
     TrainRunStatus, TrainType,
     UserSecret,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity, UserEntity } from '@typescript-auth/server-core';
-import { Realm, User } from '@typescript-auth/domains';
+import { RealmEntity, UserEntity } from '@authelion/api-core';
+import { Realm, User } from '@authelion/common';
 import { ProposalEntity } from '../proposal/entity';
 import { MasterImageEntity } from '../master-image/entity';
 import { TrainFileEntity } from '../train-file/entity';

@@ -22,7 +22,7 @@ import {
 } from '@vue-layout/utils';
 import { BuildInput } from '@trapi/query';
 import { Socket } from 'socket.io-client';
-import { MASTER_REALM_ID } from '@typescript-auth/domains';
+import { MASTER_REALM_ID } from '@authelion/common';
 
 export const ProposalList = Vue.extend<
 ComponentListData<Proposal>,

@@ -8,7 +8,7 @@
 import { Arguments, Argv, CommandModule } from 'yargs';
 import { createDatabase } from 'typeorm-extension';
 import { createConnection } from 'typeorm';
-import { DatabaseRootSeeder as AuthDatabaseRootSeeder, setupCommand } from '@typescript-auth/server-core';
+import { DatabaseRootSeeder as AuthDatabaseRootSeeder, setupCommand } from '@authelion/api-core';
 import { PermissionKey } from '@personalhealthtrain/central-common';
 import { useClient } from 'redis-extension';
 import { createConfig } from '../../config';

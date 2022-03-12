@@ -9,7 +9,7 @@ import path from 'path';
 import { ConnectionWithAdditionalOptions, buildConnectionOptions } from 'typeorm-extension';
 import {
     setEntitiesForConnectionOptions,
-} from '@typescript-auth/server-core';
+} from '@authelion/api-core';
 import { ConnectionOptions } from 'typeorm';
 import { MasterImageEntity } from '../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../domains/core/master-image-group/entity';

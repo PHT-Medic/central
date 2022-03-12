@@ -9,7 +9,7 @@ import 'reflect-metadata';
 import dotenv from 'dotenv';
 
 import { createConnection } from 'typeorm';
-import { buildTokenAggregator } from '@typescript-auth/server-core';
+import { buildTokenAggregator } from '@authelion/api-core';
 import { useClient } from 'redis-extension';
 
 import env from './env';

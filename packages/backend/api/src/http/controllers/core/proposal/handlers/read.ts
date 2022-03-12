@@ -1,11 +1,11 @@
 import { getRepository } from 'typeorm';
-import { onlyRealmPermittedQueryResources } from '@typescript-auth/server-core';
+import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
 import {
     applyFields,
     applyFilters, applyPagination, applyRelations, applySort,
 } from 'typeorm-extension';
 import { NotFoundError } from '@typescript-error/http';
-import { isPermittedForResourceRealm } from '@typescript-auth/domains';
+import { isPermittedForResourceRealm } from '@authelion/common';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 

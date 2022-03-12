@@ -11,8 +11,8 @@ import {
     SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
 import {
-    AbilityManager, PermissionItem, Realm, Robot, User,
-} from '@typescript-auth/domains';
+    AbilityManager, PermissionMeta, Realm, Robot, User,
+} from '@authelion/common';
 import { Namespace, Server, Socket } from 'socket.io';
 
 export type SocketDataInterface = {
@@ -26,7 +26,7 @@ export type SocketDataInterface = {
     robot?: Robot,
     robotId?: Robot['id'],
 
-    permissions?: PermissionItem<any>[],
+    permissions?: PermissionMeta[],
     ability?: AbilityManager,
 
     roomConnections: Record<string, number>

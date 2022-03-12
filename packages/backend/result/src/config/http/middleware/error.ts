@@ -11,7 +11,7 @@ import {
     InternalServerError,
     ServerError, ServerErrorSettings,
 } from '@typescript-error/http';
-import { hasOwnProperty } from '@typescript-auth/domains';
+import { hasOwnProperty } from '@authelion/common';
 import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 import { useLogger } from '../../../modules/log';
 

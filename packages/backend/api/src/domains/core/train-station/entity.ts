@@ -22,8 +22,8 @@ import {
     TrainStationApprovalStatus,
     TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@typescript-auth/server-core';
-import { Realm } from '@typescript-auth/domains';
+import { RealmEntity } from '@authelion/api-core';
+import { Realm } from '@authelion/common';
 import { TrainEntity } from '../train/entity';
 import { StationEntity } from '../station/entity';
 

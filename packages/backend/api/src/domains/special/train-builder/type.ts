@@ -9,7 +9,7 @@ import {
     Ecosystem,
     MasterImage, Station, Train, UserSecret,
 } from '@personalhealthtrain/central-common';
-import { User } from '@typescript-auth/domains';
+import { User } from '@authelion/common';
 
 export enum TrainBuilderCommand {
     START = 'trainBuildStart',

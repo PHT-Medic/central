@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
-import { OAuth2Provider } from '@typescript-auth/domains';
+import { OAuth2Provider } from '@authelion/common';
 import { BuildInput } from '@trapi/query';
 import MedicineWorker from '../components/svg/MedicineWorker';
 import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';

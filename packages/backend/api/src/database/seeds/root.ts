@@ -14,9 +14,9 @@ import {
     RolePermissionEntity,
     RoleRepository,
     useRobotEventEmitter,
-} from '@typescript-auth/server-core';
+} from '@authelion/api-core';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { MASTER_REALM_ID, createNanoID } from '@typescript-auth/domains';
+import { MASTER_REALM_ID, createNanoID } from '@authelion/common';
 import { PHTStationRole, getPHTStationRolePermissions } from '../../config/pht/permissions/station';
 import { StationEntity } from '../../domains/core/station/entity';
 

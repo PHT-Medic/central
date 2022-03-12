@@ -3,7 +3,7 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-erro
 import path from 'path';
 import { HTTPClient, PermissionID } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
-import { isPermittedForResourceRealm } from '@typescript-auth/domains';
+import { isPermittedForResourceRealm } from '@authelion/common';
 import { buildImageOutputFilePath } from '../../../paths';
 import { ExpressRequest, ExpressResponse } from '../../type';
 

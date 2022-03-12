@@ -11,9 +11,9 @@ import {
 import { Context } from '@nuxt/types';
 import https from 'https';
 import { Inject } from '@nuxt/types/app';
-import { HTTPClient as AuthHTTPClient } from '@typescript-auth/domains';
+import { HTTPClient as AuthHTTPClient } from '@authelion/common';
 import { HTTPClient } from '@personalhealthtrain/central-common';
-import { setHTTPClient } from '@typescript-auth/vue';
+import { setHTTPClient } from '@authelion/vue';
 
 export default (ctx: Context, inject : Inject) => {
     let apiUrl : string | undefined;

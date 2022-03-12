@@ -9,7 +9,7 @@ import { getRepository } from 'typeorm';
 import tar from 'tar-stream';
 import fs from 'fs';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { isPermittedForResourceRealm } from '@typescript-auth/domains';
+import { isPermittedForResourceRealm } from '@authelion/common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { getTrainFilesDirectoryPath } from '../../../../../config/pht/train-file/path';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';

@@ -7,7 +7,7 @@
 <script lang="ts">
 
 import { PropType } from 'vue';
-import { Realm } from '@typescript-auth/domains';
+import { Realm } from '@authelion/common';
 
 export default {
     props: {

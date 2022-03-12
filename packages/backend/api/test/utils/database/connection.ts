@@ -12,7 +12,7 @@ import { ConnectionOptions, createConnection, getConnection } from 'typeorm';
 import {
     DatabaseRootSeeder as AuthDatabaseRootSeeder,
     setEntitiesForConnectionOptions,
-} from '@typescript-auth/server-core';
+} from '@authelion/api-core';
 import { PermissionKey } from '@personalhealthtrain/central-common';
 import { buildDatabaseConnectionOptions, modifyDatabaseConnectionOptions } from '../../../src/database/utils';
 import { buildRobotAggregator } from '../../../src/aggregators/robot';

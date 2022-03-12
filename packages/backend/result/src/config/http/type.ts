@@ -11,7 +11,7 @@ import {
 import {
     ExpressRequest as AuthExpressRequest,
     ExpressResponse as AuthExpressResponse,
-} from '@typescript-auth/server-adapter';
+} from '@authelion/api-adapter';
 import { Environment } from '../../env';
 import { Config } from '../../config';
 

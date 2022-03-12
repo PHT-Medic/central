@@ -1,8 +1,8 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
-import { isPermittedForResourceRealm } from '@typescript-auth/domains';
-import { onlyRealmPermittedQueryResources } from '@typescript-auth/server-core';
+import { isPermittedForResourceRealm } from '@authelion/common';
+import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
 import { applyFilters } from 'typeorm-extension';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';

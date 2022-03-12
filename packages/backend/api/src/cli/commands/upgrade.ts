@@ -7,7 +7,7 @@
 
 import { Argv, CommandModule } from 'yargs';
 import { createConnection } from 'typeorm';
-import { upgradeCommand } from '@typescript-auth/server-core';
+import { upgradeCommand } from '@authelion/api-core';
 import { buildDatabaseConnectionOptions } from '../../database/utils';
 import { useSpinner } from '../../config/spinner';
 

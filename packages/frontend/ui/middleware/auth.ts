@@ -6,7 +6,7 @@
  */
 
 import { Context } from '@nuxt/types';
-import { buildAbilityMetaFromName } from '@typescript-auth/domains';
+import { buildAbilityMetaFromName } from '@authelion/common';
 import AuthModule from '../config/auth';
 import { LayoutKey } from '../config/layout';
 

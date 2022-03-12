@@ -1,8 +1,8 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
-import { onlyRealmPermittedQueryResources } from '@typescript-auth/server-core';
+import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
 import { applyFilters, applyPagination, applyQueryRelations } from 'typeorm-extension';
-import { isPermittedForResourceRealm } from '@typescript-auth/domains';
+import { isPermittedForResourceRealm } from '@authelion/common';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 

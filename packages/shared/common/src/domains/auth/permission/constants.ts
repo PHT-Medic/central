@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID as AuthPermissionID } from '@typescript-auth/domains';
+import { PermissionID as AuthPermissionID } from '@authelion/common';
 
 export enum PermissionKey {
     PROPOSAL_ADD = 'proposal_add',

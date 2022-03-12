@@ -9,7 +9,7 @@ import { Train, TrainType } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
 import { NotFoundError } from '@typescript-error/http';
-import { isPermittedForResourceRealm } from '@typescript-auth/domains';
+import { isPermittedForResourceRealm } from '@authelion/common';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, ExpressValidatorMeta, matchedValidationData } from '../../../../express-validation';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';

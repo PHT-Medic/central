@@ -14,8 +14,8 @@ import {
     OAuth2TokenKind,
     OAuth2TokenResponse,
     OAuth2TokenSubKind,
-    PermissionItem, Robot, TokenVerificationPayload, User, buildAbilityMetaFromName,
-} from '@typescript-auth/domains';
+    PermissionMeta, Robot, TokenVerificationPayload, User, buildAbilityMetaFromName,
+} from '@authelion/common';
 import { Config, createClient } from '@trapi/client';
 import { AuthBrowserStorageKey } from './constants';
 
@@ -250,7 +250,7 @@ class AuthModule {
         return this.hasAbility(ability);
     }
 
-    public setPermissions(permissions: PermissionItem[]) {
+    public setPermissions(permissions: PermissionMeta[]) {
         if (!Array.isArray(permissions)) return;
 
         this.abilityManager.setPermissions(permissions);

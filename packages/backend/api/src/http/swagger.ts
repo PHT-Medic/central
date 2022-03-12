@@ -13,7 +13,7 @@ import {
     generateDocumentation,
 } from '@trapi/swagger';
 import path from 'path';
-import { getSwaggerEntrypointFilePath } from '@typescript-auth/server-core';
+import { getSwaggerEntrypointFilePath } from '@authelion/api-core';
 import { getRootDirPath, getWritableDirPath } from '../config/paths';
 import env from '../env';
 
@@ -29,7 +29,7 @@ export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDoc
             getSwaggerEntrypointFilePath(),
         ],
         ignore: ['**/node_modules/**'],
-        allow: ['**/@typescript-auth/**'],
+        allow: ['**/@authelion/**'],
         decorator: {
             internal: true,
             library: [

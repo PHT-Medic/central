@@ -7,7 +7,7 @@
 
 import { Proposal, ProposalRisk } from '@personalhealthtrain/central-common';
 import { SuperTest, Test } from 'supertest';
-import { MASTER_REALM_ID } from '@typescript-auth/domains';
+import { MASTER_REALM_ID } from '@authelion/common';
 
 export const TEST_DEFAULT_PROPOSAL : Partial<Proposal> = {
     realm_id: MASTER_REALM_ID,
