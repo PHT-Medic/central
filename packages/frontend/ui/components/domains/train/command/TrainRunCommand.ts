@@ -50,19 +50,23 @@ export const TrainRunCommand = Vue.extend<any, ActionCommandMethods, any, TrainC
                 this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_STOP);
         },
         isDisabled() {
-            if (this.entity.build_status === TrainBuildStatus.FINISHED) {
-                return false;
-            }
-
-            if (
-                this.command === TrainCommand.RUN_START &&
-                [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.entity.run_status) === -1
-            ) {
+            if (this.entity.build_status !== TrainBuildStatus.FINISHED) {
                 return true;
             }
 
-            return this.command === TrainCommand.RUN_RESET &&
-                [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.entity.run_status) === -1;
+            if (
+                this.command === TrainCommand.RUN_START
+            ) {
+                return [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.entity.run_status) === -1;
+            }
+
+            if (
+                this.command === TrainCommand.RUN_RESET
+            ) {
+                return [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.entity.run_status) === -1;
+            }
+
+            return false;
         },
         commandText() {
             switch (this.command) {

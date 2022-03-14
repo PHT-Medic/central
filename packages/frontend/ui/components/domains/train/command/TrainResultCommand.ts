@@ -50,36 +50,39 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
             return this.$auth.hasPermission(PermissionID.TRAIN_RESULT_READ);
         },
         isDisabled() {
-            if (this.entity.run_status === TrainRunStatus.FINISHED) {
-                return false;
-            }
-
-            if (
-                this.command === 'resultDownload' &&
-                !this.entity.result_status
-            ) {
+            if (this.entity.run_status !== TrainRunStatus.FINISHED) {
                 return true;
             }
 
             if (
-                this.command === TrainCommand.RESULT_START &&
-                this.entity.result_status &&
-                [
-                    TrainBuildStatus.STOPPED,
-                    TrainBuildStatus.FAILED,
-                ].indexOf(this.command) === -1
+                this.command === 'resultDownload'
             ) {
-                return true;
+                return !this.entity.result_status;
             }
 
-            return this.command === TrainCommand.RESULT_STOP &&
-                this.entity.result_status &&
-                [
-                    TrainResultStatus.STARTING,
-                    TrainResultStatus.STARTED,
-                    TrainResultStatus.FINISHED,
-                    TrainResultStatus.STOPPING,
-                ].indexOf(this.command) === -1;
+            if (
+                this.command === TrainCommand.RESULT_START
+            ) {
+                return this.entity.result_status &&
+                    [
+                        TrainBuildStatus.STOPPED,
+                        TrainBuildStatus.FAILED,
+                    ].indexOf(this.entity.result_status) === -1;
+            }
+
+            if (
+                this.command === TrainCommand.RESULT_STOP
+            ) {
+                return !this.entity.result_status ||
+                    [
+                        TrainResultStatus.STARTING,
+                        TrainResultStatus.STARTED,
+                        TrainResultStatus.FINISHED,
+                        TrainResultStatus.STOPPING,
+                    ].indexOf(this.entity.result_status) === -1;
+            }
+
+            return false;
         },
         commandText() {
             switch (this.command) {
