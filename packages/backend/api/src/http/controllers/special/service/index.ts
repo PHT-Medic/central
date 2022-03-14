@@ -15,10 +15,11 @@ import { NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';
 import { postHarborHookRouteHandler } from './handlers/registry/hook';
 
-import { doRegistryCommand } from './handlers/registry/command';
-import { doSecretStorageCommand } from './handlers/secret-storage/command';
+import { runRegistryCommandRouteHandler } from './handlers/registry/command';
+import { runSecretStorageCommandRouteHandler } from './handlers/secret-storage/command';
 import { ExpressRequest, ExpressResponse } from '../../../type';
 import { RegistryHook } from '../../../../domains/special/registry';
+import { runStationRegistryCommandRouteHandler } from './handlers/station-registry/command';
 
 @SwaggerTags('extra')
 @Controller('/services')
@@ -49,9 +50,11 @@ export class ServiceController {
 
         switch (id) {
             case ServiceID.REGISTRY:
-                return doRegistryCommand(req, res);
+                return runRegistryCommandRouteHandler(req, res);
             case ServiceID.SECRET_STORAGE:
-                return doSecretStorageCommand(req, res);
+                return runSecretStorageCommandRouteHandler(req, res);
+            case ServiceID.STATION_REGISTRY:
+                return runStationRegistryCommandRouteHandler(req, res);
         }
 
         throw new NotFoundError();

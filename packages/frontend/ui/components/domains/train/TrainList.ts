@@ -250,9 +250,7 @@ ComponentListProperties<Train>
             },
         });
         const noMore = buildListNoMore(this, createElement, {
-            text: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
-                'There are no more trains available...',
-            ]),
+            text: 'There are no more trains available...',
         });
         const pagination = buildListPagination(this, createElement);
 

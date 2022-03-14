@@ -24,7 +24,7 @@ import {
 
 const commands = Object.values(RegistryCommand);
 
-export async function doRegistryCommand(req: ExpressRequest, res: ExpressResponse) {
+export async function runRegistryCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) {
     if (!req.ability.hasPermission(PermissionID.SERVICE_MANAGE)) {
         throw new ForbiddenError('You are not permitted to manage the registry service.');
     }

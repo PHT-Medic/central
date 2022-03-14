@@ -95,7 +95,7 @@ ComponentListProperties<Station>
             this.busy = true;
 
             try {
-                const response = await this.$api.station.getMany(mergeDeep({
+                const query = mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
@@ -106,7 +106,9 @@ ComponentListProperties<Station>
                     sort: {
                         name: 'ASC',
                     },
-                }, this.query));
+                }, this.query);
+
+                const response = await this.$api.station.getMany(query);
 
                 this.items = response.data;
                 const { total } = response.meta;
@@ -158,9 +160,7 @@ ComponentListProperties<Station>
         const search = buildListSearch(this, createElement);
         const items = buildListItems(this, createElement, { itemIconClass: 'fa fa-hospital' });
         const noMore = buildListNoMore(this, createElement, {
-            text: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
-                'There are no more stations available...',
-            ]),
+            text: 'There are no more stations available...',
         });
         const pagination = buildListPagination(this, createElement);
 

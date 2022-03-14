@@ -381,9 +381,7 @@ ComponentListProperties<ProposalStation> & {
         });
 
         const noMore = buildListNoMore(this, createElement, {
-            text: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
-                `There are no more ${vm.target}s available...`,
-            ]),
+            text: `There are no more ${vm.target}s available...`,
         });
         const pagination = buildListPagination(this, createElement);
 

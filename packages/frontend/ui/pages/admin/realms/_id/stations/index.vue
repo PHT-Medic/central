@@ -89,13 +89,13 @@ export default {
                     >
                         <i class="fa fa-bars" />
                     </nuxt-link>
-                    <auth-entity-delete
+                    <entity-delete
                         v-if="canDrop"
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
                         :entity-type="'station'"
                         :with-text="false"
-                        @done="handleDeleted"
+                        @deleted="handleDeleted"
                     />
                 </template>
                 <template #cell(created_at)="data">

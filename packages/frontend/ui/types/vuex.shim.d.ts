@@ -9,13 +9,13 @@ import { HTTPClient } from '@personalhealthtrain/central-common';
 import { HTTPClient as AuthHTTPClient } from '@authelion/common';
 import AuthModule from '../config/auth';
 import {SocketModule} from "../config/socket";
-import {NavigationProvider} from "../config/layout/module";
-import {BrowserStorageAdapter} from "browser-storage-adapter";
+import {NavigationProvider} from "../config/layout";
+import {Adapter} from "browser-storage-adapter";
 
 declare module 'vuex/types/index' {
     interface Store<S> {
-        $warehouse: BrowserStorageAdapter,
-        $authWarehouse: BrowserStorageAdapter,
+        $warehouse: Adapter,
+        $authWarehouse: Adapter,
 
         $api: HTTPClient,
         $authApi: AuthHTTPClient,

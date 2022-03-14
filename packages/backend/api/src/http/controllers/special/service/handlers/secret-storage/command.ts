@@ -49,7 +49,7 @@ enum TargetEntity {
     STATION = 'station',
 }
 
-export async function doSecretStorageCommand(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function runSecretStorageCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { command } = req.body;
 
     if (

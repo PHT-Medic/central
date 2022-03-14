@@ -37,6 +37,9 @@ export default {
                 {
                     id: ServiceID.EMAIL_SERVICE, name: 'E-Mail Service', icon: 'fas fa-envelope', version: 'v1.0.0-alpha.0',
                 },
+                {
+                    id: ServiceID.STATION_REGISTRY, name: 'Station Registry', icon: 'fa-solid fa-atom', version: 'v1.0.0-alpha.0',
+                },
             ],
             thirdPartyItems: [
                 {

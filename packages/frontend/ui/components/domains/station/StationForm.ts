@@ -6,11 +6,7 @@
  */
 
 import {
-    RegistryCommand,
-    SecretStorageCommand,
     Station,
-    buildRegistryStationProjectName,
-    buildStationSecretStorageKey,
     createNanoID,
     isHex,
 } from '@personalhealthtrain/central-common';
@@ -22,9 +18,11 @@ import {
     SlotName, buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea, initPropertiesFromSource,
 } from '@vue-layout/utils';
 import Vue, {
-    CreateElement, PropType, VNode, VNodeChildren,
+    CreateElement, PropType, VNode, VNodeChildren, VNodeData,
 } from 'vue';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
+import StationRegistryManagement from './StationRegistryManagement';
+import StationSecretStorageManagement from './StationSecretStorageManagement';
 
 const alphaNum = helpers.regex('alphaNum', /^[a-z0-9]*$/);
 
@@ -52,6 +50,7 @@ export const StationForm = Vue.extend({
                 email: '',
                 realm_id: '',
                 secure_id: '',
+                hidden: false,
             },
 
             busy: false,
@@ -106,17 +105,6 @@ export const StationForm = Vue.extend({
         updatedAt() {
             return this.isEditing ? this.entity.updated_at : undefined;
         },
-
-        pathName() {
-            return this.form.name ?
-                buildStationSecretStorageKey(this.entity.secure_id) :
-                '';
-        },
-        projectName() {
-            return this.form.name ?
-                buildRegistryStationProjectName(this.entity.secure_id) :
-                '';
-        },
     },
     watch: {
         updatedAt(val, oldVal) {
@@ -127,8 +115,7 @@ export const StationForm = Vue.extend({
     },
     created() {
         Promise.resolve()
-            .then(this.initFromProperties)
-            .then(this.loadRealms);
+            .then(this.initFromProperties);
     },
     methods: {
         initFromProperties() {
@@ -142,7 +129,7 @@ export const StationForm = Vue.extend({
             }
 
             if (
-                this.form.name &&
+                !this.form.name &&
                 (this.realmId || this.realmName)
             ) {
                 this.form.name = this.realmName || this.realmId;
@@ -178,26 +165,6 @@ export const StationForm = Vue.extend({
 
             this.busy = false;
         },
-        async drop() {
-            if (this.busy || !this.isEditing) {
-                return;
-            }
-
-            this.busy = true;
-
-            try {
-                const entity = await this.$api.station.delete(this.entity.id);
-
-                this.$emit('deleted', entity);
-            } catch (e) {
-                if (e instanceof Error) {
-                    this.$emit('failed');
-                }
-            }
-
-            this.busy = false;
-        },
-
         generateSecureId() {
             this.form.secure_id = createNanoID();
         },
@@ -205,67 +172,6 @@ export const StationForm = Vue.extend({
             this.form.secure_id = this.entity.secure_id;
         },
 
-        async runSecretStorageEngineKeySave() {
-            await this.runSecretStorageCommand(SecretStorageCommand.ENGINE_KEY_SAVE);
-        },
-        async runSecretStorageEngineKeyDelete() {
-            await this.runSecretStorageCommand(SecretStorageCommand.ENGINE_KEY_DROP);
-        },
-        async runSecretStorageCommand(action) {
-            if (this.busy || !this.isEditing) return;
-
-            this.busy = true;
-
-            try {
-                const station = await this.$api.service.runSecretStorageCommand(action, {
-                    name: buildStationSecretStorageKey(this.entity.id),
-                });
-
-                this.$emit('updated', station);
-            } catch (e) {
-                if (e instanceof Error) {
-                    this.$emit('failed', e);
-                }
-            }
-
-            this.busy = false;
-        },
-        async runRegistryProjectCreate() {
-            await this.runRegistryCommand(RegistryCommand.STATION_SAVE);
-        },
-        async runRegistryProjectDelete() {
-            await this.runRegistryCommand(RegistryCommand.STATION_DELETE);
-        },
-        async runRegistryCommand(command) {
-            if (this.busy || !this.isEditing) return;
-
-            this.busy = true;
-
-            try {
-                await this.$api.service.runRegistryCommand(command, {
-                    id: this.entity.id,
-                });
-
-                // eslint-disable-next-line default-case
-                switch (command) {
-                    case RegistryCommand.STATION_DELETE:
-                        this.$emit('updated', {
-                            registry_project_id: null,
-                            registry_project_account_id: null,
-                            registry_project_account_name: null,
-                            registry_project_account_token: null,
-                            registry_project_webhook_exists: null,
-                        });
-                        break;
-                }
-            } catch (e) {
-                if (e instanceof Error) {
-                    this.$emit('failed', e);
-                }
-            }
-
-            this.busy = false;
-        },
     },
     render(createElement: CreateElement): VNode {
         const vm = this;
@@ -382,6 +288,27 @@ export const StationForm = Vue.extend({
             },
         });
 
+        const hidden = h('div', {
+            staticClass: 'form-group mb-1',
+        }, [
+            h('b-form-checkbox', {
+                model: {
+                    value: vm.form.hidden,
+                    callback(v: boolean) {
+                        vm.form.hidden = v;
+                    },
+                    expression: 'form.hidden',
+                },
+            } as VNodeData, [
+                'Hidden?',
+            ]),
+            h('div', {
+                staticClass: 'alert alert-sm alert-info mt-1',
+            }, [
+                'If enabled the station can not be target during proposal & train creation.',
+            ]),
+        ]);
+
         const submit = buildFormSubmit(vm, h, {
             updateText: 'Update',
             createText: 'Create',
@@ -390,169 +317,6 @@ export const StationForm = Vue.extend({
         let editingElements : VNodeChildren = [];
 
         if (this.isEditing) {
-            const secretStorageElements = [
-                h('h6', [
-                    h('i', { staticClass: 'fa fa-key pr-1' }),
-                    'Secret Storage',
-                ]),
-                h('p', { staticClass: 'mb-2' }, [
-                    'To keep the data between the secret key storage engine and the ui in sync, you can',
-                    ' ',
-                    'either pull existing secrets from the storage engine or push local secrets against it.',
-                ]),
-                h('p', [
-                    h('strong', { staticClass: 'pr-1' }, 'Path:'),
-                    vm.pathName,
-                ]),
-                h('div', { staticClass: 'd-flex flex-row' }, [
-                    h('div', [
-                        h('button', {
-                            class: 'btn btn-xs btn-primary',
-                            attrs: {
-                                disabled: vm.busy,
-                                type: 'button',
-                            },
-                            on: {
-                                click($event) {
-                                    $event.preventDefault();
-
-                                    vm.runSecretStorageEngineKeySave.call(null);
-                                },
-                            },
-                        }, [
-                            h('i', { staticClass: 'fa fa-save pr-1' }),
-                            'Save',
-                        ]),
-                    ]),
-                    h('div', { staticClass: 'ml-auto' }, [
-                        h('button', {
-                            class: 'btn btn-xs btn-danger',
-                            attrs: {
-                                disabled: vm.busy,
-                                type: 'button',
-                            },
-                            on: {
-                                click($event) {
-                                    $event.preventDefault();
-
-                                    vm.runSecretStorageEngineKeyDelete.call(null);
-                                },
-                            },
-                        }, [
-                            h('i', { staticClass: 'fa fa-trash pr-1' }),
-                            'Delete',
-                        ]),
-                    ]),
-                ]),
-            ];
-
-            const robotCredentials = [];
-
-            if (vm.entity.registry_project_account_name) {
-                robotCredentials.push(h('div', [
-                    vm.entity.registry_project_account_name,
-                ]));
-            }
-
-            if (vm.entity.registry_project_account_token) {
-                robotCredentials.push(h('div', [
-                    vm.entity.registry_project_account_token,
-                ]));
-            }
-
-            const registryElements = [
-                h('h6', [
-                    h('i', { staticClass: 'fa fa-folder-open pr-1' }),
-                    'Registry',
-                ]),
-                h('p', { staticClass: 'mb-2' }, [
-                    'To keep the data between the registry and the ui in sync, you can pull all available information about the',
-                    ' ',
-                    'project, webhook, robot-account,... of a station or create them.',
-                ]),
-                h('div', {
-                    staticClass: 'mb-2 d-flex flex-column',
-                }, [
-                    h('div', [
-                        h('strong', { staticClass: 'pr-1' }, 'Namespace:'),
-                        vm.projectName,
-                        h('i', {
-                            staticClass: 'pl-1',
-                            class: {
-                                'fa fa-check text-success': vm.entity.registry_project_id,
-                                'fa fa-times text-danger': !vm.entity.registry_project_id,
-                            },
-                        }),
-                    ]),
-
-                    h('div', [
-                        h('strong', { staticClass: 'pr-1' }, 'Webhook:'),
-                        h('i', {
-                            class: {
-                                'fa fa-check text-success': vm.entity.registry_project_webhook_exists,
-                                'fa fa-times text-danger': !vm.entity.registry_project_webhook_exists,
-                            },
-                        }),
-                    ]),
-
-                    h('div', [
-                        h('strong', { staticClass: 'pr-1' }, 'Robot:'),
-                        h('div', { staticClass: 'd-flex flex-column' }, [
-                            h('div', [
-                                h('i', {
-                                    class: {
-                                        'fa fa-check text-success': vm.entity.registry_project_account_id,
-                                        'fa fa-times text-danger': !vm.entity.registry_project_account_id,
-                                    },
-                                }),
-                            ]),
-                            robotCredentials,
-                        ]),
-                    ]),
-                ]),
-
-                h('div', { staticClass: 'd-flex flex-row' }, [
-                    h('div', [
-                        h('button', {
-                            class: 'btn btn-xs btn-primary',
-                            attrs: {
-                                disabled: vm.busy,
-                                type: 'button',
-                            },
-                            on: {
-                                click($event) {
-                                    $event.preventDefault();
-
-                                    vm.runRegistryProjectCreate.call(null);
-                                },
-                            },
-                        }, [
-                            h('i', { staticClass: 'fa fa-save pr-1' }),
-                            'Save',
-                        ]),
-                    ]),
-                    h('div', { staticClass: 'ml-auto' }, [
-                        h('button', {
-                            class: 'btn btn-xs btn-danger',
-                            attrs: {
-                                disabled: vm.busy,
-                                type: 'button',
-                            },
-                            on: {
-                                click($event) {
-                                    $event.preventDefault();
-
-                                    vm.runRegistryProjectDelete.call(null);
-                                },
-                            },
-                        }, [
-                            h('i', { staticClass: 'fa fa-trash pr-1' }),
-                            'Delete',
-                        ]),
-                    ]),
-                ]),
-            ];
-
             editingElements = [
                 h('hr'),
                 h('div', { staticClass: 'alert alert-warning alert-sm' }, [
@@ -564,10 +328,28 @@ export const StationForm = Vue.extend({
                 ]),
                 h('div', { staticClass: 'row' }, [
                     h('div', { staticClass: 'col' }, [
-                        secretStorageElements,
+                        h(StationSecretStorageManagement, {
+                            props: {
+                                entity: vm.entity,
+                            },
+                            on: {
+                                updated(entity) {
+                                    vm.handleUpdated.call(null, entity);
+                                },
+                            },
+                        }),
                     ]),
                     h('div', { staticClass: 'col' }, [
-                        registryElements,
+                        h(StationRegistryManagement, {
+                            props: {
+                                entity: vm.entity,
+                            },
+                            on: {
+                                updated(entity) {
+                                    vm.handleUpdated.call(null, entity);
+                                },
+                            },
+                        }),
                     ]),
                 ]),
             ];
@@ -580,6 +362,8 @@ export const StationForm = Vue.extend({
                 }, [
                     realm,
                     name,
+                    h('hr'),
+                    hidden,
                     h('hr'),
                     email,
                     h('hr'),

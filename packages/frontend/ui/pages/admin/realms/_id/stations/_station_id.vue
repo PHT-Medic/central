@@ -79,6 +79,12 @@ export default Vue.extend({
 
             await this.$nuxt.$router.push(`/admin/realms/${this.enitty.id}/stations`);
         },
+        handleFailed(e) {
+            this.$bvToast.toast(e.message, {
+                toaster: 'b-toaster-top-center',
+                variant: 'warning',
+            });
+        },
     },
 });
 </script>
@@ -87,5 +93,6 @@ export default Vue.extend({
         :entity="childEntity"
         :realm-id="entity.id"
         @updated="handleUpdated"
+        @failed="handleFailed"
     />
 </template>

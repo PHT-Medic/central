@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export enum Ecosystem {
-    DEFAULT = 'tue',
-    PADME = 'padme',
+export enum StationRegistryQueueCommand {
+    SYNC = 'STATION_REGISTRY_SYNC',
 }

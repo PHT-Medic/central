@@ -58,8 +58,6 @@ export function createConfig({ env } : ConfigContext) : Config {
         },
     }, ApiKey.HARBOR);
 
-    setRedisConfig({ connectionString: env.redisConnectionString });
-
     setHTTPConfig({
         clazz: VaultAPI,
         driver: {
@@ -76,6 +74,24 @@ export function createConfig({ env } : ConfigContext) : Config {
             connectionString: env.vaultConnectionString,
         },
     }, ApiKey.VAULT);
+
+    setHTTPConfig({
+        driver: {
+            baseURL: 'https://menzel.informatik.rwth-aachen.de:3005/centralservice/api/',
+        },
+    }, ApiKey.AACHEN_CENTRAL_SERVICE);
+
+    setHTTPConfig({
+        driver: {
+            baseURL: 'https://station-registry.hs-mittweida.de/api/',
+        },
+    }, ApiKey.AACHEN_STATION_REGISTRY);
+
+    // ---------------------------------------------
+
+    setRedisConfig({ connectionString: env.redisConnectionString });
+
+    // ---------------------------------------------
 
     setAmqpConfig({
         connection: env.rabbitMqConnectionString,

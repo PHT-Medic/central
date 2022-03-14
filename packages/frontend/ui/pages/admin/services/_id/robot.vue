@@ -7,7 +7,7 @@
 <script lang="ts">
 import { ServiceID } from '@personalhealthtrain/central-common';
 import { useHTTPClient } from '@authelion/vue';
-import { PropType } from 'vue';
+import Vue, { PropType } from 'vue';
 
 export default {
     props: {
@@ -41,6 +41,17 @@ export default {
                 // ...
             }
         },
+        handleUpdated(item) {
+            const keys = Object.keys(item);
+            for (let i = 0; i < keys.length; i++) {
+                Vue.set(this.item, keys[i], item[keys[i]]);
+            }
+
+            this.$bvToast.toast('The robot was successfully updated.', {
+                toaster: 'b-toaster-top-center',
+                variant: 'success',
+            });
+        },
     },
 };
 </script>
@@ -51,6 +62,7 @@ export default {
             :name="entityId"
             :realm-id="item.realm_id"
             :entity="item"
+            @updated="handleUpdated"
         />
     </div>
 </template>

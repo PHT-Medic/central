@@ -6,27 +6,30 @@
  */
 
 import {
+    BeforeInsert,
     Column,
     CreateDateColumn,
     Entity,
-    Index,
     JoinColumn,
     ManyToOne,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import { Ecosystem, Station, createNanoID } from '@personalhealthtrain/central-common';
 import { RealmEntity } from '@authelion/api-core';
 import { Realm } from '@authelion/common';
 
+@Unique(['name', 'realm_id'])
 @Entity({ name: 'stations' })
 export class StationEntity implements Station {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
-    @Index()
     @Column({
-        type: 'varchar', length: 100, select: false, default: createNanoID(),
+        type: 'varchar',
+        length: 100,
+        select: false,
+        unique: true,
     })
         secure_id: string;
 
@@ -86,4 +89,11 @@ export class StationEntity implements Station {
     @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'realm_id' })
         realm: RealmEntity;
+
+    @BeforeInsert()
+    setSecureId() {
+        if (!this.secure_id) {
+            this.secure_id = createNanoID();
+        }
+    }
 }

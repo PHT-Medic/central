@@ -42,7 +42,6 @@ export function useLogger() : Logger {
     logger = createLogger({
         format: format.combine(
             includeNamespaceInMessage(),
-            format.colorize({ all: true }),
             format.json(),
             format.timestamp(),
         ),

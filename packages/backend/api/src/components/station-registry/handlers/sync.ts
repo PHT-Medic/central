@@ -1,0 +1,176 @@
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import { useClient } from '@trapi/client';
+import { Message, publishMessage } from 'amqp-extension';
+import { In, getRepository } from 'typeorm';
+import { RealmEntity } from '@authelion/api-core';
+import { hasOwnProperty } from '@authelion/common';
+import { StationEntity } from '../../../domains/core/station/entity';
+import { ApiKey } from '../../../config/api';
+import { transformStationRegistryResponse } from '../utils/transform';
+import { buildSecretStorageQueueMessage } from '../../../domains/special/secret-storage/queue';
+import {
+    SecretStorageQueueCommand,
+    SecretStorageQueueEntityType,
+} from '../../../domains/special/secret-storage/constants';
+import { useLogger } from '../../../config/log';
+
+export async function syncStationRegistry(message: Message) {
+    const realmRepository = getRepository(RealmEntity);
+
+    let response = await useClient(ApiKey.AACHEN_STATION_REGISTRY).get('organizations');
+
+    const externalRealms = transformStationRegistryResponse(response.data)
+        .map((item) => realmRepository.create({
+            id: item.id,
+            name: item.name,
+        }));
+
+    useLogger()
+        .info(
+            `Read ${externalRealms.length} realms from the station-registry.`,
+            {
+                total: externalRealms.length,
+            },
+        );
+
+    const realms = await realmRepository.find({
+        id: In(externalRealms.map((item) => item.id)),
+    });
+    const realmIds = realms.map((item) => item.id);
+
+    const existingExternalRealms : RealmEntity[] = [];
+    const nonExistingExternalRealms : RealmEntity[] = [];
+
+    for (let i = 0; i < externalRealms.length; i++) {
+        const index = realmIds.indexOf(externalRealms[i].id);
+        if (index === -1) {
+            nonExistingExternalRealms.push(externalRealms[i]);
+        } else {
+            existingExternalRealms.push(realmRepository.merge(
+                realms[index],
+                externalRealms[i],
+            ));
+        }
+    }
+
+    if (nonExistingExternalRealms.length > 0) {
+        await realmRepository.save(nonExistingExternalRealms);
+
+        useLogger()
+            .info(
+                `Created ${nonExistingExternalRealms.length} realms from the station-registry.`,
+                { total: nonExistingExternalRealms.length },
+            );
+    }
+
+    if (existingExternalRealms.length > 0) {
+        await realmRepository.save(existingExternalRealms);
+
+        useLogger()
+            .info(
+                `Updated ${existingExternalRealms.length} realms from the station-registry.`,
+                { total: existingExternalRealms.length },
+            );
+    }
+
+    // -------------------------------------------------------------------------
+
+    const stationRepository = getRepository(StationEntity);
+    response = await useClient(ApiKey.AACHEN_STATION_REGISTRY).get('stations');
+
+    let externalStations = transformStationRegistryResponse(response.data)
+        .map((item) => stationRepository.create({
+            secure_id: item.id,
+            name: item.name,
+            realm_id: item.realm_id,
+        }))
+        .filter((item) => !!item.realm_id);
+
+    useLogger()
+        .info(
+            `Read ${externalStations.length} stations from the station-registry.`,
+            { total: externalStations.length },
+        );
+
+    const { data: stationPublicKeys } = await useClient(ApiKey.AACHEN_CENTRAL_SERVICE).get('stations/publickey');
+    if (typeof stationPublicKeys === 'object') {
+        for (let i = 0; i < externalStations.length; i++) {
+            if (
+                hasOwnProperty(stationPublicKeys, externalStations[i].secure_id) &&
+                typeof stationPublicKeys[externalStations[i].secure_id] === 'string'
+            ) {
+                externalStations[i].public_key = stationPublicKeys[externalStations[i].secure_id];
+            }
+        }
+    }
+
+    externalStations = externalStations.map((item) => {
+        item.secure_id = item.secure_id
+            .toLowerCase()
+            .replaceAll('-', '');
+
+        return item;
+    });
+
+    const stations = await stationRepository.find({
+        select: ['id', 'secure_id'],
+        where: {
+            secure_id: In(externalStations.map((item) => item.secure_id)),
+        },
+    });
+    const stationSecureIds = stations.map((item) => item.secure_id);
+
+    const existingExternalStations : StationEntity[] = [];
+    const nonExistingExternalStations : StationEntity[] = [];
+
+    for (let i = 0; i < externalStations.length; i++) {
+        const index = stationSecureIds.indexOf(externalStations[i].secure_id);
+        if (index === -1) {
+            nonExistingExternalStations.push(externalStations[i]);
+        } else {
+            existingExternalStations.push(stationRepository.merge(stations[index], externalStations[i]));
+        }
+    }
+
+    if (nonExistingExternalStations.length > 0) {
+        await stationRepository.save(nonExistingExternalStations);
+
+        useLogger()
+            .info(
+                `Created ${nonExistingExternalStations.length} stations from the station-registry.`,
+                { total: nonExistingExternalStations.length },
+            );
+    }
+
+    if (existingExternalStations.length > 0) {
+        await stationRepository.save(existingExternalStations);
+
+        useLogger()
+            .info(
+                `Updated ${existingExternalStations.length} stations from the station-registry.`,
+                { total: existingExternalStations.length },
+            );
+    }
+
+    externalStations = [...existingExternalStations, ...nonExistingExternalStations];
+
+    for (let i = 0; i < externalStations.length; i++) {
+        const queueMessage = buildSecretStorageQueueMessage(
+            SecretStorageQueueCommand.SAVE,
+            {
+                type: SecretStorageQueueEntityType.STATION,
+                id: externalStations[i].id,
+            },
+        );
+
+        await publishMessage(queueMessage);
+    }
+
+    return message;
+}

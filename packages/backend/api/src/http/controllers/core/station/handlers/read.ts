@@ -56,7 +56,7 @@ export async function getManyStationRouteHandler(req: ExpressRequest, res: Expre
     });
 
     applyFilters(query, filter, {
-        allowed: ['id', 'name', 'realm_id'],
+        allowed: ['id', 'name', 'hidden', 'realm_id'],
         defaultAlias: 'station',
     });
 

@@ -197,9 +197,7 @@ ComponentListProperties<MasterImage>
         });
 
         const noMore = buildListNoMore(this, createElement, {
-            text: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
-                'There are no more master-images available...',
-            ]),
+            text: 'There are no more master-images available...',
         });
         const pagination = buildListPagination(this, createElement);
 

@@ -8,6 +8,7 @@
 import Vue, { PropType } from 'vue';
 import { ServiceID } from '@personalhealthtrain/central-common';
 import RegistryManagement from '../../../../components/domains/service/RegistryManagement';
+import StationRegistryManagement from '../../../../components/domains/service/StationRegistryManagement';
 
 export default Vue.extend({
     props: {
@@ -21,6 +22,14 @@ export default Vue.extend({
                 },
                 on: {
                     updated: (event) => this.$emit('updated', event),
+                },
+            });
+        }
+
+        if (this.entityId === ServiceID.STATION_REGISTRY) {
+            return h(StationRegistryManagement, {
+                props: {
+                    entityId: this.entityId,
                 },
             });
         }

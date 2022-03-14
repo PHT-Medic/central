@@ -57,6 +57,13 @@ export async function runStationValidation(
 
     // -------------------------------------------------------------
 
+    await check('hidden')
+        .isBoolean()
+        .optional()
+        .run(req);
+
+    // -------------------------------------------------------------
+
     if (operation === 'create') {
         await check('realm_id')
             .exists()

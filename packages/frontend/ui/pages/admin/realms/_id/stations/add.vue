@@ -32,6 +32,12 @@ export default {
 
             this.$nuxt.$router.push(`/admin/realms/${this.entity.id}/stations/${e.id}`);
         },
+        handleFailed(e) {
+            this.$bvToast.toast(e.message, {
+                toaster: 'b-toaster-top-center',
+                variant: 'warning',
+            });
+        },
     },
 };
 </script>
@@ -40,5 +46,6 @@ export default {
         :realm-id="entity.id"
         :realm-name="entity.name"
         @created="handleCreated"
+        @failed="handleFailed"
     />
 </template>

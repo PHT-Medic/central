@@ -214,9 +214,7 @@ ComponentListProperties<UserSecret>
         });
 
         const noMore = buildListNoMore(this, createElement, {
-            text: createElement('div', { staticClass: 'alert alert-sm alert-info' }, [
-                'There are no more secrets available...',
-            ]),
+            text: 'There are no more secrets available...',
         });
         const pagination = buildListPagination(this, createElement);
 

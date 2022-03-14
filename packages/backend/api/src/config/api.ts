@@ -8,4 +8,7 @@
 export enum ApiKey {
     VAULT = 'vault',
     HARBOR = 'harbor',
+
+    AACHEN_CENTRAL_SERVICE = 'aachenCentralService',
+    AACHEN_STATION_REGISTRY = 'aachenStationRegistry',
 }

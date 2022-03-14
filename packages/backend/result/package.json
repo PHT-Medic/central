@@ -21,8 +21,8 @@
     "dependencies": {
         "@personalhealthtrain/central-common": "^1.2.2",
         "@trapi/client": "2.0.5",
-        "@authelion/common": "^0.0.1",
-        "@authelion/api-adapter": "^0.0.1",
+        "@authelion/common": "^0.0.2",
+        "@authelion/api-adapter": "^0.0.2",
         "@typescript-error/http": "^1.1.3",
         "amqp-extension": "^1.0.1",
         "body-parser": "^1.19.2",

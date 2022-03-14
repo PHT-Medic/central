@@ -245,6 +245,13 @@ export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Pr
 
         const stations = h('div', [
             h(StationList, {
+                props: {
+                    query: {
+                        filter: {
+                            hidden: false,
+                        },
+                    },
+                },
                 scopedSlots: {
                     [SlotName.HEADER_TITLE]: () => h('label', 'Stations'),
                     [SlotName.ITEM_ACTIONS]: (props) => {

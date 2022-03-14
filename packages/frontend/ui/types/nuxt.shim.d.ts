@@ -8,9 +8,9 @@
 import { HTTPClient } from '@personalhealthtrain/central-common';
 import { HTTPClient as AuthHTTPClient } from '@authelion/common';
 import AuthModule from '../config/auth';
-import {Store} from "vuex";
-import {SocketModule} from "../config/socket";
-import {BrowserStorageAdapter} from "browser-storage-adapter";
+import { Store } from "vuex";
+import { SocketModule } from "../config/socket";
+import { Adapter } from "browser-storage-adapter";
 
 declare module '@nuxt/types' {
     // nuxtContext.app.$myInjectedFunction inside asyncData, fetch, plugins, middleware, nuxtServerInit
@@ -20,8 +20,8 @@ declare module '@nuxt/types' {
 
     // nuxtContext.$myInjectedFunction
     interface Context {
-        $warehouse: BrowserStorageAdapter,
-        $authWarehouse: BrowserStorageAdapter,
+        $warehouse: Adapter,
+        $authWarehouse: Adapter,
 
         $api: HTTPClient,
         $authApi: AuthHTTPClient,

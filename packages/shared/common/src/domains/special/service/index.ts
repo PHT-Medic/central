@@ -9,5 +9,6 @@ export * from './api';
 export * from './registry';
 export * from './secret-engine';
 export * from './constants';
+export * from './station-registry';
 export * from './type';
 export * from './utils';

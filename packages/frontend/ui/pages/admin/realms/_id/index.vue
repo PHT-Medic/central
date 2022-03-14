@@ -19,11 +19,11 @@ export default {
         <div class="col">
             <h6><i class="fa fa-city" /> Station</h6>
             <p>
-                You can create a station and associate it to the current realm. <br>
-                This realm can than be the target for example of a proposal or a train.
+                Create one or more stations and associate them to the current realm. <br>
+                Those stations can be targeted by a proposal or train, if they are not marked as <strong>hidden</strong>.
             </p>
             <nuxt-link
-                :to="'/admin/realms/'+entity.id+'/station'"
+                :to="'/admin/realms/'+entity.id+'/stations'"
                 class="btn btn-xs btn-dark"
             >
                 Manage
@@ -45,7 +45,5 @@ export default {
                 Manage
             </nuxt-link>
         </div>
-
-        <hr>
     </div>
 </template>
