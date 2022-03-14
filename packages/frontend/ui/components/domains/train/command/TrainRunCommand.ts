@@ -57,13 +57,15 @@ export const TrainRunCommand = Vue.extend<any, ActionCommandMethods, any, TrainC
             if (
                 this.command === TrainCommand.RUN_START
             ) {
-                return [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.entity.run_status) === -1;
+                return this.entity.run_status &&
+                    [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.entity.run_status) === -1;
             }
 
             if (
                 this.command === TrainCommand.RUN_RESET
             ) {
-                return [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.entity.run_status) === -1;
+                return this.entity.run_status &&
+                    [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.entity.run_status) === -1;
             }
 
             return false;

@@ -5,12 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue, { PropType, VNodeData } from 'vue';
+import Vue, { PropType } from 'vue';
 import {
     PermissionID,
     Train, TrainBuildStatus, TrainCommand, TrainConfigurationStatus,
 } from '@personalhealthtrain/central-common';
-import { BDropdownItem } from 'bootstrap-vue';
 import { TrainCommandProperties } from './type';
 import { renderActionCommand } from '../../../render/utils';
 import { ActionCommandMethods } from '../../../render/type';

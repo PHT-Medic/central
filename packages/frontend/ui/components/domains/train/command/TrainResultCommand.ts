@@ -57,7 +57,11 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
             if (
                 this.command === 'resultDownload'
             ) {
-                return !this.entity.result_status;
+                return !this.entity.result_status ||
+                    (
+                        this.entity.result_status !== TrainResultStatus.FINISHED &&
+                        this.entity.result_status !== TrainResultStatus.DOWNLOADED
+                    );
             }
 
             if (

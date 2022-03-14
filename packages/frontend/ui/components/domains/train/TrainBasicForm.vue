@@ -31,7 +31,7 @@ export default {
                 name: '',
             },
             types: [
-                { id: TrainType.ANALYSE, name: 'Analyse' },
+                { id: TrainType.ANALYSE, name: 'Analysis' },
                 { id: TrainType.DISCOVERY, name: 'Discovery' },
             ],
         };

@@ -70,6 +70,14 @@ Content
     vertical-align: middle;
 }
 
+.list .list-item.active {
+    background-color: #d7d3d3;
+}
+
+.list .list-item div {
+    align-items: center !important;
+}
+
 .list .list-item div:first-child {
     margin-right: 0.5rem;
 }
