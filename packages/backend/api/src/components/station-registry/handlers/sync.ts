@@ -10,6 +10,7 @@ import { Message, publishMessage } from 'amqp-extension';
 import { In, getRepository } from 'typeorm';
 import { RealmEntity } from '@authelion/api-core';
 import { hasOwnProperty } from '@authelion/common';
+import { Ecosystem } from '@personalhealthtrain/central-common';
 import { StationEntity } from '../../../domains/core/station/entity';
 import { ApiKey } from '../../../config/api';
 import { transformStationRegistryResponse } from '../utils/transform';
@@ -89,6 +90,7 @@ export async function syncStationRegistry(message: Message) {
             secure_id: item.id,
             name: item.name,
             realm_id: item.realm_id,
+            ecosystem: Ecosystem.PADME,
         }))
         .filter((item) => !!item.realm_id);
 
