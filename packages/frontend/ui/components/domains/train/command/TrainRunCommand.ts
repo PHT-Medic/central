@@ -50,8 +50,8 @@ export const TrainRunCommand = Vue.extend<any, ActionCommandMethods, any, TrainC
                 this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_STOP);
         },
         isDisabled() {
-            if (this.entity.build_status !== TrainBuildStatus.FINISHED) {
-                return true;
+            if (this.entity.build_status === TrainBuildStatus.FINISHED) {
+                return false;
             }
 
             if (
