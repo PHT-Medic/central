@@ -14,7 +14,7 @@ import { MessageQueueRoutingKey } from '../config/mq';
 import { TrainEntity } from '../domains/core/train/entity';
 import { AggregatorTrainExtractorEvent } from '../domains/special/aggregator';
 import { extractTrainConfigFromTrainExtractorPayload } from '../domains/special/train-extractor/utils';
-import { syncTrainConfigRouteToDatabase } from '../domains/core/train-config/sync';
+import { syncTrainConfigToDatabase } from '../domains/core/train-config/sync';
 import { buildTrainBuilderQueueMessage } from '../domains/special/train-builder/queue';
 import { TrainBuilderCommand } from '../domains/special/train-builder/type';
 
@@ -60,7 +60,12 @@ async function handleTrainExtractorEvent(
                 return;
             }
 
-            await syncTrainConfigRouteToDatabase(config.route);
+            const result = await syncTrainConfigToDatabase(config);
+
+            train.run_station_id = result.stationId;
+            train.run_station_index = result.position;
+
+            await trainRepository.save(train);
 
             const queueMessage = await buildTrainBuilderQueueMessage(TrainBuilderCommand.META_BUILD, train);
             await publishMessage(queueMessage);

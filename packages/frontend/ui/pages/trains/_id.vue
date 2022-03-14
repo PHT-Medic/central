@@ -4,9 +4,11 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
 import Vue from 'vue';
-import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
+import { Socket } from 'socket.io-client';
+import { SocketClientToServerEvents, SocketServerToClientEvents } from '@personalhealthtrain/central-common';
+import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 import TrainName from '../../components/domains/train/TrainName';
 
 export default {
@@ -17,14 +19,14 @@ export default {
     },
     async asyncData(context) {
         try {
-            const item = await context.$api.train.getOne(context.params.id, {
+            const entity = await context.$api.train.getOne(context.params.id, {
                 relations: {
                     proposal: true,
                 },
             });
 
             return {
-                item,
+                entity,
             };
         } catch (e) {
             await context.redirect('/trains');
@@ -36,7 +38,7 @@ export default {
     },
     data() {
         return {
-            item: undefined,
+            entity: undefined,
             tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
                 { name: 'Setup', icon: 'fa fa-wrench', urlSuffix: '/setup' },
@@ -44,30 +46,36 @@ export default {
         };
     },
     mounted() {
-        const socket = this.$socket.useRealmWorkspace(this.item.realm_id);
-        socket.emit('trainsSubscribe', { data: { id: this.item.id } });
+        const socket : Socket<
+        SocketServerToClientEvents,
+        SocketClientToServerEvents
+        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
+        socket.emit('trainsSubscribe', { data: { id: this.entity.id } });
         socket.on('trainUpdated', this.handleSocketUpdated);
         socket.on('trainDeleted', this.handleSocketDeleted);
     },
     beforeDestroy() {
-        const socket = this.$socket.useRealmWorkspace(this.item.realm_id);
-        socket.emit('trainsUnsubscribe', { data: { id: this.item.id } });
+        const socket : Socket<
+        SocketServerToClientEvents,
+        SocketClientToServerEvents
+        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
+        socket.emit('trainsUnsubscribe', { data: { id: this.entity.id } });
         socket.off('trainUpdated', this.handleSocketUpdated);
         socket.off('trainDeleted', this.handleSocketDeleted);
     },
     methods: {
         handleSocketUpdated(context) {
             if (
-                this.item.id !== context.data.id ||
-                context.meta.roomId !== this.item.id
+                this.entity.id !== context.data.id ||
+                context.meta.roomId !== this.entity.id
             ) return;
 
             this.handleUpdated(context.data);
         },
         async handleSocketDeleted(context) {
             if (
-                this.item.id !== context.data.id ||
-                context.meta.roomId !== this.item.id
+                this.entity.id !== context.data.id ||
+                context.meta.roomId !== this.entity.id
             ) return;
 
             await this.$nuxt.$router.push('/trains');
@@ -75,7 +83,7 @@ export default {
         handleUpdated(data) {
             const keys = Object.keys(data);
             for (let i = 0; i < keys.length; i++) {
-                Vue.set(this.item, keys[i], data[keys[i]]);
+                Vue.set(this.entity, keys[i], data[keys[i]]);
             }
         },
     },
@@ -87,8 +95,8 @@ export default {
             🚊 Train
             <span class="sub-title">
                 <train-name
-                    :entity-id="item.id"
-                    :entity-name="item.name"
+                    :entity-id="entity.id"
+                    :entity-name="entity.name"
                 />
             </span>
         </h1>
@@ -111,8 +119,8 @@ export default {
                                     v-for="(tab,key) in tabs"
                                     :key="key"
                                     :disabled="tab.active"
-                                    :to="'/trains/' + item.id + tab.urlSuffix"
-                                    :active="$route.path.startsWith('/trains/'+item.id + tab.urlSuffix) && tab.urlSuffix.length !== 0"
+                                    :to="'/trains/' + entity.id + tab.urlSuffix"
+                                    :active="$route.path.startsWith('/trains/'+entity.id + tab.urlSuffix) && tab.urlSuffix.length !== 0"
                                     exact-active-class="active"
                                     exact
                                 >
@@ -127,7 +135,7 @@ export default {
         </div>
 
         <nuxt-child
-            :train="item"
+            :entity="entity"
             @updated="handleUpdated"
         />
     </div>

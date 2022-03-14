@@ -10,7 +10,7 @@ export type TrainConfigRouteItem = {
     eco_system: string,
     rsa_public_key: string,
     index: number,
-    signature: string | null,
+    signature: Record<string, any> | null,
     encrypted_key: string | null
 };
 

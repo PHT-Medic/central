@@ -4,16 +4,15 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import { PropType } from 'vue';
+import { Train } from '@personalhealthtrain/central-common';
 import TrainWizard from '../../../components/domains/train/wizard/TrainWizard';
 
 export default {
     components: { TrainWizard },
     props: {
-        train: {
-            type: Object,
-            default: undefined,
-        },
+        entity: Object as PropType<Train>,
     },
     methods: {
         handleUpdated(train) {
@@ -24,7 +23,7 @@ export default {
 </script>
 <template>
     <train-wizard
-        :entity="train"
+        :entity="entity"
         @updated="handleUpdated"
     />
 </template>

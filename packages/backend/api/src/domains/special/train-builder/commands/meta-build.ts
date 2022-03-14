@@ -14,6 +14,9 @@ import { buildTrainBuilderStationsProperty } from './utils';
 export async function buildTrainBuilderMetaCommandPayload(train: Train) : Promise<Partial<TrainBuilderMetaPayload>> {
     const message : Partial<TrainBuilderMetaPayload> = {
         id: train.id,
+        runStatus: train.run_status,
+        runStationId: train.run_station_id,
+        runStationIndex: train.run_station_index,
     };
 
     message.stations = await buildTrainBuilderStationsProperty(train.id);

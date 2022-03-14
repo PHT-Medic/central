@@ -10,7 +10,6 @@ import { Station, TrainStationRunStatus } from '@personalhealthtrain/central-com
 export type AggregatorTrainEventPayload = {
     id: string,
     stationId?: Station['id'],
-    stationIndex?: number,
     status?: TrainStationRunStatus,
     artifactTag?: string,
     artifactDigest?: string

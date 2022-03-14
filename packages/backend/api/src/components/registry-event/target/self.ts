@@ -12,19 +12,20 @@ import {
     REGISTRY_OUTGOING_PROJECT_NAME,
     REGISTRY_SYSTEM_USER_NAME,
     TrainStationRunStatus,
-    isRegistryStationProjectName,
+    getRegistryStationProjectNameId, isRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
 
+import { getRepository } from 'typeorm';
 import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../../domains/special/registry';
-import { DispatcherHarborEventWithAdditionalData } from '../extend';
 import { AggregatorRegistryEvent, buildAggregatorRegistryQueueMessage } from '../../../domains/special/aggregator';
 import { useLogger } from '../../../config/log';
+import { StationEntity } from '../../../domains/core/station/entity';
 
 export async function dispatchRegistryEventToSelf(
     message: Message,
 ) : Promise<Message> {
     const type : RegistryQueueEvent = message.type as RegistryQueueEvent;
-    const data : DispatcherHarborEventWithAdditionalData = message.data as RegistryEventQueuePayload;
+    const data : RegistryEventQueuePayload = message.data as RegistryEventQueuePayload;
 
     if (type !== RegistryQueueEvent.PUSH_ARTIFACT) {
         useLogger()
@@ -67,35 +68,25 @@ export async function dispatchRegistryEventToSelf(
     // station project
     const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
     if (isStationProject) {
-        if (
-            typeof data.station === 'undefined' ||
-            typeof data.stationIndex === 'undefined'
-        ) {
-            return message;
-        }
+        const stationRepository = getRepository(StationEntity);
+        const station = await stationRepository.findOne({
+            secure_id: getRegistryStationProjectNameId(data.namespace),
+        });
 
-        // If stationIndex is 0, then the target is the first station of the route.
-        if (data.stationIndex === 0) {
-            await publishMessage(buildAggregatorRegistryQueueMessage(
-                AggregatorRegistryEvent.TRAIN_STARTED,
-                {
-                    id: data.repositoryName,
-                    stationId: data.station.id,
-                },
-            ));
+        if (typeof station === 'undefined') {
+            return message;
         }
 
         await publishMessage(buildAggregatorRegistryQueueMessage(
             AggregatorRegistryEvent.TRAIN_MOVED,
             {
                 id: data.repositoryName,
-                stationId: data.station.id,
-                stationIndex: data.stationIndex,
                 status: data.operator === REGISTRY_SYSTEM_USER_NAME ?
                     TrainStationRunStatus.ARRIVED :
                     TrainStationRunStatus.DEPARTED,
                 artifactTag: data.artifactTag,
                 artifactDigest: data.artifactDigest,
+                stationId: station.id,
             },
         ));
     }

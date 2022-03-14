@@ -4,17 +4,16 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import { PropType } from 'vue';
+import { Train } from '@personalhealthtrain/central-common';
 import TrainPipeline from '../../../components/domains/train/TrainPipeline';
 import TrainStationsProgress from '../../../components/domains/train-station/TrainStationsProgress';
 
 export default {
     components: { TrainStationsProgress, TrainPipeline },
     props: {
-        train: {
-            type: Object,
-            default: undefined,
-        },
+        entity: Object as PropType<Train>,
     },
     methods: {
         handleUpdated(train) {
@@ -30,9 +29,9 @@ export default {
 <template>
     <div>
         <div class="panel-box mb-3">
-            <h6><i class="fa fa-city" /> <span class="text-info">{{ train.stations }}</span> Station(s)</h6>
+            <h6><i class="fa fa-city" /> <span class="text-info">{{ entity.stations }}</span> Station(s)</h6>
 
-            <train-stations-progress :entity="train" />
+            <train-stations-progress :entity="entity" />
         </div>
         <div class="row">
             <div class="col-12 col-md-5">
@@ -41,7 +40,7 @@ export default {
 
                     <train-pipeline
                         :list-direction="'column'"
-                        :entity="train"
+                        :entity="entity"
                         @updated="handleUpdated"
                         @failed="handleFailed"
                     />

@@ -6,31 +6,27 @@
  */
 
 import { ConsumeHandler, Message } from 'amqp-extension';
-import { extendRegistryData } from './extend';
 import { dispatchRegistryEventToTrainExtractor } from './target/train-extractor';
 import { dispatchRegistryEventToSelf } from './target/self';
 import { dispatchRegistryEventToTrainRouter } from './target/train-router';
 import { RegistryQueueEvent } from '../../domains/special/registry';
-import { useSpinner } from '../../config/spinner';
+import { useLogger } from '../../config/log';
 
 async function handleEvent(message: Message) {
-    const spinner = useSpinner();
-
     return Promise.resolve(message)
         .then((message) => {
-            spinner.start(`handling ${message.type} event...`);
+            useLogger().info(`Handling ${message.type} event...`, { component: 'registry-event' });
             return message;
         })
-        .then(extendRegistryData)
         .then(dispatchRegistryEventToSelf)
         .then(dispatchRegistryEventToTrainRouter)
         .then(dispatchRegistryEventToTrainExtractor)
         .then((message) => {
-            spinner.succeed(`handled ${message.type}  event.`);
+            useLogger().info(`Handled ${message.type}  event.`, { component: 'registry-event' });
             return message;
         })
         .catch((e) => {
-            spinner.fail(`handling ${message.type}  failed.`);
+            useLogger().info(`Handling ${message.type}  failed.`, { component: 'registry-event' });
             throw e;
         });
 }

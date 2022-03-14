@@ -22,16 +22,12 @@ export async function handleRegistryTrainEvent(message: Message) {
     switch (message.type) {
         case AggregatorRegistryEvent.TRAIN_INITIALIZED:
             entity.build_status = TrainBuildStatus.FINISHED;
-            break;
-        case AggregatorRegistryEvent.TRAIN_STARTED:
-            entity.run_status = TrainRunStatus.RUNNING;
-            entity.run_station_id = null;
+
             entity.run_station_index = null;
+            entity.run_station_id = null;
             break;
         case AggregatorRegistryEvent.TRAIN_MOVED:
             entity.run_status = TrainRunStatus.RUNNING;
-            entity.run_station_id = data.stationId;
-            entity.run_station_index = data.stationIndex;
             break;
         case AggregatorRegistryEvent.TRAIN_FINISHED:
             entity.run_status = TrainRunStatus.FINISHED;

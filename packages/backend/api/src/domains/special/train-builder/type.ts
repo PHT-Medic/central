@@ -7,7 +7,7 @@
 
 import {
     Ecosystem,
-    MasterImage, Station, Train, UserSecret,
+    MasterImage, Station, Train, TrainRunStatus, UserSecret,
 } from '@personalhealthtrain/central-common';
 import { User } from '@authelion/common';
 
@@ -50,6 +50,9 @@ export type TrainBuilderStartPayload = {
 
 export type TrainBuilderMetaPayload = {
     id: Train['id'],
+    runStatus: TrainRunStatus | null,
+    runStationId: Train['run_station_id'],
+    runStationIndex: Train['run_station_index'],
 
     stations: TrainBuilderStation[],
 };
