@@ -8,6 +8,7 @@
 import {
     Logger, createLogger, format, transports,
 } from 'winston';
+
 import path from 'path';
 import { getWritableDirPath } from '../paths';
 
@@ -51,6 +52,7 @@ export function useLogger() : Logger {
                 filename: path.join(getWritableDirPath(), 'error.log'),
                 level: 'warn',
             }),
+            new transports.File({ filename: path.join(getWritableDirPath(), 'combined.log') }),
         ],
     });
 

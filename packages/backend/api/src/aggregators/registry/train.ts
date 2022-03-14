@@ -11,11 +11,15 @@ import { TrainBuildStatus, TrainRunStatus } from '@personalhealthtrain/central-c
 import { TrainEntity } from '../../domains/core/train/entity';
 import { TrainStationEntity } from '../../domains/core/train-station/entity';
 import { AggregatorRegistryEvent, AggregatorTrainEventPayload } from '../../domains/special/aggregator';
+import { useLogger } from '../../config/log';
 
 export async function handleRegistryTrainEvent(message: Message) {
     const repository = getRepository(TrainEntity);
 
     const data : AggregatorTrainEventPayload = message.data as AggregatorTrainEventPayload;
+
+    useLogger()
+        .info(`Received registry ${message.type} event.`, { aggregator: 'registry', payload: message.data });
 
     const entity = await repository.findOne(data.id);
 

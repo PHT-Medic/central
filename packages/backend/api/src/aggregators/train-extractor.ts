@@ -17,6 +17,7 @@ import { extractTrainConfigFromTrainExtractorPayload } from '../domains/special/
 import { syncTrainConfigToDatabase } from '../domains/core/train-config/sync';
 import { buildTrainBuilderQueueMessage } from '../domains/special/train-builder/queue';
 import { TrainBuilderCommand } from '../domains/special/train-builder/type';
+import { useLogger } from '../config/log';
 
 const EventStatusMap : Record<AggregatorTrainExtractorEvent, TrainResultStatus | null> = {
     [AggregatorTrainExtractorEvent.STARTING]: TrainResultStatus.STARTING,
@@ -39,6 +40,9 @@ async function handleTrainExtractorEvent(
         return;
     }
 
+    useLogger()
+        .info(`Received train-extractor ${event} event.`, { aggregator: 'train-extractor', payload: data });
+
     const trainRepository = getRepository(TrainEntity);
 
     const train = await trainRepository.findOne(data.repositoryName);
@@ -55,7 +59,9 @@ async function handleTrainExtractorEvent(
             break;
         }
         case TrainExtractorMode.READ: {
+            console.log(data);
             const config = extractTrainConfigFromTrainExtractorPayload(data);
+            console.log(config);
             if (typeof config === 'undefined') {
                 return;
             }

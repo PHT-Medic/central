@@ -5,21 +5,25 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainRunStatus } from '@personalhealthtrain/central-common';
+import { Train, TrainRunStatus } from '@personalhealthtrain/central-common';
 import { Message, consumeQueue } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import { MessageQueueRoutingKey } from '../config/mq';
 import { TrainEntity } from '../domains/core/train/entity';
 import { AggregatorTrainRouterEvent } from '../domains/special/aggregator';
+import { useLogger } from '../config/log';
 
 const EventStatusMap : Record<AggregatorTrainRouterEvent, TrainRunStatus> = {
     [AggregatorTrainRouterEvent.STOPPED]: TrainRunStatus.STOPPED,
     [AggregatorTrainRouterEvent.FAILED]: TrainRunStatus.FAILED,
 };
 
-async function updateTrain(trainId: string, event: AggregatorTrainRouterEvent) {
+async function updateTrain(id: Train['id'], event: AggregatorTrainRouterEvent) {
+    useLogger()
+        .info(`Received train-router ${event} event.`, { aggregator: 'train-router', payload: { id } });
+
     const repository = getRepository(TrainEntity);
-    const entity = await repository.findOne(trainId);
+    const entity = await repository.findOne(id);
     if (typeof entity === 'undefined') {
         return;
     }
