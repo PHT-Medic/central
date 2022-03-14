@@ -103,12 +103,14 @@ export const StationForm = Vue.extend({
         },
 
         updatedAt() {
-            return this.isEditing ? this.entity.updated_at : undefined;
+            return this.entity ?
+                this.entity.updated_at :
+                undefined;
         },
     },
     watch: {
         updatedAt(val, oldVal) {
-            if (val && val !== oldVal) {
+            if (val !== oldVal) {
                 this.initFromProperties();
             }
         },
@@ -171,7 +173,6 @@ export const StationForm = Vue.extend({
         resetSecureId() {
             this.form.secure_id = this.entity.secure_id;
         },
-
     },
     render(createElement: CreateElement): VNode {
         const vm = this;

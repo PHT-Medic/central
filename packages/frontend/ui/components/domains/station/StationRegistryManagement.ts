@@ -22,6 +22,10 @@ export default Vue.extend({
         projectName() {
             return buildRegistryStationProjectName(this.entity.secure_id);
         },
+        isEditing() {
+            return this.entity &&
+                Object.prototype.hasOwnProperty.call(this.entity, 'id');
+        },
     },
     methods: {
         async createProject() {

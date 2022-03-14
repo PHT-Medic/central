@@ -7,7 +7,7 @@
 
 import Vue, { CreateElement, VNode } from 'vue';
 import { required } from 'vuelidate/lib/validators';
-import { buildFormSelect } from '@vue-layout/utils';
+import { SlotName, buildFormSelect } from '@vue-layout/utils';
 import { MasterImageList } from './MasterImageList';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 
@@ -213,32 +213,30 @@ export const MasterImagePicker = Vue.extend({
                         query: vm.imageQuery,
                     },
                     scopedSlots: {
-                        items(props) {
-                            return buildFormSelect(vm, h, {
-                                validationTranslator: buildVuelidateTranslator(this.$ilingo),
-                                options: props.items.map((item) => ({
-                                    id: item.id,
-                                    value: item.name,
-                                })),
-                                propName: 'master_image_id',
-                                domProps: {
-                                    disabled: props.busy,
-                                },
-                                attrs: {
-                                    disabled: props.busy,
-                                },
-                                title: [
-                                    'Image',
-                                    (vm.form.master_image_id ?
-                                        h('i', { staticClass: 'ml-1 fa fa-check text-success' }) :
-                                        h()
-                                    ),
-                                ],
-                                changeCallback(value) {
-                                    vm.setImage.call(null, { id: value });
-                                },
-                            });
-                        },
+                        [SlotName.ITEMS]: (props) => buildFormSelect(vm, h, {
+                            validationTranslator: buildVuelidateTranslator(this.$ilingo),
+                            options: props.items.map((item) => ({
+                                id: item.id,
+                                value: item.name,
+                            })),
+                            propName: 'master_image_id',
+                            domProps: {
+                                disabled: props.busy,
+                            },
+                            attrs: {
+                                disabled: props.busy,
+                            },
+                            title: [
+                                'Image',
+                                (vm.form.master_image_id ?
+                                    h('i', { staticClass: 'ml-1 fa fa-check text-success' }) :
+                                    h()
+                                ),
+                            ],
+                            changeCallback(value) {
+                                vm.setImage.call(null, { id: value });
+                            },
+                        }),
                     },
                 }),
             ]);

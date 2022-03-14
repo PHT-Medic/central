@@ -26,6 +26,10 @@ export default Vue.extend({
         pathName() {
             return buildStationSecretStorageKey(this.entity.secure_id);
         },
+        isEditing() {
+            return this.entity &&
+                Object.prototype.hasOwnProperty.call(this.entity, 'id');
+        },
     },
     methods: {
         async saveEngineKey() {

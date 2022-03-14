@@ -105,7 +105,8 @@ export async function syncStationRegistry(message: Message) {
                 hasOwnProperty(stationPublicKeys, externalStations[i].secure_id) &&
                 typeof stationPublicKeys[externalStations[i].secure_id] === 'string'
             ) {
-                externalStations[i].public_key = stationPublicKeys[externalStations[i].secure_id];
+                externalStations[i].public_key = Buffer.from(stationPublicKeys[externalStations[i].secure_id], 'base64')
+                    .toString('hex');
             }
         }
     }

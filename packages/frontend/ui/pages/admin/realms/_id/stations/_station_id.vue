@@ -7,6 +7,12 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import { Realm } from '@authelion/common';
+import { Socket } from 'socket.io-client';
+import {
+    SocketClientToServerEvents,
+    SocketServerToClientEventContext, SocketServerToClientEvents,
+    Station,
+} from '@personalhealthtrain/central-common';
 import { StationForm } from '../../../../../components/domains/station/StationForm';
 
 export default Vue.extend({
@@ -59,7 +65,37 @@ export default Vue.extend({
             childEntity: undefined,
         };
     },
+    created() {
+        const socket : Socket<
+        SocketServerToClientEvents,
+        SocketClientToServerEvents
+        > = this.$socket.useRealmWorkspace(this.entity.id);
+
+        if (this.childEntity) {
+            socket.emit('stationsSubscribe', { data: { id: this.childEntity.id } });
+            socket.on('stationUpdated', this.handleSocketCreated);
+        }
+    },
+    beforeDestroy() {
+        const socket : Socket<
+        SocketServerToClientEvents,
+        SocketClientToServerEvents
+        > = this.$socket.useRealmWorkspace(this.entity.id);
+
+        if (this.childEntity) {
+            socket.emit('stationsUnsubscribe', { data: { id: this.childEntity.id } });
+            socket.off('stationUpdated', this.handleSocketCreated);
+        }
+    },
     methods: {
+        handleSocketUpdated(context: SocketServerToClientEventContext<Station>) {
+            if (
+                this.childEntity.id !== context.data.id ||
+                context.meta.roomId !== this.childEntity.id
+            ) return;
+
+            this.handleUpdated(context.data);
+        },
         handleUpdated(item) {
             const keys = Object.keys(item);
             for (let i = 0; i < keys.length; i++) {
