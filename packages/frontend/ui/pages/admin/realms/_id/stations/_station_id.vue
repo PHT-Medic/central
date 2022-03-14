@@ -13,9 +13,11 @@ import {
     SocketServerToClientEventContext, SocketServerToClientEvents,
     Station,
 } from '@personalhealthtrain/central-common';
+import { ComponentListHandlerMethodOptions } from '@vue-layout/utils';
 import { StationForm } from '../../../../../components/domains/station/StationForm';
 
-export default Vue.extend({
+// todo: add data, prop, method typing
+export default Vue.extend<any, any, any, any>({
     components: { StationForm },
     props: {
         entity: {
@@ -44,6 +46,8 @@ export default Vue.extend({
             });
 
             if (stations.length === 0) {
+                await context.redirect(`/admin/realms/${context.params.id}/stations`);
+
                 return {
                     childEntity: undefined,
                 };
@@ -73,7 +77,7 @@ export default Vue.extend({
 
         if (this.childEntity) {
             socket.emit('stationsSubscribe', { data: { id: this.childEntity.id } });
-            socket.on('stationUpdated', this.handleSocketCreated);
+            socket.on('stationUpdated', this.handleSocketUpdated);
         }
     },
     beforeDestroy() {
@@ -84,7 +88,7 @@ export default Vue.extend({
 
         if (this.childEntity) {
             socket.emit('stationsUnsubscribe', { data: { id: this.childEntity.id } });
-            socket.off('stationUpdated', this.handleSocketCreated);
+            socket.off('stationUpdated', this.handleSocketUpdated);
         }
     },
     methods: {
@@ -94,18 +98,26 @@ export default Vue.extend({
                 context.meta.roomId !== this.childEntity.id
             ) return;
 
-            this.handleUpdated(context.data);
+            this.handleUpdated(context.data, { displayMessage: false });
         },
-        handleUpdated(item) {
+        handleUpdated(
+            item: Station,
+            options?: ComponentListHandlerMethodOptions<Station> & {displayMessage?: boolean},
+        ) {
+            options = options || {};
+            options.displayMessage = options.displayMessage ?? true;
+
             const keys = Object.keys(item);
             for (let i = 0; i < keys.length; i++) {
                 Vue.set(this.childEntity, keys[i], item[keys[i]]);
             }
 
-            this.$bvToast.toast('The station was successfully updated.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
+            if (options.displayMessage) {
+                this.$bvToast.toast('The station was successfully updated.', {
+                    toaster: 'b-toaster-top-center',
+                    variant: 'success',
+                });
+            }
         },
         async handleDeleted() {
             this.$bvToast.toast('The station was successfully deleted.', {

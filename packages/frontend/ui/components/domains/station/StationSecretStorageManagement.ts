@@ -12,7 +12,8 @@ import {
     buildStationSecretStorageKey,
 } from '@personalhealthtrain/central-common';
 
-export default Vue.extend({
+// todo: add data, prop, method typing
+export default Vue.extend<any, any, any, any>({
     name: 'StationSecretStorageManagement',
     props: {
         entity: Object as PropType<Station>,

@@ -173,6 +173,9 @@ export const StationForm = Vue.extend({
         resetSecureId() {
             this.form.secure_id = this.entity.secure_id;
         },
+        handleUpdated(item) {
+            this.$emit('updated', item);
+        },
     },
     render(createElement: CreateElement): VNode {
         const vm = this;

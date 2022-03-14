@@ -214,7 +214,7 @@ export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Pr
                         click($event) {
                             $event.preventDefault();
 
-                            vm.toggleFormData.call(null, ['risk', value.id]);
+                            vm.toggleFormData.call(null, 'risk', value.id);
                         },
                     },
                 }, [

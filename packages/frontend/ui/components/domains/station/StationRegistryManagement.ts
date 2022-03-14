@@ -8,7 +8,11 @@
 import Vue, { CreateElement, PropType, VNode } from 'vue';
 import { RegistryCommand, Station, buildRegistryStationProjectName } from '@personalhealthtrain/central-common';
 
-export default Vue.extend({
+// todo: add data, prop, method typing
+type Properties = {
+    entity: Station
+};
+export default Vue.extend<any, any, any, Properties>({
     name: 'StationRegistryManagement',
     props: {
         entity: Object as PropType<Station>,
