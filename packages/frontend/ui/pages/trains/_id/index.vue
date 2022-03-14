@@ -7,8 +7,8 @@
 <script lang="ts">
 import { PropType } from 'vue';
 import { Train } from '@personalhealthtrain/central-common';
-import TrainPipeline from '../../../components/domains/train/TrainPipeline';
-import TrainStationsProgress from '../../../components/domains/train-station/TrainStationsProgress';
+import TrainPipeline from '../../../components/domains/train/TrainPipeline.vue';
+import TrainStationsProgress from '../../../components/domains/train-station/TrainStationsProgress.vue';
 
 export default {
     components: { TrainStationsProgress, TrainPipeline },

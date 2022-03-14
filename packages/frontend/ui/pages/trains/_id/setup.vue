@@ -7,7 +7,7 @@
 <script lang="ts">
 import { PropType } from 'vue';
 import { Train } from '@personalhealthtrain/central-common';
-import TrainWizard from '../../../components/domains/train/wizard/TrainWizard';
+import TrainWizard from '../../../components/domains/train/wizard/TrainWizard.vue';
 
 export default {
     components: { TrainWizard },

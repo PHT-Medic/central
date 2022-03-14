@@ -9,7 +9,7 @@ import Vue from 'vue';
 import { Socket } from 'socket.io-client';
 import { SocketClientToServerEvents, SocketServerToClientEvents } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
-import TrainName from '../../components/domains/train/TrainName';
+import TrainName from '../../components/domains/train/TrainName.vue';
 
 export default {
     components: { TrainName },
