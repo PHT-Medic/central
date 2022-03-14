@@ -55,6 +55,14 @@ export async function createTrainStationRouteHandler(req: ExpressRequest, res: E
         entity.approval_status = TrainStationApprovalStatus.APPROVED;
     }
 
+    if (!entity.position) {
+        const trainStations = await repository.count({
+            train_id: entity.train_id,
+        });
+
+        entity.position = trainStations + 1;
+    }
+
     entity = await repository.save(entity);
 
     train.stations += 1;
