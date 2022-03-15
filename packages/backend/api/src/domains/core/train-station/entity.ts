@@ -27,6 +27,7 @@ import { Realm } from '@authelion/common';
 import { TrainEntity } from '../train/entity';
 import { StationEntity } from '../station/entity';
 
+@Unique(['index', 'train_id'])
 @Unique(['station_id', 'train_id'])
 @Entity({ name: 'train_stations' })
 export class TrainStationEntity implements TrainStation {
@@ -47,7 +48,7 @@ export class TrainStationEntity implements TrainStation {
         comment: string;
 
     @Column({ type: 'int', unsigned: true, nullable: true })
-        position: number;
+        index: number;
 
     @Column({ type: 'varchar', length: 32, nullable: true })
         artifact_tag: string | null;

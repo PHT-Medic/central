@@ -1,4 +1,4 @@
-import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { PermissionID } from '@personalhealthtrain/central-common';
@@ -8,10 +8,6 @@ import { runTrainStationValidation } from './utils';
 
 export async function updateTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
-
-    if (typeof id !== 'string') {
-        throw new BadRequestError('The train-station id is not valid.');
-    }
 
     const repository = getRepository(TrainStationEntity);
     let trainStation = await repository.findOne(id);
@@ -33,25 +29,25 @@ export async function updateTrainStationRouteHandler(req: ExpressRequest, res: E
         throw new ForbiddenError();
     }
 
-    const data : Partial<TrainStationEntity> = await runTrainStationValidation(req, 'update');
+    const result = await runTrainStationValidation(req, 'update');
 
     if (!isAuthorityOfStation) {
-        if (data.approval_status) {
-            delete data.approval_status;
+        if (result.data.approval_status) {
+            delete result.data.approval_status;
         }
 
-        if (data.comment) {
-            delete data.comment;
+        if (result.data.comment) {
+            delete result.data.comment;
         }
     }
 
     if (!isAuthorityOfTrain) {
-        if (data.position) {
-            delete data.position;
+        if (result.data.index) {
+            delete result.data.index;
         }
     }
 
-    trainStation = repository.merge(trainStation, data);
+    trainStation = repository.merge(trainStation, result.data);
 
     trainStation = await repository.save(trainStation);
 

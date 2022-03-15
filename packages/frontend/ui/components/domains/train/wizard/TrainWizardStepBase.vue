@@ -63,10 +63,6 @@ export default {
         };
     },
     computed: {
-        selectedTrainStations() {
-            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-            return this.trainStation.items.sort((a, b) => (a.position > b.position ? 1 : -1));
-        },
         realmId() {
             return this.$store.getters['auth/userRealmId'];
         },
@@ -104,9 +100,17 @@ export default {
         },
         handleTrainStationCreated(item) {
             this.$refs.trainStationList.handleCreated(item);
+
+            if (item.train) {
+                this.$emit('updated', item.train);
+            }
         },
         handleTrainStationDeleted(item) {
             this.$refs.trainStationList.handleDeleted(item);
+
+            if (item.train) {
+                this.$emit('updated', item.train);
+            }
         },
     },
 };

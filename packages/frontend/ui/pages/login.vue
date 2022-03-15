@@ -5,13 +5,17 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import Vue, { CreateElement, VNode } from 'vue';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
 import { OAuth2Provider } from '@authelion/common';
 import { BuildInput } from '@trapi/query';
+import { SlotName, buildFormInput, buildFormSubmit } from '@vue-layout/utils';
+import { OAuth2ProviderList } from '@authelion/vue';
 import MedicineWorker from '../components/svg/MedicineWorker';
-import { LayoutKey, LayoutNavigationID } from '../config/layout/contants';
+import { LayoutKey, LayoutNavigationID } from '../config/layout';
+import { buildVuelidateTranslator } from '../config/ilingo/utils';
 
-export default {
+export default Vue.extend({
     components: { MedicineWorker },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_OUT]: true,
@@ -30,14 +34,14 @@ export default {
             },
             error: null,
             busy: false,
-            formData: {
+            form: {
                 name: '',
                 password: '',
             },
         };
     },
     validations: {
-        formData: {
+        form: {
             name: {
                 required,
                 minLength: minLength(3),
@@ -76,14 +80,17 @@ export default {
             this.error = null;
 
             try {
-                const { name, password } = this.formData;
+                const { name, password } = this.form;
 
                 await this.$store.dispatch('auth/triggerLogin', { name, password });
 
                 await this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
             } catch (e) {
                 if (e instanceof Error) {
-                    this.error = e.message;
+                    this.$bvToast.toast(e.message, {
+                        toaster: 'b-toaster-top-center',
+                        variant: 'warning',
+                    });
                 }
             }
 
@@ -94,160 +101,97 @@ export default {
             return this.$authApi.oauth2Provider.getAuthorizeUri(this.$config.apiUrl, provider.id);
         },
     },
-};
+    render(createElement: CreateElement): VNode {
+        const vm = this;
+        const h = createElement;
+        const name = buildFormInput(vm, h, {
+            validationTranslator: buildVuelidateTranslator(this.$ilingo),
+            title: 'Name / E-Mail',
+            propName: 'name',
+        });
+        const password = buildFormInput(vm, h, {
+            validationTranslator: buildVuelidateTranslator(this.$ilingo),
+            title: 'Passwort',
+            propName: 'password',
+            attrs: {
+                type: 'password',
+            },
+        });
+        const submit = buildFormSubmit(vm, h, {
+            createIconClass: 'fa-solid fa-right-to-bracket',
+            createButtonClass: 'btn btn-dark btn-sm btn-block',
+            createText: 'Login',
+        });
+        return h('div', { staticClass: 'container' }, [
+            h('h4', 'Login'),
+            h('div', { staticClass: 'text-center' }, [
+                h(MedicineWorker, {
+                    props: {
+                        width: 400,
+                        height: 'auto',
+                    },
+                }),
+            ]),
+            h('form', {
+                on: {
+                    submit($event) {
+                        $event.preventDefault();
+                        return vm.submit.call(null);
+                    },
+                },
+            }, [
+                h('div', { staticClass: 'row' }, [
+                    h('div', { staticClass: 'col-12 col-sm-6' }, [
+                        h('h6', 'Master'),
+                        name,
+                        password,
+                        submit,
+                    ]),
+                    h('div', { staticClass: 'col-12 col-sm-6' }, [
+                        h('h6', 'Stations'),
+                        h(OAuth2ProviderList, {
+                            props: {
+                                query: vm.providerQuery,
+                                withSearch: false,
+                            },
+                            scopedSlots: {
+                                [SlotName.ITEMS]: (props) => h(
+                                    'ul',
+                                    {
+                                        staticClass: 'list-unstyled m-0 p-0',
+                                    },
+                                    props.items.map((item) => h('li', {
+                                        key: item.id,
+                                        staticClass: 'mb-1',
+                                    }, [
+                                        h('div', {
+                                            staticClass: 'd-flex flex-wrap flex-row',
+                                        }, [
+                                            h('div', [
+                                                h('strong', item.realm.name),
+                                                h('span', { staticClass: 'pl-1 pr-1' }, ['-']),
+                                                item.name,
+                                            ]),
+                                            h('div', { staticClass: 'ml-auto' }, [
+                                                h('a', {
+                                                    attrs: {
+                                                        href: vm.buildUrl(item),
+                                                        type: 'button',
+                                                    },
+                                                    staticClass: 'btn btn-success btn-xs',
+                                                }, [
+                                                    'Login',
+                                                ]),
+                                            ]),
+                                        ]),
+                                    ])),
+                                ),
+                            },
+                        }),
+                    ]),
+                ]),
+            ]),
+        ]);
+    },
+});
 </script>
-<template>
-    <div class="container">
-        <h4>
-            Login
-        </h4>
-
-        <div class="text-center">
-            <medicine-worker
-                :width="400"
-                height="auto"
-            />
-        </div>
-
-        <div class="row mt-3">
-            <div class="col-12 col-sm-6 mb-sm-0 mb-3">
-                <h6 class="title">
-                    Master
-                </h6>
-
-                <transition name="slide-fade">
-                    <div
-                        v-if="error"
-                        class="alert alert-danger alert-sm"
-                    >
-                        {{ error }}
-                    </div>
-                </transition>
-
-                <form @submit.prevent="submit">
-                    <div
-                        class="form-group"
-                        :class="{ 'form-group-error': $v.formData.name.$error }"
-                    >
-                        <label for="name">Name</label>
-                        <input
-                            id="name"
-                            v-model="$v.formData.name.$model"
-                            class="form-control"
-                            type="text"
-                            placeholder="username or e-mail"
-                            autocomplete="username"
-                            required
-                            autofocus
-                        >
-
-                        <div
-                            v-if="!$v.formData.name.required && !$v.formData.name.$model"
-                            class="form-group-hint group-required"
-                        >
-                            Please enter a username or email address.
-                        </div>
-                        <div
-                            v-if="!$v.formData.name.minLength"
-                            class="form-group-hint group-required"
-                        >
-                            The length of the name must be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters.
-                        </div>
-                        <div
-                            v-if="!$v.formData.name.maxLength"
-                            class="form-group-hint group-required"
-                        >
-                            The length of the name must be less than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
-                        </div>
-                    </div>
-
-                    <div
-                        class="form-group"
-                        :class="{ 'form-group-error': $v.formData.password.$error }"
-                    >
-                        <label for="password">Password</label>
-                        <input
-                            id="password"
-                            v-model="$v.formData.password.$model"
-                            class="form-control"
-                            type="password"
-                            placeholder="password"
-                            autocomplete="current-password"
-                            required
-                        >
-
-                        <div
-                            v-if="!$v.formData.password.required && !$v.formData.password.$model"
-                            class="form-group-hint group-required"
-                        >
-                            Please enter a password.
-                        </div>
-                        <div
-                            v-if="!$v.formData.password.minLength"
-                            class="form-group-hint group-required"
-                        >
-                            The length of the password must be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters.
-                        </div>
-                        <div
-                            v-if="!$v.formData.password.maxLength"
-                            class="form-group-hint group-required"
-                        >
-                            The length of the password must be less than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
-                        </div>
-                    </div>
-
-                    <div>
-                        <button
-                            type="submit"
-                            class="btn btn-primary btn-sm"
-                            :disabled="$v.formData.$invalid || busy"
-                            @click.prevent="submit"
-                        >
-                            Login
-                        </button>
-                    </div>
-                </form>
-            </div>
-            <div
-                class="col-12 col-sm-6"
-                title="Station"
-            >
-                <h6 class="title">
-                    Station
-                </h6>
-
-                <o-auth2-provider-list
-                    :query="providerQuery"
-                    :with-search="false"
-                >
-                    <template #items="props">
-                        <ul class="list-unstyled">
-                            <li
-                                v-for="(item,key) in props.items"
-                                :key="key"
-                                class="mb-1"
-                            >
-                                <div class="card-header">
-                                    <div class="d-flex flex-wrap flex-row">
-                                        <div>
-                                            <strong>{{ item.realm.name }}</strong> - {{ item.name }}
-                                        </div>
-                                        <div class="ml-auto">
-                                            <a
-                                                :href="buildUrl(item)"
-                                                type="button"
-                                                class="btn btn-success btn-xs"
-                                            >
-                                                Login
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </template>
-                </o-auth2-provider-list>
-            </div>
-        </div>
-    </div>
-</template>

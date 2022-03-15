@@ -5,68 +5,44 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, Train, TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
-import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { PermissionID, TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
+import { ForbiddenError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
-import { isPermittedForResourceRealm } from '@authelion/common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { runTrainStationValidation } from './utils';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
-import { StationEntity } from '../../../../../domains/core/station/entity';
 import env from '../../../../../env';
+import { TrainEntity } from '../../../../../domains/core/train/entity';
 
 export async function createTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.TRAIN_EDIT)) {
         throw new ForbiddenError();
     }
 
-    const data : Partial<TrainStationEntity> = await runTrainStationValidation(req, 'create');
-
-    // train
-    const trainRepository = getRepository<Train>(TrainEntity);
-    const train = await trainRepository.findOne(data.train_id);
-
-    if (typeof train === 'undefined') {
-        throw new NotFoundError('The referenced train was not found.');
-    }
-
-    if (!isPermittedForResourceRealm(req.realmId, train.realm_id)) {
-        throw new ForbiddenError();
-    }
-
-    data.train_realm_id = train.realm_id;
-
-    // station
-    const stationRepository = getRepository(StationEntity);
-    const station = await stationRepository.findOne(data.station_id);
-
-    if (typeof station === 'undefined') {
-        throw new NotFoundError('The referenced station was not found.');
-    }
-
-    data.station_realm_id = station.realm_id;
+    const result = await runTrainStationValidation(req, 'create');
 
     const repository = getRepository(TrainStationEntity);
 
-    let entity = repository.create(data);
+    let entity = repository.create(result.data);
 
     if (env.skipTrainApprovalOperation) {
         entity.approval_status = TrainStationApprovalStatus.APPROVED;
     }
 
-    if (!entity.position) {
-        const trainStations = await repository.count({
+    if (!entity.index) {
+        entity.index = await repository.count({
             train_id: entity.train_id,
         });
-
-        entity.position = trainStations + 1;
     }
 
     entity = await repository.save(entity);
 
-    train.stations += 1;
-    await trainRepository.save(train);
+    result.meta.train.stations += 1;
+    const trainRepository = getRepository(TrainEntity);
+    await trainRepository.save(result.meta.train);
+
+    entity.train = result.meta.train;
+    entity.station = result.meta.station;
 
     return res.respondCreated({
         data: entity,

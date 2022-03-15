@@ -23,7 +23,7 @@ export interface TrainStation {
 
     comment: string;
 
-    position: number;
+    index: number;
 
     // ------------------------------------------------------------------
 

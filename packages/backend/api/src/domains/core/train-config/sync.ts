@@ -44,7 +44,7 @@ export async function syncTrainConfigToDatabase(config: TrainConfig) : Promise<T
 
         const routeItem = routeByIdIndex[items[i].station.secure_id];
 
-        items[i].position = routeItem.index;
+        items[i].index = routeItem.index;
         if (routeItem.signature) {
             position = routeItem.index;
 

@@ -7,7 +7,7 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
+import { LessThan, MoreThan, getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
@@ -44,11 +44,30 @@ export async function deleteTrainStationRouteHandler(req: ExpressRequest, res: E
 
     entity.id = entityId;
 
+    // -------------------------------------------
+
+    await repository.createQueryBuilder()
+        .update()
+        .where({
+            index: MoreThan(entity.index),
+            train_id: entity.train_id,
+        })
+        .set({
+            index: () => '`index` - 1',
+        })
+        .execute();
+
+    // -------------------------------------------
+
     const trainRepository = getRepository(TrainEntity);
     const train = await trainRepository.findOne(entity.train_id);
 
     train.stations -= 1;
     await trainRepository.save(train);
+
+    entity.train = train;
+
+    // -------------------------------------------
 
     return res.respondDeleted({ data: entity });
 }

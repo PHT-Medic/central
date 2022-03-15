@@ -55,7 +55,7 @@ export class TrainStationController {
 
     @Post('', [ForceLoggedInMiddleware])
     async add(
-        @Body() data: Pick<TrainStation, 'station_id' | 'train_id' | 'comment' | 'position' | 'approval_status'>,
+        @Body() data: PartialTrainStation,
             @Request() req: any,
             @Response() res: any,
     ): Promise<PartialTrainStation | undefined> {

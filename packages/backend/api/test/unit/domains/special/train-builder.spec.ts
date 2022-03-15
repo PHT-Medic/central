@@ -141,7 +141,7 @@ describe('src/domains/train-builder', () => {
             station_id: stationB.id,
             station_realm_id: stationB.realm_id,
             approval_status: TrainStationApprovalStatus.APPROVED,
-            position: 0,
+            index: 0,
         });
 
         await trainStationRepository.save(trainStationA);

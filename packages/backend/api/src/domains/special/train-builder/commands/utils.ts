@@ -23,6 +23,6 @@ export async function buildTrainBuilderStationsProperty(id: Train['id']) : Promi
     return trainStations.map((trainStation) => ({
         id: trainStation.station.secure_id,
         ecosystem: trainStation.station.ecosystem as Ecosystem,
-        index: trainStation.position,
+        index: trainStation.index,
     }));
 }
