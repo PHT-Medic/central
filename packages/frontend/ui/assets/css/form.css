@@ -5,26 +5,28 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-.form-group-warning label,
-.form-group-warning .label {
+.form-group-warning > label,
+.form-group-warning > .label {
     color: #a68d2f;
 }
 
 .form-group-warning input.form-control,
 .form-group-warning textarea.form-control,
-.form-group-warning select.form-control {
+.form-group-warning select.form-control,
+.form-group-warning .custom-file {
     box-shadow: 0 0 0 0.1rem #f3db82;
     border-color: #f3db82;
 }
 
-.form-group-error label,
-.form-group-error .label {
+.form-group-error > label,
+.form-group-error > .label {
     color: #f04124;
 }
 
 .form-group-error input.form-control,
 .form-group-error textarea.form-control,
-.form-group-error select.form-control {
+.form-group-error select.form-control,
+.form-group-error .custom-file  {
     box-shadow: 0 0 0 0.1rem #f79483;
     border-color: #f79483;
 }

@@ -79,10 +79,6 @@ ComponentListProperties<UserSecret>
         q(val, oldVal) {
             if (val === oldVal) return;
 
-            if (val.length === 1 && val.length > oldVal.length) {
-                return;
-            }
-
             this.meta.offset = 0;
 
             this.load();
@@ -104,7 +100,7 @@ ComponentListProperties<UserSecret>
             this.busy = true;
 
             try {
-                const response = await this.$api.userSecret.getMany(mergeDeep({
+                const query = mergeDeep({
                     page: {
                         limit: this.meta.limit,
                         offset: this.meta.offset,
@@ -112,7 +108,9 @@ ComponentListProperties<UserSecret>
                     filter: {
                         key: this.q.length > 0 ? `~${this.q}` : this.q,
                     },
-                }, this.query));
+                }, this.query);
+
+                const response = await this.$api.userSecret.getMany(query);
 
                 this.items = response.data;
                 const { total } = response.meta;
@@ -123,25 +121,6 @@ ComponentListProperties<UserSecret>
             }
 
             this.busy = false;
-        },
-        async drop(id) {
-            if (this.itemBusy) return;
-
-            this.itemBusy = true;
-
-            try {
-                await this.$api.userSecret.delete(id);
-
-                this.dropArrayItem({ id });
-
-                this.$emit('deleted', { id });
-            } catch (e) {
-                if (e instanceof Error) {
-                    this.$emit('failed', e);
-                }
-            }
-
-            this.itemBusy = false;
         },
 
         handleCreated(

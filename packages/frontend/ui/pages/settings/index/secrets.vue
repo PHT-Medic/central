@@ -27,6 +27,9 @@ export default {
         itemId() {
             return this.item ? this.item.id : undefined;
         },
+        query() {
+            return { filter: { user_id: this.user.id }, sort: { created_at: 'DESC' } };
+        },
     },
     methods: {
         handleCreated(item) {
@@ -52,6 +55,13 @@ export default {
 
             this.$bvToast.toast('The secret was successfully deleted.', {
                 variant: 'danger',
+                toaster: 'b-toaster-top-center',
+            });
+        },
+
+        handleFailed(e) {
+            this.$bvToast.toast(e.message, {
+                variant: 'warning',
                 toaster: 'b-toaster-top-center',
             });
         },
@@ -96,10 +106,12 @@ export default {
 <template>
     <div class="row">
         <div class="col-4">
+            <h6><i class="fa-solid fa-file-lines pr-1" /> Form</h6>
             <user-secret-form
                 ref="itemForm"
                 :user-id="user.id"
-                :entity-property="item"
+                :entity="item"
+                @failed="handleFailed"
                 @updated="handleUpdated"
                 @created="handleCreated"
             />
@@ -107,25 +119,14 @@ export default {
         <div class="col-8">
             <user-secret-list
                 ref="itemsList"
-                :query="{filters: {user_id: user.id}, sort: {created_at: 'DESC'}}"
+                :query="query"
                 @deleted="handleDeleted"
             >
+                <template #header-title>
+                    <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
+                </template>
                 <template #item-actions="props">
                     <div class="ml-1">
-                        <entity-delete
-                            :with-text="false"
-                            class="btn btn-xs btn-danger"
-                            :entity-id="props.item.id"
-                            :entity-type="'userSecret'"
-                            @deleted="props.handleDeleted"
-                        />
-                        <button
-                            type="button"
-                            class="btn btn-xs btn-primary"
-                            @click.prevent="triggerSync(props.item)"
-                        >
-                            <i class="fas fa-sync" />
-                        </button>
                         <button
                             type="button"
                             class="btn btn-xs"
@@ -137,6 +138,20 @@ export default {
                                 :class="{'fas fa-pen-alt': itemId !== props.item.id, 'fa fa-eject': itemId === props.item.id}"
                             />
                         </button>
+                        <button
+                            type="button"
+                            class="btn btn-xs btn-primary"
+                            @click.prevent="triggerSync(props.item)"
+                        >
+                            <i class="fa-solid fa-square-arrow-up-right" />
+                        </button>
+                        <entity-delete
+                            :with-text="false"
+                            class="btn btn-xs btn-danger"
+                            :entity-id="props.item.id"
+                            :entity-type="'userSecret'"
+                            @deleted="props.handleDeleted"
+                        />
                     </div>
                 </template>
             </user-secret-list>

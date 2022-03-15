@@ -62,7 +62,7 @@ export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, Trai
                         TrainBuildStatus.STOPPED,
                         TrainBuildStatus.STOPPING,
                         TrainBuildStatus.FAILED,
-                    ].indexOf(this.command) === -1;
+                    ].indexOf(this.entity.build_status) === -1;
             }
 
             if (this.command === TrainCommand.BUILD_STOP) {

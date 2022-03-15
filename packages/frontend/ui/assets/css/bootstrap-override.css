@@ -127,3 +127,7 @@ a:focus{
 .vue-form-wizard .wizard-icon-circle .wizard-icon-container {
     border-radius: 50%;
 }
+
+.custom-file {
+    border-radius: 0.25rem;
+}
