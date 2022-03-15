@@ -62,6 +62,9 @@ export default {
         :load-on-init="true"
         :query="query"
     >
+        <template #header-title>
+            <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
+        </template>
         <template #items="props">
             <b-table
                 :items="props.items"

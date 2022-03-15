@@ -39,7 +39,7 @@ export default {
         :load-on-init="true"
     >
         <template #header-title>
-            This is a slight overview of all permissions.
+            <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
         </template>
         <template #items="props">
             <b-table

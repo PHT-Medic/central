@@ -75,7 +75,7 @@ export default {
         :query="query"
     >
         <template #header-title>
-            This is a slight overview of all roles.
+            <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
         </template>
         <template #items="props">
             <b-table

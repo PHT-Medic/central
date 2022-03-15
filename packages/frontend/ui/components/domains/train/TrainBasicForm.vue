@@ -179,7 +179,7 @@ export default {
             >
                 <proposal-list :query="proposalQuery">
                     <template #header>
-                        Proposals
+                        <label>Proposals</label>
                     </template>
                     <template #item="props">
                         <proposal-item

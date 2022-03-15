@@ -54,9 +54,11 @@ export default {
         </div>
         <div class="m-t-10">
             <proposal-list
-                :with-header="false"
                 :query="query"
             >
+                <template #header-title>
+                    <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
+                </template>
                 <template #item="props">
                     <proposal-item
                         :entity="props.item"

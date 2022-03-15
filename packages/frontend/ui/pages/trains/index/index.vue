@@ -43,7 +43,11 @@ export default {
         </div>
 
         <div class="m-t-10">
-            <train-list :query="query" />
+            <train-list :query="query">
+                <template #header-title>
+                    <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
+                </template>
+            </train-list>
         </div>
     </div>
 </template>

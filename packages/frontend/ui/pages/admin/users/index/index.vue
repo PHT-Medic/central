@@ -59,7 +59,7 @@ export default {
 <template>
     <user-list ref="itemList">
         <template #header-title>
-            This is a slight overview of all users.
+            <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
         </template>
         <template #items="props">
             <b-table

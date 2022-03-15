@@ -60,7 +60,7 @@ export default {
 <template>
     <realm-list ref="itemsList">
         <template #header-title>
-            This is a slight overview of all realms.
+            <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
         </template>
         <template #header-actions="props">
             <div class="d-flex flex-row">

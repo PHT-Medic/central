@@ -5,6 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import Vue from 'vue';
 import {
     PermissionID,
 } from '@personalhealthtrain/central-common';
@@ -14,7 +15,7 @@ import ProposalStationApprovalCommand from '../../../components/domains/proposal
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 import { ProposalStationList } from '../../../components/domains/proposal-station/ProposalStationList';
 
-export default {
+export default Vue.extend({
     components: {
         ProposalStationList,
         ProposalStationApprovalCommand,
@@ -110,7 +111,7 @@ export default {
             this.$refs.form.hide();
         },
     },
-};
+});
 </script>
 <template>
     <div>
@@ -126,6 +127,9 @@ export default {
                 :realm-id="realmId"
                 :source-id="stationId"
             >
+                <template #header-title>
+                    <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
+                </template>
                 <template #items="props">
                     <b-table
                         :items="props.items"
