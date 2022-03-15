@@ -8,7 +8,10 @@
 import Vue, { PropType } from 'vue';
 import {
     PermissionID,
-    Train, TrainBuildStatus, TrainCommand, TrainConfigurationStatus,
+    Train,
+    TrainBuildStatus,
+    TrainCommand,
+    TrainConfigurationStatus,
 } from '@personalhealthtrain/central-common';
 import { TrainCommandProperties } from './type';
 import { renderActionCommand } from '../../../render/utils';
@@ -52,22 +55,25 @@ export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, Trai
             }
 
             if (
-                this.command === TrainCommand.BUILD_START &&
-                this.entity.build_status &&
-                [
-                    TrainBuildStatus.STOPPED,
-                    TrainBuildStatus.FAILED,
-                ].indexOf(this.command) === -1
+                this.command === TrainCommand.BUILD_START
             ) {
-                return true;
+                return this.entity.build_status &&
+                    [
+                        TrainBuildStatus.STOPPED,
+                        TrainBuildStatus.STOPPING,
+                        TrainBuildStatus.FAILED,
+                    ].indexOf(this.command) === -1;
             }
 
-            return this.command === TrainCommand.BUILD_STOP &&
-                [
+            if (this.command === TrainCommand.BUILD_STOP) {
+                return this.entity.build_status && [
                     TrainBuildStatus.STARTING,
                     TrainBuildStatus.STARTED,
                     TrainBuildStatus.STOPPING,
                 ].indexOf(this.entity.build_status) === -1;
+            }
+
+            return false;
         },
         commandText() {
             switch (this.command) {

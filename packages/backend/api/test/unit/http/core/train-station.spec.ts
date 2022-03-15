@@ -12,6 +12,7 @@ import { createSuperTestProposal } from '../../../utils/domains/proposal';
 import { createSuperTestStation } from '../../../utils/domains/station';
 import { createSuperTestTrain } from '../../../utils/domains/train';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
+import { createSuperTestProposalStation } from '../../../utils/domains/proposal-station';
 
 describe('src/controllers/core/train-station', () => {
     const superTest = useSuperTest();
@@ -26,10 +27,16 @@ describe('src/controllers/core/train-station', () => {
 
     it('should create, read, update, delete resource & get collection', async () => {
         const proposal = await createSuperTestProposal(superTest);
+        const station = await createSuperTestStation(superTest);
+
+        await createSuperTestProposalStation(superTest, {
+            station_id: station.body.id,
+            proposal_id: proposal.body.id,
+        });
+
         const train = await createSuperTestTrain(superTest, {
             proposal_id: proposal.body.id,
         });
-        const station = await createSuperTestStation(superTest);
 
         const details : Partial<TrainStation> = {
             train_id: train.body.id,
