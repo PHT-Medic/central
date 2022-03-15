@@ -1,28 +1,35 @@
 /*
- * Copyright (c) 2022.
+ * Copyright (c) 2022-2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainType } from '@personalhealthtrain/central-common';
+import { TrainType } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
 import { NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError, ExpressValidatorMeta, matchedValidationData } from '../../../../express-validation';
+import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
-import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { createRequestMasterImageIdValidation } from '../../master-image/utils';
-import { createRequestProposalIdValidation } from '../../proposal/utils';
+import { TrainValidationResult } from '../type';
+import { extendExpressValidationResultWithProposal } from '../../proposal/utils/extend';
 
 export async function runTrainValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
-) : Promise<Partial<Train>> {
+) : Promise<TrainValidationResult> {
+    const result : TrainValidationResult = {
+        data: {},
+        meta: {},
+    };
+
     if (operation === 'create') {
-        await createRequestProposalIdValidation()
+        await check('proposal_id')
+            .exists()
+            .isUUID()
             .run(req);
 
         await check('type')
@@ -85,5 +92,16 @@ export async function runTrainValidation(
         throw new ExpressValidationError(validation);
     }
 
-    return matchedValidationData(req, { includeOptionals: true });
+    result.data = matchedValidationData(req, { includeOptionals: true });
+
+    // ----------------------------------------------
+
+    await extendExpressValidationResultWithProposal(result);
+    if (result.meta.proposal) {
+        if (!isPermittedForResourceRealm(req.realmId, result.meta.proposal.realm_id)) {
+            throw new NotFoundError('The referenced proposal realm is not permitted.');
+        }
+    }
+
+    return result;
 }

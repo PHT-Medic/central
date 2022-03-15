@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { PermissionID } from '@personalhealthtrain/central-common';
@@ -15,10 +15,6 @@ import { runProposalStationValidation } from './utils';
 
 export async function updateProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
-
-    if (typeof id !== 'string') {
-        throw new BadRequestError('The proposal-station id is not valid.');
-    }
 
     const repository = getRepository(ProposalStationEntity);
     let entity = await repository.findOne(id);
@@ -42,9 +38,9 @@ export async function updateProposalStationRouteHandler(req: ExpressRequest, res
         throw new ForbiddenError();
     }
 
-    const data = await runProposalStationValidation(req, 'update');
+    const result = await runProposalStationValidation(req, 'update');
 
-    entity = repository.merge(entity, data);
+    entity = repository.merge(entity, result.data);
 
     entity = await repository.save(entity);
 

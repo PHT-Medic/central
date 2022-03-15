@@ -16,6 +16,8 @@ import { TrainStationValidationResult } from '../type';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
+import { extendExpressValidationResultWithStation } from '../../station/utils/extend';
+import { extendExpressValidationResultWithTrain } from '../../train/utils/extend';
 
 export async function runTrainStationValidation(
     req: ExpressRequest,
@@ -66,34 +68,20 @@ export async function runTrainStationValidation(
 
     // ----------------------------------------------
 
-    if (result.data.train_id) {
-        const trainRepository = getRepository(TrainEntity);
-        const train = await trainRepository.findOne(result.data.train_id);
-        if (typeof train === 'undefined') {
-            throw new NotFoundError('The referenced train is invalid.');
-        }
-
+    await extendExpressValidationResultWithTrain(result);
+    if (result.meta.train) {
         if (
-            !isPermittedForResourceRealm(req.realmId, train.realm_id)
+            !isPermittedForResourceRealm(req.realmId, result.meta.train.realm_id)
         ) {
             throw new NotFoundError('The referenced train realm is not permitted.');
         }
 
-        result.data.train_realm_id = train.realm_id;
-
-        result.meta.train = train;
+        result.data.train_realm_id = result.meta.train.realm_id;
     }
 
-    if (result.data.station_id) {
-        const stationRepository = getRepository(StationEntity);
-        const station = await stationRepository.findOne(result.data.station_id);
-        if (typeof station === 'undefined') {
-            throw new NotFoundError('The referenced station is invalid.');
-        }
-
-        result.data.station_realm_id = station.realm_id;
-
-        result.meta.station = station;
+    await extendExpressValidationResultWithStation(result);
+    if (result.meta.station) {
+        result.data.station_realm_id = result.meta.station.realm_id;
     }
 
     if (

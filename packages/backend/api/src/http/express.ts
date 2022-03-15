@@ -25,6 +25,7 @@ export function createExpressApp(redis?: Client | boolean | string) : ExpressApp
     const expressApp : Express = express();
 
     expressApp.set('trust proxy', 1);
+    expressApp.set('x-powered-by', false);
 
     expressApp.use(cors({
         origin(origin, callback) {

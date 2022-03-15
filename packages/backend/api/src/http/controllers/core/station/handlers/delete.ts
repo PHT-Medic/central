@@ -9,6 +9,7 @@ import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { publishMessage } from 'amqp-extension';
+import { isPermittedForResourceRealm } from '@authelion/common';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { buildSecretStorageQueueMessage } from '../../../../../domains/special/secret-storage/queue';
@@ -44,6 +45,10 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
 
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
+    }
+
+    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+        throw new ForbiddenError('You are not permitted to delete this station.');
     }
 
     if (env.env === 'test') {

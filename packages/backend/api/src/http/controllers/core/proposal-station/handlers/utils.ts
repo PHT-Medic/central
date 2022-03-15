@@ -7,21 +7,32 @@
 
 import { check, validationResult } from 'express-validator';
 import { isProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
+import { NotFoundError } from '@typescript-error/http';
+import { isPermittedForResourceRealm } from '@authelion/common';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
-import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
-import { createRequestProposalIdValidation } from '../../proposal/utils';
-import { createRequestStationIdValidation } from '../../station/utils';
+import { extendExpressValidationResultWithStation } from '../../station/utils/extend';
+import { ProposalStationValidationResult } from '../type';
+import { extendExpressValidationResultWithProposal } from '../../proposal/utils/extend';
 
 export async function runProposalStationValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
-) : Promise<Partial<ProposalStationEntity>> {
+) : Promise<ProposalStationValidationResult> {
+    const result : ProposalStationValidationResult = {
+        data: {},
+        meta: {},
+    };
+
     if (operation === 'create') {
-        await createRequestProposalIdValidation()
+        await check('proposal_id')
+            .exists()
+            .isUUID()
             .run(req);
 
-        await createRequestStationIdValidation({ permittedForRealm: false })
+        await check('station_id')
+            .exists()
+            .isUUID()
             .run(req);
     }
 
@@ -45,5 +56,23 @@ export async function runProposalStationValidation(
         throw new ExpressValidationError(validation);
     }
 
-    return matchedValidationData(req, { includeOptionals: true });
+    result.data = matchedValidationData(req, { includeOptionals: true });
+
+    // ----------------------------------------------
+
+    await extendExpressValidationResultWithProposal(result);
+    if (result.meta.proposal) {
+        result.data.proposal_realm_id = result.meta.proposal.realm_id;
+
+        if (!isPermittedForResourceRealm(req.realmId, result.meta.proposal.realm_id)) {
+            throw new NotFoundError('The referenced proposal realm is not permitted.');
+        }
+    }
+
+    await extendExpressValidationResultWithStation(result);
+    if (result.meta.station) {
+        result.data.station_realm_id = result.meta.station.realm_id;
+    }
+
+    return result;
 }

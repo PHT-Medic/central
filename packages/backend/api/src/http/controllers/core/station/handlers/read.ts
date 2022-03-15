@@ -1,11 +1,54 @@
-import { getRepository } from 'typeorm';
+import { SelectQueryBuilder, getRepository } from 'typeorm';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import {
-    applyFields, applyFilters, applyPagination, applyRelations,
+    parseQueryFields,
+} from '@trapi/query';
+import {
+    applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations,
 } from 'typeorm-extension';
-import { NotFoundError } from '@typescript-error/http';
+import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
+
+async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>, fields: any) {
+    const protectedFields = [
+        'secure_id',
+        'public_key',
+        'email',
+        'registry_project_account_id',
+        'registry_project_account_name',
+        'registry_project_account_token',
+        'registry_project_id',
+        'registry_project_webhook_exists',
+    ];
+
+    const fieldsParsed = parseQueryFields(fields, {
+        allowed: [
+            'id',
+            'name',
+            'created_at',
+            'updated_at',
+            ...protectedFields,
+        ],
+        defaultAlias: 'station',
+    });
+
+    const protectedSelected = fieldsParsed
+        .filter((field) => field.alias === 'station' && protectedFields.indexOf(field.key) !== -1);
+
+    if (protectedSelected.length > 0) {
+        if (
+            !req.ability.hasPermission(PermissionID.STATION_EDIT)
+        ) {
+            throw new ForbiddenError(
+                `You are not permitted to read the restricted fields: ${
+                    protectedSelected.map((field) => field.key).join(', ')}`,
+            );
+        }
+    }
+
+    applyQueryFieldsParseOutput(query, fieldsParsed);
+}
 
 export async function getOneStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -15,23 +58,7 @@ export async function getOneStationRouteHandler(req: ExpressRequest, res: Expres
     const query = repository.createQueryBuilder('station')
         .where('station.id = :id', { id });
 
-    if (
-        req.ability.hasPermission(PermissionID.STATION_EDIT)
-    ) {
-        applyFields(query, fields, {
-            allowed: [
-                'secure_id',
-                'public_key',
-                'email',
-                'registry_project_account_id',
-                'registry_project_account_name',
-                'registry_project_account_token',
-                'registry_project_id',
-                'registry_project_webhook_exists',
-            ],
-            defaultAlias: 'station',
-        });
-    }
+    await checkAndApplyFields(req, query, fields);
 
     const entity = await query.getOne();
 
@@ -60,23 +87,7 @@ export async function getManyStationRouteHandler(req: ExpressRequest, res: Expre
         defaultAlias: 'station',
     });
 
-    if (
-        req.ability.hasPermission(PermissionID.STATION_EDIT)
-    ) {
-        applyFields(query, fields, {
-            allowed: [
-                'secure_id',
-                'public_key',
-                'email',
-                'registry_project_account_id',
-                'registry_project_account_name',
-                'registry_project_account_token',
-                'registry_project_id',
-                'registry_project_webhook_exists',
-            ],
-            defaultAlias: 'station',
-        });
-    }
+    await checkAndApplyFields(req, query, fields);
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });
 

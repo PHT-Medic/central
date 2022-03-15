@@ -19,6 +19,7 @@
         "@socket.io/redis-emitter": "^4.1.1",
         "@trapi/client": "^2.0.5",
         "@trapi/swagger": "^0.2.15",
+        "@trapi/query": "^2.0.5",
         "@typescript-error/http": "^1.1.3",
         "amqp-extension": "^1.0.1",
         "body-parser": "^1.19.2",

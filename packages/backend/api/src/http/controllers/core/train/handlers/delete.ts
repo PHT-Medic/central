@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022.
+ * Copyright (c) 2022-2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -17,10 +17,6 @@ import { getTrainFilesDirectoryPath } from '../../../../../config/pht/train-file
 
 export async function deleteTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
-
-    if (typeof id !== 'string') {
-        throw new BadRequestError();
-    }
 
     if (!req.ability.hasPermission(PermissionID.TRAIN_DROP)) {
         throw new ForbiddenError();
@@ -49,6 +45,8 @@ export async function deleteTrainRouteHandler(req: ExpressRequest, res: ExpressR
     proposal.trains--;
     const proposalRepository = getRepository(ProposalEntity);
     await proposalRepository.save(proposal);
+
+    entity.proposal = proposal;
 
     try {
         await fs.promises.access(getTrainFilesDirectoryPath(entity.id), fs.constants.R_OK | fs.constants.W_OK);

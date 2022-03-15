@@ -6,7 +6,7 @@
   -->
 <script>
 import { ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default {
     meta: {
@@ -30,18 +30,11 @@ export default {
             proposalStationStatus: ProposalStationApprovalStatus,
         };
     },
-    methods: {
-        handleUpdated(item) {
-            this.$emit('proposalStationUpdated', item);
-
-            this.$refs.proposalStationList.editArrayItem(item);
-        },
-    },
 };
 </script>
 <template>
-    <div class="container">
-        <div class="row align-items-center">
+    <div>
+        <div class="row">
             <div class="col-xl-3 col-md-6 text-center">
                 <div class="bg-warm-flame p-1 rounded">
                     <h6 class="mt-1">

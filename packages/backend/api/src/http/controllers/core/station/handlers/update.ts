@@ -10,6 +10,7 @@ import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
 import { useClient } from '@trapi/client';
 import { publishMessage } from 'amqp-extension';
+import { isPermittedForResourceRealm } from '@authelion/common';
 import { runStationValidation } from './utils';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
@@ -51,6 +52,10 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
 
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
+    }
+
+    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+        throw new ForbiddenError('You are not permitted to delete this station.');
     }
 
     if (
