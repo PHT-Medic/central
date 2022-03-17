@@ -25,7 +25,8 @@ export function extractTrainConfigFromTrainExtractorPayload(
         return undefined;
     }
 
-    const raw = JSON.parse(payload.files[index].content.toString('utf-8'));
+    const raw = JSON.parse(payload.files[index].content);
+    console.log(raw);
 
     return isTrainConfig(raw) ? raw : undefined;
 }

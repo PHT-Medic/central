@@ -59,7 +59,6 @@ async function handleTrainExtractorEvent(
             break;
         }
         case TrainExtractorMode.READ: {
-            console.log(data);
             const config = extractTrainConfigFromTrainExtractorPayload(data);
             console.log(config);
             if (typeof config === 'undefined') {

@@ -16,14 +16,15 @@
     "license": "MIT",
     "devDependencies": {
         "@authelion/common": "^0.0.2",
+        "@trapi/query": "^2.1.1",
         "rimraf": "^3.0.2"
     },
     "peerDependencies": {
-        "@authelion/common": "^0.0.x"
+        "@authelion/common": "^0.0.x",
+        "@trapi/query": "2.x"
     },
     "dependencies": {
         "@trapi/client": "^2.0.5",
-        "@trapi/query": "^2.0.5",
         "nanoid": "^3.3.1"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",

@@ -119,7 +119,7 @@ export default Vue.extend({
         });
         const submit = buildFormSubmit(vm, h, {
             createIconClass: 'fa-solid fa-right-to-bracket',
-            createButtonClass: 'btn btn-dark btn-sm btn-block',
+            createButtonClass: 'btn btn-primary btn-sm btn-block',
             createText: 'Login',
         });
         return h('div', { staticClass: 'container' }, [

@@ -20,5 +20,5 @@ export type DockerContainerFile = {
     name: string,
     type: DockerContainerFileType,
     size: number,
-    content: Buffer
+    content: string
 };

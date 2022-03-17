@@ -13,7 +13,7 @@ export type TrainExtractorFileType = 'file' | 'link' | 'symlink' | 'directory' |
 export type TrainExtractorFile = {
     name: string,
     size: number,
-    content: Buffer
+    content: string
 };
 
 export type TrainExtractorQueuePayload = {

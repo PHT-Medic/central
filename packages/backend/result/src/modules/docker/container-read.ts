@@ -24,7 +24,7 @@ function extractTarStream(stream: NodeJS.ReadableStream) : Promise<DockerContain
                 files.push({
                     name: header.name,
                     type: header.type as DockerContainerFileType,
-                    content: Buffer.concat(buff),
+                    content: Buffer.concat(buff).toString('utf-8'),
                     size: header.size,
                 });
 
