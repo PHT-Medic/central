@@ -119,7 +119,7 @@ export default Vue.extend({
         });
         const submit = buildFormSubmit(vm, h, {
             createIconClass: 'fa-solid fa-right-to-bracket',
-            createButtonClass: 'btn btn-primary btn-sm btn-block',
+            createButtonClass: 'btn btn-secondary btn-sm btn-block',
             createText: 'Login',
         });
         return h('div', { staticClass: 'container' }, [
@@ -155,37 +155,25 @@ export default Vue.extend({
                                 withSearch: false,
                             },
                             scopedSlots: {
-                                [SlotName.ITEMS]: (props) => h(
-                                    'ul',
-                                    {
-                                        staticClass: 'list-unstyled m-0 p-0',
-                                    },
-                                    props.items.map((item) => h('li', {
-                                        key: item.id,
-                                        staticClass: 'mb-1',
-                                    }, [
-                                        h('div', {
-                                            staticClass: 'd-flex flex-wrap flex-row',
+                                [SlotName.ITEM]: (props) => h('div', {
+                                    staticClass: 'd-flex flex-wrap flex-row',
+                                }, [
+                                    h('div', [
+                                        h('strong', props.item.realm.name),
+                                        h('span', { staticClass: 'ml-2 badge badge-dark' }, [props.item.name]),
+                                    ]),
+                                    h('div', { staticClass: 'ml-auto' }, [
+                                        h('a', {
+                                            attrs: {
+                                                href: vm.buildUrl(props.item),
+                                                type: 'button',
+                                            },
+                                            staticClass: 'btn btn-success btn-xs',
                                         }, [
-                                            h('div', [
-                                                h('strong', item.realm.name),
-                                                h('span', { staticClass: 'pl-1 pr-1' }, ['-']),
-                                                item.name,
-                                            ]),
-                                            h('div', { staticClass: 'ml-auto' }, [
-                                                h('a', {
-                                                    attrs: {
-                                                        href: vm.buildUrl(item),
-                                                        type: 'button',
-                                                    },
-                                                    staticClass: 'btn btn-success btn-xs',
-                                                }, [
-                                                    'Login',
-                                                ]),
-                                            ]),
+                                            'Login',
                                         ]),
-                                    ])),
-                                ),
+                                    ]),
+                                ]),
                             },
                         }),
                     ]),
