@@ -8,16 +8,12 @@
 import { getRepository } from 'typeorm';
 
 import {
-    Ecosystem,
-    Train,
-    TrainStationApprovalStatus,
+    Train, TrainBuilderStartPayload,
 } from '@personalhealthtrain/central-common';
 import path from 'path';
-import { TrainBuilderStartPayload } from '../type';
 import { MasterImageEntity } from '../../../core/master-image/entity';
 import { MasterImageGroupEntity } from '../../../core/master-image-group/entity';
 import { TrainFileEntity } from '../../../core/train-file/entity';
-import { TrainStationEntity } from '../../../core/train-station/entity';
 import { buildTrainBuilderStationsProperty } from './utils';
 
 export async function buildTrainBuilderStartCommandPayload(train: Train) : Promise<Partial<TrainBuilderStartPayload>> {

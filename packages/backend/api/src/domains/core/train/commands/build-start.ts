@@ -11,7 +11,8 @@ import {
     Train,
     TrainBuildStatus,
     TrainConfigurationStatus,
-    TrainManagerExtractingQueueEvent, TrainResultStatus,
+    TrainManagerQueueCommand,
+    TrainResultStatus,
     TrainRunStatus,
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
@@ -20,6 +21,8 @@ import { TrainBuilderCommand } from '../../../special/train-builder/type';
 import { findTrain } from './utils';
 import { TrainStationEntity } from '../../train-station/entity';
 import { TrainEntity } from '../entity';
+import env from '../../../../env';
+import { MessageQueueRoutingKey } from '../../../../config/mq';
 
 export async function startBuildTrain(
     train: Train | number | string,
@@ -51,6 +54,11 @@ export async function startBuildTrain(
             }
 
             const queueMessage = await buildTrainBuilderQueueMessage(TrainBuilderCommand.START, train);
+
+            if (env.trainManagerForBuilding) {
+                queueMessage.options.routingKey = MessageQueueRoutingKey.TRAIN_MANAGER_COMMAND;
+                queueMessage.type = TrainManagerQueueCommand.BUILD;
+            }
 
             await publishMessage(queueMessage);
         }

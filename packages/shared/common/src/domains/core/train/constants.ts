@@ -85,9 +85,12 @@ export enum TrainCommand {
 
 export enum TrainContainerFileName {
     CONFIG = 'train_config.json',
+    QUERY = 'query.json',
 }
 
 export enum TrainContainerPath {
+    MAIN = '/opt/pht_train',
+    QUERY = '/opt/pht-train/query.json',
     CONFIG = '/opt/train_config.json',
     RESULTS = '/opt/pht_results',
 }

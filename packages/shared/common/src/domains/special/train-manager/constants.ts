@@ -7,6 +7,8 @@
 
 export enum TrainManagerQueueCommand {
     EXTRACT = 'extract',
+    BUILD = 'build',
+    ROUTE = 'route',
     STATUS = 'status',
 }
 

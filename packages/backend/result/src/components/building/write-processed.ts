@@ -1,13 +1,13 @@
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
-import { TrainManagerExtractingQueueEvent } from '@personalhealthtrain/central-common';
+import { TrainManagerBuildingQueueEvent } from '@personalhealthtrain/central-common';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 
-export async function writeExtractedEvent(message: Message) {
+export async function writeProcessedEvent(message: Message) {
     await publishMessage(buildMessage({
         options: {
             routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
         },
-        type: TrainManagerExtractingQueueEvent.PROCESSED,
+        type: TrainManagerBuildingQueueEvent.FINISHED,
         data: message.data,
         metadata: message.metadata,
     }));

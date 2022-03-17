@@ -13,6 +13,18 @@ export type DockerPullOptions = {
     }
 };
 
+// -------------------------------------------------------
+
+export type DockerPushImage = {
+    tag?: string,
+    name: string
+};
+
+export type DockerPushImageOptions = {
+    remove?: boolean
+};
+// -------------------------------------------------------
+
 export type DockerContainerFileType = 'file' | 'link' | 'symlink' | 'directory' |
 'block-device' | 'character-device' | 'fifo' | 'contiguous-file';
 

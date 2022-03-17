@@ -15,7 +15,7 @@ import {
 import { getHarborFQRepositoryPath } from '../../config/services/harbor';
 import env from '../../env';
 import { DockerPullOptions, pullDockerRegistryImage } from '../../modules/docker';
-import { ImageProcessError } from './error';
+import { ExtractingError } from './error';
 
 const harborConfig = parseHarborConnectionString(env.harborConnectionString);
 const harborUrL = new URL(harborConfig.host);
@@ -37,6 +37,6 @@ export async function downloadImage(message: Message) {
 
         return message;
     } catch (e) {
-        throw new ImageProcessError(TrainManagerExtractionStep.DOWNLOAD, e.message);
+        throw new ExtractingError(TrainManagerExtractionStep.DOWNLOAD, e.message);
     }
 }

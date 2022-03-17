@@ -16,7 +16,7 @@ function canVerifyCredentials() {
     return !lastChecked || (Date.now() - (30 * 1000)) > lastChecked;
 }
 
-export async function refreshAuthRobotTokenOnResponseError(err?: any) {
+export function refreshAuthRobotTokenOnResponseError(err?: any) {
     const { config } = err;
 
     if (
@@ -30,31 +30,36 @@ export async function refreshAuthRobotTokenOnResponseError(err?: any) {
         if (canVerifyCredentials()) {
             lastChecked = Date.now();
 
-            try {
-                const response = await useClient<VaultAPI>('vault').keyValue
-                    .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM);
-
-                if (response) {
+            return useClient<VaultAPI>('vault').keyValue
+                .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM)
+                .then((response) => {
                     const tokenApi = new TokenAPI(useClient().driver);
 
-                    const token = await tokenApi.create({
+                    return tokenApi.create({
                         id: response.data.id,
                         secret: response.data.secret,
                         grant_type: OAuth2TokenGrant.ROBOT_CREDENTIALS,
-                    });
+                    })
+                        .then((token) => {
+                            useClient()
+                                .setAuthorizationHeader({
+                                    type: 'Bearer',
+                                    token: token.access_token,
+                                });
 
-                    useClient().setAuthorizationHeader({
-                        type: 'Bearer',
-                        token: token.access_token,
-                    });
+                            return useClient().request(config);
+                        })
+                        .catch((e) => {
+                            useClient().unsetAuthorizationHeader();
 
-                    return await useClient().request(config);
-                }
+                            return Promise.reject(e);
+                        });
+                })
+                .catch((e) => {
+                    useClient().unsetAuthorizationHeader();
 
-                useClient().unsetAuthorizationHeader();
-            } catch (e) {
-                useClient().unsetAuthorizationHeader();
-            }
+                    return Promise.reject(e);
+                });
         }
     }
 

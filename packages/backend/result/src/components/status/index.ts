@@ -4,7 +4,7 @@ import { useLogger } from '../../modules/log';
 import { statusImage } from './status';
 import { writeFailedEvent } from './write-failed';
 
-export function createImageStatusComponentHandlers() : ConsumeHandlers {
+export function createStatusComponentHandlers() : ConsumeHandlers {
     return {
         [TrainManagerQueueCommand.STATUS]: async (message: Message) => {
             useLogger().debug('status event received', { component: 'image-status', trainId: message.data.trainId });

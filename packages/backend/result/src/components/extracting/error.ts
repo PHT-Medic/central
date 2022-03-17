@@ -8,7 +8,7 @@
 import { BaseError, buildErrorOptions } from '@typescript-error/http';
 import { TrainManagerExtractionStep } from '@personalhealthtrain/central-common';
 
-export class ImageProcessError extends BaseError {
+export class ExtractingError extends BaseError {
     constructor(step: TrainManagerExtractionStep, message?: string) {
         super(buildErrorOptions({
             message,

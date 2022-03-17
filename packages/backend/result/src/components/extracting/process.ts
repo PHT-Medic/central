@@ -5,9 +5,9 @@ import { buildImageOutputFilePath, getImageOutputDirectoryPath } from '../../con
 import { getHarborFQRepositoryPath } from '../../config/services/harbor';
 import { readDockerContainerPaths, removeLocalRegistryImage, saveDockerContainerPathsTo } from '../../modules/docker';
 import { ensureDirectory } from '../../modules/fs';
-import { ImageProcessError } from './error';
+import { ExtractingError } from './error';
 
-export async function extractImage(message: Message) {
+export async function processEvent(message: Message) {
     try {
         const data: TrainManagerExtractingQueuePayload = message.data as TrainManagerExtractingQueuePayload;
 
@@ -66,6 +66,6 @@ export async function extractImage(message: Message) {
             data,
         };
     } catch (e) {
-        throw new ImageProcessError(TrainManagerExtractionStep.EXTRACT, e.message);
+        throw new ExtractingError(TrainManagerExtractionStep.EXTRACT, e.message);
     }
 }

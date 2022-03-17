@@ -5,10 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Ecosystem, Train, TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
+import {
+    Ecosystem, Train, TrainBuilderStation, TrainStationApprovalStatus,
+} from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { TrainStationEntity } from '../../../core/train-station/entity';
-import { TrainBuilderStation } from '../type';
 
 export async function buildTrainBuilderStationsProperty(id: Train['id']) : Promise<TrainBuilderStation[]> {
     const trainStationRepository = getRepository(TrainStationEntity);

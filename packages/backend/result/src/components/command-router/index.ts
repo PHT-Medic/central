@@ -1,13 +1,15 @@
 import { consumeQueue } from 'amqp-extension';
 import { MessageQueueSelfRoutingKey } from '../../config/services/rabbitmq';
-import { createImageProcessComponentHandlers } from '../image-process';
-import { createImageStatusComponentHandlers } from '../image-status';
+import { createExtractingComponentHandlers } from '../extracting';
+import { createStatusComponentHandlers } from '../status';
+import { createBuildingComponentHandlers } from '../building';
 
 export function buildCommandRouterComponent() {
     function start() {
         return consumeQueue({ routingKey: MessageQueueSelfRoutingKey.COMMAND }, {
-            ...createImageProcessComponentHandlers(),
-            ...createImageStatusComponentHandlers(),
+            ...createBuildingComponentHandlers(),
+            ...createExtractingComponentHandlers(),
+            ...createStatusComponentHandlers(),
         });
     }
 

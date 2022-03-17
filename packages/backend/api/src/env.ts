@@ -49,10 +49,10 @@ export interface Environment {
     skipProposalApprovalOperation: boolean,
     skipTrainApprovalOperation: boolean,
 
-    userPasswordImmutable: boolean,
-    userSecretsImmutable: boolean,
+    httpProxyAPIs: string | undefined,
 
-    httpProxyAPIs: string | undefined
+    trainManagerForBuilding: boolean,
+    trainManagerForRouting: boolean
 }
 
 // tslint:disable-next-line:radix
@@ -79,9 +79,10 @@ const env : Environment = {
     skipProposalApprovalOperation: requireFromEnv('SKIP_PROPOSAL_APPROVAL_OPERATION', 'false').toLowerCase() !== 'false',
     skipTrainApprovalOperation: requireFromEnv('SKIP_TRAIN_APPROVAL_OPERATION', 'false').toLowerCase() !== 'false',
 
-    userPasswordImmutable: requireFromEnv('USER_PASSWORD_IMMUTABLE', 'false').toLowerCase() !== 'false',
-    userSecretsImmutable: requireFromEnv('USER_SECRETS_IMMUTABLE', 'false').toLowerCase() !== 'false',
     httpProxyAPIs: requireFromEnv('HTTP_PROXY_APIS', null),
+
+    trainManagerForBuilding: requireFromEnv('TRAIN_MANAGER_BUILDING', 'false').toLowerCase() !== 'false',
+    trainManagerForRouting: requireFromEnv('TRAIN_MANAGER_ROUTING', 'false').toLowerCase() !== 'false',
 };
 
 export default env;
