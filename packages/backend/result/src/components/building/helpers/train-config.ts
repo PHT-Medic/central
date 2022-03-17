@@ -6,7 +6,7 @@
  */
 
 import {
-    HTTPClient, SecretType, TrainBuilderStartPayload, TrainConfig,
+    HTTPClient, SecretType, TrainBuilderStartPayload, TrainConfig, TrainConfigSourceType,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 
@@ -19,7 +19,7 @@ export async function buildTrainConfig(data: TrainBuilderStartPayload) : Promise
             paillier_public_key: null,
         },
         source: {
-            type: 'docker_repository',
+            type: TrainConfigSourceType.DOCKER,
             address: data.master_image,
             tag: 'latest',
         },
