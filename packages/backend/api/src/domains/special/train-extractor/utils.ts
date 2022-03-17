@@ -6,7 +6,7 @@
  */
 
 import {
-    TrainConfig, TrainContainerPath, TrainExtractorQueuePayload, isTrainConfig,
+    TrainConfig, TrainContainerFileName, TrainContainerPath, TrainExtractorQueuePayload, isTrainConfig,
 } from '@personalhealthtrain/central-common';
 
 export function extractTrainConfigFromTrainExtractorPayload(
@@ -16,7 +16,17 @@ export function extractTrainConfigFromTrainExtractorPayload(
         return undefined;
     }
 
-    const index = payload.files.findIndex((file) => file.name === TrainContainerPath.CONFIG);
+    const index = payload.files.findIndex((file) => {
+        if (
+            file.path &&
+            file.path === TrainContainerPath.CONFIG
+        ) {
+            return true;
+        }
+
+        return file.name === TrainContainerFileName.CONFIG;
+    });
+
     if (index === -1) {
         return undefined;
     }
@@ -26,7 +36,8 @@ export function extractTrainConfigFromTrainExtractorPayload(
     }
 
     const raw = JSON.parse(payload.files[index].content);
-    console.log(raw);
 
-    return isTrainConfig(raw) ? raw : undefined;
+    return isTrainConfig(raw) ?
+        raw :
+        undefined;
 }

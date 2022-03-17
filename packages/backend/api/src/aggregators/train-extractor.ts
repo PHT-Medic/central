@@ -60,12 +60,12 @@ async function handleTrainExtractorEvent(
         }
         case TrainExtractorMode.READ: {
             const config = extractTrainConfigFromTrainExtractorPayload(data);
-            console.log(config);
             if (typeof config === 'undefined') {
                 return;
             }
 
             const result = await syncTrainConfigToDatabase(config);
+            console.log(result);
 
             train.run_station_id = result.stationId;
             train.run_station_index = result.position;

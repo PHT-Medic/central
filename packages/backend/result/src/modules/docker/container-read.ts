@@ -64,6 +64,11 @@ export async function readDockerContainerPaths(
         });
 
         const archiveFiles = await extractTarStream(archiveStream);
+        archiveFiles.map((file) => {
+            file.path = directoryPaths[i];
+            return file;
+        });
+
         files.push(...archiveFiles);
     }
 

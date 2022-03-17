@@ -12,8 +12,10 @@ export type TrainExtractorFileType = 'file' | 'link' | 'symlink' | 'directory' |
 
 export type TrainExtractorFile = {
     name: string,
+    path?: string,
     size: number,
-    content: string
+    content: string,
+    [key: string]: any
 };
 
 export type TrainExtractorQueuePayload = {

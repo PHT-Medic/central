@@ -18,6 +18,7 @@ export type DockerContainerFileType = 'file' | 'link' | 'symlink' | 'directory' 
 
 export type DockerContainerFile = {
     name: string,
+    path?: string,
     type: DockerContainerFileType,
     size: number,
     content: string

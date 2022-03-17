@@ -88,6 +88,10 @@ export enum TrainCommand {
 
 // -------------------------------------------------------------------------
 
+export enum TrainContainerFileName {
+    CONFIG = 'train_config.json',
+}
+
 export enum TrainContainerPath {
     CONFIG = '/opt/train_config.json',
     RESULTS = '/opt/pht_results',
