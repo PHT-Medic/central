@@ -8,7 +8,7 @@
 import { ConsumeHandler, Message } from 'amqp-extension';
 import { saveToRegistry } from './handlers/save';
 import { deleteFromRegistry } from './handlers/delete';
-import { RegistryQueueCommand } from '../../domains/special/registry/constants';
+import { RegistryQueueCommand } from '../../domains/special/registry';
 import { setupRegistry } from './handlers/setup';
 
 export function createRegistryComponentHandlers() : Record<RegistryQueueCommand, ConsumeHandler> {

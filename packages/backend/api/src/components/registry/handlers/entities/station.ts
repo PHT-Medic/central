@@ -113,11 +113,6 @@ export async function saveStationToRegistry(payload: RegistryStationQueuePayload
             });
     }
 
-    /*
-    if (
-        !entity.registry_project_webhook_exists
-    ) {
-     */
     const response = await useClient<VaultAPI>(ApiKey.VAULT)
         .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
 
