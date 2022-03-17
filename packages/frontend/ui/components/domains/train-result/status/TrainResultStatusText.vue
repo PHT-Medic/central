@@ -16,41 +16,34 @@
 </template>
 <script>
 
-import { TrainResultStatus } from '@personalhealthtrain/central-common';
+import { TrainManagerExtractingQueueEvent } from '@personalhealthtrain/central-common';
 
 export default {
     props: {
         status: {
-            type: TrainResultStatus,
+            type: TrainManagerExtractingQueueEvent,
             default: null,
         },
     },
     computed: {
         statusText() {
             switch (this.status) {
-                case TrainResultStatus.STARTING:
-                    return 'starting...';
-                case TrainResultStatus.STOPPING:
-                    return 'stopping...';
-
-                case TrainResultStatus.STARTED:
+                case TrainManagerExtractingQueueEvent.STARTED:
                     return 'started';
-                case TrainResultStatus.STOPPED:
-                    return 'stopped';
 
-                case TrainResultStatus.DOWNLOADING:
+                case TrainManagerExtractingQueueEvent.DOWNLOADING:
                     return 'downloading...';
-                case TrainResultStatus.DOWNLOADED:
+                case TrainManagerExtractingQueueEvent.DOWNLOADED:
                     return 'downloaded';
 
-                case TrainResultStatus.EXTRACTING:
+                case TrainManagerExtractingQueueEvent.PROCESSING:
                     return 'extracting...';
-                case TrainResultStatus.EXTRACTED:
+                case TrainManagerExtractingQueueEvent.PROCESSED:
                     return 'extracted';
 
-                case TrainResultStatus.FINISHED:
+                case TrainManagerExtractingQueueEvent.FINISHED:
                     return 'finished';
-                case TrainResultStatus.FAILED:
+                case TrainManagerExtractingQueueEvent.FAILED:
                     return 'failed';
 
                 default:
@@ -59,21 +52,16 @@ export default {
         },
         classSuffix() {
             switch (this.status) {
-                case TrainResultStatus.STARTING:
-                case TrainResultStatus.STARTED:
-                case TrainResultStatus.STOPPED:
-                case TrainResultStatus.DOWNLOADING:
-                case TrainResultStatus.EXTRACTING:
-                case TrainResultStatus.EXTRACTED:
+                case TrainManagerExtractingQueueEvent.STARTED:
+                case TrainManagerExtractingQueueEvent.DOWNLOADING:
+                case TrainManagerExtractingQueueEvent.PROCESSING:
+                case TrainManagerExtractingQueueEvent.PROCESSED:
                     return 'primary';
 
-                case TrainResultStatus.FINISHED:
+                case TrainManagerExtractingQueueEvent.FINISHED:
                     return 'success';
 
-                case TrainResultStatus.STOPPING:
-                    return 'warning';
-
-                case TrainResultStatus.FAILED:
+                case TrainManagerExtractingQueueEvent.FAILED:
                     return 'danger';
 
                 default:

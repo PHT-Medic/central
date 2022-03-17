@@ -18,7 +18,8 @@ import {
     startBuildTrain,
     startTrain,
     stopBuildTrain,
-    triggerTrainResultStart, triggerTrainResultStatus, triggerTrainResultStop,
+    triggerTrainResultStart,
+    triggerTrainResultStatus,
 } from '../../../../../domains/core/train/commands';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { ExpressValidationError } from '../../../../express-validation';
@@ -90,9 +91,6 @@ export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: E
             break;
         case TrainCommand.RESULT_START:
             entity = await triggerTrainResultStart(entity.id);
-            break;
-        case TrainCommand.RESULT_STOP:
-            entity = await triggerTrainResultStop(entity.id);
             break;
 
         // General Commands

@@ -16,31 +16,28 @@
 </template>
 <script>
 
-import { TrainResultStatus } from '@personalhealthtrain/central-common';
+import { TrainManagerExtractingQueueEvent } from '@personalhealthtrain/central-common';
 
 export default {
     props: {
         status: {
-            type: TrainResultStatus,
+            type: TrainManagerExtractingQueueEvent,
             default: null,
         },
     },
     computed: {
         iconClass() {
             switch (this.status) {
-                case TrainResultStatus.STARTING:
-                case TrainResultStatus.STOPPING:
-                    return 'fas fa-sync';
-                case TrainResultStatus.DOWNLOADING:
+                case TrainManagerExtractingQueueEvent.DOWNLOADING:
                     return 'fa-download';
-                case TrainResultStatus.DOWNLOADED:
+                case TrainManagerExtractingQueueEvent.DOWNLOADED:
                     return 'fa-file-download';
-                case TrainResultStatus.EXTRACTING:
-                case TrainResultStatus.EXTRACTED:
+                case TrainManagerExtractingQueueEvent.PROCESSING:
+                case TrainManagerExtractingQueueEvent.PROCESSED:
                     return 'fa-file-export';
-                case TrainResultStatus.FINISHED:
+                case TrainManagerExtractingQueueEvent.FINISHED:
                     return 'fa-save';
-                case TrainResultStatus.FAILED:
+                case TrainManagerExtractingQueueEvent.FAILED:
                     return 'fa-exclamation';
                 default:
                     return 'fa fa-info';

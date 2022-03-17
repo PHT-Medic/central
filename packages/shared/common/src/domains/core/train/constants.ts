@@ -45,17 +45,13 @@ export enum TrainRunStatus {
 // -------------------------------------------------------------------------
 
 export enum TrainResultStatus {
-    STARTING = 'starting',
     STARTED = 'started',
-
-    STOPPING = 'stopping',
-    STOPPED = 'stopped',
 
     DOWNLOADING = 'downloading',
     DOWNLOADED = 'downloaded',
 
-    EXTRACTING = 'extracting',
-    EXTRACTED = 'extracted',
+    PROCESSING = 'extracting',
+    PROCESSED = 'extracted',
 
     FINISHED = 'finished',
     FAILED = 'failed',
@@ -81,7 +77,6 @@ export enum TrainCommand {
 
     RESULT_STATUS = 'resultStatus',
     RESULT_START = 'resultStart',
-    RESULT_STOP = 'resultStop',
 
     GENERATE_HASH = 'generateHash',
 }

@@ -1,13 +1,13 @@
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
 import fs from 'fs';
-import { TrainExtractorQueueEvent, TrainExtractorQueuePayload } from '@personalhealthtrain/central-common';
+import { TrainManagerExtractingQueueEvent, TrainManagerExtractingQueuePayload } from '@personalhealthtrain/central-common';
 import { buildImageOutputFilePath } from '../../config/paths';
 import { getHarborFQRepositoryPath } from '../../config/services/harbor';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { checkIfLocalRegistryImageExists } from '../../modules/docker';
 
 export async function statusImage(message: Message) {
-    const data : TrainExtractorQueuePayload = message.data as TrainExtractorQueuePayload;
+    const data : TrainManagerExtractingQueuePayload = message.data as TrainManagerExtractingQueuePayload;
 
     // 1. Check if result already exists.
     const trainResultPath : string = buildImageOutputFilePath(data.repositoryName);
@@ -19,7 +19,7 @@ export async function statusImage(message: Message) {
             options: {
                 routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
             },
-            type: TrainExtractorQueueEvent.EXTRACTED,
+            type: TrainManagerExtractingQueueEvent.PROCESSED,
             data: message.data,
         }));
 
@@ -38,7 +38,7 @@ export async function statusImage(message: Message) {
             options: {
                 routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
             },
-            type: TrainExtractorQueueEvent.DOWNLOADED,
+            type: TrainManagerExtractingQueueEvent.DOWNLOADED,
             data: message.data,
             metadata: message.metadata,
         }));
@@ -52,7 +52,7 @@ export async function statusImage(message: Message) {
         options: {
             routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
         },
-        type: TrainExtractorQueueEvent.UNKNOWN,
+        type: TrainManagerExtractingQueueEvent.UNKNOWN,
         data: message.data,
         metadata: message.metadata,
     }));

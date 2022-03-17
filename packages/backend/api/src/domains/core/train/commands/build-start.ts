@@ -8,7 +8,12 @@
 import { publishMessage } from 'amqp-extension';
 import { Not, getRepository } from 'typeorm';
 import {
-    Train, TrainBuildStatus, TrainConfigurationStatus, TrainResultStatus, TrainRunStatus, TrainStationApprovalStatus,
+    Train,
+    TrainBuildStatus,
+    TrainConfigurationStatus,
+    TrainManagerExtractingQueueEvent, TrainResultStatus,
+    TrainRunStatus,
+    TrainStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
 import { buildTrainBuilderQueueMessage } from '../../../special/train-builder/queue';
 import { TrainBuilderCommand } from '../../../special/train-builder/type';

@@ -261,14 +261,6 @@ export default {
                         @done="handleUpdated"
                         @failed="handleFailed"
                     />
-                    <train-result-command
-                        :command="trainCommand.RESULT_STOP"
-                        :element-type="'dropDownItem'"
-                        :with-icon="true"
-                        :entity="entity"
-                        @done="handleUpdated"
-                        @failed="handleFailed"
-                    />
                 </b-dropdown>
             </div>
         </div>

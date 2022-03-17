@@ -1,5 +1,5 @@
 import { URL } from 'url';
-import { parseHarborConnectionString } from '../../domains/service/harbor';
+import { parseHarborConnectionString } from '@personalhealthtrain/central-common';
 import env from '../../env';
 
 const harborConfig = parseHarborConnectionString(env.harborConnectionString);

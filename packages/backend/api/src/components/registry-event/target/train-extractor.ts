@@ -10,9 +10,9 @@ import { Message, publishMessage } from 'amqp-extension';
 import {
     REGISTRY_OUTGOING_PROJECT_NAME,
     TrainContainerPath,
-    TrainExtractorMode,
+    TrainManagerExtractionMode, TrainManagerQueueCommand,
 } from '@personalhealthtrain/central-common';
-import { TrainExtractorQueueCommand, buildTrainExtractorQueueMessage } from '../../../domains/special/train-extractor';
+import { buildTrainManagerQueueMessage } from '../../../domains/special/train-manager';
 import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../../domains/special/registry';
 import { useLogger } from '../../../config/log';
 
@@ -31,7 +31,7 @@ export async function dispatchRegistryEventToTrainExtractor(
 
     const isOutgoingProject : boolean = data.namespace === REGISTRY_OUTGOING_PROJECT_NAME;
 
-    await publishMessage(buildTrainExtractorQueueMessage(TrainExtractorQueueCommand.START, {
+    await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT, {
         repositoryName: data.repositoryName,
         projectName: data.namespace,
 
@@ -41,8 +41,8 @@ export async function dispatchRegistryEventToTrainExtractor(
         ],
 
         mode: isOutgoingProject ?
-            TrainExtractorMode.WRITE :
-            TrainExtractorMode.READ,
+            TrainManagerExtractionMode.WRITE :
+            TrainManagerExtractionMode.READ,
     }));
 
     return message;

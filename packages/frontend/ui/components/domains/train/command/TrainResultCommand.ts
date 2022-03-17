@@ -74,18 +74,6 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
                     ].indexOf(this.entity.result_status) === -1;
             }
 
-            if (
-                this.command === TrainCommand.RESULT_STOP
-            ) {
-                return !this.entity.result_status ||
-                    [
-                        TrainResultStatus.STARTING,
-                        TrainResultStatus.STARTED,
-                        TrainResultStatus.FINISHED,
-                        TrainResultStatus.STOPPING,
-                    ].indexOf(this.entity.result_status) === -1;
-            }
-
             return false;
         },
         commandText() {
@@ -94,8 +82,6 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
                     return 'download';
                 case TrainCommand.RESULT_START:
                     return 'start';
-                case TrainCommand.RESULT_STOP:
-                    return 'stop';
                 case TrainCommand.RESULT_STATUS:
                     return 'check';
                 default:
@@ -108,8 +94,6 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
                     return 'fa fa-download';
                 case TrainCommand.RESULT_START:
                     return 'fa fa-wrench';
-                case TrainCommand.RESULT_STOP:
-                    return 'fa fa-stop';
                 case TrainCommand.RESULT_STATUS:
                     return 'fas fa-shield-alt';
                 default:
@@ -122,8 +106,6 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
                     return 'dark';
                 case TrainCommand.RESULT_START:
                     return 'success';
-                case TrainCommand.RESULT_STOP:
-                    return 'danger';
                 case TrainCommand.RESULT_STATUS:
                     return 'primary';
                 default:

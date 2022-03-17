@@ -6,11 +6,11 @@
  */
 
 import {
-    TrainConfig, TrainContainerFileName, TrainContainerPath, TrainExtractorQueuePayload, isTrainConfig,
+    TrainConfig, TrainContainerFileName, TrainContainerPath, TrainManagerExtractingQueuePayload, isTrainConfig,
 } from '@personalhealthtrain/central-common';
 
 export function extractTrainConfigFromTrainExtractorPayload(
-    payload: TrainExtractorQueuePayload,
+    payload: TrainManagerExtractingQueuePayload,
 ) : undefined | TrainConfig {
     if (!payload.files || payload.files.length === 0) {
         return undefined;

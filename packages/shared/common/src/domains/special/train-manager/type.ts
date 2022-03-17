@@ -5,24 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainExtractorMode } from './constants';
+import { TrainManagerExtractionMode } from './constants';
 
-export type TrainExtractorFileType = 'file' | 'link' | 'symlink' | 'directory' |
+export type TrainManagerExtractingFileType = 'file' | 'link' | 'symlink' | 'directory' |
 'block-device' | 'character-device' | 'fifo' | 'contiguous-file';
 
-export type TrainExtractorFile = {
+export type TrainManagerExtractingFile = {
     name: string,
     path?: string,
     size: number,
     content: string,
-    [key: string]: any
+    type: TrainManagerExtractingFileType
 };
 
-export type TrainExtractorQueuePayload = {
+export type TrainManagerExtractingQueuePayload = {
     filePaths?: string[],
-    files?: TrainExtractorFile[],
+    files?: TrainManagerExtractingFile[],
 
-    mode: `${TrainExtractorMode}`,
+    mode: `${TrainManagerExtractionMode}`,
 
     projectName: string,
     repositoryName: string

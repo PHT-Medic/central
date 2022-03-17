@@ -23,7 +23,7 @@ export enum MessageQueueRoutingKey {
     /**
      * External Service Command
      */
-    RESULT_SERVICE_COMMAND = 'rs.command',
+    TRAIN_MANAGER_COMMAND = 'rs.command',
     TRAIN_BUILDER_COMMAND = 'tb',
     TRAIN_ROUTER_COMMAND = 'tr',
 }

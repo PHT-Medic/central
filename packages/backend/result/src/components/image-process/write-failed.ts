@@ -1,18 +1,19 @@
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
-import { TrainExtractorQueueEvent, TrainExtractorStep } from '@personalhealthtrain/central-common';
+import { TrainManagerExtractingQueueEvent } from '@personalhealthtrain/central-common';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
+import { ImageProcessError } from './error';
 
-export async function writeExtractingFailedEvent(message: Message, error: Error) {
+export async function writeFailedEvent(message: Message, error: ImageProcessError) {
     await publishMessage(buildMessage({
         options: {
             routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
         },
-        type: TrainExtractorQueueEvent.FAILED,
+        type: TrainManagerExtractingQueueEvent.FAILED,
         data: {
             ...message.data,
             error: {
                 message: error.message,
-                step: TrainExtractorStep.EXTRACT,
+                step: error.getOption('step'),
             },
         },
         metadata: message.metadata,

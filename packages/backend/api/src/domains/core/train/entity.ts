@@ -25,7 +25,8 @@ import {
     Train,
     TrainBuildStatus,
     TrainConfigurationStatus,
-    TrainFile, TrainResultStatus,
+    TrainFile,
+    TrainResultStatus,
     TrainRunStatus, TrainType,
     UserSecret,
 } from '@personalhealthtrain/central-common';
@@ -119,7 +120,7 @@ export class TrainEntity implements Train {
     // ------------------------------------------------------------------
 
     @Column({
-        type: 'enum', nullable: true, default: null, enum: TrainBuildStatus,
+        type: 'varchar', length: 64, default: null,
     })
         build_status: TrainBuildStatus | null;
 
@@ -129,7 +130,7 @@ export class TrainEntity implements Train {
     // ------------------------------------------------------------------
 
     @Column({
-        type: 'enum', nullable: true, default: null, enum: TrainRunStatus,
+        type: 'varchar', length: 64, default: null,
     })
         run_status: TrainRunStatus | null;
 
@@ -188,7 +189,7 @@ export class TrainEntity implements Train {
     // ------------------------------------------------------------------
 
     @Column({
-        type: 'enum', nullable: true, default: null, enum: TrainResultStatus,
+        type: 'varchar', length: 64, default: null,
     })
         result_status: TrainResultStatus | null;
 

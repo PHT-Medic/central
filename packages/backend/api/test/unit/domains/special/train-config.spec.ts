@@ -9,15 +9,15 @@ import path from 'path';
 import {
     TrainContainerFileName,
     TrainContainerPath,
-    TrainExtractorQueuePayload,
+    TrainManagerExtractingQueuePayload,
 } from '@personalhealthtrain/central-common';
-import { extractTrainConfigFromTrainExtractorPayload } from '../../../../src/domains/special/train-extractor/utils';
+import { extractTrainConfigFromTrainExtractorPayload } from '../../../../src/domains/special/train-manager/utils';
 
 describe('src/domains/train-builder', () => {
     it('should build train message', async () => {
         const trainConfig = await import(path.join(__dirname, '..', '..', 'data', 'train-config.json'));
 
-        const queuePayload : TrainExtractorQueuePayload = {
+        const queuePayload : TrainManagerExtractingQueuePayload = {
             filePaths: [TrainContainerPath.CONFIG],
             files: [
                 {

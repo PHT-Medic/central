@@ -18,6 +18,7 @@ import {
 } from './constants';
 import { UserSecret } from '../../auth';
 import { Station } from '../station';
+import { TrainManagerExtractingQueueEvent } from '../../special';
 
 export interface Train {
     id: string;
