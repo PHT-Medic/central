@@ -113,21 +113,22 @@ export async function saveStationToRegistry(payload: RegistryStationQueuePayload
             });
     }
 
+    /*
     if (
         !entity.registry_project_webhook_exists
     ) {
-        const response = await useClient<VaultAPI>(ApiKey.VAULT)
-            .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
+     */
+    const response = await useClient<VaultAPI>(ApiKey.VAULT)
+        .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
 
-        // todo: create robot account or sync to vault if not available :)
+    // todo: create robot account or sync to vault if not available :)
 
-        if (response) {
-            await useClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.ensure(projectName, response.data, {
-                internalAPIUrl: env.internalApiUrl,
-            }, true);
+    if (response) {
+        await useClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.ensure(projectName, response.data, {
+            internalAPIUrl: env.internalApiUrl,
+        }, true);
 
-            entity.registry_project_webhook_exists = true;
-        }
+        entity.registry_project_webhook_exists = true;
     }
 
     await repository.save(entity);

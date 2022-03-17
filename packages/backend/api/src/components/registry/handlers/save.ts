@@ -7,8 +7,7 @@
 
 import { Message } from 'amqp-extension';
 import { saveStationToRegistry } from './entities/station';
-import { RegistryQueuePayload } from '../../../domains/special/registry/type';
-import { RegistryQueueEntityType } from '../../../domains/special/registry/constants';
+import { RegistryQueueEntityType, RegistryQueuePayload } from '../../../domains/special/registry';
 
 export async function saveToRegistry(message: Message) {
     const payload : RegistryQueuePayload = message.data as RegistryQueuePayload;

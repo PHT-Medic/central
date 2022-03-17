@@ -7,6 +7,7 @@ import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 
@@ -45,6 +46,8 @@ async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilde
                     protectedSelected.map((field) => field.key).join(', ')}`,
             );
         }
+
+        onlyRealmPermittedQueryResources(query, req.realmId, 'station.realm_id');
     }
 
     applyQueryFieldsParseOutput(query, fieldsParsed);
