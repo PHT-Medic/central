@@ -49,7 +49,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
     registerSocketHandlers(server);
 
     // build & register realm workspaces
-    const realmWorkspaces = server.of(/^\/realm#[a-z0-9]+$/);
+    const realmWorkspaces = server.of(/^\/realm#[a-z0-9A-Z-_]+$/);
     realmWorkspaces.use(setupSocketMiddleware({
         redis: context.config.redisDatabase,
         http: useClient('default').driver,
@@ -61,7 +61,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
             return;
         }
 
-        const matches = socket.nsp.name.match(/^\/realm#([a-z0-9]+)$/);
+        const matches = socket.nsp.name.match(/^\/realm#([a-z0-9A-Z-_]+)$/);
 
         if (matches[1] === socket.data.realmId || socket.data.realmId === MASTER_REALM_ID) {
             next();

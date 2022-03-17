@@ -26,6 +26,7 @@ import {
 } from '@vue-layout/utils';
 import { BuildInput } from '@trapi/query';
 import { Socket } from 'socket.io-client';
+import { MASTER_REALM_ID } from '@authelion/common';
 import { TrainListItem } from './TrainListItem';
 
 export const TrainList = Vue.extend<
@@ -61,6 +62,10 @@ ComponentListProperties<Train>
             type: Boolean,
             default: true,
         },
+        realmId: {
+            type: String,
+            default: undefined,
+        },
     },
     data() {
         return {
@@ -81,12 +86,23 @@ ComponentListProperties<Train>
         };
     },
     computed: {
-        realmId() {
+        userRealmId() {
+            return this.$store.getters['auth/userRealmId'];
+        },
+        socketRealmId() {
+            if (this.realmId) {
+                return this.realmId;
+            }
+
+            if (this.userRealmId === MASTER_REALM_ID) {
+                return undefined;
+            }
+
             if (this.query.filter.realm_id) {
                 return this.query.filter.realm_id;
             }
 
-            return this.$store.getters['auth/userRealmId'];
+            return this.userRealmId;
         },
         queryFinal() {
             return mergeDeep({
@@ -124,12 +140,10 @@ ComponentListProperties<Train>
         this.load();
     },
     mounted() {
-        // todo: maybe allow non realm workspace subscription
-
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.realmId);
+        > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
         socket.emit('trainsSubscribe');
         socket.on('trainCreated', this.handleSocketCreated);
@@ -138,7 +152,7 @@ ComponentListProperties<Train>
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.realmId);
+        > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
         socket.emit('trainsUnsubscribe');
         socket.off('trainCreated', this.handleSocketCreated);
