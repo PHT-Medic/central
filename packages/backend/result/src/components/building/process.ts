@@ -122,15 +122,17 @@ export async function processMessage(message: Message) {
     const baseImageURL = buildRemoteDockerImageURL(REGISTRY_INCOMING_PROJECT_NAME, data.id, 'base');
     await pushDockerImages(baseImageURL, authConfig);
 
+    useLogger().debug('Pushed image', {
+        component: 'building',
+        image: baseImageURL,
+    });
+
     const latestImageURL = buildRemoteDockerImageURL(REGISTRY_INCOMING_PROJECT_NAME, data.id, 'latest');
     await pushDockerImages(latestImageURL, authConfig);
 
     useLogger().debug('Pushed image', {
         component: 'building',
-        urls: [
-            latestImageURL,
-            baseImageURL,
-        ],
+        image: latestImageURL,
     });
 
     await container.remove({

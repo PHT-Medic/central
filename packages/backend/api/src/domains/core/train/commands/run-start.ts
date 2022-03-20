@@ -39,18 +39,8 @@ export async function startTrain(train: Train | number | string) : Promise<Train
         throw new Error('The train has already been started...');
     } else {
         if (env.trainManagerForRouting) {
-            await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE, {
-                repositoryName: train.id,
-                projectName: REGISTRY_INCOMING_PROJECT_NAME,
-                operator: REGISTRY_SYSTEM_USER_NAME,
-                artifactTag: REGISTRY_ARTIFACT_TAG_BASE,
-            }));
-
-            await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE, {
-                repositoryName: train.id,
-                projectName: REGISTRY_INCOMING_PROJECT_NAME,
-                operator: REGISTRY_SYSTEM_USER_NAME,
-                artifactTag: REGISTRY_ARTIFACT_TAG_LATEST,
+            await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE_START, {
+                id: train.id,
             }));
         } else {
             const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.START, { id: train.id });

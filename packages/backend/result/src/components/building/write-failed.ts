@@ -1,10 +1,16 @@
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
 import { TrainManagerBuildingQueueEvent } from '@personalhealthtrain/central-common';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { BuildingError } from './error';
 
 export async function writeFailedEvent(message: Message, error: BuildingError) {
-    console.log(error);
     await publishMessage(buildMessage({
         options: {
             routingKey: MessageQueueSelfToUIRoutingKey.EVENT,

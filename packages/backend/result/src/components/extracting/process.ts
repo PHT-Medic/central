@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
 import { Message } from 'amqp-extension';
 import fs from 'fs';
 import { TrainManagerExtractingQueuePayload, TrainManagerExtractionMode, TrainManagerExtractionStep } from '@personalhealthtrain/central-common';
@@ -7,7 +14,7 @@ import { readDockerContainerPaths, removeDockerImage, saveDockerContainerPathsTo
 import { ensureDirectory } from '../../modules/fs';
 import { ExtractingError } from './error';
 
-export async function processEvent(message: Message) {
+export async function processExtractCommand(message: Message) {
     try {
         const data: TrainManagerExtractingQueuePayload = message.data as TrainManagerExtractingQueuePayload;
 

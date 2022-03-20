@@ -13,6 +13,7 @@ export enum TrainManagerQueueCommand {
     BUILD_STATUS = 'buildStatus',
 
     ROUTE = 'route',
+    ROUTE_START = 'routeStart',
 }
 
 // ----------------------------------------------------------

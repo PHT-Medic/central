@@ -12,7 +12,8 @@ import { RoutingError } from './error';
 import { writeProcessedEvent } from './write-processed';
 import { writeProcessingEvent } from './write-processing';
 import { writeFailedEvent } from './write-failed';
-import { processMessage } from './process';
+import { processRouteCommand } from './process';
+import { processStartCommand } from './start';
 
 export function createRoutingComponentHandlers() : ConsumeHandlers {
     return {
@@ -23,8 +24,18 @@ export function createRoutingComponentHandlers() : ConsumeHandlers {
 
             await Promise.resolve(message)
                 .then(writeProcessingEvent)
-                .then(processMessage)
+                .then(processRouteCommand)
                 .then(writeProcessedEvent)
+                .catch((err: Error) => writeFailedEvent(message, err as RoutingError));
+        },
+
+        [TrainManagerQueueCommand.ROUTE_START]: async (message: Message) => {
+            useLogger().debug('Route start event received', {
+                component: 'routing',
+            });
+
+            await Promise.resolve(message)
+                .then(processStartCommand)
                 .catch((err: Error) => writeFailedEvent(message, err as RoutingError));
         },
     };

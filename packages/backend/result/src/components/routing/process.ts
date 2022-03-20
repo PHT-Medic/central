@@ -6,7 +6,7 @@
  */
 
 import { BuildInput } from '@trapi/query';
-import { Message, publishMessage } from 'amqp-extension';
+import { Message } from 'amqp-extension';
 import {
     HTTPClient,
     HarborAPI,
@@ -15,20 +15,22 @@ import {
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
     REGISTRY_SYSTEM_USER_NAME,
-    TrainManagerQueueCommand,
     TrainManagerRoutingPayload,
     TrainStation,
     buildRegistryStationProjectName, getRegistryStationProjectNameId, isRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
-import { buildTrainManagerQueueMessage } from '@personalhealthtrain/central-api/src/domains/special/train-manager';
 import { mergeStationsWithTrainStations } from './helpers/merge';
 import { useLogger } from '../../modules/log';
 
-export async function processMessage(message: Message) {
+export async function processRouteCommand(message: Message) {
     const data = message.data as TrainManagerRoutingPayload;
 
     const client = useClient<HTTPClient>();
+    const harborClient = useClient<HarborAPI>('harbor');
+
+    // -------------------------------------------------------------------
+
     const query : BuildInput<TrainStation> = {
         filter: {
             train_id: data.repositoryName,
@@ -54,6 +56,8 @@ export async function processMessage(message: Message) {
     });
 
     const stationsExtended = mergeStationsWithTrainStations(stations, trainStations);
+
+    // -------------------------------------------------------------------
 
     let sourceProjectName : string | undefined;
     let destinationProjectName: string | undefined;
@@ -114,6 +118,8 @@ export async function processMessage(message: Message) {
         return message;
     }
 
+    // -------------------------------------------------------------------
+
     useLogger().debug('Move image', {
         component: 'routing',
         projectFrom: sourceProjectName,
@@ -121,28 +127,11 @@ export async function processMessage(message: Message) {
         artifactTag: data.artifactTag,
     });
 
-    const harborClient = useClient<HarborAPI>('harbor');
-
-    try {
-        await harborClient.projectArtifact.copy(
-            destinationProjectName,
-            data.repositoryName,
-            `${sourceProjectName}/${data.repositoryName}:${data.artifactTag}`,
-        );
-    } catch (e) {
-        if (e.response.status === 400) {
-            const queueMessage = buildTrainManagerQueueMessage(
-                TrainManagerQueueCommand.BUILD,
-                {
-                    id: data.repositoryName,
-                },
-            );
-
-            await publishMessage(queueMessage);
-        }
-
-        throw e;
-    }
+    await harborClient.projectArtifact.copy(
+        destinationProjectName,
+        data.repositoryName,
+        `${sourceProjectName}/${data.repositoryName}:${data.artifactTag}`,
+    );
 
     try {
         await harborClient.projectArtifact
@@ -150,6 +139,33 @@ export async function processMessage(message: Message) {
     } catch (e) {
         // ...
     }
+
+    // -------------------------------------------------------------------
+
+    const isSourceStationProject = isRegistryStationProjectName(sourceProjectName);
+    const isDestinationStationProject = isRegistryStationProjectName(destinationProjectName);
+
+    if (
+        isSourceStationProject &&
+        isDestinationStationProject &&
+        data.artifactTag === REGISTRY_ARTIFACT_TAG_LATEST
+    ) {
+        // station does not push 'base' tag on completion
+        await harborClient.projectArtifact.copy(
+            destinationProjectName,
+            data.repositoryName,
+            `${sourceProjectName}/${data.repositoryName}:${REGISTRY_ARTIFACT_TAG_BASE}`,
+        );
+
+        try {
+            await harborClient.projectArtifact
+                .delete(sourceProjectName, data.repositoryName, REGISTRY_ARTIFACT_TAG_BASE);
+        } catch (e) {
+            // ...
+        }
+    }
+
+    // -------------------------------------------------------------------
 
     // latest is always last push, so only remove project than ;)
     if (data.artifactTag === REGISTRY_ARTIFACT_TAG_LATEST) {

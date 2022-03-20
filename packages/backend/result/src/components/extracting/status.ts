@@ -13,7 +13,7 @@ import { buildRemoteDockerImageURL } from '../../config/services/registry';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { checkIfLocalRegistryImageExists } from '../../modules/docker';
 
-export async function processExtractingStatusEvent(message: Message) {
+export async function processExtractStatusCommand(message: Message) {
     const data : TrainManagerExtractingQueuePayload = message.data as TrainManagerExtractingQueuePayload;
 
     // 1. Check if result already exists.
