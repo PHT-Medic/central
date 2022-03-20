@@ -17,14 +17,15 @@ export async function createProposalRouteHandler(req: ExpressRequest, res: Expre
         throw new ForbiddenError();
     }
 
-    const data : Partial<ProposalEntity> = await runProposalValidation(req, 'create');
+    const result = await runProposalValidation(req, 'create');
 
     const repository = getRepository(ProposalEntity);
     const entity = repository.create({
         realm_id: req.realmId,
         user_id: req.user.id,
-        ...data,
+        ...result.data,
     });
+
     await repository.save(entity);
 
     return res.respond({ data: entity });

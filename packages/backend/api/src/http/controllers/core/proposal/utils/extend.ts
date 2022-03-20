@@ -6,9 +6,9 @@
  */
 
 import { getRepository } from 'typeorm';
-import { NotFoundError } from '@typescript-error/http';
+import { BadRequestError, NotFoundError } from '@typescript-error/http';
 import { Proposal } from '@personalhealthtrain/central-common';
-import { ExpressValidationResult } from '../../../../express-validation';
+import { ExpressValidationResult, buildExpressValidationErrorMessage } from '../../../../express-validation';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 
 type ExpressValidationResultExtendedWithProposal = ExpressValidationResult<{
@@ -23,13 +23,13 @@ export async function extendExpressValidationResultWithProposal<
     T extends ExpressValidationResultExtendedWithProposal,
     >(result: T) : Promise<T> {
     if (result.data.proposal_id) {
-        const stationRepository = getRepository(ProposalEntity);
-        const station = await stationRepository.findOne(result.data.proposal_id);
-        if (typeof station === 'undefined') {
-            throw new NotFoundError('The referenced proposal is invalid.');
+        const repository = getRepository(ProposalEntity);
+        const entity = await repository.findOne(result.data.proposal_id);
+        if (typeof entity === 'undefined') {
+            throw new BadRequestError(buildExpressValidationErrorMessage('proposal_id'));
         }
 
-        result.meta.proposal = station;
+        result.meta.proposal = entity;
     }
 
     return result;

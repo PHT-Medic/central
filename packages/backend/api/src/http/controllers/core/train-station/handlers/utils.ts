@@ -8,10 +8,14 @@
 import { check, validationResult } from 'express-validator';
 import { isTrainStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
-import { NotFoundError } from '@typescript-error/http';
+import { BadRequestError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
+import {
+    ExpressValidationError,
+    buildExpressValidationErrorMessage,
+    matchedValidationData,
+} from '../../../../express-validation';
 import { TrainStationValidationResult } from '../type';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
@@ -73,7 +77,7 @@ export async function runTrainStationValidation(
         if (
             !isPermittedForResourceRealm(req.realmId, result.meta.train.realm_id)
         ) {
-            throw new NotFoundError('The referenced train realm is not permitted.');
+            throw new BadRequestError(buildExpressValidationErrorMessage('train_id'));
         }
 
         result.data.train_realm_id = result.meta.train.realm_id;

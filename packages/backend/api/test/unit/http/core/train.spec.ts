@@ -114,7 +114,7 @@ describe('src/controllers/core/train', () => {
     it('should not create resource with invalid master-image', async () => {
         const proposal = await createSuperTestProposal(superTest);
 
-        let response = await createSuperTestTrain(superTest, {
+        const response = await createSuperTestTrain(superTest, {
             ...details,
             proposal_id: proposal.body.id,
             master_image_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
@@ -122,14 +122,5 @@ describe('src/controllers/core/train', () => {
 
         expect(response.status).toEqual(400);
         expect(response.body.message).toEqual(buildExpressValidationErrorMessage<Train>(['master_image_id']));
-
-        response = await createSuperTestTrain(superTest, {
-            ...details,
-            proposal_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
-            master_image_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
-        });
-
-        expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildExpressValidationErrorMessage<Train>(['master_image_id', 'proposal_id']));
     });
 });

@@ -41,6 +41,6 @@ export async function updateTrainRouteHandler(req: ExpressRequest, res: ExpressR
     await repository.save(entity);
 
     return res.respondAccepted({
-        data: result,
+        data: entity,
     });
 }

@@ -11,7 +11,7 @@ import {
     TrainContainerPath,
     TrainManagerExtractingQueuePayload,
 } from '@personalhealthtrain/central-common';
-import { extractTrainConfigFromTrainExtractorPayload } from '../../../../src/domains/special/train-manager/utils';
+import { extractTrainConfigFromTrainExtractorPayload } from '../../../../src/domains/special/train-manager';
 
 describe('src/domains/train-builder', () => {
     it('should build train message', async () => {
@@ -25,6 +25,7 @@ describe('src/domains/train-builder', () => {
                     path: TrainContainerPath.CONFIG,
                     size: 5074,
                     content: JSON.stringify(trainConfig),
+                    type: 'file',
                 },
             ],
             mode: 'read',

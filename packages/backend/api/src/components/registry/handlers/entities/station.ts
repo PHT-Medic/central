@@ -78,7 +78,12 @@ export async function saveStationToRegistry(payload: RegistryStationQueuePayload
                 const response = await useClient<VaultAPI>(ApiKey.VAULT)
                     .keyValue.find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, entity.secure_id);
 
-                if (response) {
+                if (
+                    response &&
+                    response.data.registry_robot_id &&
+                    response.data.registry_robot_name &&
+                    response.data.registry_robot_secret
+                ) {
                     robotAccount = {
                         id: response.data.registry_robot_id,
                         name: response.data.registry_robot_name,

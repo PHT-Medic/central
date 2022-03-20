@@ -6,9 +6,9 @@
  */
 
 import { getRepository } from 'typeorm';
-import { NotFoundError } from '@typescript-error/http';
+import { BadRequestError, NotFoundError } from '@typescript-error/http';
 import { Station } from '@personalhealthtrain/central-common';
-import { ExpressValidationResult } from '../../../../express-validation';
+import { ExpressValidationResult, buildExpressValidationErrorMessage } from '../../../../express-validation';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 
 type ExpressValidationResultExtendedWithStation = ExpressValidationResult<{
@@ -23,13 +23,13 @@ export async function extendExpressValidationResultWithStation<
     T extends ExpressValidationResultExtendedWithStation,
 >(result: T) : Promise<T> {
     if (result.data.station_id) {
-        const stationRepository = getRepository(StationEntity);
-        const station = await stationRepository.findOne(result.data.station_id);
-        if (typeof station === 'undefined') {
-            throw new NotFoundError('The referenced station is invalid.');
+        const repository = getRepository(StationEntity);
+        const entity = await repository.findOne(result.data.station_id);
+        if (typeof entity === 'undefined') {
+            throw new BadRequestError(buildExpressValidationErrorMessage('station_id'));
         }
 
-        result.meta.station = station;
+        result.meta.station = entity;
     }
 
     return result;
