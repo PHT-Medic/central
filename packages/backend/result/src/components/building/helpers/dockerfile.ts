@@ -12,7 +12,6 @@ import {
 } from '@personalhealthtrain/central-common';
 import path from 'path';
 import { URL } from 'url';
-import { buildDockerImage } from '../../../modules/docker/image-build';
 import env from '../../../env';
 import { useLogger } from '../../../modules/log';
 
@@ -35,7 +34,7 @@ export async function buildDockerFile(data: TrainBuilderStartPayload) : Promise<
         component: 'building',
     });
 
-    const dockerFile = `
+    return `
     FROM ${harborUrL.hostname}/master/${data.master_image}
     RUN mkdir ${TrainContainerPath.MAIN} &&\
         mkdir ${TrainContainerPath.RESULTS} &&\
@@ -43,6 +42,4 @@ export async function buildDockerFile(data: TrainBuilderStartPayload) : Promise<
 
     CMD ["${data.entrypoint_command}", ${argumentsString}"${path.posix.join(TrainContainerPath.MAIN, data.entrypoint_path)}"]
     `;
-
-    return dockerFile;
 }

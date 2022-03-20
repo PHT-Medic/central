@@ -7,10 +7,18 @@
 
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
-import { Train, TrainRunStatus } from '@personalhealthtrain/central-common';
+import {
+    REGISTRY_INCOMING_PROJECT_NAME,
+    REGISTRY_SYSTEM_USER_NAME,
+    Train,
+    TrainManagerQueueCommand,
+    TrainRunStatus,
+} from '@personalhealthtrain/central-common';
 import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../special/train-router';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
+import env from '../../../../env';
+import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 
 export async function startTrain(train: Train | number | string) : Promise<Train> {
     const repository = getRepository<Train>(TrainEntity);
@@ -29,9 +37,17 @@ export async function startTrain(train: Train | number | string) : Promise<Train
         // todo: make it a ClientError.BadRequest
         throw new Error('The train has already been started...');
     } else {
-        const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.START, { id: train.id });
+        if (env.trainManagerForRouting) {
+            await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE, {
+                repositoryName: train.id,
+                projectName: REGISTRY_INCOMING_PROJECT_NAME,
+                operator: REGISTRY_SYSTEM_USER_NAME,
+            }));
+        } else {
+            const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.START, { id: train.id });
 
-        await publishMessage(queueMessage);
+            await publishMessage(queueMessage);
+        }
 
         train = repository.merge(train, {
             run_status: TrainRunStatus.STARTING,

@@ -12,6 +12,8 @@ export enum TrainManagerQueueCommand {
     STATUS = 'status',
 }
 
+// ----------------------------------------------------------
+
 export enum TrainManagerBuildingQueueEvent {
     STARTED = 'buildingStarted',
 
@@ -19,6 +21,8 @@ export enum TrainManagerBuildingQueueEvent {
 
     FAILED = 'buildingFailed',
 }
+
+// ----------------------------------------------------------
 
 export enum TrainManagerRoutingQueueEvent {
     STARTED = 'routerStarted',
@@ -29,6 +33,8 @@ export enum TrainManagerRoutingQueueEvent {
 
     FAILED = 'routingFailed',
 }
+
+// ----------------------------------------------------------
 
 export enum TrainManagerExtractingQueueEvent {
     STARTED = 'extractionStarted', // ui trigger

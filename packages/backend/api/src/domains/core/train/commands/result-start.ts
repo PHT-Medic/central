@@ -13,7 +13,6 @@ import {
     REGISTRY_OUTGOING_PROJECT_NAME,
     Train,
     TrainContainerPath,
-    TrainManagerExtractingQueueEvent,
     TrainManagerExtractionMode,
     TrainManagerQueueCommand,
     TrainResultStatus,

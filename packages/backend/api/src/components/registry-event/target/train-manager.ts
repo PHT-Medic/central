@@ -8,13 +8,15 @@
 import { Message, publishMessage } from 'amqp-extension';
 
 import {
+    REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
     TrainContainerPath,
-    TrainManagerExtractionMode, TrainManagerQueueCommand,
+    TrainManagerExtractionMode, TrainManagerQueueCommand, isRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
 import { buildTrainManagerQueueMessage } from '../../../domains/special/train-manager';
 import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../../domains/special/registry';
 import { useLogger } from '../../../config/log';
+import env from '../../../env';
 
 export async function dispatchRegistryEventToTrainExtractor(
     message: Message,
@@ -44,6 +46,19 @@ export async function dispatchRegistryEventToTrainExtractor(
             TrainManagerExtractionMode.WRITE :
             TrainManagerExtractionMode.READ,
     }));
+
+    const isIncomingProject : boolean = data.namespace === REGISTRY_INCOMING_PROJECT_NAME;
+    const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
+
+    if (env.trainManagerForRouting) {
+        if (isStationProject || isIncomingProject) {
+            await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE, {
+                repositoryName: data.repositoryName,
+                projectName: data.namespace,
+                operator: data.operator,
+            }));
+        }
+    }
 
     return message;
 }

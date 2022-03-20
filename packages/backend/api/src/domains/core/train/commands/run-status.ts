@@ -66,7 +66,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
         .addSelect('station.secure_id')
         .leftJoinAndSelect('trainStation.station', 'station')
         .orderBy({
-            'trainStation.position': 'DESC',
+            'trainStation.index': 'DESC',
             'trainStation.created_at': 'DESC',
         });
 

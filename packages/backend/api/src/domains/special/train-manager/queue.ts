@@ -6,12 +6,15 @@
  */
 
 import { Message, buildMessage } from 'amqp-extension';
-import { TrainManagerExtractingQueuePayload, TrainManagerQueueCommand } from '@personalhealthtrain/central-common';
+import {
+    TrainManagerQueueCommand,
+    TrainManagerQueuePayload,
+} from '@personalhealthtrain/central-common';
 import { MessageQueueRoutingKey } from '../../../config/mq';
 
-export function buildTrainManagerQueueMessage(
-    command: TrainManagerQueueCommand,
-    data: TrainManagerExtractingQueuePayload,
+export function buildTrainManagerQueueMessage<T extends `${TrainManagerQueueCommand}`>(
+    command: T,
+    data: TrainManagerQueuePayload<T>,
 ) : Message {
     return buildMessage({
         options: {

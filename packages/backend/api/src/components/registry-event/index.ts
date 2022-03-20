@@ -6,7 +6,7 @@
  */
 
 import { ConsumeHandler, Message } from 'amqp-extension';
-import { dispatchRegistryEventToTrainExtractor } from './target/train-extractor';
+import { dispatchRegistryEventToTrainExtractor } from './target/train-manager';
 import { dispatchRegistryEventToSelf } from './target/self';
 import { dispatchRegistryEventToTrainRouter } from './target/train-router';
 import { RegistryQueueEvent } from '../../domains/special/registry';

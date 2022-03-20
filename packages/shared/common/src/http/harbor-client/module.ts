@@ -12,6 +12,7 @@ import { HarborRobotAccountAPI } from './robot-account';
 import { HarborProjectAPI } from './project';
 import { HarborProjectWebHookAPI } from './project-webhook';
 import { HarborProjectRepositoryAPI } from './project-repository';
+import { HarborProjectArtifactAPI } from './project-artifact';
 
 export function parseHarborConnectionString(connectionString: string) : APIServiceHarborConfig {
     const parts : string[] = connectionString.split('@');
@@ -36,6 +37,8 @@ export function parseHarborConnectionString(connectionString: string) : APIServi
 export class HarborAPI extends Client {
     public readonly project: HarborProjectAPI;
 
+    public readonly projectArtifact: HarborProjectArtifactAPI;
+
     public readonly projectRepository: HarborProjectRepositoryAPI;
 
     public readonly projectWebHook: HarborProjectWebHookAPI;
@@ -59,6 +62,7 @@ export class HarborAPI extends Client {
         });
 
         this.project = new HarborProjectAPI(this.driver);
+        this.projectArtifact = new HarborProjectArtifactAPI(this.driver);
         this.projectWebHook = new HarborProjectWebHookAPI(this.driver);
         this.projectRepository = new HarborProjectRepositoryAPI(this.driver);
         this.robotAccount = new HarborRobotAccountAPI(this.driver);

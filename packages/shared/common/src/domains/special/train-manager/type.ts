@@ -5,7 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainManagerExtractionMode } from './constants';
+import { TrainManagerExtractionMode, TrainManagerQueueCommand } from './constants';
+import { TrainBuilderStartPayload } from '../train-builder';
+
+// ----------------------------------------------------------
 
 export type TrainManagerExtractingFileType = 'file' | 'link' | 'symlink' | 'directory' |
 'block-device' | 'character-device' | 'fifo' | 'contiguous-file';
@@ -27,3 +30,22 @@ export type TrainManagerExtractingQueuePayload = {
     projectName: string,
     repositoryName: string
 };
+
+// ----------------------------------------------------------
+
+export type TrainManagerRoutingPayload = {
+    repositoryName: string,
+    projectName: string,
+    operator: string
+};
+
+// ----------------------------------------------------------
+
+export type TrainManagerQueuePayload<T extends `${TrainManagerQueueCommand}`> =
+    T extends `${TrainManagerQueueCommand.EXTRACT}` | `${TrainManagerQueueCommand.STATUS}` ?
+        TrainManagerExtractingQueuePayload :
+        T extends `${TrainManagerQueueCommand.BUILD}` ?
+            TrainBuilderStartPayload :
+            T extends `${TrainManagerQueueCommand.ROUTE}` ?
+                TrainManagerRoutingPayload :
+                never;

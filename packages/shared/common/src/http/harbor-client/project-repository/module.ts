@@ -64,4 +64,9 @@ export class HarborProjectRepositoryAPI {
             } as HarborRepository;
         });
     }
+
+    async delete(projectName: string, repositoryName: string) : Promise<void> {
+        await this.client
+            .get(`projects/${projectName}/repositories/${repositoryName}`);
+    }
 }

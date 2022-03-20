@@ -38,6 +38,7 @@ export async function handleTrainManagerRoutingQueueEvent(
             status = TrainRunStatus.STARTED;
             break;
         case TrainManagerRoutingQueueEvent.MOVED:
+            console.log(data);
             // todo: don't do anything here yet ;)
             break;
         case TrainManagerRoutingQueueEvent.FAILED:

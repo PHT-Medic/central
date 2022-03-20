@@ -13,6 +13,7 @@ import {
     ForbiddenError,
 } from '@typescript-error/http';
 import { publishMessage } from 'amqp-extension';
+import { getRepository } from 'typeorm';
 import env from '../../../../../../env';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
 import { setupRegistry } from '../../../../../../components/registry/handlers/setup';
@@ -21,6 +22,7 @@ import {
     deleteStationFromRegistry,
     saveStationToRegistry,
 } from '../../../../../../components/registry/handlers/entities/station';
+import { StationEntity } from '../../../../../../domains/core/station/entity';
 
 const commands = Object.values(RegistryCommand);
 
@@ -72,23 +74,40 @@ export async function runRegistryCommandRouteHandler(req: ExpressRequest, res: E
                 await publishMessage(queueMessage);
             }
             break;
-        case RegistryCommand.STATION_DELETE:
+        case RegistryCommand.STATION_DELETE: {
+            const repository = getRepository(StationEntity);
+            const entity = await repository.createQueryBuilder('station')
+                .addSelect('station.secure_id')
+                .addSelect('station.registry_project_id')
+                .addSelect('station.registry_project_account_id')
+                .where({
+                    id,
+                })
+                .getOne();
+
             if (env.env === 'test') {
                 await deleteStationFromRegistry({
                     type: RegistryQueueEntityType.STATION,
-                    id,
+                    id: entity.id,
+                    secure_id: entity.secure_id,
+                    registry_project_id: entity.registry_project_id,
+                    registry_project_account_id: entity.registry_project_account_id,
                 });
             } else {
                 const queueMessage = buildRegistryQueueMessage(
                     RegistryQueueCommand.DELETE,
                     {
                         type: RegistryQueueEntityType.STATION,
-                        id,
+                        id: entity.id,
+                        secure_id: entity.secure_id,
+                        registry_project_id: entity.registry_project_id,
+                        registry_project_account_id: entity.registry_project_account_id,
                     },
                 );
                 await publishMessage(queueMessage);
             }
             break;
+        }
     }
 
     return res.respondAccepted();

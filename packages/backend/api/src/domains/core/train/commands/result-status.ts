@@ -8,7 +8,6 @@
 import {
     REGISTRY_OUTGOING_PROJECT_NAME,
     Train,
-    TrainContainerPath,
     TrainManagerExtractionMode, TrainManagerQueueCommand,
 } from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
