@@ -6,40 +6,40 @@
  */
 
 import {
-    TrainBuilderStartPayload,
+    Train,
     TrainContainerPath,
     parseHarborConnectionString,
 } from '@personalhealthtrain/central-common';
 import path from 'path';
 import { URL } from 'url';
 import env from '../../../env';
-import { useLogger } from '../../../modules/log';
 
-export async function buildDockerFile(data: TrainBuilderStartPayload) : Promise<string> {
+export async function buildDockerFile(entity: Train) : Promise<string> {
     const harborConfig = parseHarborConnectionString(env.harborConnectionString);
     const harborUrL = new URL(harborConfig.host);
 
     let argumentsString = '';
 
-    if (data.entrypoint_command_arguments) {
-        let parts = Array.isArray(data.entrypoint_command_arguments) ?
-            data.entrypoint_command_arguments :
-            [data.entrypoint_command_arguments];
+    if (entity.master_image.command_arguments) {
+        let parts = Array.isArray(entity.master_image.command_arguments) ?
+            entity.master_image.command_arguments :
+            [entity.master_image.command_arguments];
 
         parts = parts.map((part) => `"${part}"`);
         argumentsString = `${parts.join(', ')} `;
     }
 
-    useLogger().debug('Building Dockerfile', {
-        component: 'building',
-    });
+    const entrypointPath = path.posix.join(
+        entity.entrypoint_file.directory,
+        entity.entrypoint_file.name,
+    );
 
     return `
-    FROM ${harborUrL.hostname}/master/${data.master_image}
+    FROM ${harborUrL.hostname}/master/${entity.master_image.virtual_path}
     RUN mkdir ${TrainContainerPath.MAIN} &&\
         mkdir ${TrainContainerPath.RESULTS} &&\
         chmod -R +x ${TrainContainerPath.MAIN}
 
-    CMD ["${data.entrypoint_command}", ${argumentsString}"${path.posix.join(TrainContainerPath.MAIN, data.entrypoint_path)}"]
+    CMD ["${entity.master_image.command}", ${argumentsString}"${path.posix.join(TrainContainerPath.MAIN, entrypointPath)}"]
     `;
 }

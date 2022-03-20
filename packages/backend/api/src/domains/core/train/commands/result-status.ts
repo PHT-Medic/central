@@ -24,7 +24,7 @@ export async function triggerTrainResultStatus(
     train = await findTrain(train, repository);
 
     // send queue message
-    await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.STATUS, {
+    await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT_STATUS, {
         repositoryName: train.id,
         projectName: REGISTRY_OUTGOING_PROJECT_NAME,
 

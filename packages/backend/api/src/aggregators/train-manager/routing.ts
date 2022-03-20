@@ -6,18 +6,23 @@
  */
 
 import {
-    TrainManagerExtractingQueuePayload,
-    TrainManagerRoutingQueueEvent,
-    TrainRunStatus,
+    REGISTRY_ARTIFACT_TAG_BASE,
+    REGISTRY_INCOMING_PROJECT_NAME,
+    REGISTRY_OUTGOING_PROJECT_NAME,
+    TrainManagerRoutingPayload, TrainManagerRoutingQueueEvent, TrainRunStatus, isRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { useLogger } from '../../config/log';
 import { TrainEntity } from '../../domains/core/train/entity';
 
 export async function handleTrainManagerRoutingQueueEvent(
-    data: TrainManagerExtractingQueuePayload,
+    data: TrainManagerRoutingPayload,
     event: TrainManagerRoutingQueueEvent,
 ) {
+    if (data.artifactTag === REGISTRY_ARTIFACT_TAG_BASE) {
+        return;
+    }
+
     useLogger()
         .info(`Received train-manager routing ${event} event.`, {
             aggregator: 'train-manager',
@@ -31,25 +36,29 @@ export async function handleTrainManagerRoutingQueueEvent(
         return;
     }
 
-    let status : TrainRunStatus = null;
-
     switch (event) {
         case TrainManagerRoutingQueueEvent.STARTED:
-            status = TrainRunStatus.STARTED;
+            entity.run_status = TrainRunStatus.STARTED;
             break;
-        case TrainManagerRoutingQueueEvent.MOVED:
-            console.log(data);
-            // todo: don't do anything here yet ;)
+        case TrainManagerRoutingQueueEvent.MOVE_FINISHED:
+            if (
+                isRegistryStationProjectName(data.projectName) ||
+                data.projectName === REGISTRY_INCOMING_PROJECT_NAME
+            ) {
+                entity.run_status = TrainRunStatus.RUNNING;
+            }
+
+            if (data.projectName === REGISTRY_OUTGOING_PROJECT_NAME) {
+                entity.run_status = TrainRunStatus.FINISHED;
+            }
             break;
         case TrainManagerRoutingQueueEvent.FAILED:
-            status = TrainRunStatus.FAILED;
+            entity.run_status = TrainRunStatus.FAILED;
             break;
         case TrainManagerRoutingQueueEvent.FINISHED:
-            status = TrainRunStatus.FINISHED;
+            entity.run_status = TrainRunStatus.FINISHED;
             break;
     }
-
-    entity.run_status = status;
 
     await repository.save(entity);
 }

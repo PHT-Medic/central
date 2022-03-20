@@ -16,34 +16,34 @@
 </template>
 <script>
 
-import { TrainManagerExtractingQueueEvent } from '@personalhealthtrain/central-common';
+import { TrainResultStatus } from '@personalhealthtrain/central-common';
 
 export default {
     props: {
         status: {
-            type: TrainManagerExtractingQueueEvent,
+            type: TrainResultStatus,
             default: null,
         },
     },
     computed: {
         statusText() {
             switch (this.status) {
-                case TrainManagerExtractingQueueEvent.STARTED:
+                case TrainResultStatus.STARTED:
                     return 'started';
 
-                case TrainManagerExtractingQueueEvent.DOWNLOADING:
+                case TrainResultStatus.DOWNLOADING:
                     return 'downloading...';
-                case TrainManagerExtractingQueueEvent.DOWNLOADED:
+                case TrainResultStatus.DOWNLOADED:
                     return 'downloaded';
 
-                case TrainManagerExtractingQueueEvent.PROCESSING:
+                case TrainResultStatus.PROCESSING:
                     return 'extracting...';
-                case TrainManagerExtractingQueueEvent.PROCESSED:
+                case TrainResultStatus.PROCESSED:
                     return 'extracted';
 
-                case TrainManagerExtractingQueueEvent.FINISHED:
+                case TrainResultStatus.FINISHED:
                     return 'finished';
-                case TrainManagerExtractingQueueEvent.FAILED:
+                case TrainResultStatus.FAILED:
                     return 'failed';
 
                 default:
@@ -52,16 +52,16 @@ export default {
         },
         classSuffix() {
             switch (this.status) {
-                case TrainManagerExtractingQueueEvent.STARTED:
-                case TrainManagerExtractingQueueEvent.DOWNLOADING:
-                case TrainManagerExtractingQueueEvent.PROCESSING:
-                case TrainManagerExtractingQueueEvent.PROCESSED:
+                case TrainResultStatus.STARTED:
+                case TrainResultStatus.DOWNLOADING:
+                case TrainResultStatus.PROCESSING:
+                case TrainResultStatus.PROCESSED:
                     return 'primary';
 
-                case TrainManagerExtractingQueueEvent.FINISHED:
+                case TrainResultStatus.FINISHED:
                     return 'success';
 
-                case TrainManagerExtractingQueueEvent.FAILED:
+                case TrainResultStatus.FAILED:
                     return 'danger';
 
                 default:

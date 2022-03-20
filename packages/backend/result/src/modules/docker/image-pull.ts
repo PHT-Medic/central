@@ -6,13 +6,15 @@
  */
 
 import { useDocker } from './instance';
-import { DockerPullOptions } from './type';
+import { DockerAuthConfig } from './type';
 
-export async function pullDockerRegistryImage(
-    repositoryTag: string,
-    dockerOptions: DockerPullOptions,
+export async function pullDockerImage(
+    image: string,
+    authConfig: DockerAuthConfig,
 ) {
-    const stream = await useDocker().pull(repositoryTag, dockerOptions);
+    const stream = await useDocker().pull(image, {
+        authconfig: authConfig,
+    });
 
     return new Promise<any>(((resolve, reject) => {
         useDocker().modem.followProgress(stream, (error: Error, output: any) => {

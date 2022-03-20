@@ -8,7 +8,8 @@
 import { getRepository } from 'typeorm';
 
 import {
-    Train, TrainBuilderStartPayload,
+    Train,
+    TrainBuilderStartPayload,
 } from '@personalhealthtrain/central-common';
 import path from 'path';
 import { MasterImageEntity } from '../../../core/master-image/entity';

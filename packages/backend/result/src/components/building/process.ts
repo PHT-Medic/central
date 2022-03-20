@@ -9,42 +9,66 @@ import { Message } from 'amqp-extension';
 import {
     HTTPClient,
     REGISTRY_INCOMING_PROJECT_NAME,
-    TrainBuilderStartPayload,
     TrainContainerFileName,
-    TrainContainerPath, parseHarborConnectionString,
+    TrainContainerPath, TrainManagerBuildPayload,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
-import { URL } from 'url';
+import { NotFoundError } from '@typescript-error/http';
 import { buildTrainConfig } from './helpers/train-config';
 import { useDocker } from '../../modules/docker';
 import { buildDockerFile } from './helpers/dockerfile';
-import env from '../../env';
 import { pushDockerImages } from '../../modules/docker/image-push';
 import { useLogger } from '../../modules/log';
 import { createPackFromFileContent } from './helpers/file-gzip';
 import { buildDockerImage } from '../../modules/docker/image-build';
+import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../config/services/registry';
 
 export async function processMessage(message: Message) {
-    const data = message.data as TrainBuilderStartPayload;
+    const data = message.data as TrainManagerBuildPayload;
 
-    const harborConfig = parseHarborConnectionString(env.harborConnectionString);
-    const harborUrL = new URL(harborConfig.host);
+    const client = useClient<HTTPClient>();
 
-    const repository = `${harborUrL.hostname}/${REGISTRY_INCOMING_PROJECT_NAME}/${data.id}`;
+    const train = await client.train.getOne(data.id, {
+        relations: {
+            entrypoint_file: true,
+            master_image: true,
+        },
+    });
 
-    const dockerFile = await buildDockerFile(data);
-    await buildDockerImage(dockerFile, repository);
+    if (typeof train === 'undefined') {
+        throw new NotFoundError();
+    }
+
+    // -----------------------------------------------------------------------------------
+
+    useLogger().debug('Creating Dockerfile...', {
+        component: 'building',
+    });
+    const dockerFile = await buildDockerFile(train);
+
+    // -----------------------------------------------------------------------------------
+
+    useLogger().debug('Building image...', {
+        component: 'building',
+    });
+
+    const imageURL = buildRemoteDockerImageURL(REGISTRY_INCOMING_PROJECT_NAME, train.id);
+    await buildDockerImage(dockerFile, imageURL);
+
+    // -----------------------------------------------------------------------------------
 
     useLogger().debug('Creating container...', {
         component: 'building',
     });
     const container = await useDocker()
-        .createContainer({ Image: repository });
+        .createContainer({ Image: imageURL });
+
+    // -----------------------------------------------------------------------------------
 
     useLogger().debug(`Writing ${TrainContainerFileName.CONFIG} to container`, {
         component: 'building',
     });
-    const trainConfig = await buildTrainConfig(data);
+    const trainConfig = await buildTrainConfig(train);
     await container.putArchive(
         createPackFromFileContent(JSON.stringify(trainConfig), TrainContainerFileName.CONFIG),
         {
@@ -52,12 +76,12 @@ export async function processMessage(message: Message) {
         },
     );
 
-    if (data.query) {
+    if (train.query) {
         useLogger().debug(`Writing ${TrainContainerFileName.QUERY} to container`, {
             component: 'building',
         });
         await container.putArchive(
-            createPackFromFileContent(JSON.stringify(data.query), TrainContainerFileName.QUERY),
+            createPackFromFileContent(JSON.stringify(train.query), TrainContainerFileName.QUERY),
             {
                 path: TrainContainerPath.MAIN,
             },
@@ -67,7 +91,7 @@ export async function processMessage(message: Message) {
     useLogger().debug('Writing files to container', {
         component: 'building',
     });
-    const client = useClient<HTTPClient>();
+
     const stream : NodeJS.ReadableStream = await client.trainFile.download(data.id);
     await container.putArchive(stream, {
         path: TrainContainerPath.MAIN,
@@ -78,31 +102,34 @@ export async function processMessage(message: Message) {
     });
 
     await container.commit({
-        repo: repository,
+        repo: imageURL,
         tag: 'latest',
     });
 
     await container.commit({
-        repo: repository,
+        repo: imageURL,
         tag: 'base',
     });
+
+    // -----------------------------------------------------------------------------------
 
     useLogger().debug('Push committed containers as image', {
         component: 'building',
     });
 
-    await pushDockerImages([
-        { name: repository, tag: 'base' },
-        { name: repository, tag: 'latest' },
-    ], {
-        remove: true,
-    });
+    const authConfig = buildDockerAuthConfig();
+
+    const baseImageURL = buildRemoteDockerImageURL(REGISTRY_INCOMING_PROJECT_NAME, data.id, 'base');
+    await pushDockerImages(baseImageURL, authConfig);
+
+    const latestImageURL = buildRemoteDockerImageURL(REGISTRY_INCOMING_PROJECT_NAME, data.id, 'latest');
+    await pushDockerImages(latestImageURL, authConfig);
 
     useLogger().debug('Pushed image', {
         component: 'building',
-        repository: [
-            `${repository}:latest`,
-            `${repository}:base`,
+        urls: [
+            latestImageURL,
+            baseImageURL,
         ],
     });
 

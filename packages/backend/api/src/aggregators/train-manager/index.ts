@@ -7,7 +7,7 @@
 
 import {
     TrainManagerBuildingQueueEvent, TrainManagerExtractingQueueEvent,
-    TrainManagerExtractingQueuePayload, TrainManagerRoutingQueueEvent,
+    TrainManagerExtractingQueuePayload, TrainManagerRoutingPayload, TrainManagerRoutingQueueEvent,
 } from '@personalhealthtrain/central-common';
 import { Message, consumeQueue } from 'amqp-extension';
 import { MessageQueueRoutingKey } from '../../config/mq';
@@ -45,7 +45,7 @@ export function buildTrainManagerAggregator() {
                 const routingEventIndex = routingValues.indexOf(message.type);
                 if (routingEventIndex !== -1) {
                     await handleTrainManagerRoutingQueueEvent(
-                        message.data as TrainManagerExtractingQueuePayload,
+                        message.data as TrainManagerRoutingPayload,
                         message.type as TrainManagerRoutingQueueEvent,
                     );
                 }

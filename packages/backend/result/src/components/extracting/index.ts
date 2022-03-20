@@ -9,12 +9,13 @@ import { writeDownloadingEvent } from './write-downloading';
 import { downloadImage } from './download';
 import { writeDownloadedEvent } from './write-downloaded';
 import { ExtractingError } from './error';
+import { processExtractingStatusEvent } from './status';
 
 export function createExtractingComponentHandlers() : ConsumeHandlers {
     return {
         [TrainManagerQueueCommand.EXTRACT]: async (message: Message) => {
             useLogger().debug('process event received', {
-                component: 'image-process',
+                component: 'image-extracting',
             });
 
             await Promise.resolve(message)
@@ -25,6 +26,15 @@ export function createExtractingComponentHandlers() : ConsumeHandlers {
                 .then(processEvent)
                 .then(writeProcessedEvent)
                 .catch((err: ExtractingError) => writeFailedEvent(message, err));
+        },
+        [TrainManagerQueueCommand.EXTRACT_STATUS]: async (message: Message) => {
+            useLogger().debug('status event received', {
+                component: 'image-extracting',
+            });
+
+            await Promise.resolve(message)
+                .then(processExtractingStatusEvent)
+                .catch((err) => writeFailedEvent(message, err));
         },
     };
 }

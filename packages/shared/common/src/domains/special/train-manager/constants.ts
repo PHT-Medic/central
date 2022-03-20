@@ -7,9 +7,12 @@
 
 export enum TrainManagerQueueCommand {
     EXTRACT = 'extract',
+    EXTRACT_STATUS = 'extract_status',
+
     BUILD = 'build',
+    BUILD_STATUS = 'buildStatus',
+
     ROUTE = 'route',
-    STATUS = 'status',
 }
 
 // ----------------------------------------------------------
@@ -20,6 +23,8 @@ export enum TrainManagerBuildingQueueEvent {
     FINISHED = 'buildingFinished',
 
     FAILED = 'buildingFailed',
+
+    NONE = 'buildingNone', // rs trigger
 }
 
 // ----------------------------------------------------------
@@ -27,7 +32,8 @@ export enum TrainManagerBuildingQueueEvent {
 export enum TrainManagerRoutingQueueEvent {
     STARTED = 'routerStarted',
 
-    MOVED = 'routerMoved',
+    MOVE_STARTED = 'routerMoveStarted',
+    MOVE_FINISHED = 'routerMoveFinished',
 
     FINISHED = 'routingFinished',
 

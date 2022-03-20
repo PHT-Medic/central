@@ -11,13 +11,8 @@ import {
     TrainManagerExtractionMode, TrainResultStatus,
 } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
-import { publishMessage } from 'amqp-extension';
 import { useLogger } from '../../config/log';
 import { TrainEntity } from '../../domains/core/train/entity';
-import { extractTrainConfigFromTrainExtractorPayload } from '../../domains/special/train-manager';
-import { syncTrainConfigToDatabase } from '../../domains/core/train-config/sync';
-import { buildTrainBuilderQueueMessage } from '../../domains/special/train-builder/queue';
-import { TrainBuilderCommand } from '../../domains/special/train-builder/type';
 
 export async function handleTrainManagerExtractingQueueEvent(
     data: TrainManagerExtractingQueuePayload,
@@ -36,6 +31,7 @@ export async function handleTrainManagerExtractingQueueEvent(
     }
 
     switch (data.mode) {
+        case TrainManagerExtractionMode.NONE:
         case TrainManagerExtractionMode.WRITE: {
             let status : TrainResultStatus;
 
@@ -53,7 +49,7 @@ export async function handleTrainManagerExtractingQueueEvent(
                     status = TrainResultStatus.PROCESSING;
                     break;
                 case TrainManagerExtractingQueueEvent.PROCESSED:
-                    status = TrainResultStatus.PROCESSED;
+                    status = TrainResultStatus.FINISHED;
                     break;
                 case TrainManagerExtractingQueueEvent.FINISHED:
                     status = TrainResultStatus.FINISHED;
@@ -67,24 +63,6 @@ export async function handleTrainManagerExtractingQueueEvent(
 
             await trainRepository.save(train);
 
-            break;
-        }
-        case TrainManagerExtractionMode.READ: {
-            const config = extractTrainConfigFromTrainExtractorPayload(data);
-            if (typeof config === 'undefined') {
-                return;
-            }
-
-            const result = await syncTrainConfigToDatabase(config);
-            console.log(result);
-
-            train.run_station_id = result.stationId;
-            train.run_station_index = result.position;
-
-            await trainRepository.save(train);
-
-            const queueMessage = await buildTrainBuilderQueueMessage(TrainBuilderCommand.META_BUILD, train);
-            await publishMessage(queueMessage);
             break;
         }
     }

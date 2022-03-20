@@ -6,42 +6,62 @@
  */
 
 import {
-    HTTPClient, SecretType, TrainBuilderStartPayload, TrainConfig, TrainConfigSourceType,
+    HTTPClient,
+    SecretType,
+    Train,
+    TrainConfig,
+    TrainConfigSourceType,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
+import path from 'path';
+import { mergeStationsWithTrainStations } from '../../routing/helpers/merge';
+import { buildDockerAuthConfig } from '../../../config/services/registry';
 
-export async function buildTrainConfig(data: TrainBuilderStartPayload) : Promise<TrainConfig> {
+/**
+ * Build train config for a specific train.
+ *
+ * train.master_image (required)
+ *
+ *
+ * @param entity
+ */
+export async function buildTrainConfig(entity: Train) : Promise<TrainConfig> {
+    const authConfig = buildDockerAuthConfig();
+
     const config : TrainConfig = {
-        id: data.id,
+        id: entity.id,
         creator: {
-            id: data.user_id,
+            id: entity.user_id,
             rsa_public_key: null,
             paillier_public_key: null,
         },
         source: {
             type: TrainConfigSourceType.DOCKER,
-            address: data.master_image,
+            address: path.posix.join(authConfig.serveraddress, entity.master_image.virtual_path),
             tag: 'latest',
         },
-        proposal_id: data.proposal_id,
-        session_id: data.session_id,
-        file_list: data.files,
-        immutable_file_hash: data.hash,
-        immutable_file_signature: data.hash_signed,
+        proposal_id: entity.proposal_id,
+        session_id: entity.session_id,
+        file_list: [],
+        immutable_file_hash: entity.hash,
+        immutable_file_signature: entity.hash_signed,
         route: [],
     };
 
     const client = useClient<HTTPClient>();
 
+    const response = await client.trainFile.getMany(entity.id);
+    config.files = response.data.map((file) => `${file.directory}/${file.name}`);
+
     // ----------------------------------------------------------
 
     const userSecretIds : string[] = [];
-    if (data.user_rsa_secret_id) {
-        userSecretIds.push(data.user_rsa_secret_id);
+    if (entity.user_rsa_secret_id) {
+        userSecretIds.push(entity.user_rsa_secret_id);
     }
 
-    if (data.user_paillier_secret_id) {
-        userSecretIds.push(data.user_paillier_secret_id);
+    if (entity.user_paillier_secret_id) {
+        userSecretIds.push(entity.user_paillier_secret_id);
     }
 
     const userSecrets = await client.userSecret.getMany({
@@ -62,21 +82,30 @@ export async function buildTrainConfig(data: TrainBuilderStartPayload) : Promise
 
     // ----------------------------------------------------------
 
-    const stations = await client.station.getMany({
+    const { data: trainStations } = await client.trainStation.getMany({
         filter: {
-            secure_id: data.stations.map((station) => station.id),
+            train_id: entity.id,
+        },
+        sort: {
+            index: 'ASC',
+        },
+    });
+
+    const { data: stations } = await client.station.getMany({
+        filter: {
+            id: trainStations.map((trainStation) => trainStation.station_id),
         },
         fields: ['+secure_id', '+public_key'],
     });
 
-    for (let i = 0; i < stations.data.length; i++) {
-        const trainConfigIndex = data.stations.findIndex((station) => station.id === stations.data[i].secure_id);
+    const stationsExtended = mergeStationsWithTrainStations(stations, trainStations);
 
+    for (let i = 0; i < stationsExtended.length; i++) {
         config.route.push({
-            station: stations.data[i].secure_id,
-            rsa_public_key: stations.data[i].public_key,
-            eco_system: stations.data[i].ecosystem,
-            index: trainConfigIndex >= 0 ? data.stations[trainConfigIndex].index : null,
+            station: stationsExtended[i].secure_id,
+            rsa_public_key: stationsExtended[i].public_key,
+            eco_system: stationsExtended[i].ecosystem,
+            index: stationsExtended[i].index,
             encrypted_key: null,
             signature: null,
         });

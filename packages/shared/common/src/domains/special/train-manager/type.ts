@@ -6,7 +6,7 @@
  */
 
 import { TrainManagerExtractionMode, TrainManagerQueueCommand } from './constants';
-import { TrainBuilderStartPayload } from '../train-builder';
+import { Train } from '../../core';
 
 // ----------------------------------------------------------
 
@@ -36,16 +36,21 @@ export type TrainManagerExtractingQueuePayload = {
 export type TrainManagerRoutingPayload = {
     repositoryName: string,
     projectName: string,
-    operator: string
+    operator: string,
+    artifactTag: string
+};
+
+export type TrainManagerBuildPayload = {
+    id: Train['id']
 };
 
 // ----------------------------------------------------------
 
 export type TrainManagerQueuePayload<T extends `${TrainManagerQueueCommand}`> =
-    T extends `${TrainManagerQueueCommand.EXTRACT}` | `${TrainManagerQueueCommand.STATUS}` ?
+    T extends `${TrainManagerQueueCommand.EXTRACT}` | `${TrainManagerQueueCommand.EXTRACT_STATUS}` ?
         TrainManagerExtractingQueuePayload :
-        T extends `${TrainManagerQueueCommand.BUILD}` ?
-            TrainBuilderStartPayload :
+        T extends `${TrainManagerQueueCommand.BUILD}` | `${TrainManagerQueueCommand.BUILD_STATUS}` ?
+            TrainManagerBuildPayload :
             T extends `${TrainManagerQueueCommand.ROUTE}` ?
                 TrainManagerRoutingPayload :
                 never;

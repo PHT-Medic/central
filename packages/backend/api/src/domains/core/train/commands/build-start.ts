@@ -19,7 +19,7 @@ import { findTrain } from './utils';
 import { TrainStationEntity } from '../../train-station/entity';
 import { TrainEntity } from '../entity';
 import env from '../../../../env';
-import { MessageQueueRoutingKey } from '../../../../config/mq';
+import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 
 export async function startBuildTrain(
     train: Train | number | string,
@@ -48,14 +48,19 @@ export async function startBuildTrain(
             throw new Error('Not all stations have approved the train yet.');
         }
 
-        const queueMessage = await buildTrainBuilderQueueMessage(TrainBuilderCommand.START, train);
-
         if (env.trainManagerForBuilding) {
-            queueMessage.options.routingKey = MessageQueueRoutingKey.TRAIN_MANAGER_COMMAND;
-            queueMessage.type = TrainManagerQueueCommand.BUILD;
-        }
+            const queueMessage = buildTrainManagerQueueMessage(
+                TrainManagerQueueCommand.BUILD,
+                {
+                    id: train.id,
+                },
+            );
 
-        await publishMessage(queueMessage);
+            await publishMessage(queueMessage);
+        } else {
+            const queueMessage = await buildTrainBuilderQueueMessage(TrainBuilderCommand.START, train);
+            await publishMessage(queueMessage);
+        }
 
         train = repository.merge(train, {
             build_status: TrainBuildStatus.STARTING,

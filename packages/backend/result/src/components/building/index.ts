@@ -6,13 +6,14 @@
  */
 
 import { ConsumeHandlers, Message } from 'amqp-extension';
-import { TrainManagerQueueCommand, hasOwnProperty } from '@personalhealthtrain/central-common';
+import { TrainManagerQueueCommand } from '@personalhealthtrain/central-common';
 import { useLogger } from '../../modules/log';
 import { BuildingError } from './error';
 import { writeProcessedEvent } from './write-processed';
 import { writeProcessingEvent } from './write-processing';
 import { writeFailedEvent } from './write-failed';
 import { processMessage } from './process';
+import { processBuildStatusEvent } from './status';
 
 export function createBuildingComponentHandlers() : ConsumeHandlers {
     return {
@@ -25,6 +26,15 @@ export function createBuildingComponentHandlers() : ConsumeHandlers {
                 .then(writeProcessingEvent)
                 .then(processMessage)
                 .then(writeProcessedEvent)
+                .catch((err: Error) => writeFailedEvent(message, err as BuildingError));
+        },
+        [TrainManagerQueueCommand.BUILD_STATUS]: async (message: Message) => {
+            useLogger().debug('Build status event received', {
+                component: 'building',
+            });
+
+            await Promise.resolve(message)
+                .then(processBuildStatusEvent)
                 .catch((err: Error) => writeFailedEvent(message, err as BuildingError));
         },
     };

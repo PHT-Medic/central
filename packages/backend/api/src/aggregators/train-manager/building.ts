@@ -31,21 +31,30 @@ export async function handleTrainManagerBuildingQueueEvent(
         return;
     }
 
-    let status : TrainBuildStatus = null;
-
     switch (event) {
+        case TrainManagerBuildingQueueEvent.NONE:
+            entity.build_status = null;
+            break;
         case TrainManagerBuildingQueueEvent.STARTED:
-            status = TrainBuildStatus.STARTED;
+            entity.build_status = TrainBuildStatus.STARTED;
             break;
         case TrainManagerBuildingQueueEvent.FAILED:
-            status = TrainBuildStatus.FAILED;
+            entity.build_status = TrainBuildStatus.FAILED;
             break;
         case TrainManagerBuildingQueueEvent.FINISHED:
-            status = TrainBuildStatus.FINISHED;
+            entity.build_status = TrainBuildStatus.FINISHED;
             break;
     }
 
-    entity.build_status = status;
+    if (
+        event === TrainManagerBuildingQueueEvent.STARTED ||
+        event === TrainManagerBuildingQueueEvent.FAILED ||
+        event === TrainManagerBuildingQueueEvent.NONE
+    ) {
+        entity.run_status = null;
+        entity.run_station_index = null;
+        entity.run_status = null;
+    }
 
     await repository.save(entity);
 }

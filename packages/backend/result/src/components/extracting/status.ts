@@ -1,12 +1,19 @@
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
 import fs from 'fs';
 import { TrainManagerExtractingQueueEvent, TrainManagerExtractingQueuePayload } from '@personalhealthtrain/central-common';
 import { buildImageOutputFilePath } from '../../config/paths';
-import { getHarborFQRepositoryPath } from '../../config/services/harbor';
+import { buildRemoteDockerImageURL } from '../../config/services/registry';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { checkIfLocalRegistryImageExists } from '../../modules/docker';
 
-export async function statusImage(message: Message) {
+export async function processExtractingStatusEvent(message: Message) {
     const data : TrainManagerExtractingQueuePayload = message.data as TrainManagerExtractingQueuePayload;
 
     // 1. Check if result already exists.
@@ -30,7 +37,7 @@ export async function statusImage(message: Message) {
 
     // 2. Check if image exists locally
 
-    const repositoryTag = getHarborFQRepositoryPath(data.projectName, data.repositoryName);
+    const repositoryTag = buildRemoteDockerImageURL(data.projectName, data.repositoryName);
     const exists : boolean = await checkIfLocalRegistryImageExists(repositoryTag);
 
     if (exists) {
@@ -38,7 +45,7 @@ export async function statusImage(message: Message) {
             options: {
                 routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
             },
-            type: TrainManagerExtractingQueueEvent.DOWNLOADED,
+            type: TrainManagerExtractingQueueEvent.FINISHED,
             data: message.data,
             metadata: message.metadata,
         }));

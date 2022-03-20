@@ -2,8 +2,8 @@ import { Message } from 'amqp-extension';
 import fs from 'fs';
 import { TrainManagerExtractingQueuePayload, TrainManagerExtractionMode, TrainManagerExtractionStep } from '@personalhealthtrain/central-common';
 import { buildImageOutputFilePath, getImageOutputDirectoryPath } from '../../config/paths';
-import { getHarborFQRepositoryPath } from '../../config/services/harbor';
-import { readDockerContainerPaths, removeLocalRegistryImage, saveDockerContainerPathsTo } from '../../modules/docker';
+import { buildRemoteDockerImageURL } from '../../config/services/registry';
+import { readDockerContainerPaths, removeDockerImage, saveDockerContainerPathsTo } from '../../modules/docker';
 import { ensureDirectory } from '../../modules/fs';
 import { ExtractingError } from './error';
 
@@ -18,7 +18,7 @@ export async function processEvent(message: Message) {
             };
         }
 
-        const repositoryPath: string = getHarborFQRepositoryPath(data.projectName, data.repositoryName);
+        const repositoryPath: string = buildRemoteDockerImageURL(data.projectName, data.repositoryName);
 
         switch (data.mode) {
             case TrainManagerExtractionMode.READ: {
@@ -56,7 +56,7 @@ export async function processEvent(message: Message) {
 
         try {
             // we are done here with the docker image :)
-            await removeLocalRegistryImage(repositoryPath);
+            await removeDockerImage(repositoryPath);
         } catch (e) {
             // we tried :P
         }

@@ -7,7 +7,7 @@ export async function writeProcessingEvent(message: Message) {
         options: {
             routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
         },
-        type: TrainManagerRoutingQueueEvent.STARTED,
+        type: TrainManagerRoutingQueueEvent.MOVE_STARTED,
         data: message.data,
         metadata: message.metadata,
     }));

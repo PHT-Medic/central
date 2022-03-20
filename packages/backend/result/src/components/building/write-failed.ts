@@ -4,6 +4,7 @@ import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { BuildingError } from './error';
 
 export async function writeFailedEvent(message: Message, error: BuildingError) {
+    console.log(error);
     await publishMessage(buildMessage({
         options: {
             routingKey: MessageQueueSelfToUIRoutingKey.EVENT,

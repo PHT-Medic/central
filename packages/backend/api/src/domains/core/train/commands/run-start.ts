@@ -8,6 +8,7 @@
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import {
+    REGISTRY_ARTIFACT_TAG_BASE, REGISTRY_ARTIFACT_TAG_LATEST,
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_SYSTEM_USER_NAME,
     Train,
@@ -42,6 +43,14 @@ export async function startTrain(train: Train | number | string) : Promise<Train
                 repositoryName: train.id,
                 projectName: REGISTRY_INCOMING_PROJECT_NAME,
                 operator: REGISTRY_SYSTEM_USER_NAME,
+                artifactTag: REGISTRY_ARTIFACT_TAG_BASE,
+            }));
+
+            await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE, {
+                repositoryName: train.id,
+                projectName: REGISTRY_INCOMING_PROJECT_NAME,
+                operator: REGISTRY_SYSTEM_USER_NAME,
+                artifactTag: REGISTRY_ARTIFACT_TAG_LATEST,
             }));
         } else {
             const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.START, { id: train.id });

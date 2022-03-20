@@ -7,8 +7,10 @@
 
 import { useDocker } from './instance';
 
-export async function removeLocalRegistryImage(image: string) {
+export async function removeDockerImage(image: string) {
     await useDocker()
         .getImage(image)
-        .remove();
+        .remove({
+            force: true,
+        });
 }

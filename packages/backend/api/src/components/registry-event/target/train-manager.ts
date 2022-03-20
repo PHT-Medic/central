@@ -33,19 +33,19 @@ export async function dispatchRegistryEventToTrainExtractor(
 
     const isOutgoingProject : boolean = data.namespace === REGISTRY_OUTGOING_PROJECT_NAME;
 
-    await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT, {
-        repositoryName: data.repositoryName,
-        projectName: data.namespace,
+    if (isOutgoingProject) {
+        await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT, {
+            repositoryName: data.repositoryName,
+            projectName: data.namespace,
 
-        filePaths: [
-            ...(isOutgoingProject ? [TrainContainerPath.RESULTS] : []),
-            TrainContainerPath.CONFIG,
-        ],
+            filePaths: [
+                TrainContainerPath.RESULTS,
+                TrainContainerPath.CONFIG,
+            ],
 
-        mode: isOutgoingProject ?
-            TrainManagerExtractionMode.WRITE :
-            TrainManagerExtractionMode.READ,
-    }));
+            mode: TrainManagerExtractionMode.WRITE,
+        }));
+    }
 
     const isIncomingProject : boolean = data.namespace === REGISTRY_INCOMING_PROJECT_NAME;
     const isStationProject : boolean = isRegistryStationProjectName(data.namespace);
@@ -56,6 +56,7 @@ export async function dispatchRegistryEventToTrainExtractor(
                 repositoryName: data.repositoryName,
                 projectName: data.namespace,
                 operator: data.operator,
+                artifactTag: data.artifactTag,
             }));
         }
     }

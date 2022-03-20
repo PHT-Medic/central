@@ -19,7 +19,7 @@ export default {
     computed: {
         path() {
             let filename = this.file.name;
-            if (typeof this.file.webkitRelativePath !== 'undefined') {
+            if (this.file.webkitRelativePath) {
                 filename = this.file.webkitRelativePath;
             }
             return filename;

@@ -5,24 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type DockerPullOptions = {
-    authconfig: {
-        username: string,
-        password: string,
-        serveraddress: string
-    }
+export type DockerAuthConfig = {
+    username: string,
+    password: string,
+    serveraddress: string
 };
 
-// -------------------------------------------------------
-
-export type DockerPushImage = {
-    tag?: string,
-    name: string
-};
-
-export type DockerPushImageOptions = {
-    remove?: boolean
-};
 // -------------------------------------------------------
 
 export type DockerContainerFileType = 'file' | 'link' | 'symlink' | 'directory' |

@@ -25,11 +25,7 @@ export function createRoutingComponentHandlers() : ConsumeHandlers {
                 .then(writeProcessingEvent)
                 .then(processMessage)
                 .then(writeProcessedEvent)
-                .catch((err: Error) => {
-                    console.log(err);
-
-                    return writeFailedEvent(message, err as RoutingError);
-                });
+                .catch((err: Error) => writeFailedEvent(message, err as RoutingError));
         },
     };
 }

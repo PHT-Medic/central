@@ -5,46 +5,31 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { parseHarborConnectionString } from '@personalhealthtrain/central-common';
-import { URL } from 'url';
-import env from '../../env';
 import { useDocker } from './instance';
-import { DockerPushImage, DockerPushImageOptions } from './type';
+import { DockerAuthConfig } from './type';
 
-export async function pushDockerImages(images: DockerPushImage[], options?: DockerPushImageOptions) {
-    options = options || {};
-    options.remove = options.remove ?? true;
+export async function pushDockerImages(image: string, authConfig: DockerAuthConfig) {
+    const imageLatest = await useDocker()
+        .getImage(image);
 
-    const harborConfig = parseHarborConnectionString(env.harborConnectionString);
-    const harborUrL = new URL(harborConfig.host);
+    const stream = await imageLatest.push({
+        authconfig: authConfig,
+    });
 
-    for (let i = 0; i < images.length; i++) {
-        const imageLatest = await useDocker()
-            .getImage(`${images[i].name}:${images[i].tag || 'latest'}`);
+    await new Promise((resolve, reject) => {
+        useDocker().modem.followProgress(
+            stream,
+            (err: Error, res: any[]) => {
+                if (err) {
+                    return reject(err);
+                }
 
-        const stream = await imageLatest.push({
-            authconfig: {
-                username: harborConfig.user,
-                password: harborConfig.password,
-                serveraddress: harborUrL.hostname,
+                return resolve(res);
             },
-        });
+        );
+    });
 
-        await new Promise((resolve, reject) => {
-            useDocker().modem.followProgress(
-                stream,
-                (err: Error, res: any[]) => {
-                    if (err) {
-                        return reject(err);
-                    }
-
-                    return resolve(res);
-                },
-            );
-        });
-
-        if (options.remove) {
-            await imageLatest.remove();
-        }
-    }
+    await imageLatest.remove({
+        force: true,
+    });
 }
