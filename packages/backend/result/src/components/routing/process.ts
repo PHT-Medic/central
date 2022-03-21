@@ -8,6 +8,7 @@
 import { BuildInput } from '@trapi/query';
 import { Message } from 'amqp-extension';
 import {
+    Ecosystem,
     HTTPClient,
     HarborAPI,
     REGISTRY_ARTIFACT_TAG_BASE,
@@ -17,7 +18,9 @@ import {
     REGISTRY_SYSTEM_USER_NAME,
     TrainManagerRoutingPayload,
     TrainStation,
-    buildRegistryStationProjectName, getRegistryStationProjectNameId, isRegistryStationProjectName,
+    buildRegistryStationProjectName,
+    getRegistryStationProjectNameId,
+    isRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { mergeStationsWithTrainStations } from './helpers/merge';
@@ -90,9 +93,8 @@ export async function processRouteCommand(message: Message) {
             return message;
         }
 
-        const currentStation = stationsExtended[index];
-
         sourceProjectName = data.projectName;
+        const currentStation = stationsExtended[index];
 
         const nextStationIndex = stationsExtended.findIndex((station) => station.index === currentStation.index + 1);
         if (nextStationIndex === -1) {
@@ -101,6 +103,14 @@ export async function processRouteCommand(message: Message) {
         } else {
             // move to next station
             destinationProjectName = buildRegistryStationProjectName(stationsExtended[nextStationIndex].secure_id);
+
+            if (stationsExtended[nextStationIndex].ecosystem !== Ecosystem.DEFAULT) {
+                switch (stationsExtended[nextStationIndex].ecosystem) {
+                    case Ecosystem.PADME:
+                        // move train to padme eco-system ;)
+                        break;
+                }
+            }
         }
     }
 

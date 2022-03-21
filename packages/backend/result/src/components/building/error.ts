@@ -31,7 +31,7 @@ export class BuildingError extends BaseError {
 
     // --------------------------------------------------------------------
 
-    static BuildingError(step?: `${TrainManagerBuildingStep}`, message?: string) {
+    static notFound(step?: `${TrainManagerBuildingStep}`, message?: string) {
         return new BuildingError({
             type: TrainManagerBuildingErrorType.TRAIN_NOT_BUILD,
             step,

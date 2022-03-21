@@ -31,6 +31,11 @@ export type TrainConfigCreator = {
 };
 
 export type TrainConfig = {
+    id: string,
+
+    '@id': string,
+    '@context': string,
+
     creator: TrainConfigCreator,
     file_list: string[],
     // hash

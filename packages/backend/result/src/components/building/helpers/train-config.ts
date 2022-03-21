@@ -30,6 +30,7 @@ export async function buildTrainConfig(entity: Train) : Promise<TrainConfig> {
 
     const config : TrainConfig = {
         id: entity.id,
+        '@id': entity.id,
         creator: {
             id: entity.user_id,
             rsa_public_key: null,
@@ -51,7 +52,7 @@ export async function buildTrainConfig(entity: Train) : Promise<TrainConfig> {
     const client = useClient<HTTPClient>();
 
     const response = await client.trainFile.getMany(entity.id);
-    config.files = response.data.map((file) => `${file.directory}/${file.name}`);
+    config.file_list = response.data.map((file) => `${file.directory}/${file.name}`);
 
     // ----------------------------------------------------------
 

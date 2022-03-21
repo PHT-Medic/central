@@ -10,10 +10,9 @@ import {
     HTTPClient,
     REGISTRY_INCOMING_PROJECT_NAME,
     TrainContainerFileName,
-    TrainContainerPath, TrainManagerBuildPayload,
+    TrainContainerPath, TrainManagerBuildPayload, TrainManagerBuildingStep,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
-import { NotFoundError } from '@typescript-error/http';
 import { buildTrainConfig } from './helpers/train-config';
 import { useDocker } from '../../modules/docker';
 import { buildDockerFile } from './helpers/dockerfile';
@@ -22,6 +21,7 @@ import { useLogger } from '../../modules/log';
 import { createPackFromFileContent } from './helpers/file-gzip';
 import { buildDockerImage } from '../../modules/docker/image-build';
 import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../config/services/registry';
+import { BuildingError } from './error';
 
 export async function processMessage(message: Message) {
     const data = message.data as TrainManagerBuildPayload;
@@ -36,7 +36,7 @@ export async function processMessage(message: Message) {
     });
 
     if (typeof train === 'undefined') {
-        throw new NotFoundError();
+        throw BuildingError.notFound(TrainManagerBuildingStep.BUILD);
     }
 
     // -----------------------------------------------------------------------------------
