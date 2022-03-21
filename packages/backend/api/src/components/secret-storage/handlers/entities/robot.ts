@@ -6,26 +6,16 @@
  */
 
 import {
-    HarborAPI,
-    HarborProjectWebhook,
-    REGISTRY_INCOMING_PROJECT_NAME,
-    REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-    REGISTRY_OUTGOING_PROJECT_NAME,
     ROBOT_SECRET_ENGINE_KEY,
     ServiceID,
-    Station,
     VaultAPI,
     buildRobotSecretStoragePayload,
-
 } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
 import { useClient } from '@trapi/client';
-import { StationEntity } from '../../../../domains/core/station/entity';
+import { publishMessage } from 'amqp-extension';
 import { ApiKey } from '../../../../config/api';
-import env from '../../../../env';
-import {
-    SecretStorageRobotQueuePayload,
-} from '../../../../domains/special/secret-storage/type';
+import { SecretStorageRobotQueuePayload } from '../../../../domains/special/secret-storage/type';
+import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../domains/special/registry';
 
 export async function saveRobotToSecretStorage(payload: SecretStorageRobotQueuePayload) {
     if (!payload.id || !payload.secret) {
@@ -33,42 +23,11 @@ export async function saveRobotToSecretStorage(payload: SecretStorageRobotQueueP
     }
 
     if (payload.name === ServiceID.REGISTRY) {
-        const stationRepository = getRepository(StationEntity);
-        const queryBuilder = stationRepository.createQueryBuilder('station');
-        const stations = await queryBuilder
-            .addSelect('station.registry_project_id')
-            .where('station.registry_project_id IS NOT NULL')
-            .getMany();
+        const queueMessage = buildRegistryQueueMessage(
+            RegistryQueueCommand.SETUP,
+        );
 
-        const promises: Promise<HarborProjectWebhook>[] = stations.map((station: Station) => {
-            const promise = useClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.ensure(
-                station.registry_project_id,
-                {
-                    id: payload.id,
-                    secret: payload.secret,
-                },
-                { internalAPIUrl: env.internalApiUrl },
-            );
-
-            return promise;
-        });
-
-        const specialProjects = [
-            REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-            REGISTRY_INCOMING_PROJECT_NAME,
-            REGISTRY_OUTGOING_PROJECT_NAME,
-        ];
-
-        specialProjects.map((repository) => {
-            promises.push(useClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.ensure(repository, {
-                id: payload.id,
-                secret: payload.secret,
-            }, { internalAPIUrl: env.internalApiUrl }, true));
-
-            return repository;
-        });
-
-        await Promise.all(promises);
+        await publishMessage(queueMessage);
     }
 
     const data = buildRobotSecretStoragePayload(payload.id, payload.secret);

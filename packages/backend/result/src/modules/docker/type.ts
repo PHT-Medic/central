@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type DockerPullOptions = {
-    authconfig: {
-        username: string,
-        password: string,
-        serveraddress: string
-    }
+export type DockerAuthConfig = {
+    username: string,
+    password: string,
+    serveraddress: string
 };
+
+// -------------------------------------------------------
 
 export type DockerContainerFileType = 'file' | 'link' | 'symlink' | 'directory' |
 'block-device' | 'character-device' | 'fifo' | 'contiguous-file';

@@ -8,12 +8,11 @@
 import {
     REGISTRY_OUTGOING_PROJECT_NAME,
     Train,
-    TrainContainerPath,
-    TrainExtractorMode,
+    TrainManagerExtractionMode, TrainManagerQueueCommand,
 } from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
-import { TrainExtractorQueueCommand, buildTrainExtractorQueueMessage } from '../../../special/train-extractor';
+import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 
@@ -25,11 +24,11 @@ export async function triggerTrainResultStatus(
     train = await findTrain(train, repository);
 
     // send queue message
-    await publishMessage(buildTrainExtractorQueueMessage(TrainExtractorQueueCommand.STATUS, {
+    await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT_STATUS, {
         repositoryName: train.id,
         projectName: REGISTRY_OUTGOING_PROJECT_NAME,
 
-        mode: TrainExtractorMode.NONE,
+        mode: TrainManagerExtractionMode.NONE,
     }));
 
     return train;

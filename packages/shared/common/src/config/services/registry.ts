@@ -29,6 +29,12 @@ export const REGISTRY_SYSTEM_USER_NAME = 'system';
 
 // -----------------------------------
 
+export const REGISTRY_ARTIFACT_TAG_LATEST = 'latest';
+
+export const REGISTRY_ARTIFACT_TAG_BASE = 'base';
+
+// -----------------------------------
+
 export function isSpecialRegistryProjectName(name: string) : boolean {
     return [
         REGISTRY_INCOMING_PROJECT_NAME,

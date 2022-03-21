@@ -52,17 +52,19 @@ export default {
 
             const total = this.meta.total + 2; // + 2 because incoming + outgoing
 
-            // no index -> outgoing or incoming
-            if (!this.entity.run_station_index) {
-                // outgoing, because train terminated
-                if (this.entity.run_status === TrainRunStatus.FINISHED) {
-                    return 100;
-                }
-
-                return 100 * (1 / total);
+            if (this.entity.run_status === TrainRunStatus.FINISHED) {
+                return 100;
             }
 
-            return 100 * ((this.entity.run_station_index + 1) / (total - 2));
+            let position = 0;
+
+            if (this.entity.run_station_index) {
+                position = this.entity.run_station_index + 2;
+            } else {
+                position = 1;
+            }
+
+            return 100 * (position / total);
         },
         direction() {
             return this.entity.realm_id === this.$store.getters['auth/userRealmId'] ?

@@ -5,12 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Robot } from '@authelion/common';
-import { ClientDriverInstance, stringifyAuthorizationHeader } from '@trapi/client';
-import { HarborProjectWebhook, HarborProjectWebhookOptions } from './type';
-import { ServiceID } from '../../../domains';
-
-const WEBHOOK_ID = 'UI';
+import { mergeDeep } from '@authelion/common';
+import { ClientDriverInstance } from '@trapi/client';
+import * as os from 'os';
+import { HarborProjectWebhook } from './type';
+import { createNanoID } from '../../../utils';
 
 export class HarborProjectWebHookAPI {
     protected client: ClientDriverInstance;
@@ -21,7 +20,8 @@ export class HarborProjectWebHookAPI {
 
     async find(
         projectIdOrName: number | string,
-        isProjectName = false,
+        isProjectName: boolean,
+        name : string,
     ): Promise<HarborProjectWebhook | undefined> {
         const headers: Record<string, any> = {};
 
@@ -32,7 +32,7 @@ export class HarborProjectWebHookAPI {
         const { data } = await this.client
             .get(`projects/${projectIdOrName}/webhook/policies`, headers);
 
-        const policies = data.filter((policy: { name: string; }) => policy.name === WEBHOOK_ID);
+        const policies = data.filter((policy: { name: string; }) => policy.name === name);
 
         if (policies.length === 1) {
             return policies[0];
@@ -43,9 +43,8 @@ export class HarborProjectWebHookAPI {
 
     async ensure(
         projectIdOrName: number | string,
-        client: Pick<Robot, 'id' | 'secret'>,
-        options: HarborProjectWebhookOptions,
-        isProjectName = false,
+        isProjectName: boolean,
+        data: Partial<HarborProjectWebhook>,
     ): Promise<HarborProjectWebhook> {
         const headers: Record<string, any> = {};
 
@@ -53,36 +52,19 @@ export class HarborProjectWebHookAPI {
             headers['X-Is-Resource-Name'] = true;
         }
 
-        const apiUrl: string | undefined = options.internalAPIUrl ?? options.externalAPIUrl;
-        if (!apiUrl) {
-            throw new Error('An API Harbor URL must be specified.');
-        }
-
-        const webhook: HarborProjectWebhook = {
-            name: WEBHOOK_ID,
+        const webhook: HarborProjectWebhook = mergeDeep({
+            name: createNanoID(),
             enabled: true,
-            targets: [
-                {
-                    auth_header: stringifyAuthorizationHeader({
-                        type: 'Basic',
-                        username: client.id,
-                        password: client.secret,
-                    }),
-                    skip_cert_verify: true,
-                    // todo: change this, if service not on same machine.
-                    address: `${apiUrl}services/${ServiceID.REGISTRY}/hook`,
-                    type: 'http',
-                },
-            ],
+            targets: [],
             event_types: ['PUSH_ARTIFACT'],
-        };
+        }, data);
 
         try {
             await this.client
                 .post(`projects/${projectIdOrName}/webhook/policies`, webhook, headers);
         } catch (e) {
             if (e?.response?.status === 409) {
-                await this.delete(projectIdOrName, isProjectName);
+                await this.delete(projectIdOrName, isProjectName, webhook.name);
 
                 await this.client
                     .post(`projects/${projectIdOrName}/webhook/policies`, webhook, headers);
@@ -94,8 +76,8 @@ export class HarborProjectWebHookAPI {
         return webhook;
     }
 
-    async delete(projectIdOrName: number | string, isProjectName = false) {
-        const webhook = await this.find(projectIdOrName, isProjectName);
+    async delete(projectIdOrName: number | string, isProjectName: boolean, name: string) {
+        const webhook = await this.find(projectIdOrName, isProjectName, name);
 
         if (typeof webhook !== 'undefined') {
             await this.client

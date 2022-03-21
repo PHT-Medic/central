@@ -1,0 +1,69 @@
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import {
+    TrainManagerExtractingQueueEvent,
+    TrainManagerExtractingQueuePayload,
+    TrainManagerExtractionMode, TrainResultStatus,
+} from '@personalhealthtrain/central-common';
+import { getRepository } from 'typeorm';
+import { useLogger } from '../../config/log';
+import { TrainEntity } from '../../domains/core/train/entity';
+
+export async function handleTrainManagerExtractingQueueEvent(
+    data: TrainManagerExtractingQueuePayload,
+    event: TrainManagerExtractingQueueEvent,
+) {
+    useLogger()
+        .info(`Received train-manager extracting ${event} event.`, {
+            aggregator: 'train-manager', payload: data,
+        });
+
+    const trainRepository = getRepository(TrainEntity);
+
+    const train = await trainRepository.findOne(data.repositoryName);
+    if (typeof train === 'undefined') {
+        return;
+    }
+
+    switch (data.mode) {
+        case TrainManagerExtractionMode.NONE:
+        case TrainManagerExtractionMode.WRITE: {
+            let status : TrainResultStatus;
+
+            switch (event) {
+                case TrainManagerExtractingQueueEvent.STARTED:
+                    status = TrainResultStatus.STARTED;
+                    break;
+                case TrainManagerExtractingQueueEvent.DOWNLOADING:
+                    status = TrainResultStatus.DOWNLOADING;
+                    break;
+                case TrainManagerExtractingQueueEvent.DOWNLOADED:
+                    status = TrainResultStatus.DOWNLOADED;
+                    break;
+                case TrainManagerExtractingQueueEvent.PROCESSING:
+                    status = TrainResultStatus.PROCESSING;
+                    break;
+                case TrainManagerExtractingQueueEvent.PROCESSED:
+                    status = TrainResultStatus.FINISHED;
+                    break;
+                case TrainManagerExtractingQueueEvent.FINISHED:
+                    status = TrainResultStatus.FINISHED;
+                    break;
+                case TrainManagerExtractingQueueEvent.FAILED:
+                    status = TrainResultStatus.FAILED;
+                    break;
+            }
+
+            train.result_status = status;
+
+            await trainRepository.save(train);
+
+            break;
+        }
+    }
+}

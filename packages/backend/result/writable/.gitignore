@@ -3,3 +3,4 @@
 !.gitignore
 !train-results
 !train-results/DEMO.tar
+!temp

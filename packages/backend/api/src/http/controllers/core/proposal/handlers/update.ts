@@ -13,27 +13,27 @@ export async function updateProposalRouteHandler(req: ExpressRequest, res: Expre
         throw new ForbiddenError();
     }
 
-    const data = await runProposalValidation(req, 'update');
-    if (!data) {
+    const result = await runProposalValidation(req, 'update');
+    if (!result.data) {
         return res.respondAccepted();
     }
 
     const repository = getRepository(ProposalEntity);
-    let proposal = await repository.findOne(id);
+    let entity = await repository.findOne(id);
 
-    if (typeof proposal === 'undefined') {
+    if (typeof entity === 'undefined') {
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, proposal.realm_id)) {
+    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
         throw new ForbiddenError();
     }
 
-    proposal = repository.merge(proposal, data);
+    entity = repository.merge(entity, result.data);
 
-    const result = await repository.save(proposal);
+    await repository.save(entity);
 
     return res.respondAccepted({
-        data: result,
+        data: entity,
     });
 }

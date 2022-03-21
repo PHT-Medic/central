@@ -8,12 +8,14 @@
 import { Message, publishMessage } from 'amqp-extension';
 import {
     HarborAPI,
-    REGISTRY_INCOMING_PROJECT_NAME, REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-    REGISTRY_OUTGOING_PROJECT_NAME, ROBOT_SECRET_ENGINE_KEY, RobotSecretEnginePayload,
-    ServiceID, VaultAPI,
+    HarborProjectWebhook, REGISTRY_INCOMING_PROJECT_NAME,
+    REGISTRY_MASTER_IMAGE_PROJECT_NAME, REGISTRY_OUTGOING_PROJECT_NAME,
+    ROBOT_SECRET_ENGINE_KEY, RobotSecretEnginePayload, ServiceID,
+    VaultAPI, buildRegistryWebhookTarget,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { getRepository } from 'typeorm';
+import os from 'os';
 import env from '../../../env';
 import { ApiKey } from '../../../config/api';
 import { StationEntity } from '../../../domains/core/station/entity';
@@ -31,6 +33,20 @@ export async function setupRegistry(message?: Message) {
         return message;
     }
 
+    const webhookData : Partial<HarborProjectWebhook> = {
+        name: os.hostname(),
+        targets: [
+            buildRegistryWebhookTarget({
+                apiUrl: env.apiUrl,
+                robot: {
+                    id: response.data.id,
+                    secret: response.data.secret,
+                },
+            }),
+
+        ],
+    };
+
     // -----------------------------------------------
 
     // incoming
@@ -39,9 +55,9 @@ export async function setupRegistry(message?: Message) {
         public: false,
     });
 
-    await useClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.ensure(incomingEntity.id, response.data, {
-        internalAPIUrl: env.internalApiUrl,
-    });
+    await useClient<HarborAPI>(ApiKey.HARBOR)
+        .projectWebHook
+        .ensure(incomingEntity.id, false, webhookData);
 
     // outgoing
     const outgoingEntity = await useClient<HarborAPI>(ApiKey.HARBOR).project.save({
@@ -49,9 +65,9 @@ export async function setupRegistry(message?: Message) {
         public: false,
     });
 
-    await useClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.ensure(outgoingEntity.id, response.data, {
-        internalAPIUrl: env.internalApiUrl,
-    });
+    await useClient<HarborAPI>(ApiKey.HARBOR)
+        .projectWebHook
+        .ensure(outgoingEntity.id, false, webhookData);
 
     // master ( images )
     await useClient<HarborAPI>(ApiKey.HARBOR).project.save({

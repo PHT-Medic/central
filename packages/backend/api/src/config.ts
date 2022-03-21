@@ -14,7 +14,7 @@ import https from 'https';
 import { setConfig as setRedisConfig } from 'redis-extension';
 import { Environment } from './env';
 import { buildTrainBuilderAggregator } from './aggregators/train-builder';
-import { buildTrainResultAggregator } from './aggregators/train-extractor';
+import { buildTrainManagerAggregator } from './aggregators/train-manager';
 import { buildRegistryAggregator } from './aggregators/registry';
 import { buildRobotAggregator } from './aggregators/robot';
 import { buildTrainRouterAggregator } from './aggregators/train-router';
@@ -106,7 +106,7 @@ export function createConfig({ env } : ConfigContext) : Config {
 
         buildRegistryAggregator(),
         buildTrainBuilderAggregator(),
-        buildTrainResultAggregator(),
+        buildTrainManagerAggregator(),
         buildTrainRouterAggregator(),
     ];
 

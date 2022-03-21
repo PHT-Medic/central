@@ -168,7 +168,8 @@ export default {
             this.busy = true;
 
             try {
-                this.items = await this.$api.trainFile.getMany(this.train.id);
+                const response = await this.$api.trainFile.getMany(this.train.id);
+                this.items = response.data;
             } catch (e) {
                 // ...
             }
@@ -443,18 +444,19 @@ export default {
                 </div>
 
                 <div class="d-flex flex-column">
-                    <train-file
-                        v-for="file in items"
-                        :key="file.id"
-                        class="mr-1"
-                        :file="file"
-                        :files-selected="selected"
-                        :file-selected-id="form.entrypoint_file_id"
-                        @check="toggleFile"
-                        @updated="handleUpdated"
-                        @deleted="handleDeleted"
-                        @toggle="changeEntryPointFile"
-                    />
+                    <template v-for="file in items">
+                        <train-file
+                            :key="file.id"
+                            class="mr-1"
+                            :file="file"
+                            :files-selected="selected"
+                            :file-selected-id="form.entrypoint_file_id"
+                            @check="toggleFile"
+                            @updated="handleUpdated"
+                            @deleted="handleDeleted"
+                            @toggle="changeEntryPointFile"
+                        />
+                    </template>
                 </div>
 
                 <div class="form-group">

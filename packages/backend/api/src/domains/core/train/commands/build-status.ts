@@ -7,13 +7,15 @@
 
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
-import { Train } from '@personalhealthtrain/central-common';
+import { Train, TrainManagerQueueCommand } from '@personalhealthtrain/central-common';
 import { buildTrainBuilderQueueMessage } from '../../../special/train-builder/queue';
 import { TrainBuilderCommand } from '../../../special/train-builder/type';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
+import env from '../../../../env';
+import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 
-export async function detectTrainBuildStatus(train: Train | number | string, demo = false) : Promise<Train> {
+export async function detectTrainBuildStatus(train: Train | number | string) : Promise<Train> {
     const repository = getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
@@ -22,7 +24,16 @@ export async function detectTrainBuildStatus(train: Train | number | string, dem
         throw new Error('The train could not be found.');
     }
 
-    if (!demo) {
+    if (env.trainManagerForBuilding) {
+        const queueMessage = buildTrainManagerQueueMessage(
+            TrainManagerQueueCommand.BUILD_STATUS,
+            {
+                id: train.id,
+            },
+        );
+
+        await publishMessage(queueMessage);
+    } else {
         const queueMessage = await buildTrainBuilderQueueMessage(TrainBuilderCommand.STATUS, train);
 
         await publishMessage(queueMessage);

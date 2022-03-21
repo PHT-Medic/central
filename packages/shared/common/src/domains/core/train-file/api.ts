@@ -62,4 +62,14 @@ export class TrainFileAPI {
 
         return response.data;
     }
+
+    async download(
+        trainId: Train['id'],
+    ) {
+        const response = await this.client.get(this.getDownloadURI(trainId), {
+            responseType: 'stream',
+        });
+
+        return response.data;
+    }
 }

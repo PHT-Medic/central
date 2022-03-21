@@ -13,7 +13,9 @@ import { isPermittedForResourceRealm } from '@authelion/common';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
-import { createRequestMasterImageIdValidation } from '../../master-image/utils';
+import {
+    extendExpressValidationResultWithMasterImage,
+} from '../../master-image/utils/extend';
 import { TrainValidationResult } from '../type';
 import { extendExpressValidationResultWithProposal } from '../../proposal/utils/extend';
 
@@ -29,6 +31,7 @@ export async function runTrainValidation(
     if (operation === 'create') {
         await check('proposal_id')
             .exists()
+            .notEmpty()
             .isUUID()
             .run(req);
 
@@ -75,7 +78,10 @@ export async function runTrainValidation(
         .optional({ nullable: true })
         .run(req);
 
-    await createRequestMasterImageIdValidation()
+    await check('master_image_id')
+        .exists()
+        .notEmpty()
+        .isUUID()
         .optional({ nullable: true })
         .run(req);
 
@@ -96,6 +102,7 @@ export async function runTrainValidation(
 
     // ----------------------------------------------
 
+    await extendExpressValidationResultWithMasterImage(result);
     await extendExpressValidationResultWithProposal(result);
     if (result.meta.proposal) {
         if (!isPermittedForResourceRealm(req.realmId, result.meta.proposal.realm_id)) {

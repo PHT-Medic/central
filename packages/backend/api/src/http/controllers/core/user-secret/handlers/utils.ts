@@ -20,13 +20,6 @@ export async function runUserSecretValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
 ) : Promise<Partial<UserSecret>> {
-    if (
-        env.userSecretsImmutable &&
-        !req.ability.hasPermission(PermissionID.USER_EDIT)
-    ) {
-        throw new BadRequestError('User secrets are immutable and can not be changed in this environment.');
-    }
-
     const keyChain = check('key')
         .isLength({ min: 3, max: 128 });
 

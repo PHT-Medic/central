@@ -8,7 +8,7 @@
 import { getCustomRepository, getRepository } from 'typeorm';
 import { UserRepository } from '@authelion/api-core';
 import {
-    Ecosystem, SecretType, TrainStationApprovalStatus, createNanoID,
+    Ecosystem, SecretType, TrainBuilderStation, TrainStationApprovalStatus, createNanoID,
 } from '@personalhealthtrain/central-common';
 import path from 'path';
 import { ProposalEntity } from '../../../../src/domains/core/proposal/entity';
@@ -27,7 +27,6 @@ import { TEST_DEFAULT_TRAIN_FILE } from '../../../utils/domains/train-file';
 import { StationEntity } from '../../../../src/domains/core/station/entity';
 import { TEST_DEFAULT_STATION } from '../../../utils/domains/station';
 import { TrainStationEntity } from '../../../../src/domains/core/train-station/entity';
-import { TrainBuilderStation } from '../../../../src/domains/special/train-builder/type';
 
 describe('src/domains/train-builder', () => {
     createConfig({ env });

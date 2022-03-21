@@ -6,6 +6,7 @@
  */
 
 export * from './client';
+export * from './contants';
 export * from './interceptors';
 export * from './harbor-client';
 export * from './vault-client';

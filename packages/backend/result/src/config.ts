@@ -1,7 +1,14 @@
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
 import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
 import {
     HTTPClient,
-    VaultAPI, refreshAuthRobotTokenOnResponseError,
+    HarborAPI, VaultAPI, refreshAuthRobotTokenOnResponseError,
 } from '@personalhealthtrain/central-common';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
@@ -44,6 +51,18 @@ function createConfig({ env } : ConfigContext) : Config {
             connectionString: env.vaultConnectionString,
         },
     }, 'vault');
+
+    setHTTPConfig({
+        clazz: HarborAPI,
+        driver: {
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false,
+            }),
+        },
+        extra: {
+            connectionString: env.harborConnectionString,
+        },
+    }, 'harbor');
 
     setHTTPConfig({
         clazz: HTTPClient,

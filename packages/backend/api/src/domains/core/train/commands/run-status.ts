@@ -37,7 +37,10 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     let harborRepository: HarborRepository | undefined = await useClient<HarborAPI>(ApiKey.HARBOR).projectRepository
         .find(REGISTRY_OUTGOING_PROJECT_NAME, train.id);
 
-    if (typeof harborRepository !== 'undefined') {
+    if (
+        harborRepository &&
+        harborRepository.artifactCount > 0
+    ) {
         train = repository.merge(train, {
             build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
             configuration_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure
@@ -66,7 +69,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
         .addSelect('station.secure_id')
         .leftJoinAndSelect('trainStation.station', 'station')
         .orderBy({
-            'trainStation.position': 'DESC',
+            'trainStation.index': 'DESC',
             'trainStation.created_at': 'DESC',
         });
 
@@ -84,7 +87,10 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
             harborRepository = await useClient<HarborAPI>(ApiKey.HARBOR).projectRepository
                 .find(stationName, train.id);
 
-            if (typeof harborRepository !== 'undefined') {
+            if (
+                harborRepository &&
+                harborRepository.artifactCount > 0
+            ) {
                 // update train station status
 
                 train = repository.merge(train, {
@@ -115,7 +121,10 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     harborRepository = await useClient<HarborAPI>(ApiKey.HARBOR).projectRepository
         .find(REGISTRY_INCOMING_PROJECT_NAME, train.id);
 
-    if (typeof harborRepository !== 'undefined') {
+    if (
+        harborRepository &&
+        harborRepository.artifactCount > 0
+    ) {
         train = repository.merge(train, {
             build_status: TrainBuildStatus.FINISHED, // optional, just to ensure
             configuration_status: TrainConfigurationStatus.FINISHED, // optional, just to ensure

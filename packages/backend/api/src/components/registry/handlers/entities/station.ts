@@ -5,17 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import os from 'os';
+
 import {
     HarborAPI,
     HarborProject,
+    HarborProjectWebhook,
     HarborRobotAccount,
     ROBOT_SECRET_ENGINE_KEY,
     RobotSecretEnginePayload,
     STATION_SECRET_ENGINE_KEY,
     ServiceID,
-    StationSecretStoragePayload,
-    VaultAPI,
-    buildRegistryStationProjectName,
+    StationSecretStoragePayload, VaultAPI, buildRegistryStationProjectName, buildRegistryWebhookTarget,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { getRepository } from 'typeorm';
@@ -77,20 +78,36 @@ export async function saveStationToRegistry(payload: RegistryStationQueuePayload
                 const response = await useClient<VaultAPI>(ApiKey.VAULT)
                     .keyValue.find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, entity.secure_id);
 
-                // todo: create robot account or sync to vault if not available :)
-                if (response) {
-                    entity.registry_project_account_id = response.data.registry_robot_id;
-                    entity.registry_project_account_name = response.data.registry_robot_name;
-                    entity.registry_project_account_token = response.data.registry_robot_secret;
-                }
-
                 if (
-                    !entity.registry_project_account_id ||
-                    !entity.registry_project_account_name ||
-                    !entity.registry_project_account_token
+                    response &&
+                    response.data.registry_robot_id &&
+                    response.data.registry_robot_name &&
+                    response.data.registry_robot_secret
                 ) {
+                    robotAccount = {
+                        id: response.data.registry_robot_id,
+                        name: response.data.registry_robot_name,
+                        secret: response.data.registry_robot_secret,
+                    };
+
+                    await useClient<HarborAPI>(ApiKey.HARBOR).robotAccount.refreshSecret(
+                        robotAccount.id,
+                        robotAccount.secret,
+                    );
+                } else {
                     robotAccount = await useClient<HarborAPI>(ApiKey.HARBOR).robotAccount
                         .find(projectName, true);
+
+                    await useClient<VaultAPI>(ApiKey.VAULT)
+                        .keyValue.save(
+                            STATION_SECRET_ENGINE_KEY,
+                            entity.secure_id,
+                            {
+                                registry_robot_id: robotAccount.id,
+                                registry_robot_name: robotAccount.name,
+                                registry_robot_secret: robotAccount.secret,
+                            } as StationSecretStoragePayload,
+                        );
                 }
             }
         }
@@ -107,6 +124,7 @@ export async function saveStationToRegistry(payload: RegistryStationQueuePayload
     if (
         entity.registry_project_account_id
     ) {
+        // just update the name for insurance ;)
         await useClient<HarborAPI>(ApiKey.HARBOR).robotAccount
             .update(entity.registry_project_account_id, projectName, {
                 name: entity.registry_project_account_name,
@@ -116,12 +134,24 @@ export async function saveStationToRegistry(payload: RegistryStationQueuePayload
     const response = await useClient<VaultAPI>(ApiKey.VAULT)
         .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
 
-    // todo: create robot account or sync to vault if not available :)
-
     if (response) {
-        await useClient<HarborAPI>(ApiKey.HARBOR).projectWebHook.ensure(projectName, response.data, {
-            internalAPIUrl: env.internalApiUrl,
-        }, true);
+        const webhookData : Partial<HarborProjectWebhook> = {
+            name: os.hostname(),
+            targets: [
+                buildRegistryWebhookTarget({
+                    apiUrl: env.apiUrl,
+                    robot: {
+                        id: response.data.id,
+                        secret: response.data.secret,
+                    },
+                }),
+
+            ],
+        };
+
+        await useClient<HarborAPI>(ApiKey.HARBOR)
+            .projectWebHook
+            .ensure(projectName, true, webhookData);
 
         entity.registry_project_webhook_exists = true;
     }
@@ -151,6 +181,18 @@ export async function deleteStationFromRegistry(payload: RegistryStationQueuePay
                 .delete(payload.registry_project_account_id);
         } catch (e) {
             // ...
+        }
+
+        const response = await useClient<VaultAPI>(ApiKey.VAULT)
+            .keyValue.find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, payload.secure_id);
+
+        if (response) {
+            response.data.registry_robot_id = null;
+            response.data.registry_robot_name = null;
+            response.data.registry_robot_secret = null;
+
+            await useClient<VaultAPI>(ApiKey.VAULT)
+                .keyValue.save(STATION_SECRET_ENGINE_KEY, payload.secure_id, response.data);
         }
     }
 }

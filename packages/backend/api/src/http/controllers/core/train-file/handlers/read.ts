@@ -55,5 +55,14 @@ export async function getManyTrainFileGetManyRouteHandler(req: ExpressRequest, r
         throw new NotFoundError();
     }
 
-    return res.respond({ data: entity });
+    const [entities, total] = await query.getManyAndCount();
+
+    return res.respond({
+        data: {
+            data: entities,
+            meta: {
+                total,
+            },
+        },
+    });
 }

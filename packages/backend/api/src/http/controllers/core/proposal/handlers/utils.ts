@@ -6,18 +6,21 @@
  */
 
 import { check, validationResult } from 'express-validator';
-import { getRepository } from 'typeorm';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
-import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
-import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
-import { createRequestMasterImageIdValidation } from '../../master-image/utils';
+import { TrainValidationResult } from '../../train/type';
+import { extendExpressValidationResultWithMasterImage } from '../../master-image/utils/extend';
 
 export async function runProposalValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
-) : Promise<Partial<ProposalEntity>> {
+) : Promise<TrainValidationResult> {
+    const result : TrainValidationResult = {
+        data: {},
+        meta: {},
+    };
+
     const titleChain = check('title')
         .exists()
         .isLength({ min: 5, max: 100 });
@@ -55,7 +58,9 @@ export async function runProposalValidation(
 
     // ----------------------------------------------
 
-    await createRequestMasterImageIdValidation()
+    await check('master_image_id')
+        .isUUID()
+        .notEmpty()
         .optional({ nullable: true })
         .run(req);
 
@@ -66,5 +71,9 @@ export async function runProposalValidation(
         throw new ExpressValidationError(validation);
     }
 
-    return matchedValidationData(req, { includeOptionals: true });
+    result.data = matchedValidationData(req, { includeOptionals: true });
+
+    await extendExpressValidationResultWithMasterImage(result);
+
+    return result;
 }

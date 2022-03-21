@@ -1,17 +1,22 @@
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
 import { consumeQueue } from 'amqp-extension';
 import { MessageQueueSelfRoutingKey } from '../../config/services/rabbitmq';
-import { createImageDownloadComponentHandlers } from '../image-download';
-import { createImageEntryPointComponentHandlers } from '../image-start';
-import { createImageExtractComponentHandlers } from '../image-extract';
-import { createImageStatusComponentHandlers } from '../image-status';
+import { createExtractingComponentHandlers } from '../extracting';
+import { createBuildingComponentHandlers } from '../building';
+import { createRoutingComponentHandlers } from '../routing';
 
 export function buildCommandRouterComponent() {
     function start() {
         return consumeQueue({ routingKey: MessageQueueSelfRoutingKey.COMMAND }, {
-            ...createImageEntryPointComponentHandlers(),
-            ...createImageDownloadComponentHandlers(),
-            ...createImageExtractComponentHandlers(),
-            ...createImageStatusComponentHandlers(),
+            ...createBuildingComponentHandlers(),
+            ...createExtractingComponentHandlers(),
+            ...createRoutingComponentHandlers(),
         });
     }
 
