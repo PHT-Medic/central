@@ -34,7 +34,7 @@ export type TrainConfig = {
     id: string,
 
     '@id': string,
-    '@context': string,
+    '@context': string | null,
 
     creator: TrainConfigCreator,
     file_list: string[],

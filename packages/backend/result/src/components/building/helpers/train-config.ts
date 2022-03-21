@@ -31,6 +31,7 @@ export async function buildTrainConfig(entity: Train) : Promise<TrainConfig> {
     const config : TrainConfig = {
         id: entity.id,
         '@id': entity.id,
+        '@context': null,
         creator: {
             id: entity.user_id,
             rsa_public_key: null,
