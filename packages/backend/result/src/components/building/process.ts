@@ -46,6 +46,11 @@ export async function processMessage(message: Message) {
     });
     const dockerFile = await buildDockerFile(train);
 
+    useLogger().debug('Created Dockerfile...', {
+        component: 'building',
+        dockerFile,
+    });
+
     // -----------------------------------------------------------------------------------
 
     useLogger().debug('Building image...', {

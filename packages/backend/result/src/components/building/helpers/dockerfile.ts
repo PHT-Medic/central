@@ -6,33 +6,53 @@
  */
 
 import {
+    HTTPClient,
     Train,
-    TrainContainerPath,
-    parseHarborConnectionString,
+    TrainContainerPath, parseHarborConnectionString,
 } from '@personalhealthtrain/central-common';
 import path from 'path';
 import { URL } from 'url';
+import { useClient } from '@trapi/client';
 import env from '../../../env';
 
 export async function buildDockerFile(entity: Train) : Promise<string> {
     const harborConfig = parseHarborConnectionString(env.harborConnectionString);
     const harborUrL = new URL(harborConfig.host);
 
-    let argumentsString = '';
-
-    if (entity.master_image.command_arguments) {
-        let parts = Array.isArray(entity.master_image.command_arguments) ?
-            entity.master_image.command_arguments :
-            [entity.master_image.command_arguments];
-
-        parts = parts.map((part) => `"${part}"`);
-        argumentsString = `${parts.join(', ')} `;
-    }
-
     const entrypointPath = path.posix.join(
         entity.entrypoint_file.directory,
         entity.entrypoint_file.name,
     );
+
+    let entrypointCommand = entity.master_image.command;
+    let entrypointCommandArguments = entity.master_image.command_arguments;
+
+    const client = useClient<HTTPClient>();
+
+    const { data: masterImageGroups } = await client.masterImageGroup.getMany({
+        filter: {
+            virtual_path: entity.master_image.group_virtual_path,
+        },
+    });
+
+    if (masterImageGroups.length > 0) {
+        const masterImageGroup = masterImageGroups.shift();
+        if (masterImageGroup) {
+            entrypointCommand = entrypointCommand || masterImageGroup.command;
+            entrypointCommandArguments = entrypointCommandArguments || masterImageGroup.command_arguments;
+        }
+    }
+
+    let argumentsString = '';
+
+    if (entrypointCommandArguments) {
+        let parts = Array.isArray(entrypointCommandArguments) ?
+            entrypointCommandArguments :
+            [entrypointCommandArguments];
+
+        parts = parts.map((part) => `"${part}"`);
+        argumentsString = `${parts.join(', ')} `;
+    }
 
     return `
     FROM ${harborUrL.hostname}/master/${entity.master_image.virtual_path}
@@ -40,6 +60,6 @@ export async function buildDockerFile(entity: Train) : Promise<string> {
         mkdir ${TrainContainerPath.RESULTS} &&\
         chmod -R +x ${TrainContainerPath.MAIN}
 
-    CMD ["${entity.master_image.command}", ${argumentsString}"${path.posix.join(TrainContainerPath.MAIN, entrypointPath)}"]
+    CMD ["${entrypointCommand}", ${argumentsString}"${path.posix.join(TrainContainerPath.MAIN, entrypointPath)}"]
     `;
 }
