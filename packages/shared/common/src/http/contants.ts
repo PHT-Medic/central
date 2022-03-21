@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './client';
-export * from './contants';
-export * from './interceptors';
-export * from './harbor-client';
-export * from './vault-client';
+export enum HTTPClientKey {
+    DEFAULT = 'default',
+    VAULT = 'vault',
+    HARBOR = 'harbor',
+}

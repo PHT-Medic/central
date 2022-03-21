@@ -7,19 +7,39 @@
 
 import { Message, publishMessage } from 'amqp-extension';
 import {
+    HTTPClientKey, HarborAPI,
     REGISTRY_ARTIFACT_TAG_BASE,
     REGISTRY_ARTIFACT_TAG_LATEST,
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_SYSTEM_USER_NAME,
     TrainManagerQueueCommand,
-    TrainManagerRoutingStartPayload,
+    TrainManagerRoutingStartPayload, TrainManagerRoutingStep,
 } from '@personalhealthtrain/central-common';
+import { useClient } from '@trapi/client';
 import { buildSelfQueueMessage } from '../../config/queue';
+import { RoutingError } from './error';
 
 export async function processStartCommand(message: Message) {
     const data = message.data as TrainManagerRoutingStartPayload;
 
-    // todo check if build, else send building queue command
+    const harborRepository = await useClient<HarborAPI>(HTTPClientKey.HARBOR).projectRepository
+        .find(REGISTRY_INCOMING_PROJECT_NAME, data.id);
+
+    if (
+        !harborRepository ||
+        harborRepository.artifactCount === 0
+    ) {
+        const queueMessage = buildSelfQueueMessage(
+            TrainManagerQueueCommand.BUILD,
+            {
+                id: data.id,
+            },
+        );
+
+        await publishMessage(queueMessage);
+
+        throw RoutingError.trainNotFound(TrainManagerRoutingStep.START);
+    }
 
     await publishMessage(buildSelfQueueMessage(TrainManagerQueueCommand.ROUTE, {
         repositoryName: data.id,

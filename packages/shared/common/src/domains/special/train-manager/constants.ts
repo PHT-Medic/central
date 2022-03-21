@@ -28,6 +28,17 @@ export enum TrainManagerBuildingQueueEvent {
     NONE = 'buildingNone', // rs trigger
 }
 
+export enum TrainManagerBuildingErrorType {
+    TRAIN_NOT_BUILD = 'trainNotBuild',
+    UNKNOWN = 'unknown',
+}
+
+export enum TrainManagerBuildingStep {
+    START = 'start',
+    BUILD = 'build',
+    UNKNOWN = 'unknown',
+}
+
 // ----------------------------------------------------------
 
 export enum TrainManagerRoutingQueueEvent {
@@ -39,6 +50,17 @@ export enum TrainManagerRoutingQueueEvent {
     FINISHED = 'routingFinished',
 
     FAILED = 'routingFailed',
+}
+
+export enum TrainManagerRoutingErrorType {
+    TRAIN_NOT_BUILD = 'trainNotBuild',
+    UNKNOWN = 'unknown',
+}
+
+export enum TrainManagerRoutingStep {
+    START = 'start',
+    MOVE = 'move',
+    UNKNOWN = 'unknown',
 }
 
 // ----------------------------------------------------------

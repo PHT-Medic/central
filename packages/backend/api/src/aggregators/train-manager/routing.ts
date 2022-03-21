@@ -54,6 +54,7 @@ export async function handleTrainManagerRoutingQueueEvent(
             break;
         case TrainManagerRoutingQueueEvent.FAILED:
             entity.run_status = TrainRunStatus.FAILED;
+            entity.result_status = null;
             break;
         case TrainManagerRoutingQueueEvent.FINISHED:
             entity.run_status = TrainRunStatus.FINISHED;

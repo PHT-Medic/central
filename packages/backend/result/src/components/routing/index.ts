@@ -8,7 +8,6 @@
 import { ConsumeHandlers, Message } from 'amqp-extension';
 import { TrainManagerQueueCommand } from '@personalhealthtrain/central-common';
 import { useLogger } from '../../modules/log';
-import { RoutingError } from './error';
 import { writeProcessedEvent } from './write-processed';
 import { writeProcessingEvent } from './write-processing';
 import { writeFailedEvent } from './write-failed';
@@ -26,7 +25,7 @@ export function createRoutingComponentHandlers() : ConsumeHandlers {
                 .then(writeProcessingEvent)
                 .then(processRouteCommand)
                 .then(writeProcessedEvent)
-                .catch((err: Error) => writeFailedEvent(message, err as RoutingError));
+                .catch((err: Error) => writeFailedEvent(message, err));
         },
 
         [TrainManagerQueueCommand.ROUTE_START]: async (message: Message) => {
@@ -36,7 +35,7 @@ export function createRoutingComponentHandlers() : ConsumeHandlers {
 
             await Promise.resolve(message)
                 .then(processStartCommand)
-                .catch((err: Error) => writeFailedEvent(message, err as RoutingError));
+                .catch((err: Error) => writeFailedEvent(message, err));
         },
     };
 }

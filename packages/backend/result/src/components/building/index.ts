@@ -8,7 +8,6 @@
 import { ConsumeHandlers, Message } from 'amqp-extension';
 import { TrainManagerQueueCommand } from '@personalhealthtrain/central-common';
 import { useLogger } from '../../modules/log';
-import { BuildingError } from './error';
 import { writeProcessedEvent } from './write-processed';
 import { writeProcessingEvent } from './write-processing';
 import { writeFailedEvent } from './write-failed';
@@ -26,7 +25,7 @@ export function createBuildingComponentHandlers() : ConsumeHandlers {
                 .then(writeProcessingEvent)
                 .then(processMessage)
                 .then(writeProcessedEvent)
-                .catch((err: Error) => writeFailedEvent(message, err as BuildingError));
+                .catch((err: Error) => writeFailedEvent(message, err));
         },
         [TrainManagerQueueCommand.BUILD_STATUS]: async (message: Message) => {
             useLogger().debug('Build status event received', {
@@ -35,7 +34,7 @@ export function createBuildingComponentHandlers() : ConsumeHandlers {
 
             await Promise.resolve(message)
                 .then(processBuildStatusEvent)
-                .catch((err: Error) => writeFailedEvent(message, err as BuildingError));
+                .catch((err: Error) => writeFailedEvent(message, err));
         },
     };
 }

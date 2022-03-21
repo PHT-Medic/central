@@ -18,7 +18,7 @@ import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../../domains/
 import { useLogger } from '../../../config/log';
 import env from '../../../env';
 
-export async function dispatchRegistryEventToTrainExtractor(
+export async function dispatchRegistryEventToTrainManager(
     message: Message,
 ) : Promise<Message> {
     const type : RegistryQueueEvent = message.type as RegistryQueueEvent;
@@ -27,7 +27,7 @@ export async function dispatchRegistryEventToTrainExtractor(
     // only process terminated trains and the PUSH_ARTIFACT event
     if (type !== RegistryQueueEvent.PUSH_ARTIFACT) {
         useLogger()
-            .info(`skipping ${type} event distribution for train-extractor`);
+            .info(`skipping ${type} event distribution for train-manager`);
         return message;
     }
 

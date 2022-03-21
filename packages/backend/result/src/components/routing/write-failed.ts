@@ -10,7 +10,11 @@ import { TrainManagerRoutingQueueEvent } from '@personalhealthtrain/central-comm
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { RoutingError } from './error';
 
-export async function writeFailedEvent(message: Message, error: RoutingError) {
+export async function writeFailedEvent(message: Message, error: Error) {
+    const routingError = error instanceof RoutingError ?
+        error :
+        new RoutingError({ previous: error });
+
     await publishMessage(buildMessage({
         options: {
             routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
@@ -19,8 +23,9 @@ export async function writeFailedEvent(message: Message, error: RoutingError) {
         data: {
             ...message.data,
             error: {
-                message: error.message,
-                step: error.getOption('step'),
+                message: routingError.message,
+                step: routingError.getStep(),
+                type: routingError.getType(),
             },
         },
         metadata: message.metadata,

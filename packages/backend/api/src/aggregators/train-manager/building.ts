@@ -54,6 +54,7 @@ export async function handleTrainManagerBuildingQueueEvent(
         entity.run_status = null;
         entity.run_station_index = null;
         entity.run_status = null;
+        entity.result_status = null;
     }
 
     await repository.save(entity);
