@@ -32,34 +32,9 @@ export default Vue.extend({
                 deleted: '?',
                 updated: '?',
             },
-            projectKey: {
-                INCOMING: REGISTRY_INCOMING_PROJECT_NAME,
-                OUTGOING: REGISTRY_OUTGOING_PROJECT_NAME,
-                MASTER_IMAGE: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-            },
         };
     },
     methods: {
-        async setup() {
-            if (this.busy) return;
-
-            this.busy = true;
-
-            try {
-                await this.$api.service.runCommand(this.entityId, RegistryCommand.SETUP);
-
-                this.$bvToast.toast('You successfully executed the setup routine.', {
-                    toaster: 'b-toaster-top-center',
-                });
-            } catch (e) {
-                this.$bvToast.toast(e.message, {
-                    toaster: 'b-toaster-top-center',
-                    variant: 'danger',
-                });
-            }
-
-            this.busy = false;
-        },
         async syncMasterImages() {
             if (this.masterImagesMeta.busy) return;
 
@@ -101,62 +76,7 @@ export default Vue.extend({
                     { staticClass: 'row' },
                     [
                         h('div', { staticClass: 'col' }, [
-                            h('h6', [
-                                h('i', { staticClass: 'fa fa-sign-in-alt mr-1' }),
-                                'Incoming',
-                            ]),
-                            h('p', { staticClass: 'mb-1' }, [
-                                'The incoming project is required for the',
-                                h('i', { staticClass: 'pl-1 pr-1' }, ['TrainBuilder']),
-                                'to work properly. When the TrainBuilder ' +
-                                'is finished with building the train, the train will be pushed to the incoming project. ' +
-                                'From there the TrainRouter can move it to the first station project of the route.',
-                            ]),
 
-                            h('hr'),
-
-                            h('h6', [
-                                h('i', { staticClass: 'fa fa-sign-out-alt mr-1' }),
-                                'Outgoing',
-                            ]),
-                            h('p', { staticClass: 'mb-1' }, [
-                                'The outgoing project is required for the',
-                                h('i', { staticClass: 'pl-1 pr-1' }, 'ResultService'),
-                                'to pull the train from the',
-                                'outgoing project and extract the results of the journey.',
-                            ]),
-
-                            h('hr'),
-
-                            h('h6', [
-                                h('i', { staticClass: 'fa fa-info mr-1' }),
-                                'Info',
-                            ]),
-                            h('p', [
-                                'To setup or ensure the existence of all projects (incoming, outgoing, ...) and ',
-                                'the corresponding webhooks run the setup routine.',
-                            ]),
-
-                            h('button', {
-                                domProps: {
-                                    disabled: vm.busy,
-                                },
-                                attrs: {
-                                    type: 'button',
-                                    disabled: vm.busy,
-                                },
-                                staticClass: 'btn btn-xs btn-dark',
-                                on: {
-                                    click(event) {
-                                        event.preventDefault();
-
-                                        vm.setup.call(null);
-                                    },
-                                },
-                            }, [
-                                h('i', { staticClass: 'fa fa-cogs mr-1' }),
-                                'Setup',
-                            ]),
                         ]),
                         h('div', { staticClass: 'col' }, [
                             h('h6', [

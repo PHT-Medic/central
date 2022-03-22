@@ -17,7 +17,10 @@ import { ExtractingError } from './error';
 export async function downloadImage(message: Message) {
     try {
         const data: TrainManagerExtractingQueuePayload = message.data as TrainManagerExtractingQueuePayload;
-        const repositoryTag = buildRemoteDockerImageURL(data.projectName, data.repositoryName);
+        const repositoryTag = buildRemoteDockerImageURL({
+            projectName: data.projectName,
+            repositoryName: data.repositoryName,
+        });
 
         await pullDockerImage(repositoryTag, buildDockerAuthConfig());
 

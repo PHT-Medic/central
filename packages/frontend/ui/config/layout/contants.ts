@@ -216,6 +216,16 @@ export const LayoutSideAdminNavigation: Component[] = [
                     PermissionID.SERVICE_MANAGE,
                 ],
             },
+            {
+                name: 'Registries',
+                type: 'link',
+                url: '/admin/registries',
+                icon: 'fa-brands fa-docker',
+                [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                [LayoutKey.REQUIRED_PERMISSIONS]: [
+                    PermissionID.REGISTRY_MANAGE,
+                ],
+            },
         ],
     },
 

@@ -10,7 +10,7 @@ import {
     MasterImageAPI,
     MasterImageGroupAPI,
     ProposalAPI,
-    ProposalStationAPI, ServiceAPI,
+    ProposalStationAPI, RegistryAPI, RegistryProjectAPI, ServiceAPI,
     SettingsOptionAPI,
     StationAPI, TrainAPI, TrainFileAPI, TrainStationAPI,
     UserSecretAPI,
@@ -26,6 +26,10 @@ export class HTTPClient extends Client {
     public readonly proposal : ProposalAPI;
 
     public readonly proposalStation: ProposalStationAPI;
+
+    public readonly registry : RegistryAPI;
+
+    public readonly registryProject : RegistryProjectAPI;
 
     public readonly station : StationAPI;
 
@@ -47,6 +51,8 @@ export class HTTPClient extends Client {
         this.masterImageGroup = new MasterImageGroupAPI(this.driver);
         this.proposal = new ProposalAPI(this.driver);
         this.proposalStation = new ProposalStationAPI(this.driver);
+        this.registry = new RegistryAPI(this.driver);
+        this.registryProject = new RegistryProjectAPI(this.driver);
         this.station = new StationAPI(this.driver);
         this.train = new TrainAPI(this.driver);
         this.trainFile = new TrainFileAPI(this.driver);

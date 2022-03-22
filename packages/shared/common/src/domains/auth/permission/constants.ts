@@ -13,6 +13,8 @@ export enum PermissionKey {
     PROPOSAL_EDIT = 'proposal_edit',
     PROPOSAL_APPROVE = 'proposal_approve',
 
+    REGISTRY_MANAGE = 'registry_manage',
+
     STATION_ADD = 'station_add',
     STATION_DROP = 'station_drop',
     STATION_EDIT = 'station_edit',

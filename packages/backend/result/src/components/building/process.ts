@@ -16,7 +16,7 @@ import { useClient } from '@trapi/client';
 import { buildTrainConfig } from './helpers/train-config';
 import { useDocker } from '../../modules/docker';
 import { buildDockerFile } from './helpers/dockerfile';
-import { pushDockerImages } from '../../modules/docker/image-push';
+import { pushDockerImage } from '../../modules/docker/image-push';
 import { useLogger } from '../../modules/log';
 import { createPackFromFileContent } from './helpers/file-gzip';
 import { buildDockerImage } from '../../modules/docker/image-build';
@@ -57,7 +57,11 @@ export async function processMessage(message: Message) {
         component: 'building',
     });
 
-    const imageURL = buildRemoteDockerImageURL(REGISTRY_INCOMING_PROJECT_NAME, train.id);
+    const imageURL = buildRemoteDockerImageURL({
+        projectName: REGISTRY_INCOMING_PROJECT_NAME,
+        repositoryName: train.id,
+    });
+
     await buildDockerImage(dockerFile, imageURL);
 
     // -----------------------------------------------------------------------------------
@@ -124,16 +128,24 @@ export async function processMessage(message: Message) {
 
     const authConfig = buildDockerAuthConfig();
 
-    const baseImageURL = buildRemoteDockerImageURL(REGISTRY_INCOMING_PROJECT_NAME, data.id, 'base');
-    await pushDockerImages(baseImageURL, authConfig);
+    const baseImageURL = buildRemoteDockerImageURL({
+        projectName: REGISTRY_INCOMING_PROJECT_NAME,
+        repositoryName: train.id,
+        tagOrDigest: 'base',
+    });
+    await pushDockerImage(baseImageURL, authConfig);
 
     useLogger().debug('Pushed image', {
         component: 'building',
         image: baseImageURL,
     });
 
-    const latestImageURL = buildRemoteDockerImageURL(REGISTRY_INCOMING_PROJECT_NAME, data.id, 'latest');
-    await pushDockerImages(latestImageURL, authConfig);
+    const latestImageURL = buildRemoteDockerImageURL({
+        projectName: REGISTRY_INCOMING_PROJECT_NAME,
+        repositoryName: train.id,
+        tagOrDigest: 'latest',
+    });
+    await pushDockerImage(latestImageURL, authConfig);
 
     useLogger().debug('Pushed image', {
         component: 'building',

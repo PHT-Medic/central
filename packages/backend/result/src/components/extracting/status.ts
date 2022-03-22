@@ -37,7 +37,11 @@ export async function processExtractStatusCommand(message: Message) {
 
     // 2. Check if image exists locally
 
-    const repositoryTag = buildRemoteDockerImageURL(data.projectName, data.repositoryName);
+    const repositoryTag = buildRemoteDockerImageURL({
+        projectName: data.projectName,
+        repositoryName: data.repositoryName,
+    });
+
     const exists : boolean = await checkIfLocalRegistryImageExists(repositoryTag);
 
     if (exists) {

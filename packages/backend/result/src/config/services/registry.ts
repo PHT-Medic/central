@@ -6,37 +6,53 @@
  */
 
 import { URL } from 'url';
-import { parseHarborConnectionString } from '@personalhealthtrain/central-common';
+import { APIServiceHarborConfig, parseHarborConnectionString } from '@personalhealthtrain/central-common';
 import env from '../../env';
 import { DockerAuthConfig } from '../../modules/docker';
 
-const harborConfig = parseHarborConnectionString(env.harborConnectionString);
-const harborUrL = new URL(harborConfig.host);
+const harborDefaultConfig = parseHarborConnectionString(env.harborConnectionString);
 
-export function buildRemoteDockerImageURL(
+type RemoteDockerImageURLBuildContext = {
     projectName: string,
     repositoryName: string,
     tagOrDigest?: string,
-): string {
+
+    hostname?: string
+};
+
+export function buildRemoteDockerImageURL(context: RemoteDockerImageURLBuildContext): string {
+    let hostname = context.hostname || harborDefaultConfig.host;
+
+    if (
+        hostname.startsWith('http://') ||
+        hostname.startsWith('https://')
+    ) {
+        const url = new URL(hostname);
+        hostname = url.hostname;
+    }
+
     let basePath = [
-        harborUrL.hostname,
-        projectName,
-        repositoryName,
+        hostname,
+        context.projectName,
+        context.repositoryName,
     ].join('/');
 
-    if (tagOrDigest) {
-        basePath += tagOrDigest.startsWith('sha') ?
-            `@${tagOrDigest}` :
-            `:${tagOrDigest}`;
+    if (context.tagOrDigest) {
+        basePath += context.tagOrDigest.startsWith('sha') ?
+            `@${context.tagOrDigest}` :
+            `:${context.tagOrDigest}`;
     }
 
     return basePath;
 }
 
-export function buildDockerAuthConfig() : DockerAuthConfig {
+export function buildDockerAuthConfig(config?: APIServiceHarborConfig) : DockerAuthConfig {
+    config = config || harborDefaultConfig;
+    const url = new URL(config.host);
+
     return {
-        username: harborConfig.user,
-        password: harborConfig.password,
-        serveraddress: harborUrL.hostname,
+        username: config.user,
+        password: config.password,
+        serveraddress: url.hostname,
     };
 }

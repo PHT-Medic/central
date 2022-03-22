@@ -10,27 +10,25 @@ import { Message } from 'amqp-extension';
 import {
     Ecosystem,
     HTTPClient,
-    HarborAPI,
     REGISTRY_ARTIFACT_TAG_BASE,
-    REGISTRY_ARTIFACT_TAG_LATEST,
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
     REGISTRY_SYSTEM_USER_NAME,
     TrainManagerRoutingPayload,
     TrainStation,
     buildRegistryStationProjectName,
-    getRegistryStationProjectNameId,
-    isRegistryStationProjectName,
+    getRegistryStationProjectNameId, isRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { mergeStationsWithTrainStations } from './helpers/merge';
 import { useLogger } from '../../modules/log';
+import { transferProjectRepository } from './helpers/transfer';
+import { transferProjectRepositoryToOtherEcosystem } from './helpers/transfer-external';
 
 export async function processRouteCommand(message: Message) {
     const data = message.data as TrainManagerRoutingPayload;
 
     const client = useClient<HTTPClient>();
-    const harborClient = useClient<HarborAPI>('harbor');
 
     // -------------------------------------------------------------------
 
@@ -80,6 +78,11 @@ export async function processRouteCommand(message: Message) {
 
         sourceProjectName = REGISTRY_INCOMING_PROJECT_NAME;
         destinationProjectName = buildRegistryStationProjectName(stationsExtended[index].secure_id);
+
+        await transferProjectRepository(
+            { projectName: sourceProjectName, repositoryName: data.repositoryName, artifactTag: data.artifactTag },
+            { projectName: destinationProjectName, repositoryName: data.repositoryName },
+        );
     }
 
     if (
@@ -100,90 +103,56 @@ export async function processRouteCommand(message: Message) {
         if (nextStationIndex === -1) {
             // move to outgoing
             destinationProjectName = REGISTRY_OUTGOING_PROJECT_NAME;
-        } else {
-            // move to next station
-            destinationProjectName = buildRegistryStationProjectName(stationsExtended[nextStationIndex].secure_id);
 
-            if (stationsExtended[nextStationIndex].ecosystem !== Ecosystem.DEFAULT) {
-                switch (stationsExtended[nextStationIndex].ecosystem) {
-                    case Ecosystem.PADME:
-                        // move train to padme eco-system ;)
-                        break;
-                }
+            if (data.artifactTag !== REGISTRY_ARTIFACT_TAG_BASE) {
+                await transferProjectRepository(
+                    {
+                        projectName: sourceProjectName,
+                        repositoryName: data.repositoryName,
+                        artifactTag: data.artifactTag,
+                    },
+                    { projectName: destinationProjectName, repositoryName: data.repositoryName },
+                );
             }
-        }
-    }
+        } else {
+            const nextStation = stationsExtended[nextStationIndex];
 
-    if (
-        !sourceProjectName ||
-        !destinationProjectName
-    ) {
-        return message;
-    }
+            if (nextStation.ecosystem === Ecosystem.DEFAULT) {
+                useLogger().debug('Move image', {
+                    component: 'routing',
+                    projectFrom: sourceProjectName,
+                    projectTo: destinationProjectName,
+                    artifactTag: data.artifactTag,
+                });
 
-    if (
-        data.artifactTag === REGISTRY_ARTIFACT_TAG_BASE &&
-        destinationProjectName === REGISTRY_OUTGOING_PROJECT_NAME
-    ) {
-        return message;
-    }
+                // move to next station
+                destinationProjectName = buildRegistryStationProjectName(nextStation.secure_id);
 
-    // -------------------------------------------------------------------
-
-    useLogger().debug('Move image', {
-        component: 'routing',
-        projectFrom: sourceProjectName,
-        projectTo: destinationProjectName,
-        artifactTag: data.artifactTag,
-    });
-
-    await harborClient.projectArtifact.copy(
-        destinationProjectName,
-        data.repositoryName,
-        `${sourceProjectName}/${data.repositoryName}:${data.artifactTag}`,
-    );
-
-    try {
-        await harborClient.projectArtifact
-            .delete(sourceProjectName, data.repositoryName, data.artifactTag);
-    } catch (e) {
-        // ...
-    }
-
-    // -------------------------------------------------------------------
-
-    const isSourceStationProject = isRegistryStationProjectName(sourceProjectName);
-    const isDestinationStationProject = isRegistryStationProjectName(destinationProjectName);
-
-    if (
-        isSourceStationProject &&
-        isDestinationStationProject &&
-        data.artifactTag === REGISTRY_ARTIFACT_TAG_LATEST
-    ) {
-        // station does not push 'base' tag on completion
-        await harborClient.projectArtifact.copy(
-            destinationProjectName,
-            data.repositoryName,
-            `${sourceProjectName}/${data.repositoryName}:${REGISTRY_ARTIFACT_TAG_BASE}`,
-        );
-
-        try {
-            await harborClient.projectArtifact
-                .delete(sourceProjectName, data.repositoryName, REGISTRY_ARTIFACT_TAG_BASE);
-        } catch (e) {
-            // ...
-        }
-    }
-
-    // -------------------------------------------------------------------
-
-    // latest is always last push, so only remove project than ;)
-    if (data.artifactTag === REGISTRY_ARTIFACT_TAG_LATEST) {
-        try {
-            await harborClient.projectRepository
-                .delete(sourceProjectName, data.repositoryName);
-        } catch (e) {
-            // ...
+                await transferProjectRepository(
+                    {
+                        projectName: sourceProjectName,
+                        repositoryName: data.repositoryName,
+                        artifactTag: data.artifactTag,
+                    },
+                    {
+                        projectName: destinationProjectName,
+                        repositoryName: data.repositoryName,
+                    },
+                );
+            } else {
+                await transferProjectRepositoryToOtherEcosystem(
+                    {
+                        projectName: sourceProjectName,
+                        repositoryName: data.repositoryName,
+                        artifactTag: data.artifactTag,
+                    },
+                    {
+                        projectName: destinationProjectName,
+                        repositoryName: data.repositoryName,
+                        stationExtended: nextStation,
+                    },
+                );
+            }
         }
     }
 

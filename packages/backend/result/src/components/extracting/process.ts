@@ -25,7 +25,10 @@ export async function processExtractCommand(message: Message) {
             };
         }
 
-        const repositoryPath: string = buildRemoteDockerImageURL(data.projectName, data.repositoryName);
+        const repositoryPath: string = buildRemoteDockerImageURL({
+            projectName: data.projectName,
+            repositoryName: data.repositoryName,
+        });
 
         switch (data.mode) {
             case TrainManagerExtractionMode.READ: {
