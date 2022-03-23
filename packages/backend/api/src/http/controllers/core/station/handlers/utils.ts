@@ -27,19 +27,6 @@ export async function runStationValidation(
 
     // -------------------------------------------------------------
 
-    const secureIdChain = check('secure_id')
-        .isLength({ min: 1, max: 100 })
-        .exists()
-        .matches(/^[a-z0-9]*$/);
-
-    if (operation === 'update') {
-        secureIdChain.optional();
-    }
-
-    await secureIdChain.run(req);
-
-    // -------------------------------------------------------------
-
     await check('public_key')
         .isLength({ min: 5, max: 4096 })
         .exists()

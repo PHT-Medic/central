@@ -5,14 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { StationExtended } from '../type';
+import { RegistryProject } from '@personalhealthtrain/central-common';
 
-export type ProjectRepositoryTransferItem = {
-    projectName: string,
+export type TransferItem = {
+    project: RegistryProject,
     repositoryName: string,
     artifactTag?: string,
-};
-
-export type ProjectRepositoryExternalTransferItem = ProjectRepositoryTransferItem & {
-    stationExtended: StationExtended
 };

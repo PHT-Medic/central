@@ -10,7 +10,7 @@ import { ClientDriverInstance } from '@trapi/client';
 import { Registry } from './entity';
 import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 import { nullifyEmptyObjectProperties } from '../../../utils';
-import { RegistryCommandNew } from './constants';
+import { RegistryCommand } from '../../special';
 
 export class RegistryAPI {
     protected client: ClientDriverInstance;
@@ -25,8 +25,8 @@ export class RegistryAPI {
         return response.data;
     }
 
-    async getOne(id: Registry['id']): Promise<SingleResourceResponse<Registry>> {
-        const response = await this.client.get(`registries/${id}`);
+    async getOne(id: Registry['id'], options?: BuildInput<Registry>): Promise<SingleResourceResponse<Registry>> {
+        const response = await this.client.get(`registries/${id}${buildQuery(options)}`);
 
         return response.data;
     }
@@ -47,17 +47,5 @@ export class RegistryAPI {
         const response = await this.client.delete(`registries/${id}`);
 
         return response.data;
-    }
-
-    async runCommand(
-        id: Registry['id'],
-        command: `${RegistryCommandNew}` | RegistryCommandNew,
-        data?: Record<string, any>,
-    ): Promise<SingleResourceResponse<Record<string, any>>> {
-        data = data || {};
-
-        const { data: resultData } = await this.client.post(`registries/${id}/command`, { command, ...data });
-
-        return resultData;
     }
 }

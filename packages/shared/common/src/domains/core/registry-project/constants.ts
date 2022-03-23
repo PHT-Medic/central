@@ -6,6 +6,10 @@
  */
 
 export enum RegistryProjectType {
-    IN = 'in',
-    OUT = 'out',
+    DEFAULT = 'default',
+    ECOSYSTEM_AGGREGATOR = 'ecosystemAggregator',
+    INCOMING = 'incoming',
+    OUTGOING = 'outgoing',
+    MASTER_IMAGES = 'masterImage',
+    STATION = 'station',
 }

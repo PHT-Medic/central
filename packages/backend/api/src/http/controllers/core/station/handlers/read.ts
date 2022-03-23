@@ -13,14 +13,8 @@ import { ExpressRequest, ExpressResponse } from '../../../../type';
 
 async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>, fields: any) {
     const protectedFields = [
-        'secure_id',
         'public_key',
         'email',
-        'registry_project_account_id',
-        'registry_project_account_name',
-        'registry_project_account_token',
-        'registry_project_id',
-        'registry_project_webhook_exists',
     ];
 
     const fieldsParsed = parseQueryFields(fields, {
@@ -82,11 +76,11 @@ export async function getManyStationRouteHandler(req: ExpressRequest, res: Expre
 
     applyRelations(query, includes, {
         defaultAlias: 'station',
-        allowed: ['realm'],
+        allowed: ['realm', 'registry_project', 'registry'],
     });
 
     applyFilters(query, filter, {
-        allowed: ['id', 'name', 'hidden', 'realm_id', 'secure_id'],
+        allowed: ['id', 'name', 'hidden', 'realm_id'],
         defaultAlias: 'station',
     });
 

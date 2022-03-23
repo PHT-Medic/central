@@ -7,5 +7,4 @@
 
 export * from './service';
 export * from './socket';
-export * from './train-builder';
 export * from './train-manager';

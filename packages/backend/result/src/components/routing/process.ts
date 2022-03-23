@@ -8,27 +8,40 @@
 import { BuildInput } from '@trapi/query';
 import { Message } from 'amqp-extension';
 import {
-    Ecosystem,
     HTTPClient,
-    REGISTRY_ARTIFACT_TAG_BASE,
-    REGISTRY_INCOMING_PROJECT_NAME,
-    REGISTRY_OUTGOING_PROJECT_NAME,
-    REGISTRY_SYSTEM_USER_NAME,
+    RegistryProjectType,
     TrainManagerRoutingPayload,
     TrainStation,
-    buildRegistryStationProjectName,
-    getRegistryStationProjectNameId, isRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { mergeStationsWithTrainStations } from './helpers/merge';
 import { useLogger } from '../../modules/log';
-import { transferProjectRepository } from './helpers/transfer';
-import { transferProjectRepositoryToOtherEcosystem } from './helpers/transfer-external';
+import { handleIncomingMoveOperation } from './handlers/incoming';
+import { handleStationMoveOperation } from './handlers/station';
+import { handleEcosystemAggregatorMoveOperation } from './handlers/ecosystem-aggregator';
 
 export async function processRouteCommand(message: Message) {
     const data = message.data as TrainManagerRoutingPayload;
 
     const client = useClient<HTTPClient>();
+
+    // -------------------------------------------------------------------
+
+    const projectResponse = await client.registryProject.getMany({
+        filter: {
+            external_name: data.projectName,
+        },
+        page: {
+            limit: 1,
+        },
+    });
+
+    if (projectResponse.data.length === 0) {
+        // todo: handle not found project representation, throw error
+        return message;
+    }
+
+    const registryProject = projectResponse.data[0];
 
     // -------------------------------------------------------------------
 
@@ -53,106 +66,38 @@ export async function processRouteCommand(message: Message) {
         filter: {
             id: trainStations.map((trainStation) => trainStation.station_id),
         },
-        fields: ['+secure_id'],
+        relations: {
+            registry_project: true,
+        },
     });
 
     const stationsExtended = mergeStationsWithTrainStations(stations, trainStations);
 
     // -------------------------------------------------------------------
 
-    let sourceProjectName : string | undefined;
-    let destinationProjectName: string | undefined;
-
-    if (
-        data.projectName === REGISTRY_INCOMING_PROJECT_NAME &&
-        data.operator === REGISTRY_SYSTEM_USER_NAME
-    ) {
-        // move to station repo with index 0.
-        const index = stationsExtended.findIndex((station) => station.index === 0);
-        if (index === -1) {
-            useLogger().debug('Route has no first project index', {
-                component: 'routing',
+    switch (registryProject.type) {
+        case RegistryProjectType.INCOMING: {
+            await handleIncomingMoveOperation({
+                items: stationsExtended,
+                project: registryProject,
+                routingPayload: data,
             });
-            return message;
+            break;
         }
-
-        sourceProjectName = REGISTRY_INCOMING_PROJECT_NAME;
-        destinationProjectName = buildRegistryStationProjectName(stationsExtended[index].secure_id);
-
-        await transferProjectRepository(
-            { projectName: sourceProjectName, repositoryName: data.repositoryName, artifactTag: data.artifactTag },
-            { projectName: destinationProjectName, repositoryName: data.repositoryName },
-        );
-    }
-
-    if (
-        isRegistryStationProjectName(data.projectName) &&
-        data.operator !== REGISTRY_SYSTEM_USER_NAME
-    ) {
-        const secureId = getRegistryStationProjectNameId(data.projectName);
-
-        const index = stationsExtended.findIndex((station) => station.secure_id === secureId);
-        if (index === -1) {
-            return message;
+        case RegistryProjectType.STATION: {
+            await handleStationMoveOperation({
+                items: stationsExtended,
+                project: registryProject,
+                routingPayload: data,
+            });
+            break;
         }
-
-        sourceProjectName = data.projectName;
-        const currentStation = stationsExtended[index];
-
-        const nextStationIndex = stationsExtended.findIndex((station) => station.index === currentStation.index + 1);
-        if (nextStationIndex === -1) {
-            // move to outgoing
-            destinationProjectName = REGISTRY_OUTGOING_PROJECT_NAME;
-
-            if (data.artifactTag !== REGISTRY_ARTIFACT_TAG_BASE) {
-                await transferProjectRepository(
-                    {
-                        projectName: sourceProjectName,
-                        repositoryName: data.repositoryName,
-                        artifactTag: data.artifactTag,
-                    },
-                    { projectName: destinationProjectName, repositoryName: data.repositoryName },
-                );
-            }
-        } else {
-            const nextStation = stationsExtended[nextStationIndex];
-
-            if (nextStation.ecosystem === Ecosystem.DEFAULT) {
-                useLogger().debug('Move image', {
-                    component: 'routing',
-                    projectFrom: sourceProjectName,
-                    projectTo: destinationProjectName,
-                    artifactTag: data.artifactTag,
-                });
-
-                // move to next station
-                destinationProjectName = buildRegistryStationProjectName(nextStation.secure_id);
-
-                await transferProjectRepository(
-                    {
-                        projectName: sourceProjectName,
-                        repositoryName: data.repositoryName,
-                        artifactTag: data.artifactTag,
-                    },
-                    {
-                        projectName: destinationProjectName,
-                        repositoryName: data.repositoryName,
-                    },
-                );
-            } else {
-                await transferProjectRepositoryToOtherEcosystem(
-                    {
-                        projectName: sourceProjectName,
-                        repositoryName: data.repositoryName,
-                        artifactTag: data.artifactTag,
-                    },
-                    {
-                        projectName: destinationProjectName,
-                        repositoryName: data.repositoryName,
-                        stationExtended: nextStation,
-                    },
-                );
-            }
+        case RegistryProjectType.ECOSYSTEM_AGGREGATOR: {
+            await handleEcosystemAggregatorMoveOperation({
+                items: stationsExtended,
+                project: registryProject,
+                routingPayload: data,
+            });
         }
     }
 

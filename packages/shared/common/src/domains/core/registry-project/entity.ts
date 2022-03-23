@@ -8,19 +8,21 @@
 import { Realm } from '@authelion/common';
 import { Registry } from '../registry';
 import { Ecosystem } from '../ecosystem';
+import { RegistryProjectType } from './constants';
 
 export interface RegistryProject {
     id: string;
-
-    alias: string;
 
     name: string;
 
     ecosystem: Ecosystem;
 
-    ecosystem_aggregator: boolean;
+    type: RegistryProjectType;
 
     // ------------------------------------------------------------------
+
+    // a-z0-9-_ {0,255}
+    external_name: string;
 
     external_id: string | null;
 
@@ -30,7 +32,7 @@ export interface RegistryProject {
 
     account_name: string | null;
 
-    account_token: string | null;
+    account_secret: string | null;
 
     // ------------------------------------------------------------------
 

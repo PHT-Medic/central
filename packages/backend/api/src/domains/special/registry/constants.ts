@@ -6,9 +6,11 @@
  */
 
 export enum RegistryQueueCommand {
-    SAVE = 'REGISTRY_SAVE',
     SETUP = 'REGISTRY_SETUP',
     DELETE = 'REGISTRY_DELETE',
+
+    PROJECT_SETUP = 'REGISTRY_PROJECT_SETUP',
+    PROJECT_DELETE = 'REGISTRY_PROJECT_DELETE',
 }
 
 export enum RegistryQueueEvent {
@@ -24,5 +26,6 @@ export enum RegistryQueueEvent {
 }
 
 export enum RegistryQueueEntityType {
+    PROJECT = 'project',
     STATION = 'station',
 }

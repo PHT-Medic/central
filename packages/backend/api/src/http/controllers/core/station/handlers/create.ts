@@ -6,29 +6,16 @@
  */
 
 import {
-    PermissionID,
-    isHex,
+    Ecosystem, PermissionID, RegistryProjectType, createNanoID, isHex,
 } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@typescript-error/http';
 import { validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
-import { publishMessage } from 'amqp-extension';
 import { ExpressValidationError } from '../../../../express-validation';
 import { runStationValidation } from './utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { StationEntity } from '../../../../../domains/core/station/entity';
-import { buildSecretStorageQueueMessage } from '../../../../../domains/special/secret-storage/queue';
-import {
-    SecretStorageQueueCommand,
-    SecretStorageQueueEntityType,
-} from '../../../../../domains/special/secret-storage/constants';
-import env from '../../../../../env';
-import { saveStationToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/station';
-import {
-    saveStationToRegistry,
-} from '../../../../../components/registry/handlers/entities/station';
-import { RegistryQueueCommand, RegistryQueueEntityType } from '../../../../../domains/special/registry/constants';
-import { buildRegistryQueueMessage } from '../../../../../domains/special/registry/queue';
+import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 
 export async function createStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.STATION_ADD)) {
@@ -53,41 +40,27 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
 
     const entity = repository.create(data);
 
+    // -----------------------------------------------------
+
+    if (entity.ecosystem === Ecosystem.DEFAULT) {
+        const registryProjectExternalName = entity.external_id || createNanoID();
+        const registryProjectRepository = getRepository(RegistryProjectEntity);
+        const registryProject = registryProjectRepository.create({
+            external_name: registryProjectExternalName,
+            name: entity.name,
+            ecosystem: entity.ecosystem,
+            type: RegistryProjectType.STATION,
+        });
+
+        // todo: maybe
+    }
+
+    // -----------------------------------------------------
+
     await repository.save(entity);
 
-    if (entity.public_key) {
-        if (env.env === 'test') {
-            await saveStationToSecretStorage({
-                type: SecretStorageQueueEntityType.STATION,
-                id: entity.id,
-            });
-        } else {
-            const queueMessage = buildSecretStorageQueueMessage(
-                SecretStorageQueueCommand.SAVE,
-                {
-                    type: SecretStorageQueueEntityType.STATION,
-                    id: entity.id,
-                },
-            );
-            await publishMessage(queueMessage);
-        }
-    }
-
-    if (env.env === 'test') {
-        await saveStationToRegistry({
-            type: RegistryQueueEntityType.STATION,
-            id: entity.id,
-        });
-    } else {
-        const queueMessage = buildRegistryQueueMessage(
-            RegistryQueueCommand.SAVE,
-            {
-                type: RegistryQueueEntityType.STATION,
-                id: entity.id,
-            },
-        );
-        await publishMessage(queueMessage);
-    }
+    // todo: create registry project for ecoystem & registry
+    // todo: create setup registry project queue message
 
     return res.respond({ data: entity });
 }

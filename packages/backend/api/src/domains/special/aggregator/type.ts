@@ -5,12 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Station, TrainStationRunStatus } from '@personalhealthtrain/central-common';
+import {
+    Registry, RegistryProject, TrainStationRunStatus,
+} from '@personalhealthtrain/central-common';
 
 export type AggregatorTrainEventPayload = {
     id: string,
-    stationId?: Station['id'],
-    status?: TrainStationRunStatus,
+    registryId?: Registry['id'],
+    registryProjectId: RegistryProject['id'],
+    status: TrainStationRunStatus,
     artifactTag?: string,
     artifactDigest?: string
 };

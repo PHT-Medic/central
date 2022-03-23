@@ -7,9 +7,8 @@
 
 export enum RegistryCommand {
     SETUP = 'setup',
+    DELETE = 'delete',
 
-    STATION_SAVE = 'stationSave',
-    STATION_DELETE = 'stationDelete',
+    PROJECT_SETUP = 'projectSetup',
+    PROJECT_DELETE = 'projectDelete',
 }
-
-export type RegistryCommandType = `${RegistryCommand}`;

@@ -14,7 +14,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import {
-    Ecosystem, Registry, RegistryProject,
+    Ecosystem, Registry, RegistryProject, RegistryProjectType,
 } from '@personalhealthtrain/central-common';
 import { RealmEntity } from '@authelion/api-core';
 import { Realm } from '@authelion/common';
@@ -31,7 +31,7 @@ export class RegistryProjectEntity implements RegistryProject {
         select: false,
         unique: true,
     })
-        alias: string;
+        external_name: string;
 
     @Column({ type: 'varchar', length: 128 })
         name: string;
@@ -40,15 +40,14 @@ export class RegistryProjectEntity implements RegistryProject {
         ecosystem: Ecosystem;
 
     @Column({
-        type: 'boolean', default: false,
+        type: 'varchar', length: 64, nullable: true, default: RegistryProjectType.DEFAULT,
     })
-        ecosystem_aggregator: boolean;
+        type: RegistryProjectType;
 
     // ------------------------------------------------------------------
     @Column({
         type: 'varchar',
         length: 64,
-        select: false,
         unique: true,
     })
         external_id: string;
@@ -56,23 +55,23 @@ export class RegistryProjectEntity implements RegistryProject {
     // ------------------------------------------------------------------
 
     @Column({
-        type: 'varchar', length: 64, nullable: true, select: false,
+        type: 'varchar', length: 64, nullable: true,
     })
         account_id: string | null;
 
     @Column({
-        type: 'varchar', length: 256, nullable: true, select: false,
+        type: 'varchar', length: 256, nullable: true,
     })
         account_name: string | null;
 
     @Column({
         type: 'varchar', length: 256, nullable: true, select: false,
     })
-        account_token: string | null;
+        account_secret: string | null;
 
     // ------------------------------------------------------------------
 
-    @Column({ type: 'boolean', default: false, select: false })
+    @Column({ type: 'boolean', default: false })
         webhook_exists: boolean;
 
     // ------------------------------------------------------------------

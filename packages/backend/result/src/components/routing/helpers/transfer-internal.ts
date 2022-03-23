@@ -10,52 +10,52 @@ import {
     HarborAPI,
     REGISTRY_ARTIFACT_TAG_BASE,
     REGISTRY_ARTIFACT_TAG_LATEST,
-    isRegistryStationProjectName,
+    RegistryProjectType,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
-import { ProjectRepositoryTransferItem } from './type';
+import { TransferItem } from './type';
 
-export async function transferProjectRepository(
-    source: ProjectRepositoryTransferItem,
-    destination: ProjectRepositoryTransferItem,
+export async function transferInternal(
+    source: TransferItem,
+    destination: TransferItem,
 ) {
     const sourceArtifactTag = source.artifactTag || 'latest';
 
     const harborClient = useClient<HarborAPI>(HTTPClientKey.HARBOR);
 
     await harborClient.projectArtifact.copy(
-        destination.projectName,
+        destination.project.external_name,
         destination.repositoryName,
-        `${source.projectName}/${source.repositoryName}:${sourceArtifactTag}`,
+        `${source.project.external_name}/${source.repositoryName}:${sourceArtifactTag}`,
     );
 
     try {
         await harborClient.projectArtifact
-            .delete(source.projectName, source.repositoryName, sourceArtifactTag);
+            .delete(source.project.external_name, source.repositoryName, sourceArtifactTag);
     } catch (e) {
         // ...
     }
 
     // -------------------------------------------------------------------
 
-    const isSourceStationProject = isRegistryStationProjectName(source.projectName);
-    const isDestinationStationProject = isRegistryStationProjectName(destination.projectName);
-
     if (
-        isSourceStationProject &&
-        isDestinationStationProject &&
+        (
+            source.project.type === RegistryProjectType.STATION ||
+                source.project.type === RegistryProjectType.ECOSYSTEM_AGGREGATOR
+        ) &&
+        destination.project.type === RegistryProjectType.STATION &&
         sourceArtifactTag === REGISTRY_ARTIFACT_TAG_LATEST
     ) {
         // station does not push 'base' tag on completion
         await harborClient.projectArtifact.copy(
-            destination.projectName,
+            destination.project.external_name,
             destination.repositoryName,
-            `${source.projectName}/${source.repositoryName}:${REGISTRY_ARTIFACT_TAG_BASE}`,
+            `${source.project.external_name}/${source.repositoryName}:${REGISTRY_ARTIFACT_TAG_BASE}`,
         );
 
         try {
             await harborClient.projectArtifact
-                .delete(source.projectName, source.repositoryName, REGISTRY_ARTIFACT_TAG_BASE);
+                .delete(source.project.external_name, source.repositoryName, REGISTRY_ARTIFACT_TAG_BASE);
         } catch (e) {
             // ...
         }
@@ -67,7 +67,7 @@ export async function transferProjectRepository(
     if (sourceArtifactTag === REGISTRY_ARTIFACT_TAG_LATEST) {
         try {
             await harborClient.projectRepository
-                .delete(source.projectName, source.repositoryName);
+                .delete(source.project.external_name, source.repositoryName);
         } catch (e) {
             // ...
         }

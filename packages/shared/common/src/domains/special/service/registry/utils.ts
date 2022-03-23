@@ -13,7 +13,7 @@ import { ServiceID } from '../constants';
 export function buildRegistryWebhookTarget(
     context: {
         robot: Pick<Robot, 'id' | 'secret'>,
-        apiUrl: string
+        url: string
     },
 ) : HarborProjectWebhookTarget {
     return {
@@ -23,7 +23,7 @@ export function buildRegistryWebhookTarget(
             password: context.robot.secret,
         }),
         skip_cert_verify: true,
-        address: `${context.apiUrl}services/${ServiceID.REGISTRY}/hook`,
+        address: `${context.url}services/${ServiceID.REGISTRY}/hook`,
         type: 'http',
     };
 }

@@ -6,7 +6,7 @@
  */
 
 import Vue, { CreateElement, PropType, VNode } from 'vue';
-import { Registry, RegistryCommandNew } from '@personalhealthtrain/central-common';
+import { Registry, RegistryCommand, ServiceID } from '@personalhealthtrain/central-common';
 import EntityDelete from '../EntityDelete';
 import { MasterImageList } from '../master-image/MasterImageList';
 
@@ -27,7 +27,9 @@ export default Vue.extend({
             this.busy = true;
 
             try {
-                await this.$api.registry.runCommand(this.entityId, RegistryCommandNew.SETUP);
+                await this.$api.service.runRegistryCommand(RegistryCommand.SETUP, {
+                    id: this.entityId,
+                });
 
                 this.$bvToast.toast('You successfully executed the setup routine.', {
                     toaster: 'b-toaster-top-center',

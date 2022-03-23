@@ -7,12 +7,11 @@
 
 import {
     Station,
-    createNanoID,
     isHex,
 } from '@personalhealthtrain/central-common';
 import { RealmList } from '@authelion/vue';
 import {
-    email, helpers, maxLength, minLength, required,
+    email, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 import {
     SlotName, buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea, initPropertiesFromSource,
@@ -21,10 +20,8 @@ import Vue, {
     CreateElement, PropType, VNode, VNodeChildren, VNodeData,
 } from 'vue';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
-import StationRegistryManagement from './StationRegistryManagement';
-import StationSecretStorageManagement from './StationSecretStorageManagement';
-
-const alphaNum = helpers.regex('alphaNum', /^[a-z0-9]*$/);
+import RegistryProjectDetails from '../registry-project/RegistryProjectDetails';
+import { RegistryList } from '../registry/RegistryList';
 
 export const StationForm = Vue.extend({
     name: 'StationForm',
@@ -49,7 +46,7 @@ export const StationForm = Vue.extend({
                 public_key: '',
                 email: '',
                 realm_id: '',
-                secure_id: '',
+                registry_id: '',
                 hidden: false,
             },
 
@@ -66,6 +63,9 @@ export const StationForm = Vue.extend({
             realm_id: {
                 required,
             },
+            registry_id: {
+                required,
+            },
             email: {
                 minLength: minLength(10),
                 maxLength: maxLength(256),
@@ -74,12 +74,6 @@ export const StationForm = Vue.extend({
             public_key: {
                 minLength: minLength(10),
                 maxLength: maxLength(4096),
-            },
-            secure_id: {
-                required,
-                alphaNum,
-                minLength: minLength(1),
-                maxLength: maxLength(100),
             },
         },
     },
@@ -92,14 +86,8 @@ export const StationForm = Vue.extend({
             return this.realmId || (this.entity && this.entity.realm_id);
         },
         isHexPublicKey() {
-            return this.form.public_key && isHex(this.form.public_key);
-        },
-        hasSecureIdChanged() {
-            if (typeof this.entity?.secure_id === 'undefined') {
-                return false;
-            }
-
-            return this.entity.secure_id !== this.form.secure_id;
+            return this.form.public_key &&
+                isHex(this.form.public_key);
         },
 
         updatedAt() {
@@ -136,10 +124,6 @@ export const StationForm = Vue.extend({
             ) {
                 this.form.name = this.realmName || this.realmId;
             }
-
-            if (!this.form.secure_id) {
-                this.form.secure_id = createNanoID();
-            }
         },
         async submit() {
             if (this.busy || this.$v.$invalid) {
@@ -166,12 +150,6 @@ export const StationForm = Vue.extend({
             }
 
             this.busy = false;
-        },
-        generateSecureId() {
-            this.form.secure_id = createNanoID();
-        },
-        resetSecureId() {
-            this.form.secure_id = this.entity.secure_id;
         },
         handleUpdated(item) {
             this.$emit('updated', item);
@@ -213,60 +191,6 @@ export const StationForm = Vue.extend({
             title: 'Name',
             propName: 'name',
         });
-
-        const secureId = buildFormInput<Station>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(vm.$ilingo),
-            title: 'Secure ID',
-            propName: 'secure_id',
-        });
-
-        const secureIdHint = h('div', {
-            staticClass: 'alert alert-sm',
-            class: {
-                'alert-danger': vm.hasSecureIdChanged,
-                'alert-info': !vm.hasSecureIdChanged,
-            },
-        }, [
-            h('div', { staticClass: 'mb-1' }, [
-                (vm.hasSecureIdChanged ?
-                    'If you change the Secure ID, a new representation will be created in the Registry & Secret-Storage.' :
-                    'If you don\'t want to chose a secure identifier by your own, you can generate one.'
-                ),
-            ]),
-            h('button', {
-                class: 'btn btn-xs btn-dark',
-                attrs: {
-                    type: 'button',
-                },
-                on: {
-                    click($event) {
-                        $event.preventDefault();
-
-                        vm.generateSecureId.call(null);
-                    },
-                },
-            }, [
-                h('i', { staticClass: 'fa fa-wrench pr-1' }),
-                'Generate',
-            ]),
-            h('button', {
-                class: 'btn btn-xs btn-dark ml-1',
-                attrs: {
-                    type: 'button',
-                    disabled: !vm.hasSecureIdChanged,
-                },
-                on: {
-                    click($event) {
-                        $event.preventDefault();
-
-                        vm.resetSecureId.call(null);
-                    },
-                },
-            }, [
-                h('i', { staticClass: 'fa fa-undo pr-1' }),
-                'Reset',
-            ]),
-        ]);
 
         const email = buildFormInput<Station>(vm, h, {
             validationTranslator: buildVuelidateTranslator(vm.$ilingo),
@@ -330,32 +254,52 @@ export const StationForm = Vue.extend({
                     h('strong', { staticClass: 'pl-1 pr-1' }, 'registry'),
                     'are performed asynchronously and therefore might take a while, till the view will be updated.',
                 ]),
-                h('div', { staticClass: 'row' }, [
-                    h('div', { staticClass: 'col' }, [
-                        h(StationSecretStorageManagement, {
-                            props: {
-                                entity: vm.entity,
+                h(RegistryProjectDetails, {
+                    props: {
+                        entityId: vm.entity.registry_project_id,
+                    },
+                    on: {
+                        updated(entity) {
+                            vm.handleUpdated.call(null, entity);
+                        },
+                    },
+                }),
+            ];
+        }
+
+        let registry : VNodeChildren = [];
+
+        if (!vm.isRegistryLocked) {
+            registry = [
+                h('hr'),
+                h(RegistryList, {
+                    scopedSlots: {
+                        [SlotName.ITEM_ACTIONS]: (props) => h('button', {
+                            attrs: {
+                                disabled: props.busy,
                             },
+                            class: {
+                                'btn-dark': vm.form.registry_id !== props.item.id,
+                                'btn-warning': vm.form.registry_id === props.item.id,
+                            },
+                            staticClass: 'btn btn-xs',
                             on: {
-                                updated(entity) {
-                                    vm.handleUpdated.call(null, entity);
+                                click($event) {
+                                    $event.preventDefault();
+
+                                    vm.toggleFormData.call(null, 'registry_id', props.item.id);
                                 },
                             },
-                        }),
-                    ]),
-                    h('div', { staticClass: 'col' }, [
-                        h(StationRegistryManagement, {
-                            props: {
-                                entity: vm.entity,
-                            },
-                            on: {
-                                updated(entity) {
-                                    vm.handleUpdated.call(null, entity);
+                        }, [
+                            h('i', {
+                                class: {
+                                    'fa fa-plus': vm.form.registry_id !== props.item.id,
+                                    'fa fa-minus': vm.form.registry_id === props.item.id,
                                 },
-                            },
-                        }),
-                    ]),
-                ]),
+                            }),
+                        ]),
+                    },
+                }),
             ];
         }
 
@@ -376,10 +320,10 @@ export const StationForm = Vue.extend({
                 h('div', {
                     staticClass: 'col',
                 }, [
-                    secureId,
-                    secureIdHint,
                     h('hr'),
                     publicKey,
+                    h('hr'),
+                    registry,
                 ]),
             ]),
             ...editingElements,

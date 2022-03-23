@@ -117,7 +117,6 @@ export class DatabaseRootSeeder implements Seeder {
             stations.push({
                 realm_id: realms[i].id,
                 name: realms[i].name,
-                secure_id: createNanoID('0123456789abcdefghijklmnopqrstuvwxyz', 30),
             });
         }
 

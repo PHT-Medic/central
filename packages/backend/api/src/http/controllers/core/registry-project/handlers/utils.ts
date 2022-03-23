@@ -42,6 +42,27 @@ export async function runRegistryProjectValidation(
 
     await titleChain.run(req);
 
+    // -------------------------------------------------------------
+
+    const externalNameChain = check('external_name')
+        .isLength({ min: 1, max: 255 })
+        .exists()
+        .matches(/^[a-z0-9-_]*$/);
+
+    if (operation === 'update') {
+        externalNameChain.optional();
+    }
+
+    await externalNameChain.run(req);
+
+    // -------------------------------------------------------------
+
+    await check('ecosystem_aggregator')
+        .exists()
+        .isBoolean()
+        .optional()
+        .run(req);
+
     // ----------------------------------------------
 
     const validation = validationResult(req);

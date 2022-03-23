@@ -13,12 +13,9 @@ import {
     TrainManagerQueueCommand,
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
-import { buildTrainBuilderQueueMessage } from '../../../special/train-builder/queue';
-import { TrainBuilderCommand } from '../../../special/train-builder/type';
 import { findTrain } from './utils';
 import { TrainStationEntity } from '../../train-station/entity';
 import { TrainEntity } from '../entity';
-import env from '../../../../env';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 
 export async function startBuildTrain(
@@ -48,19 +45,14 @@ export async function startBuildTrain(
             throw new Error('Not all stations have approved the train yet.');
         }
 
-        if (env.trainManagerForBuilding) {
-            const queueMessage = buildTrainManagerQueueMessage(
-                TrainManagerQueueCommand.BUILD,
-                {
-                    id: train.id,
-                },
-            );
+        const queueMessage = buildTrainManagerQueueMessage(
+            TrainManagerQueueCommand.BUILD,
+            {
+                id: train.id,
+            },
+        );
 
-            await publishMessage(queueMessage);
-        } else {
-            const queueMessage = await buildTrainBuilderQueueMessage(TrainBuilderCommand.START, train);
-            await publishMessage(queueMessage);
-        }
+        await publishMessage(queueMessage);
 
         train = repository.merge(train, {
             build_status: TrainBuildStatus.STARTING,

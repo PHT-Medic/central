@@ -1,65 +1,111 @@
 /*
- * Copyright (c) 2022.
+ * Copyright (c) 2022-2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
 import Vue, { CreateElement, PropType, VNode } from 'vue';
-import { RegistryCommand, Station, buildRegistryStationProjectName } from '@personalhealthtrain/central-common';
+import { RegistryCommand, RegistryProject, ServiceID } from '@personalhealthtrain/central-common';
 
 // todo: add data, prop, method typing
 type Properties = {
-    entity: Station
+    entityId: RegistryProject['id'],
+    entity?: RegistryProject
 };
-export default Vue.extend<any, any, any, Properties>({
-    name: 'StationRegistryManagement',
+
+type Data = {
+    item: null | RegistryProject,
+    busy: boolean
+};
+
+export default Vue.extend<Data, any, any, Properties>({
+    name: 'RegistryProjectDetails',
     props: {
-        entity: Object as PropType<Station>,
+        entityId: String as PropType<RegistryProject['id']>,
+        entity: {
+            type: Object as PropType<RegistryProject>,
+            default: undefined,
+        },
     },
     data() {
         return {
             busy: false,
+            item: null,
         };
     },
     computed: {
-        projectName() {
-            return buildRegistryStationProjectName(this.entity.secure_id);
+        name() {
+            return this.item ?
+                this.item.external_name :
+                undefined;
         },
-        isEditing() {
-            return this.entity &&
-                Object.prototype.hasOwnProperty.call(this.entity, 'id');
+        accountId() {
+            return this.item ?
+                this.item.account_id :
+                undefined;
+        },
+        accountName() {
+            return this.item ?
+                this.item.account_name :
+                undefined;
+        },
+        accountSecret() {
+            return this.item ?
+                this.item.account_secret :
+                undefined;
+        },
+        webhookExists() {
+            return this.item ?
+                this.item.webhook_exists :
+                undefined;
+        },
+        updatedAt() {
+            return this.entity ?
+                this.entity.updated_at :
+                undefined;
         },
     },
+    created() {
+        Promise.resolve()
+            .then(this.initFromProperties)
+            .then(this.resolve);
+    },
     methods: {
-        async createProject() {
-            await this.run(RegistryCommand.STATION_SAVE);
+        async initFromProperties() {
+            if (!this.entity) return;
+
+            this.item = this.entity;
+        },
+        async resolve() {
+            if (this.entity) return;
+
+            try {
+                // todo: add account_*** fields to query
+                this.item = await this.$api.registryProject.getOne(this.entityId);
+
+                this.$emit('resolved', this.item);
+            } catch (e) {
+                // ....
+            }
+        },
+        async setupProject() {
+            await this.run(RegistryCommand.PROJECT_SETUP);
         },
         async deleteProject() {
-            await this.run(RegistryCommand.STATION_DELETE);
+            await this.run(RegistryCommand.PROJECT_DELETE);
         },
         async run(command) {
-            if (this.busy || !this.isEditing) return;
+            if (this.busy) return;
 
             this.busy = true;
 
             try {
-                await this.$api.service.runRegistryCommand(command, {
+                await this.$api.service.runCommand(ServiceID.REGISTRY, command, {
                     id: this.entity.id,
                 });
 
-                // eslint-disable-next-line default-case
-                switch (command) {
-                    case RegistryCommand.STATION_DELETE:
-                        this.$emit('updated', {
-                            registry_project_id: null,
-                            registry_project_account_id: null,
-                            registry_project_account_name: null,
-                            registry_project_account_token: null,
-                            registry_project_webhook_exists: null,
-                        });
-                        break;
-                }
+                this.$emit('updated');
             } catch (e) {
                 if (e instanceof Error) {
                     this.$emit('failed', e);
@@ -74,15 +120,15 @@ export default Vue.extend<any, any, any, Properties>({
 
         const robotCredentials = [];
 
-        if (vm.entity.registry_project_account_name) {
+        if (vm.accountName) {
             robotCredentials.push(h('div', [
-                vm.entity.registry_project_account_name,
+                vm.accountName,
             ]));
         }
 
-        if (vm.entity.registry_project_account_token) {
+        if (vm.accountSecret) {
             robotCredentials.push(h('div', [
-                vm.entity.registry_project_account_token,
+                vm.accountSecret,
             ]));
         }
 
@@ -101,22 +147,15 @@ export default Vue.extend<any, any, any, Properties>({
             }, [
                 h('div', [
                     h('strong', { staticClass: 'pr-1' }, 'Namespace:'),
-                    vm.projectName,
-                    h('i', {
-                        staticClass: 'pl-1',
-                        class: {
-                            'fa fa-check text-success': vm.entity.registry_project_id,
-                            'fa fa-times text-danger': !vm.entity.registry_project_id,
-                        },
-                    }),
+                    vm.name,
                 ]),
 
                 h('div', [
                     h('strong', { staticClass: 'pr-1' }, 'Webhook:'),
                     h('i', {
                         class: {
-                            'fa fa-check text-success': vm.entity.registry_project_webhook_exists,
-                            'fa fa-times text-danger': !vm.entity.registry_project_webhook_exists,
+                            'fa fa-check text-success': vm.webhookExists,
+                            'fa fa-times text-danger': !vm.webhookExists,
                         },
                     }),
                 ]),
@@ -127,8 +166,8 @@ export default Vue.extend<any, any, any, Properties>({
                         h('div', [
                             h('i', {
                                 class: {
-                                    'fa fa-check text-success': vm.entity.registry_project_account_id,
-                                    'fa fa-times text-danger': !vm.entity.registry_project_account_id,
+                                    'fa fa-check text-success': vm.accountId,
+                                    'fa fa-times text-danger': !vm.accountId,
                                 },
                             }),
                         ]),
@@ -149,7 +188,7 @@ export default Vue.extend<any, any, any, Properties>({
                             click($event) {
                                 $event.preventDefault();
 
-                                vm.createProject.call(null);
+                                vm.setupProject.call(null);
                             },
                         },
                     }, [

@@ -6,22 +6,19 @@
  */
 
 import { URL } from 'url';
-import { APIServiceHarborConfig, parseHarborConnectionString } from '@personalhealthtrain/central-common';
-import env from '../../env';
+import { APIServiceHarborConfig } from '@personalhealthtrain/central-common';
 import { DockerAuthConfig } from '../../modules/docker';
-
-const harborDefaultConfig = parseHarborConnectionString(env.harborConnectionString);
 
 type RemoteDockerImageURLBuildContext = {
     projectName: string,
     repositoryName: string,
     tagOrDigest?: string,
 
-    hostname?: string
+    hostname: string
 };
 
 export function buildRemoteDockerImageURL(context: RemoteDockerImageURLBuildContext): string {
-    let hostname = context.hostname || harborDefaultConfig.host;
+    let { hostname } = context;
 
     if (
         hostname.startsWith('http://') ||
@@ -46,8 +43,7 @@ export function buildRemoteDockerImageURL(context: RemoteDockerImageURLBuildCont
     return basePath;
 }
 
-export function buildDockerAuthConfig(config?: APIServiceHarborConfig) : DockerAuthConfig {
-    config = config || harborDefaultConfig;
+export function buildDockerAuthConfig(config: APIServiceHarborConfig) : DockerAuthConfig {
     const url = new URL(config.host);
 
     return {

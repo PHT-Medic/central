@@ -5,21 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { RegistryCommand, ServiceID } from '@personalhealthtrain/central-common';
+import { RegistryCommand, ServiceID, TrainCommand } from '@personalhealthtrain/central-common';
 import { SwaggerTags } from '@trapi/swagger';
 import {
-    Body, Controller, Post, Request, Response,
+    Body, Controller, Params, Post, Request, Response,
 } from '@decorators/express';
 
 import { NotFoundError } from '@typescript-error/http';
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';
 import { postHarborHookRouteHandler } from './handlers/registry/hook';
 
-import { runRegistryCommandRouteHandler } from './handlers/registry/command';
-import { runSecretStorageCommandRouteHandler } from './handlers/secret-storage/command';
+import { handleSecretStorageCommandRouteHandler } from './handlers/secret-storage/command';
 import { ExpressRequest, ExpressResponse } from '../../../type';
 import { RegistryHook } from '../../../../domains/special/registry';
-import { runStationRegistryCommandRouteHandler } from './handlers/station-registry/command';
+import { handleStationRegistryCommandRouteHandler } from './handlers/station-registry/command';
+import { handleRegistryCommandRouteHandler } from './handlers/registry/command';
 
 @SwaggerTags('extra')
 @Controller('/services')
@@ -50,11 +50,11 @@ export class ServiceController {
 
         switch (id) {
             case ServiceID.REGISTRY:
-                return runRegistryCommandRouteHandler(req, res);
+                return handleRegistryCommandRouteHandler(req, res);
             case ServiceID.SECRET_STORAGE:
-                return runSecretStorageCommandRouteHandler(req, res);
+                return handleSecretStorageCommandRouteHandler(req, res);
             case ServiceID.STATION_REGISTRY:
-                return runStationRegistryCommandRouteHandler(req, res);
+                return handleStationRegistryCommandRouteHandler(req, res);
         }
 
         throw new NotFoundError();

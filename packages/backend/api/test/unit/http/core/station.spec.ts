@@ -32,6 +32,8 @@ describe('src/controllers/core/station', () => {
         ...TEST_DEFAULT_STATION,
     };
 
+    // fix test :)
+
     const secureId = details.secure_id;
 
     it('should create, read, update, delete resource and get collection', async () => {

@@ -5,9 +5,4 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type StationSecretStoragePayload = {
-    rsa_public_key?: string,
-    registry_robot_name?: string,
-    registry_robot_id?: number,
-    registry_robot_secret?: string
-};
+export const REGISTRY_PROJECT_SECRET_ENGINE_KEY = 'registry-project';

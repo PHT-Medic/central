@@ -8,12 +8,12 @@
 /**
  * Incoming train project name
  */
-export const REGISTRY_INCOMING_PROJECT_NAME = 'pht_incoming';
+export const REGISTRY_INCOMING_PROJECT_NAME = 'incoming';
 
 /**
  * Outgoing train project name
  */
-export const REGISTRY_OUTGOING_PROJECT_NAME = 'pht_outgoing';
+export const REGISTRY_OUTGOING_PROJECT_NAME = 'outgoing';
 
 /**
  * Master Image project name

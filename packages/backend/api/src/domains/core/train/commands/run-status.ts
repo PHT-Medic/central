@@ -14,7 +14,6 @@ import {
     TrainBuildStatus,
     TrainConfigurationStatus,
     TrainRunStatus,
-    buildRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { useClient } from '@trapi/client';
@@ -68,6 +67,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
         .createQueryBuilder('trainStation')
         .addSelect('station.secure_id')
         .leftJoinAndSelect('trainStation.station', 'station')
+        .leftJoinAndSelect('station.registry_project', 'registryProject')
         .orderBy({
             'trainStation.index': 'DESC',
             'trainStation.created_at': 'DESC',
@@ -76,16 +76,13 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     const trainStations = await trainStationQueryBuilder.getMany();
 
     for (let i = 0; i < trainStations.length; i++) {
-        const stationId : string | number | undefined = trainStations[i].station.secure_id ??
-            trainStations[i].station.id;
+        const { external_name } = trainStations[i].station.registry_project;
 
-        if (!stationId) continue;
-
-        const stationName : string = buildRegistryStationProjectName(stationId);
+        if (!external_name) continue;
 
         try {
             harborRepository = await useClient<HarborAPI>(ApiKey.HARBOR).projectRepository
-                .find(stationName, train.id);
+                .find(external_name, train.id);
 
             if (
                 harborRepository &&

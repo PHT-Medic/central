@@ -7,11 +7,13 @@
 
 import { Realm } from '@authelion/common';
 import { Ecosystem } from '../ecosystem';
+import { RegistryProject } from '../registry-project';
+import { Registry } from '../registry';
 
 export interface Station {
     id: string;
 
-    secure_id: string;
+    external_id: string;
 
     name: string;
 
@@ -25,15 +27,13 @@ export interface Station {
 
     // ------------------------------------------------------------------
 
-    registry_project_id: number | null;
+    registry_id: Registry['id'];
 
-    registry_project_account_id: number | null;
+    registry: Registry;
 
-    registry_project_account_name: string | null;
+    registry_project_id: RegistryProject['id'] | null;
 
-    registry_project_account_token: string | null;
-
-    registry_project_webhook_exists: boolean;
+    registry_project: RegistryProject;
 
     // ------------------------------------------------------------------
 

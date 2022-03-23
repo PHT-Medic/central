@@ -37,7 +37,7 @@ export class RegistryEntity implements Registry {
     // ------------------------------------------------------------------
 
     @Column({
-        type: 'varchar', length: 256, nullable: true, select: false,
+        type: 'varchar', length: 256, nullable: true,
     })
         account_name: string | null;
 

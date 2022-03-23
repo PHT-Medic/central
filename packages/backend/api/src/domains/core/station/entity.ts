@@ -6,7 +6,6 @@
  */
 
 import {
-    BeforeInsert,
     Column,
     CreateDateColumn,
     Entity,
@@ -15,9 +14,13 @@ import {
     PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import { Ecosystem, Station, createNanoID } from '@personalhealthtrain/central-common';
+import {
+    Ecosystem, Registry, RegistryProject, Station,
+} from '@personalhealthtrain/central-common';
 import { RealmEntity } from '@authelion/api-core';
 import { Realm } from '@authelion/common';
+import { RegistryProjectEntity } from '../registry-project/entity';
+import { RegistryEntity } from '../registry/entity';
 
 @Unique(['name', 'realm_id'])
 @Entity({ name: 'stations' })
@@ -25,13 +28,8 @@ export class StationEntity implements Station {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
-    @Column({
-        type: 'varchar',
-        length: 100,
-        select: false,
-        unique: true,
-    })
-        secure_id: string;
+    @Column({ type: 'varchar', length: 64, nullable: true })
+        external_id: string;
 
     @Column({ type: 'varchar', length: 128 })
         name: string;
@@ -54,24 +52,19 @@ export class StationEntity implements Station {
 
     // ------------------------------------------------------------------
 
-    @Column({ nullable: true, default: null, select: false })
-        registry_project_id: number | null;
+    @Column()
+        registry_id: Registry['id'];
 
-    @Column({
-        nullable: true, default: null, select: false, type: 'int',
-    })
-        registry_project_account_id: number | null;
+    @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'registry_id' })
+        registry: Registry;
 
-    @Column({ nullable: true, default: null, select: false })
-        registry_project_account_name: string | null;
+    @Column({ nullable: true })
+        registry_project_id: RegistryProject['id'];
 
-    @Column({
-        type: 'text', nullable: true, default: null, select: false,
-    })
-        registry_project_account_token: string | null;
-
-    @Column({ default: false, select: false })
-        registry_project_webhook_exists: boolean;
+    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
+    @JoinColumn({ name: 'registry_project_id' })
+        registry_project: RegistryProject;
 
     // ------------------------------------------------------------------
 
@@ -89,11 +82,4 @@ export class StationEntity implements Station {
     @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'realm_id' })
         realm: RealmEntity;
-
-    @BeforeInsert()
-    setSecureId() {
-        if (!this.secure_id) {
-            this.secure_id = createNanoID();
-        }
-    }
 }

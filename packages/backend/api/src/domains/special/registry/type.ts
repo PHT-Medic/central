@@ -5,15 +5,25 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Station } from '@personalhealthtrain/central-common';
-import { RegistryQueueEntityType } from './constants';
+import { Registry, RegistryProject } from '@personalhealthtrain/central-common';
+import { RegistryQueueCommand } from './constants';
 
-export type RegistryStationQueuePayload = {
-    type: RegistryQueueEntityType.STATION
-} & Partial<Station>;
+export type RegistryQueueSetupPayload = {
+    entityId: Registry['id'],
+    entity?: Registry
+};
 
-export type RegistryQueuePayload =
-    RegistryStationQueuePayload;
+export type RegistryProjectQueuePayload = {
+    entityId: RegistryProject['id'],
+    entity?: RegistryProject
+};
+
+export type RegistryQueuePayload<T extends `${RegistryQueueCommand}`> =
+    T extends `${RegistryQueueCommand.SETUP}` | `${RegistryQueueCommand.DELETE}` ?
+        RegistryQueueSetupPayload :
+        T extends `${RegistryQueueCommand.PROJECT_SETUP}` | `${RegistryQueueCommand.PROJECT_DELETE}` ?
+            RegistryProjectQueuePayload :
+            never;
 
 // ---------------------------------------------------
 

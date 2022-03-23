@@ -23,7 +23,7 @@ export type HarborRobotAccountPermission = {
 };
 
 export type HarborRobotAccount = {
-    id?: number,
+    id?: number | string,
     name: string,
     secret?: string | null,
     creation_time?: string,

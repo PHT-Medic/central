@@ -42,7 +42,7 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
     data() {
         return {
             form: {
-                alias: '',
+                external_name: '',
                 name: '',
                 ecosystem_aggregator: false,
                 registry_id: '',
@@ -60,11 +60,11 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
             return this.registryId;
         },
         isAliasUnchanged() {
-            if (!this.entity || !this.entity.alias) {
+            if (!this.entity || !this.entity.external_name) {
                 return true;
             }
 
-            return this.entity.alias !== this.form.alias;
+            return this.entity.external_name !== this.form.external_name;
         },
         updatedAt() {
             return this.entity ? this.entity.updated_at : undefined;
@@ -88,7 +88,7 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
                     minLength: minLength(3),
                     maxLength: maxLength(128),
                 },
-                alias: {
+                external_name: {
                     required,
                     alphaNum,
                     minLength: minLength(3),
@@ -151,10 +151,10 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
         },
 
         generateAlias() {
-            this.form.alias = createNanoID();
+            this.form.external_name = createNanoID();
         },
         resetAlias() {
-            this.form.alias = this.entity.alias;
+            this.form.external_name = this.entity.external_name;
         },
     },
     render(createElement: CreateElement): VNode {
@@ -166,13 +166,13 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
             title: 'Name',
             propName: 'name',
         });
-        const alias = buildFormInput<Station>(vm, h, {
+        const externalName = buildFormInput<Station>(vm, h, {
             validationTranslator: buildVuelidateTranslator(vm.$ilingo),
             title: 'Alias',
-            propName: 'alias',
+            propName: 'external_name',
         });
 
-        const aliasHint = h('div', {
+        const externalNameHint = h('div', {
             staticClass: 'alert alert-sm',
             class: {
                 'alert-danger': !vm.isAliasUnchanged,
@@ -181,8 +181,8 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
         }, [
             h('div', { staticClass: 'mb-1' }, [
                 (!vm.isAliasUnchanged ?
-                    'If you change the alias, a new representation will be created in the Registry.' :
-                    'If you don\'t want to chose a alias by your own, you can generate one.'
+                    'If you change the external_name, a new representation will be created in the Registry.' :
+                    'If you don\'t want to chose a external_name by your own, you can generate one.'
                 ),
             ]),
             h('button', {
@@ -291,8 +291,8 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
         }, [
             name,
             h('hr'),
-            alias,
-            aliasHint,
+            externalName,
+            externalNameHint,
             h('hr'),
             ecosystemAggregator,
             registry,

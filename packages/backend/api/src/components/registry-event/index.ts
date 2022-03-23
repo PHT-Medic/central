@@ -6,9 +6,7 @@
  */
 
 import { ConsumeHandler, Message } from 'amqp-extension';
-import { dispatchRegistryEventToTrainManager } from './target/train-manager';
-import { dispatchRegistryEventToSelf } from './target/self';
-import { dispatchRegistryEventToTrainRouter } from './target/train-router';
+import { dispatchRegistryEventToTrainManager } from './train-manager';
 import { RegistryQueueEvent } from '../../domains/special/registry';
 import { useLogger } from '../../config/log';
 
@@ -18,8 +16,6 @@ async function handleEvent(message: Message) {
             useLogger().info(`Handling ${message.type} event...`, { component: 'registry-event' });
             return message;
         })
-        .then(dispatchRegistryEventToSelf)
-        .then(dispatchRegistryEventToTrainRouter)
         .then(dispatchRegistryEventToTrainManager)
         .then((message) => {
             useLogger().info(`Handled ${message.type}  event.`, { component: 'registry-event' });
