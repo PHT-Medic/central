@@ -10,7 +10,7 @@ import { Message } from 'amqp-extension';
 import {
     HTTPClient,
     RegistryProjectType,
-    TrainManagerRoutingPayload,
+    TrainManagerRoutingPayload, TrainManagerRoutingStep,
     TrainStation,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
@@ -19,6 +19,7 @@ import { useLogger } from '../../modules/log';
 import { handleIncomingMoveOperation } from './handlers/incoming';
 import { handleStationMoveOperation } from './handlers/station';
 import { handleEcosystemAggregatorMoveOperation } from './handlers/ecosystem-aggregator';
+import { RoutingError } from './error';
 
 export async function processRouteCommand(message: Message) {
     const data = message.data as TrainManagerRoutingPayload;
@@ -37,8 +38,9 @@ export async function processRouteCommand(message: Message) {
     });
 
     if (projectResponse.data.length === 0) {
-        // todo: handle not found project representation, throw error
-        return message;
+        throw RoutingError.registryProjectNotFound({
+            step: TrainManagerRoutingStep.MOVE,
+        });
     }
 
     const registryProject = projectResponse.data[0];

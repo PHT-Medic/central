@@ -26,7 +26,7 @@ export async function handleTrainManagerBuildingQueueEvent(
 
     const repository = getRepository(TrainEntity);
 
-    const entity = await repository.findOne(data.repositoryName);
+    const entity = await repository.findOne(data.id);
     if (typeof entity === 'undefined') {
         return;
     }
@@ -43,6 +43,7 @@ export async function handleTrainManagerBuildingQueueEvent(
             break;
         case TrainManagerBuildingQueueEvent.FINISHED:
             entity.build_status = TrainBuildStatus.FINISHED;
+            entity.build_registry_project_id = data.registryProjectId;
             break;
     }
 

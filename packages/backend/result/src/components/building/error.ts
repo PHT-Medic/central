@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BaseError, ErrorOptions } from '@typescript-error/http';
+import { ErrorOptions } from '@typescript-error/http';
 import {
     TrainManagerBuildingErrorType,
     TrainManagerBuildingStep,
 } from '@personalhealthtrain/central-common';
+import { BaseError } from '../error';
 
 export class BuildingError extends BaseError {
     constructor(options: ErrorOptions) {
@@ -29,11 +30,19 @@ export class BuildingError extends BaseError {
         return this.getOption('type');
     }
 
-    // --------------------------------------------------------------------
+    // -------------------------------------------------------------------
 
-    static notFound(step?: `${TrainManagerBuildingStep}`, message?: string) {
+    static entrypointNotFound(step?: `${TrainManagerBuildingStep}`, message?: string) {
         return new BuildingError({
-            type: TrainManagerBuildingErrorType.TRAIN_NOT_BUILD,
+            type: TrainManagerBuildingErrorType.ENTRYPOINT_NOT_FOUND,
+            step,
+            message,
+        });
+    }
+
+    static masterImageNotFound(step?: `${TrainManagerBuildingStep}`, message?: string) {
+        return new BuildingError({
+            type: TrainManagerBuildingErrorType.MASTER_IMAGE_NOT_FOUND,
             step,
             message,
         });

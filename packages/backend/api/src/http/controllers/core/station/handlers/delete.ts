@@ -6,11 +6,12 @@
  */
 
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { PermissionID } from '@personalhealthtrain/central-common';
+import { Ecosystem, PermissionID } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 
 export async function deleteStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -40,7 +41,16 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 
-    // todo: delete registry_project entity & queue message emit
+    if (
+        entity.registry_project_id
+    ) {
+        const registryProjectRepository = getRepository(RegistryProjectEntity);
+
+        const registryProject = await registryProjectRepository.findOne(entity.registry_project_id);
+        await registryProjectRepository.remove(registryProject);
+
+        // todo: delete registry_project entity & queue message emit
+    }
 
     const { id: entityId } = entity;
 

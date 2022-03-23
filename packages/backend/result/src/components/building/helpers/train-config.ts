@@ -11,11 +11,15 @@ import {
     Train,
     TrainConfig,
     TrainConfigSourceType,
+    getHostNameFromString,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
-import path from 'path';
 import { mergeStationsWithTrainStations } from '../../routing/helpers/merge';
-import { buildDockerAuthConfig } from '../../../config/services/registry';
+
+type TrainConfigBuildContext = {
+    entity: Train,
+    hostname: string
+};
 
 /**
  * Build train config for a specific train.
@@ -23,10 +27,10 @@ import { buildDockerAuthConfig } from '../../../config/services/registry';
  * train.master_image (required)
  *
  *
- * @param entity
+ * @param context
  */
-export async function buildTrainConfig(entity: Train) : Promise<TrainConfig> {
-    const authConfig = buildDockerAuthConfig();
+export async function buildTrainConfig(context: TrainConfigBuildContext) : Promise<TrainConfig> {
+    const { entity, hostname } = context;
 
     const config : TrainConfig = {
         id: entity.id,
@@ -39,7 +43,8 @@ export async function buildTrainConfig(entity: Train) : Promise<TrainConfig> {
         },
         source: {
             type: TrainConfigSourceType.DOCKER,
-            address: path.posix.join(authConfig.serveraddress, entity.master_image.virtual_path),
+            // path.posix.join(getHostNameFromString(hostname), entity.master_image.virtual_path)
+            address: getHostNameFromString(hostname),
             tag: 'latest',
         },
         proposal_id: entity.proposal_id,
@@ -97,14 +102,14 @@ export async function buildTrainConfig(entity: Train) : Promise<TrainConfig> {
         filter: {
             id: trainStations.map((trainStation) => trainStation.station_id),
         },
-        fields: ['+secure_id', '+public_key'],
+        fields: ['+public_key'],
     });
 
     const stationsExtended = mergeStationsWithTrainStations(stations, trainStations);
 
     for (let i = 0; i < stationsExtended.length; i++) {
         config.route.push({
-            station: stationsExtended[i].secure_id,
+            station: stationsExtended[i].external_id,
             rsa_public_key: stationsExtended[i].public_key,
             eco_system: stationsExtended[i].ecosystem,
             index: stationsExtended[i].index,

@@ -8,7 +8,8 @@
 import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
 import {
     HTTPClient,
-    HarborAPI, VaultAPI, refreshAuthRobotTokenOnResponseError,
+    VaultAPI,
+    refreshAuthRobotTokenOnResponseError,
 } from '@personalhealthtrain/central-common';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
@@ -51,18 +52,6 @@ function createConfig({ env } : ConfigContext) : Config {
             connectionString: env.vaultConnectionString,
         },
     }, 'vault');
-
-    setHTTPConfig({
-        clazz: HarborAPI,
-        driver: {
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false,
-            }),
-        },
-        extra: {
-            connectionString: env.harborConnectionString,
-        },
-    }, 'harbor');
 
     setHTTPConfig({
         clazz: HTTPClient,

@@ -7,23 +7,42 @@
 
 import { Message, publishMessage } from 'amqp-extension';
 import {
-    HTTPClientKey, HarborAPI,
+    HTTPClient,
+    HarborAPI,
     REGISTRY_ARTIFACT_TAG_BASE,
     REGISTRY_ARTIFACT_TAG_LATEST,
-    REGISTRY_INCOMING_PROJECT_NAME,
-    REGISTRY_SYSTEM_USER_NAME,
+    RegistryProject,
     TrainManagerQueueCommand,
-    TrainManagerRoutingStartPayload, TrainManagerRoutingStep,
+    TrainManagerRoutingStartPayload, TrainManagerRoutingStep, buildConnectionStringFromRegistry, createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { createClient, useClient } from '@trapi/client';
 import { buildSelfQueueMessage } from '../../config/queue';
 import { RoutingError } from './error';
+import { BuildingError } from '../building/error';
 
 export async function processStartCommand(message: Message) {
     const data = message.data as TrainManagerRoutingStartPayload;
 
-    const harborRepository = await useClient<HarborAPI>(HTTPClientKey.HARBOR).projectRepository
-        .find(REGISTRY_INCOMING_PROJECT_NAME, data.id);
+    if (!data.registry) {
+        throw RoutingError.registryNotFound();
+    }
+
+    const connectionString = buildConnectionStringFromRegistry(data.registry);
+    const httpClientConfig = createBasicHarborAPIConfig(connectionString);
+    const httpClient = createClient<HarborAPI>(httpClientConfig);
+
+    const client = useClient<HTTPClient>();
+
+    let incomingProject : RegistryProject;
+
+    try {
+        incomingProject = await client.registryProject.getOne(data.entity.build_registry_project_id);
+    } catch (e) {
+        throw BuildingError.registryProjectNotFound();
+    }
+
+    const harborRepository = await httpClient.projectRepository
+        .find(incomingProject.external_name, data.id);
 
     if (
         !harborRepository ||
@@ -38,20 +57,22 @@ export async function processStartCommand(message: Message) {
 
         await publishMessage(queueMessage);
 
-        throw RoutingError.trainNotFound(TrainManagerRoutingStep.START);
+        throw RoutingError.notFound({
+            type: TrainManagerRoutingStep.START,
+        });
     }
 
-    await publishMessage(buildSelfQueueMessage(TrainManagerQueueCommand.ROUTE, {
-        repositoryName: data.id,
-        projectName: REGISTRY_INCOMING_PROJECT_NAME,
-        operator: REGISTRY_SYSTEM_USER_NAME,
-        artifactTag: REGISTRY_ARTIFACT_TAG_BASE,
-    }));
+    const artifacts : string[] = [
+        REGISTRY_ARTIFACT_TAG_BASE,
+        REGISTRY_ARTIFACT_TAG_LATEST,
+    ];
 
-    await publishMessage(buildSelfQueueMessage(TrainManagerQueueCommand.ROUTE, {
-        repositoryName: data.id,
-        projectName: REGISTRY_INCOMING_PROJECT_NAME,
-        operator: REGISTRY_SYSTEM_USER_NAME,
-        artifactTag: REGISTRY_ARTIFACT_TAG_LATEST,
-    }));
+    for (let i = 0; artifacts.length; i++) {
+        await publishMessage(buildSelfQueueMessage(TrainManagerQueueCommand.ROUTE, {
+            repositoryName: data.id,
+            projectName: incomingProject.external_name,
+            operator: data.registry.account_name,
+            artifactTag: artifacts[i],
+        }));
+    }
 }

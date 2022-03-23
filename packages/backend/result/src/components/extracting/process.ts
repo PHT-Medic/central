@@ -7,7 +7,10 @@
 
 import { Message } from 'amqp-extension';
 import fs from 'fs';
-import { TrainManagerExtractingQueuePayload, TrainManagerExtractionMode, TrainManagerExtractionStep } from '@personalhealthtrain/central-common';
+import {
+    TrainManagerExtractingMode,
+    TrainManagerExtractingQueuePayload, TrainManagerExtractingStep,
+} from '@personalhealthtrain/central-common';
 import { buildImageOutputFilePath, getImageOutputDirectoryPath } from '../../config/paths';
 import { buildRemoteDockerImageURL } from '../../config/services/registry';
 import { readDockerContainerPaths, removeDockerImage, saveDockerContainerPathsTo } from '../../modules/docker';
@@ -15,67 +18,78 @@ import { ensureDirectory } from '../../modules/fs';
 import { ExtractingError } from './error';
 
 export async function processExtractCommand(message: Message) {
-    try {
-        const data: TrainManagerExtractingQueuePayload = message.data as TrainManagerExtractingQueuePayload;
+    const data: TrainManagerExtractingQueuePayload = message.data as TrainManagerExtractingQueuePayload;
 
-        if (!data.filePaths || data.filePaths.length === 0) {
-            return {
-                ...message,
-                data,
-            };
-        }
-
-        const repositoryPath: string = buildRemoteDockerImageURL({
-            projectName: data.projectName,
-            repositoryName: data.repositoryName,
+    if (!data.registry) {
+        throw ExtractingError.registryNotFound({
+            step: TrainManagerExtractingStep.EXTRACT,
         });
+    }
 
-        switch (data.mode) {
-            case TrainManagerExtractionMode.READ: {
-                data.files = await readDockerContainerPaths(
-                    repositoryPath,
-                    data.filePaths,
-                );
+    if (!data.registryProject) {
+        throw ExtractingError.registryProjectNotFound({
+            step: TrainManagerExtractingStep.EXTRACT,
+        });
+    }
 
-                break;
-            }
-            case TrainManagerExtractionMode.WRITE: {
-                // Create directory or do nothing...
-                const destinationPath: string = getImageOutputDirectoryPath();
-                await ensureDirectory(destinationPath);
-
-                // delete result file if it already exists.
-                const outputFilePath: string = buildImageOutputFilePath(data.repositoryName);
-
-                try {
-                    await fs.promises.access(outputFilePath, fs.constants.F_OK);
-                    await fs.promises.unlink(outputFilePath);
-                } catch (e) {
-                    // do nothing :)
-                }
-
-                await saveDockerContainerPathsTo(
-                    repositoryPath,
-                    data.filePaths,
-                    outputFilePath,
-                );
-
-                break;
-            }
-        }
-
-        try {
-            // we are done here with the docker image :)
-            await removeDockerImage(repositoryPath);
-        } catch (e) {
-            // we tried :P
-        }
-
+    if (!data.filePaths || data.filePaths.length === 0) {
         return {
             ...message,
             data,
         };
-    } catch (e) {
-        throw new ExtractingError(TrainManagerExtractionStep.EXTRACT, e.message);
     }
+
+    // -----------------------------------------------------------------------------------
+
+    const repositoryPath: string = buildRemoteDockerImageURL({
+        hostname: data.registry.address,
+        projectName: data.registryProject.external_name,
+        repositoryName: data.id,
+    });
+
+    switch (data.mode) {
+        case TrainManagerExtractingMode.READ: {
+            data.files = await readDockerContainerPaths(
+                repositoryPath,
+                data.filePaths,
+            );
+
+            break;
+        }
+        case TrainManagerExtractingMode.WRITE: {
+            // Create directory or do nothing...
+            const destinationPath: string = getImageOutputDirectoryPath();
+            await ensureDirectory(destinationPath);
+
+            // delete result file if it already exists.
+            const outputFilePath: string = buildImageOutputFilePath(data.id);
+
+            try {
+                await fs.promises.access(outputFilePath, fs.constants.F_OK);
+                await fs.promises.unlink(outputFilePath);
+            } catch (e) {
+                // do nothing :)
+            }
+
+            await saveDockerContainerPathsTo(
+                repositoryPath,
+                data.filePaths,
+                outputFilePath,
+            );
+
+            break;
+        }
+    }
+
+    try {
+        // we are done here with the docker image :)
+        await removeDockerImage(repositoryPath);
+    } catch (e) {
+        // we tried :P
+    }
+
+    return {
+        ...message,
+        data,
+    };
 }

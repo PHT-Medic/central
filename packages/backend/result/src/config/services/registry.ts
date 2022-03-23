@@ -6,7 +6,7 @@
  */
 
 import { URL } from 'url';
-import { APIServiceHarborConfig } from '@personalhealthtrain/central-common';
+import { APIServiceHarborConfig, getHostNameFromString } from '@personalhealthtrain/central-common';
 import { DockerAuthConfig } from '../../modules/docker';
 
 type RemoteDockerImageURLBuildContext = {
@@ -18,18 +18,8 @@ type RemoteDockerImageURLBuildContext = {
 };
 
 export function buildRemoteDockerImageURL(context: RemoteDockerImageURLBuildContext): string {
-    let { hostname } = context;
-
-    if (
-        hostname.startsWith('http://') ||
-        hostname.startsWith('https://')
-    ) {
-        const url = new URL(hostname);
-        hostname = url.hostname;
-    }
-
     let basePath = [
-        hostname,
+        getHostNameFromString(context.hostname),
         context.projectName,
         context.repositoryName,
     ].join('/');
@@ -44,11 +34,9 @@ export function buildRemoteDockerImageURL(context: RemoteDockerImageURLBuildCont
 }
 
 export function buildDockerAuthConfig(config: APIServiceHarborConfig) : DockerAuthConfig {
-    const url = new URL(config.host);
-
     return {
         username: config.user,
         password: config.password,
-        serveraddress: url.hostname,
+        serveraddress: getHostNameFromString(config.host),
     };
 }

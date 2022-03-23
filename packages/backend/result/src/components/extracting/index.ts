@@ -17,6 +17,7 @@ import { downloadImage } from './download';
 import { writeDownloadedEvent } from './write-downloaded';
 import { ExtractingError } from './error';
 import { processExtractStatusCommand } from './status';
+import { resolveTrainRegistry } from '../utils/train-registry';
 
 export function createExtractingComponentHandlers() : ConsumeHandlers {
     return {
@@ -26,6 +27,7 @@ export function createExtractingComponentHandlers() : ConsumeHandlers {
             });
 
             await Promise.resolve(message)
+                .then(resolveTrainRegistry)
                 .then(writeDownloadingEvent)
                 .then(downloadImage)
                 .then(writeDownloadedEvent)
@@ -40,6 +42,7 @@ export function createExtractingComponentHandlers() : ConsumeHandlers {
             });
 
             await Promise.resolve(message)
+                .then(resolveTrainRegistry)
                 .then(processExtractStatusCommand)
                 .catch((err) => writeFailedEvent(message, err));
         },

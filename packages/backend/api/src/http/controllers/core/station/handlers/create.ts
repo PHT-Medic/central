@@ -8,7 +8,7 @@
 import {
     Ecosystem, PermissionID, RegistryProjectType, createNanoID, isHex,
 } from '@personalhealthtrain/central-common';
-import { ForbiddenError } from '@typescript-error/http';
+import { BadRequestError, ForbiddenError } from '@typescript-error/http';
 import { validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
 import { ExpressValidationError } from '../../../../express-validation';
@@ -27,22 +27,32 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
         throw new ExpressValidationError(validation);
     }
 
-    const data = await runStationValidation(req, 'create');
+    const result = await runStationValidation(req, 'create');
 
     if (
-        data.public_key &&
-        !isHex(data.public_key)
+        result.data.public_key &&
+        !isHex(result.data.public_key)
     ) {
-        data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
+        result.data.public_key = Buffer.from(result.data.public_key, 'utf8').toString('hex');
     }
 
     const repository = getRepository(StationEntity);
 
-    const entity = repository.create(data);
+    const entity = repository.create(result.data);
 
     // -----------------------------------------------------
 
-    if (entity.ecosystem === Ecosystem.DEFAULT) {
+    if (
+        entity.registry_id
+    ) {
+        if (!entity.ecosystem) {
+            entity.ecosystem = result.meta.registry.ecosystem;
+        }
+
+        if (entity.ecosystem !== result.meta.registry.ecosystem) {
+            throw new BadRequestError('The ecosystem of the station and the registry must be the same.');
+        }
+
         const registryProjectExternalName = entity.external_id || createNanoID();
         const registryProjectRepository = getRepository(RegistryProjectEntity);
         const registryProject = registryProjectRepository.create({
@@ -50,17 +60,19 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
             name: entity.name,
             ecosystem: entity.ecosystem,
             type: RegistryProjectType.STATION,
+            registry_id: entity.registry_id,
         });
 
-        // todo: maybe
+        await registryProjectRepository.save(registryProject);
+
+        entity.registry_project_id = registryProject.id;
+
+        // todo: create setup registry project queue message
     }
 
     // -----------------------------------------------------
 
     await repository.save(entity);
-
-    // todo: create registry project for ecoystem & registry
-    // todo: create setup registry project queue message
 
     return res.respond({ data: entity });
 }

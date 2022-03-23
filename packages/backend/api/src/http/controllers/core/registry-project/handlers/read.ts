@@ -1,17 +1,59 @@
-import { getRepository } from 'typeorm';
+import { SelectQueryBuilder, getRepository } from 'typeorm';
 import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
 import {
     applyFields,
-    applyFilters, applyPagination, applyRelations, applySort,
+    applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, applySort,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { parseQueryFields } from '@trapi/query';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 
+function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>, fields: any) {
+    const protectedFields = [
+        'account_secret',
+    ];
+
+    const fieldsParsed = parseQueryFields(fields, {
+        allowed: [
+            'id',
+            'name',
+            'ecosystem',
+            'external_name',
+            'type',
+            'realm_id',
+            'registry_id',
+            'webhook_exists',
+            'created_at',
+            'updated_at',
+            ...protectedFields,
+        ],
+        defaultAlias: 'registryProject',
+    });
+
+    const protectedSelected = fieldsParsed
+        .filter((field) => field.alias === 'registryProject' &&
+            protectedFields.indexOf(field.key) !== -1);
+
+    if (protectedSelected.length > 0) {
+        if (
+            !req.ability.hasPermission(PermissionID.REGISTRY_MANAGE)
+        ) {
+            throw new ForbiddenError(
+                `You are not permitted to read the restricted fields: ${
+                    protectedSelected.map((field) => field.key).join(', ')}`,
+            );
+        }
+    }
+
+    applyQueryFieldsParseOutput(query, fieldsParsed);
+}
+
 export async function getOneRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
-    const { include } = req.query;
+    const { include, fields } = req.query;
 
     const repository = getRepository(RegistryProjectEntity);
     const query = repository.createQueryBuilder('registryProject')
@@ -21,6 +63,8 @@ export async function getOneRegistryProjectRouteHandler(req: ExpressRequest, res
         defaultAlias: 'registryProject',
         allowed: ['realm', 'registry'],
     });
+
+    checkAndApplyFields(req, query, fields);
 
     const entity = await query.getOne();
 
@@ -45,19 +89,16 @@ export async function getManyRegistryProjectRouteHandler(req: ExpressRequest, re
 
     onlyRealmPermittedQueryResources(query, req.realmId, 'registryProject.realm_id');
 
-    applyFields(query, fields, {
-        defaultAlias: 'registryProject',
-        allowed: ['id', 'name', 'address', 'ecosystem', 'created_at', 'updated_at'],
-    });
+    checkAndApplyFields(req, query, fields);
 
     applyFilters(query, filter, {
         defaultAlias: 'registryProject',
-        allowed: ['id', 'ecosystem', 'name'],
+        allowed: ['id', 'ecosystem', 'name', 'registry_id'],
     });
 
     applySort(query, sort, {
         defaultAlias: 'registryProject',
-        allowed: ['id', 'updated_at', 'created_at'],
+        allowed: ['id', 'ecosystem', 'updated_at', 'created_at'],
     });
 
     applyRelations(query, include, {

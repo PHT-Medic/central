@@ -5,14 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train } from '@personalhealthtrain/central-common';
+import { Station } from '@personalhealthtrain/central-common';
 import { ExpressValidationResult } from '../../../express-validation';
-import { ProposalEntity } from '../../../../domains/core/proposal/entity';
-import { MasterImageEntity } from '../../../../domains/core/master-image/entity';
 import { RegistryEntity } from '../../../../domains/core/registry/entity';
 
-export type TrainValidationResult = ExpressValidationResult<Train, {
-    proposal?: ProposalEntity,
-    masterImage?: MasterImageEntity,
+export type StationValidationResult = ExpressValidationResult<Station, {
     registry?: RegistryEntity
 }>;

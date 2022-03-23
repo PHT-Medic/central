@@ -20,7 +20,7 @@ import {
 } from 'typeorm';
 import {
     MasterImage,
-    Proposal,
+    Proposal, RegistryProject,
     Station,
     Train,
     TrainBuildStatus,
@@ -36,6 +36,8 @@ import { ProposalEntity } from '../proposal/entity';
 import { MasterImageEntity } from '../master-image/entity';
 import { TrainFileEntity } from '../train-file/entity';
 import { UserSecretEntity } from '../user-secret/entity';
+import { RegistryEntity } from '../registry/entity';
+import { RegistryProjectEntity } from '../registry-project/entity';
 
 @Entity()
 export class TrainEntity implements Train {
@@ -78,45 +80,6 @@ export class TrainEntity implements Train {
     })
         configuration_status: TrainConfigurationStatus | null;
 
-    @BeforeInsert()
-    @BeforeUpdate()
-    setConfigurationStatus() {
-        this.configuration_status = null;
-
-        if (this.stations > 0) {
-            this.configuration_status = TrainConfigurationStatus.BASE_CONFIGURED;
-        } else {
-            return;
-        }
-
-        if (this.user_rsa_secret_id) {
-            this.configuration_status = TrainConfigurationStatus.SECURITY_CONFIGURED;
-        } else {
-            return;
-        }
-
-        if (this.entrypoint_file_id) {
-            this.configuration_status = TrainConfigurationStatus.RESOURCE_CONFIGURED;
-        } else {
-            return;
-        }
-
-        if (this.hash) {
-            this.configuration_status = TrainConfigurationStatus.HASH_GENERATED;
-        } else {
-            return;
-        }
-
-        if (this.hash_signed) {
-            this.configuration_status = TrainConfigurationStatus.HASH_SIGNED;
-        } else {
-            return;
-        }
-
-        // check if all conditions are met
-        this.configuration_status = TrainConfigurationStatus.FINISHED;
-    }
-
     // ------------------------------------------------------------------
 
     @Column({
@@ -126,6 +89,13 @@ export class TrainEntity implements Train {
 
     @Column({ type: 'uuid', nullable: true, default: null })
         build_id: string;
+
+    @Column()
+        build_registry_project_id: RegistryProject['id'];
+
+    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'registry_id' })
+        build_registry_project: RegistryProject;
 
     // ------------------------------------------------------------------
 
@@ -151,6 +121,15 @@ export class TrainEntity implements Train {
 
     @UpdateDateColumn()
         updated_at: Date;
+
+    // ------------------------------------------------------------------
+
+    @Column()
+        registry_id: Realm['id'];
+
+    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'registry_id' })
+        registry: RegistryEntity;
 
     // ------------------------------------------------------------------
 
@@ -209,4 +188,45 @@ export class TrainEntity implements Train {
     @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'master_image_id' })
         master_image: MasterImageEntity;
+
+    // ------------------------------------------------------------------
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    setConfigurationStatus() {
+        this.configuration_status = null;
+
+        if (this.stations > 0) {
+            this.configuration_status = TrainConfigurationStatus.BASE_CONFIGURED;
+        } else {
+            return;
+        }
+
+        if (this.user_rsa_secret_id) {
+            this.configuration_status = TrainConfigurationStatus.SECURITY_CONFIGURED;
+        } else {
+            return;
+        }
+
+        if (this.entrypoint_file_id) {
+            this.configuration_status = TrainConfigurationStatus.RESOURCE_CONFIGURED;
+        } else {
+            return;
+        }
+
+        if (this.hash) {
+            this.configuration_status = TrainConfigurationStatus.HASH_GENERATED;
+        } else {
+            return;
+        }
+
+        if (this.hash_signed) {
+            this.configuration_status = TrainConfigurationStatus.HASH_SIGNED;
+        } else {
+            return;
+        }
+
+        // check if all conditions are met
+        this.configuration_status = TrainConfigurationStatus.FINISHED;
+    }
 }

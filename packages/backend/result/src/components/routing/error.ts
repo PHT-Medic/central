@@ -5,8 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BaseError, ErrorOptions } from '@typescript-error/http';
-import { TrainManagerRoutingErrorType, TrainManagerRoutingStep } from '@personalhealthtrain/central-common';
+import { ErrorOptions } from '@typescript-error/http';
+import {
+    TrainManagerRoutingErrorType,
+    TrainManagerRoutingStep,
+} from '@personalhealthtrain/central-common';
+import { BaseError } from '../error';
 
 export class RoutingError extends BaseError {
     constructor(options: ErrorOptions) {
@@ -14,25 +18,5 @@ export class RoutingError extends BaseError {
         options.type = options.type || TrainManagerRoutingErrorType.UNKNOWN;
 
         super(options);
-    }
-
-    // --------------------------------------------------------------------
-
-    public getStep() : TrainManagerRoutingStep {
-        return this.getOption('step');
-    }
-
-    public getType() : TrainManagerRoutingErrorType {
-        return this.getOption('type');
-    }
-
-    // --------------------------------------------------------------------
-
-    static trainNotFound(step?: `${TrainManagerRoutingStep}`, message?: string) {
-        return new RoutingError({
-            type: TrainManagerRoutingErrorType.TRAIN_NOT_BUILD,
-            step,
-            message,
-        });
     }
 }

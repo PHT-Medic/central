@@ -5,6 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export enum TrainManagerBaseErrorType {
+    NOT_FOUND = 'notFound',
+    REGISTRY_NOT_FOUND = 'registryNotFound',
+    REGISTRY_PROJECT_NOT_FOUND = 'registryProjectNotFound',
+    UNKNOWN = 'unknown',
+}
+
 export enum TrainManagerQueueCommand {
     EXTRACT = 'extract',
     EXTRACT_STATUS = 'extract_status',
@@ -30,6 +37,8 @@ export enum TrainManagerBuildingQueueEvent {
 
 export enum TrainManagerBuildingErrorType {
     TRAIN_NOT_BUILD = 'trainNotBuild',
+    ENTRYPOINT_NOT_FOUND = 'entrypointNotFound',
+    MASTER_IMAGE_NOT_FOUND = 'masterImageNotFound',
     UNKNOWN = 'unknown',
 }
 
@@ -80,12 +89,18 @@ export enum TrainManagerExtractingQueueEvent {
     UNKNOWN = 'extractionUnknown', // rs trigger
 }
 
-export enum TrainManagerExtractionStep {
-    DOWNLOAD = 'download',
-    EXTRACT = 'extract',
+export enum TrainManagerExtractingErrorType {
+    UNKNOWN = 'unknown',
 }
 
-export enum TrainManagerExtractionMode {
+export enum TrainManagerExtractingStep {
+    DOWNLOAD = 'download',
+    EXTRACT = 'extract',
+    STATUS = 'status',
+    UNKNOWN = 'unknown',
+}
+
+export enum TrainManagerExtractingMode {
     READ = 'read',
     WRITE = 'write',
     NONE = 'none',

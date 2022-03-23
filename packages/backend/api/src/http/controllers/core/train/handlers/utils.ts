@@ -5,19 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainType } from '@personalhealthtrain/central-common';
+import { Ecosystem, TrainType } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
-import { NotFoundError } from '@typescript-error/http';
+import { BadRequestError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
-import {
-    extendExpressValidationResultWithMasterImage,
-} from '../../master-image/utils/extend';
+import { extendExpressValidationResultWithMasterImage } from '../../master-image/utils/extend';
 import { TrainValidationResult } from '../type';
 import { extendExpressValidationResultWithProposal } from '../../proposal/utils/extend';
+import { extendExpressValidationResultWithRegistry } from '../../registry/utils/extend';
 
 export async function runTrainValidation(
     req: ExpressRequest,
@@ -85,6 +84,13 @@ export async function runTrainValidation(
         .optional({ nullable: true })
         .run(req);
 
+    await check('registry_id')
+        .exists()
+        .notEmpty()
+        .isUUID()
+        .optional({ nullable: true })
+        .run(req);
+
     await check('query')
         .isString()
         .isLength({ min: 1, max: 4096 })
@@ -104,9 +110,21 @@ export async function runTrainValidation(
 
     await extendExpressValidationResultWithMasterImage(result);
     await extendExpressValidationResultWithProposal(result);
+    await extendExpressValidationResultWithRegistry(result);
+
     if (result.meta.proposal) {
         if (!isPermittedForResourceRealm(req.realmId, result.meta.proposal.realm_id)) {
-            throw new NotFoundError('The referenced proposal realm is not permitted.');
+            throw new BadRequestError('The referenced proposal realm is not permitted.');
+        }
+    }
+
+    if (result.meta.registry) {
+        if (!isPermittedForResourceRealm(req.realmId, result.meta.registry.realm_id)) {
+            throw new BadRequestError('The referenced registry realm is not permitted.');
+        }
+
+        if (result.meta.registry.ecosystem !== Ecosystem.DEFAULT) {
+            throw new BadRequestError('The registry must be part of the local ecosystem.');
         }
     }
 

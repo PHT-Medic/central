@@ -10,7 +10,7 @@ import { Message, publishMessage } from 'amqp-extension';
 import {
     RegistryProjectType,
     TrainContainerPath,
-    TrainManagerExtractionMode,
+    TrainManagerExtractingMode,
     TrainManagerQueueCommand,
 } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
@@ -45,15 +45,14 @@ export async function dispatchRegistryEventToTrainManager(
 
     if (registryProject.type === RegistryProjectType.OUTGOING) {
         await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT, {
-            repositoryName: data.repositoryName,
-            projectName: data.namespace,
+            id: data.repositoryName,
 
             filePaths: [
                 TrainContainerPath.RESULTS,
                 TrainContainerPath.CONFIG,
             ],
 
-            mode: TrainManagerExtractionMode.WRITE,
+            mode: TrainManagerExtractingMode.WRITE,
         }));
 
         return message;

@@ -46,15 +46,12 @@ export async function runRegistryValidation(
 
     // ----------------------------------------------
 
-    const ecosystemChain = check('ecosystem')
-        .exists()
-        .isIn(Object.values(Ecosystem));
-
-    if (operation === 'update') {
-        ecosystemChain.optional();
+    if (operation === 'create') {
+        await check('ecosystem')
+            .exists()
+            .isIn(Object.values(Ecosystem))
+            .run(req);
     }
-
-    await ecosystemChain.run(req);
 
     // ----------------------------------------------
 

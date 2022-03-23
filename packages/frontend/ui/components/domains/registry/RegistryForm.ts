@@ -49,7 +49,7 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
             busy: false,
 
             ecosystems: [
-                { id: Ecosystem.DEFAULT, value: 'FLAME' },
+                { id: Ecosystem.DEFAULT, value: 'DEFAULT' },
                 { id: Ecosystem.PADME, value: 'PADME' },
             ],
         };

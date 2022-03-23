@@ -13,6 +13,7 @@ import {
     TrainManagerQueueCommand,
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
+import { BadRequestError } from '@typescript-error/http';
 import { findTrain } from './utils';
 import { TrainStationEntity } from '../../train-station/entity';
 import { TrainEntity } from '../entity';
@@ -28,6 +29,10 @@ export async function startBuildTrain(
     if (typeof train === 'undefined') {
         // todo: make it a ClientError.BadRequest
         throw new Error('The train could not be found.');
+    }
+
+    if (!train.registry_id) {
+        throw new BadRequestError('A train registry is required to build a train.');
     }
 
     if (train.run_status) {

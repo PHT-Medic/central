@@ -13,7 +13,7 @@ import {
     REGISTRY_OUTGOING_PROJECT_NAME,
     Train,
     TrainContainerPath,
-    TrainManagerExtractionMode,
+    TrainManagerExtractingMode,
     TrainManagerQueueCommand,
     TrainResultStatus,
     TrainRunStatus,
@@ -46,15 +46,14 @@ export async function triggerTrainResultStart(
 
     // send queue message
     await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT, {
-        repositoryName: train.id,
-        projectName: REGISTRY_OUTGOING_PROJECT_NAME,
+        id: train.id,
 
         filePaths: [
             TrainContainerPath.RESULTS,
             TrainContainerPath.CONFIG,
         ],
 
-        mode: TrainManagerExtractionMode.WRITE,
+        mode: TrainManagerExtractingMode.WRITE,
     }));
 
     train = repository.merge(train, {

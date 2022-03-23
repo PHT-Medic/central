@@ -13,6 +13,8 @@ import { writeProcessingEvent } from './write-processing';
 import { writeFailedEvent } from './write-failed';
 import { processMessage } from './process';
 import { processBuildStatusEvent } from './status';
+import { resolveTrainRegistry } from '../utils/train-registry';
+import { resolveTrain } from '../utils/train';
 
 export function createBuildingComponentHandlers() : ConsumeHandlers {
     return {
@@ -22,6 +24,8 @@ export function createBuildingComponentHandlers() : ConsumeHandlers {
             });
 
             await Promise.resolve(message)
+                .then(resolveTrain)
+                .then(resolveTrainRegistry)
                 .then(writeProcessingEvent)
                 .then(processMessage)
                 .then(writeProcessedEvent)
@@ -33,6 +37,8 @@ export function createBuildingComponentHandlers() : ConsumeHandlers {
             });
 
             await Promise.resolve(message)
+                .then(resolveTrain)
+                .then(resolveTrainRegistry)
                 .then(processBuildStatusEvent)
                 .catch((err: Error) => writeFailedEvent(message, err));
         },

@@ -6,8 +6,8 @@
  */
 
 import {
-    Station,
-    isHex,
+    Ecosystem,
+    Registry, Station, isHex,
 } from '@personalhealthtrain/central-common';
 import { RealmList } from '@authelion/vue';
 import {
@@ -19,9 +19,10 @@ import {
 import Vue, {
     CreateElement, PropType, VNode, VNodeChildren, VNodeData,
 } from 'vue';
+import { BuildInput } from '@trapi/query';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
-import RegistryProjectDetails from '../registry-project/RegistryProjectDetails';
 import { RegistryList } from '../registry/RegistryList';
+import StationRegistryProjectDetails from './StationRegistryProjectDetails';
 
 export const StationForm = Vue.extend({
     name: 'StationForm',
@@ -48,7 +49,13 @@ export const StationForm = Vue.extend({
                 realm_id: '',
                 registry_id: '',
                 hidden: false,
+                ecosystem: '',
             },
+
+            ecosystems: [
+                { id: Ecosystem.DEFAULT, value: 'DEFAULT' },
+                { id: Ecosystem.PADME, value: 'PADME' },
+            ],
 
             busy: false,
         };
@@ -61,6 +68,9 @@ export const StationForm = Vue.extend({
                 maxLength: maxLength(30),
             },
             realm_id: {
+                required,
+            },
+            ecosystem: {
                 required,
             },
             registry_id: {
@@ -254,9 +264,9 @@ export const StationForm = Vue.extend({
                     h('strong', { staticClass: 'pl-1 pr-1' }, 'registry'),
                     'are performed asynchronously and therefore might take a while, till the view will be updated.',
                 ]),
-                h(RegistryProjectDetails, {
+                h(StationRegistryProjectDetails, {
                     props: {
-                        entityId: vm.entity.registry_project_id,
+                        entity: vm.entity,
                     },
                     on: {
                         updated(entity) {
@@ -267,12 +277,29 @@ export const StationForm = Vue.extend({
             ];
         }
 
+        const ecosystem = buildFormSelect<Registry>(vm, h, {
+            validationTranslator: buildVuelidateTranslator(this.$ilingo),
+            title: 'Ecosystem',
+            propName: 'ecosystem',
+            options: vm.ecosystems,
+        });
+
         let registry : VNodeChildren = [];
 
-        if (!vm.isRegistryLocked) {
+        if (
+            !vm.isRegistryLocked &&
+            vm.form.ecosystem
+        ) {
             registry = [
                 h('hr'),
                 h(RegistryList, {
+                    props: {
+                        query: {
+                            filter: {
+                                ecosystem: vm.form.ecosystem,
+                            },
+                        } as BuildInput<Registry>,
+                    },
                     scopedSlots: {
                         [SlotName.ITEM_ACTIONS]: (props) => h('button', {
                             attrs: {
@@ -323,6 +350,7 @@ export const StationForm = Vue.extend({
                     h('hr'),
                     publicKey,
                     h('hr'),
+                    ecosystem,
                     registry,
                 ]),
             ]),

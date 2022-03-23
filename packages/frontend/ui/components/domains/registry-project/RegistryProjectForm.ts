@@ -6,17 +6,25 @@
  */
 
 import {
-    Registry, RegistryProject, Station, createNanoID,
+    Registry,
+    RegistryProject,
+    RegistryProjectType,
+    Station,
+    createNanoID,
 } from '@personalhealthtrain/central-common';
 import Vue, {
-    CreateElement, PropType, VNode, VNodeChildren, VNodeData,
+    CreateElement, PropType, VNode, VNodeChildren,
 } from 'vue';
 import {
-    ComponentFormData, SlotName, buildFormInput, buildFormSubmit, initPropertiesFromSource,
+    ComponentFormData,
+    SlotName,
+    buildFormInput,
+    buildFormSelect,
+    buildFormSubmit,
+    initPropertiesFromSource,
 } from '@vue-layout/utils';
 import {
-    helpers,
-    maxLength, minLength, required,
+    helpers, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 import { RegistryList } from '../registry/RegistryList';
@@ -44,9 +52,17 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
             form: {
                 external_name: '',
                 name: '',
-                ecosystem_aggregator: false,
+                type: RegistryProjectType.DEFAULT,
                 registry_id: '',
             },
+
+            types: [
+                { id: RegistryProjectType.DEFAULT, value: 'DEFAULT' },
+                { id: RegistryProjectType.ECOSYSTEM_AGGREGATOR, value: 'Aggregator' },
+                { id: RegistryProjectType.INCOMING, value: 'Incoming' },
+                { id: RegistryProjectType.OUTGOING, value: 'Outgoing' },
+                { id: RegistryProjectType.MASTER_IMAGES, value: 'Master-Images' },
+            ],
 
             busy: false,
         };
@@ -59,7 +75,7 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
         isRegistryLocked() {
             return this.registryId;
         },
-        isAliasUnchanged() {
+        isExternalNameUnchanged() {
             if (!this.entity || !this.entity.external_name) {
                 return true;
             }
@@ -67,7 +83,9 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
             return this.entity.external_name !== this.form.external_name;
         },
         updatedAt() {
-            return this.entity ? this.entity.updated_at : undefined;
+            return this.entity ?
+                this.entity.updated_at :
+                undefined;
         },
     },
     watch: {
@@ -175,12 +193,12 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
         const externalNameHint = h('div', {
             staticClass: 'alert alert-sm',
             class: {
-                'alert-danger': !vm.isAliasUnchanged,
-                'alert-info': vm.isAliasUnchanged,
+                'alert-danger': !vm.isExternalNameUnchanged,
+                'alert-info': vm.isExternalNameUnchanged,
             },
         }, [
             h('div', { staticClass: 'mb-1' }, [
-                (!vm.isAliasUnchanged ?
+                (!vm.isExternalNameUnchanged ?
                     'If you change the external_name, a new representation will be created in the Registry.' :
                     'If you don\'t want to chose a external_name by your own, you can generate one.'
                 ),
@@ -205,7 +223,7 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
                 class: 'btn btn-xs btn-dark ml-1',
                 attrs: {
                     type: 'button',
-                    disabled: vm.isAliasUnchanged,
+                    disabled: vm.isExternalNameUnchanged,
                 },
                 on: {
                     click($event) {
@@ -220,26 +238,12 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
             ]),
         ]);
 
-        const ecosystemAggregator = h('div', {
-            staticClass: 'form-group mb-1',
-        }, [
-            h('b-form-checkbox', {
-                model: {
-                    value: vm.form.ecosystem_aggregator,
-                    callback(v: boolean) {
-                        vm.form.ecosystem_aggregator = v;
-                    },
-                    expression: 'form.ecosystem_aggregator',
-                },
-            } as VNodeData, [
-                'Aggregator for ecosystem?',
-            ]),
-            h('div', {
-                staticClass: 'alert alert-sm alert-info mt-1',
-            }, [
-                'If enabled this project will act as a aggregator project to transfer trains in this ecosystem.',
-            ]),
-        ]);
+        const types = buildFormSelect<RegistryProject>(vm, h, {
+            validationTranslator: buildVuelidateTranslator(this.$ilingo),
+            title: 'Type',
+            propName: 'type',
+            options: vm.types,
+        });
 
         let registry : VNodeChildren = [];
 
@@ -294,7 +298,7 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
             externalName,
             externalNameHint,
             h('hr'),
-            ecosystemAggregator,
+            types,
             registry,
             h('hr'),
             submit,

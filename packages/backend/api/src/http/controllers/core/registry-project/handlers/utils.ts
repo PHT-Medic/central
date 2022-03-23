@@ -6,6 +6,7 @@
  */
 
 import { check, validationResult } from 'express-validator';
+import { RegistryProjectType } from '@personalhealthtrain/central-common';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
 import { RegistryProjectValidationResult } from '../type';
@@ -57,11 +58,12 @@ export async function runRegistryProjectValidation(
 
     // -------------------------------------------------------------
 
-    await check('ecosystem_aggregator')
-        .exists()
-        .isBoolean()
-        .optional()
-        .run(req);
+    if (operation === 'create') {
+        await check('type')
+            .exists()
+            .isIn(Object.keys(RegistryProjectType))
+            .run(req);
+    }
 
     // ----------------------------------------------
 

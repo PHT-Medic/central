@@ -11,8 +11,9 @@ import { useLogger } from '../../modules/log';
 import { writeProcessedEvent } from './write-processed';
 import { writeProcessingEvent } from './write-processing';
 import { writeFailedEvent } from './write-failed';
-import { processRouteCommand } from './process';
+import { processRouteCommand } from './route';
 import { processStartCommand } from './start';
+import { resolveTrainRegistry } from '../utils/train-registry';
 
 export function createRoutingComponentHandlers() : ConsumeHandlers {
     return {
@@ -34,6 +35,7 @@ export function createRoutingComponentHandlers() : ConsumeHandlers {
             });
 
             await Promise.resolve(message)
+                .then(resolveTrainRegistry)
                 .then(processStartCommand)
                 .catch((err: Error) => writeFailedEvent(message, err));
         },

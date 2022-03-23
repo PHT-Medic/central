@@ -98,7 +98,7 @@ export async function transferEcosystemOut(
 
     await pushDockerImage(destinationImage, buildDockerAuthConfig({
         host: aggregatorProject.registry.address,
-        user: aggregatorProject.registry.account_name || aggregatorProject.account_name,
-        password: aggregatorProject.registry.account_secret || aggregatorProject.account_secret,
+        user: aggregatorProject.account_name,
+        password: aggregatorProject.account_secret,
     }));
 }

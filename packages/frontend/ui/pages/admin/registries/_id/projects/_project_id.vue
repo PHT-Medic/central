@@ -32,9 +32,9 @@ export default Vue.extend<any, any, any, any>({
                         '+external_id',
                         '+account_id',
                         '+account_name',
-                        '+account_token',
+                        '+account_secret',
                         '+webhook_exists',
-                        '+alias',
+                        '+external_name',
                     ],
                 },
             });

@@ -5,15 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Proposal, Station } from '@personalhealthtrain/central-common';
+import { Ecosystem } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
+import { extendExpressValidationResultWithRegistry } from '../../registry/utils/extend';
+import { StationValidationResult } from '../type';
 
 export async function runStationValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
-) : Promise<Partial<Station>> {
+) : Promise<StationValidationResult> {
+    const result : StationValidationResult = {
+        data: {},
+        meta: {},
+    };
+
     const nameChain = check('name')
         .isLength({ min: 5, max: 100 })
         .exists()
@@ -51,11 +58,38 @@ export async function runStationValidation(
 
     // -------------------------------------------------------------
 
+    const externalNameChain = check('external_id')
+        .isLength({ min: 1, max: 255 })
+        .exists()
+        .matches(/^[a-z0-9-_]*$/);
+
+    if (operation === 'update') {
+        externalNameChain.optional();
+    }
+
+    await externalNameChain.run(req);
+
+    // -------------------------------------------------------------
+
+    await check('registry_id')
+        .exists()
+        .isUUID()
+        .optional({ nullable: true })
+        .run(req);
+
+    // -------------------------------------------------------------
+
     if (operation === 'create') {
         await check('realm_id')
             .exists()
             .isString()
             .notEmpty()
+            .run(req);
+
+        await check('ecosystem')
+            .exists()
+            .isIn(Object.values(Ecosystem))
+            .optional({ nullable: true })
             .run(req);
     }
 
@@ -66,5 +100,8 @@ export async function runStationValidation(
         throw new ExpressValidationError(validation);
     }
 
-    return matchedValidationData(req, { includeOptionals: true });
+    result.data = matchedValidationData(req, { includeOptionals: true });
+    await extendExpressValidationResultWithRegistry(result);
+
+    return result;
 }

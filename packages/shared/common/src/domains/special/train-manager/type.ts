@@ -5,8 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainManagerExtractionMode, TrainManagerQueueCommand } from './constants';
-import { Train } from '../../core';
+import { TrainManagerExtractingMode, TrainManagerQueueCommand } from './constants';
+import { Registry, RegistryProject, Train } from '../../core';
+
+// ----------------------------------------------------------
+
+export type TrainManagerBaseQueuePayload = {
+    id: Train['id'],
+    entity?: Train,
+    registry?: Registry,
+    registryId?: Registry['id'],
+    registryProject?: RegistryProject,
+    registryProjectId?: RegistryProject['id']
+};
 
 // ----------------------------------------------------------
 
@@ -21,14 +32,11 @@ export type TrainManagerExtractingFile = {
     type: TrainManagerExtractingFileType
 };
 
-export type TrainManagerExtractingQueuePayload = {
+export type TrainManagerExtractingQueuePayload = TrainManagerBaseQueuePayload & {
     filePaths?: string[],
     files?: TrainManagerExtractingFile[],
 
-    mode: `${TrainManagerExtractionMode}`,
-
-    projectName: string,
-    repositoryName: string
+    mode: `${TrainManagerExtractingMode}`,
 };
 
 // ----------------------------------------------------------
@@ -40,13 +48,13 @@ export type TrainManagerRoutingPayload = {
     artifactTag: string
 };
 
-export type TrainManagerRoutingStartPayload = {
+export type TrainManagerRoutingStartPayload = TrainManagerBaseQueuePayload & {
     id: Train['id']
 };
 
-export type TrainManagerBuildPayload = {
-    id: Train['id']
-};
+// ----------------------------------------------------------
+
+export type TrainManagerBuildPayload = TrainManagerBaseQueuePayload;
 
 // ----------------------------------------------------------
 

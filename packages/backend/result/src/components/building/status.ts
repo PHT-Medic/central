@@ -7,19 +7,52 @@
 
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
 import {
+    HTTPClient,
     HarborAPI,
-    REGISTRY_INCOMING_PROJECT_NAME,
     TrainManagerBuildPayload,
     TrainManagerBuildingQueueEvent,
+    buildConnectionStringFromRegistry,
+    createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { createClient, useClient } from '@trapi/client';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
+import { BuildingError } from './error';
 
 export async function processBuildStatusEvent(message: Message) {
     const data = message.data as TrainManagerBuildPayload;
 
-    const harborRepository = await useClient<HarborAPI>('harbor').projectRepository
-        .find(REGISTRY_INCOMING_PROJECT_NAME, data.id);
+    if (!data.entity) {
+        throw BuildingError.notFound();
+    }
+
+    if (!data.registry) {
+        throw BuildingError.registryNotFound();
+    }
+
+    if (!data.entity.build_registry_project_id) {
+        await publishMessage(buildMessage({
+            options: {
+                routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
+            },
+            type: TrainManagerBuildingQueueEvent.NONE,
+            data: message.data,
+            metadata: message.metadata,
+        }));
+
+        return message;
+    }
+
+    // -----------------------------------------------------------------------------------
+
+    const connectionString = buildConnectionStringFromRegistry(data.registry);
+    const httpClientConfig = createBasicHarborAPIConfig(connectionString);
+    const httpClient = createClient<HarborAPI>(httpClientConfig);
+
+    const client = useClient<HTTPClient>();
+    const incomingProject = await client.registryProject.getOne(data.entity.build_registry_project_id);
+
+    const harborRepository = await httpClient.projectRepository
+        .find(incomingProject.external_name, data.id);
 
     if (
         harborRepository &&
@@ -34,7 +67,7 @@ export async function processBuildStatusEvent(message: Message) {
             metadata: message.metadata,
         }));
 
-        return;
+        return message;
     }
 
     await publishMessage(buildMessage({
@@ -45,4 +78,6 @@ export async function processBuildStatusEvent(message: Message) {
         data: message.data,
         metadata: message.metadata,
     }));
+
+    return message;
 }

@@ -10,7 +10,7 @@ import {
     CreateDateColumn,
     Entity,
     JoinColumn,
-    ManyToOne, PrimaryColumn,
+    ManyToOne, PrimaryColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import {
@@ -20,18 +20,12 @@ import { RealmEntity } from '@authelion/api-core';
 import { Realm } from '@authelion/common';
 import { RegistryEntity } from '../registry/entity';
 
+@Unique('registry_project_external_name_registry_index', ['external_name', 'registry_id'])
+@Unique('registry_project_external_id_registry_index', ['external_id', 'registry_id'])
 @Entity({ name: 'registry_projects' })
 export class RegistryProjectEntity implements RegistryProject {
     @PrimaryColumn('uuid')
         id: string;
-
-    @Column({
-        type: 'varchar',
-        length: 64,
-        select: false,
-        unique: true,
-    })
-        external_name: string;
 
     @Column({ type: 'varchar', length: 128 })
         name: string;
@@ -45,10 +39,16 @@ export class RegistryProjectEntity implements RegistryProject {
         type: RegistryProjectType;
 
     // ------------------------------------------------------------------
+
     @Column({
         type: 'varchar',
         length: 64,
-        unique: true,
+    })
+        external_name: string;
+
+    @Column({
+        type: 'varchar',
+        length: 64,
     })
         external_id: string;
 
