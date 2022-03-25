@@ -13,9 +13,11 @@ import {
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { publishMessage } from 'amqp-extension';
+import { getRepository } from 'typeorm';
 import { ApiKey } from '../../../../config/api';
 import { SecretStorageRobotQueuePayload } from '../../../../domains/special/secret-storage/type';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../domains/special/registry';
+import { RegistryEntity } from '../../../../domains/core/registry/entity';
 
 export async function saveRobotToSecretStorage(payload: SecretStorageRobotQueuePayload) {
     if (!payload.id || !payload.secret) {
@@ -23,11 +25,21 @@ export async function saveRobotToSecretStorage(payload: SecretStorageRobotQueueP
     }
 
     if (payload.name === ServiceID.REGISTRY) {
-        const queueMessage = buildRegistryQueueMessage(
-            RegistryQueueCommand.SETUP,
-        );
+        const registryRepository = getRepository(RegistryEntity);
+        const registries = await registryRepository.find({
+            select: ['id'],
+        });
 
-        await publishMessage(queueMessage);
+        for (let i = 0; i < registries.length; i++) {
+            const queueMessage = buildRegistryQueueMessage(
+                RegistryQueueCommand.SETUP,
+                {
+                    id: registries[i].id,
+                },
+            );
+
+            await publishMessage(queueMessage);
+        }
     }
 
     const data = buildRobotSecretStoragePayload(payload.id, payload.secret);

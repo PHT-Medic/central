@@ -8,7 +8,7 @@
 import { ConsumeHandler, Message } from 'amqp-extension';
 import { RegistryQueueCommand, RegistryQueuePayload } from '../../domains/special/registry';
 import { setupRegistry } from './handlers/default';
-import { deleteRegistryProjectFromRemote, setupRegistryProjectForRemote } from './handlers/project';
+import { linkRegistryProject, relinkRegistryProject, unlinkRegistryProject } from './handlers/project';
 
 export function createRegistryComponentHandlers() : Record<RegistryQueueCommand, ConsumeHandler> {
     return {
@@ -21,13 +21,17 @@ export function createRegistryComponentHandlers() : Record<RegistryQueueCommand,
             // tear down registry
         },
 
-        [RegistryQueueCommand.PROJECT_SETUP]: async (message: Message) => {
-            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_SETUP>;
-            await setupRegistryProjectForRemote(payload);
+        [RegistryQueueCommand.PROJECT_LINK]: async (message: Message) => {
+            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_LINK>;
+            await linkRegistryProject(payload);
         },
-        [RegistryQueueCommand.PROJECT_DELETE]: async (message: Message) => {
-            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_DELETE>;
-            await deleteRegistryProjectFromRemote(payload);
+        [RegistryQueueCommand.PROJECT_UNLINK]: async (message: Message) => {
+            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_UNLINK>;
+            await unlinkRegistryProject(payload);
+        },
+        [RegistryQueueCommand.PROJECT_RELINK]: async (message: Message) => {
+            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_RELINK>;
+            await relinkRegistryProject(payload);
         },
     };
 }

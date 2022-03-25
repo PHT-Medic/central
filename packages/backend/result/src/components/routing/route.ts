@@ -15,10 +15,9 @@ import {
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { mergeStationsWithTrainStations } from './helpers/merge';
-import { useLogger } from '../../modules/log';
 import { handleIncomingMoveOperation } from './handlers/incoming';
 import { handleStationMoveOperation } from './handlers/station';
-import { handleEcosystemAggregatorMoveOperation } from './handlers/ecosystem-aggregator';
+import { handleEcosystemAggregatorMoveOperation } from './handlers/aggreagtor';
 import { RoutingError } from './error';
 
 export async function processRouteCommand(message: Message) {
@@ -39,7 +38,8 @@ export async function processRouteCommand(message: Message) {
 
     if (projectResponse.data.length === 0) {
         throw RoutingError.registryProjectNotFound({
-            step: TrainManagerRoutingStep.MOVE,
+            step: TrainManagerRoutingStep.ROUTE,
+            message: 'The pushed registry-project is not registered.',
         });
     }
 
@@ -58,10 +58,7 @@ export async function processRouteCommand(message: Message) {
 
     const { data: trainStations } = await client.trainStation.getMany(query);
     if (trainStations.length === 0) {
-        useLogger().debug('Route empty', {
-            component: 'routing',
-        });
-        return message;
+        throw RoutingError.routeEmpty(TrainManagerRoutingStep.ROUTE);
     }
 
     const { data: stations } = await client.station.getMany({
@@ -94,7 +91,7 @@ export async function processRouteCommand(message: Message) {
             });
             break;
         }
-        case RegistryProjectType.ECOSYSTEM_AGGREGATOR: {
+        case RegistryProjectType.AGGREGATOR: {
             await handleEcosystemAggregatorMoveOperation({
                 items: stationsExtended,
                 project: registryProject,

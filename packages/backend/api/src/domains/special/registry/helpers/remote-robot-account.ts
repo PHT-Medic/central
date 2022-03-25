@@ -34,40 +34,44 @@ export async function ensureRemoteRegistryProjectAccount(
             robotAccount = await httpClient.robotAccount.create(context.name);
         } catch (e) {
             if (e?.response?.status === 409) {
-                const response = await useClient<VaultAPI>(HTTPClientKey.VAULT)
+                let { data: secretStorageData } = await useClient<VaultAPI>(HTTPClientKey.VAULT)
                     .keyValue.find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, context.name);
 
                 if (
-                    response &&
-                    response.data.account_id &&
-                    response.data.account_name &&
-                    response.data.account_secret
+                    !!secretStorageData &&
+                    !!secretStorageData.account_id &&
+                    !!secretStorageData.account_name &&
+                    !!secretStorageData.account_secret
                 ) {
                     robotAccount = {
-                        id: response.data.account_id,
-                        name: response.data.account_name,
-                        secret: response.data.account_secret,
+                        id: secretStorageData.account_id,
+                        name: secretStorageData.account_name,
+                        secret: secretStorageData.account_secret,
                     };
 
-                    await useClient<HarborAPI>(ApiKey.HARBOR).robotAccount.refreshSecret(
+                    await httpClient.robotAccount.refreshSecret(
                         robotAccount.id,
                         robotAccount.secret,
                     );
                 } else {
-                    robotAccount = await useClient<HarborAPI>(ApiKey.HARBOR).robotAccount
+                    robotAccount = await httpClient.robotAccount
                         .find(context.name, true);
 
-                    await useClient<VaultAPI>(ApiKey.VAULT)
-                        .keyValue.save(
-                            REGISTRY_PROJECT_SECRET_ENGINE_KEY,
-                            context.name,
-                            {
-                                account_id: robotAccount.id,
-                                account_name: robotAccount.name,
-                                account_secret: robotAccount.secret,
-                            } as RegistryProjectSecretStoragePayload,
-                        );
+                    secretStorageData = {
+                        account_id: `${robotAccount.id}`,
+                        account_name: robotAccount.name,
+                        account_secret: robotAccount.secret,
+                    };
                 }
+
+                await useClient<VaultAPI>(ApiKey.VAULT)
+                    .keyValue.save(
+                        REGISTRY_PROJECT_SECRET_ENGINE_KEY,
+                        context.name,
+                        secretStorageData,
+                    );
+            } else {
+                throw e;
             }
         }
 
@@ -76,16 +80,17 @@ export async function ensureRemoteRegistryProjectAccount(
             context.account.name = robotAccount.name;
             context.account.secret = robotAccount.secret;
         }
-    }
+    } else {
+        robotAccount = {
+            id: context.account.id,
+            name: context.account.name,
+            secret: context.account.secret,
+        };
 
-    if (
-        context.account.id
-    ) {
-        // just update the name for insurance ;)
-        await httpClient.robotAccount
-            .update(context.account.id, context.name, {
-                name: context.account.name,
-            });
+        await httpClient.robotAccount.refreshSecret(
+            robotAccount.id,
+            robotAccount.secret,
+        );
     }
 
     return robotAccount;

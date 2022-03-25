@@ -19,4 +19,12 @@ export class RoutingError extends BaseError {
 
         super(options);
     }
+
+    static routeEmpty(step?: `${TrainManagerRoutingStep}`, message?: string) {
+        return new RoutingError({
+            type: TrainManagerRoutingErrorType.ROUTE_EMPTY,
+            step,
+            message,
+        });
+    }
 }

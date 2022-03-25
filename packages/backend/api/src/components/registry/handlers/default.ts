@@ -7,7 +7,6 @@
 
 import { publishMessage } from 'amqp-extension';
 import {
-    HarborAPI,
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
@@ -17,9 +16,8 @@ import {
     RobotSecretEnginePayload,
     ServiceID,
     VaultAPI,
-    buildConnectionStringFromRegistry, createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
-import { createClient, useClient } from '@trapi/client';
+import { useClient } from '@trapi/client';
 import { getRepository } from 'typeorm';
 import { ApiKey } from '../../../config/api';
 import {
@@ -29,14 +27,18 @@ import {
 } from '../../../domains/special/registry';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
 import { RegistryEntity } from '../../../domains/core/registry/entity';
-import { ensureRemoteRegistryProject } from '../../../domains/special/registry/helpers/remote';
-import { ensureRemoteRegistryProjectWebhook } from '../../../domains/special/registry/helpers/remote-webhook';
 
 export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueCommand.SETUP>) {
     const response = await useClient<VaultAPI>(ApiKey.VAULT)
         .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
 
     if (!response) {
+        // todo: throw error
+        return payload;
+    }
+
+    if (!payload.id && !payload.entity) {
+        // todo: throw error
         return payload;
     }
 
@@ -48,19 +50,8 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
         entity = payload.entity;
     } else {
         const repository = getRepository(RegistryEntity);
-        entity = await repository.createQueryBuilder('registry')
-            .addSelect([
-                'registry.address',
-                'registry.account_name',
-                'registry.account_token',
-            ])
-            .where('registryProject.id = :id', { id: payload.entityId })
-            .getOne();
+        entity = await repository.findOne(payload.id);
     }
-
-    const connectionString = buildConnectionStringFromRegistry(entity);
-    const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-    const httpClient = createClient<HarborAPI>(httpClientConfig);
 
     // ---------------------------------------------------------------------
 
@@ -69,33 +60,21 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     // ---------------------------------------------------------------------
 
     // incoming
-    const incoming = await ensureRemoteRegistryProject(httpClient, {
-        remoteName: REGISTRY_INCOMING_PROJECT_NAME,
-        remoteOptions: {
-            public: false,
-        },
-    });
-
-    await ensureRemoteRegistryProjectWebhook(httpClient, {
-        idOrName: incoming.id,
-        isName: false,
-    });
-
     let incomingEntity = await projectRepository.findOne({
-        external_name: incoming.name,
+        external_name: REGISTRY_INCOMING_PROJECT_NAME,
     });
     if (typeof incomingEntity === 'undefined') {
         incomingEntity = projectRepository.create({
-            name: incoming.name,
-            external_name: incoming.name,
-            external_id: `${incoming.id}`,
-            webhook_exists: true,
+            name: REGISTRY_INCOMING_PROJECT_NAME,
+            external_name: REGISTRY_INCOMING_PROJECT_NAME,
             type: RegistryProjectType.INCOMING,
+            registry_id: entity.id,
+            realm_id: entity.realm_id,
+            public: false,
         });
     } else {
         incomingEntity = projectRepository.merge(incomingEntity, {
-            external_id: `${incoming.id}`,
-            webhook_exists: true,
+            public: false,
         });
     }
     await projectRepository.save(incomingEntity);
@@ -103,33 +82,21 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     // ---------------------------------------------------------------------
 
     // outgoing
-    const outgoing = await ensureRemoteRegistryProject(httpClient, {
-        remoteName: REGISTRY_OUTGOING_PROJECT_NAME,
-        remoteOptions: {
-            public: false,
-        },
-    });
-
-    await ensureRemoteRegistryProjectWebhook(httpClient, {
-        idOrName: outgoing.id,
-        isName: false,
-    });
-
     let outgoingEntity = await projectRepository.findOne({
-        external_name: outgoing.name,
+        external_name: REGISTRY_OUTGOING_PROJECT_NAME,
     });
     if (typeof outgoingEntity === 'undefined') {
         outgoingEntity = projectRepository.create({
-            name: outgoing.name,
-            external_name: outgoing.name,
-            external_id: `${outgoing.id}`,
-            webhook_exists: true,
+            name: REGISTRY_OUTGOING_PROJECT_NAME,
+            external_name: REGISTRY_OUTGOING_PROJECT_NAME,
             type: RegistryProjectType.OUTGOING,
+            registry_id: entity.id,
+            realm_id: entity.realm_id,
+            public: false,
         });
     } else {
         outgoingEntity = projectRepository.merge(outgoingEntity, {
-            external_id: `${outgoing.id}`,
-            webhook_exists: true,
+            public: false,
         });
     }
     await projectRepository.save(outgoingEntity);
@@ -137,26 +104,21 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     // -----------------------------------------------------------------------
 
     // master ( images )
-    const masterImages = await ensureRemoteRegistryProject(httpClient, {
-        remoteName: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-        remoteOptions: {
-            public: false,
-        },
-    });
-
     let masterImagesEntity = await projectRepository.findOne({
-        external_name: masterImages.name,
+        external_name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     });
     if (typeof masterImagesEntity === 'undefined') {
         masterImagesEntity = projectRepository.create({
-            name: masterImages.name,
-            external_name: masterImages.name,
-            external_id: `${masterImages.id}`,
+            name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
+            external_name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
             type: RegistryProjectType.MASTER_IMAGES,
+            registry_id: entity.id,
+            realm_id: entity.realm_id,
+            public: false,
         });
     } else {
         masterImagesEntity = projectRepository.merge(masterImagesEntity, {
-            external_id: `${masterImages.id}`,
+            public: false,
         });
     }
     await projectRepository.save(masterImagesEntity);
@@ -164,13 +126,17 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     // -----------------------------------------------
 
     const entities = await projectRepository.find({
-        registry_id: entity.id,
+        where: {
+            registry_id: entity.id,
+        },
+        select: ['id'],
     });
+
     for (let i = 0; i < entities.length; i++) {
         const queueMessage = buildRegistryQueueMessage(
-            RegistryQueueCommand.PROJECT_SETUP,
+            RegistryQueueCommand.PROJECT_LINK,
             {
-                entityId: entities[i].id,
+                id: entities[i].id,
             },
         );
 

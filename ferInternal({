@@ -1,0 +1,3482 @@
+[1mdiff --git a/packages/backend/api/src/components/registry-event/train-manager.ts b/packages/backend/api/src/components/registry-event/train-manager.ts[m
+[1mindex ad79c12f..fb650574 100644[m
+[1m--- a/packages/backend/api/src/components/registry-event/train-manager.ts[m
+[1m+++ b/packages/backend/api/src/components/registry-event/train-manager.ts[m
+[36m@@ -61,7 +61,7 @@[m [mexport async function dispatchRegistryEventToTrainManager([m
+     if ([m
+         registryProject.type === RegistryProjectType.STATION ||[m
+         registryProject.type === RegistryProjectType.INCOMING ||[m
+[31m-        registryProject.type === RegistryProjectType.ECOSYSTEM_AGGREGATOR[m
+[32m+[m[32m        registryProject.type === RegistryProjectType.AGGREGATOR[m
+     ) {[m
+         await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE, {[m
+             repositoryName: data.repositoryName,[m
+[1mdiff --git a/packages/backend/api/src/components/registry/handlers/default.ts b/packages/backend/api/src/components/registry/handlers/default.ts[m
+[1mindex 6be8a1a0..54bef9af 100644[m
+[1m--- a/packages/backend/api/src/components/registry/handlers/default.ts[m
+[1m+++ b/packages/backend/api/src/components/registry/handlers/default.ts[m
+[36m@@ -7,7 +7,6 @@[m
+ [m
+ import { publishMessage } from 'amqp-extension';[m
+ import {[m
+[31m-    HarborAPI,[m
+     REGISTRY_INCOMING_PROJECT_NAME,[m
+     REGISTRY_MASTER_IMAGE_PROJECT_NAME,[m
+     REGISTRY_OUTGOING_PROJECT_NAME,[m
+[36m@@ -17,9 +16,8 @@[m [mimport {[m
+     RobotSecretEnginePayload,[m
+     ServiceID,[m
+     VaultAPI,[m
+[31m-    buildConnectionStringFromRegistry, createBasicHarborAPIConfig,[m
+ } from '@personalhealthtrain/central-common';[m
+[31m-import { createClient, useClient } from '@trapi/client';[m
+[32m+[m[32mimport { useClient } from '@trapi/client';[m
+ import { getRepository } from 'typeorm';[m
+ import { ApiKey } from '../../../config/api';[m
+ import {[m
+[36m@@ -29,14 +27,18 @@[m [mimport {[m
+ } from '../../../domains/special/registry';[m
+ import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';[m
+ import { RegistryEntity } from '../../../domains/core/registry/entity';[m
+[31m-import { ensureRemoteRegistryProject } from '../../../domains/special/registry/helpers/remote';[m
+[31m-import { ensureRemoteRegistryProjectWebhook } from '../../../domains/special/registry/helpers/remote-webhook';[m
+ [m
+ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueCommand.SETUP>) {[m
+     const response = await useClient<VaultAPI>(ApiKey.VAULT)[m
+         .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);[m
+ [m
+     if (!response) {[m
+[32m+[m[32m        // todo: throw error[m
+[32m+[m[32m        return payload;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    if (!payload.id && !payload.entity) {[m
+[32m+[m[32m        // todo: throw error[m
+         return payload;[m
+     }[m
+ [m
+[36m@@ -48,20 +50,9 @@[m [mexport async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC[m
+         entity = payload.entity;[m
+     } else {[m
+         const repository = getRepository(RegistryEntity);[m
+[31m-        entity = await repository.createQueryBuilder('registry')[m
+[31m-            .addSelect([[m
+[31m-                'registry.address',[m
+[31m-                'registry.account_name',[m
+[31m-                'registry.account_token',[m
+[31m-            ])[m
+[31m-            .where('registryProject.id = :id', { id: payload.entityId })[m
+[31m-            .getOne();[m
+[32m+[m[32m        entity = await repository.findOne(payload.id);[m
+     }[m
+ [m
+[31m-    const connectionString = buildConnectionStringFromRegistry(entity);[m
+[31m-    const httpClientConfig = createBasicHarborAPIConfig(connectionString);[m
+[31m-    const httpClient = createClient<HarborAPI>(httpClientConfig);[m
+[31m-[m
+     // ---------------------------------------------------------------------[m
+ [m
+     const projectRepository = getRepository(RegistryProjectEntity);[m
+[36m@@ -69,33 +60,21 @@[m [mexport async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC[m
+     // ---------------------------------------------------------------------[m
+ [m
+     // incoming[m
+[31m-    const incoming = await ensureRemoteRegistryProject(httpClient, {[m
+[31m-        remoteName: REGISTRY_INCOMING_PROJECT_NAME,[m
+[31m-        remoteOptions: {[m
+[31m-            public: false,[m
+[31m-        },[m
+[31m-    });[m
+[31m-[m
+[31m-    await ensureRemoteRegistryProjectWebhook(httpClient, {[m
+[31m-        idOrName: incoming.id,[m
+[31m-        isName: false,[m
+[31m-    });[m
+[31m-[m
+     let incomingEntity = await projectRepository.findOne({[m
+[31m-        external_name: incoming.name,[m
+[32m+[m[32m        external_name: REGISTRY_INCOMING_PROJECT_NAME,[m
+     });[m
+     if (typeof incomingEntity === 'undefined') {[m
+         incomingEntity = projectRepository.create({[m
+[31m-            name: incoming.name,[m
+[31m-            external_name: incoming.name,[m
+[31m-            external_id: `${incoming.id}`,[m
+[31m-            webhook_exists: true,[m
+[32m+[m[32m            name: REGISTRY_INCOMING_PROJECT_NAME,[m
+[32m+[m[32m            external_name: REGISTRY_INCOMING_PROJECT_NAME,[m
+             type: RegistryProjectType.INCOMING,[m
+[32m+[m[32m            registry_id: entity.id,[m
+[32m+[m[32m            realm_id: entity.realm_id,[m
+[32m+[m[32m            public: false,[m
+         });[m
+     } else {[m
+         incomingEntity = projectRepository.merge(incomingEntity, {[m
+[31m-            external_id: `${incoming.id}`,[m
+[31m-            webhook_exists: true,[m
+[32m+[m[32m            public: false,[m
+         });[m
+     }[m
+     await projectRepository.save(incomingEntity);[m
+[36m@@ -103,33 +82,21 @@[m [mexport async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC[m
+     // ---------------------------------------------------------------------[m
+ [m
+     // outgoing[m
+[31m-    const outgoing = await ensureRemoteRegistryProject(httpClient, {[m
+[31m-        remoteName: REGISTRY_OUTGOING_PROJECT_NAME,[m
+[31m-        remoteOptions: {[m
+[31m-            public: false,[m
+[31m-        },[m
+[31m-    });[m
+[31m-[m
+[31m-    await ensureRemoteRegistryProjectWebhook(httpClient, {[m
+[31m-        idOrName: outgoing.id,[m
+[31m-        isName: false,[m
+[31m-    });[m
+[31m-[m
+     let outgoingEntity = await projectRepository.findOne({[m
+[31m-        external_name: outgoing.name,[m
+[32m+[m[32m        external_name: REGISTRY_OUTGOING_PROJECT_NAME,[m
+     });[m
+     if (typeof outgoingEntity === 'undefined') {[m
+         outgoingEntity = projectRepository.create({[m
+[31m-            name: outgoing.name,[m
+[31m-            external_name: outgoing.name,[m
+[31m-            external_id: `${outgoing.id}`,[m
+[31m-            webhook_exists: true,[m
+[32m+[m[32m            name: REGISTRY_OUTGOING_PROJECT_NAME,[m
+[32m+[m[32m            external_name: REGISTRY_OUTGOING_PROJECT_NAME,[m
+             type: RegistryProjectType.OUTGOING,[m
+[32m+[m[32m            registry_id: entity.id,[m
+[32m+[m[32m            realm_id: entity.realm_id,[m
+[32m+[m[32m            public: false,[m
+         });[m
+     } else {[m
+         outgoingEntity = projectRepository.merge(outgoingEntity, {[m
+[31m-            external_id: `${outgoing.id}`,[m
+[31m-            webhook_exists: true,[m
+[32m+[m[32m            public: false,[m
+         });[m
+     }[m
+     await projectRepository.save(outgoingEntity);[m
+[36m@@ -137,26 +104,21 @@[m [mexport async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC[m
+     // -----------------------------------------------------------------------[m
+ [m
+     // master ( images )[m
+[31m-    const masterImages = await ensureRemoteRegistryProject(httpClient, {[m
+[31m-        remoteName: REGISTRY_MASTER_IMAGE_PROJECT_NAME,[m
+[31m-        remoteOptions: {[m
+[31m-            public: false,[m
+[31m-        },[m
+[31m-    });[m
+[31m-[m
+     let masterImagesEntity = await projectRepository.findOne({[m
+[31m-        external_name: masterImages.name,[m
+[32m+[m[32m        external_name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,[m
+     });[m
+     if (typeof masterImagesEntity === 'undefined') {[m
+         masterImagesEntity = projectRepository.create({[m
+[31m-            name: masterImages.name,[m
+[31m-            external_name: masterImages.name,[m
+[31m-            external_id: `${masterImages.id}`,[m
+[32m+[m[32m            name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,[m
+[32m+[m[32m            external_name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,[m
+             type: RegistryProjectType.MASTER_IMAGES,[m
+[32m+[m[32m            registry_id: entity.id,[m
+[32m+[m[32m            realm_id: entity.realm_id,[m
+[32m+[m[32m            public: false,[m
+         });[m
+     } else {[m
+         masterImagesEntity = projectRepository.merge(masterImagesEntity, {[m
+[31m-            external_id: `${masterImages.id}`,[m
+[32m+[m[32m            public: false,[m
+         });[m
+     }[m
+     await projectRepository.save(masterImagesEntity);[m
+[36m@@ -164,13 +126,17 @@[m [mexport async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC[m
+     // -----------------------------------------------[m
+ [m
+     const entities = await projectRepository.find({[m
+[31m-        registry_id: entity.id,[m
+[32m+[m[32m        where: {[m
+[32m+[m[32m            registry_id: entity.id,[m
+[32m+[m[32m        },[m
+[32m+[m[32m        select: ['id'],[m
+     });[m
+[32m+[m
+     for (let i = 0; i < entities.length; i++) {[m
+         const queueMessage = buildRegistryQueueMessage([m
+[31m-            RegistryQueueCommand.PROJECT_SETUP,[m
+[32m+[m[32m            RegistryQueueCommand.PROJECT_LINK,[m
+             {[m
+[31m-                entityId: entities[i].id,[m
+[32m+[m[32m                id: entities[i].id,[m
+             },[m
+         );[m
+ [m
+[1mdiff --git a/packages/backend/api/src/components/registry/handlers/project.ts b/packages/backend/api/src/components/registry/handlers/project.ts[m
+[1mindex 613d0b6e..72748349 100644[m
+[1m--- a/packages/backend/api/src/components/registry/handlers/project.ts[m
+[1m+++ b/packages/backend/api/src/components/registry/handlers/project.ts[m
+[36m@@ -9,14 +9,12 @@[m [mimport { getRepository } from 'typeorm';[m
+ import { NotFoundError } from '@typescript-error/http';[m
+ import {[m
+     Ecosystem,[m
+[31m-    HTTPClientKey,[m
+     HarborAPI,[m
+     REGISTRY_PROJECT_SECRET_ENGINE_KEY,[m
+     RegistryProjectSecretStoragePayload,[m
+     VaultAPI,[m
+[31m-    buildConnectionStringFromRegistry,[m
+[31m-    buildRegistryProjectFromSecretStoragePayload,[m
+[31m-    buildRegistryProjectSecretStoragePayload, createBasicHarborAPIConfig, mergeDeep,[m
+[32m+[m[32m    buildAPIConnectionStringFromRegistry,[m
+[32m+[m[32m    createBasicHarborAPIConfig,[m
+ } from '@personalhealthtrain/central-common';[m
+ import { createClient, useClient } from '@trapi/client';[m
+ import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';[m
+[36m@@ -30,7 +28,9 @@[m [mimport { ensureRemoteRegistryProjectWebhook } from '../../../domains/special/reg[m
+ import { ApiKey } from '../../../config/api';[m
+ import { RegistryEntity } from '../../../domains/core/registry/entity';[m
+ [m
+[31m-export async function setupRegistryProjectForRemote(payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_SETUP>) {[m
+[32m+[m[32mexport async function linkRegistryProject([m
+[32m+[m[32m    payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_LINK>,[m
+[32m+[m[32m) {[m
+     const repository = getRepository(RegistryProjectEntity);[m
+ [m
+     let { entity } = payload;[m
+[36m@@ -38,15 +38,9 @@[m [mexport async function setupRegistryProjectForRemote(payload: RegistryQueuePayloa[m
+     if (!entity) {[m
+         entity = await repository.createQueryBuilder('registryProject')[m
+             .addSelect([[m
+[31m-                'registryProject.external_id',[m
+[31m-                'registryProject.account_id',[m
+[31m-                'registryProject.account_name',[m
+[31m-                'registryProject.account_token',[m
+[31m-                'registryProject.webhook_exists',[m
+[31m-                'registryProject.alias',[m
+[32m+[m[32m                'registryProject.account_secret',[m
+             ])[m
+[31m-            .leftJoinAndSelect('registryProject.registry', 'registry')[m
+[31m-            .where('registryProject.id = :id', { id: payload.entityId })[m
+[32m+[m[32m            .where('registryProject.id = :id', { id: payload.id })[m
+             .getOne();[m
+     }[m
+ [m
+[36m@@ -54,98 +48,90 @@[m [mexport async function setupRegistryProjectForRemote(payload: RegistryQueuePayloa[m
+         throw new NotFoundError();[m
+     }[m
+ [m
+[32m+[m[32m    if (entity.ecosystem !== Ecosystem.DEFAULT) {[m
+[32m+[m[32m        return;[m
+[32m+[m[32m    }[m
+[32m+[m
+     const registryRepository = getRepository(RegistryEntity);[m
+     const registryEntity = await registryRepository.createQueryBuilder('registry')[m
+         .addSelect([[m
+[31m-            'registry.address',[m
+[31m-            'registry.account_name',[m
+[31m-            'registry.account_token',[m
+[32m+[m[32m            'registry.account_secret',[m
+         ])[m
+[31m-        .where('registryProject.id = :id', { id: entity.registry_id })[m
+[32m+[m[32m        .where('registry.id = :id', { id: entity.registry_id })[m
+         .getOne();[m
+ [m
+[31m-    const connectionString = buildConnectionStringFromRegistry(registryEntity);[m
+[32m+[m[32m    const connectionString = buildAPIConnectionStringFromRegistry(registryEntity);[m
+     const httpClientConfig = createBasicHarborAPIConfig(connectionString);[m
+     const httpClient = createClient<HarborAPI>(httpClientConfig);[m
+ [m
+[31m-    switch (entity.ecosystem) {[m
+[31m-        case Ecosystem.DEFAULT: {[m
+[31m-            await ensureRemoteRegistryProject(httpClient, {[m
+[31m-                remoteId: entity.external_id,[m
+[31m-                remoteName: entity.external_name,[m
+[31m-            });[m
+[31m-[m
+[31m-            await ensureRemoteRegistryProjectAccount(httpClient, {[m
+[31m-                name: entity.external_name,[m
+[31m-                account: {[m
+[31m-                    id: entity.account_id,[m
+[31m-                    name: entity.account_name,[m
+[31m-                    secret: entity.account_secret,[m
+[31m-                },[m
+[31m-            });[m
+[31m-[m
+[31m-            await ensureRemoteRegistryProjectWebhook(httpClient, {[m
+[31m-                idOrName: entity.external_name,[m
+[31m-                isName: true,[m
+[31m-            });[m
+[31m-[m
+[31m-            // -------------------------------------------------------------------------[m
+[31m-[m
+[31m-            const response = await useClient<VaultAPI>(HTTPClientKey.VAULT)[m
+[31m-                .keyValue[m
+[31m-                .find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, `${entity.external_name}`);[m
+[31m-[m
+[31m-            const data : RegistryProjectSecretStoragePayload = mergeDeep([m
+[31m-                (response ? response.data : {}),[m
+[31m-                buildRegistryProjectSecretStoragePayload(entity),[m
+[31m-            );[m
+[31m-[m
+[31m-            await useClient<VaultAPI>(ApiKey.VAULT).keyValue.save([m
+[31m-                REGISTRY_PROJECT_SECRET_ENGINE_KEY,[m
+[31m-                `${entity.external_name}`,[m
+[31m-                data,[m
+[31m-            );[m
+[31m-[m
+[31m-            entity = repository.merge(entity, buildRegistryProjectFromSecretStoragePayload(data));[m
+[31m-[m
+[31m-            await repository.save(entity);[m
+[31m-            break;[m
+[31m-        }[m
+[31m-        default:[m
+[31m-            //[m
+[31m-            break;[m
+[32m+[m[32m    await ensureRemoteRegistryProject(httpClient, {[m
+[32m+[m[32m        remoteId: entity.external_id,[m
+[32m+[m[32m        remoteName: entity.external_name,[m
+[32m+[m[32m        remoteOptions: {[m
+[32m+[m[32m            public: entity.public,[m
+[32m+[m[32m        },[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32m    const robotAccount = await ensureRemoteRegistryProjectAccount(httpClient, {[m
+[32m+[m[32m        name: entity.external_name,[m
+[32m+[m[32m        account: {[m
+[32m+[m[32m            id: entity.account_id,[m
+[32m+[m[32m            name: entity.account_name,[m
+[32m+[m[32m            secret: entity.account_secret,[m
+[32m+[m[32m        },[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32m    if (robotAccount) {[m
+[32m+[m[32m        entity.account_id = `${robotAccount.id}`;[m
+[32m+[m[32m        entity.account_name = robotAccount.name;[m
+[32m+[m[32m        entity.account_secret = robotAccount.secret;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    const webhook = await ensureRemoteRegistryProjectWebhook(httpClient, {[m
+[32m+[m[32m        idOrName: entity.external_name,[m
+[32m+[m[32m        isName: true,[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32m    if (webhook) {[m
+[32m+[m[32m        entity.webhook_name = webhook.name;[m
+[32m+[m[32m        entity.webhook_exists = true;[m
+     }[m
+[32m+[m
+[32m+[m[32m    await repository.save(entity);[m
+ }[m
+ [m
+[31m-export async function deleteRegistryProjectFromRemote(payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_DELETE>) {[m
+[31m-    // todo : separate query for registry to get "hidden" files ;)[m
+[32m+[m[32mexport async function unlinkRegistryProject([m
+[32m+[m[32m    payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_UNLINK>,[m
+[32m+[m[32m) {[m
+[32m+[m[32m    const registryRepository = getRepository(RegistryEntity);[m
+[32m+[m[32m    const registryEntity = await registryRepository.createQueryBuilder('registry')[m
+[32m+[m[32m        .addSelect([[m
+[32m+[m[32m            'registry.account_secret',[m
+[32m+[m[32m        ])[m
+[32m+[m[32m        .where('registry.id = :id', { id: payload.registryId })[m
+[32m+[m[32m        .getOne();[m
+ [m
+[31m-    const connectionString = buildConnectionStringFromRegistry(payload.entity.registry);[m
+[32m+[m[32m    const connectionString = buildAPIConnectionStringFromRegistry(registryEntity);[m
+     const httpClientConfig = createBasicHarborAPIConfig(connectionString);[m
+     const httpClient = createClient<HarborAPI>(httpClientConfig);[m
+ [m
+     try {[m
+[31m-        const isProjectName = !payload.entity.external_id;[m
+[31m-        const id = isProjectName ?[m
+[31m-            payload.entity.external_name :[m
+[31m-            payload.entity.external_id;[m
+[31m-[m
+         await httpClient.project[m
+[31m-            .delete(id, isProjectName);[m
+[32m+[m[32m            .delete(payload.externalName, true);[m
+     } catch (e) {[m
+         // ...[m
+     }[m
+ [m
+[31m-    if (payload.entity.account_id) {[m
+[32m+[m[32m    if (payload.accountId) {[m
+         try {[m
+             await httpClient.robotAccount[m
+[31m-                .delete(payload.entity.account_id);[m
+[32m+[m[32m                .delete(payload.accountId);[m
+         } catch (e) {[m
+             // ...[m
+         }[m
+ [m
+         const response = await useClient<VaultAPI>(ApiKey.VAULT)[m
+[31m-            .keyValue.find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.entity.external_name);[m
+[32m+[m[32m            .keyValue.find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.externalName);[m
+ [m
+         if (response) {[m
+             response.data.account_id = null;[m
+[36m@@ -153,7 +139,32 @@[m [mexport async function deleteRegistryProjectFromRemote(payload: RegistryQueuePayl[m
+             response.data.account_secret = null;[m
+ [m
+             await useClient<VaultAPI>(ApiKey.VAULT)[m
+[31m-                .keyValue.save(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.entity.external_name, response.data);[m
+[32m+[m[32m                .keyValue.save(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.externalName, response.data);[m
+         }[m
+     }[m
+[32m+[m
+[32m+[m[32m    if (payload.updateDatabase) {[m
+[32m+[m[32m        const projectRepository = getRepository(RegistryProjectEntity);[m
+[32m+[m[32m        const project = await projectRepository.findOne(payload.id);[m
+[32m+[m
+[32m+[m[32m        if (project) {[m
+[32m+[m[32m            project.external_id = null;[m
+[32m+[m
+[32m+[m[32m            project.account_id = null;[m
+[32m+[m[32m            project.account_name = null;[m
+[32m+[m[32m            project.account_secret = null;[m
+[32m+[m
+[32m+[m[32m            project.webhook_exists = false;[m
+[32m+[m[32m            project.webhook_name = null;[m
+[32m+[m
+[32m+[m[32m            await projectRepository.save(project);[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mexport async function relinkRegistryProject([m
+[32m+[m[32m    payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_RELINK>,[m
+[32m+[m[32m) {[m
+[32m+[m[32m    await unlinkRegistryProject(payload);[m
+[32m+[m[32m    await linkRegistryProject(payload);[m
+ }[m
+[1mdiff --git a/packages/backend/api/src/components/registry/index.ts b/packages/backend/api/src/components/registry/index.ts[m
+[1mindex 56ce826f..e08e8a26 100644[m
+[1m--- a/packages/backend/api/src/components/registry/index.ts[m
+[1m+++ b/packages/backend/api/src/components/registry/index.ts[m
+[36m@@ -8,7 +8,7 @@[m
+ import { ConsumeHandler, Message } from 'amqp-extension';[m
+ import { RegistryQueueCommand, RegistryQueuePayload } from '../../domains/special/registry';[m
+ import { setupRegistry } from './handlers/default';[m
+[31m-import { deleteRegistryProjectFromRemote, setupRegistryProjectForRemote } from './handlers/project';[m
+[32m+[m[32mimport { linkRegistryProject, relinkRegistryProject, unlinkRegistryProject } from './handlers/project';[m
+ [m
+ export function createRegistryComponentHandlers() : Record<RegistryQueueCommand, ConsumeHandler> {[m
+     return {[m
+[36m@@ -21,13 +21,17 @@[m [mexport function createRegistryComponentHandlers() : Record<RegistryQueueCommand,[m
+             // tear down registry[m
+         },[m
+ [m
+[31m-        [RegistryQueueCommand.PROJECT_SETUP]: async (message: Message) => {[m
+[31m-            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_SETUP>;[m
+[31m-            await setupRegistryProjectForRemote(payload);[m
+[32m+[m[32m        [RegistryQueueCommand.PROJECT_LINK]: async (message: Message) => {[m
+[32m+[m[32m            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_LINK>;[m
+[32m+[m[32m            await linkRegistryProject(payload);[m
+         },[m
+[31m-        [RegistryQueueCommand.PROJECT_DELETE]: async (message: Message) => {[m
+[31m-            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_DELETE>;[m
+[31m-            await deleteRegistryProjectFromRemote(payload);[m
+[32m+[m[32m        [RegistryQueueCommand.PROJECT_UNLINK]: async (message: Message) => {[m
+[32m+[m[32m            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_UNLINK>;[m
+[32m+[m[32m            await unlinkRegistryProject(payload);[m
+[32m+[m[32m        },[m
+[32m+[m[32m        [RegistryQueueCommand.PROJECT_RELINK]: async (message: Message) => {[m
+[32m+[m[32m            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_RELINK>;[m
+[32m+[m[32m            await relinkRegistryProject(payload);[m
+         },[m
+     };[m
+ }[m
+[1mdiff --git a/packages/backend/api/src/components/secret-storage/handlers/entities/robot.ts b/packages/backend/api/src/components/secret-storage/handlers/entities/robot.ts[m
+[1mindex 7b06a794..13f97e55 100644[m
+[1m--- a/packages/backend/api/src/components/secret-storage/handlers/entities/robot.ts[m
+[1m+++ b/packages/backend/api/src/components/secret-storage/handlers/entities/robot.ts[m
+[36m@@ -13,9 +13,11 @@[m [mimport {[m
+ } from '@personalhealthtrain/central-common';[m
+ import { useClient } from '@trapi/client';[m
+ import { publishMessage } from 'amqp-extension';[m
+[32m+[m[32mimport { getRepository } from 'typeorm';[m
+ import { ApiKey } from '../../../../config/api';[m
+ import { SecretStorageRobotQueuePayload } from '../../../../domains/special/secret-storage/type';[m
+ import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../domains/special/registry';[m
+[32m+[m[32mimport { RegistryEntity } from '../../../../domains/core/registry/entity';[m
+ [m
+ export async function saveRobotToSecretStorage(payload: SecretStorageRobotQueuePayload) {[m
+     if (!payload.id || !payload.secret) {[m
+[36m@@ -23,11 +25,21 @@[m [mexport async function saveRobotToSecretStorage(payload: SecretStorageRobotQueueP[m
+     }[m
+ [m
+     if (payload.name === ServiceID.REGISTRY) {[m
+[31m-        const queueMessage = buildRegistryQueueMessage([m
+[31m-            RegistryQueueCommand.SETUP,[m
+[31m-        );[m
+[32m+[m[32m        const registryRepository = getRepository(RegistryEntity);[m
+[32m+[m[32m        const registries = await registryRepository.find({[m
+[32m+[m[32m            select: ['id'],[m
+[32m+[m[32m        });[m
+ [m
+[31m-        await publishMessage(queueMessage);[m
+[32m+[m[32m        for (let i = 0; i < registries.length; i++) {[m
+[32m+[m[32m            const queueMessage = buildRegistryQueueMessage([m
+[32m+[m[32m                RegistryQueueCommand.SETUP,[m
+[32m+[m[32m                {[m
+[32m+[m[32m                    id: registries[i].id,[m
+[32m+[m[32m                },[m
+[32m+[m[32m            );[m
+[32m+[m
+[32m+[m[32m            await publishMessage(queueMessage);[m
+[32m+[m[32m        }[m
+     }[m
+ [m
+     const data = buildRobotSecretStoragePayload(payload.id, payload.secret);[m
+[1mdiff --git a/packages/backend/api/src/domains/core/registry-project/entity.ts b/packages/backend/api/src/domains/core/registry-project/entity.ts[m
+[1mindex 37b2ea64..836fe7bd 100644[m
+[1m--- a/packages/backend/api/src/domains/core/registry-project/entity.ts[m
+[1m+++ b/packages/backend/api/src/domains/core/registry-project/entity.ts[m
+[36m@@ -10,7 +10,7 @@[m [mimport {[m
+     CreateDateColumn,[m
+     Entity,[m
+     JoinColumn,[m
+[31m-    ManyToOne, PrimaryColumn, Unique,[m
+[32m+[m[32m    ManyToOne, PrimaryGeneratedColumn, Unique,[m
+     UpdateDateColumn,[m
+ } from 'typeorm';[m
+ import {[m
+[36m@@ -24,7 +24,7 @@[m [mimport { RegistryEntity } from '../registry/entity';[m
+ @Unique('registry_project_external_id_registry_index', ['external_id', 'registry_id'])[m
+ @Entity({ name: 'registry_projects' })[m
+ export class RegistryProjectEntity implements RegistryProject {[m
+[31m-    @PrimaryColumn('uuid')[m
+[32m+[m[32m    @PrimaryGeneratedColumn('uuid')[m
+         id: string;[m
+ [m
+     @Column({ type: 'varchar', length: 128 })[m
+[36m@@ -38,6 +38,9 @@[m [mexport class RegistryProjectEntity implements RegistryProject {[m
+     })[m
+         type: RegistryProjectType;[m
+ [m
+[32m+[m[32m    @Column({ type: 'boolean', default: true })[m
+[32m+[m[32m        public: boolean;[m
+[32m+[m
+     // ------------------------------------------------------------------[m
+ [m
+     @Column({[m
+[36m@@ -49,8 +52,10 @@[m [mexport class RegistryProjectEntity implements RegistryProject {[m
+     @Column({[m
+         type: 'varchar',[m
+         length: 64,[m
+[32m+[m[32m        nullable: true,[m
+[32m+[m[32m        default: null,[m
+     })[m
+[31m-        external_id: string;[m
+[32m+[m[32m        external_id: string | null;[m
+ [m
+     // ------------------------------------------------------------------[m
+ [m
+[36m@@ -71,6 +76,11 @@[m [mexport class RegistryProjectEntity implements RegistryProject {[m
+ [m
+     // ------------------------------------------------------------------[m
+ [m
+[32m+[m[32m    @Column({[m
+[32m+[m[32m        type: 'varchar', length: 128, default: null, nullable: true,[m
+[32m+[m[32m    })[m
+[32m+[m[32m        webhook_name: string | null;[m
+[32m+[m
+     @Column({ type: 'boolean', default: false })[m
+         webhook_exists: boolean;[m
+ [m
+[1mdiff --git a/packages/backend/api/src/domains/core/registry/entity.ts b/packages/backend/api/src/domains/core/registry/entity.ts[m
+[1mindex e152f52f..f918e70b 100644[m
+[1m--- a/packages/backend/api/src/domains/core/registry/entity.ts[m
+[1m+++ b/packages/backend/api/src/domains/core/registry/entity.ts[m
+[36m@@ -29,7 +29,7 @@[m [mexport class RegistryEntity implements Registry {[m
+         name: string;[m
+ [m
+     @Column({ type: 'varchar', length: 512 })[m
+[31m-        address: string;[m
+[32m+[m[32m        host: string;[m
+ [m
+     @Column({ type: 'varchar', length: 64, default: Ecosystem.DEFAULT })[m
+         ecosystem: Ecosystem;[m
+[1mdiff --git a/packages/backend/api/src/domains/core/station/entity.ts b/packages/backend/api/src/domains/core/station/entity.ts[m
+[1mindex 7eee9f76..ae6750bc 100644[m
+[1m--- a/packages/backend/api/src/domains/core/station/entity.ts[m
+[1m+++ b/packages/backend/api/src/domains/core/station/entity.ts[m
+[36m@@ -6,6 +6,7 @@[m
+  */[m
+ [m
+ import {[m
+[32m+[m[32m    BeforeInsert, BeforeUpdate,[m
+     Column,[m
+     CreateDateColumn,[m
+     Entity,[m
+[36m@@ -52,12 +53,12 @@[m [mexport class StationEntity implements Station {[m
+ [m
+     // ------------------------------------------------------------------[m
+ [m
+[31m-    @Column()[m
+[31m-        registry_id: Registry['id'];[m
+[32m+[m[32m    @Column({ nullable: true })[m
+[32m+[m[32m        registry_id: Registry['id'] | null;[m
+ [m
+[31m-    @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE' })[m
+[32m+[m[32m    @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE', nullable: true })[m
+     @JoinColumn({ name: 'registry_id' })[m
+[31m-        registry: Registry;[m
+[32m+[m[32m        registry: Registry | null;[m
+ [m
+     @Column({ nullable: true })[m
+         registry_project_id: RegistryProject['id'];[m
+[36m@@ -82,4 +83,14 @@[m [mexport class StationEntity implements Station {[m
+     @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })[m
+     @JoinColumn({ name: 'realm_id' })[m
+         realm: RealmEntity;[m
+[32m+[m
+[32m+[m[32m    // ------------------------------------------------------------------[m
+[32m+[m
+[32m+[m[32m    @BeforeInsert()[m
+[32m+[m[32m    @BeforeUpdate()[m
+[32m+[m[32m    setHidden() {[m
+[32m+[m[32m        if (!this.registry_id || !this.ecosystem) {[m
+[32m+[m[32m            this.hidden = true;[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }[m
+ }[m
+[1mdiff --git a/packages/backend/api/src/domains/core/train/commands/build-start.ts b/packages/backend/api/src/domains/core/train/commands/build-start.ts[m
+[1mindex 303c9479..042b0bac 100644[m
+[1m--- a/packages/backend/api/src/domains/core/train/commands/build-start.ts[m
+[1m+++ b/packages/backend/api/src/domains/core/train/commands/build-start.ts[m
+[36m@@ -8,6 +8,8 @@[m
+ import { publishMessage } from 'amqp-extension';[m
+ import { Not, getRepository } from 'typeorm';[m
+ import {[m
+[32m+[m[32m    Ecosystem,[m
+[32m+[m[32m    RegistryProjectType,[m
+     Train,[m
+     TrainBuildStatus,[m
+     TrainManagerQueueCommand,[m
+[36m@@ -18,6 +20,8 @@[m [mimport { findTrain } from './utils';[m
+ import { TrainStationEntity } from '../../train-station/entity';[m
+ import { TrainEntity } from '../entity';[m
+ import { buildTrainManagerQueueMessage } from '../../../special/train-manager';[m
+[32m+[m[32mimport { RegistryEntity } from '../../registry/entity';[m
+[32m+[m[32mimport { RegistryProjectEntity } from '../../registry-project/entity';[m
+ [m
+ export async function startBuildTrain([m
+     train: Train | number | string,[m
+[36m@@ -27,8 +31,7 @@[m [mexport async function startBuildTrain([m
+     train = await findTrain(train, repository);[m
+ [m
+     if (typeof train === 'undefined') {[m
+[31m-        // todo: make it a ClientError.BadRequest[m
+[31m-        throw new Error('The train could not be found.');[m
+[32m+[m[32m        throw new BadRequestError('The train could not be found.');[m
+     }[m
+ [m
+     if (!train.registry_id) {[m
+[36m@@ -36,8 +39,7 @@[m [mexport async function startBuildTrain([m
+     }[m
+ [m
+     if (train.run_status) {[m
+[31m-        // todo: make it a ClientError.BadRequest[m
+[31m-        throw new Error('The train can not longer be build...');[m
+[32m+[m[32m        throw new BadRequestError('The train can not longer be build...');[m
+     } else {[m
+         const trainStationRepository = getRepository(TrainStationEntity);[m
+         const trainStations = await trainStationRepository.find({[m
+[36m@@ -46,8 +48,38 @@[m [mexport async function startBuildTrain([m
+         });[m
+ [m
+         if (trainStations.length > 0) {[m
+[31m-            // todo: make it a ClientError.NotFound[m
+[31m-            throw new Error('Not all stations have approved the train yet.');[m
+[32m+[m[32m            throw new BadRequestError('Not all stations have approved the train yet.');[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        if (!train.registry_id) {[m
+[32m+[m[32m            const registryRepository = getRepository(RegistryEntity);[m
+[32m+[m[32m            const registry = await registryRepository.findOne({[m
+[32m+[m[32m                where: {[m
+[32m+[m[32m                    ecosystem: Ecosystem.DEFAULT,[m
+[32m+[m[32m                },[m
+[32m+[m[32m            });[m
+[32m+[m
+[32m+[m[32m            if (typeof registry === 'undefined') {[m
+[32m+[m[32m                throw new BadRequestError('No registry is registered for the default ecosystem.');[m
+[32m+[m[32m            }[m
+[32m+[m
+[32m+[m[32m            train.registry_id = registry.id;[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        if (!train.build_registry_project_id) {[m
+[32m+[m[32m            const projectRepository = getRepository(RegistryProjectEntity);[m
+[32m+[m[32m            const project = await projectRepository.findOne({[m
+[32m+[m[32m                where: {[m
+[32m+[m[32m                    registry_id: train.registry_id,[m
+[32m+[m[32m                    type: RegistryProjectType.INCOMING,[m
+[32m+[m[32m                },[m
+[32m+[m[32m            });[m
+[32m+[m
+[32m+[m[32m            if (typeof project === 'undefined') {[m
+[32m+[m[32m                throw new BadRequestError('No incoming project is registered for the default ecosystem.');[m
+[32m+[m[32m            }[m
+[32m+[m
+[32m+[m[32m            train.build_registry_project_id = project.id;[m
+         }[m
+ [m
+         const queueMessage = buildTrainManagerQueueMessage([m
+[1mdiff --git a/packages/backend/api/src/domains/core/train/commands/result-start.ts b/packages/backend/api/src/domains/core/train/commands/result-start.ts[m
+[1mindex 0a45a6cc..a05189b3 100644[m
+[1m--- a/packages/backend/api/src/domains/core/train/commands/result-start.ts[m
+[1m+++ b/packages/backend/api/src/domains/core/train/commands/result-start.ts[m
+[36m@@ -18,15 +18,12 @@[m [mimport {[m
+     TrainResultStatus,[m
+     TrainRunStatus,[m
+ } from '@personalhealthtrain/central-common';[m
+[31m-import { useClient } from '@trapi/client';[m
+ import { buildTrainManagerQueueMessage } from '../../../special/train-manager';[m
+ import { findTrain } from './utils';[m
+ import { TrainEntity } from '../entity';[m
+[31m-import { ApiKey } from '../../../../config/api';[m
+ [m
+ export async function triggerTrainResultStart([m
+     train: string | Train,[m
+[31m-    harborRepository?: HarborRepository,[m
+ ) : Promise<Train> {[m
+     const repository = getRepository<Train>(TrainEntity);[m
+ [m
+[36m@@ -37,13 +34,6 @@[m [mexport async function triggerTrainResultStart([m
+         throw new Error('The train has not finished yet...');[m
+     }[m
+ [m
+[31m-    if (typeof harborRepository === 'undefined') {[m
+[31m-        harborRepository = await useClient<HarborAPI>(ApiKey.HARBOR).projectRepository.find(REGISTRY_OUTGOING_PROJECT_NAME, train.id);[m
+[31m-        if (typeof harborRepository === 'undefined') {[m
+[31m-            throw new Error('The train has not arrived at the outgoing station yet...');[m
+[31m-        }[m
+[31m-    }[m
+[31m-[m
+     // send queue message[m
+     await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT, {[m
+         id: train.id,[m
+[1mdiff --git a/packages/backend/api/src/domains/core/train/commands/run-status.ts b/packages/backend/api/src/domains/core/train/commands/run-status.ts[m
+[1mindex c06106e0..5aebee57 100644[m
+[1m--- a/packages/backend/api/src/domains/core/train/commands/run-status.ts[m
+[1m+++ b/packages/backend/api/src/domains/core/train/commands/run-status.ts[m
+[36m@@ -13,12 +13,12 @@[m [mimport {[m
+     Train,[m
+     TrainBuildStatus,[m
+     TrainConfigurationStatus,[m
+[32m+[m[32m    TrainResultStatus,[m
+     TrainRunStatus,[m
+ } from '@personalhealthtrain/central-common';[m
+ import { getRepository } from 'typeorm';[m
+ import { useClient } from '@trapi/client';[m
+ import { findTrain } from './utils';[m
+[31m-import { triggerTrainResultStart } from './result-start';[m
+ import { TrainEntity } from '../entity';[m
+ import { TrainStationEntity } from '../../train-station/entity';[m
+ import { ApiKey } from '../../../../config/api';[m
+[36m@@ -47,15 +47,6 @@[m [mexport async function detectTrainRunStatus(train: Train | number | string) : Pro[m
+             run_status: TrainRunStatus.FINISHED,[m
+         });[m
+ [m
+[31m-        // check if we marked the train as terminated yet :O ?[m
+[31m-        if (train.run_status !== TrainRunStatus.FINISHED) {[m
+[31m-            train = await triggerTrainResultStart(train.id, harborRepository);[m
+[31m-        } else {[m
+[31m-            train = repository.merge(train, {[m
+[31m-                result_status: null,[m
+[31m-            });[m
+[31m-        }[m
+[31m-[m
+         await repository.save(train);[m
+ [m
+         return train;[m
+[1mdiff --git a/packages/backend/api/src/domains/core/train/entity.ts b/packages/backend/api/src/domains/core/train/entity.ts[m
+[1mindex 439abdb8..c7a0a31f 100644[m
+[1m--- a/packages/backend/api/src/domains/core/train/entity.ts[m
+[1m+++ b/packages/backend/api/src/domains/core/train/entity.ts[m
+[36m@@ -20,7 +20,7 @@[m [mimport {[m
+ } from 'typeorm';[m
+ import {[m
+     MasterImage,[m
+[31m-    Proposal, RegistryProject,[m
+[32m+[m[32m    Proposal, Registry, RegistryProject,[m
+     Station,[m
+     Train,[m
+     TrainBuildStatus,[m
+[36m@@ -87,15 +87,12 @@[m [mexport class TrainEntity implements Train {[m
+     })[m
+         build_status: TrainBuildStatus | null;[m
+ [m
+[31m-    @Column({ type: 'uuid', nullable: true, default: null })[m
+[31m-        build_id: string;[m
+[32m+[m[32m    @Column({ nullable: true })[m
+[32m+[m[32m        build_registry_project_id: RegistryProject['id'] | null;[m
+ [m
+[31m-    @Column()[m
+[31m-        build_registry_project_id: RegistryProject['id'];[m
+[31m-[m
+[31m-    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE' })[m
+[31m-    @JoinColumn({ name: 'registry_id' })[m
+[31m-        build_registry_project: RegistryProject;[m
+[32m+[m[32m    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })[m
+[32m+[m[32m    @JoinColumn({ name: 'build_registry_project_id' })[m
+[32m+[m[32m        build_registry_project: RegistryProjectEntity | null;[m
+ [m
+     // ------------------------------------------------------------------[m
+ [m
+[36m@@ -124,12 +121,12 @@[m [mexport class TrainEntity implements Train {[m
+ [m
+     // ------------------------------------------------------------------[m
+ [m
+[31m-    @Column()[m
+[31m-        registry_id: Realm['id'];[m
+[32m+[m[32m    @Column({ nullable: true })[m
+[32m+[m[32m        registry_id: Registry['id'] | null;[m
+ [m
+[31m-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })[m
+[32m+[m[32m    @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE', nullable: true })[m
+     @JoinColumn({ name: 'registry_id' })[m
+[31m-        registry: RegistryEntity;[m
+[32m+[m[32m        registry: RegistryEntity | null;[m
+ [m
+     // ------------------------------------------------------------------[m
+ [m
+[36m@@ -172,6 +169,13 @@[m [mexport class TrainEntity implements Train {[m
+     })[m
+         result_status: TrainResultStatus | null;[m
+ [m
+[32m+[m[32m    @Column({ nullable: true })[m
+[32m+[m[32m        result_registry_project_id: RegistryProject['id'] | null;[m
+[32m+[m
+[32m+[m[32m    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })[m
+[32m+[m[32m    @JoinColumn({ name: 'build_registry_project_id' })[m
+[32m+[m[32m        result_registry_project: RegistryProjectEntity | null;[m
+[32m+[m
+     // ------------------------------------------------------------------[m
+     @Column({ type: 'uuid' })[m
+         proposal_id: Proposal['id'];[m
+[1mdiff --git a/packages/backend/api/src/domains/special/registry/constants.ts b/packages/backend/api/src/domains/special/registry/constants.ts[m
+[1mindex 4b624b93..e7b4c472 100644[m
+[1m--- a/packages/backend/api/src/domains/special/registry/constants.ts[m
+[1m+++ b/packages/backend/api/src/domains/special/registry/constants.ts[m
+[36m@@ -9,8 +9,9 @@[m [mexport enum RegistryQueueCommand {[m
+     SETUP = 'REGISTRY_SETUP',[m
+     DELETE = 'REGISTRY_DELETE',[m
+ [m
+[31m-    PROJECT_SETUP = 'REGISTRY_PROJECT_SETUP',[m
+[31m-    PROJECT_DELETE = 'REGISTRY_PROJECT_DELETE',[m
+[32m+[m[32m    PROJECT_LINK = 'REGISTRY_PROJECT_LINK',[m
+[32m+[m[32m    PROJECT_RELINK = 'REGISTRY_PROJECT_RELINK',[m
+[32m+[m[32m    PROJECT_UNLINK = 'REGISTRY_PROJECT_UNLINK',[m
+ }[m
+ [m
+ export enum RegistryQueueEvent {[m
+[1mdiff --git a/packages/backend/api/src/domains/special/registry/helpers/remote-robot-account.ts b/packages/backend/api/src/domains/special/registry/helpers/remote-robot-account.ts[m
+[1mindex db9018d2..592c0d1d 100644[m
+[1m--- a/packages/backend/api/src/domains/special/registry/helpers/remote-robot-account.ts[m
+[1m+++ b/packages/backend/api/src/domains/special/registry/helpers/remote-robot-account.ts[m
+[36m@@ -34,40 +34,44 @@[m [mexport async function ensureRemoteRegistryProjectAccount([m
+             robotAccount = await httpClient.robotAccount.create(context.name);[m
+         } catch (e) {[m
+             if (e?.response?.status === 409) {[m
+[31m-                const response = await useClient<VaultAPI>(HTTPClientKey.VAULT)[m
+[32m+[m[32m                let { data: secretStorageData } = await useClient<VaultAPI>(HTTPClientKey.VAULT)[m
+                     .keyValue.find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, context.name);[m
+ [m
+                 if ([m
+[31m-                    response &&[m
+[31m-                    response.data.account_id &&[m
+[31m-                    response.data.account_name &&[m
+[31m-                    response.data.account_secret[m
+[32m+[m[32m                    !!secretStorageData &&[m
+[32m+[m[32m                    !!secretStorageData.account_id &&[m
+[32m+[m[32m                    !!secretStorageData.account_name &&[m
+[32m+[m[32m                    !!secretStorageData.account_secret[m
+                 ) {[m
+                     robotAccount = {[m
+[31m-                        id: response.data.account_id,[m
+[31m-                        name: response.data.account_name,[m
+[31m-                        secret: response.data.account_secret,[m
+[32m+[m[32m                        id: secretStorageData.account_id,[m
+[32m+[m[32m                        name: secretStorageData.account_name,[m
+[32m+[m[32m                        secret: secretStorageData.account_secret,[m
+                     };[m
+ [m
+[31m-                    await useClient<HarborAPI>(ApiKey.HARBOR).robotAccount.refreshSecret([m
+[32m+[m[32m                    await httpClient.robotAccount.refreshSecret([m
+                         robotAccount.id,[m
+                         robotAccount.secret,[m
+                     );[m
+                 } else {[m
+[31m-                    robotAccount = await useClient<HarborAPI>(ApiKey.HARBOR).robotAccount[m
+[32m+[m[32m                    robotAccount = await httpClient.robotAccount[m
+                         .find(context.name, true);[m
+ [m
+[31m-                    await useClient<VaultAPI>(ApiKey.VAULT)[m
+[31m-                        .keyValue.save([m
+[31m-                            REGISTRY_PROJECT_SECRET_ENGINE_KEY,[m
+[31m-                            context.name,[m
+[31m-                            {[m
+[31m-                                account_id: robotAccount.id,[m
+[31m-                                account_name: robotAccount.name,[m
+[31m-                                account_secret: robotAccount.secret,[m
+[31m-                            } as RegistryProjectSecretStoragePayload,[m
+[31m-                        );[m
+[32m+[m[32m                    secretStorageData = {[m
+[32m+[m[32m                        account_id: `${robotAccount.id}`,[m
+[32m+[m[32m                        account_name: robotAccount.name,[m
+[32m+[m[32m                        account_secret: robotAccount.secret,[m
+[32m+[m[32m                    };[m
+                 }[m
+[32m+[m
+[32m+[m[32m                await useClient<VaultAPI>(ApiKey.VAULT)[m
+[32m+[m[32m                    .keyValue.save([m
+[32m+[m[32m                        REGISTRY_PROJECT_SECRET_ENGINE_KEY,[m
+[32m+[m[32m                        context.name,[m
+[32m+[m[32m                        secretStorageData,[m
+[32m+[m[32m                    );[m
+[32m+[m[32m            } else {[m
+[32m+[m[32m                throw e;[m
+             }[m
+         }[m
+ [m
+[36m@@ -76,16 +80,17 @@[m [mexport async function ensureRemoteRegistryProjectAccount([m
+             context.account.name = robotAccount.name;[m
+             context.account.secret = robotAccount.secret;[m
+         }[m
+[31m-    }[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m        robotAccount = {[m
+[32m+[m[32m            id: context.account.id,[m
+[32m+[m[32m            name: context.account.name,[m
+[32m+[m[32m            secret: context.account.secret,[m
+[32m+[m[32m        };[m
+ [m
+[31m-    if ([m
+[31m-        context.account.id[m
+[31m-    ) {[m
+[31m-        // just update the name for insurance ;)[m
+[31m-        await httpClient.robotAccount[m
+[31m-            .update(context.account.id, context.name, {[m
+[31m-                name: context.account.name,[m
+[31m-            });[m
+[32m+[m[32m        await httpClient.robotAccount.refreshSecret([m
+[32m+[m[32m            robotAccount.id,[m
+[32m+[m[32m            robotAccount.secret,[m
+[32m+[m[32m        );[m
+     }[m
+ [m
+     return robotAccount;[m
+[1mdiff --git a/packages/backend/api/src/domains/special/registry/helpers/remote-webhook.ts b/packages/backend/api/src/domains/special/registry/helpers/remote-webhook.ts[m
+[1mindex 72aac138..44360795 100644[m
+[1m--- a/packages/backend/api/src/domains/special/registry/helpers/remote-webhook.ts[m
+[1m+++ b/packages/backend/api/src/domains/special/registry/helpers/remote-webhook.ts[m
+[36m@@ -23,7 +23,7 @@[m [mexport async function ensureRemoteRegistryProjectWebhook([m
+         idOrName: string | number,[m
+         isName?: boolean[m
+     },[m
+[31m-) : Promise<void> {[m
+[32m+[m[32m) : Promise<HarborProjectWebhook | undefined> {[m
+     const response = await useClient<VaultAPI>(HTTPClientKey.VAULT)[m
+         .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);[m
+ [m
+[36m@@ -42,8 +42,10 @@[m [mexport async function ensureRemoteRegistryProjectWebhook([m
+             ],[m
+         };[m
+ [m
+[31m-        await httpClient[m
+[32m+[m[32m        return httpClient[m
+             .projectWebHook[m
+             .ensure(context.idOrName, context.isName, webhookData);[m
+     }[m
+[32m+[m
+[32m+[m[32m    return undefined;[m
+ }[m
+[1mdiff --git a/packages/backend/api/src/domains/special/registry/type.ts b/packages/backend/api/src/domains/special/registry/type.ts[m
+[1mindex 2d5dcda3..03248135 100644[m
+[1m--- a/packages/backend/api/src/domains/special/registry/type.ts[m
+[1m+++ b/packages/backend/api/src/domains/special/registry/type.ts[m
+[36m@@ -9,21 +9,31 @@[m [mimport { Registry, RegistryProject } from '@personalhealthtrain/central-common';[m
+ import { RegistryQueueCommand } from './constants';[m
+ [m
+ export type RegistryQueueSetupPayload = {[m
+[31m-    entityId: Registry['id'],[m
+[32m+[m[32m    id: Registry['id'],[m
+     entity?: Registry[m
+ };[m
+ [m
+[31m-export type RegistryProjectQueuePayload = {[m
+[31m-    entityId: RegistryProject['id'],[m
+[32m+[m[32mexport type RegistryProjectLinkQueuePayload = {[m
+[32m+[m[32m    id: RegistryProject['id'],[m
+     entity?: RegistryProject[m
+ };[m
+ [m
+[32m+[m[32mexport type RegistryProjectUnlinkQueuePayload = {[m
+[32m+[m[32m    id: RegistryProject['id'],[m
+[32m+[m[32m    registryId: Registry['id'],[m
+[32m+[m[32m    externalName: RegistryProject['external_name'],[m
+[32m+[m[32m    accountId: RegistryProject['account_id'],[m
+[32m+[m[32m    updateDatabase?: boolean[m
+[32m+[m[32m};[m
+[32m+[m
+ export type RegistryQueuePayload<T extends `${RegistryQueueCommand}`> =[m
+     T extends `${RegistryQueueCommand.SETUP}` | `${RegistryQueueCommand.DELETE}` ?[m
+         RegistryQueueSetupPayload :[m
+[31m-        T extends `${RegistryQueueCommand.PROJECT_SETUP}` | `${RegistryQueueCommand.PROJECT_DELETE}` ?[m
+[31m-            RegistryProjectQueuePayload :[m
+[31m-            never;[m
+[32m+[m[32m        T extends `${RegistryQueueCommand.PROJECT_LINK}` ?[m
+[32m+[m[32m            RegistryProjectLinkQueuePayload :[m
+[32m+[m[32m            T extends `${RegistryQueueCommand.PROJECT_UNLINK}` | `${RegistryQueueCommand.PROJECT_RELINK}` ?[m
+[32m+[m[32m                RegistryProjectUnlinkQueuePayload :[m
+[32m+[m[32m                never;[m
+ [m
+ // ---------------------------------------------------[m
+ [m
+[1mdiff --git a/packages/backend/api/src/http/controllers/core/registry-project/handlers/create.ts b/packages/backend/api/src/http/controllers/core/registry-project/handlers/create.ts[m
+[1mindex 4fb9f3dc..a30bf4f3 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/core/registry-project/handlers/create.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/core/registry-project/handlers/create.ts[m
+[36m@@ -8,9 +8,11 @@[m
+ import { PermissionID } from '@personalhealthtrain/central-common';[m
+ import { ForbiddenError } from '@typescript-error/http';[m
+ import { getRepository } from 'typeorm';[m
+[32m+[m[32mimport { publishMessage } from 'amqp-extension';[m
+ import { ExpressRequest, ExpressResponse } from '../../../../type';[m
+ import { runRegistryProjectValidation } from './utils';[m
+ import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';[m
+[32m+[m[32mimport { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';[m
+ [m
+ export async function createRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {[m
+     if (!req.ability.hasPermission(PermissionID.REGISTRY_MANAGE)) {[m
+[36m@@ -28,5 +30,14 @@[m [mexport async function createRegistryProjectRouteHandler(req: ExpressRequest, res[m
+ [m
+     await repository.save(entity);[m
+ [m
+[32m+[m[32m    const queueMessage = buildRegistryQueueMessage([m
+[32m+[m[32m        RegistryQueueCommand.PROJECT_LINK,[m
+[32m+[m[32m        {[m
+[32m+[m[32m            id: entity.id,[m
+[32m+[m[32m        },[m
+[32m+[m[32m    );[m
+[32m+[m
+[32m+[m[32m    await publishMessage(queueMessage);[m
+[32m+[m
+     return res.respond({ data: entity });[m
+ }[m
+[1mdiff --git a/packages/backend/api/src/http/controllers/core/registry-project/handlers/delete.ts b/packages/backend/api/src/http/controllers/core/registry-project/handlers/delete.ts[m
+[1mindex 77158058..1eaa248b 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/core/registry-project/handlers/delete.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/core/registry-project/handlers/delete.ts[m
+[36m@@ -9,8 +9,10 @@[m [mimport { PermissionID } from '@personalhealthtrain/central-common';[m
+ import { ForbiddenError, NotFoundError } from '@typescript-error/http';[m
+ import { getRepository } from 'typeorm';[m
+ import { isPermittedForResourceRealm } from '@authelion/common';[m
+[32m+[m[32mimport { publishMessage } from 'amqp-extension';[m
+ import { ExpressRequest, ExpressResponse } from '../../../../type';[m
+ import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';[m
+[32m+[m[32mimport { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';[m
+ [m
+ export async function deleteRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {[m
+     const { id } = req.params;[m
+[36m@@ -36,5 +38,17 @@[m [mexport async function deleteRegistryProjectRouteHandler(req: ExpressRequest, res[m
+ [m
+     entity.id = entityId;[m
+ [m
+[32m+[m[32m    const queueMessage = buildRegistryQueueMessage([m
+[32m+[m[32m        RegistryQueueCommand.PROJECT_UNLINK,[m
+[32m+[m[32m        {[m
+[32m+[m[32m            id: entity.id,[m
+[32m+[m[32m            registryId: entity.registry_id,[m
+[32m+[m[32m            externalName: entity.external_name,[m
+[32m+[m[32m            accountId: entity.account_id,[m
+[32m+[m[32m        },[m
+[32m+[m[32m    );[m
+[32m+[m
+[32m+[m[32m    await publishMessage(queueMessage);[m
+[32m+[m
+     return res.respondDeleted({ data: entity });[m
+ }[m
+[1mdiff --git a/packages/backend/api/src/http/controllers/core/registry-project/handlers/update.ts b/packages/backend/api/src/http/controllers/core/registry-project/handlers/update.ts[m
+[1mindex 1d525019..623b01dc 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/core/registry-project/handlers/update.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/core/registry-project/handlers/update.ts[m
+[36m@@ -2,9 +2,11 @@[m [mimport { PermissionID } from '@personalhealthtrain/central-common';[m
+ import { ForbiddenError, NotFoundError } from '@typescript-error/http';[m
+ import { getRepository } from 'typeorm';[m
+ import { isPermittedForResourceRealm } from '@authelion/common';[m
+[32m+[m[32mimport { publishMessage } from 'amqp-extension';[m
+ import { ExpressRequest, ExpressResponse } from '../../../../type';[m
+ import { runRegistryProjectValidation } from './utils';[m
+ import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';[m
+[32m+[m[32mimport { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';[m
+ [m
+ export async function updateRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {[m
+     const { id } = req.params;[m
+[36m@@ -33,6 +35,33 @@[m [mexport async function updateRegistryProjectRouteHandler(req: ExpressRequest, res[m
+ [m
+     await repository.save(entity);[m
+ [m
+[32m+[m[32m    if ([m
+[32m+[m[32m        entity.external_name &&[m
+[32m+[m[32m        result.data.external_name &&[m
+[32m+[m[32m        entity.external_name !== result.data.external_name[m
+[32m+[m[32m    ) {[m
+[32m+[m[32m        const queueMessage = buildRegistryQueueMessage([m
+[32m+[m[32m            RegistryQueueCommand.PROJECT_UNLINK,[m
+[32m+[m[32m            {[m
+[32m+[m[32m                id: entity.id,[m
+[32m+[m[32m                registryId: entity.registry_id,[m
+[32m+[m[32m                externalName: result.data.external_name,[m
+[32m+[m[32m                accountId: result.data.account_id,[m
+[32m+[m[32m            },[m
+[32m+[m[32m        );[m
+[32m+[m
+[32m+[m[32m        await publishMessage(queueMessage);[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    const queueMessage = buildRegistryQueueMessage([m
+[32m+[m[32m        RegistryQueueCommand.PROJECT_LINK,[m
+[32m+[m[32m        {[m
+[32m+[m[32m            id: entity.id,[m
+[32m+[m[32m        },[m
+[32m+[m[32m    );[m
+[32m+[m
+[32m+[m[32m    await publishMessage(queueMessage);[m
+[32m+[m
+     return res.respondAccepted({[m
+         data: entity,[m
+     });[m
+[1mdiff --git a/packages/backend/api/src/http/controllers/core/registry-project/handlers/utils.ts b/packages/backend/api/src/http/controllers/core/registry-project/handlers/utils.ts[m
+[1mindex 8a4e8932..cc5f89df 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/core/registry-project/handlers/utils.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/core/registry-project/handlers/utils.ts[m
+[36m@@ -61,7 +61,7 @@[m [mexport async function runRegistryProjectValidation([m
+     if (operation === 'create') {[m
+         await check('type')[m
+             .exists()[m
+[31m-            .isIn(Object.keys(RegistryProjectType))[m
+[32m+[m[32m            .isIn(Object.values(RegistryProjectType))[m
+             .run(req);[m
+     }[m
+ [m
+[1mdiff --git a/packages/backend/api/src/http/controllers/core/registry/handlers/read.ts b/packages/backend/api/src/http/controllers/core/registry/handlers/read.ts[m
+[1mindex bd18bd17..c4c3029d 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/core/registry/handlers/read.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/core/registry/handlers/read.ts[m
+[36m@@ -19,7 +19,7 @@[m [mfunction checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>[m
+         allowed: [[m
+             'id',[m
+             'name',[m
+[31m-            'address',[m
+[32m+[m[32m            'host',[m
+             'ecosystem',[m
+             'created_at',[m
+             'updated_at',[m
+[1mdiff --git a/packages/backend/api/src/http/controllers/core/registry/handlers/utils.ts b/packages/backend/api/src/http/controllers/core/registry/handlers/utils.ts[m
+[1mindex 0de436b8..943e3cee 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/core/registry/handlers/utils.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/core/registry/handlers/utils.ts[m
+[36m@@ -6,10 +6,9 @@[m
+  */[m
+ [m
+ import { check, validationResult } from 'express-validator';[m
+[31m-import { Ecosystem } from '@personalhealthtrain/central-common';[m
+[32m+[m[32mimport { Ecosystem, getHostNameFromString } from '@personalhealthtrain/central-common';[m
+ import { ExpressRequest } from '../../../../type';[m
+ import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';[m
+[31m-import { extendExpressValidationResultWithMasterImage } from '../../master-image/utils/extend';[m
+ import { RegistryValidationResult } from '../type';[m
+ [m
+ export async function runRegistryValidation([m
+[36m@@ -33,16 +32,16 @@[m [mexport async function runRegistryValidation([m
+ [m
+     // ----------------------------------------------[m
+ [m
+[31m-    const addressChain = check('address')[m
+[32m+[m[32m    const hostChain = check('host')[m
+         .exists()[m
+         .isURL()[m
+         .isLength({ min: 5, max: 512 });[m
+ [m
+     if (operation === 'update') {[m
+[31m-        addressChain.optional();[m
+[32m+[m[32m        hostChain.optional();[m
+     }[m
+ [m
+[31m-    await addressChain.run(req);[m
+[32m+[m[32m    await hostChain.run(req);[m
+ [m
+     // ----------------------------------------------[m
+ [m
+[36m@@ -78,5 +77,9 @@[m [mexport async function runRegistryValidation([m
+ [m
+     result.data = matchedValidationData(req, { includeOptionals: true });[m
+ [m
+[32m+[m[32m    if (result.data.host) {[m
+[32m+[m[32m        result.data.host = getHostNameFromString(result.data.host);[m
+[32m+[m[32m    }[m
+[32m+[m
+     return result;[m
+ }[m
+[1mdiff --git a/packages/backend/api/src/http/controllers/core/station/handlers/create.ts b/packages/backend/api/src/http/controllers/core/station/handlers/create.ts[m
+[1mindex 7e9b05da..a5848940 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/core/station/handlers/create.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/core/station/handlers/create.ts[m
+[36m@@ -6,16 +6,18 @@[m
+  */[m
+ [m
+ import {[m
+[31m-    Ecosystem, PermissionID, RegistryProjectType, createNanoID, isHex,[m
+[32m+[m[32m    PermissionID, RegistryProjectType, createNanoID, isHex,[m
+ } from '@personalhealthtrain/central-common';[m
+ import { BadRequestError, ForbiddenError } from '@typescript-error/http';[m
+ import { validationResult } from 'express-validator';[m
+ import { getRepository } from 'typeorm';[m
+[32m+[m[32mimport { publishMessage } from 'amqp-extension';[m
+ import { ExpressValidationError } from '../../../../express-validation';[m
+ import { runStationValidation } from './utils';[m
+ import { ExpressRequest, ExpressResponse } from '../../../../type';[m
+ import { StationEntity } from '../../../../../domains/core/station/entity';[m
+ import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';[m
+[32m+[m[32mimport { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';[m
+ [m
+ export async function createStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {[m
+     if (!req.ability.hasPermission(PermissionID.STATION_ADD)) {[m
+[36m@@ -42,13 +44,13 @@[m [mexport async function createStationRouteHandler(req: ExpressRequest, res: Expres[m
+ [m
+     // -----------------------------------------------------[m
+ [m
+[32m+[m[32m    if (!entity.ecosystem) {[m
+[32m+[m[32m        entity.ecosystem = result.meta.registry.ecosystem;[m
+[32m+[m[32m    }[m
+[32m+[m
+     if ([m
+         entity.registry_id[m
+     ) {[m
+[31m-        if (!entity.ecosystem) {[m
+[31m-            entity.ecosystem = result.meta.registry.ecosystem;[m
+[31m-        }[m
+[31m-[m
+         if (entity.ecosystem !== result.meta.registry.ecosystem) {[m
+             throw new BadRequestError('The ecosystem of the station and the registry must be the same.');[m
+         }[m
+[36m@@ -61,13 +63,22 @@[m [mexport async function createStationRouteHandler(req: ExpressRequest, res: Expres[m
+             ecosystem: entity.ecosystem,[m
+             type: RegistryProjectType.STATION,[m
+             registry_id: entity.registry_id,[m
+[32m+[m[32m            realm_id: entity.realm_id,[m
+[32m+[m[32m            public: false,[m
+         });[m
+ [m
+         await registryProjectRepository.save(registryProject);[m
+ [m
+         entity.registry_project_id = registryProject.id;[m
+ [m
+[31m-        // todo: create setup registry project queue message[m
+[32m+[m[32m        const queueMessage = buildRegistryQueueMessage([m
+[32m+[m[32m            RegistryQueueCommand.PROJECT_LINK,[m
+[32m+[m[32m            {[m
+[32m+[m[32m                id: registryProject.id,[m
+[32m+[m[32m            },[m
+[32m+[m[32m        );[m
+[32m+[m
+[32m+[m[32m        await publishMessage(queueMessage);[m
+     }[m
+ [m
+     // -----------------------------------------------------[m
+[1mdiff --git a/packages/backend/api/src/http/controllers/core/station/handlers/delete.ts b/packages/backend/api/src/http/controllers/core/station/handlers/delete.ts[m
+[1mindex ea12a4eb..41a74b40 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/core/station/handlers/delete.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/core/station/handlers/delete.ts[m
+[36m@@ -6,12 +6,14 @@[m
+  */[m
+ [m
+ import { ForbiddenError, NotFoundError } from '@typescript-error/http';[m
+[31m-import { Ecosystem, PermissionID } from '@personalhealthtrain/central-common';[m
+[32m+[m[32mimport { PermissionID } from '@personalhealthtrain/central-common';[m
+ import { getRepository } from 'typeorm';[m
+ import { isPermittedForResourceRealm } from '@authelion/common';[m
+[32m+[m[32mimport { publishMessage } from 'amqp-extension';[m
+ import { StationEntity } from '../../../../../domains/core/station/entity';[m
+ import { ExpressRequest, ExpressResponse } from '../../../../type';[m
+ import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';[m
+[32m+[m[32mimport { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';[m
+ [m
+ export async function deleteStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {[m
+     const { id } = req.params;[m
+[36m@@ -47,9 +49,20 @@[m [mexport async function deleteStationRouteHandler(req: ExpressRequest, res: Expres[m
+         const registryProjectRepository = getRepository(RegistryProjectEntity);[m
+ [m
+         const registryProject = await registryProjectRepository.findOne(entity.registry_project_id);[m
+[31m-        await registryProjectRepository.remove(registryProject);[m
+[32m+[m[32m        if (registryProject) {[m
+[32m+[m[32m            const queueMessage = buildRegistryQueueMessage([m
+[32m+[m[32m                RegistryQueueCommand.PROJECT_UNLINK,[m
+[32m+[m[32m                {[m
+[32m+[m[32m                    id: registryProject.id,[m
+[32m+[m[32m                    registryId: registryProject.registry_id,[m
+[32m+[m[32m                    externalName: registryProject.external_name,[m
+[32m+[m[32m                    accountId: registryProject.account_id,[m
+[32m+[m[32m                },[m
+[32m+[m[32m            );[m
+ [m
+[31m-        // todo: delete registry_project entity & queue message emit[m
+[32m+[m[32m            await publishMessage(queueMessage);[m
+[32m+[m[32m            await registryProjectRepository.remove(registryProject);[m
+[32m+[m[32m        }[m
+     }[m
+ [m
+     const { id: entityId } = entity;[m
+[1mdiff --git a/packages/backend/api/src/http/controllers/core/station/handlers/update.ts b/packages/backend/api/src/http/controllers/core/station/handlers/update.ts[m
+[1mindex 536731df..11a74cb2 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/core/station/handlers/update.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/core/station/handlers/update.ts[m
+[36m@@ -5,10 +5,12 @@[m [mimport {[m
+ import { ForbiddenError, NotFoundError } from '@typescript-error/http';[m
+ import { getRepository } from 'typeorm';[m
+ import { isPermittedForResourceRealm } from '@authelion/common';[m
+[32m+[m[32mimport { Message, publishMessage } from 'amqp-extension';[m
+ import { runStationValidation } from './utils';[m
+ import { StationEntity } from '../../../../../domains/core/station/entity';[m
+ import { ExpressRequest, ExpressResponse } from '../../../../type';[m
+ import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';[m
+[32m+[m[32mimport { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';[m
+ [m
+ export async function updateStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {[m
+     const { id } = req.params;[m
+[36m@@ -25,13 +27,8 @@[m [mexport async function updateStationRouteHandler(req: ExpressRequest, res: Expres[m
+     const repository = getRepository(StationEntity);[m
+     const query = repository.createQueryBuilder('station')[m
+         .addSelect([[m
+[31m-            'station.registry_project_id',[m
+[31m-            'station.registry_project_account_id',[m
+[31m-            'station.registry_project_account_name',[m
+[31m-            'station.registry_project_account_token',[m
+[31m-            'station.registry_project_webhook_exists',[m
+             'station.public_key',[m
+[31m-            'station.secure_id',[m
+[32m+[m[32m            'station.external_id',[m
+         ])[m
+         .where('station.id = :id', { id });[m
+ [m
+[36m@@ -67,21 +64,53 @@[m [mexport async function updateStationRouteHandler(req: ExpressRequest, res: Expres[m
+             registryProject = await registryProjectRepository.findOne(entity.registry_project_id);[m
+         }[m
+ [m
+[31m-        if (!registryProject) {[m
+[32m+[m[32m        let registryOperation : 'link' | 'relink' = 'link';[m
+[32m+[m[32m        if (registryProject) {[m
+[32m+[m[32m            if (registryProject.external_name !== registryProjectExternalName) {[m
+[32m+[m[32m                registryProject = registryProjectRepository.merge(registryProject, {[m
+[32m+[m[32m                    external_name: registryProjectExternalName,[m
+[32m+[m[32m                });[m
+[32m+[m
+[32m+[m[32m                registryOperation = 'relink';[m
+[32m+[m[32m            }[m
+[32m+[m[32m        } else {[m
+             registryProject = registryProjectRepository.create({[m
+                 external_name: registryProjectExternalName,[m
+                 name: entity.name,[m
+                 ecosystem: entity.ecosystem,[m
+                 type: RegistryProjectType.STATION,[m
+                 registry_id: entity.registry_id,[m
+[32m+[m[32m                realm_id: entity.realm_id,[m
+[32m+[m[32m                public: false,[m
+             });[m
+[31m-[m
+[31m-            await registryProjectRepository.save(registryProject);[m
+         }[m
+ [m
+[32m+[m[32m        await registryProjectRepository.save(registryProject);[m
+[32m+[m
+         entity.registry_project_id = registryProject.id;[m
+ [m
+[31m-        // todo: create setup registry project queue message[m
+[32m+[m[32m        let queueMessage : Message;[m
+[32m+[m
+[32m+[m[32m        if (registryOperation === 'link') {[m
+[32m+[m[32m            queueMessage = buildRegistryQueueMessage([m
+[32m+[m[32m                RegistryQueueCommand.PROJECT_LINK,[m
+[32m+[m[32m                {[m
+[32m+[m[32m                    id: registryProject.id,[m
+[32m+[m[32m                },[m
+[32m+[m[32m            );[m
+[32m+[m[32m        } else {[m
+[32m+[m[32m            queueMessage = buildRegistryQueueMessage([m
+[32m+[m[32m                RegistryQueueCommand.PROJECT_RELINK,[m
+[32m+[m[32m                {[m
+[32m+[m[32m                    id: registryProject.id,[m
+[32m+[m[32m                    registryId: registryProject.registry_id,[m
+[32m+[m[32m                    externalName: registryProject.external_name,[m
+[32m+[m[32m                    accountId: registryProject.account_id,[m
+[32m+[m[32m                },[m
+[32m+[m[32m            );[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        await publishMessage(queueMessage);[m
+     }[m
+ [m
+     await repository.save(entity);[m
+[1mdiff --git a/packages/backend/api/src/http/controllers/core/station/handlers/utils.ts b/packages/backend/api/src/http/controllers/core/station/handlers/utils.ts[m
+[1mindex 2e918105..920c54c2 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/core/station/handlers/utils.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/core/station/handlers/utils.ts[m
+[36m@@ -58,16 +58,12 @@[m [mexport async function runStationValidation([m
+ [m
+     // -------------------------------------------------------------[m
+ [m
+[31m-    const externalNameChain = check('external_id')[m
+[32m+[m[32m    await check('external_id')[m
+         .isLength({ min: 1, max: 255 })[m
+         .exists()[m
+[31m-        .matches(/^[a-z0-9-_]*$/);[m
+[31m-[m
+[31m-    if (operation === 'update') {[m
+[31m-        externalNameChain.optional();[m
+[31m-    }[m
+[31m-[m
+[31m-    await externalNameChain.run(req);[m
+[32m+[m[32m        .matches(/^[a-z0-9-_]*$/)[m
+[32m+[m[32m        .optional({ nullable: true })[m
+[32m+[m[32m        .run(req);[m
+ [m
+     // -------------------------------------------------------------[m
+ [m
+[36m@@ -89,7 +85,6 @@[m [mexport async function runStationValidation([m
+         await check('ecosystem')[m
+             .exists()[m
+             .isIn(Object.values(Ecosystem))[m
+[31m-            .optional({ nullable: true })[m
+             .run(req);[m
+     }[m
+ [m
+[1mdiff --git a/packages/backend/api/src/http/controllers/core/train-station/handlers/create.ts b/packages/backend/api/src/http/controllers/core/train-station/handlers/create.ts[m
+[1mindex 1343289b..f10d2aed 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/core/train-station/handlers/create.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/core/train-station/handlers/create.ts[m
+[36m@@ -6,7 +6,7 @@[m
+  */[m
+ [m
+ import { PermissionID, TrainStationApprovalStatus } from '@personalhealthtrain/central-common';[m
+[31m-import { ForbiddenError } from '@typescript-error/http';[m
+[32m+[m[32mimport { BadRequestError, ForbiddenError } from '@typescript-error/http';[m
+ import { getRepository } from 'typeorm';[m
+ import { ExpressRequest, ExpressResponse } from '../../../../type';[m
+ import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';[m
+[36m@@ -21,6 +21,14 @@[m [mexport async function createTrainStationRouteHandler(req: ExpressRequest, res: E[m
+ [m
+     const result = await runTrainStationValidation(req, 'create');[m
+ [m
+[32m+[m[32m    if (!result.meta.station.ecosystem) {[m
+[32m+[m[32m        throw new BadRequestError('The referenced station must be assigned to an ecosystem.');[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    if (!result.meta.station.registry_id) {[m
+[32m+[m[32m        throw new BadRequestError('The referenced station must be assigned to a registry');[m
+[32m+[m[32m    }[m
+[32m+[m
+     const repository = getRepository(TrainStationEntity);[m
+ [m
+     let entity = repository.create(result.data);[m
+[1mdiff --git a/packages/backend/api/src/http/controllers/core/train/handlers/utils.ts b/packages/backend/api/src/http/controllers/core/train/handlers/utils.ts[m
+[1mindex a889ed1d..8509d042 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/core/train/handlers/utils.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/core/train/handlers/utils.ts[m
+[36m@@ -124,7 +124,7 @@[m [mexport async function runTrainValidation([m
+         }[m
+ [m
+         if (result.meta.registry.ecosystem !== Ecosystem.DEFAULT) {[m
+[31m-            throw new BadRequestError('The registry must be part of the local ecosystem.');[m
+[32m+[m[32m            throw new BadRequestError('The registry must be part of the default ecosystem.');[m
+         }[m
+     }[m
+ [m
+[1mdiff --git a/packages/backend/api/src/http/controllers/special/service/handlers/registry/command.ts b/packages/backend/api/src/http/controllers/special/service/handlers/registry/command.ts[m
+[1mindex 712c7bd4..15aeabde 100644[m
+[1m--- a/packages/backend/api/src/http/controllers/special/service/handlers/registry/command.ts[m
+[1m+++ b/packages/backend/api/src/http/controllers/special/service/handlers/registry/command.ts[m
+[36m@@ -22,8 +22,8 @@[m [mimport {[m
+     buildRegistryQueueMessage,[m
+ } from '../../../../../../domains/special/registry';[m
+ import {[m
+[31m-    deleteRegistryProjectFromRemote,[m
+[31m-    setupRegistryProjectForRemote,[m
+[32m+[m[32m    linkRegistryProject,[m
+[32m+[m[32m    unlinkRegistryProject,[m
+ } from '../../../../../../components/registry/handlers/project';[m
+ import { RegistryProjectEntity } from '../../../../../../domains/core/registry-project/entity';[m
+ import { RegistryEntity } from '../../../../../../domains/core/registry/entity';[m
+[36m@@ -41,9 +41,7 @@[m [mexport async function handleRegistryCommandRouteHandler(req: ExpressRequest, res[m
+         throw new BadRequestError('The registry command is not valid.');[m
+     }[m
+ [m
+[31m-    if ([m
+[31m-        typeof id !== 'string'[m
+[31m-    ) {[m
+[32m+[m[32m    if (typeof id !== 'string') {[m
+         throw new BadRequestError(`An ID parameter is required for the registry command ${command}`);[m
+     }[m
+ [m
+[36m@@ -53,37 +51,33 @@[m [mexport async function handleRegistryCommandRouteHandler(req: ExpressRequest, res[m
+             const repository = getRepository(RegistryEntity);[m
+             const entity = await repository.createQueryBuilder('registry')[m
+                 .addSelect([[m
+[31m-                    'registry.address',[m
+[31m-                    'registry.account_name',[m
+[31m-                    'registry.account_token',[m
+[32m+[m[32m                    'registry.account_secret',[m
+                 ])[m
+[31m-                .where('registryProject.id = :id', { id })[m
+[32m+[m[32m                .where('registry.id = :id', { id })[m
+                 .getOne();[m
+ [m
+             if (command === RegistryCommand.SETUP) {[m
+                 if (env.env === 'test') {[m
+                     await setupRegistry({[m
+[32m+[m[32m                        id: entity.id,[m
+                         entity,[m
+[31m-                        entityId: entity.id,[m
+                     });[m
+                 } else {[m
+                     const queueMessage = buildRegistryQueueMessage([m
+                         RegistryQueueCommand.SETUP,[m
+                         {[m
+[32m+[m[32m                            id: entity.id,[m
+                             entity,[m
+[31m-                            entityId: entity.id,[m
+                         },[m
+                     );[m
+                     await publishMessage(queueMessage);[m
+                 }[m
+[31m-            } else if (env.env === 'test') {[m
+[31m-                // todo: implement registry deletion[m
+             } else {[m
+                 const queueMessage = buildRegistryQueueMessage([m
+                     RegistryQueueCommand.DELETE,[m
+                     {[m
+[32m+[m[32m                        id: entity.id,[m
+                         entity,[m
+[31m-                        entityId: entity.id,[m
+                     },[m
+                 );[m
+ [m
+[36m@@ -96,42 +90,45 @@[m [mexport async function handleRegistryCommandRouteHandler(req: ExpressRequest, res[m
+             const repository = getRepository(RegistryProjectEntity);[m
+             const entity = await repository.createQueryBuilder('registryProject')[m
+                 .addSelect([[m
+[31m-                    'registryProject.external_id',[m
+[31m-                    'registryProject.account_id',[m
+[31m-                    'registryProject.account_name',[m
+[31m-                    'registryProject.account_token',[m
+[31m-                    'registryProject.webhook_exists',[m
+[31m-                    'registryProject.alias',[m
+[32m+[m[32m                    'registryProject.account_secret',[m
+                 ])[m
+                 .where('registryProject.id = :id', { id })[m
+                 .getOne();[m
+ [m
+             if (command === RegistryCommand.PROJECT_SETUP) {[m
+                 if (env.env === 'test') {[m
+[31m-                    await setupRegistryProjectForRemote({[m
+[31m-                        entityId: id,[m
+[32m+[m[32m                    await linkRegistryProject({[m
+[32m+[m[32m                        id: entity.id,[m
+[32m+[m[32m                        entity,[m
+                     });[m
+                 } else {[m
+                     const queueMessage = buildRegistryQueueMessage([m
+[31m-                        RegistryQueueCommand.PROJECT_SETUP,[m
+[32m+[m[32m                        RegistryQueueCommand.PROJECT_LINK,[m
+                         {[m
+[31m-                            entityId: id,[m
+[32m+[m[32m                            id: entity.id,[m
+[32m+[m[32m                            entity,[m
+                         },[m
+                     );[m
+                     await publishMessage(queueMessage);[m
+                 }[m
+                 break;[m
+             } else if (env.env === 'test') {[m
+[31m-                await deleteRegistryProjectFromRemote({[m
+[31m-                    entity,[m
+[31m-                    entityId: entity.id,[m
+[32m+[m[32m                await unlinkRegistryProject({[m
+[32m+[m[32m                    id: entity.id,[m
+[32m+[m[32m                    registryId: entity.registry_id,[m
+[32m+[m[32m                    externalName: entity.external_name,[m
+[32m+[m[32m                    accountId: entity.account_id,[m
+[32m+[m[32m                    updateDatabase: true,[m
+                 });[m
+             } else {[m
+                 const queueMessage = buildRegistryQueueMessage([m
+[31m-                    RegistryQueueCommand.PROJECT_DELETE,[m
+[32m+[m[32m                    RegistryQueueCommand.PROJECT_UNLINK,[m
+                     {[m
+[31m-                        entity,[m
+[31m-                        entityId: entity.id,[m
+[32m+[m[32m                        id: entity.id,[m
+[32m+[m[32m                        registryId: entity.registry_id,[m
+[32m+[m[32m                        externalName: entity.external_name,[m
+[32m+[m[32m                        accountId: entity.account_id,[m
+[32m+[m[32m                        updateDatabase: true,[m
+                     },[m
+                 );[m
+                 await publishMessage(queueMessage);[m
+[1mdiff --git a/packages/backend/result/src/components/building/process.ts b/packages/backend/result/src/components/building/process.ts[m
+[1mindex 866f5ac4..4087159c 100644[m
+[1m--- a/packages/backend/result/src/components/building/process.ts[m
+[1m+++ b/packages/backend/result/src/components/building/process.ts[m
+[36m@@ -8,7 +8,6 @@[m
+ import { Message } from 'amqp-extension';[m
+ import {[m
+     HTTPClient,[m
+[31m-    RegistryProjectType,[m
+     TrainContainerFileName,[m
+     TrainContainerPath,[m
+     TrainManagerBuildPayload,[m
+[36m@@ -35,11 +34,15 @@[m [mexport async function processMessage(message: Message) {[m
+         throw BuildingError.registryNotFound();[m
+     }[m
+ [m
+[32m+[m[32m    if (!data.entity.build_registry_project_id) {[m
+[32m+[m[32m        throw BuildingError.registryProjectNotFound();[m
+[32m+[m[32m    }[m
+[32m+[m
+     // -----------------------------------------------------------------------------------[m
+ [m
+     const dockerFile = await buildDockerFile({[m
+         entity: data.entity,[m
+[31m-        hostname: data.registry.address,[m
+[32m+[m[32m        hostname: data.registry.host,[m
+     });[m
+ [m
+     // -----------------------------------------------------------------------------------[m
+[36m@@ -49,29 +52,13 @@[m [mexport async function processMessage(message: Message) {[m
+     });[m
+ [m
+     const client = useClient<HTTPClient>();[m
+[31m-[m
+[31m-    // todo: future make incoming project selectable in ui[m
+[31m-    const { data: incomingProjects } = await client.registryProject.getMany({[m
+[31m-        filter: {[m
+[31m-            registry_id: data.registry.id,[m
+[31m-            type: RegistryProjectType.INCOMING,[m
+[31m-        },[m
+[31m-        page: {[m
+[31m-            limit: 1,[m
+[31m-        },[m
+[31m-    });[m
+[31m-[m
+[31m-    if (incomingProjects.length === 0) {[m
+[31m-        throw BuildingError.registryProjectNotFound();[m
+[31m-    }[m
+[31m-[m
+[31m-    const incomingProject = incomingProjects[0];[m
+[32m+[m[32m    const incomingProject = await client.registryProject.getOne(data.entity.build_registry_project_id);[m
+ [m
+     data.registryProject = incomingProject;[m
+     data.registryProjectId = incomingProject.id;[m
+ [m
+     const imageURL = buildRemoteDockerImageURL({[m
+[31m-        hostname: data.registry.address,[m
+[32m+[m[32m        hostname: data.registry.host,[m
+         projectName: incomingProject.external_name,[m
+         repositoryName: data.entity.id,[m
+     });[m
+[36m@@ -93,7 +80,7 @@[m [mexport async function processMessage(message: Message) {[m
+     });[m
+     const trainConfig = await buildTrainConfig({[m
+         entity: data.entity,[m
+[31m-        hostname: data.registry.address,[m
+[32m+[m[32m        hostname: data.registry.host,[m
+     });[m
+ [m
+     await container.putArchive([m
+[36m@@ -145,13 +132,13 @@[m [mexport async function processMessage(message: Message) {[m
+     });[m
+ [m
+     const authConfig = buildDockerAuthConfig({[m
+[31m-        host: data.registry.address,[m
+[32m+[m[32m        host: data.registry.host,[m
+         user: data.registry.account_name,[m
+         password: data.registry.account_secret,[m
+     });[m
+ [m
+     const baseImageURL = buildRemoteDockerImageURL({[m
+[31m-        hostname: data.registry.address,[m
+[32m+[m[32m        hostname: data.registry.host,[m
+         projectName: incomingProject.external_name,[m
+         repositoryName: data.entity.id,[m
+         tagOrDigest: 'base',[m
+[36m@@ -164,7 +151,7 @@[m [mexport async function processMessage(message: Message) {[m
+     });[m
+ [m
+     const latestImageURL = buildRemoteDockerImageURL({[m
+[31m-        hostname: data.registry.address,[m
+[32m+[m[32m        hostname: data.registry.host,[m
+         projectName: incomingProject.external_name,[m
+         repositoryName: data.entity.id,[m
+         tagOrDigest: 'latest',[m
+[1mdiff --git a/packages/backend/result/src/components/building/status.ts b/packages/backend/result/src/components/building/status.ts[m
+[1mindex 0b2d16b7..4f067ce3 100644[m
+[1m--- a/packages/backend/result/src/components/building/status.ts[m
+[1m+++ b/packages/backend/result/src/components/building/status.ts[m
+[36m@@ -11,7 +11,7 @@[m [mimport {[m
+     HarborAPI,[m
+     TrainManagerBuildPayload,[m
+     TrainManagerBuildingQueueEvent,[m
+[31m-    buildConnectionStringFromRegistry,[m
+[32m+[m[32m    buildAPIConnectionStringFromRegistry,[m
+     createBasicHarborAPIConfig,[m
+ } from '@personalhealthtrain/central-common';[m
+ import { createClient, useClient } from '@trapi/client';[m
+[36m@@ -44,7 +44,7 @@[m [mexport async function processBuildStatusEvent(message: Message) {[m
+ [m
+     // -----------------------------------------------------------------------------------[m
+ [m
+[31m-    const connectionString = buildConnectionStringFromRegistry(data.registry);[m
+[32m+[m[32m    const connectionString = buildAPIConnectionStringFromRegistry(data.registry);[m
+     const httpClientConfig = createBasicHarborAPIConfig(connectionString);[m
+     const httpClient = createClient<HarborAPI>(httpClientConfig);[m
+ [m
+[1mdiff --git a/packages/backend/result/src/components/extracting/download.ts b/packages/backend/result/src/components/extracting/download.ts[m
+[1mindex 93f2251f..42e055a3 100644[m
+[1m--- a/packages/backend/result/src/components/extracting/download.ts[m
+[1m+++ b/packages/backend/result/src/components/extracting/download.ts[m
+[36m@@ -37,14 +37,14 @@[m [mexport async function downloadImage(message: Message) {[m
+ [m
+     for (let i = 0; i < outgoingProjects.length; i++) {[m
+         const repositoryTag = buildRemoteDockerImageURL({[m
+[31m-            hostname: data.registry.address,[m
+[32m+[m[32m            hostname: data.registry.host,[m
+             projectName: outgoingProjects[i].external_name,[m
+             repositoryName: data.id,[m
+         });[m
+ [m
+         try {[m
+             await pullDockerImage(repositoryTag, buildDockerAuthConfig({[m
+[31m-                host: data.registry.address,[m
+[32m+[m[32m                host: data.registry.host,[m
+                 user: data.registry.account_name,[m
+                 password: data.registry.account_secret,[m
+             }));[m
+[36m@@ -55,5 +55,12 @@[m [mexport async function downloadImage(message: Message) {[m
+         }[m
+     }[m
+ [m
+[32m+[m[32m    if (!data.registryProject) {[m
+[32m+[m[32m        throw ExtractingError.registryProjectNotFound({[m
+[32m+[m[32m            step: TrainManagerExtractingStep.DOWNLOAD,[m
+[32m+[m[32m            message: 'The train was not found in any outgoing registry project.',[m
+[32m+[m[32m        });[m
+[32m+[m[32m    }[m
+[32m+[m
+     return message;[m
+ }[m
+[1mdiff --git a/packages/backend/result/src/components/extracting/error.ts b/packages/backend/result/src/components/extracting/error.ts[m
+[1mindex e89ea7cd..267d0b7c 100644[m
+[1m--- a/packages/backend/result/src/components/extracting/error.ts[m
+[1m+++ b/packages/backend/result/src/components/extracting/error.ts[m
+[36m@@ -5,7 +5,7 @@[m
+  * view the LICENSE file that was distributed with this source code.[m
+  */[m
+ [m
+[31m-import { ErrorOptions, buildErrorOptions } from '@typescript-error/http';[m
+[32m+[m[32mimport { ErrorOptions } from '@typescript-error/http';[m
+ import {[m
+     TrainManagerExtractingErrorType,[m
+     TrainManagerExtractingStep,[m
+[1mdiff --git a/packages/backend/result/src/components/extracting/process.ts b/packages/backend/result/src/components/extracting/process.ts[m
+[1mindex 6556c07e..1fa65e84 100644[m
+[1m--- a/packages/backend/result/src/components/extracting/process.ts[m
+[1m+++ b/packages/backend/result/src/components/extracting/process.ts[m
+[36m@@ -29,6 +29,7 @@[m [mexport async function processExtractCommand(message: Message) {[m
+     if (!data.registryProject) {[m
+         throw ExtractingError.registryProjectNotFound({[m
+             step: TrainManagerExtractingStep.EXTRACT,[m
+[32m+[m[32m            message: 'There was no registry-project during the download process.',[m
+         });[m
+     }[m
+ [m
+[36m@@ -42,7 +43,7 @@[m [mexport async function processExtractCommand(message: Message) {[m
+     // -----------------------------------------------------------------------------------[m
+ [m
+     const repositoryPath: string = buildRemoteDockerImageURL({[m
+[31m-        hostname: data.registry.address,[m
+[32m+[m[32m        hostname: data.registry.host,[m
+         projectName: data.registryProject.external_name,[m
+         repositoryName: data.id,[m
+     });[m
+[1mdiff --git a/packages/backend/result/src/components/extracting/status.ts b/packages/backend/result/src/components/extracting/status.ts[m
+[1mindex 9c633d97..596c16dc 100644[m
+[1m--- a/packages/backend/result/src/components/extracting/status.ts[m
+[1m+++ b/packages/backend/result/src/components/extracting/status.ts[m
+[36m@@ -60,7 +60,7 @@[m [mexport async function processExtractStatusCommand(message: Message) {[m
+ [m
+     for (let i = 0; i < incomingProjects.length; i++) {[m
+         const repositoryTag = buildRemoteDockerImageURL({[m
+[31m-            hostname: data.registry.address,[m
+[32m+[m[32m            hostname: data.registry.host,[m
+             projectName: incomingProjects[i].external_name,[m
+             repositoryName: data.id,[m
+         });[m
+[1mdiff --git a/packages/backend/result/src/components/routing/error.ts b/packages/backend/result/src/components/routing/error.ts[m
+[1mindex ba3573f5..bdc4a194 100644[m
+[1m--- a/packages/backend/result/src/components/routing/error.ts[m
+[1m+++ b/packages/backend/result/src/components/routing/error.ts[m
+[36m@@ -19,4 +19,12 @@[m [mexport class RoutingError extends BaseError {[m
+ [m
+         super(options);[m
+     }[m
+[32m+[m
+[32m+[m[32m    static routeEmpty(step?: `${TrainManagerRoutingStep}`, message?: string) {[m
+[32m+[m[32m        return new RoutingError({[m
+[32m+[m[32m            type: TrainManagerRoutingErrorType.ROUTE_EMPTY,[m
+[32m+[m[32m            step,[m
+[32m+[m[32m            message,[m
+[32m+[m[32m        });[m
+[32m+[m[32m    }[m
+ }[m
+[1mdiff --git a/packages/backend/result/src/components/routing/handlers/aggreagtor.ts b/packages/backend/result/src/components/routing/handlers/aggreagtor.ts[m
+[1mindex c3cf50ba..c0a68b9a 100644[m
+[1m--- a/packages/backend/result/src/components/routing/handlers/aggreagtor.ts[m
+[1m+++ b/packages/backend/result/src/components/routing/handlers/aggreagtor.ts[m
+[36m@@ -6,16 +6,19 @@[m
+  */[m
+ [m
+ import {[m
+[31m-    Ecosystem,[m
+[32m+[m[32m    Ecosystem, HTTPClient, REGISTRY_ARTIFACT_TAG_BASE,[m
+     REGISTRY_ARTIFACT_TAG_LATEST,[m
+     RegistryProject,[m
+     TrainManagerRoutingPayload,[m
+     TrainStationRunStatus,[m
+ } from '@personalhealthtrain/central-common';[m
+[32m+[m[32mimport { useClient } from '@trapi/client';[m
+ import { StationExtended } from '../type';[m
+[31m-import { transfer } from '../helpers/transfer';[m
+[31m-import { transferEcosystemOut } from '../helpers/transfer-ecosystem-out';[m
+[31m-import { transferOutgoing } from '../helpers/transfer-outgoing';[m
+[32m+[m[32mimport { transferInternal } from '../transfer/internal';[m
+[32m+[m[32mimport { transferEcosystemOut } from '../transfer/ecosystem';[m
+[32m+[m[32mimport { transferOutgoing } from '../transfer/outgoing';[m
+[32m+[m[32mimport { buildDockerAuthConfig } from '../../../config/services/registry';[m
+[32m+[m[32mimport { moveDockerImage } from '../../../modules/docker/image-move';[m
+ [m
+ type MoveOperationContext = {[m
+     routingPayload: TrainManagerRoutingPayload,[m
+[36m@@ -56,21 +59,46 @@[m [mexport async function handleEcosystemAggregatorMoveOperation(context: MoveOperat[m
+     } else {[m
+         const next = context.items[nextIndex];[m
+ [m
+[31m-        // todo: we need to create base image!![m
+[31m-        // todo: pull source project artifact latest -> copy to base :)[m
+[31m-[m
+         if (next.ecosystem === Ecosystem.DEFAULT) {[m
+[31m-            await transfer([m
+[31m-                {[m
+[31m-                    project: context.project,[m
+[31m-                    repositoryName: context.routingPayload.repositoryName,[m
+[31m-                    artifactTag: context.routingPayload.artifactTag,[m
+[31m-                },[m
+[31m-                {[m
+[31m-                    project: next.registry_project,[m
+[31m-                    repositoryName: context.routingPayload.repositoryName,[m
+[31m-                },[m
+[31m-            );[m
+[32m+[m[32m            const client = useClient<HTTPClient>();[m
+[32m+[m[32m            const registry = await client.registry.getOne(context.project.registry_id, {[m
+[32m+[m[32m                fields: ['+account_secret'],[m
+[32m+[m[32m            });[m
+[32m+[m
+[32m+[m[32m            const authConfig = buildDockerAuthConfig({[m
+[32m+[m[32m                host: registry.host,[m
+[32m+[m[32m                user: registry.account_name,[m
+[32m+[m[32m                password: registry.account_secret,[m
+[32m+[m[32m            });[m
+[32m+[m
+[32m+[m[32m            // create base tag from latest ;)[m
+[32m+[m[32m            await moveDockerImage({[m
+[32m+[m[32m                sourceAuthConfig: authConfig,[m
+[32m+[m[32m                sourceRepositoryName: context.routingPayload.repositoryName,[m
+[32m+[m[32m                sourceProjectName: context.project.external_name,[m
+[32m+[m[32m                sourceTag: context.routingPayload.artifactTag,[m
+[32m+[m
+[32m+[m[32m                destinationTag: REGISTRY_ARTIFACT_TAG_BASE,[m
+[32m+[m[32m            });[m
+[32m+[m
+[32m+[m[32m            const tags = [[m
+[32m+[m[32m                REGISTRY_ARTIFACT_TAG_BASE,[m
+[32m+[m[32m                REGISTRY_ARTIFACT_TAG_LATEST,[m
+[32m+[m[32m            ];[m
+[32m+[m
+[32m+[m[32m            for (let i = 0; i < tags.length; i++) {[m
+[32m+[m[32m                await transferInternal({[m
+[32m+[m[32m                    source: {[m
+[32m+[m[32m                        project: context.project,[m
+[32m+[m[32m                        repositoryName: context.routingPayload.repositoryName,[m
+[32m+[m[32m                        artifactTag: tags[i],[m
+[32m+[m[32m                    },[m
+[32m+[m[32m                    destination: {[m
+[32m+[m[32m                        project: next.registry_project,[m
+[32m+[m[32m                        repositoryName: context.routingPayload.repositoryName,[m
+[32m+[m[32m                    },[m
+[32m+[m[32m                });[m
+[32m+[m[32m            }[m
+         } else {[m
+             await transferEcosystemOut([m
+                 {[m
+[1mdiff --git a/packages/backend/result/src/components/routing/handlers/incoming.ts b/packages/backend/result/src/components/routing/handlers/incoming.ts[m
+[1mindex 4589b052..64362b95 100644[m
+[1m--- a/packages/backend/result/src/components/routing/handlers/incoming.ts[m
+[1m+++ b/packages/backend/result/src/components/routing/handlers/incoming.ts[m
+[36m@@ -11,9 +11,9 @@[m [mimport {[m
+     TrainManagerRoutingPayload,[m
+ } from '@personalhealthtrain/central-common';[m
+ import { useLogger } from '../../../modules/log';[m
+[31m-import { transferInternal } from '../helpers/transfer-internal';[m
+[32m+[m[32mimport { transferInternal } from '../transfer/internal';[m
+ import { StationExtended } from '../type';[m
+[31m-import { transferEcosystemOut } from '../helpers/transfer-ecosystem-out';[m
+[32m+[m[32mimport { transferEcosystemOut } from '../transfer/ecosystem';[m
+ [m
+ type MoveOperationContext = {[m
+     routingPayload: TrainManagerRoutingPayload,[m
+[36m@@ -37,13 +37,15 @@[m [mexport async function handleIncomingMoveOperation(context: MoveOperationContext)[m
+     if (nextStation.ecosystem === Ecosystem.DEFAULT) {[m
+         await transferInternal([m
+             {[m
+[31m-                project: context.project,[m
+[31m-                repositoryName: context.routingPayload.repositoryName,[m
+[31m-                artifactTag: context.routingPayload.artifactTag,[m
+[31m-            },[m
+[31m-            {[m
+[31m-                project: nextStation.registry_project,[m
+[31m-                repositoryName: context.routingPayload.repositoryName,[m
+[32m+[m[32m                source: {[m
+[32m+[m[32m                    project: context.project,[m
+[32m+[m[32m                    repositoryName: context.routingPayload.repositoryName,[m
+[32m+[m[32m                    artifactTag: context.routingPayload.artifactTag,[m
+[32m+[m[32m                },[m
+[32m+[m[32m                destination: {[m
+[32m+[m[32m                    project: nextStation.registry_project,[m
+[32m+[m[32m                    repositoryName: context.routingPayload.repositoryName,[m
+[32m+[m[32m                },[m
+             },[m
+         );[m
+     } else {[m
+[1mdiff --git a/packages/backend/result/src/components/routing/handlers/station.ts b/packages/backend/result/src/components/routing/handlers/station.ts[m
+[1mindex bd0c663e..8d9ee2e6 100644[m
+[1m--- a/packages/backend/result/src/components/routing/handlers/station.ts[m
+[1m+++ b/packages/backend/result/src/components/routing/handlers/station.ts[m
+[36m@@ -7,14 +7,13 @@[m
+ [m
+ import {[m
+     Ecosystem,[m
+[31m-    REGISTRY_ARTIFACT_TAG_BASE,[m
+     RegistryProject,[m
+     TrainManagerRoutingPayload,[m
+ } from '@personalhealthtrain/central-common';[m
+ import { StationExtended } from '../type';[m
+[31m-import { transferInternal } from '../helpers/transfer-internal';[m
+[31m-import { transferEcosystemOut } from '../helpers/transfer-ecosystem-out';[m
+[31m-import { transferOutgoing } from '../helpers/transfer-outgoing';[m
+[32m+[m[32mimport { transferInternal } from '../transfer/internal';[m
+[32m+[m[32mimport { transferEcosystemOut } from '../transfer/ecosystem';[m
+[32m+[m[32mimport { transferOutgoing } from '../transfer/outgoing';[m
+ [m
+ type MoveOperationContext = {[m
+     routingPayload: TrainManagerRoutingPayload,[m
+[36m@@ -36,10 +35,6 @@[m [mexport async function handleStationMoveOperation(context: MoveOperationContext)[m
+ [m
+     const nextIndex = context.items.findIndex((station) => station.index === currentStation.index + 1);[m
+     if (nextIndex === -1) {[m
+[31m-        if (context.routingPayload.artifactTag === REGISTRY_ARTIFACT_TAG_BASE) {[m
+[31m-            return;[m
+[31m-        }[m
+[31m-[m
+         await transferOutgoing({[m
+             project: currentStation.registry_project,[m
+             repositoryName: context.routingPayload.repositoryName,[m
+[36m@@ -49,17 +44,17 @@[m [mexport async function handleStationMoveOperation(context: MoveOperationContext)[m
+         const nextStation = context.items[nextIndex];[m
+ [m
+         if (nextStation.ecosystem === Ecosystem.DEFAULT) {[m
+[31m-            await transferInternal([m
+[31m-                {[m
+[32m+[m[32m            await transferInternal({[m
+[32m+[m[32m                source: {[m
+                     project: currentStation.registry_project,[m
+                     repositoryName: context.routingPayload.repositoryName,[m
+                     artifactTag: context.routingPayload.artifactTag,[m
+                 },[m
+[31m-                {[m
+[32m+[m[32m                destination: {[m
+                     project: nextStation.registry_project,[m
+                     repositoryName: context.routingPayload.repositoryName,[m
+                 },[m
+[31m-            );[m
+[32m+[m[32m            });[m
+         } else {[m
+             await transferEcosystemOut([m
+                 {[m
+[1mdiff --git a/packages/backend/result/src/components/routing/route.ts b/packages/backend/result/src/components/routing/route.ts[m
+[1mindex 8dbdd215..d6ef7b01 100644[m
+[1m--- a/packages/backend/result/src/components/routing/route.ts[m
+[1m+++ b/packages/backend/result/src/components/routing/route.ts[m
+[36m@@ -15,10 +15,9 @@[m [mimport {[m
+ } from '@personalhealthtrain/central-common';[m
+ import { useClient } from '@trapi/client';[m
+ import { mergeStationsWithTrainStations } from './helpers/merge';[m
+[31m-import { useLogger } from '../../modules/log';[m
+ import { handleIncomingMoveOperation } from './handlers/incoming';[m
+ import { handleStationMoveOperation } from './handlers/station';[m
+[31m-import { handleEcosystemAggregatorMoveOperation } from './handlers/ecosystem-aggregator';[m
+[32m+[m[32mimport { handleEcosystemAggregatorMoveOperation } from './handlers/aggreagtor';[m
+ import { RoutingError } from './error';[m
+ [m
+ export async function processRouteCommand(message: Message) {[m
+[36m@@ -39,7 +38,8 @@[m [mexport async function processRouteCommand(message: Message) {[m
+ [m
+     if (projectResponse.data.length === 0) {[m
+         throw RoutingError.registryProjectNotFound({[m
+[31m-            step: TrainManagerRoutingStep.MOVE,[m
+[32m+[m[32m            step: TrainManagerRoutingStep.ROUTE,[m
+[32m+[m[32m            message: 'The pushed registry-project is not registered.',[m
+         });[m
+     }[m
+ [m
+[36m@@ -58,10 +58,7 @@[m [mexport async function processRouteCommand(message: Message) {[m
+ [m
+     const { data: trainStations } = await client.trainStation.getMany(query);[m
+     if (trainStations.length === 0) {[m
+[31m-        useLogger().debug('Route empty', {[m
+[31m-            component: 'routing',[m
+[31m-        });[m
+[31m-        return message;[m
+[32m+[m[32m        throw RoutingError.routeEmpty(TrainManagerRoutingStep.ROUTE);[m
+     }[m
+ [m
+     const { data: stations } = await client.station.getMany({[m
+[36m@@ -94,7 +91,7 @@[m [mexport async function processRouteCommand(message: Message) {[m
+             });[m
+             break;[m
+         }[m
+[31m-        case RegistryProjectType.ECOSYSTEM_AGGREGATOR: {[m
+[32m+[m[32m        case RegistryProjectType.AGGREGATOR: {[m
+             await handleEcosystemAggregatorMoveOperation({[m
+                 items: stationsExtended,[m
+                 project: registryProject,[m
+[1mdiff --git a/packages/backend/result/src/components/routing/start.ts b/packages/backend/result/src/components/routing/start.ts[m
+[1mindex e810a9f9..3ffd4096 100644[m
+[1m--- a/packages/backend/result/src/components/routing/start.ts[m
+[1m+++ b/packages/backend/result/src/components/routing/start.ts[m
+[36m@@ -13,7 +13,7 @@[m [mimport {[m
+     REGISTRY_ARTIFACT_TAG_LATEST,[m
+     RegistryProject,[m
+     TrainManagerQueueCommand,[m
+[31m-    TrainManagerRoutingStartPayload, TrainManagerRoutingStep, buildConnectionStringFromRegistry, createBasicHarborAPIConfig,[m
+[32m+[m[32m    TrainManagerRoutingStartPayload, TrainManagerRoutingStep, buildAPIConnectionStringFromRegistry, createBasicHarborAPIConfig,[m
+ } from '@personalhealthtrain/central-common';[m
+ import { createClient, useClient } from '@trapi/client';[m
+ import { buildSelfQueueMessage } from '../../config/queue';[m
+[36m@@ -24,10 +24,12 @@[m [mexport async function processStartCommand(message: Message) {[m
+     const data = message.data as TrainManagerRoutingStartPayload;[m
+ [m
+     if (!data.registry) {[m
+[31m-        throw RoutingError.registryNotFound();[m
+[32m+[m[32m        throw RoutingError.registryNotFound({[m
+[32m+[m[32m            step: TrainManagerRoutingStep.START,[m
+[32m+[m[32m        });[m
+     }[m
+ [m
+[31m-    const connectionString = buildConnectionStringFromRegistry(data.registry);[m
+[32m+[m[32m    const connectionString = buildAPIConnectionStringFromRegistry(data.registry);[m
+     const httpClientConfig = createBasicHarborAPIConfig(connectionString);[m
+     const httpClient = createClient<HarborAPI>(httpClientConfig);[m
+ [m
+[36m@@ -38,7 +40,10 @@[m [mexport async function processStartCommand(message: Message) {[m
+     try {[m
+         incomingProject = await client.registryProject.getOne(data.entity.build_registry_project_id);[m
+     } catch (e) {[m
+[31m-        throw BuildingError.registryProjectNotFound();[m
+[32m+[m[32m        throw BuildingError.registryProjectNotFound({[m
+[32m+[m[32m            step: TrainManagerRoutingStep.START,[m
+[32m+[m[32m            message: 'The train build registry-project was not found.',[m
+[32m+[m[32m        });[m
+     }[m
+ [m
+     const harborRepository = await httpClient.projectRepository[m
+[36m@@ -59,6 +64,7 @@[m [mexport async function processStartCommand(message: Message) {[m
+ [m
+         throw RoutingError.notFound({[m
+             type: TrainManagerRoutingStep.START,[m
+[32m+[m[32m            message: 'The train does not exist in the incoming registry-project.',[m
+         });[m
+     }[m
+ [m
+[1mdiff --git a/packages/backend/result/src/components/routing/transfer/ecosystem.ts b/packages/backend/result/src/components/routing/transfer/ecosystem.ts[m
+[1mindex fbb98cfa..ad1e25aa 100644[m
+[1m--- a/packages/backend/result/src/components/routing/transfer/ecosystem.ts[m
+[1m+++ b/packages/backend/result/src/components/routing/transfer/ecosystem.ts[m
+[36m@@ -1,5 +1,5 @@[m
+ /*[m
+[31m- * Copyright (c) 2022.[m
+[32m+[m[32m * Copyright (c) 2022-2022.[m
+  * Author Peter Placzek (tada5hi)[m
+  * For the full copyright and license information,[m
+  * view the LICENSE file that was distributed with this source code.[m
+[1mdiff --git a/packages/backend/result/src/components/routing/transfer/internal.ts b/packages/backend/result/src/components/routing/transfer/internal.ts[m
+[1mindex 07e8b0f1..47010169 100644[m
+[1m--- a/packages/backend/result/src/components/routing/transfer/internal.ts[m
+[1m+++ b/packages/backend/result/src/components/routing/transfer/internal.ts[m
+[36m@@ -18,29 +18,28 @@[m [mimport { createClient, useClient } from '@trapi/client';[m
+ import { TransferItem } from './type';[m
+ [m
+ type TransferContext = {[m
+[32m+[m[32m    registry?: Registry,[m
+     source: TransferItem,[m
+[31m-    sourceRegistry?: Registry,[m
+     destination: TransferItem,[m
+[31m-    destinationRegistry?: Registry[m
+ };[m
+ [m
+[31m-export async function transfer(context: TransferContext) {[m
+[32m+[m[32mexport async function transferInternal(context: TransferContext) {[m
+     const sourceArtifactTag = context.source.artifactTag || 'latest';[m
+ [m
+     // --------------------------------------------------------------[m
+ [m
+     if (context.source.project.registry_id !== context.destination.project.registry_id) {[m
+[31m-        // todo: transfer between registries[m
+[32m+[m[32m        return;[m
+     }[m
+ [m
+[31m-    if (!context.sourceRegistry) {[m
+[32m+[m[32m    if (!context.registry) {[m
+         const client = useClient<HTTPClient>();[m
+[31m-        context.sourceRegistry = await client.registry.getOne(context.source.project.registry_id, {[m
+[32m+[m[32m        context.registry = await client.registry.getOne(context.source.project.registry_id, {[m
+             fields: ['+account_secret'],[m
+         });[m
+     }[m
+ [m
+[31m-    const connectionString = buildAPIConnectionStringFromRegistry(context.sourceRegistry);[m
+[32m+[m[32m    const connectionString = buildAPIConnectionStringFromRegistry(context.registry);[m
+     const httpClientConfig = createBasicHarborAPIConfig(connectionString);[m
+     const httpClient = createClient<HarborAPI>(httpClientConfig);[m
+ [m
+[1mdiff --git a/packages/backend/result/src/components/routing/transfer/type.ts b/packages/backend/result/src/components/routing/transfer/type.ts[m
+[1mindex c8f6fc90..dd8cd0a4 100644[m
+[1m--- a/packages/backend/result/src/components/routing/transfer/type.ts[m
+[1m+++ b/packages/backend/result/src/components/routing/transfer/type.ts[m
+[36m@@ -1,11 +1,11 @@[m
+ /*[m
+[31m- * Copyright (c) 2022.[m
+[32m+[m[32m * Copyright (c) 2022-2022.[m
+  * Author Peter Placzek (tada5hi)[m
+  * For the full copyright and license information,[m
+  * view the LICENSE file that was distributed with this source code.[m
+  */[m
+ [m
+[31m-import { RegistryProject, RegistryProjectType } from '@personalhealthtrain/central-common';[m
+[32m+[m[32mimport { Registry, RegistryProject } from '@personalhealthtrain/central-common';[m
+ [m
+ export type TransferItem = {[m
+     project: RegistryProject,[m
+[36m@@ -13,4 +13,9 @@[m [mexport type TransferItem = {[m
+     artifactTag?: string,[m
+ };[m
+ [m
+[31m-export type TransferDestinationType = `${RegistryProjectType.OUTGOING}`;[m
+[32m+[m[32mexport type TransferContext = {[m
+[32m+[m[32m    source: TransferItem,[m
+[32m+[m[32m    sourceRegistry?: Registry,[m
+[32m+[m[32m    destination: TransferItem,[m
+[32m+[m[32m    destinationRegistry?: Registry[m
+[32m+[m[32m};[m
+[1mdiff --git a/packages/frontend/ui/assets/css/bootstrap-override.css b/packages/frontend/ui/assets/css/bootstrap-override.css[m
+[1mindex 7458963b..61911bc0 100644[m
+[1m--- a/packages/frontend/ui/assets/css/bootstrap-override.css[m
+[1m+++ b/packages/frontend/ui/assets/css/bootstrap-override.css[m
+[36m@@ -131,3 +131,7 @@[m [ma:focus{[m
+ .custom-file {[m
+     border-radius: 0.25rem;[m
+ }[m
+[32m+[m
+[32m+[m[32m.dropdown-item {[m
+[32m+[m[32m    font-size: 13px;[m
+[32m+[m[32m}[m
+[1mdiff --git a/packages/frontend/ui/components/domains/master-image/MasterImagesSync.ts b/packages/frontend/ui/components/domains/master-image/MasterImagesSync.ts[m
+[1mindex a314c696..563e0d33 100644[m
+[1m--- a/packages/frontend/ui/components/domains/master-image/MasterImagesSync.ts[m
+[1m+++ b/packages/frontend/ui/components/domains/master-image/MasterImagesSync.ts[m
+[36m@@ -7,12 +7,11 @@[m
+ [m
+ import {[m
+     MasterImageCommand,[m
+[31m-    ServiceID,[m
+ } from '@personalhealthtrain/central-common';[m
+[31m-import Vue, { CreateElement, PropType, VNode } from 'vue';[m
+[32m+[m[32mimport Vue, { CreateElement, VNode } from 'vue';[m
+ import { SlotName } from '@vue-layout/utils';[m
+ import EntityDelete from '../EntityDelete';[m
+[31m-import { MasterImageList } from '../master-image/MasterImageList';[m
+[32m+[m[32mimport { MasterImageList } from './MasterImageList';[m
+ [m
+ export default Vue.extend({[m
+     components: { EntityDelete, MasterImageList },[m
+[36m@@ -60,14 +59,6 @@[m [mexport default Vue.extend({[m
+         return h([m
+             'div',[m
+             [[m
+[31m-                h('h4', [[m
+[31m-                    h('i', { staticClass: 'fa fa-archive mr-1' }),[m
+[31m-                    'Projects',[m
+[31m-                ]),[m
+[31m-                h('h6', [[m
+[31m-                    h('i', { staticClass: 'fas fa-sd-card mr-1' }),[m
+[31m-                    'Master Images',[m
+[31m-                ]),[m
+                 h('p', [[m
+                     'The creation of the master image project, will also register a webhook, ' +[m
+                     'which will keep the master images between the harbor service and the UI in sync. ' +[m
+[1mdiff --git a/packages/frontend/ui/components/domains/registry-project/RegistryProjectDetails.ts b/packages/frontend/ui/components/domains/registry-project/RegistryProjectDetails.ts[m
+[1mindex 13e06ec1..c4d0693f 100644[m
+[1m--- a/packages/frontend/ui/components/domains/registry-project/RegistryProjectDetails.ts[m
+[1m+++ b/packages/frontend/ui/components/domains/registry-project/RegistryProjectDetails.ts[m
+[36m@@ -133,15 +133,6 @@[m [mexport default Vue.extend<Data, any, any, Properties>({[m
+         }[m
+ [m
+         return h('div', [[m
+[31m-            h('h6', [[m
+[31m-                h('i', { staticClass: 'fa fa-folder-open pr-1' }),[m
+[31m-                'Registry',[m
+[31m-            ]),[m
+[31m-            h('p', { staticClass: 'mb-2' }, [[m
+[31m-                'To keep the data between the registry and the ui in sync, you can pull all available information about the',[m
+[31m-                ' ',[m
+[31m-                'project, webhook, robot-account,... of a station or create them.',[m
+[31m-            ]),[m
+             h('div', {[m
+                 staticClass: 'mb-2 d-flex flex-column',[m
+             }, [[m
+[36m@@ -162,57 +153,69 @@[m [mexport default Vue.extend<Data, any, any, Properties>({[m
+ [m
+                 h('div', [[m
+                     h('strong', { staticClass: 'pr-1' }, 'Robot:'),[m
+[32m+[m[32m                    h('i', {[m
+[32m+[m[32m                        class: {[m
+[32m+[m[32m                            'fa fa-check text-success': vm.accountId,[m
+[32m+[m[32m                            'fa fa-times text-danger': !vm.accountId,[m
+[32m+[m[32m                        },[m
+[32m+[m[32m                    }),[m
+                     h('div', { staticClass: 'd-flex flex-column' }, [[m
+[31m-                        h('div', [[m
+[31m-                            h('i', {[m
+[31m-                                class: {[m
+[31m-                                    'fa fa-check text-success': vm.accountId,[m
+[31m-                                    'fa fa-times text-danger': !vm.accountId,[m
+[31m-                                },[m
+[31m-                            }),[m
+[31m-                        ]),[m
+                         robotCredentials,[m
+                     ]),[m
+                 ]),[m
+             ]),[m
+[32m+[m[32m            h('hr'),[m
+[32m+[m[32m            h('div', { staticClass: 'row' }, [[m
+[32m+[m[32m                h('div', { staticClass: 'col' }, [[m
+[32m+[m[32m                    h('div', {[m
+[32m+[m[32m                        staticClass: 'alert alert-sm alert-info',[m
+[32m+[m[32m                    }, [[m
+[32m+[m[32m                        'The setup trigger will spin up the remote registry representation.',[m
+[32m+[m[32m                    ]),[m
+[32m+[m[32m                    h('div', { staticClass: 'text-center' }, [[m
+[32m+[m[32m                        h('button', {[m
+[32m+[m[32m                            class: 'btn btn-xs btn-primary',[m
+[32m+[m[32m                            attrs: {[m
+[32m+[m[32m                                disabled: vm.busy,[m
+[32m+[m[32m                                type: 'button',[m
+[32m+[m[32m                            },[m
+[32m+[m[32m                            on: {[m
+[32m+[m[32m                                click($event) {[m
+[32m+[m[32m                                    $event.preventDefault();[m
+ [m
+[31m-            h('div', { staticClass: 'd-flex flex-row' }, [[m
+[31m-                h('div', [[m
+[31m-                    h('button', {[m
+[31m-                        class: 'btn btn-xs btn-primary',[m
+[31m-                        attrs: {[m
+[31m-                            disabled: vm.busy,[m
+[31m-                            type: 'button',[m
+[31m-                        },[m
+[31m-                        on: {[m
+[31m-                            click($event) {[m
+[31m-                                $event.preventDefault();[m
+[31m-[m
+[31m-                                vm.setupProject.call(null);[m
+[32m+[m[32m                                    vm.setupProject.call(null);[m
+[32m+[m[32m                                },[m
+                             },[m
+[31m-                        },[m
+[31m-                    }, [[m
+[31m-                        h('i', { staticClass: 'fa fa-save pr-1' }),[m
+[31m-                        'Save',[m
+[32m+[m[32m                        }, [[m
+[32m+[m[32m                            h('i', { staticClass: 'fa fa-save pr-1' }),[m
+[32m+[m[32m                            'Setup',[m
+[32m+[m[32m                        ]),[m
+                     ]),[m
+                 ]),[m
+[31m-                h('div', { staticClass: 'ml-auto' }, [[m
+[31m-                    h('button', {[m
+[31m-                        class: 'btn btn-xs btn-danger',[m
+[31m-                        attrs: {[m
+[31m-                            disabled: vm.busy,[m
+[31m-                            type: 'button',[m
+[31m-                        },[m
+[31m-                        on: {[m
+[31m-                            click($event) {[m
+[31m-                                $event.preventDefault();[m
+[32m+[m[32m                h('div', { staticClass: 'col' }, [[m
+[32m+[m[32m                    h('div', {[m
+[32m+[m[32m                        staticClass: 'alert alert-sm alert-warning',[m
+[32m+[m[32m                    }, [[m
+[32m+[m[32m                        'The delete trigger will remove the remote registry representation.',[m
+[32m+[m[32m                    ]),[m
+[32m+[m[32m                    h('div', { staticClass: 'text-center' }, [[m
+[32m+[m[32m                        h('button', {[m
+[32m+[m[32m                            class: 'btn btn-xs btn-danger',[m
+[32m+[m[32m                            attrs: {[m
+[32m+[m[32m                                disabled: vm.busy,[m
+[32m+[m[32m                                type: 'button',[m
+[32m+[m[32m                            },[m
+[32m+[m[32m                            on: {[m
+[32m+[m[32m                                click($event) {[m
+[32m+[m[32m                                    $event.preventDefault();[m
+ [m
+[31m-                                vm.deleteProject.call(null);[m
+[32m+[m[32m                                    vm.deleteProject.call(null);[m
+[32m+[m[32m                                },[m
+                             },[m
+[31m-                        },[m
+[31m-                    }, [[m
+[31m-                        h('i', { staticClass: 'fa fa-trash pr-1' }),[m
+[31m-                        'Delete',[m
+[32m+[m[32m                        }, [[m
+[32m+[m[32m                            h('i', { staticClass: 'fa fa-trash pr-1' }),[m
+[32m+[m[32m                            'Delete',[m
+[32m+[m[32m                        ]),[m
+                     ]),[m
+                 ]),[m
+             ]),[m
+[1mdiff --git a/packages/frontend/ui/components/domains/registry-project/RegistryProjectForm.ts b/packages/frontend/ui/components/domains/registry-project/RegistryProjectForm.ts[m
+[1mindex 48e620d8..a8a25284 100644[m
+[1m--- a/packages/frontend/ui/components/domains/registry-project/RegistryProjectForm.ts[m
+[1m+++ b/packages/frontend/ui/components/domains/registry-project/RegistryProjectForm.ts[m
+[36m@@ -58,7 +58,7 @@[m [mexport const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>[m
+ [m
+             types: [[m
+                 { id: RegistryProjectType.DEFAULT, value: 'DEFAULT' },[m
+[31m-                { id: RegistryProjectType.ECOSYSTEM_AGGREGATOR, value: 'Aggregator' },[m
+[32m+[m[32m                { id: RegistryProjectType.AGGREGATOR, value: 'Aggregator' },[m
+                 { id: RegistryProjectType.INCOMING, value: 'Incoming' },[m
+                 { id: RegistryProjectType.OUTGOING, value: 'Outgoing' },[m
+                 { id: RegistryProjectType.MASTER_IMAGES, value: 'Master-Images' },[m
+[36m@@ -112,10 +112,10 @@[m [mexport const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>[m
+                     minLength: minLength(3),[m
+                     maxLength: maxLength(64),[m
+                 },[m
+[31m-                ecosystem_aggregator: {[m
+[32m+[m[32m                type: {[m
+                     required,[m
+                 },[m
+[31m-                realm_id: {[m
+[32m+[m[32m                registry_id: {[m
+                     required,[m
+                 },[m
+             },[m
+[36m@@ -123,8 +123,8 @@[m [mexport const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>[m
+     },[m
+     methods: {[m
+         initFromProperties() {[m
+[31m-            if (this.projectId) {[m
+[31m-                this.form.project_id = this.projectId;[m
+[32m+[m[32m            if (this.registryId) {[m
+[32m+[m[32m                this.form.registry_id = this.registryId;[m
+             }[m
+ [m
+             if (typeof this.entity === 'undefined') {[m
+[36m@@ -186,7 +186,7 @@[m [mexport const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>[m
+         });[m
+         const externalName = buildFormInput<Station>(vm, h, {[m
+             validationTranslator: buildVuelidateTranslator(vm.$ilingo),[m
+[31m-            title: 'Alias',[m
+[32m+[m[32m            title: 'External Name',[m
+             propName: 'external_name',[m
+         });[m
+ [m
+[36m@@ -238,11 +238,14 @@[m [mexport const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>[m
+             ]),[m
+         ]);[m
+ [m
+[31m-        const types = buildFormSelect<RegistryProject>(vm, h, {[m
+[32m+[m[32m        const type = buildFormSelect<RegistryProject>(vm, h, {[m
+             validationTranslator: buildVuelidateTranslator(this.$ilingo),[m
+             title: 'Type',[m
+             propName: 'type',[m
+             options: vm.types,[m
+[32m+[m[32m            attrs: {[m
+[32m+[m[32m                disabled: vm.isEditing,[m
+[32m+[m[32m            },[m
+         });[m
+ [m
+         let registry : VNodeChildren = [];[m
+[36m@@ -293,12 +296,12 @@[m [mexport const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>[m
+                 },[m
+             },[m
+         }, [[m
+[32m+[m[32m            type,[m
+[32m+[m[32m            h('hr'),[m
+             name,[m
+             h('hr'),[m
+             externalName,[m
+             externalNameHint,[m
+[31m-            h('hr'),[m
+[31m-            types,[m
+             registry,[m
+             h('hr'),[m
+             submit,[m
+[1mdiff --git a/packages/frontend/ui/components/domains/registry/RegistryForm.ts b/packages/frontend/ui/components/domains/registry/RegistryForm.ts[m
+[1mindex d862e142..028dd9f7 100644[m
+[1m--- a/packages/frontend/ui/components/domains/registry/RegistryForm.ts[m
+[1m+++ b/packages/frontend/ui/components/domains/registry/RegistryForm.ts[m
+[36m@@ -13,7 +13,7 @@[m [mimport {[m
+     ComponentFormData, SlotName, buildFormInput, buildFormSelect, buildFormSubmit, initPropertiesFromSource,[m
+ } from '@vue-layout/utils';[m
+ import {[m
+[31m-    maxLength, minLength, required, url,[m
+[32m+[m[32m    maxLength, minLength, required,[m
+ } from 'vuelidate/lib/validators';[m
+ import { RealmList } from '@authelion/vue';[m
+ import { Realm } from '@authelion/common';[m
+[36m@@ -39,7 +39,7 @@[m [mexport const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr[m
+         return {[m
+             form: {[m
+                 name: '',[m
+[31m-                address: '',[m
+[32m+[m[32m                host: '',[m
+                 ecosystem: Ecosystem.DEFAULT,[m
+                 account_name: '',[m
+                 account_secret: '',[m
+[36m@@ -84,9 +84,8 @@[m [mexport const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr[m
+                     minLength: minLength(3),[m
+                     maxLength: maxLength(128),[m
+                 },[m
+[31m-                address: {[m
+[32m+[m[32m                host: {[m
+                     required,[m
+[31m-                    url,[m
+                     maxLength: maxLength(512),[m
+                 },[m
+                 ecosystem: {[m
+[36m@@ -161,10 +160,13 @@[m [mexport const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr[m
+             propName: 'name',[m
+         });[m
+ [m
+[31m-        const address = buildFormInput<Registry>(vm, h, {[m
+[32m+[m[32m        const host = buildFormInput<Registry>(vm, h, {[m
+             validationTranslator: buildVuelidateTranslator(this.$ilingo),[m
+[31m-            title: 'Address',[m
+[31m-            propName: 'address',[m
+[32m+[m[32m            title: 'Host',[m
+[32m+[m[32m            propName: 'host',[m
+[32m+[m[32m            attrs: {[m
+[32m+[m[32m                placeholder: 'e.g. ghcr.io',[m
+[32m+[m[32m            },[m
+         });[m
+ [m
+         const ecosystem = buildFormSelect<Registry>(vm, h, {[m
+[36m@@ -172,6 +174,9 @@[m [mexport const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr[m
+             title: 'Ecosystem',[m
+             propName: 'ecosystem',[m
+             options: vm.ecosystems,[m
+[32m+[m[32m            attrs: {[m
+[32m+[m[32m                disabled: vm.isEditing,[m
+[32m+[m[32m            },[m
+         });[m
+ [m
+         const accountName = buildFormInput<Registry>(vm, h, {[m
+[36m@@ -241,10 +246,7 @@[m [mexport const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr[m
+                         'General',[m
+                     ]),[m
+                     name,[m
+[31m-                    h('hr'),[m
+[31m-                    address,[m
+[31m-                    h('hr'),[m
+[31m-                    ecosystem,[m
+[32m+[m[32m                    host,[m
+                 ]),[m
+                 h('div', { staticClass: 'col' }, [[m
+                     h('h6', [[m
+[36m@@ -255,6 +257,16 @@[m [mexport const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr[m
+                     accountSecret,[m
+                 ]),[m
+             ]),[m
+[32m+[m[32m            h('hr'),[m
+[32m+[m[32m            h([m
+[32m+[m[32m                'div',[m
+[32m+[m[32m                { staticClass: 'alert alert-warning alert-danger' },[m
+[32m+[m[32m                [[m
+[32m+[m[32m                    'It is only possible to register harbor registries > v2.3.0',[m
+[32m+[m[32m                ],[m
+[32m+[m[32m            ),[m
+[32m+[m[32m            h('hr'),[m
+[32m+[m[32m            ecosystem,[m
+             realm,[m
+             h('hr'),[m
+             submit,[m
+[1mdiff --git a/packages/frontend/ui/components/domains/registry/RegistrySetup.ts b/packages/frontend/ui/components/domains/registry/RegistrySetup.ts[m
+[1mindex 2c2037c7..54f2e8d9 100644[m
+[1m--- a/packages/frontend/ui/components/domains/registry/RegistrySetup.ts[m
+[1m+++ b/packages/frontend/ui/components/domains/registry/RegistrySetup.ts[m
+[36m@@ -6,7 +6,7 @@[m
+  */[m
+ [m
+ import Vue, { CreateElement, PropType, VNode } from 'vue';[m
+[31m-import { Registry, RegistryCommand, ServiceID } from '@personalhealthtrain/central-common';[m
+[32m+[m[32mimport { Registry, RegistryCommand } from '@personalhealthtrain/central-common';[m
+ import EntityDelete from '../EntityDelete';[m
+ import { MasterImageList } from '../master-image/MasterImageList';[m
+ [m
+[1mdiff --git a/packages/frontend/ui/components/domains/station/StationForm.ts b/packages/frontend/ui/components/domains/station/StationForm.ts[m
+[1mindex 63808f85..91125e41 100644[m
+[1m--- a/packages/frontend/ui/components/domains/station/StationForm.ts[m
+[1m+++ b/packages/frontend/ui/components/domains/station/StationForm.ts[m
+[36m@@ -134,6 +134,12 @@[m [mexport const StationForm = Vue.extend({[m
+             ) {[m
+                 this.form.name = this.realmName || this.realmId;[m
+             }[m
+[32m+[m
+[32m+[m[32m            this.$nextTick(() => {[m
+[32m+[m[32m                if (this.$refs.registry) {[m
+[32m+[m[32m                    this.$refs.registry.load();[m
+[32m+[m[32m                }[m
+[32m+[m[32m            });[m
+         },[m
+         async submit() {[m
+             if (this.busy || this.$v.$invalid) {[m
+[36m@@ -164,6 +170,14 @@[m [mexport const StationForm = Vue.extend({[m
+         handleUpdated(item) {[m
+             this.$emit('updated', item);[m
+         },[m
+[32m+[m
+[32m+[m[32m        async toggleFormData(key, id) {[m
+[32m+[m[32m            if (this.form[key] === id) {[m
+[32m+[m[32m                this.form[key] = null;[m
+[32m+[m[32m            } else {[m
+[32m+[m[32m                this.form[key] = id;[m
+[32m+[m[32m            }[m
+[32m+[m[32m        },[m
+     },[m
+     render(createElement: CreateElement): VNode {[m
+         const vm = this;[m
+[36m@@ -229,7 +243,9 @@[m [mexport const StationForm = Vue.extend({[m
+         const hidden = h('div', {[m
+             staticClass: 'form-group mb-1',[m
+         }, [[m
+[32m+[m[32m            h('label', { staticClass: 'mb-2' }, ['Hidden']),[m
+             h('b-form-checkbox', {[m
+[32m+[m[32m                staticClass: 'pb-2',[m
+                 model: {[m
+                     value: vm.form.hidden,[m
+                     callback(v: boolean) {[m
+[36m@@ -238,50 +254,24 @@[m [mexport const StationForm = Vue.extend({[m
+                     expression: 'form.hidden',[m
+                 },[m
+             } as VNodeData, [[m
+[31m-                'Hidden?',[m
+[31m-            ]),[m
+[31m-            h('div', {[m
+[31m-                staticClass: 'alert alert-sm alert-info mt-1',[m
+[31m-            }, [[m
+[31m-                'If enabled the station can not be target during proposal & train creation.',[m
+[32m+[m[32m                'Hide for proposal & train selection?',[m
+             ]),[m
+         ]);[m
+ [m
+[31m-        const submit = buildFormSubmit(vm, h, {[m
+[31m-            updateText: 'Update',[m
+[31m-            createText: 'Create',[m
+[31m-        });[m
+[31m-[m
+[31m-        let editingElements : VNodeChildren = [];[m
+[31m-[m
+[31m-        if (this.isEditing) {[m
+[31m-            editingElements = [[m
+[31m-                h('hr'),[m
+[31m-                h('div', { staticClass: 'alert alert-warning alert-sm' }, [[m
+[31m-                    'The tasks for the',[m
+[31m-                    h('strong', { staticClass: 'pl-1 pr-1' }, 'secret-storage'),[m
+[31m-                    'and',[m
+[31m-                    h('strong', { staticClass: 'pl-1 pr-1' }, 'registry'),[m
+[31m-                    'are performed asynchronously and therefore might take a while, till the view will be updated.',[m
+[31m-                ]),[m
+[31m-                h(StationRegistryProjectDetails, {[m
+[31m-                    props: {[m
+[31m-                        entity: vm.entity,[m
+[31m-                    },[m
+[31m-                    on: {[m
+[31m-                        updated(entity) {[m
+[31m-                            vm.handleUpdated.call(null, entity);[m
+[31m-                        },[m
+[31m-                    },[m
+[31m-                }),[m
+[31m-            ];[m
+[31m-        }[m
+[31m-[m
+[31m-        const ecosystem = buildFormSelect<Registry>(vm, h, {[m
+[32m+[m[32m        const ecosystem = buildFormSelect<Station>(vm, h, {[m
+             validationTranslator: buildVuelidateTranslator(this.$ilingo),[m
+             title: 'Ecosystem',[m
+             propName: 'ecosystem',[m
+             options: vm.ecosystems,[m
+[32m+[m[32m            changeCallback(input) {[m
+[32m+[m[32m                vm.form.ecosystem = input;[m
+[32m+[m
+[32m+[m[32m                vm.$nextTick(() => {[m
+[32m+[m[32m                    if (vm.$refs.registry) {[m
+[32m+[m[32m                        vm.$refs.registry.load();[m
+[32m+[m[32m                    }[m
+[32m+[m[32m                });[m
+[32m+[m[32m            },[m
+         });[m
+ [m
+         let registry : VNodeChildren = [];[m
+[36m@@ -293,7 +283,9 @@[m [mexport const StationForm = Vue.extend({[m
+             registry = [[m
+                 h('hr'),[m
+                 h(RegistryList, {[m
+[32m+[m[32m                    ref: 'registry',[m
+                     props: {[m
+[32m+[m[32m                        loadOnInit: false,[m
+                         query: {[m
+                             filter: {[m
+                                 ecosystem: vm.form.ecosystem,[m
+[36m@@ -330,6 +322,29 @@[m [mexport const StationForm = Vue.extend({[m
+             ];[m
+         }[m
+ [m
+[32m+[m[32m        const submit = buildFormSubmit(vm, h, {[m
+[32m+[m[32m            updateText: 'Update',[m
+[32m+[m[32m            createText: 'Create',[m
+[32m+[m[32m        });[m
+[32m+[m
+[32m+[m[32m        let editingElements : VNodeChildren = [];[m
+[32m+[m
+[32m+[m[32m        if (this.isEditing) {[m
+[32m+[m[32m            editingElements = [[m
+[32m+[m[32m                h('hr'),[m
+[32m+[m[32m                h(StationRegistryProjectDetails, {[m
+[32m+[m[32m                    props: {[m
+[32m+[m[32m                        entity: vm.entity,[m
+[32m+[m[32m                    },[m
+[32m+[m[32m                    on: {[m
+[32m+[m[32m                        updated(entity) {[m
+[32m+[m[32m                            vm.handleUpdated.call(null, entity);[m
+[32m+[m[32m                        },[m
+[32m+[m[32m                    },[m
+[32m+[m[32m                }),[m
+[32m+[m[32m            ];[m
+[32m+[m[32m        }[m
+[32m+[m
+         return h('div', [[m
+             h('div', { staticClass: 'row' }, [[m
+                 h('div', {[m
+[36m@@ -338,20 +353,20 @@[m [mexport const StationForm = Vue.extend({[m
+                     realm,[m
+                     name,[m
+                     h('hr'),[m
+[31m-                    hidden,[m
+[31m-                    h('hr'),[m
+[31m-                    email,[m
+[31m-                    h('hr'),[m
+[31m-                    submit,[m
+[32m+[m[32m                    ecosystem,[m
+[32m+[m[32m                    registry,[m
+[32m+[m
+                 ]),[m
+                 h('div', {[m
+                     staticClass: 'col',[m
+                 }, [[m
+[32m+[m[32m                    hidden,[m
+[32m+[m[32m                    h('hr'),[m
+[32m+[m[32m                    email,[m
+                     h('hr'),[m
+                     publicKey,[m
+                     h('hr'),[m
+[31m-                    ecosystem,[m
+[31m-                    registry,[m
+[32m+[m[32m                    submit,[m
+                 ]),[m
+             ]),[m
+             ...editingElements,[m
+[1mdiff --git a/packages/frontend/ui/config/layout/contants.ts b/packages/frontend/ui/config/layout/contants.ts[m
+[1mindex fefe4307..70f90bd0 100644[m
+[1m--- a/packages/frontend/ui/config/layout/contants.ts[m
+[1m+++ b/packages/frontend/ui/config/layout/contants.ts[m
+[36m@@ -216,16 +216,6 @@[m [mexport const LayoutSideAdminNavigation: Component[] = [[m
+                     PermissionID.SERVICE_MANAGE,[m
+                 ],[m
+             },[m
+[31m-            {[m
+[31m-                name: 'Registries',[m
+[31m-                type: 'link',[m
+[31m-                url: '/admin/registries',[m
+[31m-                icon: 'fa-brands fa-docker',[m
+[31m-                [LayoutKey.REQUIRED_LOGGED_IN]: true,[m
+[31m-                [LayoutKey.REQUIRED_PERMISSIONS]: [[m
+[31m-                    PermissionID.REGISTRY_MANAGE,[m
+[31m-                ],[m
+[31m-            },[m
+         ],[m
+     },[m
+ [m
+[1mdiff --git a/packages/frontend/ui/pages/admin/services/_id/index.ts b/packages/frontend/ui/pages/admin/services/_id/index.ts[m
+[1mindex b0800479..c2cb8f74 100644[m
+[1m--- a/packages/frontend/ui/pages/admin/services/_id/index.ts[m
+[1m+++ b/packages/frontend/ui/pages/admin/services/_id/index.ts[m
+[36m@@ -7,7 +7,7 @@[m
+ [m
+ import Vue, { PropType } from 'vue';[m
+ import { ServiceID } from '@personalhealthtrain/central-common';[m
+[31m-import RegistryManagement from '../../../../components/domains/service/RegistryManagement';[m
+[32m+[m[32mimport RegistryManagement from '../../../../components/domains/master-image/MasterImagesSync';[m
+ import StationRegistryManagement from '../../../../components/domains/service/StationRegistryManagement';[m
+ [m
+ export default Vue.extend({[m
+[1mdiff --git a/packages/frontend/ui/pages/admin/services/registry/_id.vue b/packages/frontend/ui/pages/admin/services/registry/_id.vue[m
+[1mindex 384de40a..a6cfd2c6 100644[m
+[1m--- a/packages/frontend/ui/pages/admin/services/registry/_id.vue[m
+[1m+++ b/packages/frontend/ui/pages/admin/services/registry/_id.vue[m
+[36m@@ -1,12 +1,12 @@[m
+ <!--[m
+[31m-  Copyright (c) 2021-2021.[m
+[32m+[m[32m  Copyright (c) 2021-2022.[m
+   Author Peter Placzek (tada5hi)[m
+   For the full copyright and license information,[m
+   view the LICENSE file that was distributed with this source code.[m
+   -->[m
+[31m-<script>[m
+[32m+[m[32m<script lang="ts">[m
+ import { PermissionID } from '@personalhealthtrain/central-common';[m
+[31m-import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';[m
+[32m+[m[32mimport { LayoutKey, LayoutNavigationID } from '../../../../config/layout';[m
+ [m
+ export default {[m
+     meta: {[m
+[36m@@ -20,7 +20,9 @@[m [mexport default {[m
+         let entity;[m
+ [m
+         try {[m
+[31m-            entity = await context.$api.registry.getOne(context.params.id);[m
+[32m+[m[32m            entity = await context.$api.registry.getOne(context.params.id, {[m
+[32m+[m[32m                fields: ['+account_secret'],[m
+[32m+[m[32m            });[m
+ [m
+             return {[m
+                 entity,[m
+[36m@@ -41,11 +43,26 @@[m [mexport default {[m
+                     name: 'General', icon: 'fas fa-bars', urlSuffix: '',[m
+                 },[m
+                 {[m
+[31m-                    name: 'Projects', icon: 'fa-solid fa-diagram-project', urlSuffix: 'projects',[m
+[32m+[m[32m                    name: 'Setup', icon: 'fa-solid fa-cog', urlSuffix: 'setup',[m
+                 },[m
+                 {[m
+[31m-                    name: 'Setup', icon: 'fa-solid fa-cog', urlSuffix: 'setup',[m
+[32m+[m[32m                    name: 'Projects',[m
+[32m+[m[32m                    icon: 'fa-solid fa-diagram-project',[m
+[32m+[m[32m                    urlSuffix: 'projects',[m
+[32m+[m[32m                    components: [[m
+[32m+[m[32m                        {[m
+[32m+[m[32m                            name: 'overview',[m
+[32m+[m[32m                            urlSuffix: '',[m
+[32m+[m[32m                            icon: 'fa fa-bars',[m
+[32m+[m[32m                        },[m
+[32m+[m[32m                        {[m
+[32m+[m[32m                            name: 'add',[m
+[32m+[m[32m                            urlSuffix: '/add',[m
+[32m+[m[32m                            icon: 'fa fa-plus',[m
+[32m+[m[32m                        },[m
+[32m+[m[32m                    ],[m
+                 },[m
+[32m+[m
+             ],[m
+         };[m
+     },[m
+[36m@@ -74,41 +91,60 @@[m [mexport default {[m
+ </script>[m
+ <template>[m
+     <div class="container">[m
+[31m-        <h1 class="title no-border mb-3">[m
+[31m-            {{ entity.name }} <span class="sub-title">Details</span>[m
+[31m-        </h1>[m
+[32m+[m[32m        <div class="text-center">[m
+[32m+[m[32m            <h3 class="title no-border mb-3">[m
+[32m+[m[32m                {{ entity.name }}[m
+[32m+[m[32m            </h3>[m
+ [m
+[31m-        <div class="m-b-20 m-t-10">[m
+[31m-            <div class="panel-card">[m
+[31m-                <div class="panel-card-body">[m
+[31m-                    <b-nav pills>[m
+[31m-                        <b-nav-item[m
+[31m-                            :to="'/admin/registries'"[m
+[31m-                            exact[m
+[31m-                            exact-active-class="active"[m
+[31m-                        >[m
+[31m-                            <i class="fa fa-arrow-left" />[m
+[31m-                        </b-nav-item>[m
+[31m-                        <b-nav-item[m
+[31m-                            v-for="(item,key) in tabs"[m
+[31m-                            :key="key"[m
+[31m-                            :disabled="item.active"[m
+[31m-                            :to="'/admin/registries/' + entity.id + '/' + item.urlSuffix"[m
+[31m-                            exact[m
+[31m-                            exact-active-class="active"[m
+[31m-                        >[m
+[31m-                            <i :class="item.icon" />[m
+[31m-                            {{ item.name }}[m
+[31m-                        </b-nav-item>[m
+[32m+[m[32m            <hr>[m
+[32m+[m[32m        </div>[m
+[32m+[m
+[32m+[m[32m        <div>[m
+[32m+[m[32m            <div class="content-wrapper">[m
+[32m+[m[32m                <div class="content-sidebar flex-column">[m
+[32m+[m[32m                    <b-nav[m
+[32m+[m[32m                        pills[m
+[32m+[m[32m                        vertical[m
+[32m+[m[32m                    >[m
+[32m+[m[32m                        <template v-for="(item,key) in tabs">[m
+[32m+[m[32m                            <b-nav-item-dropdown[m
+[32m+[m[32m                                v-if="item.components"[m
+[32m+[m[32m                                :key="key"[m
+[32m+[m[32m                                :text="item.name"[m
+[32m+[m[32m                                :html="'<i class=\''+item.icon+'\'></i> '+item.name"[m
+[32m+[m[32m                                right[m
+[32m+[m[32m                            >[m
+[32m+[m[32m                                <b-dropdown-item[m
+[32m+[m[32m                                    v-for="(subItem, subIndex) in item.components"[m
+[32m+[m[32m                                    :key="subIndex"[m
+[32m+[m[32m                                    :to="'/admin/services/registry/' + entity.id + '/' + item.urlSuffix + subItem.urlSuffix"[m
+[32m+[m[32m                                >[m
+[32m+[m[32m                                    <i :class="subItem.icon" />[m
+[32m+[m[32m                                    {{ subItem.name }}[m
+[32m+[m[32m                                </b-dropdown-item>[m
+[32m+[m[32m                            </b-nav-item-dropdown>[m
+[32m+[m[32m                            <b-nav-item[m
+[32m+[m[32m                                v-if="!item.components"[m
+[32m+[m[32m                                :key="key"[m
+[32m+[m[32m                                :disabled="item.active"[m
+[32m+[m[32m                                :to="'/admin/services/registry/' + entity.id + '/' + item.urlSuffix"[m
+[32m+[m[32m                                exact[m
+[32m+[m[32m                                exact-active-class="active"[m
+[32m+[m[32m                            >[m
+[32m+[m[32m                                <i :class="item.icon" />[m
+[32m+[m[32m                                {{ item.name }}[m
+[32m+[m[32m                            </b-nav-item>[m
+[32m+[m[32m                        </template>[m
+                     </b-nav>[m
+                 </div>[m
+[32m+[m[32m                <div class="content-container">[m
+[32m+[m[32m                    <nuxt-child[m
+[32m+[m[32m                        :entity="entity"[m
+[32m+[m[32m                        @updated="handleUpdated"[m
+[32m+[m[32m                        @deleted="handleDeleted"[m
+[32m+[m[32m                    />[m
+[32m+[m[32m                </div>[m
+             </div>[m
+         </div>[m
+[31m-[m
+[31m-        <nuxt-child[m
+[31m-            :entity="entity"[m
+[31m-            @updated="handleUpdated"[m
+[31m-            @deleted="handleDeleted"[m
+[31m-        />[m
+     </div>[m
+ </template>[m
+[1mdiff --git a/packages/frontend/ui/pages/admin/services/registry/_id/index.vue b/packages/frontend/ui/pages/admin/services/registry/_id/index.vue[m
+[1mindex ee956e38..85311138 100644[m
+[1m--- a/packages/frontend/ui/pages/admin/services/registry/_id/index.vue[m
+[1m+++ b/packages/frontend/ui/pages/admin/services/registry/_id/index.vue[m
+[36m@@ -1,5 +1,5 @@[m
+ <!--[m
+[31m-  Copyright (c) 2021-2021.[m
+[32m+[m[32m  Copyright (c) 2021-2022.[m
+   Author Peter Placzek (tada5hi)[m
+   For the full copyright and license information,[m
+   view the LICENSE file that was distributed with this source code.[m
+[36m@@ -8,7 +8,7 @@[m
+ [m
+ import { PropType } from 'vue';[m
+ import { Registry } from '@personalhealthtrain/central-common';[m
+[31m-import { RegistryForm } from '../../../../components/domains/registry/RegistryForm';[m
+[32m+[m[32mimport { RegistryForm } from '../../../../../components/domains/registry/RegistryForm';[m
+ [m
+ export default {[m
+     components: { RegistryForm },[m
+[1mdiff --git a/packages/frontend/ui/pages/admin/services/registry/_id/projects.vue b/packages/frontend/ui/pages/admin/services/registry/_id/projects.vue[m
+[1mindex c877d04b..cce95bb1 100644[m
+[1m--- a/packages/frontend/ui/pages/admin/services/registry/_id/projects.vue[m
+[1m+++ b/packages/frontend/ui/pages/admin/services/registry/_id/projects.vue[m
+[36m@@ -1,5 +1,5 @@[m
+ <!--[m
+[31m-  Copyright (c) 2021.[m
+[32m+[m[32m  Copyright (c) 2021-2022.[m
+   Author Peter Placzek (tada5hi)[m
+   For the full copyright and license information,[m
+   view the LICENSE file that was distributed with this source code.[m
+[36m@@ -9,7 +9,7 @@[m
+ import { PermissionID } from '@personalhealthtrain/central-common';[m
+ import { PropType } from 'vue';[m
+ import { Realm } from '@authelion/common';[m
+[31m-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';[m
+[32m+[m[32mimport { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';[m
+ [m
+ export default {[m
+     meta: {[m
+[36m@@ -27,16 +27,7 @@[m [mexport default {[m
+             sidebar: {[m
+                 hide: false,[m
+                 items: [[m
+[31m-                    {[m
+[31m-                        name: 'overview',[m
+[31m-                        urlSuffix: '',[m
+[31m-                        icon: 'fa fa-bars',[m
+[31m-                    },[m
+[31m-                    {[m
+[31m-                        name: 'add',[m
+[31m-                        urlSuffix: '/add',[m
+[31m-                        icon: 'fa fa-plus',[m
+[31m-                    },[m
+[32m+[m
+                 ],[m
+             },[m
+         };[m
+[36m@@ -44,27 +35,5 @@[m [mexport default {[m
+ };[m
+ </script>[m
+ <template>[m
+[31m-    <div class="content-wrapper">[m
+[31m-        <div class="content-sidebar flex-column">[m
+[31m-            <b-nav[m
+[31m-                pills[m
+[31m-                vertical[m
+[31m-            >[m
+[31m-                <b-nav-item[m
+[31m-                    v-for="(item,key) in sidebar.items"[m
+[31m-                    :key="key"[m
+[31m-                    :disabled="item.active"[m
+[31m-                    :to="'/admin/registries/'+entity.id+'/projects' + item.urlSuffix"[m
+[31m-                    exact[m
+[31m-                    exact-active-class="active"[m
+[31m-                >[m
+[31m-                    <i :class="item.icon" />[m
+[31m-                    {{ item.name }}[m
+[31m-                </b-nav-item>[m
+[31m-            </b-nav>[m
+[31m-        </div>[m
+[31m-        <div class="content-container">[m
+[31m-            <nuxt-child :entity="entity" />[m
+[31m-        </div>[m
+[31m-    </div>[m
+[32m+[m[32m    <nuxt-child :entity="entity" />[m
+ </template>[m
+[1mdiff --git a/packages/frontend/ui/pages/admin/services/registry/_id/projects/_project_id.vue b/packages/frontend/ui/pages/admin/services/registry/_id/projects/_project_id.vue[m
+[1mindex 66d6813f..6212ab22 100644[m
+[1m--- a/packages/frontend/ui/pages/admin/services/registry/_id/projects/_project_id.vue[m
+[1m+++ b/packages/frontend/ui/pages/admin/services/registry/_id/projects/_project_id.vue[m
+[36m@@ -10,7 +10,7 @@[m [mimport {[m
+     Registry,[m
+     RegistryProject,[m
+ } from '@personalhealthtrain/central-common';[m
+[31m-import { RegistryProjectForm } from '../../../../../components/domains/registry-project/RegistryProjectForm';[m
+[32m+[m[32mimport { RegistryProjectForm } from '../../../../../../components/domains/registry-project/RegistryProjectForm';[m
+ [m
+ // todo: add data, prop, method typing[m
+ export default Vue.extend<any, any, any, any>({[m
+[36m@@ -25,7 +25,7 @@[m [mexport default Vue.extend<any, any, any, any>({[m
+         try {[m
+             const { data: stations } = await context.$api.registryProject.getMany({[m
+                 filter: {[m
+[31m-                    id: context.params.station_id,[m
+[32m+[m[32m                    id: context.params.project_id,[m
+                 },[m
+                 fields: {[m
+                     station: [[m
+[1mdiff --git a/packages/frontend/ui/pages/admin/services/registry/_id/projects/add.vue b/packages/frontend/ui/pages/admin/services/registry/_id/projects/add.vue[m
+[1mindex 3cce5608..b61773ee 100644[m
+[1m--- a/packages/frontend/ui/pages/admin/services/registry/_id/projects/add.vue[m
+[1m+++ b/packages/frontend/ui/pages/admin/services/registry/_id/projects/add.vue[m
+[36m@@ -7,8 +7,8 @@[m
+ <script lang="ts">[m
+ import { PermissionID, Registry } from '@personalhealthtrain/central-common';[m
+ import { PropType } from 'vue';[m
+[31m-import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';[m
+[31m-import { RegistryProjectForm } from '../../../../../components/domains/registry-project/RegistryProjectForm';[m
+[32m+[m[32mimport { LayoutKey, LayoutNavigationID } from '../../../../../../config/layout';[m
+[32m+[m[32mimport { RegistryProjectForm } from '../../../../../../components/domains/registry-project/RegistryProjectForm';[m
+ [m
+ export default {[m
+     components: { RegistryProjectForm },[m
+[36m@@ -29,7 +29,7 @@[m [mexport default {[m
+                 variant: 'success',[m
+             });[m
+ [m
+[31m-            this.$nuxt.$router.push(`/admin/registries/${this.entity.id}/projects/${e.id}`);[m
+[32m+[m[32m            this.$nuxt.$router.push(`/admin/services/registry/${this.entity.id}/projects/${e.id}`);[m
+         },[m
+         handleFailed(e) {[m
+             this.$bvToast.toast(e.message, {[m
+[1mdiff --git a/packages/frontend/ui/pages/admin/services/registry/_id/projects/index.vue b/packages/frontend/ui/pages/admin/services/registry/_id/projects/index.vue[m
+[1mindex 03c405a4..0948d9d2 100644[m
+[1m--- a/packages/frontend/ui/pages/admin/services/registry/_id/projects/index.vue[m
+[1m+++ b/packages/frontend/ui/pages/admin/services/registry/_id/projects/index.vue[m
+[36m@@ -7,11 +7,12 @@[m
+ <script lang="ts">[m
+ import { PermissionID, Registry } from '@personalhealthtrain/central-common';[m
+ import { PropType } from 'vue';[m
+[31m-import { RegistryProjectList } from '../../../../../components/domains/registry-project/RegistryProjectList';[m
+[31m-import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';[m
+[32m+[m[32mimport { RegistryProjectList } from '../../../../../../components/domains/registry-project/RegistryProjectList';[m
+[32m+[m[32mimport { LayoutKey, LayoutNavigationID } from '../../../../../../config/layout';[m
+[32m+[m[32mimport RegistryProjectDetails from '../../../../../../components/domains/registry-project/RegistryProjectDetails';[m
+ [m
+ export default {[m
+[31m-    components: { RegistryProjectList },[m
+[32m+[m[32m    components: { RegistryProjectDetails, RegistryProjectList },[m
+     meta: {[m
+         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,[m
+         [LayoutKey.REQUIRED_LOGGED_IN]: true,[m
+[36m@@ -22,14 +23,19 @@[m [mexport default {[m
+     data() {[m
+         return {[m
+             query: {[m
+[31m-                filters: {[m
+[31m-                    realm_id: this.entity.id,[m
+[32m+[m[32m                filter: {[m
+[32m+[m[32m                    registry_id: this.entity.id,[m
+                 },[m
+[32m+[m[32m                fields: ['+account_secret'],[m
+             },[m
+[32m+[m[32m            item: null,[m
+             fields: [[m
+                 {[m
+                     key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',[m
+                 },[m
+[32m+[m[32m                {[m
+[32m+[m[32m                    key: 'type', label: 'Type', thClass: 'text-left', tdClass: 'text-left',[m
+[32m+[m[32m                },[m
+                 {[m
+                     key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',[m
+                 },[m
+[36m@@ -63,53 +69,85 @@[m [mexport default {[m
+ [m
+             this.$refs.itemsList.handleDeleted(item);[m
+         },[m
+[32m+[m[32m        showDetails(item) {[m
+[32m+[m[32m            this.item = item;[m
+[32m+[m[32m            this.$refs.modal.show();[m
+[32m+[m[32m        },[m
+     },[m
+ };[m
+ </script>[m
+ <template>[m
+[31m-    <registry-project-list[m
+[31m-        ref="itemsList"[m
+[31m-        :query="query"[m
+[31m-        :load-on-init="true"[m
+[31m-    >[m
+[31m-        <template #items="props">[m
+[31m-            <b-table[m
+[31m-                :items="props.items"[m
+[31m-                :fields="fields"[m
+[31m-                :busy="props.busy"[m
+[31m-                head-variant="'dark'"[m
+[31m-                outlined[m
+[31m-            >[m
+[31m-                <template #cell(options)="data">[m
+[31m-                    <nuxt-link[m
+[31m-                        v-if="canView"[m
+[31m-                        class="btn btn-xs btn-outline-primary"[m
+[31m-                        :to="'/admin/registries/'+entity.id+'/projects/'+data.item.id"[m
+[31m-                    >[m
+[31m-                        <i class="fa fa-bars" />[m
+[31m-                    </nuxt-link>[m
+[31m-                    <entity-delete[m
+[31m-                        v-if="canDrop"[m
+[31m-                        class="btn btn-xs btn-outline-danger"[m
+[31m-                        :entity-id="data.item.id"[m
+[31m-                        :entity-type="'registryProject'"[m
+[31m-                        :with-text="false"[m
+[31m-                        @deleted="handleDeleted"[m
+[31m-                    />[m
+[31m-                </template>[m
+[31m-                <template #cell(created_at)="data">[m
+[31m-                    <timeago :datetime="data.item.created_at" />[m
+[31m-                </template>[m
+[31m-                <template #cell(updated_at)="data">[m
+[31m-                    <timeago :datetime="data.item.updated_at" />[m
+[31m-                </template>[m
+[31m-                <template #table-busy>[m
+[31m-                    <div class="text-center text-danger my-2">[m
+[31m-                        <b-spinner class="align-middle" />[m
+[31m-                        <strong>Loading...</strong>[m
+[31m-                    </div>[m
+[31m-                </template>[m
+[31m-            </b-table>[m
+[31m-        </template>[m
+[31m-    </registry-project-list>[m
+[32m+[m[32m    <div>[m
+[32m+[m[32m        <registry-project-list[m
+[32m+[m[32m            ref="itemsList"[m
+[32m+[m[32m            :query="query"[m
+[32m+[m[32m            :load-on-init="true"[m
+[32m+[m[32m        >[m
+[32m+[m[32m            <template #items="props">[m
+[32m+[m[32m                <b-table[m
+[32m+[m[32m                    :items="props.items"[m
+[32m+[m[32m                    :fields="fields"[m
+[32m+[m[32m                    :busy="props.busy"[m
+[32m+[m[32m                    head-variant="'dark'"[m
+[32m+[m[32m                    outlined[m
+[32m+[m[32m                >[m
+[32m+[m[32m                    <template #cell(type)="data">[m
+[32m+[m[32m                        <span class="badge badge-dark">[m
+[32m+[m[32m                            {{ data.item.type }}[m
+[32m+[m[32m                        </span>[m
+[32m+[m[32m                    </template>[m
+[32m+[m[32m                    <template #cell(options)="data">[m
+[32m+[m[32m                        <nuxt-link[m
+[32m+[m[32m                            v-if="canView"[m
+[32m+[m[32m                            class="btn btn-xs btn-outline-primary"[m
+[32m+[m[32m                            :to="'/admin/services/registry/'+entity.id+'/projects/'+data.item.id"[m
+[32m+[m[32m                        >[m
+[32m+[m[32m                            <i class="fa fa-bars" />[m
+[32m+[m[32m                        </nuxt-link>[m
+[32m+[m[32m                        <button[m
+[32m+[m[32m                            type="button"[m
+[32m+[m[32m                            class="btn btn-xs btn-outline-dark"[m
+[32m+[m[32m                            @click.prevent="showDetails(data.item)"[m
+[32m+[m[32m                        >[m
+[32m+[m[32m                            <i class="fa-solid fa-info" />[m
+[32m+[m[32m                        </button>[m
+[32m+[m[32m                        <entity-delete[m
+[32m+[m[32m                            v-if="canDrop"[m
+[32m+[m[32m                            class="btn btn-xs btn-outline-danger"[m
+[32m+[m[32m                            :entity-id="data.item.id"[m
+[32m+[m[32m                            :entity-type="'registryProject'"[m
+[32m+[m[32m                            :with-text="false"[m
+[32m+[m[32m                            @deleted="handleDeleted"[m
+[32m+[m[32m                        />[m
+[32m+[m[32m                    </template>[m
+[32m+[m[32m                    <template #cell(created_at)="data">[m
+[32m+[m[32m                        <timeago :datetime="data.item.created_at" />[m
+[32m+[m[32m                    </template>[m
+[32m+[m[32m                    <template #cell(updated_at)="data">[m
+[32m+[m[32m                        <timeago :datetime="data.item.updated_at" />[m
+[32m+[m[32m                    </template>[m
+[32m+[m[32m                    <template #table-busy>[m
+[32m+[m[32m                        <div class="text-center text-danger my-2">[m
+[32m+[m[32m                            <b-spinner class="align-middle" />[m
+[32m+[m[32m                            <strong>Loading...</strong>[m
+[32m+[m[32m                        </div>[m
+[32m+[m[32m                    </template>[m
+[32m+[m[32m                </b-table>[m
+[32m+[m[32m            </template>[m
+[32m+[m[32m        </registry-project-list>[m
+[32m+[m
+[32m+[m[32m        <b-modal[m
+[32m+[m[32m            ref="modal"[m
+[32m+[m[32m            size="lg"[m
+[32m+[m[32m            button-size="sm"[m
+[32m+[m[32m            :title-html="'<i class=\'fa-solid fa-diagram-project pr-1 \'></i> ' + (item ? item.name : 'Unknown') + '-Project'"[m
+[32m+[m[32m            :no-close-on-backdrop="true"[m
+[32m+[m[32m            :no-close-on-esc="true"[m
+[32m+[m[32m            :hide-footer="true"[m
+[32m+[m[32m        >[m
+[32m+[m[32m            <registry-project-details[m
+[32m+[m[32m                :entity="item"[m
+[32m+[m[32m            />[m
+[32m+[m[32m        </b-modal>[m
+[32m+[m[32m    </div>[m
+ </template>[m
+[1mdiff --git a/packages/frontend/ui/pages/admin/services/registry/_id/setup.vue b/packages/frontend/ui/pages/admin/services/registry/_id/setup.vue[m
+[1mindex 8ac29143..969ce849 100644[m
+[1m--- a/packages/frontend/ui/pages/admin/services/registry/_id/setup.vue[m
+[1m+++ b/packages/frontend/ui/pages/admin/services/registry/_id/setup.vue[m
+[36m@@ -1,5 +1,5 @@[m
+ <!--[m
+[31m-  Copyright (c) 2021-2021.[m
+[32m+[m[32m  Copyright (c) 2021-2022.[m
+   Author Peter Placzek (tada5hi)[m
+   For the full copyright and license information,[m
+   view the LICENSE file that was distributed with this source code.[m
+[36m@@ -7,7 +7,7 @@[m
+ <script lang="ts">[m
+ import { PropType } from 'vue';[m
+ import { Registry } from '@personalhealthtrain/central-common';[m
+[31m-import RegistrySetup from '../../../../components/domains/registry/RegistrySetup';[m
+[32m+[m[32mimport RegistrySetup from '../../../../../components/domains/registry/RegistrySetup';[m
+ [m
+ export default {[m
+     components: { RegistrySetup },[m
+[1mdiff --git a/packages/frontend/ui/pages/admin/services/registry/index.vue b/packages/frontend/ui/pages/admin/services/registry/index.vue[m
+[1mindex 75c3ff1d..507a0fc8 100644[m
+[1m--- a/packages/frontend/ui/pages/admin/services/registry/index.vue[m
+[1m+++ b/packages/frontend/ui/pages/admin/services/registry/index.vue[m
+[36m@@ -1,5 +1,5 @@[m
+ <!--[m
+[31m-  Copyright (c) 2021.[m
+[32m+[m[32m  Copyright (c) 2021-2022.[m
+   Author Peter Placzek (tada5hi)[m
+   For the full copyright and license information,[m
+   view the LICENSE file that was distributed with this source code.[m
+[36m@@ -8,7 +8,7 @@[m
+ <script>[m
+ [m
+ import { PermissionID } from '@personalhealthtrain/central-common';[m
+[31m-import { LayoutKey, LayoutNavigationID } from '../../../config/layout';[m
+[32m+[m[32mimport { LayoutKey, LayoutNavigationID } from '../../../../config/layout';[m
+ [m
+ export default {[m
+     meta: {[m
+[36m@@ -48,11 +48,7 @@[m [mexport default {[m
+ };[m
+ </script>[m
+ <template>[m
+[31m-    <div class="container">[m
+[31m-        <h1 class="title no-border mb-3">[m
+[31m-            Registry <span class="sub-title">Management</span>[m
+[31m-        </h1>[m
+[31m-[m
+[32m+[m[32m    <div>[m
+         <div class="content-wrapper">[m
+             <div class="content-sidebar flex-column">[m
+                 <b-nav[m
+[36m@@ -63,7 +59,7 @@[m [mexport default {[m
+                         v-for="(item,key) in sidebar.items"[m
+                         :key="key"[m
+                         :disabled="item.active"[m
+[31m-                        :to="'/admin/registries' + item.urlSuffix"[m
+[32m+[m[32m                        :to="'/admin/services/registry' + item.urlSuffix"[m
+                         exact[m
+                         exact-active-class="active"[m
+                     >[m
+[1mdiff --git a/packages/frontend/ui/pages/admin/services/registry/index/add.vue b/packages/frontend/ui/pages/admin/services/registry/index/add.vue[m
+[1mindex 47781f10..d9ce0fb6 100644[m
+[1m--- a/packages/frontend/ui/pages/admin/services/registry/index/add.vue[m
+[1m+++ b/packages/frontend/ui/pages/admin/services/registry/index/add.vue[m
+[36m@@ -6,8 +6,8 @@[m
+   -->[m
+ <script>[m
+ import { PermissionID } from '@personalhealthtrain/central-common';[m
+[31m-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';[m
+[31m-import { RegistryForm } from '../../../../components/domains/registry/RegistryForm';[m
+[32m+[m[32mimport { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';[m
+[32m+[m[32mimport { RegistryForm } from '../../../../../components/domains/registry/RegistryForm';[m
+ [m
+ export default {[m
+     components: { RegistryForm },[m
+[36m@@ -20,7 +20,7 @@[m [mexport default {[m
+     },[m
+     methods: {[m
+         handleCreated(e) {[m
+[31m-            this.$nuxt.$router.push(`/admin/registries/${e.id}`);[m
+[32m+[m[32m            this.$nuxt.$router.push(`/admin/services/registry/${e.id}`);[m
+         },[m
+     },[m
+ };[m
+[1mdiff --git a/packages/frontend/ui/pages/admin/services/registry/index/index.vue b/packages/frontend/ui/pages/admin/services/registry/index/index.vue[m
+[1mindex 870b5264..bfaf158c 100644[m
+[1m--- a/packages/frontend/ui/pages/admin/services/registry/index/index.vue[m
+[1m+++ b/packages/frontend/ui/pages/admin/services/registry/index/index.vue[m
+[36m@@ -6,8 +6,8 @@[m
+   -->[m
+ <script>[m
+ import { PermissionID } from '@personalhealthtrain/central-common';[m
+[31m-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';[m
+[31m-import { RegistryList } from '../../../../components/domains/registry/RegistryList';[m
+[32m+[m[32mimport { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';[m
+[32m+[m[32mimport { RegistryList } from '../../../../../components/domains/registry/RegistryList';[m
+ [m
+ export default {[m
+     components: { RegistryList },[m
+[36m@@ -79,7 +79,7 @@[m [mexport default {[m
+                     <nuxt-link[m
+                         v-if="canManage"[m
+                         v-b-tooltip="'Overview'"[m
+[31m-                        :to="'/admin/registries/'+data.item.id"[m
+[32m+[m[32m                        :to="'/admin/services/registry/'+data.item.id"[m
+                         class="btn btn-xs btn-outline-primary"[m
+                     >[m
+                         <i class="fa fa-bars" />[m
+[1mdiff --git a/packages/shared/common/src/domains/core/registry-project/constants.ts b/packages/shared/common/src/domains/core/registry-project/constants.ts[m
+[1mindex 67518639..4e0375e7 100644[m
+[1m--- a/packages/shared/common/src/domains/core/registry-project/constants.ts[m
+[1m+++ b/packages/shared/common/src/domains/core/registry-project/constants.ts[m
+[36m@@ -7,9 +7,9 @@[m
+ [m
+ export enum RegistryProjectType {[m
+     DEFAULT = 'default',[m
+[31m-    ECOSYSTEM_AGGREGATOR = 'ecosystemAggregator',[m
+[32m+[m[32m    AGGREGATOR = 'aggregator',[m
+     INCOMING = 'incoming',[m
+     OUTGOING = 'outgoing',[m
+[31m-    MASTER_IMAGES = 'masterImage',[m
+[32m+[m[32m    MASTER_IMAGES = 'masterImages',[m
+     STATION = 'station',[m
+ }[m
+[1mdiff --git a/packages/shared/common/src/domains/core/registry-project/entity.ts b/packages/shared/common/src/domains/core/registry-project/entity.ts[m
+[1mindex ff1029a0..00166904 100644[m
+[1m--- a/packages/shared/common/src/domains/core/registry-project/entity.ts[m
+[1m+++ b/packages/shared/common/src/domains/core/registry-project/entity.ts[m
+[36m@@ -19,6 +19,8 @@[m [mexport interface RegistryProject {[m
+ [m
+     type: RegistryProjectType;[m
+ [m
+[32m+[m[32m    public: boolean;[m
+[32m+[m
+     // ------------------------------------------------------------------[m
+ [m
+     // a-z0-9-_ {0,255}[m
+[36m@@ -36,6 +38,8 @@[m [mexport interface RegistryProject {[m
+ [m
+     // ------------------------------------------------------------------[m
+ [m
+[32m+[m[32m    webhook_name: string | null;[m
+[32m+[m
+     webhook_exists: boolean | null;[m
+ [m
+     // ------------------------------------------------------------------[m
+[1mdiff --git a/packages/shared/common/src/domains/core/registry/entity.ts b/packages/shared/common/src/domains/core/registry/entity.ts[m
+[1mindex 6776f780..a9011534 100644[m
+[1m--- a/packages/shared/common/src/domains/core/registry/entity.ts[m
+[1m+++ b/packages/shared/common/src/domains/core/registry/entity.ts[m
+[36m@@ -13,7 +13,7 @@[m [mexport interface Registry {[m
+ [m
+     name: string;[m
+ [m
+[31m-    address: string;[m
+[32m+[m[32m    host: string;[m
+ [m
+     ecosystem: Ecosystem;[m
+ [m
+[1mdiff --git a/packages/shared/common/src/domains/core/registry/utils.ts b/packages/shared/common/src/domains/core/registry/utils.ts[m
+[1mindex 711e1f13..23e99c3e 100644[m
+[1m--- a/packages/shared/common/src/domains/core/registry/utils.ts[m
+[1m+++ b/packages/shared/common/src/domains/core/registry/utils.ts[m
+[36m@@ -7,7 +7,9 @@[m
+ [m
+ import { Registry } from './entity';[m
+ [m
+[31m-export function buildConnectionStringFromRegistry(entity: Registry) {[m
+[31m-    // ensure /api/v2.0/ is represent[m
+[31m-    return `${entity.account_name}:${entity.account_secret}@${entity.address}`;[m
+[32m+[m[32mexport function buildAPIConnectionStringFromRegistry(entity: Registry) {[m
+[32m+[m[32m    // todo: support other registries beside harbor and v2.0[m
+[32m+[m
+[32m+[m[32m    const url = `https://${entity.host}/api/v2.0/`;[m
+[32m+[m[32m    return `${entity.account_name}:${entity.account_secret}@${url}`;[m
+ }[m
+[1mdiff --git a/packages/shared/common/src/domains/core/station/entity.ts b/packages/shared/common/src/domains/core/station/entity.ts[m
+[1mindex a00d8d34..e6373f22 100644[m
+[1m--- a/packages/shared/common/src/domains/core/station/entity.ts[m
+[1m+++ b/packages/shared/common/src/domains/core/station/entity.ts[m
+[36m@@ -13,7 +13,7 @@[m [mimport { Registry } from '../registry';[m
+ export interface Station {[m
+     id: string;[m
+ [m
+[31m-    external_id: string;[m
+[32m+[m[32m    external_id: string | null;[m
+ [m
+     name: string;[m
+ [m
+[1mdiff --git a/packages/shared/common/src/domains/core/train/entity.ts b/packages/shared/common/src/domains/core/train/entity.ts[m
+[1mindex 2daad35f..e104a8c3 100644[m
+[1m--- a/packages/shared/common/src/domains/core/train/entity.ts[m
+[1m+++ b/packages/shared/common/src/domains/core/train/entity.ts[m
+[36m@@ -50,8 +50,6 @@[m [mexport interface Train {[m
+ [m
+     build_status: TrainBuildStatus | null;[m
+ [m
+[31m-    build_id: string | null;[m
+[31m-[m
+     build_registry_project_id: RegistryProject['id'] | null;[m
+ [m
+     build_registry_project: RegistryProject | null;[m
+[36m@@ -100,6 +98,10 @@[m [mexport interface Train {[m
+ [m
+     result_status: TrainResultStatus | null;[m
+ [m
+[32m+[m[32m    result_registry_project_id: RegistryProject['id'] | null;[m
+[32m+[m
+[32m+[m[32m    result_registry_project: RegistryProject | null;[m
+[32m+[m
+     // ------------------------------------------------------------------[m
+     proposal_id: Proposal['id'];[m
+ [m
+[1mdiff --git a/packages/shared/common/src/domains/special/train-manager/constants.ts b/packages/shared/common/src/domains/special/train-manager/constants.ts[m
+[1mindex 4716c6c4..b2569a8e 100644[m
+[1m--- a/packages/shared/common/src/domains/special/train-manager/constants.ts[m
+[1m+++ b/packages/shared/common/src/domains/special/train-manager/constants.ts[m
+[36m@@ -63,12 +63,13 @@[m [mexport enum TrainManagerRoutingQueueEvent {[m
+ [m
+ export enum TrainManagerRoutingErrorType {[m
+     TRAIN_NOT_BUILD = 'trainNotBuild',[m
+[32m+[m[32m    ROUTE_EMPTY = 'routeEmpty',[m
+     UNKNOWN = 'unknown',[m
+ }[m
+ [m
+ export enum TrainManagerRoutingStep {[m
+     START = 'start',[m
+[31m-    MOVE = 'move',[m
+[32m+[m[32m    ROUTE = 'route',[m
+     UNKNOWN = 'unknown',[m
+ }[m
+ [m
+[1mdiff --git a/packages/shared/common/src/domains/utils.ts b/packages/shared/common/src/domains/utils.ts[m
+[1mindex 70fd2e29..ec991a61 100644[m
+[1m--- a/packages/shared/common/src/domains/utils.ts[m
+[1m+++ b/packages/shared/common/src/domains/utils.ts[m
+[36m@@ -19,6 +19,10 @@[m [mexport function useDomainAPI(client: HTTPClient, name: string) {[m
+             return client.proposal;[m
+         case 'proposalStation':[m
+             return client.proposalStation;[m
+[32m+[m[32m        case 'registry':[m
+[32m+[m[32m            return client.registry;[m
+[32m+[m[32m        case 'registryProject':[m
+[32m+[m[32m            return client.registryProject;[m
+         case 'station':[m
+             return client.station;[m
+         case 'train':[m
+[1mdiff --git a/packages/shared/common/src/http/contants.ts b/packages/shared/common/src/http/contants.ts[m
+[1mindex 5cc5e58e..09cb1a43 100644[m
+[1m--- a/packages/shared/common/src/http/contants.ts[m
+[1m+++ b/packages/shared/common/src/http/contants.ts[m
+[36m@@ -8,5 +8,4 @@[m
+ export enum HTTPClientKey {[m
+     DEFAULT = 'default',[m
+     VAULT = 'vault',[m
+[31m-    HARBOR = 'harbor',[m
+ }[m

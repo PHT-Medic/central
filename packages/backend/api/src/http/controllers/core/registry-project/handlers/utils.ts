@@ -61,7 +61,7 @@ export async function runRegistryProjectValidation(
     if (operation === 'create') {
         await check('type')
             .exists()
-            .isIn(Object.keys(RegistryProjectType))
+            .isIn(Object.values(RegistryProjectType))
             .run(req);
     }
 

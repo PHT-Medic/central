@@ -6,16 +6,18 @@
  */
 
 import {
-    Ecosystem, PermissionID, RegistryProjectType, createNanoID, isHex,
+    PermissionID, RegistryProjectType, createNanoID, isHex,
 } from '@personalhealthtrain/central-common';
 import { BadRequestError, ForbiddenError } from '@typescript-error/http';
 import { validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
+import { publishMessage } from 'amqp-extension';
 import { ExpressValidationError } from '../../../../express-validation';
 import { runStationValidation } from './utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
 export async function createStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.STATION_ADD)) {
@@ -42,13 +44,13 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
 
     // -----------------------------------------------------
 
+    if (!entity.ecosystem) {
+        entity.ecosystem = result.meta.registry.ecosystem;
+    }
+
     if (
         entity.registry_id
     ) {
-        if (!entity.ecosystem) {
-            entity.ecosystem = result.meta.registry.ecosystem;
-        }
-
         if (entity.ecosystem !== result.meta.registry.ecosystem) {
             throw new BadRequestError('The ecosystem of the station and the registry must be the same.');
         }
@@ -61,13 +63,22 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
             ecosystem: entity.ecosystem,
             type: RegistryProjectType.STATION,
             registry_id: entity.registry_id,
+            realm_id: entity.realm_id,
+            public: false,
         });
 
         await registryProjectRepository.save(registryProject);
 
         entity.registry_project_id = registryProject.id;
 
-        // todo: create setup registry project queue message
+        const queueMessage = buildRegistryQueueMessage(
+            RegistryQueueCommand.PROJECT_LINK,
+            {
+                id: registryProject.id,
+            },
+        );
+
+        await publishMessage(queueMessage);
     }
 
     // -----------------------------------------------------

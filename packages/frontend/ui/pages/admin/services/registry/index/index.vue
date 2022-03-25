@@ -4,34 +4,25 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script lang="ts">
-import { PermissionID, Registry } from '@personalhealthtrain/central-common';
-import { PropType } from 'vue';
-import { RegistryProjectList } from '../../../../../components/domains/registry-project/RegistryProjectList';
-import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
+<script>
+import { PermissionID } from '@personalhealthtrain/central-common';
+import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';
+import { RegistryList } from '../../../../../components/domains/registry/RegistryList';
 
 export default {
-    components: { RegistryProjectList },
+    components: { RegistryList },
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
     },
-    props: {
-        entity: Object as PropType<Registry>,
-    },
     data() {
         return {
-            query: {
-                filters: {
-                    realm_id: this.entity.id,
-                },
-            },
             fields: [
                 {
-                    key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
-                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+                    key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
                     key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
@@ -39,27 +30,25 @@ export default {
                 {
                     key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
                 },
-                {
-                    key: 'options', label: '', tdClass: 'text-left',
-                },
+                { key: 'options', label: '', tdClass: 'text-left' },
             ],
         };
     },
     computed: {
-        canView() {
-            return this.$auth.hasPermission(PermissionID.STATION_EDIT) ||
-                this.$auth.hasPermission(PermissionID.STATION_DROP);
+        query() {
+            return {
+                sort: {
+                    updated_at: 'DESC',
+                },
+            };
         },
-        canDrop() {
-            return this.$auth.hasPermission(PermissionID.STATION_DROP);
+        canManage() {
+            return this.$auth.hasPermission(PermissionID.REGISTRY_MANAGE);
         },
     },
     methods: {
         async handleDeleted(item) {
-            this.$bvToast.toast('The project was successfully deleted.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
+            this.$emit('deleted', item);
 
             this.$refs.itemsList.handleDeleted(item);
         },
@@ -67,11 +56,14 @@ export default {
 };
 </script>
 <template>
-    <registry-project-list
+    <registry-list
         ref="itemsList"
-        :query="query"
         :load-on-init="true"
+        :query="query"
     >
+        <template #header-title>
+            <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
+        </template>
         <template #items="props">
             <b-table
                 :items="props.items"
@@ -80,21 +72,25 @@ export default {
                 head-variant="'dark'"
                 outlined
             >
+                <template #cell(realm)="data">
+                    <span class="badge-dark badge">{{ data.item.realm_id }}</span>
+                </template>
                 <template #cell(options)="data">
                     <nuxt-link
-                        v-if="canView"
+                        v-if="canManage"
+                        v-b-tooltip="'Overview'"
+                        :to="'/admin/services/registry/'+data.item.id"
                         class="btn btn-xs btn-outline-primary"
-                        :to="'/admin/registries/'+entity.id+'/projects/'+data.item.id"
                     >
                         <i class="fa fa-bars" />
                     </nuxt-link>
-                    <entity-delete
-                        v-if="canDrop"
+                    <auth-entity-delete
+                        v-if="canManage"
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
-                        :entity-type="'registryProject'"
+                        :entity-type="'registry'"
                         :with-text="false"
-                        @deleted="handleDeleted"
+                        @done="handleDeleted"
                     />
                 </template>
                 <template #cell(created_at)="data">
@@ -111,5 +107,5 @@ export default {
                 </template>
             </b-table>
         </template>
-    </registry-project-list>
+    </registry-list>
 </template>

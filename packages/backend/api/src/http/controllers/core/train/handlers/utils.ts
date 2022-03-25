@@ -124,7 +124,7 @@ export async function runTrainValidation(
         }
 
         if (result.meta.registry.ecosystem !== Ecosystem.DEFAULT) {
-            throw new BadRequestError('The registry must be part of the local ecosystem.');
+            throw new BadRequestError('The registry must be part of the default ecosystem.');
         }
     }
 

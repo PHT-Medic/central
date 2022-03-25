@@ -7,8 +7,8 @@
 <script lang="ts">
 import { PermissionID, Registry } from '@personalhealthtrain/central-common';
 import { PropType } from 'vue';
-import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
-import { RegistryProjectForm } from '../../../../../components/domains/registry-project/RegistryProjectForm';
+import { LayoutKey, LayoutNavigationID } from '../../../../../../config/layout';
+import { RegistryProjectForm } from '../../../../../../components/domains/registry-project/RegistryProjectForm';
 
 export default {
     components: { RegistryProjectForm },
@@ -29,7 +29,7 @@ export default {
                 variant: 'success',
             });
 
-            this.$nuxt.$router.push(`/admin/registries/${this.entity.id}/projects/${e.id}`);
+            this.$nuxt.$router.push(`/admin/services/registry/${this.entity.id}/projects/${e.id}`);
         },
         handleFailed(e) {
             this.$bvToast.toast(e.message, {

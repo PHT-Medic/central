@@ -7,7 +7,7 @@
 
 import Vue, { PropType } from 'vue';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import RegistryManagement from '../../../../components/domains/service/RegistryManagement';
+import RegistryManagement from '../../../../components/domains/master-image/MasterImagesSync';
 import StationRegistryManagement from '../../../../components/domains/service/StationRegistryManagement';
 
 export default Vue.extend({

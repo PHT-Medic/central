@@ -9,14 +9,12 @@ import { getRepository } from 'typeorm';
 import { NotFoundError } from '@typescript-error/http';
 import {
     Ecosystem,
-    HTTPClientKey,
     HarborAPI,
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
     RegistryProjectSecretStoragePayload,
     VaultAPI,
-    buildConnectionStringFromRegistry,
-    buildRegistryProjectFromSecretStoragePayload,
-    buildRegistryProjectSecretStoragePayload, createBasicHarborAPIConfig, mergeDeep,
+    buildAPIConnectionStringFromRegistry,
+    createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
@@ -30,7 +28,9 @@ import { ensureRemoteRegistryProjectWebhook } from '../../../domains/special/reg
 import { ApiKey } from '../../../config/api';
 import { RegistryEntity } from '../../../domains/core/registry/entity';
 
-export async function setupRegistryProjectForRemote(payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_SETUP>) {
+export async function linkRegistryProject(
+    payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_LINK>,
+) {
     const repository = getRepository(RegistryProjectEntity);
 
     let { entity } = payload;
@@ -38,15 +38,9 @@ export async function setupRegistryProjectForRemote(payload: RegistryQueuePayloa
     if (!entity) {
         entity = await repository.createQueryBuilder('registryProject')
             .addSelect([
-                'registryProject.external_id',
-                'registryProject.account_id',
-                'registryProject.account_name',
-                'registryProject.account_token',
-                'registryProject.webhook_exists',
-                'registryProject.alias',
+                'registryProject.account_secret',
             ])
-            .leftJoinAndSelect('registryProject.registry', 'registry')
-            .where('registryProject.id = :id', { id: payload.entityId })
+            .where('registryProject.id = :id', { id: payload.id })
             .getOne();
     }
 
@@ -54,98 +48,90 @@ export async function setupRegistryProjectForRemote(payload: RegistryQueuePayloa
         throw new NotFoundError();
     }
 
+    if (entity.ecosystem !== Ecosystem.DEFAULT) {
+        return;
+    }
+
     const registryRepository = getRepository(RegistryEntity);
     const registryEntity = await registryRepository.createQueryBuilder('registry')
         .addSelect([
-            'registry.address',
-            'registry.account_name',
-            'registry.account_token',
+            'registry.account_secret',
         ])
-        .where('registryProject.id = :id', { id: entity.registry_id })
+        .where('registry.id = :id', { id: entity.registry_id })
         .getOne();
 
-    const connectionString = buildConnectionStringFromRegistry(registryEntity);
+    const connectionString = buildAPIConnectionStringFromRegistry(registryEntity);
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
     const httpClient = createClient<HarborAPI>(httpClientConfig);
 
-    switch (entity.ecosystem) {
-        case Ecosystem.DEFAULT: {
-            await ensureRemoteRegistryProject(httpClient, {
-                remoteId: entity.external_id,
-                remoteName: entity.external_name,
-            });
+    await ensureRemoteRegistryProject(httpClient, {
+        remoteId: entity.external_id,
+        remoteName: entity.external_name,
+        remoteOptions: {
+            public: entity.public,
+        },
+    });
 
-            await ensureRemoteRegistryProjectAccount(httpClient, {
-                name: entity.external_name,
-                account: {
-                    id: entity.account_id,
-                    name: entity.account_name,
-                    secret: entity.account_secret,
-                },
-            });
+    const robotAccount = await ensureRemoteRegistryProjectAccount(httpClient, {
+        name: entity.external_name,
+        account: {
+            id: entity.account_id,
+            name: entity.account_name,
+            secret: entity.account_secret,
+        },
+    });
 
-            await ensureRemoteRegistryProjectWebhook(httpClient, {
-                idOrName: entity.external_name,
-                isName: true,
-            });
-
-            // -------------------------------------------------------------------------
-
-            const response = await useClient<VaultAPI>(HTTPClientKey.VAULT)
-                .keyValue
-                .find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, `${entity.external_name}`);
-
-            const data : RegistryProjectSecretStoragePayload = mergeDeep(
-                (response ? response.data : {}),
-                buildRegistryProjectSecretStoragePayload(entity),
-            );
-
-            await useClient<VaultAPI>(ApiKey.VAULT).keyValue.save(
-                REGISTRY_PROJECT_SECRET_ENGINE_KEY,
-                `${entity.external_name}`,
-                data,
-            );
-
-            entity = repository.merge(entity, buildRegistryProjectFromSecretStoragePayload(data));
-
-            await repository.save(entity);
-            break;
-        }
-        default:
-            //
-            break;
+    if (robotAccount) {
+        entity.account_id = `${robotAccount.id}`;
+        entity.account_name = robotAccount.name;
+        entity.account_secret = robotAccount.secret;
     }
+
+    const webhook = await ensureRemoteRegistryProjectWebhook(httpClient, {
+        idOrName: entity.external_name,
+        isName: true,
+    });
+
+    if (webhook) {
+        entity.webhook_name = webhook.name;
+        entity.webhook_exists = true;
+    }
+
+    await repository.save(entity);
 }
 
-export async function deleteRegistryProjectFromRemote(payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_DELETE>) {
-    // todo : separate query for registry to get "hidden" files ;)
+export async function unlinkRegistryProject(
+    payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_UNLINK>,
+) {
+    const registryRepository = getRepository(RegistryEntity);
+    const registryEntity = await registryRepository.createQueryBuilder('registry')
+        .addSelect([
+            'registry.account_secret',
+        ])
+        .where('registry.id = :id', { id: payload.registryId })
+        .getOne();
 
-    const connectionString = buildConnectionStringFromRegistry(payload.entity.registry);
+    const connectionString = buildAPIConnectionStringFromRegistry(registryEntity);
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
     const httpClient = createClient<HarborAPI>(httpClientConfig);
 
     try {
-        const isProjectName = !payload.entity.external_id;
-        const id = isProjectName ?
-            payload.entity.external_name :
-            payload.entity.external_id;
-
         await httpClient.project
-            .delete(id, isProjectName);
+            .delete(payload.externalName, true);
     } catch (e) {
         // ...
     }
 
-    if (payload.entity.account_id) {
+    if (payload.accountId) {
         try {
             await httpClient.robotAccount
-                .delete(payload.entity.account_id);
+                .delete(payload.accountId);
         } catch (e) {
             // ...
         }
 
         const response = await useClient<VaultAPI>(ApiKey.VAULT)
-            .keyValue.find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.entity.external_name);
+            .keyValue.find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.externalName);
 
         if (response) {
             response.data.account_id = null;
@@ -153,7 +139,32 @@ export async function deleteRegistryProjectFromRemote(payload: RegistryQueuePayl
             response.data.account_secret = null;
 
             await useClient<VaultAPI>(ApiKey.VAULT)
-                .keyValue.save(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.entity.external_name, response.data);
+                .keyValue.save(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.externalName, response.data);
         }
     }
+
+    if (payload.updateDatabase) {
+        const projectRepository = getRepository(RegistryProjectEntity);
+        const project = await projectRepository.findOne(payload.id);
+
+        if (project) {
+            project.external_id = null;
+
+            project.account_id = null;
+            project.account_name = null;
+            project.account_secret = null;
+
+            project.webhook_exists = false;
+            project.webhook_name = null;
+
+            await projectRepository.save(project);
+        }
+    }
+}
+
+export async function relinkRegistryProject(
+    payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_RELINK>,
+) {
+    await unlinkRegistryProject(payload);
+    await linkRegistryProject(payload);
 }

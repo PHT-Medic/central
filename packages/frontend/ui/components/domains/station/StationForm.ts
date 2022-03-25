@@ -134,6 +134,12 @@ export const StationForm = Vue.extend({
             ) {
                 this.form.name = this.realmName || this.realmId;
             }
+
+            this.$nextTick(() => {
+                if (this.$refs.registry) {
+                    this.$refs.registry.load();
+                }
+            });
         },
         async submit() {
             if (this.busy || this.$v.$invalid) {
@@ -163,6 +169,14 @@ export const StationForm = Vue.extend({
         },
         handleUpdated(item) {
             this.$emit('updated', item);
+        },
+
+        async toggleFormData(key, id) {
+            if (this.form[key] === id) {
+                this.form[key] = null;
+            } else {
+                this.form[key] = id;
+            }
         },
     },
     render(createElement: CreateElement): VNode {
@@ -229,7 +243,9 @@ export const StationForm = Vue.extend({
         const hidden = h('div', {
             staticClass: 'form-group mb-1',
         }, [
+            h('label', { staticClass: 'mb-2' }, ['Hidden']),
             h('b-form-checkbox', {
+                staticClass: 'pb-2',
                 model: {
                     value: vm.form.hidden,
                     callback(v: boolean) {
@@ -238,50 +254,24 @@ export const StationForm = Vue.extend({
                     expression: 'form.hidden',
                 },
             } as VNodeData, [
-                'Hidden?',
-            ]),
-            h('div', {
-                staticClass: 'alert alert-sm alert-info mt-1',
-            }, [
-                'If enabled the station can not be target during proposal & train creation.',
+                'Hide for proposal & train selection?',
             ]),
         ]);
 
-        const submit = buildFormSubmit(vm, h, {
-            updateText: 'Update',
-            createText: 'Create',
-        });
-
-        let editingElements : VNodeChildren = [];
-
-        if (this.isEditing) {
-            editingElements = [
-                h('hr'),
-                h('div', { staticClass: 'alert alert-warning alert-sm' }, [
-                    'The tasks for the',
-                    h('strong', { staticClass: 'pl-1 pr-1' }, 'secret-storage'),
-                    'and',
-                    h('strong', { staticClass: 'pl-1 pr-1' }, 'registry'),
-                    'are performed asynchronously and therefore might take a while, till the view will be updated.',
-                ]),
-                h(StationRegistryProjectDetails, {
-                    props: {
-                        entity: vm.entity,
-                    },
-                    on: {
-                        updated(entity) {
-                            vm.handleUpdated.call(null, entity);
-                        },
-                    },
-                }),
-            ];
-        }
-
-        const ecosystem = buildFormSelect<Registry>(vm, h, {
+        const ecosystem = buildFormSelect<Station>(vm, h, {
             validationTranslator: buildVuelidateTranslator(this.$ilingo),
             title: 'Ecosystem',
             propName: 'ecosystem',
             options: vm.ecosystems,
+            changeCallback(input) {
+                vm.form.ecosystem = input;
+
+                vm.$nextTick(() => {
+                    if (vm.$refs.registry) {
+                        vm.$refs.registry.load();
+                    }
+                });
+            },
         });
 
         let registry : VNodeChildren = [];
@@ -293,7 +283,9 @@ export const StationForm = Vue.extend({
             registry = [
                 h('hr'),
                 h(RegistryList, {
+                    ref: 'registry',
                     props: {
+                        loadOnInit: false,
                         query: {
                             filter: {
                                 ecosystem: vm.form.ecosystem,
@@ -330,6 +322,29 @@ export const StationForm = Vue.extend({
             ];
         }
 
+        const submit = buildFormSubmit(vm, h, {
+            updateText: 'Update',
+            createText: 'Create',
+        });
+
+        let editingElements : VNodeChildren = [];
+
+        if (this.isEditing) {
+            editingElements = [
+                h('hr'),
+                h(StationRegistryProjectDetails, {
+                    props: {
+                        entity: vm.entity,
+                    },
+                    on: {
+                        updated(entity) {
+                            vm.handleUpdated.call(null, entity);
+                        },
+                    },
+                }),
+            ];
+        }
+
         return h('div', [
             h('div', { staticClass: 'row' }, [
                 h('div', {
@@ -338,20 +353,20 @@ export const StationForm = Vue.extend({
                     realm,
                     name,
                     h('hr'),
-                    hidden,
-                    h('hr'),
-                    email,
-                    h('hr'),
-                    submit,
+                    ecosystem,
+                    registry,
+
                 ]),
                 h('div', {
                     staticClass: 'col',
                 }, [
+                    hidden,
+                    h('hr'),
+                    email,
                     h('hr'),
                     publicKey,
                     h('hr'),
-                    ecosystem,
-                    registry,
+                    submit,
                 ]),
             ]),
             ...editingElements,

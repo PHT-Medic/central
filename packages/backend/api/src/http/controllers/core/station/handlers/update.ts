@@ -5,10 +5,12 @@ import {
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { Message, publishMessage } from 'amqp-extension';
 import { runStationValidation } from './utils';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
 export async function updateStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -25,13 +27,8 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
     const repository = getRepository(StationEntity);
     const query = repository.createQueryBuilder('station')
         .addSelect([
-            'station.registry_project_id',
-            'station.registry_project_account_id',
-            'station.registry_project_account_name',
-            'station.registry_project_account_token',
-            'station.registry_project_webhook_exists',
             'station.public_key',
-            'station.secure_id',
+            'station.external_id',
         ])
         .where('station.id = :id', { id });
 
@@ -67,21 +64,53 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
             registryProject = await registryProjectRepository.findOne(entity.registry_project_id);
         }
 
-        if (!registryProject) {
+        let registryOperation : 'link' | 'relink' = 'link';
+        if (registryProject) {
+            if (registryProject.external_name !== registryProjectExternalName) {
+                registryProject = registryProjectRepository.merge(registryProject, {
+                    external_name: registryProjectExternalName,
+                });
+
+                registryOperation = 'relink';
+            }
+        } else {
             registryProject = registryProjectRepository.create({
                 external_name: registryProjectExternalName,
                 name: entity.name,
                 ecosystem: entity.ecosystem,
                 type: RegistryProjectType.STATION,
                 registry_id: entity.registry_id,
+                realm_id: entity.realm_id,
+                public: false,
             });
-
-            await registryProjectRepository.save(registryProject);
         }
+
+        await registryProjectRepository.save(registryProject);
 
         entity.registry_project_id = registryProject.id;
 
-        // todo: create setup registry project queue message
+        let queueMessage : Message;
+
+        if (registryOperation === 'link') {
+            queueMessage = buildRegistryQueueMessage(
+                RegistryQueueCommand.PROJECT_LINK,
+                {
+                    id: registryProject.id,
+                },
+            );
+        } else {
+            queueMessage = buildRegistryQueueMessage(
+                RegistryQueueCommand.PROJECT_RELINK,
+                {
+                    id: registryProject.id,
+                    registryId: registryProject.registry_id,
+                    externalName: registryProject.external_name,
+                    accountId: registryProject.account_id,
+                },
+            );
+        }
+
+        await publishMessage(queueMessage);
     }
 
     await repository.save(entity);

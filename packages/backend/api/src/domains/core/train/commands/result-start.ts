@@ -18,15 +18,12 @@ import {
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
-import { ApiKey } from '../../../../config/api';
 
 export async function triggerTrainResultStart(
     train: string | Train,
-    harborRepository?: HarborRepository,
 ) : Promise<Train> {
     const repository = getRepository<Train>(TrainEntity);
 
@@ -35,13 +32,6 @@ export async function triggerTrainResultStart(
     if (train.run_status !== TrainRunStatus.FINISHED) {
         // todo: make it a ClientError.BadRequest
         throw new Error('The train has not finished yet...');
-    }
-
-    if (typeof harborRepository === 'undefined') {
-        harborRepository = await useClient<HarborAPI>(ApiKey.HARBOR).projectRepository.find(REGISTRY_OUTGOING_PROJECT_NAME, train.id);
-        if (typeof harborRepository === 'undefined') {
-            throw new Error('The train has not arrived at the outgoing station yet...');
-        }
     }
 
     // send queue message

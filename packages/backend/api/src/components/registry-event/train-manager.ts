@@ -61,7 +61,7 @@ export async function dispatchRegistryEventToTrainManager(
     if (
         registryProject.type === RegistryProjectType.STATION ||
         registryProject.type === RegistryProjectType.INCOMING ||
-        registryProject.type === RegistryProjectType.ECOSYSTEM_AGGREGATOR
+        registryProject.type === RegistryProjectType.AGGREGATOR
     ) {
         await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE, {
             repositoryName: data.repositoryName,

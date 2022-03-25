@@ -131,3 +131,7 @@ a:focus{
 .custom-file {
     border-radius: 0.25rem;
 }
+
+.dropdown-item {
+    font-size: 13px;
+}

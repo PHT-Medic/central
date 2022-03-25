@@ -60,7 +60,7 @@ export async function processExtractStatusCommand(message: Message) {
 
     for (let i = 0; i < incomingProjects.length; i++) {
         const repositoryTag = buildRemoteDockerImageURL({
-            hostname: data.registry.address,
+            hostname: data.registry.host,
             projectName: incomingProjects[i].external_name,
             repositoryName: data.id,
         });

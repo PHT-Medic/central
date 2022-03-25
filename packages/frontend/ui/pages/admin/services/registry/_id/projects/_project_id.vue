@@ -10,7 +10,7 @@ import {
     Registry,
     RegistryProject,
 } from '@personalhealthtrain/central-common';
-import { RegistryProjectForm } from '../../../../../components/domains/registry-project/RegistryProjectForm';
+import { RegistryProjectForm } from '../../../../../../components/domains/registry-project/RegistryProjectForm';
 
 // todo: add data, prop, method typing
 export default Vue.extend<any, any, any, any>({
@@ -25,7 +25,7 @@ export default Vue.extend<any, any, any, any>({
         try {
             const { data: stations } = await context.$api.registryProject.getMany({
                 filter: {
-                    id: context.params.station_id,
+                    id: context.params.project_id,
                 },
                 fields: {
                     station: [

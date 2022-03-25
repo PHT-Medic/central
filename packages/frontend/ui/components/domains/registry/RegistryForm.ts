@@ -13,7 +13,7 @@ import {
     ComponentFormData, SlotName, buildFormInput, buildFormSelect, buildFormSubmit, initPropertiesFromSource,
 } from '@vue-layout/utils';
 import {
-    maxLength, minLength, required, url,
+    maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 import { RealmList } from '@authelion/vue';
 import { Realm } from '@authelion/common';
@@ -39,7 +39,7 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
         return {
             form: {
                 name: '',
-                address: '',
+                host: '',
                 ecosystem: Ecosystem.DEFAULT,
                 account_name: '',
                 account_secret: '',
@@ -84,9 +84,8 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
                     minLength: minLength(3),
                     maxLength: maxLength(128),
                 },
-                address: {
+                host: {
                     required,
-                    url,
                     maxLength: maxLength(512),
                 },
                 ecosystem: {
@@ -161,10 +160,13 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
             propName: 'name',
         });
 
-        const address = buildFormInput<Registry>(vm, h, {
+        const host = buildFormInput<Registry>(vm, h, {
             validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Address',
-            propName: 'address',
+            title: 'Host',
+            propName: 'host',
+            attrs: {
+                placeholder: 'e.g. ghcr.io',
+            },
         });
 
         const ecosystem = buildFormSelect<Registry>(vm, h, {
@@ -172,6 +174,9 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
             title: 'Ecosystem',
             propName: 'ecosystem',
             options: vm.ecosystems,
+            attrs: {
+                disabled: vm.isEditing,
+            },
         });
 
         const accountName = buildFormInput<Registry>(vm, h, {
@@ -241,10 +246,7 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
                         'General',
                     ]),
                     name,
-                    h('hr'),
-                    address,
-                    h('hr'),
-                    ecosystem,
+                    host,
                 ]),
                 h('div', { staticClass: 'col' }, [
                     h('h6', [
@@ -255,6 +257,16 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
                     accountSecret,
                 ]),
             ]),
+            h('hr'),
+            h(
+                'div',
+                { staticClass: 'alert alert-warning alert-danger' },
+                [
+                    'It is only possible to register harbor registries > v2.3.0',
+                ],
+            ),
+            h('hr'),
+            ecosystem,
             realm,
             h('hr'),
             submit,

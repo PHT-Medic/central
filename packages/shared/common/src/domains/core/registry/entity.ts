@@ -13,7 +13,7 @@ export interface Registry {
 
     name: string;
 
-    address: string;
+    host: string;
 
     ecosystem: Ecosystem;
 

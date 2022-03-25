@@ -8,5 +8,4 @@
 export enum HTTPClientKey {
     DEFAULT = 'default',
     VAULT = 'vault',
-    HARBOR = 'harbor',
 }

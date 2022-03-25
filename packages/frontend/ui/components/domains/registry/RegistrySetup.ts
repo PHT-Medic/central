@@ -6,7 +6,7 @@
  */
 
 import Vue, { CreateElement, PropType, VNode } from 'vue';
-import { Registry, RegistryCommand, ServiceID } from '@personalhealthtrain/central-common';
+import { Registry, RegistryCommand } from '@personalhealthtrain/central-common';
 import EntityDelete from '../EntityDelete';
 import { MasterImageList } from '../master-image/MasterImageList';
 

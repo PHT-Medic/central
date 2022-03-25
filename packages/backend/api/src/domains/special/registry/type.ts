@@ -9,21 +9,31 @@ import { Registry, RegistryProject } from '@personalhealthtrain/central-common';
 import { RegistryQueueCommand } from './constants';
 
 export type RegistryQueueSetupPayload = {
-    entityId: Registry['id'],
+    id: Registry['id'],
     entity?: Registry
 };
 
-export type RegistryProjectQueuePayload = {
-    entityId: RegistryProject['id'],
+export type RegistryProjectLinkQueuePayload = {
+    id: RegistryProject['id'],
     entity?: RegistryProject
+};
+
+export type RegistryProjectUnlinkQueuePayload = {
+    id: RegistryProject['id'],
+    registryId: Registry['id'],
+    externalName: RegistryProject['external_name'],
+    accountId: RegistryProject['account_id'],
+    updateDatabase?: boolean
 };
 
 export type RegistryQueuePayload<T extends `${RegistryQueueCommand}`> =
     T extends `${RegistryQueueCommand.SETUP}` | `${RegistryQueueCommand.DELETE}` ?
         RegistryQueueSetupPayload :
-        T extends `${RegistryQueueCommand.PROJECT_SETUP}` | `${RegistryQueueCommand.PROJECT_DELETE}` ?
-            RegistryProjectQueuePayload :
-            never;
+        T extends `${RegistryQueueCommand.PROJECT_LINK}` ?
+            RegistryProjectLinkQueuePayload :
+            T extends `${RegistryQueueCommand.PROJECT_UNLINK}` | `${RegistryQueueCommand.PROJECT_RELINK}` ?
+                RegistryProjectUnlinkQueuePayload :
+                never;
 
 // ---------------------------------------------------
 

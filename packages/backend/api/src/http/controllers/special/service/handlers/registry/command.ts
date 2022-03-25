@@ -22,8 +22,8 @@ import {
     buildRegistryQueueMessage,
 } from '../../../../../../domains/special/registry';
 import {
-    deleteRegistryProjectFromRemote,
-    setupRegistryProjectForRemote,
+    linkRegistryProject,
+    unlinkRegistryProject,
 } from '../../../../../../components/registry/handlers/project';
 import { RegistryProjectEntity } from '../../../../../../domains/core/registry-project/entity';
 import { RegistryEntity } from '../../../../../../domains/core/registry/entity';
@@ -41,9 +41,7 @@ export async function handleRegistryCommandRouteHandler(req: ExpressRequest, res
         throw new BadRequestError('The registry command is not valid.');
     }
 
-    if (
-        typeof id !== 'string'
-    ) {
+    if (typeof id !== 'string') {
         throw new BadRequestError(`An ID parameter is required for the registry command ${command}`);
     }
 
@@ -53,37 +51,33 @@ export async function handleRegistryCommandRouteHandler(req: ExpressRequest, res
             const repository = getRepository(RegistryEntity);
             const entity = await repository.createQueryBuilder('registry')
                 .addSelect([
-                    'registry.address',
-                    'registry.account_name',
-                    'registry.account_token',
+                    'registry.account_secret',
                 ])
-                .where('registryProject.id = :id', { id })
+                .where('registry.id = :id', { id })
                 .getOne();
 
             if (command === RegistryCommand.SETUP) {
                 if (env.env === 'test') {
                     await setupRegistry({
+                        id: entity.id,
                         entity,
-                        entityId: entity.id,
                     });
                 } else {
                     const queueMessage = buildRegistryQueueMessage(
                         RegistryQueueCommand.SETUP,
                         {
+                            id: entity.id,
                             entity,
-                            entityId: entity.id,
                         },
                     );
                     await publishMessage(queueMessage);
                 }
-            } else if (env.env === 'test') {
-                // todo: implement registry deletion
             } else {
                 const queueMessage = buildRegistryQueueMessage(
                     RegistryQueueCommand.DELETE,
                     {
+                        id: entity.id,
                         entity,
-                        entityId: entity.id,
                     },
                 );
 
@@ -96,42 +90,45 @@ export async function handleRegistryCommandRouteHandler(req: ExpressRequest, res
             const repository = getRepository(RegistryProjectEntity);
             const entity = await repository.createQueryBuilder('registryProject')
                 .addSelect([
-                    'registryProject.external_id',
-                    'registryProject.account_id',
-                    'registryProject.account_name',
-                    'registryProject.account_token',
-                    'registryProject.webhook_exists',
-                    'registryProject.alias',
+                    'registryProject.account_secret',
                 ])
                 .where('registryProject.id = :id', { id })
                 .getOne();
 
             if (command === RegistryCommand.PROJECT_SETUP) {
                 if (env.env === 'test') {
-                    await setupRegistryProjectForRemote({
-                        entityId: id,
+                    await linkRegistryProject({
+                        id: entity.id,
+                        entity,
                     });
                 } else {
                     const queueMessage = buildRegistryQueueMessage(
-                        RegistryQueueCommand.PROJECT_SETUP,
+                        RegistryQueueCommand.PROJECT_LINK,
                         {
-                            entityId: id,
+                            id: entity.id,
+                            entity,
                         },
                     );
                     await publishMessage(queueMessage);
                 }
                 break;
             } else if (env.env === 'test') {
-                await deleteRegistryProjectFromRemote({
-                    entity,
-                    entityId: entity.id,
+                await unlinkRegistryProject({
+                    id: entity.id,
+                    registryId: entity.registry_id,
+                    externalName: entity.external_name,
+                    accountId: entity.account_id,
+                    updateDatabase: true,
                 });
             } else {
                 const queueMessage = buildRegistryQueueMessage(
-                    RegistryQueueCommand.PROJECT_DELETE,
+                    RegistryQueueCommand.PROJECT_UNLINK,
                     {
-                        entity,
-                        entityId: entity.id,
+                        id: entity.id,
+                        registryId: entity.registry_id,
+                        externalName: entity.external_name,
+                        accountId: entity.account_id,
+                        updateDatabase: true,
                     },
                 );
                 await publishMessage(queueMessage);

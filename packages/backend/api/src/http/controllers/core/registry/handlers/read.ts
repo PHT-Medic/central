@@ -19,7 +19,7 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
         allowed: [
             'id',
             'name',
-            'address',
+            'host',
             'ecosystem',
             'created_at',
             'updated_at',

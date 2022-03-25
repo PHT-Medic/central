@@ -13,12 +13,12 @@ import {
     Train,
     TrainBuildStatus,
     TrainConfigurationStatus,
+    TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { useClient } from '@trapi/client';
 import { findTrain } from './utils';
-import { triggerTrainResultStart } from './result-start';
 import { TrainEntity } from '../entity';
 import { TrainStationEntity } from '../../train-station/entity';
 import { ApiKey } from '../../../../config/api';
@@ -46,15 +46,6 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
             run_station_id: null, // optional, just to ensure
             run_status: TrainRunStatus.FINISHED,
         });
-
-        // check if we marked the train as terminated yet :O ?
-        if (train.run_status !== TrainRunStatus.FINISHED) {
-            train = await triggerTrainResultStart(train.id, harborRepository);
-        } else {
-            train = repository.merge(train, {
-                result_status: null,
-            });
-        }
 
         await repository.save(train);
 
