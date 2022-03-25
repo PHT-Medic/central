@@ -5,11 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { check, validationResult } from 'express-validator';
-import { Ecosystem } from '@personalhealthtrain/central-common';
+import { body, check, validationResult } from 'express-validator';
+import { Ecosystem, getHostNameFromString } from '@personalhealthtrain/central-common';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
-import { extendExpressValidationResultWithMasterImage } from '../../master-image/utils/extend';
 import { RegistryValidationResult } from '../type';
 
 export async function runRegistryValidation(
@@ -33,16 +32,16 @@ export async function runRegistryValidation(
 
     // ----------------------------------------------
 
-    const addressChain = check('address')
+    const hostChain = body('host')
         .exists()
-        .isURL()
+        .isString()
         .isLength({ min: 5, max: 512 });
 
     if (operation === 'update') {
-        addressChain.optional();
+        hostChain.optional();
     }
 
-    await addressChain.run(req);
+    await hostChain.run(req);
 
     // ----------------------------------------------
 
@@ -77,6 +76,10 @@ export async function runRegistryValidation(
     }
 
     result.data = matchedValidationData(req, { includeOptionals: true });
+
+    if (result.data.host) {
+        result.data.host = getHostNameFromString(result.data.host);
+    }
 
     return result;
 }

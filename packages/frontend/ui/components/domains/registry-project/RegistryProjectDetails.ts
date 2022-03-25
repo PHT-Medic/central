@@ -89,11 +89,11 @@ export default Vue.extend<Data, any, any, Properties>({
                 // ....
             }
         },
-        async setupProject() {
-            await this.run(RegistryCommand.PROJECT_SETUP);
+        async linkProject() {
+            await this.run(RegistryCommand.PROJECT_LINK);
         },
-        async deleteProject() {
-            await this.run(RegistryCommand.PROJECT_DELETE);
+        async unlinkProject() {
+            await this.run(RegistryCommand.PROJECT_UNLINK);
         },
         async run(command) {
             if (this.busy) return;
@@ -133,15 +133,6 @@ export default Vue.extend<Data, any, any, Properties>({
         }
 
         return h('div', [
-            h('h6', [
-                h('i', { staticClass: 'fa fa-folder-open pr-1' }),
-                'Registry',
-            ]),
-            h('p', { staticClass: 'mb-2' }, [
-                'To keep the data between the registry and the ui in sync, you can pull all available information about the',
-                ' ',
-                'project, webhook, robot-account,... of a station or create them.',
-            ]),
             h('div', {
                 staticClass: 'mb-2 d-flex flex-column',
             }, [
@@ -162,57 +153,69 @@ export default Vue.extend<Data, any, any, Properties>({
 
                 h('div', [
                     h('strong', { staticClass: 'pr-1' }, 'Robot:'),
+                    h('i', {
+                        class: {
+                            'fa fa-check text-success': vm.accountId,
+                            'fa fa-times text-danger': !vm.accountId,
+                        },
+                    }),
                     h('div', { staticClass: 'd-flex flex-column' }, [
-                        h('div', [
-                            h('i', {
-                                class: {
-                                    'fa fa-check text-success': vm.accountId,
-                                    'fa fa-times text-danger': !vm.accountId,
-                                },
-                            }),
-                        ]),
                         robotCredentials,
                     ]),
                 ]),
             ]),
-
-            h('div', { staticClass: 'd-flex flex-row' }, [
-                h('div', [
-                    h('button', {
-                        class: 'btn btn-xs btn-primary',
-                        attrs: {
-                            disabled: vm.busy,
-                            type: 'button',
-                        },
-                        on: {
-                            click($event) {
-                                $event.preventDefault();
-
-                                vm.setupProject.call(null);
-                            },
-                        },
+            h('hr'),
+            h('div', { staticClass: 'row' }, [
+                h('div', { staticClass: 'col' }, [
+                    h('div', {
+                        staticClass: 'alert alert-sm alert-info',
                     }, [
-                        h('i', { staticClass: 'fa fa-save pr-1' }),
-                        'Save',
+                        'The link trigger will spin up the remote registry representation.',
+                    ]),
+                    h('div', { staticClass: 'text-center' }, [
+                        h('button', {
+                            class: 'btn btn-xs btn-primary',
+                            attrs: {
+                                disabled: vm.busy,
+                                type: 'button',
+                            },
+                            on: {
+                                click($event) {
+                                    $event.preventDefault();
+
+                                    vm.linkProject.call(null);
+                                },
+                            },
+                        }, [
+                            h('i', { staticClass: 'fa-solid fa-link pr-1' }),
+                            'Link',
+                        ]),
                     ]),
                 ]),
-                h('div', { staticClass: 'ml-auto' }, [
-                    h('button', {
-                        class: 'btn btn-xs btn-danger',
-                        attrs: {
-                            disabled: vm.busy,
-                            type: 'button',
-                        },
-                        on: {
-                            click($event) {
-                                $event.preventDefault();
-
-                                vm.deleteProject.call(null);
-                            },
-                        },
+                h('div', { staticClass: 'col' }, [
+                    h('div', {
+                        staticClass: 'alert alert-sm alert-warning',
                     }, [
-                        h('i', { staticClass: 'fa fa-trash pr-1' }),
-                        'Delete',
+                        'The unlink trigger will remove the remote registry representation.',
+                    ]),
+                    h('div', { staticClass: 'text-center' }, [
+                        h('button', {
+                            class: 'btn btn-xs btn-danger',
+                            attrs: {
+                                disabled: vm.busy,
+                                type: 'button',
+                            },
+                            on: {
+                                click($event) {
+                                    $event.preventDefault();
+
+                                    vm.unlinkProject.call(null);
+                                },
+                            },
+                        }, [
+                            h('i', { staticClass: 'fa-solid fa-link-slash pr-1' }),
+                            'Unlink',
+                        ]),
                     ]),
                 ]),
             ]),

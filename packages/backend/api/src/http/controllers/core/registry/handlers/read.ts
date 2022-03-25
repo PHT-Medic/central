@@ -10,16 +10,16 @@ import { PermissionID } from '@personalhealthtrain/central-common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 
-function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>, fields: any) {
+function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>) {
     const protectedFields = [
         'account_secret',
     ];
 
-    const fieldsParsed = parseQueryFields(fields, {
+    const fieldsParsed = parseQueryFields(req.query.fields, {
         allowed: [
             'id',
             'name',
-            'address',
+            'host',
             'ecosystem',
             'created_at',
             'updated_at',
@@ -48,7 +48,7 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
 
 export async function getOneRegistryRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
-    const { include, fields } = req.query;
+    const { include } = req.query;
 
     const repository = getRepository(RegistryEntity);
     const query = repository.createQueryBuilder('registry')
@@ -59,7 +59,7 @@ export async function getOneRegistryRouteHandler(req: ExpressRequest, res: Expre
         allowed: ['realm'],
     });
 
-    checkAndApplyFields(req, query, fields);
+    checkAndApplyFields(req, query);
 
     const entity = await query.getOne();
 
@@ -76,7 +76,7 @@ export async function getOneRegistryRouteHandler(req: ExpressRequest, res: Expre
 
 export async function getManyRegistryRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {
-        filter, page, sort, include, fields,
+        filter, page, sort, include,
     } = req.query;
 
     const repository = getRepository(RegistryEntity);
@@ -84,7 +84,7 @@ export async function getManyRegistryRouteHandler(req: ExpressRequest, res: Expr
 
     onlyRealmPermittedQueryResources(query, req.realmId, 'registry.realm_id');
 
-    checkAndApplyFields(req, query, fields);
+    checkAndApplyFields(req, query);
 
     applyFilters(query, filter, {
         defaultAlias: 'registry',

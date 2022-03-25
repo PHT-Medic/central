@@ -58,7 +58,7 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
 
             types: [
                 { id: RegistryProjectType.DEFAULT, value: 'DEFAULT' },
-                { id: RegistryProjectType.ECOSYSTEM_AGGREGATOR, value: 'Aggregator' },
+                { id: RegistryProjectType.AGGREGATOR, value: 'Aggregator' },
                 { id: RegistryProjectType.INCOMING, value: 'Incoming' },
                 { id: RegistryProjectType.OUTGOING, value: 'Outgoing' },
                 { id: RegistryProjectType.MASTER_IMAGES, value: 'Master-Images' },
@@ -112,10 +112,10 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
                     minLength: minLength(3),
                     maxLength: maxLength(64),
                 },
-                ecosystem_aggregator: {
+                type: {
                     required,
                 },
-                realm_id: {
+                registry_id: {
                     required,
                 },
             },
@@ -123,8 +123,8 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
     },
     methods: {
         initFromProperties() {
-            if (this.projectId) {
-                this.form.project_id = this.projectId;
+            if (this.registryId) {
+                this.form.registry_id = this.registryId;
             }
 
             if (typeof this.entity === 'undefined') {
@@ -186,7 +186,7 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
         });
         const externalName = buildFormInput<Station>(vm, h, {
             validationTranslator: buildVuelidateTranslator(vm.$ilingo),
-            title: 'Alias',
+            title: 'External Name',
             propName: 'external_name',
         });
 
@@ -238,11 +238,14 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
             ]),
         ]);
 
-        const types = buildFormSelect<RegistryProject>(vm, h, {
+        const type = buildFormSelect<RegistryProject>(vm, h, {
             validationTranslator: buildVuelidateTranslator(this.$ilingo),
             title: 'Type',
             propName: 'type',
             options: vm.types,
+            attrs: {
+                disabled: vm.isEditing,
+            },
         });
 
         let registry : VNodeChildren = [];
@@ -293,12 +296,12 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
                 },
             },
         }, [
+            type,
+            h('hr'),
             name,
             h('hr'),
             externalName,
             externalNameHint,
-            h('hr'),
-            types,
             registry,
             h('hr'),
             submit,

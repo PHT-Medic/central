@@ -8,7 +8,6 @@
 import { Message } from 'amqp-extension';
 import {
     HTTPClient,
-    RegistryProjectType,
     TrainContainerFileName,
     TrainContainerPath,
     TrainManagerBuildPayload,
@@ -35,11 +34,15 @@ export async function processMessage(message: Message) {
         throw BuildingError.registryNotFound();
     }
 
+    if (!data.entity.build_registry_project_id) {
+        throw BuildingError.registryProjectNotFound();
+    }
+
     // -----------------------------------------------------------------------------------
 
     const dockerFile = await buildDockerFile({
         entity: data.entity,
-        hostname: data.registry.address,
+        hostname: data.registry.host,
     });
 
     // -----------------------------------------------------------------------------------
@@ -49,29 +52,13 @@ export async function processMessage(message: Message) {
     });
 
     const client = useClient<HTTPClient>();
-
-    // todo: future make incoming project selectable in ui
-    const { data: incomingProjects } = await client.registryProject.getMany({
-        filter: {
-            registry_id: data.registry.id,
-            type: RegistryProjectType.INCOMING,
-        },
-        page: {
-            limit: 1,
-        },
-    });
-
-    if (incomingProjects.length === 0) {
-        throw BuildingError.registryProjectNotFound();
-    }
-
-    const incomingProject = incomingProjects[0];
+    const incomingProject = await client.registryProject.getOne(data.entity.build_registry_project_id);
 
     data.registryProject = incomingProject;
     data.registryProjectId = incomingProject.id;
 
     const imageURL = buildRemoteDockerImageURL({
-        hostname: data.registry.address,
+        hostname: data.registry.host,
         projectName: incomingProject.external_name,
         repositoryName: data.entity.id,
     });
@@ -93,7 +80,7 @@ export async function processMessage(message: Message) {
     });
     const trainConfig = await buildTrainConfig({
         entity: data.entity,
-        hostname: data.registry.address,
+        hostname: data.registry.host,
     });
 
     await container.putArchive(
@@ -145,13 +132,13 @@ export async function processMessage(message: Message) {
     });
 
     const authConfig = buildDockerAuthConfig({
-        host: data.registry.address,
+        host: data.registry.host,
         user: data.registry.account_name,
         password: data.registry.account_secret,
     });
 
     const baseImageURL = buildRemoteDockerImageURL({
-        hostname: data.registry.address,
+        hostname: data.registry.host,
         projectName: incomingProject.external_name,
         repositoryName: data.entity.id,
         tagOrDigest: 'base',
@@ -164,7 +151,7 @@ export async function processMessage(message: Message) {
     });
 
     const latestImageURL = buildRemoteDockerImageURL({
-        hostname: data.registry.address,
+        hostname: data.registry.host,
         projectName: incomingProject.external_name,
         repositoryName: data.entity.id,
         tagOrDigest: 'latest',

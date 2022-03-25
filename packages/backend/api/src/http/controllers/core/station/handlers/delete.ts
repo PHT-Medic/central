@@ -6,12 +6,14 @@
  */
 
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { Ecosystem, PermissionID } from '@personalhealthtrain/central-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { publishMessage } from 'amqp-extension';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
 export async function deleteStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -22,16 +24,7 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
 
     const repository = getRepository(StationEntity);
 
-    const query = repository.createQueryBuilder('station')
-        .addSelect('station.secure_id')
-        .addSelect('station.registry_project_id')
-        .addSelect('station.registry_project_account_id')
-        .where({
-            id,
-        })
-        .getOne();
-
-    const entity = await query;
+    const entity = await repository.findOne(id);
 
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
@@ -47,9 +40,20 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
         const registryProjectRepository = getRepository(RegistryProjectEntity);
 
         const registryProject = await registryProjectRepository.findOne(entity.registry_project_id);
-        await registryProjectRepository.remove(registryProject);
+        if (registryProject) {
+            const queueMessage = buildRegistryQueueMessage(
+                RegistryQueueCommand.PROJECT_UNLINK,
+                {
+                    id: registryProject.id,
+                    registryId: registryProject.registry_id,
+                    externalName: registryProject.external_name,
+                    accountId: registryProject.account_id,
+                },
+            );
 
-        // todo: delete registry_project entity & queue message emit
+            await publishMessage(queueMessage);
+            await registryProjectRepository.remove(registryProject);
+        }
     }
 
     const { id: entityId } = entity;

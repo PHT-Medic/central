@@ -7,9 +7,9 @@
 
 export enum RegistryProjectType {
     DEFAULT = 'default',
-    ECOSYSTEM_AGGREGATOR = 'ecosystemAggregator',
+    AGGREGATOR = 'aggregator',
     INCOMING = 'incoming',
     OUTGOING = 'outgoing',
-    MASTER_IMAGES = 'masterImage',
+    MASTER_IMAGES = 'masterImages',
     STATION = 'station',
 }

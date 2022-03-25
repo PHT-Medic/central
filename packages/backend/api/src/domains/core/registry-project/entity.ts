@@ -10,7 +10,7 @@ import {
     CreateDateColumn,
     Entity,
     JoinColumn,
-    ManyToOne, PrimaryColumn, Unique,
+    ManyToOne, PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
 import {
@@ -24,7 +24,7 @@ import { RegistryEntity } from '../registry/entity';
 @Unique('registry_project_external_id_registry_index', ['external_id', 'registry_id'])
 @Entity({ name: 'registry_projects' })
 export class RegistryProjectEntity implements RegistryProject {
-    @PrimaryColumn('uuid')
+    @PrimaryGeneratedColumn('uuid')
         id: string;
 
     @Column({ type: 'varchar', length: 128 })
@@ -38,6 +38,9 @@ export class RegistryProjectEntity implements RegistryProject {
     })
         type: RegistryProjectType;
 
+    @Column({ type: 'boolean', default: true })
+        public: boolean;
+
     // ------------------------------------------------------------------
 
     @Column({
@@ -49,8 +52,10 @@ export class RegistryProjectEntity implements RegistryProject {
     @Column({
         type: 'varchar',
         length: 64,
+        nullable: true,
+        default: null,
     })
-        external_id: string;
+        external_id: string | null;
 
     // ------------------------------------------------------------------
 
@@ -70,6 +75,11 @@ export class RegistryProjectEntity implements RegistryProject {
         account_secret: string | null;
 
     // ------------------------------------------------------------------
+
+    @Column({
+        type: 'varchar', length: 128, default: null, nullable: true,
+    })
+        webhook_name: string | null;
 
     @Column({ type: 'boolean', default: false })
         webhook_exists: boolean;

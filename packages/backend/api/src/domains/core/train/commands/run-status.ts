@@ -18,7 +18,6 @@ import {
 import { getRepository } from 'typeorm';
 import { useClient } from '@trapi/client';
 import { findTrain } from './utils';
-import { triggerTrainResultStart } from './result-start';
 import { TrainEntity } from '../entity';
 import { TrainStationEntity } from '../../train-station/entity';
 import { ApiKey } from '../../../../config/api';
@@ -47,15 +46,6 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
             run_status: TrainRunStatus.FINISHED,
         });
 
-        // check if we marked the train as terminated yet :O ?
-        if (train.run_status !== TrainRunStatus.FINISHED) {
-            train = await triggerTrainResultStart(train.id, harborRepository);
-        } else {
-            train = repository.merge(train, {
-                result_status: null,
-            });
-        }
-
         await repository.save(train);
 
         return train;
@@ -65,7 +55,6 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     const trainStationRepository = getRepository(TrainStationEntity);
     const trainStationQueryBuilder = trainStationRepository
         .createQueryBuilder('trainStation')
-        .addSelect('station.secure_id')
         .leftJoinAndSelect('trainStation.station', 'station')
         .leftJoinAndSelect('station.registry_project', 'registryProject')
         .orderBy({
@@ -76,13 +65,13 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
     const trainStations = await trainStationQueryBuilder.getMany();
 
     for (let i = 0; i < trainStations.length; i++) {
-        const { external_name } = trainStations[i].station.registry_project;
+        const { external_name: externalName } = trainStations[i].station.registry_project;
 
-        if (!external_name) continue;
+        if (!externalName) continue;
 
         try {
             harborRepository = await useClient<HarborAPI>(ApiKey.HARBOR).projectRepository
-                .find(external_name, train.id);
+                .find(externalName, train.id);
 
             if (
                 harborRepository &&

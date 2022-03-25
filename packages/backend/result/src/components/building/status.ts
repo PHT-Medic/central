@@ -11,7 +11,7 @@ import {
     HarborAPI,
     TrainManagerBuildPayload,
     TrainManagerBuildingQueueEvent,
-    buildConnectionStringFromRegistry,
+    buildAPIConnectionStringFromRegistry,
     createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
@@ -44,7 +44,7 @@ export async function processBuildStatusEvent(message: Message) {
 
     // -----------------------------------------------------------------------------------
 
-    const connectionString = buildConnectionStringFromRegistry(data.registry);
+    const connectionString = buildAPIConnectionStringFromRegistry(data.registry);
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
     const httpClient = createClient<HarborAPI>(httpClientConfig);
 

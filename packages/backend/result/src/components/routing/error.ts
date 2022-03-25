@@ -7,10 +7,11 @@
 
 import { ErrorOptions } from '@typescript-error/http';
 import {
+    TrainManagerBaseErrorType,
     TrainManagerRoutingErrorType,
     TrainManagerRoutingStep,
 } from '@personalhealthtrain/central-common';
-import { BaseError } from '../error';
+import { BaseError, ErrorOptionsExtended } from '../error';
 
 export class RoutingError extends BaseError {
     constructor(options: ErrorOptions) {
@@ -18,5 +19,22 @@ export class RoutingError extends BaseError {
         options.type = options.type || TrainManagerRoutingErrorType.UNKNOWN;
 
         super(options);
+    }
+
+    static routeEmpty(step?: `${TrainManagerRoutingStep}`, message?: string) {
+        return new RoutingError({
+            type: TrainManagerRoutingErrorType.ROUTE_EMPTY,
+            step,
+            message,
+        });
+    }
+
+    static operatorInvalid(
+        options?: ErrorOptionsExtended,
+    ) {
+        return new BaseError({
+            type: TrainManagerRoutingErrorType.OPERATOR_INVALID,
+            ...(options || {}),
+        });
     }
 }

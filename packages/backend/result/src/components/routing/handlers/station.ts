@@ -7,14 +7,14 @@
 
 import {
     Ecosystem,
-    REGISTRY_ARTIFACT_TAG_BASE,
-    RegistryProject,
-    TrainManagerRoutingPayload,
+    RegistryProject, TrainManagerRoutingErrorType,
+    TrainManagerRoutingPayload, TrainManagerRoutingStep,
 } from '@personalhealthtrain/central-common';
 import { StationExtended } from '../type';
-import { transferInternal } from '../helpers/transfer-internal';
-import { transferEcosystemOut } from '../helpers/transfer-ecosystem-out';
-import { transferOutgoing } from '../helpers/transfer-outgoing';
+import { transferInternal } from '../transfer/internal';
+import { transferEcosystemOut } from '../transfer/ecosystem';
+import { transferOutgoing } from '../transfer/outgoing';
+import { RoutingError } from '../error';
 
 type MoveOperationContext = {
     routingPayload: TrainManagerRoutingPayload,
@@ -24,22 +24,27 @@ type MoveOperationContext = {
 export async function handleStationMoveOperation(context: MoveOperationContext) : Promise<void> {
     const index = context.items.findIndex((station) => station.registry_project_id === context.project.id);
     if (index === -1) {
-        // todo: throw error, for no project related station found...
-        return;
+        throw RoutingError.registryProjectNotFound({
+            step: TrainManagerRoutingStep.ROUTE,
+            type: TrainManagerRoutingErrorType.UNKNOWN,
+            message: 'The current station could not be found.',
+        });
     }
 
     const currentStation = context.items[index];
 
-    if (currentStation.registry_project.account_name !== context.routingPayload.operator) {
-        return;
+    if (
+        !currentStation.registry_project ||
+        currentStation.registry_project.account_name !== context.routingPayload.operator
+    ) {
+        throw RoutingError.operatorInvalid({
+            step: TrainManagerRoutingStep.ROUTE,
+            message: 'The operator is not valid for this operation.',
+        });
     }
 
     const nextIndex = context.items.findIndex((station) => station.index === currentStation.index + 1);
     if (nextIndex === -1) {
-        if (context.routingPayload.artifactTag === REGISTRY_ARTIFACT_TAG_BASE) {
-            return;
-        }
-
         await transferOutgoing({
             project: currentStation.registry_project,
             repositoryName: context.routingPayload.repositoryName,
@@ -49,17 +54,17 @@ export async function handleStationMoveOperation(context: MoveOperationContext) 
         const nextStation = context.items[nextIndex];
 
         if (nextStation.ecosystem === Ecosystem.DEFAULT) {
-            await transferInternal(
-                {
+            await transferInternal({
+                source: {
                     project: currentStation.registry_project,
                     repositoryName: context.routingPayload.repositoryName,
                     artifactTag: context.routingPayload.artifactTag,
                 },
-                {
+                destination: {
                     project: nextStation.registry_project,
                     repositoryName: context.routingPayload.repositoryName,
                 },
-            );
+            });
         } else {
             await transferEcosystemOut(
                 {

@@ -9,9 +9,10 @@ import { Message, buildMessage, publishMessage } from 'amqp-extension';
 import { TrainManagerBuildingQueueEvent } from '@personalhealthtrain/central-common';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { BuildingError } from './error';
+import { BaseError } from '../error';
 
 export async function writeFailedEvent(message: Message, error: Error) {
-    const buildingError = error instanceof BuildingError ?
+    const buildingError = error instanceof BuildingError || error instanceof BaseError ?
         error :
         new BuildingError({ previous: error });
 

@@ -7,7 +7,9 @@
 
 import { Registry } from './entity';
 
-export function buildConnectionStringFromRegistry(entity: Registry) {
-    // ensure /api/v2.0/ is represent
-    return `${entity.account_name}:${entity.account_secret}@${entity.address}`;
+export function buildAPIConnectionStringFromRegistry(entity: Registry) {
+    // todo: support other registries beside harbor and v2.0
+
+    const url = `https://${entity.host}/api/v2.0/`;
+    return `${entity.account_name}:${entity.account_secret}@${url}`;
 }

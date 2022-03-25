@@ -29,7 +29,7 @@ export class RegistryEntity implements Registry {
         name: string;
 
     @Column({ type: 'varchar', length: 512 })
-        address: string;
+        host: string;
 
     @Column({ type: 'varchar', length: 64, default: Ecosystem.DEFAULT })
         ecosystem: Ecosystem;

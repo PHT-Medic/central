@@ -13,7 +13,7 @@ import {
     REGISTRY_ARTIFACT_TAG_LATEST,
     RegistryProject,
     TrainManagerQueueCommand,
-    TrainManagerRoutingStartPayload, TrainManagerRoutingStep, buildConnectionStringFromRegistry, createBasicHarborAPIConfig,
+    TrainManagerRoutingStartPayload, TrainManagerRoutingStep, buildAPIConnectionStringFromRegistry, createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
 import { buildSelfQueueMessage } from '../../config/queue';
@@ -24,10 +24,12 @@ export async function processStartCommand(message: Message) {
     const data = message.data as TrainManagerRoutingStartPayload;
 
     if (!data.registry) {
-        throw RoutingError.registryNotFound();
+        throw RoutingError.registryNotFound({
+            step: TrainManagerRoutingStep.START,
+        });
     }
 
-    const connectionString = buildConnectionStringFromRegistry(data.registry);
+    const connectionString = buildAPIConnectionStringFromRegistry(data.registry);
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
     const httpClient = createClient<HarborAPI>(httpClientConfig);
 
@@ -38,7 +40,10 @@ export async function processStartCommand(message: Message) {
     try {
         incomingProject = await client.registryProject.getOne(data.entity.build_registry_project_id);
     } catch (e) {
-        throw BuildingError.registryProjectNotFound();
+        throw BuildingError.registryProjectNotFound({
+            step: TrainManagerRoutingStep.START,
+            message: 'The train build registry-project was not found.',
+        });
     }
 
     const harborRepository = await httpClient.projectRepository
@@ -59,6 +64,7 @@ export async function processStartCommand(message: Message) {
 
         throw RoutingError.notFound({
             type: TrainManagerRoutingStep.START,
+            message: 'The train does not exist in the incoming registry-project.',
         });
     }
 
@@ -67,12 +73,14 @@ export async function processStartCommand(message: Message) {
         REGISTRY_ARTIFACT_TAG_LATEST,
     ];
 
-    for (let i = 0; artifacts.length; i++) {
-        await publishMessage(buildSelfQueueMessage(TrainManagerQueueCommand.ROUTE, {
+    for (let i = 0; i < artifacts.length; i++) {
+        const message = buildSelfQueueMessage(TrainManagerQueueCommand.ROUTE, {
             repositoryName: data.id,
             projectName: incomingProject.external_name,
             operator: data.registry.account_name,
             artifactTag: artifacts[i],
-        }));
+        });
+
+        await publishMessage(message);
     }
 }

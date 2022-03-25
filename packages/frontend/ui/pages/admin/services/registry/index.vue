@@ -1,5 +1,5 @@
 <!--
-  Copyright (c) 2021.
+  Copyright (c) 2021-2022.
   Author Peter Placzek (tada5hi)
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
@@ -8,7 +8,7 @@
 <script>
 
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default {
     meta: {
@@ -48,11 +48,7 @@ export default {
 };
 </script>
 <template>
-    <div class="container">
-        <h1 class="title no-border mb-3">
-            Registry <span class="sub-title">Management</span>
-        </h1>
-
+    <div>
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
                 <b-nav
@@ -63,7 +59,7 @@ export default {
                         v-for="(item,key) in sidebar.items"
                         :key="key"
                         :disabled="item.active"
-                        :to="'/admin/registries' + item.urlSuffix"
+                        :to="'/admin/services/registry' + item.urlSuffix"
                         exact
                         exact-active-class="active"
                     >

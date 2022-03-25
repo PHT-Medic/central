@@ -19,6 +19,8 @@ export interface RegistryProject {
 
     type: RegistryProjectType;
 
+    public: boolean;
+
     // ------------------------------------------------------------------
 
     // a-z0-9-_ {0,255}
@@ -35,6 +37,8 @@ export interface RegistryProject {
     account_secret: string | null;
 
     // ------------------------------------------------------------------
+
+    webhook_name: string | null;
 
     webhook_exists: boolean | null;
 

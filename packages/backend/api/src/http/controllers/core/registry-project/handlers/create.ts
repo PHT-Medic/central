@@ -8,9 +8,11 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
+import { publishMessage } from 'amqp-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { runRegistryProjectValidation } from './utils';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
 export async function createRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.REGISTRY_MANAGE)) {
@@ -27,6 +29,15 @@ export async function createRegistryProjectRouteHandler(req: ExpressRequest, res
     });
 
     await repository.save(entity);
+
+    const queueMessage = buildRegistryQueueMessage(
+        RegistryQueueCommand.PROJECT_LINK,
+        {
+            id: entity.id,
+        },
+    );
+
+    await publishMessage(queueMessage);
 
     return res.respond({ data: entity });
 }

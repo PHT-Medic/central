@@ -6,16 +6,19 @@
  */
 
 import {
-    Ecosystem,
+    Ecosystem, HTTPClient, REGISTRY_ARTIFACT_TAG_BASE,
     REGISTRY_ARTIFACT_TAG_LATEST,
     RegistryProject,
     TrainManagerRoutingPayload,
     TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
+import { useClient } from '@trapi/client';
 import { StationExtended } from '../type';
-import { transferInternal } from '../helpers/transfer-internal';
-import { transferEcosystemOut } from '../helpers/transfer-ecosystem-out';
-import { transferOutgoing } from '../helpers/transfer-outgoing';
+import { transferInternal } from '../transfer/internal';
+import { transferEcosystemOut } from '../transfer/ecosystem';
+import { transferOutgoing } from '../transfer/outgoing';
+import { buildDockerAuthConfig } from '../../../config/services/registry';
+import { moveDockerImage } from '../../../modules/docker/image-move';
 
 type MoveOperationContext = {
     routingPayload: TrainManagerRoutingPayload,
@@ -56,21 +59,46 @@ export async function handleEcosystemAggregatorMoveOperation(context: MoveOperat
     } else {
         const next = context.items[nextIndex];
 
-        // todo: we need to create base image!!
-        // todo: pull source project artifact latest -> copy to base :)
-
         if (next.ecosystem === Ecosystem.DEFAULT) {
-            await transferInternal(
-                {
-                    project: context.project,
-                    repositoryName: context.routingPayload.repositoryName,
-                    artifactTag: context.routingPayload.artifactTag,
-                },
-                {
-                    project: next.registry_project,
-                    repositoryName: context.routingPayload.repositoryName,
-                },
-            );
+            const client = useClient<HTTPClient>();
+            const registry = await client.registry.getOne(context.project.registry_id, {
+                fields: ['+account_secret'],
+            });
+
+            const authConfig = buildDockerAuthConfig({
+                host: registry.host,
+                user: registry.account_name,
+                password: registry.account_secret,
+            });
+
+            // create base tag from latest ;)
+            await moveDockerImage({
+                sourceAuthConfig: authConfig,
+                sourceRepositoryName: context.routingPayload.repositoryName,
+                sourceProjectName: context.project.external_name,
+                sourceTag: context.routingPayload.artifactTag,
+
+                destinationTag: REGISTRY_ARTIFACT_TAG_BASE,
+            });
+
+            const tags = [
+                REGISTRY_ARTIFACT_TAG_BASE,
+                REGISTRY_ARTIFACT_TAG_LATEST,
+            ];
+
+            for (let i = 0; i < tags.length; i++) {
+                await transferInternal({
+                    source: {
+                        project: context.project,
+                        repositoryName: context.routingPayload.repositoryName,
+                        artifactTag: tags[i],
+                    },
+                    destination: {
+                        project: next.registry_project,
+                        repositoryName: context.routingPayload.repositoryName,
+                    },
+                });
+            }
         } else {
             await transferEcosystemOut(
                 {

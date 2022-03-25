@@ -1,5 +1,5 @@
 <!--
-  Copyright (c) 2021-2021.
+  Copyright (c) 2021-2022.
   Author Peter Placzek (tada5hi)
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
@@ -8,7 +8,7 @@
 
 import { PropType } from 'vue';
 import { Registry } from '@personalhealthtrain/central-common';
-import { RegistryForm } from '../../../../components/domains/registry/RegistryForm';
+import { RegistryForm } from '../../../../../components/domains/registry/RegistryForm';
 
 export default {
     components: { RegistryForm },

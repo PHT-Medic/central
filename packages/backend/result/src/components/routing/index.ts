@@ -14,6 +14,7 @@ import { writeFailedEvent } from './write-failed';
 import { processRouteCommand } from './route';
 import { processStartCommand } from './start';
 import { resolveTrainRegistry } from '../utils/train-registry';
+import { resolveTrain } from '../utils/train';
 
 export function createRoutingComponentHandlers() : ConsumeHandlers {
     return {
@@ -35,6 +36,7 @@ export function createRoutingComponentHandlers() : ConsumeHandlers {
             });
 
             await Promise.resolve(message)
+                .then(resolveTrain)
                 .then(resolveTrainRegistry)
                 .then(processStartCommand)
                 .catch((err: Error) => writeFailedEvent(message, err));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022.
+ * Copyright (c) 2022-2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -35,29 +35,33 @@ export async function transferEcosystemOut(
 
     // ------------------------------------------------------------------
 
-    const { data: aggregatorProjects } = await client.registryProject.getMany({
+    const { data: externalProjects } = await client.registryProject.getMany({
         filter: {
             registry_id: destination.project.registry_id,
-            type: RegistryProjectType.ECOSYSTEM_AGGREGATOR,
-        },
-        relations: {
-            registry: true,
+            type: RegistryProjectType.AGGREGATOR,
         },
         page: {
             limit: 1,
         },
     });
 
-    if (aggregatorProjects.length === 0) {
+    if (externalProjects.length === 0) {
         // todo: other ecosystem must have aggregator project to move to...
         return;
     }
 
-    const aggregatorProject = aggregatorProjects[0];
+    const aggregatorProject = externalProjects[0];
+
+    const aggregatorRegistry = await client.registry.getOne(aggregatorProject.registry_id, {
+        fields: ['+account_secret'],
+    });
+
+    // ------------------------------------------------------------------
+
     const externalImageURL = buildRemoteDockerImageURL({
         projectName: aggregatorProject.external_name,
         repositoryName: destination.repositoryName,
-        hostname: aggregatorProject.registry.address,
+        hostname: aggregatorProject.registry.host,
     });
 
     // ------------------------------------------------------------------
@@ -67,7 +71,7 @@ export async function transferEcosystemOut(
     });
 
     const selfImageURL = buildRemoteDockerImageURL({
-        hostname: selfRegistry.address,
+        hostname: selfRegistry.host,
         projectName: source.project.external_name,
         repositoryName: source.repositoryName,
         tagOrDigest: sourceArtifactTag,
@@ -76,7 +80,7 @@ export async function transferEcosystemOut(
     await pullDockerImage(
         selfImageURL,
         buildDockerAuthConfig({
-            host: selfRegistry.address,
+            host: selfRegistry.host,
             user: selfRegistry.account_name || source.project.account_name,
             password: selfRegistry.account_secret || source.project.account_secret,
         }),
@@ -97,7 +101,7 @@ export async function transferEcosystemOut(
         .getImage(`${externalImageURL}:latest`);
 
     await pushDockerImage(destinationImage, buildDockerAuthConfig({
-        host: aggregatorProject.registry.address,
+        host: aggregatorProject.registry.host,
         user: aggregatorProject.account_name,
         password: aggregatorProject.account_secret,
     }));

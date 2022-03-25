@@ -23,7 +23,7 @@ export async function ensureRemoteRegistryProjectWebhook(
         idOrName: string | number,
         isName?: boolean
     },
-) : Promise<void> {
+) : Promise<HarborProjectWebhook | undefined> {
     const response = await useClient<VaultAPI>(HTTPClientKey.VAULT)
         .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
 
@@ -42,8 +42,10 @@ export async function ensureRemoteRegistryProjectWebhook(
             ],
         };
 
-        await httpClient
+        return httpClient
             .projectWebHook
             .ensure(context.idOrName, context.isName, webhookData);
     }
+
+    return undefined;
 }

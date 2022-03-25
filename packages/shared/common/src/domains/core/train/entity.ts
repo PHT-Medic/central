@@ -50,8 +50,6 @@ export interface Train {
 
     build_status: TrainBuildStatus | null;
 
-    build_id: string | null;
-
     build_registry_project_id: RegistryProject['id'] | null;
 
     build_registry_project: RegistryProject | null;
@@ -99,6 +97,10 @@ export interface Train {
     // ------------------------------------------------------------------
 
     result_status: TrainResultStatus | null;
+
+    result_registry_project_id: RegistryProject['id'] | null;
+
+    result_registry_project: RegistryProject | null;
 
     // ------------------------------------------------------------------
     proposal_id: Proposal['id'];

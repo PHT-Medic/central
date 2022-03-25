@@ -37,14 +37,14 @@ export async function downloadImage(message: Message) {
 
     for (let i = 0; i < outgoingProjects.length; i++) {
         const repositoryTag = buildRemoteDockerImageURL({
-            hostname: data.registry.address,
+            hostname: data.registry.host,
             projectName: outgoingProjects[i].external_name,
             repositoryName: data.id,
         });
 
         try {
             await pullDockerImage(repositoryTag, buildDockerAuthConfig({
-                host: data.registry.address,
+                host: data.registry.host,
                 user: data.registry.account_name,
                 password: data.registry.account_secret,
             }));
@@ -53,6 +53,13 @@ export async function downloadImage(message: Message) {
         } catch (e) {
             // ...
         }
+    }
+
+    if (!data.registryProject) {
+        throw ExtractingError.registryProjectNotFound({
+            step: TrainManagerExtractingStep.DOWNLOAD,
+            message: 'The train was not found in any outgoing registry project.',
+        });
     }
 
     return message;

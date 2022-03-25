@@ -13,7 +13,7 @@ import { Registry } from '../registry';
 export interface Station {
     id: string;
 
-    external_id: string;
+    external_id: string | null;
 
     name: string;
 

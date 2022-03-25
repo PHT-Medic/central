@@ -9,11 +9,14 @@ import { Message, buildMessage, publishMessage } from 'amqp-extension';
 import { TrainManagerRoutingQueueEvent } from '@personalhealthtrain/central-common';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { RoutingError } from './error';
+import { BaseError } from '../error';
 
 export async function writeFailedEvent(message: Message, error: Error) {
-    const routingError = error instanceof RoutingError ?
+    const routingError = error instanceof RoutingError || error instanceof BaseError ?
         error :
         new RoutingError({ previous: error });
+
+    console.log(error);
 
     await publishMessage(buildMessage({
         options: {

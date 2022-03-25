@@ -6,8 +6,8 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
-import { RegistryForm } from '../../../../components/domains/registry/RegistryForm';
+import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
+import { RegistryForm } from '../../../../../components/domains/registry/RegistryForm';
 
 export default {
     components: { RegistryForm },
@@ -20,7 +20,7 @@ export default {
     },
     methods: {
         handleCreated(e) {
-            this.$nuxt.$router.push(`/admin/registries/${e.id}`);
+            this.$nuxt.$router.push(`/admin/services/registry/${e.id}`);
         },
     },
 };

@@ -9,6 +9,6 @@ export enum RegistryCommand {
     SETUP = 'setup',
     DELETE = 'delete',
 
-    PROJECT_SETUP = 'projectSetup',
-    PROJECT_DELETE = 'projectDelete',
+    PROJECT_LINK = 'projectLink',
+    PROJECT_UNLINK = 'projectUnlink',
 }

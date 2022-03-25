@@ -63,12 +63,14 @@ export enum TrainManagerRoutingQueueEvent {
 
 export enum TrainManagerRoutingErrorType {
     TRAIN_NOT_BUILD = 'trainNotBuild',
+    ROUTE_EMPTY = 'routeEmpty',
+    OPERATOR_INVALID = 'operatorInvalid',
     UNKNOWN = 'unknown',
 }
 
 export enum TrainManagerRoutingStep {
     START = 'start',
-    MOVE = 'move',
+    ROUTE = 'route',
     UNKNOWN = 'unknown',
 }
 

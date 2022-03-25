@@ -29,6 +29,7 @@ export async function processExtractCommand(message: Message) {
     if (!data.registryProject) {
         throw ExtractingError.registryProjectNotFound({
             step: TrainManagerExtractingStep.EXTRACT,
+            message: 'There was no registry-project during the download process.',
         });
     }
 
@@ -42,7 +43,7 @@ export async function processExtractCommand(message: Message) {
     // -----------------------------------------------------------------------------------
 
     const repositoryPath: string = buildRemoteDockerImageURL({
-        hostname: data.registry.address,
+        hostname: data.registry.host,
         projectName: data.registryProject.external_name,
         repositoryName: data.id,
     });

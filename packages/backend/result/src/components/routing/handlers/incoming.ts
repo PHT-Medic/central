@@ -11,9 +11,9 @@ import {
     TrainManagerRoutingPayload,
 } from '@personalhealthtrain/central-common';
 import { useLogger } from '../../../modules/log';
-import { transferInternal } from '../helpers/transfer-internal';
+import { transferInternal } from '../transfer/internal';
 import { StationExtended } from '../type';
-import { transferEcosystemOut } from '../helpers/transfer-ecosystem-out';
+import { transferEcosystemOut } from '../transfer/ecosystem';
 
 type MoveOperationContext = {
     routingPayload: TrainManagerRoutingPayload,
@@ -37,13 +37,15 @@ export async function handleIncomingMoveOperation(context: MoveOperationContext)
     if (nextStation.ecosystem === Ecosystem.DEFAULT) {
         await transferInternal(
             {
-                project: context.project,
-                repositoryName: context.routingPayload.repositoryName,
-                artifactTag: context.routingPayload.artifactTag,
-            },
-            {
-                project: nextStation.registry_project,
-                repositoryName: context.routingPayload.repositoryName,
+                source: {
+                    project: context.project,
+                    repositoryName: context.routingPayload.repositoryName,
+                    artifactTag: context.routingPayload.artifactTag,
+                },
+                destination: {
+                    project: nextStation.registry_project,
+                    repositoryName: context.routingPayload.repositoryName,
+                },
             },
         );
     } else {

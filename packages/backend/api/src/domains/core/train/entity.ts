@@ -20,7 +20,7 @@ import {
 } from 'typeorm';
 import {
     MasterImage,
-    Proposal, RegistryProject,
+    Proposal, Registry, RegistryProject,
     Station,
     Train,
     TrainBuildStatus,
@@ -87,15 +87,12 @@ export class TrainEntity implements Train {
     })
         build_status: TrainBuildStatus | null;
 
-    @Column({ type: 'uuid', nullable: true, default: null })
-        build_id: string;
+    @Column({ nullable: true })
+        build_registry_project_id: RegistryProject['id'] | null;
 
-    @Column()
-        build_registry_project_id: RegistryProject['id'];
-
-    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'registry_id' })
-        build_registry_project: RegistryProject;
+    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
+    @JoinColumn({ name: 'build_registry_project_id' })
+        build_registry_project: RegistryProjectEntity | null;
 
     // ------------------------------------------------------------------
 
@@ -124,12 +121,12 @@ export class TrainEntity implements Train {
 
     // ------------------------------------------------------------------
 
-    @Column()
-        registry_id: Realm['id'];
+    @Column({ nullable: true })
+        registry_id: Registry['id'] | null;
 
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
+    @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE', nullable: true })
     @JoinColumn({ name: 'registry_id' })
-        registry: RegistryEntity;
+        registry: RegistryEntity | null;
 
     // ------------------------------------------------------------------
 
@@ -171,6 +168,13 @@ export class TrainEntity implements Train {
         type: 'varchar', length: 64, default: null,
     })
         result_status: TrainResultStatus | null;
+
+    @Column({ nullable: true })
+        result_registry_project_id: RegistryProject['id'] | null;
+
+    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
+    @JoinColumn({ name: 'result_registry_project_id' })
+        result_registry_project: RegistryProjectEntity | null;
 
     // ------------------------------------------------------------------
     @Column({ type: 'uuid' })

@@ -58,16 +58,12 @@ export async function runStationValidation(
 
     // -------------------------------------------------------------
 
-    const externalNameChain = check('external_id')
+    await check('external_id')
         .isLength({ min: 1, max: 255 })
         .exists()
-        .matches(/^[a-z0-9-_]*$/);
-
-    if (operation === 'update') {
-        externalNameChain.optional();
-    }
-
-    await externalNameChain.run(req);
+        .matches(/^[a-z0-9-_]*$/)
+        .optional({ nullable: true })
+        .run(req);
 
     // -------------------------------------------------------------
 
@@ -89,7 +85,6 @@ export async function runStationValidation(
         await check('ecosystem')
             .exists()
             .isIn(Object.values(Ecosystem))
-            .optional({ nullable: true })
             .run(req);
     }
 

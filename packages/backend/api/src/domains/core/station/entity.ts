@@ -6,6 +6,7 @@
  */
 
 import {
+    BeforeInsert, BeforeUpdate,
     Column,
     CreateDateColumn,
     Entity,
@@ -52,12 +53,12 @@ export class StationEntity implements Station {
 
     // ------------------------------------------------------------------
 
-    @Column()
-        registry_id: Registry['id'];
+    @Column({ nullable: true })
+        registry_id: Registry['id'] | null;
 
-    @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE' })
+    @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE', nullable: true })
     @JoinColumn({ name: 'registry_id' })
-        registry: Registry;
+        registry: Registry | null;
 
     @Column({ nullable: true })
         registry_project_id: RegistryProject['id'];
@@ -82,4 +83,14 @@ export class StationEntity implements Station {
     @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'realm_id' })
         realm: RealmEntity;
+
+    // ------------------------------------------------------------------
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    setHidden() {
+        if (!this.registry_id || !this.ecosystem) {
+            this.hidden = true;
+        }
+    }
 }
