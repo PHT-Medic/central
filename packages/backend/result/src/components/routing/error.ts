@@ -7,7 +7,6 @@
 
 import { ErrorOptions } from '@typescript-error/http';
 import {
-    TrainManagerBaseErrorType,
     TrainManagerRoutingErrorType,
     TrainManagerRoutingStep,
 } from '@personalhealthtrain/central-common';

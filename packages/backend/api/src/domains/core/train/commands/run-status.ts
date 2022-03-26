@@ -13,6 +13,7 @@ import {
     Train,
     TrainBuildStatus,
     TrainConfigurationStatus,
+    TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
