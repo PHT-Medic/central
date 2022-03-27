@@ -70,6 +70,10 @@ TrainStationProgress
     border-radius: 5px;
 }
 
+.icon-circle.active {
+    background: #FF5B5B;
+}
+
 .icon-circle .icon {
     display: -webkit-box;
     display: -ms-flexbox;

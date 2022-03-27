@@ -86,7 +86,10 @@ export default {
                 <template
                     #items="props"
                 >
-                    <div class="d-flex flex-column progress-step">
+                    <div
+                        v-if="!props.busy"
+                        class="d-flex flex-column progress-step"
+                    >
                         <div class="d-flex justify-content-center icon-circle bg-dark text-light">
                             <span class="icon">Incoming</span>
                         </div>
@@ -111,8 +114,8 @@ export default {
                                 class="d-flex justify-content-center icon-circle progress-step text-light"
                                 :class="{
                                     'bg-secondary': !item.run_status,
-                                    'bg-success': item.run_status === trainStationRunStatus.DEPARTED,
-                                    'bg-warning': item.run_status === trainStationRunStatus.ARRIVED
+                                    'bg-dark': item.run_status === trainStationRunStatus.DEPARTED,
+                                    'active': item.run_status === trainStationRunStatus.ARRIVED
                                 }"
                             >
                                 <span class="icon">{{ item.station.name }}</span>
@@ -125,7 +128,10 @@ export default {
                             </div>
                         </div>
                     </template>
-                    <div class="d-flex flex-column progress-step">
+                    <div
+                        v-if="!props.busy"
+                        class="d-flex flex-column progress-step"
+                    >
                         <div class="d-flex justify-content-center icon-circle bg-dark text-light">
                             <span class="icon">Outgoing</span>
                         </div>

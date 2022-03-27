@@ -5,12 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { PropType } from 'vue';
+import Vue, { PropType } from 'vue';
 import { Train } from '@personalhealthtrain/central-common';
 import TrainPipeline from '../../../components/domains/train/TrainPipeline.vue';
 import TrainStationsProgress from '../../../components/domains/train-station/TrainStationsProgress.vue';
 
-export default {
+export default Vue.extend({
     components: { TrainStationsProgress, TrainPipeline },
     props: {
         entity: Object as PropType<Train>,
@@ -23,14 +23,15 @@ export default {
             this.$emit('failed', e);
         },
     },
-};
+});
 </script>
 
 <template>
     <div>
         <div class="panel-box mb-3">
             <h6 class="mb-3">
-                <i class="fa fa-city" /> <span class="text-info">{{ entity.stations }}</span> Station(s)
+                <span class="text-info">{{ entity.stations }}</span> Station(s)
+                <i class="fa-solid fa-house-medical" />
             </h6>
 
             <train-stations-progress :entity="entity" />
