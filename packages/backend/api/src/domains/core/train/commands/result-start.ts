@@ -8,9 +8,6 @@
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
 import {
-    HarborAPI,
-    HarborRepository,
-    REGISTRY_OUTGOING_PROJECT_NAME,
     Train,
     TrainContainerPath,
     TrainManagerExtractingMode,

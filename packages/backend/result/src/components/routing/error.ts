@@ -7,7 +7,10 @@
 
 import { ErrorOptions } from '@typescript-error/http';
 import {
-    TrainManagerRoutingErrorType,
+    TrainManagerBaseErrorCode,
+    TrainManagerExtractingErrorCode,
+    TrainManagerExtractingStep,
+    TrainManagerRoutingErrorCode,
     TrainManagerRoutingStep,
 } from '@personalhealthtrain/central-common';
 import { BaseError, ErrorOptionsExtended } from '../error';
@@ -15,14 +18,26 @@ import { BaseError, ErrorOptionsExtended } from '../error';
 export class RoutingError extends BaseError {
     constructor(options: ErrorOptions) {
         options.step = options.step || TrainManagerRoutingStep.UNKNOWN;
-        options.type = options.type || TrainManagerRoutingErrorType.UNKNOWN;
+        options.type = options.type || TrainManagerRoutingErrorCode.UNKNOWN;
 
         super(options);
     }
 
+    // --------------------------------------------------------------------
+
+    public getStep() : TrainManagerRoutingStep {
+        return this.getOption('step');
+    }
+
+    public getCode() : TrainManagerRoutingErrorCode | TrainManagerBaseErrorCode {
+        return this.getOption('type');
+    }
+
+    // --------------------------------------------------------------------
+
     static routeEmpty(step?: `${TrainManagerRoutingStep}`, message?: string) {
         return new RoutingError({
-            type: TrainManagerRoutingErrorType.ROUTE_EMPTY,
+            type: TrainManagerRoutingErrorCode.ROUTE_EMPTY,
             step,
             message,
         });
@@ -31,8 +46,8 @@ export class RoutingError extends BaseError {
     static operatorInvalid(
         options?: ErrorOptionsExtended,
     ) {
-        return new BaseError({
-            type: TrainManagerRoutingErrorType.OPERATOR_INVALID,
+        return new RoutingError({
+            type: TrainManagerRoutingErrorCode.OPERATOR_INVALID,
             ...(options || {}),
         });
     }

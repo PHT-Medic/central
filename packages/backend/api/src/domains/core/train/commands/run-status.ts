@@ -76,7 +76,7 @@ export async function detectTrainRunStatus(train: Train | number | string) : Pro
 
             if (
                 harborRepository &&
-                harborRepository.artifactCount > 0
+                harborRepository.artifactCount === 2
             ) {
                 // update train station status
 

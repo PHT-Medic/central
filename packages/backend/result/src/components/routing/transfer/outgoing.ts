@@ -8,16 +8,22 @@
 import {
     HTTPClient,
     REGISTRY_ARTIFACT_TAG_BASE,
-    RegistryProjectType,
+    RegistryProjectType, TrainManagerRoutingErrorCode, TrainManagerRoutingStep,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
-import { TransferItem } from '../transfer/type';
-import { transferInternal } from '../transfer/internal';
+import { TransferItem } from './type';
+import { transferInternal } from './internal';
+import { RoutingError } from '../error';
+import { useLogger } from '../../../modules/log';
 
 export async function transferOutgoing(source: TransferItem) {
     if (source.artifactTag === REGISTRY_ARTIFACT_TAG_BASE) {
         return;
     }
+
+    useLogger().debug(`Move repository ${source.repositoryName} internal from ${source.project.name} project to random outgoing project.`, {
+        component: 'routing',
+    });
 
     const client = await useClient<HTTPClient>();
     const { data: outgoingProjects } = await client.registryProject.getMany({
@@ -31,8 +37,10 @@ export async function transferOutgoing(source: TransferItem) {
     });
 
     if (outgoingProjects.length === 0) {
-        // todo: throw error for no outgoing set :/
-        return;
+        throw RoutingError.registryProjectNotFound({
+            step: TrainManagerRoutingStep.ROUTE,
+            message: 'No outgoing repository found.',
+        });
     }
 
     await transferInternal({

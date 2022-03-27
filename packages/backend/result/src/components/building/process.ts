@@ -10,7 +10,7 @@ import {
     HTTPClient,
     TrainContainerFileName,
     TrainContainerPath,
-    TrainManagerBuildPayload,
+    TrainManagerBuildPayload, TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { buildTrainConfig } from './helpers/train-config';
@@ -24,7 +24,7 @@ import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../config/s
 import { BuildingError } from './error';
 
 export async function processMessage(message: Message) {
-    const data = message.data as TrainManagerBuildPayload;
+    const data = message.data as TrainManagerQueuePayloadExtended<TrainManagerBuildPayload>;
 
     if (!data.entity) {
         throw BuildingError.notFound();
@@ -34,7 +34,7 @@ export async function processMessage(message: Message) {
         throw BuildingError.registryNotFound();
     }
 
-    if (!data.entity.build_registry_project_id) {
+    if (!data.entity.incoming_registry_project_id) {
         throw BuildingError.registryProjectNotFound();
     }
 
@@ -52,7 +52,7 @@ export async function processMessage(message: Message) {
     });
 
     const client = useClient<HTTPClient>();
-    const incomingProject = await client.registryProject.getOne(data.entity.build_registry_project_id);
+    const incomingProject = await client.registryProject.getOne(data.entity.incoming_registry_project_id);
 
     data.registryProject = incomingProject;
     data.registryProjectId = incomingProject.id;

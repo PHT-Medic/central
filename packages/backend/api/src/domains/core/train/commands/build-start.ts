@@ -62,7 +62,7 @@ export async function startBuildTrain(
             train.registry_id = registry.id;
         }
 
-        if (!train.build_registry_project_id) {
+        if (!train.incoming_registry_project_id) {
             const projectRepository = getRepository(RegistryProjectEntity);
             const project = await projectRepository.findOne({
                 where: {
@@ -75,7 +75,7 @@ export async function startBuildTrain(
                 throw new BadRequestError('No incoming project is registered for the default ecosystem.');
             }
 
-            train.build_registry_project_id = project.id;
+            train.incoming_registry_project_id = project.id;
         }
 
         const queueMessage = buildTrainManagerQueueMessage(

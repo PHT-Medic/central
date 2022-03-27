@@ -5,6 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Station, TrainStation } from '@personalhealthtrain/central-common';
+import {
+    RegistryProject, Station, TrainManagerRoutingPayload, TrainStation,
+} from '@personalhealthtrain/central-common';
 
 export type StationExtended = Station & Pick<TrainStation, 'index' | 'run_status'>;
+
+export type RouteContext = {
+    payload: TrainManagerRoutingPayload,
+    project: RegistryProject,
+};
+
+export type RouteContextExtended = RouteContext & {
+    items: StationExtended[],
+};

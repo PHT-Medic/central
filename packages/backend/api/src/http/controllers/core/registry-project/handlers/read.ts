@@ -93,7 +93,7 @@ export async function getManyRegistryProjectRouteHandler(req: ExpressRequest, re
 
     applyFilters(query, filter, {
         defaultAlias: 'registryProject',
-        allowed: ['id', 'ecosystem', 'name', 'registry_id', 'external_name'],
+        allowed: ['id', 'ecosystem', 'name', 'registry_id', 'external_name', 'type'],
     });
 
     applySort(query, sort, {

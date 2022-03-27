@@ -11,7 +11,7 @@ import {
     HTTPClient, RegistryProjectType,
     TrainManagerExtractingQueueEvent,
     TrainManagerExtractingQueuePayload,
-    TrainManagerExtractingStep,
+    TrainManagerExtractingStep, TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { buildImageOutputFilePath } from '../../config/paths';
@@ -21,7 +21,7 @@ import { checkIfLocalRegistryImageExists } from '../../modules/docker';
 import { ExtractingError } from './error';
 
 export async function processExtractStatusCommand(message: Message) {
-    const data : TrainManagerExtractingQueuePayload = message.data as TrainManagerExtractingQueuePayload;
+    const data = message.data as TrainManagerQueuePayloadExtended<TrainManagerExtractingQueuePayload>;
 
     if (!data.registry) {
         throw ExtractingError.registryNotFound({

@@ -6,27 +6,23 @@
  */
 
 import {
-    Ecosystem,
-    RegistryProject, TrainManagerRoutingErrorType,
-    TrainManagerRoutingPayload, TrainManagerRoutingStep,
+    Ecosystem, REGISTRY_ARTIFACT_TAG_BASE,
+    TrainManagerRoutingErrorCode,
+    TrainManagerRoutingStep,
 } from '@personalhealthtrain/central-common';
-import { StationExtended } from '../type';
+import { RouteContextExtended } from '../type';
 import { transferInternal } from '../transfer/internal';
 import { transferEcosystemOut } from '../transfer/ecosystem';
 import { transferOutgoing } from '../transfer/outgoing';
 import { RoutingError } from '../error';
+import { useLogger } from '../../../modules/log';
 
-type MoveOperationContext = {
-    routingPayload: TrainManagerRoutingPayload,
-    project: RegistryProject,
-    items: StationExtended[],
-};
-export async function handleStationMoveOperation(context: MoveOperationContext) : Promise<void> {
+export async function routeStationProject(context: RouteContextExtended) : Promise<void> {
     const index = context.items.findIndex((station) => station.registry_project_id === context.project.id);
     if (index === -1) {
         throw RoutingError.registryProjectNotFound({
             step: TrainManagerRoutingStep.ROUTE,
-            type: TrainManagerRoutingErrorType.UNKNOWN,
+            type: TrainManagerRoutingErrorCode.UNKNOWN,
             message: 'The current station could not be found.',
         });
     }
@@ -34,21 +30,22 @@ export async function handleStationMoveOperation(context: MoveOperationContext) 
     const currentStation = context.items[index];
 
     if (
-        !currentStation.registry_project ||
-        currentStation.registry_project.account_name !== context.routingPayload.operator
+        currentStation.registry_project.account_name !== context.payload.operator ||
+        context.payload.artifactTag === REGISTRY_ARTIFACT_TAG_BASE
     ) {
-        throw RoutingError.operatorInvalid({
-            step: TrainManagerRoutingStep.ROUTE,
-            message: 'The operator is not valid for this operation.',
-        });
+        return;
     }
+
+    useLogger().debug(`Handle station project ${context.project.name}.`, {
+        component: 'routing',
+    });
 
     const nextIndex = context.items.findIndex((station) => station.index === currentStation.index + 1);
     if (nextIndex === -1) {
         await transferOutgoing({
             project: currentStation.registry_project,
-            repositoryName: context.routingPayload.repositoryName,
-            artifactTag: context.routingPayload.artifactTag,
+            repositoryName: context.payload.repositoryName,
+            artifactTag: context.payload.artifactTag,
         });
     } else {
         const nextStation = context.items[nextIndex];
@@ -57,24 +54,24 @@ export async function handleStationMoveOperation(context: MoveOperationContext) 
             await transferInternal({
                 source: {
                     project: currentStation.registry_project,
-                    repositoryName: context.routingPayload.repositoryName,
-                    artifactTag: context.routingPayload.artifactTag,
+                    repositoryName: context.payload.repositoryName,
+                    artifactTag: context.payload.artifactTag,
                 },
                 destination: {
                     project: nextStation.registry_project,
-                    repositoryName: context.routingPayload.repositoryName,
+                    repositoryName: context.payload.repositoryName,
                 },
             });
         } else {
             await transferEcosystemOut(
                 {
                     project: currentStation.registry_project,
-                    repositoryName: context.routingPayload.repositoryName,
-                    artifactTag: context.routingPayload.artifactTag,
+                    repositoryName: context.payload.repositoryName,
+                    artifactTag: context.payload.artifactTag,
                 },
                 {
                     project: nextStation.registry_project,
-                    repositoryName: context.routingPayload.repositoryName,
+                    repositoryName: context.payload.repositoryName,
                 },
             );
         }

@@ -87,13 +87,6 @@ export class TrainEntity implements Train {
     })
         build_status: TrainBuildStatus | null;
 
-    @Column({ nullable: true })
-        build_registry_project_id: RegistryProject['id'] | null;
-
-    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
-    @JoinColumn({ name: 'build_registry_project_id' })
-        build_registry_project: RegistryProjectEntity | null;
-
     // ------------------------------------------------------------------
 
     @Column({
@@ -113,11 +106,34 @@ export class TrainEntity implements Train {
 
     // ------------------------------------------------------------------
 
+    @Column({
+        type: 'varchar', length: 64, default: null,
+    })
+        result_status: TrainResultStatus | null;
+
+    // ------------------------------------------------------------------
+
     @CreateDateColumn()
         created_at: Date;
 
     @UpdateDateColumn()
         updated_at: Date;
+
+    // ------------------------------------------------------------------
+
+    @Column({ nullable: true })
+        incoming_registry_project_id: RegistryProject['id'] | null;
+
+    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
+    @JoinColumn({ name: 'incoming_registry_project_id' })
+        incoming_registry_project: RegistryProjectEntity | null;
+
+    @Column({ nullable: true })
+        outgoing_registry_project_id: RegistryProject['id'] | null;
+
+    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
+    @JoinColumn({ name: 'outgoing_registry_project_id' })
+        outgoing_registry_project: RegistryProjectEntity | null;
 
     // ------------------------------------------------------------------
 
@@ -161,20 +177,6 @@ export class TrainEntity implements Train {
     @ManyToOne(() => UserEntity, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'user_id' })
         user: UserEntity;
-
-    // ------------------------------------------------------------------
-
-    @Column({
-        type: 'varchar', length: 64, default: null,
-    })
-        result_status: TrainResultStatus | null;
-
-    @Column({ nullable: true })
-        result_registry_project_id: RegistryProject['id'] | null;
-
-    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
-    @JoinColumn({ name: 'result_registry_project_id' })
-        result_registry_project: RegistryProjectEntity | null;
 
     // ------------------------------------------------------------------
     @Column({ type: 'uuid' })

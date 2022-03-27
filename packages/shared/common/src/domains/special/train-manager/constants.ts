@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export enum TrainManagerBaseErrorType {
+export enum TrainManagerBaseErrorCode {
     NOT_FOUND = 'notFound',
     REGISTRY_NOT_FOUND = 'registryNotFound',
     REGISTRY_PROJECT_NOT_FOUND = 'registryProjectNotFound',
@@ -35,7 +35,7 @@ export enum TrainManagerBuildingQueueEvent {
     NONE = 'buildingNone', // rs trigger
 }
 
-export enum TrainManagerBuildingErrorType {
+export enum TrainManagerBuildingErrorCode {
     TRAIN_NOT_BUILD = 'trainNotBuild',
     ENTRYPOINT_NOT_FOUND = 'entrypointNotFound',
     MASTER_IMAGE_NOT_FOUND = 'masterImageNotFound',
@@ -61,7 +61,7 @@ export enum TrainManagerRoutingQueueEvent {
     FAILED = 'routingFailed',
 }
 
-export enum TrainManagerRoutingErrorType {
+export enum TrainManagerRoutingErrorCode {
     TRAIN_NOT_BUILD = 'trainNotBuild',
     ROUTE_EMPTY = 'routeEmpty',
     OPERATOR_INVALID = 'operatorInvalid',
@@ -91,7 +91,7 @@ export enum TrainManagerExtractingQueueEvent {
     UNKNOWN = 'extractionUnknown', // rs trigger
 }
 
-export enum TrainManagerExtractingErrorType {
+export enum TrainManagerExtractingErrorCode {
     UNKNOWN = 'unknown',
 }
 

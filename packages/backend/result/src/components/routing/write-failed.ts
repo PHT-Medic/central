@@ -5,34 +5,30 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Message, buildMessage, publishMessage } from 'amqp-extension';
-import { TrainManagerRoutingQueueEvent } from '@personalhealthtrain/central-common';
-import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
+import { Message, publishMessage } from 'amqp-extension';
+import {
+    TrainManagerRoutingPayload,
+    TrainManagerRoutingQueueEvent,
+} from '@personalhealthtrain/central-common';
 import { RoutingError } from './error';
-import { BaseError } from '../error';
+import { buildAPIQueueEventMessage } from '../../config/queue';
 
 export async function writeFailedEvent(message: Message, error: Error) {
-    const routingError = error instanceof RoutingError || error instanceof BaseError ?
+    const routingError = error instanceof RoutingError ?
         error :
         new RoutingError({ previous: error });
 
-    console.log(error);
-
-    await publishMessage(buildMessage({
-        options: {
-            routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
-        },
-        type: TrainManagerRoutingQueueEvent.FAILED,
-        data: {
-            ...message.data,
+    await publishMessage(buildAPIQueueEventMessage(
+        TrainManagerRoutingQueueEvent.FAILED,
+        {
+            ...message.data as TrainManagerRoutingPayload,
             error: {
                 message: routingError.message,
                 step: routingError.getStep(),
-                type: routingError.getType(),
+                code: routingError.getCode(),
             },
         },
-        metadata: message.metadata,
-    }));
+    ));
 
     return message;
 }

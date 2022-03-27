@@ -29,7 +29,9 @@ export default {
 <template>
     <div>
         <div class="panel-box mb-3">
-            <h6><i class="fa fa-city" /> <span class="text-info">{{ entity.stations }}</span> Station(s)</h6>
+            <h6 class="mb-3">
+                <i class="fa fa-city" /> <span class="text-info">{{ entity.stations }}</span> Station(s)
+            </h6>
 
             <train-stations-progress :entity="entity" />
         </div>

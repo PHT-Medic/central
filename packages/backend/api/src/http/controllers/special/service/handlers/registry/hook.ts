@@ -47,9 +47,6 @@ function useHookEventDataValidator() : BaseSchema {
 }
 
 export async function postHarborHookRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const spinner = useSpinner();
-    spinner.info('receiving registry hook');
-
     const hook : RegistryHook = await useHookEventDataValidator().validate(req.body);
 
     const hookTypes = Object
@@ -57,7 +54,6 @@ export async function postHarborHookRouteHandler(req: ExpressRequest, res: Expre
         .map((event) => event.substring('REGISTRY_'.length));
 
     if (hookTypes.indexOf(hook.type) === -1) {
-        spinner.fail('processing of registry hook failed');
         return res.status(200).end();
     }
 
@@ -76,10 +72,6 @@ export async function postHarborHookRouteHandler(req: ExpressRequest, res: Expre
     );
 
     await publishMessage(message);
-
-    spinner.info(`publishing "${event}" event`);
-
-    spinner.clear();
 
     return res.status(200).end();
 }

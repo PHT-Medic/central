@@ -10,15 +10,18 @@ import { Message } from 'amqp-extension';
 import {
     HTTPClient,
     RegistryProjectType,
-    TrainManagerRoutingPayload, TrainManagerRoutingStep,
+    TrainManagerRoutingPayload,
+    TrainManagerRoutingStep,
     TrainStation,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { mergeStationsWithTrainStations } from './helpers/merge';
-import { handleIncomingMoveOperation } from './handlers/incoming';
-import { handleStationMoveOperation } from './handlers/station';
-import { handleEcosystemAggregatorMoveOperation } from './handlers/aggreagtor';
+import { routeIncomingProject } from './handlers/incoming';
+import { routeStationProject } from './handlers/station';
+import { routeAggregatorProject } from './handlers/aggreagtor';
 import { RoutingError } from './error';
+import { routeOutgoingProject } from './handlers/outgoing';
+import { StationExtended } from './type';
 
 export async function processRouteCommand(message: Message) {
     const data = message.data as TrainManagerRoutingPayload;
@@ -56,46 +59,63 @@ export async function processRouteCommand(message: Message) {
         },
     };
 
-    const { data: trainStations } = await client.trainStation.getMany(query);
-    if (trainStations.length === 0) {
-        throw RoutingError.routeEmpty(TrainManagerRoutingStep.ROUTE);
+    // -------------------------------------------------------------------
+
+    let items : StationExtended[] = [];
+
+    if (
+        registryProject.type === RegistryProjectType.INCOMING ||
+        registryProject.type === RegistryProjectType.STATION ||
+        registryProject.type === RegistryProjectType.AGGREGATOR
+    ) {
+        const { data: trainStations } = await client.trainStation.getMany(query);
+        if (trainStations.length === 0) {
+            throw RoutingError.routeEmpty(TrainManagerRoutingStep.ROUTE);
+        }
+
+        const { data: stations } = await client.station.getMany({
+            filter: {
+                id: trainStations.map((trainStation) => trainStation.station_id),
+            },
+            include: {
+                registry_project: true,
+            },
+        });
+
+        items = mergeStationsWithTrainStations(stations, trainStations);
     }
-
-    const { data: stations } = await client.station.getMany({
-        filter: {
-            id: trainStations.map((trainStation) => trainStation.station_id),
-        },
-        include: {
-            registry_project: true,
-        },
-    });
-
-    const stationsExtended = mergeStationsWithTrainStations(stations, trainStations);
 
     // -------------------------------------------------------------------
 
     switch (registryProject.type) {
         case RegistryProjectType.INCOMING: {
-            await handleIncomingMoveOperation({
-                items: stationsExtended,
+            await routeIncomingProject({
+                items,
                 project: registryProject,
-                routingPayload: data,
+                payload: data,
+            });
+            break;
+        }
+        case RegistryProjectType.OUTGOING: {
+            await routeOutgoingProject({
+                project: registryProject,
+                payload: data,
             });
             break;
         }
         case RegistryProjectType.STATION: {
-            await handleStationMoveOperation({
-                items: stationsExtended,
+            await routeStationProject({
+                items,
                 project: registryProject,
-                routingPayload: data,
+                payload: data,
             });
             break;
         }
         case RegistryProjectType.AGGREGATOR: {
-            await handleEcosystemAggregatorMoveOperation({
-                items: stationsExtended,
+            await routeAggregatorProject({
+                items,
                 project: registryProject,
-                routingPayload: data,
+                payload: data,
             });
         }
     }

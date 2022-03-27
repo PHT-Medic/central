@@ -10,8 +10,8 @@ import { ClientDriverInstance } from '@trapi/client';
 import { RegistryProject } from './entity';
 import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 import { nullifyEmptyObjectProperties } from '../../../utils';
-import {Registry} from "../registry";
-import {RegistryCommand} from "../../special";
+import { Registry } from '../registry';
+import { RegistryCommand } from '../../special';
 
 export class RegistryProjectAPI {
     protected client: ClientDriverInstance;
@@ -26,8 +26,8 @@ export class RegistryProjectAPI {
         return response.data;
     }
 
-    async getOne(id: RegistryProject['id']): Promise<SingleResourceResponse<RegistryProject>> {
-        const response = await this.client.get(`registry-projects/${id}`);
+    async getOne(id: RegistryProject['id'], options?: BuildInput<RegistryProject>): Promise<SingleResourceResponse<RegistryProject>> {
+        const response = await this.client.get(`registry-projects/${id}${buildQuery(options)}`);
 
         return response.data;
     }

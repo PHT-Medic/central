@@ -8,32 +8,29 @@
 import {
     Ecosystem, HTTPClient, REGISTRY_ARTIFACT_TAG_BASE,
     REGISTRY_ARTIFACT_TAG_LATEST,
-    RegistryProject,
-    TrainManagerRoutingPayload,
     TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
-import { StationExtended } from '../type';
+import { RouteContextExtended } from '../type';
 import { transferInternal } from '../transfer/internal';
 import { transferEcosystemOut } from '../transfer/ecosystem';
 import { transferOutgoing } from '../transfer/outgoing';
 import { buildDockerAuthConfig } from '../../../config/services/registry';
 import { moveDockerImage } from '../../../modules/docker/image-move';
+import { useLogger } from '../../../modules/log';
 
-type MoveOperationContext = {
-    routingPayload: TrainManagerRoutingPayload,
-    project: RegistryProject,
-    items: StationExtended[],
-};
-
-export async function handleEcosystemAggregatorMoveOperation(context: MoveOperationContext) : Promise<void> {
+export async function routeAggregatorProject(context: RouteContextExtended) : Promise<void> {
     // only handle push events to self ecosystem aggregator project
     if (
         context.project.ecosystem !== Ecosystem.DEFAULT ||
-        context.routingPayload.artifactTag !== REGISTRY_ARTIFACT_TAG_LATEST
+        context.payload.artifactTag !== REGISTRY_ARTIFACT_TAG_LATEST
     ) {
         return;
     }
+
+    useLogger().debug(`Handle aggregator project ${context.project.name}.`, {
+        component: 'routing',
+    });
 
     let nextIndex = -1;
 
@@ -53,8 +50,8 @@ export async function handleEcosystemAggregatorMoveOperation(context: MoveOperat
     if (nextIndex === -1) {
         await transferOutgoing({
             project: context.project,
-            repositoryName: context.routingPayload.repositoryName,
-            artifactTag: context.routingPayload.artifactTag,
+            repositoryName: context.payload.repositoryName,
+            artifactTag: context.payload.artifactTag,
         });
     } else {
         const next = context.items[nextIndex];
@@ -74,9 +71,9 @@ export async function handleEcosystemAggregatorMoveOperation(context: MoveOperat
             // create base tag from latest ;)
             await moveDockerImage({
                 sourceAuthConfig: authConfig,
-                sourceRepositoryName: context.routingPayload.repositoryName,
+                sourceRepositoryName: context.payload.repositoryName,
                 sourceProjectName: context.project.external_name,
-                sourceTag: context.routingPayload.artifactTag,
+                sourceTag: context.payload.artifactTag,
 
                 destinationTag: REGISTRY_ARTIFACT_TAG_BASE,
             });
@@ -90,12 +87,12 @@ export async function handleEcosystemAggregatorMoveOperation(context: MoveOperat
                 await transferInternal({
                     source: {
                         project: context.project,
-                        repositoryName: context.routingPayload.repositoryName,
+                        repositoryName: context.payload.repositoryName,
                         artifactTag: tags[i],
                     },
                     destination: {
                         project: next.registry_project,
-                        repositoryName: context.routingPayload.repositoryName,
+                        repositoryName: context.payload.repositoryName,
                     },
                 });
             }
@@ -103,12 +100,12 @@ export async function handleEcosystemAggregatorMoveOperation(context: MoveOperat
             await transferEcosystemOut(
                 {
                     project: context.project,
-                    repositoryName: context.routingPayload.repositoryName,
-                    artifactTag: context.routingPayload.artifactTag,
+                    repositoryName: context.payload.repositoryName,
+                    artifactTag: context.payload.artifactTag,
                 },
                 {
                     project: context.project,
-                    repositoryName: context.routingPayload.repositoryName,
+                    repositoryName: context.payload.repositoryName,
                 },
             );
         }

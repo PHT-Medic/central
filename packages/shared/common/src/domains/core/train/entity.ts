@@ -50,10 +50,6 @@ export interface Train {
 
     build_status: TrainBuildStatus | null;
 
-    build_registry_project_id: RegistryProject['id'] | null;
-
-    build_registry_project: RegistryProject | null;
-
     // ------------------------------------------------------------------
 
     run_status: TrainRunStatus | null;
@@ -64,9 +60,23 @@ export interface Train {
 
     // ------------------------------------------------------------------
 
+    result_status: TrainResultStatus | null;
+
+    // ------------------------------------------------------------------
+
     created_at: Date;
 
     updated_at: Date;
+
+    // ------------------------------------------------------------------
+
+    incoming_registry_project_id: RegistryProject['id'] | null;
+
+    incoming_registry_project: RegistryProject | null;
+
+    outgoing_registry_project_id: RegistryProject['id'] | null;
+
+    outgoing_registry_project: RegistryProject | null;
 
     // ------------------------------------------------------------------
 
@@ -96,13 +106,6 @@ export interface Train {
 
     // ------------------------------------------------------------------
 
-    result_status: TrainResultStatus | null;
-
-    result_registry_project_id: RegistryProject['id'] | null;
-
-    result_registry_project: RegistryProject | null;
-
-    // ------------------------------------------------------------------
     proposal_id: Proposal['id'];
 
     proposal: Proposal;

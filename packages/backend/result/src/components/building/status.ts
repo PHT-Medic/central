@@ -11,15 +11,15 @@ import {
     HarborAPI,
     TrainManagerBuildPayload,
     TrainManagerBuildingQueueEvent,
-    buildAPIConnectionStringFromRegistry,
-    createBasicHarborAPIConfig,
+    TrainManagerQueuePayloadExtended,
+    buildAPIConnectionStringFromRegistry, createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { BuildingError } from './error';
 
 export async function processBuildStatusEvent(message: Message) {
-    const data = message.data as TrainManagerBuildPayload;
+    const data = message.data as TrainManagerQueuePayloadExtended<TrainManagerBuildPayload>;
 
     if (!data.entity) {
         throw BuildingError.notFound();
@@ -29,7 +29,7 @@ export async function processBuildStatusEvent(message: Message) {
         throw BuildingError.registryNotFound();
     }
 
-    if (!data.entity.build_registry_project_id) {
+    if (!data.entity.incoming_registry_project_id) {
         await publishMessage(buildMessage({
             options: {
                 routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
@@ -49,7 +49,7 @@ export async function processBuildStatusEvent(message: Message) {
     const httpClient = createClient<HarborAPI>(httpClientConfig);
 
     const client = useClient<HTTPClient>();
-    const incomingProject = await client.registryProject.getOne(data.entity.build_registry_project_id);
+    const incomingProject = await client.registryProject.getOne(data.entity.incoming_registry_project_id);
 
     const harborRepository = await httpClient.projectRepository
         .find(incomingProject.external_name, data.id);

@@ -33,7 +33,7 @@ export default Vue.extend({
         arrived() {
             switch (this.id) {
                 case TrainStationStatic.INCOMING:
-                    return this.trainBuildStatus === TrainBuildStatus.FINISHED;
+                    return this.trainBuildStatus === TrainBuildStatus.FINISHED && this.trainRunStationIndex === null;
                 case TrainStationStatic.OUTGOING:
                     return this.trainRunStatus === TrainRunStatus.FINISHED;
             }

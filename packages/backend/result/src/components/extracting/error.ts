@@ -7,7 +7,8 @@
 
 import { ErrorOptions } from '@typescript-error/http';
 import {
-    TrainManagerExtractingErrorType,
+    TrainManagerBaseErrorCode,
+    TrainManagerExtractingErrorCode,
     TrainManagerExtractingStep,
 } from '@personalhealthtrain/central-common';
 import { BaseError } from '../error';
@@ -15,8 +16,18 @@ import { BaseError } from '../error';
 export class ExtractingError extends BaseError {
     constructor(options: ErrorOptions) {
         options.step = options.step || TrainManagerExtractingStep.UNKNOWN;
-        options.type = options.type || TrainManagerExtractingErrorType.UNKNOWN;
+        options.type = options.type || TrainManagerExtractingErrorCode.UNKNOWN;
 
         super(options);
+    }
+
+    // --------------------------------------------------------------------
+
+    public getStep() : TrainManagerExtractingStep {
+        return this.getOption('step');
+    }
+
+    public getType() : TrainManagerExtractingErrorCode | TrainManagerBaseErrorCode {
+        return this.getOption('type');
     }
 }

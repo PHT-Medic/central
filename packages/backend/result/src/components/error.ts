@@ -7,7 +7,7 @@
 
 import { BaseError as Base, ErrorOptions } from '@typescript-error/http';
 import {
-    TrainManagerBaseErrorType,
+    TrainManagerBaseErrorCode,
 } from '@personalhealthtrain/central-common';
 
 export type ErrorOptionsExtended = ErrorOptions & {
@@ -17,26 +17,16 @@ export type ErrorOptionsExtended = ErrorOptions & {
 
 export class BaseError extends Base {
     constructor(options: ErrorOptionsExtended) {
-        options.type = options.type || TrainManagerBaseErrorType.UNKNOWN;
+        options.type = options.type || TrainManagerBaseErrorCode.UNKNOWN;
 
         super(options);
     }
 
     // --------------------------------------------------------------------
 
-    public getStep() {
-        return this.getOption('step');
-    }
-
-    public getType() {
-        return this.getOption('type');
-    }
-
-    // --------------------------------------------------------------------
-
     static notFound(options?: ErrorOptionsExtended) {
-        return new BaseError({
-            type: TrainManagerBaseErrorType.NOT_FOUND,
+        return new this({
+            type: TrainManagerBaseErrorCode.NOT_FOUND,
             ...(options || {}),
         });
     }
@@ -44,8 +34,8 @@ export class BaseError extends Base {
     static registryNotFound(
         options?: ErrorOptionsExtended,
     ) {
-        return new BaseError({
-            type: TrainManagerBaseErrorType.REGISTRY_NOT_FOUND,
+        return new this({
+            type: TrainManagerBaseErrorCode.REGISTRY_NOT_FOUND,
             ...(options || {}),
         });
     }
@@ -53,8 +43,8 @@ export class BaseError extends Base {
     static registryProjectNotFound(
         options?: ErrorOptionsExtended,
     ) {
-        return new BaseError({
-            type: TrainManagerBaseErrorType.REGISTRY_PROJECT_NOT_FOUND,
+        return new this({
+            type: TrainManagerBaseErrorCode.REGISTRY_PROJECT_NOT_FOUND,
             ...(options || {}),
         });
     }

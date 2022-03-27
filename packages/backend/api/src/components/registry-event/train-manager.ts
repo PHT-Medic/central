@@ -8,9 +8,6 @@
 import { Message, publishMessage } from 'amqp-extension';
 
 import {
-    RegistryProjectType,
-    TrainContainerPath,
-    TrainManagerExtractingMode,
     TrainManagerQueueCommand,
 } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
@@ -43,33 +40,12 @@ export async function dispatchRegistryEventToTrainManager(
         return message;
     }
 
-    if (registryProject.type === RegistryProjectType.OUTGOING) {
-        await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT, {
-            id: data.repositoryName,
-
-            filePaths: [
-                TrainContainerPath.RESULTS,
-                TrainContainerPath.CONFIG,
-            ],
-
-            mode: TrainManagerExtractingMode.WRITE,
-        }));
-
-        return message;
-    }
-
-    if (
-        registryProject.type === RegistryProjectType.STATION ||
-        registryProject.type === RegistryProjectType.INCOMING ||
-        registryProject.type === RegistryProjectType.AGGREGATOR
-    ) {
-        await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE, {
-            repositoryName: data.repositoryName,
-            projectName: data.namespace,
-            operator: data.operator,
-            artifactTag: data.artifactTag,
-        }));
-    }
+    await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE, {
+        repositoryName: data.repositoryName,
+        projectName: data.namespace,
+        operator: data.operator,
+        artifactTag: data.artifactTag,
+    }));
 
     return message;
 }

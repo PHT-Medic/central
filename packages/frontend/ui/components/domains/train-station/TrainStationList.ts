@@ -172,6 +172,7 @@ ComponentListProperties<TrainStation> & {
         }
 
         socket.on('trainStationCreated', this.handleSocketCreated);
+        socket.on('trainStationUpdated', this.handleSocketUpdated);
         socket.on('trainStationDeleted', this.handleSocketDeleted);
     },
     beforeDestroy() {
@@ -194,6 +195,7 @@ ComponentListProperties<TrainStation> & {
         }
 
         socket.off('trainStationCreated', this.handleSocketCreated);
+        socket.off('trainStationUpdated', this.handleSocketUpdated);
         socket.off('trainStationDeleted', this.handleSocketDeleted);
     },
     methods: {
@@ -228,6 +230,14 @@ ComponentListProperties<TrainStation> & {
             ) return;
 
             this.handleCreated(context.data);
+        },
+        handleSocketUpdated(context) {
+            if (
+                !this.isSameSocketRoom(context.meta.roomName) ||
+                !this.isSocketEventForSource(context.data)
+            ) return;
+
+            this.handleUpdated(context.data);
         },
         handleSocketDeleted(context: SocketServerToClientEventContext<TrainStation>) {
             if (

@@ -16,6 +16,7 @@ import { TransferItem } from './type';
 import { pullDockerImage, useDocker } from '../../../modules/docker';
 import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../../config/services/registry';
 import { pushDockerImage } from '../../../modules/docker/image-push';
+import { useLogger } from '../../../modules/log';
 
 export async function transferEcosystemOut(
     source: TransferItem,
@@ -30,6 +31,10 @@ export async function transferEcosystemOut(
         // don't move base tag to external ... ^^
         return;
     }
+
+    useLogger().debug(`Move repository ${source.repositoryName} from ${source.project.name} project to ${destination.project.name} project of ${destination.project.ecosystem} ecosystem.`, {
+        component: 'routing',
+    });
 
     const client = await useClient<HTTPClient>();
 
@@ -101,8 +106,8 @@ export async function transferEcosystemOut(
         .getImage(`${externalImageURL}:latest`);
 
     await pushDockerImage(destinationImage, buildDockerAuthConfig({
-        host: aggregatorProject.registry.host,
-        user: aggregatorProject.account_name,
-        password: aggregatorProject.account_secret,
+        host: aggregatorRegistry.host,
+        user: aggregatorRegistry.account_name,
+        password: aggregatorRegistry.account_secret,
     }));
 }

@@ -9,19 +9,22 @@ import { Message, publishMessage } from 'amqp-extension';
 import {
     HTTPClient,
     HarborAPI,
-    REGISTRY_ARTIFACT_TAG_BASE,
     REGISTRY_ARTIFACT_TAG_LATEST,
     RegistryProject,
     TrainManagerQueueCommand,
-    TrainManagerRoutingStartPayload, TrainManagerRoutingStep, buildAPIConnectionStringFromRegistry, createBasicHarborAPIConfig,
+    TrainManagerQueuePayloadExtended,
+    TrainManagerRoutingStartPayload,
+    TrainManagerRoutingStep,
+    buildAPIConnectionStringFromRegistry,
+    createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
-import { buildSelfQueueMessage } from '../../config/queue';
+import { buildSelfQueueCommandMessage } from '../../config/queue';
 import { RoutingError } from './error';
 import { BuildingError } from '../building/error';
 
 export async function processStartCommand(message: Message) {
-    const data = message.data as TrainManagerRoutingStartPayload;
+    const data = message.data as TrainManagerQueuePayloadExtended<TrainManagerRoutingStartPayload>;
 
     if (!data.registry) {
         throw RoutingError.registryNotFound({
@@ -38,7 +41,7 @@ export async function processStartCommand(message: Message) {
     let incomingProject : RegistryProject;
 
     try {
-        incomingProject = await client.registryProject.getOne(data.entity.build_registry_project_id);
+        incomingProject = await client.registryProject.getOne(data.entity.incoming_registry_project_id);
     } catch (e) {
         throw BuildingError.registryProjectNotFound({
             step: TrainManagerRoutingStep.START,
@@ -51,9 +54,9 @@ export async function processStartCommand(message: Message) {
 
     if (
         !harborRepository ||
-        harborRepository.artifactCount === 0
+        harborRepository.artifactCount < 2
     ) {
-        const queueMessage = buildSelfQueueMessage(
+        const queueMessage = buildSelfQueueCommandMessage(
             TrainManagerQueueCommand.BUILD,
             {
                 id: data.id,
@@ -68,19 +71,12 @@ export async function processStartCommand(message: Message) {
         });
     }
 
-    const artifacts : string[] = [
-        REGISTRY_ARTIFACT_TAG_BASE,
-        REGISTRY_ARTIFACT_TAG_LATEST,
-    ];
+    const routeMessage = buildSelfQueueCommandMessage(TrainManagerQueueCommand.ROUTE, {
+        repositoryName: data.id,
+        projectName: incomingProject.external_name,
+        operator: data.registry.account_name,
+        artifactTag: REGISTRY_ARTIFACT_TAG_LATEST,
+    });
 
-    for (let i = 0; i < artifacts.length; i++) {
-        const message = buildSelfQueueMessage(TrainManagerQueueCommand.ROUTE, {
-            repositoryName: data.id,
-            projectName: incomingProject.external_name,
-            operator: data.registry.account_name,
-            artifactTag: artifacts[i],
-        });
-
-        await publishMessage(message);
-    }
+    await publishMessage(routeMessage);
 }

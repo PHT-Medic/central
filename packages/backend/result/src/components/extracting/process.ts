@@ -9,7 +9,7 @@ import { Message } from 'amqp-extension';
 import fs from 'fs';
 import {
     TrainManagerExtractingMode,
-    TrainManagerExtractingQueuePayload, TrainManagerExtractingStep,
+    TrainManagerExtractingQueuePayload, TrainManagerExtractingStep, TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 import { buildImageOutputFilePath, getImageOutputDirectoryPath } from '../../config/paths';
 import { buildRemoteDockerImageURL } from '../../config/services/registry';
@@ -18,7 +18,7 @@ import { ensureDirectory } from '../../modules/fs';
 import { ExtractingError } from './error';
 
 export async function processExtractCommand(message: Message) {
-    const data: TrainManagerExtractingQueuePayload = message.data as TrainManagerExtractingQueuePayload;
+    const data = message.data as TrainManagerQueuePayloadExtended<TrainManagerExtractingQueuePayload>;
 
     if (!data.registry) {
         throw ExtractingError.registryNotFound({

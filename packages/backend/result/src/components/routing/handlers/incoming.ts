@@ -6,22 +6,17 @@
  */
 
 import {
-    Ecosystem,
-    RegistryProject,
-    TrainManagerRoutingPayload,
+    Ecosystem, REGISTRY_ARTIFACT_TAG_BASE,
+    TrainManagerRoutingQueueEvent,
 } from '@personalhealthtrain/central-common';
+import { publishMessage } from 'amqp-extension';
 import { useLogger } from '../../../modules/log';
 import { transferInternal } from '../transfer/internal';
-import { StationExtended } from '../type';
 import { transferEcosystemOut } from '../transfer/ecosystem';
+import { buildAPIQueueEventMessage } from '../../../config/queue';
+import { RouteContextExtended } from '../type';
 
-type MoveOperationContext = {
-    routingPayload: TrainManagerRoutingPayload,
-    project: RegistryProject,
-    items: StationExtended[],
-};
-
-export async function handleIncomingMoveOperation(context: MoveOperationContext) : Promise<void> {
+export async function routeIncomingProject(context: RouteContextExtended) : Promise<void> {
     // move to station repo with index 0.
     const nextIndex = context.items.findIndex((station) => station.index === 0);
     if (nextIndex === -1) {
@@ -32,6 +27,15 @@ export async function handleIncomingMoveOperation(context: MoveOperationContext)
         return;
     }
 
+    if (context.payload.artifactTag === REGISTRY_ARTIFACT_TAG_BASE) {
+        return;
+    }
+
+    await publishMessage(buildAPIQueueEventMessage(
+        TrainManagerRoutingQueueEvent.STARTED,
+        context.payload,
+    ));
+
     const nextStation = context.items[nextIndex];
 
     if (nextStation.ecosystem === Ecosystem.DEFAULT) {
@@ -39,12 +43,12 @@ export async function handleIncomingMoveOperation(context: MoveOperationContext)
             {
                 source: {
                     project: context.project,
-                    repositoryName: context.routingPayload.repositoryName,
-                    artifactTag: context.routingPayload.artifactTag,
+                    repositoryName: context.payload.repositoryName,
+                    artifactTag: context.payload.artifactTag,
                 },
                 destination: {
                     project: nextStation.registry_project,
-                    repositoryName: context.routingPayload.repositoryName,
+                    repositoryName: context.payload.repositoryName,
                 },
             },
         );
@@ -52,12 +56,12 @@ export async function handleIncomingMoveOperation(context: MoveOperationContext)
         await transferEcosystemOut(
             {
                 project: context.project,
-                repositoryName: context.routingPayload.repositoryName,
-                artifactTag: context.routingPayload.artifactTag,
+                repositoryName: context.payload.repositoryName,
+                artifactTag: context.payload.artifactTag,
             },
             {
                 project: nextStation.registry_project,
-                repositoryName: context.routingPayload.repositoryName,
+                repositoryName: context.payload.repositoryName,
             },
         );
     }
