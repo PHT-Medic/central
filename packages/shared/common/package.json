@@ -17,7 +17,7 @@
     "devDependencies": {
         "@authelion/common": "^0.0.2",
         "@trapi/client": "^2.0.6",
-        "@trapi/harbor-client": "^0.0.4",
+        "@trapi/harbor-client": "^0.0.5",
         "@trapi/query": "^2.1.2",
         "@typescript-error/core": "^1.1.3",
         "rimraf": "^3.0.2"
