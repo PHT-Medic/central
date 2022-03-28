@@ -51,8 +51,9 @@ export async function linkRegistryProject(
 
     if (entity.ecosystem !== Ecosystem.DEFAULT) {
         useLogger()
-            .warn('Project linkage aborted. Only default ecosystem supported.', {
+            .warn('Only default ecosystem supported.', {
                 component: 'registry',
+                command: RegistryQueueCommand.PROJECT_LINK,
             });
         return;
     }
@@ -69,41 +70,73 @@ export async function linkRegistryProject(
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
     const httpClient = createClient<HarborClient>(httpClientConfig);
 
-    await ensureRemoteRegistryProject(httpClient, {
-        remoteId: entity.external_id,
-        remoteName: entity.external_name,
-        remoteOptions: {
-            public: entity.public,
-        },
-    });
+    try {
+        const project = await ensureRemoteRegistryProject(httpClient, {
+            remoteId: entity.external_id,
+            remoteName: entity.external_name,
+            remoteOptions: {
+                public: entity.public,
+            },
+        });
 
-    const robotAccount = await ensureRemoteRegistryProjectAccount(httpClient, {
-        name: entity.external_name,
-        account: {
-            id: entity.account_id,
-            name: entity.account_name,
-            secret: entity.account_secret,
-        },
-    });
+        entity.external_id = project.project_id;
+    } catch (e) {
+        useLogger()
+            .warn('Project could not be created.', {
+                component: 'registry',
+                command: RegistryQueueCommand.PROJECT_LINK,
+            });
 
-    if (robotAccount) {
-        entity.account_id = `${robotAccount.id}`;
-        entity.account_name = robotAccount.name;
-        entity.account_secret = robotAccount.secret;
-    } else {
-        entity.account_id = null;
-        entity.account_name = null;
-        entity.account_secret = null;
+        return;
     }
 
-    const webhook = await saveRemoteRegistryProjectWebhook(httpClient, {
-        idOrName: entity.external_name,
-        isName: true,
-    });
+    try {
+        const robotAccount = await ensureRemoteRegistryProjectAccount(httpClient, {
+            name: entity.external_name,
+            account: {
+                id: entity.account_id,
+                name: entity.account_name,
+                secret: entity.account_secret,
+            },
+        });
 
-    if (webhook) {
-        entity.webhook_name = webhook.name;
-        entity.webhook_exists = true;
+        if (robotAccount) {
+            entity.account_id = `${robotAccount.id}`;
+            entity.account_name = robotAccount.name;
+            entity.account_secret = robotAccount.secret;
+        } else {
+            entity.account_id = null;
+            entity.account_name = null;
+            entity.account_secret = null;
+        }
+    } catch (e) {
+        useLogger()
+            .warn('Robot account could not be created.', {
+                component: 'registry',
+                command: RegistryQueueCommand.PROJECT_LINK,
+            });
+
+        return;
+    }
+
+    try {
+        const webhook = await saveRemoteRegistryProjectWebhook(httpClient, {
+            idOrName: entity.external_name,
+            isName: true,
+        });
+
+        if (webhook) {
+            entity.webhook_name = webhook.name;
+            entity.webhook_exists = true;
+        }
+    } catch (e) {
+        useLogger()
+            .warn('Webhook could not be created.', {
+                component: 'registry',
+                command: RegistryQueueCommand.PROJECT_LINK,
+            });
+
+        return;
     }
 
     await repository.save(entity);
@@ -128,7 +161,11 @@ export async function unlinkRegistryProject(
         await httpClient.project
             .delete(payload.externalName, true);
     } catch (e) {
-        // ...
+        useLogger()
+            .warn('Project could not be deleted.', {
+                component: 'registry',
+                command: RegistryQueueCommand.PROJECT_UNLINK,
+            });
     }
 
     if (payload.accountId) {
@@ -136,7 +173,11 @@ export async function unlinkRegistryProject(
             await httpClient.robotAccount
                 .delete(payload.accountId);
         } catch (e) {
-            // ...
+            useLogger()
+                .warn('Robot Account could not be deleted.', {
+                    component: 'registry',
+                    command: RegistryQueueCommand.PROJECT_UNLINK,
+                });
         }
 
         const response = await useClient<VaultAPI>(ApiKey.VAULT)

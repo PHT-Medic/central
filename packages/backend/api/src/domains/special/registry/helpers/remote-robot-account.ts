@@ -24,6 +24,8 @@ export async function ensureRemoteRegistryProjectAccount(
 ) : Promise<HarborRobotAccount> {
     let robotAccount : HarborRobotAccount | undefined;
 
+    let secretStorageData : RegistryProjectSecretStoragePayload | undefined;
+
     if (
         !context.account.id ||
         !context.account.name ||
@@ -33,8 +35,15 @@ export async function ensureRemoteRegistryProjectAccount(
             robotAccount = await httpClient.robotAccount.create(context.name);
         } catch (e) {
             if (e?.response?.status === 409) {
-                let { data: secretStorageData } = await useClient<VaultAPI>(HTTPClientKey.VAULT)
+                const response = await useClient<VaultAPI>(HTTPClientKey.VAULT)
                     .keyValue.find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, context.name);
+
+                if (
+                    response &&
+                    response.data
+                ) {
+                    secretStorageData = response.data;
+                }
 
                 if (
                     !!secretStorageData &&
@@ -90,6 +99,19 @@ export async function ensureRemoteRegistryProjectAccount(
             robotAccount.id,
             robotAccount.secret,
         );
+
+        secretStorageData = {
+            account_id: `${robotAccount.id}`,
+            account_name: robotAccount.name,
+            account_secret: robotAccount.secret,
+        };
+
+        await useClient<VaultAPI>(ApiKey.VAULT)
+            .keyValue.save(
+                REGISTRY_PROJECT_SECRET_ENGINE_KEY,
+                context.name,
+                secretStorageData,
+            );
     }
 
     return robotAccount;

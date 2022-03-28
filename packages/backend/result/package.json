@@ -23,7 +23,7 @@
         "@authelion/common": "^0.0.2",
         "@personalhealthtrain/central-common": "^1.3.19",
         "@trapi/client": "^2.0.6",
-        "@trapi/harbor-client": "^0.0.4",
+        "@trapi/harbor-client": "^0.0.6",
         "@trapi/query": "^2.1.2",
         "@typescript-error/http": "^1.1.4",
         "amqp-extension": "^1.0.1",

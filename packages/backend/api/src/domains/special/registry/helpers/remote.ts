@@ -6,8 +6,7 @@
  */
 
 import {
-    HarborClient, HarborProject,
-    HarborProjectCreateContext,
+    HarborClient, HarborProject, HarborProjectPayload,
 } from '@trapi/harbor-client';
 
 export async function ensureRemoteRegistryProject(
@@ -15,24 +14,18 @@ export async function ensureRemoteRegistryProject(
     context: {
         remoteId?: string | number | null,
         remoteName: string,
-        remoteOptions?: Partial<HarborProjectCreateContext>
+        remoteOptions?: Partial<HarborProjectPayload>
     },
 ) : Promise<HarborProject> {
-    let harborProject : HarborProject | undefined;
+    await httpClient.project.save({
+        project_name: context.remoteName,
+        public: false,
+        ...(context.remoteOptions ? context.remoteOptions : {}),
+    });
 
-    if (context.remoteId) {
-        harborProject = await httpClient.project.find(context.remoteId);
-    }
+    const harborProject : HarborProject = await httpClient.project.getOne(context.remoteName, true);
 
-    if (!harborProject) {
-        harborProject = await httpClient.project.save({
-            project_name: context.remoteName,
-            public: false,
-            ...(context.remoteOptions ? context.remoteOptions : {}),
-        });
-    }
-
-    context.remoteId = `${harborProject.id}`;
+    context.remoteId = `${harborProject.project_id}`;
 
     return harborProject;
 }
