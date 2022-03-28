@@ -82,6 +82,14 @@ export async function linkRegistryProject(
 
     const connectionString = buildRegistryClientConnectionStringFromRegistry(registryEntity);
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
+
+    useLogger()
+        .info('Connect to registry', {
+            component: 'registry',
+            command: RegistryQueueCommand.PROJECT_LINK,
+            connectionString,
+        });
+
     const httpClient = createClient<HarborClient>(httpClientConfig);
 
     try {

@@ -17,7 +17,7 @@
     "devDependencies": {
         "@authelion/common": "^0.0.2",
         "@trapi/client": "^2.0.6",
-        "@trapi/harbor-client": "^0.1.0",
+        "@trapi/harbor-client": "^0.1.1",
         "@trapi/vault-client": "^0.0.1",
         "@trapi/query": "^2.1.2",
         "@typescript-error/core": "^1.1.3",
