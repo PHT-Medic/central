@@ -90,7 +90,7 @@ export default {
                         :entity-id="data.item.id"
                         :entity-type="'registry'"
                         :with-text="false"
-                        @done="handleDeleted"
+                        @deleted="handleDeleted"
                     />
                 </template>
                 <template #cell(created_at)="data">
