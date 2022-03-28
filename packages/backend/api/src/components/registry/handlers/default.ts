@@ -27,18 +27,25 @@ import {
 } from '../../../domains/special/registry';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
 import { RegistryEntity } from '../../../domains/core/registry/entity';
+import { useLogger } from '../../../config/log';
 
 export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueCommand.SETUP>) {
     const response = await useClient<VaultAPI>(ApiKey.VAULT)
         .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
 
     if (!response) {
-        // todo: throw error
+        useLogger()
+            .warn('Registry setup failed. No robot credentials present in secret storage.', {
+                component: 'registry',
+            });
         return payload;
     }
 
     if (!payload.id && !payload.entity) {
-        // todo: throw error
+        useLogger()
+            .warn('Registry setup failed. No registry specified.', {
+                component: 'registry',
+            });
         return payload;
     }
 
@@ -56,6 +63,11 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     // ---------------------------------------------------------------------
 
     if (entity.ecosystem !== Ecosystem.DEFAULT) {
+        useLogger()
+            .warn('Registry setup aborted. Only default ecosystem supported.', {
+                component: 'registry',
+            });
+
         return payload;
     }
 

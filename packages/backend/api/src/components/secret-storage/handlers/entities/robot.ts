@@ -6,6 +6,7 @@
  */
 
 import {
+    Ecosystem,
     ROBOT_SECRET_ENGINE_KEY,
     ServiceID,
     VaultAPI,
@@ -17,33 +18,36 @@ import { getRepository } from 'typeorm';
 import { ApiKey } from '../../../../config/api';
 import { SecretStorageRobotQueuePayload } from '../../../../domains/special/secret-storage/type';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../domains/special/registry';
-import { RegistryEntity } from '../../../../domains/core/registry/entity';
+import { RegistryProjectEntity } from '../../../../domains/core/registry-project/entity';
 
 export async function saveRobotToSecretStorage(payload: SecretStorageRobotQueuePayload) {
     if (!payload.id || !payload.secret) {
         return;
     }
 
+    const data = buildRobotSecretStoragePayload(payload.id, payload.secret);
+    await useClient<VaultAPI>(ApiKey.VAULT).keyValue.save(ROBOT_SECRET_ENGINE_KEY, `${payload.name}`, data);
+
     if (payload.name === ServiceID.REGISTRY) {
-        const registryRepository = getRepository(RegistryEntity);
-        const registries = await registryRepository.find({
+        const projectRepository = getRepository(RegistryProjectEntity);
+        const projects = await projectRepository.find({
             select: ['id'],
+            where: {
+                ecosystem: Ecosystem.DEFAULT,
+            },
         });
 
-        for (let i = 0; i < registries.length; i++) {
+        for (let i = 0; i < projects.length; i++) {
             const queueMessage = buildRegistryQueueMessage(
-                RegistryQueueCommand.SETUP,
+                RegistryQueueCommand.PROJECT_LINK,
                 {
-                    id: registries[i].id,
+                    id: projects[i].id,
                 },
             );
 
             await publishMessage(queueMessage);
         }
     }
-
-    const data = buildRobotSecretStoragePayload(payload.id, payload.secret);
-    await useClient<VaultAPI>(ApiKey.VAULT).keyValue.save(ROBOT_SECRET_ENGINE_KEY, `${payload.name}`, data);
 }
 
 export async function deleteRobotFromSecretStorage(payload: SecretStorageRobotQueuePayload) {

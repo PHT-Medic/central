@@ -27,6 +27,7 @@ import { ensureRemoteRegistryProject } from '../../../domains/special/registry/h
 import { saveRemoteRegistryProjectWebhook } from '../../../domains/special/registry/helpers/remote-webhook';
 import { ApiKey } from '../../../config/api';
 import { RegistryEntity } from '../../../domains/core/registry/entity';
+import { useLogger } from '../../../config/log';
 
 export async function linkRegistryProject(
     payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_LINK>,
@@ -49,6 +50,10 @@ export async function linkRegistryProject(
     }
 
     if (entity.ecosystem !== Ecosystem.DEFAULT) {
+        useLogger()
+            .warn('Project linkage aborted. Only default ecosystem supported.', {
+                component: 'registry',
+            });
         return;
     }
 

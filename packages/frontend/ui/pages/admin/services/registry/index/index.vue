@@ -6,7 +6,7 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';
+import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
 import { RegistryList } from '../../../../../components/domains/registry/RegistryList';
 
 export default {
@@ -84,7 +84,7 @@ export default {
                     >
                         <i class="fa fa-bars" />
                     </nuxt-link>
-                    <auth-entity-delete
+                    <entity-delete
                         v-if="canManage"
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
