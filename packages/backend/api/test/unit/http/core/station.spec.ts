@@ -12,6 +12,7 @@ import {
     StationSecretStoragePayload, VaultAPI, buildRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
+import { VaultClient } from '@trapi/vault-client';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
 import { TEST_DEFAULT_STATION, createSuperTestStation } from '../../../utils/domains/station';
@@ -59,7 +60,7 @@ describe('src/controllers/core/station', () => {
 
         // ---------------------------------------------------------
 
-        let stationSecret = await useClient<VaultAPI>(ApiKey.VAULT).keyValue
+        let stationSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
             .find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, secureId);
 
         expect(stationSecret.data).toBeDefined();
@@ -130,7 +131,7 @@ describe('src/controllers/core/station', () => {
 
         // ---------------------------------------------------------
 
-        stationSecret = await useClient<VaultAPI>(ApiKey.VAULT).keyValue
+        stationSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
             .find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, secureId);
 
         expect(stationSecret.data).toBeDefined();
@@ -145,7 +146,7 @@ describe('src/controllers/core/station', () => {
 
         // ---------------------------------------------------------
 
-        stationSecret = await useClient<VaultAPI>(ApiKey.VAULT).keyValue
+        stationSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
             .find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, secureId);
         expect(stationSecret).toBeUndefined();
 

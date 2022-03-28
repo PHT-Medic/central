@@ -8,12 +8,12 @@
 import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
 import {
     HTTPClient,
-    VaultAPI,
     refreshAuthRobotTokenOnResponseError,
 } from '@personalhealthtrain/central-common';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import https from 'https';
+import { VaultClient } from '@trapi/vault-client';
 import { buildCommandRouterComponent } from './components/command-router';
 import { Environment } from './env';
 
@@ -42,7 +42,7 @@ function createConfig({ env } : ConfigContext) : Config {
     });
 
     setHTTPConfig({
-        clazz: VaultAPI,
+        clazz: VaultClient,
         driver: {
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false,

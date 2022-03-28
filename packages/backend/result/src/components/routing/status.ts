@@ -18,7 +18,7 @@ import {
     createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
-import { HarborClient, parseHarborProjectRepositoryName } from '@trapi/harbor-client';
+import { HarborClient, parseProjectRepositoryName } from '@trapi/harbor-client';
 import { buildAPIQueueEventMessage } from '../../config/queue';
 import { RoutingError } from './error';
 import { BuildingError } from '../building/error';
@@ -99,7 +99,7 @@ export async function processRouteStatusCommand(message: Message) {
         const searchResult = await httpClient.search(data.id);
         if (searchResult.repository.length > 0) {
             if (searchResult.repository[0].artifact_count >= 2) {
-                const parsed = parseHarborProjectRepositoryName(searchResult.repository[0].repository_name);
+                const parsed = parseProjectRepositoryName(searchResult.repository[0].repository_name);
 
                 await publishMessage(buildAPIQueueEventMessage(
                     TrainManagerRoutingQueueEvent.POSITION_FOUND,

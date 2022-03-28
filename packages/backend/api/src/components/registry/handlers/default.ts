@@ -15,10 +15,11 @@ import {
     Registry,
     RegistryProjectType,
     RobotSecretEnginePayload,
-    ServiceID, VaultAPI,
+    ServiceID,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { getRepository } from 'typeorm';
+import { VaultClient } from '@trapi/vault-client';
 import { ApiKey } from '../../../config/api';
 import {
     RegistryQueueCommand,
@@ -30,7 +31,7 @@ import { RegistryEntity } from '../../../domains/core/registry/entity';
 import { useLogger } from '../../../config/log';
 
 export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueCommand.SETUP>) {
-    const response = await useClient<VaultAPI>(ApiKey.VAULT)
+    const response = await useClient<VaultClient>(ApiKey.VAULT)
         .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
 
     if (!response) {

@@ -8,7 +8,7 @@
 import { Robot } from '@authelion/common';
 import { Config, stringifyAuthorizationHeader } from '@trapi/client';
 import https from 'https';
-import { HarborClient, HarborProjectWebhookTarget } from '@trapi/harbor-client';
+import { HarborClient, ProjectWebhookTarget } from '@trapi/harbor-client';
 import { ServiceID } from '../constants';
 import { ProxyConnectionConfig, detectProxyConnectionConfig } from '../../../../utils';
 
@@ -17,7 +17,7 @@ export function buildRegistryWebhookTarget(
         robot: Pick<Robot, 'id' | 'secret'>,
         url: string
     },
-) : HarborProjectWebhookTarget {
+) : ProjectWebhookTarget {
     return {
         auth_header: stringifyAuthorizationHeader({
             type: 'Basic',

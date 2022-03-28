@@ -6,17 +6,15 @@
  */
 
 import { getRepository } from 'typeorm';
-import { NotFoundError } from '@typescript-error/http';
 import {
     Ecosystem,
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
     RegistryProjectSecretStoragePayload,
-    VaultAPI,
-    buildRegistryClientConnectionStringFromRegistry,
-    createBasicHarborAPIConfig,
+    buildRegistryClientConnectionStringFromRegistry, createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, isClientError, useClient } from '@trapi/client';
 import { HarborClient } from '@trapi/harbor-client';
+import { VaultClient } from '@trapi/vault-client';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
 import {
     RegistryQueueCommand,
@@ -46,7 +44,13 @@ export async function linkRegistryProject(
     }
 
     if (typeof entity === 'undefined') {
-        throw new NotFoundError();
+        useLogger()
+            .error('Registry project not found.', {
+                component: 'registry',
+                command: RegistryQueueCommand.PROJECT_LINK,
+            });
+
+        return;
     }
 
     if (entity.ecosystem !== Ecosystem.DEFAULT) {
@@ -66,6 +70,16 @@ export async function linkRegistryProject(
         .where('registry.id = :id', { id: entity.registry_id })
         .getOne();
 
+    if (typeof registryEntity === 'undefined') {
+        useLogger()
+            .error('Registry not found.', {
+                component: 'registry',
+                command: RegistryQueueCommand.PROJECT_LINK,
+            });
+
+        return;
+    }
+
     const connectionString = buildRegistryClientConnectionStringFromRegistry(registryEntity);
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
     const httpClient = createClient<HarborClient>(httpClientConfig);
@@ -81,13 +95,16 @@ export async function linkRegistryProject(
 
         entity.external_id = project.project_id;
     } catch (e) {
+        if (!isClientError(e)) {
+            console.log(e);
+        }
         useLogger()
             .warn('Project could not be created.', {
                 component: 'registry',
                 command: RegistryQueueCommand.PROJECT_LINK,
                 payload: isClientError(e) ?
                     e.response.data :
-                    e.message,
+                    e,
             });
 
         return;
@@ -113,13 +130,17 @@ export async function linkRegistryProject(
             entity.account_secret = null;
         }
     } catch (e) {
+        if (!isClientError(e)) {
+            console.log(e);
+        }
+
         useLogger()
             .warn('Robot account could not be created.', {
                 component: 'registry',
                 command: RegistryQueueCommand.PROJECT_LINK,
                 payload: isClientError(e) ?
                     e.response.data :
-                    e.message,
+                    e,
             });
 
         return;
@@ -142,7 +163,7 @@ export async function linkRegistryProject(
                 command: RegistryQueueCommand.PROJECT_LINK,
                 payload: isClientError(e) ?
                     e.response.data :
-                    e.message,
+                    e,
             });
 
         return;
@@ -189,7 +210,7 @@ export async function unlinkRegistryProject(
                 });
         }
 
-        const response = await useClient<VaultAPI>(ApiKey.VAULT)
+        const response = await useClient<VaultClient>(ApiKey.VAULT)
             .keyValue.find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.externalName);
 
         if (response) {
@@ -197,7 +218,7 @@ export async function unlinkRegistryProject(
             response.data.account_name = null;
             response.data.account_secret = null;
 
-            await useClient<VaultAPI>(ApiKey.VAULT)
+            await useClient<VaultClient>(ApiKey.VAULT)
                 .keyValue.save(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.externalName, response.data);
         }
     }

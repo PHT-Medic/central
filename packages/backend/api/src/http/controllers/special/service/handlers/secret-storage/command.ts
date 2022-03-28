@@ -9,7 +9,6 @@ import { check, matchedData, validationResult } from 'express-validator';
 import {
     PermissionID,
     SecretStorageCommand,
-    VaultAPI,
     getUserSecretsSecretStorageKey,
     isUserSecretsSecretStorageKey,
 } from '@personalhealthtrain/central-common';
@@ -20,6 +19,7 @@ import {
 } from '@typescript-error/http';
 import { UserEntity } from '@authelion/api-core';
 import { publishMessage } from 'amqp-extension';
+import { VaultClient } from '@trapi/vault-client';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
 import { ExpressValidationError } from '../../../../../express-validation';
 import { ApiKey } from '../../../../../../config/api';
@@ -97,7 +97,7 @@ export async function handleSecretStorageCommandRouteHandler(req: ExpressRequest
 
     switch (command as SecretStorageCommand) {
         case SecretStorageCommand.ENGINE_CREATE: {
-            await useClient<VaultAPI>(ApiKey.VAULT)
+            await useClient<VaultClient>(ApiKey.VAULT)
                 .keyValue.createMount({
                     path: rawPath,
                 });

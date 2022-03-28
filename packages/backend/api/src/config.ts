@@ -6,12 +6,13 @@
  */
 
 import {
-    ProxyConnectionConfig, VaultAPI, detectProxyConnectionConfig,
+    ProxyConnectionConfig, detectProxyConnectionConfig,
 } from '@personalhealthtrain/central-common';
 import { setConfig as setHTTPConfig } from '@trapi/client';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import https from 'https';
 import { setConfig as setRedisConfig } from 'redis-extension';
+import { VaultClient } from '@trapi/vault-client';
 import { Environment } from './env';
 import { buildTrainManagerAggregator } from './aggregators/train-manager';
 import { buildRobotAggregator } from './aggregators/robot';
@@ -39,7 +40,7 @@ export function createConfig({ env } : ConfigContext) : Config {
     const proxyConfig : ProxyConnectionConfig | undefined = detectProxyConnectionConfig();
 
     setHTTPConfig({
-        clazz: VaultAPI,
+        clazz: VaultClient,
         driver: {
             ...(proxyAPis.includes('vault') && proxyConfig ? {
                 proxy: proxyConfig,

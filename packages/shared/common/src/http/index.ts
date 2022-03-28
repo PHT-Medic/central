@@ -8,4 +8,3 @@
 export * from './client';
 export * from './contants';
 export * from './interceptors';
-export * from './vault-client';

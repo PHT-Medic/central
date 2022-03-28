@@ -5,24 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { HarborClient, HarborRobotAccount } from '@trapi/harbor-client';
+import { HarborClient, RobotAccount } from '@trapi/harbor-client';
 import {
     HTTPClientKey,
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
     RegistryProjectSecretStoragePayload,
-    VaultAPI,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
+import { VaultClient } from '@trapi/vault-client';
 import { ApiKey } from '../../../../config/api';
 
 export async function ensureRemoteRegistryProjectAccount(
     httpClient: HarborClient,
     context: {
         name: string,
-        account: Partial<HarborRobotAccount>
+        account: Partial<RobotAccount>
     },
-) : Promise<HarborRobotAccount> {
-    let robotAccount : HarborRobotAccount | undefined;
+) : Promise<RobotAccount> {
+    let robotAccount : RobotAccount | undefined;
 
     let secretStorageData : RegistryProjectSecretStoragePayload | undefined;
 
@@ -35,7 +35,7 @@ export async function ensureRemoteRegistryProjectAccount(
             robotAccount = await httpClient.robotAccount.create(context.name);
         } catch (e) {
             if (e?.response?.status === 409) {
-                const response = await useClient<VaultAPI>(HTTPClientKey.VAULT)
+                const response = await useClient<VaultClient>(HTTPClientKey.VAULT)
                     .keyValue.find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, context.name);
 
                 if (
@@ -72,7 +72,7 @@ export async function ensureRemoteRegistryProjectAccount(
                     };
                 }
 
-                await useClient<VaultAPI>(ApiKey.VAULT)
+                await useClient<VaultClient>(ApiKey.VAULT)
                     .keyValue.save(
                         REGISTRY_PROJECT_SECRET_ENGINE_KEY,
                         context.name,
@@ -106,7 +106,7 @@ export async function ensureRemoteRegistryProjectAccount(
             account_secret: robotAccount.secret,
         };
 
-        await useClient<VaultAPI>(ApiKey.VAULT)
+        await useClient<VaultClient>(ApiKey.VAULT)
             .keyValue.save(
                 REGISTRY_PROJECT_SECRET_ENGINE_KEY,
                 context.name,

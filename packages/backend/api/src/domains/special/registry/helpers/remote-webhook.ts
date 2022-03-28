@@ -5,16 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { HarborClient, HarborProjectWebhook } from '@trapi/harbor-client';
+import { HarborClient, ProjectWebhook } from '@trapi/harbor-client';
 import {
     HTTPClientKey,
     ROBOT_SECRET_ENGINE_KEY,
     RobotSecretEnginePayload,
-    ServiceID, VaultAPI,
+    ServiceID,
     buildRegistryWebhookTarget,
 } from '@personalhealthtrain/central-common';
 import os from 'os';
 import { useClient } from '@trapi/client';
+import { VaultClient } from '@trapi/vault-client';
 import env from '../../../../env';
 
 export async function saveRemoteRegistryProjectWebhook(
@@ -23,12 +24,12 @@ export async function saveRemoteRegistryProjectWebhook(
         idOrName: string | number,
         isName?: boolean
     },
-) : Promise<HarborProjectWebhook | undefined> {
-    const response = await useClient<VaultAPI>(HTTPClientKey.VAULT)
+) : Promise<ProjectWebhook | undefined> {
+    const response = await useClient<VaultClient>(HTTPClientKey.VAULT)
         .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
 
     if (response) {
-        const webhookData : Partial<HarborProjectWebhook> = {
+        const webhookData : Partial<ProjectWebhook> = {
             name: os.hostname(),
             targets: [
                 buildRegistryWebhookTarget({

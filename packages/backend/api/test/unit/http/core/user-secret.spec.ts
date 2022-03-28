@@ -10,9 +10,9 @@ import {
     USER_SECRETS_SECRET_ENGINE_KEY,
     UserSecret,
     UserSecretsSecretStoragePayload,
-    VaultAPI,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
+import { VaultClient } from '@trapi/vault-client';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
 import { ApiKey } from '../../../../src/config/api';
@@ -73,7 +73,7 @@ describe('src/controllers/core/user-secret', () => {
 
         // ---------------------------------------------------------
 
-        let userSecret = await useClient<VaultAPI>(ApiKey.VAULT).keyValue
+        let userSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
             .find<UserSecretsSecretStoragePayload>(USER_SECRETS_SECRET_ENGINE_KEY, details.user_id);
 
         expect(userSecret.data).toBeDefined();
@@ -128,7 +128,7 @@ describe('src/controllers/core/user-secret', () => {
 
         // ---------------------------------------------------------
 
-        userSecret = await useClient<VaultAPI>(ApiKey.VAULT).keyValue
+        userSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
             .find<UserSecretsSecretStoragePayload>(USER_SECRETS_SECRET_ENGINE_KEY, details.user_id);
 
         expect(userSecret.data).toBeDefined();
@@ -144,7 +144,7 @@ describe('src/controllers/core/user-secret', () => {
 
         expect(response.status).toEqual(200);
 
-        userSecret = await useClient<VaultAPI>(ApiKey.VAULT).keyValue
+        userSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
             .find<UserSecretsSecretStoragePayload>(USER_SECRETS_SECRET_ENGINE_KEY, details.user_id);
 
         expect(userSecret).toBeUndefined();

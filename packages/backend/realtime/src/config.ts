@@ -8,10 +8,10 @@
 import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import {
-    VaultAPI,
     refreshAuthRobotTokenOnResponseError,
 } from '@personalhealthtrain/central-common';
 import https from 'https';
+import { VaultClient } from '@trapi/vault-client';
 import { Environment } from './env';
 
 interface ConfigContext {
@@ -35,7 +35,7 @@ export function createConfig({ env } : ConfigContext) : Config {
     const redisSub = redisDatabase.duplicate();
 
     setHTTPConfig({
-        clazz: VaultAPI,
+        clazz: VaultClient,
         driver: {
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false,

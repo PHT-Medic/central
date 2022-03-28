@@ -7,7 +7,7 @@
 
 import { useClient } from '@trapi/client';
 import { ErrorCode, OAuth2TokenGrant, TokenAPI } from '@authelion/common';
-import { VaultAPI } from '../../vault-client';
+import { VaultClient } from '@trapi/vault-client';
 import { ROBOT_SECRET_ENGINE_KEY, ServiceID } from '../../../domains';
 
 let lastChecked : number | undefined;
@@ -30,7 +30,7 @@ export function refreshAuthRobotTokenOnResponseError(err?: any) {
         if (canVerifyCredentials()) {
             lastChecked = Date.now();
 
-            return useClient<VaultAPI>('vault').keyValue
+            return useClient<VaultClient>('vault').keyValue
                 .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM)
                 .then((response) => {
                     const tokenApi = new TokenAPI(useClient().driver);
