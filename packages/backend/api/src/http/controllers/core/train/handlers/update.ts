@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
@@ -34,6 +34,14 @@ export async function updateTrainRouteHandler(req: ExpressRequest, res: ExpressR
 
     if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
         throw new ForbiddenError();
+    }
+
+    if (
+        entity.registry_id &&
+        result.data.registry_id &&
+        entity.registry_id !== result.data.registry_id
+    ) {
+        throw new BadRequestError('The registry can not be changed after it is specified.');
     }
 
     entity = repository.merge(entity, result.data);

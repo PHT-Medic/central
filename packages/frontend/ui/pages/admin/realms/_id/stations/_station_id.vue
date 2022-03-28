@@ -33,14 +33,10 @@ export default Vue.extend<any, any, any, any>({
                 },
                 fields: {
                     station: [
+                        '+registry_id',
                         '+registry_project_id',
-                        '+registry_project_account_id',
-                        '+registry_project_account_name',
-                        '+registry_project_account_token',
-                        '+registry_project_webhook_exists',
                         '+public_key',
                         '+email',
-                        '+secure_id',
                     ],
                 },
             });

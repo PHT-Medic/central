@@ -7,29 +7,56 @@
 
 import { Message, publishMessage } from 'amqp-extension';
 import {
-    HTTPClientKey, HarborAPI,
-    REGISTRY_ARTIFACT_TAG_BASE,
+    HTTPClient,
     REGISTRY_ARTIFACT_TAG_LATEST,
-    REGISTRY_INCOMING_PROJECT_NAME,
-    REGISTRY_SYSTEM_USER_NAME,
+    RegistryProject,
     TrainManagerQueueCommand,
-    TrainManagerRoutingStartPayload, TrainManagerRoutingStep,
+    TrainManagerQueuePayloadExtended,
+    TrainManagerRoutingStartPayload,
+    TrainManagerRoutingStep,
+    buildRegistryClientConnectionStringFromRegistry,
+    createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
-import { buildSelfQueueMessage } from '../../config/queue';
+import { createClient, useClient } from '@trapi/client';
+import { HarborClient } from '@trapi/harbor-client';
+import { buildSelfQueueCommandMessage } from '../../config/queue';
 import { RoutingError } from './error';
+import { BuildingError } from '../building/error';
 
-export async function processStartCommand(message: Message) {
-    const data = message.data as TrainManagerRoutingStartPayload;
+export async function processRouteStartCommand(message: Message) {
+    const data = message.data as TrainManagerQueuePayloadExtended<TrainManagerRoutingStartPayload>;
 
-    const harborRepository = await useClient<HarborAPI>(HTTPClientKey.HARBOR).projectRepository
-        .find(REGISTRY_INCOMING_PROJECT_NAME, data.id);
+    if (!data.registry) {
+        throw RoutingError.registryNotFound({
+            step: TrainManagerRoutingStep.START,
+        });
+    }
+
+    const connectionString = buildRegistryClientConnectionStringFromRegistry(data.registry);
+    const httpClientConfig = createBasicHarborAPIConfig(connectionString);
+    const httpClient = createClient<HarborClient>(httpClientConfig);
+
+    const client = useClient<HTTPClient>();
+
+    let incomingProject : RegistryProject;
+
+    try {
+        incomingProject = await client.registryProject.getOne(data.entity.incoming_registry_project_id);
+    } catch (e) {
+        throw BuildingError.registryProjectNotFound({
+            step: TrainManagerRoutingStep.START,
+            message: 'The train build registry-project was not found.',
+        });
+    }
+
+    const harborRepository = await httpClient.projectRepository
+        .find(incomingProject.external_name, data.id);
 
     if (
         !harborRepository ||
-        harborRepository.artifactCount === 0
+        harborRepository.artifact_count < 2
     ) {
-        const queueMessage = buildSelfQueueMessage(
+        const queueMessage = buildSelfQueueCommandMessage(
             TrainManagerQueueCommand.BUILD,
             {
                 id: data.id,
@@ -38,20 +65,18 @@ export async function processStartCommand(message: Message) {
 
         await publishMessage(queueMessage);
 
-        throw RoutingError.trainNotFound(TrainManagerRoutingStep.START);
+        throw RoutingError.notFound({
+            type: TrainManagerRoutingStep.START,
+            message: 'The train does not exist in the incoming registry-project.',
+        });
     }
 
-    await publishMessage(buildSelfQueueMessage(TrainManagerQueueCommand.ROUTE, {
+    const routeMessage = buildSelfQueueCommandMessage(TrainManagerQueueCommand.ROUTE, {
         repositoryName: data.id,
-        projectName: REGISTRY_INCOMING_PROJECT_NAME,
-        operator: REGISTRY_SYSTEM_USER_NAME,
-        artifactTag: REGISTRY_ARTIFACT_TAG_BASE,
-    }));
-
-    await publishMessage(buildSelfQueueMessage(TrainManagerQueueCommand.ROUTE, {
-        repositoryName: data.id,
-        projectName: REGISTRY_INCOMING_PROJECT_NAME,
-        operator: REGISTRY_SYSTEM_USER_NAME,
+        projectName: incomingProject.external_name,
+        operator: data.registry.account_name,
         artifactTag: REGISTRY_ARTIFACT_TAG_LATEST,
-    }));
+    });
+
+    await publishMessage(routeMessage);
 }

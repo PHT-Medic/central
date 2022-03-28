@@ -156,9 +156,9 @@ ComponentListProperties<Station>
         },
     },
     render(createElement: CreateElement): VNode {
-        const header = buildListHeader(this, createElement, { titleText: 'Stations', iconClass: 'fa fa-hospital' });
+        const header = buildListHeader(this, createElement, { titleText: 'Stations', iconClass: 'fa-solid fa-house-medical' });
         const search = buildListSearch(this, createElement);
-        const items = buildListItems(this, createElement, { itemIconClass: 'fa fa-hospital' });
+        const items = buildListItems(this, createElement, { itemIconClass: 'fa-solid fa-house-medical' });
         const noMore = buildListNoMore(this, createElement, {
             text: 'There are no more stations available...',
         });

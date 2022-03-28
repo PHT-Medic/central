@@ -31,9 +31,9 @@ export default Vue.extend({
         classSuffix() {
             switch (this.status) {
                 case TrainStationRunStatus.ARRIVED:
-                    return 'success';
+                    return 'primary';
                 case TrainStationRunStatus.DEPARTED:
-                    return 'dark';
+                    return 'success';
                 default:
                     return 'info';
             }

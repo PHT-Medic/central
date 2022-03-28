@@ -5,12 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Image } from 'dockerode';
 import { useDocker } from './instance';
 import { DockerAuthConfig } from './type';
 
-export async function pushDockerImages(image: string, authConfig: DockerAuthConfig) {
-    const imageLatest = await useDocker()
-        .getImage(image);
+export async function pushDockerImage(image: Image | string, authConfig: DockerAuthConfig) {
+    const imageLatest = typeof image === 'string' ?
+        await useDocker().getImage(image) :
+        image;
 
     const stream = await imageLatest.push({
         authconfig: authConfig,

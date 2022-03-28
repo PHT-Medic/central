@@ -7,13 +7,23 @@
 
 import {
     REGISTRY_ARTIFACT_TAG_BASE,
-    REGISTRY_INCOMING_PROJECT_NAME,
-    REGISTRY_OUTGOING_PROJECT_NAME,
-    TrainManagerRoutingPayload, TrainManagerRoutingQueueEvent, TrainRunStatus, isRegistryStationProjectName,
+    RegistryProjectType,
+    TrainContainerPath,
+    TrainManagerExtractingMode,
+    TrainManagerQueueCommand,
+    TrainManagerRoutingPayload,
+    TrainManagerRoutingQueueEvent,
+    TrainRunStatus,
+    TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
+import { publishMessage } from 'amqp-extension';
 import { useLogger } from '../../config/log';
 import { TrainEntity } from '../../domains/core/train/entity';
+import { RegistryProjectEntity } from '../../domains/core/registry-project/entity';
+import { StationEntity } from '../../domains/core/station/entity';
+import { TrainStationEntity } from '../../domains/core/train-station/entity';
+import { buildTrainManagerQueueMessage } from '../../domains/special/train-manager';
 
 export async function handleTrainManagerRoutingQueueEvent(
     data: TrainManagerRoutingPayload,
@@ -29,37 +39,132 @@ export async function handleTrainManagerRoutingQueueEvent(
             payload: data,
         });
 
-    const repository = getRepository(TrainEntity);
+    // -------------------------------------------------------------------------------
 
-    const entity = await repository.findOne(data.repositoryName);
-    if (typeof entity === 'undefined') {
+    const trainRepository = getRepository(TrainEntity);
+    const train = await trainRepository.findOne(data.repositoryName);
+    if (typeof train === 'undefined') {
         return;
     }
 
+    // -------------------------------------------------------------------------------
+
     switch (event) {
-        case TrainManagerRoutingQueueEvent.STARTED:
-            entity.run_status = TrainRunStatus.STARTED;
-            break;
-        case TrainManagerRoutingQueueEvent.MOVE_FINISHED:
-            if (
-                isRegistryStationProjectName(data.projectName) ||
-                data.projectName === REGISTRY_INCOMING_PROJECT_NAME
-            ) {
-                entity.run_status = TrainRunStatus.RUNNING;
+        case TrainManagerRoutingQueueEvent.STARTED: {
+            train.run_status = TrainRunStatus.STARTED;
+
+            const trainStationRepository = getRepository(TrainStationEntity);
+            const trainStations = await trainStationRepository.find({
+                train_id: train.id,
+            });
+
+            for (let i = 0; i < trainStations.length; i++) {
+                trainStations[i].run_status = null;
+
+                await trainStationRepository.save(trainStations[i]);
             }
 
-            if (data.projectName === REGISTRY_OUTGOING_PROJECT_NAME) {
-                entity.run_status = TrainRunStatus.FINISHED;
+            await trainRepository.save(train);
+            break;
+        }
+        case TrainManagerRoutingQueueEvent.POSITION_FOUND:
+        case TrainManagerRoutingQueueEvent.MOVE_FINISHED: {
+            const registryProjectRepository = getRepository(RegistryProjectEntity);
+            const registryProject = await registryProjectRepository.findOne({
+                external_name: data.projectName,
+            });
+
+            if (typeof registryProject === 'undefined') {
+                return;
             }
+
+            switch (registryProject.type) {
+                case RegistryProjectType.INCOMING: {
+                    train.run_status = TrainRunStatus.RUNNING;
+
+                    await trainRepository.save(train);
+                    break;
+                }
+                case RegistryProjectType.OUTGOING: {
+                    train.run_status = TrainRunStatus.FINISHED;
+                    train.outgoing_registry_project_id = registryProject.id;
+
+                    await trainRepository.save(train);
+
+                    if (event === TrainManagerRoutingQueueEvent.MOVE_FINISHED) {
+                        await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT, {
+                            id: train.id,
+
+                            filePaths: [
+                                TrainContainerPath.RESULTS,
+                                TrainContainerPath.CONFIG,
+                            ],
+
+                            mode: TrainManagerExtractingMode.WRITE,
+                        }));
+                    }
+                    break;
+                }
+                case RegistryProjectType.STATION: {
+                    train.run_status = TrainRunStatus.RUNNING;
+
+                    const stationRepository = getRepository(StationEntity);
+                    const station = await stationRepository.findOne({
+                        registry_project_id: registryProject.id,
+                    });
+
+                    if (typeof station !== 'undefined') {
+                        const trainStationRepository = getRepository(TrainStationEntity);
+                        const trainStation = await trainStationRepository.findOne({
+                            train_id: train.id,
+                            station_id: station.id,
+                        });
+
+                        if (typeof trainStation !== 'undefined') {
+                            train.run_station_index = trainStation.index;
+                            train.run_station_id = trainStation.station_id;
+
+                            if (event === TrainManagerRoutingQueueEvent.MOVE_FINISHED) {
+                                trainStation.artifact_tag = data.artifactTag;
+
+                                // operator was station ;)
+                                if (data.operator === registryProject.account_name) {
+                                    trainStation.run_status = TrainStationRunStatus.DEPARTED;
+                                } else {
+                                    trainStation.run_status = TrainStationRunStatus.ARRIVED;
+                                }
+                            }
+
+                            await trainStationRepository.save(trainStation);
+                        }
+                    }
+
+                    await trainRepository.save(train);
+                    break;
+                }
+            }
+
             break;
-        case TrainManagerRoutingQueueEvent.FAILED:
-            entity.run_status = TrainRunStatus.FAILED;
-            entity.result_status = null;
+        }
+        case TrainManagerRoutingQueueEvent.FAILED: {
+            train.run_status = TrainRunStatus.FAILED;
+            train.run_station_id = null;
+            train.run_station_index = null;
+
+            train.result_status = null;
+
+            await trainRepository.save(train);
             break;
-        case TrainManagerRoutingQueueEvent.FINISHED:
-            entity.run_status = TrainRunStatus.FINISHED;
+        }
+        case TrainManagerRoutingQueueEvent.POSITION_NOT_FOUND: {
+            train.run_status = null;
+            train.run_station_id = null;
+            train.run_station_index = null;
+
+            train.result_status = null;
+
+            await trainRepository.save(train);
             break;
+        }
     }
-
-    await repository.save(entity);
 }

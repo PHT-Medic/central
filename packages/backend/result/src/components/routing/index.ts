@@ -11,16 +11,14 @@ import { useLogger } from '../../modules/log';
 import { writeProcessedEvent } from './write-processed';
 import { writeProcessingEvent } from './write-processing';
 import { writeFailedEvent } from './write-failed';
-import { processRouteCommand } from './process';
-import { processStartCommand } from './start';
+import { processRouteCommand } from './route';
+import { processRouteStartCommand } from './start';
+import { extendQueuePayload } from '../utils/train';
+import { processRouteStatusCommand } from './status';
 
 export function createRoutingComponentHandlers() : ConsumeHandlers {
     return {
         [TrainManagerQueueCommand.ROUTE]: async (message: Message) => {
-            useLogger().debug('Route event received', {
-                component: 'routing',
-            });
-
             await Promise.resolve(message)
                 .then(writeProcessingEvent)
                 .then(processRouteCommand)
@@ -29,12 +27,15 @@ export function createRoutingComponentHandlers() : ConsumeHandlers {
         },
 
         [TrainManagerQueueCommand.ROUTE_START]: async (message: Message) => {
-            useLogger().debug('Route start event received', {
-                component: 'routing',
-            });
-
             await Promise.resolve(message)
-                .then(processStartCommand)
+                .then(extendQueuePayload)
+                .then(processRouteStartCommand)
+                .catch((err: Error) => writeFailedEvent(message, err));
+        },
+        [TrainManagerQueueCommand.ROUTE_STATUS]: async (message: Message) => {
+            await Promise.resolve(message)
+                .then(extendQueuePayload)
+                .then(processRouteStatusCommand)
                 .catch((err: Error) => writeFailedEvent(message, err));
         },
     };

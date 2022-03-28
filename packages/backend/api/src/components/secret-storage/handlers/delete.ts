@@ -9,7 +9,6 @@ import { Message } from 'amqp-extension';
 import { SecretStorageQueuePayload } from '../../../domains/special/secret-storage/type';
 import { SecretStorageQueueEntityType } from '../../../domains/special/secret-storage/constants';
 import { deleteRobotFromSecretStorage } from './entities/robot';
-import { deleteStationFromSecretStorage } from './entities/station';
 import { deleteUserSecretsFromSecretStorage } from './entities/user';
 
 export async function deleteFromSecretStorage(message: Message) {
@@ -18,9 +17,6 @@ export async function deleteFromSecretStorage(message: Message) {
     switch (payload.type) {
         case SecretStorageQueueEntityType.ROBOT:
             await deleteRobotFromSecretStorage(payload);
-            break;
-        case SecretStorageQueueEntityType.STATION:
-            await deleteStationFromSecretStorage(payload);
             break;
         case SecretStorageQueueEntityType.USER_SECRETS:
             await deleteUserSecretsFromSecretStorage(payload);

@@ -5,19 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Message, buildMessage, publishMessage } from 'amqp-extension';
-import { TrainManagerRoutingQueueEvent } from '@personalhealthtrain/central-common';
-import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
+import { Message, publishMessage } from 'amqp-extension';
+import { TrainManagerRoutingPayload, TrainManagerRoutingQueueEvent } from '@personalhealthtrain/central-common';
+import { buildAPIQueueEventMessage } from '../../config/queue';
 
 export async function writeProcessingEvent(message: Message) {
-    await publishMessage(buildMessage({
-        options: {
-            routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
-        },
-        type: TrainManagerRoutingQueueEvent.MOVE_STARTED,
-        data: message.data,
-        metadata: message.metadata,
-    }));
+    await publishMessage(buildAPIQueueEventMessage(
+        TrainManagerRoutingQueueEvent.MOVE_STARTED,
+        message.data as TrainManagerRoutingPayload,
+    ));
 
     return message;
 }

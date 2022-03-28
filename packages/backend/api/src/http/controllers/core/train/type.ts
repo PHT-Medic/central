@@ -8,7 +8,11 @@
 import { Train } from '@personalhealthtrain/central-common';
 import { ExpressValidationResult } from '../../../express-validation';
 import { ProposalEntity } from '../../../../domains/core/proposal/entity';
+import { MasterImageEntity } from '../../../../domains/core/master-image/entity';
+import { RegistryEntity } from '../../../../domains/core/registry/entity';
 
 export type TrainValidationResult = ExpressValidationResult<Train, {
-    proposal?: ProposalEntity
+    proposal?: ProposalEntity,
+    masterImage?: MasterImageEntity,
+    registry?: RegistryEntity
 }>;

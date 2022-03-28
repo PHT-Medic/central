@@ -6,9 +6,8 @@
  */
 
 import {
-    REGISTRY_OUTGOING_PROJECT_NAME,
     Train,
-    TrainManagerExtractionMode, TrainManagerQueueCommand,
+    TrainManagerExtractingMode, TrainManagerQueueCommand,
 } from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
 import { getRepository } from 'typeorm';
@@ -25,10 +24,9 @@ export async function triggerTrainResultStatus(
 
     // send queue message
     await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT_STATUS, {
-        repositoryName: train.id,
-        projectName: REGISTRY_OUTGOING_PROJECT_NAME,
+        id: train.id,
 
-        mode: TrainManagerExtractionMode.NONE,
+        mode: TrainManagerExtractingMode.NONE,
     }));
 
     return train;

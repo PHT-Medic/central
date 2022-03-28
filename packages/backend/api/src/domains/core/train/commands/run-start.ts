@@ -38,15 +38,9 @@ export async function startTrain(train: Train | number | string) : Promise<Train
         // todo: make it a ClientError.BadRequest
         throw new Error('The train has already been started...');
     } else {
-        if (env.trainManagerForRouting) {
-            await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE_START, {
-                id: train.id,
-            }));
-        } else {
-            const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.START, { id: train.id });
-
-            await publishMessage(queueMessage);
-        }
+        await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE_START, {
+            id: train.id,
+        }));
 
         train = repository.merge(train, {
             run_status: TrainRunStatus.STARTING,

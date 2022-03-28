@@ -5,16 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BaseError, ErrorOptions } from '@typescript-error/http';
+import { ErrorOptions } from '@typescript-error/http';
 import {
-    TrainManagerBuildingErrorType,
+    TrainManagerBaseErrorCode,
+    TrainManagerBuildingErrorCode,
     TrainManagerBuildingStep,
 } from '@personalhealthtrain/central-common';
+import { BaseError } from '../error';
 
 export class BuildingError extends BaseError {
     constructor(options: ErrorOptions) {
         options.step = options.step || TrainManagerBuildingStep.UNKNOWN;
-        options.type = options.type || TrainManagerBuildingErrorType.UNKNOWN;
+        options.type = options.type || TrainManagerBuildingErrorCode.UNKNOWN;
 
         super(options);
     }
@@ -25,15 +27,23 @@ export class BuildingError extends BaseError {
         return this.getOption('step');
     }
 
-    public getType() : TrainManagerBuildingErrorType {
+    public getType() : TrainManagerBuildingErrorCode | TrainManagerBaseErrorCode {
         return this.getOption('type');
     }
 
-    // --------------------------------------------------------------------
+    // -------------------------------------------------------------------
 
-    static notFound(step?: `${TrainManagerBuildingStep}`, message?: string) {
+    static entrypointNotFound(step?: `${TrainManagerBuildingStep}`, message?: string) {
         return new BuildingError({
-            type: TrainManagerBuildingErrorType.TRAIN_NOT_BUILD,
+            type: TrainManagerBuildingErrorCode.ENTRYPOINT_NOT_FOUND,
+            step,
+            message,
+        });
+    }
+
+    static masterImageNotFound(step?: `${TrainManagerBuildingStep}`, message?: string) {
+        return new BuildingError({
+            type: TrainManagerBuildingErrorCode.MASTER_IMAGE_NOT_FOUND,
             step,
             message,
         });

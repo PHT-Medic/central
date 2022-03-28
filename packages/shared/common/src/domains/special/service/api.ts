@@ -6,11 +6,12 @@
  */
 
 import { ClientDriverInstance } from '@trapi/client';
-import { RegistryCommandType } from './registry';
+import { RegistryCommand } from './registry';
 import { ServiceID } from './constants';
 import { ServiceIDType } from './type';
 import { SingleResourceResponse } from '../../type';
 import { SecretStorageCommand } from './secret-engine';
+import { Registry, RegistryProject } from '../../core';
 
 export class ServiceAPI {
     protected client: ClientDriverInstance;
@@ -32,8 +33,11 @@ export class ServiceAPI {
     }
 
     async runRegistryCommand(
-        command: RegistryCommandType,
-        data: Record<string, any>,
+        command: `${RegistryCommand}` | RegistryCommand,
+        data: {
+            id: Registry['id'] | RegistryProject['id'],
+            [key: string]: any
+        },
     ): Promise<SingleResourceResponse<Record<string, any>>> {
         return this.runCommand(ServiceID.REGISTRY, command, data);
     }

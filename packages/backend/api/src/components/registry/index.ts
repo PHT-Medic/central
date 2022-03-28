@@ -6,21 +6,32 @@
  */
 
 import { ConsumeHandler, Message } from 'amqp-extension';
-import { saveToRegistry } from './handlers/save';
-import { deleteFromRegistry } from './handlers/delete';
-import { RegistryQueueCommand } from '../../domains/special/registry';
-import { setupRegistry } from './handlers/setup';
+import { RegistryQueueCommand, RegistryQueuePayload } from '../../domains/special/registry';
+import { setupRegistry } from './handlers/default';
+import { linkRegistryProject, relinkRegistryProject, unlinkRegistryProject } from './handlers/project';
 
 export function createRegistryComponentHandlers() : Record<RegistryQueueCommand, ConsumeHandler> {
     return {
-        [RegistryQueueCommand.SAVE]: async (message: Message) => {
-            await saveToRegistry(message);
+        [RegistryQueueCommand.SETUP]: async (message: Message) => {
+            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.SETUP>;
+
+            await setupRegistry(payload);
         },
         [RegistryQueueCommand.DELETE]: async (message: Message) => {
-            await deleteFromRegistry(message);
+            // tear down registry
         },
-        [RegistryQueueCommand.SETUP]: async (message: Message) => {
-            await setupRegistry(message);
+
+        [RegistryQueueCommand.PROJECT_LINK]: async (message: Message) => {
+            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_LINK>;
+            await linkRegistryProject(payload);
+        },
+        [RegistryQueueCommand.PROJECT_UNLINK]: async (message: Message) => {
+            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_UNLINK>;
+            await unlinkRegistryProject(payload);
+        },
+        [RegistryQueueCommand.PROJECT_RELINK]: async (message: Message) => {
+            const payload = message.data as RegistryQueuePayload<RegistryQueueCommand.PROJECT_RELINK>;
+            await relinkRegistryProject(payload);
         },
     };
 }

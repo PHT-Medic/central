@@ -6,7 +6,7 @@
  */
 
 import { PermissionID, TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
-import { ForbiddenError } from '@typescript-error/http';
+import { BadRequestError, ForbiddenError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
@@ -20,6 +20,14 @@ export async function createTrainStationRouteHandler(req: ExpressRequest, res: E
     }
 
     const result = await runTrainStationValidation(req, 'create');
+
+    if (!result.meta.station.ecosystem) {
+        throw new BadRequestError('The referenced station must be assigned to an ecosystem.');
+    }
+
+    if (!result.meta.station.registry_id) {
+        throw new BadRequestError('The referenced station must be assigned to a registry');
+    }
 
     const repository = getRepository(TrainStationEntity);
 

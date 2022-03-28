@@ -1,27 +1,16 @@
 import {
-    HarborAPI,
-    PermissionID,
-    STATION_SECRET_ENGINE_KEY,
-    VaultAPI,
-    buildRegistryStationProjectName,
-    isHex,
+    Ecosystem,
+    PermissionID, RegistryProjectType, createNanoID, isHex,
 } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { getRepository } from 'typeorm';
-import { useClient } from '@trapi/client';
-import { publishMessage } from 'amqp-extension';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { Message, publishMessage } from 'amqp-extension';
 import { runStationValidation } from './utils';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { ApiKey } from '../../../../../config/api';
-import { buildSecretStorageQueueMessage } from '../../../../../domains/special/secret-storage/queue';
-import {
-    SecretStorageQueueCommand,
-    SecretStorageQueueEntityType,
-} from '../../../../../domains/special/secret-storage/constants';
-import env from '../../../../../env';
-import { saveStationToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/station';
+import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
 export async function updateStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -30,21 +19,16 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
         throw new ForbiddenError();
     }
 
-    const data = await runStationValidation(req, 'update');
-    if (!data) {
+    const result = await runStationValidation(req, 'update');
+    if (!result.data) {
         return res.respondAccepted();
     }
 
     const repository = getRepository(StationEntity);
     const query = repository.createQueryBuilder('station')
         .addSelect([
-            'station.registry_project_id',
-            'station.registry_project_account_id',
-            'station.registry_project_account_name',
-            'station.registry_project_account_token',
-            'station.registry_project_webhook_exists',
             'station.public_key',
-            'station.secure_id',
+            'station.external_id',
         ])
         .where('station.id = :id', { id });
 
@@ -59,54 +43,77 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
     }
 
     if (
-        data.public_key &&
-        data.public_key !== entity.public_key &&
-        !isHex(data.public_key)
+        result.data.public_key &&
+        result.data.public_key !== entity.public_key &&
+        !isHex(result.data.public_key)
     ) {
-        data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
+        result.data.public_key = Buffer.from(result.data.public_key, 'utf8').toString('hex');
     }
 
-    if (data.secure_id) {
-        // secure id changed -> remove vault- & harbor-project
-        if (data.secure_id !== entity.secure_id) {
-            try {
-                const name = buildRegistryStationProjectName(entity.secure_id);
-                await useClient<HarborAPI>(ApiKey.HARBOR).project
-                    .delete(name, true);
-            } catch (e) {
-                // ...
-            }
+    entity = repository.merge(entity, result.data);
 
-            try {
-                await useClient<VaultAPI>(ApiKey.VAULT).keyValue
-                    .delete(STATION_SECRET_ENGINE_KEY, entity.secure_id);
-            } catch (e) {
-                // ...
-            }
+    if (
+        entity.ecosystem === Ecosystem.DEFAULT &&
+        entity.registry_id
+    ) {
+        const registryProjectExternalName = entity.external_id || createNanoID();
+        const registryProjectRepository = getRepository(RegistryProjectEntity);
+
+        let registryProject : RegistryProjectEntity | undefined;
+        if (entity.registry_project_id) {
+            registryProject = await registryProjectRepository.findOne(entity.registry_project_id);
         }
-    }
 
-    entity = repository.merge(entity, data);
+        let registryOperation : 'link' | 'relink' = 'link';
+        if (registryProject) {
+            if (registryProject.external_name !== registryProjectExternalName) {
+                registryProject = registryProjectRepository.merge(registryProject, {
+                    external_name: registryProjectExternalName,
+                });
 
-    await repository.save(entity);
-
-    if (entity.public_key) {
-        if (env.env === 'test') {
-            await saveStationToSecretStorage({
-                type: SecretStorageQueueEntityType.STATION,
-                id: entity.id,
-            });
+                registryOperation = 'relink';
+            }
         } else {
-            const queueMessage = buildSecretStorageQueueMessage(
-                SecretStorageQueueCommand.SAVE,
+            registryProject = registryProjectRepository.create({
+                external_name: registryProjectExternalName,
+                name: entity.name,
+                ecosystem: entity.ecosystem,
+                type: RegistryProjectType.STATION,
+                registry_id: entity.registry_id,
+                realm_id: entity.realm_id,
+                public: false,
+            });
+        }
+
+        await registryProjectRepository.save(registryProject);
+
+        entity.registry_project_id = registryProject.id;
+
+        let queueMessage : Message;
+
+        if (registryOperation === 'link') {
+            queueMessage = buildRegistryQueueMessage(
+                RegistryQueueCommand.PROJECT_LINK,
                 {
-                    type: SecretStorageQueueEntityType.STATION,
-                    id: entity.id,
+                    id: registryProject.id,
                 },
             );
-            await publishMessage(queueMessage);
+        } else {
+            queueMessage = buildRegistryQueueMessage(
+                RegistryQueueCommand.PROJECT_RELINK,
+                {
+                    id: registryProject.id,
+                    registryId: registryProject.registry_id,
+                    externalName: registryProject.external_name,
+                    accountId: registryProject.account_id,
+                },
+            );
         }
+
+        await publishMessage(queueMessage);
     }
+
+    await repository.save(entity);
 
     return res.respondAccepted({
         data: entity,

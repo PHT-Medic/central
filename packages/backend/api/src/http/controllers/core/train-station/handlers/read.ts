@@ -1,6 +1,8 @@
 import { getRepository } from 'typeorm';
 import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
-import { applyFilters, applyPagination, applyRelations } from 'typeorm-extension';
+import {
+    applyFilters, applyPagination, applyRelations, applySort,
+} from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
@@ -35,7 +37,9 @@ export async function getOneTrainStationRouteHandler(req: ExpressRequest, res: E
 }
 
 export async function getManyTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { filter, page, include } = req.query;
+    const {
+        filter, page, include, sort,
+    } = req.query;
 
     const repository = getRepository(TrainStationEntity);
     const query = await repository.createQueryBuilder('trainStation');
@@ -65,6 +69,11 @@ export async function getManyTrainStationRouteHandler(req: ExpressRequest, res: 
             'station.name',
             'station.realm_id',
         ],
+    });
+
+    applySort(query, sort, {
+        allowed: ['created_at', 'updated_at', 'index'],
+        defaultAlias: 'trainStation',
     });
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });

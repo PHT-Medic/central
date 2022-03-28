@@ -20,7 +20,7 @@ import { buildStationRegistryQueueMessage } from '../../../../../../domains/spec
 
 const commands = Object.values(StationRegistryCommand);
 
-export async function runStationRegistryCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function handleStationRegistryCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { command } = req.body;
 
     if (

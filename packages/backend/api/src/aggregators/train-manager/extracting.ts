@@ -6,9 +6,9 @@
  */
 
 import {
+    TrainManagerExtractingMode,
     TrainManagerExtractingQueueEvent,
-    TrainManagerExtractingQueuePayload,
-    TrainManagerExtractionMode, TrainResultStatus,
+    TrainManagerExtractingQueuePayload, TrainResultStatus,
 } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { useLogger } from '../../config/log';
@@ -25,14 +25,14 @@ export async function handleTrainManagerExtractingQueueEvent(
 
     const trainRepository = getRepository(TrainEntity);
 
-    const train = await trainRepository.findOne(data.repositoryName);
+    const train = await trainRepository.findOne(data.id);
     if (typeof train === 'undefined') {
         return;
     }
 
     switch (data.mode) {
-        case TrainManagerExtractionMode.NONE:
-        case TrainManagerExtractionMode.WRITE: {
+        case TrainManagerExtractingMode.NONE:
+        case TrainManagerExtractingMode.WRITE: {
             let status : TrainResultStatus;
 
             switch (event) {

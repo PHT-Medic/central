@@ -6,32 +6,34 @@
  */
 
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
-import { TrainManagerBuildingQueueEvent } from '@personalhealthtrain/central-common';
+import {
+    TrainManagerBuildPayload,
+    TrainManagerBuildingQueueEvent,
+    TrainManagerQueueEventPayload, TrainManagerQueueEventPayloadExtended,
+} from '@personalhealthtrain/central-common';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { BuildingError } from './error';
+import { BaseError } from '../error';
+import { buildAPIQueueEventMessage } from '../../config/queue';
 
 export async function writeFailedEvent(message: Message, error: Error) {
     const buildingError = error instanceof BuildingError ?
         error :
         new BuildingError({ previous: error });
 
-    const queueMessage = buildMessage({
-        options: {
-            routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
+    const payload : TrainManagerQueueEventPayloadExtended<TrainManagerBuildingQueueEvent.FAILED> = {
+        ...message.data as TrainManagerBuildPayload,
+        error: {
+            message: buildingError.message,
+            step: buildingError.getStep(),
+            code: buildingError.getType(),
         },
-        type: TrainManagerBuildingQueueEvent.FAILED,
-        data: {
-            ...message.data,
-            error: {
-                message: buildingError.message,
-                step: buildingError.getStep(),
-                type: buildingError.getType(),
-            },
-        },
-        metadata: message.metadata,
-    });
+    };
 
-    await publishMessage(queueMessage);
+    await publishMessage(buildAPIQueueEventMessage(
+        TrainManagerBuildingQueueEvent.FAILED,
+        payload,
+    ));
 
     return message;
 }

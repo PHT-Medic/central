@@ -34,6 +34,7 @@ export default async (ctx: Context, inject: Inject) => {
                 alphaNum: 'Der Eingabewert darf nur aus folgenden Zeichen bestehen: [0-9a-z]+',
                 alphaNumHyphenUnderscore: 'Der Eingabewert darf nur aus folgenden Zeichen bestehen: [0-9a-z-_]+',
                 alphaWithUpperNumHyphenUnderscore: 'Der Eingabewert darf nur aus folgenden Zeichen bestehen: [0-9a-zA-Z-_]+',
+                url: 'Die URL ist nicht gültig.',
             },
         },
         en: {
@@ -57,6 +58,7 @@ export default async (ctx: Context, inject: Inject) => {
                 alphaNum: 'The input value is only allowed to consist of the following characters: [0-9a-z]+',
                 alphaNumHyphenUnderscore: 'The input value is only allowed to consist of the following characters: [0-9a-z-_]+',
                 alphaWithUpperNumHyphenUnderscore: 'The input value is only allowed to consist of the following characters: [0-9a-zA-Z-_]+',
+                url: 'The URL is invalid.',
             },
         },
     });

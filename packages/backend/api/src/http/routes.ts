@@ -17,6 +17,8 @@ import { TrainFileController } from './controllers/core/train-file';
 import { TrainStationController } from './controllers/core/train-station';
 import { ServiceController } from './controllers/special/service';
 import { MasterImageGroupController } from './controllers/core/master-image-groups';
+import { RegistryController } from './controllers/core/registry';
+import { RegistryProjectController } from './controllers/core/registry-project';
 
 export function registerControllers(router: Application) {
     attachControllers(router, [
@@ -25,6 +27,8 @@ export function registerControllers(router: Application) {
         MasterImageGroupController,
         ProposalController,
         ProposalStationController,
+        RegistryController,
+        RegistryProjectController,
         StationController,
         TrainController,
         TrainFileController,

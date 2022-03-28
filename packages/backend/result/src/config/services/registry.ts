@@ -5,38 +5,38 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { URL } from 'url';
-import { parseHarborConnectionString } from '@personalhealthtrain/central-common';
-import env from '../../env';
+import { getHostNameFromString } from '@personalhealthtrain/central-common';
+import { HarborClientConfig } from '@trapi/harbor-client';
 import { DockerAuthConfig } from '../../modules/docker';
 
-const harborConfig = parseHarborConnectionString(env.harborConnectionString);
-const harborUrL = new URL(harborConfig.host);
-
-export function buildRemoteDockerImageURL(
+type RemoteDockerImageURLBuildContext = {
     projectName: string,
     repositoryName: string,
     tagOrDigest?: string,
-): string {
+
+    hostname: string
+};
+
+export function buildRemoteDockerImageURL(context: RemoteDockerImageURLBuildContext): string {
     let basePath = [
-        harborUrL.hostname,
-        projectName,
-        repositoryName,
+        getHostNameFromString(context.hostname),
+        context.projectName,
+        context.repositoryName,
     ].join('/');
 
-    if (tagOrDigest) {
-        basePath += tagOrDigest.startsWith('sha') ?
-            `@${tagOrDigest}` :
-            `:${tagOrDigest}`;
+    if (context.tagOrDigest) {
+        basePath += context.tagOrDigest.startsWith('sha') ?
+            `@${context.tagOrDigest}` :
+            `:${context.tagOrDigest}`;
     }
 
     return basePath;
 }
 
-export function buildDockerAuthConfig() : DockerAuthConfig {
+export function buildDockerAuthConfig(config: HarborClientConfig) : DockerAuthConfig {
     return {
-        username: harborConfig.user,
-        password: harborConfig.password,
-        serveraddress: harborUrL.hostname,
+        username: config.user,
+        password: config.password,
+        serveraddress: getHostNameFromString(config.host),
     };
 }

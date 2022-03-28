@@ -7,22 +7,44 @@
 
 import { Message } from 'amqp-extension';
 import {
+    HTTPClient,
     TrainManagerExtractingQueuePayload,
-    TrainManagerExtractionStep,
+    TrainManagerExtractingStep, TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
+import { useClient } from '@trapi/client';
 import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../config/services/registry';
 import { pullDockerImage } from '../../modules/docker';
 import { ExtractingError } from './error';
 
 export async function downloadImage(message: Message) {
-    try {
-        const data: TrainManagerExtractingQueuePayload = message.data as TrainManagerExtractingQueuePayload;
-        const repositoryTag = buildRemoteDockerImageURL(data.projectName, data.repositoryName);
+    const data = message.data as TrainManagerQueuePayloadExtended<TrainManagerExtractingQueuePayload>;
 
-        await pullDockerImage(repositoryTag, buildDockerAuthConfig());
-
-        return message;
-    } catch (e) {
-        throw new ExtractingError(TrainManagerExtractionStep.DOWNLOAD, e.message);
+    if (!data.registry) {
+        throw ExtractingError.registryNotFound({
+            step: TrainManagerExtractingStep.DOWNLOAD,
+        });
     }
+
+    const client = useClient<HTTPClient>();
+
+    const registryProject = await client.registryProject.getOne(data.entity.outgoing_registry_project_id);
+    data.registryProject = registryProject;
+    data.registryProjectId = registryProject.id;
+
+    const repositoryTag = buildRemoteDockerImageURL({
+        hostname: data.registry.host,
+        projectName: registryProject.external_name,
+        repositoryName: data.id,
+    });
+
+    await pullDockerImage(repositoryTag, buildDockerAuthConfig({
+        host: data.registry.host,
+        user: data.registry.account_name,
+        password: data.registry.account_secret,
+    }));
+
+    return {
+        ...message,
+        data,
+    };
 }

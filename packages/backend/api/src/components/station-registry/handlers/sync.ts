@@ -87,7 +87,7 @@ export async function syncStationRegistry(message: Message) {
 
     let externalStations = transformStationRegistryResponse(response.data)
         .map((item) => stationRepository.create({
-            secure_id: item.id,
+            external_id: item.id,
             name: item.name,
             realm_id: item.realm_id,
             ecosystem: Ecosystem.PADME,
@@ -104,17 +104,17 @@ export async function syncStationRegistry(message: Message) {
     if (typeof stationPublicKeys === 'object') {
         for (let i = 0; i < externalStations.length; i++) {
             if (
-                hasOwnProperty(stationPublicKeys, externalStations[i].secure_id) &&
-                typeof stationPublicKeys[externalStations[i].secure_id] === 'string'
+                hasOwnProperty(stationPublicKeys, externalStations[i].external_id) &&
+                typeof stationPublicKeys[externalStations[i].external_id] === 'string'
             ) {
-                externalStations[i].public_key = Buffer.from(stationPublicKeys[externalStations[i].secure_id], 'base64')
+                externalStations[i].public_key = Buffer.from(stationPublicKeys[externalStations[i].external_id], 'base64')
                     .toString('hex');
             }
         }
     }
 
     externalStations = externalStations.map((item) => {
-        item.secure_id = item.secure_id
+        item.external_id = item.external_id
             .toLowerCase()
             .replaceAll('-', '');
 
@@ -122,18 +122,15 @@ export async function syncStationRegistry(message: Message) {
     });
 
     const stations = await stationRepository.find({
-        select: ['id', 'secure_id'],
-        where: {
-            secure_id: In(externalStations.map((item) => item.secure_id)),
-        },
+        external_id: In(externalStations.map((item) => item.external_id)),
     });
-    const stationSecureIds = stations.map((item) => item.secure_id);
+    const stationSecureIds = stations.map((item) => item.external_id);
 
     const existingExternalStations : StationEntity[] = [];
     const nonExistingExternalStations : StationEntity[] = [];
 
     for (let i = 0; i < externalStations.length; i++) {
-        const index = stationSecureIds.indexOf(externalStations[i].secure_id);
+        const index = stationSecureIds.indexOf(externalStations[i].external_id);
         if (index === -1) {
             nonExistingExternalStations.push(externalStations[i]);
         } else {

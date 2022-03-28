@@ -5,14 +5,29 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BaseError, buildErrorOptions } from '@typescript-error/http';
-import { TrainManagerExtractionStep } from '@personalhealthtrain/central-common';
+import { ErrorOptions } from '@typescript-error/http';
+import {
+    TrainManagerBaseErrorCode,
+    TrainManagerExtractingErrorCode,
+    TrainManagerExtractingStep,
+} from '@personalhealthtrain/central-common';
+import { BaseError } from '../error';
 
 export class ExtractingError extends BaseError {
-    constructor(step: TrainManagerExtractionStep, message?: string) {
-        super(buildErrorOptions({
-            message,
-            step,
-        }));
+    constructor(options: ErrorOptions) {
+        options.step = options.step || TrainManagerExtractingStep.UNKNOWN;
+        options.type = options.type || TrainManagerExtractingErrorCode.UNKNOWN;
+
+        super(options);
+    }
+
+    // --------------------------------------------------------------------
+
+    public getStep() : TrainManagerExtractingStep {
+        return this.getOption('step');
+    }
+
+    public getType() : TrainManagerExtractingErrorCode | TrainManagerBaseErrorCode {
+        return this.getOption('type');
     }
 }

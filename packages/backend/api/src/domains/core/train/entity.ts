@@ -20,7 +20,7 @@ import {
 } from 'typeorm';
 import {
     MasterImage,
-    Proposal,
+    Proposal, Registry, RegistryProject,
     Station,
     Train,
     TrainBuildStatus,
@@ -36,6 +36,8 @@ import { ProposalEntity } from '../proposal/entity';
 import { MasterImageEntity } from '../master-image/entity';
 import { TrainFileEntity } from '../train-file/entity';
 import { UserSecretEntity } from '../user-secret/entity';
+import { RegistryEntity } from '../registry/entity';
+import { RegistryProjectEntity } from '../registry-project/entity';
 
 @Entity()
 export class TrainEntity implements Train {
@@ -78,6 +80,123 @@ export class TrainEntity implements Train {
     })
         configuration_status: TrainConfigurationStatus | null;
 
+    // ------------------------------------------------------------------
+
+    @Column({
+        type: 'varchar', length: 64, default: null,
+    })
+        build_status: TrainBuildStatus | null;
+
+    // ------------------------------------------------------------------
+
+    @Column({
+        type: 'varchar', length: 64, default: null,
+    })
+        run_status: TrainRunStatus | null;
+
+    @Column({
+        type: 'uuid', nullable: true, default: null,
+    })
+        run_station_id: Station['id'] | null;
+
+    @Column({
+        type: 'integer', unsigned: true, nullable: true, default: null,
+    })
+        run_station_index: number | null;
+
+    // ------------------------------------------------------------------
+
+    @Column({
+        type: 'varchar', length: 64, default: null,
+    })
+        result_status: TrainResultStatus | null;
+
+    // ------------------------------------------------------------------
+
+    @CreateDateColumn()
+        created_at: Date;
+
+    @UpdateDateColumn()
+        updated_at: Date;
+
+    // ------------------------------------------------------------------
+
+    @Column({ nullable: true })
+        incoming_registry_project_id: RegistryProject['id'] | null;
+
+    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
+    @JoinColumn({ name: 'incoming_registry_project_id' })
+        incoming_registry_project: RegistryProjectEntity | null;
+
+    @Column({ nullable: true })
+        outgoing_registry_project_id: RegistryProject['id'] | null;
+
+    @ManyToOne(() => RegistryProjectEntity, { onDelete: 'CASCADE', nullable: true })
+    @JoinColumn({ name: 'outgoing_registry_project_id' })
+        outgoing_registry_project: RegistryProjectEntity | null;
+
+    // ------------------------------------------------------------------
+
+    @Column({ nullable: true })
+        registry_id: Registry['id'] | null;
+
+    @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE', nullable: true })
+    @JoinColumn({ name: 'registry_id' })
+        registry: RegistryEntity | null;
+
+    // ------------------------------------------------------------------
+
+    @Column()
+        realm_id: Realm['id'];
+
+    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'realm_id' })
+        realm: RealmEntity;
+
+    // ------------------------------------------------------------------
+
+    @Column({ nullable: true, type: 'uuid' })
+        user_rsa_secret_id: UserSecret['id'] | null;
+
+    @ManyToOne(() => UserSecretEntity, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'user_rsa_secret_id' })
+        user_rsa_secret: UserSecretEntity | null;
+
+    @Column({ nullable: true, type: 'uuid' })
+        user_paillier_secret_id: UserSecret['id'] | null;
+
+    @ManyToOne(() => UserSecretEntity, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'user_paillier_secret_id' })
+        user_paillier_secret_: UserSecretEntity | null;
+
+    // ------------------------------------------------------------------
+
+    @Column({ nullable: true, type: 'uuid' })
+        user_id: User['id'];
+
+    @ManyToOne(() => UserEntity, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'user_id' })
+        user: UserEntity;
+
+    // ------------------------------------------------------------------
+    @Column({ type: 'uuid' })
+        proposal_id: Proposal['id'];
+
+    @ManyToOne(() => ProposalEntity, (proposal) => proposal.trains, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'proposal_id' })
+        proposal: ProposalEntity;
+
+    // ------------------------------------------------------------------
+
+    @Column({ nullable: true, type: 'uuid' })
+        master_image_id: MasterImage['id'] | null;
+
+    @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL', nullable: true })
+    @JoinColumn({ name: 'master_image_id' })
+        master_image: MasterImageEntity;
+
+    // ------------------------------------------------------------------
+
     @BeforeInsert()
     @BeforeUpdate()
     setConfigurationStatus() {
@@ -116,97 +235,4 @@ export class TrainEntity implements Train {
         // check if all conditions are met
         this.configuration_status = TrainConfigurationStatus.FINISHED;
     }
-
-    // ------------------------------------------------------------------
-
-    @Column({
-        type: 'varchar', length: 64, default: null,
-    })
-        build_status: TrainBuildStatus | null;
-
-    @Column({ type: 'uuid', nullable: true, default: null })
-        build_id: string;
-
-    // ------------------------------------------------------------------
-
-    @Column({
-        type: 'varchar', length: 64, default: null,
-    })
-        run_status: TrainRunStatus | null;
-
-    @Column({
-        type: 'uuid', nullable: true, default: null,
-    })
-        run_station_id: Station['id'] | null;
-
-    @Column({
-        type: 'integer', unsigned: true, nullable: true, default: null,
-    })
-        run_station_index: number | null;
-
-    // ------------------------------------------------------------------
-
-    @CreateDateColumn()
-        created_at: Date;
-
-    @UpdateDateColumn()
-        updated_at: Date;
-
-    // ------------------------------------------------------------------
-
-    @Column()
-        realm_id: Realm['id'];
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'realm_id' })
-        realm: RealmEntity;
-
-    // ------------------------------------------------------------------
-
-    @Column({ nullable: true, type: 'uuid' })
-        user_rsa_secret_id: UserSecret['id'] | null;
-
-    @ManyToOne(() => UserSecretEntity, { nullable: true, onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'user_rsa_secret_id' })
-        user_rsa_secret: UserSecretEntity | null;
-
-    @Column({ nullable: true, type: 'uuid' })
-        user_paillier_secret_id: UserSecret['id'] | null;
-
-    @ManyToOne(() => UserSecretEntity, { nullable: true, onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'user_paillier_secret_id' })
-        user_paillier_secret_: UserSecretEntity | null;
-
-    // ------------------------------------------------------------------
-
-    @Column({ nullable: true, type: 'uuid' })
-        user_id: User['id'];
-
-    @ManyToOne(() => UserEntity, { nullable: true, onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'user_id' })
-        user: UserEntity;
-
-    // ------------------------------------------------------------------
-
-    @Column({
-        type: 'varchar', length: 64, default: null,
-    })
-        result_status: TrainResultStatus | null;
-
-    // ------------------------------------------------------------------
-    @Column({ type: 'uuid' })
-        proposal_id: Proposal['id'];
-
-    @ManyToOne(() => ProposalEntity, (proposal) => proposal.trains, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'proposal_id' })
-        proposal: ProposalEntity;
-
-    // ------------------------------------------------------------------
-
-    @Column({ nullable: true, type: 'uuid' })
-        master_image_id: MasterImage['id'] | null;
-
-    @ManyToOne(() => MasterImageEntity, { onDelete: 'SET NULL', nullable: true })
-    @JoinColumn({ name: 'master_image_id' })
-        master_image: MasterImageEntity;
 }

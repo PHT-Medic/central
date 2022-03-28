@@ -19,6 +19,10 @@ export function useDomainAPI(client: HTTPClient, name: string) {
             return client.proposal;
         case 'proposalStation':
             return client.proposalStation;
+        case 'registry':
+            return client.registry;
+        case 'registryProject':
+            return client.registryProject;
         case 'station':
             return client.station;
         case 'train':

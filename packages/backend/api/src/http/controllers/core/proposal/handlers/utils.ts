@@ -9,14 +9,14 @@ import { check, validationResult } from 'express-validator';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
-import { TrainValidationResult } from '../../train/type';
 import { extendExpressValidationResultWithMasterImage } from '../../master-image/utils/extend';
+import { ProposalValidationResult } from '../type';
 
 export async function runProposalValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
-) : Promise<TrainValidationResult> {
-    const result : TrainValidationResult = {
+) : Promise<ProposalValidationResult> {
+    const result : ProposalValidationResult = {
         data: {},
         meta: {},
     };

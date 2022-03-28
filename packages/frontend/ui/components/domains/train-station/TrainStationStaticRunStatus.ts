@@ -33,7 +33,9 @@ export default Vue.extend({
         arrived() {
             switch (this.id) {
                 case TrainStationStatic.INCOMING:
-                    return this.trainBuildStatus === TrainBuildStatus.FINISHED;
+                    return this.trainBuildStatus === TrainBuildStatus.FINISHED &&
+                        this.trainRunStatus !== TrainRunStatus.FINISHED &&
+                        this.trainRunStationIndex === null;
                 case TrainStationStatic.OUTGOING:
                     return this.trainRunStatus === TrainRunStatus.FINISHED;
             }
@@ -43,7 +45,11 @@ export default Vue.extend({
         departed() {
             switch (this.id) {
                 case TrainStationStatic.INCOMING:
-                    return this.trainRunStatus === TrainRunStatus.RUNNING;
+                    return this.trainBuildStatus === TrainBuildStatus.FINISHED &&
+                        (
+                            this.trainRunStatus === TrainRunStatus.RUNNING ||
+                            this.trainRunStatus === TrainRunStatus.FINISHED
+                        );
             }
 
             return false;
@@ -62,9 +68,9 @@ export default Vue.extend({
         classSuffix() {
             switch (true) {
                 case this.arrived:
-                    return 'success';
-                case this.departed:
                     return 'primary';
+                case this.departed:
+                    return 'success';
                 default:
                     return 'info';
             }

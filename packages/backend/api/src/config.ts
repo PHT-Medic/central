@@ -6,18 +6,15 @@
  */
 
 import {
-    HarborAPI, ProxyConnectionConfig, VaultAPI, detectProxyConnectionConfig,
+    ProxyConnectionConfig, VaultAPI, detectProxyConnectionConfig,
 } from '@personalhealthtrain/central-common';
 import { setConfig as setHTTPConfig } from '@trapi/client';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import https from 'https';
 import { setConfig as setRedisConfig } from 'redis-extension';
 import { Environment } from './env';
-import { buildTrainBuilderAggregator } from './aggregators/train-builder';
 import { buildTrainManagerAggregator } from './aggregators/train-manager';
-import { buildRegistryAggregator } from './aggregators/registry';
 import { buildRobotAggregator } from './aggregators/robot';
-import { buildTrainRouterAggregator } from './aggregators/train-router';
 
 import { ApiKey } from './config/api';
 
@@ -40,23 +37,6 @@ export function createConfig({ env } : ConfigContext) : Config {
     }
 
     const proxyConfig : ProxyConnectionConfig | undefined = detectProxyConnectionConfig();
-
-    setHTTPConfig({
-        clazz: HarborAPI,
-        driver: {
-            ...(proxyAPis.includes('harbor') && proxyConfig ? {
-                proxy: proxyConfig,
-            } : {
-                proxy: false,
-            }),
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false,
-            }),
-        },
-        extra: {
-            connectionString: env.harborConnectionString,
-        },
-    }, ApiKey.HARBOR);
 
     setHTTPConfig({
         clazz: VaultAPI,
@@ -104,10 +84,7 @@ export function createConfig({ env } : ConfigContext) : Config {
     const aggregators : {start: () => void}[] = [
         buildRobotAggregator(),
 
-        buildRegistryAggregator(),
-        buildTrainBuilderAggregator(),
         buildTrainManagerAggregator(),
-        buildTrainRouterAggregator(),
     ];
 
     const components : {start: () => void}[] = [

@@ -6,10 +6,9 @@
  */
 
 import {
-    PermissionID,
-    isHex,
+    PermissionID, RegistryProjectType, createNanoID, isHex,
 } from '@personalhealthtrain/central-common';
-import { ForbiddenError } from '@typescript-error/http';
+import { BadRequestError, ForbiddenError } from '@typescript-error/http';
 import { validationResult } from 'express-validator';
 import { getRepository } from 'typeorm';
 import { publishMessage } from 'amqp-extension';
@@ -17,18 +16,8 @@ import { ExpressValidationError } from '../../../../express-validation';
 import { runStationValidation } from './utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { StationEntity } from '../../../../../domains/core/station/entity';
-import { buildSecretStorageQueueMessage } from '../../../../../domains/special/secret-storage/queue';
-import {
-    SecretStorageQueueCommand,
-    SecretStorageQueueEntityType,
-} from '../../../../../domains/special/secret-storage/constants';
-import env from '../../../../../env';
-import { saveStationToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/station';
-import {
-    saveStationToRegistry,
-} from '../../../../../components/registry/handlers/entities/station';
-import { RegistryQueueCommand, RegistryQueueEntityType } from '../../../../../domains/special/registry/constants';
-import { buildRegistryQueueMessage } from '../../../../../domains/special/registry/queue';
+import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
 export async function createStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.STATION_ADD)) {
@@ -40,54 +29,61 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
         throw new ExpressValidationError(validation);
     }
 
-    const data = await runStationValidation(req, 'create');
+    const result = await runStationValidation(req, 'create');
 
     if (
-        data.public_key &&
-        !isHex(data.public_key)
+        result.data.public_key &&
+        !isHex(result.data.public_key)
     ) {
-        data.public_key = Buffer.from(data.public_key, 'utf8').toString('hex');
+        result.data.public_key = Buffer.from(result.data.public_key, 'utf8').toString('hex');
     }
 
     const repository = getRepository(StationEntity);
 
-    const entity = repository.create(data);
+    const entity = repository.create(result.data);
 
-    await repository.save(entity);
+    // -----------------------------------------------------
 
-    if (entity.public_key) {
-        if (env.env === 'test') {
-            await saveStationToSecretStorage({
-                type: SecretStorageQueueEntityType.STATION,
-                id: entity.id,
-            });
-        } else {
-            const queueMessage = buildSecretStorageQueueMessage(
-                SecretStorageQueueCommand.SAVE,
-                {
-                    type: SecretStorageQueueEntityType.STATION,
-                    id: entity.id,
-                },
-            );
-            await publishMessage(queueMessage);
-        }
+    if (!entity.ecosystem) {
+        entity.ecosystem = result.meta.registry.ecosystem;
     }
 
-    if (env.env === 'test') {
-        await saveStationToRegistry({
-            type: RegistryQueueEntityType.STATION,
-            id: entity.id,
+    if (
+        entity.registry_id
+    ) {
+        if (entity.ecosystem !== result.meta.registry.ecosystem) {
+            throw new BadRequestError('The ecosystem of the station and the registry must be the same.');
+        }
+
+        const registryProjectExternalName = entity.external_id || createNanoID();
+        const registryProjectRepository = getRepository(RegistryProjectEntity);
+        const registryProject = registryProjectRepository.create({
+            external_name: registryProjectExternalName,
+            name: entity.name,
+            ecosystem: entity.ecosystem,
+            type: RegistryProjectType.STATION,
+            registry_id: entity.registry_id,
+            realm_id: entity.realm_id,
+            public: false,
         });
-    } else {
+
+        await registryProjectRepository.save(registryProject);
+
+        entity.registry_project_id = registryProject.id;
+
         const queueMessage = buildRegistryQueueMessage(
-            RegistryQueueCommand.SAVE,
+            RegistryQueueCommand.PROJECT_LINK,
             {
-                type: RegistryQueueEntityType.STATION,
-                id: entity.id,
+                id: registryProject.id,
             },
         );
+
         await publishMessage(queueMessage);
     }
+
+    // -----------------------------------------------------
+
+    await repository.save(entity);
 
     return res.respond({ data: entity });
 }

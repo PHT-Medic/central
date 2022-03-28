@@ -7,31 +7,51 @@
 
 import {
     HTTPClient,
-    Train,
-    TrainContainerPath, parseHarborConnectionString,
+    MasterImage,
+    Train, TrainContainerPath, TrainFile, getHostNameFromString,
 } from '@personalhealthtrain/central-common';
 import path from 'path';
-import { URL } from 'url';
 import { useClient } from '@trapi/client';
-import env from '../../../env';
+import { BuildingError } from '../error';
 
-export async function buildDockerFile(entity: Train) : Promise<string> {
-    const harborConfig = parseHarborConnectionString(env.harborConnectionString);
-    const harborUrL = new URL(harborConfig.host);
+type DockerFileBuildContext = {
+    entity: Pick<Train, 'id' | 'master_image_id' | 'entrypoint_file_id'>,
+    hostname: string
+};
+
+export async function buildTrainDockerFile(context: DockerFileBuildContext) : Promise<{
+    content: string,
+    masterImagePath: string
+}> {
+    const client = useClient<HTTPClient>();
+
+    let entryPoint : TrainFile;
+
+    try {
+        entryPoint = await client.trainFile.getOne(context.entity.id, context.entity.entrypoint_file_id);
+    } catch (e) {
+        throw BuildingError.entrypointNotFound();
+    }
+
+    let masterImage : MasterImage;
+
+    try {
+        masterImage = await client.masterImage.getOne(context.entity.master_image_id);
+    } catch (e) {
+        throw BuildingError.masterImageNotFound();
+    }
 
     const entrypointPath = path.posix.join(
-        entity.entrypoint_file.directory,
-        entity.entrypoint_file.name,
+        entryPoint.directory,
+        entryPoint.name,
     );
 
-    let entrypointCommand = entity.master_image.command;
-    let entrypointCommandArguments = entity.master_image.command_arguments;
-
-    const client = useClient<HTTPClient>();
+    let entrypointCommand = masterImage.command;
+    let entrypointCommandArguments = masterImage.command_arguments;
 
     const { data: masterImageGroups } = await client.masterImageGroup.getMany({
         filter: {
-            virtual_path: entity.master_image.group_virtual_path,
+            virtual_path: masterImage.group_virtual_path,
         },
     });
 
@@ -54,12 +74,18 @@ export async function buildDockerFile(entity: Train) : Promise<string> {
         argumentsString = `${parts.join(', ')} `;
     }
 
-    return `
-    FROM ${harborUrL.hostname}/master/${entity.master_image.virtual_path}
+    const masterImagePath = `${getHostNameFromString(context.hostname)}/master/${masterImage.virtual_path}`;
+    const content = `
+    FROM ${masterImagePath}
     RUN mkdir ${TrainContainerPath.MAIN} &&\
         mkdir ${TrainContainerPath.RESULTS} &&\
         chmod -R +x ${TrainContainerPath.MAIN}
 
     CMD ["${entrypointCommand}", ${argumentsString}"${path.posix.join(TrainContainerPath.MAIN, entrypointPath)}"]
     `;
+
+    return {
+        content,
+        masterImagePath,
+    };
 }

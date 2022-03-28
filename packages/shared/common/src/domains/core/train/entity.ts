@@ -18,7 +18,8 @@ import {
 } from './constants';
 import { UserSecret } from '../../auth';
 import { Station } from '../station';
-import { TrainManagerExtractingQueueEvent } from '../../special';
+import { Registry } from '../registry';
+import { RegistryProject } from '../registry-project';
 
 export interface Train {
     id: string;
@@ -49,8 +50,6 @@ export interface Train {
 
     build_status: TrainBuildStatus | null;
 
-    build_id: string | null;
-
     // ------------------------------------------------------------------
 
     run_status: TrainRunStatus | null;
@@ -61,9 +60,29 @@ export interface Train {
 
     // ------------------------------------------------------------------
 
+    result_status: TrainResultStatus | null;
+
+    // ------------------------------------------------------------------
+
     created_at: Date;
 
     updated_at: Date;
+
+    // ------------------------------------------------------------------
+
+    incoming_registry_project_id: RegistryProject['id'] | null;
+
+    incoming_registry_project: RegistryProject | null;
+
+    outgoing_registry_project_id: RegistryProject['id'] | null;
+
+    outgoing_registry_project: RegistryProject | null;
+
+    // ------------------------------------------------------------------
+
+    registry: Registry;
+
+    registry_id: Registry['id'];
 
     // ------------------------------------------------------------------
 
@@ -87,9 +106,6 @@ export interface Train {
 
     // ------------------------------------------------------------------
 
-    result_status: TrainResultStatus | null;
-
-    // ------------------------------------------------------------------
     proposal_id: Proposal['id'];
 
     proposal: Proposal;

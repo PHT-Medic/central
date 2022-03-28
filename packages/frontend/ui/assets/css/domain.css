@@ -54,7 +54,7 @@ TrainStationProgress
 }
 
 .progress-step {
-    width: 70px;
+    width: 100px;
     display: flex;
     justify-content: center;
     align-content: center;
@@ -67,7 +67,11 @@ TrainStationProgress
     height: 70px;
     background-color: #ececec;
     position: relative;
-    border-radius: 50%;
+    border-radius: 5px;
+}
+
+.icon-circle.active {
+    background: #FF5B5B;
 }
 
 .icon-circle .icon {

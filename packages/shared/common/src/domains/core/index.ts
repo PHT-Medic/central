@@ -11,6 +11,8 @@ export * from './master-image';
 export * from './proposal';
 export * from './proposal-station';
 export * from './settings-option';
+export * from './registry';
+export * from './registry-project';
 export * from './station';
 export * from './train';
 export * from './train-config';

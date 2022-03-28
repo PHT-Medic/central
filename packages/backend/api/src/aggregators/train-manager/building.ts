@@ -26,7 +26,7 @@ export async function handleTrainManagerBuildingQueueEvent(
 
     const repository = getRepository(TrainEntity);
 
-    const entity = await repository.findOne(data.repositoryName);
+    const entity = await repository.findOne(data.id);
     if (typeof entity === 'undefined') {
         return;
     }

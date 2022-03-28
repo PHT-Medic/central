@@ -6,14 +6,16 @@
  */
 
 import { Robot } from '@authelion/common';
-import { stringifyAuthorizationHeader } from '@trapi/client';
-import { HarborProjectWebhookTarget } from '../../../../http';
+import { Config, stringifyAuthorizationHeader } from '@trapi/client';
+import https from 'https';
+import { HarborClient, HarborProjectWebhookTarget } from '@trapi/harbor-client';
 import { ServiceID } from '../constants';
+import { ProxyConnectionConfig, detectProxyConnectionConfig } from '../../../../utils';
 
 export function buildRegistryWebhookTarget(
     context: {
         robot: Pick<Robot, 'id' | 'secret'>,
-        apiUrl: string
+        url: string
     },
 ) : HarborProjectWebhookTarget {
     return {
@@ -23,7 +25,24 @@ export function buildRegistryWebhookTarget(
             password: context.robot.secret,
         }),
         skip_cert_verify: true,
-        address: `${context.apiUrl}services/${ServiceID.REGISTRY}/hook`,
+        address: `${context.url}services/${ServiceID.REGISTRY}/hook`,
         type: 'http',
+    };
+}
+
+export function createBasicHarborAPIConfig(connectionString: string) : Config {
+    const proxyConfig : ProxyConnectionConfig | undefined = detectProxyConnectionConfig();
+
+    return {
+        clazz: HarborClient,
+        driver: {
+            proxy: proxyConfig,
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false,
+            }),
+        },
+        extra: {
+            connectionString,
+        },
     };
 }

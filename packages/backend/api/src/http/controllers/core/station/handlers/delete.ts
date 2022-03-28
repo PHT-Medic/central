@@ -8,20 +8,12 @@
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
-import { publishMessage } from 'amqp-extension';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { publishMessage } from 'amqp-extension';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { buildSecretStorageQueueMessage } from '../../../../../domains/special/secret-storage/queue';
-import {
-    SecretStorageQueueCommand,
-    SecretStorageQueueEntityType,
-} from '../../../../../domains/special/secret-storage/constants';
-import env from '../../../../../env';
-import { deleteStationFromSecretStorage } from '../../../../../components/secret-storage/handlers/entities/station';
-import { deleteStationFromRegistry } from '../../../../../components/registry/handlers/entities/station';
-import { RegistryQueueCommand, RegistryQueueEntityType } from '../../../../../domains/special/registry/constants';
-import { buildRegistryQueueMessage } from '../../../../../domains/special/registry/queue';
+import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
 export async function deleteStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -32,16 +24,7 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
 
     const repository = getRepository(StationEntity);
 
-    const query = repository.createQueryBuilder('station')
-        .addSelect('station.secure_id')
-        .addSelect('station.registry_project_id')
-        .addSelect('station.registry_project_account_id')
-        .where({
-            id,
-        })
-        .getOne();
-
-    const entity = await query;
+    const entity = await repository.findOne(id);
 
     if (typeof entity === 'undefined') {
         throw new NotFoundError();
@@ -51,44 +34,26 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 
-    if (env.env === 'test') {
-        await deleteStationFromRegistry({
-            type: RegistryQueueEntityType.STATION,
-            id: entity.id,
-            secure_id: entity.secure_id,
-            registry_project_id: entity.registry_project_id,
-            registry_project_account_id: entity.registry_project_account_id,
-        });
-    } else {
-        const queueMessage = buildRegistryQueueMessage(
-            RegistryQueueCommand.DELETE,
-            {
-                type: RegistryQueueEntityType.STATION,
-                id: entity.id,
-                secure_id: entity.secure_id,
-                registry_project_id: entity.registry_project_id,
-                registry_project_account_id: entity.registry_project_account_id,
-            },
-        );
-        await publishMessage(queueMessage);
-    }
+    if (
+        entity.registry_project_id
+    ) {
+        const registryProjectRepository = getRepository(RegistryProjectEntity);
 
-    if (env.env === 'test') {
-        await deleteStationFromSecretStorage({
-            type: SecretStorageQueueEntityType.STATION,
-            id: entity.id,
-            secure_id: entity.secure_id,
-        });
-    } else {
-        const queueMessage = buildSecretStorageQueueMessage(
-            SecretStorageQueueCommand.DELETE,
-            {
-                type: SecretStorageQueueEntityType.STATION,
-                id: entity.id,
-                secure_id: entity.secure_id,
-            },
-        );
-        await publishMessage(queueMessage);
+        const registryProject = await registryProjectRepository.findOne(entity.registry_project_id);
+        if (registryProject) {
+            const queueMessage = buildRegistryQueueMessage(
+                RegistryQueueCommand.PROJECT_UNLINK,
+                {
+                    id: registryProject.id,
+                    registryId: registryProject.registry_id,
+                    externalName: registryProject.external_name,
+                    accountId: registryProject.account_id,
+                },
+            );
+
+            await publishMessage(queueMessage);
+            await registryProjectRepository.remove(registryProject);
+        }
     }
 
     const { id: entityId } = entity;

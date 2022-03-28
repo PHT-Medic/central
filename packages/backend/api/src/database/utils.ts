@@ -20,6 +20,8 @@ import { ProposalStationEntity } from '../domains/core/proposal-station/entity';
 import { TrainFileEntity } from '../domains/core/train-file/entity';
 import { TrainStationEntity } from '../domains/core/train-station/entity';
 import { UserSecretEntity } from '../domains/core/user-secret/entity';
+import { RegistryEntity } from '../domains/core/registry/entity';
+import { RegistryProjectEntity } from '../domains/core/registry-project/entity';
 
 export function modifyDatabaseConnectionOptions(
     connectionOptions: ConnectionWithAdditionalOptions,
@@ -34,6 +36,8 @@ export function modifyDatabaseConnectionOptions(
             MasterImageGroupEntity,
             ProposalEntity,
             ProposalStationEntity,
+            RegistryEntity,
+            RegistryProjectEntity,
             StationEntity,
             TrainEntity,
             TrainFileEntity,

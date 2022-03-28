@@ -25,16 +25,16 @@ export function buildRegistryEventQueueMessage(
     });
 }
 
-export function buildRegistryQueueMessage(
-    type: `${RegistryQueueCommand}`,
-    data?: RegistryQueuePayload,
+export function buildRegistryQueueMessage<T extends `${RegistryQueueCommand}`>(
+    command: T,
+    data?: RegistryQueuePayload<T>,
     metaData: Record<string, any> = {},
 ) : Message {
     return buildMessage({
         options: {
             routingKey: MessageQueueRoutingKey.COMMAND,
         },
-        type,
+        type: command,
         data: data || {},
         metadata: metaData,
     });

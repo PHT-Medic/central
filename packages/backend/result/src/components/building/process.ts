@@ -8,15 +8,15 @@
 import { Message } from 'amqp-extension';
 import {
     HTTPClient,
-    REGISTRY_INCOMING_PROJECT_NAME,
     TrainContainerFileName,
-    TrainContainerPath, TrainManagerBuildPayload, TrainManagerBuildingStep,
+    TrainContainerPath,
+    TrainManagerBuildPayload, TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { buildTrainConfig } from './helpers/train-config';
 import { useDocker } from '../../modules/docker';
-import { buildDockerFile } from './helpers/dockerfile';
-import { pushDockerImages } from '../../modules/docker/image-push';
+import { buildTrainDockerFile } from './helpers/dockerfile';
+import { pushDockerImage } from '../../modules/docker/image-push';
 import { useLogger } from '../../modules/log';
 import { createPackFromFileContent } from './helpers/file-gzip';
 import { buildDockerImage } from '../../modules/docker/image-build';
@@ -24,31 +24,25 @@ import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../config/s
 import { BuildingError } from './error';
 
 export async function processMessage(message: Message) {
-    const data = message.data as TrainManagerBuildPayload;
+    const data = message.data as TrainManagerQueuePayloadExtended<TrainManagerBuildPayload>;
 
-    const client = useClient<HTTPClient>();
+    if (!data.entity) {
+        throw BuildingError.notFound();
+    }
 
-    const train = await client.train.getOne(data.id, {
-        relations: {
-            entrypoint_file: true,
-            master_image: true,
-        },
-    });
+    if (!data.registry) {
+        throw BuildingError.registryNotFound();
+    }
 
-    if (typeof train === 'undefined') {
-        throw BuildingError.notFound(TrainManagerBuildingStep.BUILD);
+    if (!data.entity.incoming_registry_project_id) {
+        throw BuildingError.registryProjectNotFound();
     }
 
     // -----------------------------------------------------------------------------------
 
-    useLogger().debug('Creating Dockerfile...', {
-        component: 'building',
-    });
-    const dockerFile = await buildDockerFile(train);
-
-    useLogger().debug('Created Dockerfile...', {
-        component: 'building',
-        dockerFile,
+    const { content: dockerFile, masterImagePath } = await buildTrainDockerFile({
+        entity: data.entity,
+        hostname: data.registry.host,
     });
 
     // -----------------------------------------------------------------------------------
@@ -57,7 +51,18 @@ export async function processMessage(message: Message) {
         component: 'building',
     });
 
-    const imageURL = buildRemoteDockerImageURL(REGISTRY_INCOMING_PROJECT_NAME, train.id);
+    const client = useClient<HTTPClient>();
+    const incomingProject = await client.registryProject.getOne(data.entity.incoming_registry_project_id);
+
+    data.registryProject = incomingProject;
+    data.registryProjectId = incomingProject.id;
+
+    const imageURL = buildRemoteDockerImageURL({
+        hostname: data.registry.host,
+        projectName: incomingProject.external_name,
+        repositoryName: data.entity.id,
+    });
+
     await buildDockerImage(dockerFile, imageURL);
 
     // -----------------------------------------------------------------------------------
@@ -73,7 +78,11 @@ export async function processMessage(message: Message) {
     useLogger().debug(`Writing ${TrainContainerFileName.CONFIG} to container`, {
         component: 'building',
     });
-    const trainConfig = await buildTrainConfig(train);
+    const trainConfig = await buildTrainConfig({
+        entity: data.entity,
+        masterImagePath,
+    });
+
     await container.putArchive(
         createPackFromFileContent(JSON.stringify(trainConfig), TrainContainerFileName.CONFIG),
         {
@@ -81,12 +90,12 @@ export async function processMessage(message: Message) {
         },
     );
 
-    if (train.query) {
+    if (data.entity.query) {
         useLogger().debug(`Writing ${TrainContainerFileName.QUERY} to container`, {
             component: 'building',
         });
         await container.putArchive(
-            createPackFromFileContent(JSON.stringify(train.query), TrainContainerFileName.QUERY),
+            createPackFromFileContent(JSON.stringify(data.entity.query), TrainContainerFileName.QUERY),
             {
                 path: TrainContainerPath.MAIN,
             },
@@ -122,18 +131,32 @@ export async function processMessage(message: Message) {
         component: 'building',
     });
 
-    const authConfig = buildDockerAuthConfig();
+    const authConfig = buildDockerAuthConfig({
+        host: data.registry.host,
+        user: data.registry.account_name,
+        password: data.registry.account_secret,
+    });
 
-    const baseImageURL = buildRemoteDockerImageURL(REGISTRY_INCOMING_PROJECT_NAME, data.id, 'base');
-    await pushDockerImages(baseImageURL, authConfig);
+    const baseImageURL = buildRemoteDockerImageURL({
+        hostname: data.registry.host,
+        projectName: incomingProject.external_name,
+        repositoryName: data.entity.id,
+        tagOrDigest: 'base',
+    });
+    await pushDockerImage(baseImageURL, authConfig);
 
     useLogger().debug('Pushed image', {
         component: 'building',
         image: baseImageURL,
     });
 
-    const latestImageURL = buildRemoteDockerImageURL(REGISTRY_INCOMING_PROJECT_NAME, data.id, 'latest');
-    await pushDockerImages(latestImageURL, authConfig);
+    const latestImageURL = buildRemoteDockerImageURL({
+        hostname: data.registry.host,
+        projectName: incomingProject.external_name,
+        repositoryName: data.entity.id,
+        tagOrDigest: 'latest',
+    });
+    await pushDockerImage(latestImageURL, authConfig);
 
     useLogger().debug('Pushed image', {
         component: 'building',
