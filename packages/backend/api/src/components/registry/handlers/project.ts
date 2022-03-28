@@ -12,7 +12,7 @@ import {
     RegistryProjectSecretStoragePayload,
     buildRegistryClientConnectionStringFromRegistry, createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
-import { createClient, isClientError, useClient } from '@trapi/client';
+import { createClient, useClient } from '@trapi/client';
 import { HarborClient } from '@trapi/harbor-client';
 import { VaultClient } from '@trapi/vault-client';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
@@ -103,16 +103,10 @@ export async function linkRegistryProject(
 
         entity.external_id = project.project_id;
     } catch (e) {
-        if (!isClientError(e)) {
-            console.log(e);
-        }
         useLogger()
             .warn('Project could not be created.', {
                 component: 'registry',
                 command: RegistryQueueCommand.PROJECT_LINK,
-                payload: isClientError(e) ?
-                    e.response.data :
-                    e,
             });
 
         return;
@@ -138,17 +132,10 @@ export async function linkRegistryProject(
             entity.account_secret = null;
         }
     } catch (e) {
-        if (!isClientError(e)) {
-            console.log(e);
-        }
-
         useLogger()
             .warn('Robot account could not be created.', {
                 component: 'registry',
                 command: RegistryQueueCommand.PROJECT_LINK,
-                payload: isClientError(e) ?
-                    e.response.data :
-                    e,
             });
 
         return;
@@ -169,9 +156,6 @@ export async function linkRegistryProject(
             .warn('Webhook could not be created.', {
                 component: 'registry',
                 command: RegistryQueueCommand.PROJECT_LINK,
-                payload: isClientError(e) ?
-                    e.response.data :
-                    e,
             });
 
         return;
