@@ -46,6 +46,7 @@ export function errorMiddleware(
     if (baseError.getOption('logMessage')) {
         const isInspected = error instanceof ClientError || error instanceof ServerError;
         useLogger().log({ level: 'error', message: `${!isInspected ? error.message : (baseError.message || baseError)}` });
+        console.log(baseError);
     }
 
     if (baseError.getOption('decorateMessage')) {
