@@ -60,9 +60,8 @@ export type TrainManagerRoutingPayload = {
     artifactTag: string
 };
 
-export type TrainManagerRoutingStartPayload = TrainManagerBaseQueuePayload & {
-    id: Train['id']
-};
+export type TrainManagerRoutingStartPayload = TrainManagerBaseQueuePayload;
+export type TrainManagerRoutingStatusPayload = TrainManagerBaseQueuePayload;
 
 // ----------------------------------------------------------
 
@@ -79,7 +78,9 @@ export type TrainManagerQueueCommandPayload<T extends `${TrainManagerQueueComman
                 TrainManagerRoutingPayload :
                 T extends `${TrainManagerQueueCommand.ROUTE_START}` ?
                     TrainManagerRoutingStartPayload :
-                    never;
+                    T extends `${TrainManagerQueueCommand.ROUTE_STATUS}` ?
+                        TrainManagerRoutingStatusPayload :
+                        never;
 
 export type TrainManagerQueueEventPayload<
     T extends `${TrainManagerRoutingQueueEvent}` | `${TrainManagerBuildingQueueEvent}` | `${TrainManagerExtractingQueueEvent}`,

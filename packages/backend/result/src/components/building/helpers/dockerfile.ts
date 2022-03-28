@@ -19,7 +19,10 @@ type DockerFileBuildContext = {
     hostname: string
 };
 
-export async function buildDockerFile(context: DockerFileBuildContext) : Promise<string> {
+export async function buildTrainDockerFile(context: DockerFileBuildContext) : Promise<{
+    content: string,
+    masterImagePath: string
+}> {
     const client = useClient<HTTPClient>();
 
     let entryPoint : TrainFile;
@@ -71,12 +74,18 @@ export async function buildDockerFile(context: DockerFileBuildContext) : Promise
         argumentsString = `${parts.join(', ')} `;
     }
 
-    return `
-    FROM ${getHostNameFromString(context.hostname)}/master/${masterImage.virtual_path}
+    const masterImagePath = `${getHostNameFromString(context.hostname)}/master/${masterImage.virtual_path}`;
+    const content = `
+    FROM ${masterImagePath}
     RUN mkdir ${TrainContainerPath.MAIN} &&\
         mkdir ${TrainContainerPath.RESULTS} &&\
         chmod -R +x ${TrainContainerPath.MAIN}
 
     CMD ["${entrypointCommand}", ${argumentsString}"${path.posix.join(TrainContainerPath.MAIN, entrypointPath)}"]
     `;
+
+    return {
+        content,
+        masterImagePath,
+    };
 }

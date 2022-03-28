@@ -12,8 +12,9 @@ import { writeProcessedEvent } from './write-processed';
 import { writeProcessingEvent } from './write-processing';
 import { writeFailedEvent } from './write-failed';
 import { processRouteCommand } from './route';
-import { processStartCommand } from './start';
+import { processRouteStartCommand } from './start';
 import { extendQueuePayload } from '../utils/train';
+import { processRouteStatusCommand } from './status';
 
 export function createRoutingComponentHandlers() : ConsumeHandlers {
     return {
@@ -28,7 +29,13 @@ export function createRoutingComponentHandlers() : ConsumeHandlers {
         [TrainManagerQueueCommand.ROUTE_START]: async (message: Message) => {
             await Promise.resolve(message)
                 .then(extendQueuePayload)
-                .then(processStartCommand)
+                .then(processRouteStartCommand)
+                .catch((err: Error) => writeFailedEvent(message, err));
+        },
+        [TrainManagerQueueCommand.ROUTE_STATUS]: async (message: Message) => {
+            await Promise.resolve(message)
+                .then(extendQueuePayload)
+                .then(processRouteStatusCommand)
                 .catch((err: Error) => writeFailedEvent(message, err));
         },
     };

@@ -6,7 +6,7 @@
  */
 
 import {
-    HarborAPI, ProxyConnectionConfig, VaultAPI, detectProxyConnectionConfig,
+    ProxyConnectionConfig, VaultAPI, detectProxyConnectionConfig,
 } from '@personalhealthtrain/central-common';
 import { setConfig as setHTTPConfig } from '@trapi/client';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
@@ -37,23 +37,6 @@ export function createConfig({ env } : ConfigContext) : Config {
     }
 
     const proxyConfig : ProxyConnectionConfig | undefined = detectProxyConnectionConfig();
-
-    setHTTPConfig({
-        clazz: HarborAPI,
-        driver: {
-            ...(proxyAPis.includes('harbor') && proxyConfig ? {
-                proxy: proxyConfig,
-            } : {
-                proxy: false,
-            }),
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false,
-            }),
-        },
-        extra: {
-            connectionString: env.harborConnectionString,
-        },
-    }, ApiKey.HARBOR);
 
     setHTTPConfig({
         clazz: VaultAPI,

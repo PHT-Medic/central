@@ -34,7 +34,7 @@ type Properties = {
     registryId?: Registry['id']
 };
 
-const alphaNum = helpers.regex('alphaNum', /^[a-z0-9]*$/);
+const alphaWithUpperNumHyphenUnderscore = helpers.regex('alphaWithUpperNumHyphenUnderscore', /^[a-z0-9-_]*$/);
 
 export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>, any, any, Properties>({
     props: {
@@ -108,7 +108,7 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
                 },
                 external_name: {
                     required,
-                    alphaNum,
+                    alphaWithUpperNumHyphenUnderscore,
                     minLength: minLength(3),
                     maxLength: maxLength(64),
                 },

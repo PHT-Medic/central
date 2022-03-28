@@ -21,6 +21,7 @@ export enum TrainManagerQueueCommand {
 
     ROUTE = 'route',
     ROUTE_START = 'routeStart',
+    ROUTE_STATUS = 'routeStatus',
 }
 
 // ----------------------------------------------------------
@@ -51,10 +52,13 @@ export enum TrainManagerBuildingStep {
 // ----------------------------------------------------------
 
 export enum TrainManagerRoutingQueueEvent {
-    STARTED = 'routerStarted',
+    STARTED = 'routingStarted',
 
-    MOVE_STARTED = 'routerMoveStarted',
-    MOVE_FINISHED = 'routerMoveFinished',
+    MOVE_STARTED = 'routingMoveStarted',
+    MOVE_FINISHED = 'routingMoveFinished',
+
+    POSITION_FOUND = 'routingPositionFound',
+    POSITION_NOT_FOUND = 'routingPositionNotFound',
 
     FINISHED = 'routingFinished',
 
@@ -71,6 +75,7 @@ export enum TrainManagerRoutingErrorCode {
 export enum TrainManagerRoutingStep {
     START = 'start',
     ROUTE = 'route',
+    STATUS = 'status',
     UNKNOWN = 'unknown',
 }
 

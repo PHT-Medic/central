@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { PermissionID } from '@personalhealthtrain/central-common';
+import { Ecosystem, PermissionID } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default {
@@ -38,13 +38,19 @@ export default {
     data() {
         return {
             entity: null,
-            tabs: [
+        };
+    },
+    computed: {
+        tabs() {
+            return [
                 {
                     name: 'General', icon: 'fas fa-bars', urlSuffix: '',
                 },
-                {
-                    name: 'Setup', icon: 'fa-solid fa-cog', urlSuffix: 'setup',
-                },
+                ...(this.entity.ecosystem === Ecosystem.DEFAULT ?
+                    [{
+                        name: 'Setup', icon: 'fa-solid fa-cog', urlSuffix: 'setup',
+                    }] : []
+                ),
                 {
                     name: 'Projects',
                     icon: 'fa-solid fa-diagram-project',
@@ -62,9 +68,8 @@ export default {
                         },
                     ],
                 },
-
-            ],
-        };
+            ];
+        },
     },
     methods: {
         handleUpdated(item) {

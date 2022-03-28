@@ -7,6 +7,7 @@
 
 import { publishMessage } from 'amqp-extension';
 import {
+    Ecosystem,
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
@@ -14,8 +15,7 @@ import {
     Registry,
     RegistryProjectType,
     RobotSecretEnginePayload,
-    ServiceID,
-    VaultAPI,
+    ServiceID, VaultAPI,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { getRepository } from 'typeorm';
@@ -55,6 +55,12 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
 
     // ---------------------------------------------------------------------
 
+    if (entity.ecosystem !== Ecosystem.DEFAULT) {
+        return payload;
+    }
+
+    // ---------------------------------------------------------------------
+
     const projectRepository = getRepository(RegistryProjectEntity);
 
     // ---------------------------------------------------------------------
@@ -62,6 +68,7 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     // incoming
     let incomingEntity = await projectRepository.findOne({
         external_name: REGISTRY_INCOMING_PROJECT_NAME,
+        registry_id: entity.id,
     });
     if (typeof incomingEntity === 'undefined') {
         incomingEntity = projectRepository.create({
@@ -84,6 +91,7 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     // outgoing
     let outgoingEntity = await projectRepository.findOne({
         external_name: REGISTRY_OUTGOING_PROJECT_NAME,
+        registry_id: entity.id,
     });
     if (typeof outgoingEntity === 'undefined') {
         outgoingEntity = projectRepository.create({
@@ -106,6 +114,7 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     // master ( images )
     let masterImagesEntity = await projectRepository.findOne({
         external_name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
+        registry_id: entity.id,
     });
     if (typeof masterImagesEntity === 'undefined') {
         masterImagesEntity = projectRepository.create({

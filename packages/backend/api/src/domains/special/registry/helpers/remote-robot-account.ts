@@ -5,10 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { HarborClient, HarborRobotAccount } from '@trapi/harbor-client';
 import {
     HTTPClientKey,
-    HarborAPI,
-    HarborRobotAccount,
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
     RegistryProjectSecretStoragePayload,
     VaultAPI,
@@ -17,7 +16,7 @@ import { useClient } from '@trapi/client';
 import { ApiKey } from '../../../../config/api';
 
 export async function ensureRemoteRegistryProjectAccount(
-    httpClient: HarborAPI,
+    httpClient: HarborClient,
     context: {
         name: string,
         account: Partial<HarborRobotAccount>

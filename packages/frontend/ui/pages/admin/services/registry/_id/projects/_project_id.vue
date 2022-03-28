@@ -40,7 +40,7 @@ export default Vue.extend<any, any, any, any>({
             });
 
             if (stations.length === 0) {
-                await context.redirect(`/admin/registries/${context.params.id}/projects`);
+                await context.redirect(`/admin/services/registry/${context.params.id}/projects`);
 
                 return {
                     childEntity: undefined,

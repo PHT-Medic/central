@@ -8,22 +8,22 @@
 import { Message, publishMessage } from 'amqp-extension';
 import {
     HTTPClient,
-    HarborAPI,
     REGISTRY_ARTIFACT_TAG_LATEST,
     RegistryProject,
     TrainManagerQueueCommand,
     TrainManagerQueuePayloadExtended,
     TrainManagerRoutingStartPayload,
     TrainManagerRoutingStep,
-    buildAPIConnectionStringFromRegistry,
+    buildRegistryClientConnectionStringFromRegistry,
     createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
+import { HarborClient } from '@trapi/harbor-client';
 import { buildSelfQueueCommandMessage } from '../../config/queue';
 import { RoutingError } from './error';
 import { BuildingError } from '../building/error';
 
-export async function processStartCommand(message: Message) {
+export async function processRouteStartCommand(message: Message) {
     const data = message.data as TrainManagerQueuePayloadExtended<TrainManagerRoutingStartPayload>;
 
     if (!data.registry) {
@@ -32,9 +32,9 @@ export async function processStartCommand(message: Message) {
         });
     }
 
-    const connectionString = buildAPIConnectionStringFromRegistry(data.registry);
+    const connectionString = buildRegistryClientConnectionStringFromRegistry(data.registry);
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-    const httpClient = createClient<HarborAPI>(httpClientConfig);
+    const httpClient = createClient<HarborClient>(httpClientConfig);
 
     const client = useClient<HTTPClient>();
 
@@ -54,7 +54,7 @@ export async function processStartCommand(message: Message) {
 
     if (
         !harborRepository ||
-        harborRepository.artifactCount < 2
+        harborRepository.artifact_count < 2
     ) {
         const queueMessage = buildSelfQueueCommandMessage(
             TrainManagerQueueCommand.BUILD,

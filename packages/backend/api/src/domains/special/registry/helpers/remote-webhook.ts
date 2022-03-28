@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { HarborClient, HarborProjectWebhook } from '@trapi/harbor-client';
 import {
     HTTPClientKey,
-    HarborAPI, HarborProjectWebhook,
     ROBOT_SECRET_ENGINE_KEY,
     RobotSecretEnginePayload,
     ServiceID, VaultAPI,
@@ -17,8 +17,8 @@ import os from 'os';
 import { useClient } from '@trapi/client';
 import env from '../../../../env';
 
-export async function ensureRemoteRegistryProjectWebhook(
-    httpClient: HarborAPI,
+export async function saveRemoteRegistryProjectWebhook(
+    httpClient: HarborClient,
     context: {
         idOrName: string | number,
         isName?: boolean
@@ -44,7 +44,7 @@ export async function ensureRemoteRegistryProjectWebhook(
 
         return httpClient
             .projectWebHook
-            .ensure(context.idOrName, context.isName, webhookData);
+            .save(context.idOrName, context.isName, webhookData);
     }
 
     return undefined;

@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { URL } from 'url';
-import { APIServiceHarborConfig, getHostNameFromString } from '@personalhealthtrain/central-common';
+import { getHostNameFromString } from '@personalhealthtrain/central-common';
+import { HarborClientConfig } from '@trapi/harbor-client';
 import { DockerAuthConfig } from '../../modules/docker';
 
 type RemoteDockerImageURLBuildContext = {
@@ -33,7 +33,7 @@ export function buildRemoteDockerImageURL(context: RemoteDockerImageURLBuildCont
     return basePath;
 }
 
-export function buildDockerAuthConfig(config: APIServiceHarborConfig) : DockerAuthConfig {
+export function buildDockerAuthConfig(config: HarborClientConfig) : DockerAuthConfig {
     return {
         username: config.user,
         password: config.password,

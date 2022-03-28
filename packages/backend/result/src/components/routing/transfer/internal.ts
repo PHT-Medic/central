@@ -7,14 +7,14 @@
 
 import {
     HTTPClient,
-    HarborAPI,
     REGISTRY_ARTIFACT_TAG_BASE,
     Registry,
     RegistryProjectType,
-    buildAPIConnectionStringFromRegistry,
+    buildRegistryClientConnectionStringFromRegistry,
     createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
+import { HarborClient } from '@trapi/harbor-client';
 import { TransferItem } from './type';
 import { useLogger } from '../../../modules/log';
 import { transferInterRegistry } from './registry';
@@ -48,9 +48,9 @@ export async function transferInternal(context: TransferContext) {
         });
     }
 
-    const connectionString = buildAPIConnectionStringFromRegistry(context.registry);
+    const connectionString = buildRegistryClientConnectionStringFromRegistry(context.registry);
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-    const httpClient = createClient<HarborAPI>(httpClientConfig);
+    const httpClient = createClient<HarborClient>(httpClientConfig);
 
     // --------------------------------------------------------------
 

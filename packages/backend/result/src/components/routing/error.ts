@@ -8,8 +8,6 @@
 import { ErrorOptions } from '@typescript-error/http';
 import {
     TrainManagerBaseErrorCode,
-    TrainManagerExtractingErrorCode,
-    TrainManagerExtractingStep,
     TrainManagerRoutingErrorCode,
     TrainManagerRoutingStep,
 } from '@personalhealthtrain/central-common';

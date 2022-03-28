@@ -8,13 +8,13 @@
 import { Message, buildMessage, publishMessage } from 'amqp-extension';
 import {
     HTTPClient,
-    HarborAPI,
     TrainManagerBuildPayload,
     TrainManagerBuildingQueueEvent,
     TrainManagerQueuePayloadExtended,
-    buildAPIConnectionStringFromRegistry, createBasicHarborAPIConfig,
+    buildRegistryClientConnectionStringFromRegistry, createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
+import { HarborClient } from '@trapi/harbor-client';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { BuildingError } from './error';
 
@@ -44,9 +44,9 @@ export async function processBuildStatusEvent(message: Message) {
 
     // -----------------------------------------------------------------------------------
 
-    const connectionString = buildAPIConnectionStringFromRegistry(data.registry);
+    const connectionString = buildRegistryClientConnectionStringFromRegistry(data.registry);
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-    const httpClient = createClient<HarborAPI>(httpClientConfig);
+    const httpClient = createClient<HarborClient>(httpClientConfig);
 
     const client = useClient<HTTPClient>();
     const incomingProject = await client.registryProject.getOne(data.entity.incoming_registry_project_id);
@@ -56,7 +56,7 @@ export async function processBuildStatusEvent(message: Message) {
 
     if (
         harborRepository &&
-        harborRepository.artifactCount > 0
+        harborRepository.artifact_count > 0
     ) {
         await publishMessage(buildMessage({
             options: {

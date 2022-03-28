@@ -18,7 +18,7 @@ import { mergeStationsWithTrainStations } from '../../routing/helpers/merge';
 
 type TrainConfigBuildContext = {
     entity: Train,
-    hostname: string
+    masterImagePath: string
 };
 
 /**
@@ -30,7 +30,7 @@ type TrainConfigBuildContext = {
  * @param context
  */
 export async function buildTrainConfig(context: TrainConfigBuildContext) : Promise<TrainConfig> {
-    const { entity, hostname } = context;
+    const { entity, masterImagePath } = context;
 
     const config : TrainConfig = {
         id: entity.id,
@@ -43,8 +43,7 @@ export async function buildTrainConfig(context: TrainConfigBuildContext) : Promi
         },
         source: {
             type: TrainConfigSourceType.DOCKER,
-            // path.posix.join(getHostNameFromString(hostname), entity.master_image.virtual_path)
-            address: getHostNameFromString(hostname),
+            address: masterImagePath,
             tag: 'latest',
         },
         proposal_id: entity.proposal_id,

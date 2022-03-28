@@ -7,12 +7,12 @@
 
 import {
     HTTPClient,
-    HarborAPI,
     REGISTRY_ARTIFACT_TAG_BASE,
-    buildAPIConnectionStringFromRegistry,
+    buildRegistryClientConnectionStringFromRegistry,
     createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
+import { HarborClient } from '@trapi/harbor-client';
 import { buildDockerAuthConfig } from '../../../config/services/registry';
 import { TransferContext } from './type';
 import { moveDockerImage } from '../../../modules/docker/image-move';
@@ -58,9 +58,9 @@ export async function transferInterRegistry(context: TransferContext) {
 
     // -------------------------------------------------------------------------
 
-    const connectionString = buildAPIConnectionStringFromRegistry(context.sourceRegistry);
+    const connectionString = buildRegistryClientConnectionStringFromRegistry(context.sourceRegistry);
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-    const httpClient = createClient<HarborAPI>(httpClientConfig);
+    const httpClient = createClient<HarborClient>(httpClientConfig);
 
     try {
         await httpClient.projectArtifact

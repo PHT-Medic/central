@@ -9,14 +9,14 @@ import { getRepository } from 'typeorm';
 import { NotFoundError } from '@typescript-error/http';
 import {
     Ecosystem,
-    HarborAPI,
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
     RegistryProjectSecretStoragePayload,
     VaultAPI,
-    buildAPIConnectionStringFromRegistry,
+    buildRegistryClientConnectionStringFromRegistry,
     createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
+import { HarborClient } from '@trapi/harbor-client';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
 import {
     RegistryQueueCommand,
@@ -24,7 +24,7 @@ import {
 } from '../../../domains/special/registry';
 import { ensureRemoteRegistryProjectAccount } from '../../../domains/special/registry/helpers/remote-robot-account';
 import { ensureRemoteRegistryProject } from '../../../domains/special/registry/helpers/remote';
-import { ensureRemoteRegistryProjectWebhook } from '../../../domains/special/registry/helpers/remote-webhook';
+import { saveRemoteRegistryProjectWebhook } from '../../../domains/special/registry/helpers/remote-webhook';
 import { ApiKey } from '../../../config/api';
 import { RegistryEntity } from '../../../domains/core/registry/entity';
 
@@ -60,9 +60,9 @@ export async function linkRegistryProject(
         .where('registry.id = :id', { id: entity.registry_id })
         .getOne();
 
-    const connectionString = buildAPIConnectionStringFromRegistry(registryEntity);
+    const connectionString = buildRegistryClientConnectionStringFromRegistry(registryEntity);
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-    const httpClient = createClient<HarborAPI>(httpClientConfig);
+    const httpClient = createClient<HarborClient>(httpClientConfig);
 
     await ensureRemoteRegistryProject(httpClient, {
         remoteId: entity.external_id,
@@ -91,7 +91,7 @@ export async function linkRegistryProject(
         entity.account_secret = null;
     }
 
-    const webhook = await ensureRemoteRegistryProjectWebhook(httpClient, {
+    const webhook = await saveRemoteRegistryProjectWebhook(httpClient, {
         idOrName: entity.external_name,
         isName: true,
     });
@@ -115,9 +115,9 @@ export async function unlinkRegistryProject(
         .where('registry.id = :id', { id: payload.registryId })
         .getOne();
 
-    const connectionString = buildAPIConnectionStringFromRegistry(registryEntity);
+    const connectionString = buildRegistryClientConnectionStringFromRegistry(registryEntity);
     const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-    const httpClient = createClient<HarborAPI>(httpClientConfig);
+    const httpClient = createClient<HarborClient>(httpClientConfig);
 
     try {
         await httpClient.project

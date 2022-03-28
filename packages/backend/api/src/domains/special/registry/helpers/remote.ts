@@ -6,13 +6,12 @@
  */
 
 import {
-    HarborAPI,
-    HarborProject,
+    HarborClient, HarborProject,
     HarborProjectCreateContext,
-} from '@personalhealthtrain/central-common';
+} from '@trapi/harbor-client';
 
 export async function ensureRemoteRegistryProject(
-    httpClient: HarborAPI,
+    httpClient: HarborClient,
     context: {
         remoteId?: string | number | null,
         remoteName: string,

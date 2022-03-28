@@ -6,11 +6,17 @@
   -->
 <script lang="ts">
 import { PropType } from 'vue';
-import { Registry } from '@personalhealthtrain/central-common';
+import { Ecosystem, Registry } from '@personalhealthtrain/central-common';
 import RegistrySetup from '../../../../../components/domains/registry/RegistrySetup';
 
 export default {
     components: { RegistrySetup },
+    created() {
+        if (this.entity.ecosystem !== Ecosystem.DEFAULT) {
+            Promise.resolve()
+                .then(this.$nuxt.$router.push(`/admin/services/registry/${this.entity.id}`));
+        }
+    },
     props: {
         entity: Object as PropType<Registry>,
     },

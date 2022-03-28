@@ -15,7 +15,7 @@ import {
 import { useClient } from '@trapi/client';
 import { buildTrainConfig } from './helpers/train-config';
 import { useDocker } from '../../modules/docker';
-import { buildDockerFile } from './helpers/dockerfile';
+import { buildTrainDockerFile } from './helpers/dockerfile';
 import { pushDockerImage } from '../../modules/docker/image-push';
 import { useLogger } from '../../modules/log';
 import { createPackFromFileContent } from './helpers/file-gzip';
@@ -40,7 +40,7 @@ export async function processMessage(message: Message) {
 
     // -----------------------------------------------------------------------------------
 
-    const dockerFile = await buildDockerFile({
+    const { content: dockerFile, masterImagePath } = await buildTrainDockerFile({
         entity: data.entity,
         hostname: data.registry.host,
     });
@@ -80,7 +80,7 @@ export async function processMessage(message: Message) {
     });
     const trainConfig = await buildTrainConfig({
         entity: data.entity,
-        hostname: data.registry.host,
+        masterImagePath,
     });
 
     await container.putArchive(
