@@ -103,6 +103,7 @@ export async function linkRegistryProject(
 
         entity.external_id = project.project_id;
     } catch (e) {
+        console.log(e);
         useLogger()
             .warn('Project could not be created.', {
                 component: 'registry',
@@ -132,6 +133,7 @@ export async function linkRegistryProject(
             entity.account_secret = null;
         }
     } catch (e) {
+        console.log(e);
         useLogger()
             .warn('Robot account could not be created.', {
                 component: 'registry',
