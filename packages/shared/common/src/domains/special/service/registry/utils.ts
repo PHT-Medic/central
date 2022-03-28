@@ -7,10 +7,8 @@
 
 import { Robot } from '@authelion/common';
 import { Config, stringifyAuthorizationHeader } from '@trapi/client';
-import https from 'https';
 import { HarborClient, ProjectWebhookTarget } from '@trapi/harbor-client';
 import { ServiceID } from '../constants';
-import { ProxyConnectionConfig, detectProxyConnectionConfig } from '../../../../utils';
 
 export function buildRegistryWebhookTarget(
     context: {
@@ -31,16 +29,8 @@ export function buildRegistryWebhookTarget(
 }
 
 export function createBasicHarborAPIConfig(connectionString: string) : Config {
-    const proxyConfig : ProxyConnectionConfig | undefined = detectProxyConnectionConfig();
-
     return {
         clazz: HarborClient,
-        driver: {
-            proxy: proxyConfig,
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false,
-            }),
-        },
         extra: {
             connectionString,
         },

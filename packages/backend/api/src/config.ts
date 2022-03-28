@@ -5,12 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    ProxyConnectionConfig, detectProxyConnectionConfig,
-} from '@personalhealthtrain/central-common';
 import { setConfig as setHTTPConfig } from '@trapi/client';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
-import https from 'https';
 import { setConfig as setRedisConfig } from 'redis-extension';
 import { VaultClient } from '@trapi/vault-client';
 import { Environment } from './env';
@@ -32,25 +28,8 @@ export type Config = {
 };
 
 export function createConfig({ env } : ConfigContext) : Config {
-    let proxyAPis : string[] = [];
-    if (env.httpProxyAPIs) {
-        proxyAPis = env.httpProxyAPIs.split(',').map((api) => api.toLowerCase());
-    }
-
-    const proxyConfig : ProxyConnectionConfig | undefined = detectProxyConnectionConfig();
-
     setHTTPConfig({
         clazz: VaultClient,
-        driver: {
-            ...(proxyAPis.includes('vault') && proxyConfig ? {
-                proxy: proxyConfig,
-            } : {
-                proxy: false,
-            }),
-            httpsAgent: new https.Agent({
-                rejectUnauthorized: false,
-            }),
-        },
         extra: {
             connectionString: env.vaultConnectionString,
         },

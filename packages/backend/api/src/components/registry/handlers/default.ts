@@ -11,16 +11,10 @@ import {
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
-    ROBOT_SECRET_ENGINE_KEY,
     Registry,
     RegistryProjectType,
-    RobotSecretEnginePayload,
-    ServiceID,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
 import { getRepository } from 'typeorm';
-import { VaultClient } from '@trapi/vault-client';
-import { ApiKey } from '../../../config/api';
 import {
     RegistryQueueCommand,
     RegistryQueuePayload,
@@ -31,21 +25,11 @@ import { RegistryEntity } from '../../../domains/core/registry/entity';
 import { useLogger } from '../../../config/log';
 
 export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueCommand.SETUP>) {
-    const response = await useClient<VaultClient>(ApiKey.VAULT)
-        .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
-
-    if (!response) {
-        useLogger()
-            .warn('Registry setup failed. No robot credentials present in secret storage.', {
-                component: 'registry',
-            });
-        return payload;
-    }
-
     if (!payload.id && !payload.entity) {
         useLogger()
-            .warn('Registry setup failed. No registry specified.', {
+            .warn('No registry specified.', {
                 component: 'registry',
+                command: RegistryQueueCommand.SETUP,
             });
         return payload;
     }
@@ -65,8 +49,9 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
 
     if (entity.ecosystem !== Ecosystem.DEFAULT) {
         useLogger()
-            .warn('Registry setup aborted. Only default ecosystem supported.', {
+            .warn('Only default ecosystem is supported.', {
                 component: 'registry',
+                command: RegistryQueueCommand.SETUP,
             });
 
         return payload;
