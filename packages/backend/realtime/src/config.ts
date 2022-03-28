@@ -8,6 +8,7 @@
 import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import {
+    detectProxyConnectionConfig,
     refreshAuthRobotTokenOnResponseError,
 } from '@personalhealthtrain/central-common';
 import { VaultClient } from '@trapi/vault-client';
@@ -27,6 +28,8 @@ export type Config = {
 };
 
 export function createConfig({ env } : ConfigContext) : Config {
+    const proxyConfig = detectProxyConnectionConfig();
+
     setRedisConfig({ connectionString: env.redisConnectionString });
 
     const redisDatabase = useRedisClient();
@@ -43,6 +46,11 @@ export function createConfig({ env } : ConfigContext) : Config {
     setHTTPConfig({
         driver: {
             baseURL: env.apiUrl,
+            ...(proxyConfig ? {
+                proxy: proxyConfig,
+            } : {
+                proxy: false,
+            }),
             withCredentials: true,
         },
     });

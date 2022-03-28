@@ -9,6 +9,7 @@ import { setConfig as setHTTPConfig } from '@trapi/client';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { setConfig as setRedisConfig } from 'redis-extension';
 import { VaultClient } from '@trapi/vault-client';
+import { detectProxyConnectionConfig } from '@personalhealthtrain/central-common';
 import { Environment } from './env';
 import { buildTrainManagerAggregator } from './aggregators/train-manager';
 import { buildRobotAggregator } from './aggregators/robot';
@@ -28,8 +29,13 @@ export type Config = {
 };
 
 export function createConfig({ env } : ConfigContext) : Config {
+    const proxyConfig = detectProxyConnectionConfig();
+
     setHTTPConfig({
         clazz: VaultClient,
+        driver: {
+            proxy: false,
+        },
         extra: {
             connectionString: env.vaultConnectionString,
         },
@@ -38,12 +44,22 @@ export function createConfig({ env } : ConfigContext) : Config {
     setHTTPConfig({
         driver: {
             baseURL: 'https://menzel.informatik.rwth-aachen.de:3005/centralservice/api/',
+            ...(proxyConfig ? {
+                proxy: proxyConfig,
+            } : {
+                proxy: false,
+            }),
         },
     }, ApiKey.AACHEN_CENTRAL_SERVICE);
 
     setHTTPConfig({
         driver: {
             baseURL: 'https://station-registry.hs-mittweida.de/api/',
+            ...(proxyConfig ? {
+                proxy: proxyConfig,
+            } : {
+                proxy: false,
+            }),
         },
     }, ApiKey.AACHEN_STATION_REGISTRY);
 
