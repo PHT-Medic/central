@@ -12,32 +12,29 @@ import { buildSocketRealmNamespaceName, buildSocketStationRoomName } from '@pers
 import { useSocketEmitter } from '../../config/socket-emitter';
 import { StationEntity } from '../../domains/core/station/entity';
 
-type Operator = 'create' | 'update' | 'delete';
-type Event = 'stationCreated' | 'stationUpdated' | 'stationDeleted';
-
-const OperatorEventMap : Record<Operator, Event> = {
-    create: 'stationCreated',
-    update: 'stationUpdated',
-    delete: 'stationDeleted',
-};
+enum Operation {
+    CREATE = 'stationCreated',
+    UPDATE = 'stationUpdated',
+    DELETE = 'stationDeleted',
+}
 
 function publish(
-    operation: Operator,
+    operation: `${Operation}`,
     item: StationEntity,
 ) {
     useSocketEmitter()
         .in(buildSocketStationRoomName())
-        .emit(OperatorEventMap[operation], {
+        .emit(operation, {
             data: item,
             meta: {
                 roomName: buildSocketStationRoomName(),
             },
         });
 
-    if (operation !== 'create') {
+    if (operation !== Operation.CREATE) {
         useSocketEmitter()
             .in(buildSocketStationRoomName(item.id))
-            .emit(OperatorEventMap[operation], {
+            .emit(operation, {
                 data: item,
                 meta: {
                     roomName: buildSocketStationRoomName(item.id),
@@ -54,7 +51,7 @@ function publish(
         useSocketEmitter()
             .of(workspaces[i])
             .in(buildSocketStationRoomName())
-            .emit(OperatorEventMap[operation], {
+            .emit(operation, {
                 data: item,
                 meta: {
                     roomName: buildSocketStationRoomName(),
@@ -62,12 +59,12 @@ function publish(
             });
     }
 
-    if (operation !== 'create') {
+    if (operation !== Operation.CREATE) {
         for (let i = 0; i < workspaces.length; i++) {
             useSocketEmitter()
                 .of(workspaces[i])
                 .in(buildSocketStationRoomName(item.id))
-                .emit(OperatorEventMap[operation], {
+                .emit(operation, {
                     data: item,
                     meta: {
                         roomName: buildSocketStationRoomName(item.id),
@@ -85,17 +82,14 @@ export class TrainSubscriber implements EntitySubscriberInterface<StationEntity>
     }
 
     afterInsert(event: InsertEvent<StationEntity>): Promise<any> | void {
-        publish('create', event.entity);
+        publish(Operation.CREATE, event.entity);
     }
 
     afterUpdate(event: UpdateEvent<StationEntity>): Promise<any> | void {
-        publish('update', event.entity as StationEntity);
-        return undefined;
+        publish(Operation.UPDATE, event.entity as StationEntity);
     }
 
     beforeRemove(event: RemoveEvent<StationEntity>): Promise<any> | void {
-        publish('delete', event.entity);
-
-        return undefined;
+        publish(Operation.DELETE, event.entity);
     }
 }

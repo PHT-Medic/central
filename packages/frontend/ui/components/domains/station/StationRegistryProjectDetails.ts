@@ -6,7 +6,9 @@
  */
 
 import Vue, { CreateElement, PropType, VNode } from 'vue';
-import { Ecosystem, RegistryProject, Station } from '@personalhealthtrain/central-common';
+import {
+    Ecosystem, PermissionID, RegistryProject, Station,
+} from '@personalhealthtrain/central-common';
 import RegistryProjectDetails from '../registry-project/RegistryProjectDetails';
 
 type Properties = {
@@ -28,6 +30,16 @@ export default Vue.extend<any, any, any, Properties>({
     },
     render(h: CreateElement): VNode {
         const vm = this;
+
+        if (!vm.$auth.hasPermission(PermissionID.REGISTRY_MANAGE)) {
+            return h(
+                'div',
+                { staticClass: 'alert alert-sm alert-danger' },
+                [
+                    'You are not permitted to view the registry-project details.',
+                ],
+            );
+        }
 
         if (vm.entity.ecosystem !== Ecosystem.DEFAULT) {
             return h(
@@ -56,7 +68,7 @@ export default Vue.extend<any, any, any, Properties>({
             {
                 props: {
                     entityId: vm.entity.registry_project_id,
-                    entity: vm.entity.registry_project,
+                    realmId: vm.entity.realm_id,
                 },
                 on: {
                     resolved(item) {

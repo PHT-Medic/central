@@ -10,37 +10,37 @@ import {
 } from 'typeorm';
 import {
     buildSocketRealmNamespaceName,
-    buildSocketTrainRoomName,
+    buildSocketRegistryProjectRoomName,
 } from '@personalhealthtrain/central-common';
 import { useSocketEmitter } from '../../config/socket-emitter';
-import { TrainEntity } from '../../domains/core/train/entity';
+import { RegistryProjectEntity } from '../../domains/core/registry-project/entity';
 
 enum Operation {
-    CREATE = 'trainCreated',
-    UPDATE = 'trainUpdated',
-    DELETE = 'trainDeleted',
+    CREATE = 'registryProjectCreated',
+    UPDATE = 'registryProjectUpdated',
+    DELETE = 'registryProjectDeleted',
 }
 
 function publish(
     operation: `${Operation}`,
-    item: TrainEntity,
+    item: RegistryProjectEntity,
 ) {
     useSocketEmitter()
-        .in(buildSocketTrainRoomName())
+        .in(buildSocketRegistryProjectRoomName())
         .emit(operation, {
             data: item,
             meta: {
-                roomName: buildSocketTrainRoomName(),
+                roomName: buildSocketRegistryProjectRoomName(),
             },
         });
 
     if (operation !== Operation.CREATE) {
         useSocketEmitter()
-            .in(buildSocketTrainRoomName(item.id))
+            .in(buildSocketRegistryProjectRoomName(item.id))
             .emit(operation, {
                 data: item,
                 meta: {
-                    roomName: buildSocketTrainRoomName(item.id),
+                    roomName: buildSocketRegistryProjectRoomName(item.id),
                     roomId: item.id,
                 },
             });
@@ -53,11 +53,11 @@ function publish(
     for (let i = 0; i < workspaces.length; i++) {
         useSocketEmitter()
             .of(workspaces[i])
-            .in(buildSocketTrainRoomName())
+            .in(buildSocketRegistryProjectRoomName())
             .emit(operation, {
                 data: item,
                 meta: {
-                    roomName: buildSocketTrainRoomName(),
+                    roomName: buildSocketRegistryProjectRoomName(),
                 },
             });
     }
@@ -66,11 +66,11 @@ function publish(
         for (let i = 0; i < workspaces.length; i++) {
             useSocketEmitter()
                 .of(workspaces[i])
-                .in(buildSocketTrainRoomName(item.id))
+                .in(buildSocketRegistryProjectRoomName(item.id))
                 .emit(operation, {
                     data: item,
                     meta: {
-                        roomName: buildSocketTrainRoomName(item.id),
+                        roomName: buildSocketRegistryProjectRoomName(item.id),
                         roomId: item.id,
                     },
                 });
@@ -79,20 +79,23 @@ function publish(
 }
 
 @EventSubscriber()
-export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
+export class RegistryProjectSubscriber implements EntitySubscriberInterface<RegistryProjectEntity> {
     listenTo(): CallableFunction | string {
-        return TrainEntity;
+        return RegistryProjectEntity;
     }
 
-    afterInsert(event: InsertEvent<TrainEntity>): Promise<any> | void {
+    afterInsert(event: InsertEvent<RegistryProjectEntity>): Promise<any> | void {
         publish(Operation.CREATE, event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<TrainEntity>): Promise<any> | void {
-        publish(Operation.UPDATE, event.entity as TrainEntity);
+    afterUpdate(event: UpdateEvent<RegistryProjectEntity>): Promise<any> | void {
+        publish(Operation.UPDATE, event.entity as RegistryProjectEntity);
+        return undefined;
     }
 
-    beforeRemove(event: RemoveEvent<TrainEntity>): Promise<any> | void {
+    beforeRemove(event: RemoveEvent<RegistryProjectEntity>): Promise<any> | void {
         publish(Operation.DELETE, event.entity);
+
+        return undefined;
     }
 }

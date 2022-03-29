@@ -19,6 +19,7 @@ import {
 } from '../../domains/train-station/handlers';
 import { registerTrainFileSocketHandlers } from '../../domains/train-file/handlers';
 import { registerStationSocketHandlers } from '../../domains/station/handlers';
+import { registerRegistryProjectSocketHandlers } from '../../domains/registry-project/handlers';
 
 export function registerSocketHandlers(io: SocketServerInterface) {
     io.on('connection', (socket) => {
@@ -30,6 +31,8 @@ export function registerSocketHandlers(io: SocketServerInterface) {
 
         registerProposalSocketHandlers(io, socket);
         registerProposalStationSocketHandlers(io, socket);
+
+        registerRegistryProjectSocketHandlers(io, socket);
 
         registerStationSocketHandlers(io, socket);
 
@@ -47,6 +50,8 @@ export function registerSocketNamespaceHandlers(io: SocketNamespaceInterface) {
 
         registerProposalSocketHandlers(io, socket);
         registerProposalStationForRealmSocketHandlers(io, socket);
+
+        registerRegistryProjectSocketHandlers(io, socket);
 
         registerStationSocketHandlers(io, socket);
 

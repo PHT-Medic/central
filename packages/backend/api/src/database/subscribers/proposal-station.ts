@@ -15,32 +15,29 @@ import {
 import { useSocketEmitter } from '../../config/socket-emitter';
 import { ProposalStationEntity } from '../../domains/core/proposal-station/entity';
 
-type Operator = 'create' | 'update' | 'delete';
-type Event = 'proposalStationCreated' | 'proposalStationUpdated' | 'proposalStationDeleted';
-
-const OperatorEventMap : Record<Operator, Event> = {
-    create: 'proposalStationCreated',
-    update: 'proposalStationUpdated',
-    delete: 'proposalStationDeleted',
-};
+enum Operation {
+    CREATE = 'proposalStationCreated',
+    UPDATE = 'proposalStationUpdated',
+    DELETE = 'proposalStationDeleted',
+}
 
 function publish(
-    operation: Operator,
+    operation: `${Operation}`,
     item: ProposalStationEntity,
 ) {
     useSocketEmitter()
         .in(buildSocketProposalStationRoomName())
-        .emit(OperatorEventMap[operation], {
+        .emit(operation, {
             data: item,
             meta: {
                 roomName: buildSocketProposalStationRoomName(),
             },
         });
 
-    if (operation !== 'create') {
+    if (operation !== Operation.CREATE) {
         useSocketEmitter()
             .in(buildSocketProposalStationRoomName(item.id))
-            .emit(OperatorEventMap[operation], {
+            .emit(operation, {
                 data: item,
                 meta: {
                     roomName: buildSocketProposalStationRoomName(item.id),
@@ -62,7 +59,7 @@ function publish(
         useSocketEmitter()
             .of(workspaces[i])
             .in(roomName)
-            .emit(OperatorEventMap[operation], {
+            .emit(operation, {
                 data: item,
                 meta: {
                     roomName,
@@ -70,7 +67,7 @@ function publish(
             });
     }
 
-    if (operation !== 'create') {
+    if (operation !== Operation.CREATE) {
         for (let i = 0; i < workspaces.length; i++) {
             const roomName = workspaces[i] === buildSocketRealmNamespaceName(item.station_realm_id) ?
                 buildSocketProposalStationInRoomName(item.id) :
@@ -79,7 +76,7 @@ function publish(
             useSocketEmitter()
                 .of(workspaces[i])
                 .in(roomName)
-                .emit(OperatorEventMap[operation], {
+                .emit(operation, {
                     data: item,
                     meta: {
                         roomName,
@@ -97,17 +94,14 @@ export class ProposalStationSubscriber implements EntitySubscriberInterface<Prop
     }
 
     afterInsert(event: InsertEvent<ProposalStationEntity>): Promise<any> | void {
-        publish('create', event.entity);
+        publish(Operation.CREATE, event.entity);
     }
 
     afterUpdate(event: UpdateEvent<ProposalStationEntity>): Promise<any> | void {
-        publish('update', event.entity as ProposalStationEntity);
-        return undefined;
+        publish(Operation.UPDATE, event.entity as ProposalStationEntity);
     }
 
     beforeRemove(event: RemoveEvent<ProposalStationEntity>): Promise<any> | void {
-        publish('delete', event.entity);
-
-        return undefined;
+        publish(Operation.DELETE, event.entity);
     }
 }

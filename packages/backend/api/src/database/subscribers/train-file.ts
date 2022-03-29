@@ -15,32 +15,29 @@ import {
 import { useSocketEmitter } from '../../config/socket-emitter';
 import { TrainFileEntity } from '../../domains/core/train-file/entity';
 
-type Operator = 'create' | 'update' | 'delete';
-type Event = 'trainFileCreated' | 'trainFileUpdated' | 'trainFileDeleted';
-
-const OperatorEventMap : Record<Operator, Event> = {
-    create: 'trainFileCreated',
-    update: 'trainFileUpdated',
-    delete: 'trainFileDeleted',
-};
+enum Operation {
+    CREATE = 'trainFileCreated',
+    UPDATE = 'trainFileUpdated',
+    DELETE = 'trainFileDeleted',
+}
 
 function publish(
-    operation: Operator,
+    operation: `${Operation}`,
     item: TrainFileEntity,
 ) {
     useSocketEmitter()
         .in(buildSocketTrainFileRoomName())
-        .emit(OperatorEventMap[operation], {
+        .emit(operation, {
             data: item,
             meta: {
                 roomName: buildSocketTrainFileRoomName(),
             },
         });
 
-    if (operation !== 'create') {
+    if (operation !== Operation.CREATE) {
         useSocketEmitter()
             .in(buildSocketTrainFileRoomName(item.id))
-            .emit(OperatorEventMap[operation], {
+            .emit(operation, {
                 data: item,
                 meta: {
                     roomName: buildSocketTrainFileRoomName(item.id),
@@ -59,7 +56,7 @@ function publish(
         useSocketEmitter()
             .of(workspaces[i])
             .in(roomName)
-            .emit(OperatorEventMap[operation], {
+            .emit(operation, {
                 data: item,
                 meta: {
                     roomName,
@@ -67,14 +64,14 @@ function publish(
             });
     }
 
-    if (operation !== 'create') {
+    if (operation !== Operation.CREATE) {
         for (let i = 0; i < workspaces.length; i++) {
             const roomName = buildSocketTrainFileRoomName(item.id);
 
             useSocketEmitter()
                 .of(workspaces[i])
                 .in(roomName)
-                .emit(OperatorEventMap[operation], {
+                .emit(operation, {
                     data: item,
                     meta: {
                         roomName,
@@ -92,17 +89,14 @@ export class TrainFileSubscriber implements EntitySubscriberInterface<TrainFileE
     }
 
     afterInsert(event: InsertEvent<TrainFileEntity>): Promise<any> | void {
-        publish('create', event.entity);
+        publish(Operation.CREATE, event.entity);
     }
 
     afterUpdate(event: UpdateEvent<TrainFileEntity>): Promise<any> | void {
-        publish('update', event.entity as TrainFileEntity);
-        return undefined;
+        publish(Operation.UPDATE, event.entity as TrainFileEntity);
     }
 
     beforeRemove(event: RemoveEvent<TrainFileEntity>): Promise<any> | void {
-        publish('delete', event.entity);
-
-        return undefined;
+        publish(Operation.DELETE, event.entity);
     }
 }

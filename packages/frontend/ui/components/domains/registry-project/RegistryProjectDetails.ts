@@ -6,16 +6,22 @@
  */
 
 import Vue, { CreateElement, PropType, VNode } from 'vue';
-import { RegistryCommand, RegistryProject, ServiceID } from '@personalhealthtrain/central-common';
+import {
+    RegistryCommand, RegistryProject, ServiceID,
+    SocketClientToServerEvents,
+    SocketServerToClientEventContext,
+    SocketServerToClientEvents,
+} from '@personalhealthtrain/central-common';
+import { Socket } from 'socket.io-client';
+import { MASTER_REALM_ID, Realm } from '@authelion/common';
 
-// todo: add data, prop, method typing
 type Properties = {
     entityId: RegistryProject['id'],
-    entity?: RegistryProject
+    realmId?: Realm['id']
 };
 
 type Data = {
-    item: null | RegistryProject,
+    entity: null | RegistryProject,
     busy: boolean
 };
 
@@ -23,41 +29,55 @@ export default Vue.extend<Data, any, any, Properties>({
     name: 'RegistryProjectDetails',
     props: {
         entityId: String as PropType<RegistryProject['id']>,
-        entity: {
-            type: Object as PropType<RegistryProject>,
-            default: undefined,
+        realmId: {
+            type: String,
         },
     },
     data() {
         return {
             busy: false,
-            item: null,
+            entity: null,
         };
     },
     computed: {
+        userRealmId() {
+            return this.$store.getters['auth/userRealmId'];
+        },
+        socketRealmId() {
+            if (this.realmId) {
+                return this.realmId;
+            }
+
+            if (this.userRealmId === MASTER_REALM_ID) {
+                return undefined;
+            }
+
+            return this.userRealmId;
+        },
+
         name() {
-            return this.item ?
-                this.item.external_name :
+            return this.entity ?
+                this.entity.external_name :
                 undefined;
         },
         accountId() {
-            return this.item ?
-                this.item.account_id :
+            return this.entity ?
+                this.entity.account_id :
                 undefined;
         },
         accountName() {
-            return this.item ?
-                this.item.account_name :
+            return this.entity ?
+                this.entity.account_name :
                 undefined;
         },
         accountSecret() {
-            return this.item ?
-                this.item.account_secret :
+            return this.entity ?
+                this.entity.account_secret :
                 undefined;
         },
         webhookExists() {
-            return this.item ?
-                this.item.webhook_exists :
+            return this.entity ?
+                this.entity.webhook_exists :
                 undefined;
         },
         updatedAt() {
@@ -68,27 +88,64 @@ export default Vue.extend<Data, any, any, Properties>({
     },
     created() {
         Promise.resolve()
-            .then(this.initFromProperties)
             .then(this.resolve);
     },
-    methods: {
-        async initFromProperties() {
-            if (!this.entity) return;
+    mounted() {
+        const socket : Socket<
+        SocketServerToClientEvents,
+        SocketClientToServerEvents
+        > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-            this.item = this.entity;
-        },
+        socket.emit('registryProjectsSubscribe', { data: { id: this.entityId } });
+        socket.on('registryProjectUpdated', this.handleSocketUpdated);
+    },
+    beforeDestroy() {
+        const socket : Socket<
+        SocketServerToClientEvents,
+        SocketClientToServerEvents
+        > = this.$socket.useRealmWorkspace(this.socketRealmId);
+
+        socket.emit('registryProjectsUnsubscribe', { data: { id: this.entityId } });
+        socket.off('registryProjectUpdated', this.handleSocketUpdated);
+    },
+    methods: {
         async resolve() {
-            if (this.entity) return;
+            if (this.busy) return;
+
+            this.busy = true;
 
             try {
-                // todo: add account_*** fields to query
-                this.item = await this.$api.registryProject.getOne(this.entityId);
+                this.entity = await this.$api.registryProject.getOne(this.entityId, {
+                    fields: ['+account_secret'],
+                });
 
-                this.$emit('resolved', this.item);
+                this.$emit('resolved', this.entity);
             } catch (e) {
-                // ....
+                if (e instanceof Error) {
+                    this.$emit('failed', e);
+                }
             }
+
+            this.busy = false;
         },
+
+        handleSocketUpdated(context: SocketServerToClientEventContext<RegistryProject>) {
+            if (
+                context.data.id !== this.entityId
+            ) return;
+
+            this.handleUpdated(context.data);
+        },
+
+        handleUpdated(item: RegistryProject) {
+            const keys = Object.keys(item) as (keyof RegistryProject)[];
+            for (let i = 0; i < keys.length; i++) {
+                Vue.set(this.entity, keys[i], item[keys[i]]);
+            }
+
+            this.$emit('updated', item);
+        },
+
         async linkProject() {
             await this.run(RegistryCommand.PROJECT_LINK);
         },

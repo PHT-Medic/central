@@ -146,7 +146,9 @@ export default {
             :hide-footer="true"
         >
             <registry-project-details
-                :entity="item"
+                v-if="item"
+                :entity-id="item.id"
+                :realm-id="item.realm_id"
             />
         </b-modal>
     </div>
