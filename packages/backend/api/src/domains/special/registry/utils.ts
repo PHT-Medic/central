@@ -8,8 +8,7 @@
 import { Robot } from '@authelion/common';
 import { Config, stringifyAuthorizationHeader } from '@trapi/client';
 import { HarborClient, ProjectWebhookTarget } from '@trapi/harbor-client';
-import { ServiceID } from '../constants';
-import { detectProxyConnectionConfig } from '../../../../utils';
+import { ServiceID, detectProxyConnectionConfig } from '@personalhealthtrain/central-common';
 
 export function buildRegistryWebhookTarget(
     context: {

@@ -9,13 +9,13 @@ import {
     HTTPClient,
     REGISTRY_ARTIFACT_TAG_BASE,
     buildRegistryClientConnectionStringFromRegistry,
-    createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
 import { HarborClient } from '@trapi/harbor-client';
 import { buildDockerAuthConfig } from '../../../config/services/registry';
 import { TransferContext } from './type';
 import { moveDockerImage } from '../../../modules/docker/image-move';
+import { createBasicHarborAPIConfig } from '../../../domains/harbor';
 
 export async function transferInterRegistry(context: TransferContext) {
     const client = useClient<HTTPClient>();

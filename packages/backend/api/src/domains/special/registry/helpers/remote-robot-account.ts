@@ -11,7 +11,7 @@ import {
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
     RegistryProjectSecretStoragePayload,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { isClientError, useClient } from '@trapi/client';
 import { VaultClient } from '@trapi/vault-client';
 import { ApiKey } from '../../../../config/api';
 
@@ -95,23 +95,43 @@ export async function ensureRemoteRegistryProjectAccount(
             secret: context.account.secret,
         };
 
-        await httpClient.robotAccount.refreshSecret(
-            robotAccount.id,
-            robotAccount.secret,
-        );
-
-        secretStorageData = {
-            account_id: `${robotAccount.id}`,
-            account_name: robotAccount.name,
-            account_secret: robotAccount.secret,
-        };
-
-        await useClient<VaultClient>(ApiKey.VAULT)
-            .keyValue.save(
-                REGISTRY_PROJECT_SECRET_ENGINE_KEY,
-                context.name,
-                secretStorageData,
+        try {
+            await httpClient.robotAccount.refreshSecret(
+                robotAccount.id,
+                robotAccount.secret,
             );
+
+            secretStorageData = {
+                account_id: `${robotAccount.id}`,
+                account_name: robotAccount.name,
+                account_secret: robotAccount.secret,
+            };
+
+            await useClient<VaultClient>(ApiKey.VAULT)
+                .keyValue.save(
+                    REGISTRY_PROJECT_SECRET_ENGINE_KEY,
+                    context.name,
+                    secretStorageData,
+                );
+        } catch (e) {
+            if (isClientError(e)) {
+                if (
+                    e.response &&
+                    e.response.status === 404
+                ) {
+                    return ensureRemoteRegistryProjectAccount(httpClient, {
+                        name: context.name,
+                        account: {
+                            id: null,
+                            name: null,
+                            secret: null,
+                        },
+                    });
+                }
+            }
+
+            throw e;
+        }
     }
 
     return robotAccount;

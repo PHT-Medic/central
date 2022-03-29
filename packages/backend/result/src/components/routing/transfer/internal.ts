@@ -11,13 +11,13 @@ import {
     Registry,
     RegistryProjectType,
     buildRegistryClientConnectionStringFromRegistry,
-    createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
 import { HarborClient } from '@trapi/harbor-client';
 import { TransferItem } from './type';
 import { useLogger } from '../../../modules/log';
 import { transferInterRegistry } from './registry';
+import { createBasicHarborAPIConfig } from '../../../domains/harbor';
 
 type TransferContext = {
     registry?: Registry,

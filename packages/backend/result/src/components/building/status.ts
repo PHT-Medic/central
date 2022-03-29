@@ -11,12 +11,13 @@ import {
     TrainManagerBuildPayload,
     TrainManagerBuildingQueueEvent,
     TrainManagerQueuePayloadExtended,
-    buildRegistryClientConnectionStringFromRegistry, createBasicHarborAPIConfig,
+    buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
 import { HarborClient } from '@trapi/harbor-client';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
 import { BuildingError } from './error';
+import { createBasicHarborAPIConfig } from '../../domains/harbor';
 
 export async function processBuildStatusEvent(message: Message) {
     const data = message.data as TrainManagerQueuePayloadExtended<TrainManagerBuildPayload>;

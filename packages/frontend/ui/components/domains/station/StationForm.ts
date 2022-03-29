@@ -11,7 +11,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import { RealmList } from '@authelion/vue';
 import {
-    email, maxLength, minLength, required,
+    email, helpers, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
 import {
     SlotName, buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea, initPropertiesFromSource,
@@ -23,6 +23,8 @@ import { BuildInput } from '@trapi/query';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 import { RegistryList } from '../registry/RegistryList';
 import StationRegistryProjectDetails from './StationRegistryProjectDetails';
+
+const alphaWithUpperNumHyphenUnderscore = helpers.regex('alphaWithUpperNumHyphenUnderscore', /^[a-z0-9-_]*$/);
 
 export const StationForm = Vue.extend({
     name: 'StationForm',
@@ -45,6 +47,7 @@ export const StationForm = Vue.extend({
             form: {
                 name: '',
                 public_key: '',
+                external_name: '',
                 email: '',
                 realm_id: '',
                 registry_id: '',
@@ -75,6 +78,11 @@ export const StationForm = Vue.extend({
             },
             registry_id: {
                 required,
+            },
+            external_name: {
+                alphaWithUpperNumHyphenUnderscore,
+                minLength: minLength(3),
+                maxLength: maxLength(64),
             },
             email: {
                 minLength: minLength(10),
@@ -216,6 +224,12 @@ export const StationForm = Vue.extend({
             propName: 'name',
         });
 
+        const externalName = buildFormInput<Station>(vm, h, {
+            validationTranslator: buildVuelidateTranslator(vm.$ilingo),
+            title: 'External Name',
+            propName: 'external_name',
+        });
+
         const email = buildFormInput<Station>(vm, h, {
             validationTranslator: buildVuelidateTranslator(vm.$ilingo),
             title: 'E-Mail',
@@ -336,11 +350,6 @@ export const StationForm = Vue.extend({
                     props: {
                         entity: vm.entity,
                     },
-                    on: {
-                        updated(entity) {
-                            vm.handleUpdated.call(null, entity);
-                        },
-                    },
                 }),
             ];
         }
@@ -352,6 +361,8 @@ export const StationForm = Vue.extend({
                 }, [
                     realm,
                     name,
+                    h('hr'),
+                    externalName,
                     h('hr'),
                     ecosystem,
                     registry,

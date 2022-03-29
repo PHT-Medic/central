@@ -9,8 +9,7 @@ import { getRepository } from 'typeorm';
 import {
     Ecosystem,
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
-    RegistryProjectSecretStoragePayload,
-    buildRegistryClientConnectionStringFromRegistry, createBasicHarborAPIConfig,
+    buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
 import { HarborClient } from '@trapi/harbor-client';
@@ -26,6 +25,7 @@ import { saveRemoteRegistryProjectWebhook } from '../../../domains/special/regis
 import { ApiKey } from '../../../config/api';
 import { RegistryEntity } from '../../../domains/core/registry/entity';
 import { useLogger } from '../../../config/log';
+import { createBasicHarborAPIConfig } from '../../../domains/special/registry/utils';
 
 export async function linkRegistryProject(
     payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_LINK>,
@@ -87,7 +87,6 @@ export async function linkRegistryProject(
         .info('Connect to registry', {
             component: 'registry',
             command: RegistryQueueCommand.PROJECT_LINK,
-            connectionString,
         });
 
     const httpClient = createClient<HarborClient>(httpClientConfig);
@@ -103,7 +102,6 @@ export async function linkRegistryProject(
 
         entity.external_id = project.project_id;
     } catch (e) {
-        console.log(e);
         useLogger()
             .warn('Project could not be created.', {
                 component: 'registry',
@@ -133,7 +131,6 @@ export async function linkRegistryProject(
             entity.account_secret = null;
         }
     } catch (e) {
-        console.log(e);
         useLogger()
             .warn('Robot account could not be created.', {
                 component: 'registry',
@@ -203,18 +200,17 @@ export async function unlinkRegistryProject(
                     command: RegistryQueueCommand.PROJECT_UNLINK,
                 });
         }
+    }
 
-        const response = await useClient<VaultClient>(ApiKey.VAULT)
-            .keyValue.find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.externalName);
-
-        if (response) {
-            response.data.account_id = null;
-            response.data.account_name = null;
-            response.data.account_secret = null;
-
-            await useClient<VaultClient>(ApiKey.VAULT)
-                .keyValue.save(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.externalName, response.data);
-        }
+    try {
+        await useClient<VaultClient>(ApiKey.VAULT)
+            .keyValue.delete(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.externalName);
+    } catch (e) {
+        useLogger()
+            .warn('Vault project representation could not be deleted.', {
+                component: 'registry',
+                command: RegistryQueueCommand.PROJECT_UNLINK,
+            });
     }
 
     if (payload.updateDatabase) {
@@ -239,6 +235,9 @@ export async function unlinkRegistryProject(
 export async function relinkRegistryProject(
     payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_RELINK>,
 ) {
-    await unlinkRegistryProject(payload);
+    await unlinkRegistryProject({
+        ...payload,
+        updateDatabase: true,
+    });
     await linkRegistryProject(payload);
 }

@@ -6,7 +6,7 @@
  */
 
 import { getRepository } from 'typeorm';
-import { BadRequestError, NotFoundError } from '@typescript-error/http';
+import { BadRequestError } from '@typescript-error/http';
 import { Station } from '@personalhealthtrain/central-common';
 import { ExpressValidationResult, buildExpressValidationErrorMessage } from '../../../../express-validation';
 import { StationEntity } from '../../../../../domains/core/station/entity';

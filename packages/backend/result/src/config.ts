@@ -5,14 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
+import { setConfig as setHTTPConfig, useClient, useClient as useHTTPClient } from '@trapi/client';
 import {
     HTTPClient,
-    refreshAuthRobotTokenOnResponseError,
+    HTTPClientKey, ROBOT_SECRET_ENGINE_KEY, ServiceID, createRefreshRobotTokenOnResponseErrorHandler,
 } from '@personalhealthtrain/central-common';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import { VaultClient } from '@trapi/vault-client';
+import { Robot } from '@authelion/common';
 import { buildCommandRouterComponent } from './components/command-router';
 import { Environment } from './env';
 
@@ -45,7 +46,7 @@ function createConfig({ env } : ConfigContext) : Config {
         extra: {
             connectionString: env.vaultConnectionString,
         },
-    }, 'vault');
+    }, HTTPClientKey.VAULT);
 
     setHTTPConfig({
         clazz: HTTPClient,
@@ -57,7 +58,14 @@ function createConfig({ env } : ConfigContext) : Config {
 
     useHTTPClient().mountResponseInterceptor(
         (value) => value,
-        refreshAuthRobotTokenOnResponseError,
+        createRefreshRobotTokenOnResponseErrorHandler({
+            async load() {
+                return useClient<VaultClient>(HTTPClientKey.VAULT).keyValue
+                    .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM)
+                    .then((response) => response.data as Robot);
+            },
+            httpClient: useClient(),
+        }),
     );
 
     const aggregators : {start: () => void}[] = [

@@ -58,7 +58,7 @@ export async function runStationValidation(
 
     // -------------------------------------------------------------
 
-    await check('external_id')
+    await check('external_name')
         .isLength({ min: 1, max: 255 })
         .exists()
         .matches(/^[a-z0-9-_]*$/)

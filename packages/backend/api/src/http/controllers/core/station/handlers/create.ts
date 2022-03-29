@@ -55,7 +55,7 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
             throw new BadRequestError('The ecosystem of the station and the registry must be the same.');
         }
 
-        const registryProjectExternalName = entity.external_id || createNanoID();
+        const registryProjectExternalName = entity.external_name || createNanoID();
         const registryProjectRepository = getRepository(RegistryProjectEntity);
         const registryProject = registryProjectRepository.create({
             external_name: registryProjectExternalName,

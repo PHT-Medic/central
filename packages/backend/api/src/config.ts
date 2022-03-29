@@ -9,7 +9,7 @@ import { setConfig as setHTTPConfig } from '@trapi/client';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { setConfig as setRedisConfig } from 'redis-extension';
 import { VaultClient } from '@trapi/vault-client';
-import { detectProxyConnectionConfig } from '@personalhealthtrain/central-common';
+import { HTTPClientKey, detectProxyConnectionConfig } from '@personalhealthtrain/central-common';
 import { Environment } from './env';
 import { buildTrainManagerAggregator } from './aggregators/train-manager';
 import { buildRobotAggregator } from './aggregators/robot';
@@ -39,7 +39,7 @@ export function createConfig({ env } : ConfigContext) : Config {
         extra: {
             connectionString: env.vaultConnectionString,
         },
-    }, ApiKey.VAULT);
+    }, HTTPClientKey.VAULT);
 
     setHTTPConfig({
         driver: {

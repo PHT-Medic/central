@@ -143,7 +143,9 @@ export default Vue.extend<Data, any, any, Properties>({
                 Vue.set(this.entity, keys[i], item[keys[i]]);
             }
 
-            this.$emit('updated', item);
+            Promise.resolve()
+                .then(this.resolve)
+                .then(() => this.$emit('updated', this.entity));
         },
 
         async linkProject() {

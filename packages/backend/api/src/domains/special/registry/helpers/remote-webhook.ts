@@ -11,12 +11,12 @@ import {
     ROBOT_SECRET_ENGINE_KEY,
     RobotSecretEnginePayload,
     ServiceID,
-    buildRegistryWebhookTarget,
 } from '@personalhealthtrain/central-common';
 import os from 'os';
 import { useClient } from '@trapi/client';
 import { VaultClient } from '@trapi/vault-client';
 import env from '../../../../env';
+import { buildRegistryWebhookTarget } from '../utils';
 
 export async function saveRemoteRegistryProjectWebhook(
     httpClient: HarborClient,

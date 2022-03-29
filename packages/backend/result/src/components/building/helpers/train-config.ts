@@ -108,7 +108,7 @@ export async function buildTrainConfig(context: TrainConfigBuildContext) : Promi
 
     for (let i = 0; i < stationsExtended.length; i++) {
         config.route.push({
-            station: stationsExtended[i].external_id,
+            station: stationsExtended[i].external_name,
             rsa_public_key: stationsExtended[i].public_key,
             eco_system: stationsExtended[i].ecosystem,
             index: stationsExtended[i].index,

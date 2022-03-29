@@ -28,7 +28,7 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
     const query = repository.createQueryBuilder('station')
         .addSelect([
             'station.public_key',
-            'station.external_id',
+            'station.external_name',
         ])
         .where('station.id = :id', { id });
 
@@ -56,7 +56,7 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
         entity.ecosystem === Ecosystem.DEFAULT &&
         entity.registry_id
     ) {
-        const registryProjectExternalName = entity.external_id || createNanoID();
+        const registryProjectExternalName = entity.external_name || createNanoID();
         const registryProjectRepository = getRepository(RegistryProjectEntity);
 
         let registryProject : RegistryProjectEntity | undefined;

@@ -22,7 +22,7 @@ export async function runRegistryValidation(
 
     const titleChain = check('name')
         .exists()
-        .isLength({ min: 5, max: 128 });
+        .isLength({ min: 3, max: 128 });
 
     if (operation === 'update') {
         titleChain.optional();
@@ -35,7 +35,7 @@ export async function runRegistryValidation(
     const hostChain = body('host')
         .exists()
         .isString()
-        .isLength({ min: 5, max: 512 });
+        .isLength({ min: 3, max: 512 });
 
     if (operation === 'update') {
         hostChain.optional();
@@ -56,7 +56,7 @@ export async function runRegistryValidation(
 
     await check('account_name')
         .exists()
-        .isLength({ min: 5, max: 256 })
+        .isLength({ min: 3, max: 256 })
         .optional({ nullable: true })
         .run(req);
 
@@ -64,7 +64,7 @@ export async function runRegistryValidation(
 
     await check('account_secret')
         .exists()
-        .isLength({ min: 5, max: 256 })
+        .isLength({ min: 3, max: 256 })
         .optional({ nullable: true })
         .run(req);
 

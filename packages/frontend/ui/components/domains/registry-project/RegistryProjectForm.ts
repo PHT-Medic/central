@@ -184,7 +184,7 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
             title: 'Name',
             propName: 'name',
         });
-        const externalName = buildFormInput<Station>(vm, h, {
+        const externalName = buildFormInput<RegistryProject>(vm, h, {
             validationTranslator: buildVuelidateTranslator(vm.$ilingo),
             title: 'External Name',
             propName: 'external_name',

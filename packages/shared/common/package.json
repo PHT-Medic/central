@@ -17,18 +17,14 @@
     "devDependencies": {
         "@authelion/common": "^0.0.2",
         "@trapi/client": "^2.0.6",
-        "@trapi/harbor-client": "^0.1.1",
         "@trapi/query": "^2.1.2",
-        "@trapi/vault-client": "^0.0.1",
         "@typescript-error/core": "^1.1.3",
         "rimraf": "^3.0.2"
     },
     "peerDependencies": {
         "@authelion/common": "^0.0.x",
         "@trapi/client": "^2.x",
-        "@trapi/harbor-client": "^0.x",
         "@trapi/query": "2.x",
-        "@trapi/vault-client": "^0.x",
         "@typescript-error/core": "^1.x"
     },
     "dependencies": {

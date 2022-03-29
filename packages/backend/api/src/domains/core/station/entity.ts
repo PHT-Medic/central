@@ -30,7 +30,7 @@ export class StationEntity implements Station {
         id: string;
 
     @Column({ type: 'varchar', length: 64, nullable: true })
-        external_id: string;
+        external_name: string;
 
     @Column({ type: 'varchar', length: 128 })
         name: string;

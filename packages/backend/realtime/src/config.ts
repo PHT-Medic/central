@@ -5,13 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
+import { setConfig as setHTTPConfig, useClient, useClient as useHTTPClient } from '@trapi/client';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import {
+    HTTPClientKey,
+    ROBOT_SECRET_ENGINE_KEY,
+    ServiceID,
+    createRefreshRobotTokenOnResponseErrorHandler,
     detectProxyConnectionConfig,
-    refreshAuthRobotTokenOnResponseError,
 } from '@personalhealthtrain/central-common';
 import { VaultClient } from '@trapi/vault-client';
+import { Robot } from '@authelion/common';
 import { Environment } from './env';
 
 interface ConfigContext {
@@ -41,7 +45,7 @@ export function createConfig({ env } : ConfigContext) : Config {
         extra: {
             connectionString: env.vaultConnectionString,
         },
-    }, 'vault');
+    }, HTTPClientKey.VAULT);
 
     setHTTPConfig({
         driver: {
@@ -57,7 +61,14 @@ export function createConfig({ env } : ConfigContext) : Config {
 
     useHTTPClient().mountResponseInterceptor(
         (value) => value,
-        refreshAuthRobotTokenOnResponseError,
+        createRefreshRobotTokenOnResponseErrorHandler({
+            async load() {
+                return useClient<VaultClient>(HTTPClientKey.VAULT).keyValue
+                    .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM)
+                    .then((response) => response.data as Robot);
+            },
+            httpClient: useClient(),
+        }),
     );
 
     const aggregators : {start: () => void}[] = [

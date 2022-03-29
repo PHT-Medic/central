@@ -15,13 +15,13 @@ import {
     TrainManagerRoutingStatusPayload,
     TrainManagerRoutingStep,
     buildRegistryClientConnectionStringFromRegistry,
-    createBasicHarborAPIConfig,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
 import { HarborClient, parseProjectRepositoryName } from '@trapi/harbor-client';
 import { buildAPIQueueEventMessage } from '../../config/queue';
 import { RoutingError } from './error';
 import { BuildingError } from '../building/error';
+import { createBasicHarborAPIConfig } from '../../domains/harbor';
 
 export async function processRouteStatusCommand(message: Message) {
     const data = message.data as TrainManagerQueuePayloadExtended<TrainManagerRoutingStatusPayload>;
