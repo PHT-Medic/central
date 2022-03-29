@@ -28,6 +28,7 @@ export class DatabaseRootSeeder implements Seeder {
          * Create robot accounts for services.
          */
 
+        // todo: check existence and update entries
         const services : ServiceID[] = Object.values(ServiceID);
         const robotRepository = getRepository(RobotEntity);
         let robots = await robotRepository.createQueryBuilder('robot')

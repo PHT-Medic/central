@@ -27,7 +27,8 @@ export type TrainConfigSource = {
 export type TrainConfigCreator = {
     id: string,
     rsa_public_key: string,
-    paillier_public_key: string,
+    paillier_public_key?: string | null,
+    encrypted_key?: string | null
 };
 
 export type TrainConfig = {
@@ -48,6 +49,4 @@ export type TrainConfig = {
     route: TrainConfigRouteItem[],
     session_id: string,
     source: TrainConfigSource,
-
-    [key: string]: any
 };
