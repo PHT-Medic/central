@@ -23,7 +23,7 @@
         "@trapi/swagger": "^0.2.16",
         "@trapi/vault-client": "^0.0.1",
         "@typescript-error/http": "^1.1.4",
-        "amqp-extension": "^1.0.1",
+        "amqp-extension": "^1.0.2",
         "body-parser": "^1.19.2",
         "busboy": "^1.5.0",
         "cookie-parser": "^1.4.6",
