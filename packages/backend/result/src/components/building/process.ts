@@ -7,7 +7,7 @@
 
 import { Message } from 'amqp-extension';
 import {
-    HTTPClient,
+    HTTPClient, REGISTRY_ARTIFACT_TAG_LATEST,
     TrainContainerFileName,
     TrainContainerPath,
     TrainManagerBuildPayload, TrainManagerQueuePayloadExtended,
@@ -61,9 +61,11 @@ export async function processMessage(message: Message) {
         hostname: data.registry.host,
         projectName: incomingProject.external_name,
         repositoryName: data.entity.id,
+        tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
     });
 
-    await buildDockerImage(dockerFile, imageURL);
+    const imageBuildOutput = await buildDockerImage(dockerFile, imageURL);
+    console.log(imageBuildOutput);
 
     // -----------------------------------------------------------------------------------
 
