@@ -49,8 +49,8 @@ export async function buildTrainConfig(context: TrainConfigBuildContext) : Promi
         proposal_id: entity.proposal_id,
         session_id: entity.session_id,
         file_list: [],
-        immutable_file_hash: entity.hash,
-        immutable_file_signature: entity.hash_signed,
+        hash: entity.hash,
+        signature: entity.hash_signed,
         route: [],
     };
 

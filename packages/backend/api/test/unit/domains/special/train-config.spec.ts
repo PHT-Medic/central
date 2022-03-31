@@ -29,8 +29,7 @@ describe('src/domains/train-builder', () => {
                 },
             ],
             mode: 'read',
-            projectName: 'pht_incoming',
-            repositoryName: 'e81a773a-161c-43a2-8eee-2e2723bd1c41',
+            id: 'e81a773a-161c-43a2-8eee-2e2723bd1c41',
         };
 
         const output = extractTrainConfigFromTrainExtractorPayload(queuePayload);

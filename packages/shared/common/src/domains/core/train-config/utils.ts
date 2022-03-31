@@ -89,15 +89,15 @@ export function isTrainConfig(value: unknown) : value is TrainConfig {
     }
 
     if (
-        !hasOwnProperty(value, 'immutable_file_hash') ||
-        typeof value.immutable_file_hash !== 'string'
+        !hasOwnProperty(value, 'hash') ||
+        typeof value.hash !== 'string'
     ) {
         return false;
     }
 
     if (
-        !hasOwnProperty(value, 'immutable_file_signature') ||
-        typeof value.immutable_file_signature !== 'string'
+        !hasOwnProperty(value, 'signature') ||
+        typeof value.signature !== 'string'
     ) {
         return false;
     }

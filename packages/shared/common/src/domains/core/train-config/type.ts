@@ -39,10 +39,8 @@ export type TrainConfig = {
 
     creator: TrainConfigCreator,
     file_list: string[],
-    // hash
-    immutable_file_hash: string,
-    // signature
-    immutable_file_signature: string,
+    hash: string,
+    signature: string,
     proposal_id: Proposal['id'],
     result_hash?: string | null,
     result_signature?: string | null,
