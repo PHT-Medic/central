@@ -160,7 +160,7 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
 
             this.busy = false;
         },
-        async toggleFormData(key, id) {
+        toggleForm(key, id) {
             if (this.form[key] === id) {
                 this.form[key] = null;
             } else {
@@ -268,7 +268,7 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
                                 click($event) {
                                     $event.preventDefault();
 
-                                    vm.toggleFormData.call(null, 'registry_id', props.item.id);
+                                    vm.toggleForm.call(null, 'registry_id', props.item.id);
                                 },
                             },
                         }, [

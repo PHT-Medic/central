@@ -94,7 +94,7 @@ export default {
                         :entity-id="data.item.id"
                         :entity-type="'user'"
                         :with-text="false"
-                        @done="handleDeleted"
+                        @deleted="handleDeleted"
                     />
                 </template>
                 <template #cell(created_at)="data">

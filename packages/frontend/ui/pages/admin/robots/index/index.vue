@@ -91,7 +91,7 @@ export default {
                         :entity-id="data.item.id"
                         :entity-type="'robot'"
                         :with-text="false"
-                        @done="handleDeleted"
+                        @deleted="handleDeleted"
                     />
                 </template>
                 <template #cell(created_at)="data">
