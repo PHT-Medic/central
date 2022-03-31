@@ -22,7 +22,7 @@ export async function runStationValidation(
     };
 
     const nameChain = check('name')
-        .isLength({ min: 5, max: 100 })
+        .isLength({ min: 3, max: 128 })
         .exists()
         .notEmpty();
 
@@ -59,7 +59,7 @@ export async function runStationValidation(
     // -------------------------------------------------------------
 
     await check('external_name')
-        .isLength({ min: 1, max: 255 })
+        .isLength({ min: 1, max: 64 })
         .exists()
         .matches(/^[a-z0-9-_]*$/)
         .optional({ nullable: true })

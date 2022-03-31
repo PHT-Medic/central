@@ -17,6 +17,8 @@ import { BaseError } from '../error';
 import { buildAPIQueueEventMessage } from '../../config/queue';
 
 export async function writeFailedEvent(message: Message, error: Error) {
+    console.log(error);
+
     const buildingError = error instanceof BuildingError ?
         error :
         new BuildingError({ previous: error });

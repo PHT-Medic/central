@@ -69,6 +69,7 @@ export async function processMessage(message: Message) {
 
     useLogger().debug('Creating container...', {
         component: 'building',
+        imageURL,
     });
     const container = await useDocker()
         .createContainer({ Image: imageURL });

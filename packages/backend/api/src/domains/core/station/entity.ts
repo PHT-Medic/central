@@ -23,6 +23,7 @@ import { Realm } from '@authelion/common';
 import { RegistryProjectEntity } from '../registry-project/entity';
 import { RegistryEntity } from '../registry/entity';
 
+@Unique('station_external_name_index', ['external_name'])
 @Unique(['name', 'realm_id'])
 @Entity({ name: 'stations' })
 export class StationEntity implements Station {
