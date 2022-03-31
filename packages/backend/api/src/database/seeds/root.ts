@@ -5,18 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Connection, In, getRepository } from 'typeorm';
+import { Connection, In, getCustomRepository } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 import {
     RealmEntity,
     RobotEntity,
+    RobotRepository,
     RoleEntity,
     RolePermissionEntity,
     RoleRepository,
     useRobotEventEmitter,
 } from '@authelion/api-core';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { MASTER_REALM_ID, createNanoID } from '@authelion/common';
+import { MASTER_REALM_ID } from '@authelion/common';
 import { PHTStationRole, getPHTStationRolePermissions } from '../../config/pht/permissions/station';
 import { StationEntity } from '../../domains/core/station/entity';
 
@@ -28,10 +29,15 @@ export class DatabaseRootSeeder implements Seeder {
          * Create robot accounts for services.
          */
 
-        // todo: check existence and update entries
-        const services : ServiceID[] = Object.values(ServiceID);
-        const robotRepository = getRepository(RobotEntity);
-        let robots = await robotRepository.createQueryBuilder('robot')
+        const services : ServiceID[] = [
+            ServiceID.REGISTRY,
+            ServiceID.SYSTEM,
+
+            ServiceID.GITHUB,
+        ];
+
+        const robotRepository = getCustomRepository(RobotRepository);
+        const robots = await robotRepository.createQueryBuilder('robot')
             .where({
                 name: In(services),
             })
@@ -39,18 +45,21 @@ export class DatabaseRootSeeder implements Seeder {
 
         const serviceSecrets : {[K in ServiceID]?: string} = {};
 
-        robots = services
-            .filter((service) => robots.findIndex((robot) => robot.name === service) === -1)
-            .map((service) => {
-                const secret = createNanoID(undefined, 64);
-                serviceSecrets[service] = secret;
+        for (let i = 0; i < services.length; i++) {
+            const index = robots.findIndex((robot) => robot.name === services[i]);
+            if (index !== -1) {
+                continue;
+            }
 
-                return robotRepository.create({
-                    name: service,
-                    secret,
-                    realm_id: MASTER_REALM_ID,
-                });
+            const { entity, secret } = await robotRepository.createWithSecret({
+                name: services[i],
+                realm_id: MASTER_REALM_ID,
             });
+
+            robots.push(entity as RobotEntity);
+
+            serviceSecrets[services[i]] = secret;
+        }
 
         await robotRepository.save(robots);
 
@@ -59,11 +68,13 @@ export class DatabaseRootSeeder implements Seeder {
                 .emit('credentials', {
                     id: robots[i].id,
                     name: robots[i].name,
-                    secret: serviceSecrets[robots[i].name] || robots[i].secret,
+                    secret: serviceSecrets[robots[i].name],
                 });
         }
 
         // -------------------------------------------------
+
+        // todo: check existence and update entries
 
         /**
          * Create PHT roles

@@ -26,19 +26,13 @@ export default {
             ],
             items: [
                 {
-                    id: ServiceID.SYSTEM, name: 'System', icon: 'fa fa-robot', version: 'v1.0.0-alpha.0',
-                },
-                {
-                    id: ServiceID.TRAIN_BUILDER, name: 'Train Builder', icon: 'fa fa-wrench', version: 'v1.0.0-alpha.0',
-                },
-                {
-                    id: ServiceID.TRAIN_ROUTER, name: 'Train Router', icon: 'fas fa-map-marked-alt', version: 'v1.0.0-alpha.0',
+                    id: ServiceID.SYSTEM, name: 'System', icon: 'fa-solid fa-atom', version: 'v1.0.0-alpha.0',
                 },
                 {
                     id: ServiceID.EMAIL_SERVICE, name: 'E-Mail Service', icon: 'fas fa-envelope', version: 'v1.0.0-alpha.0',
                 },
                 {
-                    id: ServiceID.STATION_REGISTRY, name: 'Station Registry', icon: 'fa-solid fa-atom', version: 'v1.0.0-alpha.0',
+                    id: ServiceID.STATION_REGISTRY, name: 'Station Registry', icon: 'fa-solid fa-box-archive', version: 'v1.0.0-alpha.0',
                 },
             ],
             thirdPartyItems: [

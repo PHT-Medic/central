@@ -8,8 +8,6 @@
 export enum ServiceID {
     // Core Service(s)
     SYSTEM = 'SYSTEM',
-    TRAIN_BUILDER = 'TRAIN_BUILDER',
-    TRAIN_ROUTER = 'TRAIN_ROUTER',
     EMAIL_SERVICE = 'EMAIL_SERVICE',
 
     // Cooperation(s)

@@ -9,6 +9,7 @@ import rateLimit from 'express-rate-limit';
 import { RequestHandler } from 'express';
 import { TooManyRequestsError } from '@typescript-error/http';
 import { ServiceID } from '@personalhealthtrain/central-common';
+import { MASTER_REALM_ID } from '@authelion/common';
 import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 
 export function useRateLimiter(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) {
@@ -22,9 +23,8 @@ export function useRateLimiter(req: ExpressRequest, res: ExpressResponse, next: 
 
             if (req.robot) {
                 if (
-                    req.robot.name === ServiceID.SYSTEM ||
-                    req.robot.name === ServiceID.TRAIN_BUILDER ||
-                    req.robot.name === ServiceID.TRAIN_ROUTER
+                    req.robot.name === ServiceID.SYSTEM &&
+                    req.robot.realm_id === MASTER_REALM_ID
                 ) {
                     return 0; // unlimited req p. sec
                 }
