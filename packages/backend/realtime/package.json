@@ -11,7 +11,7 @@
     "description": "This package contains the central realtime application of the PHT.",
     "dependencies": {
         "@authelion/api-adapter": "^0.0.2",
-        "@authelion/common": "^0.0.2",
+        "@authelion/common": "^0.0.3",
         "@personalhealthtrain/central-common": "^1.3.24",
         "@socket.io/redis-adapter": "^7.1.0",
         "@trapi/client": "^2.0.6",
