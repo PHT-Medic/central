@@ -7,7 +7,7 @@
 
 import { Message } from 'amqp-extension';
 import {
-    HTTPClient, REGISTRY_ARTIFACT_TAG_LATEST,
+    HTTPClient, REGISTRY_ARTIFACT_TAG_BASE, REGISTRY_ARTIFACT_TAG_LATEST,
     TrainContainerFileName,
     TrainContainerPath,
     TrainManagerBuildPayload, TrainManagerQueuePayloadExtended,
@@ -64,7 +64,18 @@ export async function processMessage(message: Message) {
         tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
     });
 
-    const imageBuildOutput = await buildDockerImage(dockerFile, imageURL);
+    const authConfig = buildDockerAuthConfig({
+        host: data.registry.host,
+        user: data.registry.account_name,
+        password: data.registry.account_secret,
+    });
+
+    const imageBuildOutput = await buildDockerImage({
+        content: dockerFile,
+        imageName: imageURL,
+        authConfig,
+    });
+
     console.log(imageBuildOutput);
 
     // -----------------------------------------------------------------------------------
@@ -134,17 +145,11 @@ export async function processMessage(message: Message) {
         component: 'building',
     });
 
-    const authConfig = buildDockerAuthConfig({
-        host: data.registry.host,
-        user: data.registry.account_name,
-        password: data.registry.account_secret,
-    });
-
     const baseImageURL = buildRemoteDockerImageURL({
         hostname: data.registry.host,
         projectName: incomingProject.external_name,
         repositoryName: data.entity.id,
-        tagOrDigest: 'base',
+        tagOrDigest: REGISTRY_ARTIFACT_TAG_BASE,
     });
     await pushDockerImage(baseImageURL, authConfig);
 
@@ -157,7 +162,7 @@ export async function processMessage(message: Message) {
         hostname: data.registry.host,
         projectName: incomingProject.external_name,
         repositoryName: data.entity.id,
-        tagOrDigest: 'latest',
+        tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
     });
     await pushDockerImage(latestImageURL, authConfig);
 
