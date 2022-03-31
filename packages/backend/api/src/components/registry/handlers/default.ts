@@ -121,7 +121,7 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
             type: RegistryProjectType.MASTER_IMAGES,
             registry_id: entity.id,
             realm_id: entity.realm_id,
-            public: false,
+            public: true,
         });
     } else {
         masterImagesEntity = projectRepository.merge(masterImagesEntity, {

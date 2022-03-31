@@ -39,9 +39,15 @@ export async function buildDockerImage(
     });
 
     return new Promise<any>(((resolve, reject) => {
-        useDocker().modem.followProgress(stream, (error: Error, output: any) => {
+        useDocker().modem.followProgress(stream, (error: Error, output: Record<string, any>[]) => {
             if (error) {
                 reject(error);
+                return;
+            }
+
+            const raw = output.pop();
+            if (typeof raw?.errorDetail?.message === 'string') {
+                reject(new Error(raw.errorDetail.message));
                 return;
             }
 

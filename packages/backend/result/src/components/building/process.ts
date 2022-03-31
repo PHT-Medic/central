@@ -70,13 +70,11 @@ export async function processMessage(message: Message) {
         password: data.registry.account_secret,
     });
 
-    const imageBuildOutput = await buildDockerImage({
+    await buildDockerImage({
         content: dockerFile,
         imageName: imageURL,
         authConfig,
     });
-
-    console.log(imageBuildOutput);
 
     // -----------------------------------------------------------------------------------
 
