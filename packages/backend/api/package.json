@@ -39,7 +39,7 @@
         "mysql": "^2.18.1",
         "ora": "^5.4.1",
         "prom-client": "^14.0.1",
-        "redis-extension": "^1.0.0-4",
+        "redis-extension": "^1.0.0",
         "reflect-metadata": "^0.1.13",
         "swagger-ui-express": "^4.3.0",
         "tar": "^6.1.2",
