@@ -29,7 +29,7 @@
         "redis-extension": "^1.0.0-4",
         "reflect-metadata": "^0.1.13",
         "socket.io": "^4.4.0",
-        "winston": "^3.6.0"
+        "winston": "^3.7.1"
     },
     "devDependencies": {
         "@types/axios": "^0.14.0",
