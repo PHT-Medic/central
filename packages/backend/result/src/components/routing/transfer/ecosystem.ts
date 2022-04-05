@@ -9,30 +9,31 @@ import {
     Ecosystem,
     HTTPClient,
     REGISTRY_ARTIFACT_TAG_BASE,
-    RegistryProjectType,
+    RegistryProjectType, TrainManagerRoutingStep,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
-import { TransferItem } from './type';
+import { TransferEcosystemItem, TransferItem } from './type';
 import { pullDockerImage, useDocker } from '../../../modules/docker';
 import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../../config/services/registry';
 import { pushDockerImage } from '../../../modules/docker/image-push';
 import { useLogger } from '../../../modules/log';
+import { RoutingError } from '../error';
 
 export async function transferEcosystemOut(
     source: TransferItem,
-    destination: TransferItem,
+    destination: TransferEcosystemItem,
 ) {
     const sourceArtifactTag = source.artifactTag || 'latest';
 
     if (
         sourceArtifactTag === REGISTRY_ARTIFACT_TAG_BASE ||
-        destination.project.ecosystem === Ecosystem.DEFAULT
+        destination.ecosystem === Ecosystem.DEFAULT
     ) {
         // don't move base tag to external ... ^^
         return;
     }
 
-    useLogger().debug(`Move repository ${source.repositoryName} from ${source.project.name} project to ${destination.project.name} project of ${destination.project.ecosystem} ecosystem.`, {
+    useLogger().debug(`Move repository ${source.repositoryName} from ${source.project.name} project to ${destination.ecosystem} ecosystem.`, {
         component: 'routing',
     });
 
@@ -42,7 +43,7 @@ export async function transferEcosystemOut(
 
     const { data: externalProjects } = await client.registryProject.getMany({
         filter: {
-            registry_id: destination.project.registry_id,
+            ecosystem: destination.ecosystem,
             type: RegistryProjectType.AGGREGATOR,
         },
         page: {
@@ -51,8 +52,10 @@ export async function transferEcosystemOut(
     });
 
     if (externalProjects.length === 0) {
-        // todo: other ecosystem must have aggregator project to move to...
-        return;
+        throw RoutingError.registryProjectNotFound({
+            step: TrainManagerRoutingStep.ROUTE,
+            message: `No aggregator project for the external ecosystem ${destination.ecosystem} was found`,
+        });
     }
 
     const aggregatorProject = externalProjects[0];

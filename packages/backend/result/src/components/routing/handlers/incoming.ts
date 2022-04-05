@@ -60,7 +60,7 @@ export async function routeIncomingProject(context: RouteContextExtended) : Prom
                 artifactTag: context.payload.artifactTag,
             },
             {
-                project: nextStation.registry_project,
+                ecosystem: nextStation.ecosystem,
                 repositoryName: context.payload.repositoryName,
             },
         );

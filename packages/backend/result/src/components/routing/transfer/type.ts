@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Registry, RegistryProject } from '@personalhealthtrain/central-common';
+import { Ecosystem, Registry, RegistryProject } from '@personalhealthtrain/central-common';
 
 export type TransferItem = {
     project: RegistryProject,
@@ -13,9 +13,16 @@ export type TransferItem = {
     artifactTag?: string,
 };
 
+export type TransferEcosystemItem = {
+    ecosystem: Ecosystem,
+    repositoryName: string,
+    artifactTag?: string,
+};
+
 export type TransferContext = {
     source: TransferItem,
     sourceRegistry?: Registry,
-    destination: TransferItem,
+    destination?: TransferItem,
+    destinationEcosystem?: TransferEcosystemItem,
     destinationRegistry?: Registry
 };

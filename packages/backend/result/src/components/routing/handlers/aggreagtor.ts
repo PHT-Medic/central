@@ -104,7 +104,7 @@ export async function routeAggregatorProject(context: RouteContextExtended) : Pr
                     artifactTag: context.payload.artifactTag,
                 },
                 {
-                    project: context.project,
+                    ecosystem: next.ecosystem,
                     repositoryName: context.payload.repositoryName,
                 },
             );

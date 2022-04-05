@@ -70,7 +70,7 @@ export async function routeStationProject(context: RouteContextExtended) : Promi
                     artifactTag: context.payload.artifactTag,
                 },
                 {
-                    project: nextStation.registry_project,
+                    ecosystem: nextStation.ecosystem,
                     repositoryName: context.payload.repositoryName,
                 },
             );

@@ -6,16 +6,20 @@
  */
 
 import { Ecosystem } from '@personalhealthtrain/central-common';
-import { TransferContext } from './type';
+import { TransferContext, TransferItem } from './type';
 import { transferEcosystemOut } from './ecosystem';
 import { transferInternal } from './internal';
 import { transferInterRegistry } from './registry';
 
 export async function transfer(context: TransferContext) {
-    if (context.source.project.ecosystem === context.destination.project.ecosystem) {
+    if (
+        context.destination &&
+        context.source.project.ecosystem === context.destination.project.ecosystem
+    ) {
         if (context.source.project.registry_id === context.destination.project.registry_id) {
             await transferInternal({
                 ...context,
+                destination: context.destination as TransferItem,
                 registry: context.sourceRegistry || context.destinationRegistry,
             });
         } else {
@@ -30,6 +34,6 @@ export async function transfer(context: TransferContext) {
             return;
         }
 
-        await transferEcosystemOut(context.source, context.destination);
+        await transferEcosystemOut(context.source, context.destinationEcosystem);
     }
 }
