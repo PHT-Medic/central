@@ -28,7 +28,7 @@
         "@trapi/vault-client": "^0.0.1",
         "@typescript-error/http": "^1.1.4",
         "amqp-extension": "^1.0.2",
-        "body-parser": "^1.19.2",
+        "body-parser": "^1.20.0",
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
         "crypto": "^1.0.1",
