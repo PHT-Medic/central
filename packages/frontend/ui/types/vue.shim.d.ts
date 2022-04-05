@@ -11,7 +11,6 @@ import {Store} from "vuex";
 import {SocketModule} from "../config/socket";
 import AuthModule from "../config/auth";
 import {Ilingo} from "ilingo";
-import Vue from "vue";
 
 declare module '*.vue' {
     import Vue from 'vue';

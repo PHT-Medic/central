@@ -23,43 +23,43 @@ enum Operation {
     DELETE = 'trainStationDeleted',
 }
 
+type EmitRecord = {
+    namespace?: string,
+    roomNameFn: (id?: string) => string
+};
+
 function publish(
     operation: `${Operation}`,
     item: TrainStationEntity,
 ) {
-    useSocketEmitter()
-        .in(buildSocketTrainStationRoomName())
-        .emit(operation, {
-            data: item,
-            meta: {
-                roomName: buildSocketTrainStationRoomName(),
-            },
-        });
-
-    if (operation !== Operation.CREATE) {
-        useSocketEmitter()
-            .in(buildSocketTrainStationRoomName(item.id))
-            .emit(operation, {
-                data: item,
-                meta: {
-                    roomName: buildSocketTrainStationRoomName(item.id),
-                    roomId: item.id,
-                },
-            });
-    }
-
-    const workspaces = [
-        buildSocketRealmNamespaceName(item.station_realm_id),
-        buildSocketRealmNamespaceName(item.train_realm_id),
+    const items : EmitRecord[] = [
+        {
+            namespace: buildSocketRealmNamespaceName(item.station_realm_id),
+            roomNameFn: buildSocketTrainStationInRoomName,
+        },
+        {
+            namespace: buildSocketRealmNamespaceName(item.train_realm_id),
+            roomNameFn: buildSocketTrainStationOutRoomName,
+        },
+        {
+            roomNameFn: buildSocketTrainStationRoomName,
+        },
+        {
+            roomNameFn: buildSocketTrainStationInRoomName,
+        },
+        {
+            roomNameFn: buildSocketTrainStationOutRoomName,
+        },
     ];
 
-    for (let i = 0; i < workspaces.length; i++) {
-        const roomName = workspaces[i] === buildSocketRealmNamespaceName(item.station_realm_id) ?
-            buildSocketTrainStationInRoomName() :
-            buildSocketTrainStationOutRoomName();
+    for (let i = 0; i < items.length; i++) {
+        let emitter = useSocketEmitter();
+        if (items[i].namespace) {
+            emitter = emitter.of(items[i].namespace);
+        }
 
-        useSocketEmitter()
-            .of(workspaces[i])
+        let roomName = items[i].roomNameFn();
+        emitter
             .in(roomName)
             .emit(operation, {
                 data: item,
@@ -67,25 +67,17 @@ function publish(
                     roomName,
                 },
             });
-    }
 
-    if (operation !== Operation.CREATE) {
-        for (let i = 0; i < workspaces.length; i++) {
-            const roomName = workspaces[i] === buildSocketRealmNamespaceName(item.station_realm_id) ?
-                buildSocketTrainStationInRoomName(item.id) :
-                buildSocketTrainStationOutRoomName(item.id);
-
-            useSocketEmitter()
-                .of(workspaces[i])
-                .in(roomName)
-                .emit(operation, {
-                    data: item,
-                    meta: {
-                        roomName,
-                        roomId: item.id,
-                    },
-                });
-        }
+        roomName = items[i].roomNameFn(item.id);
+        emitter
+            .in(roomName)
+            .emit(operation, {
+                data: item,
+                meta: {
+                    roomName,
+                    roomId: item.id,
+                },
+            });
     }
 }
 

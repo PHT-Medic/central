@@ -23,7 +23,7 @@ export default {
         },
 
         docsUrl() {
-            return new URL('docs/', this.$config.apiUrl).href;
+            return new URL('docs', this.$config.apiUrl).href;
         },
         metricsUrl() {
             return new URL('metrics', this.$config.apiUrl).href;
@@ -54,7 +54,9 @@ export default {
                     >
                         <template slot-scope="props">
                             <i class="fa fa-clock pr-1" /> The session expires in
-                            <span class="text-success">{{ props.minutes }} minute(s), {{ props.seconds }} second(s)</span>.
+                            <span class="text-success">
+                                {{ props.minutes }} minute(s), {{ props.seconds }} second(s)
+                            </span>.
                         </template>
                     </countdown>
                 </small>

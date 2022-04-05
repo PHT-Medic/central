@@ -80,7 +80,7 @@ export class SetupCommand implements CommandModule {
                 spinner,
                 database: false,
                 databaseSeeder: false, // false, to trigger own subscribers
-                documentation: false, // todo: make true again if external dependencies can be used to generate swagger docs.
+                documentation: false,
                 keyPair: true,
             });
         }

@@ -9,7 +9,6 @@ import { HTTPClient } from '@personalhealthtrain/central-common';
 import { HTTPClient as AuthHTTPClient } from '@authelion/common';
 import AuthModule from '../config/auth';
 import {SocketModule} from "../config/socket";
-import {NavigationProvider} from "../config/layout";
 import {Adapter} from "browser-storage-adapter";
 
 declare module 'vuex/types/index' {
@@ -22,8 +21,6 @@ declare module 'vuex/types/index' {
 
         $auth: AuthModule,
 
-        $socket: SocketModule,
-
-        $layoutNavigationProvider: NavigationProvider
+        $socket: SocketModule
     }
 }
