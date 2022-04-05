@@ -7,8 +7,8 @@
 
 import {
     Ecosystem,
-    HTTPClient,
-    REGISTRY_ARTIFACT_TAG_BASE,
+    HTTPClient, REGISTRY_ARTIFACT_TAG_BASE,
+    Registry,
     RegistryProjectType, TrainManagerRoutingStep,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
@@ -60,16 +60,27 @@ export async function transferEcosystemOut(
 
     const aggregatorProject = externalProjects[0];
 
-    const aggregatorRegistry = await client.registry.getOne(aggregatorProject.registry_id, {
-        fields: ['+account_secret'],
-    });
+    // ------------------------------------------------------------------
+
+    let aggregatorRegistry : Registry;
+
+    try {
+        aggregatorRegistry = await client.registry.getOne(aggregatorProject.registry_id, {
+            fields: ['+account_secret'],
+        });
+    } catch (e) {
+        throw RoutingError.registryNotFound({
+            step: TrainManagerRoutingStep.ROUTE,
+            message: `No aggregator registry for the external ecosystem ${destination.ecosystem} was found`,
+        });
+    }
 
     // ------------------------------------------------------------------
 
     const externalImageURL = buildRemoteDockerImageURL({
         projectName: aggregatorProject.external_name,
         repositoryName: destination.repositoryName,
-        hostname: aggregatorProject.registry.host,
+        hostname: aggregatorRegistry.host,
     });
 
     // ------------------------------------------------------------------
