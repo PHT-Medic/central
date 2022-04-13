@@ -44,7 +44,7 @@
         "swagger-ui-express": "^4.3.0",
         "tar": "^6.1.2",
         "tar-stream": "^2.1.4",
-        "typeorm": "^0.2.45",
+        "typeorm": "^0.3.6",
         "typeorm-extension": "^1.2.2",
         "winston": "^3.7.2",
         "yargs": "^17.4.0",
