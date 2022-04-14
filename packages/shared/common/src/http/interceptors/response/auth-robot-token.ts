@@ -13,7 +13,7 @@ import { HTTPClient } from '../../client';
 let lastChecked : number | undefined;
 
 function canVerifyCredentials() {
-    return !lastChecked || (Date.now() - (30 * 1000)) > lastChecked;
+    return !lastChecked || (Date.now() - (5 * 1000)) > lastChecked;
 }
 
 export function createRefreshRobotTokenOnResponseErrorHandler(context: {
@@ -28,7 +28,8 @@ export function createRefreshRobotTokenOnResponseErrorHandler(context: {
                 err.response.status === 401 || // Unauthorized
                 err.response.status === 403 || // Forbidden
                 err.response.data?.code === ErrorCode.CREDENTIALS_INVALID ||
-                err.response.data?.code === ErrorCode.TOKEN_EXPIRED
+                err.response.data?.code === ErrorCode.TOKEN_EXPIRED ||
+                err.response.data?.code === ErrorCode.TOKEN_INVALID
             )
         ) {
             if (canVerifyCredentials()) {

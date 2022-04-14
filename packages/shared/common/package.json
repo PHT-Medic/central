@@ -15,7 +15,7 @@
     },
     "license": "MIT",
     "devDependencies": {
-        "@authelion/common": "^0.0.3",
+        "@authelion/common": "^0.0.4",
         "@trapi/client": "^2.0.6",
         "@trapi/query": "^2.1.2",
         "@typescript-error/core": "^1.1.3",
