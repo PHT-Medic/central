@@ -7,9 +7,9 @@
 
 import {
     PermissionID,
+    StationSocketClientToServerEventName,
     buildSocketStationRoomName,
-    extendSocketClientToServerEventCallback,
-    extendSocketClientToServerEventContext,
+    extendSocketClientToServerEventCallback, extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@typescript-error/http';
 import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
@@ -21,7 +21,7 @@ export function registerStationSocketHandlers(
 ) {
     if (!socket.data.user && !socket.data.robot) return;
 
-    socket.on('stationsSubscribe', async (context, cb) => {
+    socket.on(StationSocketClientToServerEventName.SUBSCRIBE, async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);
         cb = extendSocketClientToServerEventCallback(cb);
 
@@ -42,7 +42,7 @@ export function registerStationSocketHandlers(
         }
     });
 
-    socket.on('stationsUnsubscribe', (context) => {
+    socket.on(StationSocketClientToServerEventName.UNSUBSCRIBE, (context) => {
         context = extendSocketClientToServerEventContext(context);
 
         decrSocketRoomConnections(socket, buildSocketStationRoomName(context.data.id));

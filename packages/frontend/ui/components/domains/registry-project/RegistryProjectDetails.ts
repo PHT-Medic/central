@@ -7,7 +7,11 @@
 
 import Vue, { CreateElement, PropType, VNode } from 'vue';
 import {
-    RegistryCommand, RegistryProject, ServiceID,
+    RegistryCommand,
+    RegistryProject,
+    RegistryProjectSocketClientToServerEventName,
+    RegistryProjectSocketServerToClientEventName,
+    ServiceID,
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
@@ -96,8 +100,8 @@ export default Vue.extend<Data, any, any, Properties>({
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-        socket.emit('registryProjectsSubscribe', { data: { id: this.entityId } });
-        socket.on('registryProjectUpdated', this.handleSocketUpdated);
+        socket.emit(RegistryProjectSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.entityId } });
+        socket.on(RegistryProjectSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
     },
     beforeDestroy() {
         const socket : Socket<
@@ -105,8 +109,8 @@ export default Vue.extend<Data, any, any, Properties>({
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-        socket.emit('registryProjectsUnsubscribe', { data: { id: this.entityId } });
-        socket.off('registryProjectUpdated', this.handleSocketUpdated);
+        socket.emit(RegistryProjectSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.entityId } });
+        socket.off(RegistryProjectSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
     },
     methods: {
         async resolve() {

@@ -7,8 +7,10 @@
 
 import {
     PermissionID,
+    TrainFileSocketClientToServerEventName,
     buildSocketTrainFileRoomName,
-    extendSocketClientToServerEventCallback, extendSocketClientToServerEventContext,
+    extendSocketClientToServerEventCallback,
+    extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@typescript-error/http';
 import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
@@ -20,7 +22,7 @@ export function registerTrainFileSocketHandlers(
 ) {
     if (!socket.data.user && !socket.data.robot) return;
 
-    socket.on('trainFilesSubscribe', async (context, cb) => {
+    socket.on(TrainFileSocketClientToServerEventName.SUBSCRIBE, async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);
         cb = extendSocketClientToServerEventCallback(cb);
 
@@ -41,7 +43,7 @@ export function registerTrainFileSocketHandlers(
         }
     });
 
-    socket.on('trainFilesUnsubscribe', (context) => {
+    socket.on(TrainFileSocketClientToServerEventName.UNSUBSCRIBE, (context) => {
         context = extendSocketClientToServerEventContext(context);
 
         decrSocketRoomConnections(socket, buildSocketTrainFileRoomName(context.data.id));

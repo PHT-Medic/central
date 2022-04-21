@@ -7,13 +7,16 @@
 
 import {
     ProposalStation,
+    ProposalStationSocketClientToServerEventName,
+    ProposalStationSocketServerToClientEventName,
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
     Station,
     Train,
     buildSocketProposalStationInRoomName,
-    buildSocketProposalStationOutRoomName, buildSocketProposalStationRoomName, mergeDeep,
+    buildSocketProposalStationOutRoomName,
+    buildSocketProposalStationRoomName, mergeDeep,
 } from '@personalhealthtrain/central-common';
 
 import Vue, { CreateElement, PropType, VNode } from 'vue';
@@ -156,18 +159,18 @@ ComponentListProperties<ProposalStation> & {
         if (this.socketRealmId) {
             switch (this.direction) {
                 case Direction.IN:
-                    socket.emit('proposalStationsInSubscribe');
+                    socket.emit(ProposalStationSocketClientToServerEventName.IN_SUBSCRIBE);
                     break;
                 case Direction.OUT:
-                    socket.emit('proposalStationsOutSubscribe');
+                    socket.emit(ProposalStationSocketClientToServerEventName.OUT_SUBSCRIBE);
                     break;
             }
         } else {
-            socket.emit('proposalStationsSubscribe');
+            socket.emit(ProposalStationSocketClientToServerEventName.SUBSCRIBE);
         }
 
-        socket.on('proposalStationCreated', this.handleSocketCreated);
-        socket.on('proposalStationDeleted', this.handleSocketDeleted);
+        socket.on(ProposalStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
+        socket.on(ProposalStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     beforeDestroy() {
         const socket : Socket<
@@ -178,18 +181,18 @@ ComponentListProperties<ProposalStation> & {
         if (this.socketRealmId) {
             switch (this.direction) {
                 case Direction.IN:
-                    socket.emit('proposalStationsInSubscribe');
+                    socket.emit(ProposalStationSocketClientToServerEventName.IN_UNSUBSCRIBE);
                     break;
                 case Direction.OUT:
-                    socket.emit('proposalStationsOutSubscribe');
+                    socket.emit(ProposalStationSocketClientToServerEventName.OUT_UNSUBSCRIBE);
                     break;
             }
         } else {
-            socket.emit('proposalStationsSubscribe');
+            socket.emit(ProposalStationSocketClientToServerEventName.UNSUBSCRIBE);
         }
 
-        socket.off('proposalStationCreated', this.handleSocketCreated);
-        socket.off('proposalStationDeleted', this.handleSocketDeleted);
+        socket.off(ProposalStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
+        socket.off(ProposalStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     methods: {
         isSameSocketRoom(room) {

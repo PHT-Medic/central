@@ -7,9 +7,9 @@
 
 import {
     PermissionID,
+    ProposalSocketClientToServerEventName,
     buildSocketProposalRoomName,
-    extendSocketClientToServerEventCallback,
-    extendSocketClientToServerEventContext,
+    extendSocketClientToServerEventCallback, extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@typescript-error/http';
 import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
@@ -21,7 +21,7 @@ export function registerProposalSocketHandlers(
 ) {
     if (!socket.data.user && !socket.data.robot) return;
 
-    socket.on('proposalsSubscribe', async (context, cb) => {
+    socket.on(ProposalSocketClientToServerEventName.SUBSCRIBE, async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);
         cb = extendSocketClientToServerEventCallback(cb);
 
@@ -43,7 +43,7 @@ export function registerProposalSocketHandlers(
         }
     });
 
-    socket.on('proposalsUnsubscribe', (context) => {
+    socket.on(ProposalSocketClientToServerEventName.UNSUBSCRIBE, (context) => {
         context = extendSocketClientToServerEventContext(context);
 
         decrSocketRoomConnections(socket, buildSocketProposalRoomName(context.data.id));

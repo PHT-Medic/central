@@ -7,10 +7,12 @@
 
 import {
     PermissionID,
+    TrainStationSocketClientToServerEventName,
     buildSocketTrainStationInRoomName,
     buildSocketTrainStationOutRoomName,
     buildSocketTrainStationRoomName,
-    extendSocketClientToServerEventCallback, extendSocketClientToServerEventContext,
+    extendSocketClientToServerEventCallback,
+    extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@typescript-error/http';
 import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
@@ -24,7 +26,7 @@ export function registerTrainStationSocketHandlers(
 
     // ------------------------------------------------------------
 
-    socket.on('trainStationsSubscribe', async (context, cb) => {
+    socket.on(TrainStationSocketClientToServerEventName.SUBSCRIBE, async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);
         cb = extendSocketClientToServerEventCallback(cb);
 
@@ -45,7 +47,7 @@ export function registerTrainStationSocketHandlers(
         }
     });
 
-    socket.on('trainStationsUnsubscribe', (context) => {
+    socket.on(TrainStationSocketClientToServerEventName.UNSUBSCRIBE, (context) => {
         context = extendSocketClientToServerEventContext(context);
 
         decrSocketRoomConnections(socket, buildSocketTrainStationRoomName(context.data.id));
@@ -60,7 +62,7 @@ export function registerTrainStationForRealmSocketHandlers(
 
     // ------------------------------------------------------------
 
-    socket.on('trainStationsInSubscribe', async (context, cb) => {
+    socket.on(TrainStationSocketClientToServerEventName.IN_SUBSCRIBE, async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);
         cb = extendSocketClientToServerEventCallback(cb);
 
@@ -81,7 +83,7 @@ export function registerTrainStationForRealmSocketHandlers(
         }
     });
 
-    socket.on('trainStationsInUnsubscribe', (context) => {
+    socket.on(TrainStationSocketClientToServerEventName.IN_UNSUBSCRIBE, (context) => {
         context = extendSocketClientToServerEventContext(context);
 
         decrSocketRoomConnections(socket, buildSocketTrainStationInRoomName(context.data.id));
@@ -89,7 +91,7 @@ export function registerTrainStationForRealmSocketHandlers(
 
     // ----------------------------------------------------------
 
-    socket.on('trainStationsOutSubscribe', async (context, cb) => {
+    socket.on(TrainStationSocketClientToServerEventName.OUT_SUBSCRIBE, async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);
         cb = extendSocketClientToServerEventCallback(cb);
 
@@ -110,7 +112,7 @@ export function registerTrainStationForRealmSocketHandlers(
         }
     });
 
-    socket.on('trainStationsOutUnsubscribe', (context) => {
+    socket.on(TrainStationSocketClientToServerEventName.OUT_UNSUBSCRIBE, (context) => {
         context = extendSocketClientToServerEventContext(context);
 
         decrSocketRoomConnections(socket, buildSocketTrainStationOutRoomName(context.data.id));

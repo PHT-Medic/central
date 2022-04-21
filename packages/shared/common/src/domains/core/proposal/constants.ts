@@ -10,3 +10,14 @@ export enum ProposalRisk {
     MID = 'mid',
     HIGH = 'high',
 }
+
+export enum ProposalSocketServerToClientEventName {
+    CREATED = 'proposalCreated',
+    UPDATED = 'proposalUpdated',
+    DELETED = 'proposalDeleted',
+}
+
+export enum ProposalSocketClientToServerEventName {
+    SUBSCRIBE = 'proposalSubscribe',
+    UNSUBSCRIBE = 'proposalUnsubscribe',
+}

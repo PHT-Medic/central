@@ -4,22 +4,28 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
 import {
-    buildSocketTrainFileRoomName,
-    hasOwnProperty,
+    SocketClientToServerEvents,
+    SocketServerToClientEvents,
+    Train,
+    TrainFileSocketClientToServerEventName,
+    TrainFileSocketServerToClientEventName,
+    buildSocketTrainFileRoomName, hasOwnProperty,
 } from '@personalhealthtrain/central-common';
 import { required } from 'vuelidate/lib/validators';
-import Vue from 'vue';
-import TrainFile from './TrainFile';
-import TrainFormFile from './TrainFormFile';
+import Vue, { PropType } from 'vue';
+import { Socket } from 'socket.io-client';
+import { MASTER_REALM_ID } from '@authelion/common';
+import TrainFile from './TrainFile.vue';
+import TrainFormFile from './TrainFormFile.vue';
 import TrainImageCommand from '../train/TrainImageCommand';
 
 export default {
     components: { TrainImageCommand, TrainFormFile, TrainFile },
     props: {
         train: {
-            type: Object,
+            type: Object as PropType<Train>,
             default: undefined,
         },
     },
@@ -68,6 +74,26 @@ export default {
 
             return `${this.items[index].directory}/${this.items[index].name}`;
         },
+
+        userRealmId() {
+            return this.$store.getters['auth/userRealmId'];
+        },
+        socketRealmId() {
+            if (this.realmId) {
+                return this.realmId;
+            }
+
+            if (this.userRealmId === MASTER_REALM_ID) {
+                return undefined;
+            }
+
+            if (this.train.realm_id) {
+                return this.train.realm_id;
+            }
+
+            return this.userRealmId;
+        },
+
         updatedAt() {
             return this.train?.updated_at ? this.train.updated_at : undefined;
         },
@@ -86,16 +112,22 @@ export default {
             .then(this.load);
     },
     mounted() {
-        const socket = this.$socket.useRealmWorkspace(this.query?.filter?.realm_id ?? this.query?.filters?.realm_id);
-        socket.emit('trainFilesSubscribe');
+        const socket : Socket<
+        SocketServerToClientEvents,
+        SocketClientToServerEvents
+        > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-        socket.on('trainFileCreated', this.handleSocketCreated);
+        socket.emit(TrainFileSocketClientToServerEventName.SUBSCRIBE);
+        socket.on(TrainFileSocketServerToClientEventName.CREATED, this.handleSocketCreated);
     },
     beforeDestroy() {
-        const socket = this.$socket.useRealmWorkspace(this.query?.filter?.realm_id ?? this.query?.filters?.realm_id);
-        socket.emit('trainFilesSubscribe');
+        const socket : Socket<
+        SocketServerToClientEvents,
+        SocketClientToServerEvents
+        > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-        socket.off('trainFileCreated', this.handleSocketCreated);
+        socket.emit(TrainFileSocketClientToServerEventName.UNSUBSCRIBE);
+        socket.off(TrainFileSocketServerToClientEventName.CREATED, this.handleSocketCreated);
     },
     methods: {
         initFromProperties() {

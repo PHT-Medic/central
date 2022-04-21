@@ -15,9 +15,19 @@ export enum ProposalStationApprovalStatus {
     APPROVED = 'approved',
 }
 
-export type ProposalStationApprovalStatusType = `${ProposalStationApprovalStatus}`;
+export enum ProposalStationSocketServerToClientEventName {
+    CREATED = 'proposalStationCreated',
+    UPDATED = 'proposalStationUpdated',
+    DELETED = 'proposalStationDeleted',
+}
 
-const ProposalStationApprovalStatusValues = Object.values(ProposalStationApprovalStatus);
-export function isProposalStationApprovalStatus(type: any) : type is ProposalStationApprovalStatusType {
-    return ProposalStationApprovalStatusValues.indexOf(type) !== -1;
+export enum ProposalStationSocketClientToServerEventName {
+    SUBSCRIBE = 'proposalStationSubscribe',
+    UNSUBSCRIBE = 'proposalStationUnsubscribe',
+
+    IN_SUBSCRIBE = 'proposalStationInSubscribe',
+    IN_UNSUBSCRIBE = 'proposalStationInUnsubscribe',
+
+    OUT_SUBSCRIBE = 'proposalStationOutSubscribe',
+    OUT_UNSUBSCRIBE = 'proposalStationOutUnsubscribe',
 }

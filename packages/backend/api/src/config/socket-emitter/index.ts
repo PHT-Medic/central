@@ -5,18 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useClient } from 'redis-extension';
-import { Emitter } from '@socket.io/redis-emitter';
-import { SocketServerToClientEvents } from '@personalhealthtrain/central-common';
-
-let instance : undefined | Emitter<SocketServerToClientEvents>;
-
-export function useSocketEmitter() : Emitter<SocketServerToClientEvents> {
-    if (typeof instance !== 'undefined') {
-        return instance;
-    }
-
-    instance = new Emitter<SocketServerToClientEvents>(useClient('default'));
-
-    return instance;
-}
+export * from './emit';
+export * from './singleton';
+export * from './type';

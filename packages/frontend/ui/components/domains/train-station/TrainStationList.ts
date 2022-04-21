@@ -12,8 +12,11 @@ import {
     Station,
     Train,
     TrainStation,
+    TrainStationSocketClientToServerEventName,
+    TrainStationSocketServerToClientEventName,
     buildSocketTrainStationInRoomName,
-    buildSocketTrainStationOutRoomName, buildSocketTrainStationRoomName, mergeDeep,
+    buildSocketTrainStationOutRoomName,
+    buildSocketTrainStationRoomName, mergeDeep,
 } from '@personalhealthtrain/central-common';
 
 import Vue, { CreateElement, PropType, VNode } from 'vue';
@@ -161,19 +164,19 @@ ComponentListProperties<TrainStation> & {
         if (this.socketRealmId) {
             switch (this.direction) {
                 case Direction.IN:
-                    socket.emit('trainStationsInSubscribe');
+                    socket.emit(TrainStationSocketClientToServerEventName.IN_SUBSCRIBE);
                     break;
                 case Direction.OUT:
-                    socket.emit('trainStationsOutSubscribe');
+                    socket.emit(TrainStationSocketClientToServerEventName.OUT_SUBSCRIBE);
                     break;
             }
         } else {
-            socket.emit('trainStationsSubscribe');
+            socket.emit(TrainStationSocketClientToServerEventName.SUBSCRIBE);
         }
 
-        socket.on('trainStationCreated', this.handleSocketCreated);
-        socket.on('trainStationUpdated', this.handleSocketUpdated);
-        socket.on('trainStationDeleted', this.handleSocketDeleted);
+        socket.on(TrainStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
+        socket.on(TrainStationSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
+        socket.on(TrainStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     beforeDestroy() {
         const socket : Socket<
@@ -184,19 +187,19 @@ ComponentListProperties<TrainStation> & {
         if (this.socketRealmId) {
             switch (this.direction) {
                 case Direction.IN:
-                    socket.emit('trainStationsInUnsubscribe');
+                    socket.emit(TrainStationSocketClientToServerEventName.IN_UNSUBSCRIBE);
                     break;
                 case Direction.OUT:
-                    socket.emit('trainStationsOutUnsubscribe');
+                    socket.emit(TrainStationSocketClientToServerEventName.OUT_UNSUBSCRIBE);
                     break;
             }
         } else {
-            socket.emit('trainStationsUnsubscribe');
+            socket.emit(TrainStationSocketClientToServerEventName.UNSUBSCRIBE);
         }
 
-        socket.off('trainStationCreated', this.handleSocketCreated);
-        socket.off('trainStationUpdated', this.handleSocketUpdated);
-        socket.off('trainStationDeleted', this.handleSocketDeleted);
+        socket.off(TrainStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
+        socket.off(TrainStationSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
+        socket.off(TrainStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     methods: {
         isSameSocketRoom(room) {

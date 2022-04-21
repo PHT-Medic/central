@@ -94,3 +94,16 @@ export enum TrainContainerPath {
     CONFIG = '/opt/train_config.json',
     RESULTS = '/opt/pht_results',
 }
+
+// -------------------------------------------------------------------------
+
+export enum TrainSocketServerToClientEventName {
+    CREATED = 'trainCreated',
+    UPDATED = 'trainUpdated',
+    DELETED = 'trainDeleted',
+}
+
+export enum TrainSocketClientToServerEventName {
+    SUBSCRIBE = 'trainSubscribe',
+    UNSUBSCRIBE = 'trainUnsubscribe',
+}

@@ -10,7 +10,7 @@ import {
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
-    Train,
+    Train, TrainSocketClientToServerEventName, TrainSocketServerToClientEventName,
 } from '@personalhealthtrain/central-common';
 import TrainPipeline from './TrainPipeline.vue';
 import TrainStationsProgress from '../train-station/TrainStationsProgress.vue';
@@ -56,10 +56,9 @@ export const TrainListItem = Vue.extend({
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.entity.realm_id);
 
-        socket.emit('trainsSubscribe', { data: { id: this.entity.id } });
-
-        socket.on('trainUpdated', this.handleSocketUpdated);
-        socket.on('trainDeleted', this.handleSocketDeleted);
+        socket.emit(TrainSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.entity.id } });
+        socket.on(TrainSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
+        socket.on(TrainSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     beforeDestroy() {
         const socket : Socket<
@@ -67,9 +66,9 @@ export const TrainListItem = Vue.extend({
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.entity.realm_id);
 
-        socket.emit('trainsUnsubscribe', { data: { id: this.item.id } });
-        socket.off('trainUpdated', this.handleSocketUpdated);
-        socket.off('trainDeleted', this.handleSocketDeleted);
+        socket.emit(TrainSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.item.id } });
+        socket.off(TrainSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
+        socket.off(TrainSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     methods: {
         handleSocketUpdated(context: SocketServerToClientEventContext<Train>) {

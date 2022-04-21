@@ -9,8 +9,8 @@ import {
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
     Train,
-    buildSocketTrainRoomName,
-    mergeDeep,
+    TrainSocketClientToServerEventName,
+    TrainSocketServerToClientEventName, buildSocketTrainRoomName, mergeDeep,
 } from '@personalhealthtrain/central-common';
 import Vue, { CreateElement, PropType, VNode } from 'vue';
 import {
@@ -145,8 +145,8 @@ ComponentListProperties<Train>
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-        socket.emit('trainsSubscribe');
-        socket.on('trainCreated', this.handleSocketCreated);
+        socket.emit(TrainSocketClientToServerEventName.SUBSCRIBE);
+        socket.on(TrainSocketServerToClientEventName.CREATED, this.handleSocketCreated);
     },
     beforeDestroy() {
         const socket : Socket<
@@ -154,8 +154,8 @@ ComponentListProperties<Train>
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-        socket.emit('trainsUnsubscribe');
-        socket.off('trainCreated', this.handleSocketCreated);
+        socket.emit(TrainSocketClientToServerEventName.UNSUBSCRIBE);
+        socket.off(TrainSocketServerToClientEventName.CREATED, this.handleSocketCreated);
     },
     methods: {
         handleSocketCreated(context: SocketServerToClientEventContext<Train>) {

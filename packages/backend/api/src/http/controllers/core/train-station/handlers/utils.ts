@@ -6,7 +6,7 @@
  */
 
 import { check, validationResult } from 'express-validator';
-import { isTrainStationApprovalStatus } from '@personalhealthtrain/central-common';
+import { TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { getRepository } from 'typeorm';
 import { BadRequestError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
@@ -17,8 +17,6 @@ import {
     matchedValidationData,
 } from '../../../../express-validation';
 import { TrainStationValidationResult } from '../type';
-import { StationEntity } from '../../../../../domains/core/station/entity';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { extendExpressValidationResultWithStation } from '../../station/utils/extend';
 import { extendExpressValidationResultWithTrain } from '../../train/utils/extend';
@@ -52,7 +50,7 @@ export async function runTrainStationValidation(
     if (operation === 'update') {
         await check('approval_status')
             .optional({ nullable: true })
-            .custom((value) => isTrainStationApprovalStatus(value))
+            .isIn(Object.values(TrainStationApprovalStatus))
             .run(req);
 
         await check('comment')

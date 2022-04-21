@@ -9,6 +9,8 @@ import Vue, { CreateElement, VNode } from 'vue';
 import { ComponentListItemData } from '@vue-layout/utils';
 import {
     ProposalStation,
+    ProposalStationSocketClientToServerEventName,
+    ProposalStationSocketServerToClientEventName,
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
@@ -57,18 +59,18 @@ ProposalStationAssignActionProperties>({
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.realmId);
 
-        socket.emit('proposalStationsOutUnsubscribe');
-        socket.off('proposalStationCreated', this.handleSocketCreated);
-        socket.off('proposalStationDeleted', this.handleSocketDeleted);
+        socket.emit(ProposalStationSocketClientToServerEventName.OUT_UNSUBSCRIBE);
+        socket.off(ProposalStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
+        socket.off(ProposalStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     mounted() {
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.realmId);
-        socket.emit('proposalStationsOutSubscribe');
-        socket.on('proposalStationCreated', this.handleSocketCreated);
-        socket.on('proposalStationDeleted', this.handleSocketDeleted);
+        socket.emit(ProposalStationSocketClientToServerEventName.OUT_SUBSCRIBE);
+        socket.on(ProposalStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
+        socket.on(ProposalStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     methods: {
         async init() {

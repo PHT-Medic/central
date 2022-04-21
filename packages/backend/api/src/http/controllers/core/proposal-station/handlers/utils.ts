@@ -6,7 +6,7 @@
  */
 
 import { check, validationResult } from 'express-validator';
-import { isProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
+import { ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { ExpressRequest } from '../../../../type';
@@ -39,7 +39,7 @@ export async function runProposalStationValidation(
     if (operation === 'update') {
         await check('approval_status')
             .optional()
-            .custom((command) => isProposalStationApprovalStatus(command))
+            .isIn(Object.values(ProposalStationApprovalStatus))
             .run(req);
 
         await check('comment')

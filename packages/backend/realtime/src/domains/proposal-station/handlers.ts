@@ -7,10 +7,12 @@
 
 import {
     PermissionID,
+    ProposalStationSocketClientToServerEventName,
     buildSocketProposalStationInRoomName,
     buildSocketProposalStationOutRoomName,
     buildSocketProposalStationRoomName,
-    extendSocketClientToServerEventCallback, extendSocketClientToServerEventContext,
+    extendSocketClientToServerEventCallback,
+    extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@typescript-error/http';
 import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
@@ -24,7 +26,7 @@ export function registerProposalStationSocketHandlers(
 
     // ------------------------------------------------------------
 
-    socket.on('proposalStationsSubscribe', async (context, cb) => {
+    socket.on(ProposalStationSocketClientToServerEventName.SUBSCRIBE, async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);
         cb = extendSocketClientToServerEventCallback(cb);
 
@@ -45,7 +47,7 @@ export function registerProposalStationSocketHandlers(
         }
     });
 
-    socket.on('proposalStationsUnsubscribe', (context) => {
+    socket.on(ProposalStationSocketClientToServerEventName.UNSUBSCRIBE, (context) => {
         context = extendSocketClientToServerEventContext(context);
 
         decrSocketRoomConnections(socket, buildSocketProposalStationRoomName(context.data.id));
@@ -60,7 +62,7 @@ export function registerProposalStationForRealmSocketHandlers(
 
     // ------------------------------------------------------------
 
-    socket.on('proposalStationsInSubscribe', async (context, cb) => {
+    socket.on(ProposalStationSocketClientToServerEventName.IN_SUBSCRIBE, async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);
         cb = extendSocketClientToServerEventCallback(cb);
 
@@ -81,7 +83,7 @@ export function registerProposalStationForRealmSocketHandlers(
         }
     });
 
-    socket.on('proposalStationsInUnsubscribe', (context) => {
+    socket.on(ProposalStationSocketClientToServerEventName.IN_UNSUBSCRIBE, (context) => {
         context = extendSocketClientToServerEventContext(context);
 
         decrSocketRoomConnections(socket, buildSocketProposalStationInRoomName(context.data.id));
@@ -89,7 +91,7 @@ export function registerProposalStationForRealmSocketHandlers(
 
     // ------------------------------------------------------------
 
-    socket.on('proposalStationsOutSubscribe', async (context, cb) => {
+    socket.on(ProposalStationSocketClientToServerEventName.OUT_SUBSCRIBE, async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);
         cb = extendSocketClientToServerEventCallback(cb);
 
@@ -110,7 +112,7 @@ export function registerProposalStationForRealmSocketHandlers(
         }
     });
 
-    socket.on('proposalStationsOutUnsubscribe', (context) => {
+    socket.on(ProposalStationSocketClientToServerEventName.OUT_UNSUBSCRIBE, (context) => {
         context = extendSocketClientToServerEventContext(context);
 
         decrSocketRoomConnections(socket, buildSocketProposalStationOutRoomName(context.data.id));

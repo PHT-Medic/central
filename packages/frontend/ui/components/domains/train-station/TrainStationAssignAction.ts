@@ -11,7 +11,10 @@ import {
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
-    TrainStation, buildSocketTrainStationInRoomName, buildSocketTrainStationOutRoomName,
+    TrainStation,
+    TrainStationSocketClientToServerEventName,
+    TrainStationSocketServerToClientEventName,
+    buildSocketTrainStationInRoomName, buildSocketTrainStationOutRoomName,
 } from '@personalhealthtrain/central-common';
 import { Socket } from 'socket.io-client';
 
@@ -55,18 +58,19 @@ TrainStationAssignActionProperties>({
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.realmId);
 
-        socket.emit('trainStationsOutUnsubscribe');
-        socket.off('trainStationCreated', this.handleSocketCreated);
-        socket.off('trainStationDeleted', this.handleSocketDeleted);
+        socket.emit(TrainStationSocketClientToServerEventName.OUT_UNSUBSCRIBE);
+        socket.off(TrainStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
+        socket.off(TrainStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     mounted() {
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.realmId);
-        socket.emit('trainStationsOutSubscribe');
-        socket.on('trainStationCreated', this.handleSocketCreated);
-        socket.on('trainStationDeleted', this.handleSocketDeleted);
+
+        socket.emit(TrainStationSocketClientToServerEventName.OUT_SUBSCRIBE);
+        socket.on(TrainStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
+        socket.on(TrainStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     methods: {
         async init() {

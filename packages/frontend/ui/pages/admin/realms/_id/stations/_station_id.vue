@@ -11,7 +11,7 @@ import { Socket } from 'socket.io-client';
 import {
     SocketClientToServerEvents,
     SocketServerToClientEventContext, SocketServerToClientEvents,
-    Station,
+    Station, StationSocketClientToServerEventName, StationSocketServerToClientEventName,
 } from '@personalhealthtrain/central-common';
 import { ComponentListHandlerMethodOptions } from '@vue-layout/utils';
 import { StationForm } from '../../../../../components/domains/station/StationForm';
@@ -72,8 +72,8 @@ export default Vue.extend<any, any, any, any>({
         > = this.$socket.useRealmWorkspace(this.entity.id);
 
         if (this.childEntity) {
-            socket.emit('stationsSubscribe', { data: { id: this.childEntity.id } });
-            socket.on('stationUpdated', this.handleSocketUpdated);
+            socket.emit(StationSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.childEntity.id } });
+            socket.on(StationSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
         }
     },
     beforeDestroy() {
@@ -83,8 +83,8 @@ export default Vue.extend<any, any, any, any>({
         > = this.$socket.useRealmWorkspace(this.entity.id);
 
         if (this.childEntity) {
-            socket.emit('stationsUnsubscribe', { data: { id: this.childEntity.id } });
-            socket.off('stationUpdated', this.handleSocketUpdated);
+            socket.emit(StationSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.childEntity.id } });
+            socket.off(StationSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
         }
     },
     methods: {

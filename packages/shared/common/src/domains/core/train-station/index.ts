@@ -8,4 +8,4 @@
 export * from './api';
 export * from './entity';
 export * from './socket';
-export * from './constatnts';
+export * from './constants';

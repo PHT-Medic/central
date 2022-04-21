@@ -13,3 +13,14 @@ export enum RegistryProjectType {
     MASTER_IMAGES = 'masterImages',
     STATION = 'station',
 }
+
+export enum RegistryProjectSocketServerToClientEventName {
+    CREATED = 'registryProjectCreated',
+    UPDATED = 'registryProjectUpdated',
+    DELETED = 'registryProjectDeleted',
+}
+
+export enum RegistryProjectSocketClientToServerEventName {
+    SUBSCRIBE = 'registryProjectSubscribe',
+    UNSUBSCRIBE = 'registryProjectUnsubscribe',
+}

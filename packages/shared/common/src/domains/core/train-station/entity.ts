@@ -8,7 +8,7 @@
 import { Realm } from '@authelion/common';
 import { Station } from '../station';
 import { Train } from '../train';
-import { TrainStationApprovalStatus, TrainStationRunStatus } from './constatnts';
+import { TrainStationApprovalStatus, TrainStationRunStatus } from './constants';
 
 export interface TrainStation {
     id: string;

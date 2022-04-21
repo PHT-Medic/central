@@ -7,7 +7,7 @@
 import Vue, { CreateElement, PropType, VNode } from 'vue';
 import {
     PermissionID,
-    Proposal,
+    Proposal, ProposalSocketClientToServerEventName, ProposalSocketServerToClientEventName,
     SocketClientToServerEvents,
     SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
@@ -44,10 +44,10 @@ export const ProposalItem = Vue.extend({
         SocketServerToClientEvents,
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.entity.realm_id);
-        socket.emit('proposalsSubscribe', { data: { id: this.entity.id } });
+        socket.emit(ProposalSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.entity.id } });
 
-        socket.on('proposalUpdated', this.handleSocketUpdated);
-        socket.on('proposalDeleted', this.handleSocketDeleted);
+        socket.on(ProposalSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
+        socket.on(ProposalSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     beforeDestroy() {
         const socket : Socket<
@@ -55,9 +55,9 @@ export const ProposalItem = Vue.extend({
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.entity.realm_id);
 
-        socket.emit('proposalsUnsubscribe', { data: { id: this.entity.id } });
-        socket.off('proposalUpdated', this.handleSocketUpdated);
-        socket.off('proposalDeleted', this.handleSocketDeleted);
+        socket.emit(ProposalSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.entity.id } });
+        socket.off(ProposalSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
+        socket.off(ProposalSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     methods: {
         handleSocketUpdated(context) {

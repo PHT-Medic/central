@@ -6,11 +6,11 @@
  */
 import {
     Proposal,
+    ProposalSocketClientToServerEventName,
+    ProposalSocketServerToClientEventName,
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
-    SocketServerToClientEvents,
-    buildSocketProposalRoomName,
-    mergeDeep,
+    SocketServerToClientEvents, buildSocketProposalRoomName, mergeDeep,
 } from '@personalhealthtrain/central-common';
 import Vue, { CreateElement, PropType, VNode } from 'vue';
 import {
@@ -118,8 +118,8 @@ ComponentListProperties<Proposal> & {
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-        socket.emit('proposalsSubscribe');
-        socket.on('proposalCreated', this.handleSocketCreated);
+        socket.emit(ProposalSocketClientToServerEventName.SUBSCRIBE);
+        socket.on(ProposalSocketServerToClientEventName.CREATED, this.handleSocketCreated);
     },
     beforeDestroy() {
         const socket : Socket<
@@ -127,8 +127,8 @@ ComponentListProperties<Proposal> & {
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.socketRealmId);
 
-        socket.emit('proposalsUnsubscribe');
-        socket.off('proposalCreated', this.handleSocketCreated);
+        socket.emit(ProposalSocketClientToServerEventName.UNSUBSCRIBE);
+        socket.off(ProposalSocketServerToClientEventName.CREATED, this.handleSocketCreated);
     },
     methods: {
         handleSocketCreated(context: SocketServerToClientEventContext<Proposal>) {

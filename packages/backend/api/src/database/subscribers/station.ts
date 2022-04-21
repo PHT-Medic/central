@@ -8,71 +8,34 @@
 import {
     EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
-import { buildSocketRealmNamespaceName, buildSocketStationRoomName } from '@personalhealthtrain/central-common';
-import { useSocketEmitter } from '../../config/socket-emitter';
+import {
+    StationSocketServerToClientEventName,
+    buildSocketRealmNamespaceName,
+    buildSocketStationRoomName,
+} from '@personalhealthtrain/central-common';
+import {
+    SocketServerToClientEventConfigurationItem,
+    emitSocketServerToClientEvent,
+} from '../../config/socket-emitter';
 import { StationEntity } from '../../domains/core/station/entity';
 
-enum Operation {
-    CREATE = 'stationCreated',
-    UPDATE = 'stationUpdated',
-    DELETE = 'stationDeleted',
-}
-
 function publish(
-    operation: `${Operation}`,
+    operation: `${StationSocketServerToClientEventName}`,
     item: StationEntity,
 ) {
-    useSocketEmitter()
-        .in(buildSocketStationRoomName())
-        .emit(operation, {
-            data: item,
-            meta: {
-                roomName: buildSocketStationRoomName(),
+    emitSocketServerToClientEvent({
+        configuration: [
+            {
+                roomNameFn: buildSocketStationRoomName,
+                namespace: buildSocketRealmNamespaceName(item.realm_id),
             },
-        });
-
-    if (operation !== Operation.CREATE) {
-        useSocketEmitter()
-            .in(buildSocketStationRoomName(item.id))
-            .emit(operation, {
-                data: item,
-                meta: {
-                    roomName: buildSocketStationRoomName(item.id),
-                    roomId: item.id,
-                },
-            });
-    }
-
-    const workspaces = [
-        buildSocketRealmNamespaceName(item.realm_id),
-    ];
-
-    for (let i = 0; i < workspaces.length; i++) {
-        useSocketEmitter()
-            .of(workspaces[i])
-            .in(buildSocketStationRoomName())
-            .emit(operation, {
-                data: item,
-                meta: {
-                    roomName: buildSocketStationRoomName(),
-                },
-            });
-    }
-
-    if (operation !== Operation.CREATE) {
-        for (let i = 0; i < workspaces.length; i++) {
-            useSocketEmitter()
-                .of(workspaces[i])
-                .in(buildSocketStationRoomName(item.id))
-                .emit(operation, {
-                    data: item,
-                    meta: {
-                        roomName: buildSocketStationRoomName(item.id),
-                        roomId: item.id,
-                    },
-                });
-        }
-    }
+            {
+                roomNameFn: buildSocketStationRoomName,
+            },
+        ],
+        operation,
+        item,
+    });
 }
 
 @EventSubscriber()
@@ -82,14 +45,14 @@ export class TrainSubscriber implements EntitySubscriberInterface<StationEntity>
     }
 
     afterInsert(event: InsertEvent<StationEntity>): Promise<any> | void {
-        publish(Operation.CREATE, event.entity);
+        publish(StationSocketServerToClientEventName.CREATED, event.entity);
     }
 
     afterUpdate(event: UpdateEvent<StationEntity>): Promise<any> | void {
-        publish(Operation.UPDATE, event.entity as StationEntity);
+        publish(StationSocketServerToClientEventName.UPDATED, event.entity as StationEntity);
     }
 
     beforeRemove(event: RemoveEvent<StationEntity>): Promise<any> | void {
-        publish(Operation.DELETE, event.entity);
+        publish(StationSocketServerToClientEventName.DELETED, event.entity);
     }
 }

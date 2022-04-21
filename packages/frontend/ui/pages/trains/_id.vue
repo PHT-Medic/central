@@ -7,7 +7,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Socket } from 'socket.io-client';
-import { SocketClientToServerEvents, SocketServerToClientEvents } from '@personalhealthtrain/central-common';
+import {
+    SocketClientToServerEvents,
+    SocketServerToClientEvents,
+    TrainSocketClientToServerEventName, TrainSocketServerToClientEventName,
+} from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 import TrainName from '../../components/domains/train/TrainName.vue';
 
@@ -50,18 +54,18 @@ export default {
         SocketServerToClientEvents,
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.entity.realm_id);
-        socket.emit('trainsSubscribe', { data: { id: this.entity.id } });
-        socket.on('trainUpdated', this.handleSocketUpdated);
-        socket.on('trainDeleted', this.handleSocketDeleted);
+        socket.emit(TrainSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.entity.id } });
+        socket.on(TrainSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
+        socket.on(TrainSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     beforeDestroy() {
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
         > = this.$socket.useRealmWorkspace(this.entity.realm_id);
-        socket.emit('trainsUnsubscribe', { data: { id: this.entity.id } });
-        socket.off('trainUpdated', this.handleSocketUpdated);
-        socket.off('trainDeleted', this.handleSocketDeleted);
+        socket.emit(TrainSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.entity.id } });
+        socket.off(TrainSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
+        socket.off(TrainSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
     },
     methods: {
         handleSocketUpdated(context) {

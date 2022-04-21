@@ -15,13 +15,6 @@ export enum TrainStationApprovalStatus {
     APPROVED = 'approved',
 }
 
-export type TrainStationApprovalStatusType = `${TrainStationApprovalStatus}`;
-
-const TrainStationApprovalStatusValues = Object.values(TrainStationApprovalStatus);
-export function isTrainStationApprovalStatus(type: any) : type is TrainStationApprovalStatusType {
-    return TrainStationApprovalStatusValues.indexOf(type) !== -1;
-}
-
 // -------------------------------------------------------------------------
 
 export enum TrainStationRunStatus {
@@ -32,16 +25,28 @@ export enum TrainStationRunStatus {
     FAILED = 'failed',
 }
 
-export type TrainStationRunStatusType = `${TrainStationRunStatus}`;
-
-const TrainStationRunStatusValues = Object.values(TrainStationRunStatus);
-export function isTrainStationRunStatus(type: any) : type is TrainStationRunStatusType {
-    return TrainStationRunStatusValues.indexOf(type) !== -1;
-}
-
 // -------------------------------------------------------------------------
 
 export enum TrainStationStatic {
     INCOMING = 'incoming',
     OUTGOING = 'outgoing',
+}
+
+// -------------------------------------------------------------------------
+
+export enum TrainStationSocketServerToClientEventName {
+    CREATED = 'trainStationCreated',
+    UPDATED = 'trainStationUpdated',
+    DELETED = 'trainStationDeleted',
+}
+
+export enum TrainStationSocketClientToServerEventName {
+    SUBSCRIBE = 'trainStationSubscribe',
+    UNSUBSCRIBE = 'trainStationUnsubscribe',
+
+    IN_SUBSCRIBE = 'trainStationInSubscribe',
+    IN_UNSUBSCRIBE = 'trainStationInUnsubscribe',
+
+    OUT_SUBSCRIBE = 'trainStationOutSubscribe',
+    OUT_UNSUBSCRIBE = 'trainStationOutUnsubscribe',
 }
