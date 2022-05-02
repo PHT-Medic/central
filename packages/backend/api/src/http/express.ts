@@ -45,7 +45,9 @@ export function createExpressApp(redis?: Client | boolean | string) : ExpressApp
         redis,
     });
 
-    expressApp.use(checkLicenseAgreementAccepted);
+    if (env.env === 'development') {
+        expressApp.use(checkLicenseAgreementAccepted);
+    }
 
     if (env.env !== 'test') {
         // Rate Limiter

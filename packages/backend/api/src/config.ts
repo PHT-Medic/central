@@ -34,7 +34,11 @@ export function createConfig({ env } : ConfigContext) : Config {
     setHTTPConfig({
         clazz: VaultClient,
         driver: {
-            proxy: false,
+            ...(proxyConfig ? {
+                proxy: proxyConfig,
+            } : {
+                proxy: false,
+            }),
         },
         extra: {
             connectionString: env.vaultConnectionString,
