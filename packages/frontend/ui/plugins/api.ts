@@ -12,8 +12,9 @@ import { Context } from '@nuxt/types';
 import https from 'https';
 import { Inject } from '@nuxt/types/app';
 import { HTTPClient as AuthHTTPClient } from '@authelion/common';
-import { HTTPClient } from '@personalhealthtrain/central-common';
+import { ErrorCode, HTTPClient } from '@personalhealthtrain/central-common';
 import { setHTTPClient } from '@authelion/vue';
+import { LicenseAgreementCommand, useLicenseAgreementEventEmitter } from '../domains/license-agreement';
 
 export default (ctx: Context, inject : Inject) => {
     let apiUrl : string | undefined;
@@ -41,6 +42,13 @@ export default (ctx: Context, inject : Inject) => {
     const authAPI = new AuthHTTPClient(config);
 
     const interceptor = (error) => {
+        if (typeof error?.response?.data?.code === 'string') {
+            if (error.response.data.code === ErrorCode.LICENSE_AGREEMENT) {
+                const eventEmitter = useLicenseAgreementEventEmitter();
+                eventEmitter.emit(LicenseAgreementCommand.ACCEPT);
+            }
+        }
+
         if (typeof error?.response?.data?.message === 'string') {
             error.message = error.response.data.message;
             throw error;

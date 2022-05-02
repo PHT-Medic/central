@@ -28,7 +28,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
     useLogger().debug('setup socket server...', { service: 'socket' });
 
     const server : SocketServerInterface = new Server(context.httpServer, {
-        adapter: createAdapter(context.config.redisPub, context.config.redisSub),
+        adapter: createAdapter(context.config.redisPub, context.config.redisSub) as any,
         cors: {
             origin(origin, callback) {
                 callback(null, true);

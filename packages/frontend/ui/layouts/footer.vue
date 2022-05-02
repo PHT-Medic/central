@@ -5,7 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import LicenseAgreement from '../components/domains/license-agreement/LicenseAgreement';
+
 export default {
+    components: { LicenseAgreement },
     data() {
         return {
             startYear: 2020,
@@ -22,6 +25,7 @@ export default {
 </script>
 <template>
     <div class="page-footer">
+        <license-agreement />
         <div class="copyright">
             &copy; PHT {{ year }} &bull; UI - Design & Code by <a
                 href="https://tada5hi.net"

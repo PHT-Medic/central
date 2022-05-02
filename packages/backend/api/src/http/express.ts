@@ -20,6 +20,7 @@ import { useRateLimiter } from './middleware/rate-limiter';
 import env from '../env';
 import { getWritableDirPath } from '../config/paths';
 import { ExpressAppInterface } from './type';
+import { checkLicenseAgreementAccepted } from './middleware/license-agreement';
 
 export function createExpressApp(redis?: Client | boolean | string) : ExpressAppInterface {
     const expressApp : Express = express();
@@ -43,6 +44,8 @@ export function createExpressApp(redis?: Client | boolean | string) : ExpressApp
         writableDirectoryPath: path.join(process.cwd(), 'writable'),
         redis,
     });
+
+    expressApp.use(checkLicenseAgreementAccepted);
 
     if (env.env !== 'test') {
         // Rate Limiter
