@@ -6,9 +6,9 @@
  */
 
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { useDataSource } from 'typeorm-extension';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { runProposalStationValidation } from './utils';
@@ -16,10 +16,11 @@ import { runProposalStationValidation } from './utils';
 export async function updateProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    const repository = getRepository(ProposalStationEntity);
-    let entity = await repository.findOne(id);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(ProposalStationEntity);
+    let entity = await repository.findOneBy({ id });
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 

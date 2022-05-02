@@ -7,8 +7,9 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { LessThan, MoreThan, getRepository } from 'typeorm';
+import { MoreThan } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { useDataSource } from 'typeorm-extension';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
@@ -23,11 +24,12 @@ export async function deleteTrainStationRouteHandler(req: ExpressRequest, res: E
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(TrainStationEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(TrainStationEntity);
 
-    const entity = await repository.findOne(id);
+    const entity = await repository.findOneBy({ id });
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
@@ -59,8 +61,8 @@ export async function deleteTrainStationRouteHandler(req: ExpressRequest, res: E
 
     // -------------------------------------------
 
-    const trainRepository = getRepository(TrainEntity);
-    const train = await trainRepository.findOne(entity.train_id);
+    const trainRepository = dataSource.getRepository(TrainEntity);
+    const train = await trainRepository.findOneBy({ id: entity.train_id });
 
     train.stations -= 1;
     await trainRepository.save(train);

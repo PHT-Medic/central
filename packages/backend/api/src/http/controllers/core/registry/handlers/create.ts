@@ -7,7 +7,7 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { runRegistryValidation } from './utils';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
@@ -19,7 +19,8 @@ export async function createRegistryRouteHandler(req: ExpressRequest, res: Expre
 
     const result = await runRegistryValidation(req, 'create');
 
-    const repository = getRepository(RegistryEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(RegistryEntity);
     const entity = repository.create({
         realm_id: req.realmId,
         ...result.data,

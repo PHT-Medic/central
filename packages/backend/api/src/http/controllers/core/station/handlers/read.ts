@@ -1,10 +1,10 @@
-import { SelectQueryBuilder, getRepository } from 'typeorm';
+import { SelectQueryBuilder } from 'typeorm';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import {
     parseQueryFields,
 } from '@trapi/query';
 import {
-    applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations,
+    applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
@@ -51,7 +51,8 @@ export async function getOneStationRouteHandler(req: ExpressRequest, res: Expres
     const { id } = req.params;
     const { fields, include } = req.query;
 
-    const repository = getRepository(StationEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(StationEntity);
     const query = repository.createQueryBuilder('station')
         .where('station.id = :id', { id });
 
@@ -64,7 +65,7 @@ export async function getOneStationRouteHandler(req: ExpressRequest, res: Expres
 
     const entity = await query.getOne();
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
@@ -76,7 +77,8 @@ export async function getManyStationRouteHandler(req: ExpressRequest, res: Expre
         filter, page, fields, include,
     } = req.query;
 
-    const repository = getRepository(StationEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(StationEntity);
     const query = repository.createQueryBuilder('station');
 
     applyRelations(query, include, {

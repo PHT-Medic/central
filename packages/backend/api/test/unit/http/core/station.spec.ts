@@ -9,7 +9,7 @@ import {
     HarborAPI,
     STATION_SECRET_ENGINE_KEY,
     Station,
-    StationSecretStoragePayload, VaultAPI, buildRegistryStationProjectName,
+    StationSecretStoragePayload, buildRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { VaultClient } from '@trapi/vault-client';

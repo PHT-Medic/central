@@ -7,7 +7,6 @@
 
 import { Realm, User } from '@authelion/common';
 import { MasterImage } from '../master-image';
-import { ProposalStation } from '../proposal-station';
 import { ProposalRisk } from './constants';
 
 export interface Proposal {

@@ -62,7 +62,7 @@ export default {
             this.loading = true;
 
             try {
-                const { meta } = await this.$api.userSecret.getMany({
+                await this.$api.userSecret.getMany({
                     filter: {
                         id: [
                             ...(this.userRsaSecretId ? [this.userRsaSecretId] : []),

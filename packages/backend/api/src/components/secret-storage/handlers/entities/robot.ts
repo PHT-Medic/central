@@ -13,8 +13,8 @@ import {
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { publishMessage } from 'amqp-extension';
-import { getRepository } from 'typeorm';
 import { VaultClient } from '@trapi/vault-client';
+import { useDataSource } from 'typeorm-extension';
 import { ApiKey } from '../../../../config/api';
 import { SecretStorageRobotQueuePayload } from '../../../../domains/special/secret-storage/type';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../domains/special/registry';
@@ -25,11 +25,13 @@ export async function saveRobotToSecretStorage(payload: SecretStorageRobotQueueP
         return;
     }
 
+    const dataSource = await useDataSource();
+
     const data = buildRobotSecretStoragePayload(payload.id, payload.secret);
     await useClient<VaultClient>(ApiKey.VAULT).keyValue.save(ROBOT_SECRET_ENGINE_KEY, `${payload.name}`, data);
 
     if (payload.name === ServiceID.REGISTRY) {
-        const projectRepository = getRepository(RegistryProjectEntity);
+        const projectRepository = dataSource.getRepository(RegistryProjectEntity);
         const projects = await projectRepository.find({
             select: ['id'],
             where: {

@@ -1,7 +1,6 @@
-import { getRepository } from 'typeorm';
 import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
 import {
-    applyFields, applyFilters, applyPagination, applyRelations, applySort,
+    applyFields, applyFilters, applyPagination, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@typescript-error/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
@@ -11,7 +10,8 @@ import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity
 export async function getOneUserSecretRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    const repository = getRepository(UserSecretEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(UserSecretEntity);
     const query = await repository.createQueryBuilder('entity')
         .where('entity.realm_id = :realmId', { realmId: req.realmId })
         .where('entity.id = :id', { id });
@@ -24,7 +24,7 @@ export async function getOneUserSecretRouteHandler(req: ExpressRequest, res: Exp
 
     const entity = await query.getOne();
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
@@ -36,7 +36,8 @@ export async function getManyUserSecretRouteHandler(req: ExpressRequest, res: Ex
         include, fields, filter, page, sort,
     } = req.query;
 
-    const repository = getRepository(UserSecretEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(UserSecretEntity);
     const query = await repository.createQueryBuilder('entity')
         .where('entity.realm_id = :realmId', { realmId: req.realmId });
 

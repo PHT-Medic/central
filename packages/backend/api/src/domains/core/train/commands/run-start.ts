@@ -6,27 +6,23 @@
  */
 
 import { publishMessage } from 'amqp-extension';
-import { getRepository } from 'typeorm';
 import {
-    REGISTRY_ARTIFACT_TAG_BASE, REGISTRY_ARTIFACT_TAG_LATEST,
-    REGISTRY_INCOMING_PROJECT_NAME,
-    REGISTRY_SYSTEM_USER_NAME,
     Train,
     TrainManagerQueueCommand,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
-import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../special/train-router';
+import { useDataSource } from 'typeorm-extension';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
-import env from '../../../../env';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 
 export async function startTrain(train: Train | number | string) : Promise<Train> {
-    const repository = getRepository<Train>(TrainEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 
-    if (typeof train === 'undefined') {
+    if (!train) {
         // todo: make it a ClientError.BadRequest
         throw new Error('The train could not be found.');
     }

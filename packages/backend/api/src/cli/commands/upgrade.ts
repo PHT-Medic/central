@@ -6,9 +6,9 @@
  */
 
 import { Argv, CommandModule } from 'yargs';
-import { createConnection } from 'typeorm';
 import { upgradeCommand } from '@authelion/api-core';
-import { buildDatabaseConnectionOptions } from '../../database/utils';
+import { DataSource } from 'typeorm';
+import { buildDataSourceOptions } from '../../database/utils';
 import { useSpinner } from '../../config/spinner';
 
 export class UpgradeCommand implements CommandModule {
@@ -24,19 +24,20 @@ export class UpgradeCommand implements CommandModule {
     // eslint-disable-next-line class-methods-use-this
     async handler() {
         const spinner = useSpinner();
-        const connectionOptions = await buildDatabaseConnectionOptions();
+        const options = await buildDataSourceOptions();
 
         await upgradeCommand({
             spinner,
         });
 
-        const connection = await createConnection(connectionOptions);
+        const dataSource = new DataSource(options);
+        await dataSource.initialize();
 
         try {
-            await connection.runMigrations({ transaction: 'all' });
+            await dataSource.runMigrations({ transaction: 'all' });
             // eslint-disable-next-line no-useless-catch
         } finally {
-            await connection.close();
+            await dataSource.destroy();
         }
     }
 }

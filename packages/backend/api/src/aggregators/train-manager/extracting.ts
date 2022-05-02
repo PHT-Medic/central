@@ -10,7 +10,7 @@ import {
     TrainManagerExtractingQueueEvent,
     TrainManagerExtractingQueuePayload, TrainResultStatus,
 } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
+import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../config/log';
 import { TrainEntity } from '../../domains/core/train/entity';
 
@@ -23,10 +23,11 @@ export async function handleTrainManagerExtractingQueueEvent(
             aggregator: 'train-manager', payload: data,
         });
 
-    const trainRepository = getRepository(TrainEntity);
+    const dataSource = await useDataSource();
+    const trainRepository = dataSource.getRepository(TrainEntity);
 
-    const train = await trainRepository.findOne(data.id);
-    if (typeof train === 'undefined') {
+    const entity = await trainRepository.findOneBy({ id: data.id });
+    if (!entity) {
         return;
     }
 
@@ -59,9 +60,9 @@ export async function handleTrainManagerExtractingQueueEvent(
                     break;
             }
 
-            train.result_status = status;
+            entity.result_status = status;
 
-            await trainRepository.save(train);
+            await trainRepository.save(entity);
 
             break;
         }

@@ -3,9 +3,9 @@ import {
     PermissionID, RegistryProjectType, createNanoID, isHex,
 } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { Message, publishMessage } from 'amqp-extension';
+import { useDataSource } from 'typeorm-extension';
 import { runStationValidation } from './utils';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
@@ -24,7 +24,8 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
         return res.respondAccepted();
     }
 
-    const repository = getRepository(StationEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(StationEntity);
     const query = repository.createQueryBuilder('station')
         .addSelect([
             'station.public_key',
@@ -34,7 +35,7 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
 
     let entity = await query.getOne();
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
@@ -57,11 +58,11 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
         entity.registry_id
     ) {
         const registryProjectExternalName = entity.external_name || createNanoID();
-        const registryProjectRepository = getRepository(RegistryProjectEntity);
+        const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
 
         let registryProject : RegistryProjectEntity | undefined;
         if (entity.registry_project_id) {
-            registryProject = await registryProjectRepository.findOne(entity.registry_project_id);
+            registryProject = await registryProjectRepository.findOneBy({ id: entity.registry_project_id });
         }
 
         let registryOperation : 'link' | 'relink' = 'link';

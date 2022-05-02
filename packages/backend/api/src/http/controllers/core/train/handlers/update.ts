@@ -7,8 +7,8 @@
 
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { useDataSource } from 'typeorm-extension';
 import { runTrainValidation } from './utils';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
@@ -25,10 +25,11 @@ export async function updateTrainRouteHandler(req: ExpressRequest, res: ExpressR
         return res.respondAccepted();
     }
 
-    const repository = getRepository(TrainEntity);
-    let entity = await repository.findOne(id);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(TrainEntity);
+    let entity = await repository.findOneBy({ id });
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 

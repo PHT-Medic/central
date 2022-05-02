@@ -20,7 +20,7 @@ import {
     buildSocketRealmNamespaceName,
 } from '@personalhealthtrain/central-common';
 import {
-    SocketServerToClientEventConfigurationItem, emitSocketServerToClientEvent,
+    emitSocketServerToClientEvent,
 } from '../../config/socket-emitter';
 import { ProposalStationEntity } from '../../domains/core/proposal-station/entity';
 

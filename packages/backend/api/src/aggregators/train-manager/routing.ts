@@ -16,8 +16,8 @@ import {
     TrainRunStatus,
     TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
 import { publishMessage } from 'amqp-extension';
+import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../config/log';
 import { TrainEntity } from '../../domains/core/train/entity';
 import { RegistryProjectEntity } from '../../domains/core/registry-project/entity';
@@ -41,9 +41,10 @@ export async function handleTrainManagerRoutingQueueEvent(
 
     // -------------------------------------------------------------------------------
 
-    const trainRepository = getRepository(TrainEntity);
-    const train = await trainRepository.findOne(data.repositoryName);
-    if (typeof train === 'undefined') {
+    const dataSource = await useDataSource();
+    const trainRepository = dataSource.getRepository(TrainEntity);
+    const train = await trainRepository.findOneBy({ id: data.repositoryName });
+    if (!train) {
         return;
     }
 
@@ -53,8 +54,8 @@ export async function handleTrainManagerRoutingQueueEvent(
         case TrainManagerRoutingQueueEvent.STARTED: {
             train.run_status = TrainRunStatus.STARTED;
 
-            const trainStationRepository = getRepository(TrainStationEntity);
-            const trainStations = await trainStationRepository.find({
+            const trainStationRepository = dataSource.getRepository(TrainStationEntity);
+            const trainStations = await trainStationRepository.findBy({
                 train_id: train.id,
             });
 
@@ -69,12 +70,12 @@ export async function handleTrainManagerRoutingQueueEvent(
         }
         case TrainManagerRoutingQueueEvent.POSITION_FOUND:
         case TrainManagerRoutingQueueEvent.MOVE_FINISHED: {
-            const registryProjectRepository = getRepository(RegistryProjectEntity);
-            const registryProject = await registryProjectRepository.findOne({
+            const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
+            const registryProject = await registryProjectRepository.findOneBy({
                 external_name: data.projectName,
             });
 
-            if (typeof registryProject === 'undefined') {
+            if (!registryProject) {
                 return;
             }
 
@@ -108,19 +109,19 @@ export async function handleTrainManagerRoutingQueueEvent(
                 case RegistryProjectType.STATION: {
                     train.run_status = TrainRunStatus.RUNNING;
 
-                    const stationRepository = getRepository(StationEntity);
-                    const station = await stationRepository.findOne({
+                    const stationRepository = dataSource.getRepository(StationEntity);
+                    const station = await stationRepository.findOneBy({
                         registry_project_id: registryProject.id,
                     });
 
-                    if (typeof station !== 'undefined') {
-                        const trainStationRepository = getRepository(TrainStationEntity);
-                        const trainStation = await trainStationRepository.findOne({
+                    if (station) {
+                        const trainStationRepository = dataSource.getRepository(TrainStationEntity);
+                        const trainStation = await trainStationRepository.findOneBy({
                             train_id: train.id,
                             station_id: station.id,
                         });
 
-                        if (typeof trainStation !== 'undefined') {
+                        if (trainStation) {
                             train.run_station_index = trainStation.index;
                             train.run_station_id = trainStation.station_id;
 

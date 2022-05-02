@@ -121,10 +121,10 @@ export default Vue.extend({
                             </template>
                             <template #cell(approval_status)="data">
                                 <train-station-approval-status :status="data.item.approval_status">
-                                    <template #default="props">
+                                    <template #default="statusProps">
                                         <span
                                             class="badge"
-                                            :class="'badge-'+props.classSuffix"
+                                            :class="'badge-'+statusProps.classSuffix"
                                         >{{ props.statusText }}</span>
                                     </template>
                                 </train-station-approval-status>

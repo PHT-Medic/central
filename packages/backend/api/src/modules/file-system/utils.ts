@@ -60,7 +60,7 @@ export function createFileStreamHandler(destinationFilePath: string) {
                 await fs.promises.access(destinationFilePath, fs.constants.W_OK);
                 await fs.promises.unlink(destinationFilePath);
             } catch (e) {
-                console.log(e);
+                // ...
             }
         },
         getWritePromise: () => writePromise,

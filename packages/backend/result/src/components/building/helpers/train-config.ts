@@ -11,7 +11,6 @@ import {
     Train,
     TrainConfig,
     TrainConfigSourceType,
-    getHostNameFromString,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { mergeStationsWithTrainStations } from '../../routing/helpers/merge';

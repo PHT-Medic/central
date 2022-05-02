@@ -6,9 +6,9 @@
  */
 
 import { SecretType, isHex } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
 import { Buffer } from 'buffer';
 import { publishMessage } from 'amqp-extension';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { runUserSecretValidation } from './utils';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
@@ -30,7 +30,8 @@ export async function createUserSecretRouteHandler(req: ExpressRequest, res: Exp
         data.content = Buffer.from(data.content, 'utf-8').toString('hex');
     }
 
-    const repository = getRepository(UserSecretEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(UserSecretEntity);
 
     const entity = repository.create({
         user_id: req.user.id,

@@ -7,7 +7,7 @@
 
 import { Group, Image } from 'docker-scan';
 import { MasterImage, MasterImageGroup } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
+import { useDataSource } from 'typeorm-extension';
 import { MasterImageEntity } from '../../../../../../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../../../../../../domains/core/master-image-group/entity';
 
@@ -28,9 +28,11 @@ export async function mergeMasterImagesWithDatabase(
         };
     }
 
+    const dataSource = await useDataSource();
+
     const virtualPaths : string[] = entities.map((entity) => entity.virtualPath);
 
-    const repository = getRepository(MasterImageEntity);
+    const repository = dataSource.getRepository(MasterImageEntity);
     const dbEntities = await repository.createQueryBuilder()
         .getMany();
 
@@ -98,9 +100,11 @@ export async function mergeMasterImageGroupsWithDatabase(
         };
     }
 
+    const dataSource = await useDataSource();
+
     const dirVirtualPaths : string[] = entities.map((entity) => entity.virtualPath);
 
-    const repository = getRepository(MasterImageGroupEntity);
+    const repository = dataSource.getRepository(MasterImageGroupEntity);
     const dbEntities = await repository.createQueryBuilder()
         .getMany();
 

@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { RobotForm, useHTTPClient } from '@authelion/vue';
-import Vue, { PropType, VNode } from 'vue';
+import Vue, { VNode } from 'vue';
 import { ServiceID } from '@personalhealthtrain/central-common';
 import { MASTER_REALM_ID } from '@authelion/common';
 

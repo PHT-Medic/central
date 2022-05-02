@@ -14,7 +14,6 @@ import {
     buildSocketTrainRoomName,
 } from '@personalhealthtrain/central-common';
 import {
-    SocketServerToClientEventConfigurationItem,
     emitSocketServerToClientEvent,
 } from '../../config/socket-emitter';
 import { TrainEntity } from '../../domains/core/train/entity';

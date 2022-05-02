@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getRepository } from 'typeorm';
 import { BadRequestError } from '@typescript-error/http';
 import { Registry } from '@personalhealthtrain/central-common';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressValidationResult, buildExpressValidationErrorMessage } from '../../../../express-validation';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 
@@ -23,9 +23,10 @@ export async function extendExpressValidationResultWithRegistry<
     T extends ExpressValidationResultExtendedWithRegistry,
     >(result: T) : Promise<T> {
     if (result.data.registry_id) {
-        const repository = getRepository(RegistryEntity);
-        const entity = await repository.findOne(result.data.registry_id);
-        if (typeof entity === 'undefined') {
+        const dataSource = await useDataSource();
+        const repository = dataSource.getRepository(RegistryEntity);
+        const entity = await repository.findOneBy({ id: result.data.registry_id });
+        if (!entity) {
             throw new BadRequestError(buildExpressValidationErrorMessage('registry_id'));
         }
 

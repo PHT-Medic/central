@@ -13,7 +13,7 @@ import {
     ForbiddenError,
 } from '@typescript-error/http';
 import { publishMessage } from 'amqp-extension';
-import { getRepository } from 'typeorm';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
 import env from '../../../../../../env';
 import { setupRegistry } from '../../../../../../components/registry/handlers/default';
@@ -45,10 +45,12 @@ export async function handleRegistryCommandRouteHandler(req: ExpressRequest, res
         throw new BadRequestError(`An ID parameter is required for the registry command ${command}`);
     }
 
+    const dataSource = await useDataSource();
+
     switch (command) {
         case RegistryCommand.SETUP:
         case RegistryCommand.DELETE: {
-            const repository = getRepository(RegistryEntity);
+            const repository = dataSource.getRepository(RegistryEntity);
             const entity = await repository.createQueryBuilder('registry')
                 .addSelect([
                     'registry.account_secret',
@@ -87,7 +89,7 @@ export async function handleRegistryCommandRouteHandler(req: ExpressRequest, res
         }
         case RegistryCommand.PROJECT_LINK:
         case RegistryCommand.PROJECT_UNLINK: {
-            const repository = getRepository(RegistryProjectEntity);
+            const repository = dataSource.getRepository(RegistryProjectEntity);
             const entity = await repository.createQueryBuilder('registryProject')
                 .addSelect([
                     'registryProject.account_secret',

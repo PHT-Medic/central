@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import Vue from 'vue';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default {

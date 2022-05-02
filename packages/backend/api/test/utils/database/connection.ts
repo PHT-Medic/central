@@ -6,33 +6,33 @@
  */
 
 import {
-    ConnectionWithSeederOptions, createDatabase, dropDatabase,
+    createDatabase, dropDatabase, setDataSource, unsetDataSource, useDataSource,
 } from 'typeorm-extension';
-import { ConnectionOptions, createConnection, getConnection } from 'typeorm';
+import {
+    DataSource, DataSourceOptions,
+} from 'typeorm';
 import {
     DatabaseRootSeeder as AuthDatabaseRootSeeder,
-    setEntitiesForConnectionOptions,
 } from '@authelion/api-core';
 import { PermissionKey } from '@personalhealthtrain/central-common';
-import { buildDatabaseConnectionOptions, modifyDatabaseConnectionOptions } from '../../../src/database/utils';
+import { buildDataSourceOptions } from '../../../src/database/utils';
 import { buildRobotAggregator } from '../../../src/aggregators/robot';
 
-async function createConnectionOptions() {
+async function buildOptions() : Promise<DataSourceOptions> {
     return {
-        ...await buildDatabaseConnectionOptions(),
+        ...await buildDataSourceOptions(),
         database: 'test',
-    } as ConnectionWithSeederOptions;
+    } as DataSourceOptions;
 }
 
 export async function useTestDatabase() {
-    const connectionOptions = modifyDatabaseConnectionOptions(
-        setEntitiesForConnectionOptions(await createConnectionOptions(), true),
-    );
+    const options = await buildOptions();
 
-    await createDatabase({ ifNotExist: true }, connectionOptions);
+    await createDatabase({ options });
 
-    const connection = await createConnection(connectionOptions as ConnectionOptions);
-    await connection.synchronize();
+    const dataSource = new DataSource(options);
+    await dataSource.initialize();
+    await dataSource.synchronize();
 
     const { start } = buildRobotAggregator();
     start({ synchronous: true });
@@ -42,16 +42,18 @@ export async function useTestDatabase() {
         userName: 'admin',
         userPassword: 'start123',
     });
-    await authSeeder.run(connection);
+    await authSeeder.run(dataSource);
 
-    return connection;
+    setDataSource(dataSource);
+
+    return dataSource;
 }
 
 export async function dropTestDatabase() {
-    const connectionOptions = await createConnectionOptions();
+    const dataSource = await useDataSource();
+    await dataSource.destroy();
 
-    await getConnection()
-        .close();
+    await unsetDataSource();
 
-    await dropDatabase({ ifExist: true }, connectionOptions);
+    await dropDatabase({ options: dataSource.options });
 }

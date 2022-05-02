@@ -7,9 +7,9 @@
 
 import { check, validationResult } from 'express-validator';
 import { TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
 import { BadRequestError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest } from '../../../../type';
 import {
     ExpressValidationError,
@@ -90,13 +90,14 @@ export async function runTrainStationValidation(
         result.meta.station &&
         result.meta.train
     ) {
-        const proposalStationRepository = getRepository(ProposalStationEntity);
-        const proposalStation = await proposalStationRepository.findOne({
+        const dataSource = await useDataSource();
+        const proposalStationRepository = dataSource.getRepository(ProposalStationEntity);
+        const proposalStation = await proposalStationRepository.findOneBy({
             proposal_id: result.meta.train.proposal_id,
             station_id: result.meta.station.id,
         });
 
-        if (typeof proposalStation === 'undefined') {
+        if (!proposalStation) {
             throw new NotFoundError('The referenced station is not part of the train proposal.');
         }
 

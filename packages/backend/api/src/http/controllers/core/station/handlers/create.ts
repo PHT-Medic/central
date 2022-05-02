@@ -10,8 +10,8 @@ import {
 } from '@personalhealthtrain/central-common';
 import { BadRequestError, ForbiddenError } from '@typescript-error/http';
 import { validationResult } from 'express-validator';
-import { getRepository } from 'typeorm';
 import { publishMessage } from 'amqp-extension';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressValidationError } from '../../../../express-validation';
 import { runStationValidation } from './utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
@@ -38,7 +38,8 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
         result.data.public_key = Buffer.from(result.data.public_key, 'utf8').toString('hex');
     }
 
-    const repository = getRepository(StationEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(StationEntity);
 
     const entity = repository.create(result.data);
 
@@ -56,7 +57,7 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
         }
 
         const registryProjectExternalName = entity.external_name || createNanoID();
-        const registryProjectRepository = getRepository(RegistryProjectEntity);
+        const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
         const registryProject = registryProjectRepository.create({
             external_name: registryProjectExternalName,
             name: entity.name,

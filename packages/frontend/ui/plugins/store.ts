@@ -25,7 +25,7 @@ export default (ctx : Context, inject : Inject) => {
         if (!ctx.res.headersSent) {
             ctx.res.setHeader(
                 'Set-Cookie',
-                cookies.filter((v, i, arr) => arr.findIndex((val) => val.startsWith(v.substr(0, v.indexOf('=')))) === i),
+                cookies.filter((v, i, arr) => arr.findIndex((val) => val.startsWith(v.substring(0, v.indexOf('=')))) === i),
             );
         }
     };

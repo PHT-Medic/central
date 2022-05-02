@@ -7,8 +7,8 @@
 <template>
     <span>
         <slot
-            :classSuffix="classSuffix"
-            :statusText="statusText"
+            :class-suffix="classSuffix"
+            :status-text="statusText"
         >
             <span :class="'text-'+classSuffix">{{ statusText }}</span>
         </slot>

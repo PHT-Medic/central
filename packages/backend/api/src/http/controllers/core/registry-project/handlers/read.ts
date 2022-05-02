@@ -1,8 +1,7 @@
-import { SelectQueryBuilder, getRepository } from 'typeorm';
+import { SelectQueryBuilder } from 'typeorm';
 import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
 import {
-    applyFields,
-    applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, applySort,
+    applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
@@ -55,7 +54,8 @@ export async function getOneRegistryProjectRouteHandler(req: ExpressRequest, res
     const { id } = req.params;
     const { include, fields } = req.query;
 
-    const repository = getRepository(RegistryProjectEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(RegistryProjectEntity);
     const query = repository.createQueryBuilder('registryProject')
         .where('registryProject.id = :id', { id });
 
@@ -68,7 +68,7 @@ export async function getOneRegistryProjectRouteHandler(req: ExpressRequest, res
 
     const entity = await query.getOne();
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
@@ -84,7 +84,8 @@ export async function getManyRegistryProjectRouteHandler(req: ExpressRequest, re
         filter, page, sort, include, fields,
     } = req.query;
 
-    const repository = getRepository(RegistryProjectEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(RegistryProjectEntity);
     const query = repository.createQueryBuilder('registryProject');
 
     onlyRealmPermittedQueryResources(query, req.realmId, 'registryProject.realm_id');

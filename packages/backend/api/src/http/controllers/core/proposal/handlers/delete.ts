@@ -7,8 +7,8 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { useDataSource } from 'typeorm-extension';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 
@@ -19,10 +19,11 @@ export async function deleteProposalRouteHandler(req: ExpressRequest, res: Expre
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(ProposalEntity);
-    const entity = await repository.findOne(id);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(ProposalEntity);
+    const entity = await repository.findOneBy({ id });
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 

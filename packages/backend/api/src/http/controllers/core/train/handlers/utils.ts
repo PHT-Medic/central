@@ -7,9 +7,9 @@
 
 import { Ecosystem, TrainType } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
-import { getRepository } from 'typeorm';
 import { BadRequestError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
@@ -62,8 +62,9 @@ export async function runTrainValidation(
     await check('entrypoint_file_id')
         .isUUID()
         .custom(async (value) => {
-            const repository = getRepository(TrainFileEntity);
-            const entity = await repository.findOne(value);
+            const dataSource = await useDataSource();
+            const repository = dataSource.getRepository(TrainFileEntity);
+            const entity = await repository.findOneBy({ id: value });
             if (!entity) {
                 throw new NotFoundError('The referenced entrypoint file is invalid.');
             }

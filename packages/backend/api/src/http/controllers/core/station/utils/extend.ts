@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getRepository } from 'typeorm';
 import { BadRequestError } from '@typescript-error/http';
 import { Station } from '@personalhealthtrain/central-common';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressValidationResult, buildExpressValidationErrorMessage } from '../../../../express-validation';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 
@@ -23,9 +23,10 @@ export async function extendExpressValidationResultWithStation<
     T extends ExpressValidationResultExtendedWithStation,
 >(result: T) : Promise<T> {
     if (result.data.station_id) {
-        const repository = getRepository(StationEntity);
-        const entity = await repository.findOne(result.data.station_id);
-        if (typeof entity === 'undefined') {
+        const dataSource = await useDataSource();
+        const repository = dataSource.getRepository(StationEntity);
+        const entity = await repository.findOneBy({ id: result.data.station_id });
+        if (!entity) {
             throw new BadRequestError(buildExpressValidationErrorMessage('station_id'));
         }
 

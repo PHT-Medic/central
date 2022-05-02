@@ -7,9 +7,9 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { publishMessage } from 'amqp-extension';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
@@ -21,10 +21,12 @@ export async function deleteRegistryProjectRouteHandler(req: ExpressRequest, res
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(RegistryProjectEntity);
-    const entity = await repository.findOne(id);
+    const dataSource = await useDataSource();
 
-    if (typeof entity === 'undefined') {
+    const repository = dataSource.getRepository(RegistryProjectEntity);
+    const entity = await repository.findOneBy({ id });
+
+    if (!entity) {
         throw new NotFoundError();
     }
 

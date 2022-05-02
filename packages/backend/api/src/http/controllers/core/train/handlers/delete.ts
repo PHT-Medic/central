@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import fs from 'fs';
+import { useDataSource } from 'typeorm-extension';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
@@ -22,11 +22,12 @@ export async function deleteTrainRouteHandler(req: ExpressRequest, res: ExpressR
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(TrainEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(TrainEntity);
 
-    const entity = await repository.findOne(id, { relations: ['proposal'] });
+    const entity = await repository.findOne({ where: { id }, relations: ['proposal'] });
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
@@ -43,7 +44,7 @@ export async function deleteTrainRouteHandler(req: ExpressRequest, res: ExpressR
     entity.id = entityId;
 
     proposal.trains--;
-    const proposalRepository = getRepository(ProposalEntity);
+    const proposalRepository = dataSource.getRepository(ProposalEntity);
     await proposalRepository.save(proposal);
 
     entity.proposal = proposal;

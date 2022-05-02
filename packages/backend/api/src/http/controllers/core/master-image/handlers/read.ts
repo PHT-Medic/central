@@ -1,17 +1,17 @@
 import { NotFoundError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
-import { applyFilters, applyPagination } from 'typeorm-extension';
+import { applyFilters, applyPagination, useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
 
 export async function getOneMasterImageRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    const repository = getRepository(MasterImageEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(MasterImageEntity);
 
-    const entity = await repository.findOne(id);
+    const entity = await repository.findOneBy({ id });
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
@@ -21,7 +21,9 @@ export async function getOneMasterImageRouteHandler(req: ExpressRequest, res: Ex
 export async function getManyMasterImageRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { page, filter } = req.query;
 
-    const repository = getRepository(MasterImageEntity);
+    const dataSource = await useDataSource();
+
+    const repository = dataSource.getRepository(MasterImageEntity);
     const query = repository.createQueryBuilder('image');
 
     applyFilters(query, filter, {

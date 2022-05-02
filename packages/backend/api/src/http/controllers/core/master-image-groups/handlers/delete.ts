@@ -7,7 +7,7 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { MasterImageGroupEntity } from '../../../../../domains/core/master-image-group/entity';
 
@@ -18,11 +18,12 @@ export async function deleteMasterImageGroupRouteHandler(req: ExpressRequest, re
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(MasterImageGroupEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(MasterImageGroupEntity);
 
-    const entity = await repository.findOne(id);
+    const entity = await repository.findOneBy({ id });
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 

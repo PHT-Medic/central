@@ -10,7 +10,7 @@ import { Message, publishMessage } from 'amqp-extension';
 import {
     TrainManagerQueueCommand,
 } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
+import { useDataSource } from 'typeorm-extension';
 import { buildTrainManagerQueueMessage } from '../../domains/special/train-manager';
 import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../domains/special/registry';
 import { useLogger } from '../../config/log';
@@ -29,12 +29,13 @@ export async function dispatchRegistryEventToTrainManager(
         return message;
     }
 
-    const registryProjectRepository = getRepository(RegistryProjectEntity);
-    const registryProject = await registryProjectRepository.findOne({
+    const dataSource = await useDataSource();
+    const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
+    const registryProject = await registryProjectRepository.findOneBy({
         external_name: data.namespace,
     });
 
-    if (typeof registryProject === 'undefined') {
+    if (!registryProject) {
         useLogger()
             .info(`registry-project ${data.namespace} is not registered...`);
         return message;

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Connection, In, getCustomRepository } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 import {
     RealmEntity,
@@ -24,7 +24,7 @@ import { StationEntity } from '../../domains/core/station/entity';
 // ----------------------------------------------
 
 export class DatabaseRootSeeder implements Seeder {
-    public async run(connection: Connection): Promise<any> {
+    public async run(dataSource: DataSource): Promise<any> {
         /**
          * Create robot accounts for services.
          */
@@ -36,7 +36,7 @@ export class DatabaseRootSeeder implements Seeder {
             ServiceID.GITHUB,
         ];
 
-        const robotRepository = getCustomRepository(RobotRepository);
+        const robotRepository = new RobotRepository(dataSource);
         const robots = await robotRepository.createQueryBuilder('robot')
             .where({
                 name: In(services),
@@ -84,7 +84,7 @@ export class DatabaseRootSeeder implements Seeder {
             'StationEmployee', // 1
         ];
 
-        const roleRepository = connection.getCustomRepository(RoleRepository);
+        const roleRepository = new RoleRepository(dataSource);
 
         const roles : RoleEntity[] = roleNames.map((role: string) => roleRepository.create({ name: role }));
 
@@ -95,7 +95,7 @@ export class DatabaseRootSeeder implements Seeder {
         /**
          * Create PHT role - permission association
          */
-        const rolePermissionRepository = connection.getRepository(RolePermissionEntity);
+        const rolePermissionRepository = dataSource.getRepository(RolePermissionEntity);
         const rolePermissions : RolePermissionEntity[] = roles
             .map((role) => getPHTStationRolePermissions(role.name as PHTStationRole).map((permission) => rolePermissionRepository.create({
                 role_id: role.id,
@@ -115,7 +115,7 @@ export class DatabaseRootSeeder implements Seeder {
             { id: 'station2', name: 'University Munich' },
             { id: 'station3', name: 'University Tuebingen' },
         ];
-        const realmRepository = connection.getRepository(RealmEntity);
+        const realmRepository = dataSource.getRepository(RealmEntity);
         await realmRepository.insert(realms);
 
         // -------------------------------------------------
@@ -123,7 +123,7 @@ export class DatabaseRootSeeder implements Seeder {
         /**
          * Promote all PHT default realms to a station.
          */
-        const stationRepository = connection.getRepository(StationEntity);
+        const stationRepository = dataSource.getRepository(StationEntity);
         const stations : Partial<StationEntity>[] = [];
         for (let i = 0; i < realms.length; i++) {
             stations.push({

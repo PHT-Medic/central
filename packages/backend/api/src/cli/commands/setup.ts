@@ -7,13 +7,13 @@
 
 import { Arguments, Argv, CommandModule } from 'yargs';
 import { createDatabase } from 'typeorm-extension';
-import { createConnection } from 'typeorm';
 import { DatabaseRootSeeder as AuthDatabaseRootSeeder, setupCommand } from '@authelion/api-core';
 import { PermissionKey } from '@personalhealthtrain/central-common';
 import { useClient } from 'redis-extension';
+import { DataSource } from 'typeorm';
 import { createConfig } from '../../config';
 import env from '../../env';
-import { buildDatabaseConnectionOptions } from '../../database/utils';
+import { buildDataSourceOptions } from '../../database/utils';
 import { generateSwaggerDocumentation } from '../../http/swagger';
 import { DatabaseRootSeeder } from '../../database/seeds/root';
 import { buildRobotAggregator } from '../../aggregators/robot';
@@ -95,19 +95,20 @@ export class SetupCommand implements CommandModule {
             /**
              * Setup database with schema & seeder
              */
-            const connectionOptions = await buildDatabaseConnectionOptions();
+            const options = await buildDataSourceOptions();
 
             if (args.database) {
                 spinner.start('create database...');
-                await createDatabase({ ifNotExist: true }, connectionOptions);
+                await createDatabase({ options });
                 spinner.succeed('created database.');
             }
 
-            const connection = await createConnection(connectionOptions);
+            const dataSource = new DataSource(options);
+            await dataSource.initialize();
 
             try {
                 spinner.start('synchronize database...');
-                await connection.synchronize();
+                await dataSource.synchronize();
                 spinner.succeed('synchronized database...');
 
                 if (args.databaseSeeder) {
@@ -127,19 +128,19 @@ export class SetupCommand implements CommandModule {
                         userName: 'admin',
                         userPassword: 'start123',
                     });
-                    await authSeeder.run(connection);
+                    await authSeeder.run(dataSource);
 
                     const coreSeeder = new DatabaseRootSeeder();
-                    await coreSeeder.run(connection);
+                    await coreSeeder.run(dataSource);
                     spinner.start('seeded database...');
                 }
             } catch (e) {
                 spinner.start('seeding database failed...');
-                await connection.close();
+                await dataSource.destroy();
                 process.exit(1);
                 throw e;
             } finally {
-                await connection.close();
+                await dataSource.destroy();
             }
         }
 

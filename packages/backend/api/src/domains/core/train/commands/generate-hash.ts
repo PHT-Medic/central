@@ -6,20 +6,21 @@
  */
 
 import { Train, TrainConfigurationStatus } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
 import crypto from 'crypto';
 import fs from 'fs';
+import { useDataSource } from 'typeorm-extension';
 import { getTrainFileFilePath } from '../../../../config/pht/train-file/path';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 import { TrainFileEntity } from '../../train-file/entity';
 
 export async function generateTrainHash(train: Train | number | string) : Promise<Train> {
-    const repository = getRepository<Train>(TrainEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 
-    if (typeof train === 'undefined') {
+    if (!train) {
         // todo: make it a ClientError.BadRequest
         throw new Error('The train could not be found.');
     }
@@ -29,7 +30,7 @@ export async function generateTrainHash(train: Train | number | string) : Promis
     hash.update(Buffer.from(train.user_id.toString(), 'utf-8'));
 
     // Files
-    const trainFilesRepository = getRepository(TrainFileEntity);
+    const trainFilesRepository = dataSource.getRepository(TrainFileEntity);
     const trainFiles = await trainFilesRepository.createQueryBuilder('trainFiles')
         .where('trainFiles.train_id = :id', { id: train.id })
         .getMany();

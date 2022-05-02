@@ -6,16 +6,15 @@
  */
 
 import { Arguments, Argv, CommandModule } from 'yargs';
-import { createConnection } from 'typeorm';
-import { buildConnectionOptions } from 'typeorm-extension';
 import {
     DatabaseRootSeeder,
-    setEntitiesForConnectionOptions,
     useConfig,
 } from '@authelion/api-core';
 import { PermissionKey } from '@personalhealthtrain/central-common';
+import { DataSource } from 'typeorm';
 import { useSpinner } from '../../config/spinner';
 import env from '../../env';
+import { buildDataSourceOptions } from '../../database/utils';
 
 interface SeedCheckArguments extends Arguments {
 
@@ -33,13 +32,15 @@ export class CheckCommand implements CommandModule {
     async handler(args: SeedCheckArguments) {
         const spinner = useSpinner();
 
-        const connectionOptions = setEntitiesForConnectionOptions(await buildConnectionOptions(), true);
-        const connection = await createConnection(connectionOptions);
+        const dataSourceOptions = await buildDataSourceOptions();
+        const dataSource = new DataSource(dataSourceOptions);
+
+        await dataSource.initialize();
 
         try {
             if (env.env !== 'production') {
                 spinner.start('synchronizing database...');
-                await connection.synchronize();
+                await dataSource.synchronize();
                 spinner.succeed('synchronized database.');
             }
 
@@ -50,15 +51,15 @@ export class CheckCommand implements CommandModule {
                 userPassword: authConfig.adminPassword,
                 permissions: Object.values(PermissionKey),
             });
-            await authSeeder.run(connection);
+            await authSeeder.run(dataSource);
             spinner.succeed('checked database integrity.');
         } catch (e) {
             spinner.fail('checking database integrity failed.');
-            await connection.close();
+            await dataSource.destroy();
             process.exit(1);
             throw e;
         } finally {
-            await connection.close();
+            await dataSource.destroy();
             process.exit(0);
         }
     }

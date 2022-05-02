@@ -6,12 +6,12 @@
  */
 
 import { PermissionID, TrainFile } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
 import BusBoy from 'busboy';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { useDataSource } from 'typeorm-extension';
 import { createFileStreamHandler } from '../../../../../modules/file-system/utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { getTrainFilesDirectoryPath } from '../../../../../config/pht/train-file/path';
@@ -28,14 +28,15 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(TrainEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(TrainEntity);
 
-    let entity = await repository.findOne(id);
-    if (typeof entity === 'undefined') {
+    let entity = await repository.findOneBy({ id });
+    if (!entity) {
         throw new NotFoundError();
     }
 
-    const trainFileRepository = getRepository<TrainFile>(TrainFileEntity);
+    const trainFileRepository = dataSource.getRepository<TrainFile>(TrainFileEntity);
 
     const instance = BusBoy({ headers: req.headers, preservePath: true });
 

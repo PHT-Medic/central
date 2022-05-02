@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getRepository } from 'typeorm';
 import tar from 'tar-stream';
 import fs from 'fs';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { getTrainFilesDirectoryPath } from '../../../../../config/pht/train-file/path';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
@@ -23,16 +23,17 @@ export async function streamTrainFileRouteHandler(req: ExpressRequest, res: Expr
         throw new BadRequestError();
     }
 
-    const repository = getRepository(TrainEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(TrainEntity);
 
-    const train = await repository.findOne(id);
+    const train = await repository.findOneBy({ id });
 
-    if (typeof train === 'undefined') {
+    if (!train) {
         throw new NotFoundError();
     }
 
     if (!isPermittedForResourceRealm(req.realmId, train.realm_id)) {
-        const proposalStations = await getRepository(TrainStationEntity).find({
+        const proposalStations = await dataSource.getRepository(TrainStationEntity).find({
             where: {
                 train_id: train.id,
             },
@@ -67,7 +68,7 @@ export async function streamTrainFileRouteHandler(req: ExpressRequest, res: Expr
 
     const trainDirectoryPath = getTrainFilesDirectoryPath(train.id);
 
-    const files = await getRepository(TrainFileEntity).find({
+    const files = await dataSource.getRepository(TrainFileEntity).findBy({
         train_id: train.id,
     });
 

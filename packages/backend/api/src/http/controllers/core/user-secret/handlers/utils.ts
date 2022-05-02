@@ -7,14 +7,11 @@
 
 import { check, validationResult } from 'express-validator';
 import {
-    PermissionID,
     SecretType,
     UserSecret,
 } from '@personalhealthtrain/central-common';
-import { BadRequestError } from '@typescript-error/http';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
-import env from '../../../../../env';
 
 export async function runUserSecretValidation(
     req: ExpressRequest,

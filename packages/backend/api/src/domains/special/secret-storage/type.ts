@@ -7,7 +7,6 @@
 
 import { Robot, User } from '@authelion/common';
 import { Station } from '@personalhealthtrain/central-common';
-import { Stat } from 'isomorphic-git';
 import { SecretStorageQueueEntityType } from './constants';
 
 export type SecretStorageRobotQueuePayload = {

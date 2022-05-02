@@ -16,7 +16,6 @@ import {
     buildRegistryEventQueueMessage,
 } from '../../../../../../domains/special/registry';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
-import { useSpinner } from '../../../../../../config/spinner';
 
 let eventValidator : undefined | BaseSchema;
 function useHookEventDataValidator() : BaseSchema {

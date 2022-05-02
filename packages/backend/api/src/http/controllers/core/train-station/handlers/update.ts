@@ -1,7 +1,7 @@
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { useDataSource } from 'typeorm-extension';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { runTrainStationValidation } from './utils';
@@ -9,10 +9,11 @@ import { runTrainStationValidation } from './utils';
 export async function updateTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    const repository = getRepository(TrainStationEntity);
-    let trainStation = await repository.findOne(id);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(TrainStationEntity);
+    let trainStation = await repository.findOneBy({ id });
 
-    if (typeof trainStation === 'undefined') {
+    if (!trainStation) {
         throw new NotFoundError();
     }
 

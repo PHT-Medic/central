@@ -6,8 +6,8 @@
  */
 
 import { MasterImage } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
 import { BadRequestError } from '@typescript-error/http';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressValidationResult, buildExpressValidationErrorMessage } from '../../../../express-validation';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
 
@@ -23,9 +23,10 @@ export async function extendExpressValidationResultWithMasterImage<
     T extends ExpressValidationResultExtendedWithTrain,
     >(result: T) : Promise<T> {
     if (result.data.master_image_id) {
-        const repository = getRepository(MasterImageEntity);
-        const entity = await repository.findOne(result.data.master_image_id);
-        if (typeof entity === 'undefined') {
+        const dataSource = await useDataSource();
+        const repository = dataSource.getRepository(MasterImageEntity);
+        const entity = await repository.findOneBy({ id: result.data.master_image_id });
+        if (!entity) {
             throw new BadRequestError(buildExpressValidationErrorMessage('master_image_id'));
         }
 

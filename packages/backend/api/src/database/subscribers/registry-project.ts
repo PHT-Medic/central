@@ -13,7 +13,6 @@ import {
     buildSocketRealmNamespaceName, buildSocketRegistryProjectRoomName,
 } from '@personalhealthtrain/central-common';
 import {
-    SocketServerToClientEventConfigurationItem,
     emitSocketServerToClientEvent,
 } from '../../config/socket-emitter';
 import { RegistryProjectEntity } from '../../domains/core/registry-project/entity';

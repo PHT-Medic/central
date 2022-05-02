@@ -7,9 +7,10 @@
 
 import { Arguments, Argv, CommandModule } from 'yargs';
 import {
-    buildConnectionOptions, dropDatabase,
+    dropDatabase,
 } from 'typeorm-extension';
 import { useSpinner } from '../../config/spinner';
+import { buildDataSourceOptions } from '../../database/utils';
 
 interface ResetArguments extends Arguments {
 
@@ -28,8 +29,8 @@ export class ResetCommand implements CommandModule {
         const spinner = useSpinner();
 
         spinner.start('executing database reset...');
-        const connectionOptions = await buildConnectionOptions();
-        await dropDatabase({ ifExist: true }, connectionOptions);
+        const options = await buildDataSourceOptions();
+        await dropDatabase({ options });
         spinner.succeed('executed database reset.');
 
         process.exit(0);

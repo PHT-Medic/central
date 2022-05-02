@@ -7,8 +7,9 @@
 
 import { PermissionID, UserSecret } from '@personalhealthtrain/central-common';
 import { NotFoundError } from '@typescript-error/http';
-import { FindConditions, getRepository } from 'typeorm';
+import { FindOptionsWhere } from 'typeorm';
 import { publishMessage } from 'amqp-extension';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
 import env from '../../../../../env';
@@ -22,9 +23,10 @@ import { buildSecretStorageQueueMessage } from '../../../../../domains/special/s
 export async function deleteUserSecretRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    const repository = getRepository(UserSecretEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(UserSecretEntity);
 
-    const conditions : FindConditions<UserSecret> = {
+    const conditions : FindOptionsWhere<UserSecret> = {
         id,
         realm_id: req.realmId,
     };
@@ -33,9 +35,9 @@ export async function deleteUserSecretRouteHandler(req: ExpressRequest, res: Exp
         conditions.user_id = req.userId;
     }
 
-    const entity = await repository.findOne(conditions);
+    const entity = await repository.findOneBy(conditions);
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 

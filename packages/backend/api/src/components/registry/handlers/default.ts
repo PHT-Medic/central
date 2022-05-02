@@ -14,7 +14,7 @@ import {
     Registry,
     RegistryProjectType,
 } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
+import { useDataSource } from 'typeorm-extension';
 import {
     RegistryQueueCommand,
     RegistryQueuePayload,
@@ -36,13 +36,17 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
 
     // -----------------------------------------------
 
+    const dataSource = await useDataSource();
+
+    // -----------------------------------------------
+
     let entity : Registry;
 
     if (payload.entity) {
         entity = payload.entity;
     } else {
-        const repository = getRepository(RegistryEntity);
-        entity = await repository.findOne(payload.id);
+        const repository = dataSource.getRepository(RegistryEntity);
+        entity = await repository.findOneBy({ id: payload.id });
     }
 
     // ---------------------------------------------------------------------
@@ -59,16 +63,16 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
 
     // ---------------------------------------------------------------------
 
-    const projectRepository = getRepository(RegistryProjectEntity);
+    const projectRepository = dataSource.getRepository(RegistryProjectEntity);
 
     // ---------------------------------------------------------------------
 
     // incoming
-    let incomingEntity = await projectRepository.findOne({
+    let incomingEntity = await projectRepository.findOneBy({
         external_name: REGISTRY_INCOMING_PROJECT_NAME,
         registry_id: entity.id,
     });
-    if (typeof incomingEntity === 'undefined') {
+    if (!incomingEntity) {
         incomingEntity = projectRepository.create({
             name: REGISTRY_INCOMING_PROJECT_NAME,
             external_name: REGISTRY_INCOMING_PROJECT_NAME,
@@ -87,11 +91,11 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     // ---------------------------------------------------------------------
 
     // outgoing
-    let outgoingEntity = await projectRepository.findOne({
+    let outgoingEntity = await projectRepository.findOneBy({
         external_name: REGISTRY_OUTGOING_PROJECT_NAME,
         registry_id: entity.id,
     });
-    if (typeof outgoingEntity === 'undefined') {
+    if (!outgoingEntity) {
         outgoingEntity = projectRepository.create({
             name: REGISTRY_OUTGOING_PROJECT_NAME,
             external_name: REGISTRY_OUTGOING_PROJECT_NAME,
@@ -110,11 +114,11 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     // -----------------------------------------------------------------------
 
     // master ( images )
-    let masterImagesEntity = await projectRepository.findOne({
+    let masterImagesEntity = await projectRepository.findOneBy({
         external_name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
         registry_id: entity.id,
     });
-    if (typeof masterImagesEntity === 'undefined') {
+    if (!masterImagesEntity) {
         masterImagesEntity = projectRepository.create({
             name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
             external_name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,

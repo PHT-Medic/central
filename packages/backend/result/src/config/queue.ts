@@ -10,9 +10,7 @@ import {
     TrainManagerExtractingQueueEvent,
     TrainManagerQueueCommand,
     TrainManagerQueueCommandPayload,
-    TrainManagerQueueEventPayload,
     TrainManagerQueueEventPayloadExtended,
-    TrainManagerRoutingPayload,
     TrainManagerRoutingQueueEvent,
     hasOwnProperty,
 } from '@personalhealthtrain/central-common';

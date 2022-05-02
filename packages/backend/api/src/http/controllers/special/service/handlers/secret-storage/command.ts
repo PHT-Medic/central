@@ -12,7 +12,6 @@ import {
     getUserSecretsSecretStorageKey,
     isUserSecretsSecretStorageKey,
 } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
 import { useClient } from '@trapi/client';
 import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
@@ -20,6 +19,7 @@ import {
 import { UserEntity } from '@authelion/api-core';
 import { publishMessage } from 'amqp-extension';
 import { VaultClient } from '@trapi/vault-client';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
 import { ExpressValidationError } from '../../../../../express-validation';
 import { ApiKey } from '../../../../../../config/api';
@@ -77,11 +77,12 @@ export async function handleSecretStorageCommandRouteHandler(req: ExpressRequest
             throw new ForbiddenError();
         }
 
-        const userRepository = getRepository(UserEntity);
+        const dataSource = await useDataSource();
+        const userRepository = dataSource.getRepository(UserEntity);
 
-        const data = await userRepository.findOne(userId);
+        const data = await userRepository.findOneBy({ id: userId });
 
-        if (typeof data === 'undefined') {
+        if (!data) {
             throw new NotFoundError();
         }
 

@@ -7,7 +7,7 @@
 
 import { PermissionID, TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { BadRequestError, ForbiddenError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { runTrainStationValidation } from './utils';
@@ -29,7 +29,8 @@ export async function createTrainStationRouteHandler(req: ExpressRequest, res: E
         throw new BadRequestError('The referenced station must be assigned to a registry');
     }
 
-    const repository = getRepository(TrainStationEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(TrainStationEntity);
 
     let entity = repository.create(result.data);
 
@@ -38,7 +39,7 @@ export async function createTrainStationRouteHandler(req: ExpressRequest, res: E
     }
 
     if (!entity.index) {
-        entity.index = await repository.count({
+        entity.index = await repository.countBy({
             train_id: entity.train_id,
         });
     }
@@ -46,7 +47,7 @@ export async function createTrainStationRouteHandler(req: ExpressRequest, res: E
     entity = await repository.save(entity);
 
     result.meta.train.stations += 1;
-    const trainRepository = getRepository(TrainEntity);
+    const trainRepository = dataSource.getRepository(TrainEntity);
     await trainRepository.save(result.meta.train);
 
     entity.train = result.meta.train;

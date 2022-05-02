@@ -1,7 +1,6 @@
-import { getRepository } from 'typeorm';
 import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
 import {
-    applyFilters, applyPagination, applyRelations, applySort,
+    applyFilters, applyPagination, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
@@ -11,7 +10,8 @@ import { ExpressRequest, ExpressResponse } from '../../../../type';
 export async function getOneTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id, include } = req.params;
 
-    const repository = getRepository(TrainStationEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(TrainStationEntity);
     const query = repository.createQueryBuilder('trainStation')
         .where('trainStation.id = :id', { id });
 
@@ -22,7 +22,7 @@ export async function getOneTrainStationRouteHandler(req: ExpressRequest, res: E
 
     const entity = await query.getOne();
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
@@ -41,7 +41,8 @@ export async function getManyTrainStationRouteHandler(req: ExpressRequest, res: 
         filter, page, include, sort,
     } = req.query;
 
-    const repository = getRepository(TrainStationEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(TrainStationEntity);
     const query = await repository.createQueryBuilder('trainStation');
     query.distinctOn(['trainStation.id']);
 

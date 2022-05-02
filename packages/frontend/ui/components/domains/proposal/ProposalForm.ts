@@ -253,7 +253,7 @@ export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Pr
                     },
                 },
                 scopedSlots: {
-                    [SlotName.HEADER_TITLE]: (props) => h('label', ['Stations']),
+                    [SlotName.HEADER_TITLE]: () => h('label', ['Stations']),
                     [SlotName.ITEM_ACTIONS]: (props) => {
                         if (vm.isEditing) {
                             return h(ProposalStationAssignAction, {

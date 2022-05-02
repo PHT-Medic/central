@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getRepository } from 'typeorm';
 import {
     Ecosystem,
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
@@ -14,6 +13,7 @@ import {
 import { createClient, useClient } from '@trapi/client';
 import { HarborClient } from '@trapi/harbor-client';
 import { VaultClient } from '@trapi/vault-client';
+import { useDataSource } from 'typeorm-extension';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
 import {
     RegistryQueueCommand,
@@ -30,7 +30,8 @@ import { createBasicHarborAPIConfig } from '../../../domains/special/registry/ut
 export async function linkRegistryProject(
     payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_LINK>,
 ) {
-    const repository = getRepository(RegistryProjectEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(RegistryProjectEntity);
 
     let { entity } = payload;
 
@@ -43,7 +44,7 @@ export async function linkRegistryProject(
             .getOne();
     }
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         useLogger()
             .error('Registry project not found.', {
                 component: 'registry',
@@ -62,7 +63,7 @@ export async function linkRegistryProject(
         return;
     }
 
-    const registryRepository = getRepository(RegistryEntity);
+    const registryRepository = dataSource.getRepository(RegistryEntity);
     const registryEntity = await registryRepository.createQueryBuilder('registry')
         .addSelect([
             'registry.account_secret',
@@ -70,7 +71,7 @@ export async function linkRegistryProject(
         .where('registry.id = :id', { id: entity.registry_id })
         .getOne();
 
-    if (typeof registryEntity === 'undefined') {
+    if (!registryEntity) {
         useLogger()
             .error('Registry not found.', {
                 component: 'registry',
@@ -166,7 +167,8 @@ export async function linkRegistryProject(
 export async function unlinkRegistryProject(
     payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_UNLINK>,
 ) {
-    const registryRepository = getRepository(RegistryEntity);
+    const dataSource = await useDataSource();
+    const registryRepository = dataSource.getRepository(RegistryEntity);
     const registryEntity = await registryRepository.createQueryBuilder('registry')
         .addSelect([
             'registry.account_secret',
@@ -214,8 +216,8 @@ export async function unlinkRegistryProject(
     }
 
     if (payload.updateDatabase) {
-        const projectRepository = getRepository(RegistryProjectEntity);
-        const project = await projectRepository.findOne(payload.id);
+        const projectRepository = dataSource.getRepository(RegistryProjectEntity);
+        const project = await projectRepository.findOneBy({ id: payload.id });
 
         if (project) {
             project.external_id = null;
@@ -239,5 +241,6 @@ export async function relinkRegistryProject(
         ...payload,
         updateDatabase: true,
     });
+
     await linkRegistryProject(payload);
 }

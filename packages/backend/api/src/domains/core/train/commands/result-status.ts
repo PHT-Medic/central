@@ -10,7 +10,7 @@ import {
     TrainManagerExtractingMode, TrainManagerQueueCommand,
 } from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
-import { getRepository } from 'typeorm';
+import { useDataSource } from 'typeorm-extension';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
@@ -18,7 +18,8 @@ import { TrainEntity } from '../entity';
 export async function triggerTrainResultStatus(
     train: string | Train,
 ) : Promise<Train> {
-    const repository = getRepository<Train>(TrainEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 

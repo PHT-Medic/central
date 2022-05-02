@@ -6,12 +6,11 @@
  */
 
 import {
-    Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
+    Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import { MasterImage, Proposal, ProposalRisk } from '@personalhealthtrain/central-common';
 import { RealmEntity, UserEntity } from '@authelion/api-core';
 import { Realm, User } from '@authelion/common';
-import { ProposalStationEntity } from '../proposal-station/entity';
 import { MasterImageEntity } from '../master-image/entity';
 
 @Entity({ name: 'proposals' })

@@ -6,10 +6,10 @@
  */
 
 import { check, matchedData, validationResult } from 'express-validator';
-import { getRepository } from 'typeorm';
 import { Train, TrainCommand } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { useDataSource } from 'typeorm-extension';
 import {
     detectTrainBuildStatus,
     detectTrainRunStatus,
@@ -50,11 +50,12 @@ export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: E
 
     const validationData = matchedData(req, { includeOptionals: true });
 
-    const repository = getRepository<Train>(TrainEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository<Train>(TrainEntity);
 
-    let entity = await repository.findOne(id);
+    let entity = await repository.findOneBy({ id });
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 

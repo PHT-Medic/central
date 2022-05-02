@@ -6,7 +6,7 @@
  */
 
 import { publishMessage } from 'amqp-extension';
-import { Not, getRepository } from 'typeorm';
+import { Not } from 'typeorm';
 import {
     Ecosystem,
     RegistryProjectType,
@@ -16,6 +16,7 @@ import {
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
 import { BadRequestError } from '@typescript-error/http';
+import { useDataSource } from 'typeorm-extension';
 import { findTrain } from './utils';
 import { TrainStationEntity } from '../../train-station/entity';
 import { TrainEntity } from '../entity';
@@ -26,19 +27,20 @@ import { RegistryProjectEntity } from '../../registry-project/entity';
 export async function startBuildTrain(
     train: Train | number | string,
 ) : Promise<Train> {
-    const repository = getRepository<Train>(TrainEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 
-    if (typeof train === 'undefined') {
+    if (!train) {
         throw new BadRequestError('The train could not be found.');
     }
 
     if (train.run_status) {
         throw new BadRequestError('The train can not longer be build...');
     } else {
-        const trainStationRepository = getRepository(TrainStationEntity);
-        const trainStations = await trainStationRepository.find({
+        const trainStationRepository = dataSource.getRepository(TrainStationEntity);
+        const trainStations = await trainStationRepository.findBy({
             train_id: train.id,
             approval_status: Not(TrainStationApprovalStatus.APPROVED),
         });
@@ -48,14 +50,14 @@ export async function startBuildTrain(
         }
 
         if (!train.registry_id) {
-            const registryRepository = getRepository(RegistryEntity);
+            const registryRepository = dataSource.getRepository(RegistryEntity);
             const registry = await registryRepository.findOne({
                 where: {
                     ecosystem: Ecosystem.DEFAULT,
                 },
             });
 
-            if (typeof registry === 'undefined') {
+            if (!registry) {
                 throw new BadRequestError('No registry is registered for the default ecosystem.');
             }
 
@@ -63,7 +65,7 @@ export async function startBuildTrain(
         }
 
         if (!train.incoming_registry_project_id) {
-            const projectRepository = getRepository(RegistryProjectEntity);
+            const projectRepository = dataSource.getRepository(RegistryProjectEntity);
             const project = await projectRepository.findOne({
                 where: {
                     registry_id: train.registry_id,
@@ -71,7 +73,7 @@ export async function startBuildTrain(
                 },
             });
 
-            if (typeof project === 'undefined') {
+            if (!project) {
                 throw new BadRequestError('No incoming project is registered for the default ecosystem.');
             }
 

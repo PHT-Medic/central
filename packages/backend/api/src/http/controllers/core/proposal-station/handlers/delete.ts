@@ -7,8 +7,8 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { useDataSource } from 'typeorm-extension';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 
@@ -22,11 +22,12 @@ export async function deleteProposalStationRouteHandler(req: ExpressRequest, res
         throw new ForbiddenError('You are not allowed to drop a proposal station.');
     }
 
-    const repository = getRepository(ProposalStationEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(ProposalStationEntity);
 
-    const entity = await repository.findOne(id);
+    const entity = await repository.findOneBy({ id });
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 

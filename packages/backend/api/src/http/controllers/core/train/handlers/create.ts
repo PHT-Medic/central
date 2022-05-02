@@ -7,7 +7,7 @@
 
 import { PermissionID, Train } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
+import { useDataSource } from 'typeorm-extension';
 import { runTrainValidation } from './utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
@@ -27,7 +27,8 @@ export async function createTrainRouteHandler(req: ExpressRequest, res: ExpressR
         result.data.master_image_id = result.meta.proposal.master_image_id;
     }
 
-    const repository = getRepository<Train>(TrainEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository<Train>(TrainEntity);
 
     const entity = repository.create({
         realm_id: req.realmId,
@@ -38,7 +39,7 @@ export async function createTrainRouteHandler(req: ExpressRequest, res: ExpressR
     await repository.save(entity);
 
     result.meta.proposal.trains++;
-    const proposalRepository = getRepository(ProposalEntity);
+    const proposalRepository = dataSource.getRepository(ProposalEntity);
     await proposalRepository.save(result.meta.proposal);
 
     entity.proposal = result.meta.proposal;

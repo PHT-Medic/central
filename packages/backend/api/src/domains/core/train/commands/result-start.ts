@@ -6,7 +6,6 @@
  */
 
 import { publishMessage } from 'amqp-extension';
-import { getRepository } from 'typeorm';
 import {
     Train,
     TrainContainerPath,
@@ -15,6 +14,7 @@ import {
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
+import { useDataSource } from 'typeorm-extension';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
@@ -22,7 +22,8 @@ import { TrainEntity } from '../entity';
 export async function triggerTrainResultStart(
     train: string | Train,
 ) : Promise<Train> {
-    const repository = getRepository<Train>(TrainEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 

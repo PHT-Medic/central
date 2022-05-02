@@ -9,7 +9,6 @@ import {
     Registry,
     RegistryProject,
     RegistryProjectType,
-    Station,
     createNanoID,
 } from '@personalhealthtrain/central-common';
 import Vue, {

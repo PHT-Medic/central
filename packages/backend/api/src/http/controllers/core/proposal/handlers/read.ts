@@ -1,8 +1,7 @@
-import { getRepository } from 'typeorm';
 import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
 import {
     applyFields,
-    applyFilters, applyPagination, applyRelations, applySort,
+    applyFilters, applyPagination, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
@@ -13,7 +12,8 @@ export async function getOneProposalRouteHandler(req: ExpressRequest, res: Expre
     const { id } = req.params;
     const { include } = req.query;
 
-    const repository = getRepository(ProposalEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(ProposalEntity);
     const query = repository.createQueryBuilder('proposal')
         .where('proposal.id = :id', { id });
 
@@ -24,7 +24,7 @@ export async function getOneProposalRouteHandler(req: ExpressRequest, res: Expre
 
     const entity = await query.getOne();
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
@@ -43,7 +43,9 @@ export async function getManyProposalRouteHandler(req: ExpressRequest, res: Expr
         filter, page, sort, include, fields,
     } = req.query;
 
-    const repository = getRepository(ProposalEntity);
+    const dataSource = await useDataSource();
+
+    const repository = dataSource.getRepository(ProposalEntity);
     const query = repository.createQueryBuilder('proposal');
 
     if (filter) {

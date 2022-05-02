@@ -7,10 +7,11 @@
 
 import { useClient } from '@trapi/client';
 import { Message, publishMessage } from 'amqp-extension';
-import { In, getRepository } from 'typeorm';
+import { In } from 'typeorm';
 import { RealmEntity } from '@authelion/api-core';
 import { hasOwnProperty } from '@authelion/common';
 import { Ecosystem } from '@personalhealthtrain/central-common';
+import { useDataSource } from 'typeorm-extension';
 import { StationEntity } from '../../../domains/core/station/entity';
 import { ApiKey } from '../../../config/api';
 import { transformStationRegistryResponse } from '../utils/transform';
@@ -22,7 +23,8 @@ import {
 import { useLogger } from '../../../config/log';
 
 export async function syncStationRegistry(message: Message) {
-    const realmRepository = getRepository(RealmEntity);
+    const dataSource = await useDataSource();
+    const realmRepository = dataSource.getRepository(RealmEntity);
 
     let response = await useClient(ApiKey.AACHEN_STATION_REGISTRY).get('organizations');
 
@@ -40,7 +42,7 @@ export async function syncStationRegistry(message: Message) {
             },
         );
 
-    const realms = await realmRepository.find({
+    const realms = await realmRepository.findBy({
         id: In(externalRealms.map((item) => item.id)),
     });
     const realmIds = realms.map((item) => item.id);
@@ -82,7 +84,7 @@ export async function syncStationRegistry(message: Message) {
 
     // -------------------------------------------------------------------------
 
-    const stationRepository = getRepository(StationEntity);
+    const stationRepository = dataSource.getRepository(StationEntity);
     response = await useClient(ApiKey.AACHEN_STATION_REGISTRY).get('stations');
 
     let externalStations = transformStationRegistryResponse(response.data)
@@ -121,7 +123,7 @@ export async function syncStationRegistry(message: Message) {
         return item;
     });
 
-    const stations = await stationRepository.find({
+    const stations = await stationRepository.findBy({
         external_name: In(externalStations.map((item) => item.external_name)),
     });
     const stationSecureIds = stations.map((item) => item.external_name);

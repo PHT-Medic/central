@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { RegistryCommand, ServiceID, TrainCommand } from '@personalhealthtrain/central-common';
+import { RegistryCommand, ServiceID } from '@personalhealthtrain/central-common';
 import { SwaggerTags } from '@trapi/swagger';
 import {
-    Body, Controller, Params, Post, Request, Response,
+    Body, Controller, Post, Request, Response,
 } from '@decorators/express';
 
 import { NotFoundError } from '@typescript-error/http';

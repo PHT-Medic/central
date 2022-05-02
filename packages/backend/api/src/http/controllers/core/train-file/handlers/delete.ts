@@ -7,9 +7,9 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import fs from 'fs';
+import { useDataSource } from 'typeorm-extension';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { getTrainFileFilePath } from '../../../../../config/pht/train-file/path';
@@ -25,11 +25,12 @@ export async function deleteTrainFileRouteHandler(req: ExpressRequest, res: Expr
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(TrainFileEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(TrainFileEntity);
 
-    const entity = await repository.findOne(fileId);
+    const entity = await repository.findOneBy({ id: fileId });
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
@@ -46,8 +47,8 @@ export async function deleteTrainFileRouteHandler(req: ExpressRequest, res: Expr
     entity.id = entityId;
 
     // train
-    const trainRepository = getRepository(TrainEntity);
-    let train = await trainRepository.findOne(entity.train_id);
+    const trainRepository = dataSource.getRepository(TrainEntity);
+    let train = await trainRepository.findOneBy({ id: entity.train_id });
     train = trainRepository.merge(train, {
         hash: null,
         hash_signed: null,

@@ -10,7 +10,6 @@ import { ClientDriverInstance } from '@trapi/client';
 import { Registry } from './entity';
 import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 import { nullifyEmptyObjectProperties } from '../../../utils';
-import { RegistryCommand } from '../../special';
 
 export class RegistryAPI {
     protected client: ClientDriverInstance;

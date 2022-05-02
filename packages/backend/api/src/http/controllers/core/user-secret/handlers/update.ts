@@ -1,8 +1,8 @@
 import { NotFoundError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
 import { PermissionID, SecretType, isHex } from '@personalhealthtrain/central-common';
 import { Buffer } from 'buffer';
 import { publishMessage } from 'amqp-extension';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { runUserSecretValidation } from './utils';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
@@ -19,15 +19,16 @@ export async function updateUserSecretRouteHandler(req: ExpressRequest, res: Exp
 
     const data = await runUserSecretValidation(req, 'update');
 
-    const repository = getRepository(UserSecretEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(UserSecretEntity);
 
-    let entity = await repository.findOne({
+    let entity = await repository.findOneBy({
         id,
         realm_id: req.realmId,
         ...(!req.ability.hasPermission(PermissionID.USER_EDIT) ? { user_id: req.user.id } : {}),
     });
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 

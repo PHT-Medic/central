@@ -6,11 +6,11 @@
  */
 
 import path from 'path';
-import { ConnectionWithAdditionalOptions, buildConnectionOptions } from 'typeorm-extension';
+import { buildDataSourceOptions as buildOptions } from 'typeorm-extension';
 import {
     setEntitiesForConnectionOptions,
 } from '@authelion/api-core';
-import { ConnectionOptions } from 'typeorm';
+import { DataSourceOptions } from 'typeorm';
 import { MasterImageEntity } from '../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../domains/core/master-image-group/entity';
 import { ProposalEntity } from '../domains/core/proposal/entity';
@@ -23,15 +23,15 @@ import { UserSecretEntity } from '../domains/core/user-secret/entity';
 import { RegistryEntity } from '../domains/core/registry/entity';
 import { RegistryProjectEntity } from '../domains/core/registry-project/entity';
 
-export function modifyDatabaseConnectionOptions(
-    connectionOptions: ConnectionWithAdditionalOptions,
+export function extendDataSourceOptions(
+    options: DataSourceOptions,
 ) {
-    connectionOptions = setEntitiesForConnectionOptions(connectionOptions);
+    options = setEntitiesForConnectionOptions(options);
 
-    connectionOptions = {
-        ...connectionOptions,
+    options = {
+        ...options,
         entities: [
-            ...(connectionOptions.entities ? connectionOptions.entities : []),
+            ...(options.entities ? options.entities : []) as string[],
             MasterImageEntity,
             MasterImageGroupEntity,
             ProposalEntity,
@@ -46,32 +46,32 @@ export function modifyDatabaseConnectionOptions(
         ],
     };
 
-    connectionOptions = {
-        ...connectionOptions,
+    options = {
+        ...options,
         migrations: [
             path.join(__dirname, 'migrations', '*{.ts,.js}'),
         ],
     };
 
-    connectionOptions = {
-        ...connectionOptions,
+    options = {
+        ...options,
         subscribers: [
-            ...(connectionOptions.subscribers ? connectionOptions.subscribers : []),
+            ...(options.subscribers ? options.subscribers : []) as string[],
             path.join(__dirname, 'subscribers', '*{.ts,.js}'),
         ],
     };
 
-    return connectionOptions;
+    return options;
 }
 
-export async function buildDatabaseConnectionOptions(options?: ConnectionOptions) {
-    let connectionOptions;
+export async function buildDataSourceOptions() {
+    let options;
 
     try {
-        connectionOptions = await buildConnectionOptions(options);
-        connectionOptions.logging = ['error'];
+        options = await buildOptions();
+        options.logging = ['error'];
     } catch (e) {
-        connectionOptions = {
+        options = {
             name: 'default',
             type: 'better-sqlite3',
             database: path.join(process.cwd(), 'writable', process.env.NODE_ENV === 'test' ? 'test.sql' : 'db.sql'),
@@ -81,5 +81,5 @@ export async function buildDatabaseConnectionOptions(options?: ConnectionOptions
         };
     }
 
-    return modifyDatabaseConnectionOptions(connectionOptions);
+    return extendDataSourceOptions(options);
 }

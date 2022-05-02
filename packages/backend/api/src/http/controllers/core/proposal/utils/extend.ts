@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getRepository } from 'typeorm';
-import { BadRequestError, NotFoundError } from '@typescript-error/http';
+import { BadRequestError } from '@typescript-error/http';
 import { Proposal } from '@personalhealthtrain/central-common';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressValidationResult, buildExpressValidationErrorMessage } from '../../../../express-validation';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 
@@ -23,9 +23,11 @@ export async function extendExpressValidationResultWithProposal<
     T extends ExpressValidationResultExtendedWithProposal,
     >(result: T) : Promise<T> {
     if (result.data.proposal_id) {
-        const repository = getRepository(ProposalEntity);
-        const entity = await repository.findOne(result.data.proposal_id);
-        if (typeof entity === 'undefined') {
+        const dataSource = await useDataSource();
+
+        const repository = dataSource.getRepository(ProposalEntity);
+        const entity = await repository.findOneBy({ id: result.data.proposal_id });
+        if (!entity) {
             throw new BadRequestError(buildExpressValidationErrorMessage('proposal_id'));
         }
 

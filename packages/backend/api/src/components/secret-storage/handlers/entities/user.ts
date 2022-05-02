@@ -9,8 +9,8 @@ import {
     USER_SECRETS_SECRET_ENGINE_KEY,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
-import { getRepository } from 'typeorm';
 import { VaultClient } from '@trapi/vault-client';
+import { useDataSource } from 'typeorm-extension';
 import { ApiKey } from '../../../../config/api';
 import {
     SecretStorageUserSecretsQueuePayload,
@@ -29,7 +29,8 @@ export async function deleteUserSecretsFromSecretStorage(payload: SecretStorageU
 }
 
 export async function saveUserSecretsToSecretStorage(payload: SecretStorageUserSecretsQueuePayload) {
-    const repository = await getRepository(UserSecretEntity);
+    const dataSource = await useDataSource();
+    const repository = await dataSource.getRepository(UserSecretEntity);
     const query = repository.createQueryBuilder('secret')
         .where('secret.user_id = :id', { id: payload.id })
         .orderBy('secret.created_at', 'DESC');

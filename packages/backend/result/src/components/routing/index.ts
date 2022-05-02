@@ -7,7 +7,6 @@
 
 import { ConsumeHandlers, Message } from 'amqp-extension';
 import { TrainManagerQueueCommand } from '@personalhealthtrain/central-common';
-import { useLogger } from '../../modules/log';
 import { writeProcessedEvent } from './write-processed';
 import { writeProcessingEvent } from './write-processing';
 import { writeFailedEvent } from './write-failed';

@@ -1,6 +1,7 @@
-import { getRepository } from 'typeorm';
 import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
-import { applyFilters, applyPagination, applyRelations } from 'typeorm-extension';
+import {
+    applyFilters, applyPagination, applyRelations, useDataSource,
+} from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
@@ -10,7 +11,8 @@ export async function getOneProposalStationRouteHandler(req: ExpressRequest, res
     const { id } = req.params;
     const { include } = req.query;
 
-    const repository = getRepository(ProposalStationEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(ProposalStationEntity);
     const query = repository.createQueryBuilder('proposalStation')
         .where('proposalStation.id = :id', { id });
 
@@ -21,7 +23,7 @@ export async function getOneProposalStationRouteHandler(req: ExpressRequest, res
 
     const entity = await query.getOne();
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
@@ -38,7 +40,9 @@ export async function getOneProposalStationRouteHandler(req: ExpressRequest, res
 export async function getManyProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { filter, page, include } = req.query;
 
-    const repository = getRepository(ProposalStationEntity);
+    const dataSource = await useDataSource();
+
+    const repository = dataSource.getRepository(ProposalStationEntity);
     const query = await repository.createQueryBuilder('proposalStation');
     query.distinctOn(['proposalStation.id']);
 

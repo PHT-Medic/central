@@ -17,7 +17,6 @@ import {
     buildFormSubmit,
     initPropertiesFromSource,
 } from '@vue-layout/utils';
-import { FormGroup } from '../../FormGroup';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 
 type Properties = {

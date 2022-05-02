@@ -7,18 +7,19 @@
 
 import { Train, TrainRunStatus } from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
-import { getRepository } from 'typeorm';
 import { BadRequestError } from '@typescript-error/http';
+import { useDataSource } from 'typeorm-extension';
 import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../special/train-router';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 
 export async function resetTrain(train: Train | number | string) : Promise<Train> {
-    const repository = getRepository<Train>(TrainEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository<Train>(TrainEntity);
 
     train = await findTrain(train, repository);
 
-    if (typeof train === 'undefined') {
+    if (!train) {
         throw new BadRequestError('The train could not be found.');
     }
 

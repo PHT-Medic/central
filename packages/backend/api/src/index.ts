@@ -8,16 +8,17 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 
-import { createConnection } from 'typeorm';
-import { buildTokenAggregator } from '@authelion/api-core';
+import { DataSource } from 'typeorm';
+import { buildTokenAggregator, setDataSource as setAuthDataSource } from '@authelion/api-core';
 import { useClient } from 'redis-extension';
 
+import { setDataSource, setDataSourceOptions } from 'typeorm-extension';
 import env from './env';
 import { createConfig } from './config';
 import { createExpressApp } from './http/express';
 import { createHttpServer } from './http/server';
 import { useLogger } from './config/log';
-import { buildDatabaseConnectionOptions } from './database/utils';
+import { buildDataSourceOptions } from './database/utils';
 
 dotenv.config();
 
@@ -46,10 +47,17 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
         httpServer.listen(env.port, '0.0.0.0', signalStart);
     }
 
-    const connectionOptions = await buildDatabaseConnectionOptions();
-    const connection = await createConnection(connectionOptions);
+    const dataSourceOptions = await buildDataSourceOptions();
+    await setDataSourceOptions(dataSourceOptions);
+
+    const dataSource = new DataSource(dataSourceOptions);
+    await dataSource.initialize();
+
+    await setDataSource(dataSource);
+    await setAuthDataSource(dataSource);
+
     if (env.env === 'development') {
-        await connection.synchronize();
+        await dataSource.synchronize();
     }
 
     const { start: startTokenAggregator } = buildTokenAggregator(redis);

@@ -6,7 +6,7 @@
   -->
 <template>
     <span>
-        <slot :iconClass="iconClass">
+        <slot :icon-class="iconClass">
             <i
                 class="fa"
                 :class="iconClass"

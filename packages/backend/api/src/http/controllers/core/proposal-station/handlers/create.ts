@@ -7,7 +7,7 @@
 
 import { PermissionID, ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@typescript-error/http';
-import { getRepository } from 'typeorm';
+import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { runProposalStationValidation } from './utils';
@@ -23,7 +23,8 @@ export async function createProposalStationRouteHandler(req: ExpressRequest, res
 
     const result = await runProposalStationValidation(req, 'create');
 
-    const repository = getRepository(ProposalStationEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(ProposalStationEntity);
     let entity = repository.create(result.data);
 
     if (env.skipProposalApprovalOperation) {

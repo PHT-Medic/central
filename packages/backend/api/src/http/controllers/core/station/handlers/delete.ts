@@ -7,9 +7,9 @@
 
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { getRepository } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { publishMessage } from 'amqp-extension';
+import { useDataSource } from 'typeorm-extension';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
@@ -22,11 +22,12 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
         throw new ForbiddenError();
     }
 
-    const repository = getRepository(StationEntity);
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(StationEntity);
 
-    const entity = await repository.findOne(id);
+    const entity = await repository.findOneBy({ id });
 
-    if (typeof entity === 'undefined') {
+    if (!entity) {
         throw new NotFoundError();
     }
 
@@ -37,9 +38,9 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
     if (
         entity.registry_project_id
     ) {
-        const registryProjectRepository = getRepository(RegistryProjectEntity);
+        const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
 
-        const registryProject = await registryProjectRepository.findOne(entity.registry_project_id);
+        const registryProject = await registryProjectRepository.findOneBy({ id: entity.registry_project_id });
         if (registryProject) {
             const queueMessage = buildRegistryQueueMessage(
                 RegistryQueueCommand.PROJECT_UNLINK,
