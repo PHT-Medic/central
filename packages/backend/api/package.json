@@ -21,7 +21,7 @@
         "@trapi/harbor-client": "^0.1.2",
         "@trapi/query": "^2.1.2",
         "@trapi/swagger": "^0.2.16",
-        "@trapi/vault-client": "^0.0.1",
+        "@trapi/vault-client": "^0.0.4",
         "@typescript-error/http": "^1.1.4",
         "amqp-extension": "^1.0.2",
         "body-parser": "^1.20.0",
@@ -70,7 +70,7 @@
         "jest": "^28.0.3",
         "jest-serial-runner": "^1.2.0",
         "nodemon": "^2.0.15",
-        "supertest": "^6.1.6",
+        "supertest": "^6.2.3",
         "ts-jest": "^27.1.4",
         "ts-node": "^10.7.0",
         "ts-node-dev": "^1.1.7"
