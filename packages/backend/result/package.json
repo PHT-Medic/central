@@ -43,7 +43,7 @@
         "zlib": "^1.0.5"
     },
     "devDependencies": {
-        "@types/cookie-parser": "^1.4.2",
+        "@types/cookie-parser": "^1.4.3",
         "@types/cors": "^2.8.8",
         "@types/dockerode": "^3.3.8",
         "@types/dotenv": "^8.2.0",
