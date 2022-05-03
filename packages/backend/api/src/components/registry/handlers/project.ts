@@ -103,6 +103,7 @@ export async function linkRegistryProject(
 
         entity.external_id = project.project_id;
     } catch (e) {
+        console.log(e);
         useLogger()
             .warn('Project could not be created.', {
                 component: 'registry',

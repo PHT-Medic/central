@@ -9,7 +9,7 @@ import 'reflect-metadata';
 import dotenv from 'dotenv';
 
 import { DataSource } from 'typeorm';
-import { buildTokenAggregator, setDataSource as setAuthDataSource } from '@authelion/api-core';
+import { buildTokenAggregator } from '@authelion/api-core';
 import { useClient } from 'redis-extension';
 
 import { setDataSource, setDataSourceOptions } from 'typeorm-extension';
@@ -54,7 +54,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     await dataSource.initialize();
 
     await setDataSource(dataSource);
-    await setAuthDataSource(dataSource);
 
     if (env.env === 'development') {
         await dataSource.synchronize();

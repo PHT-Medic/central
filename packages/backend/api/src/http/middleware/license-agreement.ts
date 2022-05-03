@@ -14,7 +14,7 @@ export function checkLicenseAgreementAccepted(req: ExpressRequest, res: ExpressR
         if (
             !req.user.extra ||
             !hasOwnProperty(req.user.extra, 'license_agreement') ||
-            !req.user.extra.license_agreement
+            req.user.extra.license_agreement !== 'accepted'
         ) {
             if (
                 req.originalUrl.startsWith('/user-attributes') ||
