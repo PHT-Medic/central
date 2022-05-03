@@ -17,11 +17,9 @@ import {
     SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
 import { Socket } from 'socket.io-client';
-import { MASTER_REALM_ID, Realm } from '@authelion/common';
 
 type Properties = {
-    entityId: RegistryProject['id'],
-    realmId?: Realm['id']
+    entityId: RegistryProject['id']
 };
 
 type Data = {
@@ -33,9 +31,6 @@ export default Vue.extend<Data, any, any, Properties>({
     name: 'RegistryProjectDetails',
     props: {
         entityId: String as PropType<RegistryProject['id']>,
-        realmId: {
-            type: String,
-        },
     },
     data() {
         return {
@@ -44,21 +39,6 @@ export default Vue.extend<Data, any, any, Properties>({
         };
     },
     computed: {
-        userRealmId() {
-            return this.$store.getters['auth/userRealmId'];
-        },
-        socketRealmId() {
-            if (this.realmId) {
-                return this.realmId;
-            }
-
-            if (this.userRealmId === MASTER_REALM_ID) {
-                return undefined;
-            }
-
-            return this.userRealmId;
-        },
-
         name() {
             return this.entity ?
                 this.entity.external_name :
@@ -98,7 +78,7 @@ export default Vue.extend<Data, any, any, Properties>({
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.socketRealmId);
+        > = this.$socket.useRealmWorkspace();
 
         socket.emit(RegistryProjectSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.entityId } });
         socket.on(RegistryProjectSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
@@ -107,7 +87,7 @@ export default Vue.extend<Data, any, any, Properties>({
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.socketRealmId);
+        > = this.$socket.useRealmWorkspace();
 
         socket.emit(RegistryProjectSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.entityId } });
         socket.off(RegistryProjectSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);

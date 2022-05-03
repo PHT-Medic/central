@@ -78,7 +78,6 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
             external_name: REGISTRY_INCOMING_PROJECT_NAME,
             type: RegistryProjectType.INCOMING,
             registry_id: entity.id,
-            realm_id: entity.realm_id,
             public: false,
         });
     } else {
@@ -101,7 +100,6 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
             external_name: REGISTRY_OUTGOING_PROJECT_NAME,
             type: RegistryProjectType.OUTGOING,
             registry_id: entity.id,
-            realm_id: entity.realm_id,
             public: false,
         });
     } else {
@@ -124,7 +122,6 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
             external_name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
             type: RegistryProjectType.MASTER_IMAGES,
             registry_id: entity.id,
-            realm_id: entity.realm_id,
             public: true,
         });
     } else {

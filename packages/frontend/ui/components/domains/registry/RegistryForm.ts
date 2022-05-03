@@ -7,31 +7,24 @@
 
 import { Ecosystem, Registry } from '@personalhealthtrain/central-common';
 import Vue, {
-    CreateElement, PropType, VNode, VNodeChildren,
+    CreateElement, PropType, VNode,
 } from 'vue';
 import {
-    ComponentFormData, SlotName, buildFormInput, buildFormSelect, buildFormSubmit, initPropertiesFromSource,
+    ComponentFormData, buildFormInput, buildFormSelect, buildFormSubmit, initPropertiesFromSource,
 } from '@vue-layout/utils';
 import {
     maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
-import { RealmList } from '@authelion/vue';
-import { Realm } from '@authelion/common';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 
 type Properties = {
-    entity: Registry,
-    realmId?: Realm['id']
+    entity: Registry
 };
 
 export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Properties>({
     props: {
         entity: {
             type: Object as PropType<Registry>,
-            default: undefined,
-        },
-        realmId: {
-            type: String as PropType<Realm['id']>,
             default: undefined,
         },
     },
@@ -43,7 +36,6 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
                 ecosystem: Ecosystem.DEFAULT,
                 account_name: '',
                 account_secret: '',
-                realm_id: '',
             },
 
             busy: false,
@@ -58,9 +50,6 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
         isEditing() {
             return this.entity &&
                 Object.prototype.hasOwnProperty.call(this.entity, 'id');
-        },
-        isRealmLocked() {
-            return this.realmId;
         },
         updatedAt() {
             return this.entity ? this.entity.updated_at : undefined;
@@ -99,18 +88,11 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
                     minLength: minLength(3),
                     maxLength: maxLength(256),
                 },
-                realm_id: {
-                    required,
-                },
             },
         };
     },
     methods: {
         initFromProperties() {
-            if (this.realmId) {
-                this.form.realm_id = this.realmId;
-            }
-
             if (typeof this.entity === 'undefined') return;
 
             initPropertiesFromSource(this.entity, this.form);
@@ -191,42 +173,6 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
             propName: 'account_secret',
         });
 
-        let realm : VNodeChildren = [];
-
-        if (!vm.isRealmLocked) {
-            realm = [
-                h('hr'),
-                h(RealmList, {
-                    scopedSlots: {
-                        [SlotName.ITEM_ACTIONS]: (props) => h('button', {
-                            attrs: {
-                                disabled: props.busy,
-                            },
-                            class: {
-                                'btn-dark': vm.form.realm_id !== props.item.id,
-                                'btn-warning': vm.form.realm_id === props.item.id,
-                            },
-                            staticClass: 'btn btn-xs',
-                            on: {
-                                click($event) {
-                                    $event.preventDefault();
-
-                                    vm.toggleFormData.call(null, 'realm_id', props.item.id);
-                                },
-                            },
-                        }, [
-                            h('i', {
-                                class: {
-                                    'fa fa-plus': vm.form.realm_id !== props.item.id,
-                                    'fa fa-minus': vm.form.realm_id === props.item.id,
-                                },
-                            }),
-                        ]),
-                    },
-                }),
-            ];
-        }
-
         const submit = buildFormSubmit(vm, h, {
             createText: 'Create',
             updateText: 'Update',
@@ -267,7 +213,6 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
             ),
             h('hr'),
             ecosystem,
-            realm,
             h('hr'),
             submit,
         ]);

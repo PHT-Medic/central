@@ -120,10 +120,6 @@ export async function runTrainValidation(
     }
 
     if (result.meta.registry) {
-        if (!isPermittedForResourceRealm(req.realmId, result.meta.registry.realm_id)) {
-            throw new BadRequestError('The referenced registry realm is not permitted.');
-        }
-
         if (result.meta.registry.ecosystem !== Ecosystem.DEFAULT) {
             throw new BadRequestError('The registry must be part of the default ecosystem.');
         }

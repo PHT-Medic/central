@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
 import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
@@ -26,10 +32,6 @@ export async function updateRegistryProjectRouteHandler(req: ExpressRequest, res
 
     if (!entity) {
         throw new NotFoundError();
-    }
-
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
-        throw new ForbiddenError();
     }
 
     entity = repository.merge(entity, result.data);

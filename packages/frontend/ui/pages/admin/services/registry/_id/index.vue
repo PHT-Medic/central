@@ -32,7 +32,6 @@ export default {
     <div>
         <registry-form
             :entity="entity"
-            :realm-id="entity.realm_id"
             @updated="handleUpdated"
             @deleted="handleDeleted"
         />

@@ -1,10 +1,15 @@
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
 import { SelectQueryBuilder } from 'typeorm';
-import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
 import {
-    applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, applySort, useDataSource,
+    applyFilters, applyPagination, applyQueryFieldsParseOutput, applySort, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
 import { parseQueryFields } from '@trapi/query';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
@@ -48,17 +53,11 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
 
 export async function getOneRegistryRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
-    const { include } = req.query;
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryEntity);
     const query = repository.createQueryBuilder('registry')
         .where('registry.id = :id', { id });
-
-    applyRelations(query, include, {
-        defaultAlias: 'registry',
-        allowed: ['realm'],
-    });
 
     checkAndApplyFields(req, query);
 
@@ -68,39 +67,28 @@ export async function getOneRegistryRouteHandler(req: ExpressRequest, res: Expre
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
-        throw new ForbiddenError();
-    }
-
     return res.respond({ data: entity });
 }
 
 export async function getManyRegistryRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {
-        filter, page, sort, include,
+        filter, page, sort,
     } = req.query;
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryEntity);
     const query = repository.createQueryBuilder('registry');
 
-    onlyRealmPermittedQueryResources(query, req.realmId, 'registry.realm_id');
-
     checkAndApplyFields(req, query);
 
     applyFilters(query, filter, {
         defaultAlias: 'registry',
-        allowed: ['id', 'ecosystem', 'realm_id', 'name'],
+        allowed: ['id', 'ecosystem', 'name'],
     });
 
     applySort(query, sort, {
         defaultAlias: 'registry',
         allowed: ['id', 'updated_at', 'created_at'],
-    });
-
-    applyRelations(query, include, {
-        defaultAlias: 'registry',
-        allowed: ['realm'],
     });
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });

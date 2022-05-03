@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Realm } from '@authelion/common';
 import { Registry } from '../registry';
 import { Ecosystem } from '../ecosystem';
 import { RegistryProjectType } from './constants';
@@ -41,12 +40,6 @@ export interface RegistryProject {
     webhook_name: string | null;
 
     webhook_exists: boolean | null;
-
-    // ------------------------------------------------------------------
-
-    realm_id: Realm['id'];
-
-    realm: Realm;
 
     // ------------------------------------------------------------------
 

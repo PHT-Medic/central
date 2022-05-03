@@ -1,10 +1,16 @@
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
 import { SelectQueryBuilder } from 'typeorm';
 import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
 import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
 import { parseQueryFields } from '@trapi/query';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
@@ -22,7 +28,6 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
             'ecosystem',
             'external_name',
             'type',
-            'realm_id',
             'registry_id',
             'webhook_exists',
             'created_at',
@@ -61,7 +66,7 @@ export async function getOneRegistryProjectRouteHandler(req: ExpressRequest, res
 
     applyRelations(query, include, {
         defaultAlias: 'registryProject',
-        allowed: ['realm', 'registry'],
+        allowed: ['registry'],
     });
 
     checkAndApplyFields(req, query, fields);
@@ -70,10 +75,6 @@ export async function getOneRegistryProjectRouteHandler(req: ExpressRequest, res
 
     if (!entity) {
         throw new NotFoundError();
-    }
-
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
-        throw new ForbiddenError();
     }
 
     return res.respond({ data: entity });
@@ -87,8 +88,6 @@ export async function getManyRegistryProjectRouteHandler(req: ExpressRequest, re
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryProjectEntity);
     const query = repository.createQueryBuilder('registryProject');
-
-    onlyRealmPermittedQueryResources(query, req.realmId, 'registryProject.realm_id');
 
     checkAndApplyFields(req, query, fields);
 
@@ -104,7 +103,7 @@ export async function getManyRegistryProjectRouteHandler(req: ExpressRequest, re
 
     applyRelations(query, include, {
         defaultAlias: 'registryProject',
-        allowed: ['realm', 'registry'],
+        allowed: ['registry'],
     });
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });

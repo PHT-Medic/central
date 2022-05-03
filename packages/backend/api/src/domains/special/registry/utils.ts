@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022.
+ * Copyright (c) 2022-2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -8,7 +8,7 @@
 import { Robot } from '@authelion/common';
 import { Config, stringifyAuthorizationHeader } from '@trapi/client';
 import { HarborClient, ProjectWebhookTarget } from '@trapi/harbor-client';
-import { ServiceID, detectProxyConnectionConfig } from '@personalhealthtrain/central-common';
+import { ServiceID } from '@personalhealthtrain/central-common';
 
 export function buildRegistryWebhookTarget(
     context: {
@@ -29,16 +29,11 @@ export function buildRegistryWebhookTarget(
 }
 
 export function createBasicHarborAPIConfig(connectionString: string) : Config {
-    const proxyConfig = detectProxyConnectionConfig();
-
+    // todo: use proxy config in the future...
     return {
         clazz: HarborClient,
         driver: {
-            ...(proxyConfig ? {
-                proxy: proxyConfig,
-            } : {
-                proxy: false,
-            }),
+            proxy: false,
         },
         extra: {
             connectionString,

@@ -68,7 +68,6 @@ export default Vue.extend<any, any, any, Properties>({
             {
                 props: {
                     entityId: vm.entity.registry_project_id,
-                    realmId: vm.entity.realm_id,
                 },
                 on: {
                     resolved(item) {

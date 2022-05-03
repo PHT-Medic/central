@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2021.
+ * Copyright (c) 2021-2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -16,8 +16,6 @@ import {
 import {
     Ecosystem, Registry, RegistryProject, RegistryProjectType,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@authelion/api-core';
-import { Realm } from '@authelion/common';
 import { RegistryEntity } from '../registry/entity';
 
 @Unique('registry_project_external_name_registry_index', ['external_name', 'registry_id'])
@@ -92,15 +90,6 @@ export class RegistryProjectEntity implements RegistryProject {
     @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'registry_id' })
         registry: RegistryEntity;
-
-    // ------------------------------------------------------------------
-
-    @Column()
-        realm_id: Realm['id'];
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'realm_id' })
-        realm: RealmEntity;
 
     // ------------------------------------------------------------------
 
