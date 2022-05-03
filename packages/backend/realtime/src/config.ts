@@ -12,7 +12,6 @@ import {
     ROBOT_SECRET_ENGINE_KEY,
     ServiceID,
     createRefreshRobotTokenOnResponseErrorHandler,
-    detectProxyConnectionConfig,
 } from '@personalhealthtrain/central-common';
 import { VaultClient } from '@trapi/vault-client';
 import { Robot } from '@authelion/common';
@@ -32,8 +31,6 @@ export type Config = {
 };
 
 export function createConfig({ env } : ConfigContext) : Config {
-    const proxyConfig = detectProxyConnectionConfig();
-
     setRedisConfig({ connectionString: env.redisConnectionString });
 
     const redisDatabase = useRedisClient();
@@ -42,6 +39,9 @@ export function createConfig({ env } : ConfigContext) : Config {
 
     setHTTPConfig({
         clazz: VaultClient,
+        driver: {
+            proxy: false,
+        },
         extra: {
             connectionString: env.vaultConnectionString,
         },
@@ -50,11 +50,7 @@ export function createConfig({ env } : ConfigContext) : Config {
     setHTTPConfig({
         driver: {
             baseURL: env.apiUrl,
-            ...(proxyConfig ? {
-                proxy: proxyConfig,
-            } : {
-                proxy: false,
-            }),
+            proxy: false,
             withCredentials: true,
         },
     });
