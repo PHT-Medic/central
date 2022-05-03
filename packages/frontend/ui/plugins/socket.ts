@@ -17,7 +17,7 @@ export default (ctx: Context, inject: Inject) => {
     const adapter = new SocketModule(ctx, {
         url,
         options: {
-            transports: ['websocket'],
+            transports: ['websocket', 'polling'],
         },
     });
 
