@@ -22,9 +22,6 @@ export default {
                     key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
-                    key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
                     key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
                 },
                 {
@@ -72,9 +69,6 @@ export default {
                 head-variant="'dark'"
                 outlined
             >
-                <template #cell(realm)="data">
-                    <span class="badge-dark badge">{{ data.item.realm_id }}</span>
-                </template>
                 <template #cell(options)="data">
                     <nuxt-link
                         v-if="canManage"

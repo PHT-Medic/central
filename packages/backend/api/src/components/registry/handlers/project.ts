@@ -113,6 +113,8 @@ export async function linkRegistryProject(
         return;
     }
 
+    await repository.save(entity);
+
     try {
         const robotAccount = await ensureRemoteRegistryProjectAccount(httpClient, {
             name: entity.external_name,
@@ -133,6 +135,7 @@ export async function linkRegistryProject(
             entity.account_secret = null;
         }
     } catch (e) {
+        console.log(e);
         useLogger()
             .warn('Robot account could not be created.', {
                 component: 'registry',
@@ -141,6 +144,8 @@ export async function linkRegistryProject(
 
         return;
     }
+
+    await repository.save(entity);
 
     try {
         const webhook = await saveRemoteRegistryProjectWebhook(httpClient, {
@@ -153,6 +158,7 @@ export async function linkRegistryProject(
             entity.webhook_exists = true;
         }
     } catch (e) {
+        console.log(e);
         useLogger()
             .warn('Webhook could not be created.', {
                 component: 'registry',
