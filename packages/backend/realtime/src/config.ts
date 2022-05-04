@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig as setHTTPConfig, useClient, useClient as useHTTPClient } from '@trapi/client';
+import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import {
     HTTPClientKey,
@@ -15,6 +15,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import { VaultClient } from '@trapi/vault-client';
 import { Robot } from '@authelion/common';
+import { BadRequestError } from '@typescript-error/http';
 import { Environment } from './env';
 
 interface ConfigContext {
@@ -59,11 +60,17 @@ export function createConfig({ env } : ConfigContext) : Config {
         (value) => value,
         createRefreshRobotTokenOnResponseErrorHandler({
             async load() {
-                return useClient<VaultClient>(HTTPClientKey.VAULT).keyValue
+                return useHTTPClient<VaultClient>(HTTPClientKey.VAULT).keyValue
                     .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM)
-                    .then((response) => response.data as Robot);
+                    .then((response) => {
+                        if (!response) {
+                            throw new BadRequestError('No api credentials available...');
+                        }
+
+                        return response.data as Robot;
+                    });
             },
-            httpClient: useClient(),
+            httpClient: useHTTPClient(),
         }),
     );
 

@@ -15,7 +15,7 @@ export default Vue.extend<any, any, any, any>({
         };
     },
     methods: {
-        async submit() {
+        async accept() {
             if (this.busy) {
                 return;
             }
