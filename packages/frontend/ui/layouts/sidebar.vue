@@ -23,7 +23,7 @@ export default {
         },
 
         docsUrl() {
-            return new URL('docs', this.$config.apiUrl).href;
+            return new URL('docs/', this.$config.apiUrl).href;
         },
         metricsUrl() {
             return new URL('metrics', this.$config.apiUrl).href;

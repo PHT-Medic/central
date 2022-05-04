@@ -10,7 +10,7 @@ import { ForbiddenError } from '@typescript-error/http';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
-import { runProposalValidation } from './utils';
+import { runProposalValidation } from '../utils/validation';
 
 export async function createProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (!req.ability.hasPermission(PermissionID.PROPOSAL_ADD)) {

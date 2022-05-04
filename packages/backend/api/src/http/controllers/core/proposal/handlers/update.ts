@@ -11,7 +11,7 @@ import { isPermittedForResourceRealm } from '@authelion/common';
 import { useDataSource } from 'typeorm-extension';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { runProposalValidation } from './utils';
+import { runProposalValidation } from '../utils/validation';
 
 export async function updateProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;

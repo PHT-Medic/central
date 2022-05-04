@@ -47,12 +47,16 @@ export function useLogger() : Logger {
             format.timestamp(),
         ),
         transports: [
-            new transports.Console(),
+            new transports.Console({
+                level: 'info',
+            }),
             new transports.File({
                 filename: path.join(getWritableDirPath(), 'error.log'),
                 level: 'warn',
             }),
-            new transports.File({ filename: path.join(getWritableDirPath(), 'combined.log') }),
+            new transports.File({
+                filename: path.join(getWritableDirPath(), 'combined.log'),
+            }),
         ],
     });
 
