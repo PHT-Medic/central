@@ -48,7 +48,7 @@ export function useLogger() : Logger {
         ),
         transports: [
             new transports.Console({
-                level: 'info',
+                level: 'debug',
             }),
             new transports.File({
                 filename: path.join(getWritableDirPath(), 'error.log'),

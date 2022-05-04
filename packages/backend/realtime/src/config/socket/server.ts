@@ -42,8 +42,19 @@ export function createSocketServer(context : SocketServerContext) : Server {
     // receive user
     server.use(setupSocketMiddleware({
         redis: context.config.redisDatabase,
-        http: useClient('default').driver,
+        http: useClient().driver,
     }));
+
+    server.use((socket: SocketInterface, next) => {
+        if (!socket.data.userId && !socket.data.robotId) {
+            next(new UnauthorizedError());
+            return;
+        }
+
+        if (socket.data.realmId !== MASTER_REALM_ID) {
+            next(new ForbiddenError());
+        }
+    });
 
     // register handlers
     registerSocketHandlers(server);
@@ -52,7 +63,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
     const realmWorkspaces = server.of(/^\/realm#[a-z0-9A-Z-_]+$/);
     realmWorkspaces.use(setupSocketMiddleware({
         redis: context.config.redisDatabase,
-        http: useClient('default').driver,
+        http: useClient().driver,
     }));
 
     realmWorkspaces.use((socket: SocketInterface, next) => {

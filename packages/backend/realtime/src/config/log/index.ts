@@ -42,13 +42,12 @@ export function useLogger() : Logger {
     logger = createLogger({
         format: format.combine(
             includeNamespaceInMessage(),
-            format.colorize({ all: true }),
             format.json(),
             format.timestamp(),
         ),
         transports: [
             new transports.Console({
-                level: 'info',
+                level: 'debug',
             }),
             new transports.File({
                 filename: path.join(getWritableDirPath(), 'error.log'),
