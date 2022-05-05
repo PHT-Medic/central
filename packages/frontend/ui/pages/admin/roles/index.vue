@@ -45,6 +45,12 @@ export default {
                 variant: 'success',
             });
         },
+        async handleFailed(e) {
+            this.$bvToast.toast(e.message, {
+                toaster: 'b-toaster-top-center',
+                variant: 'warning',
+            });
+        },
     },
 };
 </script>
@@ -74,7 +80,10 @@ export default {
                 </b-nav>
             </div>
             <div class="content-container">
-                <nuxt-child @deleted="handleDeleted" />
+                <nuxt-child
+                    @failed="handleFailed"
+                    @deleted="handleDeleted"
+                />
             </div>
         </div>
     </div>

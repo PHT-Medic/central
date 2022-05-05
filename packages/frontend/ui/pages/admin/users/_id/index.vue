@@ -16,6 +16,9 @@ export default {
         handleUpdated(e) {
             this.$emit('updated', e);
         },
+        handleFailed(e) {
+            this.$emit('failed', e);
+        },
     },
 };
 </script>
@@ -28,6 +31,7 @@ export default {
                     :entity="entity"
                     :realm-id="entity.realm_id"
                     @updated="handleUpdated"
+                    @failed="handleFailed"
                 />
             </div>
             <div class="col-5">
@@ -35,6 +39,7 @@ export default {
                 <user-password-form
                     :id="entity.id"
                     @updated="handleUpdated"
+                    @failed="handleFailed"
                 />
             </div>
         </div>

@@ -20,6 +20,9 @@ export default {
         handleUpdated(item) {
             this.$emit('updated', item);
         },
+        handleFailed(e) {
+            this.$emit('failed', e);
+        },
     },
 };
 </script>
@@ -28,6 +31,7 @@ export default {
         <role-form
             :entity="entity"
             @updated="handleUpdated"
+            @failed="handleFailed"
         />
     </div>
 </template>

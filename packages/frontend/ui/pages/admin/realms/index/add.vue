@@ -19,9 +19,15 @@ export default {
         handleCreated(realm) {
             this.$router.push(`/admin/realms/${realm.id}`);
         },
+        handleFailed(e) {
+            this.$emit('failed', e);
+        },
     },
 };
 </script>
 <template>
-    <realm-form @created="handleCreated" />
+    <realm-form
+        @created="handleCreated"
+        @failed="handleFailed"
+    />
 </template>

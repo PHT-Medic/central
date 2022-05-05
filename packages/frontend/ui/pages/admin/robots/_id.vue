@@ -74,6 +74,12 @@ export default {
 
             await this.$nuxt.$router.push('/admin/robots');
         },
+        async handleFailed(e) {
+            this.$bvToast.toast(e.message, {
+                toaster: 'b-toaster-top-center',
+                variant: 'warning',
+            });
+        },
     },
 };
 </script>
@@ -114,6 +120,7 @@ export default {
             :entity="entity"
             @updated="handleUpdated"
             @deleted="handleDeleted"
+            @failed="handleFailed"
         />
     </div>
 </template>

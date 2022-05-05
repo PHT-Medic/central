@@ -20,9 +20,15 @@ export default {
         handleCreated(e) {
             this.$nuxt.$router.push(`/admin/users/${e.id}`);
         },
+        handleFailed(e) {
+            this.$emit('failed', e);
+        },
     },
 };
 </script>
 <template>
-    <user-form @created="handleCreated" />
+    <user-form
+        @created="handleCreated"
+        @failed="handleFailed"
+    />
 </template>

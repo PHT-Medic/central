@@ -18,11 +18,15 @@ export default {
         handleCreated() {
             this.$router.push('/admin/permissions');
         },
+        handleFailed(e) {
+            this.$emit('failed', e);
+        },
     },
 };
 </script>
 <template>
     <permission-form
         @created="handleCreated"
+        @failed="handleFailed"
     />
 </template>

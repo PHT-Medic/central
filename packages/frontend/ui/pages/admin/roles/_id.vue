@@ -61,6 +61,12 @@ export default {
                 variant: 'success',
             });
         },
+        async handleFailed(e) {
+            this.$bvToast.toast(e.message, {
+                toaster: 'b-toaster-top-center',
+                variant: 'warning',
+            });
+        },
     },
 };
 </script>
@@ -100,6 +106,7 @@ export default {
         <nuxt-child
             :entity="entity"
             @updated="handleUpdated"
+            @failed="handleFailed"
         />
     </div>
 </template>

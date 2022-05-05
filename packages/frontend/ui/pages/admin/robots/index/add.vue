@@ -20,9 +20,15 @@ export default {
         handleCreated(e) {
             this.$nuxt.$router.push(`/admin/robots/${e.id}`);
         },
+        handleFailed(e) {
+            this.$emit('failed', e);
+        },
     },
 };
 </script>
 <template>
-    <robot-form @created="handleCreated" />
+    <robot-form
+        @created="handleCreated"
+        @failed="handleFailed"
+    />
 </template>

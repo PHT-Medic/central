@@ -20,6 +20,9 @@ export default {
         handleDeleted(e) {
             this.$emit('deleted', e);
         },
+        handleFailed(e) {
+            this.$emit('failed', e);
+        },
     },
 };
 </script>
@@ -29,6 +32,7 @@ export default {
             :entity="entity"
             @updated="handleUpdated"
             @deleted="handleDeleted"
+            @failed="handleFailed"
         />
     </div>
 </template>

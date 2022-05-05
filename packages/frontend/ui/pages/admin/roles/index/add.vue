@@ -19,14 +19,18 @@ export default {
         },
     },
     methods: {
-        handleRoleCreated(e) {
+        handleCreated(e) {
             this.$router.push(`/admin/roles/${e.id}`);
+        },
+        handleFailed(e) {
+            this.$emit('failed', e);
         },
     },
 };
 </script>
 <template>
     <role-form
-        @created="handleRoleCreated"
+        @created="handleCreated"
+        @failed="handleFailed"
     />
 </template>
