@@ -7,7 +7,6 @@
 
 import { Context } from '@nuxt/types';
 import { Inject } from '@nuxt/types/app';
-import { detectProxyConnectionConfig } from '@personalhealthtrain/central-common';
 import { SocketModule } from '../config/socket';
 
 export default (ctx: Context, inject: Inject) => {
@@ -15,14 +14,25 @@ export default (ctx: Context, inject: Inject) => {
         process.env.REALTIME_URL ??
         'http://localhost:3001/';
 
-    const proxy = detectProxyConnectionConfig();
+    let transports = [];
+
+    if (
+        process.env.REALTIME_TRANSPORTS &&
+        typeof process.env.REALTIME_TRANSPORTS === 'string'
+    ) {
+        transports = process.env.REALTIME_TRANSPORTS
+            .split(',')
+            .filter((e) => e);
+    }
+
+    if (transports.length === 0) {
+        transports = ['websocket', 'polling'];
+    }
 
     const adapter = new SocketModule(ctx, {
         url,
         options: {
-            transports: [
-                ...(proxy ? ['polling'] : ['websocket']),
-            ],
+            transports,
         },
     });
 
