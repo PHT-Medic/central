@@ -16,17 +16,14 @@ export default (ctx: Context, inject: Inject) => {
 
     let transports = [];
 
-    console.log(ctx.$config.realtimeTransports);
-    console.log(process.env.REALTIME_TRANSPORTS);
-
-    const input = process.env.REALTIME_TRANSPORTS ||
+    const rawTransports = process.env.REALTIME_TRANSPORTS ||
         ctx.$config.realtimeTransports;
 
     if (
-        input &&
-        typeof input === 'string'
+        rawTransports &&
+        typeof rawTransports === 'string'
     ) {
-        transports = input
+        transports = rawTransports
             .split(',')
             .filter((e) => e);
     }
