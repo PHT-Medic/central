@@ -17,6 +17,7 @@ const config = {
                 'https://pht-medic.medizin.uni-tuebingen.de.de/result-service/',
             realtimeUrl: process.env.REALTIME_URL ||
                 'https://pht-medic.medizin.uni-tuebingen.de.de/realtime/',
+            realtimeTransports: process.env.REALTIME_TRANSPORTS,
         };
     },
     env: {
