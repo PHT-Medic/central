@@ -40,7 +40,7 @@
         "prom-client": "^14.0.1",
         "redis-extension": "^1.0.0",
         "reflect-metadata": "^0.1.13",
-        "swagger-ui-express": "^4.3.0",
+        "swagger-ui-express": "^4.4.0",
         "tar": "^6.1.2",
         "tar-stream": "^2.1.4",
         "typeorm": "^0.3.6",
