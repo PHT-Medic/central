@@ -16,7 +16,7 @@
     ],
     "devDependencies": {
         "@tada5hi/eslint-config-vue-typescript": "^1.0.2",
-        "@types/node": "^17.0.31",
+        "@types/node": "^17.0.33",
         "eslint": "^8.14.0",
         "lerna": "^4.0.0",
         "rimraf": "^3.0.2",
