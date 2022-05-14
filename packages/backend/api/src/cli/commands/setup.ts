@@ -7,7 +7,7 @@
 
 import { Arguments, Argv, CommandModule } from 'yargs';
 import { createDatabase } from 'typeorm-extension';
-import { DatabaseRootSeeder as AuthDatabaseRootSeeder, setupCommand } from '@authelion/api-core';
+import { DatabaseSeeder, setupCommand } from '@authelion/api-core';
 import { PermissionKey } from '@personalhealthtrain/central-common';
 import { useClient } from 'redis-extension';
 import { DataSource } from 'typeorm';
@@ -79,7 +79,7 @@ export class SetupCommand implements CommandModule {
             await setupCommand({
                 spinner,
                 database: false,
-                databaseSeeder: false, // false, to trigger own subscribers
+                databaseSeed: false, // false, to trigger own subscribers
                 documentation: false,
                 keyPair: true,
             });
@@ -123,11 +123,7 @@ export class SetupCommand implements CommandModule {
                     const aggregator = buildRobotAggregator();
                     aggregator.start({ synchronous: true });
 
-                    const authSeeder = new AuthDatabaseRootSeeder({
-                        permissions: Object.values(PermissionKey),
-                        userName: 'admin',
-                        userPassword: 'start123',
-                    });
+                    const authSeeder = new DatabaseSeeder();
                     await authSeeder.run(dataSource);
 
                     const coreSeeder = new DatabaseRootSeeder();

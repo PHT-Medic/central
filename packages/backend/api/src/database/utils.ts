@@ -6,11 +6,8 @@
  */
 
 import path from 'path';
-import { buildDataSourceOptions as buildOptions } from 'typeorm-extension';
-import {
-    setEntitiesForConnectionOptions,
-} from '@authelion/api-core';
-import { DataSourceOptions } from 'typeorm';
+import { buildDataSourceOptions as _buildDataSourceOptions } from 'typeorm-extension';
+import { extendDataSourceOptions } from '@authelion/api-core';
 import { MasterImageEntity } from '../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../domains/core/master-image-group/entity';
 import { ProposalEntity } from '../domains/core/proposal/entity';
@@ -22,11 +19,33 @@ import { TrainStationEntity } from '../domains/core/train-station/entity';
 import { UserSecretEntity } from '../domains/core/user-secret/entity';
 import { RegistryEntity } from '../domains/core/registry/entity';
 import { RegistryProjectEntity } from '../domains/core/registry-project/entity';
+import { ProposalSubscriber } from './subscribers/proposal';
+import { ProposalStationSubscriber } from './subscribers/proposal-station';
+import { RegistryProjectSubscriber } from './subscribers/registry-project';
+import { RobotSubscriber } from './subscribers/robot';
+import { StationSubscriber } from './subscribers/station';
+import { TrainSubscriber } from './subscribers/train';
+import { TrainFileSubscriber } from './subscribers/train-file';
+import { TrainStationSubscriber } from './subscribers/train-station';
 
-export function extendDataSourceOptions(
-    options: DataSourceOptions,
-) {
-    options = setEntitiesForConnectionOptions(options);
+export async function buildDataSourceOptions() {
+    let options;
+
+    try {
+        options = await _buildDataSourceOptions();
+        options.logging = ['error'];
+    } catch (e) {
+        options = {
+            name: 'default',
+            type: 'better-sqlite3',
+            database: path.join(process.cwd(), 'writable', process.env.NODE_ENV === 'test' ? 'test.sql' : 'db.sql'),
+            subscribers: [],
+            migrations: [],
+            logging: ['error'],
+        };
+    }
+
+    options = await extendDataSourceOptions(options);
 
     options = {
         ...options,
@@ -57,29 +76,16 @@ export function extendDataSourceOptions(
         ...options,
         subscribers: [
             ...(options.subscribers ? options.subscribers : []) as string[],
-            path.join(__dirname, 'subscribers', '*{.ts,.js}'),
+            ProposalSubscriber,
+            ProposalStationSubscriber,
+            RegistryProjectSubscriber,
+            RobotSubscriber,
+            StationSubscriber,
+            TrainSubscriber,
+            TrainFileSubscriber,
+            TrainStationSubscriber,
         ],
     };
 
-    return options;
-}
-
-export async function buildDataSourceOptions() {
-    let options;
-
-    try {
-        options = await buildOptions();
-        options.logging = ['error'];
-    } catch (e) {
-        options = {
-            name: 'default',
-            type: 'better-sqlite3',
-            database: path.join(process.cwd(), 'writable', process.env.NODE_ENV === 'test' ? 'test.sql' : 'db.sql'),
-            subscribers: [],
-            migrations: [],
-            logging: ['error'],
-        };
-    }
-
-    return extendDataSourceOptions(options);
+    return (options);
 }

@@ -7,14 +7,13 @@
 
 import { Arguments, Argv, CommandModule } from 'yargs';
 import {
-    DatabaseRootSeeder,
-    useConfig,
+    DatabaseSeeder,
 } from '@authelion/api-core';
-import { PermissionKey } from '@personalhealthtrain/central-common';
 import { DataSource } from 'typeorm';
 import { useSpinner } from '../../config/spinner';
 import env from '../../env';
 import { buildDataSourceOptions } from '../../database/utils';
+import { createConfig } from '../../config';
 
 interface SeedCheckArguments extends Arguments {
 
@@ -30,6 +29,8 @@ export class CheckCommand implements CommandModule {
     }
 
     async handler(args: SeedCheckArguments) {
+        createConfig({ env });
+
         const spinner = useSpinner();
 
         const dataSourceOptions = await buildDataSourceOptions();
@@ -45,12 +46,8 @@ export class CheckCommand implements CommandModule {
             }
 
             spinner.start('checking database integrity...');
-            const authConfig = useConfig();
-            const authSeeder = new DatabaseRootSeeder({
-                userName: authConfig.adminUsername,
-                userPassword: authConfig.adminPassword,
-                permissions: Object.values(PermissionKey),
-            });
+
+            const authSeeder = new DatabaseSeeder();
             await authSeeder.run(dataSource);
             spinner.succeed('checked database integrity.');
         } catch (e) {

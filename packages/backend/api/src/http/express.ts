@@ -8,21 +8,18 @@
 import express, { Express } from 'express';
 import cors from 'cors';
 
-import path from 'path';
 import { registerControllers as registerAuthControllers, registerMiddlewares } from '@authelion/api-core';
 import promBundle from 'express-prom-bundle';
-import { Client } from 'redis-extension';
 
 import { registerControllers } from './routes';
 
 import { errorMiddleware } from './middleware/error';
 import { useRateLimiter } from './middleware/rate-limiter';
 import env from '../env';
-import { getWritableDirPath } from '../config/paths';
 import { ExpressAppInterface } from './type';
 import { checkLicenseAgreementAccepted } from './middleware/license-agreement';
 
-export function createExpressApp(redis?: Client | boolean | string) : ExpressAppInterface {
+export function createExpressApp() : ExpressAppInterface {
     const expressApp : Express = express();
 
     expressApp.set('trust proxy', 1);
@@ -35,15 +32,7 @@ export function createExpressApp(redis?: Client | boolean | string) : ExpressApp
         credentials: true,
     }));
 
-    registerMiddlewares(expressApp, {
-        bodyParserMiddleware: true,
-        cookieParserMiddleware: true,
-        responseMiddleware: true,
-        swaggerMiddleware: true,
-
-        writableDirectoryPath: path.join(process.cwd(), 'writable'),
-        redis,
-    });
+    registerMiddlewares(expressApp);
 
     if (env.env === 'development') {
         expressApp.use(checkLicenseAgreementAccepted);
@@ -63,13 +52,7 @@ export function createExpressApp(redis?: Client | boolean | string) : ExpressApp
     }
 
     registerControllers(expressApp);
-    registerAuthControllers(expressApp, {
-        tokenMaxAge: env.jwtMaxAge,
-        selfUrl: env.apiUrl,
-        selfAuthorizeRedirectUrl: env.webAppUrl,
-        writableDirectoryPath: getWritableDirPath(),
-        redis,
-    });
+    registerAuthControllers(expressApp);
 
     expressApp.use(errorMiddleware);
 

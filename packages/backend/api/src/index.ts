@@ -9,8 +9,6 @@ import 'reflect-metadata';
 import dotenv from 'dotenv';
 
 import { DataSource } from 'typeorm';
-import { buildTokenAggregator } from '@authelion/api-core';
-import { useClient } from 'redis-extension';
 
 import { setDataSource, setDataSourceOptions } from 'typeorm-extension';
 import env from './env';
@@ -29,8 +27,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     HTTP Server & Express App
     */
     const config = createConfig({ env });
-    const redis = useClient();
-    const expressApp = createExpressApp(redis);
+    const expressApp = createExpressApp();
     const httpServer = createHttpServer({ expressApp });
 
     function signalStart() {
@@ -58,9 +55,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     if (env.env === 'development') {
         await dataSource.synchronize();
     }
-
-    const { start: startTokenAggregator } = buildTokenAggregator(redis);
-    await startTokenAggregator();
 
     start();
 })();

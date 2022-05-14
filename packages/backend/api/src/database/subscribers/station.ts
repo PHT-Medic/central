@@ -38,7 +38,7 @@ function publish(
 }
 
 @EventSubscriber()
-export class TrainSubscriber implements EntitySubscriberInterface<StationEntity> {
+export class StationSubscriber implements EntitySubscriberInterface<StationEntity> {
     listenTo(): CallableFunction | string {
         return StationEntity;
     }
