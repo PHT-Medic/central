@@ -13,7 +13,7 @@ import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { Message, publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
-import { runStationValidation } from './utils';
+import { runStationValidation } from '../utils';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';

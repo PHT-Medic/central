@@ -1,5 +1,5 @@
 <!--
-  Copyright (c) 2021-2021.
+  Copyright (c) 2022.
   Author Peter Placzek (tada5hi)
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
@@ -39,11 +39,11 @@ export default {
         >
             <h6><i class="fa fa-city" /> Station</h6>
             <p>
-                Create one or more stations and associate them to the current realm. <br>
+                Create one or more stations and associate them to the realm. <br>
                 Those stations can be targeted by a proposal or train, if they are not marked as <strong>hidden</strong>.
             </p>
             <nuxt-link
-                :to="'/admin/realms/'+entity.id+'/stations'"
+                :to="'/settings/realm/stations'"
                 class="btn btn-xs btn-dark"
             >
                 Manage
@@ -62,7 +62,7 @@ export default {
             </p>
 
             <nuxt-link
-                :to="'/admin/realms/'+entity.id+'/providers'"
+                :to="'/settings/realm/providers'"
                 class="btn btn-xs btn-dark"
             >
                 Manage

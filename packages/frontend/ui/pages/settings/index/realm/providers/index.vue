@@ -97,7 +97,7 @@ export default {
                     <template #cell(options)="data">
                         <nuxt-link
                             class="btn btn-xs btn-outline-primary"
-                            :to="'/admin/realms/'+entity.id+'/providers/'+data.item.id"
+                            :to="'/settings/realm/providers/'+data.item.id"
                         >
                             <i class="fa fa-bars" />
                         </nuxt-link>

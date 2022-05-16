@@ -1,10 +1,11 @@
 <!--
-  Copyright (c) 2021-2021.
+  Copyright (c) 2021-2022.
   Author Peter Placzek (tada5hi)
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default {
@@ -14,13 +15,13 @@ export default {
     },
     async asyncData(context) {
         try {
-            const entity = await context.$authApi.realm.getOne(context.params.id);
+            const entity = await context.$authApi.realm.getOne(context.store.getters['auth/userRealmId']);
 
             return {
                 entity,
             };
         } catch (e) {
-            await context.redirect('/admin/realms');
+            await context.redirect('/settings');
             return {
 
             };
@@ -29,14 +30,32 @@ export default {
     data() {
         return {
             entity: undefined,
-            tabs: [
-                { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-                { name: 'Stations', icon: 'fa-solid fa-house-medical', urlSuffix: '/stations' },
-                { name: 'Users', icon: 'fa fa-users', urlSuffix: '/users' },
-                { name: 'Robots', icon: 'fa fa-robot', urlSuffix: '/robots' },
-                { name: 'Providers', icon: 'fa-solid fa-atom', urlSuffix: '/providers' },
-            ],
         };
+    },
+    computed: {
+        tabs() {
+            const items = [
+                { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
+            ];
+
+            if (this.$auth.hasPermission([
+                PermissionID.STATION_EDIT,
+                PermissionID.STATION_DROP,
+                PermissionID.STATION_EDIT,
+            ])) {
+                items.push({ name: 'Stations', icon: 'fa-solid fa-house-medical', urlSuffix: '/stations' });
+            }
+
+            if (this.$auth.hasPermission([
+                PermissionID.PROVIDER_ADD,
+                PermissionID.PROVIDER_EDIT,
+                PermissionID.PROVIDER_DROP,
+            ])) {
+                items.push({ name: 'Providers', icon: 'fa-solid fa-atom', urlSuffix: '/providers' });
+            }
+
+            return items;
+        },
     },
     methods: {
         handleUpdated(item) {
@@ -60,28 +79,16 @@ export default {
 };
 </script>
 <template>
-    <div class="container">
-        <h1 class="title no-border mb-3">
-            {{ entity.name }} <span class="sub-title">Details</span>
-        </h1>
-
+    <div>
         <div class="m-b-20 m-t-10">
             <div class="flex-wrap flex-row d-flex">
                 <div>
                     <b-nav pills>
                         <b-nav-item
-                            :to="'/admin/realms'"
-                            exact
-                            exact-active-class="active"
-                        >
-                            <i class="fa fa-arrow-left" />
-                        </b-nav-item>
-
-                        <b-nav-item
                             v-for="(item,key) in tabs"
                             :key="key"
                             :disabled="item.active"
-                            :to="'/admin/realms/' + entity.id + item.urlSuffix"
+                            :to="'/settings/realm' + item.urlSuffix"
                             exact
                             exact-active-class="active"
                         >

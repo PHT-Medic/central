@@ -5,37 +5,49 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { PermissionID, PermissionIDType } from '@personalhealthtrain/central-common';
+
 export type PHTStationRole = 'StationAuthority' | 'StationEmployee';
 
-export function getPHTStationRolePermissions(type: PHTStationRole) : string[] {
+export function getPHTStationRolePermissions(type: PHTStationRole) : PermissionIDType[] {
     // eslint-disable-next-line default-case
     switch (type) {
         case 'StationEmployee':
             return [
-                'proposal_add',
-                'proposal_drop',
-                'proposal_edit',
+                PermissionID.PROPOSAL_ADD,
+                PermissionID.PROPOSAL_DROP,
+                PermissionID.PROPOSAL_EDIT,
 
-                'train_add',
-                'train_execution_start',
-                'train_execution_stop',
-                'train_drop',
-                'train_result_read',
+                PermissionID.TRAIN_ADD,
+                PermissionID.TRAIN_EDIT,
+
+                PermissionID.TRAIN_EXECUTION_START,
+                PermissionID.TRAIN_EXECUTION_STOP,
+
+                PermissionID.TRAIN_RESULT_READ,
             ];
         case 'StationAuthority':
             return [
-                'proposal_add',
-                'proposal_drop',
-                'proposal_edit',
-                'proposal_approve',
+                PermissionID.PROPOSAL_ADD,
+                PermissionID.PROPOSAL_DROP,
+                PermissionID.PROPOSAL_EDIT,
+                PermissionID.PROPOSAL_APPROVE,
 
-                'train_approve',
-                'train_edit',
-                'train_add',
-                'train_execution_start',
-                'train_execution_stop',
-                'train_drop',
-                'train_result_read',
+                PermissionID.STATION_EDIT,
+                PermissionID.STATION_DROP,
+                PermissionID.STATION_EDIT,
+
+                PermissionID.PROVIDER_ADD,
+                PermissionID.PROVIDER_EDIT,
+                PermissionID.PROVIDER_DROP,
+
+                PermissionID.TRAIN_ADD,
+                PermissionID.TRAIN_DROP,
+                PermissionID.TRAIN_EDIT,
+                PermissionID.TRAIN_APPROVE,
+                PermissionID.TRAIN_EXECUTION_START,
+                PermissionID.TRAIN_EXECUTION_STOP,
+                PermissionID.TRAIN_RESULT_READ,
             ];
     }
 

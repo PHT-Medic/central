@@ -245,9 +245,17 @@ class AuthModule {
         return this.abilityManager.can(ability.action, ability.subject);
     }
 
-    public hasPermission(name: string) : boolean {
-        const ability = buildAbilityMetaFromName(name);
-        return this.hasAbility(ability);
+    public hasPermission(name: string | string[]) : boolean {
+        const names = Array.isArray(name) ? name : [name];
+
+        for (let i = 0; i < names.length; i++) {
+            const ability = buildAbilityMetaFromName(names[i]);
+            if (this.hasAbility(ability)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public setPermissions(permissions: PermissionMeta[]) {

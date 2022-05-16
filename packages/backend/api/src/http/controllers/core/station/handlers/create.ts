@@ -13,7 +13,7 @@ import { validationResult } from 'express-validator';
 import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressValidationError } from '../../../../express-validation';
-import { runStationValidation } from './utils';
+import { runStationValidation } from '../utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';

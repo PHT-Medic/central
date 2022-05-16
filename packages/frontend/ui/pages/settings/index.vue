@@ -17,7 +17,7 @@
                     vertical
                 >
                     <b-nav-item
-                        v-for="(item,key) in sidebar.items"
+                        v-for="(item,key) in sidebarItems"
                         :key="key"
                         :disabled="item.active"
                         :to="'/settings' + item.urlSuffix"
@@ -36,6 +36,7 @@
     </div>
 </template>
 <script>
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default {
@@ -43,22 +44,36 @@ export default {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
     },
-    data() {
-        return {
-            sidebar: {
-                items: [
-                    {
-                        name: 'Account', icon: 'fas fa-bars', urlSuffix: '',
-                    },
-                    {
-                        name: 'Security', icon: 'fa fa-lock', urlSuffix: '/security',
-                    },
-                    {
-                        name: 'Secrets', icon: 'fa fa-key', urlSuffix: '/secrets',
-                    },
-                ],
-            },
-        };
+    computed: {
+        sidebarItems() {
+            const items = [
+                {
+                    name: 'Account', icon: 'fas fa-bars', urlSuffix: '',
+                },
+                {
+                    name: 'Security', icon: 'fa fa-lock', urlSuffix: '/security',
+                },
+                {
+                    name: 'Secrets', icon: 'fa fa-key', urlSuffix: '/secrets',
+                },
+            ];
+
+            if (this.$auth.hasPermission([
+                PermissionID.STATION_EDIT,
+                PermissionID.STATION_DROP,
+                PermissionID.STATION_EDIT,
+
+                PermissionID.PROVIDER_ADD,
+                PermissionID.PROVIDER_EDIT,
+                PermissionID.PROVIDER_DROP,
+            ])) {
+                items.push({
+                    name: 'Realm', icon: 'fas fa-university', urlSuffix: '/realm',
+                });
+            }
+
+            return items;
+        },
     },
 };
 </script>

@@ -7,6 +7,9 @@
 
 import { Ecosystem } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
+import { extendExpressValidationResultWithRealm } from '@authelion/api-core';
+import { isPermittedForResourceRealm } from '@authelion/common';
+import { ForbiddenError } from '@typescript-error/http';
 import { ExpressRequest } from '../../../../type';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
 import { extendExpressValidationResultWithRegistry } from '../../registry/utils/extend';
@@ -78,7 +81,7 @@ export async function runStationValidation(
     if (operation === 'create') {
         await check('realm_id')
             .exists()
-            .isString()
+            .isUUID()
             .notEmpty()
             .run(req);
 
@@ -97,6 +100,13 @@ export async function runStationValidation(
 
     result.data = matchedValidationData(req, { includeOptionals: true });
     await extendExpressValidationResultWithRegistry(result);
+    await extendExpressValidationResultWithRealm(result);
+
+    if (result.data.realm_id) {
+        if (!isPermittedForResourceRealm(req.realmId, result.data.realm_id)) {
+            throw new ForbiddenError('You are not permitted to create this station.');
+        }
+    }
 
     return result;
 }

@@ -6,9 +6,11 @@
  */
 
 import { Station } from '@personalhealthtrain/central-common';
+import { RealmEntity } from '@authelion/api-core';
 import { ExpressValidationResult } from '../../../express-validation';
 import { RegistryEntity } from '../../../../domains/core/registry/entity';
 
 export type StationValidationResult = ExpressValidationResult<Station, {
-    registry?: RegistryEntity
+    registry?: RegistryEntity,
+    realm?: RealmEntity
 }>;
