@@ -81,7 +81,7 @@ export async function runStationValidation(
     if (operation === 'create') {
         await check('realm_id')
             .exists()
-            .isUUID()
+            .isString()
             .notEmpty()
             .run(req);
 
