@@ -57,6 +57,8 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
         }
 
         const registryProjectExternalName = entity.external_name || createNanoID();
+        entity.external_name = registryProjectExternalName;
+
         const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
         const registryProject = registryProjectRepository.create({
             external_name: registryProjectExternalName,

@@ -95,6 +95,7 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
         await registryProjectRepository.save(registryProject);
 
         entity.registry_project_id = registryProject.id;
+        entity.external_name = registryProjectExternalName;
 
         let queueMessage : Message;
 
