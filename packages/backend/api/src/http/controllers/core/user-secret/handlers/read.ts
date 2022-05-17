@@ -45,12 +45,11 @@ export async function getManyUserSecretRouteHandler(req: ExpressRequest, res: Ex
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(UserSecretEntity);
-    const query = await repository.createQueryBuilder('entity')
-        .where('entity.realm_id = :realmId', { realmId: req.realmId });
+    const query = await repository.createQueryBuilder('entity');
 
     onlyRealmPermittedQueryResources(query, req.realmId);
 
-    if (!req.ability.hasPermission(PermissionID.USER_EDIT)) {
+    if (!req.ability.hasPermission(PermissionID.USER_EDIT) && req.userId) {
         query.where('entity.user_id = :userId', { userId: req.userId });
     }
 
@@ -75,6 +74,8 @@ export async function getManyUserSecretRouteHandler(req: ExpressRequest, res: Ex
     });
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });
+
+    console.log(query.getSql());
 
     const [entities, total] = await query.getManyAndCount();
 
