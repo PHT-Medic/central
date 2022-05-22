@@ -9,14 +9,16 @@ import {
     EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import {
+    TrainManagerQueueCommand,
     TrainSocketServerToClientEventName,
-    buildSocketRealmNamespaceName,
-    buildSocketTrainRoomName,
+    buildSocketRealmNamespaceName, buildSocketTrainRoomName,
 } from '@personalhealthtrain/central-common';
+import { publishMessage } from 'amqp-extension';
 import {
     emitSocketServerToClientEvent,
 } from '../../config/socket-emitter';
 import { TrainEntity } from '../../domains/core/train/entity';
+import { buildTrainManagerQueueMessage } from '../../domains/special/train-manager';
 
 function publish(
     operation: `${TrainSocketServerToClientEventName}`,
@@ -51,7 +53,15 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
         publish(TrainSocketServerToClientEventName.UPDATED, event.entity as TrainEntity);
     }
 
-    beforeRemove(event: RemoveEvent<TrainEntity>): Promise<any> | void {
+    async beforeRemove(event: RemoveEvent<TrainEntity>): Promise<any> {
         publish(TrainSocketServerToClientEventName.DELETED, event.entity);
+
+        const message = buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT_CLEANUP, {
+            id: event.entity.id,
+        });
+
+        await publishMessage(message);
+
+        return Promise.resolve(undefined);
     }
 }

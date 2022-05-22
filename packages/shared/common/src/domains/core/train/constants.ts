@@ -107,3 +107,9 @@ export enum TrainSocketClientToServerEventName {
     SUBSCRIBE = 'trainSubscribe',
     UNSUBSCRIBE = 'trainUnsubscribe',
 }
+
+// -------------------------------------------------------------------------
+
+export enum TrainQueueCommand {
+    CLEANUP = 'TRAIN_CLEANUP',
+}

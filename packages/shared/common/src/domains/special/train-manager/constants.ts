@@ -14,6 +14,7 @@ export enum TrainManagerBaseErrorCode {
 
 export enum TrainManagerQueueCommand {
     EXTRACT = 'extract',
+    EXTRACT_CLEANUP = 'extract_cleanup',
     EXTRACT_STATUS = 'extract_status',
 
     BUILD = 'build',

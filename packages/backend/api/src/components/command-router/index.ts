@@ -10,6 +10,7 @@ import { MessageQueueRoutingKey } from '../../config/mq';
 import { createSecretStorageComponentHandlers } from '../secret-storage';
 import { createRegistryComponentHandlers } from '../registry';
 import { createStationRegistryQueueComponentHandlers } from '../station-registry';
+import { createTrainComponentHandlers } from '../train';
 
 export function buildCommandRouterComponent() {
     function start() {
@@ -17,6 +18,7 @@ export function buildCommandRouterComponent() {
             ...createSecretStorageComponentHandlers(),
             ...createRegistryComponentHandlers(),
             ...createStationRegistryQueueComponentHandlers(),
+            ...createTrainComponentHandlers(),
         });
     }
 

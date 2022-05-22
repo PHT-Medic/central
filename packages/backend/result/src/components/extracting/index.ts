@@ -18,6 +18,7 @@ import { writeDownloadedEvent } from './write-downloaded';
 import { ExtractingError } from './error';
 import { processExtractStatusCommand } from './status';
 import { extendQueuePayload } from '../utils/train';
+import { cleanupImage } from './cleanup';
 
 export function createExtractingComponentHandlers() : ConsumeHandlers {
     return {
@@ -45,6 +46,14 @@ export function createExtractingComponentHandlers() : ConsumeHandlers {
                 .then(extendQueuePayload)
                 .then(processExtractStatusCommand)
                 .catch((err) => writeFailedEvent(message, err));
+        },
+        [TrainManagerQueueCommand.EXTRACT_CLEANUP]: async (message: Message) => {
+            useLogger().debug('cleanup event received', {
+                component: 'image-cleanup',
+            });
+
+            await Promise.resolve(message)
+                .then(cleanupImage);
         },
     };
 }

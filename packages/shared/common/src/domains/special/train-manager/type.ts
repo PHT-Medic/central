@@ -72,15 +72,17 @@ export type TrainManagerBuildPayload = TrainManagerBaseQueuePayload;
 export type TrainManagerQueueCommandPayload<T extends `${TrainManagerQueueCommand}`> =
     T extends `${TrainManagerQueueCommand.EXTRACT}` | `${TrainManagerQueueCommand.EXTRACT_STATUS}` ?
         TrainManagerExtractingQueuePayload :
-        T extends `${TrainManagerQueueCommand.BUILD}` | `${TrainManagerQueueCommand.BUILD_STATUS}` ?
-            TrainManagerBuildPayload :
-            T extends `${TrainManagerQueueCommand.ROUTE}` ?
-                TrainManagerRoutingPayload :
-                T extends `${TrainManagerQueueCommand.ROUTE_START}` ?
-                    TrainManagerRoutingStartPayload :
-                    T extends `${TrainManagerQueueCommand.ROUTE_STATUS}` ?
-                        TrainManagerRoutingStatusPayload :
-                        never;
+        T extends `${TrainManagerQueueCommand.EXTRACT_CLEANUP}` ?
+            TrainManagerBaseQueuePayload :
+            T extends `${TrainManagerQueueCommand.BUILD}` | `${TrainManagerQueueCommand.BUILD_STATUS}` ?
+                TrainManagerBuildPayload :
+                T extends `${TrainManagerQueueCommand.ROUTE}` ?
+                    TrainManagerRoutingPayload :
+                    T extends `${TrainManagerQueueCommand.ROUTE_START}` ?
+                        TrainManagerRoutingStartPayload :
+                        T extends `${TrainManagerQueueCommand.ROUTE_STATUS}` ?
+                            TrainManagerRoutingStatusPayload :
+                            never;
 
 export type TrainManagerQueueEventPayload<
     T extends `${TrainManagerRoutingQueueEvent}` | `${TrainManagerBuildingQueueEvent}` | `${TrainManagerExtractingQueueEvent}`,
