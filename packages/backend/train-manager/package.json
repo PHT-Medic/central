@@ -27,7 +27,7 @@
         "@trapi/query": "^2.1.3",
         "@trapi/vault-client": "^0.0.4",
         "@typescript-error/http": "^1.1.4",
-        "amqp-extension": "^1.0.2",
+        "amqp-extension": "^1.0.3",
         "body-parser": "^1.20.0",
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
@@ -53,7 +53,7 @@
         "@types/uuid": "^8.3.4",
         "@types/winston": "^2.4.4",
         "nodemon": "^2.0.16",
-        "ts-node": "^10.7.0",
+        "ts-node": "^10.8.0",
         "ts-node-dev": "^1.1.6"
     },
     "publishConfig": {
