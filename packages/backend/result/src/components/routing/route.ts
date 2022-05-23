@@ -8,7 +8,7 @@
 import { BuildInput } from '@trapi/query';
 import { Message } from 'amqp-extension';
 import {
-    HTTPClient,
+    HTTPClient, REGISTRY_ARTIFACT_TAG_BASE, REGISTRY_ARTIFACT_TAG_LATEST,
     RegistryProjectType,
     TrainManagerRoutingPayload,
     TrainManagerRoutingStep,
@@ -25,6 +25,13 @@ import { StationExtended } from './type';
 
 export async function processRouteCommand(message: Message) {
     const data = message.data as TrainManagerRoutingPayload;
+
+    if (
+        data.artifactTag !== REGISTRY_ARTIFACT_TAG_BASE &&
+        data.artifactTag !== REGISTRY_ARTIFACT_TAG_LATEST
+    ) {
+        return message;
+    }
 
     const client = useClient<HTTPClient>();
 
