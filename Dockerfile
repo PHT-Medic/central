@@ -12,7 +12,7 @@ RUN rm -rf ./node-modules && \
     npm run build && \
     touch packages/backend/api/.env && \
     touch packages/backend/realtime/.env && \
-    touch packages/backend/result/.env && \
+    touch packages/backend/train-manager/.env && \
     touch packages/frontend/ui/.env
 
 COPY ./entrypoint.sh ./entrypoint.sh

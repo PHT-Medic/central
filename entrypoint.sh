@@ -17,7 +17,7 @@ case "${1}" in
     api) PACKAGE=api;;
     ui) PACKAGE=ui;;
     realtime) PACKAGE=realtime;;
-    result) PACKAGE=result;;
+    train-manager) PACKAGE=train-manager;;
     cli) PACKAGE=cli;;
     *) echo "Unknown package: ${1}";;
 esac
@@ -28,8 +28,8 @@ if [[ -z "${PACKAGE}" ]]; then
     printf 'Usage:\n'
     printf '  api <command>\n    Start or run the api service in dev mode.\n'
     printf '  ui <command>\n    Start or run the ui in dev mode.\n'
-    printf '  realtime<command>\n    Start or run the realtime service in dev mode.\n'
-    printf '  result<command>\n    Start or run the result service in dev mode.\n'
+    printf '  realtime <command>\n    Start or run the realtime service in dev mode.\n'
+    printf '  train-manager <command>\n    Start or run the train-manager service in dev mode.\n'
     printf '  cli <command>\n    Run a CLI command.\n'
     exit 0
 fi
@@ -46,8 +46,8 @@ case "${PACKAGE}" in
     realtime)
         exec npm run "$1" --workspace=packages/backend/realtime
         ;;
-    result)
-        exec npm run "$1" --workspace=packages/backend/result
+    train-manager)
+        exec npm run "$1" --workspace=packages/backend/train-manager
         ;;
     cli)
         exec npm run cli --workspace=packages/backend/api -- "$@"

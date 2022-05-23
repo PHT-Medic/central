@@ -64,11 +64,11 @@ This repository contains the User Interface (UI).
 
 This repository contains the realtime application which connects the API with socket based clients.
 
-### @personalhealthtrain/central-result 🏭
+### @personalhealthtrain/central-train-manager 🏭
 
 [![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-result.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-result)
 
-This repository contains the Result-Service, to aggregate Results from the image registry
+This repository contains the train manager, which is responsible to route, build and extract a train.
 
 ## Usage
 Start the ui-, api-, & realtime-application in a single terminal window (or as background process) with the following command:

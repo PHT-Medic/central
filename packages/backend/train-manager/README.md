@@ -1,8 +1,8 @@
-# UI - Result Service 🏭
+# Central - Train-Manager 🏭
 
-[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fui-result-service.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fui-result-service)
+[![npm version](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-realtime.svg)](https://badge.fury.io/js/@personalhealthtrain%2Fcentral-realtime)
 
-This repository contains the Result Service of the Personal Health Train.
+This repository contains the Train-Manager of the Personal Health Train.
 It communicates with some services of the PHT and need therefore to be configured properly, like described 
 in the following sections.
 
@@ -12,7 +12,6 @@ The following settings need to be added to the environment file `.env` in the ro
 PORT=<port>
 NODE_ENV=development
 
-HARBOR_CONNECTION_STRING=<user>:<password>@<url>
 RABBITMQ_CONNECTION_STRING=amqp://<username>:<password>@<host>
 REDIS_CONNECTION_STRING=redis://<username>:<password>@<host>
 VAULT_CONNECTION_STRING=<token>@<url>/v1/

@@ -33,7 +33,7 @@
         "ui": "npm run dev --workspace=packages/frontend/ui",
         "api": "npm run dev --workspace=packages/backend/api",
         "realtime": "npm run dev --workspace=packages/backend/realtime",
-        "result": "npm run dev --workspace=packages/backend/result",
+        "train-manager": "npm run dev --workspace=packages/backend/train-manager",
         "common": "npm run build-watch --workspace=packages/shared/common"
     }
 }

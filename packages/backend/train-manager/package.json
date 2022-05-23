@@ -1,5 +1,5 @@
 {
-    "name": "@personalhealthtrain/central-result-service",
+    "name": "@personalhealthtrain/train-manager",
     "private": true,
     "author": {
         "name": "Peter Placzek",
@@ -8,7 +8,7 @@
     },
     "license": "MIT",
     "version": "1.3.24",
-    "description": "This project contains the central Result-Service of the PHT.",
+    "description": "This project contains the central Train-Manager of the PHT.",
     "main": "dist/index.js",
     "scripts": {
         "lint": "eslint --ext .ts src/",
