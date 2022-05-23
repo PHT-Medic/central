@@ -11,22 +11,16 @@ const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin');
 const config = {
     publicRuntimeConfig() {
         return {
-            apiUrl: process.env.API_URL ||
-                'https://pht-medic.medizin.uni-tuebingen.de.de/api/',
-            resultServiceApiUrl: process.env.RESULT_SERVICE_API_URL ||
-                'https://pht-medic.medizin.uni-tuebingen.de.de/result-service/',
-            realtimeUrl: process.env.REALTIME_URL ||
-                'https://pht-medic.medizin.uni-tuebingen.de.de/realtime/',
+            apiUrl: process.env.API_URL,
+            trainManagerApiUrl: process.env.TRAIN_MANAGER_API_URL,
+            realtimeUrl: process.env.REALTIME_URL,
             realtimeTransports: process.env.REALTIME_TRANSPORTS,
         };
     },
     env: {
-        apiUrl: process.env.API_URL ||
-            'https://pht-medic.medizin.uni-tuebingen.de.de/api/',
-        resultServiceApiUrl: process.env.RESULT_SERVICE_API_URL ||
-            'https://pht-medic.medizin.uni-tuebingen.de.de/result-service/',
-        realtimeUrl: process.env.REALTIME_URL ||
-            'https://pht-medic.medizin.uni-tuebingen.de.de/realtime/',
+        apiUrl: process.env.API_URL,
+        trainManagerApiUrl: process.env.TRAIN_MANAGER_API_URL,
+        realtimeUrl: process.env.REALTIME_URL,
     },
     telemetry: false,
     ssr: true,
