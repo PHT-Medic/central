@@ -4,21 +4,15 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<template>
-    <div>
-        <train-basic-form
-            :proposal-id="proposal.id"
-            @created="handleCreated"
-        />
-    </div>
-</template>
-<script>
-import TrainBasicForm from '../../../../components/domains/train/TrainBasicForm';
+<script lang="ts">
+import { PropType } from 'vue';
+import { Proposal } from '@personalhealthtrain/central-common';
+import TrainBasicForm from '../../../../components/domains/train/TrainBasicForm.vue';
 
 export default {
     components: { TrainBasicForm },
     props: {
-        proposal: Object,
+        proposal: Object as PropType<Proposal>,
     },
     methods: {
         handleCreated() {
@@ -27,3 +21,11 @@ export default {
     },
 };
 </script>
+<template>
+    <div>
+        <train-basic-form
+            :proposal-id="proposal.id"
+            @created="handleCreated"
+        />
+    </div>
+</template>

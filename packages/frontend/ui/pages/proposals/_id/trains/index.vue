@@ -4,8 +4,9 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import { PermissionID } from '@personalhealthtrain/central-common';
+<script lang="ts">
+import { PermissionID, Proposal, ProposalStation } from '@personalhealthtrain/central-common';
+import { PropType } from 'vue';
 import { TrainList } from '../../../../components/domains/train/TrainList';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
@@ -27,20 +28,17 @@ export default {
     components: { TrainList },
     props: {
         proposal: {
-            type: Object,
+            type: Object as PropType<Proposal>,
             default() {
                 return {};
             },
         },
-        visitorStation: {
-            type: Object,
+        visitorProposalStation: {
+            type: Object as PropType<ProposalStation>,
             default: undefined,
         },
     },
     computed: {
-        station_id() {
-            return this.visitorStation ? this.visitorStation.id : undefined;
-        },
         query() {
             return {
                 filter: {
@@ -56,7 +54,7 @@ export default {
 <template>
     <div>
         <div class="m-t-10">
-            <template v-if="visitorStation">
+            <template v-if="visitorProposalStation">
                 <div class="alert alert-sm alert-warning">
                     You are not permitted to view the train list.
                 </div>

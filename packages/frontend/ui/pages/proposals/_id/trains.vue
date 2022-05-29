@@ -28,18 +28,21 @@
             <div class="content-container">
                 <nuxt-child
                     :proposal="proposal"
-                    :visitor-station="visitorStation"
+                    :visitor-proposal-station="visitorProposalStation"
                 />
             </div>
         </div>
     </div>
 </template>
-<script>
+<script lang="ts">
+import { PropType } from 'vue';
+import { Proposal, ProposalStation } from '@personalhealthtrain/central-common';
+
 export default {
     props: {
-        proposal: Object,
-        visitorStation: {
-            type: Object,
+        proposal: Object as PropType<Proposal>,
+        visitorProposalStation: {
+            type: Object as PropType<ProposalStation>,
             default: undefined,
         },
     },

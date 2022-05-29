@@ -4,11 +4,14 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import { ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
+<script lang="ts">
+import Vue from 'vue';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+import { ProposalStationList } from '../../../components/domains/proposal-station/ProposalStationList';
+import ProposalStationApprovalStatus from '../../../components/domains/proposal-station/ProposalStationApprovalStatus';
 
-export default {
+export default Vue.extend({
+    components: { ProposalStationApprovalStatus, ProposalStationList },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -25,87 +28,133 @@ export default {
             default: null,
         },
     },
-    data() {
-        return {
-            proposalStationStatus: ProposalStationApprovalStatus,
-        };
+    computed: {
+        proposalStationQuery() {
+            return {
+                filter: {
+                    proposal_id: this.proposal.id,
+                },
+                sort: {
+                    station: {
+                        name: 'ASC',
+                    },
+                },
+            };
+        },
     },
-};
+});
 </script>
 <template>
     <div>
         <div class="row">
-            <div class="col-xl-3 col-md-6 text-center">
-                <div class="bg-warm-flame p-1 rounded">
-                    <h6 class="mt-1">
-                        Risk
-                    </h6>
-                    <div class="mb-1">
-                        <i class="fa fa-exclamation-triangle fa-4x" />
+            <div class="col">
+                <h6><i class="fa-solid fa-info" /> Info</h6>
+                <div class="row">
+                    <div class="col">
+                        <div class="card-grey card mt-2">
+                            <div class="card-header">
+                                <h5>MasterImage</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="mb-1">
+                                    <i class="fa fa-compact-disc fa-4x" />
+                                </div>
+                                <p class="badge badge-dark">
+                                    {{ proposal.master_image ? proposal.master_image.name : proposal.master_image_id }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                    <p class="badge badge-success">
-                        {{ proposal.risk }}
-                    </p>
+                    <div class="col">
+                        <div class="card-grey card mt-2">
+                            <div class="card-header">
+                                <h5>Risk</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="text-center">
+                                            <div class="mb-1">
+                                                <i class="fa fa-exclamation-triangle fa-4x" />
+                                            </div>
+                                            <span class="badge badge-success">
+                                                {{ proposal.risk }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div
+                                        v-if="proposal.risk_comment"
+                                        class="col"
+                                    >
+                                        <div>
+                                            <strong>Comment</strong>
+                                            <br>
+                                            {{ proposal.risk_comment }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="card-grey card mt-2">
+                            <div class="card-header">
+                                <h5>Realm</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="mb-1">
+                                    <i class="fas fa-university fa-4x" />
+                                </div>
+                                <p class="badge badge-dark">
+                                    {{ proposal.realm_id }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card-grey card mt-2">
+                            <div class="card-header">
+                                <h5>User</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="mb-1">
+                                    <i class="fa fa-user fa-4x" />
+                                </div>
+                                <p class="badge badge-dark">
+                                    {{ proposal.user ? proposal.user.name : proposal.user_id }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="col-xl-3 col-md-6 text-center">
-                <div class="bg-warm-flame p-1 rounded">
-                    <h6 class="mt-1">
-                        MasterImage
-                    </h6>
-                    <div class="mb-1">
-                        <i class="fa fa-compact-disc fa-4x" />
-                    </div>
-                    <p class="badge badge-dark">
-                        {{ proposal.master_image ? proposal.master_image.name : proposal.master_image_id }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6 text-center">
-                <div class="bg-tempting-azure p-1 rounded">
-                    <h6 class="mt-1">
-                        Realm
-                    </h6>
-                    <div class="mb-1">
-                        <i class="fas fa-university fa-4x" />
-                    </div>
-                    <p class="badge badge-dark">
-                        {{ proposal.realm_id }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-xl-3 col-md-6 text-center">
-                <div class="bg-tempting-azure p-1 rounded">
-                    <h6 class="mt-1">
-                        User
-                    </h6>
-                    <div class="mb-1">
-                        <i class="fa fa-user fa-4x" />
-                    </div>
-                    <p class="badge badge-dark">
-                        {{ proposal.user ? proposal.user.name : proposal.user_id }}
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="mt-5">
-            <div class="row">
-                <div class="col">
-                    <h6>Risk Comment</h6>
-                    <p>{{ proposal.risk_comment }}</p>
-
-                    <h6>RequestedData</h6>
-                    <p>{{ proposal.requested_data }}</p>
-                </div>
-                <div class="col">
-                    <h6>Created At</h6>
-                    <p><timeago :datetime="proposal.created_at" /></p>
-                    <h6>Updated At</h6>
-                    <p><timeago :datetime="proposal.updated_at" /></p>
-                </div>
+            <div class="col">
+                <proposal-station-list
+                    :with-search="false"
+                    :query="proposalStationQuery"
+                >
+                    <template #items="{ items }">
+                        <div class="list">
+                            <template v-for="item in items">
+                                <div
+                                    :key="item.id"
+                                    class="list-item card mb-2"
+                                >
+                                    <div class="card-header">
+                                        <h5>{{ item.station.name }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong>Status</strong> <proposal-station-approval-status :status="item.approval_status" />
+                                        <br>
+                                        <strong>Comment</strong><br> {{ item.comment || 'No comment' }}
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </proposal-station-list>
             </div>
         </div>
     </div>
