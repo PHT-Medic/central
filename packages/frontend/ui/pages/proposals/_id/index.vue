@@ -53,6 +53,23 @@ export default Vue.extend({
                     <div class="col">
                         <div class="card-grey card mt-2">
                             <div class="card-header">
+                                <h5>Trains</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="mb-1">
+                                    <i class="fa fa-train-tram fa-4x" />
+                                </div>
+                                <p class="badge badge-dark">
+                                    {{ proposal.trains }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="card-grey card mt-2">
+                            <div class="card-header">
                                 <h5>MasterImage</h5>
                             </div>
                             <div class="card-body text-center">
