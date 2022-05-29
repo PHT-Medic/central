@@ -54,7 +54,7 @@
         "@types/winston": "^2.4.4",
         "nodemon": "^2.0.16",
         "ts-node": "^10.8.0",
-        "ts-node-dev": "^1.1.6"
+        "ts-node-dev": "^2.0.0"
     },
     "publishConfig": {
         "access": "public"
