@@ -67,6 +67,9 @@ export async function getManyTrainStationRouteHandler(req: ExpressRequest, res: 
         relations,
         defaultAlias: 'trainStation',
         allowed: [
+            'run_status',
+            'approval_status',
+
             'train_id',
             'train_realm_id',
             'train.id',
