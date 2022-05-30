@@ -50,11 +50,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     const dataSource = new DataSource(dataSourceOptions);
     await dataSource.initialize();
 
-    await setDataSource(dataSource);
-
-    if (env.env === 'development') {
-        await dataSource.synchronize();
-    }
+    setDataSource(dataSource);
 
     start();
 })();

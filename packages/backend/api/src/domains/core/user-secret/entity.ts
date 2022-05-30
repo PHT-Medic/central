@@ -8,7 +8,7 @@
 import {
     Column,
     CreateDateColumn,
-    Entity,
+    Entity, Index,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
@@ -31,7 +31,8 @@ export class UserSecretEntity implements UserSecret {
     @Column({ type: 'varchar', length: 128 })
         key: string;
 
-    @Column({ type: 'enum', enum: SecretType })
+    @Index()
+    @Column({ type: 'varchar', length: 64 })
         type: SecretType;
 
     @Column({ type: 'text', nullable: true })

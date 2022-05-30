@@ -6,9 +6,8 @@
  */
 
 import { Arguments, Argv, CommandModule } from 'yargs';
-import { createDatabase } from 'typeorm-extension';
+import { createDatabase, setDataSource } from 'typeorm-extension';
 import { DatabaseSeeder, setupCommand } from '@authelion/api-core';
-import { PermissionKey } from '@personalhealthtrain/central-common';
 import { useClient } from 'redis-extension';
 import { DataSource } from 'typeorm';
 import { createConfig } from '../../config';
@@ -63,10 +62,10 @@ export class SetupCommand implements CommandModule {
         const spinner = useSpinner();
 
         if (
-            !args.auth &&
-            !args.database &&
-            !args.databaseSeeder &&
-            !args.documentation
+            typeof args.auth === 'undefined' &&
+            typeof args.database === 'undefined' &&
+            typeof args.databaseSeeder === 'undefined' &&
+            typeof args.documentation === 'undefined'
         ) {
             // eslint-disable-next-line no-multi-assign
             args.auth = args.database = args.databaseSeeder = args.documentation = true;
@@ -99,18 +98,17 @@ export class SetupCommand implements CommandModule {
 
             if (args.database) {
                 spinner.start('create database...');
-                await createDatabase({ options });
+                await createDatabase({ options, synchronize: false });
                 spinner.succeed('created database.');
             }
 
             const dataSource = new DataSource(options);
             await dataSource.initialize();
+            await dataSource.runMigrations();
+
+            setDataSource(dataSource);
 
             try {
-                spinner.start('synchronize database...');
-                await dataSource.synchronize();
-                spinner.succeed('synchronized database...');
-
                 if (args.databaseSeeder) {
                     spinner.start('seeding database...');
                     createConfig({ env });

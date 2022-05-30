@@ -39,12 +39,6 @@ export class CheckCommand implements CommandModule {
         await dataSource.initialize();
 
         try {
-            if (env.env !== 'production') {
-                spinner.start('synchronizing database...');
-                await dataSource.synchronize();
-                spinner.succeed('synchronized database.');
-            }
-
             spinner.start('checking database integrity...');
 
             const authSeeder = new DatabaseSeeder();

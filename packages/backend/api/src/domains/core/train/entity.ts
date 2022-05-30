@@ -44,7 +44,8 @@ export class TrainEntity implements Train {
     @PrimaryGeneratedColumn('uuid')
         id: string;
 
-    @Column({ type: 'enum', enum: TrainType, default: TrainType.ANALYSE })
+    @Index()
+    @Column({ type: 'varchar', length: 64, default: TrainType.ANALYSE })
         type: TrainType;
 
     @Index()
@@ -75,22 +76,25 @@ export class TrainEntity implements Train {
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({
-        type: 'enum', nullable: true, default: null, enum: TrainConfigurationStatus,
+        type: 'varchar', length: 64, nullable: true, default: null,
     })
         configuration_status: TrainConfigurationStatus | null;
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({
-        type: 'varchar', length: 64, default: null,
+        type: 'varchar', length: 64, nullable: true, default: null,
     })
         build_status: TrainBuildStatus | null;
 
     // ------------------------------------------------------------------
 
+    @Index()
     @Column({
-        type: 'varchar', length: 64, default: null,
+        type: 'varchar', length: 64, nullable: true, default: null,
     })
         run_status: TrainRunStatus | null;
 

@@ -8,7 +8,6 @@
 import { DataSource, In } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 import {
-    RealmEntity,
     RobotEntity,
     RobotRepository,
     RoleEntity,
@@ -19,7 +18,6 @@ import {
 import { ServiceID } from '@personalhealthtrain/central-common';
 import { MASTER_REALM_ID } from '@authelion/common';
 import { PHTStationRole, getPHTStationRolePermissions } from '../../config/pht/permissions/station';
-import { StationEntity } from '../../domains/core/station/entity';
 
 // ----------------------------------------------
 
@@ -104,34 +102,5 @@ export class DatabaseRootSeeder implements Seeder {
             .reduce((accumulator, entity) => [...accumulator, ...entity]);
 
         await rolePermissionRepository.save(rolePermissions);
-
-        // -------------------------------------------------
-
-        /**
-         * Create PHT default realms
-         */
-        const realms : Partial<RealmEntity>[] = [
-            { id: 'station1', name: 'University Augsburg' },
-            { id: 'station2', name: 'University Munich' },
-            { id: 'station3', name: 'University Tuebingen' },
-        ];
-        const realmRepository = dataSource.getRepository(RealmEntity);
-        await realmRepository.insert(realms);
-
-        // -------------------------------------------------
-
-        /**
-         * Promote all PHT default realms to a station.
-         */
-        const stationRepository = dataSource.getRepository(StationEntity);
-        const stations : Partial<StationEntity>[] = [];
-        for (let i = 0; i < realms.length; i++) {
-            stations.push({
-                realm_id: realms[i].id,
-                name: realms[i].name,
-            });
-        }
-
-        await stationRepository.insert(stations);
     }
 }

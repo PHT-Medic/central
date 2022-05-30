@@ -24,7 +24,7 @@ export class ProposalEntity implements Proposal {
     @Column({ type: 'varchar' })
         requested_data: string;
 
-    @Column({ type: 'enum', enum: ProposalRisk })
+    @Column({ type: 'varchar', length: 64, default: ProposalRisk.LOW })
         risk: ProposalRisk;
 
     @Column({ type: 'varchar', length: 4096 })

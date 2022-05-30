@@ -10,7 +10,10 @@ import { setConfig as setHTTPConfig } from '@trapi/client';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { setConfig as setRedisConfig } from 'redis-extension';
 import { VaultClient } from '@trapi/vault-client';
-import { HTTPClientKey, PermissionID, detectProxyConnectionConfig } from '@personalhealthtrain/central-common';
+import {
+    HTTPClientKey,
+    PermissionKey, detectProxyConnectionConfig,
+} from '@personalhealthtrain/central-common';
 import { Environment } from './env';
 import { buildTrainManagerAggregator } from './aggregators/train-manager';
 import { buildRobotAggregator } from './aggregators/robot';
@@ -83,7 +86,7 @@ export function createConfig({ env } : ConfigContext) : Config {
     setAuthConfig({
         database: {
             seed: {
-                permissions: Object.values(PermissionID),
+                permissions: Object.values(PermissionKey),
                 admin: {
                     username: 'admin',
                     password: 'start123',

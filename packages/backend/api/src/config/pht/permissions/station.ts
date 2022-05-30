@@ -20,10 +20,8 @@ export function getPHTStationRolePermissions(type: PHTStationRole) : PermissionI
 
                 PermissionID.TRAIN_ADD,
                 PermissionID.TRAIN_EDIT,
-
                 PermissionID.TRAIN_EXECUTION_START,
                 PermissionID.TRAIN_EXECUTION_STOP,
-
                 PermissionID.TRAIN_RESULT_READ,
             ];
         case 'StationAuthority':
@@ -33,13 +31,13 @@ export function getPHTStationRolePermissions(type: PHTStationRole) : PermissionI
                 PermissionID.PROPOSAL_EDIT,
                 PermissionID.PROPOSAL_APPROVE,
 
-                PermissionID.STATION_EDIT,
+                PermissionID.STATION_ADD,
                 PermissionID.STATION_DROP,
                 PermissionID.STATION_EDIT,
 
                 PermissionID.PROVIDER_ADD,
-                PermissionID.PROVIDER_EDIT,
                 PermissionID.PROVIDER_DROP,
+                PermissionID.PROVIDER_EDIT,
 
                 PermissionID.TRAIN_ADD,
                 PermissionID.TRAIN_DROP,

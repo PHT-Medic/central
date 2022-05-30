@@ -34,10 +34,17 @@ export class UpgradeCommand implements CommandModule {
         await dataSource.initialize();
 
         try {
-            await dataSource.runMigrations({ transaction: 'all' });
+            await dataSource.runMigrations();
             // eslint-disable-next-line no-useless-catch
+        } catch (e) {
+            spinner.start('Executing migrations failed...');
+            await dataSource.destroy();
+            process.exit(1);
+            throw e;
         } finally {
             await dataSource.destroy();
         }
+
+        process.exit(0);
     }
 }
