@@ -7,8 +7,6 @@
 <script>
 import {
     ProposalStationApprovalStatus,
-    buildSocketTrainStationInRoomName,
-    buildSocketTrainStationOutRoomName,
 } from '@personalhealthtrain/central-common';
 import { minLength, required } from 'vuelidate/lib/validators';
 import { ProposalStationList } from '../../proposal-station/ProposalStationList';
@@ -73,20 +71,6 @@ export default {
         },
     },
     methods: {
-        isSameSocketRoom(room) {
-            switch (this.direction) {
-                case 'in':
-                    return room === buildSocketTrainStationInRoomName();
-                case 'out':
-                    return room === buildSocketTrainStationOutRoomName();
-            }
-
-            return false;
-        },
-        proposalStationFilter(item) {
-            return this.trainStation.items.findIndex((trainStation) => trainStation.station_id === item.station_id) === -1;
-        },
-
         async handleMasterImageSelected(item) {
             try {
                 const response = await this.$api.train.update(this.train.id, {
@@ -111,6 +95,13 @@ export default {
             if (item.train) {
                 this.$emit('updated', item.train);
             }
+        },
+
+        handleFailed(e) {
+            this.$bvToast.toast(e.message, {
+                toaster: 'b-toaster-top-center',
+                variant: 'warning',
+            });
         },
     },
 };
@@ -152,6 +143,7 @@ export default {
                                 :realm-id="train.realm_id"
                                 @created="handleTrainStationCreated"
                                 @deleted="handleTrainStationDeleted"
+                                @failed="handleFailed"
                             />
                         </template>
                     </proposal-station-list>
