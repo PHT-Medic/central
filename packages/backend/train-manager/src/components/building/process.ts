@@ -106,8 +106,14 @@ export async function processMessage(message: Message) {
         useLogger().debug(`Writing ${TrainContainerFileName.QUERY} to container`, {
             component: 'building',
         });
+
+        let { query } = data.entity;
+        if (typeof query !== 'string') {
+            query = JSON.stringify(query);
+        }
+
         await container.putArchive(
-            createPackFromFileContent(JSON.stringify(data.entity.query), TrainContainerFileName.QUERY),
+            createPackFromFileContent(query, TrainContainerFileName.QUERY),
             {
                 path: '/opt',
             },
