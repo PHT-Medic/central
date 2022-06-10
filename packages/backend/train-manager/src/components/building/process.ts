@@ -109,7 +109,7 @@ export async function processMessage(message: Message) {
         await container.putArchive(
             createPackFromFileContent(JSON.stringify(data.entity.query), TrainContainerFileName.QUERY),
             {
-                path: TrainContainerPath.MAIN,
+                path: '/opt',
             },
         );
     }

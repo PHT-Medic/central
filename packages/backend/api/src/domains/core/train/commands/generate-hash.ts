@@ -48,15 +48,19 @@ export async function generateTrainHash(train: Train | number | string) : Promis
     const sessionId: Buffer = crypto.randomBytes(64);
     hash.update(sessionId);
 
-    const query: Buffer | undefined = !!train.query && train.query !== '' ?
-        Buffer.from(train.query, 'utf-8') :
-        undefined;
-
-    if (typeof query !== 'undefined') {
-        hash.update(query);
-    }
-
     train.session_id = sessionId.toString('hex');
+
+    if (
+        train.query &&
+        train.query.length > 0
+    ) {
+        let { query } = train;
+        if (typeof query !== 'string') {
+            query = JSON.stringify(query);
+        }
+
+        hash.update(Buffer.from(query, 'utf-8'));
+    }
 
     train.hash = hash.digest('hex');
     train.configuration_status = TrainConfigurationStatus.HASH_GENERATED;
