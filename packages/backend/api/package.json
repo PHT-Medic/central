@@ -23,7 +23,7 @@
         "@trapi/swagger": "^0.2.17",
         "@trapi/vault-client": "^0.0.1",
         "@typescript-error/http": "^1.1.4",
-        "amqp-extension": "^1.0.3",
+        "amqp-extension": "^1.0.4",
         "body-parser": "^1.20.0",
         "busboy": "^1.6.0",
         "cors": "^2.8.5",
@@ -69,7 +69,7 @@
         "jest-serial-runner": "^1.2.0",
         "nodemon": "^2.0.16",
         "supertest": "^6.2.3",
-        "ts-jest": "^28.0.3",
+        "ts-jest": "^28.0.4",
         "ts-node": "^10.8.0",
         "ts-node-dev": "^2.0.0"
     },
