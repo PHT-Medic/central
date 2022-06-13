@@ -77,6 +77,7 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
             if (registryProject.external_name !== registryProjectExternalName) {
                 registryProject = registryProjectRepository.merge(registryProject, {
                     external_name: registryProjectExternalName,
+                    realm_id: entity.realm_id,
                 });
 
                 registryOperation = 'relink';
@@ -87,6 +88,7 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
                 name: entity.name,
                 ecosystem: entity.ecosystem,
                 type: RegistryProjectType.STATION,
+                realm_id: entity.realm_id,
                 registry_id: entity.registry_id,
                 public: false,
             });

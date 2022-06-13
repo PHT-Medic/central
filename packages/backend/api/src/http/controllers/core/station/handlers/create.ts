@@ -65,6 +65,7 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
             name: entity.name,
             ecosystem: entity.ecosystem,
             type: RegistryProjectType.STATION,
+            realm_id: entity.realm_id,
             registry_id: entity.registry_id,
             public: false,
         });

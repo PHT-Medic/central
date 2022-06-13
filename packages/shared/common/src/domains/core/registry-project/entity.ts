@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Realm } from '@authelion/common';
 import { Registry } from '../registry';
 import { Ecosystem } from '../ecosystem';
 import { RegistryProjectType } from './constants';
@@ -46,6 +47,12 @@ export interface RegistryProject {
     registry_id: Registry['id'];
 
     registry: Registry;
+
+    // ------------------------------------------------------------------
+
+    realm_id: Realm['id'] | null;
+
+    realm: Realm | null;
 
     // ------------------------------------------------------------------
 

@@ -31,16 +31,6 @@ export default Vue.extend<any, any, any, Properties>({
     render(h: CreateElement): VNode {
         const vm = this;
 
-        if (!vm.$auth.hasPermission(PermissionID.REGISTRY_MANAGE)) {
-            return h(
-                'div',
-                { staticClass: 'alert alert-sm alert-danger' },
-                [
-                    'You are not permitted to view the registry-project details.',
-                ],
-            );
-        }
-
         if (vm.entity.ecosystem !== Ecosystem.DEFAULT) {
             return h(
                 'div',

@@ -26,7 +26,7 @@ export default {
                 variant: 'success',
             });
 
-            this.$nuxt.$router.push(`/admin/realms/${this.items.id}/users/${e.id}`);
+            this.$nuxt.$router.push(`/admin/realms/${this.entity.id}/users/${e.id}`);
         },
     },
 };

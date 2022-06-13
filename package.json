@@ -34,6 +34,7 @@
         "api": "npm run dev --workspace=packages/backend/api",
         "realtime": "npm run dev --workspace=packages/backend/realtime",
         "train-manager": "npm run dev --workspace=packages/backend/train-manager",
-        "common": "npm run build-watch --workspace=packages/shared/common"
+        "common": "npm run build-watch --workspace=packages/shared/common",
+        "upgrade": "npm run cli --workspace=packages/backend/api -- upgrade"
     }
 }

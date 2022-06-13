@@ -163,6 +163,16 @@ export default Vue.extend<Data, any, any, Properties>({
 
         const robotCredentials = [];
 
+        if (!vm.entity) {
+            return h(
+                'div',
+                { staticClass: 'alert alert-sm alert-warning' },
+                [
+                    'The registry-project details can not be displayed.',
+                ],
+            );
+        }
+
         if (vm.accountName) {
             robotCredentials.push(h('div', [
                 vm.accountName,

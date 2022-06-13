@@ -11,9 +11,11 @@ import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 import { TrainStationList } from '../../../components/domains/train-station/TrainStationList';
 import TrainStationApprovalStatus from '../../../components/domains/train-station/TrainStationApprovalStatus';
 import TrainStationApprovalCommand from '../../../components/domains/train-station/TrainStationApprovalCommand';
+import TrainStationRunStatus from '../../../components/domains/train-station/TrainStationRunStatus';
 
 export default Vue.extend({
     components: {
+        TrainStationRunStatus,
         TrainStationApprovalCommand,
         TrainStationApprovalStatus,
         TrainStationList,
@@ -53,7 +55,10 @@ export default Vue.extend({
                     key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
-                    key: 'approval_status', label: 'Status', thClass: 'text-center', tdClass: 'text-center',
+                    key: 'approval_status', label: 'Approval Status', thClass: 'text-center', tdClass: 'text-center',
+                },
+                {
+                    key: 'run_status', label: 'Run Status', thClass: 'text-center', tdClass: 'text-center',
                 },
                 {
                     key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center',
@@ -71,6 +76,13 @@ export default Vue.extend({
         },
         canManage() {
             return this.$auth.hasPermission(PermissionID.TRAIN_APPROVE);
+        },
+        query() {
+            return {
+                include: {
+                    station: true,
+                },
+            };
         },
     },
     methods: {
@@ -102,6 +114,7 @@ export default Vue.extend({
                     :realm-id="realmId"
                     :source-id="viewerStation.id"
                     :direction="'in'"
+                    :query="query"
                 >
                     <template #header-title>
                         <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
@@ -128,6 +141,16 @@ export default Vue.extend({
                                         >{{ statusProps.statusText }}</span>
                                     </template>
                                 </train-station-approval-status>
+                            </template>
+                            <template #cell(run_status)="data">
+                                <train-station-run-status :status="data.item.run_status">
+                                    <template #default="statusProps">
+                                        <span
+                                            class="badge"
+                                            :class="'badge-'+statusProps.classSuffix"
+                                        >{{ statusProps.statusText }}</span>
+                                    </template>
+                                </train-station-run-status>
                             </template>
                             <template #cell(created_at)="data">
                                 <timeago :datetime="data.item.created_at" />

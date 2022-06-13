@@ -18,6 +18,8 @@ import { RegistryProjectEntity } from '../../../../../domains/core/registry-proj
 
 function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>, fields: any) {
     const protectedFields = [
+        'account_name',
+        'account_id',
         'account_secret',
     ];
 
@@ -50,6 +52,8 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
                     protectedSelected.map((field) => field.key).join(', ')}`,
             );
         }
+
+        onlyRealmPermittedQueryResources(query, req.realmId);
     }
 
     applyQueryFieldsParseOutput(query, fieldsParsed);

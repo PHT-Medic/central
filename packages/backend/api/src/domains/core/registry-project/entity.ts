@@ -16,6 +16,8 @@ import {
 import {
     Ecosystem, Registry, RegistryProject, RegistryProjectType,
 } from '@personalhealthtrain/central-common';
+import { Realm } from '@authelion/common';
+import { RealmEntity } from '@authelion/api-core';
 import { RegistryEntity } from '../registry/entity';
 
 @Unique('registry_project_external_name_registry_index', ['external_name', 'registry_id'])
@@ -90,6 +92,15 @@ export class RegistryProjectEntity implements RegistryProject {
     @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'registry_id' })
         registry: RegistryEntity;
+
+    // ------------------------------------------------------------------
+
+    @Column({ nullable: true })
+        realm_id: Realm['id'];
+
+    @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE', nullable: true })
+    @JoinColumn({ name: 'realm_id' })
+        realm: RealmEntity;
 
     // ------------------------------------------------------------------
 
