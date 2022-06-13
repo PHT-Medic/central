@@ -98,7 +98,7 @@ export class RegistryProjectEntity implements RegistryProject {
     @Column({ nullable: true })
         realm_id: Realm['id'];
 
-    @ManyToOne(() => RegistryEntity, { onDelete: 'CASCADE', nullable: true })
+    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE', nullable: true })
     @JoinColumn({ name: 'realm_id' })
         realm: RealmEntity;
 
