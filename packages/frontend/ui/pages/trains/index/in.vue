@@ -125,7 +125,7 @@ export default Vue.extend({
                                         <span
                                             class="badge"
                                             :class="'badge-'+statusProps.classSuffix"
-                                        >{{ props.statusText }}</span>
+                                        >{{ statusProps.statusText }}</span>
                                     </template>
                                 </train-station-approval-status>
                             </template>
