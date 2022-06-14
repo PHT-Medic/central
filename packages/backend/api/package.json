@@ -34,7 +34,7 @@
         "express-prom-bundle": "^6.4.1",
         "express-rate-limit": "^6.4.0",
         "express-validator": "^6.14.1",
-        "isomorphic-git": "^1.17.2",
+        "isomorphic-git": "^1.18.2",
         "mysql": "^2.18.1",
         "ora": "^5.4.1",
         "prom-client": "^14.0.1",
