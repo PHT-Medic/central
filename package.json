@@ -15,7 +15,7 @@
         "packages/frontend/*"
     ],
     "devDependencies": {
-        "@tada5hi/eslint-config-vue-typescript": "^1.0.3",
+        "@tada5hi/eslint-config-vue-typescript": "^1.0.4",
         "@types/node": "^18.0.0",
         "eslint": "^8.17.0",
         "lerna": "^5.1.4",
