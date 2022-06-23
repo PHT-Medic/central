@@ -39,7 +39,7 @@
         "redis-extension": "^1.0.0",
         "tar-stream": "^2.1.4",
         "uuid": "^8.3.2",
-        "winston": "^3.7.2",
+        "winston": "^3.8.0",
         "zlib": "^1.0.5"
     },
     "devDependencies": {
