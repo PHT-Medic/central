@@ -12,7 +12,6 @@ import {
     REGISTRY_ARTIFACT_TAG_BASE,
     REGISTRY_ARTIFACT_TAG_LATEST,
     RegistryProjectType,
-    TrainManagerRouterCommand,
     TrainManagerRouterRoutePayload,
     TrainStation,
 } from '@personalhealthtrain/central-common';

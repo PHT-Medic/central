@@ -5,21 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Message, publishMessage } from 'amqp-extension';
+import { Message } from 'amqp-extension';
 import {
     HTTPClient,
     TrainManagerBuilderBuildPayload,
-    TrainManagerBuilderCheckPayload,
-    TrainManagerBuilderCommand,
-    TrainManagerBuilderEvent,
-    TrainManagerComponent,
-    TrainManagerQueuePayloadExtended, buildRegistryClientConnectionStringFromRegistry,
+    TrainManagerQueuePayloadExtended,
+    buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from '@trapi/client';
 import { HarborClient } from '@trapi/harbor-client';
 import { BuilderError } from '../../error';
 import { createBasicHarborAPIConfig } from '../../../../domains/harbor';
-import { buildEventQueueMessageForAPI } from '../../../../config/queue';
 import { writeNoneEvent } from './write-none';
 import { writeBuiltEvent } from '../build';
 

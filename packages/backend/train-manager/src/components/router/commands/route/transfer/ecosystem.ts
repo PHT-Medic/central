@@ -10,7 +10,6 @@ import {
     HTTPClient, REGISTRY_ARTIFACT_TAG_BASE,
     Registry,
     RegistryProjectType,
-    TrainManagerRouterCommand,
 } from '@personalhealthtrain/central-common';
 import { useClient } from '@trapi/client';
 import { TransferEcosystemItem, TransferItem } from './type';

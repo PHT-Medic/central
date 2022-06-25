@@ -75,8 +75,6 @@ export async function getManyUserSecretRouteHandler(req: ExpressRequest, res: Ex
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });
 
-    console.log(query.getSql());
-
     const [entities, total] = await query.getManyAndCount();
 
     return res.respond({

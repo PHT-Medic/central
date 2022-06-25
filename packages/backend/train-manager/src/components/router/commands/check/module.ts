@@ -11,7 +11,6 @@ import {
     RegistryProject,
     RegistryProjectType,
     TrainManagerQueuePayloadExtended,
-    TrainManagerRouterCommand,
     TrainManagerRouterStatusPayload,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
