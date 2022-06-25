@@ -6,7 +6,11 @@
  */
 
 import { publishMessage } from 'amqp-extension';
-import { Train, TrainManagerQueueCommand } from '@personalhealthtrain/central-common';
+import {
+    Train,
+    TrainManagerBuilderCommand,
+    TrainManagerComponent,
+} from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
@@ -23,7 +27,8 @@ export async function detectTrainBuildStatus(train: Train | number | string) : P
     }
 
     const queueMessage = buildTrainManagerQueueMessage(
-        TrainManagerQueueCommand.BUILD_STATUS,
+        TrainManagerComponent.BUILDER,
+        TrainManagerBuilderCommand.CHECK,
         {
             id: train.id,
         },

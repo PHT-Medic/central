@@ -6,22 +6,23 @@
  */
 
 import {
-    TrainManagerExtractingMode,
-    TrainManagerExtractingQueueEvent,
-    TrainManagerExtractingQueuePayload, TrainResultStatus,
+    TrainManagerComponent,
+    TrainManagerExtractorCommand,
+    TrainManagerExtractorEvent,
+    TrainManagerExtractorExtractQueuePayload,
+    TrainResultStatus,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import { useLogger } from '../../config/log';
+import { Message } from 'amqp-extension';
 import { TrainEntity } from '../../domains/core/train/entity';
+import { saveTrainLog } from '../../domains/core/train-log';
 
-export async function handleTrainManagerExtractingQueueEvent(
-    data: TrainManagerExtractingQueuePayload,
-    event: TrainManagerExtractingQueueEvent,
+export async function handleTrainManagerExtractorEvent(
+    command: TrainManagerExtractorCommand,
+    event: TrainManagerExtractorEvent,
+    message: Message,
 ) {
-    useLogger()
-        .info(`Received train-manager extracting ${event} event.`, {
-            aggregator: 'train-manager', payload: data,
-        });
+    const data = message.data as TrainManagerExtractorExtractQueuePayload;
 
     const dataSource = await useDataSource();
     const trainRepository = dataSource.getRepository(TrainEntity);
@@ -31,40 +32,32 @@ export async function handleTrainManagerExtractingQueueEvent(
         return;
     }
 
-    switch (data.mode) {
-        case TrainManagerExtractingMode.NONE:
-        case TrainManagerExtractingMode.WRITE: {
-            let status : TrainResultStatus;
+    let status : TrainResultStatus;
 
-            switch (event) {
-                case TrainManagerExtractingQueueEvent.STARTED:
-                    status = TrainResultStatus.STARTED;
-                    break;
-                case TrainManagerExtractingQueueEvent.DOWNLOADING:
-                    status = TrainResultStatus.DOWNLOADING;
-                    break;
-                case TrainManagerExtractingQueueEvent.DOWNLOADED:
-                    status = TrainResultStatus.DOWNLOADED;
-                    break;
-                case TrainManagerExtractingQueueEvent.PROCESSING:
-                    status = TrainResultStatus.PROCESSING;
-                    break;
-                case TrainManagerExtractingQueueEvent.PROCESSED:
-                    status = TrainResultStatus.FINISHED;
-                    break;
-                case TrainManagerExtractingQueueEvent.FINISHED:
-                    status = TrainResultStatus.FINISHED;
-                    break;
-                case TrainManagerExtractingQueueEvent.FAILED:
-                    status = TrainResultStatus.FAILED;
-                    break;
-            }
-
-            entity.result_status = status;
-
-            await trainRepository.save(entity);
-
+    switch (event) {
+        case TrainManagerExtractorEvent.DOWNLOADING:
+            status = TrainResultStatus.DOWNLOADING;
             break;
-        }
+        case TrainManagerExtractorEvent.DOWNLOADED:
+            status = TrainResultStatus.DOWNLOADED;
+            break;
+        case TrainManagerExtractorEvent.EXTRACTING:
+            status = TrainResultStatus.PROCESSING;
+            break;
+        case TrainManagerExtractorEvent.EXTRACTED:
+            status = TrainResultStatus.FINISHED;
+            break;
+        case TrainManagerExtractorEvent.FAILED:
+            status = TrainResultStatus.FAILED;
+            break;
     }
+
+    entity.result_status = status;
+
+    await trainRepository.save(entity);
+
+    await saveTrainLog({
+        train: entity,
+        component: TrainManagerComponent.EXTRACTOR,
+    });
 }

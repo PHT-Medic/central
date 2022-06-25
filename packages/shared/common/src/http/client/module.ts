@@ -15,6 +15,7 @@ import {
     StationAPI, TrainAPI, TrainFileAPI, TrainStationAPI,
     UserSecretAPI,
 } from '../../domains';
+import { TrainLogAPI } from '../../domains/core/train-log';
 
 export class HTTPClient extends Client {
     public readonly architecture: SettingsOptionAPI;
@@ -37,6 +38,8 @@ export class HTTPClient extends Client {
 
     public readonly trainFile : TrainFileAPI;
 
+    public readonly trainLog: TrainLogAPI;
+
     public readonly trainStation : TrainStationAPI;
 
     public readonly service : ServiceAPI;
@@ -56,6 +59,7 @@ export class HTTPClient extends Client {
         this.station = new StationAPI(this.driver);
         this.train = new TrainAPI(this.driver);
         this.trainFile = new TrainFileAPI(this.driver);
+        this.trainLog = new TrainLogAPI(this.driver);
         this.trainStation = new TrainStationAPI(this.driver);
         this.service = new ServiceAPI(this.driver);
         this.userSecret = new UserSecretAPI(this.driver);

@@ -6,12 +6,6 @@
  */
 
 import {
-    TrainManagerBuildingQueueEvent,
-    TrainManagerExtractingQueueEvent,
-    TrainManagerQueueCommand,
-    TrainManagerQueueCommandPayload,
-    TrainManagerQueueEventPayloadExtended,
-    TrainManagerRoutingQueueEvent,
     hasOwnProperty,
 } from '@personalhealthtrain/central-common';
 import { Message, buildMessage } from 'amqp-extension';
@@ -33,34 +27,38 @@ export function cleanupQueuePayload<T extends Record<string, any>>(payload: T): 
     return payload;
 }
 
-export function buildSelfQueueCommandMessage<
-    T extends `${TrainManagerQueueCommand}`,
->(
-    command: T,
-    data: TrainManagerQueueCommandPayload<T>,
+export function buildCommandQueueMessageForSelf(
+    command: string,
+    data: Record<string, any>,
+    metadata: Record<string, any>,
 ) : Message {
     return buildMessage({
         options: {
             routingKey: MessageQueueSelfRoutingKey.COMMAND,
         },
-        type: command,
+        type: `${metadata.component}_${command}`,
         data,
+        metadata: {
+            ...metadata,
+            command,
+        },
     });
 }
 
-export function buildAPIQueueEventMessage<
-    T extends `${TrainManagerRoutingQueueEvent}` |
-        `${TrainManagerBuildingQueueEvent}` |
-        `${TrainManagerExtractingQueueEvent}`,
->(
-    command: T,
-    data: TrainManagerQueueEventPayloadExtended<T>,
+export function buildEventQueueMessageForAPI(
+    event: string,
+    data: Record<string, any>,
+    metadata: Record<string, any>,
 ) {
     return buildMessage({
         options: {
             routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
         },
-        type: command,
+        type: `${metadata.component}_${metadata.command}_${event}`,
         data: cleanupQueuePayload({ ...data }),
+        metadata: {
+            ...metadata,
+            event,
+        },
     });
 }

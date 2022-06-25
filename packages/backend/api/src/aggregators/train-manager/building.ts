@@ -7,22 +7,24 @@
 
 import {
     TrainBuildStatus,
-    TrainManagerBuildingQueueEvent,
-    TrainManagerExtractingQueuePayload,
+    TrainManagerBuilderBuildPayload,
+    TrainManagerBuilderCommand,
+    TrainManagerBuilderEvent,
+    TrainManagerComponent,
+    TrainManagerErrorEventQueuePayload,
+    TrainManagerExtractorExtractQueuePayload,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import { useLogger } from '../../config/log';
+import { Message } from 'amqp-extension';
 import { TrainEntity } from '../../domains/core/train/entity';
+import { TrainLogSaveContext, saveTrainLog } from '../../domains/core/train-log';
 
-export async function handleTrainManagerBuildingQueueEvent(
-    data: TrainManagerExtractingQueuePayload,
-    event: TrainManagerBuildingQueueEvent,
+export async function handleTrainManagerBuilderEvent(
+    command: TrainManagerBuilderCommand,
+    event: TrainManagerBuilderEvent,
+    message: Message,
 ) {
-    useLogger()
-        .info(`Received train-manager building ${event} event.`, {
-            aggregator: 'train-manager',
-            payload: data,
-        });
+    const data = message.data as TrainManagerExtractorExtractQueuePayload;
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainEntity);
@@ -32,25 +34,44 @@ export async function handleTrainManagerBuildingQueueEvent(
         return;
     }
 
+    let trainLogContext : TrainLogSaveContext = {
+        train: entity,
+        component: TrainManagerComponent.BUILDER,
+    };
+
     switch (event) {
-        case TrainManagerBuildingQueueEvent.NONE:
+        case TrainManagerBuilderEvent.NONE:
             entity.build_status = null;
             break;
-        case TrainManagerBuildingQueueEvent.STARTED:
+        case TrainManagerBuilderEvent.BUILDING:
             entity.build_status = TrainBuildStatus.STARTED;
+
+            trainLogContext.status = TrainBuildStatus.STARTED;
             break;
-        case TrainManagerBuildingQueueEvent.FAILED:
+        case TrainManagerBuilderEvent.FAILED: {
             entity.build_status = TrainBuildStatus.FAILED;
+
+            const payload = data as TrainManagerErrorEventQueuePayload<TrainManagerBuilderBuildPayload>;
+            trainLogContext = {
+                ...trainLogContext,
+                error: true,
+                errorCode: `${payload.error.code}`,
+                step: payload.error.step,
+            };
+
             break;
-        case TrainManagerBuildingQueueEvent.FINISHED:
+        }
+        case TrainManagerBuilderEvent.PUSHED:
             entity.build_status = TrainBuildStatus.FINISHED;
+
+            trainLogContext.status = TrainBuildStatus.FINISHED;
             break;
     }
 
     if (
-        event === TrainManagerBuildingQueueEvent.STARTED ||
-        event === TrainManagerBuildingQueueEvent.FAILED ||
-        event === TrainManagerBuildingQueueEvent.NONE
+        event === TrainManagerBuilderEvent.BUILDING ||
+        event === TrainManagerBuilderEvent.FAILED ||
+        event === TrainManagerBuilderEvent.NONE
     ) {
         entity.run_status = null;
         entity.run_station_index = null;
@@ -59,4 +80,8 @@ export async function handleTrainManagerBuildingQueueEvent(
     }
 
     await repository.save(entity);
+
+    if (trainLogContext.status) {
+        await saveTrainLog(trainLogContext);
+    }
 }
