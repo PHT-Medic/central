@@ -8,12 +8,23 @@
 import {
     ErrorCode, OAuth2TokenGrant, Robot, TokenAPI,
 } from '@authelion/common';
+import { isClientError } from '@trapi/client';
 import { HTTPClient } from '../../client';
+import { hasOwnProperty } from '../../../utils';
 
-let lastChecked : number | undefined;
-
-function canVerifyCredentials() {
-    return !lastChecked || (Date.now() - (5 * 1000)) > lastChecked;
+export function shouldRefreshRobotTokenResponseError(err: unknown) : boolean {
+    return isClientError(err) && err.response && (
+        err.response.status === 401 || // Unauthorized
+        err.response.status === 403 || // Forbidden
+        (
+            hasOwnProperty(err.response.data, 'code') &&
+            (
+                err.response.data?.code === ErrorCode.CREDENTIALS_INVALID ||
+                err.response.data?.code === ErrorCode.TOKEN_EXPIRED ||
+                err.response.data?.code === ErrorCode.TOKEN_INVALID
+            )
+        )
+    );
 }
 
 export function createRefreshRobotTokenOnResponseErrorHandler(context: {
@@ -23,48 +34,36 @@ export function createRefreshRobotTokenOnResponseErrorHandler(context: {
     return (err?: any) => {
         const { config } = err;
 
-        if (
-            err.response && (
-                err.response.status === 401 || // Unauthorized
-                err.response.status === 403 || // Forbidden
-                err.response.data?.code === ErrorCode.CREDENTIALS_INVALID ||
-                err.response.data?.code === ErrorCode.TOKEN_EXPIRED ||
-                err.response.data?.code === ErrorCode.TOKEN_INVALID
-            )
-        ) {
-            if (canVerifyCredentials()) {
-                lastChecked = Date.now();
+        if (shouldRefreshRobotTokenResponseError(err)) {
+            return context.load()
+                .then((response) => {
+                    const tokenApi = new TokenAPI(context.httpClient.driver);
 
-                return context.load()
-                    .then((response) => {
-                        const tokenApi = new TokenAPI(context.httpClient.driver);
-
-                        return tokenApi.create({
-                            id: response.id,
-                            secret: response.secret,
-                            grant_type: OAuth2TokenGrant.ROBOT_CREDENTIALS,
-                        })
-                            .then((token) => {
-                                context.httpClient
-                                    .setAuthorizationHeader({
-                                        type: 'Bearer',
-                                        token: token.access_token,
-                                    });
-
-                                return context.httpClient.request(config);
-                            })
-                            .catch((e) => {
-                                context.httpClient.unsetAuthorizationHeader();
-
-                                return Promise.reject(e);
-                            });
+                    return tokenApi.create({
+                        id: response.id,
+                        secret: response.secret,
+                        grant_type: OAuth2TokenGrant.ROBOT_CREDENTIALS,
                     })
-                    .catch((e) => {
-                        context.httpClient.unsetAuthorizationHeader();
+                        .then((token) => {
+                            context.httpClient
+                                .setAuthorizationHeader({
+                                    type: 'Bearer',
+                                    token: token.access_token,
+                                });
 
-                        return Promise.reject(e);
-                    });
-            }
+                            return context.httpClient.request(config);
+                        })
+                        .catch((e) => {
+                            context.httpClient.unsetAuthorizationHeader();
+
+                            return Promise.reject(e);
+                        });
+                })
+                .catch((e) => {
+                    context.httpClient.unsetAuthorizationHeader();
+
+                    return Promise.reject(e);
+                });
         }
 
         return Promise.reject(err);

@@ -59,6 +59,8 @@ export class SetupCommand implements CommandModule {
 
     // eslint-disable-next-line class-methods-use-this
     async handler(args: SetupArguments) {
+        createConfig({ env });
+
         const spinner = useSpinner();
 
         if (
@@ -111,7 +113,6 @@ export class SetupCommand implements CommandModule {
             try {
                 if (args.databaseSeeder) {
                     spinner.start('seeding database...');
-                    createConfig({ env });
 
                     const redis = useClient();
                     if (redis.status !== 'connecting') {

@@ -12,6 +12,7 @@ import {
     ROBOT_SECRET_ENGINE_KEY,
     ServiceID,
     createRefreshRobotTokenOnResponseErrorHandler,
+    shouldRefreshRobotTokenResponseError,
 } from '@personalhealthtrain/central-common';
 import { VaultClient } from '@trapi/vault-client';
 import { Robot } from '@authelion/common';
@@ -49,6 +50,10 @@ export function createConfig({ env } : ConfigContext) : Config {
     }, HTTPClientKey.VAULT);
 
     setHTTPConfig({
+        retry: {
+            retryCondition: (err) => shouldRefreshRobotTokenResponseError(err),
+            retryDelay: (retryCount) => 5000 * retryCount,
+        },
         driver: {
             baseURL: env.apiUrl,
             proxy: false,

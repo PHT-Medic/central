@@ -8,7 +8,11 @@
 import { setConfig as setHTTPConfig, useClient, useClient as useHTTPClient } from '@trapi/client';
 import {
     HTTPClient,
-    HTTPClientKey, ROBOT_SECRET_ENGINE_KEY, ServiceID, createRefreshRobotTokenOnResponseErrorHandler,
+    HTTPClientKey,
+    ROBOT_SECRET_ENGINE_KEY,
+    ServiceID,
+    createRefreshRobotTokenOnResponseErrorHandler,
+    shouldRefreshRobotTokenResponseError,
 } from '@personalhealthtrain/central-common';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
@@ -53,6 +57,10 @@ function createConfig({ env } : ConfigContext) : Config {
 
     setHTTPConfig({
         clazz: HTTPClient,
+        retry: {
+            retryCondition: (err) => shouldRefreshRobotTokenResponseError(err),
+            retryDelay: (retryCount) => 5000 * retryCount,
+        },
         driver: {
             proxy: false,
             baseURL: env.apiUrl,

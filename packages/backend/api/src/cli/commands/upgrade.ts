@@ -10,6 +10,8 @@ import { upgradeCommand } from '@authelion/api-core';
 import { DataSource } from 'typeorm';
 import { buildDataSourceOptions } from '../../database/utils';
 import { useSpinner } from '../../config/spinner';
+import { createConfig } from '../../config';
+import env from '../../env';
 
 export class UpgradeCommand implements CommandModule {
     command = 'upgrade';
@@ -23,6 +25,8 @@ export class UpgradeCommand implements CommandModule {
 
     // eslint-disable-next-line class-methods-use-this
     async handler() {
+        createConfig({ env });
+
         const spinner = useSpinner();
         const options = await buildDataSourceOptions();
 
