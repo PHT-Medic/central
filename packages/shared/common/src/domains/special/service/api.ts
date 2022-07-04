@@ -43,7 +43,7 @@ export class ServiceAPI {
     }
 
     async runSecretStorageCommand(
-        command: SecretStorageCommand,
+        command: `${SecretStorageCommand}` | SecretStorageCommand,
         data: Record<string, any>,
     ): Promise<SingleResourceResponse<Record<string, any>>> {
         return this.runCommand(ServiceID.SECRET_STORAGE, command, data);

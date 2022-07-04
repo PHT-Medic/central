@@ -4,7 +4,7 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
 import {
     SecretStorageCommand, buildUserSecretsSecretStorageKey,
 } from '@personalhealthtrain/central-common';

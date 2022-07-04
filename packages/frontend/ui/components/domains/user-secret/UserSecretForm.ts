@@ -100,7 +100,17 @@ export default Vue.extend({
             const reader = new FileReader();
             reader.readAsText(file, 'UTF-8');
             reader.onload = (evt) => {
-                this.form.content = evt.target.result;
+                let content = evt.target.result;
+
+                if (Buffer.isBuffer(content)) {
+                    content = content.toString();
+                }
+
+                if (ArrayBuffer.isView(content)) {
+                    content = content.toString();
+                }
+
+                this.form.content = Buffer.from(content as string, 'utf-8').toString('hex');
                 this.busy = false;
                 this.$refs.myFile.value = '';
             };
