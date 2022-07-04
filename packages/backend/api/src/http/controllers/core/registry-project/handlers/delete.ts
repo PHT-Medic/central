@@ -9,6 +9,7 @@ import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
+import { isPermittedForResourceRealm } from '@authelion/common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
@@ -16,7 +17,7 @@ import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../
 export async function deleteRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.REGISTRY_MANAGE)) {
+    if (!req.ability.hasPermission(PermissionID.REGISTRY_PROJECT_MANAGE)) {
         throw new ForbiddenError();
     }
 
@@ -27,6 +28,10 @@ export async function deleteRegistryProjectRouteHandler(req: ExpressRequest, res
 
     if (!entity) {
         throw new NotFoundError();
+    }
+
+    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+        throw new ForbiddenError();
     }
 
     const { id: entityId } = entity;

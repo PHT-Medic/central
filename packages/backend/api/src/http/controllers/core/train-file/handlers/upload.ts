@@ -14,7 +14,7 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-erro
 import { useDataSource } from 'typeorm-extension';
 import { createFileStreamHandler } from '../../../../../modules/file-system/utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { getTrainFilesDirectoryPath } from '../../../../../config/pht/train-file/path';
+import { getTrainFilesDirectoryPath } from '../../../../../config/train-file/path';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 

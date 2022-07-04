@@ -33,7 +33,9 @@ export const LayoutTopNavigation: Component[] = [
         name: 'Admin',
         icon: 'fas fa-cog',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [],
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
+            PermissionID.ADMIN_UI_USE,
+        ],
     },
 ];
 export const LayoutSideDefaultNavigation: Component[] = [

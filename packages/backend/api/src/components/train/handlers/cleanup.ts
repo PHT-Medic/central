@@ -8,7 +8,7 @@
 import { TrainManagerQueueCommand, TrainQueueCommand, TrainQueuePayload } from '@personalhealthtrain/central-common';
 import fs from 'fs';
 import { publishMessage } from 'amqp-extension';
-import { getTrainFilesDirectoryPath } from '../../../config/pht/train-file/path';
+import { getTrainFilesDirectoryPath } from '../../../config/train-file/path';
 import { buildTrainManagerQueueMessage } from '../../../domains/special/train-manager';
 
 export async function cleanupTrain(payload: TrainQueuePayload<TrainQueueCommand.CLEANUP>) {

@@ -8,12 +8,15 @@
 import { PermissionID as AuthPermissionID } from '@authelion/common';
 
 export enum PermissionKey {
+    ADMIN_UI_USE = 'admin_ui_use',
+
     PROPOSAL_ADD = 'proposal_add',
     PROPOSAL_DROP = 'proposal_drop',
     PROPOSAL_EDIT = 'proposal_edit',
     PROPOSAL_APPROVE = 'proposal_approve',
 
     REGISTRY_MANAGE = 'registry_manage',
+    REGISTRY_PROJECT_MANAGE = 'registry_project_manage',
 
     STATION_ADD = 'station_add',
     STATION_DROP = 'station_drop',
@@ -31,7 +34,6 @@ export enum PermissionKey {
     MASTER_IMAGE_GROUP_MANAGE = 'master_image_group_manage',
 
     SERVICE_MANAGE = 'service_manage',
-    CLIENT_MANAGE = 'client_manage',
 }
 
 export const PermissionID = {

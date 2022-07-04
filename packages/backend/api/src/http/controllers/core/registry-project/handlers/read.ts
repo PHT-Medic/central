@@ -45,7 +45,7 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
 
     if (protectedSelected.length > 0) {
         if (
-            !req.ability.hasPermission(PermissionID.REGISTRY_MANAGE)
+            !req.ability.hasPermission(PermissionID.REGISTRY_PROJECT_MANAGE)
         ) {
             throw new ForbiddenError(
                 `You are not permitted to read the restricted fields: ${

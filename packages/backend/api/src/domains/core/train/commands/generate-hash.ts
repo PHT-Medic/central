@@ -9,7 +9,7 @@ import { Train, TrainConfigurationStatus } from '@personalhealthtrain/central-co
 import crypto from 'crypto';
 import fs from 'fs';
 import { useDataSource } from 'typeorm-extension';
-import { getTrainFileFilePath } from '../../../../config/pht/train-file/path';
+import { getTrainFileFilePath } from '../../../../config/train-file/path';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 import { TrainFileEntity } from '../../train-file/entity';

@@ -15,7 +15,7 @@ import { RegistryProjectEntity } from '../../../../../domains/core/registry-proj
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
 export async function createRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (!req.ability.hasPermission(PermissionID.REGISTRY_MANAGE)) {
+    if (!req.ability.hasPermission(PermissionID.REGISTRY_PROJECT_MANAGE)) {
         throw new ForbiddenError();
     }
 

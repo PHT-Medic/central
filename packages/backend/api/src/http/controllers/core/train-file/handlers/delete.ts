@@ -12,7 +12,7 @@ import fs from 'fs';
 import { useDataSource } from 'typeorm-extension';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { getTrainFileFilePath } from '../../../../../config/pht/train-file/path';
+import { getTrainFileFilePath } from '../../../../../config/train-file/path';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 
 export async function deleteTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {

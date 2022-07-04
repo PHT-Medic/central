@@ -39,6 +39,8 @@ export function getPHTStationRolePermissions(type: PHTStationRole) : PermissionI
                 PermissionID.PROVIDER_DROP,
                 PermissionID.PROVIDER_EDIT,
 
+                PermissionID.REGISTRY_PROJECT_MANAGE,
+
                 PermissionID.TRAIN_ADD,
                 PermissionID.TRAIN_DROP,
                 PermissionID.TRAIN_EDIT,

@@ -6,31 +6,32 @@
  */
 
 import { BadRequestError } from '@typescript-error/http';
-import { Proposal } from '@personalhealthtrain/central-common';
+import { RegistryProject } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressValidationResult, buildExpressValidationErrorMessage } from '../../../../express-validation';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
+import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 
-type ExpressValidationResultExtendedWithProposal = ExpressValidationResult<{
+type ExpressValidationResultExtendedWithRegistryProject = ExpressValidationResult<{
     [key: string]: any,
-    proposal_id: Proposal['id']
+    project_id: RegistryProject['id']
 }, {
     [key: string]: any,
-    proposal?: ProposalEntity
+    project?: RegistryProject
 }>;
 
-export async function extendExpressValidationResultWithProposal<
-    T extends ExpressValidationResultExtendedWithProposal,
+export async function extendExpressValidationResultWithRegistryProject<
+    T extends ExpressValidationResultExtendedWithRegistryProject,
     >(result: T) : Promise<T> {
-    if (result.data.proposal_id) {
+    if (result.data.project_id) {
         const dataSource = await useDataSource();
-        const repository = dataSource.getRepository(ProposalEntity);
-        const entity = await repository.findOneBy({ id: result.data.proposal_id });
+        const repository = dataSource.getRepository(RegistryProjectEntity);
+        const entity = await repository.findOneBy({ id: result.data.project_id });
         if (!entity) {
-            throw new BadRequestError(buildExpressValidationErrorMessage('proposal_id'));
+            throw new BadRequestError(buildExpressValidationErrorMessage('project_id'));
         }
 
-        result.meta.proposal = entity;
+        result.meta.project = entity;
     }
 
     return result;
