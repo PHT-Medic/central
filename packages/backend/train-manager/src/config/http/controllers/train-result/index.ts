@@ -47,7 +47,7 @@ export async function streamTrainResultRouteHandler(
 
         res.set({
             'Content-Disposition': `attachment; filename=${fileName}`,
-            'Content-Type': 'application/pdf',
+            'Content-Type': 'application/gzip',
         });
 
         stream.pipe(res);
