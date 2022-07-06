@@ -52,7 +52,7 @@
         "@types/tar-stream": "^2.2.2",
         "@types/uuid": "^8.3.4",
         "@types/winston": "^2.4.4",
-        "nodemon": "^2.0.18",
+        "nodemon": "^2.0.19",
         "ts-node": "^10.8.2",
         "ts-node-dev": "^2.0.0"
     },
