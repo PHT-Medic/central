@@ -14,14 +14,14 @@ import {
     HTTPClientKey,
     PermissionKey, detectProxyConnectionConfig,
 } from '@personalhealthtrain/central-common';
-import { Environment } from './env';
-import { buildTrainManagerAggregator } from './aggregators/train-manager';
-import { buildRobotAggregator } from './aggregators/robot';
+import { Environment } from '../env';
+import { buildTrainManagerAggregator } from '../aggregators/train-manager';
+import { buildRobotAggregator } from '../aggregators/robot';
 
-import { ApiKey } from './config/api';
+import { ApiKey } from './api';
 
-import { buildCommandRouterComponent } from './components/command-router';
-import { buildEventRouterComponent } from './components/event-router';
+import { buildCommandRouterComponent } from '../components/command-router';
+import { buildEventRouterComponent } from '../components/event-router';
 
 interface ConfigContext {
     env: Environment

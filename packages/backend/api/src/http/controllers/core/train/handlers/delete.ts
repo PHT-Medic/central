@@ -13,7 +13,7 @@ import { useDataSource } from 'typeorm-extension';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { getTrainFilesDirectoryPath } from '../../../../../config/train-file/path';
+import { getTrainFilesDirectoryPath } from '../../../../../domains/core/train-file/path';
 
 export async function deleteTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;

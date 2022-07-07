@@ -10,10 +10,12 @@ import dotenv from 'dotenv';
 
 import env from './env';
 
-import { createConfig } from './config';
-import { createHttpServer } from './config/http/server';
-import { useLogger } from './config/log';
-import { createSocketServer } from './config/socket/server';
+import {
+    createConfig,
+    createHttpServer,
+    createSocketServer,
+    useLogger,
+} from './config';
 
 dotenv.config();
 

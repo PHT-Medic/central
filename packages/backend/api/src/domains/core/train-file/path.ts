@@ -7,7 +7,7 @@
 
 import { Train, TrainFile } from '@personalhealthtrain/central-common';
 import path from 'path';
-import { getWritableDirPath } from '../paths';
+import { getWritableDirPath } from '../../../config';
 
 export function getTrainFileFileName(file: TrainFile) {
     return `${file.hash}.file`;

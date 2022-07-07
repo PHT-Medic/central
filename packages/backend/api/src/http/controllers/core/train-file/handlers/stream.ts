@@ -11,7 +11,7 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-erro
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { getTrainFilesDirectoryPath } from '../../../../../config/train-file/path';
+import { getTrainFilesDirectoryPath } from '../../../../../domains/core/train-file/path';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';

@@ -7,7 +7,7 @@
 
 import dotenv from 'dotenv';
 import env from './env';
-import createConfig from './config';
+import createConfig from './config/module';
 import createExpressApp from './config/http/express';
 import createHttpServer from './config/http/server';
 

@@ -6,7 +6,7 @@
  */
 
 import { Application } from 'express';
-import { setupTrainResultRoutes } from './train-results';
+import { setupTrainResultRoutes } from './extractor';
 import responseMiddleware from '../middleware/response';
 
 export function registerRoutes(router: Application) {

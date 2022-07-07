@@ -9,7 +9,7 @@ import { CommandModule } from 'yargs';
 import { DataSource } from 'typeorm';
 import { migrationGenerateCommand } from '@authelion/api-core';
 import path from 'path';
-import { createConfig } from '../../config';
+import { createConfig } from '../../config/module';
 import env from '../../env';
 import { buildDataSourceOptions } from '../../database/utils';
 

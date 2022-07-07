@@ -13,7 +13,7 @@ import {
     ExpressResponse as AuthExpressResponse,
 } from '@authelion/api-adapter';
 import { Environment } from '../../env';
-import { Config } from '../../config';
+import { Config } from '../module';
 
 export interface ExpressAppInterface extends Express {
 

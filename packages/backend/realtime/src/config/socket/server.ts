@@ -15,8 +15,8 @@ import { useClient } from '@trapi/client';
 import { useLogger } from '../log';
 import { registerSocketHandlers, registerSocketNamespaceHandlers } from './handlers';
 import { Environment } from '../../env';
-import { Config } from '../../config';
 import { SocketInterface, SocketServerInterface } from './type';
+import { Config } from '../type';
 
 interface SocketServerContext {
     httpServer: HTTPServer,

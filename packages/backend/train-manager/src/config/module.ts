@@ -1,43 +1,50 @@
 /*
- * Copyright (c) 2021-2021.
+ * Copyright (c) 2022-2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
-import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
+import { setConfig as setHTTPConfig, useClient, useClient as useHTTPClient } from '@trapi/client';
 import {
+    HTTPClient,
     HTTPClientKey,
     ROBOT_SECRET_ENGINE_KEY,
     ServiceID,
     createRefreshRobotTokenOnResponseErrorHandler,
     shouldRefreshRobotTokenResponseError,
 } from '@personalhealthtrain/central-common';
+import { setConfig as setAmqpConfig } from 'amqp-extension';
+import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import { VaultClient } from '@trapi/vault-client';
 import { Robot } from '@authelion/common';
-import { BadRequestError } from '@typescript-error/http';
-import { Environment } from './env';
+import { useLogger } from '@personalhealthtrain/central-realtime/src/config/log';
+import { buildCommandRouterComponent } from '../components/command-router';
+import { Environment } from '../env';
 
 interface ConfigContext {
     env: Environment
 }
 
 export type Config = {
-    redisDatabase: Client,
-    redisPub: Client,
-    redisSub: Client,
+    redis: Client,
 
     aggregators: {start: () => void}[]
     components: {start: () => void}[]
 };
 
-export function createConfig({ env } : ConfigContext) : Config {
+function createConfig({ env } : ConfigContext) : Config {
     setRedisConfig({ connectionString: env.redisConnectionString });
 
-    const redisDatabase = useRedisClient();
-    const redisPub = redisDatabase.duplicate();
-    const redisSub = redisDatabase.duplicate();
+    const redis = useRedisClient();
+
+    setAmqpConfig({
+        connection: env.rabbitMqConnectionString,
+        exchange: {
+            name: 'pht',
+            type: 'topic',
+        },
+    });
 
     setHTTPConfig({
         clazz: VaultClient,
@@ -50,13 +57,14 @@ export function createConfig({ env } : ConfigContext) : Config {
     }, HTTPClientKey.VAULT);
 
     setHTTPConfig({
+        clazz: HTTPClient,
         retry: {
             retryCondition: (err) => shouldRefreshRobotTokenResponseError(err),
             retryDelay: (retryCount) => 5000 * retryCount,
         },
         driver: {
-            baseURL: env.apiUrl,
             proxy: false,
+            baseURL: env.apiUrl,
             withCredentials: true,
         },
     });
@@ -65,17 +73,14 @@ export function createConfig({ env } : ConfigContext) : Config {
         (value) => value,
         createRefreshRobotTokenOnResponseErrorHandler({
             async load() {
-                return useHTTPClient<VaultClient>(HTTPClientKey.VAULT).keyValue
-                    .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM)
-                    .then((response) => {
-                        if (!response) {
-                            throw new BadRequestError('No api credentials available...');
-                        }
+                useLogger()
+                    .debug('Attempt to refresh api authentication & authorization');
 
-                        return response.data as Robot;
-                    });
+                return useClient<VaultClient>(HTTPClientKey.VAULT).keyValue
+                    .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM)
+                    .then((response) => response.data as Robot);
             },
-            httpClient: useHTTPClient(),
+            httpClient: useClient(),
         }),
     );
 
@@ -83,14 +88,15 @@ export function createConfig({ env } : ConfigContext) : Config {
     ];
 
     const components : {start: () => void}[] = [
+        buildCommandRouterComponent(),
     ];
 
     return {
-        redisDatabase,
-        redisPub,
-        redisSub,
+        redis,
 
         aggregators,
         components,
     };
 }
+
+export default createConfig;

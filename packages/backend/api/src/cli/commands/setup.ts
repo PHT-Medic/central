@@ -10,7 +10,7 @@ import { createDatabase, setDataSource } from 'typeorm-extension';
 import { DatabaseSeeder, setupCommand } from '@authelion/api-core';
 import { useClient } from 'redis-extension';
 import { DataSource } from 'typeorm';
-import { createConfig } from '../../config';
+import { createConfig } from '../../config/module';
 import env from '../../env';
 import { buildDataSourceOptions } from '../../database/utils';
 import { generateSwaggerDocumentation } from '../../http/swagger';

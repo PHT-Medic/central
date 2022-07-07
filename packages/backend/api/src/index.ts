@@ -12,7 +12,7 @@ import { DataSource } from 'typeorm';
 
 import { setDataSource, setDataSourceOptions } from 'typeorm-extension';
 import env from './env';
-import { createConfig } from './config';
+import { createConfig } from './config/module';
 import { createExpressApp } from './http/express';
 import { createHttpServer } from './http/server';
 import { useLogger } from './config/log';

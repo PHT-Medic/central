@@ -1,49 +1,31 @@
 /*
- * Copyright (c) 2022.
+ * Copyright (c) 2021-2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig as setHTTPConfig, useClient, useClient as useHTTPClient } from '@trapi/client';
+import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
+import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import {
-    HTTPClient,
     HTTPClientKey,
     ROBOT_SECRET_ENGINE_KEY,
     ServiceID,
     createRefreshRobotTokenOnResponseErrorHandler,
     shouldRefreshRobotTokenResponseError,
 } from '@personalhealthtrain/central-common';
-import { setConfig as setAmqpConfig } from 'amqp-extension';
-import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import { VaultClient } from '@trapi/vault-client';
 import { Robot } from '@authelion/common';
-import { buildCommandRouterComponent } from './components/command-router';
-import { Environment } from './env';
+import { BadRequestError } from '@typescript-error/http';
+import { useLogger } from './log';
+import { Config, ConfigContext } from './type';
 
-interface ConfigContext {
-    env: Environment
-}
-
-export type Config = {
-    redis: Client,
-
-    aggregators: {start: () => void}[]
-    components: {start: () => void}[]
-};
-
-function createConfig({ env } : ConfigContext) : Config {
+export function createConfig({ env } : ConfigContext) : Config {
     setRedisConfig({ connectionString: env.redisConnectionString });
 
-    const redis = useRedisClient();
-
-    setAmqpConfig({
-        connection: env.rabbitMqConnectionString,
-        exchange: {
-            name: 'pht',
-            type: 'topic',
-        },
-    });
+    const redisDatabase = useRedisClient();
+    const redisPub = redisDatabase.duplicate();
+    const redisSub = redisDatabase.duplicate();
 
     setHTTPConfig({
         clazz: VaultClient,
@@ -56,14 +38,13 @@ function createConfig({ env } : ConfigContext) : Config {
     }, HTTPClientKey.VAULT);
 
     setHTTPConfig({
-        clazz: HTTPClient,
         retry: {
             retryCondition: (err) => shouldRefreshRobotTokenResponseError(err),
             retryDelay: (retryCount) => 5000 * retryCount,
         },
         driver: {
-            proxy: false,
             baseURL: env.apiUrl,
+            proxy: false,
             withCredentials: true,
         },
     });
@@ -72,11 +53,20 @@ function createConfig({ env } : ConfigContext) : Config {
         (value) => value,
         createRefreshRobotTokenOnResponseErrorHandler({
             async load() {
-                return useClient<VaultClient>(HTTPClientKey.VAULT).keyValue
+                useLogger()
+                    .debug('Attempt to refresh api authentication & authorization');
+
+                return useHTTPClient<VaultClient>(HTTPClientKey.VAULT).keyValue
                     .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM)
-                    .then((response) => response.data as Robot);
+                    .then((response) => {
+                        if (!response) {
+                            throw new BadRequestError('No api credentials available...');
+                        }
+
+                        return response.data as Robot;
+                    });
             },
-            httpClient: useClient(),
+            httpClient: useHTTPClient(),
         }),
     );
 
@@ -84,15 +74,14 @@ function createConfig({ env } : ConfigContext) : Config {
     ];
 
     const components : {start: () => void}[] = [
-        buildCommandRouterComponent(),
     ];
 
     return {
-        redis,
+        redisDatabase,
+        redisPub,
+        redisSub,
 
         aggregators,
         components,
     };
 }
-
-export default createConfig;

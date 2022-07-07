@@ -14,7 +14,7 @@ import { isPermittedForResourceRealm } from '@authelion/common';
 import { buildImageOutputFilePath } from '../../../paths';
 import { ExpressRequest, ExpressResponse } from '../../type';
 
-export async function streamTrainResultRouteHandler(
+export async function streamExtractorFileRouteHandler(
     req: ExpressRequest,
     res: ExpressResponse,
 ) {

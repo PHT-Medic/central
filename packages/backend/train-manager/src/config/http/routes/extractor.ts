@@ -6,8 +6,8 @@
  */
 
 import { Router } from 'express';
-import { streamTrainResultRouteHandler } from '../controllers/train-result';
-import { forceLoggedIn } from '../middleware/auth';
+import { streamExtractorFileRouteHandler } from '../controllers';
+import { forceLoggedIn } from '../middleware';
 import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 
 export function setupTrainResultRoutes() {
@@ -18,7 +18,7 @@ export function setupTrainResultRoutes() {
         [forceLoggedIn],
         async (req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) => {
             try {
-                await streamTrainResultRouteHandler(req, res);
+                await streamExtractorFileRouteHandler(req, res);
             } catch (e) {
                 next(e);
             }

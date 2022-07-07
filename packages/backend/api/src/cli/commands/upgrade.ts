@@ -10,7 +10,7 @@ import { upgradeCommand } from '@authelion/api-core';
 import { DataSource } from 'typeorm';
 import { buildDataSourceOptions } from '../../database/utils';
 import { useSpinner } from '../../config/spinner';
-import { createConfig } from '../../config';
+import { createConfig } from '../../config/module';
 import env from '../../env';
 
 export class UpgradeCommand implements CommandModule {

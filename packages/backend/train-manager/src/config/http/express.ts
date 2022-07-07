@@ -14,8 +14,7 @@ import { setupHTTPMiddleware } from '@authelion/api-adapter';
 import { useClient } from '@trapi/client';
 import { registerRoutes } from './routes';
 import { ExpressAppContext, ExpressAppInterface } from './type';
-import { errorMiddleware } from './middleware/error';
-import { useRateLimiter } from './middleware/rate-limiter';
+import { errorMiddleware, useRateLimiter } from './middleware';
 import env from '../../env';
 
 function createExpressApp(context: ExpressAppContext) : ExpressAppInterface {
