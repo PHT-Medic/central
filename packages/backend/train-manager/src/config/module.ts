@@ -18,9 +18,9 @@ import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import { VaultClient } from '@trapi/vault-client';
 import { Robot } from '@authelion/common';
-import { useLogger } from '@personalhealthtrain/central-realtime/src/config/log';
 import { buildCommandRouterComponent } from '../components/command-router';
 import { Environment } from '../env';
+import { useLogger } from '../modules/log';
 
 interface ConfigContext {
     env: Environment
