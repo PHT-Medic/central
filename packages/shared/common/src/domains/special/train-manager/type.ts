@@ -5,21 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    TrainManagerBaseErrorCode,
-    TrainManagerBuildingErrorCode,
-    TrainManagerBuildingQueueEvent, TrainManagerBuildingStep, TrainManagerExtractingErrorCode,
-    TrainManagerExtractingMode, TrainManagerExtractingQueueEvent, TrainManagerExtractingStep,
-    TrainManagerQueueCommand, TrainManagerRoutingErrorCode,
-    TrainManagerRoutingQueueEvent, TrainManagerRoutingStep,
-} from './constants';
+import { TrainManagerComponent } from './constants';
 import { Registry, RegistryProject, Train } from '../../core';
+import {
+    TrainManagerBuilderCommand,
+    TrainManagerBuilderPayload,
+    TrainManagerExtractorCommand,
+    TrainManagerExtractorPayload,
+    TrainManagerRouterCommand,
+    TrainManagerRouterPayload,
+} from './components';
 
 // ----------------------------------------------------------
-
-export type TrainManagerBaseQueuePayload = {
-    id: Train['id'],
-};
 
 export type TrainManagerQueuePayloadExtended<T extends Record<string, any>> = T & {
     entity: Train,
@@ -33,95 +30,45 @@ export type TrainManagerQueuePayloadExtended<T extends Record<string, any>> = T 
 
 // ----------------------------------------------------------
 
-export type TrainManagerExtractingFileType = 'file' | 'link' | 'symlink' | 'directory' |
-'block-device' | 'character-device' | 'fifo' | 'contiguous-file';
-
-export type TrainManagerExtractingFile = {
-    name: string,
-    path?: string,
-    size: number,
-    content: string,
-    type: TrainManagerExtractingFileType
-};
-
-export type TrainManagerExtractingQueuePayload = TrainManagerBaseQueuePayload & {
-    filePaths?: string[],
-    files?: TrainManagerExtractingFile[],
-
-    mode: `${TrainManagerExtractingMode}`,
-};
-
-// ----------------------------------------------------------
-
-export type TrainManagerRoutingPayload = {
-    repositoryName: string,
-    projectName: string,
-    operator: string,
-    artifactTag: string
-};
-
-export type TrainManagerRoutingStartPayload = TrainManagerBaseQueuePayload;
-export type TrainManagerRoutingStatusPayload = TrainManagerBaseQueuePayload;
-
-// ----------------------------------------------------------
-
-export type TrainManagerBuildPayload = TrainManagerBaseQueuePayload;
-
-// ----------------------------------------------------------
-
-export type TrainManagerQueueCommandPayload<T extends `${TrainManagerQueueCommand}`> =
-    T extends `${TrainManagerQueueCommand.EXTRACT}` | `${TrainManagerQueueCommand.EXTRACT_STATUS}` ?
-        TrainManagerExtractingQueuePayload :
-        T extends `${TrainManagerQueueCommand.EXTRACT_CLEANUP}` ?
-            TrainManagerBaseQueuePayload :
-            T extends `${TrainManagerQueueCommand.BUILD}` | `${TrainManagerQueueCommand.BUILD_STATUS}` ?
-                TrainManagerBuildPayload :
-                T extends `${TrainManagerQueueCommand.ROUTE}` ?
-                    TrainManagerRoutingPayload :
-                    T extends `${TrainManagerQueueCommand.ROUTE_START}` ?
-                        TrainManagerRoutingStartPayload :
-                        T extends `${TrainManagerQueueCommand.ROUTE_STATUS}` ?
-                            TrainManagerRoutingStatusPayload :
-                            never;
-
-export type TrainManagerQueueEventPayload<
-    T extends `${TrainManagerRoutingQueueEvent}` | `${TrainManagerBuildingQueueEvent}` | `${TrainManagerExtractingQueueEvent}`,
-    > =
-    T extends `${TrainManagerRoutingQueueEvent}` ?
-        TrainManagerRoutingPayload :
-        T extends `${TrainManagerBuildingQueueEvent}` ?
-            TrainManagerBuildPayload :
-            T extends `${TrainManagerExtractingQueueEvent}` ?
-                TrainManagerExtractingQueuePayload :
+export type TrainManagerCommand<C extends `${TrainManagerComponent}` | TrainManagerComponent> =
+    C extends `${TrainManagerComponent.BUILDER}` | TrainManagerComponent.BUILDER ?
+        `${TrainManagerBuilderCommand}` | TrainManagerBuilderCommand :
+        C extends `${TrainManagerComponent.EXTRACTOR}` | TrainManagerComponent.EXTRACTOR ?
+            `${TrainManagerExtractorCommand}` | TrainManagerExtractorCommand :
+            C extends `${TrainManagerComponent.ROUTER}` | TrainManagerComponent.ROUTER ?
+                `${TrainManagerRouterCommand}` | TrainManagerRouterCommand :
                 never;
 
+export type TrainManagerCommandQueuePayload<
+    Component extends `${TrainManagerComponent}` | TrainManagerComponent,
+    Command extends TrainManagerCommand<Component>,
+> =
+        Component extends `${TrainManagerComponent.BUILDER}` | TrainManagerComponent.BUILDER ?
+            (
+                Command extends `${TrainManagerBuilderCommand}` | TrainManagerBuilderCommand ?
+                    TrainManagerBuilderPayload<Command> :
+                    never
+            ) :
+            Component extends `${TrainManagerComponent.EXTRACTOR}` | TrainManagerComponent.EXTRACTOR ?
+                (
+                    Command extends `${TrainManagerExtractorCommand}` | TrainManagerExtractorCommand ?
+                        TrainManagerExtractorPayload<Command> :
+                        never
+                ) :
+                Component extends `${TrainManagerComponent.ROUTER}` | TrainManagerComponent.ROUTER ?
+                    (
+                        Command extends `${TrainManagerRouterCommand}` | TrainManagerRouterCommand ?
+                            TrainManagerRouterPayload<Command> :
+                            never
+                    ) :
+                    never;
+
 // ----------------------------------------------------------
 
-export type TrainManagerQueueErrorEventPayload<
-    T extends `${TrainManagerRoutingQueueEvent}` | `${TrainManagerBuildingQueueEvent}` | `${TrainManagerExtractingQueueEvent}`,
-    > = T extends `${TrainManagerRoutingQueueEvent.FAILED}` |
-    `${TrainManagerBuildingQueueEvent.FAILED}` |
-    `${TrainManagerExtractingQueueEvent.FAILED}` ? {
-            error?: {
-                message?: string,
-                step: T extends `${TrainManagerRoutingQueueEvent.FAILED}` ?
-                    TrainManagerRoutingStep :
-                    T extends `${TrainManagerBuildingQueueEvent.FAILED}` ?
-                        TrainManagerBuildingStep :
-                        T extends `${TrainManagerExtractingQueueEvent.FAILED}` ?
-                            TrainManagerExtractingStep :
-                            never,
-                code: T extends `${TrainManagerRoutingQueueEvent.FAILED}` ?
-                    TrainManagerRoutingErrorCode | TrainManagerBaseErrorCode :
-                    T extends `${TrainManagerBuildingQueueEvent.FAILED}` ?
-                        TrainManagerBuildingErrorCode | TrainManagerBaseErrorCode :
-                        T extends `${TrainManagerExtractingQueueEvent.FAILED}` ?
-                            TrainManagerExtractingErrorCode | TrainManagerBaseErrorCode :
-                            never;
-            };
-        // eslint-disable-next-line @typescript-eslint/ban-types
-        } : { };
-
-export type TrainManagerQueueEventPayloadExtended<
-    T extends `${TrainManagerRoutingQueueEvent}` | `${TrainManagerBuildingQueueEvent}` | `${TrainManagerExtractingQueueEvent}`,
-    > = TrainManagerQueueEventPayload<T> & TrainManagerQueueErrorEventPayload<T>;
+export type TrainManagerErrorEventQueuePayload<T extends Record<string, any>> = {
+    error?: {
+        message?: string,
+        code?: string | number,
+        step?: string
+    };
+} & T;

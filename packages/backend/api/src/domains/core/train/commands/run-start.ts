@@ -8,7 +8,8 @@
 import { publishMessage } from 'amqp-extension';
 import {
     Train,
-    TrainManagerQueueCommand,
+    TrainManagerComponent,
+    TrainManagerRouterCommand,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
@@ -34,9 +35,13 @@ export async function startTrain(train: Train | number | string) : Promise<Train
         // todo: make it a ClientError.BadRequest
         throw new Error('The train has already been started...');
     } else {
-        await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE_START, {
-            id: train.id,
-        }));
+        await publishMessage(buildTrainManagerQueueMessage(
+            TrainManagerComponent.ROUTER,
+            TrainManagerRouterCommand.START,
+            {
+                id: train.id,
+            },
+        ));
 
         train = repository.merge(train, {
             run_status: TrainRunStatus.STARTING,

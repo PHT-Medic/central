@@ -10,6 +10,9 @@ import { Realm } from '@authelion/common';
 import { PermissionID } from '@personalhealthtrain/central-common';
 
 export default {
+    props: {
+        entity: Object as PropType<Realm>,
+    },
     computed: {
         canManageStations() {
             return this.$auth.hasPermission([
@@ -26,9 +29,7 @@ export default {
             ]);
         },
     },
-    props: {
-        entity: Object as PropType<Realm>,
-    },
+
 };
 </script>
 <template>

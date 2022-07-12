@@ -9,8 +9,8 @@ import { publishMessage } from 'amqp-extension';
 import {
     Train,
     TrainContainerPath,
-    TrainManagerExtractingMode,
-    TrainManagerQueueCommand,
+    TrainManagerComponent,
+    TrainManagerExtractorCommand,
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
@@ -33,16 +33,18 @@ export async function triggerTrainResultStart(
     }
 
     // send queue message
-    await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT, {
-        id: train.id,
+    await publishMessage(buildTrainManagerQueueMessage(
+        TrainManagerComponent.EXTRACTOR,
+        TrainManagerExtractorCommand.EXTRACT,
+        {
+            id: train.id,
 
-        filePaths: [
-            TrainContainerPath.RESULTS,
-            TrainContainerPath.CONFIG,
-        ],
-
-        mode: TrainManagerExtractingMode.WRITE,
-    }));
+            filePaths: [
+                TrainContainerPath.RESULTS,
+                TrainContainerPath.CONFIG,
+            ],
+        },
+    ));
 
     train = repository.merge(train, {
         result_status: TrainResultStatus.STARTED,

@@ -6,48 +6,52 @@
  */
 
 import {
-    TrainManagerBuildingQueueEvent, TrainManagerExtractingQueueEvent,
-    TrainManagerExtractingQueuePayload, TrainManagerRoutingPayload, TrainManagerRoutingQueueEvent,
+    TrainManagerComponent,
 } from '@personalhealthtrain/central-common';
 import { Message, consumeQueue } from 'amqp-extension';
 import { MessageQueueRoutingKey } from '../../config/mq';
-import { handleTrainManagerExtractingQueueEvent } from './extracting';
-import { handleTrainManagerBuildingQueueEvent } from './building';
-import { handleTrainManagerRoutingQueueEvent } from './routing';
+import { handleTrainManagerExtractorEvent } from './extracting';
+import { handleTrainManagerBuilderEvent } from './building';
+import { handleTrainManagerRouterEvent } from './routing';
+import { useLogger } from '../../config/log';
 
 export function buildTrainManagerAggregator() {
-    const extractingValues : string[] = Object.values(TrainManagerExtractingQueueEvent);
-    const buildingValues : string[] = Object.values(TrainManagerBuildingQueueEvent);
-    const routingValues : string[] = Object.values(TrainManagerRoutingQueueEvent);
-
     function start() {
-        return consumeQueue({ routingKey: MessageQueueRoutingKey.AGGREGATOR_RESULT_SERVICE_EVENT }, {
+        return consumeQueue({
+            routingKey: MessageQueueRoutingKey.AGGREGATOR_RESULT_SERVICE_EVENT,
+        }, {
             $any: async (message: Message) => {
-                // handle extracting events
-                const extractingEventIndex = extractingValues.indexOf(message.type);
-                if (extractingEventIndex !== -1) {
-                    await handleTrainManagerExtractingQueueEvent(
-                        message.data as TrainManagerExtractingQueuePayload,
-                        message.type as TrainManagerExtractingQueueEvent,
-                    );
-                }
+                useLogger().debug('Event received', {
+                    component: message.metadata.component,
+                    command: message.metadata.command,
+                    event: message.metadata.event,
+                });
 
-                // handle building events
-                const buildingEventIndex = buildingValues.indexOf(message.type);
-                if (buildingEventIndex !== -1) {
-                    await handleTrainManagerBuildingQueueEvent(
-                        message.data as TrainManagerExtractingQueuePayload,
-                        message.type as TrainManagerBuildingQueueEvent,
-                    );
-                }
-
-                // handle routing events
-                const routingEventIndex = routingValues.indexOf(message.type);
-                if (routingEventIndex !== -1) {
-                    await handleTrainManagerRoutingQueueEvent(
-                        message.data as TrainManagerRoutingPayload,
-                        message.type as TrainManagerRoutingQueueEvent,
-                    );
+                switch (message.metadata.component) {
+                    case TrainManagerComponent.BUILDER: {
+                        await handleTrainManagerBuilderEvent(
+                            message.metadata.command,
+                            message.metadata.event,
+                            message,
+                        );
+                        break;
+                    }
+                    case TrainManagerComponent.EXTRACTOR: {
+                        await handleTrainManagerExtractorEvent(
+                            message.metadata.command,
+                            message.metadata.event,
+                            message,
+                        );
+                        break;
+                    }
+                    case TrainManagerComponent.ROUTER: {
+                        await handleTrainManagerRouterEvent(
+                            message.metadata.command,
+                            message.metadata.event,
+                            message,
+                        );
+                        break;
+                    }
                 }
             },
         });
