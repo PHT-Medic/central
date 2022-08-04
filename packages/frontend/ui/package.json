@@ -17,7 +17,7 @@
     },
     "devDependencies": {
         "@authelion/common": "^0.0.11",
-        "@authelion/vue": "^0.0.18",
+        "@authelion/vue": "^0.1.0",
         "@fortawesome/fontawesome-free": "^6.1.1",
         "@nuxt/types": "^2.14.5",
         "@nuxt/typescript-build": "^2.1.0",
