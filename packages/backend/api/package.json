@@ -70,7 +70,7 @@
         "nodemon": "^2.0.19",
         "supertest": "^6.2.4",
         "ts-jest": "^28.0.7",
-        "ts-node": "^10.8.2",
+        "ts-node": "^10.9.1",
         "ts-node-dev": "^2.0.0"
     },
     "scripts": {
