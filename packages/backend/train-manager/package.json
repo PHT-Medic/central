@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "@authelion/api-adapter": "^0.0.13",
-        "@authelion/common": "^0.0.11",
+        "@authelion/common": "^0.2.3",
         "@personalhealthtrain/central-common": "^1.3.25",
         "@trapi/client": "^2.0.11",
         "@trapi/harbor-client": "^0.1.7",
@@ -53,7 +53,7 @@
         "@types/uuid": "^8.3.4",
         "@types/winston": "^2.4.4",
         "nodemon": "^2.0.19",
-        "ts-node": "^10.8.2",
+        "ts-node": "^10.9.1",
         "ts-node-dev": "^2.0.0"
     },
     "publishConfig": {
