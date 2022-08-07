@@ -34,7 +34,7 @@
         "express-prom-bundle": "^6.5.0",
         "express-rate-limit": "^6.5.1",
         "express-validator": "^6.14.2",
-        "isomorphic-git": "^1.18.3",
+        "isomorphic-git": "^1.19.1",
         "mysql": "^2.18.1",
         "ora": "^5.4.1",
         "prom-client": "^14.0.1",
@@ -44,7 +44,7 @@
         "tar": "^6.1.2",
         "tar-stream": "^2.1.4",
         "typeorm": "^0.3.7",
-        "typeorm-extension": "^2.1.5",
+        "typeorm-extension": "^2.1.6",
         "winston": "^3.8.1",
         "yargs": "^17.5.1",
         "yup": "^0.32.11"
