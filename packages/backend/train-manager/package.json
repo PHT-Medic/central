@@ -35,7 +35,7 @@
         "dockerode": "^3.3.2",
         "dotenv": "^16.0.1",
         "express": "^4.18.1",
-        "express-rate-limit": "^6.4.0",
+        "express-rate-limit": "^6.5.1",
         "redis-extension": "^1.0.0",
         "tar-stream": "^2.1.4",
         "uuid": "^8.3.2",
