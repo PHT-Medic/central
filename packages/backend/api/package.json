@@ -44,7 +44,7 @@
         "tar": "^6.1.2",
         "tar-stream": "^2.1.4",
         "typeorm": "^0.3.7",
-        "typeorm-extension": "^2.1.6",
+        "typeorm-extension": "^2.1.7",
         "winston": "^3.8.1",
         "yargs": "^17.5.1",
         "yup": "^0.32.11"
