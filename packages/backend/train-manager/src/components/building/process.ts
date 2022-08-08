@@ -12,7 +12,7 @@ import {
     TrainContainerPath,
     TrainManagerBuildPayload, TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { buildTrainConfig } from './helpers/train-config';
 import { useDocker } from '../../modules/docker';
 import { buildTrainDockerFile } from './helpers/dockerfile';

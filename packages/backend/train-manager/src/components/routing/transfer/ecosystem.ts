@@ -11,7 +11,7 @@ import {
     Registry,
     RegistryProjectType, TrainManagerRoutingStep,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { TransferEcosystemItem, TransferItem } from './type';
 import { pullDockerImage, useDocker } from '../../../modules/docker';
 import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../../config/services/registry';

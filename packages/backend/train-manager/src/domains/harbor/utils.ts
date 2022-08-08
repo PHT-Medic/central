@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Config } from '@trapi/client';
+import { Config } from 'hapic';
 import { detectProxyConnectionConfig } from '@personalhealthtrain/central-common';
-import { HarborClient } from '@trapi/harbor-client';
+import { Client as HarborClient } from '@hapic/harbor';
 
 export function createBasicHarborAPIConfig(connectionString: string) : Config {
     const proxyConfig = detectProxyConnectionConfig();

@@ -11,7 +11,7 @@ import {
     TrainManagerExtractingQueuePayload,
     TrainManagerExtractingStep, TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../config/services/registry';
 import { pullDockerImage } from '../../modules/docker';
 import { ExtractingError } from './error';

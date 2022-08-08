@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuildInput } from '@trapi/query';
+import { BuildInput } from 'rapiq';
 import { Message } from 'amqp-extension';
 import {
     HTTPClient, REGISTRY_ARTIFACT_TAG_BASE, REGISTRY_ARTIFACT_TAG_LATEST,
@@ -14,7 +14,7 @@ import {
     TrainManagerRoutingStep,
     TrainStation,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { mergeStationsWithTrainStations } from './helpers/merge';
 import { routeIncomingProject } from './handlers/incoming';
 import { routeStationProject } from './handlers/station';

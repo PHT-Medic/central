@@ -10,7 +10,7 @@ import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applySort, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { parseQueryFields } from '@trapi/query';
+import { parseQueryFields } from 'rapiq';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';

@@ -10,7 +10,7 @@ import {
     REGISTRY_ARTIFACT_TAG_LATEST,
     TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { RouteContextExtended } from '../type';
 import { transferInternal } from '../transfer/internal';
 import { transferEcosystemOut } from '../transfer/ecosystem';

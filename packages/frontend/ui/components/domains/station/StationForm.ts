@@ -19,7 +19,7 @@ import {
 import Vue, {
     CreateElement, PropType, VNode, VNodeChildren, VNodeData,
 } from 'vue';
-import { BuildInput } from '@trapi/query';
+import { BuildInput } from 'rapiq';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 import { RegistryList } from '../registry/RegistryList';
 import StationRegistryProjectDetails from './StationRegistryProjectDetails';

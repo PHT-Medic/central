@@ -16,9 +16,9 @@ import {
     TrainManagerRoutingStep,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { createClient, useClient } from '@trapi/client';
-import { HarborClient, parseProjectRepositoryName } from '@trapi/harbor-client';
-import { buildAPIQueueEventMessage } from '../../config/queue';
+import { createClient, useClient } from 'hapic';
+import { Client as HarborClient, parseProjectRepositoryName } from '@hapic/harbor';
+import { buildAPIQueueEventMessage } from '../../config';
 import { RoutingError } from './error';
 import { BuildingError } from '../building/error';
 import { createBasicHarborAPIConfig } from '../../domains/harbor';

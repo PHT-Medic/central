@@ -11,7 +11,7 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import { ForbiddenError, UnauthorizedError } from '@typescript-error/http';
 import { MASTER_REALM_ID } from '@authelion/common';
 import { setupSocketMiddleware } from '@authelion/api-adapter';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { useLogger } from '../log';
 import { registerSocketHandlers, registerSocketNamespaceHandlers } from './handlers';
 import { Environment } from '../../env';

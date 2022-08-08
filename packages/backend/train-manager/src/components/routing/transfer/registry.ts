@@ -10,9 +10,9 @@ import {
     REGISTRY_ARTIFACT_TAG_BASE,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { createClient, useClient } from '@trapi/client';
-import { HarborClient } from '@trapi/harbor-client';
-import { buildDockerAuthConfig } from '../../../config/services/registry';
+import { createClient, useClient } from 'hapic';
+import { Client as HarborClient } from '@hapic/harbor';
+import { buildDockerAuthConfig } from '../../../config';
 import { TransferContext } from './type';
 import { moveDockerImage } from '../../../modules/docker/image-move';
 import { createBasicHarborAPIConfig } from '../../../domains/harbor';

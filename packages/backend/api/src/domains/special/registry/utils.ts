@@ -6,8 +6,8 @@
  */
 
 import { Robot } from '@authelion/common';
-import { Config, stringifyAuthorizationHeader } from '@trapi/client';
-import { HarborClient, ProjectWebhookTarget } from '@trapi/harbor-client';
+import { Config, stringifyAuthorizationHeader } from 'hapic';
+import { Client as HarborClient, ProjectWebhookTarget } from '@hapic/harbor';
 import { ServiceID } from '@personalhealthtrain/central-common';
 
 export function buildRegistryWebhookTarget(

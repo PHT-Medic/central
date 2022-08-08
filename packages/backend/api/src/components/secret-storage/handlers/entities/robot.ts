@@ -11,11 +11,11 @@ import {
     ServiceID,
     buildRobotSecretStoragePayload,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { publishMessage } from 'amqp-extension';
-import { VaultClient } from '@trapi/vault-client';
+import { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
-import { ApiKey } from '../../../../config/api';
+import { ApiKey } from '../../../../config';
 import { SecretStorageRobotQueuePayload } from '../../../../domains/special/secret-storage/type';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../domains/special/registry';
 import { RegistryProjectEntity } from '../../../../domains/core/registry-project/entity';

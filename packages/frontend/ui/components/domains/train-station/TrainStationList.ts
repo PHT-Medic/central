@@ -32,7 +32,7 @@ import {
     buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
 import { MASTER_REALM_ID, Realm } from '@authelion/common';
-import { BuildInput } from '@trapi/query';
+import { BuildInput } from 'rapiq';
 
 enum DomainType {
     Train = 'train',

@@ -6,10 +6,10 @@
  */
 
 import { buildOAuth2TokenAggregator, setConfig as setAuthConfig } from '@authelion/api-core';
-import { setConfig as setHTTPConfig } from '@trapi/client';
+import { setConfig as setHTTPConfig } from 'hapic';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { setConfig as setRedisConfig } from 'redis-extension';
-import { VaultClient } from '@trapi/vault-client';
+import { Client as VaultClient } from '@hapic/vault';
 import {
     HTTPClientKey,
     PermissionKey, detectProxyConnectionConfig,

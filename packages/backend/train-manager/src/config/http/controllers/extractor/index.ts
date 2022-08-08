@@ -9,7 +9,7 @@ import fs from 'fs';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import path from 'path';
 import { HTTPClient, PermissionID } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { buildImageOutputFilePath } from '../../../paths';
 import { ExpressRequest, ExpressResponse } from '../../type';

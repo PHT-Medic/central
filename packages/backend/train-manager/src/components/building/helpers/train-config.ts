@@ -12,7 +12,7 @@ import {
     TrainConfig,
     TrainConfigSourceType,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { mergeStationsWithTrainStations } from '../../routing/helpers/merge';
 
 type TrainConfigBuildContext = {

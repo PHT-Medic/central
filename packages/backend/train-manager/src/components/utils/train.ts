@@ -10,7 +10,7 @@ import {
     TrainManagerBaseQueuePayload,
     TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { Message } from 'amqp-extension';
 import { BaseError } from '../error';
 

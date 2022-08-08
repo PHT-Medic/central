@@ -16,7 +16,7 @@ import {
     buildListItems,
     buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
-import { BuildInput } from '@trapi/query';
+import { BuildInput } from 'rapiq';
 
 export const UserSecretList = Vue.extend<
 ComponentListData<UserSecret>,

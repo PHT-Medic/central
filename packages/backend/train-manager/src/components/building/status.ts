@@ -13,9 +13,9 @@ import {
     TrainManagerQueuePayloadExtended,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { createClient, useClient } from '@trapi/client';
-import { HarborClient } from '@trapi/harbor-client';
-import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';
+import { createClient, useClient } from 'hapic';
+import { Client as HarborClient } from '@hapic/harbor';
+import { MessageQueueSelfToUIRoutingKey } from '../../config';
 import { BuildingError } from './error';
 import { createBasicHarborAPIConfig } from '../../domains/harbor';
 

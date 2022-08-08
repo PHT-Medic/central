@@ -13,7 +13,7 @@ import {
     TrainManagerExtractingQueuePayload,
     TrainManagerExtractingStep, TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { buildImageOutputFilePath } from '../../config/paths';
 import { buildRemoteDockerImageURL } from '../../config/services/registry';
 import { MessageQueueSelfToUIRoutingKey } from '../../config/services/rabbitmq';

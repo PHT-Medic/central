@@ -11,8 +11,8 @@ import {
     UserSecret,
     UserSecretsSecretStoragePayload,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
-import { VaultClient } from '@trapi/vault-client';
+import { useClient } from 'hapic';
+import { VaultClient } from '@hapic/vault';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
 import { ApiKey } from '../../../../src/config/api';

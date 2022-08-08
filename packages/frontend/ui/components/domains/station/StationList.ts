@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { BuildInput } from '@trapi/query';
+import { BuildInput } from 'rapiq';
 import {
     Station, mergeDeep,
 } from '@personalhealthtrain/central-common';

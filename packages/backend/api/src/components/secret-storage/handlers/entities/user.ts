@@ -8,10 +8,10 @@
 import {
     USER_SECRETS_SECRET_ENGINE_KEY,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
-import { VaultClient } from '@trapi/vault-client';
+import { useClient } from 'hapic';
+import { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
-import { ApiKey } from '../../../../config/api';
+import { ApiKey } from '../../../../config';
 import {
     SecretStorageUserSecretsQueuePayload,
 } from '../../../../domains/special/secret-storage/type';

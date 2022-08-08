@@ -11,7 +11,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import { setupHTTPMiddleware } from '@authelion/api-adapter';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { registerRoutes } from './routes';
 import { ExpressAppContext, ExpressAppInterface } from './type';
 import { errorMiddleware, useRateLimiter } from './middleware';

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig as setHTTPConfig, useClient, useClient as useHTTPClient } from '@trapi/client';
+import { setConfig as setHTTPConfig, useClient, useClient as useHTTPClient } from 'hapic';
 import {
     HTTPClient,
     HTTPClientKey,
@@ -16,7 +16,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
-import { VaultClient } from '@trapi/vault-client';
+import { Client as VaultClient } from '@hapic/vault';
 import { Robot } from '@authelion/common';
 import { buildCommandRouterComponent } from '../components/command-router';
 import { Environment } from '../env';

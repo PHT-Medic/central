@@ -6,8 +6,8 @@
  */
 
 import {
-    Config, setClient,
-} from '@trapi/client';
+    Config,
+} from 'hapic';
 import { Context } from '@nuxt/types';
 import https from 'https';
 import { Inject } from '@nuxt/types/app';
@@ -59,9 +59,6 @@ export default (ctx: Context, inject : Inject) => {
 
     resourceAPI.mountResponseInterceptor((r) => r, interceptor);
     authAPI.mountResponseInterceptor((r) => r, interceptor);
-
-    setClient(resourceAPI);
-    setClient(authAPI, 'auth');
 
     setHTTPClient(authAPI);
 

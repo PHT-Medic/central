@@ -6,7 +6,7 @@
  */
 
 import { getHostNameFromString } from '@personalhealthtrain/central-common';
-import { ConnectionConfig } from '@trapi/harbor-client';
+import { ConnectionConfig } from '@hapic/harbor';
 import { DockerAuthConfig } from '../../modules/docker';
 
 type RemoteDockerImageURLBuildContext = {

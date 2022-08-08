@@ -9,7 +9,7 @@ import { SelectQueryBuilder } from 'typeorm';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import {
     parseQueryFields,
-} from '@trapi/query';
+} from 'rapiq';
 import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, useDataSource,
 } from 'typeorm-extension';

@@ -12,17 +12,17 @@ import {
     getUserSecretsSecretStorageKey,
     isUserSecretsSecretStorageKey,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
 } from '@typescript-error/http';
 import { UserEntity } from '@authelion/api-core';
 import { publishMessage } from 'amqp-extension';
-import { VaultClient } from '@trapi/vault-client';
+import { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
 import { ExpressValidationError } from '../../../../../express-validation';
-import { ApiKey } from '../../../../../../config/api';
+import { ApiKey } from '../../../../../../config';
 import { buildSecretStorageQueueMessage } from '../../../../../../domains/special/secret-storage/queue';
 import {
     SecretStorageQueueCommand,

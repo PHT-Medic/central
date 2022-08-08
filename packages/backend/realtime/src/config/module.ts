@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig as setHTTPConfig, useClient as useHTTPClient } from '@trapi/client';
+import { setConfig as setHTTPConfig, useClient as useHTTPClient } from 'hapic';
 import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import {
     HTTPClientKey,
@@ -14,7 +14,7 @@ import {
     createRefreshRobotTokenOnResponseErrorHandler,
     shouldRefreshRobotTokenResponseError,
 } from '@personalhealthtrain/central-common';
-import { VaultClient } from '@trapi/vault-client';
+import { Client as VaultClient } from '@hapic/vault';
 import { Robot } from '@authelion/common';
 import { BadRequestError } from '@typescript-error/http';
 import { useLogger } from './log';

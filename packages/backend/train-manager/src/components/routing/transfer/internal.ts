@@ -12,8 +12,8 @@ import {
     RegistryProjectType,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { createClient, useClient } from '@trapi/client';
-import { HarborClient } from '@trapi/harbor-client';
+import { createClient, useClient } from 'hapic';
+import { Client as HarborClient } from '@hapic/harbor';
 import { TransferItem } from './type';
 import { useLogger } from '../../../modules/log';
 import { transferInterRegistry } from './registry';

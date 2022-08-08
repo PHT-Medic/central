@@ -8,7 +8,7 @@
 import {
     ErrorCode, OAuth2TokenGrant, Robot, TokenAPI,
 } from '@authelion/common';
-import { isClientError } from '@trapi/client';
+import { isClientError } from 'hapic';
 import { HTTPClient } from '../../client';
 import { hasOwnProperty } from '../../../utils';
 

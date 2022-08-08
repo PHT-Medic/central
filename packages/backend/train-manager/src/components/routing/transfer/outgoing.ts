@@ -10,7 +10,7 @@ import {
     REGISTRY_ARTIFACT_TAG_BASE,
     RegistryProjectType, TrainManagerRoutingStep,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { TransferItem } from './type';
 import { transferInternal } from './internal';
 import { RoutingError } from '../error';

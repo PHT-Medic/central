@@ -6,8 +6,8 @@
  */
 
 import {
-    HarborClient, Project, ProjectPayload,
-} from '@trapi/harbor-client';
+    Client as HarborClient, Project, ProjectPayload,
+} from '@hapic/harbor';
 
 export async function ensureRemoteRegistryProject(
     httpClient: HarborClient,

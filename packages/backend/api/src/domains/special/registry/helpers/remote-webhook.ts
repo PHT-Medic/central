@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { HarborClient, ProjectWebhook } from '@trapi/harbor-client';
+import { Client as HarborClient, ProjectWebhook } from '@hapic/harbor';
 import {
     HTTPClientKey,
     ROBOT_SECRET_ENGINE_KEY,
@@ -13,8 +13,8 @@ import {
     ServiceID,
 } from '@personalhealthtrain/central-common';
 import os from 'os';
-import { useClient } from '@trapi/client';
-import { VaultClient } from '@trapi/vault-client';
+import { useClient } from 'hapic';
+import { Client as VaultClient } from '@hapic/vault';
 import env from '../../../../env';
 import { buildRegistryWebhookTarget } from '../utils';
 

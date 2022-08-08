@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { Message, publishMessage } from 'amqp-extension';
 import { In } from 'typeorm';
 import { RealmEntity } from '@authelion/api-core';

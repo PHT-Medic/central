@@ -10,9 +10,9 @@ import {
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { createClient, useClient } from '@trapi/client';
-import { HarborClient } from '@trapi/harbor-client';
-import { VaultClient } from '@trapi/vault-client';
+import { createClient, useClient } from 'hapic';
+import { Client as HarborClient } from '@hapic/harbor';
+import { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
 import {

@@ -16,7 +16,7 @@ import {
     OAuth2TokenSubKind,
     PermissionMeta, Robot, TokenVerificationPayload, User, buildAbilityMetaFromName,
 } from '@authelion/common';
-import { Config, createClient } from '@trapi/client';
+import { Config, createClient } from 'hapic';
 import { AuthBrowserStorageKey } from './constants';
 
 export type AuthModuleOptions = {

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ClientDriverInstance } from '@trapi/client';
+import { ClientDriverInstance } from 'hapic';
 import { Train } from '../train';
 import { TrainFile } from './entity';
 import { CollectionResourceResponse, SingleResourceResponse } from '../../type';

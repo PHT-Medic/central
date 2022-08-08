@@ -11,7 +11,7 @@ import {
     Train, TrainContainerPath, TrainFile, getHostNameFromString,
 } from '@personalhealthtrain/central-common';
 import path from 'path';
-import { useClient } from '@trapi/client';
+import { useClient } from 'hapic';
 import { BuildingError } from '../error';
 
 type DockerFileBuildContext = {
