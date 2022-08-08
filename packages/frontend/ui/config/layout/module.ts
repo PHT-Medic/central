@@ -62,7 +62,8 @@ export class NavigationProvider implements ProviderInterface {
         }
 
         return applyRestrictionForComponents(items, {
-            module: this.ctx.$auth,
+            hasPermission: (name) => this.ctx.$auth.hasPermission(name),
+            isLoggedIn: () => this.ctx.$auth.isLoggedIn(),
             layoutKey: {
                 requiredAbilities: LayoutKey.REQUIRED_ABILITIES,
                 requiredPermissions: LayoutKey.REQUIRED_PERMISSIONS,
