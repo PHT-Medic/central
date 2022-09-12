@@ -9,16 +9,12 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    JoinColumn,
-    ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 import {
     Ecosystem, Registry,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@authelion/api-core';
-import { Realm } from '@authelion/common';
 
 @Entity({ name: 'registries' })
 export class RegistryEntity implements Registry {

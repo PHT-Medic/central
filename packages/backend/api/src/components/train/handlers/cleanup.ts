@@ -5,7 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainManagerQueueCommand, TrainQueueCommand, TrainQueuePayload } from '@personalhealthtrain/central-common';
+import {
+    TrainManagerComponent, TrainManagerExtractorCommand,
+    TrainQueueCommand,
+    TrainQueuePayload,
+} from '@personalhealthtrain/central-common';
 import fs from 'fs';
 import { publishMessage } from 'amqp-extension';
 import { getTrainFilesDirectoryPath } from '../../../domains/core/train-file/path';
@@ -21,9 +25,13 @@ export async function cleanupTrain(payload: TrainQueuePayload<TrainQueueCommand.
         // folder does not exist
     }
 
-    const queuePayload = buildTrainManagerQueueMessage(TrainManagerQueueCommand.EXTRACT_CLEANUP, {
-        id: payload.id,
-    });
+    const queuePayload = buildTrainManagerQueueMessage(
+        TrainManagerComponent.EXTRACTOR,
+        TrainManagerExtractorCommand.CLEANUP,
+        {
+            id: payload.id,
+        },
+    );
 
     await publishMessage(queuePayload);
 }

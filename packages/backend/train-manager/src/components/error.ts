@@ -7,26 +7,29 @@
 
 import { BaseError as Base, ErrorOptions } from '@typescript-error/http';
 import {
-    TrainManagerBaseErrorCode,
+    TrainManagerErrorCode,
 } from '@personalhealthtrain/central-common';
 
 export type ErrorOptionsExtended = ErrorOptions & {
     type?: string,
+    command?: string,
     step?: string | number
 };
 
 export class BaseError extends Base {
-    constructor(options: ErrorOptionsExtended) {
-        options.type = options.type || TrainManagerBaseErrorCode.UNKNOWN;
+    public getStep() : string {
+        return this.getOption('step');
+    }
 
-        super(options);
+    public getCode() : string | number {
+        return this.getOption('code');
     }
 
     // --------------------------------------------------------------------
 
     static notFound(options?: ErrorOptionsExtended) {
         return new this({
-            type: TrainManagerBaseErrorCode.NOT_FOUND,
+            code: TrainManagerErrorCode.NOT_FOUND,
             ...(options || {}),
         });
     }
@@ -35,7 +38,7 @@ export class BaseError extends Base {
         options?: ErrorOptionsExtended,
     ) {
         return new this({
-            type: TrainManagerBaseErrorCode.REGISTRY_NOT_FOUND,
+            code: TrainManagerErrorCode.REGISTRY_NOT_FOUND,
             ...(options || {}),
         });
     }
@@ -44,7 +47,7 @@ export class BaseError extends Base {
         options?: ErrorOptionsExtended,
     ) {
         return new this({
-            type: TrainManagerBaseErrorCode.REGISTRY_PROJECT_NOT_FOUND,
+            code: TrainManagerErrorCode.REGISTRY_PROJECT_NOT_FOUND,
             ...(options || {}),
         });
     }

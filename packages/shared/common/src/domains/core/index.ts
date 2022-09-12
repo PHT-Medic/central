@@ -17,4 +17,5 @@ export * from './station';
 export * from './train';
 export * from './train-config';
 export * from './train-file';
+export * from './train-log';
 export * from './train-station';

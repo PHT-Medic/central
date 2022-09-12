@@ -6,16 +6,15 @@
  */
 
 import {
-    HTTPClient,
-    TrainManagerBaseQueuePayload,
+    HTTPClient, Train,
     TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
 import { Message } from 'amqp-extension';
 import { BaseError } from '../error';
 
-export async function extendQueuePayload(message: Message) {
-    const data = message.data as TrainManagerQueuePayloadExtended<TrainManagerBaseQueuePayload>;
+export async function extendPayload(message: Message) {
+    const data = message.data as TrainManagerQueuePayloadExtended<{ id: Train['id'] }>;
 
     // -----------------------------------------------------------------------------------
 

@@ -6,17 +6,37 @@
  */
 
 import { consumeQueue } from 'amqp-extension';
+import { TrainManagerComponent } from '@personalhealthtrain/central-common';
 import { MessageQueueSelfRoutingKey } from '../../config/services/rabbitmq';
-import { createExtractingComponentHandlers } from '../extracting';
-import { createBuildingComponentHandlers } from '../building';
-import { createRoutingComponentHandlers } from '../routing';
+import { executeExtractorCommand } from '../extractor';
+import { executeBuilderCommand } from '../builder';
+import { executeRouterCommand } from '../router';
+import { useLogger } from '../../modules/log';
 
 export function buildCommandRouterComponent() {
     function start() {
         return consumeQueue({ routingKey: MessageQueueSelfRoutingKey.COMMAND }, {
-            ...createBuildingComponentHandlers(),
-            ...createExtractingComponentHandlers(),
-            ...createRoutingComponentHandlers(),
+            $any: async (message) => {
+                useLogger().debug('Command received', {
+                    component: message.metadata.component,
+                    command: message.metadata.command,
+                });
+
+                switch (message.metadata.component) {
+                    case TrainManagerComponent.BUILDER: {
+                        await executeBuilderCommand(message.metadata.command, message);
+                        break;
+                    }
+                    case TrainManagerComponent.EXTRACTOR: {
+                        await executeExtractorCommand(message.metadata.command, message);
+                        break;
+                    }
+                    case TrainManagerComponent.ROUTER: {
+                        await executeRouterCommand(message.metadata.command, message);
+                        break;
+                    }
+                }
+            },
         });
     }
 

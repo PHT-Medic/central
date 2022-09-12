@@ -8,7 +8,10 @@
 import { BadRequestError } from '@typescript-error/http';
 import { publishMessage } from 'amqp-extension';
 import {
-    Train, TrainBuildStatus, TrainManagerQueueCommand,
+    Train,
+    TrainBuildStatus,
+    TrainManagerComponent,
+    TrainManagerRouterCommand,
 } from '@personalhealthtrain/central-common';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 
@@ -18,9 +21,13 @@ export async function detectTrainRunStatus(train: Train) : Promise<Train> {
     ) {
         throw new BadRequestError('The train has not been build yet...');
     } else {
-        await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE_STATUS, {
-            id: train.id,
-        }));
+        await publishMessage(buildTrainManagerQueueMessage(
+            TrainManagerComponent.ROUTER,
+            TrainManagerRouterCommand.CHECK,
+            {
+                id: train.id,
+            },
+        ));
     }
 
     return train;

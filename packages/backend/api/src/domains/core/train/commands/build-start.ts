@@ -12,7 +12,8 @@ import {
     RegistryProjectType,
     Train,
     TrainBuildStatus,
-    TrainManagerQueueCommand,
+    TrainManagerBuilderCommand,
+    TrainManagerComponent,
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
 import { BadRequestError } from '@typescript-error/http';
@@ -81,7 +82,8 @@ export async function startBuildTrain(
         }
 
         const queueMessage = buildTrainManagerQueueMessage(
-            TrainManagerQueueCommand.BUILD,
+            TrainManagerComponent.BUILDER,
+            TrainManagerBuilderCommand.BUILD,
             {
                 id: train.id,
             },

@@ -7,9 +7,7 @@
 
 import { Message, publishMessage } from 'amqp-extension';
 
-import {
-    TrainManagerQueueCommand,
-} from '@personalhealthtrain/central-common';
+import { TrainManagerComponent, TrainManagerRouterCommand } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
 import { buildTrainManagerQueueMessage } from '../../domains/special/train-manager';
 import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../domains/special/registry';
@@ -41,12 +39,16 @@ export async function dispatchRegistryEventToTrainManager(
         return message;
     }
 
-    await publishMessage(buildTrainManagerQueueMessage(TrainManagerQueueCommand.ROUTE, {
-        repositoryName: data.repositoryName,
-        projectName: data.namespace,
-        operator: data.operator,
-        artifactTag: data.artifactTag,
-    }));
+    await publishMessage(buildTrainManagerQueueMessage(
+        TrainManagerComponent.ROUTER,
+        TrainManagerRouterCommand.ROUTE,
+        {
+            repositoryName: data.repositoryName,
+            projectName: data.namespace,
+            operator: data.operator,
+            artifactTag: data.artifactTag,
+        },
+    ));
 
     return message;
 }
