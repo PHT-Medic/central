@@ -19,7 +19,7 @@
         "build": "rm -rf ./dist && tsc -p tsconfig.build.json"
     },
     "dependencies": {
-        "@authelion/server-adapter": "^0.3.0-alpha.1",
+        "@authelion/server-adapter": "^0.3.0-alpha.2",
         "@authelion/common": "^0.3.0-alpha.1",
         "@hapic/harbor": "^0.0.2",
         "@hapic/vault": "^0.0.2",
