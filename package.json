@@ -31,6 +31,7 @@
         "pub": "npm run build && lerna publish",
         "lint": "eslint --ext .ts,.vue,.js ./packages/",
         "lint:fix": "npm run lint -- --fix",
+        "cli": "npm run cli --workspace=packages/backend/api",
         "ui": "npm run dev --workspace=packages/frontend/ui",
         "api": "npm run dev --workspace=packages/backend/api",
         "realtime": "npm run dev --workspace=packages/backend/realtime",

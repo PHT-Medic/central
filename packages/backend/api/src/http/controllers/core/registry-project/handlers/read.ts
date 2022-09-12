@@ -24,18 +24,22 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
     ];
 
     const fieldsParsed = parseQueryFields(fields, {
-        allowed: [
+        default: [
             'id',
             'name',
             'ecosystem',
-            'external_name',
             'type',
-            'registry_id',
+            'public',
+            'external_name',
+            'external_id',
+            'webhook_name',
             'webhook_exists',
+            'registry_id',
+            'realm_id',
             'created_at',
             'updated_at',
-            ...protectedFields,
         ],
+        allowed: protectedFields,
         defaultAlias: 'registryProject',
     });
 

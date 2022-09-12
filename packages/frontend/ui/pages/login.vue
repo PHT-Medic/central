@@ -7,10 +7,10 @@
 <script lang="ts">
 import Vue, { CreateElement, VNode } from 'vue';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
-import { OAuth2Provider } from '@authelion/common';
-import { BuildInput } from '@trapi/query';
+import { IdentityProvider } from '@authelion/common';
+import { BuildInput } from 'rapiq';
 import { SlotName, buildFormInput, buildFormSubmit } from '@vue-layout/utils';
-import { OAuth2ProviderList } from '@authelion/vue';
+import { IdentityProviderList } from '@authelion/vue';
 import MedicineWorker from '../components/svg/MedicineWorker';
 import { LayoutKey, LayoutNavigationID } from '../config/layout';
 import { buildVuelidateTranslator } from '../config/ilingo/utils';
@@ -55,7 +55,7 @@ export default Vue.extend({
         },
     },
     computed: {
-        providerQuery() : BuildInput<OAuth2Provider> {
+        providerQuery() : BuildInput<IdentityProvider> {
             return {
                 include: {
                     realm: true,
@@ -98,7 +98,7 @@ export default Vue.extend({
         },
 
         buildUrl(provider) {
-            return this.$authApi.oauth2Provider.getAuthorizeUri(this.$config.apiUrl, provider.id);
+            return this.$authApi.identityProvider.getAuthorizeUri(this.$config.apiUrl, provider.id);
         },
     },
     render(createElement: CreateElement): VNode {
@@ -149,7 +149,7 @@ export default Vue.extend({
                     ]),
                     h('div', { staticClass: 'col-12 col-sm-6' }, [
                         h('h6', 'Stations'),
-                        h(OAuth2ProviderList, {
+                        h(IdentityProviderList, {
                             props: {
                                 query: vm.providerQuery,
                                 withSearch: false,

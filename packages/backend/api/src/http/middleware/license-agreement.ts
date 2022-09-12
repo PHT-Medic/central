@@ -12,13 +12,13 @@ import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 export function checkLicenseAgreementAccepted(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) {
     if (req.userId) {
         if (
-            !req.user.extra ||
-            !hasOwnProperty(req.user.extra, 'license_agreement') ||
-            req.user.extra.license_agreement !== 'accepted'
+            !hasOwnProperty(req.user, 'license_agreement') ||
+            req.user.license_agreement !== 'accepted'
         ) {
             if (
                 req.originalUrl.startsWith('/user-attributes') ||
-                req.originalUrl.startsWith('/token')
+                req.originalUrl.startsWith('/token') ||
+                req.originalUrl.startsWith('/users/@me')
             ) {
                 next();
 

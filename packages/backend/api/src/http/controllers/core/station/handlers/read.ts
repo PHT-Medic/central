@@ -25,13 +25,18 @@ async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilde
     ];
 
     const fieldsParsed = parseQueryFields(fields, {
-        allowed: [
+        default: [
             'id',
             'name',
+            'ecosystem',
+            'hidden',
+            'realm_id',
+            'registry_id',
+            'registry_project_id',
             'created_at',
             'updated_at',
-            ...protectedFields,
         ],
+        allowed: protectedFields,
         defaultAlias: 'station',
     });
 

@@ -68,6 +68,13 @@ export class StationEntity implements Station {
     @JoinColumn({ name: 'registry_project_id' })
         registry_project: RegistryProject;
 
+    @Column()
+        realm_id: Realm['id'];
+
+    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'realm_id' })
+        realm: RealmEntity;
+
     // ------------------------------------------------------------------
 
     @CreateDateColumn()
@@ -75,15 +82,6 @@ export class StationEntity implements Station {
 
     @UpdateDateColumn()
         updated_at: Date;
-
-    // ------------------------------------------------------------------
-
-    @Column()
-        realm_id: Realm['id'];
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'realm_id' })
-        realm: RealmEntity;
 
     // ------------------------------------------------------------------
 

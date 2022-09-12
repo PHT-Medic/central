@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { buildOAuth2Aggregator, setConfig as setAuthConfig } from '@authelion/server-core';
+import { buildOAuth2Aggregator, setConfig as setAuthConfig, setLogger as setAuthLogger } from '@authelion/server-core';
 import { setConfig as setHTTPConfig } from 'hapic';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
+import path from 'path';
 import { setConfig as setRedisConfig } from 'redis-extension';
 import { Client as VaultClient } from '@hapic/vault';
 import {
@@ -22,6 +23,7 @@ import { ApiKey } from './api';
 
 import { buildCommandRouterComponent } from '../components/command-router';
 import { buildEventRouterComponent } from '../components/event-router';
+import { useLogger } from './log';
 
 interface ConfigContext {
     env: Environment
@@ -91,7 +93,7 @@ export function createConfig({ env } : ConfigContext) : Config {
             robotEnabled: true,
         },
         rootPath: process.cwd(),
-        writableDirectoryPath: 'writable',
+        writableDirectoryPath: path.join(__dirname, '..', '..', 'writable'),
         selfUrl: env.apiUrl,
         webUrl: env.webAppUrl,
         redis: true,
@@ -99,7 +101,7 @@ export function createConfig({ env } : ConfigContext) : Config {
         tokenMaxAgeRefreshToken: env.jwtMaxAge,
     });
 
-    // todo: set auth logger
+    setAuthLogger(useLogger());
 
     // ---------------------------------------------
 

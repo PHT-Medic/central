@@ -12,6 +12,7 @@ import { Context } from '@nuxt/types';
 import https from 'https';
 import { Inject } from '@nuxt/types/app';
 import { HTTPClient as AuthHTTPClient } from '@authelion/common';
+import { setHTTPClient } from '@authelion/vue';
 import { ErrorCode, HTTPClient } from '@personalhealthtrain/central-common';
 import { LicenseAgreementCommand, useLicenseAgreementEventEmitter } from '../domains/license-agreement';
 
@@ -61,4 +62,6 @@ export default (ctx: Context, inject : Inject) => {
 
     inject('api', resourceAPI);
     inject('authApi', authAPI);
+
+    setHTTPClient(authAPI);
 };

@@ -7,6 +7,7 @@
 import Vue, { CreateElement, PropType, VNode } from 'vue';
 import { Socket } from 'socket.io-client';
 import {
+    PermissionID,
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
@@ -39,7 +40,7 @@ export const TrainListItem = Vue.extend({
     },
     computed: {
         canDrop() {
-            return this.$auth.can('drop', 'train');
+            return this.$auth.has(PermissionID.TRAIN_DROP);
         },
         userName() {
             return this.entity.user ?

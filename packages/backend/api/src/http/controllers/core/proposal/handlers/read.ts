@@ -71,7 +71,19 @@ export async function getManyProposalRouteHandler(req: ExpressRequest, res: Expr
 
     applyFields(query, fields, {
         defaultAlias: 'proposal',
-        allowed: ['id', 'title'],
+        default: [
+            'id',
+            'title',
+            'requested_data',
+            'risk',
+            'risk_comment',
+            'trains',
+            'created_at',
+            'updated_at',
+            'realm_id',
+            'user_id',
+            'master_image_id',
+        ],
     });
 
     applyFilters(query, filter, {

@@ -36,5 +36,5 @@ jobs:
 
             - name: Build and install packages
               run: |
-                  npm ci
+                  npm i
                   npm run build

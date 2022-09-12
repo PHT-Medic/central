@@ -100,7 +100,11 @@ export default Vue.extend<Data, any, any, Properties>({
 
             try {
                 this.entity = await this.$api.registryProject.getOne(this.entityId, {
-                    fields: ['+account_secret'],
+                    fields: [
+                        '+account_id',
+                        '+account_name',
+                        '+account_secret',
+                    ],
                 });
 
                 this.$emit('resolved', this.entity);

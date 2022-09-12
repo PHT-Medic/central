@@ -26,7 +26,7 @@ export default {
                 filter: {
                     registry_id: this.entity.id,
                 },
-                fields: ['+account_secret'],
+                fields: ['+account_id', '+account_name', '+account_secret'],
             },
             item: null,
             fields: [

@@ -21,15 +21,16 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
     ];
 
     const fieldsParsed = parseQueryFields(req.query.fields, {
-        allowed: [
+        default: [
             'id',
             'name',
             'host',
             'ecosystem',
+            'account_name',
             'created_at',
             'updated_at',
-            ...protectedFields,
         ],
+        allowed: protectedFields,
         defaultAlias: 'registry',
     });
 

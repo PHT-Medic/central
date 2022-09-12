@@ -8,7 +8,7 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
-    applyFilters, applyPagination, applyQueryRelations, useDataSource,
+    applyFilters, applyPagination, applyRelations, useDataSource,
 } from 'typeorm-extension';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
@@ -29,7 +29,7 @@ export async function getOneTrainRouteHandler(req: ExpressRequest, res: ExpressR
 
     onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
 
-    applyQueryRelations(query, include, {
+    applyRelations(query, include, {
         defaultAlias: 'train',
         allowed: ['user', 'proposal', 'master_image', 'entrypoint_file'],
     });
@@ -68,7 +68,7 @@ export async function getManyTrainRouteHandler(req: ExpressRequest, res: Express
         onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
     }
 
-    applyQueryRelations(query, include, {
+    applyRelations(query, include, {
         defaultAlias: 'train',
         allowed: ['user', 'proposal', 'master_image', 'entrypoint_file'],
     });
