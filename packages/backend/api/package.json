@@ -11,7 +11,7 @@
     "description": "This package contains the Central API of the PHT. It was initially developed as part of my Bachelor Thesis.",
     "main": "./dist/index.js",
     "dependencies": {
-        "@authelion/server-core": "^0.3.0-alpha.1",
+        "@authelion/server-core": "^0.3.0-alpha.2",
         "@authelion/common": "^0.3.0-alpha.1",
         "@decorators/di": "^1.0.2",
         "@decorators/express": "^2.4.0",
