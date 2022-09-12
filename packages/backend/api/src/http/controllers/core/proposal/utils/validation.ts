@@ -7,19 +7,21 @@
 
 import { check, validationResult } from 'express-validator';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
+import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
+import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
-import { extendExpressValidationResultWithMasterImage } from '../../master-image/utils/extend';
-import { ProposalValidationResult } from '../type';
+import {
+    ExpressValidationError,
+    ExpressValidationResult, extendExpressValidationResultWithRelation,
+    initExpressValidationResult,
+    matchedValidationData,
+} from '../../../../express-validation';
 
 export async function runProposalValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
-) : Promise<ProposalValidationResult> {
-    const result : ProposalValidationResult = {
-        data: {},
-        meta: {},
-    };
+) : Promise<ExpressValidationResult<ProposalEntity>> {
+    const result : ExpressValidationResult<ProposalEntity> = initExpressValidationResult();
 
     const titleChain = check('title')
         .exists()
@@ -73,7 +75,10 @@ export async function runProposalValidation(
 
     result.data = matchedValidationData(req, { includeOptionals: true });
 
-    await extendExpressValidationResultWithMasterImage(result);
+    await extendExpressValidationResultWithRelation(result, MasterImageEntity, {
+        id: 'master_image_id',
+        entity: 'master_image',
+    });
 
     return result;
 }

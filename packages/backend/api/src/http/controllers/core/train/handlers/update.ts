@@ -9,14 +9,14 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-erro
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { useDataSource } from 'typeorm-extension';
-import { runTrainValidation } from './utils';
+import { runTrainValidation } from '../utils';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 
 export async function updateTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.TRAIN_EDIT)) {
+    if (!req.ability.has(PermissionID.TRAIN_EDIT)) {
         throw new ForbiddenError();
     }
 

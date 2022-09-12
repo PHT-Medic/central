@@ -31,7 +31,7 @@ import { RegistryEntity } from '../../../../../../domains/core/registry/entity';
 const commands = Object.values(RegistryCommand);
 
 export async function handleRegistryCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (!req.ability.hasPermission(PermissionID.REGISTRY_MANAGE)) {
+    if (!req.ability.has(PermissionID.REGISTRY_MANAGE)) {
         throw new ForbiddenError('You are not permitted to manage the registry.');
     }
 

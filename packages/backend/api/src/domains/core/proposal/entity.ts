@@ -9,7 +9,7 @@ import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import { MasterImage, Proposal, ProposalRisk } from '@personalhealthtrain/central-common';
-import { RealmEntity, UserEntity } from '@authelion/api-core';
+import { RealmEntity, UserEntity } from '@authelion/server-core';
 import { Realm, User } from '@authelion/common';
 import { MasterImageEntity } from '../master-image/entity';
 

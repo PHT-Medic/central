@@ -20,7 +20,7 @@ import { RegistryProjectEntity } from '../../../../../domains/core/registry-proj
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
 export async function createStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (!req.ability.hasPermission(PermissionID.STATION_ADD)) {
+    if (!req.ability.has(PermissionID.STATION_ADD)) {
         throw new ForbiddenError();
     }
 
@@ -46,13 +46,13 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
     // -----------------------------------------------------
 
     if (!entity.ecosystem) {
-        entity.ecosystem = result.meta.registry.ecosystem;
+        entity.ecosystem = result.relation.registry.ecosystem;
     }
 
     if (
         entity.registry_id
     ) {
-        if (entity.ecosystem !== result.meta.registry.ecosystem) {
+        if (entity.ecosystem !== result.relation.registry.ecosystem) {
             throw new BadRequestError('The ecosystem of the station and the registry must be the same.');
         }
 

@@ -11,7 +11,7 @@ import { PermissionID } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { runProposalStationValidation } from './utils';
+import { runProposalStationValidation } from '../utils/validation';
 
 export async function updateProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -25,7 +25,7 @@ export async function updateProposalStationRouteHandler(req: ExpressRequest, res
     }
 
     const isAuthorityOfStation = isPermittedForResourceRealm(req.realmId, entity.station_realm_id);
-    const isAuthorizedForStation = req.ability.hasPermission(PermissionID.PROPOSAL_APPROVE);
+    const isAuthorizedForStation = req.ability.has(PermissionID.PROPOSAL_APPROVE);
 
     const isAuthorityOfProposal = isPermittedForResourceRealm(req.realmId, entity.proposal_realm_id);
     if (isAuthorityOfProposal) {

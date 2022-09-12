@@ -8,7 +8,7 @@
 import express, { Express } from 'express';
 import cors from 'cors';
 
-import { registerControllers as registerAuthControllers, registerMiddlewares } from '@authelion/api-core';
+import { registerControllers as registerAuthControllers, registerMiddlewares } from '@authelion/server-core';
 import promBundle from 'express-prom-bundle';
 
 import { registerControllers } from './routes';

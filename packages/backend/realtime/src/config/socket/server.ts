@@ -10,11 +10,10 @@ import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { ForbiddenError, UnauthorizedError } from '@typescript-error/http';
 import { MASTER_REALM_ID } from '@authelion/common';
-import { setupSocketMiddleware } from '@authelion/api-adapter';
-import { useClient } from 'hapic';
+import { setupSocketMiddleware } from '@authelion/server-adapter';
 import { useLogger } from '../log';
 import { registerSocketHandlers, registerSocketNamespaceHandlers } from './handlers';
-import { Environment } from '../../env';
+import env, { Environment } from '../../env';
 import { SocketInterface, SocketServerInterface } from './type';
 import { Config } from '../type';
 
@@ -42,7 +41,8 @@ export function createSocketServer(context : SocketServerContext) : Server {
     // receive user
     server.use(setupSocketMiddleware({
         redis: context.config.redisDatabase,
-        http: useClient().driver,
+        oauth2: env.apiUrl, // todo: check if all realms supported
+        logger: useLogger(),
     }));
 
     server.use((socket: SocketInterface, next) => {
@@ -63,7 +63,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
     const realmWorkspaces = server.of(/^\/realm#[a-z0-9A-Z-_]+$/);
     realmWorkspaces.use(setupSocketMiddleware({
         redis: context.config.redisDatabase,
-        http: useClient().driver,
+        oauth2: env.apiUrl, // todo: check if all realms supported
     }));
 
     realmWorkspaces.use((socket: SocketInterface, next) => {

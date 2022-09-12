@@ -7,7 +7,7 @@
 
 import path from 'path';
 import { buildDataSourceOptions as _buildDataSourceOptions } from 'typeorm-extension';
-import { extendDataSourceOptions } from '@authelion/api-core';
+import { extendDataSourceOptions } from '@authelion/server-core';
 import { MasterImageEntity } from '../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../domains/core/master-image-group/entity';
 import { ProposalEntity } from '../domains/core/proposal/entity';

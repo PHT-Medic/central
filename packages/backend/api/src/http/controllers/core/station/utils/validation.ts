@@ -7,22 +7,23 @@
 
 import { Ecosystem } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
-import { extendExpressValidationResultWithRealm } from '@authelion/api-core';
+import { RealmEntity } from '@authelion/server-core';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { ForbiddenError } from '@typescript-error/http';
+import { RegistryEntity } from '../../../../../domains/core/registry/entity';
+import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
-import { extendExpressValidationResultWithRegistry } from '../../registry/utils/extend';
-import { StationValidationResult } from '../type';
+import {
+    ExpressValidationError, ExpressValidationResult,
+    extendExpressValidationResultWithRelation, initExpressValidationResult,
+    matchedValidationData,
+} from '../../../../express-validation';
 
 export async function runStationValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
-) : Promise<StationValidationResult> {
-    const result : StationValidationResult = {
-        data: {},
-        meta: {},
-    };
+) : Promise<ExpressValidationResult<StationEntity>> {
+    const result : ExpressValidationResult<StationEntity> = initExpressValidationResult();
 
     const nameChain = check('name')
         .isLength({ min: 3, max: 128 })
@@ -99,8 +100,16 @@ export async function runStationValidation(
     }
 
     result.data = matchedValidationData(req, { includeOptionals: true });
-    await extendExpressValidationResultWithRegistry(result);
-    await extendExpressValidationResultWithRealm(result);
+
+    await extendExpressValidationResultWithRelation(result, RegistryEntity, {
+        id: 'registry_id',
+        entity: 'registry',
+    });
+
+    await extendExpressValidationResultWithRelation(result, RealmEntity, {
+        id: 'realm_id',
+        entity: 'realm',
+    });
 
     if (result.data.realm_id) {
         if (!isPermittedForResourceRealm(req.realmId, result.data.realm_id)) {

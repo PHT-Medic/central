@@ -15,7 +15,7 @@ import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 export async function deleteRegistryRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.REGISTRY_MANAGE)) {
+    if (!req.ability.has(PermissionID.REGISTRY_MANAGE)) {
         throw new ForbiddenError();
     }
 

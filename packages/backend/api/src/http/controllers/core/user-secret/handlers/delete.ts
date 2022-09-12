@@ -31,7 +31,7 @@ export async function deleteUserSecretRouteHandler(req: ExpressRequest, res: Exp
         realm_id: req.realmId,
     };
 
-    if (!req.ability.hasPermission(PermissionID.USER_EDIT)) {
+    if (!req.ability.has(PermissionID.USER_EDIT)) {
         conditions.user_id = req.userId;
     }
 

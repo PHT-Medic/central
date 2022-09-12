@@ -16,7 +16,7 @@ import { useClient } from 'hapic';
 import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
 } from '@typescript-error/http';
-import { UserEntity } from '@authelion/api-core';
+import { UserEntity } from '@authelion/server-core';
 import { publishMessage } from 'amqp-extension';
 import { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
@@ -71,7 +71,7 @@ export async function handleSecretStorageCommandRouteHandler(req: ExpressRequest
         const userId = getUserSecretsSecretStorageKey(rawPath);
 
         if (
-            !req.ability.hasPermission(PermissionID.USER_EDIT) &&
+            !req.ability.has(PermissionID.USER_EDIT) &&
             userId !== req.userId
         ) {
             throw new ForbiddenError();
@@ -91,7 +91,7 @@ export async function handleSecretStorageCommandRouteHandler(req: ExpressRequest
             data,
         };
     } else if (
-        !req.ability.hasPermission(PermissionID.SERVICE_MANAGE)
+        !req.ability.has(PermissionID.SERVICE_MANAGE)
     ) {
         throw new ForbiddenError();
     }

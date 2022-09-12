@@ -6,11 +6,10 @@
  */
 
 import { Argv, CommandModule } from 'yargs';
-import { upgradeCommand } from '@authelion/api-core';
+import { upgradeCommand } from '@authelion/server-core';
 import { DataSource } from 'typeorm';
 import { buildDataSourceOptions } from '../../database/utils';
-import { useSpinner } from '../../config/spinner';
-import { createConfig } from '../../config/module';
+import { createConfig, useLogger } from '../../config';
 import env from '../../env';
 
 export class UpgradeCommand implements CommandModule {
@@ -27,12 +26,10 @@ export class UpgradeCommand implements CommandModule {
     async handler() {
         createConfig({ env });
 
-        const spinner = useSpinner();
+        const logger = useLogger();
         const options = await buildDataSourceOptions();
 
-        await upgradeCommand({
-            spinner,
-        });
+        await upgradeCommand({});
 
         const dataSource = new DataSource(options);
         await dataSource.initialize();
@@ -41,7 +38,7 @@ export class UpgradeCommand implements CommandModule {
             await dataSource.runMigrations();
             // eslint-disable-next-line no-useless-catch
         } catch (e) {
-            spinner.start('Executing migrations failed...');
+            logger.info('Executing migrations failed...');
             await dataSource.destroy();
             process.exit(1);
             throw e;

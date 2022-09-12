@@ -18,7 +18,7 @@ import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../
 export async function deleteStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.STATION_DROP)) {
+    if (!req.ability.has(PermissionID.STATION_DROP)) {
         throw new ForbiddenError();
     }
 

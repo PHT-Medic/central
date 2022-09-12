@@ -14,7 +14,7 @@ import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
+import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 
@@ -40,7 +40,7 @@ async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilde
 
     if (protectedSelected.length > 0) {
         if (
-            !req.ability.hasPermission(PermissionID.STATION_EDIT)
+            !req.ability.has(PermissionID.STATION_EDIT)
         ) {
             throw new ForbiddenError(
                 `You are not permitted to read the restricted fields: ${

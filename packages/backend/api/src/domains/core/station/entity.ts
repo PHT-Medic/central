@@ -18,7 +18,7 @@ import {
 import {
     Ecosystem, Registry, RegistryProject, Station,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@authelion/api-core';
+import { RealmEntity } from '@authelion/server-core';
 import { Realm } from '@authelion/common';
 import { RegistryProjectEntity } from '../registry-project/entity';
 import { RegistryEntity } from '../registry/entity';

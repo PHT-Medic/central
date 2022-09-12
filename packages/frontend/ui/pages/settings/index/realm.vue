@@ -38,7 +38,7 @@ export default {
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
             ];
 
-            if (this.$auth.hasPermission([
+            if (this.$auth.has([
                 PermissionID.STATION_EDIT,
                 PermissionID.STATION_DROP,
                 PermissionID.STATION_EDIT,
@@ -46,7 +46,7 @@ export default {
                 items.push({ name: 'Stations', icon: 'fa-solid fa-house-medical', urlSuffix: '/stations' });
             }
 
-            if (this.$auth.hasPermission([
+            if (this.$auth.has([
                 PermissionID.PROVIDER_ADD,
                 PermissionID.PROVIDER_EDIT,
                 PermissionID.PROVIDER_DROP,

@@ -15,7 +15,7 @@ import {
     Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import { RealmEntity, UserEntity } from '@authelion/api-core';
+import { RealmEntity, UserEntity } from '@authelion/server-core';
 import { SecretType, UserSecret } from '@personalhealthtrain/central-common';
 import { Realm, User } from '@authelion/common';
 

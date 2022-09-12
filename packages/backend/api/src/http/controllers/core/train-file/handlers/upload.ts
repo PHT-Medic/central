@@ -22,8 +22,8 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
     const { id } = req.params;
 
     if (
-        !req.ability.hasPermission(PermissionID.TRAIN_ADD) &&
-        !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
+        !req.ability.has(PermissionID.TRAIN_ADD) &&
+        !req.ability.has(PermissionID.TRAIN_EDIT)
     ) {
         throw new ForbiddenError();
     }

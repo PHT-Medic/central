@@ -75,7 +75,7 @@ export default Vue.extend<any, ActionCommandMethods, any, TrainStationActionProp
             }
         },
         isAllowed() {
-            return this.$auth.hasPermission(PermissionID.PROPOSAL_APPROVE);
+            return this.$auth.has(PermissionID.PROPOSAL_APPROVE);
         },
         isDisabled() {
             if (

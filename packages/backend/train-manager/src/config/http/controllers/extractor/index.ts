@@ -24,7 +24,7 @@ export async function streamExtractorFileRouteHandler(
         throw new BadRequestError('The result identifier is invalid.');
     }
 
-    if (!req.ability.hasPermission(PermissionID.TRAIN_RESULT_READ)) {
+    if (!req.ability.has(PermissionID.TRAIN_RESULT_READ)) {
         throw new ForbiddenError('You are not authorized to read the train-result file.');
     }
 

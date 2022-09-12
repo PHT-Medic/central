@@ -4,11 +4,14 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import { Robot } from '@authelion/common';
+import { PropType } from 'vue';
+
 export default {
     props: {
         entity: {
-            type: Object,
+            type: Object as PropType<Robot>,
             default: undefined,
         },
     },
@@ -20,6 +23,6 @@ export default {
 </script>
 <template>
     <div>
-        <robot-role-list :entity-id="entity.id" />
+        <robot-role-assignment-list :entity-id="entity.id" />
     </div>
 </template>

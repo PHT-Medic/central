@@ -10,13 +10,13 @@ import { ForbiddenError } from '@typescript-error/http';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
-import { runProposalStationValidation } from './utils';
+import { runProposalStationValidation } from '../utils/validation';
 import env from '../../../../../env';
 
 export async function createProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (
-        !req.ability.hasPermission(PermissionID.PROPOSAL_EDIT) &&
-        !req.ability.hasPermission(PermissionID.PROPOSAL_ADD)
+        !req.ability.has(PermissionID.PROPOSAL_EDIT) &&
+        !req.ability.has(PermissionID.PROPOSAL_ADD)
     ) {
         throw new ForbiddenError('You are not allowed to add a proposal station.');
     }

@@ -13,7 +13,7 @@ import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { runProposalValidation } from '../utils/validation';
 
 export async function createProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (!req.ability.hasPermission(PermissionID.PROPOSAL_ADD)) {
+    if (!req.ability.has(PermissionID.PROPOSAL_ADD)) {
         throw new ForbiddenError();
     }
 

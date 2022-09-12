@@ -70,7 +70,7 @@ export default Vue.extend({
             return this.$store.getters['auth/userRealmId'];
         },
         canManage() {
-            return this.$auth.hasPermission(PermissionID.PROPOSAL_APPROVE);
+            return this.$auth.has(PermissionID.PROPOSAL_APPROVE);
         },
     },
     created() {

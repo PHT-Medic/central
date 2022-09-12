@@ -58,7 +58,7 @@ export default {
                 },
             ];
 
-            if (this.$auth.hasPermission([
+            if (this.$auth.has([
                 PermissionID.STATION_EDIT,
                 PermissionID.STATION_DROP,
                 PermissionID.STATION_EDIT,

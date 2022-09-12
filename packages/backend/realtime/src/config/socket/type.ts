@@ -11,7 +11,7 @@ import {
     SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
 import {
-    AbilityManager, PermissionMeta, Realm, Robot, User,
+    AbilityDescriptor, AbilityManager, Realm, Robot, User,
 } from '@authelion/common';
 import { Namespace, Server, Socket } from 'socket.io';
 
@@ -20,13 +20,11 @@ export type SocketDataInterface = {
 
     realmId?: Realm['id'],
 
-    user?: User,
     userId?: User['id'],
 
-    robot?: Robot,
     robotId?: Robot['id'],
 
-    permissions?: PermissionMeta[],
+    permissions?: AbilityDescriptor[],
     ability?: AbilityManager,
 
     roomConnections: Record<string, number>

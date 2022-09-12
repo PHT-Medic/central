@@ -8,7 +8,7 @@
 import {
     EntitySubscriberInterface, EventSubscriber, RemoveEvent,
 } from 'typeorm';
-import { RobotEntity } from '@authelion/api-core';
+import { RobotEntity } from '@authelion/server-core';
 import { publishMessage } from 'amqp-extension';
 import { buildSecretStorageQueueMessage } from '../../domains/special/secret-storage/queue';
 import { SecretStorageQueueCommand, SecretStorageQueueEntityType } from '../../domains/special/secret-storage/constants';

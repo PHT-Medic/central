@@ -54,7 +54,7 @@ export default {
     },
     computed: {
         canEdit() {
-            return this.$auth.hasPermission(PermissionID.TRAIN_EDIT);
+            return this.$auth.has(PermissionID.TRAIN_EDIT);
         },
 
         // ---------------------------------------------------------

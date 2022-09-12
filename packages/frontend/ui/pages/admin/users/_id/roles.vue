@@ -4,28 +4,20 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import { User } from '@authelion/common';
+import { PropType } from 'vue';
+
 export default {
     props: {
         entity: {
-            type: Object,
-            default: undefined,
+            type: Object as PropType<User>,
         },
-    },
-    data() {
-        return {
-            role: {
-                items: [],
-                busy: false,
-            },
-            q: '',
-            showOnlyOwnedRoles: true,
-        };
     },
 };
 </script>
 <template>
     <div>
-        <user-role-list :entity-id="entity.id" />
+        <user-role-assignment-list :entity-id="entity.id" />
     </div>
 </template>

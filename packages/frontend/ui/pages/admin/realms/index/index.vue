@@ -42,10 +42,10 @@ export default {
     },
     computed: {
         canEdit() {
-            return this.$auth.hasPermission(PermissionID.REALM_EDIT);
+            return this.$auth.has(PermissionID.REALM_EDIT);
         },
         canDrop() {
-            return this.$auth.hasPermission(PermissionID.REALM_DROP);
+            return this.$auth.has(PermissionID.REALM_DROP);
         },
     },
     methods: {

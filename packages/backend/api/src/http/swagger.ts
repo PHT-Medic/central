@@ -13,7 +13,7 @@ import {
     generateDocumentation,
 } from '@trapi/swagger';
 import path from 'path';
-import { getSwaggerEntrypointFilePath } from '@authelion/api-core';
+import { getSwaggerEntrypointFilePath } from '@authelion/server-core';
 import { getRootDirPath, getWritableDirPath } from '../config/paths';
 import env from '../env';
 

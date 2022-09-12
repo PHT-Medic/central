@@ -14,7 +14,7 @@ import {
     RolePermissionEntity,
     RoleRepository,
     useRobotEventEmitter,
-} from '@authelion/api-core';
+} from '@authelion/server-core';
 import { ServiceID } from '@personalhealthtrain/central-common';
 import { MASTER_REALM_ID } from '@authelion/common';
 import { PHTStationRole, getPHTStationRolePermissions } from '../../config/permissions/station';

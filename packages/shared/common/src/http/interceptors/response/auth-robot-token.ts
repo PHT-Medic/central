@@ -6,8 +6,9 @@
  */
 
 import {
-    ErrorCode, OAuth2TokenGrant, Robot, TokenAPI,
+    ErrorCode, Robot,
 } from '@authelion/common';
+import { Client } from '@hapic/oauth2';
 import { isClientError } from 'hapic';
 import { HTTPClient } from '../../client';
 import { hasOwnProperty } from '../../../utils';
@@ -28,7 +29,7 @@ export function shouldRefreshRobotTokenResponseError(err: unknown) : boolean {
 }
 
 export function createRefreshRobotTokenOnResponseErrorHandler(context: {
-    httpClient: HTTPClient,
+    httpClient?: HTTPClient,
     load: () => Promise<Pick<Robot, 'id' | 'secret'>>
 }) {
     return (err?: any) => {
@@ -37,12 +38,12 @@ export function createRefreshRobotTokenOnResponseErrorHandler(context: {
         if (shouldRefreshRobotTokenResponseError(err)) {
             return context.load()
                 .then((response) => {
-                    const tokenApi = new TokenAPI(context.httpClient.driver);
+                    const tokenApi = new Client();
+                    tokenApi.setDriver(context.httpClient.driver);
 
-                    return tokenApi.create({
+                    return tokenApi.token.createWithRobotCredentials({
                         id: response.id,
                         secret: response.secret,
-                        grant_type: OAuth2TokenGrant.ROBOT_CREDENTIALS,
                     })
                         .then((token) => {
                             context.httpClient

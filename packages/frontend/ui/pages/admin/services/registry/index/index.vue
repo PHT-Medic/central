@@ -40,7 +40,7 @@ export default {
             };
         },
         canManage() {
-            return this.$auth.hasPermission(PermissionID.REGISTRY_MANAGE);
+            return this.$auth.has(PermissionID.REGISTRY_MANAGE);
         },
     },
     methods: {

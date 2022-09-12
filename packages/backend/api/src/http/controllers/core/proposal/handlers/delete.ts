@@ -15,7 +15,7 @@ import { ExpressRequest, ExpressResponse } from '../../../../type';
 export async function deleteProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.PROPOSAL_DROP)) {
+    if (!req.ability.has(PermissionID.PROPOSAL_DROP)) {
         throw new ForbiddenError();
     }
 

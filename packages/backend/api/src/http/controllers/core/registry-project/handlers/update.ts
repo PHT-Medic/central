@@ -11,14 +11,14 @@ import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { runRegistryProjectValidation } from './utils';
+import { runRegistryProjectValidation } from '../utils/validation';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
 export async function updateRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.REGISTRY_PROJECT_MANAGE)) {
+    if (!req.ability.has(PermissionID.REGISTRY_PROJECT_MANAGE)) {
         throw new ForbiddenError();
     }
 

@@ -19,14 +19,14 @@ export function registerStationSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
-    if (!socket.data.user && !socket.data.robot) return;
+    if (!socket.data.userId && !socket.data.robotId) return;
 
     socket.on(StationSocketClientToServerEventName.SUBSCRIBE, async (context, cb) => {
         context = extendSocketClientToServerEventContext(context);
         cb = extendSocketClientToServerEventCallback(cb);
 
         if (
-            !socket.data.ability.hasPermission(PermissionID.STATION_EDIT)
+            !socket.data.ability.has(PermissionID.STATION_EDIT)
         ) {
             if (typeof cb === 'function') {
                 cb(new UnauthorizedError());

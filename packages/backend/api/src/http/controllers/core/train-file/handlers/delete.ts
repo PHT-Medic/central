@@ -19,8 +19,8 @@ export async function deleteTrainFileRouteHandler(req: ExpressRequest, res: Expr
     const { fileId } = req.params;
 
     if (
-        !req.ability.hasPermission(PermissionID.TRAIN_ADD) &&
-        !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
+        !req.ability.has(PermissionID.TRAIN_ADD) &&
+        !req.ability.has(PermissionID.TRAIN_EDIT)
     ) {
         throw new ForbiddenError();
     }

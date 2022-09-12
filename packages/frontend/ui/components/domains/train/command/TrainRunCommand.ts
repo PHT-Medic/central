@@ -45,8 +45,8 @@ export const TrainRunCommand = Vue.extend<any, ActionCommandMethods, any, TrainC
     },
     computed: {
         isAllowed() {
-            return this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_START) ||
-                this.$auth.hasPermission(PermissionID.TRAIN_EXECUTION_STOP);
+            return this.$auth.has(PermissionID.TRAIN_EXECUTION_START) ||
+                this.$auth.has(PermissionID.TRAIN_EXECUTION_STOP);
         },
         isDisabled() {
             if (this.entity.build_status !== TrainBuildStatus.FINISHED) {

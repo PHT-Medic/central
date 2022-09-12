@@ -57,7 +57,7 @@ export default {
     },
     computed: {
         canDrop() {
-            return this.$auth.hasPermission(PermissionID.PROVIDER_DROP);
+            return this.$auth.has(PermissionID.PROVIDER_DROP);
         },
         query() {
             return {

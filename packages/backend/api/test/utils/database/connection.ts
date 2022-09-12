@@ -13,7 +13,7 @@ import {
 } from 'typeorm';
 import {
     DatabaseRootSeeder as AuthDatabaseRootSeeder,
-} from '@authelion/api-core';
+} from '@authelion/server-core';
 import { PermissionKey } from '@personalhealthtrain/central-common';
 import { buildDataSourceOptions } from '../../../src/database/utils';
 import { buildRobotAggregator } from '../../../src/aggregators/robot';

@@ -14,7 +14,7 @@ import { MasterImageGroupEntity } from '../../../../../domains/core/master-image
 export async function deleteMasterImageGroupRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.MASTER_IMAGE_GROUP_MANAGE)) {
+    if (!req.ability.has(PermissionID.MASTER_IMAGE_GROUP_MANAGE)) {
         throw new ForbiddenError();
     }
 

@@ -18,8 +18,8 @@ export async function deleteTrainStationRouteHandler(req: ExpressRequest, res: E
     const { id } = req.params;
 
     if (
-        !req.ability.hasPermission(PermissionID.TRAIN_EDIT) &&
-        !req.ability.hasPermission(PermissionID.TRAIN_APPROVE)
+        !req.ability.has(PermissionID.TRAIN_EDIT) &&
+        !req.ability.has(PermissionID.TRAIN_APPROVE)
     ) {
         throw new ForbiddenError();
     }

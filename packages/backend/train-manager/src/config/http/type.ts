@@ -11,7 +11,7 @@ import {
 import {
     ExpressRequest as AuthExpressRequest,
     ExpressResponse as AuthExpressResponse,
-} from '@authelion/api-adapter';
+} from '@authelion/server-adapter';
 import { Environment } from '../../env';
 import { Config } from '../module';
 

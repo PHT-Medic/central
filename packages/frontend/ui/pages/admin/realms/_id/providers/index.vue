@@ -57,7 +57,7 @@ export default {
     },
     computed: {
         canDrop() {
-            return this.$auth.hasPermission(PermissionID.PROVIDER_DROP);
+            return this.$auth.has(PermissionID.PROVIDER_DROP);
         },
         query() {
             return {
@@ -82,7 +82,7 @@ export default {
 </script>
 <template>
     <div>
-        <o-auth2-provider-list
+        <identity-provider-list
             ref="itemsList"
             :query="query"
         >
@@ -133,6 +133,6 @@ export default {
                     </template>
                 </b-table>
             </template>
-        </o-auth2-provider-list>
+        </identity-provider-list>
     </div>
 </template>

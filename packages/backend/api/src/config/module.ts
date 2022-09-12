@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { buildOAuth2TokenAggregator, setConfig as setAuthConfig } from '@authelion/api-core';
+import { buildOAuth2Aggregator, setConfig as setAuthConfig } from '@authelion/server-core';
 import { setConfig as setHTTPConfig } from 'hapic';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { setConfig as setRedisConfig } from 'redis-extension';
@@ -85,29 +85,26 @@ export function createConfig({ env } : ConfigContext) : Config {
 
     setAuthConfig({
         database: {
-            seed: {
-                permissions: Object.values(PermissionKey),
-                admin: {
-                    username: 'admin',
-                    password: 'start123',
-                },
-                robot: {
-                    enabled: true,
-                },
-            },
+            permissions: Object.values(PermissionKey),
+            adminUsername: 'admin',
+            adminPassword: 'start123',
+            robotEnabled: true,
         },
         rootPath: process.cwd(),
-        writableDirectory: 'writable',
+        writableDirectoryPath: 'writable',
         selfUrl: env.apiUrl,
         webUrl: env.webAppUrl,
         redis: true,
-        tokenMaxAge: env.jwtMaxAge,
+        tokenMaxAgeAccessToken: env.jwtMaxAge,
+        tokenMaxAgeRefreshToken: env.jwtMaxAge,
     });
+
+    // todo: set auth logger
 
     // ---------------------------------------------
 
     const aggregators : {start: () => void}[] = [
-        buildOAuth2TokenAggregator(),
+        buildOAuth2Aggregator(),
 
         buildRobotAggregator(),
 

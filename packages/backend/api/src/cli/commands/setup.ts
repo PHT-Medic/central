@@ -7,16 +7,15 @@
 
 import { Arguments, Argv, CommandModule } from 'yargs';
 import { createDatabase, setDataSource } from 'typeorm-extension';
-import { DatabaseSeeder, setupCommand } from '@authelion/api-core';
+import { DatabaseSeeder, setupCommand } from '@authelion/server-core';
 import { useClient } from 'redis-extension';
 import { DataSource } from 'typeorm';
-import { createConfig } from '../../config/module';
+import { createConfig, useLogger } from '../../config';
 import env from '../../env';
 import { buildDataSourceOptions } from '../../database/utils';
 import { generateSwaggerDocumentation } from '../../http/swagger';
 import { DatabaseRootSeeder } from '../../database/seeds/root';
 import { buildRobotAggregator } from '../../aggregators/robot';
-import { useSpinner } from '../../config/spinner';
 
 interface SetupArguments extends Arguments {
     auth: boolean,
@@ -61,7 +60,7 @@ export class SetupCommand implements CommandModule {
     async handler(args: SetupArguments) {
         createConfig({ env });
 
-        const spinner = useSpinner();
+        const logger = useLogger();
 
         if (
             typeof args.auth === 'undefined' &&
@@ -78,18 +77,16 @@ export class SetupCommand implements CommandModule {
          */
         if (args.auth) {
             await setupCommand({
-                spinner,
                 database: false,
-                databaseSeed: false, // false, to trigger own subscribers
+                databaseSeed: false,
                 documentation: false,
-                keyPair: true,
             });
         }
 
         if (args.documentation) {
-            spinner.start('generating documentation...');
+            logger.info('generating documentation...');
             await generateSwaggerDocumentation();
-            spinner.succeed('generated documentation.');
+            logger.info('generated documentation.');
         }
 
         if (args.database || args.databaseSeeder) {
@@ -99,9 +96,9 @@ export class SetupCommand implements CommandModule {
             const options = await buildDataSourceOptions();
 
             if (args.database) {
-                spinner.start('create database...');
+                logger.info('create database...');
                 await createDatabase({ options, synchronize: false });
-                spinner.succeed('created database.');
+                logger.info('created database.');
             }
 
             const dataSource = new DataSource(options);
@@ -112,7 +109,7 @@ export class SetupCommand implements CommandModule {
 
             try {
                 if (args.databaseSeeder) {
-                    spinner.start('seeding database...');
+                    logger.info('seeding database...');
 
                     const redis = useClient();
                     if (redis.status !== 'connecting') {
@@ -127,10 +124,10 @@ export class SetupCommand implements CommandModule {
 
                     const coreSeeder = new DatabaseRootSeeder();
                     await coreSeeder.run(dataSource);
-                    spinner.start('seeded database...');
+                    logger.info('seeded database...');
                 }
             } catch (e) {
-                spinner.start('seeding database failed...');
+                logger.info('seeding database failed...');
                 await dataSource.destroy();
                 process.exit(1);
                 throw e;

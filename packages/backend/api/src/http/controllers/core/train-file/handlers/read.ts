@@ -8,15 +8,15 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
-import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
+import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import { applyFilters, useDataSource } from 'typeorm-extension';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 
 export async function getOneTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     if (
-        !req.ability.hasPermission(PermissionID.TRAIN_ADD) &&
-        !req.ability.hasPermission(PermissionID.TRAIN_EDIT)
+        !req.ability.has(PermissionID.TRAIN_ADD) &&
+        !req.ability.has(PermissionID.TRAIN_EDIT)
     ) {
         throw new ForbiddenError();
     }

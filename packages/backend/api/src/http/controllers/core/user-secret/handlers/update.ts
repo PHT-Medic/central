@@ -11,7 +11,7 @@ import { Buffer } from 'buffer';
 import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { runUserSecretValidation } from './utils';
+import { runUserSecretValidation } from '../utils';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
 import { buildSecretStorageQueueMessage } from '../../../../../domains/special/secret-storage/queue';
 import {
@@ -32,7 +32,7 @@ export async function updateUserSecretRouteHandler(req: ExpressRequest, res: Exp
     let entity = await repository.findOneBy({
         id,
         realm_id: req.realmId,
-        ...(!req.ability.hasPermission(PermissionID.USER_EDIT) ? { user_id: req.user.id } : {}),
+        ...(!req.ability.has(PermissionID.USER_EDIT) ? { user_id: req.user.id } : {}),
     });
 
     if (!entity) {

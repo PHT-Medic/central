@@ -7,19 +7,21 @@
 
 import { check, validationResult } from 'express-validator';
 import { RegistryProjectType } from '@personalhealthtrain/central-common';
+import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
-import { RegistryProjectValidationResult } from '../type';
-import { extendExpressValidationResultWithRegistry } from '../../registry/utils/extend';
+import {
+    ExpressValidationError,
+    ExpressValidationResult, extendExpressValidationResultWithRelation,
+    initExpressValidationResult,
+    matchedValidationData,
+} from '../../../../express-validation';
 
 export async function runRegistryProjectValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
-) : Promise<RegistryProjectValidationResult> {
-    const result : RegistryProjectValidationResult = {
-        data: {},
-        meta: {},
-    };
+) : Promise<ExpressValidationResult<RegistryProjectEntity>> {
+    const result : ExpressValidationResult<RegistryProjectEntity> = initExpressValidationResult();
 
     const registryChain = check('registry_id')
         .exists()
@@ -73,7 +75,10 @@ export async function runRegistryProjectValidation(
     }
 
     result.data = matchedValidationData(req, { includeOptionals: true });
-    await extendExpressValidationResultWithRegistry(result);
+    await extendExpressValidationResultWithRelation(result, RegistryEntity, {
+        id: 'registry_id',
+        entity: 'registry',
+    });
 
     return result;
 }

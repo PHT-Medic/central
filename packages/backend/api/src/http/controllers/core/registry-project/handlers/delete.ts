@@ -17,7 +17,7 @@ import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../
 export async function deleteRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.REGISTRY_PROJECT_MANAGE)) {
+    if (!req.ability.has(PermissionID.REGISTRY_PROJECT_MANAGE)) {
         throw new ForbiddenError();
     }
 

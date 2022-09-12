@@ -6,13 +6,12 @@
  */
 
 import { Context } from '@nuxt/types';
-import { buildAbilityMetaFromName } from '@authelion/common';
-import AuthModule from '../config/auth';
+import { buildNameFromAbilityID } from '@authelion/common';
+import { AuthModule } from '../config/auth';
 import { LayoutKey } from '../config/layout';
 
 function checkAbilityOrPermission({ route, $auth } : Context) {
     const layoutKeys : string[] = [
-        LayoutKey.REQUIRED_ABILITIES,
         LayoutKey.REQUIRED_PERMISSIONS,
     ];
 
@@ -31,11 +30,11 @@ function checkAbilityOrPermission({ route, $auth } : Context) {
             const value = matchedRecordMeta[layoutKey];
             if (Array.isArray(value)) {
                 isAllowed = value.some((val) => {
-                    if (layoutKey === LayoutKey.REQUIRED_PERMISSIONS) {
-                        val = buildAbilityMetaFromName(val);
+                    if (layoutKey !== LayoutKey.REQUIRED_PERMISSIONS) {
+                        val = buildNameFromAbilityID(val);
                     }
 
-                    return $auth.can(val.action, val.subject);
+                    return $auth.has(val);
                 });
             }
 
@@ -76,7 +75,7 @@ export default async function middleware({
         !route.fullPath.startsWith('/logout')
     ) {
         try {
-            await (<AuthModule> $auth).resolveMe();
+            await (<AuthModule> $auth).resolve();
         } catch (e) {
             if (store.getters['auth/loggedIn']) {
                 await redirect({

@@ -8,7 +8,7 @@
 import { useClient } from 'hapic';
 import { Message, publishMessage } from 'amqp-extension';
 import { In } from 'typeorm';
-import { RealmEntity } from '@authelion/api-core';
+import { RealmEntity } from '@authelion/server-core';
 import { hasOwnProperty } from '@authelion/common';
 import { Ecosystem } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';

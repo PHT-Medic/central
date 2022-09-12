@@ -11,7 +11,7 @@ import { PermissionID } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { runTrainStationValidation } from './utils';
+import { runTrainStationValidation } from '../utils';
 
 export async function updateTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
@@ -25,10 +25,10 @@ export async function updateTrainStationRouteHandler(req: ExpressRequest, res: E
     }
 
     const isAuthorityOfStation = isPermittedForResourceRealm(req.realmId, trainStation.station_realm_id);
-    const isAuthorizedForStation = req.ability.hasPermission(PermissionID.TRAIN_APPROVE);
+    const isAuthorizedForStation = req.ability.has(PermissionID.TRAIN_APPROVE);
 
     const isAuthorityOfTrain = isPermittedForResourceRealm(req.realmId, trainStation.train_realm_id);
-    const isAuthorizedForTrain = req.ability.hasPermission(PermissionID.TRAIN_EDIT);
+    const isAuthorizedForTrain = req.ability.has(PermissionID.TRAIN_EDIT);
 
     if (
         !(isAuthorityOfStation && isAuthorizedForStation) &&

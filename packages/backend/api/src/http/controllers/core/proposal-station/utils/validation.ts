@@ -9,20 +9,22 @@ import { check, validationResult } from 'express-validator';
 import { ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
+import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
+import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
-import { extendExpressValidationResultWithStation } from '../../station/utils/extend';
-import { ProposalStationValidationResult } from '../type';
-import { extendExpressValidationResultWithProposal } from '../../proposal/utils/extend';
+import {
+    ExpressValidationError,
+    ExpressValidationResult, extendExpressValidationResultWithRelation,
+    initExpressValidationResult,
+    matchedValidationData,
+} from '../../../../express-validation';
 
 export async function runProposalStationValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
-) : Promise<ProposalStationValidationResult> {
-    const result : ProposalStationValidationResult = {
-        data: {},
-        meta: {},
-    };
+) : Promise<ExpressValidationResult<ProposalStationEntity>> {
+    const result : ExpressValidationResult<ProposalStationEntity> = initExpressValidationResult();
 
     if (operation === 'create') {
         await check('proposal_id')
@@ -60,18 +62,25 @@ export async function runProposalStationValidation(
 
     // ----------------------------------------------
 
-    await extendExpressValidationResultWithProposal(result);
-    if (result.meta.proposal) {
-        result.data.proposal_realm_id = result.meta.proposal.realm_id;
+    await extendExpressValidationResultWithRelation(result, ProposalEntity, {
+        id: 'proposal_id',
+        entity: 'proposal',
+    });
 
-        if (!isPermittedForResourceRealm(req.realmId, result.meta.proposal.realm_id)) {
+    if (result.relation.proposal) {
+        result.data.proposal_realm_id = result.relation.proposal.realm_id;
+
+        if (!isPermittedForResourceRealm(req.realmId, result.relation.proposal.realm_id)) {
             throw new NotFoundError('The referenced proposal realm is not permitted.');
         }
     }
 
-    await extendExpressValidationResultWithStation(result);
-    if (result.meta.station) {
-        result.data.station_realm_id = result.meta.station.realm_id;
+    await extendExpressValidationResultWithRelation(result, StationEntity, {
+        id: 'station_id',
+        entity: 'station',
+    });
+    if (result.relation.station) {
+        result.data.station_realm_id = result.relation.station.realm_id;
     }
 
     return result;

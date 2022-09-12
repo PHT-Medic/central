@@ -10,7 +10,7 @@ import { Buffer } from 'buffer';
 import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { runUserSecretValidation } from './utils';
+import { runUserSecretValidation } from '../utils';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
 import { buildSecretStorageQueueMessage } from '../../../../../domains/special/secret-storage/queue';
 import {

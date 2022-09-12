@@ -103,7 +103,7 @@ export default {
 
             if (
                 this.isProposalOwner &&
-                this.$auth.hasPermission(PermissionID.PROPOSAL_EDIT)
+                this.$auth.has(PermissionID.PROPOSAL_EDIT)
             ) {
                 items.push({ name: 'Settings', icon: 'fa fa-cog', urlSuffix: '/settings' });
             }

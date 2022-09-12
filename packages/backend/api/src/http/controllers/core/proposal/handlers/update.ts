@@ -16,7 +16,7 @@ import { runProposalValidation } from '../utils/validation';
 export async function updateProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.PROPOSAL_EDIT)) {
+    if (!req.ability.has(PermissionID.PROPOSAL_EDIT)) {
         throw new ForbiddenError();
     }
 

@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
-import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
+import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
     applyFilters, applyPagination, applyQueryRelations, useDataSource,
 } from 'typeorm-extension';

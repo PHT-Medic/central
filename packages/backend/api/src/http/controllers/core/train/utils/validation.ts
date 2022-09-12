@@ -10,22 +10,24 @@ import { check, validationResult } from 'express-validator';
 import { BadRequestError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { useDataSource } from 'typeorm-extension';
+import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
+import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
+import { RegistryEntity } from '../../../../../domains/core/registry/entity';
+import { TrainEntity } from '../../../../../domains/core/train/entity';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
+import {
+    ExpressValidationError,
+    ExpressValidationResult, extendExpressValidationResultWithRelation,
+    initExpressValidationResult,
+    matchedValidationData,
+} from '../../../../express-validation';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
-import { extendExpressValidationResultWithMasterImage } from '../../master-image/utils/extend';
-import { TrainValidationResult } from '../type';
-import { extendExpressValidationResultWithProposal } from '../../proposal/utils/extend';
-import { extendExpressValidationResultWithRegistry } from '../../registry/utils/extend';
 
 export async function runTrainValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
-) : Promise<TrainValidationResult> {
-    const result : TrainValidationResult = {
-        data: {},
-        meta: {},
-    };
+) : Promise<ExpressValidationResult<TrainEntity>> {
+    const result : ExpressValidationResult<TrainEntity> = initExpressValidationResult();
 
     if (operation === 'create') {
         await check('proposal_id')
@@ -109,18 +111,27 @@ export async function runTrainValidation(
 
     // ----------------------------------------------
 
-    await extendExpressValidationResultWithMasterImage(result);
-    await extendExpressValidationResultWithProposal(result);
-    await extendExpressValidationResultWithRegistry(result);
+    await extendExpressValidationResultWithRelation(result, MasterImageEntity, {
+        id: 'master_image_id',
+        entity: 'master_image',
+    });
+    await extendExpressValidationResultWithRelation(result, ProposalEntity, {
+        id: 'proposal_id',
+        entity: 'proposal',
+    });
+    await extendExpressValidationResultWithRelation(result, RegistryEntity, {
+        id: 'registry_id',
+        entity: 'registry',
+    });
 
-    if (result.meta.proposal) {
-        if (!isPermittedForResourceRealm(req.realmId, result.meta.proposal.realm_id)) {
+    if (result.relation.proposal) {
+        if (!isPermittedForResourceRealm(req.realmId, result.relation.proposal.realm_id)) {
             throw new BadRequestError('The referenced proposal realm is not permitted.');
         }
     }
 
-    if (result.meta.registry) {
-        if (result.meta.registry.ecosystem !== Ecosystem.DEFAULT) {
+    if (result.relation.registry) {
+        if (result.relation.registry.ecosystem !== Ecosystem.DEFAULT) {
             throw new BadRequestError('The registry must be part of the default ecosystem.');
         }
     }

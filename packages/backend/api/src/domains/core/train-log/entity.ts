@@ -18,7 +18,7 @@ import {
     Train,
     TrainLog,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@authelion/api-core';
+import { RealmEntity } from '@authelion/server-core';
 import { Realm } from '@authelion/common';
 import { TrainEntity } from '../train/entity';
 

@@ -10,25 +10,25 @@ import { TrainStationApprovalStatus } from '@personalhealthtrain/central-common'
 import { BadRequestError, NotFoundError } from '@typescript-error/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { useDataSource } from 'typeorm-extension';
+import { StationEntity } from '../../../../../domains/core/station/entity';
+import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
+import { TrainEntity } from '../../../../../domains/core/train/entity';
 import { ExpressRequest } from '../../../../type';
 import {
     ExpressValidationError,
+    ExpressValidationResult,
     buildExpressValidationErrorMessage,
+    extendExpressValidationResultWithRelation,
+    initExpressValidationResult,
     matchedValidationData,
 } from '../../../../express-validation';
-import { TrainStationValidationResult } from '../type';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
-import { extendExpressValidationResultWithStation } from '../../station/utils/extend';
-import { extendExpressValidationResultWithTrain } from '../../train/utils/extend';
 
 export async function runTrainStationValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
-) : Promise<TrainStationValidationResult> {
-    const result : TrainStationValidationResult = {
-        data: {},
-        meta: {},
-    };
+) : Promise<ExpressValidationResult<TrainStationEntity>> {
+    const result : ExpressValidationResult<TrainStationEntity> = initExpressValidationResult();
     if (operation === 'create') {
         await check('station_id')
             .exists()
@@ -70,38 +70,43 @@ export async function runTrainStationValidation(
 
     // ----------------------------------------------
 
-    await extendExpressValidationResultWithTrain(result);
-    if (result.meta.train) {
+    await extendExpressValidationResultWithRelation(result, TrainEntity, {
+        id: 'train_id',
+        entity: 'train',
+    });
+    if (result.relation.train) {
         if (
-            !isPermittedForResourceRealm(req.realmId, result.meta.train.realm_id)
+            !isPermittedForResourceRealm(req.realmId, result.relation.train.realm_id)
         ) {
             throw new BadRequestError(buildExpressValidationErrorMessage('train_id'));
         }
 
-        result.data.train_realm_id = result.meta.train.realm_id;
+        result.data.train_realm_id = result.relation.train.realm_id;
     }
 
-    await extendExpressValidationResultWithStation(result);
-    if (result.meta.station) {
-        result.data.station_realm_id = result.meta.station.realm_id;
+    await extendExpressValidationResultWithRelation(result, StationEntity, {
+        id: 'station_id',
+        entity: 'station',
+    });
+
+    if (result.relation.station) {
+        result.data.station_realm_id = result.relation.station.realm_id;
     }
 
     if (
-        result.meta.station &&
-        result.meta.train
+        result.relation.station &&
+        result.relation.train
     ) {
         const dataSource = await useDataSource();
         const proposalStationRepository = dataSource.getRepository(ProposalStationEntity);
         const proposalStation = await proposalStationRepository.findOneBy({
-            proposal_id: result.meta.train.proposal_id,
-            station_id: result.meta.station.id,
+            proposal_id: result.relation.train.proposal_id,
+            station_id: result.relation.station.id,
         });
 
         if (!proposalStation) {
             throw new NotFoundError('The referenced station is not part of the train proposal.');
         }
-
-        result.meta.proposalStation = proposalStation;
     }
 
     // ----------------------------------------------

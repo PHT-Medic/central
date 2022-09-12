@@ -16,8 +16,8 @@ export async function deleteProposalStationRouteHandler(req: ExpressRequest, res
     const { id } = req.params;
 
     if (
-        !req.ability.hasPermission(PermissionID.PROPOSAL_EDIT) &&
-        !req.ability.hasPermission(PermissionID.PROPOSAL_DROP)
+        !req.ability.has(PermissionID.PROPOSAL_EDIT) &&
+        !req.ability.has(PermissionID.PROPOSAL_DROP)
     ) {
         throw new ForbiddenError('You are not allowed to drop a proposal station.');
     }

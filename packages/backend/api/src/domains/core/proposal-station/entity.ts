@@ -12,7 +12,7 @@ import {
 import {
     Proposal, ProposalStation, ProposalStationApprovalStatus, Station,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@authelion/api-core';
+import { RealmEntity } from '@authelion/server-core';
 import { Realm } from '@authelion/common';
 import { ProposalEntity } from '../proposal/entity';
 import { StationEntity } from '../station/entity';

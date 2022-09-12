@@ -15,14 +15,19 @@ import {
     extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@typescript-error/http';
-import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
-import { decrSocketRoomConnections, incrSocketRoomConnections } from '../../config/socket/utils';
+import {
+    SocketInterface,
+    SocketNamespaceInterface,
+    SocketServerInterface,
+    decrSocketRoomConnections,
+    incrSocketRoomConnections,
+} from '../../config';
 
 export function registerProposalStationSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
-    if (!socket.data.user && !socket.data.robot) return;
+    if (!socket.data.userId && !socket.data.robotId) return;
 
     // ------------------------------------------------------------
 
@@ -31,7 +36,7 @@ export function registerProposalStationSocketHandlers(
         cb = extendSocketClientToServerEventCallback(cb);
 
         if (
-            !socket.data.ability.hasPermission(PermissionID.PROPOSAL_APPROVE)
+            !socket.data.ability.has(PermissionID.PROPOSAL_APPROVE)
         ) {
             if (typeof cb === 'function') {
                 cb(new UnauthorizedError());
@@ -58,7 +63,7 @@ export function registerProposalStationForRealmSocketHandlers(
     io: SocketServerInterface | SocketNamespaceInterface,
     socket: SocketInterface,
 ) {
-    if (!socket.data.user && !socket.data.robot) return;
+    if (!socket.data.userId && !socket.data.robotId) return;
 
     // ------------------------------------------------------------
 
@@ -67,7 +72,7 @@ export function registerProposalStationForRealmSocketHandlers(
         cb = extendSocketClientToServerEventCallback(cb);
 
         if (
-            !socket.data.ability.hasPermission(PermissionID.PROPOSAL_APPROVE)
+            !socket.data.ability.has(PermissionID.PROPOSAL_APPROVE)
         ) {
             if (typeof cb === 'function') {
                 cb(new UnauthorizedError());
@@ -96,7 +101,7 @@ export function registerProposalStationForRealmSocketHandlers(
         cb = extendSocketClientToServerEventCallback(cb);
 
         if (
-            !socket.data.ability.hasPermission(PermissionID.PROPOSAL_EDIT)
+            !socket.data.ability.has(PermissionID.PROPOSAL_EDIT)
         ) {
             if (typeof cb === 'function') {
                 cb(new UnauthorizedError());

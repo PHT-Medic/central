@@ -14,7 +14,7 @@ import { MasterImageEntity } from '../../../../../domains/core/master-image/enti
 export async function deleteMasterImageRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.MASTER_IMAGE_MANAGE)) {
+    if (!req.ability.has(PermissionID.MASTER_IMAGE_MANAGE)) {
         throw new ForbiddenError();
     }
 

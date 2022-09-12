@@ -7,18 +7,19 @@
 
 import { body, check, validationResult } from 'express-validator';
 import { Ecosystem, getHostNameFromString } from '@personalhealthtrain/central-common';
+import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 import { ExpressRequest } from '../../../../type';
-import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
-import { RegistryValidationResult } from '../type';
+import {
+    ExpressValidationError, ExpressValidationResult,
+    initExpressValidationResult,
+    matchedValidationData,
+} from '../../../../express-validation';
 
 export async function runRegistryValidation(
     req: ExpressRequest,
     operation: 'create' | 'update',
-) : Promise<RegistryValidationResult> {
-    const result : RegistryValidationResult = {
-        data: {},
-        meta: {},
-    };
+) : Promise<ExpressValidationResult<RegistryEntity>> {
+    const result : ExpressValidationResult<RegistryEntity> = initExpressValidationResult();
 
     const titleChain = check('name')
         .exists()

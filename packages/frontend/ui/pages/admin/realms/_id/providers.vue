@@ -52,7 +52,6 @@ export default {
                 <b-nav-item
                     v-for="(item,key) in sidebar.items"
                     :key="key"
-                    :disabled="item.active"
                     :to="'/admin/realms/' +entity.id + '/providers'+ item.urlSuffix"
                     exact
                     exact-active-class="active"

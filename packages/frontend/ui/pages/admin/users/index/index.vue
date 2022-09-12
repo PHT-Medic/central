@@ -37,14 +37,14 @@ export default {
     },
     computed: {
         canView() {
-            return this.$auth.hasPermission(PermissionID.USER_EDIT) ||
-                this.$auth.hasPermission(PermissionID.USER_PERMISSION_ADD) ||
-                this.$auth.hasPermission(PermissionID.USER_PERMISSION_DROP) ||
-                this.$auth.hasPermission(PermissionID.USER_ROLE_ADD) ||
-                this.$auth.hasPermission(PermissionID.USER_ROLE_DROP);
+            return this.$auth.has(PermissionID.USER_EDIT) ||
+                this.$auth.has(PermissionID.USER_PERMISSION_ADD) ||
+                this.$auth.has(PermissionID.USER_PERMISSION_DROP) ||
+                this.$auth.has(PermissionID.USER_ROLE_ADD) ||
+                this.$auth.has(PermissionID.USER_ROLE_DROP);
         },
         canDrop() {
-            return this.$auth.hasPermission(PermissionID.USER_DROP);
+            return this.$auth.has(PermissionID.USER_DROP);
         },
     },
     methods: {

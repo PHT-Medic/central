@@ -18,7 +18,7 @@ import { getTrainFilesDirectoryPath } from '../../../../../domains/core/train-fi
 export async function deleteTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.TRAIN_DROP)) {
+    if (!req.ability.has(PermissionID.TRAIN_DROP)) {
         throw new ForbiddenError();
     }
 

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
+import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
     applyFields, applyFilters, applyPagination, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';
@@ -25,7 +25,7 @@ export async function getOneUserSecretRouteHandler(req: ExpressRequest, res: Exp
 
     onlyRealmPermittedQueryResources(query, req.realmId);
 
-    if (!req.ability.hasPermission(PermissionID.USER_EDIT)) {
+    if (!req.ability.has(PermissionID.USER_EDIT)) {
         query.where('entity.user_id = :userId', { userId: req.userId });
     }
 
@@ -49,7 +49,7 @@ export async function getManyUserSecretRouteHandler(req: ExpressRequest, res: Ex
 
     onlyRealmPermittedQueryResources(query, req.realmId);
 
-    if (!req.ability.hasPermission(PermissionID.USER_EDIT) && req.userId) {
+    if (!req.ability.has(PermissionID.USER_EDIT) && req.userId) {
         query.where('entity.user_id = :userId', { userId: req.userId });
     }
 

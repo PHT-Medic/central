@@ -41,10 +41,10 @@ export default {
             };
         },
         canEdit() {
-            return this.$auth.hasPermission(PermissionID.ROBOT_EDIT);
+            return this.$auth.has(PermissionID.ROBOT_EDIT);
         },
         canDrop() {
-            return this.$auth.hasPermission(PermissionID.ROBOT_DROP);
+            return this.$auth.has(PermissionID.ROBOT_DROP);
         },
     },
     methods: {

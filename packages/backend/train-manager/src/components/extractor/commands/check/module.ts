@@ -13,9 +13,8 @@ import {
     TrainManagerExtractorExtractQueuePayload,
     TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
-import { useClient } from '@trapi/client';
-import { buildImageOutputFilePath } from '../../../../config/paths';
-import { buildRemoteDockerImageURL } from '../../../../config/services/registry';
+import { useClient } from 'hapic';
+import { buildImageOutputFilePath, buildRemoteDockerImageURL } from '../../../../config';
 import { checkIfLocalRegistryImageExists } from '../../../../modules/docker';
 import { ExtractorError } from '../../error';
 import { writeExtractedEvent } from '../extract';

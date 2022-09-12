@@ -15,14 +15,14 @@ export default {
     },
     computed: {
         canManageStations() {
-            return this.$auth.hasPermission([
+            return this.$auth.has([
                 PermissionID.STATION_EDIT,
                 PermissionID.STATION_DROP,
                 PermissionID.STATION_EDIT,
             ]);
         },
         canManageProviders() {
-            return this.$auth.hasPermission([
+            return this.$auth.has([
                 PermissionID.PROVIDER_ADD,
                 PermissionID.PROVIDER_EDIT,
                 PermissionID.PROVIDER_DROP,

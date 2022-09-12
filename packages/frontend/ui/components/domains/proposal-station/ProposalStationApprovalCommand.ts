@@ -76,7 +76,7 @@ export default Vue.extend<any, ActionCommandMethods, any, ProposalStationActionP
             }
         },
         isAllowed() {
-            return this.$auth.hasPermission(PermissionID.PROPOSAL_APPROVE);
+            return this.$auth.has(PermissionID.PROPOSAL_APPROVE);
         },
         isDisabled() {
             if (

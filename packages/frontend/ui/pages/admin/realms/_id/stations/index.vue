@@ -48,11 +48,11 @@ export default {
     },
     computed: {
         canView() {
-            return this.$auth.hasPermission(PermissionID.STATION_EDIT) ||
-                this.$auth.hasPermission(PermissionID.STATION_DROP);
+            return this.$auth.has(PermissionID.STATION_EDIT) ||
+                this.$auth.has(PermissionID.STATION_DROP);
         },
         canDrop() {
-            return this.$auth.hasPermission(PermissionID.STATION_DROP);
+            return this.$auth.has(PermissionID.STATION_DROP);
         },
     },
     methods: {

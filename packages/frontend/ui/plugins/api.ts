@@ -13,7 +13,6 @@ import https from 'https';
 import { Inject } from '@nuxt/types/app';
 import { HTTPClient as AuthHTTPClient } from '@authelion/common';
 import { ErrorCode, HTTPClient } from '@personalhealthtrain/central-common';
-import { setHTTPClient } from '@authelion/vue';
 import { LicenseAgreementCommand, useLicenseAgreementEventEmitter } from '../domains/license-agreement';
 
 export default (ctx: Context, inject : Inject) => {
@@ -59,8 +58,6 @@ export default (ctx: Context, inject : Inject) => {
 
     resourceAPI.mountResponseInterceptor((r) => r, interceptor);
     authAPI.mountResponseInterceptor((r) => r, interceptor);
-
-    setHTTPClient(authAPI);
 
     inject('api', resourceAPI);
     inject('authApi', authAPI);

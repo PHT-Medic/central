@@ -22,7 +22,7 @@ import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../
 export async function updateStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
-    if (!req.ability.hasPermission(PermissionID.STATION_EDIT)) {
+    if (!req.ability.has(PermissionID.STATION_EDIT)) {
         throw new ForbiddenError();
     }
 

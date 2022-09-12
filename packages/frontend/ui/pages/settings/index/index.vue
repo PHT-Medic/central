@@ -16,7 +16,7 @@ export default {
             return this.$store.getters['auth/user'];
         },
         canManage() {
-            return this.$auth.hasPermission(PermissionID.USER_EDIT);
+            return this.$auth.has(PermissionID.USER_EDIT);
         },
     },
     methods: {

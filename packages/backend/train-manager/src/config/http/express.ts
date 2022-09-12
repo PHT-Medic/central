@@ -10,8 +10,8 @@ import cors from 'cors';
 
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { setupHTTPMiddleware } from '@authelion/api-adapter';
-import { useClient } from 'hapic';
+import { setupHTTPMiddleware } from '@authelion/server-adapter';
+import { useLogger } from '../../modules/log';
 import { registerRoutes } from './routes';
 import { ExpressAppContext, ExpressAppInterface } from './type';
 import { errorMiddleware, useRateLimiter } from './middleware';
@@ -33,11 +33,10 @@ function createExpressApp(context: ExpressAppContext) : ExpressAppInterface {
         expressApp.use(useRateLimiter);
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     expressApp.use(setupHTTPMiddleware({
         redis: context.config.redis,
-        http: useClient().driver,
+        oauth2: env.apiUrl, // todo: check if all realms supported
+        logger: useLogger(),
     }));
 
     // Loading routes

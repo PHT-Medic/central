@@ -31,7 +31,7 @@ export const ProposalItem = Vue.extend({
     },
     computed: {
         canDrop() {
-            return this.$auth.hasPermission(PermissionID.PROPOSAL_DROP);
+            return this.$auth.has(PermissionID.PROPOSAL_DROP);
         },
         userName() {
             return this.entity.user ?

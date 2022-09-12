@@ -10,12 +10,12 @@ import { ForbiddenError } from '@typescript-error/http';
 import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { runRegistryProjectValidation } from './utils';
+import { runRegistryProjectValidation } from '../utils/validation';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
 export async function createRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (!req.ability.hasPermission(PermissionID.REGISTRY_PROJECT_MANAGE)) {
+    if (!req.ability.has(PermissionID.REGISTRY_PROJECT_MANAGE)) {
         throw new ForbiddenError();
     }
 
@@ -24,7 +24,7 @@ export async function createRegistryProjectRouteHandler(req: ExpressRequest, res
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryProjectEntity);
     const entity = repository.create({
-        ecosystem: result.meta.registry.ecosystem,
+        ecosystem: result.relation.registry.ecosystem,
         ...result.data,
     });
 

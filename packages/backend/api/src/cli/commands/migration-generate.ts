@@ -7,7 +7,7 @@
 
 import { CommandModule } from 'yargs';
 import { DataSource } from 'typeorm';
-import { migrationGenerateCommand } from '@authelion/api-core';
+import { migrationGenerateCommand } from '@authelion/server-core';
 import path from 'path';
 import { createConfig } from '../../config/module';
 import env from '../../env';

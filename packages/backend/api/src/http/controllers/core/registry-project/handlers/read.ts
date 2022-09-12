@@ -6,7 +6,7 @@
  */
 
 import { SelectQueryBuilder } from 'typeorm';
-import { onlyRealmPermittedQueryResources } from '@authelion/api-core';
+import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';
@@ -45,7 +45,7 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
 
     if (protectedSelected.length > 0) {
         if (
-            !req.ability.hasPermission(PermissionID.REGISTRY_PROJECT_MANAGE)
+            !req.ability.has(PermissionID.REGISTRY_PROJECT_MANAGE)
         ) {
             throw new ForbiddenError(
                 `You are not permitted to read the restricted fields: ${
