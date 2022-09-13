@@ -36,7 +36,7 @@
         "express-rate-limit": "^6.5.1",
         "hapic": "^0.0.2",
         "rapiq": "^0.0.4",
-        "redis-extension": "^1.0.0",
+        "redis-extension": "^1.0.3",
         "tar-stream": "^2.1.4",
         "uuid": "^9.0.0",
         "winston": "^3.8.1",

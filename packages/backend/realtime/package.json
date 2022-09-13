@@ -24,7 +24,7 @@
         "express-rate-limit": "^6.5.1",
         "hapic": "^0.0.2",
         "node-cron": "^3.0.1",
-        "redis-extension": "^1.0.2",
+        "redis-extension": "^1.0.3",
         "reflect-metadata": "^0.1.13",
         "socket.io": "^4.5.2",
         "winston": "^3.8.1"
