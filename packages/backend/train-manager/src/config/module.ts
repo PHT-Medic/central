@@ -74,11 +74,17 @@ function createConfig({ env } : ConfigContext) : Config {
         createRefreshRobotTokenOnResponseErrorHandler({
             async load() {
                 useLogger()
-                    .debug('Attempt to refresh api authentication & authorization');
+                    .debug('Attempt to refresh api credentials...');
 
                 return useClient<VaultClient>(HTTPClientKey.VAULT).keyValue
                     .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM)
-                    .then((response) => response.data as Robot);
+                    .then((response) => response.data as Robot)
+                    .catch((e) => {
+                        useLogger()
+                            .debug('Attempt to refresh api credentials failed.');
+
+                        return Promise.reject(e);
+                    });
             },
             httpClient: useClient(),
         }),

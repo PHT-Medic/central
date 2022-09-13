@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig as setHTTPConfig, useClient as useHTTPClient } from 'hapic';
+import { setConfig as setHTTPConfig, useClient, useClient as useHTTPClient } from 'hapic';
 import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import {
     HTTPClientKey,
@@ -16,7 +16,6 @@ import {
 } from '@personalhealthtrain/central-common';
 import { Client as VaultClient } from '@hapic/vault';
 import { Robot } from '@authelion/common';
-import { BadRequestError } from '@typescript-error/http';
 import { useLogger } from './log';
 import { Config, ConfigContext } from './type';
 
@@ -54,16 +53,16 @@ export function createConfig({ env } : ConfigContext) : Config {
         createRefreshRobotTokenOnResponseErrorHandler({
             async load() {
                 useLogger()
-                    .debug('Attempt to refresh api authentication & authorization');
+                    .debug('Attempt to refresh api credentials...');
 
-                return useHTTPClient<VaultClient>(HTTPClientKey.VAULT).keyValue
+                return useClient<VaultClient>(HTTPClientKey.VAULT).keyValue
                     .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM)
-                    .then((response) => {
-                        if (!response) {
-                            throw new BadRequestError('No api credentials available...');
-                        }
+                    .then((response) => response.data as Robot)
+                    .catch((e) => {
+                        useLogger()
+                            .debug('Attempt to refresh api credentials failed.');
 
-                        return response.data as Robot;
+                        return Promise.reject(e);
                     });
             },
             httpClient: useHTTPClient(),
