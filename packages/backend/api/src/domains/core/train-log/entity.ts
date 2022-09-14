@@ -35,6 +35,9 @@ export class TrainLogEntity implements TrainLog {
     @Column({ type: 'varchar', length: 64, nullable: true })
         command: string | null;
 
+    @Column({ type: 'varchar', length: 64, nullable: true })
+        event: string | null;
+
     @Index()
     @Column({ type: 'varchar', length: 64, nullable: true })
         step: string | null;

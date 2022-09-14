@@ -19,6 +19,7 @@ export async function saveTrainLog(context: TrainLogSaveContext) {
 
         component: context.component,
         command: context.command,
+        event: context.event,
         step: context.step,
 
         error: context.error,

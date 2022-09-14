@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { registerTrainLogSocketHandlers } from '../../domains/train-log/handlers';
 import { registerTrainSocketHandlers } from '../../domains/train/handlers';
 import { registerUserHandlers } from '../../domains/user/handlers';
 import { SocketNamespaceInterface, SocketServerInterface } from './type';
@@ -38,6 +39,7 @@ export function registerSocketHandlers(io: SocketServerInterface) {
 
         registerTrainSocketHandlers(io, socket);
         registerTrainFileSocketHandlers(io, socket);
+        registerTrainLogSocketHandlers(io, socket);
         registerTrainStationSocketHandlers(io, socket);
     });
 }
@@ -57,6 +59,7 @@ export function registerSocketNamespaceHandlers(io: SocketNamespaceInterface) {
 
         registerTrainSocketHandlers(io, socket);
         registerTrainFileSocketHandlers(io, socket);
+        registerTrainLogSocketHandlers(io, socket);
         registerTrainStationForRealmSocketHandlers(io, socket);
     });
 }

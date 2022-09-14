@@ -6,7 +6,8 @@
  */
 
 import {
-    TrainManagerComponent,
+    TrainBuildStatus,
+    TrainManagerComponent, TrainManagerErrorEventQueuePayload,
     TrainManagerExtractorCommand,
     TrainManagerExtractorEvent,
     TrainManagerExtractorExtractQueuePayload,
@@ -15,7 +16,7 @@ import {
 import { useDataSource } from 'typeorm-extension';
 import { Message } from 'amqp-extension';
 import { TrainEntity } from '../../domains/core/train/entity';
-import { saveTrainLog } from '../../domains/core/train-log';
+import { TrainLogSaveContext, saveTrainLog } from '../../domains/core/train-log';
 
 export async function handleTrainManagerExtractorEvent(
     command: TrainManagerExtractorCommand,
@@ -32,6 +33,17 @@ export async function handleTrainManagerExtractorEvent(
         return;
     }
 
+    // -------------------------------------------------------------------------------
+
+    let trainLogContext : TrainLogSaveContext = {
+        train: entity,
+        component: TrainManagerComponent.EXTRACTOR,
+        command,
+        event,
+    };
+
+    // -------------------------------------------------------------------------------
+
     let status : TrainResultStatus;
 
     switch (event) {
@@ -47,9 +59,20 @@ export async function handleTrainManagerExtractorEvent(
         case TrainManagerExtractorEvent.EXTRACTED:
             status = TrainResultStatus.FINISHED;
             break;
-        case TrainManagerExtractorEvent.FAILED:
+        case TrainManagerExtractorEvent.FAILED: {
             status = TrainResultStatus.FAILED;
+
+            const payload = data as TrainManagerErrorEventQueuePayload;
+            trainLogContext = {
+                ...trainLogContext,
+                status: TrainBuildStatus.FAILED,
+
+                error: true,
+                errorCode: `${payload.error.code}`,
+                step: payload.error.step,
+            };
             break;
+        }
     }
 
     entity.result_status = status;
@@ -57,7 +80,7 @@ export async function handleTrainManagerExtractorEvent(
     await trainRepository.save(entity);
 
     await saveTrainLog({
-        train: entity,
-        component: TrainManagerComponent.EXTRACTOR,
+        ...trainLogContext,
+        status,
     });
 }

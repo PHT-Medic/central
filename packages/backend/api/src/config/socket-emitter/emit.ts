@@ -12,6 +12,14 @@ import { SocketServerToClientEventContext } from './type';
 export function emitSocketServerToClientEvent<
     EventName extends SocketServerToClientEventName,
 >(context: SocketServerToClientEventContext<EventName>) {
+    const keys = Object.keys(context.item);
+    for (let i = 0; i < keys.length; i++) {
+        const value = context.item[keys[i]];
+        if (value instanceof Date) {
+            context.item[keys[i]] = value.toISOString();
+        }
+    }
+
     for (let i = 0; i < context.configuration.length; i++) {
         let emitter = useSocketEmitter();
         if (context.configuration[i].namespace) {

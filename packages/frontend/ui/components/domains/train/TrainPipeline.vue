@@ -4,7 +4,7 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
 import {
     PermissionID,
     TrainBuildStatus, TrainCommand,
@@ -12,13 +12,13 @@ import {
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import { TrainResultCommand } from './command/TrainResultCommand';
-import TrainBuildStatusText from './status/TrainBuildStatusText';
+import TrainBuildStatusText from './status/TrainBuildStatusText.vue';
 import { TrainBuildCommand } from './command/TrainBuildCommand';
-import TrainRunStatusText from './status/TrainRunStatusText';
+import TrainRunStatusText from './status/TrainRunStatusText.vue';
 import { TrainRunCommand } from './command/TrainRunCommand';
-import TrainResultStatusText from '../train-result/status/TrainResultStatusText';
+import TrainResultStatusText from '../train-result/status/TrainResultStatusText.vue';
 
-import TrainConfigurationStatusText from './status/TrainConfigurationStatusText';
+import TrainConfigurationStatusText from './status/TrainConfigurationStatusText.vue';
 
 export default {
     components: {
@@ -140,7 +140,7 @@ export default {
                 <b-dropdown
                     variant="dark"
                     size="xs"
-                    html="<i class='fa fa-bars' />"
+                    html="<i class='fa fa-bars'></i>"
                 >
                     <train-build-command
                         :command="trainCommand.BUILD_STATUS"
@@ -193,7 +193,7 @@ export default {
                     text="Dropdown Button"
                     variant="dark"
                     size="xs"
-                    html="<i class='fa fa-bars' />"
+                    html="<i class='fa fa-bars'></i>"
                 >
                     <train-run-command
                         :command="trainCommand.RUN_STATUS"
@@ -251,7 +251,7 @@ export default {
                 <b-dropdown
                     variant="dark"
                     size="xs"
-                    html="<i class='fa fa-bars' />"
+                    html="<i class='fa fa-bars'></i>"
                 >
                     <train-result-command
                         :command="trainCommand.RESULT_STATUS"

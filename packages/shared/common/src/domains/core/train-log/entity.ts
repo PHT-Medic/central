@@ -24,6 +24,11 @@ export interface TrainLog {
     command: string | null;
 
     /**
+     * e.g checking, checked
+     */
+    event: string | null;
+
+    /**
      * e.g: init, ...
      */
     step: string | null;

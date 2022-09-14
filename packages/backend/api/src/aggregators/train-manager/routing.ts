@@ -10,6 +10,7 @@ import {
     RegistryProjectType,
     TrainContainerPath,
     TrainManagerComponent,
+    TrainManagerErrorEventQueuePayload,
     TrainManagerExtractorCommand,
     TrainManagerRouterCommand,
     TrainManagerRouterEvent,
@@ -24,7 +25,7 @@ import { RegistryProjectEntity } from '../../domains/core/registry-project/entit
 import { StationEntity } from '../../domains/core/station/entity';
 import { TrainStationEntity } from '../../domains/core/train-station/entity';
 import { buildTrainManagerQueueMessage } from '../../domains/special/train-manager';
-import { saveTrainLog } from '../../domains/core/train-log';
+import { TrainLogSaveContext, saveTrainLog } from '../../domains/core/train-log';
 
 export async function handleTrainManagerRouterEvent(
     command: TrainManagerRouterCommand,
@@ -48,9 +49,19 @@ export async function handleTrainManagerRouterEvent(
 
     // -------------------------------------------------------------------------------
 
+    let trainLogContext : TrainLogSaveContext = {
+        train: entity,
+        component: TrainManagerComponent.ROUTER,
+        command,
+        event,
+    };
+
+    // -------------------------------------------------------------------------------
+
     switch (event) {
         case TrainManagerRouterEvent.STARTED: {
             entity.run_status = TrainRunStatus.STARTED;
+            trainLogContext.status = TrainRunStatus.STARTED;
 
             const trainStationRepository = dataSource.getRepository(TrainStationEntity);
             const trainStations = await trainStationRepository.findBy({
@@ -64,11 +75,6 @@ export async function handleTrainManagerRouterEvent(
             }
 
             await repository.save(entity);
-
-            await saveTrainLog({
-                train: entity,
-                component: TrainManagerComponent.ROUTER,
-            });
             break;
         }
         case TrainManagerRouterEvent.POSITION_FOUND:
@@ -85,25 +91,18 @@ export async function handleTrainManagerRouterEvent(
             switch (registryProject.type) {
                 case RegistryProjectType.INCOMING: {
                     entity.run_status = TrainRunStatus.RUNNING;
+                    trainLogContext.status = TrainRunStatus.RUNNING;
 
                     await repository.save(entity);
-
-                    await saveTrainLog({
-                        train: entity,
-                        component: TrainManagerComponent.ROUTER,
-                    });
                     break;
                 }
                 case RegistryProjectType.OUTGOING: {
                     entity.run_status = TrainRunStatus.FINISHED;
+                    trainLogContext.status = TrainRunStatus.FINISHED;
+
                     entity.outgoing_registry_project_id = registryProject.id;
 
                     await repository.save(entity);
-
-                    await saveTrainLog({
-                        train: entity,
-                        component: TrainManagerComponent.ROUTER,
-                    });
 
                     if (event === TrainManagerRouterEvent.ROUTED) {
                         await publishMessage(buildTrainManagerQueueMessage(
@@ -123,6 +122,7 @@ export async function handleTrainManagerRouterEvent(
                 }
                 case RegistryProjectType.STATION: {
                     entity.run_status = TrainRunStatus.RUNNING;
+                    trainLogContext.status = TrainRunStatus.RUNNING;
 
                     const stationRepository = dataSource.getRepository(StationEntity);
                     const station = await stationRepository.findOneBy({
@@ -156,11 +156,6 @@ export async function handleTrainManagerRouterEvent(
                     }
 
                     await repository.save(entity);
-
-                    await saveTrainLog({
-                        train: entity,
-                        component: TrainManagerComponent.ROUTER,
-                    });
                     break;
                 }
             }
@@ -176,10 +171,15 @@ export async function handleTrainManagerRouterEvent(
 
             await repository.save(entity);
 
-            await saveTrainLog({
-                train: entity,
-                component: TrainManagerComponent.ROUTER,
-            });
+            const payload = data as TrainManagerErrorEventQueuePayload;
+            trainLogContext = {
+                ...trainLogContext,
+                status: TrainRunStatus.FAILED,
+
+                error: true,
+                errorCode: `${payload.error.code}`,
+                step: payload.error.step,
+            };
             break;
         }
         case TrainManagerRouterEvent.POSITION_NOT_FOUND: {
@@ -190,12 +190,9 @@ export async function handleTrainManagerRouterEvent(
             entity.result_status = null;
 
             await repository.save(entity);
-
-            await saveTrainLog({
-                train: entity,
-                component: TrainManagerComponent.ROUTER,
-            });
             break;
         }
     }
+
+    await saveTrainLog(trainLogContext);
 }

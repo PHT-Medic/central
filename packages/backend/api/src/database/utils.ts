@@ -11,6 +11,7 @@ import { extendDataSourceOptions } from '@authelion/server-core';
 import { MasterImageEntity } from '../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../domains/core/master-image-group/entity';
 import { ProposalEntity } from '../domains/core/proposal/entity';
+import { TrainLogEntity } from '../domains/core/train-log';
 import { TrainEntity } from '../domains/core/train/entity';
 import { StationEntity } from '../domains/core/station/entity';
 import { ProposalStationEntity } from '../domains/core/proposal-station/entity';
@@ -26,6 +27,7 @@ import { RobotSubscriber } from './subscribers/robot';
 import { StationSubscriber } from './subscribers/station';
 import { TrainSubscriber } from './subscribers/train';
 import { TrainFileSubscriber } from './subscribers/train-file';
+import { TrainLogSubscriber } from './subscribers/train-log';
 import { TrainStationSubscriber } from './subscribers/train-station';
 
 export async function buildDataSourceOptions() {
@@ -59,6 +61,7 @@ export async function buildDataSourceOptions() {
             RegistryProjectEntity,
             StationEntity,
             TrainEntity,
+            TrainLogEntity,
             TrainFileEntity,
             TrainStationEntity,
             UserSecretEntity,
@@ -83,6 +86,7 @@ export async function buildDataSourceOptions() {
             StationSubscriber,
             TrainSubscriber,
             TrainFileSubscriber,
+            TrainLogSubscriber,
             TrainStationSubscriber,
         ],
     };

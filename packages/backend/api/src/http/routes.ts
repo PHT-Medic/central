@@ -7,6 +7,7 @@
 
 import { Application } from 'express';
 import { attachControllers } from '@decorators/express';
+import { TrainLogController } from './controllers/core/train-log';
 import { UserSecretController } from './controllers/core/user-secret';
 import { MasterImageController } from './controllers/core/master-image';
 import { ProposalController } from './controllers/core/proposal';
@@ -32,6 +33,7 @@ export function registerControllers(router: Application) {
         StationController,
         TrainController,
         TrainFileController,
+        TrainLogController,
         TrainStationController,
         UserSecretController,
 

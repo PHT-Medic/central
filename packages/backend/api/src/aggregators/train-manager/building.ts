@@ -7,17 +7,16 @@
 
 import {
     TrainBuildStatus,
-    TrainManagerBuilderBuildPayload,
     TrainManagerBuilderCommand,
     TrainManagerBuilderEvent,
     TrainManagerComponent,
     TrainManagerErrorEventQueuePayload,
     TrainManagerExtractorExtractQueuePayload,
 } from '@personalhealthtrain/central-common';
-import { useDataSource } from 'typeorm-extension';
 import { Message } from 'amqp-extension';
-import { TrainEntity } from '../../domains/core/train/entity';
+import { useDataSource } from 'typeorm-extension';
 import { TrainLogSaveContext, saveTrainLog } from '../../domains/core/train-log';
+import { TrainEntity } from '../../domains/core/train/entity';
 
 export async function handleTrainManagerBuilderEvent(
     command: TrainManagerBuilderCommand,
@@ -37,6 +36,8 @@ export async function handleTrainManagerBuilderEvent(
     let trainLogContext : TrainLogSaveContext = {
         train: entity,
         component: TrainManagerComponent.BUILDER,
+        command,
+        event,
     };
 
     switch (event) {
@@ -51,9 +52,11 @@ export async function handleTrainManagerBuilderEvent(
         case TrainManagerBuilderEvent.FAILED: {
             entity.build_status = TrainBuildStatus.FAILED;
 
-            const payload = data as TrainManagerErrorEventQueuePayload<TrainManagerBuilderBuildPayload>;
+            const payload = data as TrainManagerErrorEventQueuePayload;
             trainLogContext = {
                 ...trainLogContext,
+                status: TrainBuildStatus.FAILED,
+
                 error: true,
                 errorCode: `${payload.error.code}`,
                 step: payload.error.step,
@@ -81,7 +84,5 @@ export async function handleTrainManagerBuilderEvent(
 
     await repository.save(entity);
 
-    if (trainLogContext.status) {
-        await saveTrainLog(trainLogContext);
-    }
+    await saveTrainLog(trainLogContext);
 }

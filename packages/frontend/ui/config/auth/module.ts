@@ -260,11 +260,6 @@ export class AuthModule {
     // --------------------------------------------------------------------
 
     public setRequestToken(token: string) {
-        this.client.setAuthorizationHeader({
-            type: 'Bearer',
-            token,
-        });
-
         this.ctx.$api.setAuthorizationHeader({
             type: 'Bearer',
             token,

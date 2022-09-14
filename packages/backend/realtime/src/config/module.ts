@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig as setHTTPConfig, useClient, useClient as useHTTPClient } from 'hapic';
+import { setConfig as setHTTPConfig, useClient as useHTTPClient } from 'hapic';
 import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import {
     HTTPClientKey,
@@ -37,10 +37,6 @@ export function createConfig({ env } : ConfigContext) : Config {
     }, HTTPClientKey.VAULT);
 
     setHTTPConfig({
-        retry: {
-            retryCondition: (err) => shouldRefreshRobotTokenResponseError(err),
-            retryDelay: (retryCount) => 5000 * retryCount,
-        },
         driver: {
             baseURL: env.apiUrl,
             proxy: false,
@@ -55,7 +51,7 @@ export function createConfig({ env } : ConfigContext) : Config {
                 useLogger()
                     .debug('Attempt to refresh api credentials...');
 
-                return useClient<VaultClient>(HTTPClientKey.VAULT).keyValue
+                return useHTTPClient<VaultClient>(HTTPClientKey.VAULT).keyValue
                     .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM)
                     .then((response) => response.data as Robot)
                     .catch((e) => {

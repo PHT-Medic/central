@@ -58,10 +58,6 @@ function createConfig({ env } : ConfigContext) : Config {
 
     setHTTPConfig({
         clazz: HTTPClient,
-        retry: {
-            retryCondition: (err) => shouldRefreshRobotTokenResponseError(err),
-            retryDelay: (retryCount) => 5000 * retryCount,
-        },
         driver: {
             proxy: false,
             baseURL: env.apiUrl,

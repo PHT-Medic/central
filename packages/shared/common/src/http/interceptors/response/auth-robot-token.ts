@@ -28,6 +28,13 @@ export function shouldRefreshRobotTokenResponseError(err: unknown) : boolean {
     );
 }
 
+function getCurrentState(config) : { retryCount: number } {
+    const currentState = config.retry || {};
+    currentState.retryCount = currentState.retryCount || 0;
+    config.retry = currentState;
+    return currentState;
+}
+
 export function createRefreshRobotTokenOnResponseErrorHandler(context: {
     httpClient?: HTTPClient,
     load: () => Promise<Pick<Robot, 'id' | 'secret'>>
@@ -35,7 +42,14 @@ export function createRefreshRobotTokenOnResponseErrorHandler(context: {
     return (err?: any) => {
         const { config } = err;
 
+        const currentState = getCurrentState(config);
+        if (currentState.retryCount > 0) {
+            return Promise.reject(err);
+        }
+
         if (shouldRefreshRobotTokenResponseError(err)) {
+            currentState.retryCount += 1;
+
             return context.load()
                 .then((response) => {
                     const tokenApi = new Client();

@@ -4,21 +4,24 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
 import {
+    Train,
     TrainBuildStatus,
     TrainRunStatus,
     TrainStationRunStatus,
     TrainStationStatic,
 } from '@personalhealthtrain/central-common';
+import Vue, { PropType } from 'vue';
 import TrainStationRunStatusText from './TrainStationRunStatus';
 import TrainStationStaticRunStatusText from './TrainStationStaticRunStatus';
 import { TrainStationList } from './TrainStationList';
 
-export default {
+export default Vue.extend({
+    name: 'TrainStationsProgress',
     components: { TrainStationList, TrainStationStaticRunStatusText, TrainStationRunStatusText },
     props: {
-        entity: Object,
+        entity: Object as PropType<Train>,
         withHeader: {
             type: Boolean,
             default: false,
@@ -68,7 +71,7 @@ export default {
             return 100 * (position / total);
         },
     },
-};
+});
 </script>
 <template>
     <div>

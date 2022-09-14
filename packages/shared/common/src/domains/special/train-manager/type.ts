@@ -65,7 +65,7 @@ export type TrainManagerCommandQueuePayload<
 
 // ----------------------------------------------------------
 
-export type TrainManagerErrorEventQueuePayload<T extends Record<string, any>> = {
+export type TrainManagerErrorEventQueuePayload<T extends Record<string, any> = Record<string, any>> = {
     error?: {
         message?: string,
         code?: string | number,

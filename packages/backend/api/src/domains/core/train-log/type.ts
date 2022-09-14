@@ -19,6 +19,7 @@ export type TrainLogSaveContext = {
 
     component?: `${TrainManagerComponent}`,
     command?: string,
+    event?: string,
     step?: string,
 
     status?: string,

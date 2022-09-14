@@ -133,7 +133,7 @@ export default Vue.extend({
             'div',
             { staticClass: 'command-box' },
             [
-                h('strong', { staticClass: 'pr-1, shell-sign' }, [
+                h('strong', { staticClass: 'pr-1 shell-sign' }, [
                     '$',
                 ]),
                 vm.commandStr,

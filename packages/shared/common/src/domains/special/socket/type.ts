@@ -6,19 +6,28 @@
  */
 
 import {
-    Proposal, ProposalSocketClientToServerEventName,
+    Proposal,
+    ProposalSocketClientToServerEventName,
     ProposalSocketServerToClientEventName,
-    ProposalStation, ProposalStationSocketClientToServerEventName,
+    ProposalStation,
+    ProposalStationSocketClientToServerEventName,
     ProposalStationSocketServerToClientEventName,
-    RegistryProject, RegistryProjectSocketClientToServerEventName,
+    RegistryProject,
+    RegistryProjectSocketClientToServerEventName,
     RegistryProjectSocketServerToClientEventName,
-    Station, StationSocketClientToServerEventName,
+    Station,
+    StationSocketClientToServerEventName,
     StationSocketServerToClientEventName,
     Train,
-    TrainFile, TrainFileSocketClientToServerEventName,
-    TrainFileSocketServerToClientEventName, TrainSocketClientToServerEventName,
+    TrainFile,
+    TrainFileSocketClientToServerEventName,
+    TrainFileSocketServerToClientEventName,
+    TrainLog, TrainLogSocketClientToServerEventName,
+    TrainLogSocketServerToClientEventName,
+    TrainSocketClientToServerEventName,
     TrainSocketServerToClientEventName,
-    TrainStation, TrainStationSocketClientToServerEventName,
+    TrainStation,
+    TrainStationSocketClientToServerEventName,
     TrainStationSocketServerToClientEventName,
 } from '../../core';
 
@@ -35,6 +44,7 @@ export type SocketServerToClientEventName = `${ProposalSocketServerToClientEvent
     `${RegistryProjectSocketServerToClientEventName}` |
     `${StationSocketServerToClientEventName}` |
     `${TrainSocketServerToClientEventName}` |
+    `${TrainLogSocketServerToClientEventName}` |
     `${TrainFileSocketServerToClientEventName}` |
     `${TrainStationSocketServerToClientEventName}`;
 
@@ -48,10 +58,12 @@ export type SocketServerToClientItem<O extends SocketServerToClientEventName> = 
                 Station :
                 O extends `${TrainSocketServerToClientEventName}` ?
                     Train :
-                    O extends `${TrainFileSocketServerToClientEventName}` ?
-                        TrainFile :
-                        O extends `${TrainStationSocketServerToClientEventName}` ?
-                            TrainStation : never;
+                    O extends `${TrainLogSocketServerToClientEventName}` ?
+                        TrainLog :
+                        O extends `${TrainFileSocketServerToClientEventName}` ?
+                            TrainFile :
+                            O extends `${TrainStationSocketServerToClientEventName}` ?
+                                TrainStation : never;
 
 export type SocketServerToClientEvents = {
     [K in SocketServerToClientEventName]: (data: SocketServerToClientEventContext<SocketServerToClientItem<K>>) => void
@@ -69,6 +81,7 @@ export type SocketClientToServerEventName = `${ProposalSocketClientToServerEvent
     `${RegistryProjectSocketClientToServerEventName}` |
     `${StationSocketClientToServerEventName}` |
     `${TrainSocketClientToServerEventName}` |
+    `${TrainLogSocketClientToServerEventName}` |
     `${TrainFileSocketClientToServerEventName}` |
     `${TrainStationSocketClientToServerEventName}`;
 
@@ -82,10 +95,12 @@ export type SocketClientToServerItem<O extends SocketClientToServerEventName> = 
                 Station :
                 O extends `${TrainSocketClientToServerEventName}` ?
                     Train :
-                    O extends `${TrainFileSocketClientToServerEventName}` ?
-                        TrainFile :
-                        O extends `${TrainStationSocketClientToServerEventName}` ?
-                            TrainStation : never;
+                    O extends `${TrainLogSocketClientToServerEventName}` ?
+                        TrainLog :
+                        O extends `${TrainFileSocketClientToServerEventName}` ?
+                            TrainFile :
+                            O extends `${TrainStationSocketClientToServerEventName}` ?
+                                TrainStation : never;
 
 export type SocketClientToServerEvents = {
     [K in `${SocketClientToServerEventName}`]: (

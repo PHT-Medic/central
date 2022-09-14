@@ -5,13 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import Vue, { PropType } from 'vue';
+import { PropType } from 'vue';
 import { Train } from '@personalhealthtrain/central-common';
+import TrainLogs from '../../../components/domains/train/TrainLogs';
 import TrainPipeline from '../../../components/domains/train/TrainPipeline.vue';
 import TrainStationsProgress from '../../../components/domains/train-station/TrainStationsProgress.vue';
 
-export default Vue.extend({
-    components: { TrainStationsProgress, TrainPipeline },
+export default {
+    components: { TrainLogs, TrainPipeline, TrainStationsProgress },
     props: {
         entity: Object as PropType<Train>,
     },
@@ -23,7 +24,7 @@ export default Vue.extend({
             this.$emit('failed', e);
         },
     },
-});
+};
 </script>
 
 <template>
@@ -53,9 +54,7 @@ export default Vue.extend({
                 <div class="panel-box">
                     <h6><i class="fa fa-history" /> Logs</h6>
 
-                    <div class="alert alert-info alert-sm mb-0">
-                        Coming soon...
-                    </div>
+                    <train-logs :entity="entity" />
                 </div>
             </div>
         </div>
