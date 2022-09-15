@@ -17,15 +17,13 @@ export default Vue.extend({
     },
     async asyncData(context) {
         try {
-            const childEntity = await context.$authApi.oauth2Provider.getOne(context.params.provider_id, {
-                fields: ['+client_secret'],
-            });
+            const childEntity = await context.$authApi.identityProvider.getOne(context.params.provider_id);
 
             return {
                 childEntity,
             };
         } catch (e) {
-            await context.redirect('/settings/realm/providers');
+            await context.redirect(`/admin/realms/${context.params.id}/providers`);
 
             return {
 

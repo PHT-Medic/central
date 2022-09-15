@@ -22,6 +22,12 @@ export default {
 
             await this.$nuxt.$router.push(`/admin/realms/${this.entity.id}/providers/${e.id}`);
         },
+        async handleFailed(e) {
+            this.$bvToast.toast(e.message, {
+                toaster: 'b-toaster-top-center',
+                variant: 'warning',
+            });
+        },
     },
 };
 </script>
@@ -29,5 +35,6 @@ export default {
     <o-auth2-provider-form
         :realm-id="entity.id"
         @created="handleCreated"
+        @failed="handleFailed"
     />
 </template>

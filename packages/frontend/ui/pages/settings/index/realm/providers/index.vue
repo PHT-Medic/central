@@ -32,9 +32,6 @@ export default {
                     key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
-                    key: 'openId', label: 'OpenID?', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
                     key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
@@ -82,7 +79,7 @@ export default {
 </script>
 <template>
     <div>
-        <o-auth2-provider-list
+        <identity-provider-list
             ref="itemsList"
             :query="query"
         >
@@ -116,15 +113,6 @@ export default {
                     <template #cell(updated_at)="data">
                         <timeago :datetime="data.item.updated_at" />
                     </template>
-                    <template #cell(openId)="data">
-                        <i
-                            class="fa"
-                            :class="{
-                                'fa-check text-success': data.item.open_id,
-                                'fa-times text-danger': !data.item.open_id
-                            }"
-                        />
-                    </template>
                     <template #table-busy>
                         <div class="text-center text-danger my-2">
                             <b-spinner class="align-middle" />
@@ -133,6 +121,6 @@ export default {
                     </template>
                 </b-table>
             </template>
-        </o-auth2-provider-list>
+        </identity-provider-list>
     </div>
 </template>

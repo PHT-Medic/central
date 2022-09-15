@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Default1662987162640 implements MigrationInterface {
-    name = 'Default1662987162640';
+export class Default1663236771552 implements MigrationInterface {
+    name = 'Default1663236771552';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -135,7 +135,7 @@ export class Default1662987162640 implements MigrationInterface {
             CREATE TABLE \`auth_user_attributes\` (
                 \`id\` varchar(36) NOT NULL,
                 \`name\` varchar(255) NOT NULL,
-                \`value\` text NOT NULL,
+                \`value\` text NULL,
                 \`realm_id\` varchar(255) NOT NULL,
                 \`user_id\` varchar(255) NOT NULL,
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
@@ -226,7 +226,7 @@ export class Default1662987162640 implements MigrationInterface {
         await queryRunner.query(`
             CREATE TABLE \`auth_identity_providers\` (
                 \`id\` varchar(36) NOT NULL,
-                \`sub\` varchar(36) NOT NULL,
+                \`slug\` varchar(36) NOT NULL,
                 \`name\` varchar(128) NOT NULL,
                 \`protocol\` varchar(64) NOT NULL,
                 \`protocol_config\` varchar(64) NULL,
@@ -234,7 +234,7 @@ export class Default1662987162640 implements MigrationInterface {
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                 \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
                 \`realm_id\` varchar(255) NOT NULL,
-                UNIQUE INDEX \`IDX_ef51081221725c5c073a6045eb\` (\`sub\`, \`realm_id\`),
+                UNIQUE INDEX \`IDX_3752f24587d0405c13f5a790da\` (\`slug\`, \`realm_id\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
         `);
@@ -242,7 +242,7 @@ export class Default1662987162640 implements MigrationInterface {
             CREATE TABLE \`auth_identity_provider_attributes\` (
                 \`id\` varchar(36) NOT NULL,
                 \`name\` varchar(255) NOT NULL,
-                \`value\` text NOT NULL,
+                \`value\` text NULL,
                 \`provider_id\` varchar(255) NOT NULL,
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                 \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
@@ -300,7 +300,7 @@ export class Default1662987162640 implements MigrationInterface {
             CREATE TABLE \`auth_role_attributes\` (
                 \`id\` varchar(36) NOT NULL,
                 \`name\` varchar(255) NOT NULL,
-                \`value\` text NOT NULL,
+                \`value\` text NULL,
                 \`realm_id\` varchar(255) NULL,
                 \`role_id\` varchar(255) NOT NULL,
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
@@ -445,6 +445,29 @@ export class Default1662987162640 implements MigrationInterface {
             ) ENGINE = InnoDB
         `);
         await queryRunner.query(`
+            CREATE TABLE \`train_logs\` (
+                \`id\` varchar(36) NOT NULL,
+                \`component\` varchar(64) NULL,
+                \`command\` varchar(64) NULL,
+                \`event\` varchar(64) NULL,
+                \`step\` varchar(64) NULL,
+                \`error\` tinyint NOT NULL DEFAULT 0,
+                \`error_code\` varchar(64) NULL,
+                \`status\` varchar(64) NULL,
+                \`status_message\` text NULL,
+                \`meta\` text NULL,
+                \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+                \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                \`train_id\` varchar(255) NOT NULL,
+                \`realm_id\` varchar(255) NOT NULL,
+                INDEX \`IDX_10263b5b69c6cf8fd525f32e1a\` (\`component\`),
+                INDEX \`IDX_82f08533c80a89ad9d5fc13a5b\` (\`command\`),
+                INDEX \`IDX_5a9c144ceca9d04d7b95c1a9ff\` (\`step\`),
+                INDEX \`IDX_1f17a2029a3b579c51824b943b\` (\`status\`),
+                PRIMARY KEY (\`id\`)
+            ) ENGINE = InnoDB
+        `);
+        await queryRunner.query(`
             CREATE TABLE \`stations\` (
                 \`id\` varchar(36) NOT NULL,
                 \`external_name\` varchar(64) NULL,
@@ -455,9 +478,9 @@ export class Default1662987162640 implements MigrationInterface {
                 \`hidden\` tinyint NOT NULL DEFAULT 0,
                 \`registry_id\` varchar(255) NULL,
                 \`registry_project_id\` varchar(255) NULL,
+                \`realm_id\` varchar(255) NOT NULL,
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                 \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-                \`realm_id\` varchar(255) NOT NULL,
                 UNIQUE INDEX \`IDX_d800eab3efc6a62945ef4fb3a1\` (\`name\`, \`realm_id\`),
                 UNIQUE INDEX \`station_external_name_index\` (\`external_name\`),
                 PRIMARY KEY (\`id\`)
@@ -776,6 +799,14 @@ export class Default1662987162640 implements MigrationInterface {
             SET NULL ON UPDATE NO ACTION
         `);
         await queryRunner.query(`
+            ALTER TABLE \`train_logs\`
+            ADD CONSTRAINT \`FK_a5c233a9248190263cfacdf07fb\` FOREIGN KEY (\`train_id\`) REFERENCES \`train_entity\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
+        `);
+        await queryRunner.query(`
+            ALTER TABLE \`train_logs\`
+            ADD CONSTRAINT \`FK_531bffd9804d04e892959f7799e\` FOREIGN KEY (\`realm_id\`) REFERENCES \`auth_realms\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
+        `);
+        await queryRunner.query(`
             ALTER TABLE \`stations\`
             ADD CONSTRAINT \`FK_bda09060505122ca570ed96a882\` FOREIGN KEY (\`registry_id\`) REFERENCES \`registries\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
         `);
@@ -854,6 +885,12 @@ export class Default1662987162640 implements MigrationInterface {
         `);
         await queryRunner.query(`
             ALTER TABLE \`stations\` DROP FOREIGN KEY \`FK_bda09060505122ca570ed96a882\`
+        `);
+        await queryRunner.query(`
+            ALTER TABLE \`train_logs\` DROP FOREIGN KEY \`FK_531bffd9804d04e892959f7799e\`
+        `);
+        await queryRunner.query(`
+            ALTER TABLE \`train_logs\` DROP FOREIGN KEY \`FK_a5c233a9248190263cfacdf07fb\`
         `);
         await queryRunner.query(`
             ALTER TABLE \`train_entity\` DROP FOREIGN KEY \`FK_1a5dce25ddd3e35cf448c0ff701\`
@@ -1078,6 +1115,21 @@ export class Default1662987162640 implements MigrationInterface {
             DROP TABLE \`stations\`
         `);
         await queryRunner.query(`
+            DROP INDEX \`IDX_1f17a2029a3b579c51824b943b\` ON \`train_logs\`
+        `);
+        await queryRunner.query(`
+            DROP INDEX \`IDX_5a9c144ceca9d04d7b95c1a9ff\` ON \`train_logs\`
+        `);
+        await queryRunner.query(`
+            DROP INDEX \`IDX_82f08533c80a89ad9d5fc13a5b\` ON \`train_logs\`
+        `);
+        await queryRunner.query(`
+            DROP INDEX \`IDX_10263b5b69c6cf8fd525f32e1a\` ON \`train_logs\`
+        `);
+        await queryRunner.query(`
+            DROP TABLE \`train_logs\`
+        `);
+        await queryRunner.query(`
             DROP INDEX \`REL_c3404c5af13c46bf0ce572a49b\` ON \`train_entity\`
         `);
         await queryRunner.query(`
@@ -1165,7 +1217,7 @@ export class Default1662987162640 implements MigrationInterface {
             DROP TABLE \`auth_identity_provider_attributes\`
         `);
         await queryRunner.query(`
-            DROP INDEX \`IDX_ef51081221725c5c073a6045eb\` ON \`auth_identity_providers\`
+            DROP INDEX \`IDX_3752f24587d0405c13f5a790da\` ON \`auth_identity_providers\`
         `);
         await queryRunner.query(`
             DROP TABLE \`auth_identity_providers\`
