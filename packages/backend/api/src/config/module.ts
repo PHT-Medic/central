@@ -9,7 +9,7 @@ import { buildOAuth2Aggregator, setConfig as setAuthConfig, setLogger as setAuth
 import { setConfig as setHTTPConfig } from 'hapic';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import path from 'path';
-import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
+import { setConfig as setRedisConfig } from 'redis-extension';
 import { Client as VaultClient } from '@hapic/vault';
 import {
     HTTPClientKey,
@@ -96,7 +96,7 @@ export function createConfig({ env } : ConfigContext) : Config {
         writableDirectoryPath: path.join(__dirname, '..', '..', 'writable'),
         selfUrl: env.apiUrl,
         webUrl: env.webAppUrl,
-        redis: false,
+        redis: true,
         tokenMaxAgeAccessToken: env.jwtMaxAge,
         tokenMaxAgeRefreshToken: env.jwtMaxAge,
     });
