@@ -11,9 +11,8 @@ import {
     SocketServerToClientEvents,
     buildSocketRealmNamespaceName,
 } from '@personalhealthtrain/central-common';
-import { BaseError } from '@typescript-error/core';
 import { Manager, ManagerOptions, Socket } from 'socket.io-client';
-import { AuthBrowserStorageKey } from '../auth/constants';
+import { AuthBrowserStorageKey } from '../auth';
 
 type SocketModuleManagerConfiguration = {
     url: string,
@@ -84,7 +83,7 @@ export class SocketModule {
 
     public use(namespace = '/') : SocketInterface {
         if (typeof this.manager === 'undefined') {
-            throw new BaseError('Manager not initialized...');
+            throw new Error('Manager not initialized...');
         }
         if (this.sockets[namespace]) {
             return this.sockets[namespace];

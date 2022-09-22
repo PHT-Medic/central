@@ -7,7 +7,7 @@
 
 import { Ecosystem, TrainType } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
-import { BadRequestError, NotFoundError } from '@typescript-error/http';
+import { BadRequestError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { useDataSource } from 'typeorm-extension';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';

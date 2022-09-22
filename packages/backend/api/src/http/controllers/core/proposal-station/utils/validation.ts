@@ -7,7 +7,7 @@
 
 import { check, validationResult } from 'express-validator';
 import { ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
-import { NotFoundError } from '@typescript-error/http';
+import { NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';

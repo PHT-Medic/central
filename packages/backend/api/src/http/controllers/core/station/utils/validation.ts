@@ -9,7 +9,7 @@ import { Ecosystem } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
 import { RealmEntity } from '@authelion/server-core';
 import { isPermittedForResourceRealm } from '@authelion/common';
-import { ForbiddenError } from '@typescript-error/http';
+import { ForbiddenError } from '@ebec/http';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest } from '../../../../type';

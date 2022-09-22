@@ -6,7 +6,7 @@
  */
 
 import fs from 'fs';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import path from 'path';
 import { HTTPClient, PermissionID } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';

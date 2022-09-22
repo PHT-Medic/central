@@ -9,7 +9,7 @@ import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
     applyFilters, applyPagination, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';
-import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';

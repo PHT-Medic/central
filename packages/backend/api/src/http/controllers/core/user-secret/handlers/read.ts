@@ -9,7 +9,7 @@ import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
     applyFields, applyFilters, applyPagination, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';
-import { NotFoundError } from '@typescript-error/http';
+import { NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';

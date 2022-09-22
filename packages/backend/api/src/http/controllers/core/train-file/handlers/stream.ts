@@ -7,7 +7,7 @@
 
 import tar from 'tar-stream';
 import fs from 'fs';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';

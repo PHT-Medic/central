@@ -16,7 +16,7 @@ import {
     TrainManagerComponent,
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
-import { BadRequestError } from '@typescript-error/http';
+import { BadRequestError } from '@ebec/http';
 import { useDataSource } from 'typeorm-extension';
 import { findTrain } from './utils';
 import { TrainStationEntity } from '../../train-station/entity';

@@ -8,7 +8,7 @@
 import { Server as HTTPServer } from 'http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { ForbiddenError, UnauthorizedError } from '@typescript-error/http';
+import { ForbiddenError, UnauthorizedError } from '@ebec/http';
 import { MASTER_REALM_ID } from '@authelion/common';
 import { setupSocketMiddleware } from '@authelion/server-adapter';
 import { useLogger } from '../log';

@@ -6,7 +6,7 @@
  */
 
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { MoreThan } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { useDataSource } from 'typeorm-extension';

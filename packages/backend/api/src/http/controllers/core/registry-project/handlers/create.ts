@@ -6,7 +6,7 @@
  */
 
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { ForbiddenError } from '@typescript-error/http';
+import { ForbiddenError } from '@ebec/http';
 import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';

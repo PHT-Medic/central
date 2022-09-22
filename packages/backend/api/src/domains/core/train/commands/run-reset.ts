@@ -7,7 +7,7 @@
 
 import { Train, TrainRunStatus } from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
-import { BadRequestError } from '@typescript-error/http';
+import { BadRequestError } from '@ebec/http';
 import { useDataSource } from 'typeorm-extension';
 import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../special/train-router';
 import { findTrain } from './utils';

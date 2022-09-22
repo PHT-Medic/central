@@ -6,7 +6,7 @@
  */
 
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';

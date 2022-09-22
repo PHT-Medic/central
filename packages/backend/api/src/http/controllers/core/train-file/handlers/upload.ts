@@ -10,7 +10,7 @@ import BusBoy from 'busboy';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { useDataSource } from 'typeorm-extension';
 import { createFileStreamHandler } from '../../../../../modules/file-system/utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';

@@ -7,7 +7,7 @@
 
 import rateLimit from 'express-rate-limit';
 import { RequestHandler } from 'express';
-import { TooManyRequestsError } from '@typescript-error/http';
+import { TooManyRequestsError } from '@ebec/http';
 import { MASTER_REALM_ID } from '@authelion/common';
 import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 

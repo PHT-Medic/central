@@ -11,7 +11,7 @@ import {
 import {
     BadRequestError,
     ForbiddenError,
-} from '@typescript-error/http';
+} from '@ebec/http';
 import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';

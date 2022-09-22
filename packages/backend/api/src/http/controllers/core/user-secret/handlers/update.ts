@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { NotFoundError } from '@typescript-error/http';
+import { NotFoundError } from '@ebec/http';
 import { PermissionID, SecretType, isHex } from '@personalhealthtrain/central-common';
 import { Buffer } from 'buffer';
 import { publishMessage } from 'amqp-extension';

@@ -10,7 +10,7 @@ import {
     applyFields,
     applyFilters, applyPagination, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';
-import { NotFoundError } from '@typescript-error/http';
+import { NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';

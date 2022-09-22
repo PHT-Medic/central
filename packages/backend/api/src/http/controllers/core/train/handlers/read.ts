@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError, ForbiddenError, NotFoundError } from '@typescript-error/http';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
     applyFilters, applyPagination, applyRelations, useDataSource,

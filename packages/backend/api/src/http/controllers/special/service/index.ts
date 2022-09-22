@@ -11,7 +11,7 @@ import {
     Body, Controller, Post, Request, Response,
 } from '@decorators/express';
 
-import { NotFoundError } from '@typescript-error/http';
+import { NotFoundError } from '@ebec/http';
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';
 import { postHarborHookRouteHandler } from './handlers/registry/hook';
 

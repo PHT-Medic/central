@@ -6,7 +6,7 @@
  */
 
 import { MasterImageCommand } from '@personalhealthtrain/central-common';
-import { BadRequestError, NotFoundError } from '@typescript-error/http';
+import { BadRequestError, NotFoundError } from '@ebec/http';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { syncGitRepository } from './commands/sync-git-repository';
 import { syncPushedMasterImages } from './commands/sync-pushed';

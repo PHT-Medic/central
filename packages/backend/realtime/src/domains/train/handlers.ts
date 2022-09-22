@@ -11,7 +11,7 @@ import {
     buildSocketTrainRoomName,
     extendSocketClientToServerEventCallback, extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/central-common';
-import { UnauthorizedError } from '@typescript-error/http';
+import { UnauthorizedError } from '@ebec/http';
 import {
     SocketInterface,
     SocketNamespaceInterface,

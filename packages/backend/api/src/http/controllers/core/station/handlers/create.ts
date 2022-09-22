@@ -8,7 +8,7 @@
 import {
     PermissionID, RegistryProjectType, createNanoID, isHex,
 } from '@personalhealthtrain/central-common';
-import { BadRequestError, ForbiddenError } from '@typescript-error/http';
+import { BadRequestError, ForbiddenError } from '@ebec/http';
 import { validationResult } from 'express-validator';
 import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';

@@ -6,7 +6,7 @@
  */
 
 import { PermissionID, UserSecret } from '@personalhealthtrain/central-common';
-import { NotFoundError } from '@typescript-error/http';
+import { NotFoundError } from '@ebec/http';
 import { FindOptionsWhere } from 'typeorm';
 import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';

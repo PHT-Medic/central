@@ -6,7 +6,7 @@
  */
 
 import { PermissionID, TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
-import { BadRequestError, ForbiddenError } from '@typescript-error/http';
+import { BadRequestError, ForbiddenError } from '@ebec/http';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';

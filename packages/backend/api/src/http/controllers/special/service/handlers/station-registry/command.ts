@@ -10,7 +10,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import {
     BadRequestError, NotImplementedError,
-} from '@typescript-error/http';
+} from '@ebec/http';
 import { publishMessage } from 'amqp-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../../type';
 import env from '../../../../../../env';

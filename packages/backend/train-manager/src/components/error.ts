@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BaseError as Base, ErrorOptions } from '@typescript-error/http';
+import { BaseError as Base, Options } from '@ebec/http';
 import {
     TrainManagerErrorCode,
 } from '@personalhealthtrain/central-common';
 
-export type ErrorOptionsExtended = ErrorOptions & {
+export type ErrorOptionsExtended = Options & {
     type?: string,
     command?: string,
     step?: string | number

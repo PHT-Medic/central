@@ -6,7 +6,7 @@
  */
 
 import { PermissionID, Train } from '@personalhealthtrain/central-common';
-import { ForbiddenError } from '@typescript-error/http';
+import { ForbiddenError } from '@ebec/http';
 import { useDataSource } from 'typeorm-extension';
 import { runTrainValidation } from '../utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
