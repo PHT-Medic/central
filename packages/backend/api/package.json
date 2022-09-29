@@ -69,7 +69,7 @@
         "jest-serial-runner": "^1.2.0",
         "nodemon": "^2.0.19",
         "supertest": "^6.2.4",
-        "ts-jest": "^29.0.0",
+        "ts-jest": "^29.0.3",
         "ts-node": "^10.9.1"
     },
     "scripts": {
