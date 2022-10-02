@@ -16,7 +16,7 @@
     ],
     "devDependencies": {
         "@tada5hi/eslint-config-vue-typescript": "^1.0.7",
-        "@types/node": "^18.7.17",
+        "@types/node": "^18.7.23",
         "cross-env": "^7.0.3",
         "eslint": "^8.21.0",
         "lerna": "^5.5.1",
