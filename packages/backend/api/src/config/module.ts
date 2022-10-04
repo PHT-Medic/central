@@ -71,7 +71,9 @@ export function createConfig({ env } : ConfigContext) : Config {
 
     // ---------------------------------------------
 
-    setRedisConfig({ connectionString: env.redisConnectionString });
+    setRedisConfig({
+        connectionString: env.redisConnectionString,
+    });
 
     // ---------------------------------------------
 

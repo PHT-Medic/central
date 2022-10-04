@@ -8,7 +8,6 @@
 import { Arguments, Argv, CommandModule } from 'yargs';
 import { createDatabase, setDataSource } from 'typeorm-extension';
 import { DatabaseSeeder, setupCommand } from '@authelion/server-core';
-import { useClient } from 'redis-extension';
 import { DataSource } from 'typeorm';
 import { createConfig, useLogger } from '../../config';
 import env from '../../env';
@@ -110,11 +109,6 @@ export class SetupCommand implements CommandModule {
             try {
                 if (args.databaseSeeder) {
                     logger.info('seeding database...');
-
-                    const redis = useClient();
-                    if (redis.status !== 'connecting') {
-                        await redis.connect();
-                    }
 
                     const aggregator = buildRobotAggregator();
                     aggregator.start({ synchronous: true });
