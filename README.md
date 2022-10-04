@@ -65,7 +65,7 @@ $ npm run realtime
 ```
 
 ```shell
-$ npm run result
+$ npm run train-manager
 ```
 
 ## Credits
