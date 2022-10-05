@@ -7,10 +7,9 @@
 
 import { Argv, CommandModule } from 'yargs';
 import { upgradeCommand } from '@authelion/server-core';
-import { DataSource } from 'typeorm';
-import { buildDataSourceOptions } from '../../database/utils';
 import { createConfig, useLogger } from '../../config';
 import env from '../../env';
+import { generateSwaggerDocumentation } from '../../http/swagger';
 
 export class UpgradeCommand implements CommandModule {
     command = 'upgrade';
@@ -27,24 +26,10 @@ export class UpgradeCommand implements CommandModule {
         createConfig({ env });
 
         const logger = useLogger();
-        const options = await buildDataSourceOptions();
 
-        await upgradeCommand({});
+        await upgradeCommand({ logger });
 
-        const dataSource = new DataSource(options);
-        await dataSource.initialize();
-
-        try {
-            await dataSource.runMigrations();
-            // eslint-disable-next-line no-useless-catch
-        } catch (e) {
-            logger.info('Executing migrations failed...');
-            await dataSource.destroy();
-            process.exit(1);
-            throw e;
-        } finally {
-            await dataSource.destroy();
-        }
+        await generateSwaggerDocumentation();
 
         process.exit(0);
     }
