@@ -13,8 +13,8 @@ import {
     generateDocumentation,
 } from '@trapi/swagger';
 import path from 'path';
-import { getSwaggerEntrypointFilePath } from '@authelion/server-core';
-import { getRootDirPath, getWritableDirPath } from '../config/paths';
+import { getSwaggerEntrypoint } from '@authelion/server-core';
+import { getRootDirPath, getWritableDirPath } from '../config';
 import env from '../env';
 
 export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDocFormatType, SwaggerDocFormatData>> {
@@ -24,9 +24,9 @@ export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDoc
     const tsConfig = require(path.join(getRootDirPath(), 'tsconfig.json'));
 
     const metadataConfig : MetadataConfig = {
-        entryFile: [
-            path.join(getRootDirPath(), 'src', 'http', 'controllers', '**', '*.ts'),
-            getSwaggerEntrypointFilePath(),
+        entryPoint: [
+            { pattern: '**/*.ts', cwd: path.join(getRootDirPath(), 'src', 'http', 'controllers') },
+            getSwaggerEntrypoint(),
         ],
         ignore: ['**/node_modules/**'],
         allow: ['**/@authelion/**'],
@@ -41,8 +41,8 @@ export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDoc
     const swaggerConfig : Specification.Config = {
         yaml: true,
         host: env.apiUrl,
-        name: 'UI - API Documentation',
-        description: packageJson.description,
+        name: 'API Documentation',
+        description: 'Explore the REST Endpoints of the Central API.',
         basePath: '/',
         version: packageJson.version,
         outputDirectory: getWritableDirPath(),
