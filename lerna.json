@@ -1,34 +1,32 @@
 {
-    "packages": [
-        "packages/backend/*",
-        "packages/shared/*",
-        "packages/frontend/*"
-    ],
-    "command": {
-        "publish": {
-            "ignoreChanges": [
-                "*.md"
-            ]
-        },
-        "version": {
-            "message": "build(release): publish"
-        }
+  "packages": [
+    "packages/backend/*",
+    "packages/shared/*",
+    "packages/frontend/*"
+  ],
+  "command": {
+    "publish": {
+      "ignoreChanges": ["*.md"]
     },
-    "useWorkspaces": true,
-    "version": "1.3.26",
-    "conventionalCommits": true,
-    "changelog": {
-        "labels": {
-            "build": "Build",
-            "ci": "Continuous Integration",
-            "docs": "Documentation",
-            "feat": "New Feature",
-            "fix": "Bug Fix",
-            "perf": "Performance",
-            "refactor": "Refactor",
-            "revert": "Revert",
-            "style": "Style",
-            "test": "Test"
-        }
+    "version": {
+      "message": "build(release): publish"
     }
+  },
+  "useWorkspaces": true,
+  "version": "1.3.27",
+  "conventionalCommits": true,
+  "changelog": {
+    "labels": {
+      "build": "Build",
+      "ci": "Continuous Integration",
+      "docs": "Documentation",
+      "feat": "New Feature",
+      "fix": "Bug Fix",
+      "perf": "Performance",
+      "refactor": "Refactor",
+      "revert": "Revert",
+      "style": "Style",
+      "test": "Test"
+    }
+  }
 }
