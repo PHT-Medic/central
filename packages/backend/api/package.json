@@ -22,7 +22,7 @@
         "@trapi/swagger": "^0.3.6",
         "@ebec/http": "^0.0.3",
         "amqp-extension": "^1.0.4",
-        "body-parser": "^1.20.0",
+        "body-parser": "^1.20.1",
         "busboy": "^1.6.0",
         "cors": "^2.8.5",
         "crypto": "^1.0.1",
