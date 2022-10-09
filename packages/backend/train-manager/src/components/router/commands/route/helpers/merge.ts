@@ -6,6 +6,7 @@
  */
 
 import { Station, TrainStation, hasOwnProperty } from '@personalhealthtrain/central-common';
+import { RouterError } from '../../../error';
 import { StationExtended } from '../type';
 
 export function mergeStationsWithTrainStations(stations: Station[], trainStations: TrainStation[]) : StationExtended[] {
@@ -19,6 +20,10 @@ export function mergeStationsWithTrainStations(stations: Station[], trainStation
     for (let i = 0; i < stations.length; i++) {
         if (!hasOwnProperty(aggregatedTrainStations, stations[i].id)) {
             continue;
+        }
+
+        if (typeof stations[i].registry_project === 'undefined') {
+            throw RouterError.registryProjectNotFound();
         }
 
         extended.push({

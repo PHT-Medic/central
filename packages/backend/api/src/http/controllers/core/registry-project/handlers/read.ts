@@ -72,12 +72,12 @@ export async function getOneRegistryProjectRouteHandler(req: ExpressRequest, res
     const query = repository.createQueryBuilder('registryProject')
         .where('registryProject.id = :id', { id });
 
+    checkAndApplyFields(req, query, fields);
+
     applyRelations(query, include, {
         defaultAlias: 'registryProject',
         allowed: ['registry'],
     });
-
-    checkAndApplyFields(req, query, fields);
 
     const entity = await query.getOne();
 

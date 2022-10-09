@@ -29,6 +29,7 @@ async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilde
             'id',
             'name',
             'ecosystem',
+            'external_name',
             'hidden',
             'realm_id',
             'registry_id',
@@ -93,6 +94,8 @@ export async function getManyStationRouteHandler(req: ExpressRequest, res: Expre
     const repository = dataSource.getRepository(StationEntity);
     const query = repository.createQueryBuilder('station');
 
+    await checkAndApplyFields(req, query, fields);
+
     applyRelations(query, include, {
         defaultAlias: 'station',
         allowed: ['realm', 'registry_project', 'registry'],
@@ -102,8 +105,6 @@ export async function getManyStationRouteHandler(req: ExpressRequest, res: Expre
         allowed: ['id', 'name', 'hidden', 'realm_id'],
         defaultAlias: 'station',
     });
-
-    await checkAndApplyFields(req, query, fields);
 
     const pagination = applyPagination(query, page, { maxLimit: 50 });
 

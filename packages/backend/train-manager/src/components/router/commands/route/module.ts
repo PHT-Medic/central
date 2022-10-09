@@ -84,7 +84,7 @@ export async function processRouteCommand(message: Message) {
             filter: {
                 id: trainStations.map((trainStation) => trainStation.station_id),
             },
-            include: {
+            relations: {
                 registry_project: true,
             },
         });

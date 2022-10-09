@@ -37,6 +37,7 @@ export default Vue.extend<any, any, any, any>({
                         '+registry_project_id',
                         '+public_key',
                         '+email',
+                        '+external_name',
                     ],
                 },
             });
