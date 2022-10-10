@@ -6,10 +6,14 @@
  */
 
 import { Station, TrainStation, hasOwnProperty } from '@personalhealthtrain/central-common';
-import { RouterError } from '../../../error';
+import { BaseError } from '../../../../error';
 import { StationExtended } from '../type';
 
-export function mergeStationsWithTrainStations(stations: Station[], trainStations: TrainStation[]) : StationExtended[] {
+export function mergeStationsWithTrainStations(
+    stations: Station[],
+    trainStations: TrainStation[],
+    requiredAttributes?: (keyof StationExtended)[],
+) : StationExtended[] {
     const aggregatedTrainStations : Record<TrainStation['id'], TrainStation> = {};
     for (let i = 0; i < trainStations.length; i++) {
         aggregatedTrainStations[trainStations[i].station_id] = trainStations[i];
@@ -22,15 +26,21 @@ export function mergeStationsWithTrainStations(stations: Station[], trainStation
             continue;
         }
 
-        if (typeof stations[i].registry_project === 'undefined') {
-            throw RouterError.registryProjectNotFound();
-        }
-
-        extended.push({
+        const merged : StationExtended = {
             ...stations[i],
             index: aggregatedTrainStations[stations[i].id].index,
             run_status: aggregatedTrainStations[stations[i].id].run_status,
-        });
+        };
+
+        if (requiredAttributes) {
+            for (let i = 0; i < requiredAttributes.length; i++) {
+                if (!hasOwnProperty(merged, requiredAttributes[i])) {
+                    throw new BaseError(`Attribute ${requiredAttributes[i]} is missing for extended station object.`);
+                }
+            }
+        }
+
+        extended.push();
     }
 
     return extended;

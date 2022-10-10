@@ -89,7 +89,9 @@ export async function processRouteCommand(message: Message) {
             },
         });
 
-        items = mergeStationsWithTrainStations(stations, trainStations);
+        items = mergeStationsWithTrainStations(stations, trainStations, [
+            'registry_project',
+        ]);
     }
 
     // -------------------------------------------------------------------

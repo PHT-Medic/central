@@ -10,7 +10,7 @@ import {
     TrainManagerBuilderEvent,
 } from '@personalhealthtrain/central-common';
 import { BuilderError } from './error';
-import { buildEventQueueMessageForAPI } from '../../config/queue';
+import { buildEventQueueMessageForAPI } from '../../config';
 import { BaseError } from '../error';
 
 export async function writeFailedEvent(
