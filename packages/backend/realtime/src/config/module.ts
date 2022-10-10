@@ -8,11 +8,11 @@
 import { setConfig as setHTTPConfig, useClient as useHTTPClient } from 'hapic';
 import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import {
+    HTTPClient,
     HTTPClientKey,
     ROBOT_SECRET_ENGINE_KEY,
     ServiceID,
-    createRefreshRobotTokenOnResponseErrorHandler,
-    shouldRefreshRobotTokenResponseError,
+    createRefreshRobotTokenOnResponseErrorHandler, shouldRefreshRobotTokenResponseError,
 } from '@personalhealthtrain/central-common';
 import { Client as VaultClient } from '@hapic/vault';
 import { Robot } from '@authelion/common';
@@ -51,15 +51,24 @@ export function createConfig({ env } : ConfigContext) : Config {
                 useLogger()
                     .debug('Attempt to refresh api credentials...');
 
-                return useHTTPClient<VaultClient>(HTTPClientKey.VAULT).keyValue
-                    .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM)
-                    .then((response) => response.data as Robot)
-                    .catch((e) => {
-                        useLogger()
-                            .debug('Attempt to refresh api credentials failed.');
+                try {
+                    const response = await useHTTPClient<VaultClient>(HTTPClientKey.VAULT).keyValue
+                        .find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM);
 
-                        return Promise.reject(e);
-                    });
+                    if (
+                        response &&
+                        response.data
+                    ) {
+                        return response.data as Robot;
+                    }
+                } catch (e) {
+                    useLogger()
+                        .debug('Attempt to refresh api credentials failed.');
+
+                    throw e;
+                }
+
+                throw new Error('API credentials not present in vault.');
             },
             httpClient: useHTTPClient(),
         }),

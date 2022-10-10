@@ -92,13 +92,18 @@ export async function processBuildCommand(message: Message) {
 
     // -----------------------------------------------------------------------------------
 
-    useLogger().debug(`Writing ${TrainContainerFileName.CONFIG} to container`, {
+    useLogger().debug(`Building ${TrainContainerFileName.CONFIG}`, {
         component: 'building',
     });
 
     const trainConfig = await buildTrainConfig({
         entity: data.entity,
         masterImagePath,
+    });
+
+    useLogger().debug(`Writing ${TrainContainerFileName.CONFIG} to container`, {
+        component: 'building',
+        config: trainConfig,
     });
 
     await container.putArchive(

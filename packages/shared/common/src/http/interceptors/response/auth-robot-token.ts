@@ -36,7 +36,7 @@ function getCurrentState(config) : { retryCount: number } {
 }
 
 export function createRefreshRobotTokenOnResponseErrorHandler(context: {
-    httpClient?: HTTPClient,
+    httpClient: HTTPClient,
     load: () => Promise<Pick<Robot, 'id' | 'secret'>>
 }) {
     return (err?: any) => {
@@ -50,7 +50,8 @@ export function createRefreshRobotTokenOnResponseErrorHandler(context: {
         if (shouldRefreshRobotTokenResponseError(err)) {
             currentState.retryCount += 1;
 
-            return context.load()
+            return context.httpClient.root.checkIntegrity()
+                .then(() => context.load())
                 .then((response) => {
                     const tokenApi = new Client();
                     tokenApi.setDriver(context.httpClient.driver);

@@ -7,6 +7,7 @@
 
 import { Application } from 'express';
 import { attachControllers } from '@decorators/express';
+import { RootController } from './controllers/core/root';
 import { TrainLogController } from './controllers/core/train-log';
 import { UserSecretController } from './controllers/core/user-secret';
 import { MasterImageController } from './controllers/core/master-image';
@@ -23,6 +24,8 @@ import { RegistryProjectController } from './controllers/core/registry-project';
 
 export function registerControllers(router: Application) {
     attachControllers(router, [
+        RootController,
+
         // Core
         MasterImageController,
         MasterImageGroupController,

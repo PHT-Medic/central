@@ -10,12 +10,19 @@ import {
     MasterImageAPI,
     MasterImageGroupAPI,
     ProposalAPI,
-    ProposalStationAPI, RegistryAPI, RegistryProjectAPI, ServiceAPI,
+    ProposalStationAPI,
+    RegistryAPI,
+    RegistryProjectAPI,
+    RootAPI,
+    ServiceAPI,
     SettingsOptionAPI,
-    StationAPI, TrainAPI, TrainFileAPI, TrainStationAPI,
+    StationAPI,
+    TrainAPI,
+    TrainFileAPI,
+    TrainLogAPI,
+    TrainStationAPI,
     UserSecretAPI,
 } from '../../domains';
-import { TrainLogAPI } from '../../domains/core/train-log';
 
 export class HTTPClient extends Client {
     public readonly architecture: SettingsOptionAPI;
@@ -31,6 +38,8 @@ export class HTTPClient extends Client {
     public readonly registry : RegistryAPI;
 
     public readonly registryProject : RegistryProjectAPI;
+
+    public readonly root: RootAPI;
 
     public readonly station : StationAPI;
 
@@ -56,6 +65,7 @@ export class HTTPClient extends Client {
         this.proposalStation = new ProposalStationAPI(this.driver);
         this.registry = new RegistryAPI(this.driver);
         this.registryProject = new RegistryProjectAPI(this.driver);
+        this.root = new RootAPI(this.driver);
         this.station = new StationAPI(this.driver);
         this.train = new TrainAPI(this.driver);
         this.trainFile = new TrainFileAPI(this.driver);
