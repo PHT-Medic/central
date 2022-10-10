@@ -12,9 +12,9 @@ import { SwaggerTags } from '@trapi/swagger';
 import { checkIntegrityRouteHandler } from './handlers';
 
 @SwaggerTags('base')
-@Controller('/')
+@Controller('')
 export class RootController {
-    @Get('integrity')
+    @Get('/integrity')
     async integrity(
         @Request() req: any,
             @Response() res: any,
