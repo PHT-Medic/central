@@ -33,9 +33,9 @@ export function mergeStationsWithTrainStations(
         };
 
         if (requiredAttributes) {
-            for (let i = 0; i < requiredAttributes.length; i++) {
-                if (!hasOwnProperty(item, requiredAttributes[i])) {
-                    throw new BaseError(`Attribute ${requiredAttributes[i]} is missing for extended station object.`);
+            for (let j = 0; j < requiredAttributes.length; j++) {
+                if (!hasOwnProperty(item, requiredAttributes[j])) {
+                    throw new BaseError(`Attribute ${requiredAttributes[j]} is missing for extended station object.`);
                 }
             }
         }
