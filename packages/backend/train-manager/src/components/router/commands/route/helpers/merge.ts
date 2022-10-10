@@ -19,14 +19,14 @@ export function mergeStationsWithTrainStations(
         aggregatedTrainStations[trainStations[i].station_id] = trainStations[i];
     }
 
-    const extended : StationExtended[] = [];
+    const items : StationExtended[] = [];
 
     for (let i = 0; i < stations.length; i++) {
         if (!hasOwnProperty(aggregatedTrainStations, stations[i].id)) {
             continue;
         }
 
-        const merged : StationExtended = {
+        const item : StationExtended = {
             ...stations[i],
             index: aggregatedTrainStations[stations[i].id].index,
             run_status: aggregatedTrainStations[stations[i].id].run_status,
@@ -34,14 +34,14 @@ export function mergeStationsWithTrainStations(
 
         if (requiredAttributes) {
             for (let i = 0; i < requiredAttributes.length; i++) {
-                if (!hasOwnProperty(merged, requiredAttributes[i])) {
+                if (!hasOwnProperty(item, requiredAttributes[i])) {
                     throw new BaseError(`Attribute ${requiredAttributes[i]} is missing for extended station object.`);
                 }
             }
         }
 
-        extended.push();
+        items.push(item);
     }
 
-    return extended;
+    return items;
 }
