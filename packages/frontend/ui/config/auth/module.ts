@@ -32,7 +32,7 @@ export class AuthModule {
 
     protected abilityManager!: AbilityManager;
 
-    protected resolvePromise : Promise<void>;
+    protected resolvePromise : Promise<void> | undefined;
 
     // --------------------------------------------------------------------
 
@@ -48,7 +48,8 @@ export class AuthModule {
         };
 
         if (
-            process.server
+            process.server &&
+            config.driver
         ) {
             config.driver.proxy = false;
         }

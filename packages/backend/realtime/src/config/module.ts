@@ -8,11 +8,10 @@
 import { setConfig as setHTTPConfig, useClient as useHTTPClient } from 'hapic';
 import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import {
-    HTTPClient,
     HTTPClientKey,
     ROBOT_SECRET_ENGINE_KEY,
     ServiceID,
-    createRefreshRobotTokenOnResponseErrorHandler, shouldRefreshRobotTokenResponseError,
+    createRefreshRobotTokenOnResponseErrorHandler,
 } from '@personalhealthtrain/central-common';
 import { Client as VaultClient } from '@hapic/vault';
 import { Robot } from '@authelion/common';

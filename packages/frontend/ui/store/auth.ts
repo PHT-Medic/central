@@ -9,13 +9,14 @@ import Vue from 'vue';
 import { ActionTree, GetterTree, MutationTree } from 'vuex';
 
 import {
-    AbilityDescriptor, OAuth2TokenGrantResponse,
+    AbilityDescriptor,
+    OAuth2TokenGrantResponse,
     OAuth2TokenKind,
     Robot,
     User,
 } from '@authelion/common';
 import { RootState } from './index';
-import { AuthBrowserStorageKey } from '../config/auth/constants';
+import { AuthBrowserStorageKey } from '../config/auth';
 
 export interface AuthState {
     user: User | undefined,
