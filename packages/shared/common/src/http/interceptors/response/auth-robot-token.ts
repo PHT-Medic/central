@@ -50,6 +50,8 @@ export function createRefreshRobotTokenOnResponseErrorHandler(context: {
         if (shouldRefreshRobotTokenResponseError(err)) {
             currentState.retryCount += 1;
 
+            context.httpClient.unsetAuthorizationHeader();
+
             return context.httpClient.root.checkIntegrity()
                 .then(() => context.load())
                 .then((response) => {
