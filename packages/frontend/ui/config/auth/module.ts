@@ -230,8 +230,6 @@ export class AuthModule {
             } else {
                 this.client.userInfo.get<User>(token)
                     .then(async (entity) => {
-                        await this.ctx.store.dispatch('auth/triggerSetPermissions', token.permissions);
-
                         await this.ctx.store.dispatch('auth/triggerSetUser', entity);
                         await this.ctx.store.commit('auth/setResolved', true);
                         resolve();

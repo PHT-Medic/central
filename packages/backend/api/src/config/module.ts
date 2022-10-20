@@ -97,7 +97,7 @@ export function createConfig({ env } : ConfigContext) : Config {
         rootPath: process.cwd(),
         writableDirectoryPath: path.join(__dirname, '..', '..', 'writable'),
         selfUrl: env.apiUrl,
-        webUrl: env.webAppUrl,
+        webUrl: env.webUrl,
         redis: true,
         tokenMaxAgeAccessToken: env.jwtMaxAge,
         tokenMaxAgeRefreshToken: env.jwtMaxAge,

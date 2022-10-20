@@ -41,7 +41,7 @@ export interface Environment {
 
     apiUrl: string,
     internalApiUrl: string,
-    webAppUrl: string,
+    webUrl: string,
 
     demo: boolean,
 
@@ -70,7 +70,7 @@ const env : Environment = {
 
     apiUrl: requireFromEnv('API_URL'),
     internalApiUrl: requireFromEnv('INTERNAL_API_URL', requireFromEnv('API_URL')),
-    webAppUrl: requireFromEnv('WEB_APP_URL'),
+    webUrl: requireFromEnv('WEB_URL'),
 
     demo: requireFromEnv('DEMO', 'false').toLowerCase() !== 'false',
 

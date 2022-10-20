@@ -12,7 +12,7 @@
     "main": "./dist/index.js",
     "dependencies": {
         "@authelion/common": "^0.3.13",
-        "@authelion/server-core": "^0.3.19",
+        "@authelion/server-core": "^0.3.20",
         "@authelion/server-utils": "^0.3.14",
         "@decorators/di": "^1.0.2",
         "@decorators/express": "^2.4.0",
