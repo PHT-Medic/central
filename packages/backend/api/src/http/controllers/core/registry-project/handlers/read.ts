@@ -66,7 +66,7 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
         onlyRealmPermittedQueryResources(query, req.realmId);
     }
 
-    applyQueryFieldsParseOutput(query, fieldsParsed);
+    applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'registryProject' });
 }
 
 export async function getOneRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {

@@ -19,8 +19,8 @@
         "build": "rm -rf ./dist && tsc -p tsconfig.build.json"
     },
     "dependencies": {
-        "@authelion/common": "^0.3.12",
-        "@authelion/server-adapter": "^0.3.12",
+        "@authelion/common": "^0.3.13",
+        "@authelion/server-adapter": "^0.3.13",
         "@ebec/http": "^0.0.3",
         "@hapic/harbor": "^0.0.2",
         "@hapic/vault": "^0.0.2",
@@ -35,7 +35,7 @@
         "express": "^4.18.2",
         "express-rate-limit": "^6.5.1",
         "hapic": "^0.0.2",
-        "rapiq": "^0.2.5",
+        "rapiq": "^0.2.6",
         "redis-extension": "^1.1.1",
         "tar-stream": "^2.1.4",
         "uuid": "^9.0.0",

@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
     applyFilters, applyPagination, applyRelations, applySort, useDataSource,
 } from 'typeorm-extension';

@@ -59,7 +59,7 @@ async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilde
         onlyRealmPermittedQueryResources(query, req.realmId, 'station.realm_id');
     }
 
-    applyQueryFieldsParseOutput(query, fieldsParsed);
+    applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'station' });
 }
 
 export async function getOneStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {

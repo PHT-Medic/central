@@ -49,7 +49,7 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
         }
     }
 
-    applyQueryFieldsParseOutput(query, fieldsParsed);
+    applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'registry' });
 }
 
 export async function getOneRegistryRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
