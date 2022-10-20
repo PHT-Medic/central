@@ -1,62 +1,62 @@
 {
-  "name": "@personalhealthtrain/train-manager",
-  "private": true,
-  "author": {
-    "name": "Peter Placzek",
-    "email": "tadashi@animesu.net",
-    "url": "https://tada5hi.net"
-  },
-  "license": "MIT",
-  "version": "1.3.27",
-  "description": "This project contains the central Train-Manager of the PHT.",
-  "main": "dist/index.js",
-  "scripts": {
-    "lint": "eslint --ext .ts src/",
-    "lint:fix": "npm run lint -- --fix",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "dev-watch": "ts-node-dev src/index.ts --respawn --transpileOnly",
-    "build": "rm -rf ./dist && tsc -p tsconfig.build.json"
-  },
-  "dependencies": {
-    "@authelion/common": "^0.3.11",
-    "@authelion/server-adapter": "^0.3.11",
-    "@ebec/http": "^0.0.3",
-    "@hapic/harbor": "^0.0.2",
-    "@hapic/vault": "^0.0.2",
-    "@personalhealthtrain/central-common": "^1.3.27",
-    "amqp-extension": "^1.0.4",
-    "body-parser": "^1.20.1",
-    "cookie-parser": "^1.4.6",
-    "cors": "^2.8.5",
-    "crypto": "^1.0.1",
-    "dockerode": "^3.3.3",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "express-rate-limit": "^6.5.1",
-    "hapic": "^0.0.2",
-    "rapiq": "^0.0.6",
-    "redis-extension": "^1.1.1",
-    "tar-stream": "^2.1.4",
-    "uuid": "^9.0.0",
-    "winston": "^3.8.1",
-    "zlib": "^1.0.5"
-  },
-  "devDependencies": {
-    "@types/cookie-parser": "^1.4.3",
-    "@types/cors": "^2.8.8",
-    "@types/dockerode": "^3.3.11",
-    "@types/dotenv": "^8.2.0",
-    "@types/express": "^4.17.4",
-    "@types/express-rate-limit": "^6.0.0",
-    "@types/tar-stream": "^2.2.2",
-    "@types/uuid": "^8.3.4",
-    "@types/winston": "^2.4.4",
-    "nodemon": "^2.0.20",
-    "ts-node": "^10.9.1",
-    "ts-node-dev": "^2.0.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  }
+    "name": "@personalhealthtrain/train-manager",
+    "private": true,
+    "author": {
+        "name": "Peter Placzek",
+        "email": "tadashi@animesu.net",
+        "url": "https://tada5hi.net"
+    },
+    "license": "MIT",
+    "version": "1.3.27",
+    "description": "This project contains the central Train-Manager of the PHT.",
+    "main": "dist/index.js",
+    "scripts": {
+        "lint": "eslint --ext .ts src/",
+        "lint:fix": "npm run lint -- --fix",
+        "start": "node dist/index.js",
+        "dev": "ts-node src/index.ts",
+        "dev-watch": "ts-node-dev src/index.ts --respawn --transpileOnly",
+        "build": "rm -rf ./dist && tsc -p tsconfig.build.json"
+    },
+    "dependencies": {
+        "@authelion/common": "^0.3.12",
+        "@authelion/server-adapter": "^0.3.12",
+        "@ebec/http": "^0.0.3",
+        "@hapic/harbor": "^0.0.2",
+        "@hapic/vault": "^0.0.2",
+        "@personalhealthtrain/central-common": "^1.3.27",
+        "amqp-extension": "^1.0.4",
+        "body-parser": "^1.20.1",
+        "cookie-parser": "^1.4.6",
+        "cors": "^2.8.5",
+        "crypto": "^1.0.1",
+        "dockerode": "^3.3.3",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "express-rate-limit": "^6.5.1",
+        "hapic": "^0.0.2",
+        "rapiq": "^0.2.5",
+        "redis-extension": "^1.1.1",
+        "tar-stream": "^2.1.4",
+        "uuid": "^9.0.0",
+        "winston": "^3.8.1",
+        "zlib": "^1.0.5"
+    },
+    "devDependencies": {
+        "@types/cookie-parser": "^1.4.3",
+        "@types/cors": "^2.8.8",
+        "@types/dockerode": "^3.3.11",
+        "@types/dotenv": "^8.2.0",
+        "@types/express": "^4.17.4",
+        "@types/express-rate-limit": "^6.0.0",
+        "@types/tar-stream": "^2.2.2",
+        "@types/uuid": "^8.3.4",
+        "@types/winston": "^2.4.4",
+        "nodemon": "^2.0.20",
+        "ts-node": "^10.9.1",
+        "ts-node-dev": "^2.0.0"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
 }

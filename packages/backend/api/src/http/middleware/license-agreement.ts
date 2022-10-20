@@ -18,7 +18,8 @@ export function checkLicenseAgreementAccepted(req: ExpressRequest, res: ExpressR
             if (
                 req.originalUrl.startsWith('/user-attributes') ||
                 req.originalUrl.startsWith('/token') ||
-                req.originalUrl.startsWith('/users/@me')
+                req.originalUrl.startsWith('/users/@me') ||
+                req.originalUrl.startsWith('/identity-providers')
             ) {
                 next();
 

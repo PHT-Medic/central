@@ -8,6 +8,7 @@
 import { SelectQueryBuilder } from 'typeorm';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import {
+    ParseOptionsAllowed,
     parseQueryFields,
 } from 'rapiq';
 import {
@@ -19,12 +20,12 @@ import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 
 async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>, fields: any) {
-    const protectedFields = [
+    const protectedFields : ParseOptionsAllowed<StationEntity> = [
         'public_key',
         'email',
     ];
 
-    const fieldsParsed = parseQueryFields(fields, {
+    const fieldsParsed = parseQueryFields<StationEntity>(fields, {
         default: [
             'id',
             'name',
@@ -38,11 +39,12 @@ async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilde
             'updated_at',
         ],
         allowed: protectedFields,
-        defaultAlias: 'station',
+        defaultPath: 'station',
     });
 
     const protectedSelected = fieldsParsed
-        .filter((field) => field.alias === 'station' && protectedFields.indexOf(field.key) !== -1);
+        .filter((field) => field.path === 'station' &&
+            protectedFields.indexOf(field.key as any) !== -1);
 
     if (protectedSelected.length > 0) {
         if (

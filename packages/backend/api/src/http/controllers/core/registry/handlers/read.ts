@@ -10,17 +10,17 @@ import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applySort, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { parseQueryFields } from 'rapiq';
+import { ParseOptionsAllowed, parseQueryFields } from 'rapiq';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 
 function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>) {
-    const protectedFields = [
+    const protectedFields : ParseOptionsAllowed<RegistryEntity> = [
         'account_secret',
     ];
 
-    const fieldsParsed = parseQueryFields(req.query.fields, {
+    const fieldsParsed = parseQueryFields<RegistryEntity>(req.query.fields, {
         default: [
             'id',
             'name',
@@ -31,12 +31,12 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
             'updated_at',
         ],
         allowed: protectedFields,
-        defaultAlias: 'registry',
+        defaultPath: 'registry',
     });
 
     const protectedSelected = fieldsParsed
-        .filter((field) => field.alias === 'registry' &&
-            protectedFields.indexOf(field.key) !== -1);
+        .filter((field) => field.path === 'registry' &&
+            protectedFields.indexOf(field.key as any) !== -1);
 
     if (protectedSelected.length > 0) {
         if (

@@ -73,7 +73,7 @@ export async function getManyTrainStationRouteHandler(req: ExpressRequest, res: 
             'train_id',
             'train_realm_id',
             'train.id',
-            'train.title',
+            'train.name',
 
             'station_id',
             'station_realm_id',

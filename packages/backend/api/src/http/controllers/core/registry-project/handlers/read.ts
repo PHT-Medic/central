@@ -5,25 +5,31 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { ParseOptionsAllowed } from 'rapiq';
 import { SelectQueryBuilder } from 'typeorm';
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
-    applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, applySort, useDataSource,
+    applyFilters,
+    applyPagination,
+    applyQueryFieldsParseOutput,
+    applyRelations,
+    applySort,
+    parseQueryFields,
+    useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { parseQueryFields } from 'rapiq';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 
 function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>, fields: any) {
-    const protectedFields = [
+    const protectedFields : ParseOptionsAllowed<RegistryProjectEntity> = [
         'account_name',
         'account_id',
         'account_secret',
     ];
 
-    const fieldsParsed = parseQueryFields(fields, {
+    const fieldsParsed = parseQueryFields<RegistryProjectEntity>(fields, {
         default: [
             'id',
             'name',
@@ -40,12 +46,12 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
             'updated_at',
         ],
         allowed: protectedFields,
-        defaultAlias: 'registryProject',
+        defaultPath: 'registryProject',
     });
 
     const protectedSelected = fieldsParsed
-        .filter((field) => field.alias === 'registryProject' &&
-            protectedFields.indexOf(field.key) !== -1);
+        .filter((field) => field.path === 'registryProject' &&
+            protectedFields.indexOf(field.key as any) !== -1);
 
     if (protectedSelected.length > 0) {
         if (

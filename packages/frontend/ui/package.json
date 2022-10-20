@@ -16,8 +16,8 @@
         "generate": "nuxt generate"
     },
     "devDependencies": {
-        "@authelion/common": "^0.3.11",
-        "@authelion/vue": "^0.3.3",
+        "@authelion/common": "^0.3.12",
+        "@authelion/vue": "^0.3.4",
         "@fortawesome/fontawesome-free": "^6.1.2",
         "@hapic/oauth2": "^0.0.2",
         "@nuxt/types": "^2.14.5",
@@ -39,7 +39,7 @@
         "ilingo": "^2.0.4",
         "moment": "^2.29.4",
         "nuxt": "^2.15.8",
-        "rapiq": "^0.0.6",
+        "rapiq": "^0.2.5",
         "socket.io-client": "^4.5.2",
         "tsconfig-paths-webpack-plugin": "^4.0.0",
         "vue": "^2.7.12",
