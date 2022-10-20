@@ -20,7 +20,7 @@
         "@commitlint/config-conventional": "^17.1.0",
         "@commitlint/cz-commitlint": "^17.1.2",
         "@tada5hi/eslint-config-vue-typescript": "^1.0.8",
-        "@types/node": "^18.8.4",
+        "@types/node": "^18.11.2",
         "cross-env": "^7.0.3",
         "eslint": "^8.25.0",
         "husky": "^8.0.1",
