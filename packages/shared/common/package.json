@@ -18,7 +18,7 @@
         "@authelion/common": "^0.3.13",
         "@hapic/oauth2": "^0.0.2",
         "hapic": "^0.0.2",
-        "rapiq": "^0.2.6"
+        "rapiq": "^0.2.9"
     },
     "peerDependencies": {
         "@authelion/common": "^0.x",
