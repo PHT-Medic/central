@@ -10,13 +10,13 @@ import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applySort, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { ParseOptionsAllowed, parseQueryFields } from 'rapiq';
+import { ParseAllowedOption, parseQueryFields } from 'rapiq';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 
 function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>) {
-    const protectedFields : ParseOptionsAllowed<RegistryEntity> = [
+    const protectedFields : ParseAllowedOption<RegistryEntity> = [
         'account_secret',
     ];
 

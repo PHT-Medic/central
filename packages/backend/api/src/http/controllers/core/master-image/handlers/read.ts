@@ -6,7 +6,9 @@
  */
 
 import { NotFoundError } from '@ebec/http';
-import { applyFilters, applyPagination, useDataSource } from 'typeorm-extension';
+import {
+    applyFilters, applyPagination, applyQuery, useDataSource,
+} from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
 
@@ -26,20 +28,25 @@ export async function getOneMasterImageRouteHandler(req: ExpressRequest, res: Ex
 }
 
 export async function getManyMasterImageRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { page, filter } = req.query;
-
     const dataSource = await useDataSource();
 
     const repository = dataSource.getRepository(MasterImageEntity);
     const query = repository.createQueryBuilder('image');
 
-    applyFilters(query, filter, {
-        allowed: ['id', 'name', 'path', 'virtual_path', 'group_virtual_path'],
+    const { pagination } = applyQuery(query, req.query, {
+        defaultAlias: 'image',
+        filters: {
+            allowed: ['id', 'name', 'path', 'virtual_path', 'group_virtual_path'],
+        },
+        sort: {
+            default: {
+                path: 'ASC',
+            },
+        },
+        pagination: {
+            maxLimit: 50,
+        },
     });
-
-    const pagination = applyPagination(query, page, { maxLimit: 50 });
-
-    query.addOrderBy('image.path', 'ASC');
 
     const [entities, total] = await query.getManyAndCount();
 

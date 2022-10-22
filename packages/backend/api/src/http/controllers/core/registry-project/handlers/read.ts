@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ParseOptionsAllowed } from 'rapiq';
+import { ParseAllowedOption, parseQueryFields } from 'rapiq';
 import { SelectQueryBuilder } from 'typeorm';
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
@@ -14,7 +14,6 @@ import {
     applyQueryFieldsParseOutput,
     applyRelations,
     applySort,
-    parseQueryFields,
     useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
@@ -23,7 +22,7 @@ import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 
 function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>, fields: any) {
-    const protectedFields : ParseOptionsAllowed<RegistryProjectEntity> = [
+    const protectedFields : ParseAllowedOption<RegistryProjectEntity> = [
         'account_name',
         'account_id',
         'account_secret',

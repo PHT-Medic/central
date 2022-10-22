@@ -8,7 +8,7 @@
 import { SelectQueryBuilder } from 'typeorm';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import {
-    ParseOptionsAllowed,
+    ParseAllowedOption,
     parseQueryFields,
 } from 'rapiq';
 import {
@@ -20,7 +20,7 @@ import { StationEntity } from '../../../../../domains/core/station/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 
 async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>, fields: any) {
-    const protectedFields : ParseOptionsAllowed<StationEntity> = [
+    const protectedFields : ParseAllowedOption<StationEntity> = [
         'public_key',
         'email',
     ];
