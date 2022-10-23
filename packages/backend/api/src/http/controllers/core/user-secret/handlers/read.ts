@@ -7,7 +7,8 @@
 
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
-    applyFields, applyFilters, applyPagination, applyRelations, applySort, useDataSource,
+    applyQuery,
+    useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
@@ -19,15 +20,25 @@ export async function getOneUserSecretRouteHandler(req: ExpressRequest, res: Exp
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(UserSecretEntity);
-    const query = await repository.createQueryBuilder('entity')
-        .where('entity.realm_id = :realmId', { realmId: req.realmId })
-        .where('entity.id = :id', { id });
+    const query = await repository.createQueryBuilder('userSecret')
+        .where('userSecret.realm_id = :realmId', { realmId: req.realmId })
+        .where('userSecret.id = :id', { id });
 
     onlyRealmPermittedQueryResources(query, req.realmId);
 
     if (!req.ability.has(PermissionID.USER_EDIT)) {
-        query.where('entity.user_id = :userId', { userId: req.userId });
+        query.where('userSecret.user_id = :userId', { userId: req.userId });
     }
+
+    applyQuery(query, req.query, {
+        defaultAlias: 'userSecret',
+        fields: {
+            default: ['id', 'key', 'type', 'content', 'user_id', 'realm_id', 'created_at', 'updated_at'],
+        },
+        relations: {
+            allowed: ['user', 'realm'],
+        },
+    });
 
     const entity = await query.getOne();
 
@@ -39,41 +50,34 @@ export async function getOneUserSecretRouteHandler(req: ExpressRequest, res: Exp
 }
 
 export async function getManyUserSecretRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const {
-        include, fields, filter, page, sort,
-    } = req.query;
-
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(UserSecretEntity);
-    const query = await repository.createQueryBuilder('entity');
+    const query = await repository.createQueryBuilder('userSecret');
 
     onlyRealmPermittedQueryResources(query, req.realmId);
 
     if (!req.ability.has(PermissionID.USER_EDIT) && req.userId) {
-        query.where('entity.user_id = :userId', { userId: req.userId });
+        query.where('userSecret.user_id = :userId', { userId: req.userId });
     }
 
-    applyFields(query, fields, {
-        defaultAlias: 'entity',
-        default: ['id', 'key', 'type', 'content', 'user_id', 'realm_id', 'created_at', 'updated_at'],
+    const { pagination } = applyQuery(query, req.query, {
+        defaultAlias: 'userSecret',
+        fields: {
+            default: ['id', 'key', 'type', 'content', 'user_id', 'realm_id', 'created_at', 'updated_at'],
+        },
+        filters: {
+            allowed: ['id', 'type', 'user_id', 'key'],
+        },
+        pagination: {
+            maxLimit: 50,
+        },
+        relations: {
+            allowed: ['user', 'realm'],
+        },
+        sort: {
+            allowed: ['id', 'created_at', 'updated_at', 'user_id'],
+        },
     });
-
-    applyFilters(query, filter, {
-        defaultAlias: 'entity',
-        allowed: ['id', 'type', 'user_id', 'key'],
-    });
-
-    applyRelations(query, include, {
-        defaultAlias: 'entity',
-        allowed: ['user', 'realm'],
-    });
-
-    applySort(query, sort, {
-        defaultAlias: 'entity',
-        allowed: ['id', 'created_at', 'updated_at', 'user_id'],
-    });
-
-    const pagination = applyPagination(query, page, { maxLimit: 50 });
 
     const [entities, total] = await query.getManyAndCount();
 

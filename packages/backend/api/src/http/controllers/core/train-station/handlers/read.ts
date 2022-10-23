@@ -7,7 +7,7 @@
 
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
-    applyFilters, applyPagination, applyRelations, applySort, useDataSource,
+    applyQuery, applyRelations, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
@@ -44,10 +44,6 @@ export async function getOneTrainStationRouteHandler(req: ExpressRequest, res: E
 }
 
 export async function getManyTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const {
-        filter, page, include, sort,
-    } = req.query;
-
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainStationEntity);
     const query = await repository.createQueryBuilder('trainStation');
@@ -58,36 +54,34 @@ export async function getManyTrainStationRouteHandler(req: ExpressRequest, res: 
         'trainStation.station_realm_id',
     ]);
 
-    const relations = applyRelations(query, include, {
-        allowed: ['station', 'train'],
+    const { pagination } = applyQuery(query, req.query, {
         defaultAlias: 'trainStation',
+        filters: {
+            allowed: [
+                'run_status',
+                'approval_status',
+
+                'train_id',
+                'train_realm_id',
+                'train.id',
+                'train.name',
+
+                'station_id',
+                'station_realm_id',
+                'station.name',
+                'station.realm_id',
+            ],
+        },
+        pagination: {
+            maxLimit: 50,
+        },
+        relations: {
+            allowed: ['station', 'train'],
+        },
+        sort: {
+            allowed: ['created_at', 'updated_at', 'index'],
+        },
     });
-
-    applyFilters(query, filter, {
-        relations,
-        defaultAlias: 'trainStation',
-        allowed: [
-            'run_status',
-            'approval_status',
-
-            'train_id',
-            'train_realm_id',
-            'train.id',
-            'train.name',
-
-            'station_id',
-            'station_realm_id',
-            'station.name',
-            'station.realm_id',
-        ],
-    });
-
-    applySort(query, sort, {
-        allowed: ['created_at', 'updated_at', 'index'],
-        defaultAlias: 'trainStation',
-    });
-
-    const pagination = applyPagination(query, page, { maxLimit: 50 });
 
     const [entities, total] = await query.getManyAndCount();
 

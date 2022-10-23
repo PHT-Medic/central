@@ -7,7 +7,9 @@
 
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
-    applyFilters, applyPagination, applyRelations, useDataSource,
+    applyQuery,
+    applyRelations,
+    useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
@@ -45,8 +47,6 @@ export async function getOneProposalStationRouteHandler(req: ExpressRequest, res
 }
 
 export async function getManyProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { filter, page, include } = req.query;
-
     const dataSource = await useDataSource();
 
     const repository = dataSource.getRepository(ProposalStationEntity);
@@ -58,27 +58,30 @@ export async function getManyProposalStationRouteHandler(req: ExpressRequest, re
         'proposalStation.proposal_realm_id',
     ]);
 
-    const relations = applyRelations(query, include, {
-        allowed: ['station', 'proposal'],
+    const { pagination } = applyQuery(query, req.query, {
         defaultAlias: 'proposalStation',
+        filters: {
+            allowed: [
+                'proposal_realm_id',
+                'proposal_id',
+                'proposal.id',
+                'proposal.title',
+
+                'station_realm_id',
+                'station_id',
+                'station.name',
+            ],
+        },
+        pagination: {
+            maxLimit: 50,
+        },
+        relations: {
+            allowed: ['station', 'proposal'],
+        },
+        sort: {
+            allowed: ['created_at', 'updated_at'],
+        },
     });
-
-    applyFilters(query, filter, {
-        relations,
-        allowed: [
-            'proposal_realm_id',
-            'proposal_id',
-            'proposal.id',
-            'proposal.title',
-
-            'station_realm_id',
-            'station_id',
-            'station.name',
-        ],
-        defaultAlias: 'proposalStation',
-    });
-
-    const pagination = applyPagination(query, page, { maxLimit: 50 });
 
     const [entities, total] = await query.getManyAndCount();
 

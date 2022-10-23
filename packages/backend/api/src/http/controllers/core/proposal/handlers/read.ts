@@ -7,8 +7,8 @@
 
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
-    applyFields,
-    applyFilters, applyPagination, applyRelations, applySort, useDataSource,
+    applyQuery,
+    useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
@@ -17,16 +17,32 @@ import { ExpressRequest, ExpressResponse } from '../../../../type';
 
 export async function getOneProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
-    const { include } = req.query;
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProposalEntity);
     const query = repository.createQueryBuilder('proposal')
         .where('proposal.id = :id', { id });
 
-    applyRelations(query, include, {
+    applyQuery(query, req.query, {
         defaultAlias: 'proposal',
-        allowed: ['master_image', 'realm', 'user'],
+        fields: {
+            default: [
+                'id',
+                'title',
+                'requested_data',
+                'risk',
+                'risk_comment',
+                'trains',
+                'created_at',
+                'updated_at',
+                'realm_id',
+                'user_id',
+                'master_image_id',
+            ],
+        },
+        relations: {
+            allowed: ['user', 'realm', 'master_image'],
+        },
     });
 
     const entity = await query.getOne();
@@ -35,19 +51,12 @@ export async function getOneProposalRouteHandler(req: ExpressRequest, res: Expre
         throw new NotFoundError();
     }
 
-    // todo: permit resource to realm/station owner XAND receiving realm/station OR to all
-    /*
-    if(!isRealmPermittedForResource(req.user, entity)) {
-        return res._failForbidden();
-    }
-     */
-
     return res.respond({ data: entity });
 }
 
 export async function getManyProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const {
-        filter, page, sort, include, fields,
+        filter,
     } = req.query;
 
     const dataSource = await useDataSource();
@@ -69,39 +78,36 @@ export async function getManyProposalRouteHandler(req: ExpressRequest, res: Expr
         onlyRealmPermittedQueryResources(query, req.realmId, 'proposal.realm_id');
     }
 
-    applyFields(query, fields, {
+    const { pagination } = applyQuery(query, req.query, {
         defaultAlias: 'proposal',
-        default: [
-            'id',
-            'title',
-            'requested_data',
-            'risk',
-            'risk_comment',
-            'trains',
-            'created_at',
-            'updated_at',
-            'realm_id',
-            'user_id',
-            'master_image_id',
-        ],
+        fields: {
+            default: [
+                'id',
+                'title',
+                'requested_data',
+                'risk',
+                'risk_comment',
+                'trains',
+                'created_at',
+                'updated_at',
+                'realm_id',
+                'user_id',
+                'master_image_id',
+            ],
+        },
+        filters: {
+            allowed: ['id', 'title', 'realm_id', 'user_id'],
+        },
+        pagination: {
+            maxLimit: 50,
+        },
+        relations: {
+            allowed: ['user', 'realm', 'master_image'],
+        },
+        sort: {
+            allowed: ['id', 'updated_at', 'created_at'],
+        },
     });
-
-    applyFilters(query, filter, {
-        defaultAlias: 'proposal',
-        allowed: ['id', 'title', 'realm_id', 'user_id'],
-    });
-
-    applySort(query, sort, {
-        defaultAlias: 'proposal',
-        allowed: ['id', 'updated_at', 'created_at'],
-    });
-
-    applyRelations(query, include, {
-        defaultAlias: 'proposal',
-        allowed: ['user', 'realm', 'master_image'],
-    });
-
-    const pagination = applyPagination(query, page, { maxLimit: 50 });
 
     const [entities, total] = await query.getManyAndCount();
 

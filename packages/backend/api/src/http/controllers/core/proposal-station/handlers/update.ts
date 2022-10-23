@@ -28,7 +28,7 @@ export async function updateProposalStationRouteHandler(req: ExpressRequest, res
     const isAuthorizedForStation = req.ability.has(PermissionID.PROPOSAL_APPROVE);
 
     const isAuthorityOfProposal = isPermittedForResourceRealm(req.realmId, entity.proposal_realm_id);
-    if (isAuthorityOfProposal) {
+    if (isAuthorityOfProposal && !isAuthorityOfStation) {
         throw new ForbiddenError('Only permitted target station members can update this object.');
     }
 
@@ -36,7 +36,7 @@ export async function updateProposalStationRouteHandler(req: ExpressRequest, res
         !isAuthorityOfStation ||
         !isAuthorizedForStation
     ) {
-        throw new ForbiddenError();
+        throw new ForbiddenError('You are not permitted to update this object.');
     }
 
     const result = await runProposalStationValidation(req, 'update');

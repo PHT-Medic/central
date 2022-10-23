@@ -6,7 +6,9 @@
  */
 
 import {
-    applyFilters, applyPagination, applyRelations, applySort, useDataSource,
+    applyQuery,
+    applyRelations,
+    useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
 import { TrainLogEntity } from '../../../../../domains/core/train-log';
@@ -35,35 +37,32 @@ export async function getOneTrainLogRouteHandler(req: ExpressRequest, res: Expre
 }
 
 export async function getManyTrainLogRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const {
-        filter, page, include, sort,
-    } = req.query;
-
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainLogEntity);
     const query = await repository.createQueryBuilder('trainLog');
     query.distinctOn(['trainLog.id']);
 
-    const relations = applyRelations(query, include, {
-        allowed: ['train'],
+    const { pagination } = applyQuery(query, req.query, {
         defaultAlias: 'trainLog',
+        filters: {
+            allowed: [
+                'command',
+                'step',
+                'error',
+                'status',
+                'train_id',
+            ],
+        },
+        pagination: {
+            maxLimit: 50,
+        },
+        relations: {
+            allowed: ['realm', 'train'],
+        },
+        sort: {
+            allowed: ['command', 'step', 'status', 'created_at', 'updated_at'],
+        },
     });
-
-    applyFilters(query, filter, {
-        relations,
-        defaultAlias: 'trainLog',
-        allowed: [
-            'error',
-            'train_id',
-        ],
-    });
-
-    applySort(query, sort, {
-        allowed: ['created_at', 'updated_at'],
-        defaultAlias: 'trainLog',
-    });
-
-    const pagination = applyPagination(query, page, { maxLimit: 50 });
 
     const [entities, total] = await query.getManyAndCount();
 
