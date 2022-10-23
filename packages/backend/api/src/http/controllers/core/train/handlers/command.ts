@@ -6,7 +6,7 @@
  */
 
 import { check, matchedData, validationResult } from 'express-validator';
-import { Train, TrainCommand } from '@personalhealthtrain/central-common';
+import { TrainCommand } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { useDataSource } from 'typeorm-extension';
@@ -51,7 +51,7 @@ export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: E
     const validationData = matchedData(req, { includeOptionals: true });
 
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository<Train>(TrainEntity);
+    const repository = dataSource.getRepository(TrainEntity);
 
     let entity = await repository.findOneBy({ id });
 

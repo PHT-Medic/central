@@ -7,7 +7,6 @@
 
 import { publishMessage } from 'amqp-extension';
 import {
-    Train,
     TrainContainerPath,
     TrainManagerComponent,
     TrainManagerExtractorCommand,
@@ -20,10 +19,10 @@ import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 
 export async function triggerTrainResultStart(
-    train: string | Train,
-) : Promise<Train> {
+    train: string | TrainEntity,
+) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository<Train>(TrainEntity);
+    const repository = dataSource.getRepository(TrainEntity);
 
     train = await findTrain(train, repository);
 

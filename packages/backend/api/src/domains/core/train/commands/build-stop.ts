@@ -5,14 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainBuildStatus } from '@personalhealthtrain/central-common';
+import { TrainBuildStatus } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 
-export async function stopBuildTrain(train: Train | number | string) : Promise<Train> {
+export async function stopBuildTrain(train: TrainEntity | string) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository<Train>(TrainEntity);
+    const repository = dataSource.getRepository(TrainEntity);
 
     train = await findTrain(train, repository);
 

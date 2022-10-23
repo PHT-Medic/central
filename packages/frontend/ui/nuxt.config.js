@@ -94,6 +94,9 @@ const config = {
             Nunito: true,
         },
     },
+    bootstrapVue: {
+        icons: false,
+    },
     /*
     ** Nuxt.js modules
     */

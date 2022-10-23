@@ -16,9 +16,9 @@ import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 
-export async function detectTrainBuildStatus(train: Train | number | string) : Promise<Train> {
+export async function detectTrainBuildStatus(train: TrainEntity | string) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository<Train>(TrainEntity);
+    const repository = dataSource.getRepository(TrainEntity);
 
     train = await findTrain(train, repository);
 

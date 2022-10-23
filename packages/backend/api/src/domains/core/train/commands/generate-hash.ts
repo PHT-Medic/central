@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainConfigurationStatus } from '@personalhealthtrain/central-common';
+import { TrainConfigurationStatus } from '@personalhealthtrain/central-common';
 import crypto from 'crypto';
 import fs from 'fs';
 import { useDataSource } from 'typeorm-extension';
@@ -14,9 +14,9 @@ import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 import { TrainFileEntity } from '../../train-file/entity';
 
-export async function generateTrainHash(train: Train | number | string) : Promise<Train> {
+export async function generateTrainHash(train: TrainEntity | string) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository<Train>(TrainEntity);
+    const repository = dataSource.getRepository(TrainEntity);
 
     train = await findTrain(train, repository);
 

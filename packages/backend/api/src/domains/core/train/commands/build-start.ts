@@ -5,31 +5,29 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { publishMessage } from 'amqp-extension';
-import { Not } from 'typeorm';
+import { BadRequestError } from '@ebec/http';
 import {
     Ecosystem,
     RegistryProjectType,
-    Train,
     TrainBuildStatus,
     TrainManagerBuilderCommand,
     TrainManagerComponent,
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
-import { BadRequestError } from '@ebec/http';
+import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
-import { findTrain } from './utils';
+import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
+import { RegistryProjectEntity } from '../../registry-project/entity';
+import { RegistryEntity } from '../../registry/entity';
 import { TrainStationEntity } from '../../train-station/entity';
 import { TrainEntity } from '../entity';
-import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
-import { RegistryEntity } from '../../registry/entity';
-import { RegistryProjectEntity } from '../../registry-project/entity';
+import { findTrain } from './utils';
 
 export async function startBuildTrain(
-    train: Train | number | string,
-) : Promise<Train> {
+    train: TrainEntity | string,
+) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository<Train>(TrainEntity);
+    const repository = dataSource.getRepository(TrainEntity);
 
     train = await findTrain(train, repository);
 
@@ -43,11 +41,12 @@ export async function startBuildTrain(
         const trainStationRepository = dataSource.getRepository(TrainStationEntity);
         const trainStations = await trainStationRepository.findBy({
             train_id: train.id,
-            approval_status: Not(TrainStationApprovalStatus.APPROVED),
         });
 
-        if (trainStations.length > 0) {
-            throw new BadRequestError('Not all stations have approved the train yet.');
+        for (let i = 0; i < trainStations.length; i++) {
+            if (trainStations[i].approval_status !== TrainStationApprovalStatus.APPROVED) {
+                throw new BadRequestError('Not all stations have approved the train yet.');
+            }
         }
 
         if (!train.registry_id) {

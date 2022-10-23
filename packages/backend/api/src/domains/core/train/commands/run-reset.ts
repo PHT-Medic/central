@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainRunStatus } from '@personalhealthtrain/central-common';
+import { TrainRunStatus } from '@personalhealthtrain/central-common';
 import { publishMessage } from 'amqp-extension';
 import { BadRequestError } from '@ebec/http';
 import { useDataSource } from 'typeorm-extension';
@@ -13,9 +13,9 @@ import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../speci
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 
-export async function resetTrain(train: Train | number | string) : Promise<Train> {
+export async function resetTrain(train: TrainEntity | string) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository<Train>(TrainEntity);
+    const repository = dataSource.getRepository(TrainEntity);
 
     train = await findTrain(train, repository);
 

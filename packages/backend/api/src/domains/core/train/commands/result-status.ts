@@ -6,7 +6,6 @@
  */
 
 import {
-    Train,
     TrainManagerComponent,
     TrainManagerExtractorCommand,
 } from '@personalhealthtrain/central-common';
@@ -17,10 +16,10 @@ import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 
 export async function triggerTrainResultStatus(
-    train: string | Train,
-) : Promise<Train> {
+    train: string | TrainEntity,
+) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
-    const repository = dataSource.getRepository<Train>(TrainEntity);
+    const repository = dataSource.getRepository(TrainEntity);
 
     train = await findTrain(train, repository);
 

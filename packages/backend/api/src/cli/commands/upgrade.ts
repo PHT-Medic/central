@@ -8,6 +8,7 @@
 import { Argv, CommandModule } from 'yargs';
 import { upgradeCommand } from '@authelion/server-core';
 import { createConfig, useLogger } from '../../config';
+import { buildDataSourceOptions } from '../../database/utils';
 import env from '../../env';
 import { generateSwaggerDocumentation } from '../../http/swagger';
 
@@ -27,7 +28,9 @@ export class UpgradeCommand implements CommandModule {
 
         const logger = useLogger();
 
-        await upgradeCommand({ logger });
+        const dataSourceOptions = await buildDataSourceOptions();
+
+        await upgradeCommand({ logger, dataSourceOptions });
 
         await generateSwaggerDocumentation();
 

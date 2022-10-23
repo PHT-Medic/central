@@ -8,14 +8,14 @@
 import { BadRequestError } from '@ebec/http';
 import { publishMessage } from 'amqp-extension';
 import {
-    Train,
     TrainBuildStatus,
     TrainManagerComponent,
     TrainManagerRouterCommand,
 } from '@personalhealthtrain/central-common';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
+import { TrainEntity } from '../entity';
 
-export async function detectTrainRunStatus(train: Train) : Promise<Train> {
+export async function detectTrainRunStatus(train: TrainEntity) : Promise<TrainEntity> {
     if (
         train.build_status !== TrainBuildStatus.FINISHED
     ) {

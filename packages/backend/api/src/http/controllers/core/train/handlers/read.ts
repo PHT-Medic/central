@@ -8,7 +8,9 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
-    applyFilters, applyPagination, applyRelations, useDataSource,
+    applyQuery,
+    applyRelations,
+    useDataSource,
 } from 'typeorm-extension';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
@@ -48,39 +50,50 @@ export async function getOneTrainRouteHandler(req: ExpressRequest, res: ExpressR
 }
 
 export async function getManyTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { filter, page, include } = req.query;
-
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainEntity);
     const query = repository.createQueryBuilder('train');
 
-    if (filter) {
-        let { realm_id: realmId } = filter as Record<string, any>;
+    const { pagination, filters } = applyQuery(query, req.query, {
+        defaultAlias: 'train',
+        filters: {
+            allowed: ['id', 'name', 'proposal_id', 'realm_id'],
+        },
+        pagination: {
+            maxLimit: 50,
+        },
+        relations: {
+            allowed: ['user', 'proposal', 'master_image', 'entrypoint_file'],
+        },
+        sort: {
+            allowed: ['created_at', 'updated_at'],
+            default: {
+                updated_at: 'DESC',
+            },
+        },
+    });
 
-        if (!isPermittedForResourceRealm(req.realmId, realmId)) {
-            realmId = req.realmId;
+    let filterRealmId: string | undefined;
+
+    if (filters) {
+        for (let i = 0; i < filters.length; i++) {
+            if (
+                filters[i].path === 'train' &&
+                filters[i].key === 'realm_id'
+            ) {
+                filterRealmId = filters[i].value as string;
+                break;
+            }
         }
+    }
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        filter.realm_id = realmId;
+    if (filterRealmId) {
+        if (!isPermittedForResourceRealm(req.realmId, filterRealmId)) {
+            throw new ForbiddenError('You are not permitted to inspect trains for the given realm.');
+        }
     } else {
         onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
     }
-
-    applyRelations(query, include, {
-        defaultAlias: 'train',
-        allowed: ['user', 'proposal', 'master_image', 'entrypoint_file'],
-    });
-
-    applyFilters(query, filter, {
-        defaultAlias: 'train',
-        allowed: ['id', 'name', 'proposal_id', 'realm_id'],
-    });
-
-    const pagination = applyPagination(query, page, { maxLimit: 50 });
-
-    query.orderBy('train.updated_at', 'DESC');
 
     const [entities, total] = await query.getManyAndCount();
 
