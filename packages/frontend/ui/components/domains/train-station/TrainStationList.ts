@@ -48,9 +48,9 @@ export const TrainStationList = Vue.extend<
 ComponentListData<TrainStation>,
 ComponentListMethods<TrainStation>,
 any,
-ComponentListProperties<TrainStation> & {
+ComponentListProperties<BuildInput<TrainStation>> & {
     realmId?: Realm['id'],
-    sourceId: Train['id'] | Station['id'],
+    sourceId?: Train['id'] | Station['id'],
     target: DomainType,
     direction: Direction
 }
@@ -89,6 +89,7 @@ ComponentListProperties<TrainStation> & {
         },
         sourceId: {
             type: String,
+            default: undefined,
         },
         target: {
             type: String as PropType<DomainType>,
@@ -219,8 +220,16 @@ ComponentListProperties<TrainStation> & {
         isSocketEventForSource(item: TrainStation) {
             switch (this.source) {
                 case DomainType.Station:
+                    if (typeof this.sourceId === 'undefined') {
+                        return this.realmId === item.station_realm_id;
+                    }
+
                     return this.sourceId === item.station_id;
                 case DomainType.Train:
+                    if (typeof this.sourceId === 'undefined') {
+                        return this.realmId === item.train_realm_id;
+                    }
+
                     return this.sourceId === item.train_id;
             }
 
