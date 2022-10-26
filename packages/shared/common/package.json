@@ -17,7 +17,7 @@
     "devDependencies": {
         "@authelion/common": "^0.3.13",
         "@hapic/oauth2": "^0.0.2",
-        "hapic": "^0.0.2",
+        "hapic": "^0.1.2",
         "rapiq": "^0.3.1"
     },
     "peerDependencies": {
