@@ -5,8 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import Vue, { PropType } from 'vue';
-import { Realm } from '@authelion/common';
+import Vue from 'vue';
 import { Socket } from 'socket.io-client';
 import {
     SocketClientToServerEvents,
@@ -14,66 +13,60 @@ import {
     Station, StationSocketClientToServerEventName, StationSocketServerToClientEventName,
 } from '@personalhealthtrain/central-common';
 import { ComponentListHandlerMethodOptions } from '@vue-layout/utils';
-import { StationForm } from '../../../../../components/domains/station/StationForm';
+import { StationForm } from '../../../components/domains/station/StationForm';
 
-// todo: add data, prop, method typing
 export default Vue.extend<any, any, any, any>({
     components: { StationForm },
-    props: {
-        entity: {
-            type: Object as PropType<Realm>,
-            default: undefined,
-        },
-    },
     async asyncData(context) {
         try {
             const { data: stations } = await context.$api.station.getMany({
                 filter: {
-                    id: context.params.station_id,
+                    id: context.params.id,
                 },
-                fields: {
-                    station: [
-                        '+registry_id',
-                        '+registry_project_id',
-                        '+public_key',
-                        '+email',
-                        '+external_name',
-                    ],
-                },
+                fields: [
+                    '+registry_id',
+                    '+registry_project_id',
+                    '+public_key',
+                    '+email',
+                    '+external_name',
+                ],
             });
 
             if (stations.length === 0) {
-                await context.redirect(`/admin/realms/${context.params.id}/stations`);
+                await context.redirect('/admin/stations');
 
                 return {
-                    childEntity: undefined,
+                    entity: undefined,
                 };
             }
 
             return {
-                childEntity: stations[0],
+                entity: stations[0],
             };
         } catch (e) {
-            await context.redirect(`/admin/realms/${context.params.id}/stations`);
+            await context.redirect('/admin/stations');
 
             return {
-                childEntity: undefined,
+                entity: undefined,
             };
         }
     },
     data() {
         return {
-            childEntity: undefined,
+            entity: undefined,
+            tabs: [
+                { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
+            ],
         };
     },
     created() {
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.entity.id);
+        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
 
-        if (this.childEntity) {
-            socket.emit(StationSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.childEntity.id } });
+        if (this.entity) {
+            socket.emit(StationSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.entity.id } });
             socket.on(StationSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
         }
     },
@@ -81,18 +74,18 @@ export default Vue.extend<any, any, any, any>({
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.entity.id);
+        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
 
-        if (this.childEntity) {
-            socket.emit(StationSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.childEntity.id } });
+        if (this.entity) {
+            socket.emit(StationSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.entity.id } });
             socket.off(StationSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
         }
     },
     methods: {
         handleSocketUpdated(context: SocketServerToClientEventContext<Station>) {
             if (
-                this.childEntity.id !== context.data.id ||
-                context.meta.roomId !== this.childEntity.id
+                this.entity.id !== context.data.id ||
+                context.meta.roomId !== this.entity.id
             ) return;
 
             this.handleUpdated(context.data, { displayMessage: false });
@@ -106,7 +99,7 @@ export default Vue.extend<any, any, any, any>({
 
             const keys = Object.keys(item);
             for (let i = 0; i < keys.length; i++) {
-                Vue.set(this.childEntity, keys[i], item[keys[i]]);
+                Vue.set(this.entity, keys[i], item[keys[i]]);
             }
 
             if (options.displayMessage) {
@@ -134,10 +127,41 @@ export default Vue.extend<any, any, any, any>({
 });
 </script>
 <template>
-    <station-form
-        :entity="childEntity"
-        :realm-id="entity.id"
-        @updated="handleUpdated"
-        @failed="handleFailed"
-    />
+    <div class="container">
+        <h1 class="title no-border mb-3">
+            {{ entity.name }} <span class="sub-title">Details</span>
+        </h1>
+
+        <div class="m-b-20 m-t-10">
+            <div class="flex-wrap flex-row d-flex">
+                <div>
+                    <b-nav pills>
+                        <b-nav-item
+                            :to="'/admin/stations'"
+                            exact
+                            exact-active-class="active"
+                        >
+                            <i class="fa fa-arrow-left" />
+                        </b-nav-item>
+
+                        <b-nav-item
+                            v-for="(item,key) in tabs"
+                            :key="key"
+                            :to="'/admin/stations/' + entity.id + item.urlSuffix"
+                            exact
+                            exact-active-class="active"
+                        >
+                            <i :class="item.icon" />
+                            {{ item.name }}
+                        </b-nav-item>
+                    </b-nav>
+                </div>
+            </div>
+        </div>
+        <nuxt-child
+            :entity="entity"
+            @updated="handleUpdated"
+            @failed="handleFailed"
+        />
+    </div>
 </template>

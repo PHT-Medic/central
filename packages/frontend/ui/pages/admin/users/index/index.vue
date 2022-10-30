@@ -20,9 +20,6 @@ export default {
                     key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
-                    key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
                     key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
@@ -46,6 +43,16 @@ export default {
         canDrop() {
             return this.$auth.has(PermissionID.USER_DROP);
         },
+        managementRealmId() {
+            return this.$store.getters['auth/managementRealmId'];
+        },
+        query() {
+            return {
+                filter: {
+                    realm_id: this.managementRealmId,
+                },
+            };
+        },
     },
     methods: {
         handleDeleted(item) {
@@ -57,7 +64,10 @@ export default {
 };
 </script>
 <template>
-    <user-list ref="itemList">
+    <user-list
+        ref="itemList"
+        :query="query"
+    >
         <template #header-title>
             <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
         </template>
@@ -69,9 +79,6 @@ export default {
                 head-variant="'dark'"
                 outlined
             >
-                <template #cell(realm)="data">
-                    <span class="badge-dark badge">{{ data.item.realm_id }}</span>
-                </template>
                 <template #cell(options)="data">
                     <nuxt-link
                         v-if="canView"

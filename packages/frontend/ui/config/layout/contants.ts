@@ -115,6 +115,10 @@ export const LayoutSideAdminNavigation: Component[] = [
             PermissionID.REALM_EDIT,
             PermissionID.REALM_DROP,
 
+            PermissionID.PROVIDER_ADD,
+            PermissionID.PROVIDER_EDIT,
+            PermissionID.PROVIDER_DROP,
+
             PermissionID.USER_ADD,
             PermissionID.USER_EDIT,
             PermissionID.USER_DROP,
@@ -144,6 +148,18 @@ export const LayoutSideAdminNavigation: Component[] = [
                     PermissionID.PROVIDER_ADD,
                     PermissionID.PROVIDER_DROP,
                     PermissionID.PROPOSAL_EDIT,
+                ],
+            },
+            {
+                name: 'Identity Providers',
+                type: 'link',
+                url: '/admin/identity-providers',
+                icon: 'fas fa-atom',
+                [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                [LayoutKey.REQUIRED_PERMISSIONS]: [
+                    PermissionID.PROVIDER_ADD,
+                    PermissionID.PROVIDER_EDIT,
+                    PermissionID.PROVIDER_DROP,
                 ],
             },
             {
@@ -205,9 +221,25 @@ export const LayoutSideAdminNavigation: Component[] = [
         icon: 'fas fa-globe',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
+            PermissionID.STATION_ADD,
+            PermissionID.STATION_DROP,
+            PermissionID.STATION_EDIT,
+
             PermissionID.SERVICE_MANAGE,
         ],
         components: [
+            {
+                name: 'Stations',
+                type: 'link',
+                url: '/admin/stations',
+                icon: 'fa-solid fa-house-medical',
+                [LayoutKey.REQUIRED_LOGGED_IN]: true,
+                [LayoutKey.REQUIRED_PERMISSIONS]: [
+                    PermissionID.STATION_ADD,
+                    PermissionID.STATION_DROP,
+                    PermissionID.STATION_EDIT,
+                ],
+            },
             {
                 name: 'Services',
                 type: 'link',

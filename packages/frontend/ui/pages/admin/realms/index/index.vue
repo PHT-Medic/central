@@ -47,12 +47,20 @@ export default {
         canDrop() {
             return this.$auth.has(PermissionID.REALM_DROP);
         },
+
+        managementRealmId() {
+            return this.$store.getters['auth/managementRealmId'];
+        },
     },
     methods: {
         handleDeleted(item) {
             this.$emit('deleted', item);
 
             this.$refs.itemsList.handleDeleted(item);
+        },
+
+        async setManagementRealmId(realmId) {
+            await this.$store.dispatch('auth/triggerSetManagementRealmId', realmId);
         },
     },
 };
@@ -85,6 +93,15 @@ export default {
                 outlined
             >
                 <template #cell(options)="data">
+                    <button
+                        v-if="managementRealmId !== data.item.id"
+                        class="btn btn-xs btn-primary"
+                        @click="setManagementRealmId(data.item.id)"
+                    >
+                        <i
+                            class="fa-solid fa-check"
+                        />
+                    </button>
                     <nuxt-link
                         v-if="canEdit"
                         v-b-tooltip="'Overview'"

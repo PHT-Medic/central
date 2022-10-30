@@ -36,7 +36,6 @@
     </div>
 </template>
 <script>
-import { PermissionID } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default {
@@ -44,9 +43,9 @@ export default {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
     },
-    computed: {
-        sidebarItems() {
-            const items = [
+    data() {
+        return {
+            sidebarItems: [
                 {
                     name: 'Account', icon: 'fas fa-bars', urlSuffix: '',
                 },
@@ -56,24 +55,8 @@ export default {
                 {
                     name: 'Secrets', icon: 'fa fa-key', urlSuffix: '/secrets',
                 },
-            ];
-
-            if (this.$auth.has([
-                PermissionID.STATION_EDIT,
-                PermissionID.STATION_DROP,
-                PermissionID.STATION_EDIT,
-
-                PermissionID.PROVIDER_ADD,
-                PermissionID.PROVIDER_EDIT,
-                PermissionID.PROVIDER_DROP,
-            ])) {
-                items.push({
-                    name: 'Realm', icon: 'fas fa-university', urlSuffix: '/realm',
-                });
-            }
-
-            return items;
-        },
+            ],
+        };
     },
 };
 </script>

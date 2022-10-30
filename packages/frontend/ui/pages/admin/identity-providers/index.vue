@@ -9,21 +9,18 @@ import { PropType } from 'vue';
 import { Realm } from '@authelion/common';
 
 export default {
-    props: {
-        entity: Object as PropType<Realm>,
-    },
     data() {
         return {
             sidebar: {
                 hide: false,
                 items: [
                     {
-                        name: 'Overview',
+                        name: 'overview',
                         urlSuffix: '',
                         icon: 'fa fa-info-circle',
                     },
                     {
-                        name: 'Add',
+                        name: 'add',
                         urlSuffix: '/add',
                         icon: 'fa fa-plus',
                     },
@@ -43,30 +40,33 @@ export default {
 };
 </script>
 <template>
-    <div class="content-wrapper">
-        <div class="content-sidebar">
-            <b-nav
-                pills
-                vertical
-            >
-                <b-nav-item
-                    v-for="(item,key) in sidebar.items"
-                    :key="key"
-                    :disabled="item.active"
-                    :to="'/settings/realm/providers'+ item.urlSuffix"
-                    exact
-                    exact-active-class="active"
+    <div class="container">
+        <h1 class="title no-border mb-3">
+            Identity-Provider <span class="sub-title">Management</span>
+        </h1>
+        <div class="content-wrapper">
+            <div class="content-sidebar">
+                <b-nav
+                    pills
+                    vertical
                 >
-                    <i :class="item.icon" />
-                    {{ item.name }}
-                </b-nav-item>
-            </b-nav>
-        </div>
-        <div class="content-container">
-            <nuxt-child
-                :entity="entity"
-                @deleted="handleDeleted"
-            />
+                    <b-nav-item
+                        v-for="(item,key) in sidebar.items"
+                        :key="key"
+                        :to="'/admin/identity-providers'+ item.urlSuffix"
+                        exact
+                        exact-active-class="active"
+                    >
+                        <i :class="item.icon" />
+                        {{ item.name }}
+                    </b-nav-item>
+                </b-nav>
+            </div>
+            <div class="content-container">
+                <nuxt-child
+                    @deleted="handleDeleted"
+                />
+            </div>
         </div>
     </div>
 </template>
