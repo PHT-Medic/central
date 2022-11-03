@@ -31,10 +31,6 @@ export default {
             entity: undefined,
             tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-                { name: 'Stations', icon: 'fa-solid fa-house-medical', urlSuffix: '/stations' },
-                { name: 'Users', icon: 'fa fa-users', urlSuffix: '/users' },
-                { name: 'Robots', icon: 'fa fa-robot', urlSuffix: '/robots' },
-                { name: 'Providers', icon: 'fa-solid fa-atom', urlSuffix: '/providers' },
             ],
         };
     },

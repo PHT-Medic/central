@@ -20,9 +20,6 @@ export default {
                     key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
-                    key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
                     key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
                 },
                 {
@@ -35,6 +32,9 @@ export default {
     computed: {
         query() {
             return {
+                filter: {
+                    realm_id: this.managementRealmId,
+                },
                 sort: {
                     updated_at: 'DESC',
                 },
@@ -45,6 +45,9 @@ export default {
         },
         canDrop() {
             return this.$auth.has(PermissionID.ROBOT_DROP);
+        },
+        managementRealmId() {
+            return this.$store.getters['auth/managementRealmId'];
         },
     },
     methods: {
@@ -73,9 +76,6 @@ export default {
                 head-variant="'dark'"
                 outlined
             >
-                <template #cell(realm)="data">
-                    <span class="badge-dark badge">{{ data.item.realm_id }}</span>
-                </template>
                 <template #cell(options)="data">
                     <nuxt-link
                         v-if="canEdit"

@@ -6,10 +6,8 @@
   -->
 <script lang="ts">
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { PropType } from 'vue';
-import { Realm } from '@authelion/common';
-import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
-import { StationForm } from '../../../../../components/domains/station/StationForm';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
+import { StationForm } from '../../../../components/domains/station/StationForm';
 
 export default {
     components: { StationForm },
@@ -20,8 +18,10 @@ export default {
             PermissionID.USER_ADD,
         ],
     },
-    props: {
-        entity: Object as PropType<Realm>,
+    computed: {
+        managementRealmId() {
+            return this.$store.getters['auth/managementRealmId'];
+        },
     },
     methods: {
         handleCreated(e) {
@@ -30,7 +30,7 @@ export default {
                 variant: 'success',
             });
 
-            this.$nuxt.$router.push(`/admin/realms/${this.entity.id}/stations/${e.id}`);
+            this.$nuxt.$router.push(`/admin/stations/${e.id}`);
         },
         handleFailed(e) {
             this.$bvToast.toast(e.message, {
@@ -43,8 +43,7 @@ export default {
 </script>
 <template>
     <station-form
-        :realm-id="entity.id"
-        :realm-name="entity.name"
+        :realm-id="managementRealmId"
         @created="handleCreated"
         @failed="handleFailed"
     />

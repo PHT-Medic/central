@@ -10,7 +10,7 @@ import { ForbiddenError } from '@ebec/http';
 import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { runRegistryProjectValidation } from '../utils/validation';
+import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 

@@ -12,7 +12,6 @@ import {
     AbilityDescriptor,
     OAuth2TokenGrantResponse,
     OAuth2TokenKind,
-    Robot,
     User,
 } from '@authelion/common';
 import { RootState } from './index';
@@ -20,7 +19,7 @@ import { AuthBrowserStorageKey } from '../config/auth';
 
 export interface AuthState {
     user: User | undefined,
-    robot: Robot | undefined,
+    managementRealmId: string | undefined,
 
     permissions: AbilityDescriptor[],
     resolved: boolean,
@@ -37,7 +36,8 @@ export interface AuthState {
 }
 const state = () : AuthState => ({
     user: undefined,
-    robot: undefined,
+
+    managementRealmId: undefined,
 
     permissions: [],
     resolved: false,
@@ -58,9 +58,7 @@ export const getters : GetterTree<AuthState, RootState> = {
     userId: (state: AuthState) => (state.user ? state.user.id : undefined),
     userRealmId: (state: AuthState) => (state.user ? state.user.realm_id : undefined),
 
-    robot: (state: AuthState) => state.robot,
-    robotId: (state: AuthState) => (state.robot ? state.robot.id : undefined),
-    robotRealmId: (state: AuthState) => (state.robot ? state.robot.realm_id : undefined),
+    managementRealmId: (state) => state.managementRealmId || (state.user ? state.user.realm_id : undefined),
 
     permissions: (state: AuthState) => state.permissions,
     resolved: (state: AuthState) => state.resolved,
@@ -140,13 +138,10 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     // --------------------------------------------------------------------
 
-    triggerSetRobot({ commit }, entity) {
-        this.$authWarehouse.set(AuthBrowserStorageKey.ROBOT, entity);
-        commit('setRobot', entity);
-    },
-    triggerUnsetRobot({ commit }) {
-        this.$authWarehouse.remove(AuthBrowserStorageKey.ROBOT);
-        commit('unsetRobot');
+    triggerSetManagementRealmId({ commit }, realmId) {
+        commit('setManagementRealmId', realmId);
+
+        this.$authWarehouse.set(AuthBrowserStorageKey.MANAGEMENT_REALM_ID, realmId);
     },
 
     // --------------------------------------------------------------------
@@ -249,10 +244,10 @@ export const actions : ActionTree<AuthState, RootState> = {
         await dispatch('triggerUnsetToken', OAuth2TokenKind.ACCESS);
         await dispatch('triggerUnsetToken', OAuth2TokenKind.REFRESH);
         await dispatch('triggerUnsetUser');
-        await dispatch('triggerUnsetRobot');
         await dispatch('triggerUnsetPermissions');
 
         await dispatch('triggerSetLoginRequired', false);
+        await dispatch('triggerSetManagementRealmId', undefined);
     },
 
     // --------------------------------------------------------------------
@@ -325,11 +320,8 @@ export const mutations : MutationTree<AuthState> = {
 
     // --------------------------------------------------------------------
 
-    setRobot(state, robot) {
-        state.robot = robot;
-    },
-    unsetRobot(state) {
-        state.robot = undefined;
+    setManagementRealmId(state, realmId) {
+        state.managementRealmId = realmId;
     },
 
     // --------------------------------------------------------------------

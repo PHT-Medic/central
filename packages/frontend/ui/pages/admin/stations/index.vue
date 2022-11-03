@@ -1,5 +1,5 @@
 <!--
-  Copyright (c) 2021.
+  Copyright (c) 2021-2022.
   Author Peter Placzek (tada5hi)
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
@@ -7,9 +7,7 @@
 
 <script lang="ts">
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { PropType } from 'vue';
-import { Realm } from '@authelion/common';
-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default {
     meta: {
@@ -20,9 +18,6 @@ export default {
             PermissionID.STATION_DROP,
             PermissionID.STATION_ADD,
         ],
-    },
-    props: {
-        entity: Object as PropType<Realm>,
     },
     data() {
         return {
@@ -46,27 +41,31 @@ export default {
 };
 </script>
 <template>
-    <div class="content-wrapper">
-        <div class="content-sidebar flex-column">
-            <b-nav
-                pills
-                vertical
-            >
-                <b-nav-item
-                    v-for="(item,key) in sidebar.items"
-                    :key="key"
-                    :disabled="item.active"
-                    :to="'/settings/realm/stations' + item.urlSuffix"
-                    exact
-                    exact-active-class="active"
+    <div class="container">
+        <h1 class="title no-border mb-3">
+            Station <span class="sub-title">Management</span>
+        </h1>
+        <div class="content-wrapper">
+            <div class="content-sidebar flex-column">
+                <b-nav
+                    pills
+                    vertical
                 >
-                    <i :class="item.icon" />
-                    {{ item.name }}
-                </b-nav-item>
-            </b-nav>
-        </div>
-        <div class="content-container">
-            <nuxt-child :entity="entity" />
+                    <b-nav-item
+                        v-for="(item,key) in sidebar.items"
+                        :key="key"
+                        :to="'/admin/stations' + item.urlSuffix"
+                        exact
+                        exact-active-class="active"
+                    >
+                        <i :class="item.icon" />
+                        {{ item.name }}
+                    </b-nav-item>
+                </b-nav>
+            </div>
+            <div class="content-container">
+                <nuxt-child />
+            </div>
         </div>
     </div>
 </template>

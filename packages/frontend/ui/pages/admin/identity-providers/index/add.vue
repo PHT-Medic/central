@@ -5,13 +5,11 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-
-import { PropType } from 'vue';
-import { Realm } from '@authelion/common';
-
 export default {
-    props: {
-        entity: Object as PropType<Realm>,
+    computed: {
+        managementRealmId() {
+            return this.$store.getters['auth/managementRealmId'];
+        },
     },
     methods: {
         async handleCreated(e) {
@@ -20,7 +18,7 @@ export default {
                 variant: 'success',
             });
 
-            await this.$nuxt.$router.push(`/admin/realms/${this.entity.id}/providers/${e.id}`);
+            await this.$nuxt.$router.push(`/admin/identity-providers/${e.id}`);
         },
         async handleFailed(e) {
             this.$bvToast.toast(e.message, {
@@ -33,7 +31,7 @@ export default {
 </script>
 <template>
     <o-auth2-provider-form
-        :realm-id="entity.id"
+        :realm-id="managementRealmId"
         @created="handleCreated"
         @failed="handleFailed"
     />

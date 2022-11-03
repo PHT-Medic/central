@@ -10,12 +10,9 @@ import {
 } from '@personalhealthtrain/central-common';
 import { PropType } from 'vue';
 import { Realm } from '@authelion/common';
-import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout/contants';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
 
 export default {
-    props: {
-        entity: Object as PropType<Realm>,
-    },
     meta: {
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -59,10 +56,13 @@ export default {
         query() {
             return {
                 filter: {
-                    realm_id: this.entity.id,
+                    realm_id: this.managementRealmId,
                 },
                 fields: ['+client_secret'],
             };
+        },
+        managementRealmId() {
+            return this.$store.getters['auth/managementRealmId'];
         },
     },
     methods: {
@@ -83,6 +83,9 @@ export default {
             ref="itemsList"
             :query="query"
         >
+            <template #header-title>
+                <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
+            </template>
             <template #items="props">
                 <b-table
                     :items="props.items"
@@ -94,7 +97,7 @@ export default {
                     <template #cell(options)="data">
                         <nuxt-link
                             class="btn btn-xs btn-outline-primary"
-                            :to="'/settings/realm/providers/'+data.item.id"
+                            :to="'/admin/identity-providers/'+data.item.id"
                         >
                             <i class="fa fa-bars" />
                         </nuxt-link>

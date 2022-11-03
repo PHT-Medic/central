@@ -4,24 +4,20 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+<script lang="ts">
+import Vue from 'vue';
 
-export default {
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-    },
+export default Vue.extend({
     async asyncData(context) {
         try {
-            const entity = await context.$authApi.realm.getOne(context.store.getters['auth/userRealmId']);
+            const entity = await context.$authApi.identityProvider.getOne(context.params.id);
 
             return {
                 entity,
             };
         } catch (e) {
-            await context.redirect('/settings');
+            await context.redirect('/admin/identity-providers');
+
             return {
 
             };
@@ -30,65 +26,54 @@ export default {
     data() {
         return {
             entity: undefined,
-        };
-    },
-    computed: {
-        tabs() {
-            const items = [
+            tabs: [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-            ];
-
-            if (this.$auth.has([
-                PermissionID.STATION_EDIT,
-                PermissionID.STATION_DROP,
-                PermissionID.STATION_EDIT,
-            ])) {
-                items.push({ name: 'Stations', icon: 'fa-solid fa-house-medical', urlSuffix: '/stations' });
-            }
-
-            if (this.$auth.has([
-                PermissionID.PROVIDER_ADD,
-                PermissionID.PROVIDER_EDIT,
-                PermissionID.PROVIDER_DROP,
-            ])) {
-                items.push({ name: 'Providers', icon: 'fa-solid fa-atom', urlSuffix: '/providers' });
-            }
-
-            return items;
-        },
+            ],
+        };
     },
     methods: {
         handleUpdated(item) {
             const keys = Object.keys(item);
             for (let i = 0; i < keys.length; i++) {
-                this.entity[keys[i]] = item[keys[i]];
+                Vue.set(this.entity, keys[i], item[keys[i]]);
             }
 
-            this.$bvToast.toast(`The realm ${item.name} was successfully updated.`, {
+            this.$bvToast.toast('The provider was successfully updated.', {
                 toaster: 'b-toaster-top-center',
                 variant: 'success',
             });
         },
-        async handleFailed(e) {
+        handleFailed(e) {
             this.$bvToast.toast(e.message, {
                 toaster: 'b-toaster-top-center',
                 variant: 'warning',
             });
-        },
+        }
     },
-};
+});
 </script>
 <template>
-    <div>
+    <div class="container">
+        <h1 class="title no-border mb-3">
+            {{ entity.name }} <span class="sub-title">Details</span>
+        </h1>
+
         <div class="m-b-20 m-t-10">
             <div class="flex-wrap flex-row d-flex">
                 <div>
                     <b-nav pills>
                         <b-nav-item
+                            :to="'/admin/identity-providers'"
+                            exact
+                            exact-active-class="active"
+                        >
+                            <i class="fa fa-arrow-left" />
+                        </b-nav-item>
+
+                        <b-nav-item
                             v-for="(item,key) in tabs"
                             :key="key"
-                            :disabled="item.active"
-                            :to="'/settings/realm' + item.urlSuffix"
+                            :to="'/admin/identity-providers/' + entity.id + item.urlSuffix"
                             exact
                             exact-active-class="active"
                         >
