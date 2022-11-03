@@ -42,7 +42,7 @@
         "redis-extension": "^1.1.1",
         "reflect-metadata": "^0.1.13",
         "swagger-ui-express": "^4.5.0",
-        "tar": "^6.1.2",
+        "tar": "^6.1.12",
         "tar-stream": "^2.1.4",
         "typeorm": "^0.3.10",
         "typeorm-extension": "^2.2.8",
