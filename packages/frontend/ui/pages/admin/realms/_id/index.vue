@@ -5,68 +5,36 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { PropType } from 'vue';
 import { Realm } from '@authelion/common';
-import { PermissionID } from '@personalhealthtrain/central-common';
+import { LayoutKey } from '../../../../config/layout';
 
 export default {
-    computed: {
-        canManageStations() {
-            return this.$auth.has([
-                PermissionID.STATION_EDIT,
-                PermissionID.STATION_DROP,
-                PermissionID.STATION_EDIT,
-            ]);
-        },
-        canManageProviders() {
-            return this.$auth.has([
-                PermissionID.PROVIDER_ADD,
-                PermissionID.PROVIDER_EDIT,
-                PermissionID.PROVIDER_DROP,
-            ]);
-        },
-    },
     props: {
         entity: Object as PropType<Realm>,
+    },
+    meta: {
+        [LayoutKey.REQUIRED_PERMISSIONS]: [
+            PermissionID.REALM_EDIT,
+        ],
+    },
+    methods: {
+        handleUpdated(e) {
+            this.$emit('updated', e);
+        },
+        handleFailed(e) {
+            this.$emit('failed', e);
+        },
     },
 };
 </script>
 <template>
-    <div class="row">
-        <div
-            v-if="canManageStations"
-            class="col"
-        >
-            <h6><i class="fa fa-city" /> Station</h6>
-            <p>
-                Create one or more stations and associate them to the current realm. <br>
-                Those stations can be targeted by a proposal or train, if they are not marked as <strong>hidden</strong>.
-            </p>
-            <nuxt-link
-                :to="'/admin/realms/'+entity.id+'/stations'"
-                class="btn btn-xs btn-dark"
-            >
-                Manage
-            </nuxt-link>
-        </div>
-        <div
-            v-if="canManageProviders"
-            class="col"
-        >
-            <h6><i class="fa fa-boxes" /> Provider(s)</h6>
-
-            <p>
-                To authenticate as a user of this realm, without local authentication (name/password) against the local database,
-                you have to link an authentication provider.<br>
-                For example you can add an Open ID client like Keycloak.
-            </p>
-
-            <nuxt-link
-                :to="'/admin/realms/'+entity.id+'/providers'"
-                class="btn btn-xs btn-dark"
-            >
-                Manage
-            </nuxt-link>
-        </div>
+    <div>
+        <realm-form
+            :entity="entity"
+            @updated="handleUpdated"
+            @failed="handleFailed"
+        />
     </div>
 </template>
