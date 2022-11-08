@@ -63,14 +63,6 @@ export async function runTrainValidation(
 
     await check('entrypoint_file_id')
         .isUUID()
-        .custom(async (value) => {
-            const dataSource = await useDataSource();
-            const repository = dataSource.getRepository(TrainFileEntity);
-            const entity = await repository.findOneBy({ id: value });
-            if (!entity) {
-                throw new NotFoundError('The referenced entrypoint file is invalid.');
-            }
-        })
         .optional({ nullable: true })
         .run(req);
 
@@ -122,6 +114,11 @@ export async function runTrainValidation(
     await extendExpressValidationResultWithRelation(result, RegistryEntity, {
         id: 'registry_id',
         entity: 'registry',
+    });
+
+    await extendExpressValidationResultWithRelation(result, TrainFileEntity, {
+        id: 'entrypoint_file_id',
+        entity: 'entrypoint_file',
     });
 
     if (result.relation.proposal) {
