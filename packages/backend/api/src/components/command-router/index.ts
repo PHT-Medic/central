@@ -6,7 +6,7 @@
  */
 
 import { consumeQueue } from 'amqp-extension';
-import { MessageQueueRoutingKey } from '../../config/mq';
+import { MessageQueueRoutingKey } from '../../config';
 import { createSecretStorageComponentHandlers } from '../secret-storage';
 import { createRegistryComponentHandlers } from '../registry';
 import { createStationRegistryQueueComponentHandlers } from '../station-registry';
