@@ -16,13 +16,13 @@
     "license": "MIT",
     "devDependencies": {
         "@authelion/common": "^0.3.13",
-        "@hapic/oauth2": "^0.0.2",
+        "@hapic/oauth2": "^0.1.1",
         "hapic": "^0.0.2",
         "rapiq": "^0.3.1"
     },
     "peerDependencies": {
         "@authelion/common": "^0.x",
-        "@hapic/oauth2": "^0.0.2",
+        "@hapic/oauth2": "^0.1.1",
         "hapic": "^0.x",
         "rapiq": ">=0.3.0 <1.0.0"
     },
