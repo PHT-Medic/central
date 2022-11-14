@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "@authelion/common": "^0.3.13",
-        "@authelion/server-adapter": "^0.3.13",
+        "@authelion/server-adapter": "^0.3.16",
         "@ebec/http": "^0.0.4",
         "@hapic/harbor": "^0.0.2",
         "@hapic/vault": "^0.0.2",
