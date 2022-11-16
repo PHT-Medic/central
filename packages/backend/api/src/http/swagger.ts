@@ -32,7 +32,7 @@ export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDoc
         allow: ['**/@authelion/**'],
         decorator: {
             internal: true,
-            library: [
+            preset: [
                 'decorators-express',
             ],
         },
