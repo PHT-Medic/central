@@ -15,6 +15,8 @@ import { buildEventQueueMessageForAPI } from '../../config';
 import { BaseError } from '../error';
 
 export async function writeFailedEvent(message: Message, error: Error) {
+    console.log(error);
+
     const routingError = error instanceof RouterError || error instanceof BaseError ?
         error :
         new RouterError({ previous: error });

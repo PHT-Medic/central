@@ -103,7 +103,6 @@ export async function processBuildCommand(message: Message) {
 
     useLogger().debug(`Writing ${TrainContainerFileName.CONFIG} to container`, {
         component: 'building',
-        config: trainConfig,
     });
 
     await container.putArchive(

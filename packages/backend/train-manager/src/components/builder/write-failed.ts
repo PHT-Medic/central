@@ -17,6 +17,8 @@ export async function writeFailedEvent(
     message: Message,
     error: Error,
 ) {
+    console.log(error);
+
     const buildingError = error instanceof BuilderError || error instanceof BaseError ?
         error :
         new BuilderError({ previous: error });
