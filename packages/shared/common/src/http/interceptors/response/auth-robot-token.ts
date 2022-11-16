@@ -10,7 +10,6 @@ import {
 } from '@authelion/common';
 import { Client } from '@hapic/oauth2';
 import { isClientError } from 'hapic';
-import { ClientError } from 'hapic/dist/types/type';
 import { HTTPClient } from '../../client';
 import { hasOwnProperty } from '../../../utils';
 
