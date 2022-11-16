@@ -74,11 +74,9 @@ export function createRefreshRobotTokenOnResponseErrorHandler(context: {
                         .catch((e) => {
                             context.httpClient.unsetAuthorizationHeader();
 
-                            e.response.status = 500;
-                            e.response.data = {
-                                ...(e.response.data || {}),
-                                code: null,
-                            };
+                            if (isClientError(e)) {
+                                e.response.status = 500;
+                            }
 
                             return Promise.reject(e);
                         });
