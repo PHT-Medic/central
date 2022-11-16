@@ -10,6 +10,7 @@ import {
 } from '@authelion/common';
 import { Client } from '@hapic/oauth2';
 import { isClientError } from 'hapic';
+import { ClientError } from 'hapic/dist/types/type';
 import { HTTPClient } from '../../client';
 import { hasOwnProperty } from '../../../utils';
 
@@ -40,6 +41,10 @@ export function createRefreshRobotTokenOnResponseErrorHandler(context: {
     load: () => Promise<Pick<Robot, 'id' | 'secret'>>
 }) {
     return (err?: any) => {
+        if (!isClientError(err)) {
+            return Promise.reject(err);
+        }
+
         const { config } = err;
 
         const currentState = getCurrentState(config);
