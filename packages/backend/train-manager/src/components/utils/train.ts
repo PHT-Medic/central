@@ -23,7 +23,9 @@ export async function extendPayload(message: Message) {
     try {
         data.entity = await client.train.getOne(data.id);
     } catch (e) {
-        throw BaseError.notFound();
+        throw BaseError.notFound({
+            previous: e,
+        });
     }
 
     try {
@@ -32,7 +34,9 @@ export async function extendPayload(message: Message) {
         });
         data.registryId = data.registry.id;
     } catch (e) {
-        throw BaseError.registryNotFound();
+        throw BaseError.registryNotFound({
+            previous: e,
+        });
     }
 
     return {
