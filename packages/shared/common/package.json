@@ -18,13 +18,13 @@
         "@authelion/common": "^0.3.16",
         "@hapic/oauth2": "^0.1.2",
         "hapic": "^0.1.2",
-        "rapiq": "^0.3.1"
+        "rapiq": "^0.4.1"
     },
     "peerDependencies": {
         "@authelion/common": "^0.x",
         "@hapic/oauth2": "^0.x",
         "hapic": "^0.x",
-        "rapiq": ">=0.3.0 <1.0.0"
+        "rapiq": ">=0.4.1 <1.0.0"
     },
     "dependencies": {
         "nanoid": "^3.3.4"

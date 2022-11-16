@@ -61,10 +61,7 @@ export default Vue.extend({
                     realm: true,
                 },
                 filter: {
-                    realm_id: {
-                        operator: '!',
-                        value: 'master',
-                    },
+                    realm_id: '!master',
                 },
                 sort: {
                     created_at: 'DESC',
