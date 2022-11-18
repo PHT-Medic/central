@@ -11,7 +11,7 @@
     "description": "This package contains the central realtime application of the PHT.",
     "dependencies": {
         "@authelion/common": "^0.3.16",
-        "@authelion/server-adapter": "^0.3.16",
+        "@authelion/server-adapter": "^0.3.17",
         "@ebec/http": "^0.0.4",
         "@hapic/vault": "^0.1.3",
         "@personalhealthtrain/central-common": "^1.3.27",
