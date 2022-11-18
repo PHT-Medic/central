@@ -13,7 +13,7 @@
     "dependencies": {
         "@authelion/common": "^0.3.16",
         "@authelion/server-core": "^0.3.23",
-        "@authelion/server-utils": "^0.3.17",
+        "@authelion/server-utils": "^0.3.18",
         "@decorators/di": "^1.0.2",
         "@decorators/express": "^2.4.0",
         "@ebec/http": "^0.0.4",
