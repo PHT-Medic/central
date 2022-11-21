@@ -73,9 +73,7 @@ export function createRefreshRobotTokenOnResponseErrorHandler(context: {
                                     token: token.access_token,
                                 });
 
-                            console.log(config.headers);
                             config.headers = JSON.parse(JSON.stringify(config.headers || {}));
-                            console.log(config.headers);
                             return context.httpClient.request(config);
                         })
                         .catch((e) => {

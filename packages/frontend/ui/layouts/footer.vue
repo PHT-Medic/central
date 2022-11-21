@@ -26,8 +26,11 @@ export default {
 <template>
     <div class="page-footer">
         <license-agreement />
+
         <div class="copyright">
-            &copy; PHT {{ year }} &bull; UI - Design & Code by <a
+            &copy; {{ year }}
+            <a href="https://pht-medic.github.io/documentation/about/team.html">PHT-meDIC</a> &bull;
+            UI - Design & Code by <a
                 href="https://tada5hi.net"
                 target="_blank"
             >Peter Placzek</a>

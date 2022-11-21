@@ -53,6 +53,7 @@ export async function processCheckCommand(message: Message) {
         } catch (e) {
             throw BuilderError.registryProjectNotFound({
                 message: `The train ${specialProjects[i].type} registry-project was not found.`,
+                previous: e,
             });
         }
 

@@ -6,6 +6,7 @@
  */
 
 import Vue, { CreateElement, VNode } from 'vue';
+import LicenseAgreementContent from './LicenseAgreementContent.vue';
 
 export default Vue.extend<any, any, any, any>({
     name: 'LicenseAgreementForm',
@@ -46,14 +47,15 @@ export default Vue.extend<any, any, any, any>({
         const h = createElement;
 
         const info = h('div', {
-            staticClass: 'alert alert-sm alert-danger',
+            staticClass: 'alert alert-sm alert-warning',
         }, [
+            h('i', { class: 'fa fa-exclamation-triangle pr-1' }),
             'It is necessary to accept the license agreement',
             ' in order to be able to use the application in its entirety.',
         ]);
 
         const content = h('div', [
-            '...',
+            h(LicenseAgreementContent),
         ]);
 
         const accept = h('button', {
@@ -91,9 +93,9 @@ export default Vue.extend<any, any, any, any>({
         ]);
 
         return h('div', [
-            content,
-            h('hr'),
             info,
+            h('hr'),
+            content,
             h('hr'),
             h('div', {
                 staticClass: 'd-flex flex-row',
