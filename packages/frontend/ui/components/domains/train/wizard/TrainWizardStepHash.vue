@@ -54,6 +54,19 @@ export default {
         this.init();
     },
     methods: {
+        copyToClipboard() {
+            if (
+                typeof navigator !== 'undefined' &&
+                typeof navigator.clipboard !== 'undefined'
+            ) {
+                navigator.clipboard.writeText(this.form.hash);
+
+                this.$bvToast.toast('The hash was copied to the clipboard.', {
+                    toaster: 'b-toaster-top-center',
+                    variant: 'success',
+                });
+            }
+        },
         init() {
             if (this.train.hash) {
                 this.form.hash = this.train.hash;
@@ -145,7 +158,16 @@ export default {
         <hr class="m-t-10">
 
         <div class="form-group">
-            <label>Hash</label>
+            <label class="d-flex flex-row">
+                Hash
+
+                <a
+                    v-if="hashExists"
+                    href="javascript:void(0)"
+                    class="badge badge-dark ml-auto"
+                    @click.prevent="copyToClipboard()"
+                ><i class="fa fa-copy" /> Copy</a>
+            </label>
             <input
                 type="text"
                 class="form-control"
