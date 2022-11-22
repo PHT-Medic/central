@@ -83,6 +83,8 @@ export default {
                         user_rsa_secret_id: this.userRsaSecretId === item.id ? null : item.id,
                     });
 
+                    delete response.user_paillier_secret_id;
+
                     this.$emit('updated', response);
                     break;
                 }
@@ -90,6 +92,8 @@ export default {
                     const response = await this.$api.train.update(this.trainId, {
                         user_paillier_secret_id: this.userPaillierSecretId === item.id ? null : item.id,
                     });
+
+                    delete response.user_rsa_secret_id;
 
                     this.$emit('updated', response);
                     break;
