@@ -9,7 +9,7 @@ import {
     ErrorCode, Robot,
 } from '@authelion/common';
 import { Client } from '@hapic/oauth2';
-import { isClientError } from 'hapic';
+import { isClientError, stringifyAuthorizationHeader } from 'hapic';
 import { HTTPClient } from '../../client';
 import { hasOwnProperty } from '../../../utils';
 
@@ -74,6 +74,11 @@ export function createRefreshRobotTokenOnResponseErrorHandler(context: {
                                 });
 
                             config.headers = JSON.parse(JSON.stringify(config.headers || {}));
+                            config.headers.Authorization = stringifyAuthorizationHeader({
+                                type: 'Bearer',
+                                token: token.access_token,
+                            });
+
                             return context.httpClient.request(config);
                         })
                         .catch((e) => {
