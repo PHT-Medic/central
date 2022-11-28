@@ -122,7 +122,7 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
             try {
                 switch (this.command) {
                     case 'resultDownload':
-                        window.open(this.$api.train.getResultUrl(this.entity.id));
+                        window.open(new URL(this.$api.train.getResultDownloadPath(this.entity.id), this.$config.apiUrl).href, '_blank');
                         break;
                     default: {
                         const train = await this.$api.train.runCommand(this.entity.id, this.command);

@@ -17,7 +17,7 @@ export class TrainFileAPI {
         this.client = client;
     }
 
-    getDownloadURI(
+    getDownloadPath(
         trainId: Train['id'],
     ): string {
         return `trains/${trainId}/files/download`;
@@ -66,7 +66,7 @@ export class TrainFileAPI {
     async download(
         trainId: Train['id'],
     ) {
-        const response = await this.client.get(this.getDownloadURI(trainId), {
+        const response = await this.client.get(this.getDownloadPath(trainId), {
             responseType: 'stream',
         });
 
