@@ -15,10 +15,7 @@ import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
 import { streamToBuffer } from '../../../../../core/utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import {
-    generateTrainFilesMinioBucketName,
-} from '../../../../../domains/core/train-file/path';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
+import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/core/train';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 
 export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: ExpressResponse) {
@@ -47,7 +44,7 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
 
     const minio = useMinio();
 
-    const bucketName = generateTrainFilesMinioBucketName(entity.id);
+    const bucketName = generateTrainMinioBucketName(entity.id);
     const hasBucket = await minio.bucketExists(bucketName);
     if (!hasBucket) {
         await minio.makeBucket(bucketName, 'eu-west-1');
@@ -105,11 +102,18 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
     });
 
     instance.on('finish', async () => {
-        if (files.length === 0) {
-            throw new BadRequestError('No files provided.');
-        }
-
         await Promise.all(promises);
+
+        if (files.length === 0) {
+            return res.respond({
+                data: {
+                    data: [],
+                    meta: {
+                        total: 0,
+                    },
+                },
+            });
+        }
 
         await trainFileRepository.save(files, { listeners: true });
 

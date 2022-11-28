@@ -15,7 +15,7 @@ import {
 import { useClient } from 'hapic';
 import {
     buildRemoteDockerImageURL,
-    generateTrainResultsMinioBucketName,
+    generateTrainMinioBucketName,
 } from '../../../../config';
 import { useMinio } from '../../../../core/minio';
 import { checkIfLocalRegistryImageExists } from '../../../../modules/docker';
@@ -32,11 +32,11 @@ export async function processCheckCommand(message: Message) : Promise<Message> {
 
     // 1. Check if result already exists.
     const minio = useMinio();
-    const bucketName = generateTrainResultsMinioBucketName(data.id);
+    const bucketName = generateTrainMinioBucketName(data.id);
     const hasBucket = await minio.bucketExists(bucketName);
     if (hasBucket) {
         try {
-            await minio.getObject(bucketName, data.id);
+            await minio.getObject(bucketName, 'result');
 
             await writeExtractedEvent(message);
 

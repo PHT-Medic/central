@@ -19,7 +19,7 @@ import {
     getManyTrainRouteHandler,
     getOneTrainRouteHandler,
     handleTrainCommandRouteHandler,
-    handleTrainResultRouteHandler,
+    handleTrainResultDownloadRouteHandler,
     updateTrainRouteHandler,
 } from './handlers';
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';
@@ -37,13 +37,13 @@ export class TrainController {
         return getManyTrainRouteHandler(req, res);
     }
 
-    @Get('/:id/result', [ForceLoggedInMiddleware])
+    @Get('/:id/result/download', [ForceLoggedInMiddleware])
     async getResult(
         @Params('id') id: string,
             @Request() req: any,
             @Response() res: any,
     ): Promise<any> {
-        return handleTrainResultRouteHandler(req, res);
+        return handleTrainResultDownloadRouteHandler(req, res);
     }
 
     @Get('/:id', [ForceLoggedInMiddleware])

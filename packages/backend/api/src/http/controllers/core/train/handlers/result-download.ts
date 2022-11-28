@@ -10,14 +10,10 @@ import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
-import {
-    generateTrainFilesMinioBucketName,
-    generateTrainResultsMinioBucketName,
-} from '../../../../../domains/core/train-file/path';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
+import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/core/train';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
 
-export async function handleTrainResultRouteHandler(req: ExpressRequest, res: ExpressResponse) {
+export async function handleTrainResultDownloadRouteHandler(req: ExpressRequest, res: ExpressResponse) {
     const { id } = req.params;
 
     if (!id) {
@@ -44,10 +40,10 @@ export async function handleTrainResultRouteHandler(req: ExpressRequest, res: Ex
 
     const minio = useMinio();
 
-    const bucketName = generateTrainResultsMinioBucketName(entity.id);
+    const bucketName = generateTrainMinioBucketName(entity.id);
     const hasBucket = await minio.bucketExists(bucketName);
     if (!hasBucket) {
-        throw new NotFoundError(' train-result which is identified by the provided identifier doesn\'t exist');
+        throw new NotFoundError('The train storage is not yet initialized.');
     }
 
     try {
@@ -58,10 +54,10 @@ export async function handleTrainResultRouteHandler(req: ExpressRequest, res: Ex
             'Content-Type': 'application/gzip',
         });
 
-        const stream = await minio.getObject(bucketName, entity.id);
+        const stream = await minio.getObject(bucketName, 'result');
 
         stream.pipe(res);
     } catch (e) {
-        throw new NotFoundError('A train-result which is identified by the provided identifier doesn\'t exist');
+        throw new NotFoundError('The train result does not exist in the storage.');
     }
 }

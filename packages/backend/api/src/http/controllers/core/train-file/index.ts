@@ -17,7 +17,7 @@ import {
     deleteTrainFileRouteHandler,
     getManyTrainFileGetManyRouteHandler,
     getOneTrainFileRouteHandler,
-    streamTrainFileRouteHandler,
+    handleTrainFilesDownloadRouteHandler,
     uploadTrainFilesRouteHandler,
 } from './handlers';
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';
@@ -42,7 +42,7 @@ export class TrainFileController {
             @Request() req: any,
             @Response() res: any,
     ): Promise<Buffer> {
-        return await streamTrainFileRouteHandler(req, res) as Buffer;
+        return await handleTrainFilesDownloadRouteHandler(req, res) as Buffer;
     }
 
     @Get('/:id/files/:fileId', [ForceLoggedInMiddleware])

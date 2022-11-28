@@ -6,18 +6,6 @@
  */
 
 import { Train } from '@personalhealthtrain/central-common';
-import path from 'path';
-
-let writableDirPath : string | undefined;
-
-export function getWritableDirPath() {
-    if (typeof writableDirPath !== 'undefined') {
-        return writableDirPath;
-    }
-
-    writableDirPath = path.resolve(`${__dirname}../../../writable`);
-    return writableDirPath;
-}
 
 export function generateTrainMinioBucketName(id: Train['id']) {
     return `trains.${id}`;

@@ -12,15 +12,14 @@ const config = {
     publicRuntimeConfig() {
         return {
             apiUrl: process.env.API_URL,
-            trainManagerApiUrl: process.env.TRAIN_MANAGER_API_URL,
             realtimeUrl: process.env.REALTIME_URL,
             realtimeTransports: process.env.REALTIME_TRANSPORTS,
         };
     },
     env: {
         apiUrl: process.env.API_URL,
-        trainManagerApiUrl: process.env.TRAIN_MANAGER_API_URL,
         realtimeUrl: process.env.REALTIME_URL,
+        realtimeTransports: process.env.REALTIME_TRANSPORTS,
     },
     telemetry: false,
     ssr: true,

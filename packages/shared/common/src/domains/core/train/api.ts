@@ -19,6 +19,10 @@ export class TrainAPI {
         this.client = client;
     }
 
+    getResultUrl(id: Train['id']) {
+        return new URL(`trains/${id}/result/download`, this.client.defaults.baseURL);
+    }
+
     async getMany(
         options?: BuildInput<Train>,
     ): Promise<CollectionResourceResponse<Train>> {

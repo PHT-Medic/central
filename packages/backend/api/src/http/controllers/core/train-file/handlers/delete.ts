@@ -12,8 +12,7 @@ import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { generateTrainFilesMinioBucketName } from '../../../../../domains/core/train-file/path';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
+import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/core/train';
 
 export async function deleteTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { fileId } = req.params;
@@ -39,8 +38,12 @@ export async function deleteTrainFileRouteHandler(req: ExpressRequest, res: Expr
     }
 
     const minio = useMinio();
-    const bucketName = generateTrainFilesMinioBucketName(entity.id);
-    await minio.removeObject(bucketName, entity.hash);
+    const bucketName = generateTrainMinioBucketName(entity.train_id);
+    try {
+        await minio.removeObject(bucketName, entity.hash);
+    } catch (e) {
+        // do nothing
+    }
 
     const { id: entityId } = entity;
 

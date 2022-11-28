@@ -22,6 +22,7 @@ export function setMinioConfig(input: string | ClientOptions) {
     instance = {
         endPoint: parsed.host,
         port: parsed.port,
+        useSSL: false,
         accessKey: parsed.auth.username,
         secretKey: parsed.auth.password,
     };

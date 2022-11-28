@@ -10,25 +10,13 @@ import {
     TrainQueuePayload,
 } from '@personalhealthtrain/central-common';
 import { getMinioBucketObjectList, useMinio } from '../../../core/minio';
-import {
-    generateTrainFilesMinioBucketName,
-    generateTrainResultsMinioBucketName,
-} from '../../../domains/core/train-file/path';
+import { generateTrainMinioBucketName } from '../../../domains/core/train';
 
 export async function cleanupTrain(payload: TrainQueuePayload<TrainQueueCommand.CLEANUP>) {
     const minio = useMinio();
 
-    // Cleanup files
-    let bucketName = generateTrainFilesMinioBucketName(payload.id);
-    let hasBucket = await minio.bucketExists(bucketName);
-    if (hasBucket) {
-        const items = await getMinioBucketObjectList(minio, bucketName);
-        await minio.removeObjects(bucketName, items);
-    }
-
-    // Cleanup results
-    bucketName = generateTrainResultsMinioBucketName(payload.id);
-    hasBucket = await minio.bucketExists(bucketName);
+    const bucketName = generateTrainMinioBucketName(payload.id);
+    const hasBucket = await minio.bucketExists(bucketName);
     if (hasBucket) {
         const items = await getMinioBucketObjectList(minio, bucketName);
         await minio.removeObjects(bucketName, items);

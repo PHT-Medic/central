@@ -23,8 +23,6 @@ export function errorMiddleware(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     next: ExpressNextFunction,
 ) {
-    console.log(error);
-
     const code : string | undefined = hasOwnProperty(error, 'code') && typeof error.code === 'string' ?
         error.code :
         undefined;

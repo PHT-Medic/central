@@ -13,7 +13,7 @@ import {
 import { Writable } from 'stream';
 import {
     buildRemoteDockerImageURL,
-    generateTrainResultsMinioBucketName,
+    generateTrainMinioBucketName,
 } from '../../../../config';
 import { useMinio } from '../../../../core/minio';
 import { removeDockerImage, saveDockerContainerPathsTo } from '../../../../modules/docker';
@@ -71,21 +71,21 @@ export async function processExtractCommand(message: Message) {
     const size = Buffer.byteLength(buff);
 
     const minio = useMinio();
-    const bucketName = generateTrainResultsMinioBucketName(data.id);
+    const bucketName = generateTrainMinioBucketName(data.id);
     const hasBucket = await minio.bucketExists(bucketName);
     if (!hasBucket) {
         await minio.makeBucket(bucketName, 'eu-west-1');
     }
 
     try {
-        await minio.removeObject(bucketName, data.id);
+        await minio.removeObject(bucketName, 'result');
     } catch (e) {
         // do nothing :/
     }
 
     await minio.putObject(
         bucketName,
-        data.id, // todo: unique result identifier :)
+        'result',
         buff,
         size,
     );

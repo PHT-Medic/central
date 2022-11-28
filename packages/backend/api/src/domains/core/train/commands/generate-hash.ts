@@ -11,7 +11,7 @@ import crypto from 'crypto';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../core/minio';
 import { streamToBuffer } from '../../../../core/utils';
-import { generateTrainFilesMinioBucketName } from '../../train-file/path';
+import { generateTrainMinioBucketName } from '../utils';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 import { TrainFileEntity } from '../../train-file/entity';
@@ -37,7 +37,7 @@ export async function generateTrainHash(train: TrainEntity | string) : Promise<T
         .getMany();
 
     const minio = useMinio();
-    const bucketName = generateTrainFilesMinioBucketName(train.id);
+    const bucketName = generateTrainMinioBucketName(train.id);
 
     const promises : Promise<Buffer>[] = [];
 

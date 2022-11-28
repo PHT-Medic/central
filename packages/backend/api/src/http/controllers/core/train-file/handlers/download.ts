@@ -12,14 +12,11 @@ import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
 import { streamToBuffer } from '../../../../../core/utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import {
-    generateTrainFilesMinioBucketName,
-} from '../../../../../domains/core/train-file/path';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
+import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/core/train';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 
-export async function streamTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function handleTrainFilesDownloadRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
     const { id } = req.params;
 
     if (typeof id !== 'string') {
@@ -71,7 +68,7 @@ export async function streamTrainFileRouteHandler(req: ExpressRequest, res: Expr
 
     const minio = useMinio();
 
-    const bucketName = generateTrainFilesMinioBucketName(train.id);
+    const bucketName = generateTrainMinioBucketName(train.id);
     const hasBucket = await minio.bucketExists(bucketName);
     if (!hasBucket) {
         pack.finalize();
@@ -96,8 +93,15 @@ export async function streamTrainFileRouteHandler(req: ExpressRequest, res: Expr
             minio.getObject(bucketName, files[i].hash)
                 .then((stream) => streamToBuffer(stream))
                 .then((data) => {
+                    let name = '';
+                    if (files[i].directory !== '.') {
+                        name = `${files[i].directory}/`;
+                    }
+
+                    name += files[i].name;
+
                     pack.entry({
-                        name: `${files[i].directory}/${files[i].name}`,
+                        name,
                         size: files[i].size,
                     }, data, (err) => {
                         if (err) reject();
