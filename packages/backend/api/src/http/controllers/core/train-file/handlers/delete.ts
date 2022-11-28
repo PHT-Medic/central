@@ -8,11 +8,11 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
-import fs from 'fs';
 import { useDataSource } from 'typeorm-extension';
+import { useMinio } from '../../../../../core/minio';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { getTrainFileFilePath } from '../../../../../domains/core/train-file/path';
+import { generateTrainFilesMinioBucketName } from '../../../../../domains/core/train-file/path';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 
 export async function deleteTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
@@ -38,7 +38,9 @@ export async function deleteTrainFileRouteHandler(req: ExpressRequest, res: Expr
         throw new ForbiddenError();
     }
 
-    await fs.promises.unlink(getTrainFileFilePath(entity));
+    const minio = useMinio();
+    const bucketName = generateTrainFilesMinioBucketName(entity.id);
+    await minio.removeObject(bucketName, entity.hash);
 
     const { id: entityId } = entity;
 

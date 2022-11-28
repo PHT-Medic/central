@@ -30,15 +30,9 @@ export type TrainManagerExtractorCheckQueuePayload = {
     id: Train['id']
 };
 
-export type TrainManagerExtractorCleanupQueuePayload = {
-    id: Train['id']
-};
-
 export type TrainManagerExtractorPayload<C extends `${TrainManagerExtractorCommand}`> =
     C extends `${TrainManagerExtractorCommand.EXTRACT}` ?
         TrainManagerExtractorExtractQueuePayload :
         C extends `${TrainManagerExtractorCommand.CHECK}` ?
             TrainManagerExtractorCheckQueuePayload :
-            C extends `${TrainManagerExtractorCommand.CLEANUP}` ?
-                TrainManagerExtractorCleanupQueuePayload :
-                never;
+            never;

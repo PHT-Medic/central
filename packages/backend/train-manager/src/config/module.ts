@@ -18,6 +18,7 @@ import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from
 import { Client as VaultClient } from '@hapic/vault';
 import { Robot } from '@authelion/common';
 import { buildCommandRouterComponent } from '../components/command-router';
+import { setMinioConfig } from '../core/minio';
 import { Environment } from '../env';
 import { useLogger } from '../modules/log';
 
@@ -34,6 +35,8 @@ export type Config = {
 
 function createConfig({ env } : ConfigContext) : Config {
     setRedisConfig({ connectionString: env.redisConnectionString });
+
+    setMinioConfig(env.minioConnectionString);
 
     const redis = useRedisClient();
 

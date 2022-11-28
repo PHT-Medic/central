@@ -9,4 +9,5 @@ export * from './command';
 export * from './create';
 export * from './delete';
 export * from './read';
+export * from './result';
 export * from './update';

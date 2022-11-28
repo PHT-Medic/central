@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Train } from '@personalhealthtrain/central-common';
 import path from 'path';
 
 let writableDirPath : string | undefined;
-let rootDirPath : string | undefined;
 
 export function getWritableDirPath() {
     if (typeof writableDirPath !== 'undefined') {
@@ -19,19 +19,6 @@ export function getWritableDirPath() {
     return writableDirPath;
 }
 
-export function getRootDirPath() {
-    if (typeof rootDirPath !== 'undefined') {
-        return rootDirPath;
-    }
-
-    rootDirPath = path.resolve(`${__dirname}../../../`);
-    return rootDirPath;
-}
-
-export function getImageOutputDirectoryPath() {
-    return path.join(getWritableDirPath(), 'train-results');
-}
-
-export function buildImageOutputFilePath(id: string) {
-    return path.join(getImageOutputDirectoryPath(), `${path.basename(id, '.tar')}.tar`);
+export function generateTrainResultsMinioBucketName(id: Train['id']) {
+    return `trains#${id}:results`;
 }

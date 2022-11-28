@@ -22,5 +22,4 @@ export enum TrainManagerExtractorEvent {
 export enum TrainManagerExtractorCommand {
     EXTRACT = 'extract',
     CHECK = 'check',
-    CLEANUP = 'cleanup',
 }

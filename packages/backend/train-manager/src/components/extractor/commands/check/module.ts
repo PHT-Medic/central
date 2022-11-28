@@ -6,7 +6,6 @@
  */
 
 import { Message } from 'amqp-extension';
-import fs from 'fs';
 import {
     HTTPClient,
     RegistryProjectType,
@@ -14,7 +13,11 @@ import {
     TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { buildImageOutputFilePath, buildRemoteDockerImageURL } from '../../../../config';
+import {
+    buildRemoteDockerImageURL,
+    generateTrainResultsMinioBucketName,
+} from '../../../../config';
+import { useMinio } from '../../../../core/minio';
 import { checkIfLocalRegistryImageExists } from '../../../../modules/docker';
 import { ExtractorError } from '../../error';
 import { writeExtractedEvent } from '../extract';
@@ -28,21 +31,23 @@ export async function processCheckCommand(message: Message) : Promise<Message> {
     }
 
     // 1. Check if result already exists.
-    const trainResultPath : string = buildImageOutputFilePath(data.id);
+    const minio = useMinio();
+    const bucketName = generateTrainResultsMinioBucketName(data.id);
+    const hasBucket = await minio.bucketExists(bucketName);
+    if (hasBucket) {
+        try {
+            await minio.getObject(bucketName, data.id);
 
-    try {
-        await fs.promises.access(trainResultPath, fs.constants.F_OK);
+            await writeExtractedEvent(message);
 
-        await writeExtractedEvent(message);
-
-        return message;
-    } catch (e) {
-        // do nothing :)
+            return message;
+        } catch (e) {
+            // do nothing :)
+        }
     }
 
     // 2. Check if image exists locally
     const client = useClient<HTTPClient>();
-
     const { data: incomingProjects } = await client.registryProject.getMany({
         filter: {
             registry_id: data.registry.id,

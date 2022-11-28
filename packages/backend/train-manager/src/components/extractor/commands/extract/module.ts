@@ -6,15 +6,17 @@
  */
 
 import { Message } from 'amqp-extension';
-import fs from 'fs';
 import {
     TrainManagerExtractorExtractQueuePayload,
     TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
-import { buildImageOutputFilePath, getImageOutputDirectoryPath } from '../../../../config/paths';
-import { buildRemoteDockerImageURL } from '../../../../config/services/registry';
+import { Writable } from 'stream';
+import {
+    buildRemoteDockerImageURL,
+    generateTrainResultsMinioBucketName,
+} from '../../../../config';
+import { useMinio } from '../../../../core/minio';
 import { removeDockerImage, saveDockerContainerPathsTo } from '../../../../modules/docker';
-import { ensureDirectory } from '../../../../modules/fs';
 import { ExtractorError } from '../../error';
 
 export async function processExtractCommand(message: Message) {
@@ -45,24 +47,47 @@ export async function processExtractCommand(message: Message) {
         repositoryName: data.id,
     });
 
-    // Create directory or do nothing...
-    const destinationPath: string = getImageOutputDirectoryPath();
-    await ensureDirectory(destinationPath);
+    const buffArr : Buffer[] = [];
 
-    // delete result file if it already exists.
-    const outputFilePath: string = buildImageOutputFilePath(data.id);
+    const stream = new Writable({
+        write(chunk: any, encoding: BufferEncoding, callback: (error?: (Error | null)) => void) {
+            if (Buffer.isBuffer(chunk)) {
+                buffArr.push(chunk);
+            } else {
+                buffArr.push(Buffer.from(chunk, encoding));
+            }
 
-    try {
-        await fs.promises.access(outputFilePath, fs.constants.F_OK);
-        await fs.promises.unlink(outputFilePath);
-    } catch (e) {
-        // do nothing :)
-    }
+            callback();
+        },
+    });
 
     await saveDockerContainerPathsTo(
         repositoryPath,
         data.filePaths,
-        outputFilePath,
+        stream,
+    );
+
+    const buff = Buffer.concat(buffArr);
+    const size = Buffer.byteLength(buff);
+
+    const minio = useMinio();
+    const bucketName = generateTrainResultsMinioBucketName(data.id);
+    const hasBucket = await minio.bucketExists(bucketName);
+    if (!hasBucket) {
+        await minio.makeBucket(bucketName, 'eu-west-1');
+    }
+
+    try {
+        await minio.removeObject(bucketName, data.id);
+    } catch (e) {
+        // do nothing :/
+    }
+
+    await minio.putObject(
+        bucketName,
+        data.id, // todo: unique result identifier :)
+        buff,
+        size,
     );
 
     try {

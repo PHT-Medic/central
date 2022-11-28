@@ -9,15 +9,12 @@ import {
     EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import {
-    TrainManagerComponent,
-    TrainManagerExtractorCommand,
-    TrainSocketServerToClientEventName, buildSocketRealmNamespaceName,
-    buildSocketTrainRoomName,
+    TrainQueueCommand, TrainSocketServerToClientEventName,
+    buildSocketRealmNamespaceName, buildSocketTrainRoomName,
 } from '@personalhealthtrain/central-common';
-import { publishMessage } from 'amqp-extension';
-import { emitSocketServerToClientEvent } from '../../config/socket-emitter';
+import { buildMessage, publishMessage } from 'amqp-extension';
+import { MessageQueueRoutingKey, emitSocketServerToClientEvent } from '../../config';
 import { TrainEntity } from '../../domains/core/train/entity';
-import { buildTrainManagerQueueMessage } from '../../domains/special/train-manager';
 
 function publish(
     operation: `${TrainSocketServerToClientEventName}`,
@@ -55,13 +52,16 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
     async beforeRemove(event: RemoveEvent<TrainEntity>): Promise<any> {
         publish(TrainSocketServerToClientEventName.DELETED, event.entity);
 
-        const message = buildTrainManagerQueueMessage(
-            TrainManagerComponent.EXTRACTOR,
-            TrainManagerExtractorCommand.CLEANUP,
-            {
+        const message = buildMessage({
+            options: {
+                routingKey: MessageQueueRoutingKey.COMMAND,
+            },
+            type: TrainQueueCommand.CLEANUP,
+            data: {
                 id: event.entity.id,
             },
-        );
+            metadata: {},
+        });
 
         await publishMessage(message);
 

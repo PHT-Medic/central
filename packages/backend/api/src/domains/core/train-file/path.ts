@@ -5,22 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainFile } from '@personalhealthtrain/central-common';
-import path from 'path';
-import { getWritableDirPath } from '../../../config';
-
-export function getTrainFileFileName(file: TrainFile) {
-    return `${file.hash}.file`;
-}
-
-export function getTrainFilesDirectoryPath(trainId: Train['id']) {
-    return path.join(getWritableDirPath(), 'train-files', trainId);
-}
-
-export function getTrainFileFilePath(file: TrainFile) {
-    return path.join(getTrainFilesDirectoryPath(file.train_id), getTrainFileFileName(file));
-}
+import { Train } from '@personalhealthtrain/central-common';
 
 export function generateTrainFilesMinioBucketName(id: Train['id']) {
-    return `train#${id}`;
+    return `trains#${id}:files`;
+}
+
+export function generateTrainResultsMinioBucketName(id: Train['id']) {
+    return `trains#${id}:results`;
 }

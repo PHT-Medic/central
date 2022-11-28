@@ -8,7 +8,6 @@
 import { Message } from 'amqp-extension';
 import { TrainManagerExtractorCommand } from '@personalhealthtrain/central-common';
 import {
-    cleanupImage,
     downloadImage,
     processCheckCommand,
     processExtractCommand,
@@ -35,11 +34,6 @@ export async function executeExtractorCommand(
                 .then(processCheckCommand)
                 .then(writeCheckedEvent)
                 .catch((err) => writeFailedEvent(message, err));
-            break;
-        }
-        case TrainManagerExtractorCommand.CLEANUP: {
-            await Promise.resolve(message)
-                .then(cleanupImage);
             break;
         }
         case TrainManagerExtractorCommand.EXTRACT: {

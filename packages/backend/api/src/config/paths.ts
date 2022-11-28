@@ -9,7 +9,6 @@ import path from 'path';
 
 let writableDirPath : string | undefined;
 let rootDirPath : string | undefined;
-let publicDirPath : string | undefined;
 
 export function getWritableDirPath() {
     if (typeof writableDirPath !== 'undefined') {
@@ -27,13 +26,4 @@ export function getRootDirPath() {
 
     rootDirPath = path.resolve(`${__dirname}../../../`);
     return rootDirPath;
-}
-
-export function getPublicDirPath() {
-    if (typeof publicDirPath !== 'undefined') {
-        return publicDirPath;
-    }
-
-    publicDirPath = path.resolve(`${__dirname}../../../public`);
-    return publicDirPath;
 }

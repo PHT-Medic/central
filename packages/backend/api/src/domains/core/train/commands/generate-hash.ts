@@ -5,11 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BadRequestError } from '@ebec/http';
 import { TrainConfigurationStatus } from '@personalhealthtrain/central-common';
 import crypto from 'crypto';
-import fs from 'fs';
 import { useDataSource } from 'typeorm-extension';
-import { getTrainFileFilePath } from '../../train-file/path';
+import { useMinio } from '../../../../core/minio';
+import { streamToBuffer } from '../../../../core/utils';
+import { generateTrainFilesMinioBucketName } from '../../train-file/path';
 import { findTrain } from './utils';
 import { TrainEntity } from '../entity';
 import { TrainFileEntity } from '../../train-file/entity';
@@ -21,8 +23,7 @@ export async function generateTrainHash(train: TrainEntity | string) : Promise<T
     train = await findTrain(train, repository);
 
     if (!train) {
-        // todo: make it a ClientError.BadRequest
-        throw new Error('The train could not be found.');
+        throw new BadRequestError('The train could not be found.');
     }
 
     const hash = crypto.createHash('sha512');
@@ -35,16 +36,28 @@ export async function generateTrainHash(train: TrainEntity | string) : Promise<T
         .where('trainFiles.train_id = :id', { id: train.id })
         .getMany();
 
+    const minio = useMinio();
+    const bucketName = generateTrainFilesMinioBucketName(train.id);
+
+    const promises : Promise<Buffer>[] = [];
+
     for (let i = 0; i < trainFiles.length; i++) {
-        const filePath = getTrainFileFilePath(trainFiles[i]);
+        const promise = new Promise<Buffer>((resolve, reject) => {
+            minio.getObject(bucketName, trainFiles[i].hash)
+                .then((stream) => streamToBuffer(stream))
+                .then((buffer) => resolve(buffer))
+                .catch((e) => reject(e));
+        });
 
-        const fileContent = fs.readFileSync(filePath);
-
-        // File Hash
-        hash.update(fileContent);
+        promises.push(promise);
     }
 
-    // Session Id hash
+    const fileContents = await Promise.all(promises);
+    for (let i = 0; i < fileContents.length; i++) {
+        hash.update(fileContents[i]);
+    }
+
+    // Session id hash
     const sessionId: Buffer = crypto.randomBytes(64);
     hash.update(sessionId);
 

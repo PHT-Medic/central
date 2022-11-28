@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Writable } from 'stream';
 import fs from 'fs';
 import tar, { Pack } from 'tar-stream';
 import { useDocker } from './instance';
@@ -32,39 +33,44 @@ function extractTarStreamToPacker(stream: NodeJS.ReadableStream, packer: Pack): 
 export async function saveDockerContainerPathsTo(
     containerName: string,
     containerDirectoryPaths: string[],
-    destinationDirectoryPath: string,
+    destination: string | Writable,
 ) {
-    const destinationStream = fs.createWriteStream(destinationDirectoryPath, {
-        mode: 0o775,
-    });
+    let stream : Writable;
+
+    if (typeof destination === 'string') {
+        stream = fs.createWriteStream(destination, {
+            mode: 0o775,
+        });
+    } else {
+        stream = destination;
+    }
 
     const pack = tar.pack();
 
-    pack.pipe(destinationStream);
+    pack.pipe(stream);
 
     const container = await useDocker().createContainer({
         Image: containerName,
     });
 
+    const promises : Promise<void>[] = [];
+
     for (let i = 0; i < containerDirectoryPaths.length; i++) {
-        const archiveStream: NodeJS.ReadableStream = await container.getArchive({
-            path: containerDirectoryPaths[i],
+        const promise = new Promise<void>((resolve, reject) => {
+            container.getArchive({
+                path: containerDirectoryPaths[i],
+            })
+                .then((archive) => extractTarStreamToPacker(archive, pack))
+                .then(() => resolve())
+                .catch((e) => reject(e));
         });
 
-        await extractTarStreamToPacker(archiveStream, pack);
+        promises.push(promise);
     }
 
-    return new Promise<void>(((resolve, reject) => {
-        destinationStream.on('close', () => fs.access(destinationDirectoryPath, fs.constants.F_OK, (err) => {
-            if (err) {
-                return reject();
-            }
+    await Promise.all(promises);
 
-            return Promise.resolve()
-                .then(() => container.remove())
-                .then(() => resolve());
-        }));
+    await container.remove();
 
-        pack.finalize();
-    }));
+    pack.finalize();
 }

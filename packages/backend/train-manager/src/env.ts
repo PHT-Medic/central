@@ -31,8 +31,8 @@ export function requireFromEnv(key : string, alt?: string) {
 
 export interface Environment {
     env: string,
-    port: number,
 
+    minioConnectionString: string,
     redisConnectionString: string,
     rabbitMqConnectionString: string,
     vaultConnectionString: string,
@@ -42,8 +42,8 @@ export interface Environment {
 
 const env : Environment = {
     env: requireFromEnv('NODE_ENV'),
-    port: parseInt(requireFromEnv('PORT'), 10),
 
+    minioConnectionString: requireFromEnv('MINIO_CONNECTION_STRING'),
     redisConnectionString: requireFromEnv('REDIS_CONNECTION_STRING'),
     rabbitMqConnectionString: requireFromEnv('RABBITMQ_CONNECTION_STRING'),
     vaultConnectionString: requireFromEnv('VAULT_CONNECTION_STRING'),

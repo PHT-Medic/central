@@ -6,46 +6,31 @@
  */
 
 import {
-    TrainManagerComponent, TrainManagerExtractorCommand,
     TrainQueueCommand,
     TrainQueuePayload,
 } from '@personalhealthtrain/central-common';
-import { publishMessage } from 'amqp-extension';
-import { useMinio } from '../../../core/minio';
-import { generateTrainFilesMinioBucketName } from '../../../domains/core/train-file/path';
-import { buildTrainManagerQueueMessage } from '../../../domains/special/train-manager';
+import { getMinioBucketObjectList, useMinio } from '../../../core/minio';
+import {
+    generateTrainFilesMinioBucketName,
+    generateTrainResultsMinioBucketName,
+} from '../../../domains/core/train-file/path';
 
 export async function cleanupTrain(payload: TrainQueuePayload<TrainQueueCommand.CLEANUP>) {
     const minio = useMinio();
 
-    const bucketName = generateTrainFilesMinioBucketName(payload.id);
-    const hasBucket = await minio.bucketExists(bucketName);
+    // Cleanup files
+    let bucketName = generateTrainFilesMinioBucketName(payload.id);
+    let hasBucket = await minio.bucketExists(bucketName);
     if (hasBucket) {
-        const stream = await minio.listObjects(bucketName, undefined, true);
-        const items : string[] = [];
-
-        await new Promise<void>((resolve, reject) => {
-            stream.on('data', (obj) => {
-                items.push(obj.name);
-            });
-
-            stream.on('error', (e) => reject(e));
-
-            stream.on('end', () => {
-                minio.removeObjects(bucketName, items)
-                    .then(() => resolve())
-                    .catch((e) => reject(e));
-            });
-        });
+        const items = await getMinioBucketObjectList(minio, bucketName);
+        await minio.removeObjects(bucketName, items);
     }
 
-    const queuePayload = buildTrainManagerQueueMessage(
-        TrainManagerComponent.EXTRACTOR,
-        TrainManagerExtractorCommand.CLEANUP,
-        {
-            id: payload.id,
-        },
-    );
-
-    await publishMessage(queuePayload);
+    // Cleanup results
+    bucketName = generateTrainResultsMinioBucketName(payload.id);
+    hasBucket = await minio.bucketExists(bucketName);
+    if (hasBucket) {
+        const items = await getMinioBucketObjectList(minio, bucketName);
+        await minio.removeObjects(bucketName, items);
+    }
 }

@@ -6,6 +6,5 @@
  */
 
 export * from './check';
-export * from './cleanup';
 export * from './download';
 export * from './extract';
