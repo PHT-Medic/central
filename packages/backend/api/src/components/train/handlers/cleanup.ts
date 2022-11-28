@@ -10,19 +10,33 @@ import {
     TrainQueueCommand,
     TrainQueuePayload,
 } from '@personalhealthtrain/central-common';
-import fs from 'fs';
 import { publishMessage } from 'amqp-extension';
-import { getTrainFilesDirectoryPath } from '../../../domains/core/train-file/path';
+import { useMinio } from '../../../core/minio';
+import { generateTrainFilesMinioBucketName } from '../../../domains/core/train-file/path';
 import { buildTrainManagerQueueMessage } from '../../../domains/special/train-manager';
 
 export async function cleanupTrain(payload: TrainQueuePayload<TrainQueueCommand.CLEANUP>) {
-    const trainDirectoryPath = getTrainFilesDirectoryPath(payload.id);
+    const minio = useMinio();
 
-    try {
-        await fs.promises.access(trainDirectoryPath);
-        await fs.promises.rm(trainDirectoryPath, { recursive: true, force: true });
-    } catch (e) {
-        // folder does not exist
+    const bucketName = generateTrainFilesMinioBucketName(payload.id);
+    const hasBucket = await minio.bucketExists(bucketName);
+    if (hasBucket) {
+        const stream = await minio.listObjects(bucketName, undefined, true);
+        const items : string[] = [];
+
+        await new Promise<void>((resolve, reject) => {
+            stream.on('data', (obj) => {
+                items.push(obj.name);
+            });
+
+            stream.on('error', (e) => reject(e));
+
+            stream.on('end', () => {
+                minio.removeObjects(bucketName, items)
+                    .then(() => resolve())
+                    .catch((e) => reject(e));
+            });
+        });
     }
 
     const queuePayload = buildTrainManagerQueueMessage(

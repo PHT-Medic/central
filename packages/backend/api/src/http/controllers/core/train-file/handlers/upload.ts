@@ -6,15 +6,18 @@
  */
 
 import { PermissionID, TrainFile } from '@personalhealthtrain/central-common';
-import BusBoy from 'busboy';
+import BusBoy, { FileInfo } from 'busboy';
+import { UploadedObjectInfo } from 'minio';
 import path from 'path';
-import fs from 'fs';
 import crypto from 'crypto';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { useDataSource } from 'typeorm-extension';
-import { createFileStreamHandler } from '../../../../../modules/file-system/utils';
+import { useMinio } from '../../../../../core/minio';
+import { streamToBuffer } from '../../../../../core/utils';
 import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { getTrainFilesDirectoryPath } from '../../../../../domains/core/train-file/path';
+import {
+    generateTrainFilesMinioBucketName,
+} from '../../../../../domains/core/train-file/path';
 import { TrainEntity } from '../../../../../domains/core/train/entity';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 
@@ -42,67 +45,57 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
 
     const files: TrainFile[] = [];
 
-    // Group files in a directory to group delete ;)
-    const trainDirectoryPath = getTrainFilesDirectoryPath(entity.id);
+    const minio = useMinio();
 
-    try {
-        await fs.promises.access(trainDirectoryPath, fs.constants.R_OK | fs.constants.W_OK);
-    } catch (e) {
-        await fs.promises.mkdir(trainDirectoryPath, { mode: 0o770, recursive: true });
+    const bucketName = generateTrainFilesMinioBucketName(entity.id);
+    const hasBucket = await minio.bucketExists(bucketName);
+    if (!hasBucket) {
+        await minio.makeBucket(bucketName, 'eu-west-1');
     }
 
-    const promises : Promise<void>[] = [];
+    const promises : Promise<UploadedObjectInfo>[] = [];
 
-    instance.on('file', (filename, file, info: Record<string, any>) => {
+    instance.on('file', (filename, file, info: FileInfo) => {
         const hash = crypto.createHash('sha256');
 
         hash.update(entity.id);
         hash.update(info.filename);
 
+        const fileName: string = path.basename(info.filename);
+        const filePath: string = path.dirname(info.filename);
+
         const destinationFileName = hash.digest('hex');
-        const destinationFilePath = `${trainDirectoryPath}/${destinationFileName}.file`;
 
-        const handler = createFileStreamHandler(destinationFilePath);
-        const handlerPromise = handler.getWritePromise();
+        const promise = new Promise<UploadedObjectInfo>((resolve, reject) => {
+            streamToBuffer(file)
+                .then((buffer) => {
+                    const size = Buffer.byteLength(buffer);
 
-        file.on('data', (data) => {
-            handler.add(data);
+                    minio.putObject(
+                        bucketName,
+                        destinationFileName,
+                        buffer,
+                        size,
+                    )
+                        .then((minioInfo) => {
+                            files.push(trainFileRepository.create({
+                                hash: destinationFileName,
+                                name: fileName,
+                                size,
+                                directory: filePath,
+                                user_id: req.user.id,
+                                train_id: entity.id,
+                                realm_id: req.realmId,
+                            }));
+
+                            resolve(minioInfo);
+                        })
+                        .catch((e) => reject(e));
+                })
+                .catch((e) => reject(e));
         });
 
-        file.on('limit', () => {
-            handler.cleanup();
-            req.unpipe(instance);
-
-            throw new BadRequestError(`Size of file ${info.filename} is too large...`);
-        });
-
-        file.on('end', () => {
-            if (
-                !info.filename ||
-                info.filename.length === 0 ||
-                handler.getFileSize() === 0
-            ) {
-                handler.cleanup();
-                return;
-            }
-
-            handler.complete();
-
-            const fileName: string = path.basename(info.filename);
-            const filePath: string = path.dirname(info.filename);
-
-            files.push(trainFileRepository.create({
-                hash: destinationFileName,
-                name: fileName,
-                directory: filePath,
-                size: handler.getFileSize(),
-                user_id: req.user.id,
-                train_id: entity.id,
-                realm_id: req.realmId,
-            }));
-
-            promises.push(handlerPromise);
-        });
+        promises.push(promise);
     });
 
     instance.on('error', () => {

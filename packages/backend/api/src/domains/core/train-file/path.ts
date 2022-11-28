@@ -20,3 +20,7 @@ export function getTrainFilesDirectoryPath(trainId: Train['id']) {
 export function getTrainFileFilePath(file: TrainFile) {
     return path.join(getTrainFilesDirectoryPath(file.train_id), getTrainFileFileName(file));
 }
+
+export function generateTrainFilesMinioBucketName(id: Train['id']) {
+    return `train#${id}`;
+}

@@ -15,6 +15,7 @@ import {
     HTTPClientKey,
     PermissionKey, detectProxyConnectionConfig,
 } from '@personalhealthtrain/central-common';
+import { setMinioConfig } from '../core/minio';
 import { Environment } from '../env';
 import { buildTrainManagerAggregator } from '../aggregators/train-manager';
 import { buildRobotAggregator } from '../aggregators/robot';
@@ -84,6 +85,10 @@ export function createConfig({ env } : ConfigContext) : Config {
             type: 'topic',
         },
     });
+
+    // ---------------------------------------------
+
+    setMinioConfig(env.minioConnectionString);
 
     // ---------------------------------------------
 
