@@ -18,7 +18,7 @@
         "@commitlint/cli": "^17.2.0",
         "@commitlint/config-angular": "^17.3.0",
         "@commitlint/config-conventional": "^17.2.0",
-        "@commitlint/cz-commitlint": "^17.2.0",
+        "@commitlint/cz-commitlint": "^17.3.0",
         "@tada5hi/eslint-config-vue-typescript": "^1.0.9",
         "@types/node": "^18.11.6",
         "cross-env": "^7.0.3",
