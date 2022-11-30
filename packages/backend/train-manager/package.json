@@ -18,7 +18,7 @@
         "build": "rm -rf ./dist && tsc -p tsconfig.build.json"
     },
     "dependencies": {
-        "@authelion/common": "^0.3.16",
+        "@authelion/common": "^0.4.1",
         "@authelion/server-adapter": "^0.3.16",
         "@ebec/http": "^0.0.4",
         "@hapic/harbor": "^0.1.3",
