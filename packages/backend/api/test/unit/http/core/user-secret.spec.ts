@@ -12,10 +12,10 @@ import {
     UserSecretsSecretStoragePayload,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { VaultClient } from '@hapic/vault';
+import { Client as VaultClient } from '@hapic/vault';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
-import { ApiKey } from '../../../../src/config/api';
+import { ApiKey } from '../../../../src/config';
 
 describe('src/controllers/core/user-secret', () => {
     const superTest = useSuperTest();
@@ -54,7 +54,7 @@ describe('src/controllers/core/user-secret', () => {
             .auth('admin', 'start123')
             .send(details);
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
 
         let keys : string[] = Object.keys(details);
@@ -111,7 +111,7 @@ describe('src/controllers/core/user-secret', () => {
             .send(details)
             .auth('admin', 'start123');
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
 
         keys = Object.keys(details);
@@ -142,7 +142,7 @@ describe('src/controllers/core/user-secret', () => {
             .delete(`/user-secrets/${entityId}`)
             .auth('admin', 'start123');
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(202);
 
         userSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
             .find<UserSecretsSecretStoragePayload>(USER_SECRETS_SECRET_ENGINE_KEY, details.user_id);

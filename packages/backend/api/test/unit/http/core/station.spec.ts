@@ -6,17 +6,14 @@
  */
 
 import {
-    HarborAPI,
-    STATION_SECRET_ENGINE_KEY,
     Station,
-    StationSecretStoragePayload, buildRegistryStationProjectName,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { VaultClient } from '@hapic/vault';
+import { Client as HarborClient } from '@hapic/harbor';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
 import { TEST_DEFAULT_STATION, createSuperTestStation } from '../../../utils/domains/station';
-import { ApiKey } from '../../../../src/config/api';
+import { ApiKey } from '../../../../src/config';
 
 describe('src/controllers/core/station', () => {
     const superTest = useSuperTest();
@@ -35,13 +32,13 @@ describe('src/controllers/core/station', () => {
 
     // fix test :)
 
-    const secureId = details.secure_id;
+    const externalName = details.external_name;
 
     it('should create, read, update, delete resource and get collection', async () => {
         let publicKeyHex = Buffer.from(details.public_key, 'utf-8').toString('hex');
         let response = await createSuperTestStation(superTest, details);
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
 
         let keys : string[] = Object.keys(details);
@@ -60,28 +57,19 @@ describe('src/controllers/core/station', () => {
 
         // ---------------------------------------------------------
 
-        let stationSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
-            .find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, secureId);
-
-        expect(stationSecret.data).toBeDefined();
-        expect(stationSecret.data.rsa_public_key).toEqual(publicKeyHex);
-        expect(stationSecret.data.registry_robot_name).toEqual(`robot$${buildRegistryStationProjectName(secureId)}`);
-        expect(stationSecret.data.registry_robot_id).toBeDefined();
-        expect(stationSecret.data.registry_robot_secret).toBeDefined();
-
-        let registryProject = await useClient<HarborAPI>(ApiKey.HARBOR).project
-            .find(buildRegistryStationProjectName(secureId), true);
+        let registryProject = await useClient<HarborClient>(ApiKey.HARBOR).project
+            .getOne(externalName, true);
 
         expect(registryProject).toBeDefined();
-        expect(registryProject.id).toBeDefined();
-        expect(registryProject.name).toEqual(buildRegistryStationProjectName(secureId));
+        expect(registryProject.project_id).toBeDefined();
+        expect(registryProject.name).toEqual(externalName);
 
-        let registryRobotAccount = await useClient<HarborAPI>(ApiKey.HARBOR).robotAccount
-            .find(buildRegistryStationProjectName(secureId));
+        let registryRobotAccount = await useClient<HarborClient>(ApiKey.HARBOR).robotAccount
+            .find(externalName);
 
         expect(registryRobotAccount).toBeDefined();
         expect(registryRobotAccount.id).toBeDefined();
-        expect(registryRobotAccount.name).toEqual(`robot$${buildRegistryStationProjectName(secureId)}`);
+        expect(registryRobotAccount.name).toEqual(`robot$${externalName}`);
 
         // ---------------------------------------------------------
 
@@ -114,7 +102,7 @@ describe('src/controllers/core/station', () => {
             .send(details)
             .auth('admin', 'start123');
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
 
         keys = Object.keys(details);
@@ -131,31 +119,19 @@ describe('src/controllers/core/station', () => {
 
         // ---------------------------------------------------------
 
-        stationSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
-            .find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, secureId);
-
-        expect(stationSecret.data).toBeDefined();
-        expect(stationSecret.data.rsa_public_key).toEqual(publicKeyHex);
-
-        // ---------------------------------------------------------
-
         response = await superTest
             .delete(`/stations/${entityId}`)
             .auth('admin', 'start123');
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(202);
 
         // ---------------------------------------------------------
 
-        stationSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
-            .find<StationSecretStoragePayload>(STATION_SECRET_ENGINE_KEY, secureId);
-        expect(stationSecret).toBeUndefined();
-
-        registryProject = await useClient<HarborAPI>(ApiKey.HARBOR).project
-            .find(buildRegistryStationProjectName(secureId), true);
+        registryProject = await useClient<HarborClient>(ApiKey.HARBOR).project
+            .getOne(externalName, true);
         expect(registryProject).toBeUndefined();
 
-        registryRobotAccount = await useClient<HarborAPI>(ApiKey.HARBOR).robotAccount
-            .find(buildRegistryStationProjectName(secureId));
+        registryRobotAccount = await useClient<HarborClient>(ApiKey.HARBOR).robotAccount
+            .find(externalName);
         expect(registryRobotAccount).toBeUndefined();
     });
 });

@@ -12,10 +12,9 @@ import { DataSource } from 'typeorm';
 
 import { setDataSource, setDataSourceOptions } from 'typeorm-extension';
 import env from './env';
-import { createConfig } from './config/module';
-import { createRouter } from './http/router.js';
+import { createConfig, useLogger } from './config';
+import { createRouter } from './http/router';
 import { createHttpServer } from './http/server';
-import { useLogger } from './config/log';
 import { buildDataSourceOptions } from './database/utils';
 
 dotenv.config();

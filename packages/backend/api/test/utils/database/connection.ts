@@ -12,7 +12,7 @@ import {
     DataSource, DataSourceOptions,
 } from 'typeorm';
 import {
-    DatabaseRootSeeder as AuthDatabaseRootSeeder,
+    DatabaseSeeder as AuthDatabaseRootSeeder,
 } from '@authelion/server-core';
 import { PermissionKey } from '@personalhealthtrain/central-common';
 import { buildDataSourceOptions } from '../../../src/database/utils';
@@ -39,8 +39,9 @@ export async function useTestDatabase() {
 
     const authSeeder = new AuthDatabaseRootSeeder({
         permissions: Object.values(PermissionKey),
-        userName: 'admin',
-        userPassword: 'start123',
+        adminUsername: 'admin',
+        adminPassword: 'start123',
+        robotEnabled: false,
     });
     await authSeeder.run(dataSource);
 

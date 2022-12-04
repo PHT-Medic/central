@@ -6,13 +6,13 @@
  */
 
 import supertest, { SuperTest, Test } from 'supertest';
-import { createRouter } from '../../src/http/router.js';
-import { createConfig } from '../../src/config/module';
+import { createRouter } from '../../src/http/router';
+import { createConfig } from '../../src/config';
 import env from '../../src/env';
 
 export function useSuperTest() : SuperTest<Test> {
     createConfig({ env });
 
-    const expressApp = createRouter();
-    return supertest(expressApp);
+    const router = createRouter();
+    return supertest(router.createListener());
 }

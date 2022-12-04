@@ -37,7 +37,7 @@ describe('src/controllers/core/proposal-station', () => {
             .auth('admin', 'start123')
             .send(details);
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
         expectPropertiesEqualToSrc(details, response.body);
 
@@ -66,6 +66,6 @@ describe('src/controllers/core/proposal-station', () => {
             .delete(`/proposal-stations/${response.body.id}`)
             .auth('admin', 'start123');
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(202);
     });
 });

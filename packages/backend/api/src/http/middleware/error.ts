@@ -46,7 +46,8 @@ export function errorMiddleware(
     const statusCode : number = baseError.getOption('statusCode') ?? InternalServerErrorOptions.statusCode;
 
     if (baseError.getOption('logMessage')) {
-        useLogger().log({ level: 'error', message: `${baseError.message || baseError}` });
+        const isInspected = extendsBaseError(error);
+        useLogger().log({ level: 'error', message: `${!isInspected ? error.message : (baseError.message || baseError)}` });
     }
 
     if (baseError.getOption('decorateMessage')) {
@@ -55,9 +56,12 @@ export function errorMiddleware(
 
     response.statusCode = statusCode;
 
+    const extra = baseError.getOption('extra');
+
     send(response, {
         code: baseError.getOption('code') ?? InternalServerErrorOptions.code,
         message: baseError.message ?? InternalServerErrorOptions.message,
         statusCode,
+        ...(extra ? { extra } : {}),
     });
 }

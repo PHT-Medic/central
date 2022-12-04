@@ -5,15 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Station } from '@personalhealthtrain/central-common';
-import { SuperTest, Test } from 'supertest';
 import { MASTER_REALM_ID } from '@authelion/common';
+import { Ecosystem, Station } from '@personalhealthtrain/central-common';
+import { SuperTest, Test } from 'supertest';
 
 export const TEST_DEFAULT_STATION : Partial<Station> = {
     name: 'foo-bar-baz',
     realm_id: MASTER_REALM_ID,
     public_key: 'fooBarBazFooBarBaz',
-    secure_id: 'bar007',
+    ecosystem: Ecosystem.DEFAULT,
+    external_name: 'test',
 };
 
 export async function createSuperTestStation(superTest: SuperTest<Test>, entity?: Partial<Station>) {

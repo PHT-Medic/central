@@ -40,7 +40,7 @@ describe('src/controllers/core/proposal', () => {
     it('should create, read, update, delete resource', async () => {
         let response = await createSuperTestProposal(superTest, details);
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
         expect(response.body.trains).toEqual(0);
         expectPropertiesEqualToSrc(details, response.body);
@@ -63,7 +63,7 @@ describe('src/controllers/core/proposal', () => {
             .send(details)
             .auth('admin', 'start123');
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
         expectPropertiesEqualToSrc(details, response.body);
 
@@ -73,6 +73,6 @@ describe('src/controllers/core/proposal', () => {
             .delete(`/proposals/${response.body.id}`)
             .auth('admin', 'start123');
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(202);
     });
 });

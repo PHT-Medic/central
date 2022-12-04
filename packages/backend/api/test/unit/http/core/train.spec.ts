@@ -46,7 +46,7 @@ describe('src/controllers/core/train', () => {
             proposal_id: proposal.body.id,
         });
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
         expect(response.body.proposal_id).toEqual(proposal.body.id);
         expectPropertiesEqualToSrc(details, response.body);
@@ -69,7 +69,7 @@ describe('src/controllers/core/train', () => {
             .send(details)
             .auth('admin', 'start123');
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
         expectPropertiesEqualToSrc(details, response.body);
 
