@@ -7,13 +7,16 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@ebec/http';
+import { Request, Response, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 import { runRegistryValidation } from '../utils';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 
-export async function createRegistryRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (!req.ability.has(PermissionID.REGISTRY_MANAGE)) {
+export async function createRegistryRouteHandler(req: Request, res: Response) : Promise<any> {
+    const ability = useRequestEnv(req, 'ability');
+
+    if (!ability.has(PermissionID.REGISTRY_MANAGE)) {
         throw new ForbiddenError();
     }
 
@@ -25,5 +28,5 @@ export async function createRegistryRouteHandler(req: ExpressRequest, res: Expre
 
     await repository.save(entity);
 
-    return res.respond({ data: entity });
+    return sendCreated(res, entity);
 }

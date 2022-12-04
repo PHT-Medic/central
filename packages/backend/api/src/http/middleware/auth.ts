@@ -5,14 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Middleware } from '@decorators/express';
 import { UnauthorizedError } from '@ebec/http';
-import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
+import { HandlerInterface } from '@routup/decorators';
+import {
+    Next, Request, Response,
+} from 'routup';
+import { useRequestEnv } from '../request';
 
-export function forceLoggedIn(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) {
+export function forceLoggedIn(req: Request, res: Response, next: Next) {
     if (
-        typeof req.userId === 'undefined' &&
-        typeof req.robotId === 'undefined'
+        typeof useRequestEnv(req, 'userId') === 'undefined' &&
+        typeof useRequestEnv(req, 'robotId') === 'undefined' &&
+        typeof useRequestEnv(req, 'clientId') === 'undefined'
     ) {
         throw new UnauthorizedError();
     }
@@ -20,13 +24,8 @@ export function forceLoggedIn(req: ExpressRequest, res: ExpressResponse, next: E
     next();
 }
 
-export class ForceLoggedInMiddleware implements Middleware {
-    // eslint-disable-next-line class-methods-use-this
-    public use(
-        request: ExpressRequest,
-        response: ExpressResponse,
-        next: ExpressNextFunction,
-    ) {
-        return forceLoggedIn(request, response, next);
+export class ForceLoggedInMiddleware implements HandlerInterface {
+    public run(request: Request, response: Response, next: Next) {
+        forceLoggedIn(request, response, next);
     }
 }

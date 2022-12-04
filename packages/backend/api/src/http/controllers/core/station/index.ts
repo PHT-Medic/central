@@ -9,8 +9,8 @@ import {
     Station,
 } from '@personalhealthtrain/central-common';
 import {
-    Body, Controller, Delete, Get, Params, Post, Request, Response,
-} from '@decorators/express';
+    DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
+} from '@routup/decorators';
 import { SwaggerTags } from '@trapi/swagger';
 
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';
@@ -25,50 +25,50 @@ import {
 type PartialStation = Partial<Station>;
 
 @SwaggerTags('station')
-@Controller('/stations')
+@DController('/stations')
 export class StationController {
-    @Get('', [ForceLoggedInMiddleware])
+    @DGet('', [ForceLoggedInMiddleware])
 
     async getMany(
-        @Request() req: any,
-            @Response() res: any,
+        @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialStation[]> {
         return await getManyStationRouteHandler(req, res) as PartialStation[];
     }
 
-    @Post('', [ForceLoggedInMiddleware])
+    @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @Body() data: PartialStation,
-            @Request() req: any,
-            @Response() res: any,
+        @DBody() data: PartialStation,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialStation | undefined> {
         return await createStationRouteHandler(req, res) as PartialStation | undefined;
     }
 
-    @Get('/:id', [ForceLoggedInMiddleware])
+    @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialStation | undefined> {
         return await getOneStationRouteHandler(req, res) as PartialStation | undefined;
     }
 
-    @Post('/:id', [ForceLoggedInMiddleware])
+    @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
-        @Params('id') id: string,
-            @Body() data: PartialStation,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DBody() data: PartialStation,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialStation | undefined> {
         return await updateStationRouteHandler(req, res) as PartialStation | undefined;
     }
 
-    @Delete('/:id', [ForceLoggedInMiddleware])
+    @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialStation | undefined> {
         return await deleteStationRouteHandler(req, res) as PartialStation | undefined;
     }

@@ -9,8 +9,11 @@ import { NotFoundError } from '@ebec/http';
 import { PermissionID, SecretType, isHex } from '@personalhealthtrain/central-common';
 import { Buffer } from 'buffer';
 import { publishMessage } from 'amqp-extension';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 import { runUserSecretValidation } from '../utils';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
 import { buildSecretStorageQueueMessage } from '../../../../../domains/special/secret-storage/queue';
@@ -21,18 +24,20 @@ import {
 import env from '../../../../../env';
 import { saveUserSecretsToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/user';
 
-export async function updateUserSecretRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function updateUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
     const data = await runUserSecretValidation(req, 'update');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(UserSecretEntity);
 
+    const ability = useRequestEnv(req, 'ability');
+
     let entity = await repository.findOneBy({
         id,
-        realm_id: req.realmId,
-        ...(!req.ability.has(PermissionID.USER_EDIT) ? { user_id: req.user.id } : {}),
+        realm_id: useRequestEnv(req, 'realmId'),
+        ...(!ability.has(PermissionID.USER_EDIT) ? { user_id: useRequestEnv(req, 'userId') } : {}),
     });
 
     if (!entity) {
@@ -68,5 +73,5 @@ export async function updateUserSecretRouteHandler(req: ExpressRequest, res: Exp
         await publishMessage(queueMessage);
     }
 
-    return res.respond({ data: entity });
+    return sendAccepted(res, entity);
 }

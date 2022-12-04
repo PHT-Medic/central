@@ -10,11 +10,11 @@ import {
     SecretType,
     UserSecret,
 } from '@personalhealthtrain/central-common';
-import { ExpressRequest } from '../../../../type';
+import { Request } from 'routup';
 import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
 
 export async function runUserSecretValidation(
-    req: ExpressRequest,
+    req: Request,
     operation: 'create' | 'update',
 ) : Promise<Partial<UserSecret>> {
     const keyChain = check('key')

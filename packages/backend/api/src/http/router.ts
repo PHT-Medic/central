@@ -5,42 +5,41 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import express, { Express } from 'express';
 import cors from 'cors';
 
-import { registerControllers as registerAuthControllers, registerMiddlewares } from '@authelion/server-core';
+import {
+    registerControllers as registerAuthControllers,
+    registerMiddlewares,
+} from '@authelion/server-core';
 import promBundle from 'express-prom-bundle';
+import { Router } from 'routup';
 
 import { registerControllers } from './routes';
 
 import { errorMiddleware } from './middleware/error';
 import { useRateLimiter } from './middleware/rate-limiter';
 import env from '../env';
-import { ExpressAppInterface } from './type';
 import { checkLicenseAgreementAccepted } from './middleware/license-agreement';
 
-export function createExpressApp() : ExpressAppInterface {
-    const expressApp : Express = express();
+export function createRouter() : Router {
+    const router = new Router();
 
-    expressApp.set('trust proxy', 1);
-    expressApp.set('x-powered-by', false);
-
-    expressApp.use(cors({
+    router.use(cors({
         origin(origin, callback) {
             callback(null, true);
         },
         credentials: true,
     }));
 
-    registerMiddlewares(expressApp);
+    registerMiddlewares(router);
 
     if (env.env === 'development') {
-        expressApp.use(checkLicenseAgreementAccepted);
+        router.use(checkLicenseAgreementAccepted);
     }
 
     if (env.env !== 'test') {
         // Rate Limiter
-        expressApp.use(useRateLimiter);
+        router.use(useRateLimiter);
 
         // Metrics
         const metricsMiddleware = promBundle({
@@ -48,13 +47,13 @@ export function createExpressApp() : ExpressAppInterface {
             includePath: true,
         });
 
-        expressApp.use(metricsMiddleware);
+        router.use(metricsMiddleware);
     }
 
-    registerControllers(expressApp);
-    registerAuthControllers(expressApp);
+    registerControllers(router);
+    registerAuthControllers(router);
 
-    expressApp.use(errorMiddleware);
+    router.use(errorMiddleware);
 
-    return expressApp;
+    return router;
 }

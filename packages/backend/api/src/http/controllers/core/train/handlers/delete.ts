@@ -8,15 +8,19 @@
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
+import { TrainEntity } from '../../../../../domains/core/train';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 
-export async function deleteTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function deleteTrainRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
-    if (!req.ability.has(PermissionID.TRAIN_DROP)) {
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.TRAIN_DROP)) {
         throw new ForbiddenError();
     }
 
@@ -29,7 +33,7 @@ export async function deleteTrainRouteHandler(req: ExpressRequest, res: ExpressR
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -47,5 +51,5 @@ export async function deleteTrainRouteHandler(req: ExpressRequest, res: ExpressR
 
     entity.proposal = proposal;
 
-    return res.respondDeleted({ data: entity });
+    return sendAccepted(res, entity);
 }

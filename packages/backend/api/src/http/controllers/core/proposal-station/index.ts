@@ -9,8 +9,8 @@ import {
     ProposalStation,
 } from '@personalhealthtrain/central-common';
 import {
-    Body, Controller, Delete, Get, Params, Post, Request, Response,
-} from '@decorators/express';
+    DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
+} from '@routup/decorators';
 import { SwaggerTags } from '@trapi/swagger';
 
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';
@@ -25,49 +25,49 @@ import {
 type PartialProposalStation = Partial<ProposalStation>;
 
 @SwaggerTags('proposal', 'station')
-@Controller('/proposal-stations')
+@DController('/proposal-stations')
 export class ProposalStationController {
-    @Get('', [ForceLoggedInMiddleware])
+    @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @Request() req: any,
-            @Response() res: any,
+        @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialProposalStation[]> {
         return getManyProposalStationRouteHandler(req, res);
     }
 
-    @Post('', [ForceLoggedInMiddleware])
+    @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @Body() data: Pick<ProposalStation, 'station_id' | 'proposal_id'>,
-            @Request() req: any,
-            @Response() res: any,
+        @DBody() data: Pick<ProposalStation, 'station_id' | 'proposal_id'>,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialProposalStation | undefined> {
         return createProposalStationRouteHandler(req, res);
     }
 
-    @Get('/:id', [ForceLoggedInMiddleware])
+    @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialProposalStation | undefined> {
         return getOneProposalStationRouteHandler(req, res);
     }
 
-    @Post('/:id', [ForceLoggedInMiddleware])
+    @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
-        @Params('id') id: string,
-            @Body() data: Pick<ProposalStation, 'comment' | 'approval_status'>,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DBody() data: Pick<ProposalStation, 'comment' | 'approval_status'>,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialProposalStation | undefined> {
         return updateProposalStationRouteHandler(req, res);
     }
 
-    @Delete('/:id', [ForceLoggedInMiddleware])
+    @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialProposalStation | undefined> {
         return deleteProposalStationRouteHandler(req, res);
     }

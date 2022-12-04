@@ -5,6 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { useRequestQuery } from '@routup/query';
+import {
+    Request, Response, send, useRequestParam,
+} from 'routup';
 import { SelectQueryBuilder } from 'typeorm';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import {
@@ -17,9 +21,9 @@ import {
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import { StationEntity } from '../../../../../domains/core/station/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 
-async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>, fields: any) {
+async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {
     const protectedFields : ParseAllowedOption<StationEntity> = [
         'public_key',
         'email',
@@ -47,8 +51,10 @@ async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilde
             protectedFields.indexOf(field.key as any) !== -1);
 
     if (protectedSelected.length > 0) {
+        const ability = useRequestEnv(req, 'ability');
+
         if (
-            !req.ability.has(PermissionID.STATION_EDIT)
+            !ability.has(PermissionID.STATION_EDIT)
         ) {
             throw new ForbiddenError(
                 `You are not permitted to read the restricted fields: ${
@@ -56,15 +62,15 @@ async function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilde
             );
         }
 
-        onlyRealmPermittedQueryResources(query, req.realmId, 'station.realm_id');
+        onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'), 'station.realm_id');
     }
 
     applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'station' });
 }
 
-export async function getOneStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
-    const { fields, include } = req.query;
+export async function getOneStationRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
+    const { fields, include } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(StationEntity);
@@ -84,13 +90,13 @@ export async function getOneStationRouteHandler(req: ExpressRequest, res: Expres
         throw new NotFoundError();
     }
 
-    return res.respond({ data: entity });
+    return send(res, entity);
 }
 
-export async function getManyStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getManyStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const {
         filter, page, fields, include,
-    } = req.query;
+    } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(StationEntity);
@@ -112,13 +118,11 @@ export async function getManyStationRouteHandler(req: ExpressRequest, res: Expre
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res.respond({
-        data: {
-            data: entities,
-            meta: {
-                total,
-                ...pagination,
-            },
+    return send(res, {
+        data: entities,
+        meta: {
+            total,
+            ...pagination,
         },
     });
 }

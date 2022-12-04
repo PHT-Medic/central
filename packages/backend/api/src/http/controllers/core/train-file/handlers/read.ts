@@ -9,48 +9,53 @@ import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { useRequestQuery } from '@routup/query';
+import {
+    Request, Response, send, useRequestParam,
+} from 'routup';
 import { applyFilters, useDataSource } from 'typeorm-extension';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 
-export async function getOneTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getOneTrainFileRouteHandler(req: Request, res: Response) : Promise<any> {
+    const ability = useRequestEnv(req, 'ability');
     if (
-        !req.ability.has(PermissionID.TRAIN_ADD) &&
-        !req.ability.has(PermissionID.TRAIN_EDIT)
+        !ability.has(PermissionID.TRAIN_ADD) &&
+        !ability.has(PermissionID.TRAIN_EDIT)
     ) {
         throw new ForbiddenError();
     }
 
-    const { fileId } = req.params;
+    const id = useRequestParam(req, 'fileId');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainFileEntity);
 
     const entity = await repository.findOneBy({
-        id: fileId,
+        id,
     });
 
     if (!entity) {
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
-    return res.respond({ data: entity });
+    return send(res, entity);
 }
 
-export async function getManyTrainFileGetManyRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
-    const { filter } = req.query;
+export async function getManyTrainFileGetManyRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
+    const { filter } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainFileEntity);
     const query = repository.createQueryBuilder('trainFile')
         .where('trainFile.train_id = :trainId', { trainId: id });
 
-    onlyRealmPermittedQueryResources(query, req.realmId);
+    onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'));
 
     applyFilters(query, filter, {
         defaultAlias: 'trainFile',
@@ -59,12 +64,10 @@ export async function getManyTrainFileGetManyRouteHandler(req: ExpressRequest, r
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res.respond({
-        data: {
-            data: entities,
-            meta: {
-                total,
-            },
+    return send(res, {
+        data: entities,
+        meta: {
+            total,
         },
     });
 }

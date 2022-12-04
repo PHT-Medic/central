@@ -6,25 +6,28 @@
  */
 
 import rateLimit from 'express-rate-limit';
-import { RequestHandler } from 'express';
 import { TooManyRequestsError } from '@ebec/http';
 import { ServiceID } from '@personalhealthtrain/central-common';
 import { MASTER_REALM_ID } from '@authelion/common';
-import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
+import {
+    Handler, Next, Request, Response, getRequestIp,
+} from 'routup';
+import { useRequestEnv } from '../request';
 
-export function useRateLimiter(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) {
-    const limiter : RequestHandler = rateLimit({
+export function useRateLimiter(req: Request, res: Response, next: Next) {
+    const limiter : Handler = rateLimit({
         windowMs: 10 * 60 * 1000, // 10 minutes = 600 sec
 
-        max(req: ExpressRequest) {
-            if (req.userId) {
+        max(req: Request) {
+            if (useRequestEnv(req, 'userId')) {
                 return 100 * 60; // 6.000 req = 10 req p. sec
             }
 
-            if (req.robot) {
+            const robot = useRequestEnv(req, 'robot');
+            if (robot) {
                 if (
-                    req.robot.name === ServiceID.SYSTEM &&
-                    req.robot.realm_id === MASTER_REALM_ID
+                    robot.name === ServiceID.SYSTEM &&
+                    robot.realm_id === MASTER_REALM_ID
                 ) {
                     return 0; // unlimited req p. sec
                 }
@@ -35,9 +38,10 @@ export function useRateLimiter(req: ExpressRequest, res: ExpressResponse, next: 
             return 5 * 60; // 300 req = 1/2 req p. sec
         },
 
-        handler(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction): any {
+        handler(req: Request, res: Response, next: Next): any {
             next(new TooManyRequestsError());
         },
+        keyGenerator: (req: Request, res: Response) => getRequestIp(req, { trustProxy: true }),
     });
 
     return limiter(req, res, next);

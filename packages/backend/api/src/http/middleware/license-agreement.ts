@@ -7,19 +7,27 @@
 
 import { BadRequestError } from '@ebec/http';
 import { ErrorCode, hasOwnProperty } from '@personalhealthtrain/central-common';
-import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
+import {
+    Next, Request, Response, useRequestPath,
+} from 'routup';
+import { useRequestEnv } from '../request';
 
-export function checkLicenseAgreementAccepted(req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) {
-    if (req.userId) {
+export function checkLicenseAgreementAccepted(req: Request, res: Response, next: Next) {
+    const user = useRequestEnv(req, 'user');
+    if (user) {
         if (
-            !hasOwnProperty(req.user, 'license_agreement') ||
-            req.user.license_agreement !== 'accepted'
+            !hasOwnProperty(user, 'license_agreement') ||
+            user.license_agreement !== 'accepted'
         ) {
+            const url = useRequestPath(req);
+
+            // todo: check url value
+
             if (
-                req.originalUrl.startsWith('/user-attributes') ||
-                req.originalUrl.startsWith('/token') ||
-                req.originalUrl.startsWith('/users/@me') ||
-                req.originalUrl.startsWith('/identity-providers')
+                url.startsWith('/user-attributes') ||
+                url.startsWith('/token') ||
+                url.startsWith('/users/@me') ||
+                url.startsWith('/identity-providers')
             ) {
                 next();
 

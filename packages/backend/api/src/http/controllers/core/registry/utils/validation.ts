@@ -7,8 +7,8 @@
 
 import { body, check, validationResult } from 'express-validator';
 import { Ecosystem, getHostNameFromString } from '@personalhealthtrain/central-common';
+import { Request } from 'routup';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
-import { ExpressRequest } from '../../../../type';
 import {
     ExpressValidationError, ExpressValidationResult,
     initExpressValidationResult,
@@ -16,7 +16,7 @@ import {
 } from '../../../../express-validation';
 
 export async function runRegistryValidation(
-    req: ExpressRequest,
+    req: Request,
     operation: 'create' | 'update',
 ) : Promise<ExpressValidationResult<RegistryEntity>> {
     const result : ExpressValidationResult<RegistryEntity> = initExpressValidationResult();

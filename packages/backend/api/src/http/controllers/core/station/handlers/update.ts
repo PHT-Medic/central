@@ -12,23 +12,27 @@ import {
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { Message, publishMessage } from 'amqp-extension';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
 import { StationEntity } from '../../../../../domains/core/station/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
-export async function updateStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function updateStationRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
-    if (!req.ability.has(PermissionID.STATION_EDIT)) {
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.STATION_EDIT)) {
         throw new ForbiddenError();
     }
 
     const result = await runStationValidation(req, 'update');
     if (!result.data) {
-        return res.respondAccepted();
+        return sendAccepted(res);
     }
 
     const dataSource = await useDataSource();
@@ -46,7 +50,7 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 
@@ -125,7 +129,5 @@ export async function updateStationRouteHandler(req: ExpressRequest, res: Expres
 
     await repository.save(entity);
 
-    return res.respondAccepted({
-        data: entity,
-    });
+    return sendAccepted(res, entity);
 }

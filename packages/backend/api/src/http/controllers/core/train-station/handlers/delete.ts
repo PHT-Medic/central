@@ -7,19 +7,23 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { MoreThan } from 'typeorm';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { useDataSource } from 'typeorm-extension';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
+import { useRequestEnv } from '../../../../request';
+import { TrainEntity } from '../../../../../domains/core/train';
 
-export async function deleteTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function deleteTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
+    const ability = useRequestEnv(req, 'ability');
     if (
-        !req.ability.has(PermissionID.TRAIN_EDIT) &&
-        !req.ability.has(PermissionID.TRAIN_APPROVE)
+        !ability.has(PermissionID.TRAIN_EDIT) &&
+        !ability.has(PermissionID.TRAIN_APPROVE)
     ) {
         throw new ForbiddenError();
     }
@@ -34,8 +38,8 @@ export async function deleteTrainStationRouteHandler(req: ExpressRequest, res: E
     }
 
     if (
-        !isPermittedForResourceRealm(req.realmId, entity.station_realm_id) &&
-        !isPermittedForResourceRealm(req.realmId, entity.train_realm_id)
+        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.station_realm_id) &&
+        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.train_realm_id)
     ) {
         throw new ForbiddenError();
     }
@@ -71,5 +75,5 @@ export async function deleteTrainStationRouteHandler(req: ExpressRequest, res: E
 
     // -------------------------------------------
 
-    return res.respondDeleted({ data: entity });
+    return sendAccepted(res, entity);
 }

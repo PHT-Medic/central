@@ -5,7 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { useRequestQuery } from '@routup/query';
 import { ParseAllowedOption, parseQueryFields } from 'rapiq';
+import {
+    Request, Response, send, useRequestParam,
+} from 'routup';
 import { SelectQueryBuilder } from 'typeorm';
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
 import {
@@ -18,10 +22,10 @@ import {
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 
-function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>, fields: any) {
+function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {
     const protectedFields : ParseAllowedOption<RegistryProjectEntity> = [
         'account_name',
         'account_id',
@@ -53,8 +57,9 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
             protectedFields.indexOf(field.key as any) !== -1);
 
     if (protectedSelected.length > 0) {
+        const ability = useRequestEnv(req, 'ability');
         if (
-            !req.ability.has(PermissionID.REGISTRY_PROJECT_MANAGE)
+            !ability.has(PermissionID.REGISTRY_PROJECT_MANAGE)
         ) {
             throw new ForbiddenError(
                 `You are not permitted to read the restricted fields: ${
@@ -62,15 +67,15 @@ function checkAndApplyFields(req: ExpressRequest, query: SelectQueryBuilder<any>
             );
         }
 
-        onlyRealmPermittedQueryResources(query, req.realmId);
+        onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'));
     }
 
     applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'registryProject' });
 }
 
-export async function getOneRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
-    const { include, fields } = req.query;
+export async function getOneRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
+    const { include, fields } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryProjectEntity);
@@ -90,13 +95,13 @@ export async function getOneRegistryProjectRouteHandler(req: ExpressRequest, res
         throw new NotFoundError();
     }
 
-    return res.respond({ data: entity });
+    return send(res, entity);
 }
 
-export async function getManyRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getManyRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const {
         filter, page, sort, include, fields,
-    } = req.query;
+    } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryProjectEntity);
@@ -123,13 +128,11 @@ export async function getManyRegistryProjectRouteHandler(req: ExpressRequest, re
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res.respond({
-        data: {
-            data: entities,
-            meta: {
-                total,
-                ...pagination,
-            },
+    return send(res, {
+        data: entities,
+        meta: {
+            total,
+            ...pagination,
         },
     });
 }

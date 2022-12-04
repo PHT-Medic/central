@@ -7,9 +7,9 @@
 
 import { check, validationResult } from 'express-validator';
 import { RegistryProjectType } from '@personalhealthtrain/central-common';
+import { Request } from 'routup';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
-import { ExpressRequest } from '../../../../type';
 import {
     ExpressValidationError,
     ExpressValidationResult, extendExpressValidationResultWithRelation,
@@ -18,7 +18,7 @@ import {
 } from '../../../../express-validation';
 
 export async function runRegistryProjectValidation(
-    req: ExpressRequest,
+    req: Request,
     operation: 'create' | 'update',
 ) : Promise<ExpressValidationResult<RegistryProjectEntity>> {
     const result : ExpressValidationResult<RegistryProjectEntity> = initExpressValidationResult();

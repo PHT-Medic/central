@@ -8,18 +8,22 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/core/train';
 
-export async function deleteTrainFileRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { fileId } = req.params;
+export async function deleteTrainFileRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'filedId');
 
+    const ability = useRequestEnv(req, 'ability');
     if (
-        !req.ability.has(PermissionID.TRAIN_ADD) &&
-        !req.ability.has(PermissionID.TRAIN_EDIT)
+        !ability.has(PermissionID.TRAIN_ADD) &&
+        !ability.has(PermissionID.TRAIN_EDIT)
     ) {
         throw new ForbiddenError();
     }
@@ -27,13 +31,13 @@ export async function deleteTrainFileRouteHandler(req: ExpressRequest, res: Expr
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainFileEntity);
 
-    const entity = await repository.findOneBy({ id: fileId });
+    const entity = await repository.findOneBy({ id });
 
     if (!entity) {
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -60,5 +64,5 @@ export async function deleteTrainFileRouteHandler(req: ExpressRequest, res: Expr
     });
     await trainRepository.save(train);
 
-    return res.respondDeleted({ data: entity });
+    return sendAccepted(res, entity);
 }

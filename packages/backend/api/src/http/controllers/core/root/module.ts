@@ -6,18 +6,18 @@
  */
 
 import {
-    Controller, Get, Request, Response,
-} from '@decorators/express';
+    DController, DGet, DRequest, DResponse,
+} from '@routup/decorators';
 import { SwaggerTags } from '@trapi/swagger';
 import { checkIntegrityRouteHandler } from './handlers';
 
 @SwaggerTags('base')
-@Controller('')
+@DController('')
 export class RootController {
-    @Get('/integrity')
+    @DGet('/integrity')
     async integrity(
-        @Request() req: any,
-            @Response() res: any,
+        @DRequest() req: any,
+            @DResponse() res: any,
     ) : Promise<void> {
         return checkIntegrityRouteHandler(req, res);
     }

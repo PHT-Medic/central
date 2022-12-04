@@ -7,14 +7,13 @@
 
 import { Ecosystem, TrainType } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
-import { BadRequestError, NotFoundError } from '@ebec/http';
+import { BadRequestError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
-import { useDataSource } from 'typeorm-extension';
+import { Request } from 'routup';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
-import { ExpressRequest } from '../../../../type';
+import { TrainEntity } from '../../../../../domains/core/train';
 import {
     ExpressValidationError,
     ExpressValidationResult, extendExpressValidationResultWithRelation,
@@ -22,9 +21,10 @@ import {
     matchedValidationData,
 } from '../../../../express-validation';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
+import { useRequestEnv } from '../../../../request';
 
 export async function runTrainValidation(
-    req: ExpressRequest,
+    req: Request,
     operation: 'create' | 'update',
 ) : Promise<ExpressValidationResult<TrainEntity>> {
     const result : ExpressValidationResult<TrainEntity> = initExpressValidationResult();
@@ -122,7 +122,7 @@ export async function runTrainValidation(
     });
 
     if (result.relation.proposal) {
-        if (!isPermittedForResourceRealm(req.realmId, result.relation.proposal.realm_id)) {
+        if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), result.relation.proposal.realm_id)) {
             throw new BadRequestError('The referenced proposal realm is not permitted.');
         }
     }

@@ -8,9 +8,9 @@
 import { BadRequestError } from '@ebec/http';
 import { MatchedDataOptions, matchedData } from 'express-validator';
 import { deleteUndefinedObjectProperties } from '@personalhealthtrain/central-common';
+import { Request } from 'routup';
 import { EntityTarget } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressRequest } from '../type';
 import { ExpressValidationExtendKeys, ExpressValidationResult } from './type';
 
 export function buildExpressValidationErrorMessage<
@@ -25,7 +25,7 @@ export function buildExpressValidationErrorMessage<
 }
 
 export function matchedValidationData(
-    req: ExpressRequest,
+    req: Request,
     options?: Partial<MatchedDataOptions>,
 ): Record<string, any> {
     return deleteUndefinedObjectProperties(matchedData(req, options));

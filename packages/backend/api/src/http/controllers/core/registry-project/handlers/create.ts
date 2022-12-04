@@ -8,14 +8,16 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@ebec/http';
 import { publishMessage } from 'amqp-extension';
+import { Request, Response, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
-export async function createRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (!req.ability.has(PermissionID.REGISTRY_PROJECT_MANAGE)) {
+export async function createRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.REGISTRY_PROJECT_MANAGE)) {
         throw new ForbiddenError();
     }
 
@@ -39,5 +41,5 @@ export async function createRegistryProjectRouteHandler(req: ExpressRequest, res
 
     await publishMessage(queueMessage);
 
-    return res.respond({ data: entity });
+    return sendCreated(res, entity);
 }

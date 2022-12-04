@@ -10,9 +10,10 @@ import { check, validationResult } from 'express-validator';
 import { RealmEntity } from '@authelion/server-core';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { ForbiddenError } from '@ebec/http';
+import { Request } from 'routup';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 import { StationEntity } from '../../../../../domains/core/station/entity';
-import { ExpressRequest } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 import {
     ExpressValidationError, ExpressValidationResult,
     extendExpressValidationResultWithRelation, initExpressValidationResult,
@@ -20,7 +21,7 @@ import {
 } from '../../../../express-validation';
 
 export async function runStationValidation(
-    req: ExpressRequest,
+    req: Request,
     operation: 'create' | 'update',
 ) : Promise<ExpressValidationResult<StationEntity>> {
     const result : ExpressValidationResult<StationEntity> = initExpressValidationResult();
@@ -112,7 +113,7 @@ export async function runStationValidation(
     });
 
     if (result.data.realm_id) {
-        if (!isPermittedForResourceRealm(req.realmId, result.data.realm_id)) {
+        if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), result.data.realm_id)) {
             throw new ForbiddenError('You are not permitted to create this station.');
         }
     }

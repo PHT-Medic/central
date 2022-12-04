@@ -7,14 +7,18 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
 
-export async function deleteMasterImageRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function deleteMasterImageRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
-    if (!req.ability.has(PermissionID.MASTER_IMAGE_MANAGE)) {
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.MASTER_IMAGE_MANAGE)) {
         throw new ForbiddenError();
     }
 
@@ -33,5 +37,5 @@ export async function deleteMasterImageRouteHandler(req: ExpressRequest, res: Ex
 
     entity.id = entityId;
 
-    return res.respondDeleted({ data: entity });
+    return sendAccepted(res, entity);
 }

@@ -10,8 +10,8 @@ import {
 } from '@personalhealthtrain/central-common';
 
 import {
-    Body, Controller, Delete, Get, Params, Post, Request, Response,
-} from '@decorators/express';
+    DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
+} from '@routup/decorators';
 import { SwaggerTags } from '@trapi/swagger';
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';
 import {
@@ -25,49 +25,49 @@ import {
 type PartialRegistry = Partial<Registry>;
 
 @SwaggerTags('registry')
-@Controller('/registries')
+@DController('/registries')
 export class RegistryController {
-    @Get('', [ForceLoggedInMiddleware])
+    @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @Request() req: any,
-            @Response() res: any,
+        @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialRegistry[]> {
         return await getManyRegistryRouteHandler(req, res) as PartialRegistry[];
     }
 
-    @Get('/:id', [ForceLoggedInMiddleware])
+    @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialRegistry | undefined> {
         return await getOneRegistryRouteHandler(req, res) as PartialRegistry | undefined;
     }
 
-    @Post('/:id', [ForceLoggedInMiddleware])
+    @DPost('/:id', [ForceLoggedInMiddleware])
     async update(
-        @Params('id') id: string,
-            @Body() data: Registry,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DBody() data: Registry,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialRegistry | undefined> {
         return await updateRegistryRouteHandler(req, res) as PartialRegistry | undefined;
     }
 
-    @Post('', [ForceLoggedInMiddleware])
+    @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @Body() data: Registry,
-            @Request() req: any,
-            @Response() res: any,
+        @DBody() data: Registry,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialRegistry | undefined> {
         return await createRegistryRouteHandler(req, res) as PartialRegistry | undefined;
     }
 
-    @Delete('/:id', [ForceLoggedInMiddleware])
+    @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialRegistry | undefined> {
         return await deleteRegistryRouteHandler(req, res) as PartialRegistry | undefined;
     }

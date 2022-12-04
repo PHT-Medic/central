@@ -8,13 +8,16 @@
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
-import { runProposalStationValidation } from '../utils/validation';
+import { useRequestEnv } from '../../../../request';
+import { runProposalStationValidation } from '../utils';
 
-export async function updateProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function updateProposalStationRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProposalStationEntity);
@@ -24,10 +27,12 @@ export async function updateProposalStationRouteHandler(req: ExpressRequest, res
         throw new NotFoundError();
     }
 
-    const isAuthorityOfStation = isPermittedForResourceRealm(req.realmId, entity.station_realm_id);
-    const isAuthorizedForStation = req.ability.has(PermissionID.PROPOSAL_APPROVE);
+    const ability = useRequestEnv(req, 'ability');
 
-    const isAuthorityOfProposal = isPermittedForResourceRealm(req.realmId, entity.proposal_realm_id);
+    const isAuthorityOfStation = isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.station_realm_id);
+    const isAuthorizedForStation = ability.has(PermissionID.PROPOSAL_APPROVE);
+
+    const isAuthorityOfProposal = isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.proposal_realm_id);
     if (isAuthorityOfProposal && !isAuthorityOfStation) {
         throw new ForbiddenError('Only permitted target station members can update this object.');
     }
@@ -45,7 +50,5 @@ export async function updateProposalStationRouteHandler(req: ExpressRequest, res
 
     entity = await repository.save(entity);
 
-    return res.respondCreated({
-        data: entity,
-    });
+    return sendAccepted(res, entity);
 }

@@ -9,12 +9,14 @@ import { check, matchedData, validationResult } from 'express-validator';
 import { ScanResult } from 'docker-scan';
 import { ServiceID } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@ebec/http';
-import { ExpressRequest, ExpressResponse } from '../../../../../type';
+import { Request, Response, sendAccepted } from 'routup';
+import { useRequestEnv } from '../../../../../request';
 import { ExpressValidationError } from '../../../../../express-validation';
 import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
 
-export async function syncPushedMasterImages(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (!req.robot || req.robot.name !== ServiceID.GITHUB) {
+export async function syncPushedMasterImages(req: Request, res: Response) : Promise<any> {
+    const robot = useRequestEnv(req, 'robot');
+    if (!robot || robot.name !== ServiceID.GITHUB) {
         throw new ForbiddenError('Only the Github service is permitted to use this endpoint.');
     }
 
@@ -41,10 +43,8 @@ export async function syncPushedMasterImages(req: ExpressRequest, res: ExpressRe
     // images
     const images = await mergeMasterImagesWithDatabase(data.images);
 
-    return res.respondAccepted({
-        data: {
-            groups,
-            images,
-        },
+    return sendAccepted(res, {
+        groups,
+        images,
     });
 }

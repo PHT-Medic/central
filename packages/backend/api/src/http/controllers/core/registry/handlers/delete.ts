@@ -7,15 +7,19 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 
-export async function deleteRegistryRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function deleteRegistryRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
-    if (!req.ability.has(PermissionID.REGISTRY_MANAGE)) {
+    const ability = useRequestEnv(req, 'ability');
+
+    if (!ability.has(PermissionID.REGISTRY_MANAGE)) {
         throw new ForbiddenError();
     }
 
@@ -33,5 +37,5 @@ export async function deleteRegistryRouteHandler(req: ExpressRequest, res: Expre
 
     entity.id = entityId;
 
-    return res.respondDeleted({ data: entity });
+    return sendAccepted(res, entity);
 }

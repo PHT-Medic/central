@@ -6,31 +6,36 @@
  */
 
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { useRequestQuery } from '@routup/query';
+import {
+    Request, Response, send, useRequestParam,
+} from 'routup';
 import {
     applyQuery,
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
+import { useRequestEnv } from '../../../../request';
 
-export async function getOneUserSecretRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function getOneUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(UserSecretEntity);
     const query = await repository.createQueryBuilder('userSecret')
-        .where('userSecret.realm_id = :realmId', { realmId: req.realmId })
+        .where('userSecret.realm_id = :realmId', { realmId: useRequestEnv(req, 'realmId') })
         .where('userSecret.id = :id', { id });
 
-    onlyRealmPermittedQueryResources(query, req.realmId);
+    onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'));
 
-    if (!req.ability.has(PermissionID.USER_EDIT)) {
-        query.where('userSecret.user_id = :userId', { userId: req.userId });
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.USER_EDIT)) {
+        query.where('userSecret.user_id = :userId', { userId: useRequestEnv(req, 'userId') });
     }
 
-    applyQuery(query, req.query, {
+    applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'userSecret',
         fields: {
             default: ['id', 'key', 'type', 'content', 'user_id', 'realm_id', 'created_at', 'updated_at'],
@@ -46,21 +51,22 @@ export async function getOneUserSecretRouteHandler(req: ExpressRequest, res: Exp
         throw new NotFoundError();
     }
 
-    return res.respond({ data: entity });
+    return send(res, entity);
 }
 
-export async function getManyUserSecretRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getManyUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(UserSecretEntity);
     const query = await repository.createQueryBuilder('userSecret');
 
-    onlyRealmPermittedQueryResources(query, req.realmId);
+    onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'));
 
-    if (!req.ability.has(PermissionID.USER_EDIT) && req.userId) {
-        query.where('userSecret.user_id = :userId', { userId: req.userId });
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.USER_EDIT) && useRequestEnv(req, 'userId')) {
+        query.where('userSecret.user_id = :userId', { userId: useRequestEnv(req, 'userId') });
     }
 
-    const { pagination } = applyQuery(query, req.query, {
+    const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'userSecret',
         fields: {
             default: ['id', 'key', 'type', 'content', 'user_id', 'realm_id', 'created_at', 'updated_at'],
@@ -81,13 +87,11 @@ export async function getManyUserSecretRouteHandler(req: ExpressRequest, res: Ex
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res.respond({
-        data: {
-            data: entities,
-            meta: {
-                total,
-                ...pagination,
-            },
+    return send(res, {
+        data: entities,
+        meta: {
+            total,
+            ...pagination,
         },
     });
 }

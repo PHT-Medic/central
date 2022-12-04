@@ -9,8 +9,12 @@ import { check, matchedData, validationResult } from 'express-validator';
 import { TrainCommand } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import {
+    TrainEntity,
     detectTrainBuildStatus,
     detectTrainRunStatus,
     generateTrainHash,
@@ -20,10 +24,9 @@ import {
     stopBuildTrain,
     triggerTrainResultStart,
     triggerTrainResultStatus,
-} from '../../../../../domains/core/train/commands';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+} from '../../../../../domains/core/train';
+import { useRequestEnv } from '../../../../request';
 import { ExpressValidationError } from '../../../../express-validation';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
 
 /**
  * Execute a train command (start, stop, build).
@@ -31,8 +34,8 @@ import { TrainEntity } from '../../../../../domains/core/train/entity';
  * @param req
  * @param res
  */
-export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function handleTrainCommandRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
     if (typeof id !== 'string') {
         throw new NotFoundError();
@@ -59,7 +62,7 @@ export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: E
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -100,5 +103,5 @@ export async function handleTrainCommandRouteHandler(req: ExpressRequest, res: E
             break;
     }
 
-    return res.respond({ data: entity });
+    return sendAccepted(res, entity);
 }

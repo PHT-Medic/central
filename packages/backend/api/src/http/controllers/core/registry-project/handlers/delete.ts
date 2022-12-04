@@ -8,16 +8,20 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { publishMessage } from 'amqp-extension';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { isPermittedForResourceRealm } from '@authelion/common';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
-export async function deleteRegistryProjectRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function deleteRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
-    if (!req.ability.has(PermissionID.REGISTRY_PROJECT_MANAGE)) {
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.REGISTRY_PROJECT_MANAGE)) {
         throw new ForbiddenError();
     }
 
@@ -30,7 +34,7 @@ export async function deleteRegistryProjectRouteHandler(req: ExpressRequest, res
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -52,5 +56,5 @@ export async function deleteRegistryProjectRouteHandler(req: ExpressRequest, res
 
     await publishMessage(queueMessage);
 
-    return res.respondDeleted({ data: entity });
+    return sendAccepted(res, entity);
 }

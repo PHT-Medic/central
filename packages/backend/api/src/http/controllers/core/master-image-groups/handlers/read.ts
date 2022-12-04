@@ -6,15 +6,18 @@
  */
 
 import { NotFoundError } from '@ebec/http';
+import { useRequestQuery } from '@routup/query';
+import {
+    Request, Response, send, useRequestParam,
+} from 'routup';
 import {
     applyQuery,
     useDataSource,
 } from 'typeorm-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { MasterImageGroupEntity } from '../../../../../domains/core/master-image-group/entity';
 
-export async function getOneMasterImageGroupRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function getOneMasterImageGroupRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(MasterImageGroupEntity);
@@ -25,15 +28,15 @@ export async function getOneMasterImageGroupRouteHandler(req: ExpressRequest, re
         throw new NotFoundError();
     }
 
-    return res.respond({ data: entity });
+    return send(res, entity);
 }
 
-export async function getManyMasterImageGroupRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getManyMasterImageGroupRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(MasterImageGroupEntity);
     const query = repository.createQueryBuilder('imageGroup');
 
-    const { pagination } = applyQuery(query, req.query, {
+    const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'imageGroup',
         filters: {
             allowed: ['id', 'name', 'path', 'virtual_path'],
@@ -45,13 +48,11 @@ export async function getManyMasterImageGroupRouteHandler(req: ExpressRequest, r
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res.respond({
-        data: {
-            data: entities,
-            meta: {
-                total,
-                ...pagination,
-            },
+    return send(res, {
+        data: entities,
+        meta: {
+            total,
+            ...pagination,
         },
     });
 }

@@ -7,8 +7,8 @@
 import { MasterImage, MasterImageCommand } from '@personalhealthtrain/central-common';
 
 import {
-    Body, Controller, Delete, Get, Params, Post, Request, Response,
-} from '@decorators/express';
+    DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
+} from '@routup/decorators';
 import { SwaggerTags } from '@trapi/swagger';
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';
 import { commandMasterImageRouteHandler } from './handlers/command';
@@ -21,41 +21,41 @@ import {
 type PartialMasterImage = Partial<MasterImage>;
 
 @SwaggerTags('master-image')
-@Controller('/master-images')
+@DController('/master-images')
 export class MasterImageController {
-    @Get('', [ForceLoggedInMiddleware])
+    @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @Request() req: any,
-            @Response() res: any,
+        @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialMasterImage[]> {
         return await getManyMasterImageRouteHandler(req, res) as PartialMasterImage[];
     }
 
-    @Get('/:id', [ForceLoggedInMiddleware])
+    @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialMasterImage | undefined> {
         return await getOneMasterImageRouteHandler(req, res) as PartialMasterImage | undefined;
     }
 
-    @Post('/command', [ForceLoggedInMiddleware])
+    @DPost('/command', [ForceLoggedInMiddleware])
     async runCommand(
-    @Body() data: {
+    @DBody() data: {
         command: MasterImageCommand
     },
-    @Request() req: any,
-    @Response() res: any,
+    @DRequest() req: any,
+    @DResponse() res: any,
     ) {
         return commandMasterImageRouteHandler(req, res);
     }
 
-    @Delete('/:id', [ForceLoggedInMiddleware])
+    @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialMasterImage | undefined> {
         return deleteMasterImageRouteHandler(req, res);
     }

@@ -12,9 +12,11 @@ import {
     BadRequestError,
     ForbiddenError,
 } from '@ebec/http';
+import { useRequestBody } from '@routup/body';
 import { publishMessage } from 'amqp-extension';
+import { Request, Response, sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../../type';
+import { useRequestEnv } from '../../../../../request';
 import env from '../../../../../../env';
 import { setupRegistry } from '../../../../../../components/registry/handlers/default';
 import {
@@ -30,12 +32,14 @@ import { RegistryEntity } from '../../../../../../domains/core/registry/entity';
 
 const commands = Object.values(RegistryCommand);
 
-export async function handleRegistryCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (!req.ability.has(PermissionID.REGISTRY_MANAGE)) {
+export async function handleRegistryCommandRouteHandler(req: Request, res: Response) : Promise<any> {
+    const ability = useRequestEnv(req, 'ability');
+
+    if (!ability.has(PermissionID.REGISTRY_MANAGE)) {
         throw new ForbiddenError('You are not permitted to manage the registry.');
     }
 
-    const { id, command } = req.body;
+    const { id, command } = useRequestBody(req);
 
     if (commands.indexOf(command) === -1) {
         throw new BadRequestError('The registry command is not valid.');
@@ -139,5 +143,5 @@ export async function handleRegistryCommandRouteHandler(req: ExpressRequest, res
         }
     }
 
-    return res.respondAccepted();
+    return sendAccepted(res);
 }

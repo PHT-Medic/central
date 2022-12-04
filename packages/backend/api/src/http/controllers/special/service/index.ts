@@ -8,29 +8,29 @@
 import { RegistryCommand, ServiceID } from '@personalhealthtrain/central-common';
 import { SwaggerTags } from '@trapi/swagger';
 import {
-    Body, Controller, Post, Request, Response,
-} from '@decorators/express';
+    DBody, DController, DPost, DRequest, DResponse,
+} from '@routup/decorators';
 
 import { NotFoundError } from '@ebec/http';
+import { Request, Response, useRequestParam } from 'routup';
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';
 import { postHarborHookRouteHandler } from './handlers/registry/hook';
 
 import { handleSecretStorageCommandRouteHandler } from './handlers/secret-storage/command';
-import { ExpressRequest, ExpressResponse } from '../../../type';
 import { RegistryHook } from '../../../../domains/special/registry';
 import { handleStationRegistryCommandRouteHandler } from './handlers/station-registry/command';
 import { handleRegistryCommandRouteHandler } from './handlers/registry/command';
 
 @SwaggerTags('extra')
-@Controller('/services')
+@DController('/services')
 export class ServiceController {
-    @Post('/:id/hook', [ForceLoggedInMiddleware])
+    @DPost('/:id/hook', [ForceLoggedInMiddleware])
     async handleHarborHook(
-    @Request() req: ExpressRequest,
-        @Response() res: ExpressResponse,
-        @Body() harborHook: RegistryHook,
+    @DRequest() req: Request,
+        @DResponse() res: Response,
+        @DBody() harborHook: RegistryHook,
     ) {
-        const { id } = req.params;
+        const id = useRequestParam(req, 'id');
 
         switch (id) {
             case ServiceID.REGISTRY:
@@ -40,13 +40,13 @@ export class ServiceController {
         throw new NotFoundError();
     }
 
-    @Post('/:id/command', [ForceLoggedInMiddleware])
+    @DPost('/:id/command', [ForceLoggedInMiddleware])
     async execHarborTask(
-    @Request() req: ExpressRequest,
-        @Response() res: ExpressResponse,
-        @Body() data: {command: RegistryCommand},
+    @DRequest() req: Request,
+        @DResponse() res: Response,
+        @DBody() data: { command: RegistryCommand },
     ) {
-        const { id } = req.params;
+        const id = useRequestParam(req, 'id');
 
         switch (id) {
             case ServiceID.REGISTRY:

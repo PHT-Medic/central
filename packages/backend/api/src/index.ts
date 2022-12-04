@@ -13,7 +13,7 @@ import { DataSource } from 'typeorm';
 import { setDataSource, setDataSourceOptions } from 'typeorm-extension';
 import env from './env';
 import { createConfig } from './config/module';
-import { createExpressApp } from './http/express';
+import { createRouter } from './http/router.js';
 import { createHttpServer } from './http/server';
 import { useLogger } from './config/log';
 import { buildDataSourceOptions } from './database/utils';
@@ -27,8 +27,8 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     HTTP Server & Express App
     */
     const config = createConfig({ env });
-    const expressApp = createExpressApp();
-    const httpServer = createHttpServer({ expressApp });
+    const router = createRouter();
+    const httpServer = createHttpServer({ router });
 
     function signalStart() {
         useLogger().debug(`Startup on 127.0.0.1:${env.port} (${env.env}) completed.`, { service: 'system' });

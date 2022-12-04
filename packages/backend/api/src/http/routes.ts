@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Application } from 'express';
-import { attachControllers } from '@decorators/express';
+import { mountControllers } from '@routup/decorators';
+import { Router } from 'routup';
 import { RootController } from './controllers/core/root';
 import { TrainLogController } from './controllers/core/train-log';
 import { UserSecretController } from './controllers/core/user-secret';
@@ -22,8 +22,8 @@ import { MasterImageGroupController } from './controllers/core/master-image-grou
 import { RegistryController } from './controllers/core/registry';
 import { RegistryProjectController } from './controllers/core/registry-project';
 
-export function registerControllers(router: Application) {
-    attachControllers(router, [
+export function registerControllers(router: Router) {
+    mountControllers(router, [
         RootController,
 
         // Core

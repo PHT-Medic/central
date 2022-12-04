@@ -7,9 +7,9 @@
 
 import { check, validationResult } from 'express-validator';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
+import { Request } from 'routup';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
-import { ExpressRequest } from '../../../../type';
 import {
     ExpressValidationError,
     ExpressValidationResult, extendExpressValidationResultWithRelation,
@@ -18,7 +18,7 @@ import {
 } from '../../../../express-validation';
 
 export async function runProposalValidation(
-    req: ExpressRequest,
+    req: Request,
     operation: 'create' | 'update',
 ) : Promise<ExpressValidationResult<ProposalEntity>> {
     const result : ExpressValidationResult<ProposalEntity> = initExpressValidationResult();

@@ -5,6 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { useRequestQuery } from '@routup/query';
+import {
+    Request, Response, send, useRequestParam,
+} from 'routup';
 import {
     applyQuery,
     applyRelations,
@@ -12,17 +16,16 @@ import {
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
 import { TrainLogEntity } from '../../../../../domains/core/train-log';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
 
-export async function getOneTrainLogRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id, include } = req.params;
+export async function getOneTrainLogRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainLogEntity);
     const query = repository.createQueryBuilder('trainLog')
         .where('trainLog.id = :id', { id });
 
-    applyRelations(query, include, {
+    applyRelations(query, useRequestQuery(req, 'include'), {
         allowed: ['train'],
         defaultAlias: 'trainLog',
     });
@@ -33,16 +36,16 @@ export async function getOneTrainLogRouteHandler(req: ExpressRequest, res: Expre
         throw new NotFoundError();
     }
 
-    return res.respond({ data: entity });
+    return send(res, entity);
 }
 
-export async function getManyTrainLogRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getManyTrainLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainLogEntity);
     const query = await repository.createQueryBuilder('trainLog');
     query.distinctOn(['trainLog.id']);
 
-    const { pagination } = applyQuery(query, req.query, {
+    const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'trainLog',
         filters: {
             allowed: [
@@ -66,13 +69,11 @@ export async function getManyTrainLogRouteHandler(req: ExpressRequest, res: Expr
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res.respond({
-        data: {
-            data: entities,
-            meta: {
-                total,
-                ...pagination,
-            },
+    return send(res, {
+        data: entities,
+        meta: {
+            total,
+            ...pagination,
         },
     });
 }

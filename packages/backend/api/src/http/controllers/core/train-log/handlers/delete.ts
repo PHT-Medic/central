@@ -7,15 +7,19 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { TrainLogEntity } from '../../../../../domains/core/train-log';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 
-export async function deleteTrainLogRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function deleteTrainLogRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
+    const ability = useRequestEnv(req, 'ability');
     if (
-        !req.ability.has(PermissionID.TRAIN_EDIT)
+        !ability.has(PermissionID.TRAIN_EDIT)
     ) {
         throw new ForbiddenError();
     }
@@ -37,5 +41,5 @@ export async function deleteTrainLogRouteHandler(req: ExpressRequest, res: Expre
 
     // -------------------------------------------
 
-    return res.respondDeleted({ data: entity });
+    return sendAccepted(res, entity);
 }

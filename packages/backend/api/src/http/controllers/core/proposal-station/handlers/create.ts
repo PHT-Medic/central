@@ -7,16 +7,19 @@
 
 import { PermissionID, ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@ebec/http';
+import { Request, Response, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
-import { runProposalStationValidation } from '../utils/validation';
+import { useRequestEnv } from '../../../../request';
+import { runProposalStationValidation } from '../utils';
 import env from '../../../../../env';
 
-export async function createProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function createProposalStationRouteHandler(req: Request, res: Response) : Promise<any> {
+    const ability = useRequestEnv(req, 'ability');
+
     if (
-        !req.ability.has(PermissionID.PROPOSAL_EDIT) &&
-        !req.ability.has(PermissionID.PROPOSAL_ADD)
+        !ability.has(PermissionID.PROPOSAL_EDIT) &&
+        !ability.has(PermissionID.PROPOSAL_ADD)
     ) {
         throw new ForbiddenError('You are not allowed to add a proposal station.');
     }
@@ -33,7 +36,5 @@ export async function createProposalStationRouteHandler(req: ExpressRequest, res
 
     entity = await repository.save(entity);
 
-    return res.respondCreated({
-        data: entity,
-    });
+    return sendCreated(res, entity);
 }

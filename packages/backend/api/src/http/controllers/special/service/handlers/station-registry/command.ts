@@ -11,8 +11,9 @@ import {
 import {
     BadRequestError, NotImplementedError,
 } from '@ebec/http';
+import { useRequestBody } from '@routup/body';
 import { publishMessage } from 'amqp-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../../type';
+import { Request, Response, sendCreated } from 'routup';
 import env from '../../../../../../env';
 import { syncStationRegistry } from '../../../../../../components/station-registry/handlers/sync';
 import { StationRegistryQueueCommand } from '../../../../../../domains/special/station-registry/consants';
@@ -20,8 +21,8 @@ import { buildStationRegistryQueueMessage } from '../../../../../../domains/spec
 
 const commands = Object.values(StationRegistryCommand);
 
-export async function handleStationRegistryCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { command } = req.body;
+export async function handleStationRegistryCommandRouteHandler(req: Request, res: Response) : Promise<any> {
+    const { command } = useRequestBody(req);
 
     if (
         !command ||
@@ -47,7 +48,8 @@ export async function handleStationRegistryCommandRouteHandler(req: ExpressReque
 
                 await publishMessage(queueMessage);
             }
-            return res.respondCreated();
+
+            return sendCreated(res);
         }
     }
 

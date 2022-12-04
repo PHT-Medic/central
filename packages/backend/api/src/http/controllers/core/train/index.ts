@@ -10,8 +10,8 @@ import {
     TrainCommand,
 } from '@personalhealthtrain/central-common';
 import {
-    Body, Controller, Delete, Get, Params, Post, Request, Response,
-} from '@decorators/express';
+    DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
+} from '@routup/decorators';
 import { SwaggerTags } from '@trapi/swagger';
 import {
     createTrainRouteHandler,
@@ -27,70 +27,70 @@ import { ForceLoggedInMiddleware } from '../../../middleware/auth';
 type PartialTrain = Partial<Train>;
 
 @SwaggerTags('train')
-@Controller('/trains')
+@DController('/trains')
 export class TrainController {
-    @Get('', [ForceLoggedInMiddleware])
+    @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @Request() req: any,
-            @Response() res: any,
+        @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialTrain[]> {
         return getManyTrainRouteHandler(req, res);
     }
 
-    @Get('/:id/result/download', [ForceLoggedInMiddleware])
+    @DGet('/:id/result/download', [ForceLoggedInMiddleware])
     async getResult(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<any> {
         return handleTrainResultDownloadRouteHandler(req, res);
     }
 
-    @Get('/:id', [ForceLoggedInMiddleware])
+    @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialTrain | undefined> {
         return getOneTrainRouteHandler(req, res);
     }
 
-    @Post('/:id', [ForceLoggedInMiddleware])
+    @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
-        @Params('id') id: string,
-            @Body() data: PartialTrain,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DBody() data: PartialTrain,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialTrain | undefined> {
         return updateTrainRouteHandler(req, res);
     }
 
-    @Post('', [ForceLoggedInMiddleware])
+    @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @Body() data: PartialTrain,
-            @Request() req: any,
-            @Response() res: any,
+        @DBody() data: PartialTrain,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialTrain | undefined> {
         return createTrainRouteHandler(req, res);
     }
 
-    @Post('/:id/command', [ForceLoggedInMiddleware])
+    @DPost('/:id/command', [ForceLoggedInMiddleware])
     async doTask(
-        @Params('id') id: string,
-            @Body() data: {
+        @DParam('id') id: string,
+            @DBody() data: {
                 command: TrainCommand
             },
-            @Request() req: any,
-            @Response() res: any,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialTrain | undefined> {
         return handleTrainCommandRouteHandler(req, res);
     }
 
-    @Delete('/:id', [ForceLoggedInMiddleware])
+    @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ): Promise<PartialTrain | undefined> {
         return deleteTrainRouteHandler(req, res);
     }

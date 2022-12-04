@@ -5,6 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import {
+    Next, Request, Response, send,
+} from 'routup';
 import { hasOwnProperty } from 'typeorm-extension';
 import {
     ConflictError,
@@ -13,22 +16,19 @@ import {
     InternalServerErrorOptions,
     extendsBaseError,
 } from '@ebec/http';
-import { ExpressNextFunction, ExpressRequest, ExpressResponse } from '../type';
 import { useLogger } from '../../config';
 
 export function errorMiddleware(
     error: Error,
-    request: ExpressRequest,
-    response: ExpressResponse,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    next: ExpressNextFunction,
+    request: Request,
+    response: Response,
+    next: Next,
 ) {
     const code : string | undefined = hasOwnProperty(error, 'code') && typeof error.code === 'string' ?
         error.code :
         undefined;
 
     // catch and decorate some mysql errors :)
-    // eslint-disable-next-line default-case
     switch (code) {
         case 'ER_DUP_ENTRY':
         case 'SQLITE_CONSTRAINT_UNIQUE':
@@ -46,23 +46,18 @@ export function errorMiddleware(
     const statusCode : number = baseError.getOption('statusCode') ?? InternalServerErrorOptions.statusCode;
 
     if (baseError.getOption('logMessage')) {
-        const isInspected = extendsBaseError(error);
-        useLogger().log({ level: 'error', message: `${!isInspected ? error.message : (baseError.message || baseError)}` });
+        useLogger().log({ level: 'error', message: `${baseError.message || baseError}` });
     }
 
     if (baseError.getOption('decorateMessage')) {
         baseError.message = 'An error occurred.';
     }
 
-    const extra = baseError.getOption('extra');
+    response.statusCode = statusCode;
 
-    return response
-        .status(statusCode)
-        .json({
-            code: baseError.getOption('code') ?? InternalServerErrorOptions.code,
-            message: baseError.message ?? InternalServerErrorOptions.message,
-            statusCode,
-            ...(extra ? { extra } : {}),
-        })
-        .end();
+    send(response, {
+        code: baseError.getOption('code') ?? InternalServerErrorOptions.code,
+        message: baseError.message ?? InternalServerErrorOptions.message,
+        statusCode,
+    });
 }

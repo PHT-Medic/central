@@ -6,6 +6,10 @@
  */
 
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { useRequestQuery } from '@routup/query';
+import {
+    Request, Response, send, useRequestParam,
+} from 'routup';
 import {
     applyQuery,
     useDataSource,
@@ -13,17 +17,17 @@ import {
 import { NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 
-export async function getOneProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function getOneProposalRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProposalEntity);
     const query = repository.createQueryBuilder('proposal')
         .where('proposal.id = :id', { id });
 
-    applyQuery(query, req.query, {
+    applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'proposal',
         fields: {
             default: [
@@ -51,13 +55,13 @@ export async function getOneProposalRouteHandler(req: ExpressRequest, res: Expre
         throw new NotFoundError();
     }
 
-    return res.respond({ data: entity });
+    return send(res, entity);
 }
 
-export async function getManyProposalRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getManyProposalRouteHandler(req: Request, res: Response) : Promise<any> {
     const {
         filter,
-    } = req.query;
+    } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
 
@@ -67,18 +71,18 @@ export async function getManyProposalRouteHandler(req: ExpressRequest, res: Expr
     if (filter) {
         let { realm_id: realmId } = filter as Record<string, any>;
 
-        if (!isPermittedForResourceRealm(req.realmId, realmId)) {
-            realmId = req.realmId;
+        if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), realmId)) {
+            realmId = useRequestEnv(req, 'realmId');
         }
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         filter.realm_id = realmId;
     } else {
-        onlyRealmPermittedQueryResources(query, req.realmId, 'proposal.realm_id');
+        onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'), 'proposal.realm_id');
     }
 
-    const { pagination } = applyQuery(query, req.query, {
+    const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'proposal',
         fields: {
             default: [
@@ -111,13 +115,11 @@ export async function getManyProposalRouteHandler(req: ExpressRequest, res: Expr
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res.respond({
-        data: {
-            data: entities,
-            meta: {
-                total,
-                ...pagination,
-            },
+    return send(res, {
+        data: entities,
+        meta: {
+            total,
+            ...pagination,
         },
     });
 }

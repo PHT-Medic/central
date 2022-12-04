@@ -8,19 +8,24 @@
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import {
+    HeaderName,
+    Request, Response, setResponseHeaderAttachment, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
 import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/core/train';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 
-export async function handleTrainResultDownloadRouteHandler(req: ExpressRequest, res: ExpressResponse) {
-    const { id } = req.params;
+export async function handleTrainResultDownloadRouteHandler(req: Request, res: Response) {
+    const id = useRequestParam(req, 'id');
 
     if (!id) {
         throw new BadRequestError('The result identifier is invalid.');
     }
 
-    if (!req.ability.has(PermissionID.TRAIN_RESULT_READ)) {
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.TRAIN_RESULT_READ)) {
         throw new ForbiddenError('You are not authorized to read the train-result file.');
     }
 
@@ -34,7 +39,7 @@ export async function handleTrainResultDownloadRouteHandler(req: ExpressRequest,
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError('You are not permitted to read the train-result file.');
     }
 
@@ -49,10 +54,8 @@ export async function handleTrainResultDownloadRouteHandler(req: ExpressRequest,
     try {
         const fileName = `${entity.id}.tar`;
 
-        res.set({
-            'Content-Disposition': `attachment; filename=${fileName}`,
-            'Content-Type': 'application/gzip',
-        });
+        res.setHeader(HeaderName.CONTENT_TYPE, 'application/gzip');
+        setResponseHeaderAttachment(res, fileName);
 
         const stream = await minio.getObject(bucketName, 'result');
 

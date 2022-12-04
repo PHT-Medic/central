@@ -5,19 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Request, Response, useRequestParam } from 'routup';
 import tar from 'tar-stream';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
 import { streamToBuffer } from '../../../../../core/utils';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/core/train';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
+import { useRequestEnv } from '../../../../request';
 
-export async function handleTrainFilesDownloadRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
     if (typeof id !== 'string') {
         throw new BadRequestError();
@@ -32,7 +33,7 @@ export async function handleTrainFilesDownloadRouteHandler(req: ExpressRequest, 
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, train.realm_id)) {
+    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), train.realm_id)) {
         const proposalStations = await dataSource.getRepository(TrainStationEntity).find({
             where: {
                 train_id: train.id,
@@ -43,7 +44,7 @@ export async function handleTrainFilesDownloadRouteHandler(req: ExpressRequest, 
         let isPermitted = false;
 
         for (let i = 0; i < proposalStations.length; i++) {
-            if (isPermittedForResourceRealm(req.realmId, proposalStations[i].station.realm_id)) {
+            if (isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), proposalStations[i].station.realm_id)) {
                 isPermitted = true;
                 break;
             }

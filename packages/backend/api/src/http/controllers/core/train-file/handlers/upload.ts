@@ -11,19 +11,23 @@ import { UploadedObjectInfo } from 'minio';
 import path from 'path';
 import crypto from 'crypto';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
+import {
+    Request, Response, send, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
 import { streamToBuffer } from '../../../../../core/utils';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/core/train';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
+import { useRequestEnv } from '../../../../request';
 
-export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: ExpressResponse) {
-    const { id } = req.params;
+export async function uploadTrainFilesRouteHandler(req: Request, res: Response) {
+    const id = useRequestParam(req, 'id');
 
+    const ability = useRequestEnv(req, 'ability');
     if (
-        !req.ability.has(PermissionID.TRAIN_ADD) &&
-        !req.ability.has(PermissionID.TRAIN_EDIT)
+        !ability.has(PermissionID.TRAIN_ADD) &&
+        !ability.has(PermissionID.TRAIN_EDIT)
     ) {
         throw new ForbiddenError();
     }
@@ -66,23 +70,21 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
         const promise = new Promise<UploadedObjectInfo>((resolve, reject) => {
             streamToBuffer(file)
                 .then((buffer) => {
-                    const size = Buffer.byteLength(buffer);
-
                     minio.putObject(
                         bucketName,
                         destinationFileName,
                         buffer,
-                        size,
+                        buffer.length,
                     )
                         .then((minioInfo) => {
                             files.push(trainFileRepository.create({
                                 hash: destinationFileName,
                                 name: fileName,
-                                size,
+                                size: buffer.length,
                                 directory: filePath,
-                                user_id: req.user.id,
+                                user_id: useRequestEnv(req, 'userId'),
                                 train_id: entity.id,
-                                realm_id: req.realmId,
+                                realm_id: useRequestEnv(req, 'realmId'),
                             }));
 
                             resolve(minioInfo);
@@ -105,12 +107,10 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
         await Promise.all(promises);
 
         if (files.length === 0) {
-            return res.respond({
-                data: {
-                    data: [],
-                    meta: {
-                        total: 0,
-                    },
+            return send(res, {
+                data: [],
+                meta: {
+                    total: 0,
                 },
             });
         }
@@ -124,12 +124,10 @@ export async function uploadTrainFilesRouteHandler(req: ExpressRequest, res: Exp
 
         await repository.save(entity);
 
-        return res.respond({
-            data: {
-                data: files,
-                meta: {
-                    total: files.length,
-                },
+        return send(res, {
+            data: files,
+            meta: {
+                total: files.length,
             },
         });
     });

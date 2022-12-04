@@ -7,18 +7,22 @@
 
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { useRequestQuery } from '@routup/query';
+import {
+    Request, Response, send, useRequestParam,
+} from 'routup';
 import {
     applyQuery,
     applyRelations,
     useDataSource,
 } from 'typeorm-extension';
 import { isPermittedForResourceRealm } from '@authelion/common';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { TrainEntity } from '../../../../../domains/core/train';
+import { useRequestEnv } from '../../../../request';
 
-export async function getOneTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { include } = req.query;
-    const { id } = req.params;
+export async function getOneTrainRouteHandler(req: Request, res: Response) : Promise<any> {
+    const { include } = useRequestQuery(req);
+    const id = useRequestParam(req, 'id');
 
     if (typeof id !== 'string') {
         throw new BadRequestError();
@@ -29,7 +33,7 @@ export async function getOneTrainRouteHandler(req: ExpressRequest, res: ExpressR
     const query = repository.createQueryBuilder('train')
         .where('train.id = :id', { id });
 
-    onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
+    onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'), 'train.realm_id');
 
     applyRelations(query, include, {
         defaultAlias: 'train',
@@ -42,19 +46,19 @@ export async function getOneTrainRouteHandler(req: ExpressRequest, res: ExpressR
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
-    return res.respond({ data: entity });
+    return send(res, entity);
 }
 
-export async function getManyTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getManyTrainRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainEntity);
     const query = repository.createQueryBuilder('train');
 
-    const { pagination, filters } = applyQuery(query, req.query, {
+    const { pagination, filters } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'train',
         filters: {
             allowed: ['id', 'name', 'proposal_id', 'realm_id'],
@@ -88,22 +92,20 @@ export async function getManyTrainRouteHandler(req: ExpressRequest, res: Express
     }
 
     if (filterRealmId) {
-        if (!isPermittedForResourceRealm(req.realmId, filterRealmId)) {
+        if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), filterRealmId)) {
             throw new ForbiddenError('You are not permitted to inspect trains for the given realm.');
         }
     } else {
-        onlyRealmPermittedQueryResources(query, req.realmId, 'train.realm_id');
+        onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'), 'train.realm_id');
     }
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res.respond({
-        data: {
-            data: entities,
-            meta: {
-                total,
-                ...pagination,
-            },
+    return send(res, {
+        data: entities,
+        meta: {
+            total,
+            ...pagination,
         },
     });
 }

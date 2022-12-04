@@ -8,21 +8,25 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useRequestEnv } from '../../../../request';
 import { runTrainValidation } from '../utils';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { TrainEntity } from '../../../../../domains/core/train';
 
-export async function updateTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function updateTrainRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
-    if (!req.ability.has(PermissionID.TRAIN_EDIT)) {
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.TRAIN_EDIT)) {
         throw new ForbiddenError();
     }
 
     const result = await runTrainValidation(req, 'update');
     if (!result.data) {
-        return res.respondAccepted();
+        return sendAccepted(res);
     }
 
     const dataSource = await useDataSource();
@@ -33,7 +37,7 @@ export async function updateTrainRouteHandler(req: ExpressRequest, res: ExpressR
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -49,7 +53,5 @@ export async function updateTrainRouteHandler(req: ExpressRequest, res: ExpressR
 
     await repository.save(entity);
 
-    return res.respondAccepted({
-        data: entity,
-    });
+    return sendAccepted(res, entity);
 }

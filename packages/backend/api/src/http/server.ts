@@ -6,19 +6,19 @@
  */
 
 import http, { Server } from 'http';
+import { Router } from 'routup';
 import { useLogger } from '../config/log';
-import { ExpressAppInterface } from './type';
 
 interface HttpServerContext {
-    expressApp: ExpressAppInterface
+    router: Router
 }
 
 export interface HttpServerInterface extends Server {
 
 }
 
-export function createHttpServer({ expressApp } : HttpServerContext) : HttpServerInterface {
+export function createHttpServer({ router } : HttpServerContext) : HttpServerInterface {
     useLogger().debug('setup http server...', { service: 'http' });
 
-    return new http.Server(expressApp);
+    return new http.Server(router.createListener());
 }

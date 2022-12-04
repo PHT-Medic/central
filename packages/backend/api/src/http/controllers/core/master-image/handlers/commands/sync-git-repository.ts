@@ -11,11 +11,11 @@ import fs from 'fs';
 import { clone } from 'isomorphic-git';
 import http from 'isomorphic-git/http/node';
 import { scanDirectory } from 'docker-scan';
-import { getWritableDirPath } from '../../../../../../config/paths';
-import { ExpressRequest, ExpressResponse } from '../../../../../type';
+import { Request, Response, sendAccepted } from 'routup';
+import { getWritableDirPath } from '../../../../../../config';
 import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
 
-export async function syncGitRepository(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function syncGitRepository(req: Request, res: Response) : Promise<any> {
     const gitURL = 'https://github.com/PHT-Medic/master-images';
     const directoryPath: string = path.join(getWritableDirPath(), 'master-images.git');
 
@@ -63,10 +63,8 @@ export async function syncGitRepository(req: ExpressRequest, res: ExpressRespons
     // images
     const images = await mergeMasterImagesWithDatabase(data.images);
 
-    return res.respondAccepted({
-        data: {
-            groups,
-            images,
-        },
+    return sendAccepted(res, {
+        groups,
+        images,
     });
 }

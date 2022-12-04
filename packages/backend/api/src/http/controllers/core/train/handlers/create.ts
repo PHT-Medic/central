@@ -7,14 +7,16 @@
 
 import { PermissionID, Train } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@ebec/http';
+import { Request, Response, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { useRequestEnv } from '../../../../request';
 import { runTrainValidation } from '../utils';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
+import { TrainEntity } from '../../../../../domains/core/train';
 
-export async function createTrainRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (!req.ability.has(PermissionID.TRAIN_ADD)) {
+export async function createTrainRouteHandler(req: Request, res: Response) : Promise<any> {
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.TRAIN_ADD)) {
         throw new ForbiddenError();
     }
 
@@ -31,8 +33,8 @@ export async function createTrainRouteHandler(req: ExpressRequest, res: ExpressR
     const repository = dataSource.getRepository<Train>(TrainEntity);
 
     const entity = repository.create({
-        realm_id: req.realmId,
-        user_id: req.user.id,
+        realm_id: useRequestEnv(req, 'realmId'),
+        user_id: useRequestEnv(req, 'userId'),
         ...result.data,
     });
 
@@ -44,5 +46,5 @@ export async function createTrainRouteHandler(req: ExpressRequest, res: ExpressR
 
     entity.proposal = result.relation.proposal;
 
-    return res.respond({ data: entity });
+    return sendCreated(res, entity);
 }

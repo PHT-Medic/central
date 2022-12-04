@@ -6,23 +6,27 @@
  */
 
 import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { useRequestQuery } from '@routup/query';
+import {
+    Request, Response, send, useRequestParam,
+} from 'routup';
 import {
     applyQuery, applyRelations, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 
-export async function getOneTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id, include } = req.params;
+export async function getOneTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainStationEntity);
     const query = repository.createQueryBuilder('trainStation')
         .where('trainStation.id = :id', { id });
 
-    applyRelations(query, include, {
+    applyRelations(query, useRequestQuery(req, 'include'), {
         allowed: ['station', 'train'],
         defaultAlias: 'trainStation',
     });
@@ -34,27 +38,27 @@ export async function getOneTrainStationRouteHandler(req: ExpressRequest, res: E
     }
 
     if (
-        !isPermittedForResourceRealm(req.realmId, entity.train_realm_id) &&
-        !isPermittedForResourceRealm(req.realmId, entity.station_realm_id)
+        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.train_realm_id) &&
+        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.station_realm_id)
     ) {
         throw new ForbiddenError();
     }
 
-    return res.respond({ data: entity });
+    return send(res, entity);
 }
 
-export async function getManyTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function getManyTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainStationEntity);
     const query = await repository.createQueryBuilder('trainStation');
     query.distinctOn(['trainStation.id']);
 
-    onlyRealmPermittedQueryResources(query, req.realmId, [
+    onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'), [
         'trainStation.train_realm_id',
         'trainStation.station_realm_id',
     ]);
 
-    const { pagination } = applyQuery(query, req.query, {
+    const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'trainStation',
         filters: {
             allowed: [
@@ -85,13 +89,11 @@ export async function getManyTrainStationRouteHandler(req: ExpressRequest, res: 
 
     const [entities, total] = await query.getManyAndCount();
 
-    return res.respond({
-        data: {
-            data: entities,
-            meta: {
-                total,
-                ...pagination,
-            },
+    return send(res, {
+        data: entities,
+        meta: {
+            total,
+            ...pagination,
         },
     });
 }

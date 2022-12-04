@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { useRequestBody } from '@routup/body';
 import { check, matchedData, validationResult } from 'express-validator';
 import {
     PermissionID,
@@ -19,8 +20,10 @@ import {
 import { UserEntity } from '@authelion/server-core';
 import { publishMessage } from 'amqp-extension';
 import { Client as VaultClient } from '@hapic/vault';
+import {
+    Request, Response, send, sendAccepted, sendCreated,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../../type';
 import { ExpressValidationError } from '../../../../../express-validation';
 import { ApiKey } from '../../../../../../config';
 import { buildSecretStorageQueueMessage } from '../../../../../../domains/special/secret-storage/queue';
@@ -33,6 +36,7 @@ import {
     deleteUserSecretsFromSecretStorage,
     saveUserSecretsToSecretStorage,
 } from '../../../../../../components/secret-storage/handlers/entities/user';
+import { useRequestEnv } from '../../../../../request';
 
 const commands = Object.values(SecretStorageCommand);
 
@@ -40,8 +44,8 @@ enum TargetEntity {
     USER = 'user',
 }
 
-export async function handleSecretStorageCommandRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { command } = req.body;
+export async function handleSecretStorageCommandRouteHandler(req: Request, res: Response) : Promise<any> {
+    const { command } = useRequestBody(req);
 
     if (
         !command ||
@@ -63,6 +67,8 @@ export async function handleSecretStorageCommandRouteHandler(req: ExpressRequest
 
     const validationData = matchedData(req, { includeOptionals: true });
 
+    const ability = useRequestEnv(req, 'ability');
+
     const rawPath : string = validationData.name;
 
     let entity : { type: TargetEntity.USER, data: UserEntity };
@@ -71,8 +77,8 @@ export async function handleSecretStorageCommandRouteHandler(req: ExpressRequest
         const userId = getUserSecretsSecretStorageKey(rawPath);
 
         if (
-            !req.ability.has(PermissionID.USER_EDIT) &&
-            userId !== req.userId
+            !ability.has(PermissionID.USER_EDIT) &&
+            userId !== useRequestEnv(req, 'userId')
         ) {
             throw new ForbiddenError();
         }
@@ -91,7 +97,7 @@ export async function handleSecretStorageCommandRouteHandler(req: ExpressRequest
             data,
         };
     } else if (
-        !req.ability.has(PermissionID.SERVICE_MANAGE)
+        !ability.has(PermissionID.SERVICE_MANAGE)
     ) {
         throw new ForbiddenError();
     }
@@ -103,7 +109,7 @@ export async function handleSecretStorageCommandRouteHandler(req: ExpressRequest
                     path: rawPath,
                 });
 
-            return res.respondCreated();
+            return sendCreated(res);
         }
         case SecretStorageCommand.ENGINE_KEY_PULL: {
             switch (entity.type) {
@@ -112,7 +118,7 @@ export async function handleSecretStorageCommandRouteHandler(req: ExpressRequest
                 }
             }
 
-            return res.respond({ data: entity.data });
+            return send(res, entity.data);
         }
         case SecretStorageCommand.ENGINE_KEY_SAVE: {
             switch (entity.type) {
@@ -136,7 +142,7 @@ export async function handleSecretStorageCommandRouteHandler(req: ExpressRequest
                 }
             }
 
-            return res.respondCreated();
+            return sendCreated(res);
         }
         case SecretStorageCommand.ENGINE_KEY_DROP: {
             switch (entity.type) {
@@ -160,7 +166,7 @@ export async function handleSecretStorageCommandRouteHandler(req: ExpressRequest
                 }
             }
 
-            return res.respondDeleted();
+            return sendAccepted(res);
         }
     }
 

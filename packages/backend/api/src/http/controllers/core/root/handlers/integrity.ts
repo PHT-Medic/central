@@ -11,12 +11,12 @@ import { RobotRepository, useRobotEventEmitter } from '@authelion/server-core';
 import { Client as VaultClient } from '@hapic/vault';
 import { HTTPClientKey, ROBOT_SECRET_ENGINE_KEY, ServiceID } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
+import { Request, Response, sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
 
 export async function checkIntegrityRouteHandler(
-    req: ExpressRequest,
-    res: ExpressResponse,
+    req: Request,
+    res: Response,
 ) : Promise<any> {
     const vaultClient = useClient<VaultClient>(HTTPClientKey.VAULT);
 
@@ -49,5 +49,5 @@ export async function checkIntegrityRouteHandler(
             });
     }
 
-    return res.respondAccepted();
+    return sendAccepted(res);
 }

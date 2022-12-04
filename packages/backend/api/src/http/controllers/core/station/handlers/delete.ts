@@ -9,16 +9,20 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { isPermittedForResourceRealm } from '@authelion/common';
 import { publishMessage } from 'amqp-extension';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { StationEntity } from '../../../../../domains/core/station/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
+import { useRequestEnv } from '../../../../request';
 
-export async function deleteStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function deleteStationRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
 
-    if (!req.ability.has(PermissionID.STATION_DROP)) {
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.STATION_DROP)) {
         throw new ForbiddenError();
     }
 
@@ -31,7 +35,7 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(req.realmId, entity.realm_id)) {
+    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 
@@ -63,5 +67,5 @@ export async function deleteStationRouteHandler(req: ExpressRequest, res: Expres
 
     entity.id = entityId;
 
-    return res.respondDeleted({ data: entity });
+    return sendAccepted(res, entity);
 }

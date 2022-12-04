@@ -8,16 +8,21 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isPermittedForResourceRealm } from '@authelion/common';
+import {
+    Request, Response, sendAccepted, useRequestParam,
+} from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 
-export async function deleteProposalStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const { id } = req.params;
+export async function deleteProposalStationRouteHandler(req: Request, res: Response) : Promise<any> {
+    const id = useRequestParam(req, 'id');
+
+    const ability = useRequestEnv(req, 'ability');
 
     if (
-        !req.ability.has(PermissionID.PROPOSAL_EDIT) &&
-        !req.ability.has(PermissionID.PROPOSAL_DROP)
+        !ability.has(PermissionID.PROPOSAL_EDIT) &&
+        !ability.has(PermissionID.PROPOSAL_DROP)
     ) {
         throw new ForbiddenError('You are not allowed to drop a proposal station.');
     }
@@ -32,8 +37,8 @@ export async function deleteProposalStationRouteHandler(req: ExpressRequest, res
     }
 
     if (
-        !isPermittedForResourceRealm(req.realmId, entity.station_realm_id) &&
-        !isPermittedForResourceRealm(req.realmId, entity.proposal_realm_id)
+        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.station_realm_id) &&
+        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.proposal_realm_id)
     ) {
         throw new ForbiddenError('You are not authorized to drop this proposal station.');
     }
@@ -44,5 +49,5 @@ export async function deleteProposalStationRouteHandler(req: ExpressRequest, res
 
     entity.id = entityId;
 
-    return res.respondDeleted({ data: entity });
+    return sendAccepted(res, entity);
 }

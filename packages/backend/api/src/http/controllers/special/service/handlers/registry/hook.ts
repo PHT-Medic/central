@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { useRequestBody } from '@routup/body';
+import { Request, Response, sendAccepted } from 'routup';
 import {
     BaseSchema, array, object, string,
 } from 'yup';
@@ -15,7 +17,6 @@ import {
     RegistryQueueEvent,
     buildRegistryEventQueueMessage,
 } from '../../../../../../domains/special/registry';
-import { ExpressRequest, ExpressResponse } from '../../../../../type';
 
 let eventValidator : undefined | BaseSchema;
 function useHookEventDataValidator() : BaseSchema {
@@ -45,15 +46,15 @@ function useHookEventDataValidator() : BaseSchema {
     return eventValidator;
 }
 
-export async function postHarborHookRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    const hook : RegistryHook = await useHookEventDataValidator().validate(req.body);
+export async function postHarborHookRouteHandler(req: Request, res: Response) : Promise<any> {
+    const hook : RegistryHook = await useHookEventDataValidator().validate(useRequestBody(req));
 
     const hookTypes = Object
         .values(RegistryQueueEvent)
         .map((event) => event.substring('REGISTRY_'.length));
 
     if (hookTypes.indexOf(hook.type) === -1) {
-        return res.status(200).end();
+        return sendAccepted(res);
     }
 
     const event : RegistryQueueEvent = `REGISTRY_${hook.type}` as RegistryQueueEvent;
@@ -72,5 +73,5 @@ export async function postHarborHookRouteHandler(req: ExpressRequest, res: Expre
 
     await publishMessage(message);
 
-    return res.status(200).end();
+    return sendAccepted(res);
 }

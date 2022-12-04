@@ -8,8 +8,9 @@
 import { SecretType, isHex } from '@personalhealthtrain/central-common';
 import { Buffer } from 'buffer';
 import { publishMessage } from 'amqp-extension';
+import { Request, Response, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
+import { useRequestEnv } from '../../../../request';
 import { runUserSecretValidation } from '../utils';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
 import { buildSecretStorageQueueMessage } from '../../../../../domains/special/secret-storage/queue';
@@ -20,7 +21,7 @@ import {
 import env from '../../../../../env';
 import { saveUserSecretsToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/user';
 
-export async function createUserSecretRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
+export async function createUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
     const data = await runUserSecretValidation(req, 'create');
 
     if (
@@ -34,8 +35,8 @@ export async function createUserSecretRouteHandler(req: ExpressRequest, res: Exp
     const repository = dataSource.getRepository(UserSecretEntity);
 
     const entity = repository.create({
-        user_id: req.user.id,
-        realm_id: req.realmId,
+        user_id: useRequestEnv(req, 'userId'),
+        realm_id: useRequestEnv(req, 'realmId'),
         ...data,
     });
 
@@ -58,5 +59,5 @@ export async function createUserSecretRouteHandler(req: ExpressRequest, res: Exp
         await publishMessage(queueMessage);
     }
 
-    return res.respond({ data: entity });
+    return sendCreated(res, entity);
 }

@@ -7,15 +7,17 @@
 
 import { PermissionID, TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
+import { Request, Response, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
+import { useRequestEnv } from '../../../../request';
 import { runTrainStationValidation } from '../utils';
 import env from '../../../../../env';
-import { TrainEntity } from '../../../../../domains/core/train/entity';
+import { TrainEntity } from '../../../../../domains/core/train';
 
-export async function createTrainStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (!req.ability.has(PermissionID.TRAIN_EDIT)) {
+export async function createTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.TRAIN_EDIT)) {
         throw new ForbiddenError();
     }
 
@@ -53,7 +55,5 @@ export async function createTrainStationRouteHandler(req: ExpressRequest, res: E
     entity.train = result.relation.train;
     entity.station = result.relation.station;
 
-    return res.respondCreated({
-        data: entity,
-    });
+    return sendCreated(res, entity);
 }

@@ -33,7 +33,7 @@ export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDoc
         decorator: {
             internal: true,
             preset: [
-                'decorators-express',
+                'routup',
             ],
         },
     };

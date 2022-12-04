@@ -11,16 +11,18 @@ import {
 import { BadRequestError, ForbiddenError } from '@ebec/http';
 import { validationResult } from 'express-validator';
 import { publishMessage } from 'amqp-extension';
+import { Request, Response, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ExpressValidationError } from '../../../../express-validation';
+import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
-import { ExpressRequest, ExpressResponse } from '../../../../type';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
-export async function createStationRouteHandler(req: ExpressRequest, res: ExpressResponse) : Promise<any> {
-    if (!req.ability.has(PermissionID.STATION_ADD)) {
+export async function createStationRouteHandler(req: Request, res: Response) : Promise<any> {
+    const ability = useRequestEnv(req, 'ability');
+    if (!ability.has(PermissionID.STATION_ADD)) {
         throw new ForbiddenError();
     }
 
@@ -88,5 +90,5 @@ export async function createStationRouteHandler(req: ExpressRequest, res: Expres
 
     await repository.save(entity);
 
-    return res.respond({ data: entity });
+    return sendCreated(res, entity);
 }

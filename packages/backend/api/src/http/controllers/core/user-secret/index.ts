@@ -6,8 +6,8 @@
  */
 
 import {
-    Body, Controller, Delete, Get, Params, Post, Request, Response,
-} from '@decorators/express';
+    DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
+} from '@routup/decorators';
 import { SwaggerTags } from '@trapi/swagger';
 import {
     UserSecret,
@@ -22,49 +22,49 @@ import {
 } from './handlers';
 
 @SwaggerTags('user')
-@Controller('/user-secrets')
+@DController('/user-secrets')
 export class UserSecretController {
-    @Get('', [ForceLoggedInMiddleware])
+    @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @Request() req: any,
-            @Response() res: any,
+        @DRequest() req: any,
+            @DResponse() res: any,
     ) : Promise<UserSecret> {
         return getManyUserSecretRouteHandler(req, res);
     }
 
-    @Get('/:id', [ForceLoggedInMiddleware])
+    @DGet('/:id', [ForceLoggedInMiddleware])
     async get(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ) : Promise<UserSecret> {
         return getOneUserSecretRouteHandler(req, res);
     }
 
-    @Post('', [ForceLoggedInMiddleware])
+    @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @Request() req: any,
-            @Response() res: any,
-            @Body() data: Pick<UserSecret, 'type' | 'content'>,
+        @DRequest() req: any,
+            @DResponse() res: any,
+            @DBody() data: Pick<UserSecret, 'type' | 'content'>,
     ) : Promise<UserSecret> {
         return createUserSecretRouteHandler(req, res);
     }
 
-    @Post('/:id', [ForceLoggedInMiddleware])
+    @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
-            @Body() data: Pick<UserSecret, 'type' | 'content'>,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
+            @DBody() data: Pick<UserSecret, 'type' | 'content'>,
     ) : Promise<UserSecret> {
         return updateUserSecretRouteHandler(req, res);
     }
 
-    @Delete('/:id', [ForceLoggedInMiddleware])
+    @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @Params('id') id: string,
-            @Request() req: any,
-            @Response() res: any,
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
     ) : Promise<UserSecret> {
         return deleteUserSecretRouteHandler(req, res);
     }
