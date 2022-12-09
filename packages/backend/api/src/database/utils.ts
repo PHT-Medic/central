@@ -6,8 +6,10 @@
  */
 
 import path from 'path';
+import { DataSourceOptions } from 'typeorm';
 import { buildDataSourceOptions as _buildDataSourceOptions } from 'typeorm-extension';
 import { extendDataSourceOptions } from '@authup/server-database';
+import { getWritableDirPath } from '../config';
 import { MasterImageEntity } from '../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../domains/core/master-image-group/entity';
 import { ProposalEntity } from '../domains/core/proposal/entity';
@@ -30,17 +32,15 @@ import { TrainFileSubscriber } from './subscribers/train-file';
 import { TrainLogSubscriber } from './subscribers/train-log';
 import { TrainStationSubscriber } from './subscribers/train-station';
 
-export async function buildDataSourceOptions() {
-    let options;
+export async function buildDataSourceOptions() : Promise<DataSourceOptions> {
+    let options : DataSourceOptions;
 
     try {
         options = await _buildDataSourceOptions();
-        options.logging = ['error'];
     } catch (e) {
         options = {
-            name: 'default',
             type: 'better-sqlite3',
-            database: path.join(process.cwd(), 'writable', process.env.NODE_ENV === 'test' ? 'test.sql' : 'db.sql'),
+            database: path.join(getWritableDirPath(), process.env.NODE_ENV === 'test' ? 'test.sql' : 'db.sql'),
             subscribers: [],
             migrations: [],
             logging: ['error'],
@@ -91,5 +91,10 @@ export async function buildDataSourceOptions() {
         ],
     };
 
-    return (options);
+    options = {
+        ...options,
+        logging: false,
+    };
+
+    return options;
 }

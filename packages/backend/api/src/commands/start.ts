@@ -6,7 +6,7 @@
  */
 
 import { DatabaseSeeder } from '@authup/server-database';
-import { DataSource, DataSourceOptions } from 'typeorm';
+import { DataSource } from 'typeorm';
 import {
     checkDatabase, createDatabase, setDataSource, setupDatabaseSchema,
 } from 'typeorm-extension';
@@ -39,12 +39,9 @@ export async function startCommand(context?: StartCommandContext) {
     logger.info('Generated documentation.');
 
     const options = await buildDataSourceOptions();
-    Object.assign(options, {
-        logging: ['error'],
-    } as DataSourceOptions);
-
     const check = await checkDatabase({
         options,
+        dataSourceCleanup: true,
     });
 
     if (!check.exists) {
@@ -78,8 +75,10 @@ export async function startCommand(context?: StartCommandContext) {
     });
     await authSeeder.run(dataSource);
 
-    const coreSeeder = new DatabaseRootSeeder();
-    await coreSeeder.run(dataSource);
+    if (!check.schema) {
+        const coreSeeder = new DatabaseRootSeeder();
+        await coreSeeder.run(dataSource);
+    }
 
     if (!check.schema) {
         logger.info('Seeded database');
