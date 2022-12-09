@@ -13,7 +13,7 @@ import {
     generateDocumentation,
 } from '@trapi/swagger';
 import path from 'path';
-import { getSwaggerEntrypoint } from '@authelion/server-core';
+import { getSwaggerEntrypoint } from '@authup/server-http';
 import { getRootDirPath, getWritableDirPath } from '../config';
 import env from '../env';
 
@@ -29,7 +29,7 @@ export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDoc
             getSwaggerEntrypoint(),
         ],
         ignore: ['**/node_modules/**'],
-        allow: ['**/@authelion/**'],
+        allow: ['**/@authup/**'],
         decorator: {
             internal: true,
             preset: [

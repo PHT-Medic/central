@@ -15,9 +15,9 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { Train, TrainFile } from '@personalhealthtrain/central-common';
-import { RealmEntity, UserEntity } from '@authelion/server-core';
+import { RealmEntity, UserEntity } from '@authup/server-database';
 // eslint-disable-next-line import/no-cycle
-import { Realm, User } from '@authelion/common';
+import { Realm, User } from '@authup/common';
 import { TrainEntity } from '../train/entity';
 
 @Entity({ name: 'train_files' })

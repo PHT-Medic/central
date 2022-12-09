@@ -7,8 +7,8 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
-import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { isRealmResourceReadable } from '@authup/common';
+import { onlyRealmReadableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import {
     Request, Response, send, useRequestParam,
@@ -39,7 +39,7 @@ export async function getOneTrainFileRouteHandler(req: Request, res: Response) :
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
+    if (!isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -55,7 +55,7 @@ export async function getManyTrainFileGetManyRouteHandler(req: Request, res: Res
     const query = repository.createQueryBuilder('trainFile')
         .where('trainFile.train_id = :trainId', { trainId: id });
 
-    onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'));
+    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'));
 
     applyFilters(query, filter, {
         defaultAlias: 'trainFile',

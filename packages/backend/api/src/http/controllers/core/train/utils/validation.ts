@@ -8,7 +8,7 @@
 import { Ecosystem, TrainType } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
 import { BadRequestError } from '@ebec/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceWritable } from '@authup/common';
 import { Request } from 'routup';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
@@ -122,7 +122,7 @@ export async function runTrainValidation(
     });
 
     if (result.relation.proposal) {
-        if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), result.relation.proposal.realm_id)) {
+        if (!isRealmResourceWritable(useRequestEnv(req, 'realmId'), result.relation.proposal.realm_id)) {
             throw new BadRequestError('The referenced proposal realm is not permitted.');
         }
     }

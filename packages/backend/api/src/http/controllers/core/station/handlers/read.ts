@@ -19,7 +19,7 @@ import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { onlyRealmReadableQueryResources } from '@authup/server-database';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { useRequestEnv } from '../../../../request';
 
@@ -62,7 +62,7 @@ async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>,
             );
         }
 
-        onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'), 'station.realm_id');
+        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'), 'station.realm_id');
     }
 
     applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'station' });

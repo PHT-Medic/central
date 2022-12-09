@@ -7,7 +7,7 @@
 
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceWritable } from '@authup/common';
 import { publishMessage } from 'amqp-extension';
 import {
     Request, Response, sendAccepted, useRequestParam,
@@ -35,7 +35,7 @@ export async function deleteStationRouteHandler(req: Request, res: Response) : P
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
+    if (!isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 

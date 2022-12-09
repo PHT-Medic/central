@@ -11,7 +11,7 @@ import {
     Request, Response, sendAccepted, useRequestParam,
 } from 'routup';
 import { MoreThan } from 'typeorm';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceWritable } from '@authup/common';
 import { useDataSource } from 'typeorm-extension';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { useRequestEnv } from '../../../../request';
@@ -38,8 +38,8 @@ export async function deleteTrainStationRouteHandler(req: Request, res: Response
     }
 
     if (
-        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.station_realm_id) &&
-        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.train_realm_id)
+        !isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.station_realm_id) &&
+        !isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.train_realm_id)
     ) {
         throw new ForbiddenError();
     }

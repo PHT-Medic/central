@@ -11,7 +11,7 @@ import {
     Request, Response, send, useRequestParam,
 } from 'routup';
 import { SelectQueryBuilder } from 'typeorm';
-import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { onlyRealmReadableQueryResources } from '@authup/server-database';
 import {
     applyFilters,
     applyPagination,
@@ -67,7 +67,7 @@ function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, field
             );
         }
 
-        onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'));
+        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'));
     }
 
     applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'registryProject' });

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { onlyRealmReadableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import {
     Request, Response, send, useRequestParam,
@@ -15,7 +15,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceReadable } from '@authup/common';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { useRequestEnv } from '../../../../request';
 
@@ -71,7 +71,7 @@ export async function getManyProposalRouteHandler(req: Request, res: Response) :
     if (filter) {
         let { realm_id: realmId } = filter as Record<string, any>;
 
-        if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), realmId)) {
+        if (!isRealmResourceReadable(useRequestEnv(req, 'realmId'), realmId)) {
             realmId = useRequestEnv(req, 'realmId');
         }
 
@@ -79,7 +79,7 @@ export async function getManyProposalRouteHandler(req: Request, res: Response) :
         // @ts-ignore
         filter.realm_id = realmId;
     } else {
-        onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'), 'proposal.realm_id');
+        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'), 'proposal.realm_id');
     }
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {

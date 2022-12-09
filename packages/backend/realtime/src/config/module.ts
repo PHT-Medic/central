@@ -14,7 +14,7 @@ import {
     createRefreshRobotTokenOnResponseErrorHandler,
 } from '@personalhealthtrain/central-common';
 import { Client as VaultClient } from '@hapic/vault';
-import { Robot } from '@authelion/common';
+import { Robot } from '@authup/common';
 import { useLogger } from './log';
 import { Config, ConfigContext } from './type';
 

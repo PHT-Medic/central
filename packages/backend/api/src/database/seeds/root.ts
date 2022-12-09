@@ -14,10 +14,10 @@ import {
     RolePermissionEntity,
     RoleRepository,
     useRobotEventEmitter,
-} from '@authelion/server-core';
+} from '@authup/server-database';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { MASTER_REALM_ID } from '@authelion/common';
-import { PHTStationRole, getPHTStationRolePermissions } from '../../config/permissions/station';
+import { MASTER_REALM_ID } from '@authup/common';
+import { PHTStationRole, getPHTStationRolePermissions } from '../../config';
 
 // ----------------------------------------------
 

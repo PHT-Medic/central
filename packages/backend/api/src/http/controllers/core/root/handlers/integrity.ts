@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MASTER_REALM_ID, createNanoID } from '@authelion/common';
-import { hash } from '@authelion/server-utils';
-import { RobotRepository, useRobotEventEmitter } from '@authelion/server-core';
+import { MASTER_REALM_ID, createNanoID } from '@authup/common';
+import { hash } from '@authup/server-common';
+import { RobotRepository, useRobotEventEmitter } from '@authup/server-database';
 import { Client as VaultClient } from '@hapic/vault';
 import { HTTPClientKey, ROBOT_SECRET_ENGINE_KEY, ServiceID } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';

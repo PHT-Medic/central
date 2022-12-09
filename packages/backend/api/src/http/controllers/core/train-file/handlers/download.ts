@@ -8,7 +8,7 @@
 import { Request, Response, useRequestParam } from 'routup';
 import tar from 'tar-stream';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceReadable } from '@authup/common';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
 import { streamToBuffer } from '../../../../../core/utils';
@@ -33,7 +33,7 @@ export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Re
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), train.realm_id)) {
+    if (!isRealmResourceReadable(useRequestEnv(req, 'realmId'), train.realm_id)) {
         const proposalStations = await dataSource.getRepository(TrainStationEntity).find({
             where: {
                 train_id: train.id,
@@ -44,7 +44,7 @@ export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Re
         let isPermitted = false;
 
         for (let i = 0; i < proposalStations.length; i++) {
-            if (isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), proposalStations[i].station.realm_id)) {
+            if (isRealmResourceReadable(useRequestEnv(req, 'realmId'), proposalStations[i].station.realm_id)) {
                 isPermitted = true;
                 break;
             }

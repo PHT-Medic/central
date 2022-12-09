@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
-import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { onlyRealmReadableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import {
     Request, Response, send, useRequestParam,
@@ -16,7 +16,7 @@ import {
     applyRelations,
     useDataSource,
 } from 'typeorm-extension';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceReadable } from '@authup/common';
 import { TrainEntity } from '../../../../../domains/core/train';
 import { useRequestEnv } from '../../../../request';
 
@@ -33,7 +33,7 @@ export async function getOneTrainRouteHandler(req: Request, res: Response) : Pro
     const query = repository.createQueryBuilder('train')
         .where('train.id = :id', { id });
 
-    onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'), 'train.realm_id');
+    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'), 'train.realm_id');
 
     applyRelations(query, include, {
         defaultAlias: 'train',
@@ -46,7 +46,7 @@ export async function getOneTrainRouteHandler(req: Request, res: Response) : Pro
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
+    if (!isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -92,11 +92,11 @@ export async function getManyTrainRouteHandler(req: Request, res: Response) : Pr
     }
 
     if (filterRealmId) {
-        if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), filterRealmId)) {
+        if (!isRealmResourceReadable(useRequestEnv(req, 'realmId'), filterRealmId)) {
             throw new ForbiddenError('You are not permitted to inspect trains for the given realm.');
         }
     } else {
-        onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'), 'train.realm_id');
+        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'), 'train.realm_id');
     }
 
     const [entities, total] = await query.getManyAndCount();

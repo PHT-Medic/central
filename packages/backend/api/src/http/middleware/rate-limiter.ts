@@ -8,7 +8,7 @@
 import rateLimit from 'express-rate-limit';
 import { TooManyRequestsError } from '@ebec/http';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { MASTER_REALM_ID } from '@authelion/common';
+import { MASTER_REALM_ID } from '@authup/common';
 import {
     Handler, Next, Request, Response, getRequestIp,
 } from 'routup';

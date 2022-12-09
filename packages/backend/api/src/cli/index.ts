@@ -5,9 +5,10 @@ import yargs from 'yargs';
 import { MigrationGenerateCommand } from './commands/migration-generate';
 import { MigrationRevertCommand } from './commands/migration-revert';
 import { MigrationStatusCommand } from './commands/migration-status';
-import { SetupCommand } from './commands/setup';
-import { UpgradeCommand } from './commands/upgrade';
+import { StartCommand } from './commands/start';
 import { ResetCommand } from './commands/reset';
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 // eslint-disable-next-line no-unused-expressions,@typescript-eslint/no-unused-expressions
 yargs
@@ -16,8 +17,7 @@ yargs
     .command(new MigrationGenerateCommand())
     .command(new MigrationRevertCommand())
     .command(new MigrationStatusCommand())
-    .command(new SetupCommand())
-    .command(new UpgradeCommand())
+    .command(new StartCommand())
     .command(new ResetCommand())
     .strict()
     .alias('v', 'version')

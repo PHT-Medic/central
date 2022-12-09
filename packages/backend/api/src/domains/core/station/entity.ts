@@ -18,8 +18,8 @@ import {
 import {
     Ecosystem, Registry, RegistryProject, Station,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@authelion/server-core';
-import { Realm } from '@authelion/common';
+import { RealmEntity } from '@authup/server-database';
+import { Realm } from '@authup/common';
 import { RegistryProjectEntity } from '../registry-project/entity';
 import { RegistryEntity } from '../registry/entity';
 

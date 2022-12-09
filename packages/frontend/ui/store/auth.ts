@@ -13,7 +13,7 @@ import {
     OAuth2TokenGrantResponse,
     OAuth2TokenKind,
     User,
-} from '@authelion/common';
+} from '@authup/common';
 import { RootState } from './index';
 import { AuthBrowserStorageKey } from '../config/auth';
 

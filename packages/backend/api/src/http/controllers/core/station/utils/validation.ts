@@ -7,8 +7,8 @@
 
 import { Ecosystem } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
-import { RealmEntity } from '@authelion/server-core';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { RealmEntity } from '@authup/server-database';
+import { isRealmResourceWritable } from '@authup/common';
 import { ForbiddenError } from '@ebec/http';
 import { Request } from 'routup';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
@@ -113,7 +113,7 @@ export async function runStationValidation(
     });
 
     if (result.data.realm_id) {
-        if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), result.data.realm_id)) {
+        if (!isRealmResourceWritable(useRequestEnv(req, 'realmId'), result.data.realm_id)) {
             throw new ForbiddenError('You are not permitted to create this station.');
         }
     }

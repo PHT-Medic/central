@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Realm } from '@authelion/common';
+import { Realm } from '@authup/common';
 import { Proposal } from '../proposal';
 import { Station } from '../station';
 import { ProposalStationApprovalStatus } from './constants';

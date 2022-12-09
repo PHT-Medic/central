@@ -7,7 +7,7 @@
 
 import {
     ErrorCode, Robot,
-} from '@authelion/common';
+} from '@authup/common';
 import { Client } from '@hapic/oauth2';
 import { isClientError, stringifyAuthorizationHeader } from 'hapic';
 import { HTTPClient } from '../../client';

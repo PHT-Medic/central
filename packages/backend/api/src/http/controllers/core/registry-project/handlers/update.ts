@@ -12,7 +12,7 @@ import {
     Request, Response, sendAccepted, useRequestParam,
 } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceWritable } from '@authup/common';
 import { useRequestEnv } from '../../../../request';
 import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
@@ -39,7 +39,7 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
+    if (!isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 

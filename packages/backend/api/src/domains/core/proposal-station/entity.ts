@@ -12,8 +12,8 @@ import {
 import {
     Proposal, ProposalStation, ProposalStationApprovalStatus, Station,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@authelion/server-core';
-import { Realm } from '@authelion/common';
+import { RealmEntity } from '@authup/server-database';
+import { Realm } from '@authup/common';
 import { ProposalEntity } from '../proposal/entity';
 import { StationEntity } from '../station/entity';
 

@@ -7,7 +7,7 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceWritable } from '@authup/common';
 import {
     Request, Response, sendAccepted, useRequestParam,
 } from 'routup';
@@ -37,7 +37,7 @@ export async function deleteTrainFileRouteHandler(req: Request, res: Response) :
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
+    if (!isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 

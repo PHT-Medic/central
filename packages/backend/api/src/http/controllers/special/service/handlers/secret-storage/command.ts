@@ -17,7 +17,7 @@ import { useClient } from 'hapic';
 import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
 } from '@ebec/http';
-import { UserEntity } from '@authelion/server-core';
+import { UserEntity } from '@authup/server-database';
 import { publishMessage } from 'amqp-extension';
 import { Client as VaultClient } from '@hapic/vault';
 import {

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Robot, User } from '@authelion/common';
+import { Robot, User } from '@authup/common';
 import { Station } from '@personalhealthtrain/central-common';
 import { SecretStorageQueueEntityType } from './constants';
 

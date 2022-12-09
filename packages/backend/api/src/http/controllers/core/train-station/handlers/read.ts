@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { onlyRealmReadableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import {
     Request, Response, send, useRequestParam,
@@ -14,7 +14,7 @@ import {
     applyQuery, applyRelations, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceReadable } from '@authup/common';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { useRequestEnv } from '../../../../request';
 
@@ -38,8 +38,8 @@ export async function getOneTrainStationRouteHandler(req: Request, res: Response
     }
 
     if (
-        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.train_realm_id) &&
-        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.station_realm_id)
+        !isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.train_realm_id) &&
+        !isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.station_realm_id)
     ) {
         throw new ForbiddenError();
     }
@@ -53,7 +53,7 @@ export async function getManyTrainStationRouteHandler(req: Request, res: Respons
     const query = await repository.createQueryBuilder('trainStation');
     query.distinctOn(['trainStation.id']);
 
-    onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'), [
+    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'), [
         'trainStation.train_realm_id',
         'trainStation.station_realm_id',
     ]);

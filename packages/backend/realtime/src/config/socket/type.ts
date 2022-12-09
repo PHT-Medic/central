@@ -12,7 +12,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import {
     AbilityDescriptor, AbilityManager, Realm, Robot, User,
-} from '@authelion/common';
+} from '@authup/common';
 import { Namespace, Server, Socket } from 'socket.io';
 
 export type SocketDataInterface = {

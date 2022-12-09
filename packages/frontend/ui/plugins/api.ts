@@ -11,8 +11,8 @@ import {
 import { Context } from '@nuxt/types';
 import https from 'https';
 import { Inject } from '@nuxt/types/app';
-import { HTTPClient as AuthHTTPClient } from '@authelion/common';
-import { setHTTPClient } from '@authelion/vue';
+import { HTTPClient as AuthHTTPClient } from '@authup/common';
+import { setHTTPClient } from '@authup/vue2';
 import { ErrorCode, HTTPClient } from '@personalhealthtrain/central-common';
 import { LicenseAgreementCommand, useLicenseAgreementEventEmitter } from '../domains/license-agreement';
 

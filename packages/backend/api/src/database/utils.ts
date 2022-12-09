@@ -7,12 +7,12 @@
 
 import path from 'path';
 import { buildDataSourceOptions as _buildDataSourceOptions } from 'typeorm-extension';
-import { extendDataSourceOptions } from '@authelion/server-core';
+import { extendDataSourceOptions } from '@authup/server-database';
 import { MasterImageEntity } from '../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../domains/core/master-image-group/entity';
 import { ProposalEntity } from '../domains/core/proposal/entity';
 import { TrainLogEntity } from '../domains/core/train-log';
-import { TrainEntity } from '../domains/core/train/entity';
+import { TrainEntity } from '../domains/core/train';
 import { StationEntity } from '../domains/core/station/entity';
 import { ProposalStationEntity } from '../domains/core/proposal-station/entity';
 import { TrainFileEntity } from '../domains/core/train-file/entity';

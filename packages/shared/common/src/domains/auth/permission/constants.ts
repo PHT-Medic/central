@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID as AuthPermissionID } from '@authelion/common';
+import { PermissionID as AuthPermissionID } from '@authup/common';
 
 export enum PermissionKey {
     ADMIN_UI_USE = 'admin_ui_use',

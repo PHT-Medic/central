@@ -7,7 +7,7 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceWritable } from '@authup/common';
 import {
     Request, Response, sendAccepted, useRequestParam,
 } from 'routup';
@@ -37,8 +37,8 @@ export async function deleteProposalStationRouteHandler(req: Request, res: Respo
     }
 
     if (
-        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.station_realm_id) &&
-        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.proposal_realm_id)
+        !isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.station_realm_id) &&
+        !isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.proposal_realm_id)
     ) {
         throw new ForbiddenError('You are not authorized to drop this proposal station.');
     }

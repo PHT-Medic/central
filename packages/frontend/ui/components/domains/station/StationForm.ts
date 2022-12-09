@@ -9,7 +9,7 @@ import {
     Ecosystem,
     Registry, Station, isHex,
 } from '@personalhealthtrain/central-common';
-import { RealmList } from '@authelion/vue';
+import { RealmList } from '@authup/vue2';
 import {
     email, helpers, maxLength, minLength, required,
 } from 'vuelidate/lib/validators';

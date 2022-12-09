@@ -28,7 +28,7 @@ import {
     ComponentListProperties,
     PaginationMeta, buildListHeader, buildListItems, buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
-import { MASTER_REALM_ID, Realm } from '@authelion/common';
+import { MASTER_REALM_ID, Realm } from '@authup/common';
 import { BuildInput } from 'rapiq';
 
 enum DomainType {

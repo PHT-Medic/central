@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { onlyRealmReadableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import {
     Request, Response, send, useRequestParam,
@@ -16,7 +16,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceReadable } from '@authup/common';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { useRequestEnv } from '../../../../request';
 
@@ -41,8 +41,8 @@ export async function getOneProposalStationRouteHandler(req: Request, res: Respo
     }
 
     if (
-        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.station_realm_id) &&
-        !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.proposal_realm_id)
+        !isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.station_realm_id) &&
+        !isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.proposal_realm_id)
     ) {
         throw new ForbiddenError();
     }
@@ -57,7 +57,7 @@ export async function getManyProposalStationRouteHandler(req: Request, res: Resp
     const query = await repository.createQueryBuilder('proposalStation');
     query.distinctOn(['proposalStation.id']);
 
-    onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'), [
+    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'), [
         'proposalStation.station_realm_id',
         'proposalStation.proposal_realm_id',
     ]);

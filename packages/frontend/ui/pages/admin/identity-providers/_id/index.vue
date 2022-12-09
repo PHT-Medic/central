@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { IdentityProvider } from '@authelion/common';
+import { IdentityProvider } from '@authup/common';
 import { PropType } from 'vue';
 
 export default {

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import AuthVue from '@authelion/vue';
+import AuthVue from '@authup/vue2';
 import { Pagination } from '@vue-layout/utils';
 import Vue from 'vue';
 import Gravatar from 'vue-gravatar';

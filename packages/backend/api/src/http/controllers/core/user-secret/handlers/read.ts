@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { onlyRealmPermittedQueryResources } from '@authelion/server-core';
+import { onlyRealmReadableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import {
     Request, Response, send, useRequestParam,
@@ -28,7 +28,7 @@ export async function getOneUserSecretRouteHandler(req: Request, res: Response) 
         .where('userSecret.realm_id = :realmId', { realmId: useRequestEnv(req, 'realmId') })
         .where('userSecret.id = :id', { id });
 
-    onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'));
+    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'));
 
     const ability = useRequestEnv(req, 'ability');
     if (!ability.has(PermissionID.USER_EDIT)) {
@@ -59,7 +59,7 @@ export async function getManyUserSecretRouteHandler(req: Request, res: Response)
     const repository = dataSource.getRepository(UserSecretEntity);
     const query = await repository.createQueryBuilder('userSecret');
 
-    onlyRealmPermittedQueryResources(query, useRequestEnv(req, 'realmId'));
+    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'));
 
     const ability = useRequestEnv(req, 'ability');
     if (!ability.has(PermissionID.USER_EDIT) && useRequestEnv(req, 'userId')) {

@@ -10,7 +10,7 @@ import {
     PermissionID, RegistryProjectType, createNanoID, isHex,
 } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceWritable } from '@authup/common';
 import { Message, publishMessage } from 'amqp-extension';
 import {
     Request, Response, sendAccepted, useRequestParam,
@@ -50,7 +50,7 @@ export async function updateStationRouteHandler(req: Request, res: Response) : P
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
+    if (!isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 

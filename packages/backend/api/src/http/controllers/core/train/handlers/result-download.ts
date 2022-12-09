@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceReadable } from '@authup/common';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import {
@@ -39,7 +39,7 @@ export async function handleTrainResultDownloadRouteHandler(req: Request, res: R
         throw new NotFoundError();
     }
 
-    if (!isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.realm_id)) {
+    if (!isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.realm_id)) {
         throw new ForbiddenError('You are not permitted to read the train-result file.');
     }
 

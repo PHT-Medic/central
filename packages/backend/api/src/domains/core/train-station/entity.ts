@@ -22,8 +22,8 @@ import {
     TrainStationApprovalStatus,
     TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@authelion/server-core';
-import { Realm } from '@authelion/common';
+import { RealmEntity } from '@authup/server-database';
+import { Realm } from '@authup/common';
 import { TrainEntity } from '../train/entity';
 import { StationEntity } from '../station/entity';
 

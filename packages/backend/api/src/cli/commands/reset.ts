@@ -9,7 +9,7 @@ import { Arguments, Argv, CommandModule } from 'yargs';
 import {
     dropDatabase,
 } from 'typeorm-extension';
-import { useSpinner } from '../../config/spinner';
+import { useLogger } from '../../config';
 import { buildDataSourceOptions } from '../../database/utils';
 
 interface ResetArguments extends Arguments {
@@ -26,12 +26,12 @@ export class ResetCommand implements CommandModule {
     }
 
     async handler(args: ResetArguments) {
-        const spinner = useSpinner();
+        const spinner = useLogger();
 
-        spinner.start('executing database reset...');
+        spinner.info('Executing database reset...');
         const options = await buildDataSourceOptions();
         await dropDatabase({ options });
-        spinner.succeed('executed database reset.');
+        spinner.info('executed database reset.');
 
         process.exit(0);
     }

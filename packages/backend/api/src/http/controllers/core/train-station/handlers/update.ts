@@ -6,7 +6,7 @@
  */
 
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceWritable } from '@authup/common';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import {
     Request, Response, sendAccepted, useRequestParam,
@@ -29,10 +29,10 @@ export async function updateTrainStationRouteHandler(req: Request, res: Response
 
     const ability = useRequestEnv(req, 'ability');
 
-    const isAuthorityOfStation = isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.station_realm_id);
+    const isAuthorityOfStation = isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.station_realm_id);
     const isAuthorizedForStation = ability.has(PermissionID.TRAIN_APPROVE);
 
-    const isAuthorityOfTrain = isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), entity.train_realm_id);
+    const isAuthorityOfTrain = isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.train_realm_id);
     const isAuthorizedForTrain = ability.has(PermissionID.TRAIN_EDIT);
 
     if (

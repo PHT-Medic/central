@@ -9,7 +9,7 @@ import {
     RequestEnv,
     setRequestEnv as setEnv,
     useRequestEnv as useEnv,
-} from '@authelion/server-core';
+} from '@authup/server-http';
 import { Request } from 'routup';
 
 export function useRequestEnv(req: Request) : RequestEnv;

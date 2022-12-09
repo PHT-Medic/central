@@ -5,10 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { RobotForm, useHTTPClient } from '@authelion/vue';
+import { RobotForm, useHTTPClient } from '@authup/vue2';
 import Vue, { VNode } from 'vue';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { MASTER_REALM_ID } from '@authelion/common';
+import { MASTER_REALM_ID } from '@authup/common';
 
 export default {
     data() {

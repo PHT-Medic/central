@@ -10,7 +10,7 @@ import cors from 'cors';
 import {
     registerControllers as registerAuthControllers,
     registerMiddlewares,
-} from '@authelion/server-core';
+} from '@authup/server-http';
 import promBundle from 'express-prom-bundle';
 import { Router } from 'routup';
 

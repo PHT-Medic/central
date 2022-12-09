@@ -8,7 +8,7 @@
 <script lang="ts">
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { PropType } from 'vue';
-import { Realm } from '@authelion/common';
+import { Realm } from '@authup/common';
 import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
 
 export default {

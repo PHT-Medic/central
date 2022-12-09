@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { Role } from '@authelion/common';
+import { Role } from '@authup/common';
 import { PropType } from 'vue';
 
 export default {

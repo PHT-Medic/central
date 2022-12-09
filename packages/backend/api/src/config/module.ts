@@ -5,7 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { buildOAuth2Aggregator, setConfig as setAuthConfig, setLogger as setAuthLogger } from '@authelion/server-core';
+import { setLogger as setAuthLogger } from '@authup/server-common';
+import { setConfigOptions as setDatabaseConfigOptions } from '@authup/server-database';
+import { runOAuth2Cleaner, setConfigOptions as setHTTPConfigOptions } from '@authup/server-http';
 import { setConfig as setHTTPConfig } from 'hapic';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import path from 'path';
@@ -92,18 +94,24 @@ export function createConfig({ env } : ConfigContext) : Config {
 
     // ---------------------------------------------
 
-    setAuthConfig({
-        database: {
-            permissions: Object.values(PermissionKey),
-            adminUsername: 'admin',
-            adminPassword: 'start123',
-            robotEnabled: true,
-        },
+    setDatabaseConfigOptions({
+        env: env.env,
         rootPath: process.cwd(),
         writableDirectoryPath: path.join(__dirname, '..', '..', 'writable'),
-        selfUrl: env.apiUrl,
-        webUrl: env.appUrl,
-        redis: true,
+
+        permissions: Object.values(PermissionKey),
+        adminUsername: 'admin',
+        adminPassword: 'start123',
+        robotEnabled: true,
+    });
+
+    setHTTPConfigOptions({
+        env: env.env,
+        rootPath: process.cwd(),
+        writableDirectoryPath: path.join(__dirname, '..', '..', 'writable'),
+
+        publicUrl: env.apiUrl,
+        authorizeRedirectUrl: env.appUrl,
         tokenMaxAgeAccessToken: env.jwtMaxAge,
         tokenMaxAgeRefreshToken: env.jwtMaxAge,
     });
@@ -113,7 +121,11 @@ export function createConfig({ env } : ConfigContext) : Config {
     // ---------------------------------------------
 
     const aggregators : {start: () => void}[] = [
-        buildOAuth2Aggregator(),
+        {
+            start: async () => {
+                await runOAuth2Cleaner();
+            },
+        },
 
         buildRobotAggregator(),
 

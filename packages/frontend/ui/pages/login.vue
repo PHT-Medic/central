@@ -7,10 +7,10 @@
 <script lang="ts">
 import Vue, { CreateElement, VNode } from 'vue';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
-import { IdentityProvider } from '@authelion/common';
+import { IdentityProvider } from '@authup/common';
 import { BuildInput } from 'rapiq';
 import { SlotName, buildFormInput, buildFormSubmit } from '@vue-layout/utils';
-import { IdentityProviderList } from '@authelion/vue';
+import { IdentityProviderList } from '@authup/vue2';
 import MedicineWorker from '../components/svg/MedicineWorker';
 import { LayoutKey, LayoutNavigationID } from '../config/layout';
 import { buildVuelidateTranslator } from '../config/ilingo/utils';

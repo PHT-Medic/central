@@ -16,8 +16,8 @@ import {
 import {
     Ecosystem, Registry, RegistryProject, RegistryProjectType,
 } from '@personalhealthtrain/central-common';
-import { Realm } from '@authelion/common';
-import { RealmEntity } from '@authelion/server-core';
+import { Realm } from '@authup/common';
+import { RealmEntity } from '@authup/server-database';
 import { RegistryEntity } from '../registry/entity';
 
 @Unique('registry_project_external_name_registry_index', ['external_name', 'registry_id'])

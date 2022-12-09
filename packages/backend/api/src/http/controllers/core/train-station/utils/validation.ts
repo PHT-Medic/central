@@ -8,7 +8,7 @@
 import { check, validationResult } from 'express-validator';
 import { TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { BadRequestError, NotFoundError } from '@ebec/http';
-import { isPermittedForResourceRealm } from '@authelion/common';
+import { isRealmResourceWritable } from '@authup/common';
 import { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { StationEntity } from '../../../../../domains/core/station/entity';
@@ -77,7 +77,7 @@ export async function runTrainStationValidation(
     });
     if (result.relation.train) {
         if (
-            !isPermittedForResourceRealm(useRequestEnv(req, 'realmId'), result.relation.train.realm_id)
+            !isRealmResourceWritable(useRequestEnv(req, 'realmId'), result.relation.train.realm_id)
         ) {
             throw new BadRequestError(buildExpressValidationErrorMessage('train_id'));
         }

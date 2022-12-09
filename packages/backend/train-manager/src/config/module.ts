@@ -16,7 +16,7 @@ import {
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import { Client as VaultClient } from '@hapic/vault';
-import { Robot } from '@authelion/common';
+import { Robot } from '@authup/common';
 import { buildCommandRouterComponent } from '../components/command-router';
 import { setMinioConfig } from '../core/minio';
 import { Environment } from '../env';

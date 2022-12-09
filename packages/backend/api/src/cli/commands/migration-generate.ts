@@ -7,9 +7,9 @@
 
 import { CommandModule } from 'yargs';
 import { DataSource } from 'typeorm';
-import { migrationGenerateCommand } from '@authelion/server-core';
+import { generateMigration } from '@authup/server-database';
 import path from 'path';
-import { createConfig } from '../../config/module';
+import { createConfig } from '../../config';
 import env from '../../env';
 import { buildDataSourceOptions } from '../../database/utils';
 
@@ -26,10 +26,10 @@ export class MigrationGenerateCommand implements CommandModule {
         const dataSource = new DataSource(options);
         await dataSource.initialize();
 
-        await migrationGenerateCommand({
+        await generateMigration({
             dataSource,
             name: 'Default',
-            directory: path.join(__dirname, '..', '..', 'database', 'migrations'),
+            directoryPath: path.join(__dirname, '..', '..', 'database', 'migrations'),
         });
 
         process.exit(0);

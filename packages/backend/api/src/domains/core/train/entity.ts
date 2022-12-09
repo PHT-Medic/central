@@ -30,8 +30,8 @@ import {
     TrainRunStatus, TrainType,
     UserSecret,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity, UserEntity } from '@authelion/server-core';
-import { Realm, User } from '@authelion/common';
+import { RealmEntity, UserEntity } from '@authup/server-database';
+import { Realm, User } from '@authup/common';
 import { ProposalEntity } from '../proposal/entity';
 import { MasterImageEntity } from '../master-image/entity';
 import { TrainFileEntity } from '../train-file/entity';

@@ -9,8 +9,8 @@ import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import { MasterImage, Proposal, ProposalRisk } from '@personalhealthtrain/central-common';
-import { RealmEntity, UserEntity } from '@authelion/server-core';
-import { Realm, User } from '@authelion/common';
+import { RealmEntity, UserEntity } from '@authup/server-database';
+import { Realm, User } from '@authup/common';
 import { MasterImageEntity } from '../master-image/entity';
 
 @Entity({ name: 'proposals' })

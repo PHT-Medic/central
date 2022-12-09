@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Robot } from '@authelion/common';
+import { Robot } from '@authup/common';
 import { Config, stringifyAuthorizationHeader } from 'hapic';
 import { Client as HarborClient, ProjectWebhookTarget } from '@hapic/harbor';
 import { ServiceID } from '@personalhealthtrain/central-common';

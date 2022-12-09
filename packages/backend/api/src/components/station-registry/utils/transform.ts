@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty } from '@authelion/common';
+import { hasOwnProperty } from '@authup/common';
 import { StationRegistryEntity } from '../../../domains/special/station-registry/type';
 
 export function transformStationRegistryResponse(data: Record<string, any>) : StationRegistryEntity[] {

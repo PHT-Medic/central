@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { useHTTPClient } from '@authelion/vue';
+import { useHTTPClient } from '@authup/vue2';
 import Vue, { PropType } from 'vue';
 
 export default {

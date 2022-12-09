@@ -14,7 +14,7 @@ import {
     OAuth2TokenIntrospectionResponse,
     OAuth2TokenKind,
     User,
-} from '@authelion/common';
+} from '@authup/common';
 import { Config, createClient } from 'hapic';
 import { Client, ClientOptions } from '@hapic/oauth2';
 import { AuthBrowserStorageKey } from './constants';

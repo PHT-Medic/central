@@ -16,7 +16,7 @@ import {
 import { required } from 'vuelidate/lib/validators';
 import Vue, { PropType } from 'vue';
 import { Socket } from 'socket.io-client';
-import { MASTER_REALM_ID } from '@authelion/common';
+import { MASTER_REALM_ID } from '@authup/common';
 import TrainFile from './TrainFile.vue';
 import TrainFormFile from './TrainFormFile.vue';
 import TrainImageCommand from '../train/TrainImageCommand';
