@@ -77,13 +77,12 @@
         "ts-node": "^10.9.1"
     },
     "scripts": {
-        "start": "npm run cli -- start",
+        "dev": "npm run cli -- start",
+        "start": "node dist/cli/index.js start",
         "build": "rimraf dist/ && tsc -p tsconfig.build.json",
         "cli": "ts-node src/cli/index.ts",
         "test": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=test jest --config ./test/jest.config.js --detectOpenHandles --runInBand --testTimeout=8000 --forceExit",
-        "test:coverage": "npm run test -- --coverage",
-        "test:watch": "npm run test -- --watch",
-        "migration:create": "ts-node ../../node_modules/typeorm/cli.js migration:create -n"
+        "test:coverage": "npm run test -- --coverage"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
     "publishConfig": {
