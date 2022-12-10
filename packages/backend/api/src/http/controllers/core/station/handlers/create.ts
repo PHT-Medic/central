@@ -6,7 +6,8 @@
  */
 
 import {
-    PermissionID, RegistryProjectType, createNanoID, isHex,
+    PermissionID, RegistryProjectType, createNanoID,
+    isHex,
 } from '@personalhealthtrain/central-common';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
 import { validationResult } from 'express-validator';
@@ -16,7 +17,7 @@ import { useDataSource } from 'typeorm-extension';
 import { ExpressValidationError } from '../../../../express-validation';
 import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
-import { StationEntity } from '../../../../../domains/core/station/entity';
+import { StationEntity } from '../../../../../domains/core/station';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 
@@ -47,13 +48,14 @@ export async function createStationRouteHandler(req: Request, res: Response) : P
 
     // -----------------------------------------------------
 
-    if (!entity.ecosystem) {
+    if (
+        result.relation.registry &&
+        !entity.ecosystem
+    ) {
         entity.ecosystem = result.relation.registry.ecosystem;
     }
 
-    if (
-        entity.registry_id
-    ) {
+    if (entity.registry_id) {
         if (entity.ecosystem !== result.relation.registry.ecosystem) {
             throw new BadRequestError('The ecosystem of the station and the registry must be the same.');
         }

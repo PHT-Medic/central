@@ -18,7 +18,7 @@ import {
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
-import { StationEntity } from '../../../../../domains/core/station/entity';
+import { StationEntity } from '../../../../../domains/core/station';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 

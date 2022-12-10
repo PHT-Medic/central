@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, PermissionIDType, PermissionKey } from '@personalhealthtrain/central-common';
+import { PermissionID, PermissionIDType } from '@personalhealthtrain/central-common';
 
 export type PHTStationRole = 'StationAuthority' | 'StationEmployee';
 
@@ -27,6 +27,10 @@ export function getPHTStationRolePermissions(type: PHTStationRole) : PermissionI
         case 'StationAuthority':
             return [
                 PermissionID.ADMIN_UI_USE,
+
+                PermissionID.ROBOT_ADD,
+                PermissionID.ROBOT_DROP,
+                PermissionID.ROBOT_EDIT,
 
                 PermissionID.PROPOSAL_ADD,
                 PermissionID.PROPOSAL_DROP,

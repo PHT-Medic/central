@@ -40,7 +40,7 @@
         "prepublishOnly": "npm run build",
         "cli": "npm run cli --workspace=packages/backend/api",
         "ui": "npm run dev --workspace=packages/frontend/ui",
-        "api": "npm run start --workspace=packages/backend/api",
+        "api": "npm run dev --workspace=packages/backend/api",
         "realtime": "npm run dev --workspace=packages/backend/realtime",
         "train-manager": "npm run dev --workspace=packages/backend/train-manager",
         "common": "npm run build-watch --workspace=packages/shared/common"

@@ -5,18 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { RobotRepository } from '@authup/server-database';
 import {
-    EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
-} from 'typeorm';
-import {
+    Ecosystem,
     StationSocketServerToClientEventName,
     buildSocketRealmNamespaceName,
     buildSocketStationRoomName,
+    buildStationRobotName,
 } from '@personalhealthtrain/central-common';
 import {
-    emitSocketServerToClientEvent,
-} from '../../config/socket-emitter';
-import { StationEntity } from '../../domains/core/station/entity';
+    DataSource,
+    EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
+} from 'typeorm';
+import { emitSocketServerToClientEvent } from '../../config';
+import { StationEntity } from '../../domains/core/station';
 
 function publish(
     operation: `${StationSocketServerToClientEventName}`,
@@ -37,6 +39,31 @@ function publish(
     });
 }
 
+async function createRobot(dataSource: DataSource, entity: StationEntity) {
+    const robotRepository = new RobotRepository(dataSource);
+    const robot = await robotRepository.findOneBy({
+        name: buildStationRobotName(entity.external_name),
+        realm_id: entity.realm_id,
+    });
+
+    if (!robot) {
+        const { entity: robot } = await robotRepository.createWithSecret({
+            name: buildStationRobotName(entity.external_name),
+            realm_id: entity.realm_id,
+        });
+
+        await robotRepository.save(robot);
+    }
+}
+
+async function deleteRobot(dataSource: DataSource, entity: StationEntity) {
+    const robotRepository = new RobotRepository(dataSource);
+    await robotRepository.delete({
+        name: entity.name,
+        realm_id: entity.realm_id,
+    });
+}
+
 @EventSubscriber()
 export class StationSubscriber implements EntitySubscriberInterface<StationEntity> {
     listenTo(): CallableFunction | string {
@@ -45,13 +72,28 @@ export class StationSubscriber implements EntitySubscriberInterface<StationEntit
 
     afterInsert(event: InsertEvent<StationEntity>): Promise<any> | void {
         publish(StationSocketServerToClientEventName.CREATED, event.entity);
+
+        if (event.entity.ecosystem === Ecosystem.DEFAULT) {
+            Promise.resolve()
+                .then(() => createRobot(event.connection, event.entity));
+        }
     }
 
     afterUpdate(event: UpdateEvent<StationEntity>): Promise<any> | void {
         publish(StationSocketServerToClientEventName.UPDATED, event.entity as StationEntity);
+
+        if (event.entity.ecosystem === Ecosystem.DEFAULT) {
+            Promise.resolve()
+                .then(() => createRobot(event.connection, event.entity as StationEntity));
+        }
     }
 
     beforeRemove(event: RemoveEvent<StationEntity>): Promise<any> | void {
         publish(StationSocketServerToClientEventName.DELETED, event.entity);
+
+        if (event.entity.ecosystem === Ecosystem.DEFAULT) {
+            Promise.resolve()
+                .then(() => deleteRobot(event.connection, event.entity));
+        }
     }
 }

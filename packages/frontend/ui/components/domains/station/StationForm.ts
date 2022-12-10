@@ -23,6 +23,7 @@ import { BuildInput } from 'rapiq';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 import { RegistryList } from '../registry/RegistryList';
 import StationRegistryProjectDetails from './StationRegistryProjectDetails';
+import StationRobotDetails from './StationRobotDetails';
 
 const alphaWithUpperNumHyphenUnderscore = helpers.regex('alphaWithUpperNumHyphenUnderscore', /^[a-z0-9-_]*$/);
 
@@ -77,7 +78,7 @@ export const StationForm = Vue.extend({
                 required,
             },
             registry_id: {
-                required,
+
             },
             external_name: {
                 alphaWithUpperNumHyphenUnderscore,
@@ -346,11 +347,36 @@ export const StationForm = Vue.extend({
         if (this.isEditing) {
             editingElements = [
                 h('hr'),
-                h(StationRegistryProjectDetails, {
-                    props: {
-                        entity: vm.entity,
-                    },
-                }),
+                h('div', {
+                    staticClass: 'row',
+                }, [
+                    h('div', { staticClass: 'col' }, [
+                        h('h6', [
+                            h('i', { staticClass: 'fas fa-robot' }),
+                            ' ',
+                            'Registry Credentials',
+                        ]),
+
+                        h(StationRegistryProjectDetails, {
+                            props: {
+                                entity: vm.entity,
+                            },
+                        }),
+                    ]),
+                    h('div', { staticClass: 'col' }, [
+                        h('h6', [
+                            h('i', { staticClass: 'fas fa-robot' }),
+                            ' ',
+                            'Robot Credentials',
+                        ]),
+
+                        h(StationRobotDetails, {
+                            props: {
+                                entity: vm.entity,
+                            },
+                        }),
+                    ]),
+                ]),
             ];
         }
 

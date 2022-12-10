@@ -165,8 +165,6 @@ export default Vue.extend<Data, any, any, Properties>({
     render(h: CreateElement): VNode {
         const vm = this;
 
-        const robotCredentials = [];
-
         if (!vm.entity) {
             return h(
                 'div',
@@ -177,25 +175,33 @@ export default Vue.extend<Data, any, any, Properties>({
             );
         }
 
-        if (vm.accountName) {
-            robotCredentials.push(h('div', [
-                vm.accountName,
-            ]));
-        }
-
-        if (vm.accountSecret) {
-            robotCredentials.push(h('div', [
-                vm.accountSecret,
-            ]));
-        }
-
         return h('div', [
             h('div', {
                 staticClass: 'mb-2 d-flex flex-column',
             }, [
+                h('div', { staticClass: 'form-group' }, [
+                    h('label', { staticClass: 'pr-1' }, 'Namespace'),
+                    h('input', {
+                        staticClass: 'form-control',
+                        attrs: { type: 'text', value: vm.name, disabled: true },
+                    }),
+                ]),
+
                 h('div', [
-                    h('strong', { staticClass: 'pr-1' }, 'Namespace:'),
-                    vm.name,
+                    h('div', { staticClass: 'form-group' }, [
+                        h('label', { staticClass: 'pr-1' }, 'ID'),
+                        h('input', {
+                            staticClass: 'form-control',
+                            attrs: { type: 'text', value: vm.accountName || 'xxx', disabled: true },
+                        }),
+                    ]),
+                    h('div', { staticClass: 'form-group' }, [
+                        h('label', { staticClass: 'pr-1' }, 'Secret'),
+                        h('input', {
+                            staticClass: 'form-control',
+                            attrs: { type: 'text', value: vm.accountSecret || 'xxx', disabled: true },
+                        }),
+                    ]),
                 ]),
 
                 h('div', [
@@ -206,19 +212,6 @@ export default Vue.extend<Data, any, any, Properties>({
                             'fa fa-times text-danger': !vm.webhookExists,
                         },
                     }),
-                ]),
-
-                h('div', [
-                    h('strong', { staticClass: 'pr-1' }, 'Robot:'),
-                    h('i', {
-                        class: {
-                            'fa fa-check text-success': vm.accountId,
-                            'fa fa-times text-danger': !vm.accountId,
-                        },
-                    }),
-                    h('div', { staticClass: 'd-flex flex-column' }, [
-                        robotCredentials,
-                    ]),
                 ]),
             ]),
             h('hr'),

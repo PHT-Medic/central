@@ -7,7 +7,7 @@
 
 import Vue, { CreateElement, PropType, VNode } from 'vue';
 import {
-    Ecosystem, PermissionID, RegistryProject, Station,
+    Ecosystem, RegistryProject, Station,
 } from '@personalhealthtrain/central-common';
 import RegistryProjectDetails from '../registry-project/RegistryProjectDetails';
 
@@ -37,6 +37,16 @@ export default Vue.extend<any, any, any, Properties>({
                 { staticClass: 'alert alert-sm alert-danger' },
                 [
                     'The registry creation is only permitted for the default ecosystem.',
+                ],
+            );
+        }
+
+        if (!vm.entity.registry_id) {
+            return h(
+                'div',
+                { staticClass: 'alert alert-sm alert-warning' },
+                [
+                    'The station has not been assigned to a registry yet.',
                 ],
             );
         }
