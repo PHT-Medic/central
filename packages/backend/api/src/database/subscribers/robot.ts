@@ -20,6 +20,10 @@ export class RobotSubscriber implements EntitySubscriberInterface<RobotEntity> {
     }
 
     async afterRemove(event: RemoveEvent<RobotEntity>): Promise<Promise<any> | void> {
+        if (!event.entity.name) {
+            return;
+        }
+
         const queueMessage = buildSecretStorageQueueMessage(
             SecretStorageQueueCommand.DELETE,
             {

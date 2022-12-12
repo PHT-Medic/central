@@ -22,6 +22,9 @@ export default {
         managementRealmId() {
             return this.$store.getters['auth/managementRealmId'];
         },
+        managementRealmName() {
+            return this.$store.getters['auth/managementRealmName'];
+        },
     },
     methods: {
         handleCreated(e) {
@@ -44,6 +47,7 @@ export default {
 <template>
     <station-form
         :realm-id="managementRealmId"
+        :realm-name="managementRealmName"
         @created="handleCreated"
         @failed="handleFailed"
     />

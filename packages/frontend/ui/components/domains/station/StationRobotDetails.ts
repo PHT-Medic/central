@@ -45,7 +45,7 @@ export default Vue.extend<any, any, any, Properties>({
             {
                 props: {
                     where: {
-                        name: buildStationRobotName(vm.entity.external_name),
+                        name: vm.entity.id,
                         realm_id: vm.entity.realm_id,
                     },
                 },

@@ -11,7 +11,6 @@ import {
     StationSocketServerToClientEventName,
     buildSocketRealmNamespaceName,
     buildSocketStationRoomName,
-    buildStationRobotName,
 } from '@personalhealthtrain/central-common';
 import {
     DataSource,
@@ -42,13 +41,13 @@ function publish(
 async function createRobot(dataSource: DataSource, entity: StationEntity) {
     const robotRepository = new RobotRepository(dataSource);
     const robot = await robotRepository.findOneBy({
-        name: buildStationRobotName(entity.external_name),
+        name: entity.id,
         realm_id: entity.realm_id,
     });
 
     if (!robot) {
         const { entity: robot } = await robotRepository.createWithSecret({
-            name: buildStationRobotName(entity.external_name),
+            name: entity.id,
             realm_id: entity.realm_id,
         });
 
@@ -59,7 +58,7 @@ async function createRobot(dataSource: DataSource, entity: StationEntity) {
 async function deleteRobot(dataSource: DataSource, entity: StationEntity) {
     const robotRepository = new RobotRepository(dataSource);
     await robotRepository.delete({
-        name: entity.name,
+        name: entity.id,
         realm_id: entity.realm_id,
     });
 }
