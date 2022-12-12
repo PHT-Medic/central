@@ -117,8 +117,11 @@ export class AuthModule {
                 case AuthBrowserStorageKey.USER:
                     this.ctx.store.commit('auth/setUser', value);
                     break;
-                case AuthBrowserStorageKey.MANAGEMENT_REALM_ID:
-                    this.ctx.store.commit('auth/setManagementRealmId', value);
+                case AuthBrowserStorageKey.REALM:
+                    this.ctx.store.commit('auth/setRealm', value);
+                    break;
+                case AuthBrowserStorageKey.MANAGEMENT_REALM:
+                    this.ctx.store.commit('auth/setManagementRealm', value);
                     break;
             }
         }

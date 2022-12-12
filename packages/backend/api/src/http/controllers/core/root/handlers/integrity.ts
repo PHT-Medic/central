@@ -5,9 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MASTER_REALM_ID, createNanoID } from '@authup/common';
+import { createNanoID } from '@authup/common';
 import { hash } from '@authup/server-common';
-import { RobotRepository, useRobotEventEmitter } from '@authup/server-database';
+import {
+    RealmRepository, RobotRepository, useRobotEventEmitter,
+} from '@authup/server-database';
 import { Client as VaultClient } from '@hapic/vault';
 import { HTTPClientKey, ROBOT_SECRET_ENGINE_KEY, ServiceID } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
@@ -25,26 +27,30 @@ export async function checkIntegrityRouteHandler(
         const secret = createNanoID(64);
 
         const dataSource = await useDataSource();
-        const repository = new RobotRepository(dataSource);
-        let entity = await repository.findOneBy({
+
+        const realmRepository = new RealmRepository(dataSource);
+        const realm = await realmRepository.getMaster();
+
+        const robotRepository = new RobotRepository(dataSource);
+        let robotEntity = await robotRepository.findOneBy({
             name: ServiceID.SYSTEM,
         });
 
-        if (entity) {
-            entity.secret = await hash(secret);
+        if (robotEntity) {
+            robotEntity.secret = await hash(secret);
         } else {
-            entity = repository.create({
+            robotEntity = robotRepository.create({
                 name: ServiceID.SYSTEM,
-                realm_id: MASTER_REALM_ID,
+                realm_id: realm.id,
                 secret: await hash(secret),
             });
         }
 
-        await repository.save(entity);
+        await robotRepository.save(robotEntity);
 
         useRobotEventEmitter()
             .emit('credentials', {
-                ...entity,
+                ...robotEntity,
                 secret,
             });
     }

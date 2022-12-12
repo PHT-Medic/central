@@ -19,14 +19,11 @@ export type SocketDataInterface = {
     token?: string,
 
     realmId?: Realm['id'],
-
+    realmName?: Realm['name'],
     userId?: User['id'],
-
     robotId?: Robot['id'],
-
     permissions?: AbilityDescriptor[],
     ability?: AbilityManager,
-
     roomConnections: Record<string, number>
 };
 

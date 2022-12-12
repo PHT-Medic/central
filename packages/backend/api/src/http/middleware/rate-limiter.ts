@@ -8,7 +8,6 @@
 import rateLimit from 'express-rate-limit';
 import { TooManyRequestsError } from '@ebec/http';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { MASTER_REALM_ID } from '@authup/common';
 import {
     Handler, Next, Request, Response, getRequestIp,
 } from 'routup';
@@ -22,13 +21,9 @@ export function useRateLimiter(req: Request, res: Response, next: Next) {
             if (useRequestEnv(req, 'userId')) {
                 return 100 * 60; // 6.000 req = 10 req p. sec
             }
-
             const robot = useRequestEnv(req, 'robot');
             if (robot) {
-                if (
-                    robot.name === ServiceID.SYSTEM &&
-                    robot.realm_id === MASTER_REALM_ID
-                ) {
+                if (robot.name === ServiceID.SYSTEM) {
                     return 0; // unlimited req p. sec
                 }
 

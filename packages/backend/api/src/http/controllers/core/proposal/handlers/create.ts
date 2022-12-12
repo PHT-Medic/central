@@ -25,8 +25,9 @@ export async function createProposalRouteHandler(req: Request, res: Response) : 
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(ProposalEntity);
+    const { id: realmId } = useRequestEnv(req, 'realm');
     const entity = repository.create({
-        realm_id: useRequestEnv(req, 'realmId'),
+        realm_id: realmId,
         user_id: useRequestEnv(req, 'userId'),
         ...result.data,
     });

@@ -16,6 +16,11 @@ export default {
             PermissionID.ROBOT_ADD,
         ],
     },
+    computed: {
+        managementRealmId() {
+            return this.$store.getters['auth/managementRealmId'];
+        },
+    },
     methods: {
         handleCreated(e) {
             this.$nuxt.$router.push(`/admin/robots/${e.id}`);
@@ -28,6 +33,7 @@ export default {
 </script>
 <template>
     <robot-form
+        :realm-id="managementRealmId"
         @created="handleCreated"
         @failed="handleFailed"
     />

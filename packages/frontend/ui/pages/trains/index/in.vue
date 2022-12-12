@@ -55,7 +55,7 @@ export default Vue.extend({
     },
     computed: {
         realmId() {
-            return this.$store.getters['auth/userRealmId'];
+            return this.$store.getters['auth/realmId'];
         },
         canManage() {
             return this.$auth.has(PermissionID.TRAIN_APPROVE);

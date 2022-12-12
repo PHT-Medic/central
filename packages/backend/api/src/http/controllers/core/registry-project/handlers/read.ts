@@ -67,7 +67,7 @@ function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, field
             );
         }
 
-        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'));
+        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'));
     }
 
     applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'registryProject' });

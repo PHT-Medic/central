@@ -22,13 +22,14 @@ import { useRequestEnv } from '../../../../request';
 export async function getOneUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
 
+    const realm = useRequestEnv(req, 'realm');
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(UserSecretEntity);
     const query = await repository.createQueryBuilder('userSecret')
-        .where('userSecret.realm_id = :realmId', { realmId: useRequestEnv(req, 'realmId') })
+        .where('userSecret.realm_id = :realmId', { realmId: realm.id })
         .where('userSecret.id = :id', { id });
 
-    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'));
+    onlyRealmReadableQueryResources(query, realm);
 
     const ability = useRequestEnv(req, 'ability');
     if (!ability.has(PermissionID.USER_EDIT)) {
@@ -59,7 +60,7 @@ export async function getManyUserSecretRouteHandler(req: Request, res: Response)
     const repository = dataSource.getRepository(UserSecretEntity);
     const query = await repository.createQueryBuilder('userSecret');
 
-    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'));
+    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'));
 
     const ability = useRequestEnv(req, 'ability');
     if (!ability.has(PermissionID.USER_EDIT) && useRequestEnv(req, 'userId')) {

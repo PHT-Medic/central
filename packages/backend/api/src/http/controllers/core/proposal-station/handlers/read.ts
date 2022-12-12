@@ -41,8 +41,8 @@ export async function getOneProposalStationRouteHandler(req: Request, res: Respo
     }
 
     if (
-        !isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.station_realm_id) &&
-        !isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.proposal_realm_id)
+        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.station_realm_id) &&
+        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.proposal_realm_id)
     ) {
         throw new ForbiddenError();
     }
@@ -57,7 +57,7 @@ export async function getManyProposalStationRouteHandler(req: Request, res: Resp
     const query = await repository.createQueryBuilder('proposalStation');
     query.distinctOn(['proposalStation.id']);
 
-    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'), [
+    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'), [
         'proposalStation.station_realm_id',
         'proposalStation.proposal_realm_id',
     ]);

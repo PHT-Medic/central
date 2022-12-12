@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Default1663236771552 implements MigrationInterface {
-    name = 'Default1663236771552';
+export class Default1670850207897 implements MigrationInterface {
+    name = 'Default1670850207897';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -71,16 +71,20 @@ export class Default1663236771552 implements MigrationInterface {
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                 \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
                 INDEX \`IDX_063e4bd5b708c304b51b7ee774\` (\`realm_id\`),
-                UNIQUE INDEX \`IDX_6e74f330e34555ae90068b0392\` (\`name\`),
+                UNIQUE INDEX \`IDX_dce62a3739791bb4fb2fb5c137\` (\`name\`, \`realm_id\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
         `);
         await queryRunner.query(`
             CREATE TABLE \`auth_permissions\` (
-                \`id\` varchar(128) NOT NULL,
+                \`id\` varchar(36) NOT NULL,
+                \`name\` varchar(128) NOT NULL,
+                \`built_in\` tinyint NOT NULL DEFAULT 0,
+                \`description\` text NULL,
                 \`target\` varchar(16) NULL,
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                 \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                UNIQUE INDEX \`IDX_40a392cb2ddf6b12f841d06a82\` (\`name\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
         `);
@@ -154,9 +158,9 @@ export class Default1663236771552 implements MigrationInterface {
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                 \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
                 \`user_id\` varchar(255) NULL,
-                \`realm_id\` varchar(255) NOT NULL DEFAULT 'master',
-                UNIQUE INDEX \`IDX_f32b0b8138a40ced608c7cfc3e\` (\`name\`),
+                \`realm_id\` varchar(255) NOT NULL,
                 INDEX \`IDX_9c99802f3f360718344180c3f6\` (\`realm_id\`),
+                UNIQUE INDEX \`IDX_f89cc2abf1d7e284a7d6cd59c1\` (\`name\`, \`realm_id\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
         `);
@@ -200,11 +204,14 @@ export class Default1663236771552 implements MigrationInterface {
                 \`redirect_uri\` varchar(2000) NULL,
                 \`grant_types\` varchar(512) NULL,
                 \`scope\` varchar(512) NULL,
+                \`base_url\` varchar(2000) NULL,
+                \`root_url\` varchar(2000) NULL,
                 \`is_confidential\` tinyint NOT NULL DEFAULT 0,
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                 \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
                 \`realm_id\` varchar(255) NULL,
                 \`user_id\` varchar(255) NULL,
+                UNIQUE INDEX \`IDX_6018b722f28f1cc6fdac450e61\` (\`name\`, \`realm_id\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
         `);
@@ -1226,6 +1233,9 @@ export class Default1663236771552 implements MigrationInterface {
             DROP TABLE \`auth_authorization_codes\`
         `);
         await queryRunner.query(`
+            DROP INDEX \`IDX_6018b722f28f1cc6fdac450e61\` ON \`auth_clients\`
+        `);
+        await queryRunner.query(`
             DROP TABLE \`auth_clients\`
         `);
         await queryRunner.query(`
@@ -1241,10 +1251,10 @@ export class Default1663236771552 implements MigrationInterface {
             DROP TABLE \`auth_robot_roles\`
         `);
         await queryRunner.query(`
-            DROP INDEX \`IDX_9c99802f3f360718344180c3f6\` ON \`auth_robots\`
+            DROP INDEX \`IDX_f89cc2abf1d7e284a7d6cd59c1\` ON \`auth_robots\`
         `);
         await queryRunner.query(`
-            DROP INDEX \`IDX_f32b0b8138a40ced608c7cfc3e\` ON \`auth_robots\`
+            DROP INDEX \`IDX_9c99802f3f360718344180c3f6\` ON \`auth_robots\`
         `);
         await queryRunner.query(`
             DROP TABLE \`auth_robots\`
@@ -1274,10 +1284,13 @@ export class Default1663236771552 implements MigrationInterface {
             DROP TABLE \`auth_role_permissions\`
         `);
         await queryRunner.query(`
+            DROP INDEX \`IDX_40a392cb2ddf6b12f841d06a82\` ON \`auth_permissions\`
+        `);
+        await queryRunner.query(`
             DROP TABLE \`auth_permissions\`
         `);
         await queryRunner.query(`
-            DROP INDEX \`IDX_6e74f330e34555ae90068b0392\` ON \`auth_roles\`
+            DROP INDEX \`IDX_dce62a3739791bb4fb2fb5c137\` ON \`auth_roles\`
         `);
         await queryRunner.query(`
             DROP INDEX \`IDX_063e4bd5b708c304b51b7ee774\` ON \`auth_roles\`

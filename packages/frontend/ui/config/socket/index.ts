@@ -65,7 +65,7 @@ export class SocketModule {
         if (!this.ctx) return undefined;
 
         if (!realmId) {
-            realmId = this.ctx.store.getters['auth/userRealmId'];
+            realmId = this.ctx.store.getters['auth/realmId'];
         }
         if (!realmId) {
             const user = this.ctx.$authWarehouse.get(AuthBrowserStorageKey.USER);

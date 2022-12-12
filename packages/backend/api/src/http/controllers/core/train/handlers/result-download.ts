@@ -39,7 +39,7 @@ export async function handleTrainResultDownloadRouteHandler(req: Request, res: R
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.realm_id)) {
+    if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.realm_id)) {
         throw new ForbiddenError('You are not permitted to read the train-result file.');
     }
 

@@ -34,9 +34,10 @@ export async function updateUserSecretRouteHandler(req: Request, res: Response) 
 
     const ability = useRequestEnv(req, 'ability');
 
+    const realm = useRequestEnv(req, 'realm');
     let entity = await repository.findOneBy({
         id,
-        realm_id: useRequestEnv(req, 'realmId'),
+        realm_id: realm.id,
         ...(!ability.has(PermissionID.USER_EDIT) ? { user_id: useRequestEnv(req, 'userId') } : {}),
     });
 

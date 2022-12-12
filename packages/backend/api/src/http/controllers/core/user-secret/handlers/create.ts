@@ -34,9 +34,10 @@ export async function createUserSecretRouteHandler(req: Request, res: Response) 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(UserSecretEntity);
 
+    const realm = useRequestEnv(req, 'realm');
     const entity = repository.create({
         user_id: useRequestEnv(req, 'userId'),
-        realm_id: useRequestEnv(req, 'realmId'),
+        realm_id: realm.id,
         ...data,
     });
 

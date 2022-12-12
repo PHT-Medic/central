@@ -38,8 +38,8 @@ export async function getOneTrainStationRouteHandler(req: Request, res: Response
     }
 
     if (
-        !isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.train_realm_id) &&
-        !isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.station_realm_id)
+        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.train_realm_id) &&
+        !isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.station_realm_id)
     ) {
         throw new ForbiddenError();
     }
@@ -53,7 +53,7 @@ export async function getManyTrainStationRouteHandler(req: Request, res: Respons
     const query = await repository.createQueryBuilder('trainStation');
     query.distinctOn(['trainStation.id']);
 
-    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'), [
+    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'), [
         'trainStation.train_realm_id',
         'trainStation.station_realm_id',
     ]);

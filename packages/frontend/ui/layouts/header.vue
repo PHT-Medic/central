@@ -13,11 +13,11 @@ export default {
         user(vm) {
             return vm.$store.state.auth.user;
         },
-        managementRealmId() {
-            return this.$store.getters['auth/managementRealmId'];
+        managementRealmName() {
+            return this.$store.getters['auth/managementRealmName'];
         },
         infoText(vm) {
-            return this.managementRealmId || 'Personal Health Train';
+            return this.managementRealmName || 'Personal Health Train';
         },
     },
 };

@@ -38,8 +38,8 @@ export async function deleteTrainStationRouteHandler(req: Request, res: Response
     }
 
     if (
-        !isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.station_realm_id) &&
-        !isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.train_realm_id)
+        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.station_realm_id) &&
+        !isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.train_realm_id)
     ) {
         throw new ForbiddenError();
     }

@@ -29,9 +29,10 @@ export async function deleteUserSecretRouteHandler(req: Request, res: Response) 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(UserSecretEntity);
 
+    const realm = useRequestEnv(req, 'realm');
     const conditions : FindOptionsWhere<UserSecret> = {
         id,
-        realm_id: useRequestEnv(req, 'realmId'),
+        realm_id: realm.id,
     };
 
     const ability = useRequestEnv(req, 'ability');

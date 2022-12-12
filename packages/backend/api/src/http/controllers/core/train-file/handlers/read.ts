@@ -39,7 +39,7 @@ export async function getOneTrainFileRouteHandler(req: Request, res: Response) :
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.realm_id)) {
+    if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -55,7 +55,7 @@ export async function getManyTrainFileGetManyRouteHandler(req: Request, res: Res
     const query = repository.createQueryBuilder('trainFile')
         .where('trainFile.train_id = :trainId', { trainId: id });
 
-    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'));
+    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'));
 
     applyFilters(query, filter, {
         defaultAlias: 'trainFile',

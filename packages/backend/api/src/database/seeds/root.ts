@@ -5,9 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { ServerError } from '@ebec/http';
 import { DataSource, In } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 import {
+    PermissionEntity,
+    RealmEntity,
     RobotEntity,
     RobotRepository,
     RoleEntity,
@@ -16,17 +19,27 @@ import {
     useRobotEventEmitter,
 } from '@authup/server-database';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { MASTER_REALM_ID } from '@authup/common';
+import { MASTER_REALM_NAME, hasOwnProperty } from '@authup/common';
 import { PHTStationRole, getPHTStationRolePermissions } from '../../config';
 
 // ----------------------------------------------
 
 export class DatabaseRootSeeder implements Seeder {
     public async run(dataSource: DataSource): Promise<any> {
+        const realmRepository = dataSource.getRepository(RealmEntity);
+        const realm = await realmRepository.findOne({
+            where: {
+                name: MASTER_REALM_NAME,
+            },
+        });
+
+        if (!realm) {
+            throw new ServerError(`The ${MASTER_REALM_NAME} does not exist.`);
+        }
+
         /**
          * Create robot accounts for services.
          */
-
         const services : ServiceID[] = [
             ServiceID.REGISTRY,
             ServiceID.SYSTEM,
@@ -51,7 +64,7 @@ export class DatabaseRootSeeder implements Seeder {
 
             const { entity, secret } = await robotRepository.createWithSecret({
                 name: services[i],
-                realm_id: MASTER_REALM_ID,
+                realm_id: realm.id,
             });
 
             robots.push(entity as RobotEntity);
@@ -90,15 +103,36 @@ export class DatabaseRootSeeder implements Seeder {
 
         // -------------------------------------------------
 
+        const permissionRepository = dataSource.getRepository(PermissionEntity);
+        const permissions = await permissionRepository.find();
+        const permissionNameIdMap : Record<string, string> = {};
+
+        for (let i = 0; i < permissions.length; i++) {
+            permissionNameIdMap[permissions[i].name] = permissions[i].id;
+        }
+
         /**
          * Create PHT role - permission association
          */
         const rolePermissionRepository = dataSource.getRepository(RolePermissionEntity);
         const rolePermissions : RolePermissionEntity[] = roles
-            .map((role) => getPHTStationRolePermissions(role.name as PHTStationRole).map((permission) => rolePermissionRepository.create({
-                role_id: role.id,
-                permission_id: permission,
-            })))
+            .map((role) => {
+                const names = getPHTStationRolePermissions(role.name as PHTStationRole);
+                const entities = [];
+
+                for (let i = 0; i < names.length; i++) {
+                    if (!hasOwnProperty(permissionNameIdMap, names[i])) {
+                        continue;
+                    }
+
+                    entities.push(rolePermissionRepository.create({
+                        role_id: role.id,
+                        permission_id: permissionNameIdMap[names[i]] as string,
+                    }));
+                }
+
+                return entities;
+            })
             .reduce((accumulator, entity) => [...accumulator, ...entity]);
 
         await rolePermissionRepository.save(rolePermissions);

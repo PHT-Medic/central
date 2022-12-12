@@ -26,14 +26,14 @@ import {
 } from '@vue-layout/utils';
 import { BuildInput } from 'rapiq';
 import { Socket } from 'socket.io-client';
-import { MASTER_REALM_ID } from '@authup/common';
+import { MASTER_REALM_NAME } from '@authup/common';
 import { TrainListItem } from './TrainListItem';
 
 export const TrainList = Vue.extend<
 ComponentListData<Train>,
 ComponentListMethods<Train>,
 any,
-ComponentListProperties<Train>
+ComponentListProperties<BuildInput<Train>>
 >({
     props: {
         loadOnInit: {
@@ -86,15 +86,12 @@ ComponentListProperties<Train>
         };
     },
     computed: {
-        userRealmId() {
-            return this.$store.getters['auth/userRealmId'];
-        },
         socketRealmId() {
             if (this.realmId) {
                 return this.realmId;
             }
 
-            if (this.userRealmId === MASTER_REALM_ID) {
+            if (this.$store.getters['auth/realmName'] === MASTER_REALM_NAME) {
                 return undefined;
             }
 
@@ -102,7 +99,7 @@ ComponentListProperties<Train>
                 return this.query.filter.realm_id;
             }
 
-            return this.userRealmId;
+            return this.$store.getters['auth/realmId'];
         },
         queryFinal() {
             return mergeDeep({

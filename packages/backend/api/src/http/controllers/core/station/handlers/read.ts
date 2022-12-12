@@ -62,7 +62,7 @@ async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>,
             );
         }
 
-        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'), 'station.realm_id');
+        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'), 'station.realm_id');
     }
 
     applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'station' });

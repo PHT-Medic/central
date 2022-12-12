@@ -50,7 +50,7 @@ export async function updateStationRouteHandler(req: Request, res: Response) : P
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceWritable(useRequestEnv(req, 'realmId'), entity.realm_id)) {
+    if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), entity.realm_id)) {
         throw new ForbiddenError('You are not permitted to delete this station.');
     }
 

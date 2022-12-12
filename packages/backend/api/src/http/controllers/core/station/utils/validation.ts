@@ -113,7 +113,7 @@ export async function runStationValidation(
     });
 
     if (result.data.realm_id) {
-        if (!isRealmResourceWritable(useRequestEnv(req, 'realmId'), result.data.realm_id)) {
+        if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.data.realm_id)) {
             throw new ForbiddenError('You are not permitted to create this station.');
         }
     }

@@ -32,8 +32,10 @@ export async function createTrainRouteHandler(req: Request, res: Response) : Pro
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository<Train>(TrainEntity);
 
+    const realm = useRequestEnv(req, 'realm');
+
     const entity = repository.create({
-        realm_id: useRequestEnv(req, 'realmId'),
+        realm_id: realm.id,
         user_id: useRequestEnv(req, 'userId'),
         ...result.data,
     });

@@ -16,7 +16,7 @@ export default {
     },
     computed: {
         realmId() {
-            return this.$store.getters['auth/userRealmId'];
+            return this.$store.getters['auth/realmId'];
         },
     },
     created() {

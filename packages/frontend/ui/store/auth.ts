@@ -11,7 +11,7 @@ import { ActionTree, GetterTree, MutationTree } from 'vuex';
 import {
     AbilityDescriptor,
     OAuth2TokenGrantResponse,
-    OAuth2TokenKind,
+    OAuth2TokenKind, Realm,
     User,
 } from '@authup/common';
 import { RootState } from './index';
@@ -19,7 +19,11 @@ import { AuthBrowserStorageKey } from '../config/auth';
 
 export interface AuthState {
     user: User | undefined,
+
+    realmId: string | undefined,
+    realmName: string | undefined
     managementRealmId: string | undefined,
+    managementRealmName: string | undefined,
 
     permissions: AbilityDescriptor[],
     resolved: boolean,
@@ -37,7 +41,11 @@ export interface AuthState {
 const state = () : AuthState => ({
     user: undefined,
 
+    realmId: undefined,
+    realmName: undefined,
+
     managementRealmId: undefined,
+    managementRealmName: undefined,
 
     permissions: [],
     resolved: false,
@@ -56,9 +64,12 @@ const state = () : AuthState => ({
 export const getters : GetterTree<AuthState, RootState> = {
     user: (state: AuthState) => state.user,
     userId: (state: AuthState) => (state.user ? state.user.id : undefined),
-    userRealmId: (state: AuthState) => (state.user ? state.user.realm_id : undefined),
 
-    managementRealmId: (state) => state.managementRealmId || (state.user ? state.user.realm_id : undefined),
+    realmId: (state: AuthState) => state.realmId,
+    realmName: (state: AuthState) => state.realmName,
+
+    managementRealmId: (state) => state.managementRealmId || state.realmId,
+    managementRealmName: (state) => state.managementRealmName || state.realmName,
 
     permissions: (state: AuthState) => state.permissions,
     resolved: (state: AuthState) => state.resolved,
@@ -138,10 +149,16 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     // --------------------------------------------------------------------
 
-    triggerSetManagementRealmId({ commit }, realmId) {
-        commit('setManagementRealmId', realmId);
+    triggerSetRealm({ commit }, realm: Partial<Realm>) {
+        commit('setRealm', realm);
 
-        this.$authWarehouse.set(AuthBrowserStorageKey.MANAGEMENT_REALM_ID, realmId);
+        this.$authWarehouse.set(AuthBrowserStorageKey.REALM, realm);
+    },
+
+    triggerSetManagementRealm({ commit }, realm: Partial<Realm>) {
+        commit('setManagementRealm', realm);
+
+        this.$authWarehouse.set(AuthBrowserStorageKey.MANAGEMENT_REALM, realm);
     },
 
     // --------------------------------------------------------------------
@@ -174,6 +191,10 @@ export const actions : ActionTree<AuthState, RootState> = {
 
             const token = await this.$auth.client.token.introspect(accessToken);
             dispatch('triggerSetPermissions', token.permissions);
+            dispatch('triggerSetRealm', {
+                id: token.realm_id,
+                name: token.realm_name,
+            });
         }
     },
     // --------------------------------------------------------------------
@@ -238,7 +259,8 @@ export const actions : ActionTree<AuthState, RootState> = {
 
     /**
      * Try to log out the user.
-     * @param commit
+     *
+     * @param dispatch
      */
     async triggerLogout({ dispatch }) {
         await dispatch('triggerUnsetToken', OAuth2TokenKind.ACCESS);
@@ -247,7 +269,9 @@ export const actions : ActionTree<AuthState, RootState> = {
         await dispatch('triggerUnsetPermissions');
 
         await dispatch('triggerSetLoginRequired', false);
-        await dispatch('triggerSetManagementRealmId', undefined);
+
+        await dispatch('triggerSetRealm', {});
+        await dispatch('triggerSetManagementRealm', {});
     },
 
     // --------------------------------------------------------------------
@@ -320,8 +344,14 @@ export const mutations : MutationTree<AuthState> = {
 
     // --------------------------------------------------------------------
 
-    setManagementRealmId(state, realmId) {
-        state.managementRealmId = realmId;
+    setRealm(state, { id, name }) {
+        state.realmId = id;
+        state.realmName = name;
+    },
+
+    setManagementRealm(state, { id, name }) {
+        state.managementRealmId = id;
+        state.managementRealmName = name;
     },
 
     // --------------------------------------------------------------------

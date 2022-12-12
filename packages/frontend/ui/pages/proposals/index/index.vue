@@ -37,7 +37,7 @@ export default {
                     user: true,
                 },
                 filter: {
-                    realm_id: this.$store.getters['auth/userRealmId'],
+                    realm_id: this.$store.getters['auth/realmId'],
                 },
                 sort: {
                     updated_at: 'DESC',

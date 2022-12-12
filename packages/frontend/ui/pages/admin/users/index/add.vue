@@ -16,6 +16,11 @@ export default {
             PermissionID.USER_ADD,
         ],
     },
+    computed: {
+        managementRealmId() {
+            return this.$store.getters['auth/managementRealmId'];
+        },
+    },
     methods: {
         handleCreated(e) {
             this.$nuxt.$router.push(`/admin/users/${e.id}`);
@@ -28,6 +33,7 @@ export default {
 </script>
 <template>
     <user-form
+        :realm-id="managementRealmId"
         @created="handleCreated"
         @failed="handleFailed"
     />

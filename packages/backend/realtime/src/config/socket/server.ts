@@ -9,7 +9,7 @@ import { Server as HTTPServer } from 'http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { ForbiddenError, UnauthorizedError } from '@ebec/http';
-import { MASTER_REALM_ID } from '@authup/common';
+import { MASTER_REALM_NAME } from '@authup/common';
 import { setupSocketMiddleware } from '@authup/server-adapter';
 import { useLogger } from '../log';
 import { registerSocketHandlers, registerSocketNamespaceHandlers } from './handlers';
@@ -51,7 +51,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
             return;
         }
 
-        if (socket.data.realmId !== MASTER_REALM_ID) {
+        if (socket.data.realmName !== MASTER_REALM_NAME) {
             next(new ForbiddenError());
         }
     });
@@ -74,7 +74,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
 
         const matches = socket.nsp.name.match(/^\/realm#([a-z0-9A-Z-_]+)$/);
 
-        if (matches[1] === socket.data.realmId || socket.data.realmId === MASTER_REALM_ID) {
+        if (matches[1] === socket.data.realmId || socket.data.realmName === MASTER_REALM_NAME) {
             next();
         } else {
             next(new ForbiddenError());

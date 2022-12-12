@@ -62,10 +62,10 @@ export default {
     },
     computed: {
         realmId() {
-            return this.$store.getters['auth/userRealmId'];
+            return this.$store.getters['auth/realmId'];
         },
         direction() {
-            return this.train.realm_id === this.$store.getters['auth/userRealmId'] ?
+            return this.train.realm_id === this.$store.getters['auth/realmId'] ?
                 'out' :
                 'in';
         },

@@ -59,8 +59,8 @@ export default {
             this.$refs.itemsList.handleDeleted(item);
         },
 
-        async setManagementRealmId(realmId) {
-            await this.$store.dispatch('auth/triggerSetManagementRealmId', realmId);
+        async setManagementRealm(realm) {
+            await this.$store.dispatch('auth/triggerSetManagementRealm', realm);
         },
     },
 };
@@ -96,7 +96,7 @@ export default {
                     <button
                         v-if="managementRealmId !== data.item.id"
                         class="btn btn-xs btn-primary"
-                        @click="setManagementRealmId(data.item.id)"
+                        @click="setManagementRealm(data.item)"
                     >
                         <i
                             class="fa-solid fa-check"

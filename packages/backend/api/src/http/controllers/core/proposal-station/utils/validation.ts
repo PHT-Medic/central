@@ -12,7 +12,7 @@ import { isRealmResourceWritable } from '@authup/common';
 import { Request } from 'routup';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
-import { StationEntity } from '../../../../../domains/core/station/entity';
+import { StationEntity } from '../../../../../domains/core/station';
 import { useRequestEnv } from '../../../../request';
 import {
     ExpressValidationError,
@@ -71,7 +71,7 @@ export async function runProposalStationValidation(
     if (result.relation.proposal) {
         result.data.proposal_realm_id = result.relation.proposal.realm_id;
 
-        if (!isRealmResourceWritable(useRequestEnv(req, 'realmId'), result.relation.proposal.realm_id)) {
+        if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.proposal.realm_id)) {
             throw new NotFoundError('The referenced proposal realm is not permitted.');
         }
     }

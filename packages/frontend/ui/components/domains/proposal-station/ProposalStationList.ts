@@ -28,7 +28,7 @@ import {
     ComponentListProperties,
     PaginationMeta, buildListHeader, buildListItems, buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
-import { MASTER_REALM_ID, Realm } from '@authup/common';
+import { MASTER_REALM_NAME, Realm } from '@authup/common';
 import { BuildInput } from 'rapiq';
 
 enum DomainType {
@@ -45,7 +45,7 @@ export const ProposalStationList = Vue.extend<
 ComponentListData<ProposalStation>,
 ComponentListMethods<ProposalStation>,
 any,
-ComponentListProperties<ProposalStation> & {
+ComponentListProperties<BuildInput<ProposalStation>> & {
     realmId?: Realm['id'],
     sourceId: Train['id'] | Station['id'],
     target: `${DomainType}`,
@@ -119,19 +119,16 @@ ComponentListProperties<ProposalStation> & {
                 DomainType.Proposal :
                 DomainType.Station;
         },
-        userRealmId() {
-            return this.$store.getters['auth/userRealmId'];
-        },
         socketRealmId() {
             if (this.realmId) {
                 return this.realmId;
             }
 
-            if (this.userRealmId === MASTER_REALM_ID) {
+            if (this.$store.getters['auth/realmName'] === MASTER_REALM_NAME) {
                 return undefined;
             }
 
-            return this.userRealmId;
+            return this.$store.getters['auth/realmId'];
         },
     },
     watch: {

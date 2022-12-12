@@ -77,7 +77,7 @@ export async function runTrainStationValidation(
     });
     if (result.relation.train) {
         if (
-            !isRealmResourceWritable(useRequestEnv(req, 'realmId'), result.relation.train.realm_id)
+            !isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.train.realm_id)
         ) {
             throw new BadRequestError(buildExpressValidationErrorMessage('train_id'));
         }

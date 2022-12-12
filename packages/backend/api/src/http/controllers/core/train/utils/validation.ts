@@ -122,7 +122,7 @@ export async function runTrainValidation(
     });
 
     if (result.relation.proposal) {
-        if (!isRealmResourceWritable(useRequestEnv(req, 'realmId'), result.relation.proposal.realm_id)) {
+        if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.proposal.realm_id)) {
             throw new BadRequestError('The referenced proposal realm is not permitted.');
         }
     }

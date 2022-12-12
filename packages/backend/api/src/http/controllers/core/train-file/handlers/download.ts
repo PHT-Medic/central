@@ -33,7 +33,7 @@ export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Re
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceReadable(useRequestEnv(req, 'realmId'), train.realm_id)) {
+    if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), train.realm_id)) {
         const proposalStations = await dataSource.getRepository(TrainStationEntity).find({
             where: {
                 train_id: train.id,
@@ -44,7 +44,7 @@ export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Re
         let isPermitted = false;
 
         for (let i = 0; i < proposalStations.length; i++) {
-            if (isRealmResourceReadable(useRequestEnv(req, 'realmId'), proposalStations[i].station.realm_id)) {
+            if (isRealmResourceReadable(useRequestEnv(req, 'realm'), proposalStations[i].station.realm_id)) {
                 isPermitted = true;
                 break;
             }

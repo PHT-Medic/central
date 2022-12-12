@@ -7,7 +7,8 @@
 
 export enum AuthBrowserStorageKey {
     USER = 'user',
-    MANAGEMENT_REALM_ID = 'management_realm_id',
+    REALM = 'realm',
+    MANAGEMENT_REALM = 'management_realm',
     PERMISSIONS = 'permissions',
 
     ACCESS_TOKEN = 'access_token',

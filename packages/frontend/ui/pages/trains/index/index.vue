@@ -29,7 +29,7 @@ export default {
         query() {
             return {
                 filter: {
-                    realm_id: this.$store.getters['auth/userRealmId'],
+                    realm_id: this.$store.getters['auth/realmId'],
                 },
             };
         },

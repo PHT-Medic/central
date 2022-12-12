@@ -16,7 +16,7 @@ import {
 import { required } from 'vuelidate/lib/validators';
 import Vue, { PropType } from 'vue';
 import { Socket } from 'socket.io-client';
-import { MASTER_REALM_ID } from '@authup/common';
+import { MASTER_REALM_NAME } from '@authup/common';
 import TrainFile from './TrainFile.vue';
 import TrainFormFile from './TrainFormFile.vue';
 import TrainImageCommand from '../train/TrainImageCommand';
@@ -74,16 +74,12 @@ export default {
 
             return `${this.items[index].directory}/${this.items[index].name}`;
         },
-
-        userRealmId() {
-            return this.$store.getters['auth/userRealmId'];
-        },
         socketRealmId() {
             if (this.realmId) {
                 return this.realmId;
             }
 
-            if (this.userRealmId === MASTER_REALM_ID) {
+            if (this.$store.getters['auth/realmName'] === MASTER_REALM_NAME) {
                 return undefined;
             }
 
@@ -91,7 +87,7 @@ export default {
                 return this.train.realm_id;
             }
 
-            return this.userRealmId;
+            return this.$store.getters['auth/realmId'];
         },
 
         updatedAt() {

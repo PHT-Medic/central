@@ -77,6 +77,7 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
                         buffer.length,
                     )
                         .then((minioInfo) => {
+                            const realm = useRequestEnv(req, 'realm');
                             files.push(trainFileRepository.create({
                                 hash: destinationFileName,
                                 name: fileName,
@@ -84,7 +85,7 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
                                 directory: filePath,
                                 user_id: useRequestEnv(req, 'userId'),
                                 train_id: entity.id,
-                                realm_id: useRequestEnv(req, 'realmId'),
+                                realm_id: realm.id,
                             }));
 
                             resolve(minioInfo);

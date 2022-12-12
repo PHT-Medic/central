@@ -8,7 +8,6 @@
 import { RobotForm, useHTTPClient } from '@authup/vue2';
 import Vue, { VNode } from 'vue';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { MASTER_REALM_ID } from '@authup/common';
 
 export default {
     data() {
@@ -57,7 +56,7 @@ export default {
         return h(RobotForm, {
             props: {
                 name: ServiceID.REGISTRY,
-                realmId: MASTER_REALM_ID,
+                realmId: this.$store.getters['auth/realmId'],
                 entity: vm.item,
             },
             on: {

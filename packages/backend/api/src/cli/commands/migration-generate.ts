@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { createDatabase } from 'typeorm-extension';
 import { CommandModule } from 'yargs';
 import { DataSource } from 'typeorm';
 import { generateMigration } from '@authup/server-database';
@@ -22,6 +23,8 @@ export class MigrationGenerateCommand implements CommandModule {
         createConfig({ env });
 
         const options = await buildDataSourceOptions();
+
+        await createDatabase({ options, ifNotExist: true });
 
         const dataSource = new DataSource(options);
         await dataSource.initialize();

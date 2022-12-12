@@ -71,15 +71,16 @@ export async function getManyProposalRouteHandler(req: Request, res: Response) :
     if (filter) {
         let { realm_id: realmId } = filter as Record<string, any>;
 
-        if (!isRealmResourceReadable(useRequestEnv(req, 'realmId'), realmId)) {
-            realmId = useRequestEnv(req, 'realmId');
+        const realm = useRequestEnv(req, 'realm');
+        if (!isRealmResourceReadable(realm, realmId)) {
+            realmId = realm.id;
         }
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         filter.realm_id = realmId;
     } else {
-        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'), 'proposal.realm_id');
+        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'), 'proposal.realm_id');
     }
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {

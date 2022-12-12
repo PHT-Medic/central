@@ -33,7 +33,7 @@ export async function getOneTrainRouteHandler(req: Request, res: Response) : Pro
     const query = repository.createQueryBuilder('train')
         .where('train.id = :id', { id });
 
-    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'), 'train.realm_id');
+    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'), 'train.realm_id');
 
     applyRelations(query, include, {
         defaultAlias: 'train',
@@ -46,7 +46,7 @@ export async function getOneTrainRouteHandler(req: Request, res: Response) : Pro
         throw new NotFoundError();
     }
 
-    if (!isRealmResourceReadable(useRequestEnv(req, 'realmId'), entity.realm_id)) {
+    if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), entity.realm_id)) {
         throw new ForbiddenError();
     }
 
@@ -92,11 +92,11 @@ export async function getManyTrainRouteHandler(req: Request, res: Response) : Pr
     }
 
     if (filterRealmId) {
-        if (!isRealmResourceReadable(useRequestEnv(req, 'realmId'), filterRealmId)) {
+        if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), filterRealmId)) {
             throw new ForbiddenError('You are not permitted to inspect trains for the given realm.');
         }
     } else {
-        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realmId'), 'train.realm_id');
+        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'), 'train.realm_id');
     }
 
     const [entities, total] = await query.getManyAndCount();
