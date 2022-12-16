@@ -16,7 +16,7 @@
     "license": "MIT",
     "devDependencies": {
         "@authup/common": "^0.3.0",
-        "@hapic/oauth2": "^0.2.0",
+        "@hapic/oauth2": "^0.3.0",
         "hapic": "^0.3.0",
         "rapiq": "^0.6.1"
     },
