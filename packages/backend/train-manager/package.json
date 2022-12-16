@@ -28,7 +28,7 @@
         "crypto": "^1.0.1",
         "dockerode": "^3.3.3",
         "dotenv": "^16.0.3",
-        "hapic": "^0.2.0",
+        "hapic": "^0.3.0",
         "minio": "^7.0.32",
         "rapiq": "^0.6.1",
         "redis-extension": "^1.2.0",
