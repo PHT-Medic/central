@@ -22,7 +22,7 @@
         "@tada5hi/eslint-config-vue-typescript": "^1.0.9",
         "@types/node": "^18.11.15",
         "cross-env": "^7.0.3",
-        "eslint": "^8.29.0",
+        "eslint": "^8.30.0",
         "husky": "^8.0.2",
         "lerna": "^6.1.0",
         "rimraf": "^3.0.2",
