@@ -14,6 +14,7 @@ This repository contains the main central packages of the Personal Health Train 
 - [Configuration](#configuration)
 - [Packages](#packages)
 - [Usage](#usage)
+- [Contributing](#contributing)
 - [Credits](#credits)
 - [License](#license)
 
@@ -68,6 +69,12 @@ $ npm run realtime
 ```shell
 $ npm run train-manager
 ```
+
+## Contributing
+
+Before starting to work on a pull request, it is important to review the guidelines for
+[contributing](./CONTRIBUTING.md) and the [code of conduct](./CODE_OF_CONDUCT.md).
+These guidelines will help to ensure that contributions are made effectively and are accepted.
 
 ## Credits
 If you have any questions, feel free to contact the author & creator [Peter Placzek](https://github.com/tada5hi)  of the project.
