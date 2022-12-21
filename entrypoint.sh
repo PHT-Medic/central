@@ -36,21 +36,21 @@ fi
 
 case "${PACKAGE}" in
     api)
-        exec npm run "$1" --workspace=packages/backend/api
+        exec npm run "$1" --workspace=packages/api
         ;;
     ui)
         export NUXT_HOST=0.0.0.0
         export NUXT_PORT=3000
-        exec npm run "$1" --workspace=packages/frontend/ui
+        exec npm run "$1" --workspace=packages/ui
         ;;
     realtime)
-        exec npm run "$1" --workspace=packages/backend/realtime
+        exec npm run "$1" --workspace=packages/realtime
         ;;
     train-manager)
-        exec npm run "$1" --workspace=packages/backend/train-manager
+        exec npm run "$1" --workspace=packages/train-manager
         ;;
     cli)
-        exec npm run cli --workspace=packages/backend/api -- "$@"
+        exec npm run cli --workspace=packages/api -- "$@"
         ;;
 esac
 

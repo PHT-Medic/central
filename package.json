@@ -10,9 +10,7 @@
     "version": "1.0.0",
     "description": "This package contains all central packages. It was initially developed as part of my Bachelor Thesis.",
     "workspaces": [
-        "packages/backend/*",
-        "packages/shared/*",
-        "packages/frontend/*"
+        "packages/*"
     ],
     "devDependencies": {
         "@commitlint/cli": "^17.3.0",
