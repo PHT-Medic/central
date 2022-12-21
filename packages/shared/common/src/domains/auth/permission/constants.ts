@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID as AuthPermissionID } from '@authup/common';
+import { PermissionName as AuthPermissionName } from '@authup/common';
 
 export enum PermissionKey {
     ADMIN_UI_USE = 'admin_ui_use',
@@ -38,7 +38,7 @@ export enum PermissionKey {
 
 export const PermissionID = {
     ...PermissionKey,
-    ...AuthPermissionID,
+    ...AuthPermissionName,
 };
 
 export type PermissionIDType = typeof PermissionID[keyof typeof PermissionID];
