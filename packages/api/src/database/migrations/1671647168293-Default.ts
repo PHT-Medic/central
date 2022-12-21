@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Default1670850207897 implements MigrationInterface {
-    name = 'Default1670850207897';
+export class Default1671647168293 implements MigrationInterface {
+    name = 'Default1671647168293';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -201,7 +201,7 @@ export class Default1670850207897 implements MigrationInterface {
                 \`name\` varchar(256) NOT NULL,
                 \`description\` text NULL,
                 \`secret\` varchar(256) NULL,
-                \`redirect_uri\` varchar(2000) NULL,
+                \`redirect_uri\` text NULL,
                 \`grant_types\` varchar(512) NULL,
                 \`scope\` varchar(512) NULL,
                 \`base_url\` varchar(2000) NULL,
@@ -217,7 +217,7 @@ export class Default1670850207897 implements MigrationInterface {
         `);
         await queryRunner.query(`
             CREATE TABLE \`auth_authorization_codes\` (
-                \`id\` varchar(255) NOT NULL,
+                \`id\` varchar(36) NOT NULL,
                 \`content\` varchar(4096) NOT NULL,
                 \`expires\` datetime NOT NULL,
                 \`scope\` varchar(512) NULL,
@@ -227,6 +227,31 @@ export class Default1670850207897 implements MigrationInterface {
                 \`user_id\` varchar(255) NULL,
                 \`robot_id\` varchar(255) NULL,
                 \`realm_id\` varchar(255) NOT NULL,
+                PRIMARY KEY (\`id\`)
+            ) ENGINE = InnoDB
+        `);
+        await queryRunner.query(`
+            CREATE TABLE \`auth_scopes\` (
+                \`id\` varchar(36) NOT NULL,
+                \`built_in\` tinyint NOT NULL DEFAULT 0,
+                \`name\` varchar(128) NOT NULL,
+                \`description\` text NULL,
+                \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+                \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                \`realm_id\` varchar(255) NULL,
+                UNIQUE INDEX \`IDX_b14fab23784a81c282abef41fa\` (\`name\`, \`realm_id\`),
+                PRIMARY KEY (\`id\`)
+            ) ENGINE = InnoDB
+        `);
+        await queryRunner.query(`
+            CREATE TABLE \`auth_client_scopes\` (
+                \`id\` varchar(36) NOT NULL,
+                \`default\` tinyint NOT NULL DEFAULT 0,
+                \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+                \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                \`client_id\` varchar(255) NOT NULL,
+                \`scope_id\` varchar(255) NOT NULL,
+                UNIQUE INDEX \`IDX_ddec4250b145536333f137ff96\` (\`client_id\`, \`scope_id\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
         `);
@@ -663,6 +688,18 @@ export class Default1670850207897 implements MigrationInterface {
             ADD CONSTRAINT \`FK_343b25488aef1b87f4771f8c7eb\` FOREIGN KEY (\`realm_id\`) REFERENCES \`auth_realms\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
         `);
         await queryRunner.query(`
+            ALTER TABLE \`auth_scopes\`
+            ADD CONSTRAINT \`FK_69e83c8e7e11a247a0809eb3327\` FOREIGN KEY (\`realm_id\`) REFERENCES \`auth_realms\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
+        `);
+        await queryRunner.query(`
+            ALTER TABLE \`auth_client_scopes\`
+            ADD CONSTRAINT \`FK_6331374fa74645dae2d52547081\` FOREIGN KEY (\`client_id\`) REFERENCES \`auth_clients\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
+        `);
+        await queryRunner.query(`
+            ALTER TABLE \`auth_client_scopes\`
+            ADD CONSTRAINT \`FK_471f3da9df80f92c382a586e9ca\` FOREIGN KEY (\`scope_id\`) REFERENCES \`auth_scopes\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
+        `);
+        await queryRunner.query(`
             ALTER TABLE \`auth_identity_providers\`
             ADD CONSTRAINT \`FK_00fd737c365d688f9edd0c73eca\` FOREIGN KEY (\`realm_id\`) REFERENCES \`auth_realms\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
         `);
@@ -1002,6 +1039,15 @@ export class Default1670850207897 implements MigrationInterface {
             ALTER TABLE \`auth_identity_providers\` DROP FOREIGN KEY \`FK_00fd737c365d688f9edd0c73eca\`
         `);
         await queryRunner.query(`
+            ALTER TABLE \`auth_client_scopes\` DROP FOREIGN KEY \`FK_471f3da9df80f92c382a586e9ca\`
+        `);
+        await queryRunner.query(`
+            ALTER TABLE \`auth_client_scopes\` DROP FOREIGN KEY \`FK_6331374fa74645dae2d52547081\`
+        `);
+        await queryRunner.query(`
+            ALTER TABLE \`auth_scopes\` DROP FOREIGN KEY \`FK_69e83c8e7e11a247a0809eb3327\`
+        `);
+        await queryRunner.query(`
             ALTER TABLE \`auth_authorization_codes\` DROP FOREIGN KEY \`FK_343b25488aef1b87f4771f8c7eb\`
         `);
         await queryRunner.query(`
@@ -1228,6 +1274,18 @@ export class Default1670850207897 implements MigrationInterface {
         `);
         await queryRunner.query(`
             DROP TABLE \`auth_identity_providers\`
+        `);
+        await queryRunner.query(`
+            DROP INDEX \`IDX_ddec4250b145536333f137ff96\` ON \`auth_client_scopes\`
+        `);
+        await queryRunner.query(`
+            DROP TABLE \`auth_client_scopes\`
+        `);
+        await queryRunner.query(`
+            DROP INDEX \`IDX_b14fab23784a81c282abef41fa\` ON \`auth_scopes\`
+        `);
+        await queryRunner.query(`
+            DROP TABLE \`auth_scopes\`
         `);
         await queryRunner.query(`
             DROP TABLE \`auth_authorization_codes\`

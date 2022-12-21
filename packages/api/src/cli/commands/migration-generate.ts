@@ -29,7 +29,9 @@ export class MigrationGenerateCommand implements CommandModule {
         const dataSource = new DataSource(options);
         await dataSource.initialize();
 
-        await setupDatabaseSchema(dataSource);
+        if (dataSource.migrations.length > 0) {
+            await setupDatabaseSchema(dataSource);
+        }
 
         await generateMigration({
             dataSource,

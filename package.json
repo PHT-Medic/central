@@ -36,12 +36,12 @@
         "lint:fix": "npm run lint -- --fix",
         "prepare": "husky install",
         "prepublishOnly": "npm run build",
-        "cli": "npm run cli --workspace=packages/backend/api",
-        "ui": "npm run dev --workspace=packages/frontend/ui",
-        "api": "npm run dev --workspace=packages/backend/api",
-        "realtime": "npm run dev --workspace=packages/backend/realtime",
-        "train-manager": "npm run dev --workspace=packages/backend/train-manager",
-        "common": "npm run build-watch --workspace=packages/shared/common"
+        "cli": "npm run cli --workspace=packages/api",
+        "ui": "npm run dev --workspace=packages/ui",
+        "api": "npm run dev --workspace=packages/api",
+        "realtime": "npm run dev --workspace=packages/realtime",
+        "train-manager": "npm run dev --workspace=packages/train-manager",
+        "common": "npm run build-watch --workspace=packages/common"
     },
     "config": {
         "commitizen": {
