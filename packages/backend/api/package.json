@@ -23,7 +23,7 @@
         "@routup/cookie": "^0.2.4",
         "@routup/decorators": "^0.1.5",
         "@routup/swagger": "^0.2.4",
-        "@routup/query": "^0.2.4",
+        "@routup/query": "^0.3.1",
         "@socket.io/redis-emitter": "^5.0.0",
         "@trapi/swagger": "^0.3.8",
         "amqp-extension": "^1.0.4",
