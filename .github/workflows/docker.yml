@@ -17,13 +17,13 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
-            - uses: tada5hi/action-docker-image-pub@master
+            - uses: tada5hi/action-docker-image-publish@master
               if: github.ref_type == 'tag'
               with:
                   registryRepository: central
                   registryTag: latest
 
-            - uses: tada5hi/action-docker-image-pub@master
+            - uses: tada5hi/action-docker-image-publish@master
               if: github.ref_type == 'branch'
               with:
                   registryRepository: central
