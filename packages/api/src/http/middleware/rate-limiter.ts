@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { MASTER_REALM_NAME } from '@authup/common';
 import rateLimit from 'express-rate-limit';
 import { TooManyRequestsError } from '@ebec/http';
 import { ServiceID } from '@personalhealthtrain/central-common';
@@ -13,7 +14,7 @@ import {
 } from 'routup';
 import { useRequestEnv } from '../request';
 
-export function useRateLimiter(req: Request, res: Response, next: Next) {
+export function rateLimitMiddleware(req: Request, res: Response, next: Next) {
     const limiter : Handler = rateLimit({
         windowMs: 10 * 60 * 1000, // 10 minutes = 600 sec
 
@@ -21,9 +22,15 @@ export function useRateLimiter(req: Request, res: Response, next: Next) {
             if (useRequestEnv(req, 'userId')) {
                 return 100 * 60; // 6.000 req = 10 req p. sec
             }
+
             const robot = useRequestEnv(req, 'robot');
             if (robot) {
-                if (robot.name === ServiceID.SYSTEM) {
+                const { name } = useRequestEnv(req, 'realm');
+
+                if (
+                    name === MASTER_REALM_NAME &&
+                    robot.name === ServiceID.SYSTEM
+                ) {
                     return 0; // unlimited req p. sec
                 }
 
@@ -36,7 +43,7 @@ export function useRateLimiter(req: Request, res: Response, next: Next) {
         handler(req: Request, res: Response, next: Next): any {
             next(new TooManyRequestsError());
         },
-        keyGenerator: (req: Request, res: Response) => getRequestIp(req, { trustProxy: true }),
+        keyGenerator: (req: Request) => getRequestIp(req, { trustProxy: true }),
     });
 
     return limiter(req, res, next);

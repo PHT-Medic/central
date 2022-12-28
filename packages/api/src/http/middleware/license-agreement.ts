@@ -12,7 +12,7 @@ import {
 } from 'routup';
 import { useRequestEnv } from '../request';
 
-export function checkLicenseAgreementAccepted(req: Request, res: Response, next: Next) {
+export function licenseAgreementMiddleware(req: Request, res: Response, next: Next) {
     const user = useRequestEnv(req, 'user');
     if (user) {
         if (

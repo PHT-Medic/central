@@ -12,7 +12,7 @@ import {
 } from 'routup';
 import { useRequestEnv } from '../request';
 
-export function forceLoggedIn(req: Request, res: Response, next: Next) {
+export function forceLoggedInMiddleware(req: Request, res: Response, next: Next) {
     if (
         typeof useRequestEnv(req, 'userId') === 'undefined' &&
         typeof useRequestEnv(req, 'robotId') === 'undefined' &&
@@ -26,6 +26,6 @@ export function forceLoggedIn(req: Request, res: Response, next: Next) {
 
 export class ForceLoggedInMiddleware implements HandlerInterface {
     public run(request: Request, response: Response, next: Next) {
-        forceLoggedIn(request, response, next);
+        forceLoggedInMiddleware(request, response, next);
     }
 }

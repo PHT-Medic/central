@@ -16,10 +16,12 @@ import { Router } from 'routup';
 
 import { registerControllers } from './routes';
 
-import { errorMiddleware } from './middleware/error';
-import { useRateLimiter } from './middleware/rate-limiter';
+import {
+    errorMiddleware,
+    licenseAgreementMiddleware,
+    rateLimitMiddleware,
+} from './middleware';
 import env from '../env';
-import { checkLicenseAgreementAccepted } from './middleware/license-agreement';
 
 export function createRouter() : Router {
     const router = new Router();
@@ -34,12 +36,12 @@ export function createRouter() : Router {
     registerMiddlewares(router);
 
     if (env.env === 'development') {
-        router.use(checkLicenseAgreementAccepted);
+        router.use(licenseAgreementMiddleware);
     }
 
     if (env.env !== 'test') {
         // Rate Limiter
-        router.use(useRateLimiter);
+        router.use(rateLimitMiddleware);
 
         // Metrics
         const metricsMiddleware = promBundle({
