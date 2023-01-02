@@ -41,7 +41,7 @@
         "mysql": "^2.18.1",
         "minio": "^7.0.32",
         "ora": "^5.4.1",
-        "prom-client": "^14.0.1",
+        "prom-client": "^14.1.1",
         "rapiq": "^0.6.2",
         "redis-extension": "^1.2.0",
         "reflect-metadata": "^0.1.13",
