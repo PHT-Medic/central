@@ -74,7 +74,7 @@ export function createRefreshRobotTokenOnResponseErrorHandler(context: {
                                 });
 
                             config.headers = JSON.parse(JSON.stringify(config.headers || {}));
-                            config.headers.Authorization = stringifyAuthorizationHeader({
+                            (config.headers as Record<string, any>).Authorization = stringifyAuthorizationHeader({
                                 type: 'Bearer',
                                 token: token.access_token,
                             });
