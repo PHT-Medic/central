@@ -22,7 +22,7 @@
         "@authup/server-adapter": "^0.4.0",
         "@ebec/http": "^0.1.0",
         "@hapic/harbor": "^1.0.0",
-        "@hapic/vault": "^0.3.0",
+        "@hapic/vault": "^1.0.0",
         "@personalhealthtrain/central-common": "^1.3.27",
         "amqp-extension": "^1.0.4",
         "crypto": "^1.0.1",
