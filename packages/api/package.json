@@ -45,7 +45,7 @@
         "rapiq": "^0.6.3",
         "redis-extension": "^1.2.0",
         "reflect-metadata": "^0.1.13",
-        "routup": "^0.9.0",
+        "routup": "^0.9.1",
         "tar": "^6.1.13",
         "tar-stream": "^3.0.0",
         "typeorm": "^0.3.11",
