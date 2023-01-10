@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Default1671647168293 implements MigrationInterface {
-    name = 'Default1671647168293';
+export class Default1673344984293 implements MigrationInterface {
+    name = 'Default1673344984293';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -55,9 +55,10 @@ export class Default1671647168293 implements MigrationInterface {
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                 \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
                 \`realm_id\` varchar(255) NOT NULL,
+                INDEX \`IDX_2d54113aa2edfc3955abcf524a\` (\`name\`),
                 INDEX \`IDX_13d8b49e55a8b06bee6bbc828f\` (\`email\`),
                 INDEX \`IDX_1d5fcbfcbba74381ca8a58a3f1\` (\`realm_id\`),
-                UNIQUE INDEX \`IDX_2d54113aa2edfc3955abcf524a\` (\`name\`),
+                UNIQUE INDEX \`IDX_7e0d8fa52a9921d445798c2bb7\` (\`name\`, \`realm_id\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
         `);
@@ -82,8 +83,10 @@ export class Default1671647168293 implements MigrationInterface {
                 \`built_in\` tinyint NOT NULL DEFAULT 0,
                 \`description\` text NULL,
                 \`target\` varchar(16) NULL,
+                \`realm_id\` varchar(255) NULL,
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                 \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                INDEX \`IDX_9356935453c5e442d375531ee5\` (\`realm_id\`),
                 UNIQUE INDEX \`IDX_40a392cb2ddf6b12f841d06a82\` (\`name\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
@@ -101,6 +104,7 @@ export class Default1671647168293 implements MigrationInterface {
                 \`role_id\` varchar(255) NOT NULL,
                 \`role_realm_id\` varchar(255) NULL,
                 \`permission_id\` varchar(255) NOT NULL,
+                \`permission_realm_id\` varchar(255) NULL,
                 UNIQUE INDEX \`IDX_40c0ee0929b20575df125e8d14\` (\`permission_id\`, \`role_id\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
@@ -131,6 +135,7 @@ export class Default1671647168293 implements MigrationInterface {
                 \`user_id\` varchar(255) NOT NULL,
                 \`user_realm_id\` varchar(255) NULL,
                 \`permission_id\` varchar(255) NOT NULL,
+                \`permission_realm_id\` varchar(255) NULL,
                 UNIQUE INDEX \`IDX_e1a21fc2e6ac12fa29b02c4382\` (\`permission_id\`, \`user_id\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
@@ -189,6 +194,7 @@ export class Default1671647168293 implements MigrationInterface {
                 \`robot_id\` varchar(255) NOT NULL,
                 \`robot_realm_id\` varchar(255) NULL,
                 \`permission_id\` varchar(255) NOT NULL,
+                \`permission_realm_id\` varchar(255) NULL,
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                 \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
                 UNIQUE INDEX \`IDX_0c2284272043ed8aba6689306b\` (\`permission_id\`, \`robot_id\`),
@@ -580,6 +586,10 @@ export class Default1671647168293 implements MigrationInterface {
             ADD CONSTRAINT \`FK_063e4bd5b708c304b51b7ee7743\` FOREIGN KEY (\`realm_id\`) REFERENCES \`auth_realms\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
         `);
         await queryRunner.query(`
+            ALTER TABLE \`auth_permissions\`
+            ADD CONSTRAINT \`FK_9356935453c5e442d375531ee52\` FOREIGN KEY (\`realm_id\`) REFERENCES \`auth_realms\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
+        `);
+        await queryRunner.query(`
             ALTER TABLE \`auth_role_permissions\`
             ADD CONSTRAINT \`FK_3a6789765734cf5f3f555f2098f\` FOREIGN KEY (\`role_id\`) REFERENCES \`auth_roles\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
         `);
@@ -590,6 +600,10 @@ export class Default1671647168293 implements MigrationInterface {
         await queryRunner.query(`
             ALTER TABLE \`auth_role_permissions\`
             ADD CONSTRAINT \`FK_4bbe0c540b241ca21e4bd1d8d12\` FOREIGN KEY (\`permission_id\`) REFERENCES \`auth_permissions\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
+        `);
+        await queryRunner.query(`
+            ALTER TABLE \`auth_role_permissions\`
+            ADD CONSTRAINT \`FK_f9ab8919ff5d5993816f6881879\` FOREIGN KEY (\`permission_realm_id\`) REFERENCES \`auth_realms\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
         `);
         await queryRunner.query(`
             ALTER TABLE \`auth_user_roles\`
@@ -618,6 +632,10 @@ export class Default1671647168293 implements MigrationInterface {
         await queryRunner.query(`
             ALTER TABLE \`auth_user_permissions\`
             ADD CONSTRAINT \`FK_cf962d70634dedf7812fc28282a\` FOREIGN KEY (\`permission_id\`) REFERENCES \`auth_permissions\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
+        `);
+        await queryRunner.query(`
+            ALTER TABLE \`auth_user_permissions\`
+            ADD CONSTRAINT \`FK_e2de70574303693fea386cc0edd\` FOREIGN KEY (\`permission_realm_id\`) REFERENCES \`auth_realms\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
         `);
         await queryRunner.query(`
             ALTER TABLE \`auth_user_attributes\`
@@ -662,6 +680,10 @@ export class Default1671647168293 implements MigrationInterface {
         await queryRunner.query(`
             ALTER TABLE \`auth_robot_permissions\`
             ADD CONSTRAINT \`FK_b29fe901137f6944ecaf98fcb5a\` FOREIGN KEY (\`permission_id\`) REFERENCES \`auth_permissions\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
+        `);
+        await queryRunner.query(`
+            ALTER TABLE \`auth_robot_permissions\`
+            ADD CONSTRAINT \`FK_1cacb8af1791a5303d30cbf8590\` FOREIGN KEY (\`permission_realm_id\`) REFERENCES \`auth_realms\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
         `);
         await queryRunner.query(`
             ALTER TABLE \`auth_clients\`
@@ -1066,6 +1088,9 @@ export class Default1671647168293 implements MigrationInterface {
             ALTER TABLE \`auth_clients\` DROP FOREIGN KEY \`FK_b628ffa1b2f5415598cfb1a72af\`
         `);
         await queryRunner.query(`
+            ALTER TABLE \`auth_robot_permissions\` DROP FOREIGN KEY \`FK_1cacb8af1791a5303d30cbf8590\`
+        `);
+        await queryRunner.query(`
             ALTER TABLE \`auth_robot_permissions\` DROP FOREIGN KEY \`FK_b29fe901137f6944ecaf98fcb5a\`
         `);
         await queryRunner.query(`
@@ -1099,6 +1124,9 @@ export class Default1671647168293 implements MigrationInterface {
             ALTER TABLE \`auth_user_attributes\` DROP FOREIGN KEY \`FK_9a84db5a27d34b31644b54d9106\`
         `);
         await queryRunner.query(`
+            ALTER TABLE \`auth_user_permissions\` DROP FOREIGN KEY \`FK_e2de70574303693fea386cc0edd\`
+        `);
+        await queryRunner.query(`
             ALTER TABLE \`auth_user_permissions\` DROP FOREIGN KEY \`FK_cf962d70634dedf7812fc28282a\`
         `);
         await queryRunner.query(`
@@ -1120,6 +1148,9 @@ export class Default1671647168293 implements MigrationInterface {
             ALTER TABLE \`auth_user_roles\` DROP FOREIGN KEY \`FK_866cd5c92b05353aab240bdc10a\`
         `);
         await queryRunner.query(`
+            ALTER TABLE \`auth_role_permissions\` DROP FOREIGN KEY \`FK_f9ab8919ff5d5993816f6881879\`
+        `);
+        await queryRunner.query(`
             ALTER TABLE \`auth_role_permissions\` DROP FOREIGN KEY \`FK_4bbe0c540b241ca21e4bd1d8d12\`
         `);
         await queryRunner.query(`
@@ -1127,6 +1158,9 @@ export class Default1671647168293 implements MigrationInterface {
         `);
         await queryRunner.query(`
             ALTER TABLE \`auth_role_permissions\` DROP FOREIGN KEY \`FK_3a6789765734cf5f3f555f2098f\`
+        `);
+        await queryRunner.query(`
+            ALTER TABLE \`auth_permissions\` DROP FOREIGN KEY \`FK_9356935453c5e442d375531ee52\`
         `);
         await queryRunner.query(`
             ALTER TABLE \`auth_roles\` DROP FOREIGN KEY \`FK_063e4bd5b708c304b51b7ee7743\`
@@ -1345,6 +1379,9 @@ export class Default1671647168293 implements MigrationInterface {
             DROP INDEX \`IDX_40a392cb2ddf6b12f841d06a82\` ON \`auth_permissions\`
         `);
         await queryRunner.query(`
+            DROP INDEX \`IDX_9356935453c5e442d375531ee5\` ON \`auth_permissions\`
+        `);
+        await queryRunner.query(`
             DROP TABLE \`auth_permissions\`
         `);
         await queryRunner.query(`
@@ -1357,13 +1394,16 @@ export class Default1671647168293 implements MigrationInterface {
             DROP TABLE \`auth_roles\`
         `);
         await queryRunner.query(`
-            DROP INDEX \`IDX_2d54113aa2edfc3955abcf524a\` ON \`auth_users\`
+            DROP INDEX \`IDX_7e0d8fa52a9921d445798c2bb7\` ON \`auth_users\`
         `);
         await queryRunner.query(`
             DROP INDEX \`IDX_1d5fcbfcbba74381ca8a58a3f1\` ON \`auth_users\`
         `);
         await queryRunner.query(`
             DROP INDEX \`IDX_13d8b49e55a8b06bee6bbc828f\` ON \`auth_users\`
+        `);
+        await queryRunner.query(`
+            DROP INDEX \`IDX_2d54113aa2edfc3955abcf524a\` ON \`auth_users\`
         `);
         await queryRunner.query(`
             DROP TABLE \`auth_users\`
