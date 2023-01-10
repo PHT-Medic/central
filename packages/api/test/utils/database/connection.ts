@@ -16,7 +16,6 @@ import {
 } from '@authup/server-database';
 import { PermissionKey } from '@personalhealthtrain/central-common';
 import { buildDataSourceOptions } from '../../../src/database/utils';
-import { buildRobotAggregator } from '../../../src/aggregators/robot';
 
 async function buildOptions() : Promise<DataSourceOptions> {
     return {
@@ -28,22 +27,19 @@ async function buildOptions() : Promise<DataSourceOptions> {
 export async function useTestDatabase() {
     const options = await buildOptions();
 
-    await createDatabase({ options });
+    await createDatabase({ options, synchronize: false });
 
     const dataSource = new DataSource(options);
     await dataSource.initialize();
     await dataSource.synchronize();
 
-    const { start } = buildRobotAggregator();
-    start({ synchronous: true });
+    setDataSource(dataSource);
 
     const authSeeder = new AuthDatabaseRootSeeder({
         permissions: Object.values(PermissionKey),
         robotEnabled: true,
     });
     await authSeeder.run(dataSource);
-
-    setDataSource(dataSource);
 
     return dataSource;
 }
@@ -52,7 +48,9 @@ export async function dropTestDatabase() {
     const dataSource = await useDataSource();
     await dataSource.destroy();
 
-    await unsetDataSource();
+    const { options } = dataSource;
 
-    await dropDatabase({ options: dataSource.options });
+    unsetDataSource();
+
+    await dropDatabase({ options });
 }

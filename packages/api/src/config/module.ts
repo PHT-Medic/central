@@ -116,7 +116,9 @@ export function createConfig({ env } : ConfigContext) : Config {
         tokenMaxAgeRefreshToken: env.jwtMaxAge,
     });
 
-    setAuthLogger(useLogger());
+    if (env.env !== 'test') {
+        setAuthLogger(useLogger());
+    }
 
     // ---------------------------------------------
 

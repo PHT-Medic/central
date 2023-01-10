@@ -5,6 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isRealmResourceWritable } from '@authup/common';
+import { RealmEntity } from '@authup/server-database';
+import { ForbiddenError } from '@ebec/http';
 import { check, validationResult } from 'express-validator';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
 import { Request } from 'routup';
@@ -16,6 +19,7 @@ import {
     initExpressValidationResult,
     matchedValidationData,
 } from '../../../../express-validation';
+import { useRequestEnv } from '../../../../request';
 
 export async function runProposalValidation(
     req: Request,
@@ -62,7 +66,6 @@ export async function runProposalValidation(
 
     await check('master_image_id')
         .isUUID()
-        .notEmpty()
         .optional({ nullable: true })
         .run(req);
 
@@ -75,10 +78,30 @@ export async function runProposalValidation(
 
     result.data = matchedValidationData(req, { includeOptionals: true });
 
+    // ----------------------------------------------
+
     await extendExpressValidationResultWithRelation(result, MasterImageEntity, {
         id: 'master_image_id',
         entity: 'master_image',
     });
+
+    await extendExpressValidationResultWithRelation(result, RealmEntity, {
+        id: 'realm_id',
+        entity: 'realm',
+    });
+
+    // ----------------------------------------------
+
+    if (operation === 'create') {
+        const realm = useRequestEnv(req, 'realm');
+        if (result.data.realm_id) {
+            if (!isRealmResourceWritable(realm, result.data.realm_id)) {
+                throw new ForbiddenError('You are not permitted to create this proposal.');
+            }
+        } else {
+            result.data.realm_id = realm.id;
+        }
+    }
 
     return result;
 }

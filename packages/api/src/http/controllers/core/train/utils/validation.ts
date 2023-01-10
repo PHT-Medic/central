@@ -125,6 +125,8 @@ export async function runTrainValidation(
         if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.proposal.realm_id)) {
             throw new BadRequestError('The referenced proposal realm is not permitted.');
         }
+
+        result.data.realm_id = result.relation.proposal.realm_id;
     }
 
     if (result.relation.registry) {

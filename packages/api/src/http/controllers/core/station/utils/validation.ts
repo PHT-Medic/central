@@ -83,8 +83,8 @@ export async function runStationValidation(
     if (operation === 'create') {
         await check('realm_id')
             .exists()
-            .isString()
-            .notEmpty()
+            .isUUID()
+            .optional({ nullable: true })
             .run(req);
 
         await check('ecosystem')
@@ -102,19 +102,28 @@ export async function runStationValidation(
 
     result.data = matchedValidationData(req, { includeOptionals: true });
 
-    await extendExpressValidationResultWithRelation(result, RegistryEntity, {
-        id: 'registry_id',
-        entity: 'registry',
-    });
+    // ----------------------------------------------
 
     await extendExpressValidationResultWithRelation(result, RealmEntity, {
         id: 'realm_id',
         entity: 'realm',
     });
 
-    if (result.data.realm_id) {
-        if (!isRealmResourceWritable(useRequestEnv(req, 'realm'), result.data.realm_id)) {
-            throw new ForbiddenError('You are not permitted to create this station.');
+    await extendExpressValidationResultWithRelation(result, RegistryEntity, {
+        id: 'registry_id',
+        entity: 'registry',
+    });
+
+    // ----------------------------------------------
+
+    if (operation === 'create') {
+        const realm = useRequestEnv(req, 'realm');
+        if (result.data.realm_id) {
+            if (!isRealmResourceWritable(realm, result.data.realm_id)) {
+                throw new ForbiddenError('You are not permitted to create this station.');
+            }
+        } else {
+            result.data.realm_id = realm.id;
         }
     }
 

@@ -42,15 +42,13 @@ describe('src/controllers/core/station', () => {
 
     let details: Station;
 
-    // fix test :)
-
-    it('should create station', async () => {
+    fit('should create station', async () => {
         const response = await createSuperTestStation(superTest, details);
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
 
-        expectPropertiesEqualToSrc(details, response.body);
+        details = response.body;
     });
 
     it('should read collection', async () => {

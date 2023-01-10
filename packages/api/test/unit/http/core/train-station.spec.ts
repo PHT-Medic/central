@@ -6,6 +6,7 @@
  */
 
 import { TrainStation } from '@personalhealthtrain/central-common';
+import { removeDateProperties } from '../../../utils/date-properties';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
@@ -50,10 +51,13 @@ describe('src/controllers/core/train-station', () => {
                 station_id: station.body.id,
             });
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
 
-        details = response.body;
+        delete response.body.train;
+        delete response.body.station;
+
+        details = removeDateProperties(response.body);
     });
 
     it('should read collection', async () => {
@@ -67,7 +71,7 @@ describe('src/controllers/core/train-station', () => {
         expect(response.body.data.length).toEqual(1);
     });
 
-    it('should read collection', async () => {
+    it('should read resource', async () => {
         const response = await superTest
             .get(`/train-stations/${details.id}`)
             .auth('admin', 'start123');
@@ -83,6 +87,6 @@ describe('src/controllers/core/train-station', () => {
             .delete(`/train-stations/${details.id}`)
             .auth('admin', 'start123');
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(202);
     });
 });

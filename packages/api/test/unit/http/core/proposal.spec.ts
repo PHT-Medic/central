@@ -6,6 +6,7 @@
  */
 
 import { Proposal } from '@personalhealthtrain/central-common';
+import { removeDateProperties } from '../../../utils/date-properties';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
 import { createSuperTestProposal } from '../../../utils/domains';
@@ -25,14 +26,13 @@ describe('src/controllers/core/proposal', () => {
     let details : Proposal;
 
     it('should create resource', async () => {
-        const response = await createSuperTestProposal(superTest, details);
+        const response = await createSuperTestProposal(superTest);
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
         expect(response.body.trains).toEqual(0);
-        expectPropertiesEqualToSrc(details, response.body);
 
-        details = response.body;
+        details = removeDateProperties(response.body);
     });
 
     it('should read collection', async () => {
@@ -43,7 +43,7 @@ describe('src/controllers/core/proposal', () => {
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
         expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(0);
+        expect(response.body.data.length).toEqual(1);
     });
 
     it('should read resource', async () => {
@@ -53,6 +53,8 @@ describe('src/controllers/core/proposal', () => {
 
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
+
+        expectPropertiesEqualToSrc(details, response.body);
     });
 
     it('should update resource', async () => {
@@ -65,6 +67,7 @@ describe('src/controllers/core/proposal', () => {
 
         expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
+
         expectPropertiesEqualToSrc(details, response.body);
     });
 

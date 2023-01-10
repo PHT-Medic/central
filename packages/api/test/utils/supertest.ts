@@ -7,7 +7,7 @@
 
 import supertest, { SuperTest, Test } from 'supertest';
 import { createRouter } from '../../src/http/router';
-import { createConfig } from '../../src/config';
+import { createConfig } from '../../src';
 import env from '../../src/env';
 
 export function useSuperTest() : SuperTest<Test> {
