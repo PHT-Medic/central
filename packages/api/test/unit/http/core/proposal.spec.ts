@@ -8,7 +8,7 @@
 import { Proposal } from '@personalhealthtrain/central-common';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
-import { TEST_DEFAULT_PROPOSAL, createSuperTestProposal } from '../../../utils/domains/proposal';
+import { createSuperTestProposal } from '../../../utils/domains';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 
 describe('src/controllers/core/proposal', () => {
@@ -22,11 +22,20 @@ describe('src/controllers/core/proposal', () => {
         await dropTestDatabase();
     });
 
-    const details : Partial<Proposal> = {
-        ...TEST_DEFAULT_PROPOSAL,
-    };
+    let details : Proposal;
 
-    it('should get collection', async () => {
+    it('should create resource', async () => {
+        const response = await createSuperTestProposal(superTest, details);
+
+        expect(response.status).toEqual(201);
+        expect(response.body).toBeDefined();
+        expect(response.body.trains).toEqual(0);
+        expectPropertiesEqualToSrc(details, response.body);
+
+        details = response.body;
+    });
+
+    it('should read collection', async () => {
         const response = await superTest
             .get('/proposals')
             .auth('admin', 'start123');
@@ -37,40 +46,31 @@ describe('src/controllers/core/proposal', () => {
         expect(response.body.data.length).toEqual(0);
     });
 
-    it('should create, read, update, delete resource', async () => {
-        let response = await createSuperTestProposal(superTest, details);
-
-        expect(response.status).toEqual(201);
-        expect(response.body).toBeDefined();
-        expect(response.body.trains).toEqual(0);
-        expectPropertiesEqualToSrc(details, response.body);
-
-        // ---------------------------------------------------------
-
-        response = await superTest
-            .get(`/proposals/${response.body.id}`)
+    it('should read resource', async () => {
+        const response = await superTest
+            .get(`/proposals/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
+    });
 
-        // ---------------------------------------------------------
-
+    it('should update resource', async () => {
         details.title = 'TestA';
 
-        response = await superTest
-            .post(`/proposals/${response.body.id}`)
+        const response = await superTest
+            .post(`/proposals/${details.id}`)
             .send(details)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
         expectPropertiesEqualToSrc(details, response.body);
+    });
 
-        // ---------------------------------------------------------
-
-        response = await superTest
-            .delete(`/proposals/${response.body.id}`)
+    it('should delete resource', async () => {
+        const response = await superTest
+            .delete(`/proposals/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);

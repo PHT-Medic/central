@@ -13,7 +13,7 @@ import {
 } from 'typeorm';
 import {
     DatabaseSeeder as AuthDatabaseRootSeeder,
-} from '@authelion/server-core';
+} from '@authup/server-database';
 import { PermissionKey } from '@personalhealthtrain/central-common';
 import { buildDataSourceOptions } from '../../../src/database/utils';
 import { buildRobotAggregator } from '../../../src/aggregators/robot';
@@ -39,9 +39,7 @@ export async function useTestDatabase() {
 
     const authSeeder = new AuthDatabaseRootSeeder({
         permissions: Object.values(PermissionKey),
-        adminUsername: 'admin',
-        adminPassword: 'start123',
-        robotEnabled: false,
+        robotEnabled: true,
     });
     await authSeeder.run(dataSource);
 

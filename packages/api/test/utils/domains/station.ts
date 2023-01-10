@@ -5,13 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MASTER_REALM_ID } from '@authelion/common';
 import { Ecosystem, Station } from '@personalhealthtrain/central-common';
 import { SuperTest, Test } from 'supertest';
 
 export const TEST_DEFAULT_STATION : Partial<Station> = {
     name: 'foo-bar-baz',
-    realm_id: MASTER_REALM_ID,
     public_key: 'fooBarBazFooBarBaz',
     ecosystem: Ecosystem.DEFAULT,
     external_name: 'test',

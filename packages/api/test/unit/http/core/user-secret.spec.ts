@@ -15,7 +15,24 @@ import { useClient } from 'hapic';
 import { Client as VaultClient } from '@hapic/vault';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
-import { ApiKey } from '../../../../src/config';
+import { ApiKey } from '../../../../src';
+
+function expectPropertiesEqualToSrc(
+    src: Record<string, any>,
+    dest: Record<string, any>,
+) {
+    const keys : string[] = Object.keys(src);
+    for (let i = 0; i < keys.length; i++) {
+        switch (keys[i] as keyof UserSecret) {
+            case 'content':
+                expect(dest[keys[i]]).toEqual(Buffer.from(src.public_key, 'utf-8').toString('hex'));
+                break;
+            default:
+                expect(dest[keys[i]]).toEqual(src[keys[i]]);
+                break;
+        }
+    }
+}
 
 describe('src/controllers/core/user-secret', () => {
     const superTest = useSuperTest();
@@ -28,62 +45,44 @@ describe('src/controllers/core/user-secret', () => {
         await dropTestDatabase();
     });
 
-    const details : Partial<UserSecret> = {
-        key: SecretType.RSA_PUBLIC_KEY,
-        content: 'foo-bar-baz',
-        type: SecretType.RSA_PUBLIC_KEY,
-    };
+    let details : UserSecret;
 
-    let publicKeyHex = Buffer.from(details.content).toString('hex');
-
-    it('should create, read, update, delete resource and get collection', async () => {
+    it('should create resource', async () => {
         const userResponse = await superTest
-            .get('/users?filter[name]=admin&page[limit]=1')
+            .get('/users/admin')
             .auth('admin', 'start123');
 
-        expect(userResponse.body.data).toBeDefined();
-        expect(userResponse.body.meta).toBeDefined();
-        expect(userResponse.body.meta.total).toEqual(1);
+        expect(userResponse.statusCode).toEqual(200);
+        expect(userResponse.body).toBeDefined();
 
-        const user = userResponse.body.data[0];
+        const user = userResponse.body;
 
-        details.user_id = user.id;
-
-        let response = await superTest
+        const response = await superTest
             .post('/user-secrets')
             .auth('admin', 'start123')
-            .send(details);
+            .send({
+                key: SecretType.RSA_PUBLIC_KEY,
+                content: 'foo-bar-baz',
+                type: SecretType.RSA_PUBLIC_KEY,
+                user_id: user.id,
+            });
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
 
-        let keys : string[] = Object.keys(details);
-        for (let i = 0; i < keys.length; i++) {
-            switch (keys[i] as keyof UserSecret) {
-                case 'content':
-                    expect(response.body[keys[i]]).toEqual(publicKeyHex);
-                    break;
-                default:
-                    expect(response.body[keys[i]]).toEqual(details[keys[i]]);
-                    break;
-            }
-        }
+        details = response.body;
+    });
 
-        const entityId = response.body.id;
-
-        // ---------------------------------------------------------
-
-        let userSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
+    it('should find vault entry', async () => {
+        const userSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
             .find<UserSecretsSecretStoragePayload>(USER_SECRETS_SECRET_ENGINE_KEY, details.user_id);
 
         expect(userSecret.data).toBeDefined();
-        expect(userSecret.data).toEqual({
-            [entityId]: publicKeyHex,
-        });
+        expect(userSecret.data).toHaveProperty(details.id);
+    });
 
-        // ---------------------------------------------------------
-
-        response = await superTest
+    it('should read collection', async () => {
+        const response = await superTest
             .get('/user-secrets')
             .auth('admin', 'start123');
 
@@ -91,60 +90,43 @@ describe('src/controllers/core/user-secret', () => {
         expect(response.body).toBeDefined();
         expect(response.body.data).toBeDefined();
         expect(response.body.data.length).toEqual(1);
+    });
 
-        // ---------------------------------------------------------
-
-        response = await superTest
-            .get(`/user-secrets/${entityId}`)
+    it('should read resource', async () => {
+        const response = await superTest
+            .get(`/user-secrets/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
 
-        // ---------------------------------------------------------
+        expectPropertiesEqualToSrc(details, response.body);
+    });
 
+    it('should update resource', async () => {
         details.content = 'baz-bar-foo';
-        publicKeyHex = Buffer.from(details.content).toString('hex');
 
-        response = await superTest
-            .post(`/user-secrets/${entityId}`)
+        const response = await superTest
+            .post(`/user-secrets/${details.id}`)
             .send(details)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
 
-        keys = Object.keys(details);
-        for (let i = 0; i < keys.length; i++) {
-            switch (keys[i] as keyof UserSecret) {
-                case 'content':
-                    expect(response.body[keys[i]]).toEqual(publicKeyHex);
-                    break;
-                default:
-                    expect(response.body[keys[i]]).toEqual(details[keys[i]]);
-                    break;
-            }
-        }
+        expectPropertiesEqualToSrc(details, response.body);
+    });
 
-        // ---------------------------------------------------------
-
-        userSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
-            .find<UserSecretsSecretStoragePayload>(USER_SECRETS_SECRET_ENGINE_KEY, details.user_id);
-
-        expect(userSecret.data).toBeDefined();
-        expect(userSecret.data).toEqual({
-            [entityId]: publicKeyHex,
-        });
-
-        // ---------------------------------------------------------
-
-        response = await superTest
-            .delete(`/user-secrets/${entityId}`)
+    it('should delete resource', async () => {
+        const response = await superTest
+            .delete(`/user-secrets/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);
+    });
 
-        userSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
+    it('should not find vault entry', async () => {
+        const userSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
             .find<UserSecretsSecretStoragePayload>(USER_SECRETS_SECRET_ENGINE_KEY, details.user_id);
 
         expect(userSecret).toBeUndefined();

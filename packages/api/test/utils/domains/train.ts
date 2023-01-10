@@ -7,12 +7,10 @@
 
 import { Train, TrainType } from '@personalhealthtrain/central-common';
 import { SuperTest, Test } from 'supertest';
-import { MASTER_REALM_ID } from '@authelion/common';
 import { randomBytes } from 'crypto';
 
 export const TEST_DEFAULT_TRAIN : Partial<Train> = {
     name: 'development',
-    realm_id: MASTER_REALM_ID,
     type: TrainType.DISCOVERY,
     hash_signed: randomBytes(40).toString('hex'),
     query: '{"key": "value"}',

@@ -8,8 +8,7 @@
 import { Train, TrainType } from '@personalhealthtrain/central-common';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
-import { TEST_DEFAULT_TRAIN, createSuperTestTrain } from '../../../utils/domains/train';
-import { createSuperTestProposal } from '../../../utils/domains/proposal';
+import { createSuperTestProposal, createSuperTestTrain } from '../../../utils/domains';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 import { buildExpressValidationErrorMessage } from '../../../../src/http/express-validation';
 
@@ -24,9 +23,21 @@ describe('src/controllers/core/train', () => {
         await dropTestDatabase();
     });
 
-    const details : Partial<Train> = {
-        ...TEST_DEFAULT_TRAIN,
-    };
+    let details : Train;
+
+    it('should create resource', async () => {
+        const proposal = await createSuperTestProposal(superTest);
+        const response = await createSuperTestTrain(superTest, {
+            ...details,
+            proposal_id: proposal.body.id,
+        });
+
+        expect(response.status).toEqual(201);
+        expect(response.body).toBeDefined();
+        expect(response.body.proposal_id).toEqual(proposal.body.id);
+
+        details = response.body;
+    });
 
     it('should get collection', async () => {
         const response = await superTest
@@ -39,44 +50,34 @@ describe('src/controllers/core/train', () => {
         expect(response.body.data.length).toEqual(0);
     });
 
-    it('should create, read, update, delete resource', async () => {
-        const proposal = await createSuperTestProposal(superTest);
-        let response = await createSuperTestTrain(superTest, {
-            ...details,
-            proposal_id: proposal.body.id,
-        });
-
-        expect(response.status).toEqual(201);
-        expect(response.body).toBeDefined();
-        expect(response.body.proposal_id).toEqual(proposal.body.id);
-        expectPropertiesEqualToSrc(details, response.body);
-
-        // ---------------------------------------------------------
-
-        response = await superTest
-            .get(`/trains/${response.body.id}`)
+    it('should read resource', async () => {
+        const response = await superTest
+            .get(`/trains/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
 
-        // ---------------------------------------------------------
+        expectPropertiesEqualToSrc(details, response.body);
+    });
 
+    it('should update resource', async () => {
         details.name = 'TestA';
 
-        response = await superTest
-            .post(`/trains/${response.body.id}`)
+        const response = await superTest
+            .post(`/trains/${details.id}`)
             .send(details)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
+
         expectPropertiesEqualToSrc(details, response.body);
+    });
 
-        // ---------------------------------------------------------
-
-        response = await superTest
-            .delete(`/trains/${response.body.id}`)
+    it('should delete resource', async () => {
+        const response = await superTest
+            .delete(`/trains/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -113,7 +114,6 @@ describe('src/controllers/core/train', () => {
 
     it('should not create resource with invalid master-image', async () => {
         const proposal = await createSuperTestProposal(superTest);
-
         const response = await createSuperTestTrain(superTest, {
             ...details,
             proposal_id: proposal.body.id,

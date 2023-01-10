@@ -15,7 +15,7 @@ import { MasterImageGroupEntity } from '../domains/core/master-image-group/entit
 import { ProposalEntity } from '../domains/core/proposal/entity';
 import { TrainLogEntity } from '../domains/core/train-log';
 import { TrainEntity } from '../domains/core/train';
-import { StationEntity } from '../domains/core/station/entity';
+import { StationEntity } from '../domains/core/station';
 import { ProposalStationEntity } from '../domains/core/proposal-station/entity';
 import { TrainFileEntity } from '../domains/core/train-file/entity';
 import { TrainStationEntity } from '../domains/core/train-station/entity';

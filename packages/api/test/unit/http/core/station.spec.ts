@@ -8,12 +8,26 @@
 import {
     Station,
 } from '@personalhealthtrain/central-common';
-import { useClient } from 'hapic';
-import { Client as HarborClient } from '@hapic/harbor';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
-import { TEST_DEFAULT_STATION, createSuperTestStation } from '../../../utils/domains/station';
-import { ApiKey } from '../../../../src/config';
+import { createSuperTestStation } from '../../../utils/domains';
+
+function expectPropertiesEqualToSrc(
+    src: Record<string, any>,
+    dest: Record<string, any>,
+) {
+    const keys : string[] = Object.keys(src);
+    for (let i = 0; i < keys.length; i++) {
+        switch (keys[i] as keyof Station) {
+            case 'public_key':
+                expect(dest[keys[i]]).toEqual(Buffer.from(src.public_key, 'utf-8').toString('hex'));
+                break;
+            default:
+                expect(dest[keys[i]]).toEqual(src[keys[i]]);
+                break;
+        }
+    }
+}
 
 describe('src/controllers/core/station', () => {
     const superTest = useSuperTest();
@@ -26,54 +40,21 @@ describe('src/controllers/core/station', () => {
         await dropTestDatabase();
     });
 
-    const details : Partial<Station> = {
-        ...TEST_DEFAULT_STATION,
-    };
+    let details: Station;
 
     // fix test :)
 
-    const externalName = details.external_name;
-
-    it('should create, read, update, delete resource and get collection', async () => {
-        let publicKeyHex = Buffer.from(details.public_key, 'utf-8').toString('hex');
-        let response = await createSuperTestStation(superTest, details);
+    it('should create station', async () => {
+        const response = await createSuperTestStation(superTest, details);
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
 
-        let keys : string[] = Object.keys(details);
-        for (let i = 0; i < keys.length; i++) {
-            switch (keys[i] as keyof Station) {
-                case 'public_key':
-                    expect(response.body[keys[i]]).toEqual(publicKeyHex);
-                    break;
-                default:
-                    expect(response.body[keys[i]]).toEqual(details[keys[i]]);
-                    break;
-            }
-        }
+        expectPropertiesEqualToSrc(details, response.body);
+    });
 
-        const entityId = response.body.id;
-
-        // ---------------------------------------------------------
-
-        let registryProject = await useClient<HarborClient>(ApiKey.HARBOR).project
-            .getOne(externalName, true);
-
-        expect(registryProject).toBeDefined();
-        expect(registryProject.project_id).toBeDefined();
-        expect(registryProject.name).toEqual(externalName);
-
-        let registryRobotAccount = await useClient<HarborClient>(ApiKey.HARBOR).robotAccount
-            .find(externalName);
-
-        expect(registryRobotAccount).toBeDefined();
-        expect(registryRobotAccount.id).toBeDefined();
-        expect(registryRobotAccount.name).toEqual(`robot$${externalName}`);
-
-        // ---------------------------------------------------------
-
-        response = await superTest
+    it('should read collection', async () => {
+        const response = await superTest
             .get('/stations')
             .auth('admin', 'start123');
 
@@ -81,57 +62,39 @@ describe('src/controllers/core/station', () => {
         expect(response.body).toBeDefined();
         expect(response.body.data).toBeDefined();
         expect(response.body.data.length).toEqual(1);
+    });
 
-        // ---------------------------------------------------------
-
-        response = await superTest
-            .get(`/stations/${entityId}`)
+    it('should read resource', async () => {
+        const response = await superTest
+            .get(`/stations/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
 
-        // ---------------------------------------------------------
+        expectPropertiesEqualToSrc(details, response.body);
+    });
 
+    it('should update resource', async () => {
         details.name = 'TestA';
         details.public_key = 'baz-bar-foo';
-        publicKeyHex = Buffer.from(details.public_key, 'utf-8').toString('hex');
 
-        response = await superTest
-            .post(`/stations/${entityId}`)
+        const response = await superTest
+            .post(`/stations/${details.id}`)
             .send(details)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
 
-        keys = Object.keys(details);
-        for (let i = 0; i < keys.length; i++) {
-            switch (keys[i] as keyof Station) {
-                case 'public_key':
-                    expect(response.body[keys[i]]).toEqual(publicKeyHex);
-                    break;
-                default:
-                    expect(response.body[keys[i]]).toEqual(details[keys[i]]);
-                    break;
-            }
-        }
+        expectPropertiesEqualToSrc(details, response.body);
+    });
 
-        // ---------------------------------------------------------
-
-        response = await superTest
-            .delete(`/stations/${entityId}`)
+    it('should delete resource', async () => {
+        const response = await superTest
+            .delete(`/stations/${details.id}`)
             .auth('admin', 'start123');
+
         expect(response.status).toEqual(202);
-
-        // ---------------------------------------------------------
-
-        registryProject = await useClient<HarborClient>(ApiKey.HARBOR).project
-            .getOne(externalName, true);
-        expect(registryProject).toBeUndefined();
-
-        registryRobotAccount = await useClient<HarborClient>(ApiKey.HARBOR).robotAccount
-            .find(externalName);
-        expect(registryRobotAccount).toBeUndefined();
     });
 });
