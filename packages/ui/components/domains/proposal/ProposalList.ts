@@ -22,7 +22,7 @@ import {
 } from '@vue-layout/utils';
 import { BuildInput } from 'rapiq';
 import { Socket } from 'socket.io-client';
-import { MASTER_REALM_NAME } from '@authup/common';
+import { REALM_MASTER_NAME } from '@authup/common';
 
 export const ProposalList = Vue.extend<
 ComponentListData<Proposal>,
@@ -83,7 +83,7 @@ ComponentListProperties<BuildInput<Proposal>> & {
                 return this.realmId;
             }
 
-            if (this.$store.getters['auth/realmName'] === MASTER_REALM_NAME) {
+            if (this.$store.getters['auth/realmName'] === REALM_MASTER_NAME) {
                 return undefined;
             }
 

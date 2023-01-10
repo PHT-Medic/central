@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MASTER_REALM_NAME } from '@authup/common';
+import { REALM_MASTER_NAME } from '@authup/common';
 import rateLimit from 'express-rate-limit';
 import { TooManyRequestsError } from '@ebec/http';
 import { ServiceID } from '@personalhealthtrain/central-common';
@@ -28,7 +28,7 @@ export function rateLimitMiddleware(req: Request, res: Response, next: Next) {
                 const { name } = useRequestEnv(req, 'realm');
 
                 if (
-                    name === MASTER_REALM_NAME &&
+                    name === REALM_MASTER_NAME &&
                     robot.name === ServiceID.SYSTEM
                 ) {
                     return 0; // unlimited req p. sec

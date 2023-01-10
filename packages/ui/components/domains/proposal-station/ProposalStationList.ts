@@ -28,7 +28,7 @@ import {
     ComponentListProperties,
     PaginationMeta, buildListHeader, buildListItems, buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
-import { MASTER_REALM_NAME, Realm } from '@authup/common';
+import { REALM_MASTER_NAME, Realm } from '@authup/common';
 import { BuildInput } from 'rapiq';
 
 enum DomainType {
@@ -124,7 +124,7 @@ ComponentListProperties<BuildInput<ProposalStation>> & {
                 return this.realmId;
             }
 
-            if (this.$store.getters['auth/realmName'] === MASTER_REALM_NAME) {
+            if (this.$store.getters['auth/realmName'] === REALM_MASTER_NAME) {
                 return undefined;
             }
 

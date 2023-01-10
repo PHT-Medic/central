@@ -16,7 +16,7 @@ import {
 import { required } from 'vuelidate/lib/validators';
 import Vue, { PropType } from 'vue';
 import { Socket } from 'socket.io-client';
-import { MASTER_REALM_NAME } from '@authup/common';
+import { REALM_MASTER_NAME } from '@authup/common';
 import TrainFile from './TrainFile.vue';
 import TrainFormFile from './TrainFormFile.vue';
 import TrainImageCommand from '../train/TrainImageCommand';
@@ -79,7 +79,7 @@ export default {
                 return this.realmId;
             }
 
-            if (this.$store.getters['auth/realmName'] === MASTER_REALM_NAME) {
+            if (this.$store.getters['auth/realmName'] === REALM_MASTER_NAME) {
                 return undefined;
             }
 

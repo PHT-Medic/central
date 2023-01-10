@@ -19,7 +19,7 @@ import {
     useRobotEventEmitter,
 } from '@authup/server-database';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { MASTER_REALM_NAME, hasOwnProperty } from '@authup/common';
+import { REALM_MASTER_NAME, hasOwnProperty } from '@authup/common';
 import { PHTStationRole, getPHTStationRolePermissions } from '../../config';
 
 // ----------------------------------------------
@@ -29,12 +29,12 @@ export class DatabaseRootSeeder implements Seeder {
         const realmRepository = dataSource.getRepository(RealmEntity);
         const realm = await realmRepository.findOne({
             where: {
-                name: MASTER_REALM_NAME,
+                name: REALM_MASTER_NAME,
             },
         });
 
         if (!realm) {
-            throw new ServerError(`The ${MASTER_REALM_NAME} does not exist.`);
+            throw new ServerError(`The ${REALM_MASTER_NAME} does not exist.`);
         }
 
         /**
