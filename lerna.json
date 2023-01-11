@@ -4,7 +4,9 @@
     ],
     "command": {
         "publish": {
-            "ignoreChanges": ["*.md"]
+            "ignoreChanges": [
+                "*.md"
+            ]
         },
         "version": {
             "message": "build(release): publish"
@@ -12,7 +14,7 @@
     },
     "useWorkspaces": true,
     "useNx": true,
-    "version": "1.3.27",
+    "version": "1.4.0",
     "conventionalCommits": true,
     "changelog": {
         "labels": {
