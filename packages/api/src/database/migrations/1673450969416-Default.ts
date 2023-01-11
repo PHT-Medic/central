@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Default1673344984293 implements MigrationInterface {
-    name = 'Default1673344984293';
+export class Default1673450969416 implements MigrationInterface {
+    name = 'Default1673450969416';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -46,8 +46,8 @@ export class Default1673344984293 implements MigrationInterface {
                 \`avatar\` varchar(255) NULL,
                 \`cover\` varchar(255) NULL,
                 \`reset_hash\` varchar(256) NULL,
-                \`reset_at\` datetime NULL,
-                \`reset_expires\` datetime NULL,
+                \`reset_at\` varchar(28) NULL,
+                \`reset_expires\` varchar(28) NULL,
                 \`status\` varchar(256) NULL,
                 \`status_message\` varchar(256) NULL,
                 \`active\` tinyint NOT NULL DEFAULT 1,
@@ -225,7 +225,7 @@ export class Default1673344984293 implements MigrationInterface {
             CREATE TABLE \`auth_authorization_codes\` (
                 \`id\` varchar(36) NOT NULL,
                 \`content\` varchar(4096) NOT NULL,
-                \`expires\` datetime NOT NULL,
+                \`expires\` varchar(28) NOT NULL,
                 \`scope\` varchar(512) NULL,
                 \`redirect_uri\` varchar(2000) NULL,
                 \`id_token\` varchar(1000) NULL,
@@ -297,7 +297,7 @@ export class Default1673344984293 implements MigrationInterface {
                 \`provider_user_name\` varchar(256) NULL,
                 \`provider_user_email\` varchar(512) NULL,
                 \`expires_in\` int UNSIGNED NULL,
-                \`expires_at\` datetime NULL,
+                \`expires_at\` varchar(28) NULL,
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                 \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
                 \`user_id\` varchar(255) NOT NULL,
@@ -324,7 +324,7 @@ export class Default1673344984293 implements MigrationInterface {
         await queryRunner.query(`
             CREATE TABLE \`auth_refresh_tokens\` (
                 \`id\` varchar(36) NOT NULL,
-                \`expires\` datetime NOT NULL,
+                \`expires\` varchar(28) NOT NULL,
                 \`scope\` varchar(512) NULL,
                 \`access_token\` varchar(255) NULL,
                 \`client_id\` varchar(255) NULL,

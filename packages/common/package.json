@@ -15,13 +15,13 @@
     },
     "license": "MIT",
     "devDependencies": {
-        "@authup/common": "^0.6.3",
+        "@authup/common": "^0.7.0",
         "@hapic/oauth2": "^1.0.1",
         "hapic": "^1.0.0",
         "rapiq": "^0.6.3"
     },
     "peerDependencies": {
-        "@authup/common": "^0.x",
+        "@authup/common": ">=0.7.0 <1.0.0",
         "@hapic/oauth2": "^1.x",
         "hapic": "1.x",
         "rapiq": ">=0.5 <1.0.0"
