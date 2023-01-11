@@ -17,7 +17,7 @@
     },
     "devDependencies": {
         "@authup/common": "^0.7.0",
-        "@authup/vue2": "^0.2.1",
+        "@authup/vue2": "^0.3.0",
         "@fortawesome/fontawesome-free": "^6.1.2",
         "@hapic/oauth2": "^1.0.1",
         "@nuxt/types": "^2.14.5",
