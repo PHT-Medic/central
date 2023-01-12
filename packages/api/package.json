@@ -24,7 +24,7 @@
         "@routup/decorators": "^0.2.0",
         "@routup/query": "^0.4.0",
         "@routup/swagger": "^0.7.0",
-        "@socket.io/redis-emitter": "^5.0.0",
+        "@socket.io/redis-emitter": "^5.1.0",
         "@trapi/swagger": "^0.3.8",
         "amqp-extension": "^1.0.4",
         "axios": "^1.2.2",
