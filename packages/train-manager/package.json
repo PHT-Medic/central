@@ -18,8 +18,8 @@
         "build": "rm -rf ./dist && tsc -p tsconfig.build.json"
     },
     "dependencies": {
-        "@authup/common": "^0.7.0",
-        "@authup/server-adapter": "^0.7.0",
+        "@authup/common": "^0.8.0",
+        "@authup/server-adapter": "^0.8.0",
         "@ebec/http": "^0.1.0",
         "@hapic/harbor": "^1.0.0",
         "@hapic/vault": "^1.0.0",
