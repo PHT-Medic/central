@@ -20,8 +20,9 @@ import { Realm } from '@authup/common';
 import { RealmEntity } from '@authup/server-database';
 import { RegistryEntity } from '../registry/entity';
 
-@Unique('registry_project_external_name_registry_index', ['external_name', 'registry_id'])
-@Unique('registry_project_external_id_registry_index', ['external_id', 'registry_id'])
+@Unique(['name', 'registry_id'])
+@Unique(['external_name', 'registry_id'])
+@Unique(['external_id', 'registry_id'])
 @Entity({ name: 'registry_projects' })
 export class RegistryProjectEntity implements RegistryProject {
     @PrimaryGeneratedColumn('uuid')

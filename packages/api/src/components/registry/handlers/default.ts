@@ -12,7 +12,7 @@ import {
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
     Registry,
-    RegistryProjectType,
+    RegistryProjectType, generateRegistryProjectId,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
 import {
@@ -22,7 +22,7 @@ import {
 } from '../../../domains/special/registry';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
 import { RegistryEntity } from '../../../domains/core/registry/entity';
-import { useLogger } from '../../../config/log';
+import { useLogger } from '../../../config';
 
 export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueCommand.SETUP>) {
     if (!payload.id && !payload.entity) {
@@ -69,13 +69,13 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
 
     // incoming
     let incomingEntity = await projectRepository.findOneBy({
-        external_name: REGISTRY_INCOMING_PROJECT_NAME,
+        name: REGISTRY_INCOMING_PROJECT_NAME,
         registry_id: entity.id,
     });
     if (!incomingEntity) {
         incomingEntity = projectRepository.create({
             name: REGISTRY_INCOMING_PROJECT_NAME,
-            external_name: REGISTRY_INCOMING_PROJECT_NAME,
+            external_name: generateRegistryProjectId(),
             type: RegistryProjectType.INCOMING,
             registry_id: entity.id,
             public: false,
@@ -91,13 +91,13 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
 
     // outgoing
     let outgoingEntity = await projectRepository.findOneBy({
-        external_name: REGISTRY_OUTGOING_PROJECT_NAME,
+        name: REGISTRY_OUTGOING_PROJECT_NAME,
         registry_id: entity.id,
     });
     if (!outgoingEntity) {
         outgoingEntity = projectRepository.create({
             name: REGISTRY_OUTGOING_PROJECT_NAME,
-            external_name: REGISTRY_OUTGOING_PROJECT_NAME,
+            external_name: generateRegistryProjectId(),
             type: RegistryProjectType.OUTGOING,
             registry_id: entity.id,
             public: false,
@@ -119,7 +119,7 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     if (!masterImagesEntity) {
         masterImagesEntity = projectRepository.create({
             name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-            external_name: REGISTRY_MASTER_IMAGE_PROJECT_NAME,
+            external_name: REGISTRY_MASTER_IMAGE_PROJECT_NAME, // todo: can this be generated?
             type: RegistryProjectType.MASTER_IMAGES,
             registry_id: entity.id,
             public: true,

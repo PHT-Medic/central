@@ -22,9 +22,8 @@ import {
 import { ensureRemoteRegistryProjectAccount } from '../../../domains/special/registry/helpers/remote-robot-account';
 import { ensureRemoteRegistryProject } from '../../../domains/special/registry/helpers/remote';
 import { saveRemoteRegistryProjectWebhook } from '../../../domains/special/registry/helpers/remote-webhook';
-import { ApiKey } from '../../../config/api';
+import { ApiKey, useLogger } from '../../../config';
 import { RegistryEntity } from '../../../domains/core/registry/entity';
-import { useLogger } from '../../../config/log';
 import { createBasicHarborAPIConfig } from '../../../domains/special/registry/utils';
 
 export async function linkRegistryProject(
