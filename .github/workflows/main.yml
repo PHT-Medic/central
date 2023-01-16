@@ -11,6 +11,41 @@ on:
 
 jobs:
     build:
+        services:
+            postgres:
+                image: postgres:latest
+                env:
+                    POSTGRES_PASSWORD: start123
+                ports:
+                    - 5442:5432
+                options: >-
+                    --health-cmd pg_isready
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
+            minio:
+                image: minio/minio:latest
+                env:
+                    MINIO_ACCESS_KEY: admin
+                    MINIO_SECRET_KEY: start123
+                ports:
+                    - 9000:9000
+
+            vault:
+                image: vault:1.12.0
+                env:
+                    VAULT_DEV_ROOT_TOKEN_ID: start123
+                    VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8090
+                ports:
+                    - 8090:8090
+
+            redis:
+                image: docker.io/bitnami/redis:latest
+                env:
+                    ALLOW_EMPTY_PASSWORD=yes
+                ports:
+                    - 6379:6379
 
         runs-on: [ self-hosted ]
 
@@ -38,3 +73,21 @@ jobs:
               run: |
                   npm i
                   npm run build
+
+            - name: Test API
+              env:
+                  API_URL: http://127.0.0.1:3002/
+                  APP_URL: http://127.0.0.1:3000/
+                  MINIO_CONNECTION_STRING: http://admin:start123@127.0.0.1:9000
+                  REDIS_CONNECTION_STRING: redis://127.0.0.1
+                  VAULT_CONNECTION_STRING: start123@http://127.0.0.1:8090/v1/
+                  RABBITMQ_CONNECTION_STRING: amqp://root:start123@127.0.0.1
+                  TYPEORM_CONNECTION: postgres
+                  TYPEORM_HOST: 127.0.0.1
+                  TYPEORM_USERNAME: postgres
+                  TYPEORM_PASSWORD: start123
+                  TYPEORM_DATABASE: test
+                  SKIP_PROPOSAL_APPROVAL_OPERATION: true
+                  SKIP_TRAIN_APPROVAL_OPERATION: true
+              run: |
+                  npm run test --workspace=packages/api

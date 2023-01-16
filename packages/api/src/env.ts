@@ -31,7 +31,6 @@ export function requireFromEnv(key : string, alt?: any) {
 export interface Environment {
     env: 'development' | 'test' | 'production',
     port: number,
-    swaggerDocumentation: boolean | null
 
     jwtMaxAge: number,
 
@@ -44,15 +43,10 @@ export interface Environment {
     internalApiUrl: string,
     appUrl: string,
 
-    demo: boolean,
-
     skipProposalApprovalOperation: boolean,
     skipTrainApprovalOperation: boolean,
 
     httpProxyAPIs: string | undefined,
-
-    trainManagerForBuilding: boolean,
-    trainManagerForRouting: boolean
 }
 
 // tslint:disable-next-line:radix
@@ -61,7 +55,6 @@ const jwtMaxAge : number = parseInt(requireFromEnv('JWT_MAX_AGE', '3600'), 10);
 const env : Environment = {
     env: requireFromEnv('NODE_ENV'),
     port: parseInt(requireFromEnv('PORT'), 10),
-    swaggerDocumentation: requireFromEnv('SWAGGER_DOCUMENTATION', 'false') !== 'false',
 
     jwtMaxAge: Number.isNaN(jwtMaxAge) ? 3600 : jwtMaxAge,
 
@@ -74,15 +67,10 @@ const env : Environment = {
     internalApiUrl: requireFromEnv('INTERNAL_API_URL', requireFromEnv('API_URL')),
     appUrl: requireFromEnv('APP_URL'),
 
-    demo: requireFromEnv('DEMO', 'false').toLowerCase() !== 'false',
-
     skipProposalApprovalOperation: requireFromEnv('SKIP_PROPOSAL_APPROVAL_OPERATION', 'false').toLowerCase() !== 'false',
     skipTrainApprovalOperation: requireFromEnv('SKIP_TRAIN_APPROVAL_OPERATION', 'false').toLowerCase() !== 'false',
 
     httpProxyAPIs: requireFromEnv('HTTP_PROXY_APIS', null),
-
-    trainManagerForBuilding: requireFromEnv('TRAIN_MANAGER_BUILDING', 'false').toLowerCase() !== 'false',
-    trainManagerForRouting: requireFromEnv('TRAIN_MANAGER_ROUTING', 'false').toLowerCase() !== 'false',
 };
 
 export default env;
