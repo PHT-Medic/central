@@ -8,4 +8,3 @@
 export * from './auth';
 export * from './error';
 export * from './license-agreement';
-export * from './rate-limiter';

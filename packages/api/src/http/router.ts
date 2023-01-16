@@ -11,7 +11,6 @@ import {
     registerControllers as registerAuthControllers,
     registerMiddlewares,
 } from '@authup/server-http';
-import promBundle from 'express-prom-bundle';
 import { Router } from 'routup';
 
 import { registerControllers } from './routes';
@@ -19,7 +18,6 @@ import { registerControllers } from './routes';
 import {
     errorMiddleware,
     licenseAgreementMiddleware,
-    rateLimitMiddleware,
 } from './middleware';
 import env from '../env';
 
@@ -37,19 +35,6 @@ export function createRouter() : Router {
 
     if (env.env === 'development') {
         router.use(licenseAgreementMiddleware);
-    }
-
-    if (env.env !== 'test') {
-        // Rate Limiter
-        router.use(rateLimitMiddleware);
-
-        // Metrics
-        const metricsMiddleware = promBundle({
-            includeMethod: true,
-            includePath: true,
-        });
-
-        router.use(metricsMiddleware);
     }
 
     registerControllers(router);
