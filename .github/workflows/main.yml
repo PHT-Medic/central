@@ -9,6 +9,9 @@ on:
     pull_request:
         branches: [ master, dev ]
 
+env:
+    PRIMARY_NODE_VERSION: 16
+
 jobs:
     build:
         services:
@@ -49,32 +52,18 @@ jobs:
 
         runs-on: [ self-hosted ]
 
-        strategy:
-            matrix:
-                node-version: [16.x]
-
         steps:
             - uses: actions/checkout@v3
 
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v3.6.0
+            - name: Install
+              uses: ./.github/actions/install
               with:
-                  node-version: ${{ matrix.node-version }}
+                 node-version: ${{ env.PRIMARY_NODE_VERSION }}
 
-            - name: Use cache
-              uses: actions/cache@v3
-              with:
-                    path: |
-                        node_modules
-                        */*/node_modules
-                    key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+            - name: Build
+              uses: ./.github/actions/build
 
-            - name: Build and install packages
-              run: |
-                  npm i
-                  npm run build
-
-            - name: Test API
+            - name: Test
               env:
                   API_URL: http://127.0.0.1:3002/
                   APP_URL: http://127.0.0.1:3000/
