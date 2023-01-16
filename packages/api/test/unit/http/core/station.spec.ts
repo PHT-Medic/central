@@ -8,26 +8,11 @@
 import {
     Station,
 } from '@personalhealthtrain/central-common';
+import { removeDateProperties } from '../../../utils/date-properties';
+import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
 import { createSuperTestStation } from '../../../utils/domains';
-
-function expectPropertiesEqualToSrc(
-    src: Record<string, any>,
-    dest: Record<string, any>,
-) {
-    const keys : string[] = Object.keys(src);
-    for (let i = 0; i < keys.length; i++) {
-        switch (keys[i] as keyof Station) {
-            case 'public_key':
-                expect(dest[keys[i]]).toEqual(Buffer.from(src.public_key, 'utf-8').toString('hex'));
-                break;
-            default:
-                expect(dest[keys[i]]).toEqual(src[keys[i]]);
-                break;
-        }
-    }
-}
 
 describe('src/controllers/core/station', () => {
     const superTest = useSuperTest();
@@ -42,13 +27,13 @@ describe('src/controllers/core/station', () => {
 
     let details: Station;
 
-    fit('should create station', async () => {
-        const response = await createSuperTestStation(superTest, details);
+    it('should create station', async () => {
+        const response = await createSuperTestStation(superTest);
 
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
 
-        details = response.body;
+        details = removeDateProperties(response.body);
     });
 
     it('should read collection', async () => {
@@ -64,7 +49,7 @@ describe('src/controllers/core/station', () => {
 
     it('should read resource', async () => {
         const response = await superTest
-            .get(`/stations/${details.id}`)
+            .get(`/stations/${details.id}?fields=%2Bpublic_key,%2Bemail`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -84,6 +69,8 @@ describe('src/controllers/core/station', () => {
 
         expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
+
+        details.public_key = Buffer.from(details.public_key, 'utf-8').toString('hex');
 
         expectPropertiesEqualToSrc(details, response.body);
     });

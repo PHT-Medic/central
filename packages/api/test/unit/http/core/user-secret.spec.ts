@@ -13,26 +13,11 @@ import {
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
 import { Client as VaultClient } from '@hapic/vault';
+import { removeDateProperties } from '../../../utils/date-properties';
+import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
 import { ApiKey } from '../../../../src';
-
-function expectPropertiesEqualToSrc(
-    src: Record<string, any>,
-    dest: Record<string, any>,
-) {
-    const keys : string[] = Object.keys(src);
-    for (let i = 0; i < keys.length; i++) {
-        switch (keys[i] as keyof UserSecret) {
-            case 'content':
-                expect(dest[keys[i]]).toEqual(Buffer.from(src.public_key, 'utf-8').toString('hex'));
-                break;
-            default:
-                expect(dest[keys[i]]).toEqual(src[keys[i]]);
-                break;
-        }
-    }
-}
 
 describe('src/controllers/core/user-secret', () => {
     const superTest = useSuperTest();
@@ -70,7 +55,7 @@ describe('src/controllers/core/user-secret', () => {
         expect(response.status).toEqual(201);
         expect(response.body).toBeDefined();
 
-        details = response.body;
+        details = removeDateProperties(response.body);
     });
 
     it('should find vault entry', async () => {
@@ -113,6 +98,8 @@ describe('src/controllers/core/user-secret', () => {
 
         expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
+
+        details.content = Buffer.from(details.content, 'utf-8').toString('hex');
 
         expectPropertiesEqualToSrc(details, response.body);
     });

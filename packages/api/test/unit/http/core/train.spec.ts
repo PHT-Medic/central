@@ -6,9 +6,10 @@
  */
 
 import { Train, TrainType } from '@personalhealthtrain/central-common';
+import { removeDateProperties } from '../../../utils/date-properties';
 import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
-import { createSuperTestProposal, createSuperTestTrain } from '../../../utils/domains';
+import { TEST_DEFAULT_TRAIN, createSuperTestProposal, createSuperTestTrain } from '../../../utils/domains';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 import { buildRequestValidationErrorMessage } from '../../../../src/http/validation';
 
@@ -28,7 +29,7 @@ describe('src/controllers/core/train', () => {
     it('should create resource', async () => {
         const proposal = await createSuperTestProposal(superTest);
         const response = await createSuperTestTrain(superTest, {
-            ...details,
+            ...TEST_DEFAULT_TRAIN,
             proposal_id: proposal.body.id,
         });
 
@@ -36,7 +37,7 @@ describe('src/controllers/core/train', () => {
         expect(response.body).toBeDefined();
         expect(response.body.proposal_id).toEqual(proposal.body.id);
 
-        details = response.body;
+        details = removeDateProperties(response.body);
     });
 
     it('should get collection', async () => {
@@ -47,7 +48,7 @@ describe('src/controllers/core/train', () => {
         expect(response.status).toEqual(200);
         expect(response.body).toBeDefined();
         expect(response.body.data).toBeDefined();
-        expect(response.body.data.length).toEqual(0);
+        expect(response.body.data.length).toEqual(1);
     });
 
     it('should read resource', async () => {
@@ -80,7 +81,7 @@ describe('src/controllers/core/train', () => {
             .delete(`/trains/${details.id}`)
             .auth('admin', 'start123');
 
-        expect(response.status).toEqual(200);
+        expect(response.status).toEqual(202);
     });
 
     it('should not create resource with invalid parameters', async () => {
@@ -96,14 +97,7 @@ describe('src/controllers/core/train', () => {
     });
 
     it('should not create resource with invalid proposal', async () => {
-        let response = await createSuperTestTrain(superTest, {
-            ...details,
-        });
-
-        expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Train>(['proposal_id']));
-
-        response = await createSuperTestTrain(superTest, {
+        const response = await createSuperTestTrain(superTest, {
             ...details,
             proposal_id: '28eb7728-c78d-4c2f-ab99-dc4bcee78da9',
         });

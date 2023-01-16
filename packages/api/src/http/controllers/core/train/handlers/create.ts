@@ -46,7 +46,5 @@ export async function createTrainRouteHandler(req: Request, res: Response) : Pro
     const proposalRepository = dataSource.getRepository(ProposalEntity);
     await proposalRepository.save(result.relation.proposal);
 
-    entity.proposal = result.relation.proposal;
-
     return sendCreated(res, entity);
 }

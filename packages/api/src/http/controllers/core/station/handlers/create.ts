@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isPropertySet } from '@authup/common';
 import {
     PermissionID, RegistryProjectType, createNanoID,
     isHex,
@@ -35,7 +36,7 @@ export async function createStationRouteHandler(req: Request, res: Response) : P
     const result = await runStationValidation(req, 'create');
 
     if (
-        result.data.public_key &&
+        isPropertySet(result.data, 'public_key') &&
         !isHex(result.data.public_key)
     ) {
         result.data.public_key = Buffer.from(result.data.public_key, 'utf8').toString('hex');
