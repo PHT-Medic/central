@@ -11,9 +11,9 @@ import { deleteUndefinedObjectProperties } from '@personalhealthtrain/central-co
 import { Request } from 'routup';
 import { EntityTarget } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressValidationExtendKeys, ExpressValidationResult } from './type';
+import { ExpressValidationExtendKeys, RequestValidationResult } from './type';
 
-export function buildExpressValidationErrorMessage<
+export function buildRequestValidationErrorMessage<
     T extends Record<string, any> = Record<string, any>,
     >(name: keyof T | (keyof T)[]) {
     const names = Array.isArray(name) ? name : [name];
@@ -31,10 +31,10 @@ export function matchedValidationData(
     return deleteUndefinedObjectProperties(matchedData(req, options));
 }
 
-export function initExpressValidationResult<
+export function initRequestValidationResult<
     R extends Record<string, any>,
     M extends Record<string, any> = Record<string, any>,
-    >() : ExpressValidationResult<R, M> {
+    >() : RequestValidationResult<R, M> {
     return {
         data: {},
         relation: {},
@@ -42,23 +42,23 @@ export function initExpressValidationResult<
     };
 }
 
-export async function extendExpressValidationResultWithRelation<
+export async function extendRequestValidationResultWithRelation<
     R extends Record<string, any>,
     >(
-    result: ExpressValidationResult<R>,
+    result: RequestValidationResult<R>,
     target: EntityTarget<any>,
     keys: Partial<ExpressValidationExtendKeys<R>>,
-) : Promise<ExpressValidationResult<R>> {
+) : Promise<RequestValidationResult<R>> {
     if (result.data[keys.id]) {
         const dataSource = await useDataSource();
 
         const repository = dataSource.getRepository(target);
         const entity = await repository.findOneBy({ id: result.data[keys.id] });
         if (!entity) {
-            throw new BadRequestError(buildExpressValidationErrorMessage(keys.id));
+            throw new BadRequestError(buildRequestValidationErrorMessage(keys.id));
         }
 
-        result.relation[keys.entity as keyof ExpressValidationResult<R>['relation']] = entity;
+        result.relation[keys.entity as keyof RequestValidationResult<R>['relation']] = entity;
     }
 
     return result;

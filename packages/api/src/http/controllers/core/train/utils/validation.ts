@@ -15,19 +15,19 @@ import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 import { TrainEntity } from '../../../../../domains/core/train';
 import {
-    ExpressValidationError,
-    ExpressValidationResult, extendExpressValidationResultWithRelation,
-    initExpressValidationResult,
+    RequestValidationError,
+    RequestValidationResult, extendRequestValidationResultWithRelation,
+    initRequestValidationResult,
     matchedValidationData,
-} from '../../../../express-validation';
+} from '../../../../validation';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function runTrainValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<ExpressValidationResult<TrainEntity>> {
-    const result : ExpressValidationResult<TrainEntity> = initExpressValidationResult();
+) : Promise<RequestValidationResult<TrainEntity>> {
+    const result : RequestValidationResult<TrainEntity> = initRequestValidationResult();
 
     if (operation === 'create') {
         await check('proposal_id')
@@ -96,27 +96,27 @@ export async function runTrainValidation(
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new ExpressValidationError(validation);
+        throw new RequestValidationError(validation);
     }
 
     result.data = matchedValidationData(req, { includeOptionals: true });
 
     // ----------------------------------------------
 
-    await extendExpressValidationResultWithRelation(result, MasterImageEntity, {
+    await extendRequestValidationResultWithRelation(result, MasterImageEntity, {
         id: 'master_image_id',
         entity: 'master_image',
     });
-    await extendExpressValidationResultWithRelation(result, ProposalEntity, {
+    await extendRequestValidationResultWithRelation(result, ProposalEntity, {
         id: 'proposal_id',
         entity: 'proposal',
     });
-    await extendExpressValidationResultWithRelation(result, RegistryEntity, {
+    await extendRequestValidationResultWithRelation(result, RegistryEntity, {
         id: 'registry_id',
         entity: 'registry',
     });
 
-    await extendExpressValidationResultWithRelation(result, TrainFileEntity, {
+    await extendRequestValidationResultWithRelation(result, TrainFileEntity, {
         id: 'entrypoint_file_id',
         entity: 'entrypoint_file',
     });

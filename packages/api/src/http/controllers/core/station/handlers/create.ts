@@ -14,7 +14,7 @@ import { validationResult } from 'express-validator';
 import { publishMessage } from 'amqp-extension';
 import { Request, Response, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressValidationError } from '../../../../express-validation';
+import { RequestValidationError } from '../../../../validation';
 import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
 import { StationEntity } from '../../../../../domains/core/station';
@@ -29,7 +29,7 @@ export async function createStationRouteHandler(req: Request, res: Response) : P
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new ExpressValidationError(validation);
+        throw new RequestValidationError(validation);
     }
 
     const result = await runStationValidation(req, 'create');

@@ -15,16 +15,16 @@ import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 import { StationEntity } from '../../../../../domains/core/station/entity';
 import { useRequestEnv } from '../../../../request';
 import {
-    ExpressValidationError, ExpressValidationResult,
-    extendExpressValidationResultWithRelation, initExpressValidationResult,
+    RequestValidationError, RequestValidationResult,
+    extendRequestValidationResultWithRelation, initRequestValidationResult,
     matchedValidationData,
-} from '../../../../express-validation';
+} from '../../../../validation';
 
 export async function runStationValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<ExpressValidationResult<StationEntity>> {
-    const result : ExpressValidationResult<StationEntity> = initExpressValidationResult();
+) : Promise<RequestValidationResult<StationEntity>> {
+    const result : RequestValidationResult<StationEntity> = initRequestValidationResult();
 
     const nameChain = check('name')
         .isLength({ min: 3, max: 128 })
@@ -97,19 +97,19 @@ export async function runStationValidation(
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new ExpressValidationError(validation);
+        throw new RequestValidationError(validation);
     }
 
     result.data = matchedValidationData(req, { includeOptionals: true });
 
     // ----------------------------------------------
 
-    await extendExpressValidationResultWithRelation(result, RealmEntity, {
+    await extendRequestValidationResultWithRelation(result, RealmEntity, {
         id: 'realm_id',
         entity: 'realm',
     });
 
-    await extendExpressValidationResultWithRelation(result, RegistryEntity, {
+    await extendRequestValidationResultWithRelation(result, RegistryEntity, {
         id: 'registry_id',
         entity: 'registry',
     });

@@ -5,24 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type ExpressValidationResultMetaKey<T extends Record<string, any>> = ({
+export type RequestValidationResultMetaKey<T extends Record<string, any>> = ({
     [K in keyof T]?: T[K] extends Record<string, any> ?
         T[K] extends Date ? never : K :
         never
 })[keyof T];
 
-export type ExpressValidationResult<
+export type RequestValidationResult<
     T extends Record<string, any>,
     M extends Record<string, any> = Record<string, any>,
     > = {
         data: Partial<T>,
         relation: {
-            [K in ExpressValidationResultMetaKey<T>]?: T[K]
+            [K in RequestValidationResultMetaKey<T>]?: T[K]
         },
         meta: M
     };
 
 export type ExpressValidationExtendKeys<T extends Record<string, any>> = {
     id: keyof T,
-    entity: ExpressValidationResultMetaKey<T>
+    entity: RequestValidationResultMetaKey<T>
 };

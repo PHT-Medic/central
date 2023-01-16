@@ -11,7 +11,7 @@ import {
     UserSecret,
 } from '@personalhealthtrain/central-common';
 import { Request } from 'routup';
-import { ExpressValidationError, matchedValidationData } from '../../../../express-validation';
+import { RequestValidationError, matchedValidationData } from '../../../../validation';
 
 export async function runUserSecretValidation(
     req: Request,
@@ -53,7 +53,7 @@ export async function runUserSecretValidation(
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new ExpressValidationError(validation);
+        throw new RequestValidationError(validation);
     }
 
     return matchedValidationData(req, { includeOptionals: true });

@@ -11,17 +11,17 @@ import { Request } from 'routup';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 import {
-    ExpressValidationError,
-    ExpressValidationResult, extendExpressValidationResultWithRelation,
-    initExpressValidationResult,
+    RequestValidationError,
+    RequestValidationResult, extendRequestValidationResultWithRelation,
+    initRequestValidationResult,
     matchedValidationData,
-} from '../../../../express-validation';
+} from '../../../../validation';
 
 export async function runRegistryProjectValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<ExpressValidationResult<RegistryProjectEntity>> {
-    const result : ExpressValidationResult<RegistryProjectEntity> = initExpressValidationResult();
+) : Promise<RequestValidationResult<RegistryProjectEntity>> {
+    const result : RequestValidationResult<RegistryProjectEntity> = initRequestValidationResult();
 
     const registryChain = check('registry_id')
         .exists()
@@ -71,11 +71,11 @@ export async function runRegistryProjectValidation(
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new ExpressValidationError(validation);
+        throw new RequestValidationError(validation);
     }
 
     result.data = matchedValidationData(req, { includeOptionals: true });
-    await extendExpressValidationResultWithRelation(result, RegistryEntity, {
+    await extendRequestValidationResultWithRelation(result, RegistryEntity, {
         id: 'registry_id',
         entity: 'registry',
     });

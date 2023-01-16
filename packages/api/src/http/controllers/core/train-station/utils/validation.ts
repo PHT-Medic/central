@@ -16,20 +16,20 @@ import { TrainStationEntity } from '../../../../../domains/core/train-station/en
 import { TrainEntity } from '../../../../../domains/core/train';
 import { useRequestEnv } from '../../../../request';
 import {
-    ExpressValidationError,
-    ExpressValidationResult,
-    buildExpressValidationErrorMessage,
-    extendExpressValidationResultWithRelation,
-    initExpressValidationResult,
+    RequestValidationError,
+    RequestValidationResult,
+    buildRequestValidationErrorMessage,
+    extendRequestValidationResultWithRelation,
+    initRequestValidationResult,
     matchedValidationData,
-} from '../../../../express-validation';
+} from '../../../../validation';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 
 export async function runTrainStationValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<ExpressValidationResult<TrainStationEntity>> {
-    const result : ExpressValidationResult<TrainStationEntity> = initExpressValidationResult();
+) : Promise<RequestValidationResult<TrainStationEntity>> {
+    const result : RequestValidationResult<TrainStationEntity> = initRequestValidationResult();
     if (operation === 'create') {
         await check('station_id')
             .exists()
@@ -64,14 +64,14 @@ export async function runTrainStationValidation(
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new ExpressValidationError(validation);
+        throw new RequestValidationError(validation);
     }
 
     result.data = matchedValidationData(req, { includeOptionals: true });
 
     // ----------------------------------------------
 
-    await extendExpressValidationResultWithRelation(result, TrainEntity, {
+    await extendRequestValidationResultWithRelation(result, TrainEntity, {
         id: 'train_id',
         entity: 'train',
     });
@@ -79,13 +79,13 @@ export async function runTrainStationValidation(
         if (
             !isRealmResourceWritable(useRequestEnv(req, 'realm'), result.relation.train.realm_id)
         ) {
-            throw new BadRequestError(buildExpressValidationErrorMessage('train_id'));
+            throw new BadRequestError(buildRequestValidationErrorMessage('train_id'));
         }
 
         result.data.train_realm_id = result.relation.train.realm_id;
     }
 
-    await extendExpressValidationResultWithRelation(result, StationEntity, {
+    await extendRequestValidationResultWithRelation(result, StationEntity, {
         id: 'station_id',
         entity: 'station',
     });

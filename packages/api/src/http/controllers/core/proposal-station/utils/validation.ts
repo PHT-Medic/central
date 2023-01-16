@@ -15,17 +15,17 @@ import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { StationEntity } from '../../../../../domains/core/station';
 import { useRequestEnv } from '../../../../request';
 import {
-    ExpressValidationError,
-    ExpressValidationResult, extendExpressValidationResultWithRelation,
-    initExpressValidationResult,
+    RequestValidationError,
+    RequestValidationResult, extendRequestValidationResultWithRelation,
+    initRequestValidationResult,
     matchedValidationData,
-} from '../../../../express-validation';
+} from '../../../../validation';
 
 export async function runProposalStationValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<ExpressValidationResult<ProposalStationEntity>> {
-    const result : ExpressValidationResult<ProposalStationEntity> = initExpressValidationResult();
+) : Promise<RequestValidationResult<ProposalStationEntity>> {
+    const result : RequestValidationResult<ProposalStationEntity> = initRequestValidationResult();
 
     if (operation === 'create') {
         await check('proposal_id')
@@ -56,14 +56,14 @@ export async function runProposalStationValidation(
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new ExpressValidationError(validation);
+        throw new RequestValidationError(validation);
     }
 
     result.data = matchedValidationData(req, { includeOptionals: true });
 
     // ----------------------------------------------
 
-    await extendExpressValidationResultWithRelation(result, ProposalEntity, {
+    await extendRequestValidationResultWithRelation(result, ProposalEntity, {
         id: 'proposal_id',
         entity: 'proposal',
     });
@@ -76,7 +76,7 @@ export async function runProposalStationValidation(
         }
     }
 
-    await extendExpressValidationResultWithRelation(result, StationEntity, {
+    await extendRequestValidationResultWithRelation(result, StationEntity, {
         id: 'station_id',
         entity: 'station',
     });

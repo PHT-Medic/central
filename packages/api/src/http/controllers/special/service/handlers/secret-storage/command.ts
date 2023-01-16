@@ -24,7 +24,7 @@ import {
     Request, Response, send, sendAccepted, sendCreated,
 } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressValidationError } from '../../../../../express-validation';
+import { RequestValidationError } from '../../../../../validation';
 import { ApiKey } from '../../../../../../config';
 import { buildSecretStorageQueueMessage } from '../../../../../../domains/special/secret-storage/queue';
 import {
@@ -62,7 +62,7 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new ExpressValidationError(validation);
+        throw new RequestValidationError(validation);
     }
 
     const validationData = matchedData(req, { includeOptionals: true });

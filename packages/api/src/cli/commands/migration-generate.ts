@@ -5,14 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createDatabase, setupDatabaseSchema } from 'typeorm-extension';
+import { createDatabase, dropDatabase } from 'typeorm-extension';
 import { CommandModule } from 'yargs';
-import { DataSource } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { generateMigration } from '@authup/server-database';
 import path from 'path';
 import { createConfig } from '../../config';
 import env from '../../env';
-import { buildDataSourceOptions } from '../../database/utils';
+import { extendDataSourceOptions } from '../../database/utils';
 
 export class MigrationGenerateCommand implements CommandModule {
     command = 'migration:generate';
@@ -22,22 +22,52 @@ export class MigrationGenerateCommand implements CommandModule {
     async handler(args: any) {
         createConfig({ env });
 
-        const options = await buildDataSourceOptions();
+        const connections : DataSourceOptions[] = [
+            {
+                type: 'postgres',
+                database: 'migrations',
+                host: 'localhost',
+                port: 5432,
+                username: 'postgres',
+                password: 'start123',
+            },
+            {
+                type: 'mysql',
+                database: 'migrations',
+                host: 'localhost',
+                port: 3306,
+                username: 'root',
+                password: 'start123',
+            },
+        ];
 
-        await createDatabase({ options, ifNotExist: true });
+        const baseDirectory = path.join(__dirname, '..', '..', 'database', 'migrations');
+        const timestamp = Date.now();
 
-        const dataSource = new DataSource(options);
-        await dataSource.initialize();
+        for (let i = 0; i < connections.length; i++) {
+            const dataSourceOptions = await extendDataSourceOptions(connections[i]);
+            const directoryPath = path.join(baseDirectory, dataSourceOptions.type);
 
-        if (dataSource.migrations.length > 0) {
-            await setupDatabaseSchema(dataSource);
+            Object.assign(dataSourceOptions, {
+                migrations: [
+                    path.join(directoryPath, '*{.ts,.js}'),
+                ],
+            } satisfies Partial<DataSourceOptions>);
+
+            await dropDatabase({ options: dataSourceOptions });
+            await createDatabase({ options: dataSourceOptions, synchronize: false });
+
+            const dataSource = new DataSource(dataSourceOptions);
+            await dataSource.initialize();
+            await dataSource.runMigrations();
+
+            await generateMigration({
+                dataSource,
+                name: 'Default',
+                directoryPath,
+                timestamp,
+            });
         }
-
-        await generateMigration({
-            dataSource,
-            name: 'Default',
-            directoryPath: path.join(__dirname, '..', '..', 'database', 'migrations'),
-        });
 
         process.exit(0);
     }

@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Default1673450969416 implements MigrationInterface {
-    name = 'Default1673450969416';
+export class Default1673884545763 implements MigrationInterface {
+    name = 'Default1673884545763';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -440,8 +440,9 @@ export class Default1673450969416 implements MigrationInterface {
                 \`realm_id\` varchar(255) NULL,
                 \`created_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
                 \`updated_at\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-                UNIQUE INDEX \`registry_project_external_id_registry_index\` (\`external_id\`, \`registry_id\`),
-                UNIQUE INDEX \`registry_project_external_name_registry_index\` (\`external_name\`, \`registry_id\`),
+                UNIQUE INDEX \`IDX_d64dd084b79703879cc66b3e9c\` (\`external_id\`, \`registry_id\`),
+                UNIQUE INDEX \`IDX_1fa5e8b7ffc0786daf0adb941b\` (\`external_name\`, \`registry_id\`),
+                UNIQUE INDEX \`IDX_bd7100277fb5331625c2b474ea\` (\`name\`, \`registry_id\`),
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
         `);
@@ -1238,10 +1239,13 @@ export class Default1673450969416 implements MigrationInterface {
             DROP TABLE \`train_entity\`
         `);
         await queryRunner.query(`
-            DROP INDEX \`registry_project_external_name_registry_index\` ON \`registry_projects\`
+            DROP INDEX \`IDX_bd7100277fb5331625c2b474ea\` ON \`registry_projects\`
         `);
         await queryRunner.query(`
-            DROP INDEX \`registry_project_external_id_registry_index\` ON \`registry_projects\`
+            DROP INDEX \`IDX_1fa5e8b7ffc0786daf0adb941b\` ON \`registry_projects\`
+        `);
+        await queryRunner.query(`
+            DROP INDEX \`IDX_d64dd084b79703879cc66b3e9c\` ON \`registry_projects\`
         `);
         await queryRunner.query(`
             DROP TABLE \`registry_projects\`

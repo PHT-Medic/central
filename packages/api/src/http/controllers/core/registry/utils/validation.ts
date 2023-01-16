@@ -10,16 +10,16 @@ import { Ecosystem, getHostNameFromString } from '@personalhealthtrain/central-c
 import { Request } from 'routup';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 import {
-    ExpressValidationError, ExpressValidationResult,
-    initExpressValidationResult,
+    RequestValidationError, RequestValidationResult,
+    initRequestValidationResult,
     matchedValidationData,
-} from '../../../../express-validation';
+} from '../../../../validation';
 
 export async function runRegistryValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<ExpressValidationResult<RegistryEntity>> {
-    const result : ExpressValidationResult<RegistryEntity> = initExpressValidationResult();
+) : Promise<RequestValidationResult<RegistryEntity>> {
+    const result : RequestValidationResult<RegistryEntity> = initRequestValidationResult();
 
     const titleChain = check('name')
         .exists()
@@ -73,7 +73,7 @@ export async function runRegistryValidation(
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new ExpressValidationError(validation);
+        throw new RequestValidationError(validation);
     }
 
     result.data = matchedValidationData(req, { includeOptionals: true });

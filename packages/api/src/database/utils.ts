@@ -8,7 +8,7 @@
 import path from 'path';
 import { DataSourceOptions } from 'typeorm';
 import { buildDataSourceOptions as _buildDataSourceOptions } from 'typeorm-extension';
-import { extendDataSourceOptions } from '@authup/server-database';
+import { extendDataSourceOptions as _extendDataSourceOptions } from '@authup/server-database';
 import { getWritableDirPath } from '../config';
 import { MasterImageEntity } from '../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../domains/core/master-image-group/entity';
@@ -32,22 +32,8 @@ import { TrainFileSubscriber } from './subscribers/train-file';
 import { TrainLogSubscriber } from './subscribers/train-log';
 import { TrainStationSubscriber } from './subscribers/train-station';
 
-export async function buildDataSourceOptions() : Promise<DataSourceOptions> {
-    let options : DataSourceOptions;
-
-    try {
-        options = await _buildDataSourceOptions();
-    } catch (e) {
-        options = {
-            type: 'better-sqlite3',
-            database: path.join(getWritableDirPath(), process.env.NODE_ENV === 'test' ? 'test.sql' : 'db.sql'),
-            subscribers: [],
-            migrations: [],
-            logging: ['error'],
-        };
-    }
-
-    options = await extendDataSourceOptions(options);
+export function extendDataSourceOptions(options: DataSourceOptions) : DataSourceOptions {
+    options = _extendDataSourceOptions(options);
 
     options = {
         ...options,
@@ -71,8 +57,9 @@ export async function buildDataSourceOptions() : Promise<DataSourceOptions> {
     options = {
         ...options,
         migrations: [
-            path.join(__dirname, 'migrations', '*{.ts,.js}'),
+            path.join(__dirname, 'migrations', options.type, '*{.ts,.js}'),
         ],
+        migrationsTransactionMode: 'each',
     };
 
     options = {
@@ -91,10 +78,26 @@ export async function buildDataSourceOptions() : Promise<DataSourceOptions> {
         ],
     };
 
-    options = {
+    return {
         ...options,
         logging: false,
     };
+}
 
-    return options;
+export async function buildDataSourceOptions() : Promise<DataSourceOptions> {
+    let options : DataSourceOptions;
+
+    try {
+        options = await _buildDataSourceOptions();
+    } catch (e) {
+        options = {
+            type: 'better-sqlite3',
+            database: path.join(getWritableDirPath(), process.env.NODE_ENV === 'test' ? 'test.sql' : 'db.sql'),
+            subscribers: [],
+            migrations: [],
+            logging: ['error'],
+        };
+    }
+
+    return extendDataSourceOptions(options);
 }

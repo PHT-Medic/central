@@ -14,18 +14,18 @@ import { Request } from 'routup';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import {
-    ExpressValidationError,
-    ExpressValidationResult, extendExpressValidationResultWithRelation,
-    initExpressValidationResult,
+    RequestValidationError,
+    RequestValidationResult, extendRequestValidationResultWithRelation,
+    initRequestValidationResult,
     matchedValidationData,
-} from '../../../../express-validation';
+} from '../../../../validation';
 import { useRequestEnv } from '../../../../request';
 
 export async function runProposalValidation(
     req: Request,
     operation: 'create' | 'update',
-) : Promise<ExpressValidationResult<ProposalEntity>> {
-    const result : ExpressValidationResult<ProposalEntity> = initExpressValidationResult();
+) : Promise<RequestValidationResult<ProposalEntity>> {
+    const result : RequestValidationResult<ProposalEntity> = initRequestValidationResult();
 
     const titleChain = check('title')
         .exists()
@@ -73,19 +73,19 @@ export async function runProposalValidation(
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new ExpressValidationError(validation);
+        throw new RequestValidationError(validation);
     }
 
     result.data = matchedValidationData(req, { includeOptionals: true });
 
     // ----------------------------------------------
 
-    await extendExpressValidationResultWithRelation(result, MasterImageEntity, {
+    await extendRequestValidationResultWithRelation(result, MasterImageEntity, {
         id: 'master_image_id',
         entity: 'master_image',
     });
 
-    await extendExpressValidationResultWithRelation(result, RealmEntity, {
+    await extendRequestValidationResultWithRelation(result, RealmEntity, {
         id: 'realm_id',
         entity: 'realm',
     });

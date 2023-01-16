@@ -26,7 +26,7 @@ import {
     triggerTrainResultStatus,
 } from '../../../../../domains/core/train';
 import { useRequestEnv } from '../../../../request';
-import { ExpressValidationError } from '../../../../express-validation';
+import { RequestValidationError } from '../../../../validation';
 
 /**
  * Execute a train command (start, stop, build).
@@ -48,7 +48,7 @@ export async function handleTrainCommandRouteHandler(req: Request, res: Response
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new ExpressValidationError(validation);
+        throw new RequestValidationError(validation);
     }
 
     const validationData = matchedData(req, { includeOptionals: true });

@@ -10,7 +10,7 @@ import { useSuperTest } from '../../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
 import { createSuperTestProposal, createSuperTestTrain } from '../../../utils/domains';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
-import { buildExpressValidationErrorMessage } from '../../../../src/http/express-validation';
+import { buildRequestValidationErrorMessage } from '../../../../src/http/validation';
 
 describe('src/controllers/core/train', () => {
     const superTest = useSuperTest();
@@ -92,7 +92,7 @@ describe('src/controllers/core/train', () => {
         });
 
         expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildExpressValidationErrorMessage<Train>(['type']));
+        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Train>(['type']));
     });
 
     it('should not create resource with invalid proposal', async () => {
@@ -101,7 +101,7 @@ describe('src/controllers/core/train', () => {
         });
 
         expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildExpressValidationErrorMessage<Train>(['proposal_id']));
+        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Train>(['proposal_id']));
 
         response = await createSuperTestTrain(superTest, {
             ...details,
@@ -109,7 +109,7 @@ describe('src/controllers/core/train', () => {
         });
 
         expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildExpressValidationErrorMessage<Train>(['proposal_id']));
+        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Train>(['proposal_id']));
     });
 
     it('should not create resource with invalid master-image', async () => {
@@ -121,6 +121,6 @@ describe('src/controllers/core/train', () => {
         });
 
         expect(response.status).toEqual(400);
-        expect(response.body.message).toEqual(buildExpressValidationErrorMessage<Train>(['master_image_id']));
+        expect(response.body.message).toEqual(buildRequestValidationErrorMessage<Train>(['master_image_id']));
     });
 });

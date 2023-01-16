@@ -11,7 +11,7 @@ import { ServiceID } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@ebec/http';
 import { Request, Response, sendAccepted } from 'routup';
 import { useRequestEnv } from '../../../../../request';
-import { ExpressValidationError } from '../../../../../express-validation';
+import { RequestValidationError } from '../../../../../validation';
 import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
 
 export async function syncPushedMasterImages(req: Request, res: Response) : Promise<any> {
@@ -32,7 +32,7 @@ export async function syncPushedMasterImages(req: Request, res: Response) : Prom
 
     const validation = validationResult(req);
     if (!validation.isEmpty()) {
-        throw new ExpressValidationError(validation);
+        throw new RequestValidationError(validation);
     }
 
     const data = matchedData(req, { includeOptionals: true }) as ScanResult;
