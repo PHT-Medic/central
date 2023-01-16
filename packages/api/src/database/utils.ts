@@ -6,9 +6,10 @@
  */
 
 import path from 'path';
+import { hasClient, hasConfig } from 'redis-extension';
 import { DataSourceOptions } from 'typeorm';
 import { buildDataSourceOptions as _buildDataSourceOptions } from 'typeorm-extension';
-import { extendDataSourceOptions as _extendDataSourceOptions } from '@authup/server-database';
+import { DatabaseQueryResultCache, extendDataSourceOptions as _extendDataSourceOptions } from '@authup/server-database';
 import { getWritableDirPath } from '../config';
 import { MasterImageEntity } from '../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../domains/core/master-image-group/entity';
@@ -77,6 +78,16 @@ export function extendDataSourceOptions(options: DataSourceOptions) : DataSource
             TrainStationSubscriber,
         ],
     };
+
+    if (hasClient() || hasConfig()) {
+        Object.assign(options, {
+            cache: {
+                provider() {
+                    return new DatabaseQueryResultCache();
+                },
+            },
+        } as Partial<DataSourceOptions>);
+    }
 
     return {
         ...options,
