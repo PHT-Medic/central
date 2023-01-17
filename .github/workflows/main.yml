@@ -1,4 +1,4 @@
-# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
 name: CI
@@ -50,6 +50,14 @@ jobs:
                 ports:
                     - 6379:6379
 
+            mq:
+                image: bitnami/rabbitmq:latest
+                env:
+                    RABBITMQ_USERNAME: root
+                    RABBITMQ_PASSWORD: start123
+                ports:
+                    - 5672:5672
+
         runs-on: [ self-hosted ]
 
         steps:
@@ -65,13 +73,6 @@ jobs:
 
             - name: Test
               env:
-                  PORT: 3002
-                  API_URL: http://127.0.0.1:3002/
-                  APP_URL: http://127.0.0.1:3000/
-                  MINIO_CONNECTION_STRING: http://admin:start123@127.0.0.1:9000
-                  REDIS_CONNECTION_STRING: redis://127.0.0.1
-                  VAULT_CONNECTION_STRING: start123@http://127.0.0.1:8090/v1/
-                  RABBITMQ_CONNECTION_STRING: amqp://root:start123@127.0.0.1
                   TYPEORM_CONNECTION: postgres
                   TYPEORM_HOST: 127.0.0.1
                   TYPEORM_USERNAME: postgres
