@@ -6,8 +6,8 @@
  */
 
 import supertest, { SuperTest, Test } from 'supertest';
-import { createRouter } from '../../src/http/router';
 import { createConfig } from '../../src';
+import { createRouter } from '../../src/http/router';
 
 export function useSuperTest() : SuperTest<Test> {
     createConfig();
