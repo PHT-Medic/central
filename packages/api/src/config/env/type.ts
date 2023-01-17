@@ -5,8 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { EnvironmentName } from './constants';
+
 export interface Environment {
-    env: 'development' | 'test' | 'production',
+    env: `${EnvironmentName}`,
     port: number,
 
     jwtMaxAge: number,

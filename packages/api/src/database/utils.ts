@@ -10,7 +10,7 @@ import { hasClient, hasConfig } from 'redis-extension';
 import { DataSourceOptions } from 'typeorm';
 import { buildDataSourceOptions as _buildDataSourceOptions } from 'typeorm-extension';
 import { DatabaseQueryResultCache, extendDataSourceOptions as _extendDataSourceOptions } from '@authup/server-database';
-import { getWritableDirPath } from '../config';
+import { EnvironmentName, useEnv } from '../config';
 import { MasterImageEntity } from '../domains/core/master-image/entity';
 import { MasterImageGroupEntity } from '../domains/core/master-image-group/entity';
 import { ProposalEntity } from '../domains/core/proposal/entity';
@@ -96,18 +96,12 @@ export function extendDataSourceOptions(options: DataSourceOptions) : DataSource
 }
 
 export async function buildDataSourceOptions() : Promise<DataSourceOptions> {
-    let options : DataSourceOptions;
+    const options = await _buildDataSourceOptions();
 
-    try {
-        options = await _buildDataSourceOptions();
-    } catch (e) {
-        options = {
-            type: 'better-sqlite3',
-            database: path.join(getWritableDirPath(), process.env.NODE_ENV === 'test' ? 'test.sql' : 'db.sql'),
-            subscribers: [],
-            migrations: [],
-            logging: ['error'],
-        };
+    if (useEnv('env') === EnvironmentName.TEST) {
+        Object.assign(options, {
+            database: 'test',
+        } satisfies Partial<DataSourceOptions>);
     }
 
     return extendDataSourceOptions(options);

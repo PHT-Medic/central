@@ -18,7 +18,7 @@ import {
     PermissionKey, detectProxyConnectionConfig,
 } from '@personalhealthtrain/central-common';
 import { setMinioConfig } from '../core/minio';
-import { useEnv } from './env';
+import { EnvironmentName, useEnv } from './env';
 import { buildTrainManagerAggregator } from '../aggregators/train-manager';
 import { buildRobotAggregator } from '../aggregators/robot';
 
@@ -112,7 +112,9 @@ export function createConfig() : Config {
         tokenMaxAgeRefreshToken: useEnv('jwtMaxAge'),
     });
 
-    if (useEnv('env') !== 'test') {
+    const isTest = useEnv('env') === EnvironmentName.TEST;
+
+    if (!isTest) {
         setAuthLogger(useLogger());
     }
 
@@ -126,14 +128,20 @@ export function createConfig() : Config {
         },
 
         buildRobotAggregator(),
-
-        buildTrainManagerAggregator(),
     ];
+    if (!isTest) {
+        aggregators.push(buildTrainManagerAggregator());
+    }
 
-    const components : {start: () => void}[] = [
-        buildCommandRouterComponent(),
-        buildEventRouterComponent(),
-    ];
+    // ---------------------------------------------
+
+    const components : {start: () => void}[] = [];
+    if (!isTest) {
+        components.push(
+            buildCommandRouterComponent(),
+            buildEventRouterComponent(),
+        );
+    }
 
     return {
         aggregators,

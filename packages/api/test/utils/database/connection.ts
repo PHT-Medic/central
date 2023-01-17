@@ -9,7 +9,7 @@ import {
     createDatabase, dropDatabase, setDataSource, unsetDataSource, useDataSource,
 } from 'typeorm-extension';
 import {
-    DataSource, DataSourceOptions,
+    DataSource,
 } from 'typeorm';
 import {
     DatabaseSeeder as AuthDatabaseRootSeeder,
@@ -17,16 +17,10 @@ import {
 import { PermissionKey } from '@personalhealthtrain/central-common';
 import { buildDataSourceOptions } from '../../../src/database/utils';
 
-async function buildOptions() : Promise<DataSourceOptions> {
-    return {
-        ...await buildDataSourceOptions(),
-        database: 'test',
-    } as DataSourceOptions;
-}
-
 export async function useTestDatabase() {
-    const options = await buildOptions();
+    const options = await buildDataSourceOptions();
 
+    await dropDatabase({ ifExist: true, options });
     await createDatabase({ options, synchronize: false });
 
     const dataSource = new DataSource(options);
@@ -48,9 +42,5 @@ export async function dropTestDatabase() {
     const dataSource = await useDataSource();
     await dataSource.destroy();
 
-    const { options } = dataSource;
-
     unsetDataSource();
-
-    await dropDatabase({ options });
 }

@@ -8,11 +8,13 @@
 import { config } from 'dotenv';
 import path from 'path';
 import { useLogger } from '../log';
+import { EnvironmentName } from './constants';
 import { Environment } from './type';
 import { requireBooleanFromEnv, requireFromEnv, requireIntegerFromEnv } from './utils';
 
 const envResult = config({
-    path: path.resolve(__dirname, '../.env'),
+    debug: false,
+    path: path.resolve(__dirname, '..', '..', '..', '.env'),
 });
 
 if (envResult.error) {
@@ -33,7 +35,7 @@ export function useEnv(key?: string) : any {
     }
 
     instance = {
-        env: requireFromEnv('NODE_ENV', 'development') as 'development' | 'test' | 'production',
+        env: requireFromEnv('NODE_ENV', 'development') as `${EnvironmentName}`,
         port: requireIntegerFromEnv('PORT', 3002),
 
         jwtMaxAge: requireIntegerFromEnv('JWT_MAX_AGE', 3600),
