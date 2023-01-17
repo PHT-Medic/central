@@ -30,7 +30,7 @@
         "dotenv": "^16.0.3",
         "hapic": "^1.0.0",
         "minio": "^7.0.32",
-        "rapiq": "^0.6.3",
+        "rapiq": "^0.6.4",
         "redis-extension": "^1.2.0",
         "tar-stream": "^3.0.0",
         "uuid": "^9.0.0",
