@@ -6,7 +6,11 @@
  */
 
 import {
-    createDatabase, dropDatabase, setDataSource, unsetDataSource, useDataSource,
+    createDatabase,
+    dropDatabase,
+    setDataSource,
+    unsetDataSource,
+    useDataSource,
 } from 'typeorm-extension';
 import {
     DataSource,
@@ -20,12 +24,12 @@ import { buildDataSourceOptions } from '../../../src/database/utils';
 export async function useTestDatabase() {
     const options = await buildDataSourceOptions();
 
-    await dropDatabase({ ifExist: true, options });
+    await dropDatabase({ options, ifExist: true });
     await createDatabase({ options, synchronize: false });
 
     const dataSource = new DataSource(options);
     await dataSource.initialize();
-    await dataSource.synchronize();
+    await dataSource.runMigrations();
 
     setDataSource(dataSource);
 
@@ -42,5 +46,9 @@ export async function dropTestDatabase() {
     const dataSource = await useDataSource();
     await dataSource.destroy();
 
+    const { options } = dataSource;
+
     unsetDataSource();
+
+    await dropDatabase({ ifExist: true, options });
 }
