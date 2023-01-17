@@ -18,7 +18,7 @@ import {
     PermissionKey, detectProxyConnectionConfig,
 } from '@personalhealthtrain/central-common';
 import { setMinioConfig } from '../core/minio';
-import { Environment } from '../env';
+import { useEnv } from './env';
 import { buildTrainManagerAggregator } from '../aggregators/train-manager';
 import { buildRobotAggregator } from '../aggregators/robot';
 
@@ -28,16 +28,12 @@ import { buildCommandRouterComponent } from '../components/command-router';
 import { buildEventRouterComponent } from '../components/event-router';
 import { useLogger } from './log';
 
-interface ConfigContext {
-    env: Environment
-}
-
 export type Config = {
     aggregators: {start: () => void}[]
     components: {start: () => void}[]
 };
 
-export function createConfig({ env } : ConfigContext) : Config {
+export function createConfig() : Config {
     const proxyConfig = detectProxyConnectionConfig();
 
     setHTTPConfig({
@@ -46,7 +42,7 @@ export function createConfig({ env } : ConfigContext) : Config {
             proxy: false,
         },
         extra: {
-            connectionString: env.vaultConnectionString,
+            connectionString: useEnv('vaultConnectionString'),
         },
     }, HTTPClientKey.VAULT);
 
@@ -75,13 +71,13 @@ export function createConfig({ env } : ConfigContext) : Config {
     // ---------------------------------------------
 
     setRedisConfig({
-        connectionString: env.redisConnectionString,
+        connectionString: useEnv('redisConnectionString'),
     });
 
     // ---------------------------------------------
 
     setAmqpConfig({
-        connection: env.rabbitMqConnectionString,
+        connection: useEnv('rabbitMqConnectionString'),
         exchange: {
             name: 'pht',
             type: 'topic',
@@ -90,12 +86,12 @@ export function createConfig({ env } : ConfigContext) : Config {
 
     // ---------------------------------------------
 
-    setMinioConfig(env.minioConnectionString);
+    setMinioConfig(useEnv('minioConnectionString'));
 
     // ---------------------------------------------
 
     setDatabaseConfigOptions({
-        env: env.env,
+        env: useEnv('env'),
         rootPath: process.cwd(),
         writableDirectoryPath: path.join(__dirname, '..', '..', 'writable'),
 
@@ -106,17 +102,17 @@ export function createConfig({ env } : ConfigContext) : Config {
     });
 
     setHTTPConfigOptions({
-        env: env.env,
+        env: useEnv('env'),
         rootPath: process.cwd(),
         writableDirectoryPath: path.join(__dirname, '..', '..', 'writable'),
 
-        publicUrl: env.apiUrl,
-        authorizeRedirectUrl: env.appUrl,
-        tokenMaxAgeAccessToken: env.jwtMaxAge,
-        tokenMaxAgeRefreshToken: env.jwtMaxAge,
+        publicUrl: useEnv('apiUrl'),
+        authorizeRedirectUrl: useEnv('appUrl'),
+        tokenMaxAgeAccessToken: useEnv('jwtMaxAge'),
+        tokenMaxAgeRefreshToken: useEnv('jwtMaxAge'),
     });
 
-    if (env.env !== 'test') {
+    if (useEnv('env') !== 'test') {
         setAuthLogger(useLogger());
     }
 

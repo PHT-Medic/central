@@ -12,7 +12,7 @@ import { useDataSource } from 'typeorm-extension';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { useRequestEnv } from '../../../../request';
 import { runTrainStationValidation } from '../utils';
-import env from '../../../../../env';
+import { useEnv } from '../../../../../config/env';
 import { TrainEntity } from '../../../../../domains/core/train';
 
 export async function createTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -23,12 +23,12 @@ export async function createTrainStationRouteHandler(req: Request, res: Response
 
     const result = await runTrainStationValidation(req, 'create');
 
-    if (env.env !== 'test' && !result.relation.station.ecosystem) {
+    if (useEnv('env') !== 'test' && !result.relation.station.ecosystem) {
         throw new BadRequestError('The referenced station must be assigned to an ecosystem.');
     }
 
     // todo: this should also work in the test-suite
-    if (env.env !== 'test' && !result.relation.station.registry_id) {
+    if (useEnv('env') !== 'test' && !result.relation.station.registry_id) {
         throw new BadRequestError('The referenced station must be assigned to a registry');
     }
 
@@ -37,7 +37,7 @@ export async function createTrainStationRouteHandler(req: Request, res: Response
 
     let entity = repository.create(result.data);
 
-    if (env.skipTrainApprovalOperation) {
+    if (useEnv('skipTrainApprovalOperation')) {
         entity.approval_status = TrainStationApprovalStatus.APPROVED;
     }
 

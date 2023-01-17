@@ -18,7 +18,7 @@ import {
     SecretStorageQueueCommand,
     SecretStorageQueueEntityType,
 } from '../../../../../domains/special/secret-storage/constants';
-import env from '../../../../../env';
+import { useEnv } from '../../../../../config/env';
 import { saveUserSecretsToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/user';
 
 export async function createUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -43,7 +43,7 @@ export async function createUserSecretRouteHandler(req: Request, res: Response) 
 
     await repository.save(entity);
 
-    if (env.env === 'test') {
+    if (useEnv('env') === 'test') {
         await saveUserSecretsToSecretStorage({
             type: SecretStorageQueueEntityType.USER_SECRETS,
             id: entity.user_id,

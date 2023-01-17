@@ -17,7 +17,7 @@ import { publishMessage } from 'amqp-extension';
 import { Request, Response, sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../../request';
-import env from '../../../../../../env';
+import { useEnv } from '../../../../../../config/env';
 import { setupRegistry } from '../../../../../../components/registry/handlers/default';
 import {
     RegistryQueueCommand,
@@ -63,7 +63,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .getOne();
 
             if (command === RegistryCommand.SETUP) {
-                if (env.env === 'test') {
+                if (useEnv('env') === 'test') {
                     await setupRegistry({
                         id: entity.id,
                         entity,
@@ -102,7 +102,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .getOne();
 
             if (command === RegistryCommand.PROJECT_LINK) {
-                if (env.env === 'test') {
+                if (useEnv('env') === 'test') {
                     await linkRegistryProject({
                         id: entity.id,
                         entity,
@@ -118,7 +118,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                     await publishMessage(queueMessage);
                 }
                 break;
-            } else if (env.env === 'test') {
+            } else if (useEnv('env') === 'test') {
                 await unlinkRegistryProject({
                     id: entity.id,
                     registryId: entity.registry_id,

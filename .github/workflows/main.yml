@@ -65,6 +65,7 @@ jobs:
 
             - name: Test
               env:
+                  PORT: 3002
                   API_URL: http://127.0.0.1:3002/
                   APP_URL: http://127.0.0.1:3000/
                   MINIO_CONNECTION_STRING: http://admin:start123@127.0.0.1:9000

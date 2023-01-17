@@ -14,7 +14,7 @@ import { FindOptionsWhere } from 'typeorm';
 import { publishMessage } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
-import env from '../../../../../env';
+import { useEnv } from '../../../../../config/env';
 import { saveUserSecretsToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/user';
 import {
     SecretStorageQueueCommand,
@@ -53,7 +53,7 @@ export async function deleteUserSecretRouteHandler(req: Request, res: Response) 
 
     entity.id = entityId;
 
-    if (env.env === 'test') {
+    if (useEnv('env') === 'test') {
         await saveUserSecretsToSecretStorage({
             type: SecretStorageQueueEntityType.USER_SECRETS,
             id: entity.user_id,

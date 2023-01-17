@@ -8,10 +8,9 @@
 import supertest, { SuperTest, Test } from 'supertest';
 import { createRouter } from '../../src/http/router';
 import { createConfig } from '../../src';
-import env from '../../src/env';
 
 export function useSuperTest() : SuperTest<Test> {
-    createConfig({ env });
+    createConfig();
 
     const router = createRouter();
     return supertest(router.createListener());

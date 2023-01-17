@@ -31,7 +31,7 @@ import {
     SecretStorageQueueCommand,
     SecretStorageQueueEntityType,
 } from '../../../../../../domains/special/secret-storage/constants';
-import env from '../../../../../../env';
+import { useEnv } from '../../../../../../config/env';
 import {
     deleteUserSecretsFromSecretStorage,
     saveUserSecretsToSecretStorage,
@@ -123,7 +123,7 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
         case SecretStorageCommand.ENGINE_KEY_SAVE: {
             switch (entity.type) {
                 case TargetEntity.USER: {
-                    if (env.env === 'test') {
+                    if (useEnv('env') === 'test') {
                         await saveUserSecretsToSecretStorage({
                             type: SecretStorageQueueEntityType.USER_SECRETS,
                             id: entity.data.id,
@@ -147,7 +147,7 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
         case SecretStorageCommand.ENGINE_KEY_DROP: {
             switch (entity.type) {
                 case TargetEntity.USER: {
-                    if (env.env === 'test') {
+                    if (useEnv('env') === 'test') {
                         await deleteUserSecretsFromSecretStorage({
                             type: SecretStorageQueueEntityType.USER_SECRETS,
                             id: entity.data.id,

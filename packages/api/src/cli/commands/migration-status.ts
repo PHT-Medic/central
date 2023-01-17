@@ -7,8 +7,7 @@
 
 import { CommandModule } from 'yargs';
 import { DataSource } from 'typeorm';
-import { createConfig } from '../../config/module';
-import env from '../../env';
+import { createConfig } from '../../config';
 import { buildDataSourceOptions } from '../../database/utils';
 
 export class MigrationStatusCommand implements CommandModule {
@@ -17,7 +16,7 @@ export class MigrationStatusCommand implements CommandModule {
     describe = 'Status of database migrations.';
 
     async handler(args: any) {
-        createConfig({ env });
+        createConfig();
 
         const options = await buildDataSourceOptions();
         Object.assign(options, {

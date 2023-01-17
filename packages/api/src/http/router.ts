@@ -19,7 +19,7 @@ import {
     errorMiddleware,
     licenseAgreementMiddleware,
 } from './middleware';
-import env from '../env';
+import { useEnv } from '../config/env';
 
 export function createRouter() : Router {
     const router = new Router();
@@ -33,7 +33,7 @@ export function createRouter() : Router {
 
     registerMiddlewares(router);
 
-    if (env.env === 'development') {
+    if (useEnv('env') === 'development') {
         router.use(licenseAgreementMiddleware);
     }
 

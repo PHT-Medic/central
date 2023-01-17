@@ -14,7 +14,7 @@ import { URL } from 'url';
 import { createConfig, getWritableDirPath, useLogger } from '../config';
 import { DatabaseRootSeeder } from '../database/seeds/root';
 import { buildDataSourceOptions } from '../database/utils';
-import env from '../env';
+import {useEnv} from '../config/env';
 import { createRouter } from '../http/router';
 import { createHttpServer } from '../http/server';
 import { generateSwaggerDocumentation } from '../http/swagger';
@@ -22,15 +22,15 @@ import { StartCommandContext } from './type';
 
 export async function startCommand(context?: StartCommandContext) {
     context = context || {};
-    const config = await createConfig({ env });
+    const config = await createConfig();
 
     const logger = useLogger();
 
-    logger.info(`Environment: ${env.env}`);
+    logger.info(`Environment: ${useEnv('env')}`);
     logger.info(`WritableDirectoryPath: ${getWritableDirPath()}`);
-    logger.info(`Port: ${env.port}`);
-    logger.info(`Public-URL: ${env.apiUrl}`);
-    logger.info(`Docs-URL: ${new URL('docs/', env.apiUrl).href}`);
+    logger.info(`Port: ${useEnv('port')}`);
+    logger.info(`Public-URL: ${useEnv('apiUrl')}`);
+    logger.info(`Docs-URL: ${new URL('docs/', useEnv('apiUrl')).href}`);
 
     logger.info('Generating documentation...');
 
@@ -90,7 +90,7 @@ export async function startCommand(context?: StartCommandContext) {
     config.components.forEach((c) => c.start());
     config.aggregators.forEach((a) => a.start());
 
-    httpServer.listen(env.port, '0.0.0.0', () => {
+    httpServer.listen(useEnv('port'), '0.0.0.0', () => {
         logger.info('Started http server.');
     });
 }

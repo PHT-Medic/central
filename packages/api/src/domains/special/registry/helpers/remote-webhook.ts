@@ -15,7 +15,7 @@ import {
 import os from 'os';
 import { useClient } from 'hapic';
 import { Client as VaultClient } from '@hapic/vault';
-import env from '../../../../env';
+import { useEnv } from '../../../../config/env';
 import { buildRegistryWebhookTarget } from '../utils';
 
 export async function saveRemoteRegistryProjectWebhook(
@@ -33,7 +33,7 @@ export async function saveRemoteRegistryProjectWebhook(
             name: os.hostname(),
             targets: [
                 buildRegistryWebhookTarget({
-                    url: env.apiUrl,
+                    url: useEnv('apiUrl'),
                     robot: {
                         id: response.data.id,
                         secret: response.data.secret,

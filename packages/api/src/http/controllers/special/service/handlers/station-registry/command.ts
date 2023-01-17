@@ -14,7 +14,7 @@ import {
 import { useRequestBody } from '@routup/body';
 import { publishMessage } from 'amqp-extension';
 import { Request, Response, sendCreated } from 'routup';
-import env from '../../../../../../env';
+import { useEnv } from '../../../../../../config/env';
 import { syncStationRegistry } from '../../../../../../components/station-registry/handlers/sync';
 import { StationRegistryQueueCommand } from '../../../../../../domains/special/station-registry/consants';
 import { buildStationRegistryQueueMessage } from '../../../../../../domains/special/station-registry/queue';
@@ -33,7 +33,7 @@ export async function handleStationRegistryCommandRouteHandler(req: Request, res
 
     switch (command as StationRegistryCommand) {
         case StationRegistryCommand.SYNC: {
-            if (env.env === 'test') {
+            if (useEnv('env') === 'test') {
                 await syncStationRegistry({
                     id: null,
                     type: StationRegistryQueueCommand.SYNC,

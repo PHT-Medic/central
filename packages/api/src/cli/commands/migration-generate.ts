@@ -11,7 +11,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { generateMigration } from '@authup/server-database';
 import path from 'path';
 import { createConfig } from '../../config';
-import env from '../../env';
+import { useEnv } from '../../config/env';
 import { extendDataSourceOptions } from '../../database/utils';
 
 export class MigrationGenerateCommand implements CommandModule {
@@ -20,7 +20,7 @@ export class MigrationGenerateCommand implements CommandModule {
     describe = 'Generate database migrations.';
 
     async handler(args: any) {
-        createConfig({ env });
+        createConfig();
 
         const connections : DataSourceOptions[] = [
             {

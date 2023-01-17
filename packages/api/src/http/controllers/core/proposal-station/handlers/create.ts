@@ -12,7 +12,7 @@ import { useDataSource } from 'typeorm-extension';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { useRequestEnv } from '../../../../request';
 import { runProposalStationValidation } from '../utils';
-import env from '../../../../../env';
+import { useEnv } from '../../../../../config/env';
 
 export async function createProposalStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
@@ -30,7 +30,7 @@ export async function createProposalStationRouteHandler(req: Request, res: Respo
     const repository = dataSource.getRepository(ProposalStationEntity);
     let entity = repository.create(result.data);
 
-    if (env.skipProposalApprovalOperation) {
+    if (useEnv('skipProposalApprovalOperation')) {
         entity.approval_status = ProposalStationApprovalStatus.APPROVED;
     }
 

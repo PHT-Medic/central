@@ -12,16 +12,14 @@ import {
     SwaggerDocFormatType,
     generateDocumentation,
 } from '@trapi/swagger';
+import { loadJsonFile } from 'locter';
 import path from 'path';
 import { getSwaggerEntrypoint } from '@authup/server-http';
-import { getRootDirPath, getWritableDirPath } from '../config';
-import env from '../env';
+import { getRootDirPath, getWritableDirPath, useEnv } from '../config';
 
 export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDocFormatType, SwaggerDocFormatData>> {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires,global-require,import/no-dynamic-require
-    const packageJson = require(path.join(getRootDirPath(), 'package.json'));
-    // eslint-disable-next-line @typescript-eslint/no-var-requires,global-require,import/no-dynamic-require
-    const tsConfig = require(path.join(getRootDirPath(), 'tsconfig.json'));
+    const packageJson = await loadJsonFile(path.join(getRootDirPath(), 'package.json')) as Record<string, any>;
+    const tsConfig = await loadJsonFile(path.join(getRootDirPath(), 'tsconfig.json')) as Record<string, any>;
 
     const metadataConfig : MetadataConfig = {
         entryPoint: [
@@ -40,7 +38,7 @@ export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDoc
 
     const swaggerConfig : Specification.Config = {
         yaml: true,
-        host: env.apiUrl,
+        host: useEnv('apiUrl'),
         name: 'API Documentation',
         description: 'Explore the REST Endpoints of the Central API.',
         basePath: '/',
@@ -56,7 +54,7 @@ export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDoc
                 type: 'oauth2',
                 flows: {
                     password: {
-                        tokenUrl: `${env.apiUrl}token`,
+                        tokenUrl: new URL('token', useEnv('apiUrl')).href,
                     },
                 },
             },
