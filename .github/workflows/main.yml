@@ -15,14 +15,15 @@ env:
 jobs:
     build:
         services:
-            postgres:
-                image: postgres:latest
+            mysql:
+                image: mysql:5.7
                 env:
-                    POSTGRES_PASSWORD: start123
+                    MYSQL_ROOT_HOST: %
+                    MYSQL_ROOT_PASSWORD: start123
                 ports:
-                    - 5432:5432
+                    - 3306:3306
                 options: >-
-                    --health-cmd pg_isready
+                    --health-cmd "mysqladmin ping"
                     --health-interval 10s
                     --health-timeout 5s
                     --health-retries 5
@@ -50,19 +51,6 @@ jobs:
                 ports:
                     - 6379:6379
 
-            mq:
-                image: bitnami/rabbitmq:latest
-                env:
-                    RABBITMQ_USERNAME: root
-                    RABBITMQ_PASSWORD: start123
-                ports:
-                    - 5672:5672
-                options: >-
-                    --health-cmd "rabbitmq-diagnostics -q ping"
-                    --health-interval 10s
-                    --health-timeout 5s
-                    --health-retries 5
-
         runs-on: [ ubuntu-latest ]
 
         steps:
@@ -78,9 +66,9 @@ jobs:
 
             - name: Test
               env:
-                  TYPEORM_CONNECTION: postgres
+                  TYPEORM_CONNECTION: mysql
                   TYPEORM_HOST: 127.0.0.1
-                  TYPEORM_USERNAME: postgres
+                  TYPEORM_USERNAME: root
                   TYPEORM_PASSWORD: start123
                   TYPEORM_DATABASE: test
                   SKIP_PROPOSAL_APPROVAL_OPERATION: true
