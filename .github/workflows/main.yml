@@ -18,7 +18,7 @@ jobs:
             mysql:
                 image: mysql:5.7
                 env:
-                    MYSQL_ROOT_HOST: %
+                    MYSQL_ROOT_HOST: "%"
                     MYSQL_ROOT_PASSWORD: start123
                 ports:
                     - 3306:3306
