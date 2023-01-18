@@ -41,7 +41,7 @@
         "ora": "^5.4.1",
         "pg": "^8.8.0",
         "prom-client": "^14.1.1",
-        "rapiq": "^0.6.4",
+        "rapiq": "^0.6.5",
         "redis-extension": "^1.2.0",
         "reflect-metadata": "^0.1.13",
         "routup": "^0.12.0",
