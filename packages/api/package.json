@@ -14,7 +14,7 @@
         "@authup/common": "^0.8.0",
         "@authup/server-common": "^0.8.0",
         "@authup/server-database": "^0.8.0",
-        "@authup/server-http": "^0.8.0",
+        "@authup/server-http": "^0.10.1",
         "@ebec/http": "^0.1.0",
         "@hapic/harbor": "^1.0.0",
         "@hapic/vault": "^1.0.0",
