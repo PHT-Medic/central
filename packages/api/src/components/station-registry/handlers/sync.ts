@@ -12,15 +12,14 @@ import { RealmEntity } from '@authup/server-database';
 import { hasOwnProperty } from '@authup/common';
 import { Ecosystem } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import { StationEntity } from '../../../domains/core/station/entity';
-import { ApiKey } from '../../../config';
+import { StationEntity } from '../../../domains/core/station';
+import { ApiKey, useLogger } from '../../../config';
 import { transformStationRegistryResponse } from '../utils/transform';
 import { buildSecretStorageQueueMessage } from '../../../domains/special/secret-storage/queue';
 import {
     SecretStorageQueueCommand,
     SecretStorageQueueEntityType,
 } from '../../../domains/special/secret-storage/constants';
-import { useLogger } from '../../../config/log';
 
 export async function syncStationRegistry(message: Message) {
     const dataSource = await useDataSource();
@@ -41,6 +40,8 @@ export async function syncStationRegistry(message: Message) {
                 total: externalRealms.length,
             },
         );
+
+    // todo: use description -> id
 
     const realms = await realmRepository.findBy({
         id: In(externalRealms.map((item) => item.id)),

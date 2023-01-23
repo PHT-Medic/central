@@ -38,6 +38,7 @@ export function extendDataSourceOptions(options: DataSourceOptions) : DataSource
 
     options = {
         ...options,
+        logging: false,
         entities: [
             ...(options.entities ? options.entities : []) as string[],
             MasterImageEntity,
@@ -53,18 +54,10 @@ export function extendDataSourceOptions(options: DataSourceOptions) : DataSource
             TrainStationEntity,
             UserSecretEntity,
         ],
-    };
-
-    options = {
-        ...options,
         migrations: [
             path.join(__dirname, 'migrations', options.type, '*{.ts,.js}'),
         ],
         migrationsTransactionMode: 'each',
-    };
-
-    options = {
-        ...options,
         subscribers: [
             ...(options.subscribers ? options.subscribers : []) as string[],
             ProposalSubscriber,
@@ -89,10 +82,7 @@ export function extendDataSourceOptions(options: DataSourceOptions) : DataSource
         } as Partial<DataSourceOptions>);
     }
 
-    return {
-        ...options,
-        logging: false,
-    };
+    return options;
 }
 
 export async function buildDataSourceOptions() : Promise<DataSourceOptions> {

@@ -7,19 +7,14 @@
 
 import { config } from 'dotenv';
 import path from 'path';
-import { useLogger } from '../log';
 import { EnvironmentName } from './constants';
 import { Environment } from './type';
 import { requireBooleanFromEnv, requireFromEnv, requireIntegerFromEnv } from './utils';
 
-const envResult = config({
+config({
     debug: false,
     path: path.resolve(__dirname, '..', '..', '..', '.env'),
 });
-
-if (envResult.error) {
-    useLogger().error(`Env failed to load:${envResult.error}`);
-}
 
 let instance : Environment | undefined;
 

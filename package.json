@@ -46,6 +46,9 @@
         "train-manager": "npm run dev --workspace=packages/train-manager",
         "common": "npm run build-watch --workspace=packages/common"
     },
+    "resolutions": {
+        "minimatch": "^5.1.6"
+    },
     "config": {
         "commitizen": {
             "path": "@commitlint/cz-commitlint"

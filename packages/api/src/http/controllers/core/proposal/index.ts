@@ -13,7 +13,7 @@ import {
     DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
 } from '@routup/decorators';
 import { SwaggerTags } from '@trapi/swagger';
-import { ForceLoggedInMiddleware } from '../../../middleware/auth';
+import { ForceLoggedInMiddleware } from '../../../middleware';
 import {
     createProposalRouteHandler,
     deleteProposalRouteHandler,

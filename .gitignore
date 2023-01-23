@@ -1,7 +1,5 @@
 node_modules
 
-docker-compose.yml
-
 tsconfig.tsbuildinfo
 tsconfig.build.tsbuildinfo
 
