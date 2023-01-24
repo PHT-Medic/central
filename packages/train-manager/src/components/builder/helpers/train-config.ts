@@ -36,6 +36,10 @@ export async function buildTrainConfig(context: TrainConfigBuildContext) : Promi
         id: entity.id,
         '@id': entity.id,
         '@context': null,
+        build: {
+            signature: null,
+            rsa_public_key: null,
+        },
         creator: {
             id: entity.user_id,
             rsa_public_key: null,

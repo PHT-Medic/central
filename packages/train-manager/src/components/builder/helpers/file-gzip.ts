@@ -8,14 +8,16 @@
 import tar, { Pack } from 'tar-stream';
 
 export function createPackFromFileContent(
-    content: string,
+    content: string | Buffer,
     fileName: string,
 ) : Pack {
     const pack = tar.pack();
     const entry = pack.entry({
         name: fileName,
         type: 'file',
-        size: content.length,
+        size: typeof content === 'string' ?
+            content.length :
+            content.byteLength,
     }, (err) => {
         if (err) {
             pack.destroy(err);

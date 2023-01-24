@@ -8,6 +8,11 @@
 import { TrainConfigSourceType } from './constants';
 import { Proposal } from '../proposal';
 
+export type TrainConfigBuild = {
+    signature: string,
+    rsa_public_key: string
+};
+
 export type TrainConfigRouteItem = {
     station: string,
     eco_system: string,
@@ -37,6 +42,7 @@ export type TrainConfig = {
     '@id': string,
     '@context': string | null,
 
+    build: TrainConfigBuild,
     creator: TrainConfigCreator,
     file_list: string[],
     hash: string,

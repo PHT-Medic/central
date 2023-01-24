@@ -10,17 +10,14 @@ import {
     HTTPClient,
     REGISTRY_ARTIFACT_TAG_LATEST,
     TrainContainerFileName,
-    TrainContainerPath,
     TrainManagerBuilderBuildPayload,
     TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 
 import { useClient } from 'hapic';
-import { buildTrainConfig } from '../../helpers/train-config';
 import { useDocker } from '../../../../modules/docker';
-import { buildTrainDockerFile } from '../../helpers/dockerfile';
+import { buildTrainDockerFile, packContainerWithTrain } from '../../helpers';
 import { useLogger } from '../../../../modules/log';
-import { createPackFromFileContent } from '../../helpers/file-gzip';
 import { buildDockerImage } from '../../../../modules/docker/image-build';
 import {
     buildDockerAuthConfig,
@@ -87,6 +84,7 @@ export async function processBuildCommand(message: Message) {
         component: 'building',
         imageURL,
     });
+
     const container = await useDocker()
         .createContainer({ Image: imageURL });
 
@@ -96,48 +94,12 @@ export async function processBuildCommand(message: Message) {
         component: 'building',
     });
 
-    const trainConfig = await buildTrainConfig({
-        entity: data.entity,
+    await packContainerWithTrain(container, {
+        train: data.entity,
         masterImagePath,
     });
 
-    useLogger().debug(`Writing ${TrainContainerFileName.CONFIG} to container`, {
-        component: 'building',
-    });
-
-    await container.putArchive(
-        createPackFromFileContent(JSON.stringify(trainConfig), TrainContainerFileName.CONFIG),
-        {
-            path: '/opt',
-        },
-    );
-
-    if (data.entity.query) {
-        useLogger().debug(`Writing ${TrainContainerFileName.QUERY} to container`, {
-            component: 'building',
-        });
-
-        let { query } = data.entity;
-        if (typeof query !== 'string') {
-            query = JSON.stringify(query);
-        }
-
-        await container.putArchive(
-            createPackFromFileContent(query, TrainContainerFileName.QUERY),
-            {
-                path: '/opt',
-            },
-        );
-    }
-
-    useLogger().debug('Writing files to container', {
-        component: 'building',
-    });
-
-    const stream : NodeJS.ReadableStream = await client.trainFile.download(data.id);
-    await container.putArchive(stream, {
-        path: TrainContainerPath.MAIN,
-    });
+    // -----------------------------------------------------------------------------------
 
     useLogger().debug('Tagging container', {
         component: 'building',
