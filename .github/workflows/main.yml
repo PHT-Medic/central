@@ -54,24 +54,28 @@ jobs:
         runs-on: [ ubuntu-latest ]
 
         steps:
-            - uses: actions/checkout@v3
+            -   uses: actions/checkout@v3
 
-            - name: Install
-              uses: ./.github/actions/install
-              with:
-                 node-version: ${{ env.PRIMARY_NODE_VERSION }}
+            -   name: Install
+                uses: ./.github/actions/install
+                with:
+                    node-version: ${{ env.PRIMARY_NODE_VERSION }}
 
-            - name: Build
-              uses: ./.github/actions/build
+            -   name: Build
+                uses: ./.github/actions/build
 
-            - name: Test
-              env:
-                  TYPEORM_CONNECTION: mysql
-                  TYPEORM_HOST: 127.0.0.1
-                  TYPEORM_USERNAME: root
-                  TYPEORM_PASSWORD: start123
-                  TYPEORM_DATABASE: test
-                  SKIP_PROPOSAL_APPROVAL_OPERATION: true
-                  SKIP_TRAIN_APPROVAL_OPERATION: true
-              run: |
-                  npm run test --workspace=packages/api
+            -   name: Test API
+                env:
+                    TYPEORM_CONNECTION: mysql
+                    TYPEORM_HOST: 127.0.0.1
+                    TYPEORM_USERNAME: root
+                    TYPEORM_PASSWORD: start123
+                    TYPEORM_DATABASE: test
+                    SKIP_PROPOSAL_APPROVAL_OPERATION: true
+                    SKIP_TRAIN_APPROVAL_OPERATION: true
+                run: |
+                    npm run test --workspace=packages/api
+
+            -   name: Test Train-Manager
+                run: |
+                    npm run test --workspace=packages/train-manager
