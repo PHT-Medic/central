@@ -21,7 +21,7 @@
         "@personalhealthtrain/central-common": "^1.4.0",
         "@routup/body": "^0.7.0",
         "@routup/cookie": "^0.6.0",
-        "@routup/decorators": "^0.4.0",
+        "@routup/decorators": "^0.5.0",
         "@routup/query": "^0.6.0",
         "@routup/swagger": "^0.10.0",
         "@socket.io/redis-emitter": "^5.1.0",
