@@ -20,7 +20,7 @@
         "@hapic/vault": "^1.0.0",
         "@personalhealthtrain/central-common": "^1.4.0",
         "@routup/body": "^0.7.0",
-        "@routup/cookie": "^0.6.0",
+        "@routup/cookie": "^0.7.0",
         "@routup/decorators": "^0.5.0",
         "@routup/query": "^0.7.0",
         "@routup/swagger": "^0.10.0",
