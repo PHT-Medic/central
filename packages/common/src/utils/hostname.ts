@@ -5,8 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { URL } from 'url';
-
 export function getHostNameFromString(value: string) : string {
     if (
         value.startsWith('http://') ||
