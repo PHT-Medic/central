@@ -12,6 +12,10 @@ import { Adapter } from 'browser-storage-adapter';
 
 export default (ctx : Context, inject : Inject) => {
     const setServerCookie = (value: string) => {
+        if (ctx.res.headersSent) {
+            return;
+        }
+
         let cookies = ctx.res.getHeader('Set-Cookie') || [];
         if (typeof cookies === 'number' || typeof cookies === 'string') {
             if (typeof cookies === 'number') {
@@ -22,12 +26,10 @@ export default (ctx : Context, inject : Inject) => {
 
         cookies.unshift(value);
 
-        if (!ctx.res.headersSent) {
-            ctx.res.setHeader(
-                'Set-Cookie',
-                cookies.filter((v, i, arr) => arr.findIndex((val) => val.startsWith(v.substring(0, v.indexOf('=')))) === i),
-            );
-        }
+        ctx.res.setHeader(
+            'Set-Cookie',
+            cookies.filter((v, i, arr) => arr.findIndex((val) => val.startsWith(v.substring(0, v.indexOf('=')))) === i),
+        );
     };
 
     const getServerCookies = () => ctx.req.headers.cookie;

@@ -8,8 +8,8 @@
 import { HTTPClient } from '@personalhealthtrain/central-common';
 import { HTTPClient as AuthHTTPClient } from '@authup/common';
 import AuthModule from '../config/auth';
-import {SocketModule} from "../config/socket";
-import {Adapter} from "browser-storage-adapter";
+import {SocketModule} from '../config/socket';
+import {Adapter} from 'browser-storage-adapter';
 
 declare module 'vuex/types/index' {
     interface Store<S> {
