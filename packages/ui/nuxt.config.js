@@ -8,6 +8,9 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin');
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const path = require('node:path');
+
 const config = {
     publicRuntimeConfig() {
         return {
@@ -134,6 +137,12 @@ const config = {
             if (Object.prototype.hasOwnProperty.call(config.resolve.alias, '@')) {
                 delete config.resolve.alias['@'];
             }
+
+            config.resolve.alias.axios = path.join(__dirname, '..', '..', 'node_modules', 'axios', 'dist', 'browser', 'axios.cjs');
+            config.resolve.alias.hapic = path.join(__dirname, '..', '..', 'node_modules', 'hapic', 'dist', 'index.cjs');
+            config.resolve.alias['@hapic/oauth2'] = path.join(__dirname, '..', '..', 'node_modules', '@hapic', 'oauth2', 'dist', 'index.cjs');
+            config.resolve.alias['@authup/common'] = path.join(__dirname, '..', '..', 'node_modules', '@authup', 'common', 'dist', 'index.cjs');
+            config.resolve.alias['@authup/vue2'] = path.join(__dirname, '..', '..', 'node_modules', '@authup', 'vue2', 'dist', 'index.cjs');
 
             config.module.rules.push({
                 test: /\.mjs$/,
