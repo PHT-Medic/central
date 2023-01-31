@@ -34,7 +34,7 @@
         "rollup": "^3.12.0",
         "smob": "^0.1.0",
         "ts-jest": "^29.0.5",
-        "typescript": "4.9.4"
+        "typescript": "4.9.5"
     },
     "scripts": {
         "commit": "npx git-cz",
