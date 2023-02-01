@@ -12,10 +12,10 @@ import {
     RobotSecretEnginePayload,
     ServiceID,
 } from '@personalhealthtrain/central-common';
-import os from 'os';
+import os from 'node:os';
 import { useClient } from 'hapic';
 import { Client as VaultClient } from '@hapic/vault';
-import { useEnv } from '../../../../config/env';
+import { useEnv } from '../../../../config';
 import { buildRegistryWebhookTarget } from '../utils';
 
 export async function saveRemoteRegistryProjectWebhook(

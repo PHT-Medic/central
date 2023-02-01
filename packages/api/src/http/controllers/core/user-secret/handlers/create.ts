@@ -6,7 +6,6 @@
  */
 
 import { SecretType, isHex } from '@personalhealthtrain/central-common';
-import { Buffer } from 'buffer';
 import { publishMessage } from 'amqp-extension';
 import { Request, Response, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
@@ -18,7 +17,7 @@ import {
     SecretStorageQueueCommand,
     SecretStorageQueueEntityType,
 } from '../../../../../domains/special/secret-storage/constants';
-import { useEnv } from '../../../../../config/env';
+import { useEnv } from '../../../../../config';
 import { saveUserSecretsToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/user';
 
 export async function createUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {

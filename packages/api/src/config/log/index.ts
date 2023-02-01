@@ -9,7 +9,7 @@ import {
     Logger, createLogger, format, transports,
 } from 'winston';
 
-import path from 'path';
+import path from 'node:path';
 import { getWritableDirPath } from '../paths';
 
 let logger : undefined | any;

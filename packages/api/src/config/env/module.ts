@@ -6,7 +6,7 @@
  */
 
 import { config } from 'dotenv';
-import path from 'path';
+import path from 'node:path';
 import { EnvironmentName } from './constants';
 import { Environment } from './type';
 import { requireBooleanFromEnv, requireFromEnv, requireIntegerFromEnv } from './utils';

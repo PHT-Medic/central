@@ -8,8 +8,8 @@
 import { PermissionID, TrainFile } from '@personalhealthtrain/central-common';
 import BusBoy, { FileInfo } from 'busboy';
 import { UploadedObjectInfo } from 'minio';
-import path from 'path';
-import crypto from 'crypto';
+import path from 'node:path';
+import crypto from 'node:crypto';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import {
     Request, Response, sendCreated, useRequestParam,

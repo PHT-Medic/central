@@ -10,7 +10,7 @@ import { setConfigOptions as setDatabaseConfigOptions } from '@authup/server-dat
 import { runOAuth2Cleaner, setConfigOptions as setHTTPConfigOptions } from '@authup/server-http';
 import { setConfig as setHTTPConfig } from 'hapic';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
-import path from 'path';
+import path from 'node:path';
 import { setConfig as setRedisConfig } from 'redis-extension';
 import { Client as VaultClient } from '@hapic/vault';
 import {

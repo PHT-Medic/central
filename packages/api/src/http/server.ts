@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import http, { Server } from 'http';
+import http, { Server } from 'node:http';
 import { Router } from 'routup';
-import { useLogger } from '../config/log';
+import { useLogger } from '../config';
 
 interface HttpServerContext {
     router: Router

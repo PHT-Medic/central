@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import path from 'path';
+import path from 'node:path';
 import { hasClient, hasConfig } from 'redis-extension';
 import { DataSourceOptions } from 'typeorm';
 import { buildDataSourceOptions as _buildDataSourceOptions } from 'typeorm-extension';

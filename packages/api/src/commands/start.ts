@@ -10,11 +10,11 @@ import { DataSource } from 'typeorm';
 import {
     checkDatabase, createDatabase, setDataSource, setupDatabaseSchema,
 } from 'typeorm-extension';
-import { URL } from 'url';
-import { createConfig, getWritableDirPath, useLogger } from '../config';
+import {
+    createConfig, getWritableDirPath, useEnv, useLogger,
+} from '../config';
 import { DatabaseRootSeeder } from '../database/seeds/root';
 import { buildDataSourceOptions } from '../database/utils';
-import {useEnv} from '../config/env';
 import { createRouter } from '../http/router';
 import { createHttpServer } from '../http/server';
 import { generateSwaggerDocumentation } from '../http/swagger';
