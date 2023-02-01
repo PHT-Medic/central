@@ -34,7 +34,7 @@ export default Vue.extend({
 
             try {
                 const { images } = await this.$api.masterImage
-                    .runCommand(MasterImageCommand.SYNC_GIT_REPOSITORY);
+                    .runCommand(MasterImageCommand.SYNC);
 
                 this.masterImagesMeta.created = images.created.length;
                 this.masterImagesMeta.deleted = images.deleted.length;

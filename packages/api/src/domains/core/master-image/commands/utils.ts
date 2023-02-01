@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022.
+ * Copyright (c) 2021-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -8,8 +8,8 @@
 import { Group, Image } from 'docker-scan';
 import { MasterImage, MasterImageGroup } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import { MasterImageEntity } from '../../../../../../domains/core/master-image/entity';
-import { MasterImageGroupEntity } from '../../../../../../domains/core/master-image-group/entity';
+import { MasterImageEntity } from '../entity';
+import { MasterImageGroupEntity } from '../../master-image-group/entity';
 
 type ReturnContext<T> = {
     updated: T[],

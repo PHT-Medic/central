@@ -9,8 +9,7 @@ import { MasterImageCommand } from '@personalhealthtrain/central-common';
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import { useRequestBody } from '@routup/body';
 import { Request, Response } from 'routup';
-import { syncGitRepository } from './commands/sync-git-repository';
-import { syncPushedMasterImages } from './commands/sync-pushed';
+import { syncMasterImages } from '../../../../../domains/core/master-image';
 
 export async function commandMasterImageRouteHandler(req: Request, res: Response) {
     const body = useRequestBody(req);
@@ -25,10 +24,8 @@ export async function commandMasterImageRouteHandler(req: Request, res: Response
     const { command } = body;
 
     switch (command) {
-        case MasterImageCommand.SYNC_PUSHED:
-            return syncPushedMasterImages(req, res);
-        case MasterImageCommand.SYNC_GIT_REPOSITORY: {
-            return syncGitRepository(req, res);
+        case MasterImageCommand.SYNC: {
+            return syncMasterImages(req, res);
         }
     }
 

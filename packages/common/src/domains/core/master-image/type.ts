@@ -6,8 +6,7 @@
  */
 
 export enum MasterImageCommand {
-    SYNC_GIT_REPOSITORY = 'syncGitRepository',
-    SYNC_PUSHED = 'syncPushed',
+    SYNC = 'sync',
 }
 
 export enum MasterImageGroupType {
