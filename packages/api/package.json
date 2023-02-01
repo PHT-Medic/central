@@ -33,7 +33,6 @@
         "docker-scan": "^1.0.4",
         "dotenv": "^16.0.3",
         "express-validator": "^6.14.3",
-        "giget": "^1.0.0",
         "hapic": "^1.1.0",
         "locter": "^0.8.2",
         "minio": "^7.0.32",

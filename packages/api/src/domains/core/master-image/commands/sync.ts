@@ -5,32 +5,59 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { createClient } from 'hapic';
+import fs from 'node:fs';
 import path from 'node:path';
-import { downloadTemplate } from 'giget';
+import tar from 'tar';
 import { scanDirectory } from 'docker-scan';
 import { Request, Response, sendAccepted } from 'routup';
 import { getWritableDirPath } from '../../../../config';
 import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
 
 export async function syncMasterImages(req: Request, res: Response) : Promise<any> {
-    const directoryPath: string = path.join(getWritableDirPath(), 'master-images.git');
+    const directoryPath: string = path.join(getWritableDirPath(), 'master-images');
 
-    await downloadTemplate('github:PHT-Medic/master-images#master', {
-        force: true,
-        dir: 'master-images.git',
-        cwd: getWritableDirPath(),
+    await fs.promises.rm(directoryPath, { force: true, recursive: true });
+    await fs.promises.mkdir(directoryPath, { recursive: true });
+
+    const client = createClient();
+    const response = await client.get(
+        'https://github.com/PHT-Medic/master-images/archive/master.tar.gz',
+        {
+            responseType: 'stream',
+        },
+    );
+
+    const tarPath = path.join(getWritableDirPath(), 'master-images.tar.gz');
+    const writable = fs.createWriteStream(tarPath);
+
+    writable.on('error', () => {
+        res.statusCode = 400;
+        res.end();
     });
 
-    const data = await scanDirectory(directoryPath);
+    writable.on('finish', async () => {
+        await tar.extract({
+            file: tarPath,
+            cwd: directoryPath,
+            onentry(entry) {
+                entry.path = entry.path.split('/').splice(1).join('/');
+            },
+        });
 
-    // languages
-    const groups = await mergeMasterImageGroupsWithDatabase(data.groups);
+        const data = await scanDirectory(directoryPath);
 
-    // images
-    const images = await mergeMasterImagesWithDatabase(data.images);
+        // languages
+        const groups = await mergeMasterImageGroupsWithDatabase(data.groups);
 
-    return sendAccepted(res, {
-        groups,
-        images,
+        // images
+        const images = await mergeMasterImagesWithDatabase(data.images);
+
+        sendAccepted(res, {
+            groups,
+            images,
+        });
     });
+
+    response.data.pipe(writable);
 }
