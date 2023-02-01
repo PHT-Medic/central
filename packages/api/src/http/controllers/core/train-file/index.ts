@@ -70,7 +70,7 @@ export class TrainFileController {
         @DParam('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
-    ): Promise<PartialTrainFile | undefined> {
-        return await uploadTrainFilesRouteHandler(req, res) as PartialTrainFile | undefined;
+    ): Promise<any> {
+        return await uploadTrainFilesRouteHandler(req, res) as any;
     }
 }

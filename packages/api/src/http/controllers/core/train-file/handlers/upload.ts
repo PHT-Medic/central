@@ -12,7 +12,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import {
-    Request, Response, send, useRequestParam,
+    Request, Response, sendCreated, useRequestParam,
 } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
@@ -58,6 +58,10 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
 
     instance.on('file', (filename, file, info: FileInfo) => {
         const hash = crypto.createHash('sha256');
+
+        if (typeof info.filename === 'undefined') {
+            return;
+        }
 
         hash.update(entity.id);
         hash.update(info.filename);
@@ -108,12 +112,14 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
         await Promise.all(promises);
 
         if (files.length === 0) {
-            return send(res, {
+            sendCreated(res, {
                 data: [],
                 meta: {
                     total: 0,
                 },
             });
+
+            return;
         }
 
         await trainFileRepository.save(files, { listeners: true });
@@ -125,7 +131,7 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
 
         await repository.save(entity);
 
-        return send(res, {
+        sendCreated(res, {
             data: files,
             meta: {
                 total: files.length,
@@ -133,5 +139,5 @@ export async function uploadTrainFilesRouteHandler(req: Request, res: Response) 
         });
     });
 
-    return req.pipe(instance);
+    req.pipe(instance);
 }
