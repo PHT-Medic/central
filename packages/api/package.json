@@ -27,7 +27,7 @@
         "@socket.io/redis-emitter": "^5.1.0",
         "@trapi/swagger": "^0.3.8",
         "amqp-extension": "^1.0.4",
-        "axios": "^1.2.4",
+        "axios": "^1.3.0",
         "busboy": "^1.6.0",
         "cors": "^2.8.5",
         "docker-scan": "^1.0.4",
