@@ -8,6 +8,7 @@
 export * from './command';
 export * from './create';
 export * from './delete';
+export * from './files-download';
 export * from './read';
 export * from './result-download';
 export * from './update';

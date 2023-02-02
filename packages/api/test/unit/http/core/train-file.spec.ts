@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Proposal, Train, TrainFile } from '@personalhealthtrain/central-common';
+import { TrainFile } from '@personalhealthtrain/central-common';
 import path from 'node:path';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
 import { createSuperTestProposal, createSuperTestTrain } from '../../../utils/domains';
@@ -15,20 +15,8 @@ import { useSuperTest } from '../../../utils/supertest';
 describe('src/controllers/core/train-file', () => {
     const superTest = useSuperTest();
 
-    let proposal: Proposal;
-    let train: Train;
-
     beforeAll(async () => {
         await useTestDatabase();
-
-        let response = await createSuperTestProposal(superTest);
-        proposal = response.body;
-
-        response = await createSuperTestTrain(superTest, {
-            proposal_id: proposal.id,
-        });
-
-        train = response.body;
     });
 
     afterAll(async () => {
@@ -38,10 +26,16 @@ describe('src/controllers/core/train-file', () => {
     let details: TrainFile;
 
     it('should create resource', async () => {
+        const { body: proposal } = await createSuperTestProposal(superTest);
+        const { body: train } = await createSuperTestTrain(superTest, {
+            proposal_id: proposal.id,
+        });
+
         const filePath = path.join(__dirname, '..', '..', 'data', 'train.py');
-        const response = await superTest.post(`/trains/${train.id}/files`)
+        const response = await superTest.post('/train-files')
             .set('Accept', 'application/json')
             .set('Connection', 'keep-alive')
+            .field('train_id', train.id)
             .attach('file[0]', filePath)
             .auth('admin', 'start123');
 
@@ -58,7 +52,7 @@ describe('src/controllers/core/train-file', () => {
 
     it('should get collection', async () => {
         const response = await superTest
-            .get(`/trains/${train.id}/files`)
+            .get('/train-files')
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -69,7 +63,7 @@ describe('src/controllers/core/train-file', () => {
 
     it('should read resource', async () => {
         const response = await superTest
-            .get(`/trains/${train.id}/files/${details.id}`)
+            .get(`/train-files/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(200);
@@ -80,7 +74,7 @@ describe('src/controllers/core/train-file', () => {
 
     it('should delete resource', async () => {
         const response = await superTest
-            .delete(`/trains/${train.id}/files/${details.id}`)
+            .delete(`/train-files/${details.id}`)
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);

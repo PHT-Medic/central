@@ -95,7 +95,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
     });
 
     const client = useClient<HTTPClient>();
-    const stream : NodeJS.ReadableStream = await client.trainFile.download(context.train.id);
+    const stream : NodeJS.ReadableStream = await client.train.downloadFiles(context.train.id);
 
     const extract = tar.extract();
     const pack = tar.pack();

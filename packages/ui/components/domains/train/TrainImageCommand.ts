@@ -111,7 +111,7 @@ export default Vue.extend({
             this.trainFile.busy = true;
 
             try {
-                this.trainFile.item = await this.$api.trainFile.getOne(this.trainId, this.trainFileId);
+                this.trainFile.item = await this.$api.trainFile.getOne(this.trainFileId);
 
                 this.trainFile.loaded = true;
             } catch (e) {

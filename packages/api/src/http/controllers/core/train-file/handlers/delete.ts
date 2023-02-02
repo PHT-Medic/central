@@ -18,7 +18,7 @@ import { useRequestEnv } from '../../../../request';
 import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/core/train';
 
 export async function deleteTrainFileRouteHandler(req: Request, res: Response) : Promise<any> {
-    const id = useRequestParam(req, 'filedId');
+    const id = useRequestParam(req, 'id');
 
     const ability = useRequestEnv(req, 'ability');
     if (

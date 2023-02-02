@@ -47,19 +47,17 @@ export async function getOneTrainFileRouteHandler(req: Request, res: Response) :
 }
 
 export async function getManyTrainFileGetManyRouteHandler(req: Request, res: Response) : Promise<any> {
-    const id = useRequestParam(req, 'id');
     const { filter } = useRequestQuery(req);
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainFileEntity);
-    const query = repository.createQueryBuilder('trainFile')
-        .where('trainFile.train_id = :trainId', { trainId: id });
+    const query = repository.createQueryBuilder('trainFile');
 
     onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'));
 
     applyFilters(query, filter, {
         defaultAlias: 'trainFile',
-        allowed: ['id', 'name', 'realm_id'],
+        allowed: ['id', 'name', 'train_id', 'realm_id'],
     });
 
     const [entities, total] = await query.getManyAndCount();

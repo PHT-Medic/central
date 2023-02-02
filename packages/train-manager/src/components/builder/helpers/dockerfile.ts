@@ -28,7 +28,7 @@ export async function buildTrainDockerFile(context: DockerFileBuildContext) : Pr
     let entryPoint : TrainFile;
 
     try {
-        entryPoint = await client.trainFile.getOne(context.entity.id, context.entity.entrypoint_file_id);
+        entryPoint = await client.trainFile.getOne(context.entity.entrypoint_file_id);
     } catch (e) {
         throw BuilderError.entrypointNotFound();
     }

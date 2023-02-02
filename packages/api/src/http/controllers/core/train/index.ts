@@ -19,10 +19,11 @@ import {
     getManyTrainRouteHandler,
     getOneTrainRouteHandler,
     handleTrainCommandRouteHandler,
+    handleTrainFilesDownloadRouteHandler,
     handleTrainResultDownloadRouteHandler,
     updateTrainRouteHandler,
 } from './handlers';
-import { ForceLoggedInMiddleware } from '../../../middleware/auth';
+import { ForceLoggedInMiddleware } from '../../../middleware';
 
 type PartialTrain = Partial<Train>;
 
@@ -35,6 +36,15 @@ export class TrainController {
             @DResponse() res: any,
     ): Promise<PartialTrain[]> {
         return getManyTrainRouteHandler(req, res);
+    }
+
+    @DGet('/:id/files/download', [ForceLoggedInMiddleware])
+    async getFiles(
+        @DParam('id') id: string,
+            @DRequest() req: any,
+            @DResponse() res: any,
+    ): Promise<any> {
+        return handleTrainFilesDownloadRouteHandler(req, res);
     }
 
     @DGet('/:id/result/download', [ForceLoggedInMiddleware])

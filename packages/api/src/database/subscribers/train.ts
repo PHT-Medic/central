@@ -41,8 +41,21 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
         return TrainEntity;
     }
 
-    afterInsert(event: InsertEvent<TrainEntity>): Promise<any> | void {
+    async afterInsert(event: InsertEvent<TrainEntity>): Promise<any> {
         publish(TrainSocketServerToClientEventName.CREATED, event.entity);
+
+        const message = buildMessage({
+            options: {
+                routingKey: MessageQueueRoutingKey.COMMAND,
+            },
+            type: TrainQueueCommand.SETUP,
+            data: {
+                id: event.entity.id,
+            },
+            metadata: {},
+        });
+
+        await publishMessage(message);
     }
 
     afterUpdate(event: UpdateEvent<TrainEntity>): Promise<any> | void {

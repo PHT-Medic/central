@@ -87,7 +87,7 @@ export default {
             this.busy = true;
 
             try {
-                const file = await this.$api.trainFile.delete(this.file.train_id, this.file.id);
+                const file = await this.$api.trainFile.delete(this.file.id);
                 this.handleDeleted(file);
             } catch (e) {
                 this.$emit('failed', e);

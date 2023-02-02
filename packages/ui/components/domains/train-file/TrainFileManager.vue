@@ -196,7 +196,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await this.$api.trainFile.getMany(this.train.id);
+                const response = await this.$api.trainFile.getMany({ train_id: this.train.id });
                 this.items = response.data;
             } catch (e) {
                 // ...
@@ -213,12 +213,14 @@ export default {
 
             try {
                 const formData = new FormData();
+                formData.set('train_id', this.train.id);
+
                 for (let i = 0; i < this.form.files.length; i++) {
                     formData.append(`files[${i}]`, this.form.files[i]);
                 }
 
                 this.socketLocked = true;
-                const response = await this.$api.trainFile.upload(this.train.id, formData);
+                const response = await this.$api.trainFile.upload(formData);
                 response.data.map((item) => this.handleCreated(item, false));
                 this.socketLocked = false;
 
@@ -243,7 +245,7 @@ export default {
 
             try {
                 for (let i = 0; i < this.selected.length; i++) {
-                    const file = await this.$api.trainFile.delete(this.train.id, this.selected[i]);
+                    const file = await this.$api.trainFile.delete(this.selected[i]);
                     this.handleDeleted(file);
                 }
             } catch (e) {

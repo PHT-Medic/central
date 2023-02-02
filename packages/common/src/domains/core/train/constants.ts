@@ -114,4 +114,6 @@ export enum TrainSocketClientToServerEventName {
 
 export enum TrainQueueCommand {
     CLEANUP = 'TRAIN_CLEANUP',
+
+    SETUP = 'TRAIN_SETUP',
 }

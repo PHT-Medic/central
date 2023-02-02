@@ -20,5 +20,6 @@ export async function cleanupTrain(payload: TrainQueuePayload<TrainQueueCommand.
     if (hasBucket) {
         const items = await getMinioBucketObjectList(minio, bucketName);
         await minio.removeObjects(bucketName, items);
+        await minio.removeBucket(bucketName);
     }
 }

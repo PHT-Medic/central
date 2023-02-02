@@ -7,7 +7,7 @@
 
 import { ConsumeHandler, Message } from 'amqp-extension';
 import { TrainQueueCommand, TrainQueuePayload } from '@personalhealthtrain/central-common';
-import { cleanupTrain } from './handlers/cleanup';
+import { cleanupTrain, setupTrain } from './handlers';
 
 export function createTrainComponentHandlers() : Record<TrainQueueCommand, ConsumeHandler> {
     return {
@@ -15,6 +15,11 @@ export function createTrainComponentHandlers() : Record<TrainQueueCommand, Consu
             const payload = message.data as TrainQueuePayload<TrainQueueCommand.CLEANUP>;
 
             await cleanupTrain(payload);
+        },
+        [TrainQueueCommand.SETUP]: async (message: Message) => {
+            const payload = message.data as TrainQueuePayload<TrainQueueCommand.SETUP>;
+
+            await setupTrain(payload);
         },
     };
 }

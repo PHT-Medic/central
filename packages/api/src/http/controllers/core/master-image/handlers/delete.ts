@@ -12,7 +12,7 @@ import {
 } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
-import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
+import { MasterImageEntity } from '../../../../../domains/core/master-image';
 
 export async function deleteMasterImageRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

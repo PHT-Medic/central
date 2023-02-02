@@ -23,6 +23,12 @@ export class TrainAPI {
         return `trains/${id}/result/download`;
     }
 
+    getFilesDownloadPath(
+        trainId: Train['id'],
+    ): string {
+        return `trains/${trainId}/files/download`;
+    }
+
     async getMany(
         options?: BuildInput<Train>,
     ): Promise<CollectionResourceResponse<Train>> {
@@ -73,5 +79,21 @@ export class TrainAPI {
             .post(`trains/${id}/command`, actionData);
 
         return response;
+    }
+
+    async downloadFiles(id: Train['id']) {
+        const response = await this.client.get(this.getFilesDownloadPath(id), {
+            responseType: 'stream',
+        });
+
+        return response.data;
+    }
+
+    async downloadResult(id: Train['id']) {
+        const response = await this.client.get(this.getResultDownloadPath(id), {
+            responseType: 'stream',
+        });
+
+        return response.data;
     }
 }

@@ -8,11 +8,7 @@
 import { TrainQueueCommand } from './constants';
 import { Train } from './entity';
 
-export type TrainCleanupQueuePayload = {
-    id: Train['id']
-};
-
 export type TrainQueuePayload<T extends `${TrainQueueCommand}`> =
-    T extends `${TrainQueueCommand.CLEANUP}` ?
-        TrainCleanupQueuePayload :
+    T extends `${TrainQueueCommand.CLEANUP}` | `${TrainQueueCommand.SETUP}` ?
+        { id: Train['id'] } :
         never;

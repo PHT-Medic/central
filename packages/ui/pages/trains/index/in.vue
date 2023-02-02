@@ -70,7 +70,7 @@ export default Vue.extend({
     },
     methods: {
         download(item: TrainStation) {
-            window.open(new URL(this.$api.trainFile.getDownloadPath(item.train_id), this.$config.apiUrl).href, '_blank');
+            window.open(new URL(this.$api.train.getFilesDownloadPath(item.train_id), this.$config.apiUrl).href, '_blank');
         },
 
         handleUpdated(item) {
