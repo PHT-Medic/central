@@ -22,7 +22,7 @@
         "dotenv": "^16.0.3",
         "hapic": "^1.1.0",
         "node-cron": "^3.0.1",
-        "redis-extension": "^1.2.2",
+        "redis-extension": "^1.2.3",
         "reflect-metadata": "^0.1.13",
         "socket.io": "^4.5.4",
         "winston": "^3.8.1"
