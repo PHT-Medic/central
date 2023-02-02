@@ -34,7 +34,7 @@
         "hapic": "^1.1.0",
         "minio": "^7.0.32",
         "rapiq": "^0.7.0",
-        "redis-extension": "^1.2.2",
+        "redis-extension": "^1.2.3",
         "tar-stream": "^3.0.0",
         "uuid": "^9.0.0",
         "winston": "^3.8.1",
