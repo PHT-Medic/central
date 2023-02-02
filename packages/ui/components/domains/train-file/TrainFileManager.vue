@@ -196,7 +196,7 @@ export default {
             this.busy = true;
 
             try {
-                const response = await this.$api.trainFile.getMany({ train_id: this.train.id });
+                const response = await this.$api.trainFile.getMany({ filter: { train_id: this.train.id } });
                 this.items = response.data;
             } catch (e) {
                 // ...

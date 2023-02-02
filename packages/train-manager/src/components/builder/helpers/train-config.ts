@@ -60,7 +60,7 @@ export async function buildTrainConfig(context: TrainConfigBuildContext) : Promi
 
     const client = useClient<HTTPClient>();
 
-    const response = await client.trainFile.getMany({ train_id: entity.id });
+    const response = await client.trainFile.getMany({ filter: { train_id: entity.id } });
     config.file_list = response.data.map((file) => `${file.directory}/${file.name}`);
 
     // ----------------------------------------------------------
