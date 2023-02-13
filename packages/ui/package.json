@@ -16,11 +16,11 @@
         "generate": "nuxt generate"
     },
     "devDependencies": {
-        "@authup/common": "^0.14.0",
+        "@authup/common": "^0.15.0",
         "@authup/vue2": "^0.4.1",
         "@fortawesome/fontawesome-free": "^6.1.2",
         "@hapic/oauth2": "^1.1.0",
-        "@nuxt/types": "^2.16.0",
+        "@nuxt/types": "^2.16.1",
         "@nuxt/typescript-build": "^2.1.0",
         "@nuxtjs/dotenv": "^1.4.0",
         "@nuxtjs/google-fonts": "^2.0.0",
@@ -37,7 +37,7 @@
         "hapic": "^1.1.0",
         "ilingo": "^2.2.1",
         "moment": "^2.29.4",
-        "nuxt": "^2.15.8",
+        "nuxt": "^2.16.1",
         "rapiq": "^0.7.0",
         "socket.io-client": "^4.5.4",
         "tsconfig-paths-webpack-plugin": "^4.0.0",
