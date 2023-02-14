@@ -11,7 +11,7 @@ import {
     Request, Response, send, useRequestParam,
 } from 'routup';
 import { SelectQueryBuilder } from 'typeorm';
-import { onlyRealmReadableQueryResources } from '@authup/server-database';
+import { onlyRealmWritableQueryResources } from '@authup/server-database';
 import {
     applyFilters,
     applyPagination,
@@ -67,7 +67,7 @@ function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, field
             );
         }
 
-        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'));
+        onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'));
     }
 
     applyQueryFieldsParseOutput(query, fieldsParsed, { defaultAlias: 'registryProject' });

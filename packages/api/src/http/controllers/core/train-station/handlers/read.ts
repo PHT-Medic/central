@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { onlyRealmReadableQueryResources } from '@authup/server-database';
+import { onlyRealmWritableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import {
     Request, Response, send, useRequestParam,
@@ -53,7 +53,7 @@ export async function getManyTrainStationRouteHandler(req: Request, res: Respons
     const query = await repository.createQueryBuilder('trainStation');
     query.distinctOn(['trainStation.id']);
 
-    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'), [
+    onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), [
         'trainStation.train_realm_id',
         'trainStation.station_realm_id',
     ]);

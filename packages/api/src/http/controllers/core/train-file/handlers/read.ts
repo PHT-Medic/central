@@ -8,7 +8,7 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/common';
-import { onlyRealmReadableQueryResources } from '@authup/server-database';
+import { onlyRealmWritableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import {
     Request, Response, send, useRequestParam,
@@ -53,7 +53,7 @@ export async function getManyTrainFileGetManyRouteHandler(req: Request, res: Res
     const repository = dataSource.getRepository(TrainFileEntity);
     const query = repository.createQueryBuilder('trainFile');
 
-    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'));
+    onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'));
 
     applyFilters(query, filter, {
         defaultAlias: 'trainFile',

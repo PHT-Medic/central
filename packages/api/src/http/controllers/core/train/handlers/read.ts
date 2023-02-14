@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
-import { onlyRealmReadableQueryResources } from '@authup/server-database';
+import { onlyRealmWritableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import {
     Request, Response, send, useRequestParam,
@@ -33,7 +33,7 @@ export async function getOneTrainRouteHandler(req: Request, res: Response) : Pro
     const query = repository.createQueryBuilder('train')
         .where('train.id = :id', { id });
 
-    onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'), 'train.realm_id');
+    onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), 'train.realm_id');
 
     applyRelations(query, include, {
         defaultAlias: 'train',
@@ -91,12 +91,14 @@ export async function getManyTrainRouteHandler(req: Request, res: Response) : Pr
         }
     }
 
+    // todo: train-station realms should also be valid
+
     if (filterRealmId) {
         if (!isRealmResourceReadable(useRequestEnv(req, 'realm'), filterRealmId)) {
             throw new ForbiddenError('You are not permitted to inspect trains for the given realm.');
         }
     } else {
-        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'), 'train.realm_id');
+        onlyRealmWritableQueryResources(query, useRequestEnv(req, 'realm'), 'train.realm_id');
     }
 
     const [entities, total] = await query.getManyAndCount();

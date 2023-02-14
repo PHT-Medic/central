@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { onlyRealmReadableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import {
     Request, Response, send, useRequestParam,
@@ -15,9 +14,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { isRealmResourceReadable } from '@authup/common';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
-import { useRequestEnv } from '../../../../request';
 
 export async function getOneProposalRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -67,21 +64,6 @@ export async function getManyProposalRouteHandler(req: Request, res: Response) :
 
     const repository = dataSource.getRepository(ProposalEntity);
     const query = repository.createQueryBuilder('proposal');
-
-    if (filter) {
-        let { realm_id: realmId } = filter as Record<string, any>;
-
-        const realm = useRequestEnv(req, 'realm');
-        if (!isRealmResourceReadable(realm, realmId)) {
-            realmId = realm.id;
-        }
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        filter.realm_id = realmId;
-    } else {
-        onlyRealmReadableQueryResources(query, useRequestEnv(req, 'realm'), 'proposal.realm_id');
-    }
 
     const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'proposal',
