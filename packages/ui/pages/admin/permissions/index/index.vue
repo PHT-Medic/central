@@ -17,7 +17,7 @@ export default {
             isBusy: false,
             fields: [
                 {
-                    key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
                 },
                 {
                     key: 'created_at', label: 'Created at', thClass: 'text-center', tdClass: 'text-center',

@@ -6,7 +6,7 @@
  */
 
 import { consumeQueue } from 'amqp-extension';
-import { MessageQueueRoutingKey } from '../../config/mq';
+import { MessageQueueRoutingKey } from '../../config';
 import { createRegistryEventHandlers } from '../registry-event';
 
 export function buildEventRouterComponent() {
