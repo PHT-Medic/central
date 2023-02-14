@@ -17,7 +17,7 @@ import { publishMessage } from 'amqp-extension';
 import { Request, Response, sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../../request';
-import { useEnv } from '../../../../../../config/env';
+import { useEnv, useLogger } from '../../../../../../config';
 import { setupRegistry } from '../../../../../../components/registry/handlers/default';
 import {
     RegistryQueueCommand,
@@ -69,6 +69,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                         entity,
                     });
                 } else {
+                    useLogger().info('Submitting setup registry command.');
                     const queueMessage = buildRegistryQueueMessage(
                         RegistryQueueCommand.SETUP,
                         {
@@ -79,6 +80,8 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                     await publishMessage(queueMessage);
                 }
             } else {
+                useLogger().info('Submitting delete registry command.');
+
                 const queueMessage = buildRegistryQueueMessage(
                     RegistryQueueCommand.DELETE,
                     {
@@ -143,5 +146,5 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
         }
     }
 
-    return sendAccepted(res);
+    sendAccepted(res);
 }
