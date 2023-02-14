@@ -27,16 +27,13 @@ export default Vue.extend<any, any, any, any>({
                 filter: {
                     id: context.params.project_id,
                 },
-                fields: {
-                    station: [
-                        '+external_id',
-                        '+account_id',
-                        '+account_name',
-                        '+account_secret',
-                        '+webhook_exists',
-                        '+external_name',
-                    ],
-                },
+                fields: [
+                    '+account_id',
+                    '+account_name',
+                    '+account_secret',
+                    '+webhook_exists',
+                    '+external_name',
+                ],
             });
 
             if (stations.length === 0) {

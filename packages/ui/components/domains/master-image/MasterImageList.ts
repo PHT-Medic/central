@@ -23,7 +23,7 @@ export const MasterImageList = Vue.extend<
 ComponentListData<MasterImage>,
 ComponentListMethods<MasterImage>,
 any,
-ComponentListProperties<MasterImage>
+ComponentListProperties<BuildInput<MasterImage>>
 >({
     props: {
         loadOnInit: {

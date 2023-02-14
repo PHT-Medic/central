@@ -21,7 +21,7 @@ export const RegistryList = Vue.extend<
 ComponentListData<Registry>,
 ComponentListMethods<Registry>,
 any,
-ComponentListProperties<Registry>
+ComponentListProperties<BuildInput<Registry>>
 >({
     name: 'RegistryList',
     props: {

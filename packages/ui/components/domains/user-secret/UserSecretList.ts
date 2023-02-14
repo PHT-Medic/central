@@ -22,7 +22,7 @@ export const UserSecretList = Vue.extend<
 ComponentListData<UserSecret>,
 ComponentListMethods<UserSecret>,
 any,
-ComponentListProperties<UserSecret>
+ComponentListProperties<BuildInput<UserSecret>>
 >({
     props: {
         loadOnInit: {

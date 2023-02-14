@@ -21,7 +21,7 @@ export const StationList = Vue.extend<
 ComponentListData<Station>,
 ComponentListMethods<Station>,
 any,
-ComponentListProperties<Station>
+ComponentListProperties<BuildInput<Station>>
 >({
     name: 'StationList',
     props: {
