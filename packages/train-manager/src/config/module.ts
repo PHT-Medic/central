@@ -84,9 +84,16 @@ function createConfig({ env } : ConfigContext) : Config {
                     ) {
                         return response.data as Robot;
                     }
+
+                    useLogger()
+                        .debug('Payload to refresh api credentials could not be read', {
+                            response,
+                        });
                 } catch (e) {
                     useLogger()
-                        .debug('Attempt to refresh api credentials failed.');
+                        .debug('Attempt to refresh api credentials failed.', {
+                            error: e,
+                        });
 
                     throw e;
                 }
