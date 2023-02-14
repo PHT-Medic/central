@@ -46,8 +46,7 @@ export class TrainFileController {
 
     @DGet('', [ForceLoggedInMiddleware])
     async getMany(
-        @DParam('id') id: string,
-            @DRequest() req: any,
+        @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialTrainFile[]> {
         return await getManyTrainFileGetManyRouteHandler(req, res) as PartialTrainFile[];
@@ -55,8 +54,7 @@ export class TrainFileController {
 
     @DPost('', [ForceLoggedInMiddleware])
     async add(
-        @DParam('id') id: string,
-            @DRequest() req: any,
+        @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<any> {
         return await uploadTrainFilesRouteHandler(req, res) as any;
