@@ -12,14 +12,14 @@ import {
     SwaggerDocFormatType,
     generateDocumentation,
 } from '@trapi/swagger';
-import { loadFile } from 'locter';
+import { load } from 'locter';
 import path from 'node:path';
 import { getSwaggerEntrypoint } from '@authup/server-http';
 import { getRootDirPath, getWritableDirPath, useEnv } from '../config';
 
 export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDocFormatType, SwaggerDocFormatData>> {
-    const packageJson = await loadFile(path.join(getRootDirPath(), 'package.json')) as Record<string, any>;
-    const tsConfig = await loadFile(path.join(getRootDirPath(), 'tsconfig.json')) as Record<string, any>;
+    const packageJson = await load(path.join(getRootDirPath(), 'package.json')) as Record<string, any>;
+    const tsConfig = await load(path.join(getRootDirPath(), 'tsconfig.json')) as Record<string, any>;
 
     const metadataConfig : MetadataConfig = {
         entryPoint: [
