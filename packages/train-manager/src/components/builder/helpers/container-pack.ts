@@ -5,10 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import gunzip from 'gunzip-maybe';
 import { createKeyPair } from '@authup/server-common';
 import { HTTPClient, TrainContainerFileName, TrainContainerPath } from '@personalhealthtrain/central-common';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import { Container } from 'dockerode';
 import { useClient } from 'hapic';
 import tar from 'tar-stream';
@@ -96,25 +95,64 @@ export async function packContainerWithTrain(container: Container, context: Cont
     });
 
     const client = useClient<HTTPClient>();
-    const stream : NodeJS.ReadableStream = await client.train.streamFiles(context.train.id);
 
-    const extract = tar.extract();
-    const pack = tar.pack();
+    return new Promise<void>((resolve, reject) => {
+        client.request({
+            url: client.train.getFilesDownloadPath(context.train.id),
+            responseType: 'stream',
+        })
+            .then((response) => {
+                const extract = tar.extract();
 
-    extract.on('entry', async (header, stream, callback) => {
-        const buff = await streamToBuffer(stream);
-        const buffEncrypted = encryptSymmetric(symmetricKey, symmetricKeyIv, buff);
+                const files : [string, Buffer][] = [];
 
-        pack.entry(header, buffEncrypted, () => callback());
-    });
+                extract.on('entry', (header, stream, callback) => {
+                    streamToBuffer(stream)
+                        .then((buff) => {
+                            useLogger().debug(`Extracting train file ${header.name} (${header.size} bytes).`, {
+                                component: 'building',
+                            });
 
-    extract.on('finish', () => {
-        pack.finalize();
-    });
+                            files.push([header.name, buff]);
 
-    stream.pipe(gunzip()).pipe(extract);
+                            callback();
+                        })
+                        .catch((e) => {
+                            useLogger().error(`Extracting train file ${header.name} (${header.size} bytes) failed.`, {
+                                component: 'building',
+                            });
+                            callback(e);
+                        });
+                });
 
-    await container.putArchive(pack, {
-        path: TrainContainerPath.MAIN,
+                extract.on('error', () => {
+                    reject(new BuilderError('The train file stream could not be extracted'));
+                });
+
+                extract.on('finish', () => {
+                    const pack = tar.pack();
+
+                    for (let i = 0; i < files.length; i++) {
+                        useLogger().debug(`Encrypting/Packing train file ${files[i][0]}.`, {
+                            component: 'building',
+                        });
+
+                        pack.entry({ name: files[i][0] }, encryptSymmetric(symmetricKey, symmetricKeyIv, files[i][1]));
+
+                        useLogger().debug(`Encrypted/Packed train file ${files[i][0]}.`, {
+                            component: 'building',
+                        });
+                    }
+
+                    pack.finalize();
+
+                    container.putArchive(pack, { path: TrainContainerPath.MAIN })
+                        .then(() => resolve())
+                        .catch(() => reject(new BuilderError('The train pack stream could not be forwarded to the container.')));
+                });
+
+                response.data.pipe(extract);
+            })
+            .catch((e) => reject(e));
     });
 }

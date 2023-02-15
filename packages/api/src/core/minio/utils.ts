@@ -30,6 +30,10 @@ export async function getMinioBucketObjectList(
 export async function ensureMinioBucket(minio: Client, name: string) {
     const hasBucket = await minio.bucketExists(name);
     if (!hasBucket) {
-        await minio.makeBucket(name, 'eu-west-1');
+        try {
+            await minio.makeBucket(name, 'eu-west-1');
+        } catch (e) {
+            // ...
+        }
     }
 }

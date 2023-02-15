@@ -10,6 +10,7 @@ import tar from 'tar-stream';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/common';
 import { useDataSource } from 'typeorm-extension';
+import { useLogger } from '../../../../../config';
 import { useMinio } from '../../../../../core/minio';
 import { streamToBuffer } from '../../../../../core/utils';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
@@ -63,10 +64,6 @@ export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Re
     const pack = tar.pack();
     pack.pipe(res);
 
-    pack.on('close', () => {
-        res.end();
-    });
-
     const minio = useMinio();
 
     const bucketName = generateTrainMinioBucketName(train.id);
@@ -91,25 +88,36 @@ export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Re
 
     for (let i = 0; i < files.length; i++) {
         const promise = new Promise<void>((resolve, reject) => {
-            minio.getObject(bucketName, files[i].hash)
+            const file = files[i];
+
+            minio.getObject(bucketName, file.hash)
                 .then((stream) => streamToBuffer(stream))
                 .then((data) => {
                     let name = '';
+
                     if (
-                        files[i].directory !== '.' &&
-                        files[i].directory
+                        file.directory !== '.' &&
+                        file.directory
                     ) {
-                        name = `${files[i].directory}/`;
+                        name = `${file.directory}/`;
                     }
 
-                    name += files[i].name;
+                    name += file.name;
+
+                    useLogger().debug(`Packing train file ${name} (${data.byteLength} bytes) for streaming.`);
 
                     pack.entry({
                         name,
-                        size: files[i].size,
+                        size: data.byteLength,
                     }, data, (err) => {
-                        if (err) reject();
+                        if (err) {
+                            useLogger().error(`Packing train file ${name} for streaming failed.`);
+                            reject(err);
 
+                            return;
+                        }
+
+                        useLogger().debug(`Packed train file ${name} for streaming.`);
                         resolve();
                     });
                 })
