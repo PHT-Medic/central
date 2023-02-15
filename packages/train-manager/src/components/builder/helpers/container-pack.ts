@@ -49,7 +49,11 @@ export async function packContainerWithTrain(container: Container, context: Cont
     const stationPublicKeyString = Buffer.from(trainConfig.route[stationFirstIndex].rsa_public_key, 'hex').toString('utf-8');
     const stationPublicKey = crypto.createPublicKey(stationPublicKeyString);
 
-    const symmetricKeyEncrypted = crypto.publicEncrypt(stationPublicKey, symmetricKey);
+    const symmetricKeyEncrypted = crypto.publicEncrypt({
+        key: stationPublicKey,
+        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+        oaepHash: 'sha512',
+    }, symmetricKey);
 
     trainConfig.route[stationFirstIndex].encrypted_key = symmetricKeyEncrypted.toString('hex');
 
