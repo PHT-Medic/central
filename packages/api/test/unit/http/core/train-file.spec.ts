@@ -7,6 +7,7 @@
 
 import { TrainFile } from '@personalhealthtrain/central-common';
 import path from 'node:path';
+import tar from 'tar-stream';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
 import { createSuperTestProposal, createSuperTestTrain } from '../../../utils/domains';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
@@ -70,6 +71,28 @@ describe('src/controllers/core/train-file', () => {
         expect(response.body).toBeDefined();
 
         expectPropertiesEqualToSrc(details, response.body);
+    });
+
+    it('should files by train', (done) => {
+        const extract = tar.extract();
+
+        const headers : Record<string, any>[] = [];
+
+        extract.on('entry', async (header, stream, callback) => {
+            headers.push(header);
+
+            callback();
+        });
+
+        extract.on('finish', () => {
+            expect(headers.length).toBeGreaterThanOrEqual(1);
+            done();
+        });
+
+        superTest
+            .get(`/trains/${details.train_id}/files/download`)
+            .auth('admin', 'start123')
+            .pipe(extract);
     });
 
     it('should delete resource', async () => {

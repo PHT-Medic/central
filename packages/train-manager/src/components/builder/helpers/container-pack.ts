@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import gunzip from 'gunzip-maybe';
 import { createKeyPair } from '@authup/server-common';
 import { HTTPClient, TrainContainerFileName, TrainContainerPath } from '@personalhealthtrain/central-common';
 import crypto from 'crypto';
@@ -95,7 +96,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
     });
 
     const client = useClient<HTTPClient>();
-    const stream : NodeJS.ReadableStream = await client.train.downloadFiles(context.train.id);
+    const stream : NodeJS.ReadableStream = await client.train.streamFiles(context.train.id);
 
     const extract = tar.extract();
     const pack = tar.pack();
@@ -104,14 +105,14 @@ export async function packContainerWithTrain(container: Container, context: Cont
         const buff = await streamToBuffer(stream);
         const buffEncrypted = encryptSymmetric(symmetricKey, symmetricKeyIv, buff);
 
-        pack.entry(header, buffEncrypted, callback);
+        pack.entry(header, buffEncrypted, () => callback());
     });
 
     extract.on('finish', () => {
         pack.finalize();
     });
 
-    stream.pipe(extract);
+    stream.pipe(gunzip()).pipe(extract);
 
     await container.putArchive(pack, {
         path: TrainContainerPath.MAIN,

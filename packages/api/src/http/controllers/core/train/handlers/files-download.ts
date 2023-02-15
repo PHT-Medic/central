@@ -95,7 +95,10 @@ export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Re
                 .then((stream) => streamToBuffer(stream))
                 .then((data) => {
                     let name = '';
-                    if (files[i].directory !== '.') {
+                    if (
+                        files[i].directory !== '.' &&
+                        files[i].directory
+                    ) {
                         name = `${files[i].directory}/`;
                     }
 
