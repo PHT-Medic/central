@@ -42,6 +42,13 @@ export async function updateTrainRouteHandler(req: Request, res: Response) : Pro
     }
 
     if (
+        result.relation.entrypoint_file &&
+        result.relation.entrypoint_file.train_id !== entity.id
+    ) {
+        throw new BadRequestError('The entrypoint file id is associated to another train.');
+    }
+
+    if (
         entity.registry_id &&
         result.data.registry_id &&
         entity.registry_id !== result.data.registry_id

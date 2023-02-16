@@ -10,7 +10,7 @@ import { check, validationResult } from 'express-validator';
 import { BadRequestError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/common';
 import { Request } from 'routup';
-import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
+import { MasterImageEntity } from '../../../../../domains/core/master-image';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 import { TrainEntity } from '../../../../../domains/core/train';
