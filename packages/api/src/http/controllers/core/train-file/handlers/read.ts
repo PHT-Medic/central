@@ -26,7 +26,7 @@ export async function getOneTrainFileRouteHandler(req: Request, res: Response) :
         throw new ForbiddenError();
     }
 
-    const id = useRequestParam(req, 'fileId');
+    const id = useRequestParam(req, 'id');
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainFileEntity);
