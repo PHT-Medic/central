@@ -61,7 +61,7 @@
         "@types/module-alias": "^2.0.1",
         "@types/mysql": "^2.15.21",
         "@types/supertest": "^2.0.12",
-        "@types/tar": "^6.1.3",
+        "@types/tar": "^6.1.4",
         "@types/tar-stream": "^2.2.2",
         "@types/winston": "^2.4.4",
         "@types/yargs": "^17.0.22",
