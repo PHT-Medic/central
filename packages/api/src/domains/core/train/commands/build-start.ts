@@ -21,7 +21,7 @@ import { RegistryProjectEntity } from '../../registry-project/entity';
 import { RegistryEntity } from '../../registry/entity';
 import { TrainStationEntity } from '../../train-station/entity';
 import { TrainEntity } from '../entity';
-import { findTrain } from './utils';
+import { resolveTrain } from './utils';
 
 export async function startBuildTrain(
     train: TrainEntity | string,
@@ -29,11 +29,7 @@ export async function startBuildTrain(
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainEntity);
 
-    train = await findTrain(train, repository);
-
-    if (!train) {
-        throw new BadRequestError('The train could not be found.');
-    }
+    train = await resolveTrain(train, repository);
 
     if (train.run_status) {
         throw new BadRequestError('The train can not longer be build...');
@@ -90,9 +86,7 @@ export async function startBuildTrain(
 
         await publishMessage(queueMessage);
 
-        train = repository.merge(train, {
-            build_status: TrainBuildStatus.STARTING,
-        });
+        train.build_status = TrainBuildStatus.STARTING;
 
         await repository.save(train);
     }

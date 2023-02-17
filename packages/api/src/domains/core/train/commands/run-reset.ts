@@ -10,18 +10,14 @@ import { publishMessage } from 'amqp-extension';
 import { BadRequestError } from '@ebec/http';
 import { useDataSource } from 'typeorm-extension';
 import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../special/train-router';
-import { findTrain } from './utils';
+import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
 
 export async function resetTrain(train: TrainEntity | string) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainEntity);
 
-    train = await findTrain(train, repository);
-
-    if (!train) {
-        throw new BadRequestError('The train could not be found.');
-    }
+    train = await resolveTrain(train, repository);
 
     if (train.run_status === TrainRunStatus.FINISHED) {
         throw new BadRequestError('The train has already been terminated...');

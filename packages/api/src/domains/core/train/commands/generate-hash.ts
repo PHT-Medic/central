@@ -12,7 +12,7 @@ import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../core/minio';
 import { streamToBuffer } from '../../../../core/utils';
 import { generateTrainMinioBucketName } from '../utils';
-import { findTrain } from './utils';
+import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
 import { TrainFileEntity } from '../../train-file/entity';
 
@@ -20,11 +20,7 @@ export async function generateTrainHash(train: TrainEntity | string) : Promise<T
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainEntity);
 
-    train = await findTrain(train, repository);
-
-    if (!train) {
-        throw new BadRequestError('The train could not be found.');
-    }
+    train = await resolveTrain(train, repository);
 
     const hash = crypto.createHash('sha512');
     // User Hash

@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BadRequestError } from '@ebec/http';
 import { publishMessage } from 'amqp-extension';
 import {
     TrainContainerPath,
@@ -15,7 +16,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
-import { findTrain } from './utils';
+import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
 
 export async function triggerTrainResultStart(
@@ -24,11 +25,10 @@ export async function triggerTrainResultStart(
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainEntity);
 
-    train = await findTrain(train, repository);
+    train = await resolveTrain(train, repository);
 
     if (train.run_status !== TrainRunStatus.FINISHED) {
-        // todo: make it a ClientError.BadRequest
-        throw new Error('The train has not finished yet...');
+        throw new BadRequestError('The train has not finished yet...');
     }
 
     // send queue message

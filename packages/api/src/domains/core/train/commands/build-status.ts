@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BadRequestError } from '@ebec/http';
 import { publishMessage } from 'amqp-extension';
 import {
     Train,
@@ -12,7 +13,7 @@ import {
     TrainManagerComponent,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import { findTrain } from './utils';
+import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 
@@ -20,11 +21,7 @@ export async function detectTrainBuildStatus(train: TrainEntity | string) : Prom
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainEntity);
 
-    train = await findTrain(train, repository);
-
-    if (!train) {
-        throw new Error('The train could not be found.');
-    }
+    train = await resolveTrain(train, repository);
 
     const queueMessage = buildTrainManagerQueueMessage(
         TrainManagerComponent.BUILDER,

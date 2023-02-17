@@ -5,25 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BadRequestError } from '@ebec/http';
 import { TrainBuildStatus } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import { findTrain } from './utils';
+import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
 
 export async function stopBuildTrain(train: TrainEntity | string) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainEntity);
 
-    train = await findTrain(train, repository);
-
-    if (!train) {
-        // todo: make it a ClientError.BadRequest
-        throw new Error('The train could not be found.');
-    }
+    train = await resolveTrain(train, repository);
 
     if (train.run_status) {
-        // todo: make it a ClientError.BadRequest
-        throw new Error('The train build can not longer be stopped...');
+        throw new BadRequestError('The train build can not longer be stopped...');
     } else {
         // if we already send a stop event, we dont send it again... :)
         if (train.build_status !== TrainBuildStatus.STOPPING) {
