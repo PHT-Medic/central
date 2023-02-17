@@ -27,7 +27,7 @@
         "@hapic/harbor": "^1.1.0",
         "@hapic/vault": "^1.2.0",
         "@personalhealthtrain/central-common": "^1.4.0",
-        "amqp-extension": "1.0.4",
+        "amqp-extension": "2.0.0",
         "crypto": "^1.0.1",
         "dockerode": "^3.3.3",
         "dotenv": "^16.0.3",
