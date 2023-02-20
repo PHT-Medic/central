@@ -19,7 +19,7 @@
         "@hapic/harbor": "^1.1.0",
         "@hapic/vault": "^1.2.0",
         "@personalhealthtrain/central-common": "^1.4.0",
-        "@routup/body": "^0.7.0",
+        "@routup/body": "^0.7.1",
         "@routup/cookie": "^0.7.0",
         "@routup/decorators": "^0.5.0",
         "@routup/query": "^0.7.0",
