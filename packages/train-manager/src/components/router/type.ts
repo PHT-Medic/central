@@ -5,6 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './constants';
-export * from './module';
-export * from './type';
+export type RouterQueuePayload<T extends Record<string, any>> = {
+    data: T,
+    metadata: {
+        command: string,
+        event?: string,
+        component: string
+    }
+};

@@ -8,8 +8,10 @@
 import {
     hasOwnProperty,
 } from '@personalhealthtrain/central-common';
-import { Message, buildMessage } from 'amqp-extension';
-import { MessageQueueSelfRoutingKey, MessageQueueSelfToUIRoutingKey } from './services/rabbitmq';
+import type { PublishOptionsExtended } from 'amqp-extension';
+import { } from 'amqp-extension';
+import type { RouterQueuePayload } from '../components/router';
+import { ROUTER_QUEUE_ROUTING_KEY } from '../components/router';
 
 export function cleanupQueuePayload<T extends Record<string, any>>(payload: T): T {
     if (hasOwnProperty(payload, 'entity')) {
@@ -27,38 +29,44 @@ export function cleanupQueuePayload<T extends Record<string, any>>(payload: T): 
     return payload;
 }
 
-export function buildCommandQueueMessageForSelf(
+type QueueMessageContext = {
     command: string,
+    component: string,
+    event?: string,
     data: Record<string, any>,
-    metadata: Record<string, any>,
-) : Message {
-    return buildMessage({
-        options: {
-            routingKey: MessageQueueSelfRoutingKey.COMMAND,
+};
+export function buildCommandQueueMessageForSelf(
+    context: QueueMessageContext,
+) : PublishOptionsExtended<RouterQueuePayload<Record<string, any>>> {
+    return {
+        exchange: {
+            routingKey: ROUTER_QUEUE_ROUTING_KEY,
         },
-        type: `${metadata.component}_${command}`,
-        data,
-        metadata: {
-            ...metadata,
-            command,
+        content: {
+            data: context.data,
+            metadata: {
+                command: context.command,
+                component: context.component,
+                ...(context.event ? { event: context.event } : {}),
+            },
         },
-    });
+    };
 }
 
 export function buildEventQueueMessageForAPI(
-    event: string,
-    data: Record<string, any>,
-    metadata: Record<string, any>,
-) {
-    return buildMessage({
-        options: {
-            routingKey: MessageQueueSelfToUIRoutingKey.EVENT,
+    context : Omit<QueueMessageContext, 'event'> & { event: string },
+) : PublishOptionsExtended<RouterQueuePayload<any>> {
+    return {
+        exchange: {
+            routingKey: 'api.aggregator.tm',
         },
-        type: `${metadata.component}_${metadata.command}_${event}`,
-        data: cleanupQueuePayload({ ...data }),
-        metadata: {
-            ...metadata,
-            event,
+        content: {
+            data: cleanupQueuePayload({ ...context.data }),
+            metadata: {
+                command: context.command,
+                component: context.component,
+                event: context.event,
+            },
         },
-    });
+    };
 }

@@ -5,23 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    HTTPClient, Train,
+import type {
+    HTTPClient, Registry, Train,
     TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { Message } from 'amqp-extension';
 import { BaseError } from '../error';
 
-export async function extendPayload(message: Message) {
-    const data = message.data as TrainManagerQueuePayloadExtended<{ id: Train['id'] }>;
+export async function extendPayload<T extends { id: Train['id'] }>(
+    data: T,
+) : Promise<TrainManagerQueuePayloadExtended<T>> {
+    let train : Train;
+    let registry: Registry;
+    let registryId: Registry['id'];
 
     // -----------------------------------------------------------------------------------
 
     const client = useClient<HTTPClient>();
 
     try {
-        data.entity = await client.train.getOne(data.id);
+        train = await client.train.getOne(data.id);
     } catch (e) {
         throw BaseError.notFound({
             previous: e,
@@ -29,10 +32,10 @@ export async function extendPayload(message: Message) {
     }
 
     try {
-        data.registry = await client.registry.getOne(data.entity.registry_id, {
+        registry = await client.registry.getOne(train.registry_id, {
             fields: ['+account_secret'],
         });
-        data.registryId = data.registry.id;
+        registryId = registry.id;
     } catch (e) {
         throw BaseError.registryNotFound({
             previous: e,
@@ -40,7 +43,9 @@ export async function extendPayload(message: Message) {
     }
 
     return {
-        ...message,
-        data,
+        ...data,
+        entity: train,
+        registry,
+        registryId,
     };
 }
