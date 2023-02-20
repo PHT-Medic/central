@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, UserSecret } from '@personalhealthtrain/central-common';
+import type { UserSecret } from '@personalhealthtrain/central-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { NotFoundError } from '@ebec/http';
-import {
-    Request, Response, sendAccepted, useRequestParam,
-} from 'routup';
-import { FindOptionsWhere } from 'typeorm';
-import { publishMessage } from 'amqp-extension';
+import type { Request, Response } from 'routup';
+import { sendAccepted, useRequestParam } from 'routup';
+import type { FindOptionsWhere } from 'typeorm';
+import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
-import { useEnv } from '../../../../../config/env';
+import { useEnv } from '../../../../../config';
 import { saveUserSecretsToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/user';
 import {
     SecretStorageQueueCommand,
@@ -59,15 +59,13 @@ export async function deleteUserSecretRouteHandler(req: Request, res: Response) 
             id: entity.user_id,
         });
     } else {
-        const queueMessage = buildSecretStorageQueueMessage(
+        await publish(buildSecretStorageQueueMessage(
             SecretStorageQueueCommand.SAVE,
             {
                 type: SecretStorageQueueEntityType.USER_SECRETS,
                 id: entity.user_id,
             },
-        );
-
-        await publishMessage(queueMessage);
+        ));
     }
 
     return sendAccepted(res, entity);

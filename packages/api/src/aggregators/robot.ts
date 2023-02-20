@@ -6,7 +6,7 @@
  */
 
 import { useRobotEventEmitter } from '@authup/server-database';
-import { publishMessage } from 'amqp-extension';
+import { publish } from 'amqp-extension';
 import { buildSecretStorageQueueMessage } from '../domains/special/secret-storage/queue';
 import { SecretStorageQueueCommand, SecretStorageQueueEntityType } from '../domains/special/secret-storage/constants';
 import { useEnv } from '../config/env';
@@ -14,7 +14,7 @@ import {
     deleteRobotFromSecretStorage,
     saveRobotToSecretStorage,
 } from '../components/secret-storage/handlers/entities/robot';
-import { SecretStorageRobotQueuePayload } from '../domains/special/secret-storage/type';
+import type { SecretStorageRobotQueuePayload } from '../domains/special/secret-storage/type';
 
 export function buildRobotAggregator() {
     function start(options?: {synchronous?: boolean}) {
@@ -40,7 +40,7 @@ export function buildRobotAggregator() {
                         payload,
                     );
 
-                    await publishMessage(queueMessage);
+                    await publish(queueMessage);
                 }
             });
 
@@ -59,7 +59,7 @@ export function buildRobotAggregator() {
                         payload,
                     );
 
-                    await publishMessage(queueMessage);
+                    await publish(queueMessage);
                 }
             });
     }

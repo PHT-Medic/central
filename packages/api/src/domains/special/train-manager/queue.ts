@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Message, buildMessage } from 'amqp-extension';
-import {
+import type { PublishOptionsExtended } from 'amqp-extension';
+import type {
     TrainManagerCommand,
     TrainManagerCommandQueuePayload,
     TrainManagerComponent,
 } from '@personalhealthtrain/central-common';
-import { MessageQueueRoutingKey } from '../../../config/mq';
+import type { RouterQueuePayload } from '../../../components';
 
 export function buildTrainManagerQueueMessage<
     Component extends `${TrainManagerComponent}` | TrainManagerComponent,
@@ -20,16 +20,17 @@ export function buildTrainManagerQueueMessage<
     component: Component,
     command: Command,
     data: TrainManagerCommandQueuePayload<Component, Command>,
-) : Message {
-    return buildMessage({
-        options: {
-            routingKey: MessageQueueRoutingKey.TRAIN_MANAGER_COMMAND,
+) : PublishOptionsExtended<RouterQueuePayload<TrainManagerCommandQueuePayload<Component, Command>>> {
+    return {
+        exchange: {
+            routingKey: 'tm.router',
         },
-        type: `${component}_${command}`,
-        data,
-        metadata: {
-            component,
-            command,
+        content: {
+            data,
+            metadata: {
+                component,
+                command,
+            },
         },
-    });
+    };
 }

@@ -6,16 +6,16 @@
  */
 
 import { useRequestBody } from '@routup/body';
-import { Request, Response, sendAccepted } from 'routup';
-import {
-    BaseSchema, array, object, string,
-} from 'yup';
+import { publish } from 'amqp-extension';
+import type { Request, Response } from 'routup';
+import { sendAccepted } from 'routup';
+import type { BaseSchema } from 'yup';
+import { array, object, string } from 'yup';
 
-import { publishMessage } from 'amqp-extension';
+import type { RegistryHook } from '../../../../../../domains/special/registry';
 import {
-    RegistryHook,
-    RegistryQueueEvent,
-    buildRegistryEventQueueMessage,
+    RegistryQueueCommand,
+    RegistryQueueEvent, buildRegistryQueueMessage,
 } from '../../../../../../domains/special/registry';
 
 let eventValidator : undefined | BaseSchema;
@@ -59,8 +59,8 @@ export async function postHarborHookRouteHandler(req: Request, res: Response) : 
 
     const event : RegistryQueueEvent = `REGISTRY_${hook.type}` as RegistryQueueEvent;
 
-    const message = buildRegistryEventQueueMessage(
-        event,
+    const message = buildRegistryQueueMessage(
+        RegistryQueueCommand.EVENT_HANDLE,
         {
             operator: hook.operator,
             namespace: hook.event_data.repository.namespace,
@@ -69,9 +69,10 @@ export async function postHarborHookRouteHandler(req: Request, res: Response) : 
             artifactTag: hook.event_data.resources[0]?.tag,
             artifactDigest: hook.event_data.resources[0]?.digest,
         },
+        event,
     );
 
-    await publishMessage(message);
+    await publish(message);
 
     return sendAccepted(res);
 }

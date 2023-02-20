@@ -6,8 +6,9 @@
  */
 
 import { SecretType, isHex } from '@personalhealthtrain/central-common';
-import { publishMessage } from 'amqp-extension';
-import { Request, Response, sendCreated } from 'routup';
+import { publish } from 'amqp-extension';
+import type { Request, Response } from 'routup';
+import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runUserSecretValidation } from '../utils';
@@ -48,15 +49,13 @@ export async function createUserSecretRouteHandler(req: Request, res: Response) 
             id: entity.user_id,
         });
     } else {
-        const queueMessage = buildSecretStorageQueueMessage(
+        await publish(buildSecretStorageQueueMessage(
             SecretStorageQueueCommand.SAVE,
             {
                 type: SecretStorageQueueEntityType.USER_SECRETS,
                 id: entity.user_id,
             },
-        );
-
-        await publishMessage(queueMessage);
+        ));
     }
 
     return sendCreated(res, entity);

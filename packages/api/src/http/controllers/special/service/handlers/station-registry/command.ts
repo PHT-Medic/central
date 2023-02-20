@@ -12,9 +12,10 @@ import {
     BadRequestError, NotImplementedError,
 } from '@ebec/http';
 import { useRequestBody } from '@routup/body';
-import { publishMessage } from 'amqp-extension';
-import { Request, Response, sendCreated } from 'routup';
-import { useEnv } from '../../../../../../config/env';
+import { publish } from 'amqp-extension';
+import type { Request, Response } from 'routup';
+import { sendCreated } from 'routup';
+import { useEnv } from '../../../../../../config';
 import { syncStationRegistry } from '../../../../../../components/station-registry/handlers/sync';
 import { StationRegistryQueueCommand } from '../../../../../../domains/special/station-registry/consants';
 import { buildStationRegistryQueueMessage } from '../../../../../../domains/special/station-registry/queue';
@@ -34,19 +35,14 @@ export async function handleStationRegistryCommandRouteHandler(req: Request, res
     switch (command as StationRegistryCommand) {
         case StationRegistryCommand.SYNC: {
             if (useEnv('env') === 'test') {
-                await syncStationRegistry({
-                    id: null,
-                    type: StationRegistryQueueCommand.SYNC,
-                    data: {},
-                    metadata: {},
-                });
+                await syncStationRegistry();
             } else {
                 const queueMessage = buildStationRegistryQueueMessage(
                     StationRegistryQueueCommand.SYNC,
                     {},
                 );
 
-                await publishMessage(queueMessage);
+                await publish(queueMessage);
             }
 
             return sendCreated(res);

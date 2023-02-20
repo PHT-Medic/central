@@ -11,6 +11,5 @@ export * from './permissions';
 export * from './socket-emitter';
 export * from './api';
 export * from './module';
-export * from './mq';
 export * from './paths';
 export * from './spinner';

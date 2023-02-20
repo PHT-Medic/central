@@ -8,7 +8,7 @@
 import { Proposal } from '@personalhealthtrain/central-common';
 import { removeDateProperties } from '../../../utils/date-properties';
 import { useSuperTest } from '../../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
+import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
 import { createSuperTestProposal } from '../../../utils/domains';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 

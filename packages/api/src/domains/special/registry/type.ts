@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Registry, RegistryProject } from '@personalhealthtrain/central-common';
-import { RegistryQueueCommand } from './constants';
+import type { Registry, RegistryProject } from '@personalhealthtrain/central-common';
+import type { RegistryQueueCommand } from './constants';
 
 export type RegistryQueueSetupPayload = {
     id: Registry['id'],
@@ -26,17 +26,6 @@ export type RegistryProjectUnlinkQueuePayload = {
     updateDatabase?: boolean
 };
 
-export type RegistryQueuePayload<T extends `${RegistryQueueCommand}`> =
-    T extends `${RegistryQueueCommand.SETUP}` | `${RegistryQueueCommand.DELETE}` ?
-        RegistryQueueSetupPayload :
-        T extends `${RegistryQueueCommand.PROJECT_LINK}` ?
-            RegistryProjectLinkQueuePayload :
-            T extends `${RegistryQueueCommand.PROJECT_UNLINK}` | `${RegistryQueueCommand.PROJECT_RELINK}` ?
-                RegistryProjectUnlinkQueuePayload :
-                never;
-
-// ---------------------------------------------------
-
 export type RegistryEventQueuePayload = {
     operator: string,
     namespace: string,
@@ -46,6 +35,17 @@ export type RegistryEventQueuePayload = {
     artifactDigest?: string,
     [key: string]: string
 };
+
+export type RegistryQueuePayload<T extends `${RegistryQueueCommand}`> =
+    T extends `${RegistryQueueCommand.SETUP}` | `${RegistryQueueCommand.DELETE}` ?
+        RegistryQueueSetupPayload :
+        T extends `${RegistryQueueCommand.PROJECT_LINK}` ?
+            RegistryProjectLinkQueuePayload :
+            T extends `${RegistryQueueCommand.PROJECT_UNLINK}` | `${RegistryQueueCommand.PROJECT_RELINK}` ?
+                RegistryProjectUnlinkQueuePayload :
+                T extends `${RegistryQueueCommand.EVENT_HANDLE}` ?
+                    RegistryEventQueuePayload :
+                    never;
 
 // ---------------------------------------------------
 

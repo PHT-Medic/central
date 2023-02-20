@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { publish } from 'amqp-extension';
 import { useClient } from 'hapic';
-import { Message, publishMessage } from 'amqp-extension';
 import { In } from 'typeorm';
 import { RealmEntity } from '@authup/server-database';
 import { hasOwnProperty } from '@authup/common';
@@ -21,7 +21,7 @@ import {
     SecretStorageQueueEntityType,
 } from '../../../domains/special/secret-storage/constants';
 
-export async function syncStationRegistry(message: Message) {
+export async function syncStationRegistry() {
     const dataSource = await useDataSource();
     const realmRepository = dataSource.getRepository(RealmEntity);
 
@@ -172,8 +172,6 @@ export async function syncStationRegistry(message: Message) {
             },
         );
 
-        await publishMessage(queueMessage);
+        await publish(queueMessage);
     }
-
-    return message;
 }

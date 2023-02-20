@@ -8,7 +8,7 @@
 import { Train, TrainType } from '@personalhealthtrain/central-common';
 import { removeDateProperties } from '../../../utils/date-properties';
 import { useSuperTest } from '../../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
+import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
 import { TEST_DEFAULT_TRAIN, createSuperTestProposal, createSuperTestTrain } from '../../../utils/domains';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 import { buildRequestValidationErrorMessage } from '../../../../src/http/validation';

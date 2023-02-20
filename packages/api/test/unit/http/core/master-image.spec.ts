@@ -6,7 +6,7 @@
  */
 
 import { MasterImage, MasterImageCommand, MasterImageGroup } from '@personalhealthtrain/central-common';
-import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
+import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
 import { useSuperTest } from '../../../utils/supertest';
 
 describe('src/controllers/core/train-file', () => {

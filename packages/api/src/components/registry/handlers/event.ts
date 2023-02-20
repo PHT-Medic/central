@@ -1,30 +1,27 @@
 /*
- * Copyright (c) 2021-2022.
+ * Copyright (c) 2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-
-import { Message, publishMessage } from 'amqp-extension';
-
 import { TrainManagerComponent, TrainManagerRouterCommand } from '@personalhealthtrain/central-common';
+import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
-import { buildTrainManagerQueueMessage } from '../../domains/special/train-manager';
-import { RegistryEventQueuePayload, RegistryQueueEvent } from '../../domains/special/registry';
-import { useLogger } from '../../config/log';
-import { RegistryProjectEntity } from '../../domains/core/registry-project/entity';
+import { useLogger } from '../../../config';
+import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
+import type { RegistryEventQueuePayload } from '../../../domains/special/registry';
+import { RegistryQueueEvent } from '../../../domains/special/registry';
+import { buildTrainManagerQueueMessage } from '../../../domains/special/train-manager';
 
 export async function dispatchRegistryEventToTrainManager(
-    message: Message,
-) : Promise<Message> {
-    const type : RegistryQueueEvent = message.type as RegistryQueueEvent;
-    const data : RegistryEventQueuePayload = message.data as RegistryEventQueuePayload;
-
+    event: string,
+    data: RegistryEventQueuePayload,
+) {
     // only process terminated trains and the PUSH_ARTIFACT event
-    if (type !== RegistryQueueEvent.PUSH_ARTIFACT) {
+    if (event !== RegistryQueueEvent.PUSH_ARTIFACT) {
         useLogger()
-            .info(`skipping ${type} event distribution for train-manager`);
-        return message;
+            .info(`skipping ${event} event distribution for train-manager`);
+        return;
     }
 
     const dataSource = await useDataSource();
@@ -36,10 +33,10 @@ export async function dispatchRegistryEventToTrainManager(
     if (!registryProject) {
         useLogger()
             .info(`registry-project ${data.namespace} is not registered...`);
-        return message;
+        return;
     }
 
-    await publishMessage(buildTrainManagerQueueMessage(
+    await publish(buildTrainManagerQueueMessage(
         TrainManagerComponent.ROUTER,
         TrainManagerRouterCommand.ROUTE,
         {
@@ -49,6 +46,4 @@ export async function dispatchRegistryEventToTrainManager(
             artifactTag: data.artifactTag,
         },
     ));
-
-    return message;
 }

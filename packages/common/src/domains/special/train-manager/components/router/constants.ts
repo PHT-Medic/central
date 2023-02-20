@@ -27,6 +27,7 @@ export enum TrainManagerRouterCommand {
     START = 'start',
     ROUTE = 'route',
     CHECK = 'check',
+    RESET = 'reset',
 }
 
 export enum TrainManagerRouterErrorCode {

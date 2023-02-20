@@ -5,10 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError } from '@ebec/http';
-import { publishMessage } from 'amqp-extension';
+import { publish } from 'amqp-extension';
 import {
-    Train,
     TrainManagerBuilderCommand,
     TrainManagerComponent,
 } from '@personalhealthtrain/central-common';
@@ -23,15 +21,13 @@ export async function detectTrainBuildStatus(train: TrainEntity | string) : Prom
 
     train = await resolveTrain(train, repository);
 
-    const queueMessage = buildTrainManagerQueueMessage(
+    await publish(buildTrainManagerQueueMessage(
         TrainManagerComponent.BUILDER,
         TrainManagerBuilderCommand.CHECK,
         {
             id: train.id,
         },
-    );
-
-    await publishMessage(queueMessage);
+    ));
 
     return train;
 }

@@ -5,11 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    EntitySubscriberInterface, EventSubscriber, RemoveEvent,
-} from 'typeorm';
+import type { EntitySubscriberInterface, RemoveEvent } from 'typeorm';
+import { EventSubscriber } from 'typeorm';
 import { RobotEntity } from '@authup/server-database';
-import { publishMessage } from 'amqp-extension';
+import { publish } from 'amqp-extension';
 import { buildSecretStorageQueueMessage } from '../../domains/special/secret-storage/queue';
 import { SecretStorageQueueCommand, SecretStorageQueueEntityType } from '../../domains/special/secret-storage/constants';
 
@@ -32,6 +31,6 @@ export class RobotSubscriber implements EntitySubscriberInterface<RobotEntity> {
             },
         );
 
-        await publishMessage(queueMessage);
+        await publish(queueMessage);
     }
 }

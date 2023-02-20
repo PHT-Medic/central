@@ -13,8 +13,9 @@ import {
     ForbiddenError,
 } from '@ebec/http';
 import { useRequestBody } from '@routup/body';
-import { publishMessage } from 'amqp-extension';
-import { Request, Response, sendAccepted } from 'routup';
+import { publish } from 'amqp-extension';
+import type { Request, Response } from 'routup';
+import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../../request';
 import { useEnv, useLogger } from '../../../../../../config';
@@ -77,7 +78,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                             entity,
                         },
                     );
-                    await publishMessage(queueMessage);
+                    await publish(queueMessage);
                 }
             } else {
                 useLogger().info('Submitting delete registry command.');
@@ -90,7 +91,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                     },
                 );
 
-                await publishMessage(queueMessage);
+                await publish(queueMessage);
             }
             break;
         }
@@ -118,7 +119,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                             entity,
                         },
                     );
-                    await publishMessage(queueMessage);
+                    await publish(queueMessage);
                 }
                 break;
             } else if (useEnv('env') === 'test') {
@@ -140,7 +141,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                         updateDatabase: true,
                     },
                 );
-                await publishMessage(queueMessage);
+                await publish(queueMessage);
             }
             break;
         }

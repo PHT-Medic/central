@@ -18,7 +18,7 @@ import { buildDataSourceOptions } from '../database/utils';
 import { createRouter } from '../http/router';
 import { createHttpServer } from '../http/server';
 import { generateSwaggerDocumentation } from '../http/swagger';
-import { StartCommandContext } from './type';
+import type { StartCommandContext } from './type';
 
 export async function startCommand(context?: StartCommandContext) {
     context = context || {};

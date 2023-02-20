@@ -11,10 +11,9 @@ import {
 } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/common';
-import { Message, publishMessage } from 'amqp-extension';
-import {
-    Request, Response, sendAccepted, useRequestParam,
-} from 'routup';
+import { publish } from 'amqp-extension';
+import type { Request, Response } from 'routup';
+import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
@@ -103,17 +102,15 @@ export async function updateStationRouteHandler(req: Request, res: Response) : P
         entity.registry_project_id = registryProject.id;
         entity.external_name = registryProjectExternalName;
 
-        let queueMessage : Message;
-
         if (registryOperation === 'link') {
-            queueMessage = buildRegistryQueueMessage(
+            await publish(buildRegistryQueueMessage(
                 RegistryQueueCommand.PROJECT_LINK,
                 {
                     id: registryProject.id,
                 },
-            );
+            ));
         } else {
-            queueMessage = buildRegistryQueueMessage(
+            await publish(buildRegistryQueueMessage(
                 RegistryQueueCommand.PROJECT_RELINK,
                 {
                     id: registryProject.id,
@@ -121,10 +118,8 @@ export async function updateStationRouteHandler(req: Request, res: Response) : P
                     externalName: registryProject.external_name,
                     accountId: registryProject.account_id,
                 },
-            );
+            ));
         }
-
-        await publishMessage(queueMessage);
     }
 
     await repository.save(entity);

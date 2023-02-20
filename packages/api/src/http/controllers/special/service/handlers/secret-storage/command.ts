@@ -18,20 +18,18 @@ import {
     BadRequestError, ForbiddenError, NotFoundError, NotImplementedError,
 } from '@ebec/http';
 import { UserEntity } from '@authup/server-database';
-import { publishMessage } from 'amqp-extension';
-import { Client as VaultClient } from '@hapic/vault';
-import {
-    Request, Response, send, sendAccepted, sendCreated,
-} from 'routup';
+import { publish } from 'amqp-extension';
+import type { Client as VaultClient } from '@hapic/vault';
+import type { Request, Response } from 'routup';
+import { send, sendAccepted, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { RequestValidationError } from '../../../../../validation';
-import { ApiKey } from '../../../../../../config';
+import { ApiKey, useEnv } from '../../../../../../config';
 import { buildSecretStorageQueueMessage } from '../../../../../../domains/special/secret-storage/queue';
 import {
     SecretStorageQueueCommand,
     SecretStorageQueueEntityType,
 } from '../../../../../../domains/special/secret-storage/constants';
-import { useEnv } from '../../../../../../config/env';
 import {
     deleteUserSecretsFromSecretStorage,
     saveUserSecretsToSecretStorage,
@@ -136,7 +134,7 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
                                 id: entity.data.id,
                             },
                         );
-                        await publishMessage(queueMessage);
+                        await publish(queueMessage);
                     }
                     break;
                 }
@@ -160,7 +158,7 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
                                 id: entity.data.id,
                             },
                         );
-                        await publishMessage(queueMessage);
+                        await publish(queueMessage);
                     }
                     break;
                 }

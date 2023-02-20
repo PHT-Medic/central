@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BadRequestError } from '@ebec/http';
 import { TrainConfigurationStatus } from '@personalhealthtrain/central-common';
 import crypto from 'node:crypto';
 import { useDataSource } from 'typeorm-extension';

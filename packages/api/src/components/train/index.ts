@@ -5,21 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ConsumeHandler, Message } from 'amqp-extension';
-import { TrainQueueCommand, TrainQueuePayload } from '@personalhealthtrain/central-common';
+import type { TrainQueuePayload } from '@personalhealthtrain/central-common';
+import { TrainQueueCommand } from '@personalhealthtrain/central-common';
 import { cleanupTrain, setupTrain } from './handlers';
 
-export function createTrainComponentHandlers() : Record<TrainQueueCommand, ConsumeHandler> {
-    return {
-        [TrainQueueCommand.CLEANUP]: async (message: Message) => {
-            const payload = message.data as TrainQueuePayload<TrainQueueCommand.CLEANUP>;
-
+export async function executeTrainCommand(
+    command: string,
+    payload: TrainQueuePayload<any>,
+) {
+    switch (command) {
+        case TrainQueueCommand.CLEANUP: {
             await cleanupTrain(payload);
-        },
-        [TrainQueueCommand.SETUP]: async (message: Message) => {
-            const payload = message.data as TrainQueuePayload<TrainQueueCommand.SETUP>;
-
+            break;
+        }
+        case TrainQueueCommand.SETUP: {
             await setupTrain(payload);
-        },
-    };
+            break;
+        }
+    }
 }

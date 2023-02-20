@@ -5,19 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { publishMessage } from 'amqp-extension';
+import { publish } from 'amqp-extension';
+import type { Registry } from '@personalhealthtrain/central-common';
 import {
     Ecosystem,
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     REGISTRY_OUTGOING_PROJECT_NAME,
-    Registry,
     RegistryProjectType, generateRegistryProjectId,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
+import type { RegistryQueuePayload } from '../../../domains/special/registry';
 import {
     RegistryQueueCommand,
-    RegistryQueuePayload,
     buildRegistryQueueMessage,
 } from '../../../domains/special/registry';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
@@ -148,7 +148,7 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
             },
         );
 
-        await publishMessage(queueMessage);
+        await publish(queueMessage);
     }
 
     return payload;

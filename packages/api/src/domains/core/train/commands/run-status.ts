@@ -6,14 +6,14 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { publishMessage } from 'amqp-extension';
+import { publish } from 'amqp-extension';
 import {
     TrainBuildStatus,
     TrainManagerComponent,
     TrainManagerRouterCommand,
 } from '@personalhealthtrain/central-common';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
-import { TrainEntity } from '../entity';
+import type { TrainEntity } from '../entity';
 
 export async function detectTrainRunStatus(train: TrainEntity) : Promise<TrainEntity> {
     if (
@@ -21,7 +21,7 @@ export async function detectTrainRunStatus(train: TrainEntity) : Promise<TrainEn
     ) {
         throw new BadRequestError('The train has not been build yet...');
     } else {
-        await publishMessage(buildTrainManagerQueueMessage(
+        await publish(buildTrainManagerQueueMessage(
             TrainManagerComponent.ROUTER,
             TrainManagerRouterCommand.CHECK,
             {

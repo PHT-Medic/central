@@ -16,7 +16,7 @@ import { Client as VaultClient } from '@hapic/vault';
 import { removeDateProperties } from '../../../utils/date-properties';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 import { useSuperTest } from '../../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
+import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
 import { ApiKey } from '../../../../src';
 
 describe('src/controllers/core/user-secret', () => {

@@ -7,7 +7,7 @@
 
 import { ProposalStation } from '@personalhealthtrain/central-common';
 import { useSuperTest } from '../../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
+import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
 import { createSuperTestProposal, createSuperTestStation } from '../../../utils/domains';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 

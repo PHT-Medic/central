@@ -12,8 +12,9 @@ import {
 } from '@personalhealthtrain/central-common';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
 import { validationResult } from 'express-validator';
-import { publishMessage } from 'amqp-extension';
-import { Request, Response, sendCreated } from 'routup';
+import { publish } from 'amqp-extension';
+import type { Request, Response } from 'routup';
+import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { RequestValidationError } from '../../../../validation';
 import { useRequestEnv } from '../../../../request';
@@ -79,14 +80,12 @@ export async function createStationRouteHandler(req: Request, res: Response) : P
 
         entity.registry_project_id = registryProject.id;
 
-        const queueMessage = buildRegistryQueueMessage(
+        await publish(buildRegistryQueueMessage(
             RegistryQueueCommand.PROJECT_LINK,
             {
                 id: registryProject.id,
             },
-        );
-
-        await publishMessage(queueMessage);
+        ));
     }
 
     // -----------------------------------------------------

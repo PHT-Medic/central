@@ -9,7 +9,7 @@ import {
     TrainManagerComponent,
     TrainManagerExtractorCommand,
 } from '@personalhealthtrain/central-common';
-import { publishMessage } from 'amqp-extension';
+import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 import { resolveTrain } from './utils';
@@ -24,7 +24,7 @@ export async function triggerTrainResultStatus(
     train = await resolveTrain(train, repository);
 
     // send queue message
-    await publishMessage(buildTrainManagerQueueMessage(
+    await publish(buildTrainManagerQueueMessage(
         TrainManagerComponent.EXTRACTOR,
         TrainManagerExtractorCommand.CHECK,
         {

@@ -14,7 +14,7 @@ import {
     TrainManagerComponent,
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
-import { publishMessage } from 'amqp-extension';
+import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 import { RegistryProjectEntity } from '../../registry-project/entity';
@@ -76,15 +76,13 @@ export async function startBuildTrain(
             train.incoming_registry_project_id = project.id;
         }
 
-        const queueMessage = buildTrainManagerQueueMessage(
+        await publish(buildTrainManagerQueueMessage(
             TrainManagerComponent.BUILDER,
             TrainManagerBuilderCommand.BUILD,
             {
                 id: train.id,
             },
-        );
-
-        await publishMessage(queueMessage);
+        ));
 
         train.build_status = TrainBuildStatus.STARTING;
 

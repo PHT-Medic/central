@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainRunStatus } from '@personalhealthtrain/central-common';
-import { publishMessage } from 'amqp-extension';
+import { TrainManagerComponent, TrainManagerRouterCommand, TrainRunStatus } from '@personalhealthtrain/central-common';
+import { publish } from 'amqp-extension';
 import { BadRequestError } from '@ebec/http';
 import { useDataSource } from 'typeorm-extension';
-import { TrainRouterCommand, buildTrainRouterQueueMessage } from '../../../special/train-router';
+import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
 import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
 
@@ -23,9 +23,13 @@ export async function resetTrain(train: TrainEntity | string) : Promise<TrainEnt
         throw new BadRequestError('The train has already been terminated...');
     } else {
         if (train.run_status !== TrainRunStatus.STOPPING) {
-            const queueMessage = await buildTrainRouterQueueMessage(TrainRouterCommand.RESET, { id: train.id });
-
-            await publishMessage(queueMessage);
+            await publish(buildTrainManagerQueueMessage(
+                TrainManagerComponent.ROUTER,
+                TrainManagerRouterCommand.RESET,
+                {
+                    id: train.id,
+                },
+            ));
         }
 
         train = repository.merge(train, {

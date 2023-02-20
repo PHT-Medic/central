@@ -8,10 +8,9 @@
 import { NotFoundError } from '@ebec/http';
 import { PermissionID, SecretType, isHex } from '@personalhealthtrain/central-common';
 import { Buffer } from 'buffer';
-import { publishMessage } from 'amqp-extension';
-import {
-    Request, Response, sendAccepted, useRequestParam,
-} from 'routup';
+import { publish } from 'amqp-extension';
+import type { Request, Response } from 'routup';
+import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runUserSecretValidation } from '../utils';
@@ -21,7 +20,7 @@ import {
     SecretStorageQueueCommand,
     SecretStorageQueueEntityType,
 } from '../../../../../domains/special/secret-storage/constants';
-import { useEnv } from '../../../../../config/env';
+import { useEnv } from '../../../../../config';
 import { saveUserSecretsToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/user';
 
 export async function updateUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -63,15 +62,13 @@ export async function updateUserSecretRouteHandler(req: Request, res: Response) 
             id: entity.user_id,
         });
     } else {
-        const queueMessage = buildSecretStorageQueueMessage(
+        await publish(buildSecretStorageQueueMessage(
             SecretStorageQueueCommand.SAVE,
             {
                 type: SecretStorageQueueEntityType.USER_SECRETS,
                 id: entity.user_id,
             },
-        );
-
-        await publishMessage(queueMessage);
+        ));
     }
 
     return sendAccepted(res, entity);
