@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Writable } from 'stream';
-import fs from 'fs';
+import type { Writable } from 'node:stream';
+import fs from 'node:fs';
 import type { Pack } from 'tar-stream';
 import tar from 'tar-stream';
 import { useDocker } from './instance';

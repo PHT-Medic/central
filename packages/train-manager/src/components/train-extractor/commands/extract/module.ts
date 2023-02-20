@@ -9,7 +9,7 @@ import type {
     TrainManagerExtractorExtractQueuePayload,
     TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
-import { Writable } from 'stream';
+import { Writable } from 'node:stream';
 import {
     generateTrainMinioBucketName,
 } from '../../../../config';

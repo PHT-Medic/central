@@ -11,7 +11,7 @@ import type {
     Train, TrainFile,
 } from '@personalhealthtrain/central-common';
 import { TrainContainerPath, getHostNameFromString } from '@personalhealthtrain/central-common';
-import path from 'path';
+import path from 'node:path';
 import { useClient } from 'hapic';
 import { BuilderError } from '../error';
 

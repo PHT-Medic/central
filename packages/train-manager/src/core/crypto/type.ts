@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { KeyLike } from 'crypto';
+import type { KeyLike } from 'node:crypto';
 
 export type SignatureVerifyContext = {
     signature: Buffer | string,

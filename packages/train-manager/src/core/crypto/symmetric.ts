@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 export function decryptSymmetric(key: Buffer, data: Buffer, ivLength = 16): Buffer {
     const iv = data.slice(0, ivLength);
