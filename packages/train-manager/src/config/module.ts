@@ -14,12 +14,13 @@ import {
     createRefreshRobotTokenOnResponseErrorHandler,
 } from '@personalhealthtrain/central-common';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
-import { Client, setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
+import type { Client } from 'redis-extension';
+import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import { Client as VaultClient } from '@hapic/vault';
-import { Robot } from '@authup/common';
-import { buildCommandRouterComponent } from '../components/command-router';
+import type { Robot } from '@authup/common';
+import { buildCommandRouterComponent } from '../components/router';
 import { setMinioConfig } from '../core/minio';
-import { Environment } from '../env';
+import type { Environment } from '../env';
 import { useLogger } from '../modules/log';
 
 interface ConfigContext {
