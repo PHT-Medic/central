@@ -7,9 +7,8 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import {
-    Request, Response, sendAccepted, useRequestParam,
-} from 'routup';
+import type { Request, Response } from 'routup';
+import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { TrainLogEntity } from '../../../../../domains/core/train-log';
 import { useRequestEnv } from '../../../../request';

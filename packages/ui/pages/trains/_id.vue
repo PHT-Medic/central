@@ -6,10 +6,12 @@
   -->
 <script lang="ts">
 import Vue from 'vue';
-import { Socket } from 'socket.io-client';
-import {
+import type { Socket } from 'socket.io-client';
+import type {
     SocketClientToServerEvents,
     SocketServerToClientEvents,
+} from '@personalhealthtrain/central-common';
+import {
     TrainSocketClientToServerEventName, TrainSocketServerToClientEventName,
 } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';

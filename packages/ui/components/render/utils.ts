@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { CreateElement, VNodeChildren, VNodeData } from 'vue';
+import type { CreateElement, VNodeChildren, VNodeData } from 'vue';
 import { BDropdownItem } from 'bootstrap-vue';
-import { TrainCommandProperties } from '../domains/train/command/type';
-import { ActionCommandMethods } from './type';
+import type { TrainCommandProperties } from '../domains/train/command/type';
+import type { ActionCommandMethods } from './type';
 
 export function renderActionCommand(
     vm: TrainCommandProperties & ActionCommandMethods & {

@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import http, { Server } from 'http';
+import type { Server } from 'http';
+import http from 'http';
 import { useLogger } from '../log';
 
 export function createHttpServer() : Server {

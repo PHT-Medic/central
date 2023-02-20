@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Realm } from '@authup/common';
-import { Ecosystem } from '../ecosystem';
-import { RegistryProject } from '../registry-project';
-import { Registry } from '../registry';
+import type { Realm } from '@authup/common';
+import type { Ecosystem } from '../ecosystem';
+import type { RegistryProject } from '../registry-project';
+import type { Registry } from '../registry';
 
 export interface Station {
     id: string;

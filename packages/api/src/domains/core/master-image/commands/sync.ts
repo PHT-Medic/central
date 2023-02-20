@@ -10,7 +10,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import tar from 'tar';
 import { scanDirectory } from 'docker-scan';
-import { Request, Response, sendAccepted } from 'routup';
+import type { Request, Response } from 'routup';
+import { sendAccepted } from 'routup';
 import { getWritableDirPath } from '../../../../config';
 import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
 

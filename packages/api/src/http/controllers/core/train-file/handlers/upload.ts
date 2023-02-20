@@ -5,15 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, TrainFile } from '@personalhealthtrain/central-common';
-import BusBoy, { FileInfo } from 'busboy';
-import { UploadedObjectInfo } from 'minio';
+import type { TrainFile } from '@personalhealthtrain/central-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
+import type { FileInfo } from 'busboy';
+import BusBoy from 'busboy';
+import type { UploadedObjectInfo } from 'minio';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
-import {
-    Request, Response, send, sendCreated,
-} from 'routup';
+import type { Request, Response } from 'routup';
+import { send, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ensureMinioBucket, useMinio } from '../../../../../core/minio';
 import { streamToBuffer } from '../../../../../core/utils';

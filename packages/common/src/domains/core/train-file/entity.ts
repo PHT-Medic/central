@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Realm, User } from '@authup/common';
-import { Train } from '../train';
+import type { Realm, User } from '@authup/common';
+import type { Train } from '../train';
 
 export interface TrainFile {
     id: string;

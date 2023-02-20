@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SocketServerToClientEventName } from '@personalhealthtrain/central-common';
+import type { SocketServerToClientEventName } from '@personalhealthtrain/central-common';
 import { useSocketEmitter } from './singleton';
-import { SocketServerToClientEventContext } from './type';
+import type { SocketServerToClientEventContext } from './type';
 
 export function emitSocketServerToClientEvent<
     EventName extends SocketServerToClientEventName,

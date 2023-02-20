@@ -6,7 +6,7 @@
  */
 
 import { useDataSource } from 'typeorm-extension';
-import { TrainLogSaveContext } from './type';
+import type { TrainLogSaveContext } from './type';
 import { TrainLogEntity } from './entity';
 
 export async function saveTrainLog(context: TrainLogSaveContext) {

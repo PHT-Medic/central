@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainManagerExtractorCommand } from './constants';
-import { Train } from '../../../../core';
+import type { TrainManagerExtractorCommand } from './constants';
+import type { Train } from '../../../../core';
 
 export type TrainManagerExtractorFileType = 'file' | 'link' | 'symlink' | 'directory' |
 'block-device' | 'character-device' | 'fifo' | 'contiguous-file';

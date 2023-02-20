@@ -9,10 +9,10 @@ import {
     USER_SECRETS_SECRET_ENGINE_KEY,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { Client as VaultClient } from '@hapic/vault';
+import type { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
 import { ApiKey } from '../../../../config';
-import {
+import type {
     SecretStorageUserSecretsQueuePayload,
 } from '../../../../domains/special/secret-storage/type';
 import { UserSecretEntity } from '../../../../domains/core/user-secret/entity';

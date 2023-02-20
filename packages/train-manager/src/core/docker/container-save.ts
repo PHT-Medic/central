@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Writable } from 'stream';
+import type { Writable } from 'stream';
 import fs from 'fs';
-import tar, { Pack } from 'tar-stream';
+import type { Pack } from 'tar-stream';
+import tar from 'tar-stream';
 import { useDocker } from './instance';
 
 function extractTarStreamToPacker(stream: NodeJS.ReadableStream, packer: Pack): Promise<void> {

@@ -6,15 +6,15 @@
  */
 
 import { useRequestQuery } from '@routup/query';
-import {
-    Request, Response, send, useRequestParam,
-} from 'routup';
-import { SelectQueryBuilder } from 'typeorm';
+import type { Request, Response } from 'routup';
+import { send, useRequestParam } from 'routup';
+import type { SelectQueryBuilder } from 'typeorm';
 import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applySort, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { ParseAllowedOption, parseQueryFields } from 'rapiq';
+import type { ParseAllowedOption } from 'rapiq';
+import { parseQueryFields } from 'rapiq';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
 import { useRequestEnv } from '../../../../request';

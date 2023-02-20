@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Realm } from '@authup/common';
-import { Proposal } from '../proposal';
-import { Station } from '../station';
-import { ProposalStationApprovalStatus } from './constants';
+import type { Realm } from '@authup/common';
+import type { Proposal } from '../proposal';
+import type { Station } from '../station';
+import type { ProposalStationApprovalStatus } from './constants';
 
 export interface ProposalStation {
     id: string;

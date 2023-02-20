@@ -5,13 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Context } from '@nuxt/types';
-import {
+import type { Context } from '@nuxt/types';
+import type {
     SocketClientToServerEvents,
     SocketServerToClientEvents,
+} from '@personalhealthtrain/central-common';
+import {
     buildSocketRealmNamespaceName,
 } from '@personalhealthtrain/central-common';
-import { Manager, ManagerOptions, Socket } from 'socket.io-client';
+import type { ManagerOptions, Socket } from 'socket.io-client';
+import { Manager } from 'socket.io-client';
 import { AuthBrowserStorageKey } from '../auth';
 
 type SocketModuleManagerConfiguration = {

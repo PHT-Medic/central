@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import { TrainEntity } from '../entity';
 

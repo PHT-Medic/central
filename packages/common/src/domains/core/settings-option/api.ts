@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuildInput, buildQuery } from 'rapiq';
-import { ClientDriverInstance } from 'hapic';
-import { SettingsOption } from './entity';
+import type { BuildInput } from 'rapiq';
+import { buildQuery } from 'rapiq';
+import type { ClientDriverInstance } from 'hapic';
+import type { SettingsOption } from './entity';
 import { nullifyEmptyObjectProperties } from '../../../utils';
-import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
+import type { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
 export class SettingsOptionAPI {
     protected client: ClientDriverInstance;

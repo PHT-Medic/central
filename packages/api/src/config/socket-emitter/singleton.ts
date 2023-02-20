@@ -6,7 +6,7 @@
  */
 
 import { Emitter } from '@socket.io/redis-emitter';
-import { SocketServerToClientEvents } from '@personalhealthtrain/central-common';
+import type { SocketServerToClientEvents } from '@personalhealthtrain/central-common';
 import { useClient } from 'redis-extension';
 
 let instance : undefined | Emitter<SocketServerToClientEvents>;

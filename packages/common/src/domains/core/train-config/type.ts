@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainConfigSourceType } from './constants';
-import { Proposal } from '../proposal';
+import type { TrainConfigSourceType } from './constants';
+import type { Proposal } from '../proposal';
 
 export type TrainConfigBuild = {
     signature: string,

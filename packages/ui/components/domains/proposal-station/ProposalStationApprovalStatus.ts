@@ -4,7 +4,8 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import Vue, { CreateElement, PropType, VNode } from 'vue';
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
 import { ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { SlotName, hasNormalizedSlot, normalizeSlot } from '@vue-layout/utils';
 

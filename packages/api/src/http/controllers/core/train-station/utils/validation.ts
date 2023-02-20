@@ -9,15 +9,15 @@ import { check, validationResult } from 'express-validator';
 import { TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/common';
-import { Request } from 'routup';
+import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { StationEntity } from '../../../../../domains/core/station/entity';
-import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
+import type { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { TrainEntity } from '../../../../../domains/core/train';
 import { useRequestEnv } from '../../../../request';
+import type { RequestValidationResult } from '../../../../validation';
 import {
     RequestValidationError,
-    RequestValidationResult,
     buildRequestValidationErrorMessage,
     extendRequestValidationResultWithRelation,
     initRequestValidationResult,

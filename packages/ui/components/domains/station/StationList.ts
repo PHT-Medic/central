@@ -4,18 +4,20 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { BuildInput } from 'rapiq';
-import {
-    Station, mergeDeep,
-} from '@personalhealthtrain/central-common';
-import {
+import type { BuildInput } from 'rapiq';
+import type { Station } from '@personalhealthtrain/central-common';
+import { mergeDeep } from '@personalhealthtrain/central-common';
+import type {
     ComponentListData, ComponentListHandlerMethodOptions, ComponentListMethods, ComponentListProperties,
     PaginationMeta,
+} from '@vue-layout/utils';
+import {
     buildListHeader,
     buildListItems,
     buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
-import Vue, { CreateElement, PropType, VNode } from 'vue';
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
 
 export const StationList = Vue.extend<
 ComponentListData<Station>,

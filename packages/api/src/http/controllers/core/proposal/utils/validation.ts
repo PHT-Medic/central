@@ -10,12 +10,12 @@ import { RealmEntity } from '@authup/server-database';
 import { ForbiddenError } from '@ebec/http';
 import { check, validationResult } from 'express-validator';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
-import { Request } from 'routup';
+import type { Request } from 'routup';
 import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
-import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
+import type { ProposalEntity } from '../../../../../domains/core/proposal/entity';
+import type { RequestValidationResult } from '../../../../validation';
 import {
-    RequestValidationError,
-    RequestValidationResult, extendRequestValidationResultWithRelation,
+    RequestValidationError, extendRequestValidationResultWithRelation,
     initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';

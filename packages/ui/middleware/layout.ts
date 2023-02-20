@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Context } from '@nuxt/types';
+import type { Context } from '@nuxt/types';
 import {
     build,
 } from '@vue-layout/navigation';

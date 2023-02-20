@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Realm, User } from '@authup/common';
-import { SecretType } from './constants';
+import type { Realm, User } from '@authup/common';
+import type { SecretType } from './constants';
 
 export interface UserSecret {
     id: string;

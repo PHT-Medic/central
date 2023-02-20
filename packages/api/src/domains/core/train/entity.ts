@@ -18,20 +18,22 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import {
+import type {
     MasterImage,
     Proposal, Registry, RegistryProject,
     Station,
     Train,
     TrainBuildStatus,
-    TrainConfigurationStatus,
     TrainFile,
     TrainResultStatus,
-    TrainRunStatus, TrainType,
+    TrainRunStatus,
     UserSecret,
 } from '@personalhealthtrain/central-common';
+import {
+    TrainConfigurationStatus, TrainType,
+} from '@personalhealthtrain/central-common';
 import { RealmEntity, UserEntity } from '@authup/server-database';
-import { Realm, User } from '@authup/common';
+import type { Realm, User } from '@authup/common';
 import { ProposalEntity } from '../proposal/entity';
 import { MasterImageEntity } from '../master-image/entity';
 import { TrainFileEntity } from '../train-file/entity';

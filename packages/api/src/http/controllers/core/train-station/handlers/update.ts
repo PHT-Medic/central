@@ -8,9 +8,8 @@
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/common';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import {
-    Request, Response, sendAccepted, useRequestParam,
-} from 'routup';
+import type { Request, Response } from 'routup';
+import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { useRequestEnv } from '../../../../request';

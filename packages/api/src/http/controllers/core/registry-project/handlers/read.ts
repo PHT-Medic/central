@@ -6,11 +6,11 @@
  */
 
 import { useRequestQuery } from '@routup/query';
-import { ParseAllowedOption, parseQueryFields } from 'rapiq';
-import {
-    Request, Response, send, useRequestParam,
-} from 'routup';
-import { SelectQueryBuilder } from 'typeorm';
+import type { ParseAllowedOption } from 'rapiq';
+import { parseQueryFields } from 'rapiq';
+import type { Request, Response } from 'routup';
+import { send, useRequestParam } from 'routup';
+import type { SelectQueryBuilder } from 'typeorm';
 import { onlyRealmWritableQueryResources } from '@authup/server-database';
 import {
     applyFilters,

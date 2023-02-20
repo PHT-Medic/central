@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainLog } from './entity';
+import type { TrainLog } from './entity';
 
 export function buildSocketTrainLogRoomName(id?: TrainLog['id']) {
     return `train-logs${id ? `#${id}` : ''}`;

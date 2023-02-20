@@ -6,7 +6,8 @@
   -->
 <script lang="ts">
 import { RobotForm, useHTTPClient } from '@authup/vue2';
-import Vue, { VNode } from 'vue';
+import type { VNode } from 'vue';
+import Vue from 'vue';
 import { ServiceID } from '@personalhealthtrain/central-common';
 
 export default {

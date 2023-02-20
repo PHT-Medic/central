@@ -7,9 +7,8 @@
 
 import { NotFoundError } from '@ebec/http';
 import { useRequestQuery } from '@routup/query';
-import {
-    Request, Response, send, useRequestParam,
-} from 'routup';
+import type { Request, Response } from 'routup';
+import { send, useRequestParam } from 'routup';
 import {
     applyQuery,
     useDataSource,

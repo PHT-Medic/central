@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { IdentityProvider } from '@authup/common';
-import { PropType } from 'vue';
+import type { IdentityProvider } from '@authup/common';
+import type { PropType } from 'vue';
 
 export default {
     props: {

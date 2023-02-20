@@ -5,12 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuildInput, buildQuery } from 'rapiq';
-import { ClientDriverInstance, ClientRequestConfig } from 'hapic';
-import { Train } from './entity';
+import type { BuildInput } from 'rapiq';
+import { buildQuery } from 'rapiq';
+import type { ClientDriverInstance, ClientRequestConfig } from 'hapic';
+import type { Train } from './entity';
 import { nullifyEmptyObjectProperties } from '../../../utils';
-import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
-import { TrainCommand } from './constants';
+import type { CollectionResourceResponse, SingleResourceResponse } from '../../type';
+import type { TrainCommand } from './constants';
 
 export class TrainAPI {
     protected client: ClientDriverInstance;

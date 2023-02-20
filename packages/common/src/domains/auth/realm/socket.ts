@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Realm } from '@authup/common';
+import type { Realm } from '@authup/common';
 
 export function buildSocketRealmNamespaceName(realmId: Realm['id']) {
     return `/realm#${realmId}`;

@@ -12,7 +12,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { SettingsOption } from '@personalhealthtrain/central-common';
+import type { SettingsOption } from '@personalhealthtrain/central-common';
 
 @Entity({ name: 'settings_options' })
 export class SettingsOptionEntity implements SettingsOption {

@@ -6,7 +6,7 @@
  */
 
 import { Ecosystem } from '@personalhealthtrain/central-common';
-import { TransferContext, TransferItem } from './type';
+import type { TransferContext, TransferItem } from './type';
 import { transferEcosystemOut } from './ecosystem';
 import { transferInternal } from './internal';
 import { transferInterRegistry } from './registry';

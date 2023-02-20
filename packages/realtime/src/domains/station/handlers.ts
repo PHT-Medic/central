@@ -12,7 +12,7 @@ import {
     extendSocketClientToServerEventCallback, extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@ebec/http';
-import { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
+import type { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../config/socket/type';
 import { decrSocketRoomConnections, incrSocketRoomConnections } from '../../config/socket/utils';
 
 export function registerStationSocketHandlers(

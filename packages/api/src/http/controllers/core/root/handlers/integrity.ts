@@ -10,10 +10,11 @@ import { hash } from '@authup/server-common';
 import {
     RealmRepository, RobotRepository, useRobotEventEmitter,
 } from '@authup/server-database';
-import { Client as VaultClient } from '@hapic/vault';
+import type { Client as VaultClient } from '@hapic/vault';
 import { HTTPClientKey, ROBOT_SECRET_ENGINE_KEY, ServiceID } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { Request, Response, sendAccepted } from 'routup';
+import type { Request, Response } from 'routup';
+import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 
 export async function checkIntegrityRouteHandler(

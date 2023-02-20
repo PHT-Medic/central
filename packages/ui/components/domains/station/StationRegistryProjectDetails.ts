@@ -5,9 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue, { CreateElement, PropType, VNode } from 'vue';
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
+import type { RegistryProject, Station } from '@personalhealthtrain/central-common';
 import {
-    Ecosystem, RegistryProject, Station,
+    Ecosystem,
 } from '@personalhealthtrain/central-common';
 import RegistryProjectDetails from '../registry-project/RegistryProjectDetails';
 

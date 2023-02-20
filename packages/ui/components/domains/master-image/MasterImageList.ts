@@ -5,19 +5,23 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue, { CreateElement, PropType, VNode } from 'vue';
-import { MasterImage, mergeDeep } from '@personalhealthtrain/central-common';
-import {
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
+import type { MasterImage } from '@personalhealthtrain/central-common';
+import { mergeDeep } from '@personalhealthtrain/central-common';
+import type {
     ComponentListData,
     ComponentListHandlerMethodOptions,
     ComponentListMethods,
     ComponentListProperties,
     PaginationMeta,
+} from '@vue-layout/utils';
+import {
     buildListHeader,
     buildListItems,
     buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
-import { BuildInput } from 'rapiq';
+import type { BuildInput } from 'rapiq';
 
 export const MasterImageList = Vue.extend<
 ComponentListData<MasterImage>,

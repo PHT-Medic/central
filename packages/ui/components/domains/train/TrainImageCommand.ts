@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue, { CreateElement, VNode } from 'vue';
+import type { CreateElement, VNode } from 'vue';
+import Vue from 'vue';
 
 export default Vue.extend({
     props: {

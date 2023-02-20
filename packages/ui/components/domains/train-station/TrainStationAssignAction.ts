@@ -5,18 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue, { CreateElement, VNode } from 'vue';
-import { ComponentListItemData } from '@vue-layout/utils';
-import {
+import type { CreateElement, VNode } from 'vue';
+import Vue from 'vue';
+import type { ComponentListItemData } from '@vue-layout/utils';
+import type {
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
     TrainStation,
+} from '@personalhealthtrain/central-common';
+import {
     TrainStationSocketClientToServerEventName,
     TrainStationSocketServerToClientEventName,
     buildSocketTrainStationInRoomName, buildSocketTrainStationOutRoomName,
 } from '@personalhealthtrain/central-common';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 
 export type TrainStationAssignActionProperties = {
     trainId: string,

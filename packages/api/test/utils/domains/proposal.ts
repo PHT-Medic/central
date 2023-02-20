@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Proposal, ProposalRisk } from '@personalhealthtrain/central-common';
-import { SuperTest, Test } from 'supertest';
+import type { Proposal } from '@personalhealthtrain/central-common';
+import { ProposalRisk } from '@personalhealthtrain/central-common';
+import type { SuperTest, Test } from 'supertest';
 
 export const TEST_DEFAULT_PROPOSAL : Partial<Proposal> = {
     title: 'development',

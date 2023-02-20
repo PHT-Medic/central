@@ -4,18 +4,19 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
+import type { Train } from '@personalhealthtrain/central-common';
 import {
     PermissionID,
-    Train,
     TrainBuildStatus,
     TrainCommand,
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
-import { TrainCommandProperties } from './type';
+import type { TrainCommandProperties } from './type';
 import { renderActionCommand } from '../../../render/utils';
-import { ActionCommandMethods } from '../../../render/type';
+import type { ActionCommandMethods } from '../../../render/type';
 
 export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, TrainCommandProperties>({
     props: {

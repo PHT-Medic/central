@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ClientDriverInstance } from 'hapic';
+import type { ClientDriverInstance } from 'hapic';
 
 export class RootAPI {
     protected client: ClientDriverInstance;

@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Context } from '@nuxt/types';
+import type { Context } from '@nuxt/types';
 import { Ilingo } from 'ilingo';
-import { Inject } from '@nuxt/types/app';
+import type { Inject } from '@nuxt/types/app';
 
 export default async (ctx: Context, inject: Inject) => {
     const ilingo = new Ilingo();

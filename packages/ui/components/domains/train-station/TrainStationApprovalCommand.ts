@@ -8,9 +8,10 @@ import {
     PermissionID, TrainStationApprovalCommand,
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 import { renderActionCommand } from '../../render/utils';
-import { ActionCommandMethods, ActionCommandProperties } from '../../render/type';
+import type { ActionCommandMethods, ActionCommandProperties } from '../../render/type';
 
 type TrainStationActionProperties = {
     entityId: string,

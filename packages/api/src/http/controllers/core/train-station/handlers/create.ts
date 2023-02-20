@@ -7,7 +7,8 @@
 
 import { PermissionID, TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { BadRequestError, ForbiddenError } from '@ebec/http';
-import { Request, Response, sendCreated } from 'routup';
+import type { Request, Response } from 'routup';
+import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
 import { useRequestEnv } from '../../../../request';

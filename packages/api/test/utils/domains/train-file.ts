@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainFile } from '@personalhealthtrain/central-common';
-import { SuperTest, Test } from 'supertest';
+import type { TrainFile } from '@personalhealthtrain/central-common';
+import type { SuperTest, Test } from 'supertest';
 
 export const TEST_DEFAULT_TRAIN_FILE : Partial<TrainFile> = {
     directory: '.',

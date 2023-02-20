@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train } from '../../../../core';
-import { TrainManagerBuilderCommand } from './constants';
+import type { Train } from '../../../../core';
+import type { TrainManagerBuilderCommand } from './constants';
 
 export type TrainManagerBuilderBuildPayload = {
     id: Train['id']

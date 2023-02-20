@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Server as HTTPServer } from 'http';
+import type { Server as HTTPServer } from 'http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { ForbiddenError, UnauthorizedError } from '@ebec/http';
@@ -13,9 +13,10 @@ import { REALM_MASTER_NAME } from '@authup/common';
 import { setupSocketMiddleware } from '@authup/server-adapter';
 import { useLogger } from '../log';
 import { registerSocketHandlers, registerSocketNamespaceHandlers } from './handlers';
-import env, { Environment } from '../../env';
-import { SocketInterface, SocketServerInterface } from './type';
-import { Config } from '../type';
+import type { Environment } from '../../env';
+import env from '../../env';
+import type { SocketInterface, SocketServerInterface } from './type';
+import type { Config } from '../type';
 
 interface SocketServerContext {
     httpServer: HTTPServer,

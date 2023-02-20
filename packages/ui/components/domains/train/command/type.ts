@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainCommand } from '@personalhealthtrain/central-common';
-import { ActionCommandProperties } from '../../../render/type';
+import type { Train, TrainCommand } from '@personalhealthtrain/central-common';
+import type { ActionCommandProperties } from '../../../render/type';
 
 export type TrainCommandProperties = {
     entity: Train,

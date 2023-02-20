@@ -6,21 +6,25 @@
  */
 
 import { ServerError } from '@ebec/http';
-import { DataSource, In } from 'typeorm';
-import { Seeder } from 'typeorm-extension';
+import type { DataSource } from 'typeorm';
+import { In } from 'typeorm';
+import type { Seeder } from 'typeorm-extension';
+import type {
+    RobotEntity,
+    RoleEntity,
+} from '@authup/server-database';
 import {
     PermissionEntity,
     RealmEntity,
-    RobotEntity,
     RobotRepository,
-    RoleEntity,
     RolePermissionEntity,
     RoleRepository,
     useRobotEventEmitter,
 } from '@authup/server-database';
 import { ServiceID } from '@personalhealthtrain/central-common';
 import { REALM_MASTER_NAME, hasOwnProperty } from '@authup/common';
-import { PHTStationRole, getPHTStationRolePermissions } from '../../config';
+import type { PHTStationRole } from '../../config';
+import { getPHTStationRolePermissions } from '../../config';
 
 // ----------------------------------------------
 

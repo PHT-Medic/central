@@ -6,12 +6,13 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { MatchedDataOptions, matchedData } from 'express-validator';
+import type { MatchedDataOptions } from 'express-validator';
+import { matchedData } from 'express-validator';
 import { deleteUndefinedObjectProperties } from '@personalhealthtrain/central-common';
-import { Request } from 'routup';
-import { EntityTarget } from 'typeorm';
+import type { Request } from 'routup';
+import type { EntityTarget } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import { ExpressValidationExtendKeys, RequestValidationResult } from './type';
+import type { ExpressValidationExtendKeys, RequestValidationResult } from './type';
 
 export function buildRequestValidationErrorMessage<
     T extends Record<string, any> = Record<string, any>,

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Proposal } from './entity';
+import type { Proposal } from './entity';
 
 export function buildSocketProposalRoomName(id?: Proposal['id']) {
     return `proposals${id ? `#${id}` : ''}`;

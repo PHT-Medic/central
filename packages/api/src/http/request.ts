@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { RequestEnv } from '@authup/server-http';
 import {
-    RequestEnv,
     setRequestEnv as setEnv,
     useRequestEnv as useEnv,
 } from '@authup/server-http';
-import { Request } from 'routup';
+import type { Request } from 'routup';
 
 export function useRequestEnv(req: Request) : RequestEnv;
 export function useRequestEnv<T extends keyof RequestEnv>(req: Request, key: T) : RequestEnv[T];

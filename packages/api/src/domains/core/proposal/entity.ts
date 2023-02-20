@@ -8,9 +8,10 @@
 import {
     Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
-import { MasterImage, Proposal, ProposalRisk } from '@personalhealthtrain/central-common';
+import type { MasterImage, Proposal } from '@personalhealthtrain/central-common';
+import { ProposalRisk } from '@personalhealthtrain/central-common';
 import { RealmEntity, UserEntity } from '@authup/server-database';
-import { Realm, User } from '@authup/common';
+import type { Realm, User } from '@authup/common';
 import { MasterImageEntity } from '../master-image/entity';
 
 @Entity({ name: 'proposals' })

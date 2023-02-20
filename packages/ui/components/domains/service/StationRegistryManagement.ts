@@ -5,13 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ServiceID } from '@personalhealthtrain/central-common';
 import {
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-    REGISTRY_OUTGOING_PROJECT_NAME,
-    ServiceID, StationRegistryCommand,
+    REGISTRY_OUTGOING_PROJECT_NAME, StationRegistryCommand,
 } from '@personalhealthtrain/central-common';
-import Vue, { CreateElement, PropType, VNode } from 'vue';
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
 import EntityDelete from '../EntityDelete';
 import { MasterImageList } from '../master-image/MasterImageList';
 

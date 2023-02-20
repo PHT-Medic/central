@@ -5,12 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Ecosystem, Registry } from '@personalhealthtrain/central-common';
-import Vue, {
+import type { Registry } from '@personalhealthtrain/central-common';
+import { Ecosystem } from '@personalhealthtrain/central-common';
+import type {
     CreateElement, PropType, VNode,
 } from 'vue';
+import Vue from 'vue';
+import type { ComponentFormData } from '@vue-layout/utils';
 import {
-    ComponentFormData, buildFormInput, buildFormSelect, buildFormSubmit, initPropertiesFromSource,
+    buildFormInput, buildFormSelect, buildFormSubmit, initPropertiesFromSource,
 } from '@vue-layout/utils';
 import {
     maxLength, minLength, required,

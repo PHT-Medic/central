@@ -5,8 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { PermissionID, Registry } from '@personalhealthtrain/central-common';
-import { PropType } from 'vue';
+import type { Registry } from '@personalhealthtrain/central-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
 import { RegistryProjectList } from '../../../../../../components/domains/registry-project/RegistryProjectList';
 import { LayoutKey, LayoutNavigationID } from '../../../../../../config/layout';
 import RegistryProjectDetails from '../../../../../../components/domains/registry-project/RegistryProjectDetails';

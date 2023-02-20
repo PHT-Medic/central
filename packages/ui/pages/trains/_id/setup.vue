@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { PropType } from 'vue';
-import { Train } from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
+import type { Train } from '@personalhealthtrain/central-common';
 import TrainWizard from '../../../components/domains/train/wizard/TrainWizard.vue';
 
 export default {

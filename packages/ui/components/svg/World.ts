@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {compileToFunctions} from "vue-template-compiler";
-import {WorldTemplate} from './WorldTemplate';
+import { compileToFunctions } from 'vue-template-compiler';
 import Vue from 'vue';
+import { WorldTemplate } from './WorldTemplate';
 
 const templateCompiled = compileToFunctions(WorldTemplate);
 
@@ -23,5 +23,5 @@ export default Vue.extend({
         },
     },
     render: templateCompiled.render,
-    staticRenderFns: templateCompiled.staticRenderFns
+    staticRenderFns: templateCompiled.staticRenderFns,
 });

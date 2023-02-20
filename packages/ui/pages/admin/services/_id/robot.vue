@@ -5,9 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { ServiceID } from '@personalhealthtrain/central-common';
+import type { ServiceID } from '@personalhealthtrain/central-common';
 import { useHTTPClient } from '@authup/vue2';
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 
 export default {
     props: {

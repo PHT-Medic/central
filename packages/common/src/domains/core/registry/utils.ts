@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Registry } from './entity';
+import type { Registry } from './entity';
 
 export function buildRegistryClientConnectionStringFromRegistry(entity: Registry) {
     // todo: support other registries beside harbor and v2.0

@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {compileToFunctions} from "vue-template-compiler";
-import {MedicineWorkerTemplate} from './MedicineWorkerTemplate';
+import { compileToFunctions } from 'vue-template-compiler';
 import Vue from 'vue';
+import { MedicineWorkerTemplate } from './MedicineWorkerTemplate';
 
 const templateCompiled = compileToFunctions(MedicineWorkerTemplate);
 
@@ -23,5 +23,5 @@ export default Vue.extend({
         },
     },
     render: templateCompiled.render,
-    staticRenderFns: templateCompiled.staticRenderFns
+    staticRenderFns: templateCompiled.staticRenderFns,
 });

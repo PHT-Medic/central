@@ -14,12 +14,12 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import {
+import type {
     Train,
     TrainLog,
 } from '@personalhealthtrain/central-common';
 import { RealmEntity } from '@authup/server-database';
-import { Realm } from '@authup/common';
+import type { Realm } from '@authup/common';
 import { TrainEntity } from '../train/entity';
 
 @Entity({ name: 'train_logs' })

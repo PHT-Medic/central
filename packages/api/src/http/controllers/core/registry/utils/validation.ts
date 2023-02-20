@@ -7,10 +7,11 @@
 
 import { body, check, validationResult } from 'express-validator';
 import { Ecosystem, getHostNameFromString } from '@personalhealthtrain/central-common';
-import { Request } from 'routup';
-import { RegistryEntity } from '../../../../../domains/core/registry/entity';
+import type { Request } from 'routup';
+import type { RegistryEntity } from '../../../../../domains/core/registry/entity';
+import type { RequestValidationResult } from '../../../../validation';
 import {
-    RequestValidationError, RequestValidationResult,
+    RequestValidationError,
     initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';

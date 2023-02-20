@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainStation } from './entity';
+import type { TrainStation } from './entity';
 
 export function buildSocketTrainStationRoomName(id?: TrainStation['id']) {
     return `train-stations${id ? `#${id}` : ''}`;

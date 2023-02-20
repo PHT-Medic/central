@@ -8,9 +8,10 @@
 import {
     maxLength, minLength,
 } from 'vuelidate/lib/validators';
-import { Robot } from '@authup/common';
+import type { Robot } from '@authup/common';
 import { buildFormInput, buildFormSubmit, initPropertiesFromSource } from '@vue-layout/utils';
-import Vue, { CreateElement, PropType, VNode } from 'vue';
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 
 export default Vue.extend<any, any, any, any>({

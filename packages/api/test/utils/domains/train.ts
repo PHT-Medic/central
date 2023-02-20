@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train, TrainType } from '@personalhealthtrain/central-common';
-import { SuperTest, Test } from 'supertest';
+import type { Train } from '@personalhealthtrain/central-common';
+import { TrainType } from '@personalhealthtrain/central-common';
+import type { SuperTest, Test } from 'supertest';
 import { randomBytes } from 'crypto';
 
 export const TEST_DEFAULT_TRAIN : Partial<Train> = {

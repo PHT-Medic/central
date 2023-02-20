@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ImageInfo } from 'dockerode';
+import type { ImageInfo } from 'dockerode';
 import { useDocker } from './instance';
 
 export async function checkIfLocalRegistryImageExists(repositoryTag: string) : Promise<boolean> {

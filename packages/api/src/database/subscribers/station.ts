@@ -12,10 +12,11 @@ import {
     buildSocketRealmNamespaceName,
     buildSocketStationRoomName,
 } from '@personalhealthtrain/central-common';
-import {
+import type {
     DataSource,
-    EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
+    EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
+import { EventSubscriber } from 'typeorm';
 import { emitSocketServerToClientEvent } from '../../config';
 import { StationEntity } from '../../domains/core/station';
 

@@ -6,13 +6,14 @@
   -->
 <script lang="ts">
 import Vue from 'vue';
-import { Socket } from 'socket.io-client';
-import {
+import type { Socket } from 'socket.io-client';
+import type {
     SocketClientToServerEvents,
     SocketServerToClientEventContext, SocketServerToClientEvents,
-    Station, StationSocketClientToServerEventName, StationSocketServerToClientEventName,
+    Station,
 } from '@personalhealthtrain/central-common';
-import { ComponentListHandlerMethodOptions } from '@vue-layout/utils';
+import { StationSocketClientToServerEventName, StationSocketServerToClientEventName } from '@personalhealthtrain/central-common';
+import type { ComponentListHandlerMethodOptions } from '@vue-layout/utils';
 import { StationForm } from '../../../components/domains/station/StationForm';
 
 export default Vue.extend<any, any, any, any>({

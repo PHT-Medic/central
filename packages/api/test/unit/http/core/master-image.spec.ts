@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { MasterImage, MasterImageCommand, MasterImageGroup } from '@personalhealthtrain/central-common';
+import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/central-common';
+import { MasterImageCommand } from '@personalhealthtrain/central-common';
 import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
 import { useSuperTest } from '../../../utils/supertest';
 

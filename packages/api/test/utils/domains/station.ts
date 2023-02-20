@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Ecosystem, Station } from '@personalhealthtrain/central-common';
-import { SuperTest, Test } from 'supertest';
+import type { Station } from '@personalhealthtrain/central-common';
+import { Ecosystem } from '@personalhealthtrain/central-common';
+import type { SuperTest, Test } from 'supertest';
 
 export const TEST_DEFAULT_STATION : Partial<Station> = {
     name: 'foo-bar-baz',

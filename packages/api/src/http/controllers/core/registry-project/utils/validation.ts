@@ -7,12 +7,12 @@
 
 import { check, validationResult } from 'express-validator';
 import { RegistryProjectType } from '@personalhealthtrain/central-common';
-import { Request } from 'routup';
-import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import type { Request } from 'routup';
+import type { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
+import type { RequestValidationResult } from '../../../../validation';
 import {
-    RequestValidationError,
-    RequestValidationResult, extendRequestValidationResultWithRelation,
+    RequestValidationError, extendRequestValidationResultWithRelation,
     initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';

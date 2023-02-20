@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { EnvironmentName } from './constants';
+import type { EnvironmentName } from './constants';
 
 export interface Environment {
     env: `${EnvironmentName}`,
