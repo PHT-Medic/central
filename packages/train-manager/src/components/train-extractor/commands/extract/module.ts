@@ -11,11 +11,14 @@ import type {
 } from '@personalhealthtrain/central-common';
 import { Writable } from 'stream';
 import {
-    buildRemoteDockerImageURL,
     generateTrainMinioBucketName,
 } from '../../../../config';
-import { useMinio } from '../../../../core';
-import { removeDockerImage, saveDockerContainerPathsTo } from '../../../../modules/docker';
+import {
+    buildRemoteDockerImageURL,
+    removeDockerImage,
+    saveDockerContainerPathsTo,
+    useMinio,
+} from '../../../../core';
 import { ExtractorError } from '../../error';
 
 export async function processExtractCommand(

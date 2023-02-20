@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2022.
+ * Copyright (c) 2022-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -7,7 +7,7 @@
 
 import tar from 'tar-stream';
 import { useDocker } from './instance';
-import { DockerContainerFile, DockerContainerFileType } from './type';
+import type { DockerContainerFile, DockerContainerFileType } from './type';
 
 function extractTarStream(stream: NodeJS.ReadableStream) : Promise<DockerContainerFile[]> {
     return new Promise((resolve : (files: DockerContainerFile[]) => void, reject) => {

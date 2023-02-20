@@ -12,9 +12,8 @@ import type {
 } from '@personalhealthtrain/central-common';
 import { RegistryProjectType, TrainManagerExtractorCommand } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { buildRemoteDockerImageURL, generateTrainMinioBucketName } from '../../../../config';
-import { useMinio } from '../../../../core';
-import { checkIfLocalRegistryImageExists } from '../../../../modules/docker';
+import { generateTrainMinioBucketName } from '../../../../config';
+import { buildRemoteDockerImageURL, checkIfLocalRegistryImageExists, useMinio } from '../../../../core';
 import { ExtractorError } from '../../error';
 import { writeExtractedEvent } from '../extract';
 import { writeNoneEvent } from './write-none';

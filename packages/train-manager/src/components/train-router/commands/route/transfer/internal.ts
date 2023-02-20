@@ -5,19 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     HTTPClient,
-    REGISTRY_ARTIFACT_TAG_BASE,
     Registry,
+} from '@personalhealthtrain/central-common';
+import {
+    REGISTRY_ARTIFACT_TAG_BASE,
     RegistryProjectType,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from 'hapic';
-import { Client as HarborClient } from '@hapic/harbor';
-import { TransferItem } from './type';
-import { useLogger } from '../../../../../modules/log';
+import type { Client as HarborClient } from '@hapic/harbor';
+import type { TransferItem } from './type';
+import { useLogger } from '../../../../../core/log';
 import { transferInterRegistry } from './registry';
-import { createBasicHarborAPIConfig } from '../../../../../domains/harbor';
+import { createBasicHarborAPIConfig } from '../../../../../core/harbor';
 
 type TransferContext = {
     registry?: Registry,

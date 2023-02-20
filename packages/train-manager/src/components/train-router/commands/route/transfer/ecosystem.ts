@@ -5,18 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    Ecosystem,
-    HTTPClient, REGISTRY_ARTIFACT_TAG_BASE,
+import type {
+    HTTPClient,
     Registry,
+} from '@personalhealthtrain/central-common';
+import {
+    Ecosystem, REGISTRY_ARTIFACT_TAG_BASE,
     RegistryProjectType,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { TransferEcosystemItem, TransferItem } from './type';
-import { pullDockerImage, useDocker } from '../../../../../modules/docker';
-import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../../../../config/services/registry';
-import { pushDockerImage } from '../../../../../modules/docker/image-push';
-import { useLogger } from '../../../../../modules/log';
+import type { TransferEcosystemItem, TransferItem } from './type';
+import { pullDockerImage, useDocker } from '../../../../../core/docker';
+import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../../../../core/docker/registry';
+import { pushDockerImage } from '../../../../../core/docker/image-push';
+import { useLogger } from '../../../../../core/log';
 import { RouterError } from '../../../error';
 
 export async function transferEcosystemOut(

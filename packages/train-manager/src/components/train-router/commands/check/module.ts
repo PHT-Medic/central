@@ -19,7 +19,7 @@ import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from 'hapic';
-import { createBasicHarborAPIConfig } from '../../../../domains/harbor';
+import { createBasicHarborAPIConfig } from '../../../../core/harbor';
 import { RouterError } from '../../error';
 import { writePositionFoundEvent } from './write-position-found';
 import { writePositionNotFoundEvent } from './write-position-not-found';

@@ -16,14 +16,14 @@ import {
 } from '@personalhealthtrain/central-common';
 
 import { useClient } from 'hapic';
-import { useDocker } from '../../../../modules/docker';
-import { buildTrainDockerFile, packContainerWithTrain } from '../../helpers';
-import { useLogger } from '../../../../modules/log';
-import { buildDockerImage } from '../../../../modules/docker/image-build';
 import {
     buildDockerAuthConfig,
     buildRemoteDockerImageURL,
-} from '../../../../config';
+    useDocker,
+    useLogger,
+} from '../../../../core';
+import { buildTrainDockerFile, packContainerWithTrain } from '../../helpers';
+import { buildDockerImage } from '../../../../core/docker/image-build';
 import { BuilderError } from '../../error';
 
 export async function processBuildCommand(

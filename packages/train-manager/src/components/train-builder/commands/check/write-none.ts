@@ -11,14 +11,14 @@ import {
     TrainManagerBuilderEvent,
     TrainManagerComponent,
 } from '@personalhealthtrain/central-common';
-import { buildEventQueueMessageForAPI } from '../../../../config';
+import { buildAPIQueueMessage } from '../../../utils';
 import type { QueueEventContext } from '../../../type';
 
 export async function writeNoneEvent(
     data: TrainManagerBuilderBuildPayload,
     context: QueueEventContext<TrainManagerBuilderCommand>,
 ) {
-    await publish(buildEventQueueMessageForAPI({
+    await publish(buildAPIQueueMessage({
         event: TrainManagerBuilderEvent.NONE,
         command: context.command,
         component: TrainManagerComponent.BUILDER,

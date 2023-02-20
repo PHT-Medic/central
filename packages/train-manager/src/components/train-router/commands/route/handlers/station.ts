@@ -9,12 +9,12 @@ import {
     Ecosystem, REGISTRY_ARTIFACT_TAG_BASE,
     TrainManagerRouterErrorCode,
 } from '@personalhealthtrain/central-common';
-import { RouteContextExtended } from '../type';
+import type { RouteContextExtended } from '../type';
 import { transferInternal } from '../transfer/internal';
 import { transferEcosystemOut } from '../transfer/ecosystem';
 import { transferOutgoing } from '../transfer/outgoing';
 import { RouterError } from '../../../error';
-import { useLogger } from '../../../../../modules/log';
+import { useLogger } from '../../../../../core/log';
 
 export async function routeStationProject(context: RouteContextExtended) : Promise<void> {
     const index = context.items.findIndex((station) => station.registry_project_id === context.project.id);

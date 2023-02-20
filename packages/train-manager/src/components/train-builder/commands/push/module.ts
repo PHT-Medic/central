@@ -9,9 +9,9 @@ import type { TrainManagerBuilderBuildPayload, TrainManagerQueuePayloadExtended 
 import {
     REGISTRY_ARTIFACT_TAG_BASE, REGISTRY_ARTIFACT_TAG_LATEST, TrainManagerComponent,
 } from '@personalhealthtrain/central-common';
-import { pushDockerImage } from '../../../../modules/docker/image-push';
-import { useLogger } from '../../../../modules/log';
-import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../../../config';
+import {
+    buildDockerAuthConfig, buildRemoteDockerImageURL, pushDockerImage, useLogger,
+} from '../../../../core';
 import { BuilderError } from '../../error';
 
 export async function processPushCommand(

@@ -11,7 +11,7 @@ import type {
     TrainManagerBuilderPayload,
 } from '@personalhealthtrain/central-common';
 import { TrainManagerBuilderCommand, TrainManagerComponent } from '@personalhealthtrain/central-common';
-import { extendPayload } from '../utils/train';
+import { extendPayload } from '../utils';
 import {
     processBuildCommand,
     processCheckCommand,

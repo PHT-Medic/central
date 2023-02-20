@@ -1,15 +1,14 @@
 /*
- * Copyright (c) 2022-2022.
+ * Copyright (c) 2022-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { buildRemoteDockerImageURL } from '../../config/services/registry';
+import { buildRemoteDockerImageURL } from './registry';
 import { pushDockerImage } from './image-push';
-import {
-    DockerAuthConfig, pullDockerImage, removeDockerImage, useDocker,
-} from './index';
+import type { DockerAuthConfig } from './index';
+import { pullDockerImage, removeDockerImage, useDocker } from './index';
 
 type DockerBaseImageBuildContext = {
     sourceTag: string,

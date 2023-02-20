@@ -15,8 +15,8 @@ import {
     TrainManagerRouterEvent,
 } from '@personalhealthtrain/central-common';
 import type { QueueEventErrorContext } from '../type';
+import { buildAPIQueueMessage } from '../utils';
 import { RouterError } from './error';
-import { buildEventQueueMessageForAPI } from '../../config';
 import { BaseError } from '../error';
 
 export async function writeFailedEvent(
@@ -27,7 +27,7 @@ export async function writeFailedEvent(
         context.error :
         new RouterError({ previous: context.error });
 
-    await publish(buildEventQueueMessageForAPI({
+    await publish(buildAPIQueueMessage({
         event: TrainManagerRouterEvent.FAILED,
         component: TrainManagerComponent.ROUTER,
         command: context.command,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022.
+ * Copyright (c) 2022-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -10,8 +10,8 @@ import {
 } from '@personalhealthtrain/central-common';
 import type { PublishOptionsExtended } from 'amqp-extension';
 import { } from 'amqp-extension';
-import type { RouterQueuePayload } from '../components/router';
-import { ROUTER_QUEUE_ROUTING_KEY } from '../components/router';
+import type { RouterQueuePayload } from '../router';
+import { ROUTER_QUEUE_ROUTING_KEY } from '../router';
 
 export function cleanupQueuePayload<T extends Record<string, any>>(payload: T): T {
     if (hasOwnProperty(payload, 'entity')) {
@@ -35,7 +35,7 @@ type QueueMessageContext = {
     event?: string,
     data: Record<string, any>,
 };
-export function buildCommandQueueMessageForSelf(
+export function buildSelfQueueMessage(
     context: QueueMessageContext,
 ) : PublishOptionsExtended<RouterQueuePayload<Record<string, any>>> {
     return {
@@ -53,7 +53,7 @@ export function buildCommandQueueMessageForSelf(
     };
 }
 
-export function buildEventQueueMessageForAPI(
+export function buildAPIQueueMessage(
     context : Omit<QueueMessageContext, 'event'> & { event: string },
 ) : PublishOptionsExtended<RouterQueuePayload<any>> {
     return {
