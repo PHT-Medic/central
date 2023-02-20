@@ -16,8 +16,9 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import { RealmEntity, UserEntity } from '@authup/server-database';
-import { SecretType, UserSecret } from '@personalhealthtrain/central-common';
-import { Realm, User } from '@authup/common';
+import type { UserSecret } from '@personalhealthtrain/central-common';
+import { SecretType } from '@personalhealthtrain/central-common';
+import type { Realm, User } from '@authup/common';
 
 @Unique('keyUserId', [
     'key',

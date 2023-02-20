@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { TrainLog } from '@personalhealthtrain/central-common';
-import {
+import type { TrainLog } from '@personalhealthtrain/central-common';
+import type {
     CreateElement, PropType, VNode, VNodeChildren,
 } from 'vue';
 

@@ -5,9 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Robot } from '@authup/common';
-import { Config, stringifyAuthorizationHeader } from 'hapic';
-import { Client as HarborClient, ProjectWebhookTarget } from '@hapic/harbor';
+import type { Robot } from '@authup/common';
+import type { Config } from 'hapic';
+import { stringifyAuthorizationHeader } from 'hapic';
+import type { ProjectWebhookTarget } from '@hapic/harbor';
+import { Client as HarborClient } from '@hapic/harbor';
 import { ServiceID } from '@personalhealthtrain/central-common';
 
 export function buildRegistryWebhookTarget(

@@ -12,8 +12,9 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+import type { Registry } from '@personalhealthtrain/central-common';
 import {
-    Ecosystem, Registry,
+    Ecosystem,
 } from '@personalhealthtrain/central-common';
 
 @Entity({ name: 'registries' })

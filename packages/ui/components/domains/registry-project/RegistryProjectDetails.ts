@@ -5,18 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue, { CreateElement, PropType, VNode } from 'vue';
-import {
-    RegistryCommand,
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
+import type {
     RegistryProject,
-    RegistryProjectSocketClientToServerEventName,
-    RegistryProjectSocketServerToClientEventName,
-    ServiceID,
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
-import { Socket } from 'socket.io-client';
+import {
+    RegistryCommand,
+    RegistryProjectSocketClientToServerEventName,
+    RegistryProjectSocketServerToClientEventName,
+    ServiceID,
+} from '@personalhealthtrain/central-common';
+import type { Socket } from 'socket.io-client';
 
 type Properties = {
     entityId: RegistryProject['id']

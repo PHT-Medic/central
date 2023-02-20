@@ -5,11 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     MetadataConfig,
     Specification,
     SwaggerDocFormatData,
     SwaggerDocFormatType,
+} from '@trapi/swagger';
+import {
     generateDocumentation,
 } from '@trapi/swagger';
 import { load } from 'locter';

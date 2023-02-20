@@ -5,14 +5,15 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import type { Train } from '@personalhealthtrain/central-common';
 import {
-    Train,
     TrainBuildStatus,
     TrainRunStatus,
     TrainStationRunStatus,
     TrainStationStatic,
 } from '@personalhealthtrain/central-common';
-import Vue, { PropType } from 'vue';
+import type { PropType } from 'vue';
+import Vue from 'vue';
 import TrainStationRunStatusText from './TrainStationRunStatus';
 import TrainStationStaticRunStatusText from './TrainStationStaticRunStatus';
 import { TrainStationList } from './TrainStationList';

@@ -5,19 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue, { CreateElement, VNode } from 'vue';
-import { ComponentListItemData } from '@vue-layout/utils';
-import {
+import type { CreateElement, VNode } from 'vue';
+import Vue from 'vue';
+import type { ComponentListItemData } from '@vue-layout/utils';
+import type {
     ProposalStation,
-    ProposalStationSocketClientToServerEventName,
-    ProposalStationSocketServerToClientEventName,
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
+} from '@personalhealthtrain/central-common';
+import {
+    ProposalStationSocketClientToServerEventName,
+    ProposalStationSocketServerToClientEventName,
     buildSocketProposalStationInRoomName,
     buildSocketProposalStationOutRoomName,
 } from '@personalhealthtrain/central-common';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 
 export type ProposalStationAssignActionProperties = {
     proposalId: string,

@@ -5,18 +5,22 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Context } from '@nuxt/types';
+import type { Context } from '@nuxt/types';
 import https from 'https';
+import type {
+    OAuth2TokenGrantResponse,
+    OAuth2TokenIntrospectionResponse,
+    User,
+} from '@authup/common';
 import {
     AbilityManager,
     OAuth2SubKind,
-    OAuth2TokenGrantResponse,
-    OAuth2TokenIntrospectionResponse,
     OAuth2TokenKind,
-    User,
 } from '@authup/common';
-import { Config, createClient } from 'hapic';
-import { Client, ClientOptions } from '@hapic/oauth2';
+import type { Config } from 'hapic';
+import { createClient } from 'hapic';
+import type { ClientOptions } from '@hapic/oauth2';
+import { Client } from '@hapic/oauth2';
 import { AuthBrowserStorageKey } from './constants';
 
 export class AuthModule {

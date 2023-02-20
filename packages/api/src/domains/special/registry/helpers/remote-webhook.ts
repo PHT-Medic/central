@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Client as HarborClient, ProjectWebhook } from '@hapic/harbor';
+import type { Client as HarborClient, ProjectWebhook } from '@hapic/harbor';
+import type { RobotSecretEnginePayload } from '@personalhealthtrain/central-common';
 import {
     HTTPClientKey,
     ROBOT_SECRET_ENGINE_KEY,
-    RobotSecretEnginePayload,
     ServiceID,
 } from '@personalhealthtrain/central-common';
 import os from 'node:os';
 import { useClient } from 'hapic';
-import { Client as VaultClient } from '@hapic/vault';
+import type { Client as VaultClient } from '@hapic/vault';
 import { useEnv } from '../../../../config';
 import { buildRegistryWebhookTarget } from '../utils';
 

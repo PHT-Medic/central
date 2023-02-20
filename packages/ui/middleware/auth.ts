@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Context } from '@nuxt/types';
+import type { Context } from '@nuxt/types';
 import { buildNameFromAbilityID } from '@authup/common';
-import { AuthModule } from '../config/auth';
+import type { AuthModule } from '../config/auth';
 import { LayoutKey } from '../config/layout';
 
 function checkAbilityOrPermission({ route, $auth } : Context) {

@@ -5,15 +5,18 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import {
-    PermissionID, Proposal,
-    ProposalSocketClientToServerEventName,
+import type {
+    Proposal,
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
+import {
+    PermissionID,
+    ProposalSocketClientToServerEventName,
+} from '@personalhealthtrain/central-common';
 import Vue from 'vue';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
 export default {

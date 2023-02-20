@@ -6,7 +6,7 @@
  */
 
 import { mountControllers } from '@routup/decorators';
-import { Router } from 'routup';
+import type { Router } from 'routup';
 import { RootController } from './controllers/core/root';
 import { TrainLogController } from './controllers/core/train-log';
 import { UserSecretController } from './controllers/core/user-secret';

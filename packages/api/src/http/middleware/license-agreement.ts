@@ -7,9 +7,8 @@
 
 import { BadRequestError } from '@ebec/http';
 import { ErrorCode, hasOwnProperty } from '@personalhealthtrain/central-common';
-import {
-    Next, Request, Response, useRequestPath,
-} from 'routup';
+import type { Next, Request, Response } from 'routup';
+import { useRequestPath } from 'routup';
 import { useRequestEnv } from '../request';
 
 export function licenseAgreementMiddleware(req: Request, res: Response, next: Next) {

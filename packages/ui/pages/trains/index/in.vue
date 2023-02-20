@@ -6,7 +6,8 @@
   -->
 <script lang="ts">
 import Vue from 'vue';
-import { PermissionID, TrainStation } from '@personalhealthtrain/central-common';
+import type { TrainStation } from '@personalhealthtrain/central-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 import { TrainStationList } from '../../../components/domains/train-station/TrainStationList';
 import TrainStationApprovalStatus from '../../../components/domains/train-station/TrainStationApprovalStatus';

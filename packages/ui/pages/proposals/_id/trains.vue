@@ -35,8 +35,8 @@
     </div>
 </template>
 <script lang="ts">
-import { PropType } from 'vue';
-import { Proposal, ProposalStation } from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
+import type { Proposal, ProposalStation } from '@personalhealthtrain/central-common';
 
 export default {
     props: {

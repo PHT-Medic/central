@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Robot } from '@authup/common';
-import Vue, { CreateElement, PropType, VNode } from 'vue';
+import type { Robot } from '@authup/common';
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
+import type { Station } from '@personalhealthtrain/central-common';
 import {
-    Ecosystem,
-    Station, buildStationRobotName,
+    Ecosystem, buildStationRobotName,
 } from '@personalhealthtrain/central-common';
 import RobotDetails from '../robot/RobotDetails';
 

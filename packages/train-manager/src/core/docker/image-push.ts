@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Image } from 'dockerode';
+import type { Image } from 'dockerode';
 import { useDocker } from './instance';
-import { DockerAuthConfig } from './type';
+import type { DockerAuthConfig } from './type';
 
 export async function pushDockerImage(image: Image | string, authConfig: DockerAuthConfig) {
     const imageLatest = typeof image === 'string' ?

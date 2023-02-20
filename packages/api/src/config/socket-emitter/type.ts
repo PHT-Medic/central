@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SocketServerToClientEventName, SocketServerToClientItem } from '@personalhealthtrain/central-common';
+import type { SocketServerToClientEventName, SocketServerToClientItem } from '@personalhealthtrain/central-common';
 
 export type SocketServerToClientEventConfigurationItem = {
     namespace?: string,

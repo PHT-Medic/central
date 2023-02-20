@@ -5,9 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    Next, Request, Response, send,
-} from 'routup';
+import type { Next, Request, Response } from 'routup';
+import { send } from 'routup';
 import { hasOwnProperty } from 'typeorm-extension';
 import {
     ConflictError,

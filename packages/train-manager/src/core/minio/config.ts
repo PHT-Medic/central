@@ -6,7 +6,7 @@
  */
 
 import { parseProxyConnectionString } from '@personalhealthtrain/central-common';
-import { ClientOptions } from 'minio';
+import type { ClientOptions } from 'minio';
 
 let instance : ClientOptions | undefined;
 

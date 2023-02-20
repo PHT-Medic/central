@@ -15,7 +15,7 @@ import {
     Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import {
+import type {
     Station,
     Train,
     TrainStation,
@@ -23,7 +23,7 @@ import {
     TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
 import { RealmEntity } from '@authup/server-database';
-import { Realm } from '@authup/common';
+import type { Realm } from '@authup/common';
 import { TrainEntity } from '../train/entity';
 import { StationEntity } from '../station/entity';
 

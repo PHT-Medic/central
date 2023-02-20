@@ -9,14 +9,14 @@ import { check, validationResult } from 'express-validator';
 import { ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/common';
-import { Request } from 'routup';
-import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
+import type { Request } from 'routup';
+import type { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { StationEntity } from '../../../../../domains/core/station';
 import { useRequestEnv } from '../../../../request';
+import type { RequestValidationResult } from '../../../../validation';
 import {
-    RequestValidationError,
-    RequestValidationResult, extendRequestValidationResultWithRelation,
+    RequestValidationError, extendRequestValidationResultWithRelation,
     initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';

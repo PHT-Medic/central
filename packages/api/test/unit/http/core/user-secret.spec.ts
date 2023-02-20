@@ -5,14 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    SecretType,
-    USER_SECRETS_SECRET_ENGINE_KEY,
+import type {
     UserSecret,
     UserSecretsSecretStoragePayload,
 } from '@personalhealthtrain/central-common';
+import {
+    SecretType,
+    USER_SECRETS_SECRET_ENGINE_KEY,
+} from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { Client as VaultClient } from '@hapic/vault';
+import type { Client as VaultClient } from '@hapic/vault';
 import { removeDateProperties } from '../../../utils/date-properties';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 import { useSuperTest } from '../../../utils/supertest';

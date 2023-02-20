@@ -6,8 +6,9 @@
  */
 
 import { createDatabase, dropDatabase } from 'typeorm-extension';
-import { CommandModule } from 'yargs';
-import { DataSource, DataSourceOptions } from 'typeorm';
+import type { CommandModule } from 'yargs';
+import type { DataSourceOptions } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { generateMigration } from '@authup/server-database';
 import path from 'node:path';
 import { createConfig } from '../../config';

@@ -6,13 +6,12 @@
  */
 
 import { useRequestQuery } from '@routup/query';
-import {
-    Request, Response, send, useRequestParam,
-} from 'routup';
-import { SelectQueryBuilder } from 'typeorm';
+import type { Request, Response } from 'routup';
+import { send, useRequestParam } from 'routup';
+import type { SelectQueryBuilder } from 'typeorm';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import type { ParseAllowedOption } from 'rapiq';
 import {
-    ParseAllowedOption,
     parseQueryFields,
 } from 'rapiq';
 import {

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Client } from 'minio';
+import type { Client } from 'minio';
 
 export async function getMinioBucketObjectList(
     minio: Client,

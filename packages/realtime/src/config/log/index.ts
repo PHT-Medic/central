@@ -5,9 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    Logger, createLogger, format, transports,
-} from 'winston';
+import type { Logger } from 'winston';
+import { createLogger, format, transports } from 'winston';
 import path from 'path';
 import { getWritableDirPath } from '../paths';
 

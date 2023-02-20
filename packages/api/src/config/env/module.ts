@@ -7,8 +7,8 @@
 
 import { config } from 'dotenv';
 import path from 'node:path';
-import { EnvironmentName } from './constants';
-import { Environment } from './type';
+import type { EnvironmentName } from './constants';
+import type { Environment } from './type';
 import { requireBooleanFromEnv, requireFromEnv, requireIntegerFromEnv } from './utils';
 
 config({

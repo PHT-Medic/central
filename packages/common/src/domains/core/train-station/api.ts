@@ -5,10 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuildInput, buildQuery } from 'rapiq';
-import { ClientDriverInstance } from 'hapic';
-import { TrainStation } from './entity';
-import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
+import type { BuildInput } from 'rapiq';
+import { buildQuery } from 'rapiq';
+import type { ClientDriverInstance } from 'hapic';
+import type { TrainStation } from './entity';
+import type { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
 export class TrainStationAPI {
     protected client: ClientDriverInstance;

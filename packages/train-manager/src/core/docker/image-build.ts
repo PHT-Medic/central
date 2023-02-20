@@ -8,7 +8,7 @@
 import tar from 'tar-stream';
 import { createGzip } from 'zlib';
 import { useDocker } from './instance';
-import { DockerAuthConfig } from './type';
+import type { DockerAuthConfig } from './type';
 
 export async function buildDockerImage(
     context: {

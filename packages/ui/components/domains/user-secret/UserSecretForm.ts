@@ -5,12 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { UserSecret } from '@personalhealthtrain/central-common';
 import {
     SecretType,
-    UserSecret,
 } from '@personalhealthtrain/central-common';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
-import Vue, { CreateElement, VNode } from 'vue';
+import type { CreateElement, VNode } from 'vue';
+import Vue from 'vue';
 import {
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
 } from '@vue-layout/utils';

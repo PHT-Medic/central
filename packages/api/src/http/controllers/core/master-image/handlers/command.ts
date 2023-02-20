@@ -8,7 +8,7 @@
 import { MasterImageCommand } from '@personalhealthtrain/central-common';
 import { BadRequestError, NotFoundError } from '@ebec/http';
 import { useRequestBody } from '@routup/body';
-import { Request, Response } from 'routup';
+import type { Request, Response } from 'routup';
 import { syncMasterImages } from '../../../../../domains/core/master-image';
 
 export async function commandMasterImageRouteHandler(req: Request, res: Response) {

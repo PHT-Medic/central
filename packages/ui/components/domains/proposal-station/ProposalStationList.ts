@@ -5,31 +5,38 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     ProposalStation,
-    ProposalStationSocketClientToServerEventName,
-    ProposalStationSocketServerToClientEventName,
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
     Station,
     Train,
+} from '@personalhealthtrain/central-common';
+import {
+    ProposalStationSocketClientToServerEventName,
+    ProposalStationSocketServerToClientEventName,
     buildSocketProposalStationInRoomName,
     buildSocketProposalStationOutRoomName,
     buildSocketProposalStationRoomName, mergeDeep,
 } from '@personalhealthtrain/central-common';
 
-import Vue, { CreateElement, PropType, VNode } from 'vue';
-import { Socket } from 'socket.io-client';
-import {
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
+import type { Socket } from 'socket.io-client';
+import type {
     ComponentListData,
     ComponentListHandlerMethodOptions,
     ComponentListMethods,
     ComponentListProperties,
-    PaginationMeta, buildListHeader, buildListItems, buildListNoMore, buildListPagination, buildListSearch,
+    PaginationMeta,
 } from '@vue-layout/utils';
-import { REALM_MASTER_NAME, Realm } from '@authup/common';
-import { BuildInput } from 'rapiq';
+import {
+    buildListHeader, buildListItems, buildListNoMore, buildListPagination, buildListSearch,
+} from '@vue-layout/utils';
+import type { Realm } from '@authup/common';
+import { REALM_MASTER_NAME } from '@authup/common';
+import type { BuildInput } from 'rapiq';
 
 enum DomainType {
     Proposal = 'proposal',

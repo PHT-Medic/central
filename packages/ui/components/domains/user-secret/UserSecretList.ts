@@ -4,19 +4,23 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { SecretType, UserSecret, mergeDeep } from '@personalhealthtrain/central-common';
-import Vue, { CreateElement, PropType, VNode } from 'vue';
-import {
+import type { UserSecret } from '@personalhealthtrain/central-common';
+import { SecretType, mergeDeep } from '@personalhealthtrain/central-common';
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
+import type {
     ComponentListData,
     ComponentListHandlerMethodOptions,
     ComponentListMethods,
     ComponentListProperties,
     PaginationMeta,
+} from '@vue-layout/utils';
+import {
     buildListHeader,
     buildListItems,
     buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
-import { BuildInput } from 'rapiq';
+import type { BuildInput } from 'rapiq';
 
 export const UserSecretList = Vue.extend<
 ComponentListData<UserSecret>,

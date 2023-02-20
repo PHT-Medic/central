@@ -5,17 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     Registry,
     RegistryProject,
+} from '@personalhealthtrain/central-common';
+import {
     RegistryProjectType,
     createNanoID,
 } from '@personalhealthtrain/central-common';
-import Vue, {
+import type {
     CreateElement, PropType, VNode, VNodeChildren,
 } from 'vue';
+import Vue from 'vue';
+import type { ComponentFormData } from '@vue-layout/utils';
 import {
-    ComponentFormData,
     SlotName,
     buildFormInput,
     buildFormSelect,

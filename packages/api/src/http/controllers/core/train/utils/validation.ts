@@ -9,14 +9,14 @@ import { Ecosystem, TrainType } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
 import { BadRequestError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/common';
-import { Request } from 'routup';
+import type { Request } from 'routup';
 import { MasterImageEntity } from '../../../../../domains/core/master-image';
 import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
-import { TrainEntity } from '../../../../../domains/core/train';
+import type { TrainEntity } from '../../../../../domains/core/train';
+import type { RequestValidationResult } from '../../../../validation';
 import {
-    RequestValidationError,
-    RequestValidationResult, extendRequestValidationResultWithRelation,
+    RequestValidationError, extendRequestValidationResultWithRelation,
     initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';

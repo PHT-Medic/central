@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ProposalStation } from '@personalhealthtrain/central-common';
-import { SuperTest, Test } from 'supertest';
+import type { ProposalStation } from '@personalhealthtrain/central-common';
+import type { SuperTest, Test } from 'supertest';
 
 export async function createSuperTestProposalStation(superTest: SuperTest<Test>, proposalStation: Partial<ProposalStation>) {
     return superTest

@@ -5,17 +5,20 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import {
+import type {
     SocketClientToServerEvents,
     SocketServerToClientEvents,
     Train,
+} from '@personalhealthtrain/central-common';
+import {
     TrainFileSocketClientToServerEventName,
     TrainFileSocketServerToClientEventName,
     buildSocketTrainFileRoomName, hasOwnProperty,
 } from '@personalhealthtrain/central-common';
 import { required } from 'vuelidate/lib/validators';
-import Vue, { PropType } from 'vue';
-import { Socket } from 'socket.io-client';
+import type { PropType } from 'vue';
+import Vue from 'vue';
+import type { Socket } from 'socket.io-client';
 import { REALM_MASTER_NAME } from '@authup/common';
 import TrainFile from './TrainFile.vue';
 import TrainFormFile from './TrainFormFile.vue';

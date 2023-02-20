@@ -7,11 +7,14 @@
 import {
     maxLength, minLength, required,
 } from 'vuelidate/lib/validators';
-import Vue, { CreateElement, PropType, VNode } from 'vue';
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
 
-import { Proposal, ProposalRisk } from '@personalhealthtrain/central-common';
+import type { Proposal } from '@personalhealthtrain/central-common';
+import { ProposalRisk } from '@personalhealthtrain/central-common';
+import type { ComponentFormData } from '@vue-layout/utils';
 import {
-    ComponentFormData, SlotName, buildFormInput, buildFormSubmit, buildFormTextarea,
+    SlotName, buildFormInput, buildFormSubmit, buildFormTextarea,
 } from '@vue-layout/utils';
 import { MasterImagePicker } from '../master-image/MasterImagePicker';
 import { StationList } from '../station/StationList';

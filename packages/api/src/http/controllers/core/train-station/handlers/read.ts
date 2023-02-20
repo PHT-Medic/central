@@ -7,9 +7,8 @@
 
 import { onlyRealmWritableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
-import {
-    Request, Response, send, useRequestParam,
-} from 'routup';
+import type { Request, Response } from 'routup';
+import { send, useRequestParam } from 'routup';
 import {
     applyQuery, applyRelations, useDataSource,
 } from 'typeorm-extension';

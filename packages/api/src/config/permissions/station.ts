@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, PermissionIDType } from '@personalhealthtrain/central-common';
+import type { PermissionIDType } from '@personalhealthtrain/central-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 
 export type PHTStationRole = 'StationAuthority' | 'StationEmployee';
 

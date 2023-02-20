@@ -5,9 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionID, Train } from '@personalhealthtrain/central-common';
+import type { Train } from '@personalhealthtrain/central-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@ebec/http';
-import { Request, Response, sendCreated } from 'routup';
+import type { Request, Response } from 'routup';
+import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runTrainValidation } from '../utils';

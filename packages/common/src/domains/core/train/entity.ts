@@ -5,21 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Realm, User } from '@authup/common';
-import { MasterImage } from '../master-image';
-import { Proposal } from '../proposal';
-import { TrainFile } from '../train-file';
-import {
+import type { Realm, User } from '@authup/common';
+import type { MasterImage } from '../master-image';
+import type { Proposal } from '../proposal';
+import type { TrainFile } from '../train-file';
+import type {
     TrainBuildStatus,
     TrainConfigurationStatus,
     TrainResultStatus,
     TrainRunStatus,
     TrainType,
 } from './constants';
-import { UserSecret } from '../../auth';
-import { Station } from '../station';
-import { Registry } from '../registry';
-import { RegistryProject } from '../registry-project';
+import type { UserSecret } from '../../auth';
+import type { Station } from '../station';
+import type { Registry } from '../registry';
+import type { RegistryProject } from '../registry-project';
 
 export interface Train {
     id: string;

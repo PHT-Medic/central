@@ -15,11 +15,12 @@ import {
     PrimaryGeneratedColumn, Unique,
     UpdateDateColumn,
 } from 'typeorm';
+import type { Registry, Station } from '@personalhealthtrain/central-common';
 import {
-    Ecosystem, Registry, RegistryProject, Station,
+    Ecosystem, RegistryProject,
 } from '@personalhealthtrain/central-common';
 import { RealmEntity } from '@authup/server-database';
-import { Realm } from '@authup/common';
+import type { Realm } from '@authup/common';
 import { RegistryProjectEntity } from '../registry-project/entity';
 import { RegistryEntity } from '../registry/entity';
 

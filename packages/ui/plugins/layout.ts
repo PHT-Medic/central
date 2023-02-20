@@ -7,7 +7,7 @@
 
 import Vue from 'vue';
 import NavigationComponents, { getState, setProvider, setState } from '@vue-layout/navigation';
-import { Context } from '@nuxt/types';
+import type { Context } from '@nuxt/types';
 import { NavigationProvider } from '../config/layout';
 
 Vue.use(NavigationComponents);

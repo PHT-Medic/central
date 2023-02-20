@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import supertest, { SuperTest, Test } from 'supertest';
+import type { SuperTest, Test } from 'supertest';
+import supertest from 'supertest';
 import { createConfig } from '../../src';
 import { createRouter } from '../../src/http/router';
 

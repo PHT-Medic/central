@@ -5,8 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { PermissionID, Proposal } from '@personalhealthtrain/central-common';
-import { PropType } from 'vue';
+import type { Proposal } from '@personalhealthtrain/central-common';
+import { PermissionID } from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 import { ProposalForm } from '../../../components/domains/proposal/ProposalForm';
 

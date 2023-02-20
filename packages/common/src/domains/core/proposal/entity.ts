@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Realm, User } from '@authup/common';
-import { MasterImage } from '../master-image';
-import { ProposalRisk } from './constants';
+import type { Realm, User } from '@authup/common';
+import type { MasterImage } from '../master-image';
+import type { ProposalRisk } from './constants';
 
 export interface Proposal {
     id: string;

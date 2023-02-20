@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Registry, Station } from '@personalhealthtrain/central-common';
 import {
-    Ecosystem,
-    Registry, Station, isHex,
+    Ecosystem, isHex,
 } from '@personalhealthtrain/central-common';
 import { RealmList } from '@authup/vue2';
 import {
@@ -16,10 +16,11 @@ import {
 import {
     SlotName, buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea, initPropertiesFromSource,
 } from '@vue-layout/utils';
-import Vue, {
+import type {
     CreateElement, PropType, VNode, VNodeChildren, VNodeData,
 } from 'vue';
-import { BuildInput } from 'rapiq';
+import Vue from 'vue';
+import type { BuildInput } from 'rapiq';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 import { RegistryList } from '../registry/RegistryList';
 import StationRegistryProjectDetails from './StationRegistryProjectDetails';

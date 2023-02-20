@@ -5,8 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue, { CreateElement, PropType, VNode } from 'vue';
-import { Registry, RegistryCommand } from '@personalhealthtrain/central-common';
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
+import type { Registry } from '@personalhealthtrain/central-common';
+import { RegistryCommand } from '@personalhealthtrain/central-common';
 import EntityDelete from '../EntityDelete';
 import { MasterImageList } from '../master-image/MasterImageList';
 

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainStation } from '@personalhealthtrain/central-common';
+import type { TrainStation } from '@personalhealthtrain/central-common';
 import { removeDateProperties } from '../../../utils/date-properties';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 import { useSuperTest } from '../../../utils/supertest';

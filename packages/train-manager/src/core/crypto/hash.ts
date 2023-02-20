@@ -9,7 +9,7 @@ import {
     sign,
     verify,
 } from 'crypto';
-import { SignatureCreateContext, SignatureVerifyContext } from './type';
+import type { SignatureCreateContext, SignatureVerifyContext } from './type';
 
 export function createSignature(context: SignatureCreateContext): string {
     let data : Buffer;

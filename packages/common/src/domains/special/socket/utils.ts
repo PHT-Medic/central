@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { SocketClientToServerEventContext } from './type';
+import type { SocketClientToServerEventContext } from './type';
 
 export function extendSocketClientToServerEventContext<T>(context?: SocketClientToServerEventContext<T>) {
     context ??= {};

@@ -6,7 +6,7 @@
  */
 
 import { ROBOT_SECRET_ENGINE_KEY } from './constants';
-import { RobotSecretEnginePayload } from './type';
+import type { RobotSecretEnginePayload } from './type';
 
 export function buildRobotSecretStoragePayload(
     id: string,

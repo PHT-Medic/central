@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Station, TrainStation, hasOwnProperty } from '@personalhealthtrain/central-common';
+import type { Station, TrainStation } from '@personalhealthtrain/central-common';
+import { hasOwnProperty } from '@personalhealthtrain/central-common';
 import { BaseError } from '../../../../error';
-import { StationExtended } from '../type';
+import type { StationExtended } from '../type';
 
 export function mergeStationsWithTrainStations(
     stations: Station[],

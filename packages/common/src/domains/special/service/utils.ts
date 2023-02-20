@@ -6,7 +6,7 @@
  */
 
 import { ServiceID } from './constants';
-import { ServiceIDType } from './type';
+import type { ServiceIDType } from './type';
 
 const values = Object.values(ServiceID);
 export function isService(name: any) : name is ServiceIDType {

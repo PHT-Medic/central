@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainQueueCommand } from './constants';
-import { Train } from './entity';
+import type { TrainQueueCommand } from './constants';
+import type { Train } from './entity';
 
 export type TrainQueuePayload<T extends `${TrainQueueCommand}`> =
     T extends `${TrainQueueCommand.CLEANUP}` | `${TrainQueueCommand.SETUP}` ?

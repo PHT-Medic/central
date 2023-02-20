@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import tar, { Pack } from 'tar-stream';
+import type { Pack } from 'tar-stream';
+import tar from 'tar-stream';
 
 export function createPackFromFileContent(
     content: string | Buffer,

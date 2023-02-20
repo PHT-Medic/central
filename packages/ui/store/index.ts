@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ActionTree, GetterTree, MutationTree } from 'vuex';
+import type { ActionTree, GetterTree, MutationTree } from 'vuex';
 
 export const state = () => ({});
 

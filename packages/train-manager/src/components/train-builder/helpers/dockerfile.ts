@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     HTTPClient,
     MasterImage,
-    Train, TrainContainerPath, TrainFile, getHostNameFromString,
+    Train, TrainFile,
 } from '@personalhealthtrain/central-common';
+import { TrainContainerPath, getHostNameFromString } from '@personalhealthtrain/central-common';
 import path from 'path';
 import { useClient } from 'hapic';
 import { BuilderError } from '../error';

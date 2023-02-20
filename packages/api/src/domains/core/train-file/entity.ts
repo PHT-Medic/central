@@ -14,10 +14,10 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Train, TrainFile } from '@personalhealthtrain/central-common';
+import type { Train, TrainFile } from '@personalhealthtrain/central-common';
 import { RealmEntity, UserEntity } from '@authup/server-database';
 // eslint-disable-next-line import/no-cycle
-import { Realm, User } from '@authup/common';
+import type { Realm, User } from '@authup/common';
 import { TrainEntity } from '../train/entity';
 
 @Entity({ name: 'train_files' })

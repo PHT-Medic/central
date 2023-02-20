@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BuildInput, buildQuery } from 'rapiq';
-import { ClientDriverInstance } from 'hapic';
+import type { BuildInput } from 'rapiq';
+import { buildQuery } from 'rapiq';
+import type { ClientDriverInstance } from 'hapic';
 
-import { MasterImageGroup } from './entity';
-import { CollectionResourceResponse, SingleResourceResponse } from '../../type';
+import type { MasterImageGroup } from './entity';
+import type { CollectionResourceResponse, SingleResourceResponse } from '../../type';
 
 export class MasterImageGroupAPI {
     protected client: ClientDriverInstance;

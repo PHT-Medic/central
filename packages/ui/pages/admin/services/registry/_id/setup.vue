@@ -5,20 +5,21 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { PropType } from 'vue';
-import { Ecosystem, Registry } from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
+import type { Registry } from '@personalhealthtrain/central-common';
+import { Ecosystem } from '@personalhealthtrain/central-common';
 import RegistrySetup from '../../../../../components/domains/registry/RegistrySetup';
 
 export default {
     components: { RegistrySetup },
+    props: {
+        entity: Object as PropType<Registry>,
+    },
     created() {
         if (this.entity.ecosystem !== Ecosystem.DEFAULT) {
             Promise.resolve()
                 .then(this.$nuxt.$router.push(`/admin/services/registry/${this.entity.id}`));
         }
-    },
-    props: {
-        entity: Object as PropType<Registry>,
     },
 };
 </script>

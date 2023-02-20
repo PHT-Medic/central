@@ -9,7 +9,7 @@ import {
     DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
 } from '@routup/decorators';
 import { SwaggerTags } from '@trapi/swagger';
-import {
+import type {
     UserSecret,
 } from '@personalhealthtrain/central-common';
 import { ForceLoggedInMiddleware } from '../../../middleware/auth';

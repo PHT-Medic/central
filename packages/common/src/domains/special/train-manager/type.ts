@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainManagerComponent } from './constants';
-import { Registry, RegistryProject, Train } from '../../core';
-import {
+import type { TrainManagerComponent } from './constants';
+import type { Registry, RegistryProject, Train } from '../../core';
+import type {
     TrainManagerBuilderCommand,
     TrainManagerBuilderPayload,
     TrainManagerExtractorCommand,

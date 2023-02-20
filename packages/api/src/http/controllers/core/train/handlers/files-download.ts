@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Request, Response, useRequestParam } from 'routup';
+import type { Request, Response } from 'routup';
+import { useRequestParam } from 'routup';
 import tar from 'tar-stream';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/common';

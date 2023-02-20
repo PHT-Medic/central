@@ -13,10 +13,12 @@ import {
     extendSocketClientToServerEventContext,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@ebec/http';
-import {
+import type {
     SocketInterface,
     SocketNamespaceInterface,
     SocketServerInterface,
+} from '../../config';
+import {
     decrSocketRoomConnections,
     incrSocketRoomConnections,
 } from '../../config';

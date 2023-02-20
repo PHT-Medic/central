@@ -6,7 +6,7 @@
  */
 
 import { useDocker } from './instance';
-import { DockerAuthConfig } from './type';
+import type { DockerAuthConfig } from './type';
 
 export async function pullDockerImage(
     image: string,

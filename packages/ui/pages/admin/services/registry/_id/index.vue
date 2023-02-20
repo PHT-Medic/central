@@ -6,8 +6,8 @@
   -->
 <script lang="ts">
 
-import { PropType } from 'vue';
-import { Registry } from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
+import type { Registry } from '@personalhealthtrain/central-common';
 import { RegistryForm } from '../../../../../components/domains/registry/RegistryForm';
 
 export default {

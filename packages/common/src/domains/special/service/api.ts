@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ClientDriverInstance } from 'hapic';
-import { RegistryCommand } from './registry';
+import type { ClientDriverInstance } from 'hapic';
+import type { RegistryCommand } from './registry';
 import { ServiceID } from './constants';
-import { ServiceIDType } from './type';
-import { SingleResourceResponse } from '../../type';
-import { SecretStorageCommand } from './secret-engine';
-import { Registry, RegistryProject } from '../../core';
+import type { ServiceIDType } from './type';
+import type { SingleResourceResponse } from '../../type';
+import type { SecretStorageCommand } from './secret-engine';
+import type { Registry, RegistryProject } from '../../core';
 
 export class ServiceAPI {
     protected client: ClientDriverInstance;

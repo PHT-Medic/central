@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Arguments, Argv, CommandModule } from 'yargs';
+import type { Arguments, Argv, CommandModule } from 'yargs';
 import {
     dropDatabase,
 } from 'typeorm-extension';

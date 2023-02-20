@@ -48,7 +48,7 @@ export default Vue.extend({
                 toaster: 'b-toaster-top-center',
                 variant: 'warning',
             });
-        }
+        },
     },
 });
 </script>

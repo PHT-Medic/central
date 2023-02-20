@@ -8,9 +8,9 @@
 import { isRealmResourceReadable } from '@authup/common';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import type { Request, Response } from 'routup';
 import {
-    HeaderName,
-    Request, Response, setResponseHeaderAttachment, useRequestParam,
+    HeaderName, setResponseHeaderAttachment, useRequestParam,
 } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';

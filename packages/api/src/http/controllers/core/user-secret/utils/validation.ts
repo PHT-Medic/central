@@ -6,11 +6,11 @@
  */
 
 import { check, validationResult } from 'express-validator';
+import type { UserSecret } from '@personalhealthtrain/central-common';
 import {
     SecretType,
-    UserSecret,
 } from '@personalhealthtrain/central-common';
-import { Request } from 'routup';
+import type { Request } from 'routup';
 import { RequestValidationError, matchedValidationData } from '../../../../validation';
 
 export async function runUserSecretValidation(

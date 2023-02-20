@@ -4,15 +4,18 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import Vue, { CreateElement, PropType, VNode } from 'vue';
-import {
-    PermissionID,
-    Proposal, ProposalSocketClientToServerEventName, ProposalSocketServerToClientEventName,
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
+import type {
+    Proposal,
     SocketClientToServerEvents,
     SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
+import {
+    PermissionID, ProposalSocketClientToServerEventName, ProposalSocketServerToClientEventName,
+} from '@personalhealthtrain/central-common';
 import { SlotName, hasNormalizedSlot, normalizeSlot } from '@vue-layout/utils';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 import EntityDelete from '../EntityDelete';
 
 export const ProposalItem = Vue.extend({

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train } from '@personalhealthtrain/central-common';
+import type { Train } from '@personalhealthtrain/central-common';
 
 export function generateTrainMinioBucketName(id: Train['id']) {
     return `trains.${id}`;

@@ -5,12 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Robot } from '@authup/common';
 import {
-    ErrorCode, Robot,
+    ErrorCode,
 } from '@authup/common';
 import { Client } from '@hapic/oauth2';
 import { isClientError, stringifyAuthorizationHeader } from 'hapic';
-import { HTTPClient } from '../../client';
+import type { HTTPClient } from '../../client';
 import { hasOwnProperty } from '../../../utils';
 
 export function shouldRefreshRobotTokenResponseError(err: unknown) : boolean {

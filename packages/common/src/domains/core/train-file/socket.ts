@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainFile } from './entity';
+import type { TrainFile } from './entity';
 
 export function buildSocketTrainFileRoomName(id?: TrainFile['id']) {
     return `train-files${id ? `#${id}` : ''}`;

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { HTTPClient } from '../http';
+import type { HTTPClient } from '../http';
 
 export function useDomainAPI(client: HTTPClient, name: string) {
     switch (name) {

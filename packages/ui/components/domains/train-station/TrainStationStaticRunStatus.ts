@@ -6,7 +6,8 @@
  */
 
 import { TrainBuildStatus, TrainRunStatus, TrainStationStatic } from '@personalhealthtrain/central-common';
-import Vue, { CreateElement, PropType, VNode } from 'vue';
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
 import { SlotName, hasNormalizedSlot, normalizeSlot } from '@vue-layout/utils';
 
 export default Vue.extend({

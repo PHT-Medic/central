@@ -4,19 +4,22 @@
 * For the full copyright and license information,
 * view the LICENSE file that was distributed with this source code.
 */
-import {
+import type {
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
     Train,
     TrainLog,
+} from '@personalhealthtrain/central-common';
+import {
     TrainLogSocketClientToServerEventName,
     TrainLogSocketServerToClientEventName,
     buildSocketTrainLogRoomName,
 } from '@personalhealthtrain/central-common';
-import { ComponentListHandlerMethodOptions, PaginationMeta } from '@vue-layout/utils';
-import { Socket } from 'socket.io-client';
-import Vue, { CreateElement, PropType, VNode } from 'vue';
+import type { ComponentListHandlerMethodOptions, PaginationMeta } from '@vue-layout/utils';
+import type { Socket } from 'socket.io-client';
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
 import TrainLogComponent from './TrainLog.vue';
 
 export default Vue.extend({

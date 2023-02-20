@@ -5,12 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     Component,
     ProviderInterface,
+} from '@vue-layout/navigation';
+import {
     applyRestrictionForComponents, findTierComponent,
 } from '@vue-layout/navigation';
-import { Context } from '@nuxt/types';
+import type { Context } from '@nuxt/types';
 import {
     LayoutKey, LayoutSideAdminNavigation, LayoutSideDefaultNavigation, LayoutTopNavigation,
 } from './contants';

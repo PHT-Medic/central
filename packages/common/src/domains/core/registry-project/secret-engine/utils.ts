@@ -6,8 +6,8 @@
  */
 
 import { REGISTRY_PROJECT_SECRET_ENGINE_KEY } from './constants';
-import { RegistryProjectSecretStoragePayload } from './type';
-import { RegistryProject } from '../entity';
+import type { RegistryProjectSecretStoragePayload } from './type';
+import type { RegistryProject } from '../entity';
 
 export function isRegistryProjectSecretStorageKey(name: string): boolean {
     return name.startsWith(`${REGISTRY_PROJECT_SECRET_ENGINE_KEY}/`);

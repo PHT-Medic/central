@@ -8,7 +8,7 @@
 import { registerTrainLogSocketHandlers } from '../../domains/train-log/handlers';
 import { registerTrainSocketHandlers } from '../../domains/train/handlers';
 import { registerUserHandlers } from '../../domains/user/handlers';
-import { SocketNamespaceInterface, SocketServerInterface } from './type';
+import type { SocketNamespaceInterface, SocketServerInterface } from './type';
 import { registerProposalSocketHandlers } from '../../domains/proposal/handlers';
 import {
     registerProposalStationForRealmSocketHandlers,

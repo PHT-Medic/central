@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Robot, User } from '@authup/common';
-import { Station } from '@personalhealthtrain/central-common';
-import { SecretStorageQueueEntityType } from './constants';
+import type { Robot, User } from '@authup/common';
+import type { Station } from '@personalhealthtrain/central-common';
+import type { SecretStorageQueueEntityType } from './constants';
 
 export type SecretStorageRobotQueuePayload = {
     type: SecretStorageQueueEntityType.ROBOT,

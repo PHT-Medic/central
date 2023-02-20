@@ -6,7 +6,7 @@
  */
 
 import dotenv from 'dotenv';
-import { Arguments, CommandModule } from 'yargs';
+import type { Arguments, CommandModule } from 'yargs';
 import { startCommand } from '../../commands';
 
 interface StartArguments extends Arguments {

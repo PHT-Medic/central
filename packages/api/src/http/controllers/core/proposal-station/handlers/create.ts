@@ -7,7 +7,8 @@
 
 import { PermissionID, ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@ebec/http';
-import { Request, Response, sendCreated } from 'routup';
+import type { Request, Response } from 'routup';
+import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
 import { useRequestEnv } from '../../../../request';

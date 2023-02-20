@@ -10,12 +10,13 @@ import { check, validationResult } from 'express-validator';
 import { RealmEntity } from '@authup/server-database';
 import { isRealmResourceWritable } from '@authup/common';
 import { ForbiddenError } from '@ebec/http';
-import { Request } from 'routup';
+import type { Request } from 'routup';
 import { RegistryEntity } from '../../../../../domains/core/registry/entity';
-import { StationEntity } from '../../../../../domains/core/station/entity';
+import type { StationEntity } from '../../../../../domains/core/station/entity';
 import { useRequestEnv } from '../../../../request';
+import type { RequestValidationResult } from '../../../../validation';
 import {
-    RequestValidationError, RequestValidationResult,
+    RequestValidationError,
     extendRequestValidationResultWithRelation, initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';

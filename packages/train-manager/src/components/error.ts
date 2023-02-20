@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { BaseError as Base, Options } from '@ebec/http';
+import type { Options } from '@ebec/http';
+import { BaseError as Base } from '@ebec/http';
 import {
     TrainManagerErrorCode,
 } from '@personalhealthtrain/central-common';

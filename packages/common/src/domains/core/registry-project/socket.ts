@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { RegistryProject } from './entity';
+import type { RegistryProject } from './entity';
 
 export function buildSocketRegistryProjectRoomName(id?: RegistryProject['id']) {
     return `registry-projects${id ? `#${id}` : ''}`;

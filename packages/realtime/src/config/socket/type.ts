@@ -5,15 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     SocketClientToServerEvents,
     SocketInterServerEvents,
     SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
-import {
+import type {
     AbilityDescriptor, AbilityManager, Realm, Robot, User,
 } from '@authup/common';
-import { Namespace, Server, Socket } from 'socket.io';
+import type { Namespace, Server, Socket } from 'socket.io';
 
 export type SocketDataInterface = {
     token?: string,

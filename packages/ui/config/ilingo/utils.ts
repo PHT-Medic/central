@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ValidationTranslator } from '@vue-layout/utils';
-import { Ilingo } from 'ilingo';
+import type { ValidationTranslator } from '@vue-layout/utils';
+import type { Ilingo } from 'ilingo';
 
 export function buildVuelidateTranslator(translator: Ilingo, locale?: string) : ValidationTranslator {
     return function translate(validator: string, parameters?: Record<string, any>) : string | undefined {

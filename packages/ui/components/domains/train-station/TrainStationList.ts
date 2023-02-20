@@ -5,13 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
+import type {
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
     Station,
     Train,
     TrainStation,
+} from '@personalhealthtrain/central-common';
+import {
     TrainStationSocketClientToServerEventName,
     TrainStationSocketServerToClientEventName,
     buildSocketTrainStationInRoomName,
@@ -19,20 +21,24 @@ import {
     buildSocketTrainStationRoomName, mergeDeep,
 } from '@personalhealthtrain/central-common';
 
-import Vue, { CreateElement, PropType, VNode } from 'vue';
-import { Socket } from 'socket.io-client';
-import {
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
+import type { Socket } from 'socket.io-client';
+import type {
     ComponentListData,
     ComponentListHandlerMethodOptions,
     ComponentListMethods,
     ComponentListProperties,
     PaginationMeta,
+} from '@vue-layout/utils';
+import {
     buildListHeader,
     buildListItems,
     buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
-import { REALM_MASTER_NAME, Realm } from '@authup/common';
-import { BuildInput } from 'rapiq';
+import type { Realm } from '@authup/common';
+import { REALM_MASTER_NAME } from '@authup/common';
+import type { BuildInput } from 'rapiq';
 
 enum DomainType {
     Train = 'train',

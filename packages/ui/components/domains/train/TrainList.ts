@@ -4,28 +4,33 @@
 * For the full copyright and license information,
 * view the LICENSE file that was distributed with this source code.
 */
-import {
+import type {
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
     Train,
+} from '@personalhealthtrain/central-common';
+import {
     TrainSocketClientToServerEventName,
     TrainSocketServerToClientEventName, buildSocketTrainRoomName, mergeDeep,
 } from '@personalhealthtrain/central-common';
-import Vue, { CreateElement, PropType, VNode } from 'vue';
-import {
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
+import type {
     ComponentListData,
     ComponentListHandlerMethodOptions,
     ComponentListMethods,
     ComponentListProperties,
     PaginationMeta,
+} from '@vue-layout/utils';
+import {
     buildListHeader,
     buildListItems,
     buildListNoMore,
     buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
-import { BuildInput } from 'rapiq';
-import { Socket } from 'socket.io-client';
+import type { BuildInput } from 'rapiq';
+import type { Socket } from 'socket.io-client';
 import { REALM_MASTER_NAME } from '@authup/common';
 import { TrainListItem } from './TrainListItem';
 

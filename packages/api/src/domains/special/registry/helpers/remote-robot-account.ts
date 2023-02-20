@@ -5,14 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Client as HarborClient, RobotAccount } from '@hapic/harbor';
+import type { Client as HarborClient, RobotAccount } from '@hapic/harbor';
+import type { RegistryProjectSecretStoragePayload } from '@personalhealthtrain/central-common';
 import {
     HTTPClientKey,
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
-    RegistryProjectSecretStoragePayload,
 } from '@personalhealthtrain/central-common';
 import { isClientError, useClient } from 'hapic';
-import { Client as VaultClient } from '@hapic/vault';
+import type { Client as VaultClient } from '@hapic/vault';
 import { ApiKey } from '../../../../config';
 
 export async function ensureRemoteRegistryProjectAccount(

@@ -4,14 +4,17 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import Vue, { CreateElement, PropType, VNode } from 'vue';
-import { Socket } from 'socket.io-client';
-import {
-    PermissionID,
+import type { CreateElement, PropType, VNode } from 'vue';
+import Vue from 'vue';
+import type { Socket } from 'socket.io-client';
+import type {
     SocketClientToServerEvents,
     SocketServerToClientEventContext,
     SocketServerToClientEvents,
-    Train, TrainSocketClientToServerEventName, TrainSocketServerToClientEventName,
+    Train,
+} from '@personalhealthtrain/central-common';
+import {
+    PermissionID, TrainSocketClientToServerEventName, TrainSocketServerToClientEventName,
 } from '@personalhealthtrain/central-common';
 import TrainPipeline from './TrainPipeline.vue';
 import TrainStationsProgress from '../train-station/TrainStationsProgress.vue';

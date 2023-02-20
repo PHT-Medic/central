@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Ecosystem } from '../ecosystem';
+import type { Ecosystem } from '../ecosystem';
 
 export interface Registry {
     id: string;

@@ -10,9 +10,8 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/common';
 import { onlyRealmWritableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
-import {
-    Request, Response, send, useRequestParam,
-} from 'routup';
+import type { Request, Response } from 'routup';
+import { send, useRequestParam } from 'routup';
 import { applyFilters, useDataSource } from 'typeorm-extension';
 import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
 import { useRequestEnv } from '../../../../request';

@@ -5,8 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import Vue, { PropType } from 'vue';
-import {
+import type { PropType } from 'vue';
+import Vue from 'vue';
+import type {
     Registry,
     RegistryProject,
 } from '@personalhealthtrain/central-common';
