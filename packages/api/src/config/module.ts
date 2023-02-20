@@ -19,13 +19,11 @@ import {
 } from '@personalhealthtrain/central-common';
 import { setMinioConfig } from '../core/minio';
 import { EnvironmentName, useEnv } from './env';
-import { buildTrainManagerAggregator } from '../aggregators/train-manager';
-import { buildRobotAggregator } from '../aggregators/robot';
+import { buildRobotAggregator, buildTrainManagerAggregator } from '../aggregators';
 
 import { ApiKey } from './api';
 
-import { buildCommandRouterComponent } from '../components/command-router';
-import { buildEventRouterComponent } from '../components/event-router';
+import { buildRouterComponent } from '../components';
 import { useLogger } from './log';
 
 export type Config = {
@@ -138,8 +136,7 @@ export function createConfig() : Config {
     const components : {start: () => void}[] = [];
     if (!isTest) {
         components.push(
-            buildCommandRouterComponent(),
-            buildEventRouterComponent(),
+            buildRouterComponent(),
         );
     }
 

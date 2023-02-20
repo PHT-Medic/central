@@ -8,7 +8,7 @@
 import { TrainFile } from '@personalhealthtrain/central-common';
 import path from 'node:path';
 import tar from 'tar-stream';
-import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
+import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
 import { createSuperTestProposal, createSuperTestTrain } from '../../../utils/domains';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 import { useSuperTest } from '../../../utils/supertest';

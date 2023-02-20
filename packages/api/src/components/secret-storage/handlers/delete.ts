@@ -5,21 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Message } from 'amqp-extension';
-import { SecretStorageQueuePayload } from '../../../domains/special/secret-storage/type';
+import type { SecretStorageQueuePayload } from '../../../domains/special/secret-storage/type';
 import { SecretStorageQueueEntityType } from '../../../domains/special/secret-storage/constants';
 import { deleteRobotFromSecretStorage } from './entities/robot';
 import { deleteUserSecretsFromSecretStorage } from './entities/user';
 
-export async function deleteFromSecretStorage(message: Message) {
-    const payload: SecretStorageQueuePayload = message.data as SecretStorageQueuePayload;
-
-    switch (payload.type) {
+export async function deleteFromSecretStorage(data: SecretStorageQueuePayload) {
+    switch (data.type) {
         case SecretStorageQueueEntityType.ROBOT:
-            await deleteRobotFromSecretStorage(payload);
+            await deleteRobotFromSecretStorage(data);
             break;
         case SecretStorageQueueEntityType.USER_SECRETS:
-            await deleteUserSecretsFromSecretStorage(payload);
+            await deleteUserSecretsFromSecretStorage(data);
             break;
     }
 }

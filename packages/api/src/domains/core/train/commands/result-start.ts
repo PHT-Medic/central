@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { publishMessage } from 'amqp-extension';
+import { publish } from 'amqp-extension';
 import {
     TrainContainerPath,
     TrainManagerComponent,
@@ -32,7 +32,7 @@ export async function triggerTrainResultStart(
     }
 
     // send queue message
-    await publishMessage(buildTrainManagerQueueMessage(
+    await publish(buildTrainManagerQueueMessage(
         TrainManagerComponent.EXTRACTOR,
         TrainManagerExtractorCommand.EXTRACT,
         {

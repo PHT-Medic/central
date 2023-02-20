@@ -11,13 +11,13 @@ import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from 'hapic';
-import { Client as HarborClient } from '@hapic/harbor';
-import { Client as VaultClient } from '@hapic/vault';
+import type { Client as HarborClient } from '@hapic/harbor';
+import type { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
+import type { RegistryQueuePayload } from '../../../domains/special/registry';
 import {
     RegistryQueueCommand,
-    RegistryQueuePayload,
 } from '../../../domains/special/registry';
 import { ensureRemoteRegistryProjectAccount } from '../../../domains/special/registry/helpers/remote-robot-account';
 import { ensureRemoteRegistryProject } from '../../../domains/special/registry/helpers/remote';

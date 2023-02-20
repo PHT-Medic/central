@@ -5,26 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    TrainBuildStatus,
+import type {
     TrainManagerBuilderCommand,
-    TrainManagerBuilderEvent,
-    TrainManagerComponent,
     TrainManagerErrorEventQueuePayload,
     TrainManagerExtractorExtractQueuePayload,
 } from '@personalhealthtrain/central-common';
-import { Message } from 'amqp-extension';
+import {
+    TrainBuildStatus,
+    TrainManagerBuilderEvent,
+    TrainManagerComponent,
+} from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import { TrainLogSaveContext, saveTrainLog } from '../../domains/core/train-log';
-import { TrainEntity } from '../../domains/core/train/entity';
+import type { TrainLogSaveContext } from '../../domains/core/train-log';
+import { saveTrainLog } from '../../domains/core/train-log';
+import { TrainEntity } from '../../domains/core/train';
 
 export async function handleTrainManagerBuilderEvent(
     command: TrainManagerBuilderCommand,
     event: TrainManagerBuilderEvent,
-    message: Message,
+    data: TrainManagerExtractorExtractQueuePayload,
 ) {
-    const data = message.data as TrainManagerExtractorExtractQueuePayload;
-
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainEntity);
 

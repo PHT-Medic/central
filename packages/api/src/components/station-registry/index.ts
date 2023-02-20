@@ -5,14 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ConsumeHandler, Message } from 'amqp-extension';
 import { StationRegistryQueueCommand } from '../../domains/special/station-registry/consants';
 import { syncStationRegistry } from './handlers/sync';
 
-export function createStationRegistryQueueComponentHandlers() : Record<StationRegistryQueueCommand, ConsumeHandler> {
-    return {
-        [StationRegistryQueueCommand.SYNC]: async (message: Message) => {
-            await syncStationRegistry(message);
-        },
-    };
+export async function executeStationRegistryCommand(
+    command: string,
+    _payload: Record<string, any>,
+) {
+    switch (command) {
+        case StationRegistryQueueCommand.SYNC: {
+            await syncStationRegistry();
+            break;
+        }
+    }
 }

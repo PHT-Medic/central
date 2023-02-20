@@ -5,16 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent,
+import type {
+    EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
+import { EventSubscriber } from 'typeorm';
 import {
     TrainQueueCommand, TrainSocketServerToClientEventName,
     buildSocketRealmNamespaceName, buildSocketTrainRoomName,
 } from '@personalhealthtrain/central-common';
-import { buildMessage, publishMessage } from 'amqp-extension';
-import { MessageQueueRoutingKey, emitSocketServerToClientEvent } from '../../config';
-import { TrainEntity } from '../../domains/core/train/entity';
+import { publish as publishMessage } from 'amqp-extension';
+import { emitSocketServerToClientEvent } from '../../config';
+import { TrainEntity, buildTrainQueueMessage } from '../../domains/core/train';
 
 function publish(
     operation: `${TrainSocketServerToClientEventName}`,
@@ -44,16 +45,12 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
     async afterInsert(event: InsertEvent<TrainEntity>): Promise<any> {
         publish(TrainSocketServerToClientEventName.CREATED, event.entity);
 
-        const message = buildMessage({
-            options: {
-                routingKey: MessageQueueRoutingKey.COMMAND,
-            },
-            type: TrainQueueCommand.SETUP,
-            data: {
+        const message = buildTrainQueueMessage(
+            TrainQueueCommand.SETUP,
+            {
                 id: event.entity.id,
             },
-            metadata: {},
-        });
+        );
 
         await publishMessage(message);
     }
@@ -65,16 +62,12 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
     async beforeRemove(event: RemoveEvent<TrainEntity>): Promise<any> {
         publish(TrainSocketServerToClientEventName.DELETED, event.entity);
 
-        const message = buildMessage({
-            options: {
-                routingKey: MessageQueueRoutingKey.COMMAND,
-            },
-            type: TrainQueueCommand.CLEANUP,
-            data: {
+        const message = buildTrainQueueMessage(
+            TrainQueueCommand.CLEANUP,
+            {
                 id: event.entity.id,
             },
-            metadata: {},
-        });
+        );
 
         await publishMessage(message);
 

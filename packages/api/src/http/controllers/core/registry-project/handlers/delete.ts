@@ -7,10 +7,9 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { publishMessage } from 'amqp-extension';
-import {
-    Request, Response, sendAccepted, useRequestParam,
-} from 'routup';
+import { publish } from 'amqp-extension';
+import type { Request, Response } from 'routup';
+import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { isRealmResourceWritable } from '@authup/common';
 import { useRequestEnv } from '../../../../request';
@@ -44,7 +43,7 @@ export async function deleteRegistryProjectRouteHandler(req: Request, res: Respo
 
     entity.id = entityId;
 
-    const queueMessage = buildRegistryQueueMessage(
+    await publish(buildRegistryQueueMessage(
         RegistryQueueCommand.PROJECT_UNLINK,
         {
             id: entity.id,
@@ -52,9 +51,7 @@ export async function deleteRegistryProjectRouteHandler(req: Request, res: Respo
             externalName: entity.external_name,
             accountId: entity.account_id,
         },
-    );
-
-    await publishMessage(queueMessage);
+    ));
 
     return sendAccepted(res, entity);
 }

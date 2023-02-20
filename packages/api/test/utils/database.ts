@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021.
+ * Copyright (c) 2021-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -19,7 +19,7 @@ import {
     DatabaseSeeder as AuthDatabaseRootSeeder,
 } from '@authup/server-database';
 import { PermissionKey } from '@personalhealthtrain/central-common';
-import { buildDataSourceOptions } from '../../../src/database/utils';
+import { buildDataSourceOptions } from '../../src/database/utils';
 
 export async function useTestDatabase() {
     const options = await buildDataSourceOptions();

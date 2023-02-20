@@ -12,6 +12,8 @@ export enum RegistryQueueCommand {
     PROJECT_LINK = 'REGISTRY_PROJECT_LINK',
     PROJECT_RELINK = 'REGISTRY_PROJECT_RELINK',
     PROJECT_UNLINK = 'REGISTRY_PROJECT_UNLINK',
+
+    EVENT_HANDLE = 'REGISTRY_EVENT',
 }
 
 export enum RegistryQueueEvent {

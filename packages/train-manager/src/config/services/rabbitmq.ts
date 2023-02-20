@@ -6,10 +6,9 @@
  */
 
 export enum MessageQueueSelfRoutingKey {
-    COMMAND = 'rs.command',
-    EVENT = 'rs.event',
+    COMMAND = 'tm.router',
 }
 
 export enum MessageQueueSelfToUIRoutingKey {
-    EVENT = 'ui.rs.event',
+    EVENT = 'api.aggregator.tm',
 }

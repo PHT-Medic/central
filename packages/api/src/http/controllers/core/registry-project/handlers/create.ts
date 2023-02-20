@@ -7,8 +7,9 @@
 
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError } from '@ebec/http';
-import { publishMessage } from 'amqp-extension';
-import { Request, Response, sendCreated } from 'routup';
+import { publish } from 'amqp-extension';
+import type { Request, Response } from 'routup';
+import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runRegistryProjectValidation } from '../utils';
@@ -32,14 +33,12 @@ export async function createRegistryProjectRouteHandler(req: Request, res: Respo
 
     await repository.save(entity);
 
-    const queueMessage = buildRegistryQueueMessage(
+    await publish(buildRegistryQueueMessage(
         RegistryQueueCommand.PROJECT_LINK,
         {
             id: entity.id,
         },
-    );
-
-    await publishMessage(queueMessage);
+    ));
 
     return sendCreated(res, entity);
 }

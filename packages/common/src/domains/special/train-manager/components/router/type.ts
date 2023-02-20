@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Train } from '../../../../core';
-import { TrainManagerRouterCommand } from './constants';
+import type { Train } from '../../../../core';
+import type { TrainManagerRouterCommand } from './constants';
 
 export type TrainManagerRouterRoutePayload = {
     repositoryName: string,
@@ -24,10 +24,10 @@ export type TrainManagerRouterStatusPayload = {
 };
 
 export type TrainManagerRouterPayload<C extends `${TrainManagerRouterCommand}`> =
-    C extends `${TrainManagerRouterCommand.START}` | TrainManagerRouterCommand.START ?
+    C extends `${TrainManagerRouterCommand.START}` | `${TrainManagerRouterCommand.RESET}` ?
         TrainManagerRouterStartPayload :
-        C extends `${TrainManagerRouterCommand.CHECK}` | TrainManagerRouterCommand.CHECK ?
+        C extends `${TrainManagerRouterCommand.CHECK}` ?
             TrainManagerRouterStatusPayload :
-            C extends `${TrainManagerRouterCommand.ROUTE}` | TrainManagerRouterCommand.ROUTE ?
+            C extends `${TrainManagerRouterCommand.ROUTE}` ?
                 TrainManagerRouterRoutePayload :
                 never;

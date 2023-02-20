@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { RegistryCommand, ServiceID } from '@personalhealthtrain/central-common';
+import type { RegistryCommand } from '@personalhealthtrain/central-common';
+import { ServiceID } from '@personalhealthtrain/central-common';
 import { SwaggerTags } from '@trapi/swagger';
 import {
     DBody, DController, DPost, DRequest, DResponse,
@@ -13,7 +14,7 @@ import {
 
 import { NotFoundError } from '@ebec/http';
 import { Request, Response, useRequestParam } from 'routup';
-import { ForceLoggedInMiddleware } from '../../../middleware/auth';
+import { ForceLoggedInMiddleware } from '../../../middleware';
 import { postHarborHookRouteHandler } from './handlers/registry/hook';
 
 import { handleSecretStorageCommandRouteHandler } from './handlers/secret-storage/command';

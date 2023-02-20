@@ -6,7 +6,7 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { publishMessage } from 'amqp-extension';
+import { publish } from 'amqp-extension';
 import {
     TrainManagerComponent,
     TrainManagerRouterCommand,
@@ -29,7 +29,7 @@ export async function startTrain(train: TrainEntity | string) : Promise<TrainEnt
     ) {
         throw new BadRequestError('The train has already been started...');
     } else {
-        await publishMessage(buildTrainManagerQueueMessage(
+        await publish(buildTrainManagerQueueMessage(
             TrainManagerComponent.ROUTER,
             TrainManagerRouterCommand.START,
             {

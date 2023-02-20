@@ -5,35 +5,36 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type {
+    TrainManagerErrorEventQueuePayload,
+    TrainManagerRouterCommand,
+    TrainManagerRouterRoutePayload,
+} from '@personalhealthtrain/central-common';
 import {
     REGISTRY_ARTIFACT_TAG_BASE,
     RegistryProjectType,
     TrainContainerPath,
     TrainManagerComponent,
-    TrainManagerErrorEventQueuePayload,
     TrainManagerExtractorCommand,
-    TrainManagerRouterCommand,
     TrainManagerRouterEvent,
-    TrainManagerRouterRoutePayload,
     TrainRunStatus,
     TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
-import { Message, publishMessage } from 'amqp-extension';
+import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
-import { TrainEntity } from '../../domains/core/train/entity';
+import { TrainEntity } from '../../domains/core/train';
 import { RegistryProjectEntity } from '../../domains/core/registry-project/entity';
-import { StationEntity } from '../../domains/core/station/entity';
+import { StationEntity } from '../../domains/core/station';
 import { TrainStationEntity } from '../../domains/core/train-station/entity';
 import { buildTrainManagerQueueMessage } from '../../domains/special/train-manager';
-import { TrainLogSaveContext, saveTrainLog } from '../../domains/core/train-log';
+import type { TrainLogSaveContext } from '../../domains/core/train-log';
+import { saveTrainLog } from '../../domains/core/train-log';
 
 export async function handleTrainManagerRouterEvent(
     command: TrainManagerRouterCommand,
     event: TrainManagerRouterEvent,
-    message: Message,
+    data: TrainManagerRouterRoutePayload,
 ) {
-    const data = message.data as TrainManagerRouterRoutePayload;
-
     if (data.artifactTag === REGISTRY_ARTIFACT_TAG_BASE) {
         return;
     }
@@ -105,7 +106,7 @@ export async function handleTrainManagerRouterEvent(
                     await repository.save(entity);
 
                     if (event === TrainManagerRouterEvent.ROUTED) {
-                        await publishMessage(buildTrainManagerQueueMessage(
+                        await publish(buildTrainManagerQueueMessage(
                             TrainManagerComponent.EXTRACTOR,
                             TrainManagerExtractorCommand.EXTRACT,
                             {

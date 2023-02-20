@@ -5,37 +5,28 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Message, buildMessage } from 'amqp-extension';
-import { MessageQueueRoutingKey } from '../../../config/mq';
-import { RegistryEventQueuePayload, RegistryQueuePayload } from './type';
-import { RegistryQueueCommand, RegistryQueueEvent } from './constants';
-
-export function buildRegistryEventQueueMessage(
-    type: `${RegistryQueueEvent}`,
-    data: RegistryEventQueuePayload,
-    metaData: Record<string, any> = {},
-) {
-    return buildMessage({
-        options: {
-            routingKey: MessageQueueRoutingKey.EVENT,
-        },
-        type,
-        data,
-        metadata: metaData,
-    });
-}
+import type { PublishOptionsExtended } from 'amqp-extension';
+import { ComponentName, ROUTER_QUEUE_ROUTING_KEY } from '../../../components';
+import type { RouterQueuePayload } from '../../../components';
+import type { RegistryQueuePayload } from './type';
+import type { RegistryQueueCommand } from './constants';
 
 export function buildRegistryQueueMessage<T extends `${RegistryQueueCommand}`>(
     command: T,
-    data?: RegistryQueuePayload<T>,
-    metaData: Record<string, any> = {},
-) : Message {
-    return buildMessage({
-        options: {
-            routingKey: MessageQueueRoutingKey.COMMAND,
+    data: RegistryQueuePayload<T>,
+    event?: string,
+) : PublishOptionsExtended<RouterQueuePayload<RegistryQueuePayload<T>>> {
+    return {
+        exchange: {
+            routingKey: ROUTER_QUEUE_ROUTING_KEY,
         },
-        type: command,
-        data: data || {},
-        metadata: metaData,
-    });
+        content: {
+            data,
+            metadata: {
+                component: ComponentName.REGISTRY,
+                command,
+                event,
+            },
+        },
+    };
 }

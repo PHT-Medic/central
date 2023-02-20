@@ -8,12 +8,11 @@
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { isRealmResourceWritable } from '@authup/common';
-import { publishMessage } from 'amqp-extension';
-import {
-    Request, Response, sendAccepted, useRequestParam,
-} from 'routup';
+import { publish } from 'amqp-extension';
+import type { Request, Response } from 'routup';
+import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { StationEntity } from '../../../../../domains/core/station/entity';
+import { StationEntity } from '../../../../../domains/core/station';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
 import { useRequestEnv } from '../../../../request';
@@ -56,7 +55,7 @@ export async function deleteStationRouteHandler(req: Request, res: Response) : P
                 },
             );
 
-            await publishMessage(queueMessage);
+            await publish(queueMessage);
             await registryProjectRepository.remove(registryProject);
         }
     }

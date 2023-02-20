@@ -12,11 +12,11 @@ import {
     buildRobotSecretStoragePayload,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { publishMessage } from 'amqp-extension';
-import { Client as VaultClient } from '@hapic/vault';
+import { publish } from 'amqp-extension';
+import type { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
 import { ApiKey } from '../../../../config';
-import { SecretStorageRobotQueuePayload } from '../../../../domains/special/secret-storage/type';
+import type { SecretStorageRobotQueuePayload } from '../../../../domains/special/secret-storage/type';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../domains/special/registry';
 import { RegistryProjectEntity } from '../../../../domains/core/registry-project/entity';
 
@@ -47,7 +47,7 @@ export async function saveRobotToSecretStorage(payload: SecretStorageRobotQueueP
                 },
             );
 
-            await publishMessage(queueMessage);
+            await publish(queueMessage);
         }
     }
 }

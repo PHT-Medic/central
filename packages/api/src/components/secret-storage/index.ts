@@ -5,18 +5,38 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ConsumeHandler, Message } from 'amqp-extension';
+import { isError } from '@personalhealthtrain/central-common';
+import { useLogger } from '../../config';
+import type { SecretStorageQueuePayload } from '../../domains/special/secret-storage/type';
 import { saveToSecretStorage } from './handlers/save';
 import { deleteFromSecretStorage } from './handlers/delete';
 import { SecretStorageQueueCommand } from '../../domains/special/secret-storage/constants';
 
-export function createSecretStorageComponentHandlers() : Record<SecretStorageQueueCommand, ConsumeHandler> {
-    return {
-        [SecretStorageQueueCommand.SAVE]: async (message: Message) => {
-            await saveToSecretStorage(message);
-        },
-        [SecretStorageQueueCommand.DELETE]: async (message: Message) => {
-            await deleteFromSecretStorage(message);
-        },
-    };
+export async function executeSecretStorageComponentCommand(
+    command: string,
+    payload: SecretStorageQueuePayload,
+) : Promise<void> {
+    switch (command) {
+        case SecretStorageQueueCommand.SAVE: {
+            await Promise.resolve(payload)
+                .then(saveToSecretStorage)
+                .catch((e) => {
+                    if (isError(e)) {
+                        useLogger().error(e.message);
+                    }
+                });
+
+            break;
+        }
+        case SecretStorageQueueCommand.DELETE: {
+            await Promise.resolve(payload)
+                .then(deleteFromSecretStorage)
+                .catch((e) => {
+                    if (isError(e)) {
+                        useLogger().error(e.message);
+                    }
+                });
+            break;
+        }
+    }
 }

@@ -11,7 +11,7 @@ import {
 import { removeDateProperties } from '../../../utils/date-properties';
 import { expectPropertiesEqualToSrc } from '../../../utils/properties';
 import { useSuperTest } from '../../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../../utils/database/connection';
+import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
 import { createSuperTestStation } from '../../../utils/domains';
 
 describe('src/controllers/core/station', () => {

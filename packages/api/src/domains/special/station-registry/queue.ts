@@ -5,21 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Message, buildMessage } from 'amqp-extension';
-import { MessageQueueRoutingKey } from '../../../config/mq';
-import { StationRegistryQueueCommand } from './consants';
-import { StationRegistryQueuePayload } from './type';
+import type { PublishOptionsExtended } from 'amqp-extension';
+import type { RouterQueuePayload } from '../../../components';
+import { ComponentName, ROUTER_QUEUE_ROUTING_KEY } from '../../../components';
+import type { StationRegistryQueueCommand } from './consants';
+import type { StationRegistryQueuePayload } from './type';
 
 export function buildStationRegistryQueueMessage(
-    type: StationRegistryQueueCommand,
-    context: StationRegistryQueuePayload,
-) : Message {
-    return buildMessage({
-        options: {
-            routingKey: MessageQueueRoutingKey.COMMAND,
+    command: StationRegistryQueueCommand,
+    data: StationRegistryQueuePayload,
+) : PublishOptionsExtended<RouterQueuePayload<StationRegistryQueuePayload>> {
+    return {
+        exchange: {
+            routingKey: ROUTER_QUEUE_ROUTING_KEY,
         },
-        type,
-        data: context,
-        metadata: {},
-    });
+        content: {
+            data,
+            metadata: {
+                component: ComponentName.STATION_REGISTRY,
+                command,
+            },
+        },
+    };
 }
