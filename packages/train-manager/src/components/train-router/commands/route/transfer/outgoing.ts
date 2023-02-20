@@ -5,16 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { HTTPClient } from '@personalhealthtrain/central-common';
 import {
-    HTTPClient,
     REGISTRY_ARTIFACT_TAG_BASE,
     RegistryProjectType,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { TransferItem } from './type';
+import type { TransferItem } from './type';
 import { transferInternal } from './internal';
 import { RouterError } from '../../../error';
-import { useLogger } from '../../../../../modules/log';
+import { useLogger } from '../../../../../core/log';
 
 export async function transferOutgoing(source: TransferItem) {
     if (source.artifactTag === REGISTRY_ARTIFACT_TAG_BASE) {

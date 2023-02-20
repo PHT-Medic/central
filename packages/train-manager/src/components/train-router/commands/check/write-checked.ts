@@ -11,14 +11,14 @@ import {
     TrainManagerComponent,
     TrainManagerRouterEvent,
 } from '@personalhealthtrain/central-common';
-import { buildEventQueueMessageForAPI } from '../../../../config';
+import { buildAPIQueueMessage } from '../../../utils';
 import type { QueueEventContext } from '../../../type';
 
 export async function writeCheckedEvent(
     data: TrainManagerRouterPayload<any>,
     context: QueueEventContext<TrainManagerRouterCommand>,
 ) {
-    await publish(buildEventQueueMessageForAPI({
+    await publish(buildAPIQueueMessage({
         event: TrainManagerRouterEvent.CHECKED,
         component: TrainManagerComponent.ROUTER,
         command: context.command,

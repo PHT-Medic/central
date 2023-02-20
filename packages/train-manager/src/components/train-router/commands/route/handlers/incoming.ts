@@ -9,10 +9,10 @@ import {
     Ecosystem,
     REGISTRY_ARTIFACT_TAG_BASE,
 } from '@personalhealthtrain/central-common';
-import { useLogger } from '../../../../../modules/log';
+import { useLogger } from '../../../../../core/log';
 import { transferInternal } from '../transfer/internal';
 import { transferEcosystemOut } from '../transfer/ecosystem';
-import { RouteContextExtended } from '../type';
+import type { RouteContextExtended } from '../type';
 
 export async function routeIncomingProject(context: RouteContextExtended) : Promise<void> {
     // move to station repo with index 0.

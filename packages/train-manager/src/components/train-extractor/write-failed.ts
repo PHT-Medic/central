@@ -17,7 +17,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import type { QueueEventErrorContext } from '../type';
 import { ExtractorError } from './error';
-import { buildEventQueueMessageForAPI } from '../../config';
+import { buildAPIQueueMessage } from '../utils';
 import { BaseError } from '../error';
 
 export async function writeFailedEvent(
@@ -28,7 +28,7 @@ export async function writeFailedEvent(
         context.error :
         new ExtractorError({ previous: context.error });
 
-    await publish(buildEventQueueMessageForAPI({
+    await publish(buildAPIQueueMessage({
         event: TrainManagerExtractorEvent.FAILED,
         component: TrainManagerComponent.EXTRACTOR,
         command: context.command,

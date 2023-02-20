@@ -5,17 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { HTTPClient } from '@personalhealthtrain/central-common';
 import {
-    HTTPClient,
     REGISTRY_ARTIFACT_TAG_BASE,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from 'hapic';
-import { Client as HarborClient } from '@hapic/harbor';
-import { buildDockerAuthConfig } from '../../../../../config';
-import { TransferContext } from './type';
-import { moveDockerImage } from '../../../../../modules/docker/image-move';
-import { createBasicHarborAPIConfig } from '../../../../../domains/harbor';
+import type { Client as HarborClient } from '@hapic/harbor';
+import type { TransferContext } from './type';
+import { moveDockerImage } from '../../../../../core/docker/image-move';
+import { buildDockerAuthConfig, createBasicHarborAPIConfig } from '../../../../../core';
 
 export async function transferInterRegistry(context: TransferContext) {
     const client = useClient<HTTPClient>();

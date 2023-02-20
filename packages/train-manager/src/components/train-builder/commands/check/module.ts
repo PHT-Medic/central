@@ -17,7 +17,7 @@ import {
 } from '@personalhealthtrain/central-common';
 
 import { createClient, useClient } from 'hapic';
-import { createBasicHarborAPIConfig } from '../../../../domains/harbor';
+import { createBasicHarborAPIConfig } from '../../../../core';
 import { BuilderError } from '../../error';
 import { writeBuiltEvent } from '../build';
 import { writeNoneEvent } from './write-none';

@@ -11,14 +11,14 @@ import {
     TrainManagerComponent,
     TrainManagerExtractorEvent,
 } from '@personalhealthtrain/central-common';
-import { buildEventQueueMessageForAPI } from '../../../../config';
+import { buildAPIQueueMessage } from '../../../utils';
 import type { QueueEventContext } from '../../../type';
 
 export async function writeExtractingEvent(
     data: TrainManagerExtractorPayload<any>,
     context: QueueEventContext<TrainManagerExtractorCommand>,
 ) {
-    await publish(buildEventQueueMessageForAPI({
+    await publish(buildAPIQueueMessage({
         event: TrainManagerExtractorEvent.EXTRACTING,
         component: TrainManagerComponent.EXTRACTOR,
         command: context.command,

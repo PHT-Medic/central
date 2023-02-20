@@ -6,17 +6,18 @@
  */
 
 import { createKeyPair } from '@authup/server-common';
-import { HTTPClient, TrainContainerFileName, TrainContainerPath } from '@personalhealthtrain/central-common';
+import type { HTTPClient } from '@personalhealthtrain/central-common';
+import { TrainContainerFileName, TrainContainerPath } from '@personalhealthtrain/central-common';
 import crypto from 'node:crypto';
-import { Container } from 'dockerode';
+import type { Container } from 'dockerode';
 import { useClient } from 'hapic';
 import tar from 'tar-stream';
 import { createSignature, encryptSymmetric, streamToBuffer } from '../../../core';
-import { useLogger } from '../../../modules/log';
+import { useLogger } from '../../../core/log';
 import { BuilderError } from '../error';
 import { createPackFromFileContent } from './file-gzip';
 import { buildTrainConfig } from './train-config';
-import { ContainerPackContext } from './type';
+import type { ContainerPackContext } from './type';
 
 export async function packContainerWithTrain(container: Container, context: ContainerPackContext) {
     const keyPair = await createKeyPair({

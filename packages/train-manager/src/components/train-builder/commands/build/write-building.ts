@@ -14,14 +14,14 @@ import {
     TrainManagerBuilderEvent,
     TrainManagerComponent,
 } from '@personalhealthtrain/central-common';
-import { buildEventQueueMessageForAPI } from '../../../../config';
 import type { QueueEventContext } from '../../../type';
+import { buildAPIQueueMessage } from '../../../utils';
 
 export async function writeBuildingEvent(
     data: TrainManagerBuilderBuildPayload,
     context: QueueEventContext<TrainManagerBuilderCommand>,
 ) {
-    await publish(buildEventQueueMessageForAPI({
+    await publish(buildAPIQueueMessage({
         event: TrainManagerBuilderEvent.BUILT,
         command: context.command,
         component: TrainManagerComponent.BUILDER,

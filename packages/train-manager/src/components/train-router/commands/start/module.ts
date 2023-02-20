@@ -19,10 +19,10 @@ import {
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from 'hapic';
 import type { Client as HarborClient } from '@hapic/harbor';
-import { buildCommandQueueMessageForSelf } from '../../../../config';
+import { buildSelfQueueMessage } from '../../../utils';
 import { RouterError } from '../../error';
 import { BuilderError } from '../../../train-builder';
-import { createBasicHarborAPIConfig } from '../../../../domains/harbor';
+import { createBasicHarborAPIConfig } from '../../../../core';
 
 export async function processStartCommand(
     data: TrainManagerQueuePayloadExtended<TrainManagerRouterStartPayload>,
@@ -54,7 +54,7 @@ export async function processStartCommand(
         !harborRepository ||
         harborRepository.artifact_count < 2
     ) {
-        await publish(buildCommandQueueMessageForSelf({
+        await publish(buildSelfQueueMessage({
             command: TrainManagerBuilderCommand.BUILD,
             component: TrainManagerComponent.BUILDER,
             data: { id: data.id },
@@ -63,7 +63,7 @@ export async function processStartCommand(
         return data;
     }
 
-    await publish(buildCommandQueueMessageForSelf({
+    await publish(buildSelfQueueMessage({
         command: TrainManagerRouterCommand.ROUTE,
         component: TrainManagerComponent.ROUTER,
         data: {

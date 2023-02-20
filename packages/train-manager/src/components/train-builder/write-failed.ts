@@ -10,8 +10,8 @@ import {
     TrainManagerBuilderEvent, TrainManagerComponent,
 } from '@personalhealthtrain/central-common';
 import type { QueueEventErrorContext } from '../type';
+import { buildAPIQueueMessage } from '../utils';
 import { BuilderError } from './error';
-import { buildEventQueueMessageForAPI } from '../../config';
 import { BaseError } from '../error';
 
 export async function writeFailedEvent(
@@ -23,7 +23,7 @@ export async function writeFailedEvent(
         context.error :
         new BuilderError({ previous: context.error });
 
-    await publish(buildEventQueueMessageForAPI({
+    await publish(buildAPIQueueMessage({
         event: TrainManagerBuilderEvent.FAILED,
         component: TrainManagerComponent.BUILDER,
         command: context.command,

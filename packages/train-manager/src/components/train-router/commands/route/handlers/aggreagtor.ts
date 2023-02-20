@@ -5,19 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { HTTPClient } from '@personalhealthtrain/central-common';
 import {
-    Ecosystem, HTTPClient, REGISTRY_ARTIFACT_TAG_BASE,
+    Ecosystem, REGISTRY_ARTIFACT_TAG_BASE,
     REGISTRY_ARTIFACT_TAG_LATEST,
     TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { RouteContextExtended } from '../type';
+import type { RouteContextExtended } from '../type';
 import { transferInternal } from '../transfer/internal';
 import { transferEcosystemOut } from '../transfer/ecosystem';
 import { transferOutgoing } from '../transfer/outgoing';
-import { buildDockerAuthConfig } from '../../../../../config/services/registry';
-import { moveDockerImage } from '../../../../../modules/docker/image-move';
-import { useLogger } from '../../../../../modules/log';
+import { buildDockerAuthConfig } from '../../../../../core/docker/registry';
+import { moveDockerImage } from '../../../../../core/docker/image-move';
+import { useLogger } from '../../../../../core/log';
 
 export async function routeAggregatorProject(context: RouteContextExtended) : Promise<void> {
     // only handle push events to self ecosystem aggregator project

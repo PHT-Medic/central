@@ -11,8 +11,7 @@ import type {
     TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
-import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../../../config';
-import { pullDockerImage } from '../../../../modules/docker';
+import { buildDockerAuthConfig, buildRemoteDockerImageURL, pullDockerImage } from '../../../../core';
 import { ExtractorError } from '../../error';
 
 export async function downloadImage(

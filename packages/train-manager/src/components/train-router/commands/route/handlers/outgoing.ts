@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { RouteContext } from '../type';
-import { useLogger } from '../../../../../modules/log';
+import type { RouteContext } from '../type';
+import { useLogger } from '../../../../../core/log';
 
 export async function routeOutgoingProject(context: RouteContext) : Promise<void> {
     useLogger().debug(`Handle outgoing project ${context.project.name}.`, {
