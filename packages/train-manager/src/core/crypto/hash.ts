@@ -8,7 +8,7 @@
 import {
     sign,
     verify,
-} from 'crypto';
+} from 'node:crypto';
 import type { SignatureCreateContext, SignatureVerifyContext } from './type';
 
 export function createSignature(context: SignatureCreateContext): string {

@@ -7,7 +7,6 @@
 
 export * from './crypto';
 export * from './docker';
-export * from './file-system';
 export * from './harbor';
 export * from './log';
 export * from './minio';

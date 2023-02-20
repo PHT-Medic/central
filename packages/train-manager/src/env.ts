@@ -6,7 +6,7 @@
  */
 
 import { config } from 'dotenv';
-import path from 'path';
+import path from 'node:path';
 
 const envResult = config({
     path: path.resolve(__dirname, '../.env'),

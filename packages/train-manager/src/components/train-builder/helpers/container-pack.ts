@@ -12,8 +12,9 @@ import crypto from 'node:crypto';
 import type { Container } from 'dockerode';
 import { useClient } from 'hapic';
 import tar from 'tar-stream';
-import { createSignature, encryptSymmetric, streamToBuffer } from '../../../core';
-import { useLogger } from '../../../core/log';
+import {
+    createSignature, encryptSymmetric, streamToBuffer, useLogger,
+} from '../../../core';
 import { BuilderError } from '../error';
 import { createPackFromFileContent } from './file-gzip';
 import { buildTrainConfig } from './train-config';

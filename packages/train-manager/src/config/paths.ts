@@ -6,7 +6,7 @@
  */
 
 import type { Train } from '@personalhealthtrain/central-common';
-import path from 'path';
+import path from 'node:path';
 
 let writableDirPath : string | undefined;
 
