@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2022-2022.
+ * Copyright (c) 2022-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type StationRegistryQueuePayload = {
+export type StationRegistryComponentPayload = {
     [key: string]: any
 };
 
@@ -14,4 +14,9 @@ export type StationRegistryEntity = {
     name: string,
     realm_id?: string,
     [key: string]: any,
+};
+
+export type StationRegistryExecuteContext = {
+    data: StationRegistryComponentPayload,
+    command: string
 };

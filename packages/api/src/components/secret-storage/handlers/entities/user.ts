@@ -13,11 +13,11 @@ import type { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
 import { ApiKey } from '../../../../config';
 import type {
-    SecretStorageUserSecretsQueuePayload,
-} from '../../../../domains/special/secret-storage/type';
+    SecretStorageComponentUserSecretsPayload,
+} from '../../type';
 import { UserSecretEntity } from '../../../../domains/core/user-secret/entity';
 
-export async function deleteUserSecretsFromSecretStorage(payload: SecretStorageUserSecretsQueuePayload) {
+export async function deleteUserSecretsFromSecretStorage(payload: SecretStorageComponentUserSecretsPayload) {
     try {
         await useClient<VaultClient>(ApiKey.VAULT).keyValue.delete(
             USER_SECRETS_SECRET_ENGINE_KEY,
@@ -28,7 +28,7 @@ export async function deleteUserSecretsFromSecretStorage(payload: SecretStorageU
     }
 }
 
-export async function saveUserSecretsToSecretStorage(payload: SecretStorageUserSecretsQueuePayload) {
+export async function saveUserSecretsToSecretStorage(payload: SecretStorageComponentUserSecretsPayload) {
     const dataSource = await useDataSource();
     const repository = await dataSource.getRepository(UserSecretEntity);
     const query = repository.createQueryBuilder('secret')

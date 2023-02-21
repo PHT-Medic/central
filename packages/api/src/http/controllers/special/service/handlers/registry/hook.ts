@@ -15,7 +15,7 @@ import { array, object, string } from 'yup';
 import type { RegistryHook } from '../../../../../../domains/special/registry';
 import {
     RegistryQueueCommand,
-    RegistryQueueEvent, buildRegistryQueueMessage,
+    buildRegistryQueueMessage,
 } from '../../../../../../domains/special/registry';
 
 let eventValidator : undefined | BaseSchema;
@@ -49,17 +49,7 @@ function useHookEventDataValidator() : BaseSchema {
 export async function postHarborHookRouteHandler(req: Request, res: Response) : Promise<any> {
     const hook : RegistryHook = await useHookEventDataValidator().validate(useRequestBody(req));
 
-    const hookTypes = Object
-        .values(RegistryQueueEvent)
-        .map((event) => event.substring('REGISTRY_'.length));
-
-    if (hookTypes.indexOf(hook.type) === -1) {
-        return sendAccepted(res);
-    }
-
-    const event : RegistryQueueEvent = `REGISTRY_${hook.type}` as RegistryQueueEvent;
-
-    const message = buildRegistryQueueMessage(
+    await publish(buildRegistryQueueMessage(
         RegistryQueueCommand.EVENT_HANDLE,
         {
             operator: hook.operator,
@@ -69,10 +59,8 @@ export async function postHarborHookRouteHandler(req: Request, res: Response) : 
             artifactTag: hook.event_data.resources[0]?.tag,
             artifactDigest: hook.event_data.resources[0]?.digest,
         },
-        event,
-    );
-
-    await publish(message);
+        hook.type,
+    ));
 
     return sendAccepted(res);
 }

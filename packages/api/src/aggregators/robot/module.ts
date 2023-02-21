@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2022.
+ * Copyright (c) 2022-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -7,36 +7,34 @@
 
 import { useRobotEventEmitter } from '@authup/server-database';
 import { publish } from 'amqp-extension';
-import { buildSecretStorageQueueMessage } from '../domains/special/secret-storage/queue';
-import { SecretStorageQueueCommand, SecretStorageQueueEntityType } from '../domains/special/secret-storage/constants';
-import { useEnv } from '../config/env';
+import { buildSecretStorageQueueMessage } from '../../components/secret-storage/queue';
+import { SecretStorageCommand, SecretStorageEntityType } from '../../components/secret-storage/constants';
+import { useEnv } from '../../config';
 import {
     deleteRobotFromSecretStorage,
     saveRobotToSecretStorage,
-} from '../components/secret-storage/handlers/entities/robot';
-import type { SecretStorageRobotQueuePayload } from '../domains/special/secret-storage/type';
+} from '../../components/secret-storage/handlers/entities/robot';
+import type { SecretStorageComponentRobotPayload } from '../../components/secret-storage/type';
+import type { Aggregator } from '../type';
 
-export function buildRobotAggregator() {
-    function start(options?: {synchronous?: boolean}) {
-        options ??= {};
-        options.synchronous = useEnv('env') === 'test' ?
-            true :
-            options.synchronous;
+export function buildRobotAggregator() : Aggregator {
+    function start() {
+        const synchronous = useEnv('env') === 'test';
 
         useRobotEventEmitter()
             .on('credentials', async (robot) => {
-                const payload : SecretStorageRobotQueuePayload = {
-                    type: SecretStorageQueueEntityType.ROBOT,
+                const payload : SecretStorageComponentRobotPayload = {
+                    type: SecretStorageEntityType.ROBOT,
                     name: robot.name,
                     id: robot.id,
                     secret: robot.secret,
                 };
 
-                if (options.synchronous) {
+                if (synchronous) {
                     await saveRobotToSecretStorage(payload);
                 } else {
                     const queueMessage = buildSecretStorageQueueMessage(
-                        SecretStorageQueueCommand.SAVE,
+                        SecretStorageCommand.SAVE,
                         payload,
                     );
 
@@ -46,16 +44,16 @@ export function buildRobotAggregator() {
 
         useRobotEventEmitter()
             .on('deleted', async (robot) => {
-                const payload : SecretStorageRobotQueuePayload = {
-                    type: SecretStorageQueueEntityType.ROBOT,
+                const payload : SecretStorageComponentRobotPayload = {
+                    type: SecretStorageEntityType.ROBOT,
                     name: robot.name,
                 };
 
-                if (options.synchronous) {
+                if (synchronous) {
                     await deleteRobotFromSecretStorage(payload);
                 } else {
                     const queueMessage = buildSecretStorageQueueMessage(
-                        SecretStorageQueueCommand.DELETE,
+                        SecretStorageCommand.DELETE,
                         payload,
                     );
 

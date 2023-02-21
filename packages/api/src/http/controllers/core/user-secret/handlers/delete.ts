@@ -17,10 +17,10 @@ import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity
 import { useEnv } from '../../../../../config';
 import { saveUserSecretsToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/user';
 import {
-    SecretStorageQueueCommand,
-    SecretStorageQueueEntityType,
-} from '../../../../../domains/special/secret-storage/constants';
-import { buildSecretStorageQueueMessage } from '../../../../../domains/special/secret-storage/queue';
+    SecretStorageCommand,
+    SecretStorageEntityType,
+} from '../../../../../components/secret-storage/constants';
+import { buildSecretStorageQueueMessage } from '../../../../../components/secret-storage/queue';
 import { useRequestEnv } from '../../../../request';
 
 export async function deleteUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -55,14 +55,14 @@ export async function deleteUserSecretRouteHandler(req: Request, res: Response) 
 
     if (useEnv('env') === 'test') {
         await saveUserSecretsToSecretStorage({
-            type: SecretStorageQueueEntityType.USER_SECRETS,
+            type: SecretStorageEntityType.USER_SECRETS,
             id: entity.user_id,
         });
     } else {
         await publish(buildSecretStorageQueueMessage(
-            SecretStorageQueueCommand.SAVE,
+            SecretStorageCommand.SAVE,
             {
-                type: SecretStorageQueueEntityType.USER_SECRETS,
+                type: SecretStorageEntityType.USER_SECRETS,
                 id: entity.user_id,
             },
         ));

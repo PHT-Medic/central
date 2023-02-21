@@ -5,6 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './handlers';
-export * from './module';
-export * from './type';
+import type { TrainQueuePayload } from '@personalhealthtrain/central-common';
+
+export type TrainComponentExecuteContext = {
+    data: TrainQueuePayload<any>,
+    command: string
+};

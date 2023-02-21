@@ -9,7 +9,7 @@ import { useRequestBody } from '@routup/body';
 import { check, matchedData, validationResult } from 'express-validator';
 import {
     PermissionID,
-    SecretStorageCommand,
+    SecretStorageCommand as SecretStorageCommandRemote,
     getUserSecretsSecretStorageKey,
     isUserSecretsSecretStorageKey,
 } from '@personalhealthtrain/central-common';
@@ -25,11 +25,11 @@ import { send, sendAccepted, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { RequestValidationError } from '../../../../../validation';
 import { ApiKey, useEnv } from '../../../../../../config';
-import { buildSecretStorageQueueMessage } from '../../../../../../domains/special/secret-storage/queue';
 import {
-    SecretStorageQueueCommand,
-    SecretStorageQueueEntityType,
-} from '../../../../../../domains/special/secret-storage/constants';
+    SecretStorageCommand,
+    SecretStorageEntityType,
+    buildSecretStorageQueueMessage,
+} from '../../../../../../components';
 import {
     deleteUserSecretsFromSecretStorage,
     saveUserSecretsToSecretStorage,
@@ -100,8 +100,8 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
         throw new ForbiddenError();
     }
 
-    switch (command as SecretStorageCommand) {
-        case SecretStorageCommand.ENGINE_CREATE: {
+    switch (command as SecretStorageCommandRemote) {
+        case SecretStorageCommandRemote.ENGINE_CREATE: {
             await useClient<VaultClient>(ApiKey.VAULT)
                 .keyValue.createMount({
                     path: rawPath,
@@ -109,7 +109,7 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
 
             return sendCreated(res);
         }
-        case SecretStorageCommand.ENGINE_KEY_PULL: {
+        case SecretStorageCommandRemote.ENGINE_KEY_PULL: {
             switch (entity.type) {
                 case TargetEntity.USER: {
                     throw new BadRequestError('User secrets pull is not supported.');
@@ -118,19 +118,19 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
 
             return send(res, entity.data);
         }
-        case SecretStorageCommand.ENGINE_KEY_SAVE: {
+        case SecretStorageCommandRemote.ENGINE_KEY_SAVE: {
             switch (entity.type) {
                 case TargetEntity.USER: {
                     if (useEnv('env') === 'test') {
                         await saveUserSecretsToSecretStorage({
-                            type: SecretStorageQueueEntityType.USER_SECRETS,
+                            type: SecretStorageEntityType.USER_SECRETS,
                             id: entity.data.id,
                         });
                     } else {
                         const queueMessage = buildSecretStorageQueueMessage(
-                            SecretStorageQueueCommand.SAVE,
+                            SecretStorageCommand.SAVE,
                             {
-                                type: SecretStorageQueueEntityType.USER_SECRETS,
+                                type: SecretStorageEntityType.USER_SECRETS,
                                 id: entity.data.id,
                             },
                         );
@@ -142,19 +142,19 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
 
             return sendCreated(res);
         }
-        case SecretStorageCommand.ENGINE_KEY_DROP: {
+        case SecretStorageCommandRemote.ENGINE_KEY_DROP: {
             switch (entity.type) {
                 case TargetEntity.USER: {
                     if (useEnv('env') === 'test') {
                         await deleteUserSecretsFromSecretStorage({
-                            type: SecretStorageQueueEntityType.USER_SECRETS,
+                            type: SecretStorageEntityType.USER_SECRETS,
                             id: entity.data.id,
                         });
                     } else {
                         const queueMessage = buildSecretStorageQueueMessage(
-                            SecretStorageQueueCommand.DELETE,
+                            SecretStorageCommand.DELETE,
                             {
-                                type: SecretStorageQueueEntityType.USER_SECRETS,
+                                type: SecretStorageEntityType.USER_SECRETS,
                                 id: entity.data.id,
                             },
                         );

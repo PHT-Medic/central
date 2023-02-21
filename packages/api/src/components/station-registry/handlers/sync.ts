@@ -15,11 +15,11 @@ import { useDataSource } from 'typeorm-extension';
 import { StationEntity } from '../../../domains/core/station';
 import { ApiKey, useLogger } from '../../../config';
 import { transformStationRegistryResponse } from '../utils/transform';
-import { buildSecretStorageQueueMessage } from '../../../domains/special/secret-storage/queue';
 import {
-    SecretStorageQueueCommand,
-    SecretStorageQueueEntityType,
-} from '../../../domains/special/secret-storage/constants';
+    SecretStorageCommand,
+    SecretStorageEntityType,
+    buildSecretStorageQueueMessage,
+} from '../../secret-storage';
 
 export async function syncStationRegistry() {
     const dataSource = await useDataSource();
@@ -165,9 +165,9 @@ export async function syncStationRegistry() {
 
     for (let i = 0; i < externalStations.length; i++) {
         const queueMessage = buildSecretStorageQueueMessage(
-            SecretStorageQueueCommand.SAVE,
+            SecretStorageCommand.SAVE,
             {
-                type: SecretStorageQueueEntityType.STATION,
+                type: SecretStorageEntityType.STATION,
                 id: externalStations[i].id,
             },
         );

@@ -6,16 +6,16 @@
  */
 
 import { saveRobotToSecretStorage } from './entities/robot';
-import { SecretStorageQueueEntityType } from '../../../domains/special/secret-storage/constants';
-import type { SecretStorageQueuePayload } from '../../../domains/special/secret-storage/type';
+import { SecretStorageEntityType } from '../constants';
+import type { SecretStorageQueuePayload } from '../type';
 import { saveUserSecretsToSecretStorage } from './entities/user';
 
 export async function saveToSecretStorage(payload: SecretStorageQueuePayload) {
     switch (payload.type) {
-        case SecretStorageQueueEntityType.ROBOT:
+        case SecretStorageEntityType.ROBOT:
             await saveRobotToSecretStorage(payload);
             break;
-        case SecretStorageQueueEntityType.USER_SECRETS:
+        case SecretStorageEntityType.USER_SECRETS:
             await saveUserSecretsToSecretStorage(payload);
             break;
     }

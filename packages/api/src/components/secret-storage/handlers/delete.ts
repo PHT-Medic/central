@@ -5,17 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SecretStorageQueuePayload } from '../../../domains/special/secret-storage/type';
-import { SecretStorageQueueEntityType } from '../../../domains/special/secret-storage/constants';
+import type { SecretStorageQueuePayload } from '../type';
+import { SecretStorageEntityType } from '../constants';
 import { deleteRobotFromSecretStorage } from './entities/robot';
 import { deleteUserSecretsFromSecretStorage } from './entities/user';
 
 export async function deleteFromSecretStorage(data: SecretStorageQueuePayload) {
     switch (data.type) {
-        case SecretStorageQueueEntityType.ROBOT:
+        case SecretStorageEntityType.ROBOT:
             await deleteRobotFromSecretStorage(data);
             break;
-        case SecretStorageQueueEntityType.USER_SECRETS:
+        case SecretStorageEntityType.USER_SECRETS:
             await deleteUserSecretsFromSecretStorage(data);
             break;
     }
