@@ -9,8 +9,8 @@ import Vue from 'vue';
 import type { Train } from '@personalhealthtrain/central-common';
 import {
     PermissionID,
+    TrainAPICommand,
     TrainBuildStatus,
-    TrainCommand,
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
@@ -24,8 +24,8 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
             type: Object as PropType<Train>,
         },
         command: {
-            type: String as PropType<TrainCommand | 'resultDownload'>,
-            default: TrainCommand.RESULT_START,
+            type: String as PropType<TrainAPICommand | 'resultDownload'>,
+            default: TrainAPICommand.RESULT_START,
         },
 
         elementType: {
@@ -66,7 +66,7 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
             }
 
             if (
-                this.command === TrainCommand.RESULT_START
+                this.command === TrainAPICommand.RESULT_START
             ) {
                 return this.entity.result_status &&
                     [
@@ -81,9 +81,9 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
             switch (this.command) {
                 case 'resultDownload':
                     return 'download';
-                case TrainCommand.RESULT_START:
+                case TrainAPICommand.RESULT_START:
                     return 'start';
-                case TrainCommand.RESULT_STATUS:
+                case TrainAPICommand.RESULT_STATUS:
                     return 'check';
                 default:
                     return '';
@@ -93,9 +93,9 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
             switch (this.command) {
                 case 'resultDownload':
                     return 'fa fa-download';
-                case TrainCommand.RESULT_START:
+                case TrainAPICommand.RESULT_START:
                     return 'fa fa-wrench';
-                case TrainCommand.RESULT_STATUS:
+                case TrainAPICommand.RESULT_STATUS:
                     return 'fas fa-shield-alt';
                 default:
                     return '';
@@ -105,9 +105,9 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
             switch (this.command) {
                 case 'resultDownload':
                     return 'dark';
-                case TrainCommand.RESULT_START:
+                case TrainAPICommand.RESULT_START:
                     return 'success';
-                case TrainCommand.RESULT_STATUS:
+                case TrainAPICommand.RESULT_STATUS:
                     return 'primary';
                 default:
                     return 'info';

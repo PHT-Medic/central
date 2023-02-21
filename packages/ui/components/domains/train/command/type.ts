@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Train, TrainCommand } from '@personalhealthtrain/central-common';
+import type { Train, TrainAPICommand } from '@personalhealthtrain/central-common';
 import type { ActionCommandProperties } from '../../../render/type';
 
 export type TrainCommandProperties = {
     entity: Train,
-    command: `${TrainCommand}` | 'resultDownload',
+    command: `${TrainAPICommand}` | 'resultDownload',
 } & ActionCommandProperties;

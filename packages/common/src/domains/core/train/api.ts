@@ -11,7 +11,7 @@ import type { ClientDriverInstance, ClientRequestConfig } from 'hapic';
 import type { Train } from './entity';
 import { nullifyEmptyObjectProperties } from '../../../utils';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../../type';
-import type { TrainCommand } from './constants';
+import type { TrainAPICommand } from './constants';
 
 export class TrainAPI {
     protected client: ClientDriverInstance;
@@ -68,7 +68,7 @@ export class TrainAPI {
 
     async runCommand(
         id: Train['id'],
-        command: `${TrainCommand}` | TrainCommand,
+        command: `${TrainAPICommand}` | TrainAPICommand,
         data: Record<string, any> = {},
     ): Promise<SingleResourceResponse<Train>> {
         const actionData = {

@@ -5,9 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TrainQueuePayload } from '@personalhealthtrain/central-common';
+import type { Train } from '@personalhealthtrain/central-common';
+import type { TrainCommand } from './constants';
+
+export type TrainPayload<T extends `${TrainCommand}`> =
+    T extends `${TrainCommand.CLEANUP}` | `${TrainCommand.SETUP}` ?
+        { id: Train['id'] } :
+        never;
 
 export type TrainComponentExecuteContext = {
-    data: TrainQueuePayload<any>,
+    data: TrainPayload<any>,
     command: string
 };

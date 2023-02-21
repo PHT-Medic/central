@@ -6,11 +6,10 @@
  */
 
 import type { ClientDriverInstance } from 'hapic';
-import type { RegistryCommand } from './registry';
+import type { RegistryAPICommand } from './registry';
 import { ServiceID } from './constants';
-import type { ServiceIDType } from './type';
 import type { SingleResourceResponse } from '../../type';
-import type { SecretStorageCommand } from './secret-engine';
+import type { SecretStorageAPICommand } from './secret-engine';
 import type { Registry, RegistryProject } from '../../core';
 
 export class ServiceAPI {
@@ -21,7 +20,7 @@ export class ServiceAPI {
     }
 
     async runCommand(
-        id: ServiceIDType | ServiceID,
+        id: `${ServiceID}`,
         command: string,
         data?: Record<string, any>,
     ): Promise<SingleResourceResponse<Record<string, any>>> {
@@ -33,7 +32,7 @@ export class ServiceAPI {
     }
 
     async runRegistryCommand(
-        command: `${RegistryCommand}` | RegistryCommand,
+        command: `${RegistryAPICommand}`,
         data: {
             id: Registry['id'] | RegistryProject['id'],
             [key: string]: any
@@ -43,7 +42,7 @@ export class ServiceAPI {
     }
 
     async runSecretStorageCommand(
-        command: `${SecretStorageCommand}` | SecretStorageCommand,
+        command: `${SecretStorageAPICommand}`,
         data: Record<string, any>,
     ): Promise<SingleResourceResponse<Record<string, any>>> {
         return this.runCommand(ServiceID.SECRET_STORAGE, command, data);

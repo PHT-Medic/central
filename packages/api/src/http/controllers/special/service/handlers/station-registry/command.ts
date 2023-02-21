@@ -6,7 +6,7 @@
  */
 
 import {
-    StationRegistryCommand,
+    StationRegistryAPICommand,
 } from '@personalhealthtrain/central-common';
 import {
     BadRequestError, NotImplementedError,
@@ -22,7 +22,7 @@ import {
     syncStationRegistry,
 } from '../../../../../../components';
 
-const commands = Object.values(StationRegistryCommand);
+const commands = Object.values(StationRegistryAPICommand);
 
 export async function handleStationRegistryCommandRouteHandler(req: Request, res: Response) : Promise<any> {
     const { command } = useRequestBody(req);
@@ -34,8 +34,8 @@ export async function handleStationRegistryCommandRouteHandler(req: Request, res
         throw new BadRequestError('The station-registry command is not valid.');
     }
 
-    switch (command as StationRegistryCommand) {
-        case StationRegistryCommand.SYNC: {
+    switch (command as StationRegistryAPICommand) {
+        case StationRegistryAPICommand.SYNC: {
             if (useEnv('env') === 'test') {
                 await syncStationRegistry();
             } else {

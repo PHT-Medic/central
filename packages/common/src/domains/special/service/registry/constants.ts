@@ -5,6 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ServiceID } from './constants';
+export enum RegistryAPICommand {
+    SETUP = 'setup',
+    DELETE = 'delete',
 
-export type ServiceIDType = `${ServiceID}`;
+    PROJECT_LINK = 'projectLink',
+    PROJECT_UNLINK = 'projectUnlink',
+}

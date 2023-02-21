@@ -5,15 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TrainQueueCommand, TrainQueuePayload } from '@personalhealthtrain/central-common';
 import type { PublishOptionsExtended } from 'amqp-extension';
-import type { RouterQueuePayload } from '../../../components';
+import type { RouterQueuePayload, TrainPayload } from '../../../components';
 import { ComponentName, ROUTER_QUEUE_ROUTING_KEY } from '../../../components';
+import type { TrainCommand } from '../../../components/train/constants';
 
 export function buildTrainQueueMessage(
-    type: TrainQueueCommand,
-    data: TrainQueuePayload<any>,
-) : PublishOptionsExtended<RouterQueuePayload<TrainQueuePayload<any>>> {
+    type: TrainCommand,
+    data: TrainPayload<any>,
+) : PublishOptionsExtended<RouterQueuePayload<TrainPayload<any>>> {
     return {
         exchange: {
             routingKey: ROUTER_QUEUE_ROUTING_KEY,

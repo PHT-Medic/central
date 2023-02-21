@@ -8,8 +8,8 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 import {
     PermissionID,
+    TrainAPICommand,
     TrainBuildStatus,
-    TrainCommand,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import type { TrainCommandProperties } from './type';
@@ -23,8 +23,8 @@ export const TrainRunCommand = Vue.extend<any, ActionCommandMethods, any, TrainC
             default: undefined,
         },
         command: {
-            type: String as PropType<TrainCommand>,
-            default: TrainCommand.RUN_START,
+            type: String as PropType<TrainAPICommand>,
+            default: TrainAPICommand.RUN_START,
         },
         elementType: {
             type: String as PropType<TrainCommandProperties['elementType']>,
@@ -55,14 +55,14 @@ export const TrainRunCommand = Vue.extend<any, ActionCommandMethods, any, TrainC
             }
 
             if (
-                this.command === TrainCommand.RUN_START
+                this.command === TrainAPICommand.RUN_START
             ) {
                 return this.entity.run_status &&
                     [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.entity.run_status) === -1;
             }
 
             if (
-                this.command === TrainCommand.RUN_RESET
+                this.command === TrainAPICommand.RUN_RESET
             ) {
                 return this.entity.run_status &&
                     [TrainRunStatus.STOPPED, TrainRunStatus.STOPPING, TrainRunStatus.FAILED].indexOf(this.entity.run_status) === -1;
@@ -72,11 +72,11 @@ export const TrainRunCommand = Vue.extend<any, ActionCommandMethods, any, TrainC
         },
         commandText() {
             switch (this.command) {
-                case TrainCommand.RUN_START:
+                case TrainAPICommand.RUN_START:
                     return 'start';
-                case TrainCommand.RUN_RESET:
+                case TrainAPICommand.RUN_RESET:
                     return 'reset';
-                case TrainCommand.RUN_STATUS:
+                case TrainAPICommand.RUN_STATUS:
                     return 'check';
                 default:
                     return '';
@@ -84,11 +84,11 @@ export const TrainRunCommand = Vue.extend<any, ActionCommandMethods, any, TrainC
         },
         iconClass() {
             switch (this.command) {
-                case TrainCommand.RUN_START:
+                case TrainAPICommand.RUN_START:
                     return 'fa fa-play';
-                case TrainCommand.RUN_RESET:
+                case TrainAPICommand.RUN_RESET:
                     return 'fa-solid fa-retweet';
-                case TrainCommand.RUN_STATUS:
+                case TrainAPICommand.RUN_STATUS:
                     return 'fas fa-shield-alt';
                 default:
                     return '';
@@ -96,11 +96,11 @@ export const TrainRunCommand = Vue.extend<any, ActionCommandMethods, any, TrainC
         },
         classSuffix() {
             switch (this.command) {
-                case TrainCommand.RUN_START:
+                case TrainAPICommand.RUN_START:
                     return 'success';
-                case TrainCommand.RUN_RESET:
+                case TrainAPICommand.RUN_RESET:
                     return 'danger';
-                case TrainCommand.RUN_STATUS:
+                case TrainAPICommand.RUN_STATUS:
                     return 'primary';
                 default:
                     return 'info';

@@ -9,7 +9,7 @@ import type { ServiceID } from '@personalhealthtrain/central-common';
 import {
     REGISTRY_INCOMING_PROJECT_NAME,
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
-    REGISTRY_OUTGOING_PROJECT_NAME, StationRegistryCommand,
+    REGISTRY_OUTGOING_PROJECT_NAME, StationRegistryAPICommand,
 } from '@personalhealthtrain/central-common';
 import type { CreateElement, PropType, VNode } from 'vue';
 import Vue from 'vue';
@@ -44,7 +44,7 @@ export default Vue.extend({
             this.busy = true;
 
             try {
-                await this.$api.service.runCommand(this.entityId, StationRegistryCommand.SYNC);
+                await this.$api.service.runCommand(this.entityId, StationRegistryAPICommand.SYNC);
 
                 this.$bvToast.toast('You successfully executed the sync routine.', {
                     toaster: 'b-toaster-top-center',

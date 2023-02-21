@@ -10,10 +10,11 @@ import type {
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import {
-    TrainQueueCommand, TrainSocketServerToClientEventName,
+    TrainSocketServerToClientEventName,
     buildSocketRealmNamespaceName, buildSocketTrainRoomName,
 } from '@personalhealthtrain/central-common';
 import { publish as publishMessage } from 'amqp-extension';
+import { TrainCommand } from '../../components/train/constants';
 import { emitSocketServerToClientEvent } from '../../config';
 import { TrainEntity, buildTrainQueueMessage } from '../../domains/core/train';
 
@@ -46,7 +47,7 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
         publish(TrainSocketServerToClientEventName.CREATED, event.entity);
 
         const message = buildTrainQueueMessage(
-            TrainQueueCommand.SETUP,
+            TrainCommand.SETUP,
             {
                 id: event.entity.id,
             },
@@ -63,7 +64,7 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
         publish(TrainSocketServerToClientEventName.DELETED, event.entity);
 
         const message = buildTrainQueueMessage(
-            TrainQueueCommand.CLEANUP,
+            TrainCommand.CLEANUP,
             {
                 id: event.entity.id,
             },
