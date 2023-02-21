@@ -29,15 +29,15 @@ export function cleanupQueuePayload<T extends Record<string, any>>(payload: T): 
     return payload;
 }
 
-type QueueMessageContext = {
+type QueueMessageContext<T extends Record<string, any>> = {
     command: string,
     component: string,
     event?: string,
-    data: Record<string, any>,
+    data: T,
 };
-export function buildSelfQueueMessage(
-    context: QueueMessageContext,
-) : PublishOptionsExtended<RouterQueuePayload<Record<string, any>>> {
+export function buildSelfQueueMessage<T extends Record<string, any>>(
+    context: QueueMessageContext<T>,
+) : PublishOptionsExtended<RouterQueuePayload<T>> {
     return {
         exchange: {
             routingKey: ROUTER_QUEUE_ROUTING_KEY,
@@ -53,9 +53,9 @@ export function buildSelfQueueMessage(
     };
 }
 
-export function buildAPIQueueMessage(
-    context : Omit<QueueMessageContext, 'event'> & { event: string },
-) : PublishOptionsExtended<RouterQueuePayload<any>> {
+export function buildAPIQueueMessage<T extends Record<string, any>>(
+    context : Omit<QueueMessageContext<T>, 'event'> & { event: string },
+) : PublishOptionsExtended<RouterQueuePayload<T>> {
     return {
         exchange: {
             routingKey: 'api.aggregator.tm',

@@ -16,11 +16,11 @@ import { publish } from 'amqp-extension';
 import type { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
 import { ApiKey } from '../../../../config';
-import type { SecretStorageRobotQueuePayload } from '../../../../domains/special/secret-storage/type';
+import type { SecretStorageComponentRobotPayload } from '../../type';
 import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../domains/special/registry';
 import { RegistryProjectEntity } from '../../../../domains/core/registry-project/entity';
 
-export async function saveRobotToSecretStorage(payload: SecretStorageRobotQueuePayload) {
+export async function saveRobotToSecretStorage(payload: SecretStorageComponentRobotPayload) {
     if (!payload.id || !payload.secret) {
         return;
     }
@@ -52,7 +52,7 @@ export async function saveRobotToSecretStorage(payload: SecretStorageRobotQueueP
     }
 }
 
-export async function deleteRobotFromSecretStorage(payload: SecretStorageRobotQueuePayload) {
+export async function deleteRobotFromSecretStorage(payload: SecretStorageComponentRobotPayload) {
     try {
         await useClient<VaultClient>(ApiKey.VAULT).keyValue.delete(ROBOT_SECRET_ENGINE_KEY, `${payload.name}`);
     } catch (e) {

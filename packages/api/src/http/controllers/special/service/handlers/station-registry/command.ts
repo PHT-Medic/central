@@ -16,9 +16,11 @@ import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useEnv } from '../../../../../../config';
-import { syncStationRegistry } from '../../../../../../components/station-registry/handlers/sync';
-import { StationRegistryQueueCommand } from '../../../../../../domains/special/station-registry/consants';
-import { buildStationRegistryQueueMessage } from '../../../../../../domains/special/station-registry/queue';
+import {
+    StationRegistryComponentCommand,
+    buildStationRegistryQueueMessage,
+    syncStationRegistry,
+} from '../../../../../../components';
 
 const commands = Object.values(StationRegistryCommand);
 
@@ -38,7 +40,7 @@ export async function handleStationRegistryCommandRouteHandler(req: Request, res
                 await syncStationRegistry();
             } else {
                 const queueMessage = buildStationRegistryQueueMessage(
-                    StationRegistryQueueCommand.SYNC,
+                    StationRegistryComponentCommand.SYNC,
                     {},
                 );
 

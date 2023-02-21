@@ -20,42 +20,42 @@ export function buildRouterComponent() {
     function start() {
         return consume({ exchange: { routingKey: ROUTER_QUEUE_ROUTING_KEY } }, {
             $any: async (message: ConsumeMessage) => {
-                const messageContent : RouterQueuePayload<any> = JSON.parse(message.content.toString('utf-8'));
+                const payload : RouterQueuePayload<any> = JSON.parse(message.content.toString('utf-8'));
 
                 useLogger().debug('Command received', {
-                    component: messageContent.metadata.component,
-                    command: messageContent.metadata.command,
-                    ...(messageContent.metadata.event ? { event: messageContent.metadata.event } : {}),
+                    component: payload.metadata.component,
+                    command: payload.metadata.command,
+                    ...(payload.metadata.event ? { event: payload.metadata.event } : {}),
                 });
 
-                switch (messageContent.metadata.component) {
+                switch (payload.metadata.component) {
                     case ComponentName.REGISTRY: {
-                        await executeRegistryCommand(
-                            messageContent.metadata.command,
-                            messageContent.data,
-                            messageContent.metadata.event,
-                        );
+                        await executeRegistryCommand({
+                            command: payload.metadata.command,
+                            data: payload.data,
+                            event: payload.metadata.event,
+                        });
                         break;
                     }
                     case ComponentName.SECRET_STORAGE: {
-                        await executeSecretStorageComponentCommand(
-                            messageContent.metadata.command,
-                            messageContent.data,
-                        );
+                        await executeSecretStorageComponentCommand({
+                            command: payload.metadata.command,
+                            data: payload.data,
+                        });
                         break;
                     }
                     case ComponentName.STATION_REGISTRY: {
-                        await executeStationRegistryCommand(
-                            messageContent.metadata.command,
-                            messageContent.data,
-                        );
+                        await executeStationRegistryCommand({
+                            command: payload.metadata.command,
+                            data: payload.data,
+                        });
                         break;
                     }
                     case ComponentName.TRAIN: {
-                        await executeTrainCommand(
-                            messageContent.metadata.command,
-                            messageContent.data,
-                        );
+                        await executeTrainCommand({
+                            command: payload.metadata.command,
+                            data: payload.data,
+                        });
                         break;
                     }
                 }

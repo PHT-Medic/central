@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export enum SecretStorageQueueCommand {
-    SAVE = 'SECRET_STORAGE_SAVE',
-    DELETE = 'SECRET_STORAGE_DELETE',
+export enum SecretStorageCommand {
+    SAVE = 'save',
+    DELETE = 'delete',
 }
 
-export enum SecretStorageQueueEntityType {
+export enum SecretStorageEntityType {
     USER_SECRETS = 'userSecrets',
     STATION = 'station',
     ROBOT = 'robot',

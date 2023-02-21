@@ -6,7 +6,7 @@
  */
 
 import { hasOwnProperty } from '@authup/common';
-import type { StationRegistryEntity } from '../../../domains/special/station-registry/type';
+import type { StationRegistryEntity } from '../type';
 
 export function transformStationRegistryResponse(data: Record<string, any>) : StationRegistryEntity[] {
     const { 'entity-list': entities } = data;

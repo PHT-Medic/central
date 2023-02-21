@@ -11,7 +11,7 @@ import type { RouterQueuePayload } from './type';
 import { executeExtractorCommand } from '../train-extractor';
 import { executeBuilderCommand } from '../train-builder';
 import { executeRouterCommand } from '../train-router';
-import { useLogger } from '../../core/log';
+import { useLogger } from '../../core';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
 
 export function buildCommandRouterComponent() {

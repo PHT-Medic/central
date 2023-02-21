@@ -18,32 +18,41 @@ export async function dispatchRegistryEventToTrainManager(
     data: RegistryEventQueuePayload,
 ) {
     // only process terminated trains and the PUSH_ARTIFACT event
-    if (event !== RegistryQueueEvent.PUSH_ARTIFACT) {
-        useLogger()
-            .info(`skipping ${event} event distribution for train-manager`);
-        return;
+    switch (event) {
+        case RegistryQueueEvent.PUSH_ARTIFACT: {
+            const dataSource = await useDataSource();
+            const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
+            const registryProject = await registryProjectRepository.findOneBy({
+                external_name: data.namespace,
+            });
+
+            if (!registryProject) {
+                useLogger()
+                    .info(`registry-project ${data.namespace} is not registered...`);
+                return;
+            }
+
+            await publish(buildTrainManagerQueueMessage(
+                TrainManagerComponent.ROUTER,
+                TrainManagerRouterCommand.ROUTE,
+                {
+                    repositoryName: data.repositoryName,
+                    projectName: data.namespace,
+                    operator: data.operator,
+                    artifactTag: data.artifactTag,
+                },
+            ));
+            break;
+        }
+        case RegistryQueueEvent.DELETE_ARTIFACT:
+        case RegistryQueueEvent.PULL_ARTIFACT:
+        case RegistryQueueEvent.QUOTA_EXCEED:
+        case RegistryQueueEvent.QUOTA_WARNING:
+        case RegistryQueueEvent.SCANNING_COMPLETED:
+        case RegistryQueueEvent.SCANNING_FAILED: {
+            useLogger()
+                .info(`skipping registry event: ${event}`);
+            break;
+        }
     }
-
-    const dataSource = await useDataSource();
-    const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
-    const registryProject = await registryProjectRepository.findOneBy({
-        external_name: data.namespace,
-    });
-
-    if (!registryProject) {
-        useLogger()
-            .info(`registry-project ${data.namespace} is not registered...`);
-        return;
-    }
-
-    await publish(buildTrainManagerQueueMessage(
-        TrainManagerComponent.ROUTER,
-        TrainManagerRouterCommand.ROUTE,
-        {
-            repositoryName: data.repositoryName,
-            projectName: data.namespace,
-            operator: data.operator,
-            artifactTag: data.artifactTag,
-        },
-    ));
 }
