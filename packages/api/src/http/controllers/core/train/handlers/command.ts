@@ -6,7 +6,7 @@
  */
 
 import { check, matchedData, validationResult } from 'express-validator';
-import { TrainCommand } from '@personalhealthtrain/central-common';
+import { TrainAPICommand } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/common';
 import type { Request, Response } from 'routup';
@@ -42,7 +42,7 @@ export async function handleTrainCommandRouteHandler(req: Request, res: Response
 
     await check('command')
         .exists()
-        .custom((command) => Object.values(TrainCommand).includes(command))
+        .custom((command) => Object.values(TrainAPICommand).includes(command))
         .run(req);
 
     const validation = validationResult(req);
@@ -65,39 +65,39 @@ export async function handleTrainCommandRouteHandler(req: Request, res: Response
         throw new ForbiddenError();
     }
 
-    switch (validationData.command as TrainCommand) {
+    switch (validationData.command as TrainAPICommand) {
         // Build Commands
-        case TrainCommand.BUILD_STATUS:
+        case TrainAPICommand.BUILD_STATUS:
             entity = await detectTrainBuildStatus(entity);
             break;
-        case TrainCommand.BUILD_START:
+        case TrainAPICommand.BUILD_START:
             entity = await startBuildTrain(entity);
             break;
-        case TrainCommand.BUILD_STOP:
+        case TrainAPICommand.BUILD_STOP:
             entity = await stopBuildTrain(entity);
             break;
 
         // Run Commands
-        case TrainCommand.RUN_STATUS:
+        case TrainAPICommand.RUN_STATUS:
             entity = await detectTrainRunStatus(entity);
             break;
-        case TrainCommand.RUN_START:
+        case TrainAPICommand.RUN_START:
             entity = await startTrain(entity);
             break;
-        case TrainCommand.RUN_RESET:
+        case TrainAPICommand.RUN_RESET:
             entity = await resetTrain(entity);
             break;
 
         // Result Service
-        case TrainCommand.RESULT_STATUS:
+        case TrainAPICommand.RESULT_STATUS:
             entity = await triggerTrainResultStatus(entity.id);
             break;
-        case TrainCommand.RESULT_START:
+        case TrainAPICommand.RESULT_START:
             entity = await triggerTrainResultStart(entity.id);
             break;
 
         // General Commands
-        case TrainCommand.GENERATE_HASH:
+        case TrainAPICommand.GENERATE_HASH:
             entity = await generateTrainHash(entity);
             break;
     }

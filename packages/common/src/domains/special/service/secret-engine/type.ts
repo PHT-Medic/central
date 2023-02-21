@@ -5,6 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SecretStorageCommand } from './constants';
+import type { SecretStorageAPICommand } from './constants';
 
-export type SecretStorageCommandType = `${SecretStorageCommand}`;
+export type SecretStorageCommandType = `${SecretStorageAPICommand}`;

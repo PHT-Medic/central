@@ -9,7 +9,7 @@ import { useRequestBody } from '@routup/body';
 import { check, matchedData, validationResult } from 'express-validator';
 import {
     PermissionID,
-    SecretStorageCommand as SecretStorageCommandRemote,
+    SecretStorageAPICommand,
     getUserSecretsSecretStorageKey,
     isUserSecretsSecretStorageKey,
 } from '@personalhealthtrain/central-common';
@@ -100,8 +100,8 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
         throw new ForbiddenError();
     }
 
-    switch (command as SecretStorageCommandRemote) {
-        case SecretStorageCommandRemote.ENGINE_CREATE: {
+    switch (command as SecretStorageAPICommand) {
+        case SecretStorageAPICommand.ENGINE_CREATE: {
             await useClient<VaultClient>(ApiKey.VAULT)
                 .keyValue.createMount({
                     path: rawPath,
@@ -109,7 +109,7 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
 
             return sendCreated(res);
         }
-        case SecretStorageCommandRemote.ENGINE_KEY_PULL: {
+        case SecretStorageAPICommand.ENGINE_KEY_PULL: {
             switch (entity.type) {
                 case TargetEntity.USER: {
                     throw new BadRequestError('User secrets pull is not supported.');
@@ -118,7 +118,7 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
 
             return send(res, entity.data);
         }
-        case SecretStorageCommandRemote.ENGINE_KEY_SAVE: {
+        case SecretStorageAPICommand.ENGINE_KEY_SAVE: {
             switch (entity.type) {
                 case TargetEntity.USER: {
                     if (useEnv('env') === 'test') {
@@ -142,7 +142,7 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
 
             return sendCreated(res);
         }
-        case SecretStorageCommandRemote.ENGINE_KEY_DROP: {
+        case SecretStorageAPICommand.ENGINE_KEY_DROP: {
             switch (entity.type) {
                 case TargetEntity.USER: {
                     if (useEnv('env') === 'test') {

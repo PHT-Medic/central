@@ -5,17 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainQueueCommand } from '@personalhealthtrain/central-common';
+import { TrainCommand } from './constants';
 import { cleanupTrain, setupTrain } from './handlers';
 import type { TrainComponentExecuteContext } from './type';
 
 export async function executeTrainCommand(context: TrainComponentExecuteContext) {
     switch (context.command) {
-        case TrainQueueCommand.CLEANUP: {
+        case TrainCommand.CLEANUP: {
             await cleanupTrain(context.data);
             break;
         }
-        case TrainQueueCommand.SETUP: {
+        case TrainCommand.SETUP: {
             await setupTrain(context.data);
             break;
         }

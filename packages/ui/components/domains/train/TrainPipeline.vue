@@ -7,7 +7,7 @@
 <script lang="ts">
 import {
     PermissionID,
-    TrainBuildStatus, TrainCommand,
+    TrainAPICommand, TrainBuildStatus,
     TrainConfigurationStatus, TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
@@ -47,7 +47,7 @@ export default {
             trainConfigurationStatus: TrainConfigurationStatus,
             trainRunStatus: TrainRunStatus,
             trainResultStatus: TrainResultStatus,
-            trainCommand: TrainCommand,
+            trainCommand: TrainAPICommand,
 
             busy: false,
         };

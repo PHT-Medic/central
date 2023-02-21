@@ -10,8 +10,8 @@ import Vue from 'vue';
 import type { Train } from '@personalhealthtrain/central-common';
 import {
     PermissionID,
+    TrainAPICommand,
     TrainBuildStatus,
-    TrainCommand,
     TrainConfigurationStatus,
 } from '@personalhealthtrain/central-common';
 import type { TrainCommandProperties } from './type';
@@ -24,8 +24,8 @@ export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, Trai
             type: Object as PropType<Train>,
         },
         command: {
-            type: String as PropType<TrainCommand>,
-            default: TrainCommand.BUILD_START,
+            type: String as PropType<TrainAPICommand>,
+            default: TrainAPICommand.BUILD_START,
         },
 
         elementType: {
@@ -56,7 +56,7 @@ export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, Trai
             }
 
             if (
-                this.command === TrainCommand.BUILD_START
+                this.command === TrainAPICommand.BUILD_START
             ) {
                 return this.entity.build_status &&
                     [
@@ -66,7 +66,7 @@ export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, Trai
                     ].indexOf(this.entity.build_status) === -1;
             }
 
-            if (this.command === TrainCommand.BUILD_STOP) {
+            if (this.command === TrainAPICommand.BUILD_STOP) {
                 return this.entity.build_status && [
                     TrainBuildStatus.STARTING,
                     TrainBuildStatus.STARTED,
@@ -78,11 +78,11 @@ export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, Trai
         },
         commandText() {
             switch (this.command) {
-                case TrainCommand.BUILD_START:
+                case TrainAPICommand.BUILD_START:
                     return 'start';
-                case TrainCommand.BUILD_STOP:
+                case TrainAPICommand.BUILD_STOP:
                     return 'stop';
-                case TrainCommand.BUILD_STATUS:
+                case TrainAPICommand.BUILD_STATUS:
                     return 'check';
                 default:
                     return '';
@@ -90,11 +90,11 @@ export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, Trai
         },
         iconClass() {
             switch (this.command) {
-                case TrainCommand.BUILD_START:
+                case TrainAPICommand.BUILD_START:
                     return 'fa fa-play';
-                case TrainCommand.BUILD_STOP:
+                case TrainAPICommand.BUILD_STOP:
                     return 'fa fa-stop';
-                case TrainCommand.BUILD_STATUS:
+                case TrainAPICommand.BUILD_STATUS:
                     return 'fas fa-shield-alt';
                 default:
                     return '';
@@ -102,11 +102,11 @@ export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, Trai
         },
         classSuffix() {
             switch (this.command) {
-                case TrainCommand.BUILD_START:
+                case TrainAPICommand.BUILD_START:
                     return 'success';
-                case TrainCommand.BUILD_STOP:
+                case TrainAPICommand.BUILD_STOP:
                     return 'danger';
-                case TrainCommand.BUILD_STATUS:
+                case TrainAPICommand.BUILD_STATUS:
                     return 'primary';
                 default:
                     return 'info';

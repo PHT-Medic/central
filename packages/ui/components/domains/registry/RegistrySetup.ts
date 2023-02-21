@@ -8,7 +8,7 @@
 import type { CreateElement, PropType, VNode } from 'vue';
 import Vue from 'vue';
 import type { Registry } from '@personalhealthtrain/central-common';
-import { RegistryCommand } from '@personalhealthtrain/central-common';
+import { RegistryAPICommand } from '@personalhealthtrain/central-common';
 import EntityDelete from '../EntityDelete';
 import { MasterImageList } from '../master-image/MasterImageList';
 
@@ -29,7 +29,7 @@ export default Vue.extend({
             this.busy = true;
 
             try {
-                await this.$api.service.runRegistryCommand(RegistryCommand.SETUP, {
+                await this.$api.service.runRegistryCommand(RegistryAPICommand.SETUP, {
                     id: this.entityId,
                 });
 

@@ -7,7 +7,7 @@
 
 import type {
     Train,
-    TrainCommand,
+    TrainAPICommand,
 } from '@personalhealthtrain/central-common';
 import {
     DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
@@ -88,7 +88,7 @@ export class TrainController {
     async doTask(
         @DParam('id') id: string,
             @DBody() data: {
-                command: TrainCommand
+                command: TrainAPICommand
             },
             @DRequest() req: any,
             @DResponse() res: any,

@@ -6,7 +6,7 @@
  */
 
 import {
-    PermissionID, RegistryCommand,
+    PermissionID, RegistryAPICommand,
 } from '@personalhealthtrain/central-common';
 import {
     BadRequestError,
@@ -31,7 +31,7 @@ import {
 import { RegistryProjectEntity } from '../../../../../../domains/core/registry-project/entity';
 import { RegistryEntity } from '../../../../../../domains/core/registry/entity';
 
-const commands = Object.values(RegistryCommand);
+const commands = Object.values(RegistryAPICommand);
 
 export async function handleRegistryCommandRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
@@ -53,8 +53,8 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
     const dataSource = await useDataSource();
 
     switch (command) {
-        case RegistryCommand.SETUP:
-        case RegistryCommand.DELETE: {
+        case RegistryAPICommand.SETUP:
+        case RegistryAPICommand.DELETE: {
             const repository = dataSource.getRepository(RegistryEntity);
             const entity = await repository.createQueryBuilder('registry')
                 .addSelect([
@@ -63,7 +63,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .where('registry.id = :id', { id })
                 .getOne();
 
-            if (command === RegistryCommand.SETUP) {
+            if (command === RegistryAPICommand.SETUP) {
                 if (useEnv('env') === 'test') {
                     await setupRegistry({
                         id: entity.id,
@@ -95,8 +95,8 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
             }
             break;
         }
-        case RegistryCommand.PROJECT_LINK:
-        case RegistryCommand.PROJECT_UNLINK: {
+        case RegistryAPICommand.PROJECT_LINK:
+        case RegistryAPICommand.PROJECT_UNLINK: {
             const repository = dataSource.getRepository(RegistryProjectEntity);
             const entity = await repository.createQueryBuilder('registryProject')
                 .addSelect([
@@ -105,7 +105,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .where('registryProject.id = :id', { id })
                 .getOne();
 
-            if (command === RegistryCommand.PROJECT_LINK) {
+            if (command === RegistryAPICommand.PROJECT_LINK) {
                 if (useEnv('env') === 'test') {
                     await linkRegistryProject({
                         id: entity.id,

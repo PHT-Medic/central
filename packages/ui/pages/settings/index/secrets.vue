@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import {
-    SecretStorageCommand, buildUserSecretsSecretStorageKey,
+    SecretStorageAPICommand, buildUserSecretsSecretStorageKey,
 } from '@personalhealthtrain/central-common';
 import UserSecretForm from '../../../components/domains/user-secret/UserSecretForm';
 import { UserSecretList } from '../../../components/domains/user-secret/UserSecretList';
@@ -84,7 +84,7 @@ export default {
 
             try {
                 await this.$api.service.runSecretStorageCommand(
-                    SecretStorageCommand.ENGINE_KEY_SAVE,
+                    SecretStorageAPICommand.ENGINE_KEY_SAVE,
                     {
                         name: buildUserSecretsSecretStorageKey(this.$store.getters['auth/userId']),
                     },

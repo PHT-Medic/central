@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export enum SecretStorageCommand {
+export enum SecretStorageAPICommand {
     ENGINE_CREATE = 'engineCreate',
 
     ENGINE_KEY_SAVE = 'engineKeySave',

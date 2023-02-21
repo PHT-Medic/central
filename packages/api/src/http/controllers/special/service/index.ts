@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RegistryCommand } from '@personalhealthtrain/central-common';
+import type { RegistryAPICommand } from '@personalhealthtrain/central-common';
 import { ServiceID } from '@personalhealthtrain/central-common';
 import { SwaggerTags } from '@trapi/swagger';
 import {
@@ -45,7 +45,7 @@ export class ServiceController {
     async execHarborTask(
     @DRequest() req: Request,
         @DResponse() res: Response,
-        @DBody() data: { command: RegistryCommand },
+        @DBody() data: { command: RegistryAPICommand },
     ) {
         const id = useRequestParam(req, 'id');
 

@@ -66,7 +66,7 @@ export enum TrainType {
 
 // -------------------------------------------------------------------------
 
-export enum TrainCommand {
+export enum TrainAPICommand {
     BUILD_START = 'buildStart',
     BUILD_STOP = 'buildStop',
     BUILD_STATUS = 'buildStatus',
@@ -108,12 +108,4 @@ export enum TrainSocketServerToClientEventName {
 export enum TrainSocketClientToServerEventName {
     SUBSCRIBE = 'trainSubscribe',
     UNSUBSCRIBE = 'trainUnsubscribe',
-}
-
-// -------------------------------------------------------------------------
-
-export enum TrainQueueCommand {
-    CLEANUP = 'TRAIN_CLEANUP',
-
-    SETUP = 'TRAIN_SETUP',
 }

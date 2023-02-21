@@ -14,7 +14,7 @@ import type {
     SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
 import {
-    RegistryCommand,
+    RegistryAPICommand,
     RegistryProjectSocketClientToServerEventName,
     RegistryProjectSocketServerToClientEventName,
     ServiceID,
@@ -140,10 +140,10 @@ export default Vue.extend<Data, any, any, Properties>({
         },
 
         async linkProject() {
-            await this.run(RegistryCommand.PROJECT_LINK);
+            await this.run(RegistryAPICommand.PROJECT_LINK);
         },
         async unlinkProject() {
-            await this.run(RegistryCommand.PROJECT_UNLINK);
+            await this.run(RegistryAPICommand.PROJECT_UNLINK);
         },
         async run(command) {
             if (this.busy) return;
