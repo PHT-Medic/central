@@ -29,7 +29,7 @@
         "@authup/common": "^0.15.0",
         "@hapic/oauth2": "^1.2.0",
         "hapic": "^1.1.0",
-        "rapiq": "^0.7.0"
+        "rapiq": "^0.8.0"
     },
     "peerDependencies": {
         "@authup/common": ">=0.14.0 <1.0.0",
