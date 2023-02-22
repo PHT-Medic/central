@@ -32,7 +32,7 @@
         "cors": "^2.8.5",
         "docker-scan": "^1.0.4",
         "dotenv": "^16.0.3",
-        "express-validator": "^6.14.3",
+        "express-validator": "^6.15.0",
         "hapic": "^1.2.0",
         "locter": "^1.0.5",
         "minio": "^7.0.32",
