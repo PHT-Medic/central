@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
 import { publish } from 'amqp-extension';
 import type {
     TrainManagerBuilderBuildPayload,
@@ -14,19 +15,17 @@ import {
     TrainManagerBuilderEvent,
     TrainManagerComponent,
 } from '@personalhealthtrain/central-common';
-import type { QueueEventContext } from '../../../type';
 import { buildAPIQueueMessage } from '../../../utils';
 
-export async function writeBuildingEvent(
-    data: TrainManagerBuilderBuildPayload,
-    context: QueueEventContext<TrainManagerBuilderCommand>,
-) {
+export async function writeBuildingEvent<T extends TrainManagerBuilderBuildPayload>(
+    context: ComponentExecutionContext<`${TrainManagerBuilderCommand}`, T>,
+) : Promise<T> {
     await publish(buildAPIQueueMessage({
         event: TrainManagerBuilderEvent.BUILT,
         command: context.command,
         component: TrainManagerComponent.BUILDER,
-        data, //  { id: 'xxx' }
+        data: context.data, //  { id: 'xxx' }
     }));
 
-    return data;
+    return context.data;
 }

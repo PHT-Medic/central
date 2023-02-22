@@ -5,9 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
+import { isComponentQueuePayload } from '@personalhealthtrain/central-server-common';
 import { consume } from 'amqp-extension';
 import { TrainManagerComponent } from '@personalhealthtrain/central-common';
-import type { RouterQueuePayload } from './type';
 import { executeExtractorCommand } from '../train-extractor';
 import { executeBuilderCommand } from '../train-builder';
 import { executeRouterCommand } from '../train-router';
@@ -20,34 +21,32 @@ export function buildCommandRouterComponent() {
             exchange: { routingKey: ROUTER_QUEUE_ROUTING_KEY },
         }, {
             $any: async (message) => {
-                const messageContent : RouterQueuePayload<any> = JSON.parse(message.content.toString('utf-8'));
+                const payload = JSON.parse(message.content.toString('utf-8'));
+                if (!isComponentQueuePayload(payload)) {
+                    useLogger().warn('The queue payload could not be read as component queue payload.');
+                }
 
                 useLogger().debug('Command received', {
-                    component: messageContent.metadata.component,
-                    command: messageContent.metadata.command,
-                    ...(messageContent.metadata.event ? { event: messageContent.metadata.event } : {}),
+                    component: payload.metadata.component,
+                    command: payload.metadata.command,
                 });
 
-                switch (messageContent.metadata.component) {
+                const context : ComponentExecutionContext<any, any> = {
+                    command: payload.metadataa.command,
+                    data: payload.data,
+                };
+
+                switch (payload.metadata.component) {
                     case TrainManagerComponent.BUILDER: {
-                        await executeBuilderCommand(
-                            messageContent.metadata.command as any,
-                            messageContent.data,
-                        );
+                        await executeBuilderCommand(context);
                         break;
                     }
                     case TrainManagerComponent.EXTRACTOR: {
-                        await executeExtractorCommand(
-                            messageContent.metadata.command as any,
-                            messageContent.data,
-                        );
+                        await executeExtractorCommand(context);
                         break;
                     }
                     case TrainManagerComponent.ROUTER: {
-                        await executeRouterCommand(
-                            messageContent.metadata.command as any,
-                            messageContent.data,
-                        );
+                        await executeRouterCommand(context);
                         break;
                     }
                 }

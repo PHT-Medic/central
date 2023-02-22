@@ -5,8 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TrainManagerExtractorPayload } from '@personalhealthtrain/central-common';
-import { TrainManagerExtractorCommand } from '@personalhealthtrain/central-common';
+import type {
+    TrainManagerExtractorCheckQueuePayload,
+    TrainManagerExtractorExtractQueuePayload,
+} from '@personalhealthtrain/central-common';
+import { TrainManagerComponent, TrainManagerExtractorCommand } from '@personalhealthtrain/central-common';
+import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
 import {
     downloadImage,
     processCheckCommand,
@@ -19,23 +23,27 @@ import {
 } from './commands';
 import { writeFailedEvent } from './write-failed';
 import type { ExtractorError } from './error';
-import { extendPayload } from '../utils/train';
+import { extendPayload } from '../utils';
+
+type ExecutionContext = ComponentExecutionContext<TrainManagerExtractorCommand.CHECK, TrainManagerExtractorCheckQueuePayload> |
+ComponentExecutionContext<TrainManagerExtractorCommand.EXTRACT, TrainManagerExtractorExtractQueuePayload>;
 
 export async function executeExtractorCommand(
-    command: TrainManagerExtractorCommand,
-    message: TrainManagerExtractorPayload<any>,
+    context: ExecutionContext,
 ) : Promise<void> {
-    switch (command) {
+    const eventContext = {
+        command: context.command,
+        component: TrainManagerComponent.EXTRACTOR,
+    };
+
+    switch (context.command) {
         case TrainManagerExtractorCommand.CHECK: {
-            const eventContext = {
-                command: TrainManagerExtractorCommand.CHECK,
-            };
-            await Promise.resolve(message)
+            await Promise.resolve(context.data)
                 .then(extendPayload)
                 .then((data) => writeCheckingEvent(data, eventContext))
                 .then(processCheckCommand)
                 .then((data) => writeCheckedEvent(data, eventContext))
-                .catch((err) => writeFailedEvent(message, {
+                .catch((err) => writeFailedEvent(context.data, {
                     ...eventContext,
                     error: err,
                 }));
@@ -46,7 +54,7 @@ export async function executeExtractorCommand(
                 command: TrainManagerExtractorCommand.EXTRACT,
             };
 
-            await Promise.resolve(message)
+            await Promise.resolve(context.data)
                 .then(extendPayload)
                 .then((data) => writeDownloadingEvent(data, eventContext))
                 .then(downloadImage)
@@ -54,7 +62,7 @@ export async function executeExtractorCommand(
                 .then((data) => writeExtractingEvent(data, eventContext))
                 .then(processExtractCommand)
                 .then((data) => writeExtractedEvent(data, eventContext))
-                .catch((err: ExtractorError) => writeFailedEvent(message, {
+                .catch((err: ExtractorError) => writeFailedEvent(context.data, {
                     ...eventContext,
                     error: err,
                 }));

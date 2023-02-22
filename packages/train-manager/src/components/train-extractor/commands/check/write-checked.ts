@@ -16,7 +16,7 @@ import type { QueueEventContext } from '../../../type';
 
 export async function writeCheckedEvent(
     data: TrainManagerExtractorPayload<any>,
-    context: QueueEventContext<TrainManagerExtractorCommand>,
+    context: QueueEventContext<`${TrainManagerExtractorCommand}`>,
 ) {
     await publish(buildAPIQueueMessage({
         event: TrainManagerExtractorEvent.CHECKING,

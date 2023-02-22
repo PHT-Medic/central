@@ -8,7 +8,7 @@
 import type { Client as HarborClient } from '@hapic/harbor';
 import type {
     HTTPClient,
-    TrainManagerBuilderBuildPayload,
+    TrainManagerBuilderCheckPayload,
     TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 import {
@@ -23,8 +23,8 @@ import { writeBuiltEvent } from '../build';
 import { writeNoneEvent } from './write-none';
 
 export async function processCheckCommand(
-    data: TrainManagerQueuePayloadExtended<TrainManagerBuilderBuildPayload>,
-) : Promise<TrainManagerQueuePayloadExtended<TrainManagerBuilderBuildPayload>> {
+    data: TrainManagerQueuePayloadExtended<TrainManagerBuilderCheckPayload>,
+) : Promise<TrainManagerQueuePayloadExtended<TrainManagerBuilderCheckPayload>> {
     if (!data.entity) {
         throw BuilderError.notFound();
     }
@@ -57,7 +57,8 @@ export async function processCheckCommand(
         harborRepository &&
         harborRepository.artifact_count > 0
     ) {
-        await writeBuiltEvent(data, {
+        await writeBuiltEvent({
+            data,
             command: TrainManagerBuilderCommand.CHECK,
         });
 

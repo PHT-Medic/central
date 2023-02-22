@@ -1,0 +1,21 @@
+{
+    "name": "@personalhealthtrain/central-server-common",
+    "private": true,
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://tada5hi.net"
+    },
+    "license": "MIT",
+    "version": "1.4.0",
+    "description": "This package contains the common packages for server applications of the PHT.",
+    "scripts": {
+        "build": "tsc -p tsconfig.build.json"
+    },
+    "dependencies": {
+        "smob": "^0.1.0"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

@@ -22,7 +22,7 @@ import { BaseError } from '../error';
 
 export async function writeFailedEvent(
     data: TrainManagerExtractorPayload<any>,
-    context: QueueEventErrorContext<TrainManagerExtractorCommand>,
+    context: QueueEventErrorContext<`${TrainManagerExtractorCommand}`>,
 ) {
     const extractingError = context.error instanceof ExtractorError || context.error instanceof BaseError ?
         context.error :

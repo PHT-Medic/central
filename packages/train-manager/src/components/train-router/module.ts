@@ -5,8 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TrainManagerRouterPayload, TrainManagerRouterStatusPayload } from '@personalhealthtrain/central-common';
+import type {
+    TrainManagerRouterRoutePayload,
+    TrainManagerRouterStartPayload,
+    TrainManagerRouterStatusPayload,
+} from '@personalhealthtrain/central-common';
 import { TrainManagerRouterCommand } from '@personalhealthtrain/central-common';
+import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
 import {
     processCheckCommand,
     processRouteCommand,
@@ -19,23 +24,27 @@ import {
     writeStartingEvent,
 } from './commands';
 import { writeFailedEvent } from './write-failed';
-import { extendPayload } from '../utils/train';
+import { extendPayload } from '../utils';
+
+type ExecutionContext = ComponentExecutionContext<TrainManagerRouterCommand.CHECK, TrainManagerRouterStatusPayload> |
+ComponentExecutionContext<TrainManagerRouterCommand.ROUTE, TrainManagerRouterRoutePayload> |
+ComponentExecutionContext<TrainManagerRouterCommand.START, TrainManagerRouterStartPayload>;
 
 export async function executeRouterCommand(
-    command: TrainManagerRouterCommand,
-    message: TrainManagerRouterPayload<any>,
+    context: ExecutionContext,
 ) : Promise<void> {
-    switch (command) {
+    switch (context.command) {
         case TrainManagerRouterCommand.CHECK: {
             const eventContext = {
                 command: TrainManagerRouterCommand.CHECK,
             };
-            await Promise.resolve(message as TrainManagerRouterStatusPayload)
+
+            await Promise.resolve(context.data)
                 .then(extendPayload)
                 .then((data) => writeCheckingEvent(data, eventContext))
                 .then(processCheckCommand)
                 .then((data) => writeCheckedEvent(data, eventContext))
-                .catch((err: Error) => writeFailedEvent(message, {
+                .catch((err: Error) => writeFailedEvent(context.data, {
                     ...eventContext,
                     error: err,
                 }));
@@ -46,11 +55,11 @@ export async function executeRouterCommand(
                 command: TrainManagerRouterCommand.ROUTE,
             };
 
-            await Promise.resolve(message)
+            await Promise.resolve(context.data)
                 .then((data) => writeRoutingEvent(data, eventContext))
                 .then(processRouteCommand)
                 .then((data) => writeRoutedEvent(data, eventContext))
-                .catch((err: Error) => writeFailedEvent(message, {
+                .catch((err: Error) => writeFailedEvent(context.data, {
                     ...eventContext,
                     error: err,
                 }));
@@ -62,12 +71,12 @@ export async function executeRouterCommand(
                 command: TrainManagerRouterCommand.START,
             };
 
-            await Promise.resolve(message)
-                .then(extendPayload)
+            await Promise.resolve(extendPayload(context.data))
+                .then()
                 .then((data) => writeStartingEvent(data, eventContext))
                 .then(processStartCommand)
                 .then((data) => writeStartedEvent(data, eventContext))
-                .catch((err: Error) => writeFailedEvent(message, {
+                .catch((err: Error) => writeFailedEvent(context.data, {
                     ...eventContext,
                     error: err,
                 }));

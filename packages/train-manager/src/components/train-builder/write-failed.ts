@@ -6,6 +6,7 @@
  */
 
 import { publish } from 'amqp-extension';
+import type { TrainManagerBuilderCommand } from '@personalhealthtrain/central-common';
 import {
     TrainManagerBuilderEvent, TrainManagerComponent,
 } from '@personalhealthtrain/central-common';
@@ -16,7 +17,7 @@ import { BaseError } from '../error';
 
 export async function writeFailedEvent(
     data: Record<string, any>,
-    context: QueueEventErrorContext,
+    context: QueueEventErrorContext<`${TrainManagerBuilderCommand}`>,
 ) {
     const buildingError = context.error instanceof BuilderError ||
         context.error instanceof BaseError ?

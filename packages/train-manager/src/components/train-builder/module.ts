@@ -5,11 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    TrainManagerBuilderBuildPayload,
-    TrainManagerBuilderCheckPayload,
-    TrainManagerBuilderPayload,
-} from '@personalhealthtrain/central-common';
 import { TrainManagerBuilderCommand, TrainManagerComponent } from '@personalhealthtrain/central-common';
 import { extendPayload } from '../utils';
 import {
@@ -23,31 +18,26 @@ import {
     writePushedEvent,
     writePushingEvent,
 } from './commands';
+import type { TrainBuilderExecutionContext } from './type';
 import { writeFailedEvent } from './write-failed';
 
 export async function executeBuilderCommand(
-    command: TrainManagerBuilderCommand,
-    message: TrainManagerBuilderPayload<any>,
+    context: TrainBuilderExecutionContext,
 ) : Promise<void> {
-    switch (command) {
+    switch (context.command) {
         case TrainManagerBuilderCommand.BUILD: {
-            const eventContext = {
-                command: TrainManagerBuilderCommand.BUILD,
-                component: TrainManagerComponent.BUILDER,
-            };
-
-            await Promise.resolve(message as TrainManagerBuilderBuildPayload)
+            await Promise.resolve(context.data)
                 .then(extendPayload)
-                .then((data) => writeBuildingEvent(data, eventContext))
+                .then((data) => writeBuildingEvent({ data, command: context.command }))
                 .then(processBuildCommand)
-                .then((data) => writeBuiltEvent(data, eventContext))
-                .then((data) => writePushingEvent(data, eventContext))
+                .then((data) => writeBuiltEvent({ data, command: context.command }))
+                .then((data) => writePushingEvent({ data, command: context.command }))
                 .then(processPushCommand)
-                .then((data) => writePushedEvent(data, eventContext))
+                .then((data) => writePushedEvent({ data, command: context.command }))
                 .catch((err: Error) => writeFailedEvent(
-                    message,
+                    context.data,
                     {
-                        ...eventContext,
+                        command: context.command,
                         error: err,
                     },
                 ));
@@ -59,13 +49,13 @@ export async function executeBuilderCommand(
                 component: TrainManagerComponent.BUILDER,
             };
 
-            await Promise.resolve(message as TrainManagerBuilderCheckPayload)
+            await Promise.resolve(context.data)
                 .then(extendPayload)
                 .then((data) => writeCheckingEvent(data, eventContext))
                 .then(processCheckCommand)
                 .then((data) => writeCheckedEvent(data, eventContext))
                 .catch((err: Error) => writeFailedEvent(
-                    message,
+                    context.data,
                     {
                         ...eventContext,
                         error: err,
