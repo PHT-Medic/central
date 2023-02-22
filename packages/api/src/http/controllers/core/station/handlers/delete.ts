@@ -14,7 +14,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { StationEntity } from '../../../../../domains/core/station';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
-import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
+import { RegistryQueueCommand, buildRegistryPayload } from '../../../../../domains/special/registry';
 import { useRequestEnv } from '../../../../request';
 
 export async function deleteStationRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -45,15 +45,15 @@ export async function deleteStationRouteHandler(req: Request, res: Response) : P
 
         const registryProject = await registryProjectRepository.findOneBy({ id: entity.registry_project_id });
         if (registryProject) {
-            const queueMessage = buildRegistryQueueMessage(
-                RegistryQueueCommand.PROJECT_UNLINK,
-                {
+            const queueMessage = buildRegistryPayload({
+                command: RegistryQueueCommand.PROJECT_UNLINK,
+                data: {
                     id: registryProject.id,
                     registryId: registryProject.registry_id,
                     externalName: registryProject.external_name,
                     accountId: registryProject.account_id,
                 },
-            );
+            });
 
             await publish(queueMessage);
             await registryProjectRepository.remove(registryProject);

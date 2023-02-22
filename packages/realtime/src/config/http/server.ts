@@ -5,12 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Server } from 'http';
-import http from 'http';
-import { useLogger } from '../log';
+import type { Server } from 'node:http';
+import http from 'node:http';
 
 export function createHttpServer() : Server {
-    useLogger().debug('setup http server...', { service: 'http' });
-
     return new http.Server();
 }

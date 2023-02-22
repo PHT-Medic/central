@@ -17,7 +17,7 @@ import type { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
 import { ApiKey } from '../../../../config';
 import type { SecretStorageComponentRobotPayload } from '../../type';
-import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../domains/special/registry';
+import { RegistryQueueCommand, buildRegistryPayload } from '../../../../domains/special/registry';
 import { RegistryProjectEntity } from '../../../../domains/core/registry-project/entity';
 
 export async function saveRobotToSecretStorage(payload: SecretStorageComponentRobotPayload) {
@@ -40,12 +40,12 @@ export async function saveRobotToSecretStorage(payload: SecretStorageComponentRo
         });
 
         for (let i = 0; i < projects.length; i++) {
-            const queueMessage = buildRegistryQueueMessage(
-                RegistryQueueCommand.PROJECT_LINK,
-                {
+            const queueMessage = buildRegistryPayload({
+                command: RegistryQueueCommand.PROJECT_LINK,
+                data: {
                     id: projects[i].id,
                 },
-            );
+            });
 
             await publish(queueMessage);
         }

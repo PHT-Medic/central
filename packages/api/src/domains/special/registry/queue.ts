@@ -11,21 +11,24 @@ import type { RouterQueuePayload } from '../../../components';
 import type { RegistryQueuePayload } from './type';
 import type { RegistryQueueCommand } from './constants';
 
-export function buildRegistryQueueMessage<T extends `${RegistryQueueCommand}`>(
+type RegistryPayloadBuildContext<T extends `${RegistryQueueCommand}`> = {
     command: T,
     data: RegistryQueuePayload<T>,
-    event?: string,
+    event?: string
+};
+export function buildRegistryPayload<T extends `${RegistryQueueCommand}`>(
+    context: RegistryPayloadBuildContext<T>,
 ) : PublishOptionsExtended<RouterQueuePayload<RegistryQueuePayload<T>>> {
     return {
         exchange: {
             routingKey: ROUTER_QUEUE_ROUTING_KEY,
         },
         content: {
-            data,
+            data: context.data,
             metadata: {
                 component: ComponentName.REGISTRY,
-                command,
-                event,
+                command: context.command,
+                ...(context.event ? { event: context.event } : {}),
             },
         },
     };

@@ -15,7 +15,7 @@ import { isRealmResourceWritable } from '@authup/common';
 import { useRequestEnv } from '../../../../request';
 import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
-import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
+import { RegistryQueueCommand, buildRegistryPayload } from '../../../../../domains/special/registry';
 
 export async function updateRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -51,23 +51,23 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
         result.data.external_name &&
         entity.external_name !== result.data.external_name
     ) {
-        await publish(buildRegistryQueueMessage(
-            RegistryQueueCommand.PROJECT_UNLINK,
-            {
+        await publish(buildRegistryPayload({
+            command: RegistryQueueCommand.PROJECT_UNLINK,
+            data: {
                 id: entity.id,
                 registryId: entity.registry_id,
                 externalName: result.data.external_name,
                 accountId: result.data.account_id,
             },
-        ));
+        }));
     }
 
-    await publish(buildRegistryQueueMessage(
-        RegistryQueueCommand.PROJECT_LINK,
-        {
+    await publish(buildRegistryPayload({
+        command: RegistryQueueCommand.PROJECT_LINK,
+        data: {
             id: entity.id,
         },
-    ));
+    }));
 
     return sendAccepted(res, entity);
 }

@@ -18,7 +18,7 @@ import { useDataSource } from 'typeorm-extension';
 import type { RegistryQueuePayload } from '../../../domains/special/registry';
 import {
     RegistryQueueCommand,
-    buildRegistryQueueMessage,
+    buildRegistryPayload,
 } from '../../../domains/special/registry';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
 import { RegistryEntity } from '../../../domains/core/registry/entity';
@@ -141,12 +141,12 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     });
 
     for (let i = 0; i < entities.length; i++) {
-        const queueMessage = buildRegistryQueueMessage(
-            RegistryQueueCommand.PROJECT_LINK,
-            {
+        const queueMessage = buildRegistryPayload({
+            command: RegistryQueueCommand.PROJECT_LINK,
+            data: {
                 id: entities[i].id,
             },
-        );
+        });
 
         await publish(queueMessage);
     }

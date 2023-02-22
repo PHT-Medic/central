@@ -19,15 +19,15 @@ import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../../request';
 import { useEnv, useLogger } from '../../../../../../config';
-import { setupRegistry } from '../../../../../../components/registry/handlers/default';
-import {
-    RegistryQueueCommand,
-    buildRegistryQueueMessage,
-} from '../../../../../../domains/special/registry';
 import {
     linkRegistryProject,
+    setupRegistry,
     unlinkRegistryProject,
-} from '../../../../../../components/registry/handlers/project';
+} from '../../../../../../components';
+import {
+    RegistryQueueCommand,
+    buildRegistryPayload,
+} from '../../../../../../domains/special/registry';
 import { RegistryProjectEntity } from '../../../../../../domains/core/registry-project/entity';
 import { RegistryEntity } from '../../../../../../domains/core/registry/entity';
 
@@ -71,25 +71,25 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                     });
                 } else {
                     useLogger().info('Submitting setup registry command.');
-                    const queueMessage = buildRegistryQueueMessage(
-                        RegistryQueueCommand.SETUP,
-                        {
+                    const queueMessage = buildRegistryPayload({
+                        command: RegistryQueueCommand.SETUP,
+                        data: {
                             id: entity.id,
                             entity,
                         },
-                    );
+                    });
                     await publish(queueMessage);
                 }
             } else {
                 useLogger().info('Submitting delete registry command.');
 
-                const queueMessage = buildRegistryQueueMessage(
-                    RegistryQueueCommand.DELETE,
-                    {
+                const queueMessage = buildRegistryPayload({
+                    command: RegistryQueueCommand.DELETE,
+                    data: {
                         id: entity.id,
                         entity,
                     },
-                );
+                });
 
                 await publish(queueMessage);
             }
@@ -112,13 +112,13 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                         entity,
                     });
                 } else {
-                    const queueMessage = buildRegistryQueueMessage(
-                        RegistryQueueCommand.PROJECT_LINK,
-                        {
+                    const queueMessage = buildRegistryPayload({
+                        command: RegistryQueueCommand.PROJECT_LINK,
+                        data: {
                             id: entity.id,
                             entity,
                         },
-                    );
+                    });
                     await publish(queueMessage);
                 }
                 break;
@@ -131,16 +131,16 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                     updateDatabase: true,
                 });
             } else {
-                const queueMessage = buildRegistryQueueMessage(
-                    RegistryQueueCommand.PROJECT_UNLINK,
-                    {
+                const queueMessage = buildRegistryPayload({
+                    command: RegistryQueueCommand.PROJECT_UNLINK,
+                    data: {
                         id: entity.id,
                         registryId: entity.registry_id,
                         externalName: entity.external_name,
                         accountId: entity.account_id,
                         updateDatabase: true,
                     },
-                );
+                });
                 await publish(queueMessage);
             }
             break;

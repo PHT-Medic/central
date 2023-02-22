@@ -19,7 +19,7 @@ import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
 import { StationEntity } from '../../../../../domains/core/station';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
-import { RegistryQueueCommand, buildRegistryQueueMessage } from '../../../../../domains/special/registry';
+import { RegistryQueueCommand, buildRegistryPayload } from '../../../../../domains/special/registry';
 
 export async function updateStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -103,22 +103,22 @@ export async function updateStationRouteHandler(req: Request, res: Response) : P
         entity.external_name = registryProjectExternalName;
 
         if (registryOperation === 'link') {
-            await publish(buildRegistryQueueMessage(
-                RegistryQueueCommand.PROJECT_LINK,
-                {
+            await publish(buildRegistryPayload({
+                command: RegistryQueueCommand.PROJECT_LINK,
+                data: {
                     id: registryProject.id,
                 },
-            ));
+            }));
         } else {
-            await publish(buildRegistryQueueMessage(
-                RegistryQueueCommand.PROJECT_RELINK,
-                {
+            await publish(buildRegistryPayload({
+                command: RegistryQueueCommand.PROJECT_RELINK,
+                data: {
                     id: registryProject.id,
                     registryId: registryProject.registry_id,
                     externalName: registryProject.external_name,
                     accountId: registryProject.account_id,
                 },
-            ));
+            }));
         }
     }
 
