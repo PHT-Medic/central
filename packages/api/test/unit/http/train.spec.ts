@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2021.
+ * Copyright (c) 2021-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
 import type { Train, TrainType } from '@personalhealthtrain/central-common';
-import { removeDateProperties } from '../../../utils/date-properties';
-import { useSuperTest } from '../../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
-import { TEST_DEFAULT_TRAIN, createSuperTestProposal, createSuperTestTrain } from '../../../utils/domains';
-import { expectPropertiesEqualToSrc } from '../../../utils/properties';
-import { buildRequestValidationErrorMessage } from '../../../../src/http/validation';
+import { removeDateProperties } from '../../utils/date-properties';
+import { useSuperTest } from '../../utils/supertest';
+import { dropTestDatabase, useTestDatabase } from '../../utils/database';
+import { TEST_DEFAULT_TRAIN, createSuperTestProposal, createSuperTestTrain } from '../../utils/domains';
+import { expectPropertiesEqualToSrc } from '../../utils/properties';
+import { buildRequestValidationErrorMessage } from '../../../src/http/validation';
 
 describe('src/controllers/core/train', () => {
     const superTest = useSuperTest();

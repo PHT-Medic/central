@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021.
+ * Copyright (c) 2021-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -15,11 +15,11 @@ import {
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
 import type { Client as VaultClient } from '@hapic/vault';
-import { removeDateProperties } from '../../../utils/date-properties';
-import { expectPropertiesEqualToSrc } from '../../../utils/properties';
-import { useSuperTest } from '../../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
-import { ApiKey } from '../../../../src';
+import { removeDateProperties } from '../../utils/date-properties';
+import { expectPropertiesEqualToSrc } from '../../utils/properties';
+import { useSuperTest } from '../../utils/supertest';
+import { dropTestDatabase, useTestDatabase } from '../../utils/database';
+import { ApiKey } from '../../../src';
 
 describe('src/controllers/core/user-secret', () => {
     const superTest = useSuperTest();

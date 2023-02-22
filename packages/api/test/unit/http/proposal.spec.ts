@@ -1,16 +1,16 @@
 /*
- * Copyright (c) 2021.
+ * Copyright (c) 2021-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
 import type { Proposal } from '@personalhealthtrain/central-common';
-import { removeDateProperties } from '../../../utils/date-properties';
-import { useSuperTest } from '../../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
-import { createSuperTestProposal } from '../../../utils/domains';
-import { expectPropertiesEqualToSrc } from '../../../utils/properties';
+import { removeDateProperties } from '../../utils/date-properties';
+import { useSuperTest } from '../../utils/supertest';
+import { dropTestDatabase, useTestDatabase } from '../../utils/database';
+import { createSuperTestProposal } from '../../utils/domains';
+import { expectPropertiesEqualToSrc } from '../../utils/properties';
 
 describe('src/controllers/core/proposal', () => {
     const superTest = useSuperTest();

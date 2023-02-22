@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023.
+ * Copyright (c) 2023-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -8,10 +8,13 @@
 import type { TrainFile } from '@personalhealthtrain/central-common';
 import path from 'node:path';
 import tar from 'tar-stream';
-import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
-import { createSuperTestProposal, createSuperTestTrain } from '../../../utils/domains';
-import { expectPropertiesEqualToSrc } from '../../../utils/properties';
-import { useSuperTest } from '../../../utils/supertest';
+import {
+    dropTestDatabase,
+    expectPropertiesEqualToSrc,
+    useSuperTest,
+    useTestDatabase,
+} from '../../utils';
+import { createSuperTestProposal, createSuperTestTrain } from '../../utils/domains';
 
 describe('src/controllers/core/train-file', () => {
     const superTest = useSuperTest();

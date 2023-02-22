@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021.
+ * Copyright (c) 2021-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -8,11 +8,11 @@
 import type {
     Station,
 } from '@personalhealthtrain/central-common';
-import { removeDateProperties } from '../../../utils/date-properties';
-import { expectPropertiesEqualToSrc } from '../../../utils/properties';
-import { useSuperTest } from '../../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../../utils/database';
-import { createSuperTestStation } from '../../../utils/domains';
+import { removeDateProperties } from '../../utils/date-properties';
+import { expectPropertiesEqualToSrc } from '../../utils/properties';
+import { useSuperTest } from '../../utils/supertest';
+import { dropTestDatabase, useTestDatabase } from '../../utils/database';
+import { createSuperTestStation } from '../../utils/domains';
 
 describe('src/controllers/core/station', () => {
     const superTest = useSuperTest();
