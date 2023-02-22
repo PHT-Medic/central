@@ -33,7 +33,7 @@
         "docker-scan": "^1.0.4",
         "dotenv": "^16.0.3",
         "express-validator": "^6.14.3",
-        "hapic": "^1.1.0",
+        "hapic": "^1.2.0",
         "locter": "^1.0.5",
         "minio": "^7.0.32",
         "mysql": "^2.18.1",

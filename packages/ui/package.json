@@ -34,7 +34,7 @@
         "bootstrap-vue": "^2.23.1",
         "browser-storage-adapter": "^1.1.2",
         "events": "^3.3.0",
-        "hapic": "^1.1.0",
+        "hapic": "^1.2.0",
         "ilingo": "^2.2.1",
         "moment": "^2.29.4",
         "nuxt": "^2.16.1",

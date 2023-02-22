@@ -32,7 +32,7 @@
         "dockerode": "^3.3.3",
         "dotenv": "^16.0.3",
         "gunzip-maybe": "^1.4.2",
-        "hapic": "^1.1.0",
+        "hapic": "^1.2.0",
         "minio": "^7.0.32",
         "rapiq": "^0.8.0",
         "redis-extension": "^1.2.3",
