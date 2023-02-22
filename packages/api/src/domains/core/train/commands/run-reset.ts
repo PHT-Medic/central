@@ -23,13 +23,13 @@ export async function resetTrain(train: TrainEntity | string) : Promise<TrainEnt
         throw new BadRequestError('The train has already been terminated...');
     } else {
         if (train.run_status !== TrainRunStatus.STOPPING) {
-            await publish(buildTrainManagerPayload(
-                TrainManagerComponent.ROUTER,
-                TrainManagerRouterCommand.RESET,
-                {
+            await publish(buildTrainManagerPayload({
+                component: TrainManagerComponent.ROUTER,
+                command: TrainManagerRouterCommand.RESET,
+                data: {
                     id: train.id,
                 },
-            ));
+            }));
         }
 
         train = repository.merge(train, {

@@ -76,13 +76,13 @@ export async function startBuildTrain(
             train.incoming_registry_project_id = project.id;
         }
 
-        await publish(buildTrainManagerPayload(
-            TrainManagerComponent.BUILDER,
-            TrainManagerBuilderCommand.BUILD,
-            {
+        await publish(buildTrainManagerPayload({
+            component: TrainManagerComponent.BUILDER,
+            command: TrainManagerBuilderCommand.BUILD,
+            data: {
                 id: train.id,
             },
-        ));
+        }));
 
         train.build_status = TrainBuildStatus.STARTING;
 

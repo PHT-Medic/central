@@ -29,13 +29,13 @@ export async function startTrain(train: TrainEntity | string) : Promise<TrainEnt
     ) {
         throw new BadRequestError('The train has already been started...');
     } else {
-        await publish(buildTrainManagerPayload(
-            TrainManagerComponent.ROUTER,
-            TrainManagerRouterCommand.START,
-            {
+        await publish(buildTrainManagerPayload({
+            component: TrainManagerComponent.ROUTER,
+            command: TrainManagerRouterCommand.START,
+            data: {
                 id: train.id,
             },
-        ));
+        }));
 
         train = repository.merge(train, {
             run_status: TrainRunStatus.STARTING,

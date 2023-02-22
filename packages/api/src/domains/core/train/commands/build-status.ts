@@ -21,13 +21,13 @@ export async function detectTrainBuildStatus(train: TrainEntity | string) : Prom
 
     train = await resolveTrain(train, repository);
 
-    await publish(buildTrainManagerPayload(
-        TrainManagerComponent.BUILDER,
-        TrainManagerBuilderCommand.CHECK,
-        {
+    await publish(buildTrainManagerPayload({
+        component: TrainManagerComponent.BUILDER,
+        command: TrainManagerBuilderCommand.CHECK,
+        data: {
             id: train.id,
         },
-    ));
+    }));
 
     return train;
 }

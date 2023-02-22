@@ -32,10 +32,10 @@ export async function triggerTrainResultStart(
     }
 
     // send queue message
-    await publish(buildTrainManagerPayload(
-        TrainManagerComponent.EXTRACTOR,
-        TrainManagerExtractorCommand.EXTRACT,
-        {
+    await publish(buildTrainManagerPayload({
+        component: TrainManagerComponent.EXTRACTOR,
+        command: TrainManagerExtractorCommand.EXTRACT,
+        data: {
             id: train.id,
 
             filePaths: [
@@ -43,7 +43,7 @@ export async function triggerTrainResultStart(
                 TrainContainerPath.CONFIG,
             ],
         },
-    ));
+    }));
 
     train = repository.merge(train, {
         result_status: TrainResultStatus.STARTED,

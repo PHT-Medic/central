@@ -106,10 +106,10 @@ export async function handleTrainManagerRouterEvent(
                     await repository.save(entity);
 
                     if (event === TrainManagerRouterEvent.ROUTED) {
-                        await publish(buildTrainManagerPayload(
-                            TrainManagerComponent.EXTRACTOR,
-                            TrainManagerExtractorCommand.EXTRACT,
-                            {
+                        await publish(buildTrainManagerPayload({
+                            component: TrainManagerComponent.EXTRACTOR,
+                            command: TrainManagerExtractorCommand.EXTRACT,
+                            data: {
                                 id: entity.id,
 
                                 filePaths: [
@@ -117,7 +117,7 @@ export async function handleTrainManagerRouterEvent(
                                     TrainContainerPath.CONFIG,
                                 ],
                             },
-                        ));
+                        }));
                     }
                     break;
                 }

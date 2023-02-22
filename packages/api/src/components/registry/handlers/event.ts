@@ -32,16 +32,16 @@ export async function dispatchRegistryEventToTrainManager(
                 return;
             }
 
-            await publish(buildTrainManagerPayload(
-                TrainManagerComponent.ROUTER,
-                TrainManagerRouterCommand.ROUTE,
-                {
+            await publish(buildTrainManagerPayload({
+                component: TrainManagerComponent.ROUTER,
+                command: TrainManagerRouterCommand.ROUTE,
+                data: {
                     repositoryName: data.repositoryName,
                     projectName: data.namespace,
                     operator: data.operator,
                     artifactTag: data.artifactTag,
                 },
-            ));
+            }));
             break;
         }
         case RegistryHookEvent.DELETE_ARTIFACT:

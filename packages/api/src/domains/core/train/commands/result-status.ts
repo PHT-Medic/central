@@ -24,13 +24,13 @@ export async function triggerTrainResultStatus(
     train = await resolveTrain(train, repository);
 
     // send queue message
-    await publish(buildTrainManagerPayload(
-        TrainManagerComponent.EXTRACTOR,
-        TrainManagerExtractorCommand.CHECK,
-        {
+    await publish(buildTrainManagerPayload({
+        component: TrainManagerComponent.EXTRACTOR,
+        command: TrainManagerExtractorCommand.CHECK,
+        data: {
             id: train.id,
         },
-    ));
+    }));
 
     return train;
 }

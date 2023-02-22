@@ -21,13 +21,13 @@ export async function detectTrainRunStatus(train: TrainEntity) : Promise<TrainEn
     ) {
         throw new BadRequestError('The train has not been build yet...');
     } else {
-        await publish(buildTrainManagerPayload(
-            TrainManagerComponent.ROUTER,
-            TrainManagerRouterCommand.CHECK,
-            {
+        await publish(buildTrainManagerPayload({
+            component: TrainManagerComponent.ROUTER,
+            command: TrainManagerRouterCommand.CHECK,
+            data: {
                 id: train.id,
             },
-        ));
+        }));
     }
 
     return train;
