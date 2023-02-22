@@ -16,7 +16,7 @@ export enum RegistryQueueCommand {
     EVENT_HANDLE = 'EVENT_HANDLE',
 }
 
-export enum RegistryQueueEvent {
+export enum RegistryHookEvent {
     PUSH_ARTIFACT = 'PUSH_ARTIFACT',
     PULL_ARTIFACT = 'PULL_ARTIFACT',
     DELETE_ARTIFACT = 'DELETE_ARTIFACT',

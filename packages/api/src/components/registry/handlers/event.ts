@@ -10,8 +10,8 @@ import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../config';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
 import type { RegistryEventQueuePayload } from '../../../domains/special/registry';
-import { RegistryQueueEvent } from '../../../domains/special/registry';
-import { buildTrainManagerQueueMessage } from '../../../domains/special/train-manager';
+import { RegistryHookEvent } from '../../../domains/special/registry';
+import { buildTrainManagerPayload } from '../../../domains/special/train-manager';
 
 export async function dispatchRegistryEventToTrainManager(
     event: string,
@@ -19,7 +19,7 @@ export async function dispatchRegistryEventToTrainManager(
 ) {
     // only process terminated trains and the PUSH_ARTIFACT event
     switch (event) {
-        case RegistryQueueEvent.PUSH_ARTIFACT: {
+        case RegistryHookEvent.PUSH_ARTIFACT: {
             const dataSource = await useDataSource();
             const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
             const registryProject = await registryProjectRepository.findOneBy({
@@ -32,7 +32,7 @@ export async function dispatchRegistryEventToTrainManager(
                 return;
             }
 
-            await publish(buildTrainManagerQueueMessage(
+            await publish(buildTrainManagerPayload(
                 TrainManagerComponent.ROUTER,
                 TrainManagerRouterCommand.ROUTE,
                 {
@@ -44,12 +44,12 @@ export async function dispatchRegistryEventToTrainManager(
             ));
             break;
         }
-        case RegistryQueueEvent.DELETE_ARTIFACT:
-        case RegistryQueueEvent.PULL_ARTIFACT:
-        case RegistryQueueEvent.QUOTA_EXCEED:
-        case RegistryQueueEvent.QUOTA_WARNING:
-        case RegistryQueueEvent.SCANNING_COMPLETED:
-        case RegistryQueueEvent.SCANNING_FAILED: {
+        case RegistryHookEvent.DELETE_ARTIFACT:
+        case RegistryHookEvent.PULL_ARTIFACT:
+        case RegistryHookEvent.QUOTA_EXCEED:
+        case RegistryHookEvent.QUOTA_WARNING:
+        case RegistryHookEvent.SCANNING_COMPLETED:
+        case RegistryHookEvent.SCANNING_FAILED: {
             useLogger()
                 .info(`skipping registry event: ${event}`);
             break;

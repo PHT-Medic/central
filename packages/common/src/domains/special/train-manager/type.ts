@@ -39,7 +39,7 @@ export type TrainManagerCommand<C extends `${TrainManagerComponent}` | TrainMana
                 `${TrainManagerRouterCommand}` | TrainManagerRouterCommand :
                 never;
 
-export type TrainManagerCommandQueuePayload<
+export type TrainManagerCommandPayload<
     Component extends `${TrainManagerComponent}` | TrainManagerComponent,
     Command extends TrainManagerCommand<Component>,
 > =

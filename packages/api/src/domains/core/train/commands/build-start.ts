@@ -16,7 +16,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
-import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
+import { buildTrainManagerPayload } from '../../../special/train-manager';
 import { RegistryProjectEntity } from '../../registry-project/entity';
 import { RegistryEntity } from '../../registry/entity';
 import { TrainStationEntity } from '../../train-station/entity';
@@ -76,7 +76,7 @@ export async function startBuildTrain(
             train.incoming_registry_project_id = project.id;
         }
 
-        await publish(buildTrainManagerQueueMessage(
+        await publish(buildTrainManagerPayload(
             TrainManagerComponent.BUILDER,
             TrainManagerBuilderCommand.BUILD,
             {

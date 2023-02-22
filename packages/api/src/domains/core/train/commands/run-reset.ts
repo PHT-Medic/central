@@ -9,7 +9,7 @@ import { TrainManagerComponent, TrainManagerRouterCommand, TrainRunStatus } from
 import { publish } from 'amqp-extension';
 import { BadRequestError } from '@ebec/http';
 import { useDataSource } from 'typeorm-extension';
-import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
+import { buildTrainManagerPayload } from '../../../special/train-manager';
 import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
 
@@ -23,7 +23,7 @@ export async function resetTrain(train: TrainEntity | string) : Promise<TrainEnt
         throw new BadRequestError('The train has already been terminated...');
     } else {
         if (train.run_status !== TrainRunStatus.STOPPING) {
-            await publish(buildTrainManagerQueueMessage(
+            await publish(buildTrainManagerPayload(
                 TrainManagerComponent.ROUTER,
                 TrainManagerRouterCommand.RESET,
                 {

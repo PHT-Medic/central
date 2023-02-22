@@ -15,7 +15,7 @@ import {
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
+import { buildTrainManagerPayload } from '../../../special/train-manager';
 import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
 
@@ -32,7 +32,7 @@ export async function triggerTrainResultStart(
     }
 
     // send queue message
-    await publish(buildTrainManagerQueueMessage(
+    await publish(buildTrainManagerPayload(
         TrainManagerComponent.EXTRACTOR,
         TrainManagerExtractorCommand.EXTRACT,
         {

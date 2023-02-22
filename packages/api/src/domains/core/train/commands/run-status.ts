@@ -12,7 +12,7 @@ import {
     TrainManagerComponent,
     TrainManagerRouterCommand,
 } from '@personalhealthtrain/central-common';
-import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
+import { buildTrainManagerPayload } from '../../../special/train-manager';
 import type { TrainEntity } from '../entity';
 
 export async function detectTrainRunStatus(train: TrainEntity) : Promise<TrainEntity> {
@@ -21,7 +21,7 @@ export async function detectTrainRunStatus(train: TrainEntity) : Promise<TrainEn
     ) {
         throw new BadRequestError('The train has not been build yet...');
     } else {
-        await publish(buildTrainManagerQueueMessage(
+        await publish(buildTrainManagerPayload(
             TrainManagerComponent.ROUTER,
             TrainManagerRouterCommand.CHECK,
             {

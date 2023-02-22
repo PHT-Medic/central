@@ -26,7 +26,7 @@ import { TrainEntity } from '../../domains/core/train';
 import { RegistryProjectEntity } from '../../domains/core/registry-project/entity';
 import { StationEntity } from '../../domains/core/station';
 import { TrainStationEntity } from '../../domains/core/train-station/entity';
-import { buildTrainManagerQueueMessage } from '../../domains/special/train-manager';
+import { buildTrainManagerPayload } from '../../domains/special/train-manager';
 import type { TrainLogSaveContext } from '../../domains/core/train-log';
 import { saveTrainLog } from '../../domains/core/train-log';
 
@@ -106,7 +106,7 @@ export async function handleTrainManagerRouterEvent(
                     await repository.save(entity);
 
                     if (event === TrainManagerRouterEvent.ROUTED) {
-                        await publish(buildTrainManagerQueueMessage(
+                        await publish(buildTrainManagerPayload(
                             TrainManagerComponent.EXTRACTOR,
                             TrainManagerExtractorCommand.EXTRACT,
                             {

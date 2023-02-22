@@ -8,28 +8,35 @@
 import type { PublishOptionsExtended } from 'amqp-extension';
 import type {
     TrainManagerCommand,
-    TrainManagerCommandQueuePayload,
+    TrainManagerCommandPayload,
     TrainManagerComponent,
 } from '@personalhealthtrain/central-common';
 import type { RouterQueuePayload } from '../../../components';
 
-export function buildTrainManagerQueueMessage<
-    Component extends `${TrainManagerComponent}` | TrainManagerComponent,
+type TrainManagerPayloadBuildContext<
+    Component extends `${TrainManagerComponent}`,
     Command extends TrainManagerCommand<Component>,
->(
+> = {
     component: Component,
     command: Command,
-    data: TrainManagerCommandQueuePayload<Component, Command>,
-) : PublishOptionsExtended<RouterQueuePayload<TrainManagerCommandQueuePayload<Component, Command>>> {
+    data: TrainManagerCommandPayload<Component, Command>,
+};
+
+export function buildTrainManagerPayload<
+    Component extends `${TrainManagerComponent}`,
+    Command extends TrainManagerCommand<Component>,
+>(
+    context: TrainManagerPayloadBuildContext<Component, Command>,
+) : PublishOptionsExtended<RouterQueuePayload<TrainManagerCommandPayload<Component, Command>>> {
     return {
         exchange: {
             routingKey: 'tm.router',
         },
         content: {
-            data,
+            data: context.data,
             metadata: {
-                component,
-                command,
+                component: context.component,
+                command: context.command,
             },
         },
     };

@@ -13,7 +13,7 @@ import {
 import { useDataSource } from 'typeorm-extension';
 import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
-import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
+import { buildTrainManagerPayload } from '../../../special/train-manager';
 
 export async function detectTrainBuildStatus(train: TrainEntity | string) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
@@ -21,7 +21,7 @@ export async function detectTrainBuildStatus(train: TrainEntity | string) : Prom
 
     train = await resolveTrain(train, repository);
 
-    await publish(buildTrainManagerQueueMessage(
+    await publish(buildTrainManagerPayload(
         TrainManagerComponent.BUILDER,
         TrainManagerBuilderCommand.CHECK,
         {

@@ -15,7 +15,7 @@ import {
 import { useDataSource } from 'typeorm-extension';
 import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
-import { buildTrainManagerQueueMessage } from '../../../special/train-manager';
+import { buildTrainManagerPayload } from '../../../special/train-manager';
 
 export async function startTrain(train: TrainEntity | string) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
@@ -29,7 +29,7 @@ export async function startTrain(train: TrainEntity | string) : Promise<TrainEnt
     ) {
         throw new BadRequestError('The train has already been started...');
     } else {
-        await publish(buildTrainManagerQueueMessage(
+        await publish(buildTrainManagerPayload(
             TrainManagerComponent.ROUTER,
             TrainManagerRouterCommand.START,
             {
