@@ -24,7 +24,7 @@
         "@authup/server-adapter": "^0.15.0",
         "@authup/server-common": "^0.15.0",
         "@ebec/http": "^0.2.2",
-        "@hapic/harbor": "^1.1.0",
+        "@hapic/harbor": "^1.2.0",
         "@hapic/vault": "^1.2.0",
         "@personalhealthtrain/central-common": "^1.4.0",
         "amqp-extension": "^2.0.0",

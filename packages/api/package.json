@@ -16,7 +16,7 @@
         "@authup/server-database": "^0.15.2",
         "@authup/server-http": "^0.15.2",
         "@ebec/http": "^0.2.2",
-        "@hapic/harbor": "^1.1.0",
+        "@hapic/harbor": "^1.2.0",
         "@hapic/vault": "^1.2.0",
         "@personalhealthtrain/central-common": "^1.4.0",
         "@routup/body": "^0.7.1",
