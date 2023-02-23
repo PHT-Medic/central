@@ -16,7 +16,7 @@
         "generate": "nuxt generate"
     },
     "devDependencies": {
-        "@authup/common": "^0.15.0",
+        "@authup/common": "^0.15.3",
         "@authup/vue2": "^0.4.1",
         "@fortawesome/fontawesome-free": "^6.1.2",
         "@hapic/oauth2": "^1.2.0",

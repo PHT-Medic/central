@@ -20,7 +20,7 @@
         "test:coverage": "npm run test -- --coverage"
     },
     "dependencies": {
-        "@authup/common": "^0.15.0",
+        "@authup/common": "^0.15.3",
         "@authup/server-adapter": "^0.15.0",
         "@authup/server-common": "^0.15.0",
         "@ebec/http": "^0.2.2",
