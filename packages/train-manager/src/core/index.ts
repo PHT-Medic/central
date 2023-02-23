@@ -10,4 +10,5 @@ export * from './docker';
 export * from './harbor';
 export * from './log';
 export * from './minio';
+export * from './queue';
 export * from './utils';

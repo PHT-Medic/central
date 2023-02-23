@@ -1,6 +1,8 @@
 {
     "name": "@personalhealthtrain/central-server-common",
     "private": true,
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "author": {
         "name": "Peter Placzek",
         "email": "contact@tada5hi.net",

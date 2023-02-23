@@ -18,7 +18,7 @@ import type { Client } from 'redis-extension';
 import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import { Client as VaultClient } from '@hapic/vault';
 import type { Robot } from '@authup/common';
-import { buildCommandRouterComponent } from '../components/router';
+import { buildCommandRouterComponent } from '../core/queue/router';
 import { setMinioConfig } from '../core';
 import type { Environment } from '../env';
 import { useLogger } from '../core/log';

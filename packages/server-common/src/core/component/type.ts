@@ -12,8 +12,15 @@ export type ComponentExecutionContext<
     C extends string = string,
     T extends ObjectLiteral = ObjectLiteral,
 > = {
-    command: `${C}`,
+    command: C,
     data: T
+};
+
+export type ComponentExecutionErrorContext<
+    C extends string = string,
+    T extends ObjectLiteral = ObjectLiteral,
+> = ComponentExecutionContext<C, T> & {
+    error: Error
 };
 
 export type ComponentQueuePayload = QueuePayload<ObjectLiteral, {
