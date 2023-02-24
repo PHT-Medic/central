@@ -7,9 +7,7 @@
 
 import type { Options } from '@ebec/http';
 import { BaseError as Base } from '@ebec/http';
-import {
-    TrainManagerErrorCode,
-} from '@personalhealthtrain/central-common';
+import { ErrorCode } from './constants';
 
 export type ErrorOptionsExtended = Options & {
     type?: string,
@@ -30,7 +28,7 @@ export class BaseError extends Base {
 
     static notFound(options?: ErrorOptionsExtended) {
         return new this({
-            code: TrainManagerErrorCode.NOT_FOUND,
+            code: ErrorCode.NOT_FOUND,
             ...(options || {}),
         });
     }
@@ -39,7 +37,7 @@ export class BaseError extends Base {
         options?: ErrorOptionsExtended,
     ) {
         return new this({
-            code: TrainManagerErrorCode.REGISTRY_NOT_FOUND,
+            code: ErrorCode.REGISTRY_NOT_FOUND,
             ...(options || {}),
         });
     }
@@ -48,7 +46,7 @@ export class BaseError extends Base {
         options?: ErrorOptionsExtended,
     ) {
         return new this({
-            code: TrainManagerErrorCode.REGISTRY_PROJECT_NOT_FOUND,
+            code: ErrorCode.REGISTRY_PROJECT_NOT_FOUND,
             ...(options || {}),
         });
     }

@@ -7,19 +7,28 @@
 
 import type {
     HTTPClient,
-    TrainManagerExtractorExtractQueuePayload,
-    TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
-import { RegistryProjectType, TrainManagerExtractorCommand } from '@personalhealthtrain/central-common';
+import { RegistryProjectType } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
 import { generateTrainMinioBucketName } from '../../../../config';
 import { buildRemoteDockerImageURL, checkIfLocalRegistryImageExists, useMinio } from '../../../../core';
+import type { ComponentPayloadExtended } from '../../../type';
+import { extendPayload } from '../../../utils';
+import { ExtractorCommand } from '../../constants';
 import { ExtractorError } from '../../error';
 import { writeExtractedEvent, writeNoneEvent } from '../../events';
+import type { ExtractorExtractPayload } from '../../type';
+import { useExtractorLogger } from '../../utils';
 
 export async function processCheckCommand(
-    data: TrainManagerQueuePayloadExtended<TrainManagerExtractorExtractQueuePayload>,
-) : Promise<TrainManagerQueuePayloadExtended<TrainManagerExtractorExtractQueuePayload>> {
+    input: ExtractorExtractPayload,
+) : Promise<ComponentPayloadExtended<ExtractorExtractPayload>> {
+    useExtractorLogger().debug('Executing command', {
+        command: ExtractorCommand.CHECK,
+    });
+
+    const data = await extendPayload(input);
+
     if (!data.registry) {
         throw ExtractorError.registryNotFound();
     }
@@ -33,12 +42,15 @@ export async function processCheckCommand(
             await minio.getObject(bucketName, 'result');
 
             await writeExtractedEvent({
-                command: TrainManagerExtractorCommand.CHECK,
+                command: ExtractorCommand.CHECK,
                 data,
             });
 
             return data;
         } catch (e) {
+            useExtractorLogger().debug('Result does not exist yet.', {
+                command: ExtractorCommand.CHECK,
+            });
             // do nothing :)
         }
     }
@@ -63,7 +75,7 @@ export async function processCheckCommand(
 
         if (exists) {
             await writeExtractedEvent({
-                command: TrainManagerExtractorCommand.CHECK,
+                command: ExtractorCommand.CHECK,
                 data,
             });
 
@@ -73,8 +85,12 @@ export async function processCheckCommand(
 
     // 3. Is unknown
     await writeNoneEvent({
-        command: TrainManagerExtractorCommand.CHECK,
+        command: ExtractorCommand.CHECK,
         data,
+    });
+
+    useExtractorLogger().debug('Result execution could not be confirmed.', {
+        command: ExtractorCommand.CHECK,
     });
 
     return data;

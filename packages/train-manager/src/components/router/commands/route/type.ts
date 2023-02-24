@@ -8,14 +8,14 @@
 import type {
     RegistryProject,
     Station,
-    TrainManagerRouterRoutePayload,
     TrainStation,
 } from '@personalhealthtrain/central-common';
+import type { RouterRoutePayload } from '../../type';
 
 export type StationExtended = Station & Pick<TrainStation, 'index' | 'run_status'>;
 
 export type RouteContext = {
-    payload: TrainManagerRouterRoutePayload,
+    payload: RouterRoutePayload,
     project: RegistryProject,
 };
 

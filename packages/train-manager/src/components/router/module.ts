@@ -5,18 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    TrainManagerRouterRoutePayload,
-    TrainManagerRouterStartPayload,
-    TrainManagerRouterStatusPayload,
-} from '@personalhealthtrain/central-common';
-import { TrainManagerRouterCommand } from '@personalhealthtrain/central-common';
-import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
 import {
     processCheckCommand,
     processRouteCommand,
     processStartCommand,
 } from './commands';
+import { RouterCommand } from './constants';
 import {
     writeCheckedEvent,
     writeCheckingEvent,
@@ -27,16 +21,13 @@ import {
     writeStartingEvent,
 } from './events';
 import { extendPayload } from '../utils';
-
-type ExecutionContext = ComponentExecutionContext<TrainManagerRouterCommand.CHECK, TrainManagerRouterStatusPayload> |
-ComponentExecutionContext<TrainManagerRouterCommand.ROUTE, TrainManagerRouterRoutePayload> |
-ComponentExecutionContext<TrainManagerRouterCommand.START, TrainManagerRouterStartPayload>;
+import type { RouterExecutionContext } from './type';
 
 export async function executeRouterCommand(
-    context: ExecutionContext,
+    context: RouterExecutionContext,
 ) : Promise<void> {
     switch (context.command) {
-        case TrainManagerRouterCommand.CHECK: {
+        case RouterCommand.CHECK: {
             await Promise.resolve(context.data)
                 .then(extendPayload)
                 .then((data) => writeCheckingEvent({ data, command: context.command }))
@@ -49,11 +40,7 @@ export async function executeRouterCommand(
                 }));
             break;
         }
-        case TrainManagerRouterCommand.ROUTE: {
-            const eventContext = {
-                command: TrainManagerRouterCommand.ROUTE,
-            };
-
+        case RouterCommand.ROUTE: {
             await Promise.resolve(context.data)
                 .then((data) => writeRoutingEvent({ data, command: context.command }))
                 .then(processRouteCommand)
@@ -66,11 +53,7 @@ export async function executeRouterCommand(
 
             break;
         }
-        case TrainManagerRouterCommand.START: {
-            const eventContext = {
-                command: TrainManagerRouterCommand.START,
-            };
-
+        case RouterCommand.START: {
             await Promise.resolve(extendPayload(context.data))
                 .then()
                 .then((data) => writeStartingEvent({ data, command: context.command }))
@@ -81,6 +64,7 @@ export async function executeRouterCommand(
                     data: context.data,
                     error: err,
                 }));
+            break;
         }
     }
 }

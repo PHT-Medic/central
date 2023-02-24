@@ -7,28 +7,32 @@
 
 import type { ComponentExecutionErrorContext } from '@personalhealthtrain/central-server-common';
 import { publish } from 'amqp-extension';
-import type {
-    TrainManagerRouterCommand,
-    TrainManagerRouterPayload,
-} from '@personalhealthtrain/central-common';
-import {
-    TrainManagerComponent,
-    TrainManagerRouterEvent,
-} from '@personalhealthtrain/central-common';
+import { Component } from '../../constants';
 import { buildAPIQueueMessage } from '../../utils';
+import { RouterEvent } from '../constants';
+import type { RouterCommand } from '../constants';
 import { RouterError } from '../error';
 import { BaseError } from '../../error';
+import type { RouterPayload } from '../type';
+import { useRouterLogger } from '../utils';
 
 export async function writeFailedEvent(
-    context: ComponentExecutionErrorContext<`${TrainManagerRouterCommand}`, TrainManagerRouterPayload<any>>,
+    context: ComponentExecutionErrorContext<`${RouterCommand}`, RouterPayload<any>>,
 ) {
     const error = context.error instanceof RouterError || context.error instanceof BaseError ?
         context.error :
         new RouterError({ previous: context.error });
 
+    useRouterLogger().debug('Component execution failed.', {
+        command: context.command,
+        code: error.getCode(),
+        step: error.getStep(),
+        message: error.message, // todo: trim message
+    });
+
     await publish(buildAPIQueueMessage({
-        event: TrainManagerRouterEvent.FAILED,
-        component: TrainManagerComponent.ROUTER,
+        event: RouterEvent.FAILED,
+        component: Component.ROUTER,
         command: context.command,
         data: {
             ...context.data,

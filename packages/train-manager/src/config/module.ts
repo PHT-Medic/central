@@ -18,10 +18,8 @@ import type { Client } from 'redis-extension';
 import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import { Client as VaultClient } from '@hapic/vault';
 import type { Robot } from '@authup/common';
-import { buildCommandRouterComponent } from '../core/queue/router';
-import { setMinioConfig } from '../core';
+import { buildComponentRouter, setMinioConfig, useLogger } from '../core';
 import type { Environment } from '../env';
-import { useLogger } from '../core/log';
 
 interface ConfigContext {
     env: Environment
@@ -109,7 +107,7 @@ function createConfig({ env } : ConfigContext) : Config {
     ];
 
     const components : {start: () => void}[] = [
-        buildCommandRouterComponent(),
+        buildComponentRouter(),
     ];
 
     return {

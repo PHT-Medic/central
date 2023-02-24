@@ -14,11 +14,12 @@ import {
     RegistryProjectType,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
+import { RouterCommand } from '../../../constants';
+import { useRouterLogger } from '../../../utils';
 import type { TransferEcosystemItem, TransferItem } from './type';
-import { pullDockerImage, useDocker } from '../../../../../core/docker';
-import { buildDockerAuthConfig, buildRemoteDockerImageURL } from '../../../../../core/docker/registry';
-import { pushDockerImage } from '../../../../../core/docker/image-push';
-import { useLogger } from '../../../../../core/log';
+import {
+    buildDockerAuthConfig, buildRemoteDockerImageURL, pullDockerImage, pushDockerImage, useDocker,
+} from '../../../../../core';
 import { RouterError } from '../../../error';
 
 export async function transferEcosystemOut(
@@ -35,9 +36,10 @@ export async function transferEcosystemOut(
         return;
     }
 
-    useLogger().debug(`Move repository ${source.repositoryName} from ${source.project.name} project to ${destination.ecosystem} ecosystem.`, {
-        component: 'routing',
-    });
+    useRouterLogger()
+        .debug(`Move repository ${source.repositoryName} from ${source.project.name} project to ${destination.ecosystem} ecosystem.`, {
+            command: RouterCommand.ROUTE,
+        });
 
     const client = await useClient<HTTPClient>();
 

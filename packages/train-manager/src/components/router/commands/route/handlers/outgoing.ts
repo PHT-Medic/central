@@ -5,11 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { RouterCommand } from '../../../constants';
+import { useRouterLogger } from '../../../utils';
 import type { RouteContext } from '../type';
-import { useLogger } from '../../../../../core/log';
 
 export async function routeOutgoingProject(context: RouteContext) : Promise<void> {
-    useLogger().debug(`Handle outgoing project ${context.project.name}.`, {
-        component: 'routing',
+    useRouterLogger().debug(`Handle outgoing project ${context.project.name}.`, {
+        command: RouterCommand.ROUTE,
     });
 }

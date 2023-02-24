@@ -7,16 +7,24 @@
 
 import type {
     HTTPClient,
-    TrainManagerExtractorExtractQueuePayload,
-    TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
 import { buildDockerAuthConfig, buildRemoteDockerImageURL, pullDockerImage } from '../../../../core';
+import type { ComponentPayloadExtended } from '../../../type';
+import { extendPayload } from '../../../utils';
+import { ExtractorCommand } from '../../constants';
 import { ExtractorError } from '../../error';
+import type { ExtractorExtractPayload } from '../../type';
+import { useExtractorLogger } from '../../utils';
 
 export async function downloadImage(
-    data: TrainManagerQueuePayloadExtended<TrainManagerExtractorExtractQueuePayload>,
-) : Promise<TrainManagerQueuePayloadExtended<TrainManagerExtractorExtractQueuePayload>> {
+    input: ExtractorExtractPayload,
+) : Promise<ComponentPayloadExtended<ExtractorExtractPayload>> {
+    useExtractorLogger().debug('Executing command', {
+        command: ExtractorCommand.EXTRACT,
+    });
+
+    const data = await extendPayload(input);
     if (!data.registry) {
         throw ExtractorError.registryNotFound();
     }
@@ -25,7 +33,6 @@ export async function downloadImage(
 
     const registryProject = await client.registryProject.getOne(data.entity.outgoing_registry_project_id);
     data.registryProject = registryProject;
-    data.registryProjectId = registryProject.id;
 
     const repositoryTag = buildRemoteDockerImageURL({
         hostname: data.registry.host,

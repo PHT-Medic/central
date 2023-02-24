@@ -7,22 +7,18 @@
 
 import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
 import { publish } from 'amqp-extension';
-import type {
-    TrainManagerRouterCommand,
-    TrainManagerRouterStatusPayload,
-} from '@personalhealthtrain/central-common';
-import {
-    TrainManagerComponent,
-    TrainManagerRouterEvent,
-} from '@personalhealthtrain/central-common';
+import { Component } from '../../constants';
+import type { RouterCommand } from '../constants';
+import { RouterEvent } from '../constants';
+import type { RouterStatusPayload } from '../type';
 import { buildAPIQueueMessage } from '../../utils';
 
-export async function writeCheckedEvent<T extends TrainManagerRouterStatusPayload>(
-    context: ComponentExecutionContext<`${TrainManagerRouterCommand}`, T>,
+export async function writeCheckedEvent<T extends RouterStatusPayload>(
+    context: ComponentExecutionContext<`${RouterCommand}`, T>,
 ) {
     await publish(buildAPIQueueMessage({
-        event: TrainManagerRouterEvent.CHECKED,
-        component: TrainManagerComponent.ROUTER,
+        event: RouterEvent.CHECKED,
+        component: Component.ROUTER,
         command: context.command,
         data: context.data,
     }));

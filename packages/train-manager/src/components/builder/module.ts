@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainManagerBuilderCommand } from '@personalhealthtrain/central-common';
 import { extendPayload } from '../utils';
 import {
     processBuildCommand,
     processCheckCommand,
     processPushCommand,
 } from './commands';
+import { BuilderCommand } from './constants';
 import {
     writeBuildingEvent,
     writeBuiltEvent,
@@ -27,7 +27,7 @@ export async function executeBuilderCommand(
     context: TrainBuilderExecutionContext,
 ) : Promise<void> {
     switch (context.command) {
-        case TrainManagerBuilderCommand.BUILD: {
+        case BuilderCommand.BUILD: {
             await Promise.resolve(context.data)
                 .then(extendPayload)
                 .then((data) => writeBuildingEvent({ data, command: context.command }))
@@ -43,7 +43,7 @@ export async function executeBuilderCommand(
                 }));
             break;
         }
-        case TrainManagerBuilderCommand.CHECK: {
+        case BuilderCommand.CHECK: {
             await Promise.resolve(context.data)
                 .then(extendPayload)
                 .then((data) => writeCheckingEvent({ data, command: context.command }))

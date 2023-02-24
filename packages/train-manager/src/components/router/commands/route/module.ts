@@ -8,7 +8,6 @@
 import type { BuildInput } from 'rapiq';
 import type {
     HTTPClient,
-    TrainManagerRouterRoutePayload,
     TrainStation,
 } from '@personalhealthtrain/central-common';
 import {
@@ -17,6 +16,9 @@ import {
     RegistryProjectType,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
+import { RouterCommand } from '../../constants';
+import type { RouterRoutePayload } from '../../type';
+import { useRouterLogger } from '../../utils';
 import { mergeStationsWithTrainStations } from './helpers/merge';
 import { routeIncomingProject } from './handlers/incoming';
 import { routeStationProject } from './handlers/station';
@@ -26,12 +28,21 @@ import { routeOutgoingProject } from './handlers/outgoing';
 import type { StationExtended } from './type';
 
 export async function processRouteCommand(
-    data: TrainManagerRouterRoutePayload,
+    data: RouterRoutePayload,
 ) {
+    useRouterLogger().debug('Executing command.', {
+        command: RouterCommand.START,
+    });
+
     if (
         data.artifactTag !== REGISTRY_ARTIFACT_TAG_BASE &&
         data.artifactTag !== REGISTRY_ARTIFACT_TAG_LATEST
     ) {
+        useRouterLogger().debug('Registry tag could not be processed.', {
+            command: RouterCommand.START,
+            tag: data.artifactTag,
+        });
+
         return data;
     }
 

@@ -5,22 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    TrainManagerBuilderErrorCode,
-} from '@personalhealthtrain/central-common';
 import { BaseError } from '../error';
+import { BuilderErrorCode } from './constants';
 
 export class BuilderError extends BaseError {
     static entrypointNotFound(message?: string) {
         return new BuilderError({
-            code: TrainManagerBuilderErrorCode.ENTRYPOINT_NOT_FOUND,
+            code: BuilderErrorCode.ENTRYPOINT_NOT_FOUND,
             message,
         });
     }
 
     static masterImageNotFound(message?: string) {
         return new BuilderError({
-            code: TrainManagerBuilderErrorCode.MASTER_IMAGE_NOT_FOUND,
+            code: BuilderErrorCode.MASTER_IMAGE_NOT_FOUND,
             message,
         });
     }

@@ -11,18 +11,19 @@ import {
     RegistryProjectType,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
+import { RouterCommand } from '../../../constants';
+import { useRouterLogger } from '../../../utils';
 import type { TransferItem } from './type';
 import { transferInternal } from './internal';
 import { RouterError } from '../../../error';
-import { useLogger } from '../../../../../core/log';
 
 export async function transferOutgoing(source: TransferItem) {
     if (source.artifactTag === REGISTRY_ARTIFACT_TAG_BASE) {
         return;
     }
 
-    useLogger().debug(`Move repository ${source.repositoryName} internal from ${source.project.name} project to random outgoing project.`, {
-        component: 'routing',
+    useRouterLogger().debug(`Move repository ${source.repositoryName} internal from ${source.project.name} project to random outgoing project.`, {
+        command: RouterCommand.ROUTE,
     });
 
     const client = await useClient<HTTPClient>();

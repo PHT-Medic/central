@@ -9,24 +9,31 @@ import { publish } from 'amqp-extension';
 import type {
     HTTPClient,
     RegistryProject,
-    TrainManagerQueuePayloadExtended, TrainManagerRouterStartPayload,
 } from '@personalhealthtrain/central-common';
 import {
     REGISTRY_ARTIFACT_TAG_LATEST,
-    TrainManagerBuilderCommand,
-    TrainManagerComponent,
-    TrainManagerRouterCommand, buildRegistryClientConnectionStringFromRegistry,
+    buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from 'hapic';
 import type { Client as HarborClient } from '@hapic/harbor';
-import { buildSelfQueueMessage } from '../../../utils';
+import type { ComponentPayloadExtended } from '../../../type';
+import { buildSelfQueueMessage, extendPayload } from '../../../utils';
 import { RouterError } from '../../error';
-import { BuilderError } from '../../../builder';
+import { BuilderCommand, BuilderError } from '../../../builder';
 import { createBasicHarborAPIConfig } from '../../../../core';
+import type { RouterStartPayload } from '../../type';
+import { Component } from '../../../constants';
+import { RouterCommand } from '../../constants';
+import { useRouterLogger } from '../../utils';
 
 export async function processStartCommand(
-    data: TrainManagerQueuePayloadExtended<TrainManagerRouterStartPayload>,
-) : Promise<TrainManagerQueuePayloadExtended<TrainManagerRouterStartPayload>> {
+    input: RouterStartPayload,
+) : Promise<ComponentPayloadExtended<RouterStartPayload>> {
+    useRouterLogger().debug('Executing command.', {
+        command: RouterCommand.START,
+    });
+
+    const data = await extendPayload(input);
     if (!data.registry) {
         throw RouterError.registryNotFound();
     }
@@ -55,8 +62,8 @@ export async function processStartCommand(
         harborRepository.artifact_count < 2
     ) {
         await publish(buildSelfQueueMessage({
-            command: TrainManagerBuilderCommand.BUILD,
-            component: TrainManagerComponent.BUILDER,
+            command: BuilderCommand.BUILD,
+            component: Component.BUILDER,
             data: { id: data.id },
         }));
 
@@ -64,8 +71,8 @@ export async function processStartCommand(
     }
 
     await publish(buildSelfQueueMessage({
-        command: TrainManagerRouterCommand.ROUTE,
-        component: TrainManagerComponent.ROUTER,
+        command: RouterCommand.ROUTE,
+        component: Component.ROUTER,
         data: {
             repositoryName: data.id,
             projectName: incomingProject.external_name,

@@ -48,7 +48,6 @@
         "@types/minio": "^7.0.15",
         "@types/tar-stream": "^2.2.2",
         "@types/uuid": "^9.0.0",
-        "@types/winston": "^2.4.4",
         "ts-node": "^10.9.1"
     },
     "publishConfig": {

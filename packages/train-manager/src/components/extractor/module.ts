@@ -5,17 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    TrainManagerExtractorCheckQueuePayload,
-    TrainManagerExtractorExtractQueuePayload,
-} from '@personalhealthtrain/central-common';
-import { TrainManagerExtractorCommand } from '@personalhealthtrain/central-common';
-import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
 import {
     downloadImage,
     processCheckCommand,
     processExtractCommand,
 } from './commands';
+import { ExtractorCommand } from './constants';
 import {
     writeCheckedEvent,
     writeCheckingEvent,
@@ -26,15 +21,13 @@ import {
     writeFailedEvent,
 } from './events';
 import { extendPayload } from '../utils';
-
-type ExecutionContext = ComponentExecutionContext<TrainManagerExtractorCommand.CHECK, TrainManagerExtractorCheckQueuePayload> |
-ComponentExecutionContext<TrainManagerExtractorCommand.EXTRACT, TrainManagerExtractorExtractQueuePayload>;
+import type { ExtractorExecutionContext } from './type';
 
 export async function executeExtractorCommand(
-    context: ExecutionContext,
+    context: ExtractorExecutionContext,
 ) : Promise<void> {
     switch (context.command) {
-        case TrainManagerExtractorCommand.CHECK: {
+        case ExtractorCommand.CHECK: {
             await Promise.resolve(context.data)
                 .then(extendPayload)
                 .then((data) => writeCheckingEvent({ data, command: context.command }))
@@ -47,7 +40,7 @@ export async function executeExtractorCommand(
                 }));
             break;
         }
-        case TrainManagerExtractorCommand.EXTRACT: {
+        case ExtractorCommand.EXTRACT: {
             await Promise.resolve(context.data)
                 .then(extendPayload)
                 .then((data) => writeDownloadingEvent({ data, command: context.command }))

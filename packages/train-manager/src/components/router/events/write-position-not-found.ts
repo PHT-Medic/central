@@ -7,19 +7,18 @@
 
 import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
 import { publish } from 'amqp-extension';
-import type { TrainManagerRouterCommand, TrainManagerRouterRoutePayload } from '@personalhealthtrain/central-common';
-import {
-    TrainManagerComponent,
-    TrainManagerRouterEvent,
-} from '@personalhealthtrain/central-common';
+import { Component } from '../../constants';
 import { buildAPIQueueMessage } from '../../utils';
+import { RouterEvent } from '../constants';
+import type { RouterCommand } from '../constants';
+import type { RouterRoutePayload } from '../type';
 
-export async function writePositionNotFoundEvent<T extends TrainManagerRouterRoutePayload>(
-    context: ComponentExecutionContext<`${TrainManagerRouterCommand}`, T>,
+export async function writePositionNotFoundEvent<T extends RouterRoutePayload>(
+    context: ComponentExecutionContext<`${RouterCommand}`, T>,
 ) {
     await publish(buildAPIQueueMessage({
-        event: TrainManagerRouterEvent.POSITION_NOT_FOUND,
-        component: TrainManagerComponent.ROUTER,
+        event: RouterEvent.POSITION_NOT_FOUND,
+        component: Component.ROUTER,
         command: context.command,
         data: context.data,
     }));

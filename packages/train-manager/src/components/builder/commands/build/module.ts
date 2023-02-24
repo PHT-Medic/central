@@ -7,28 +7,31 @@
 
 import type {
     HTTPClient,
-    TrainManagerBuilderBuildPayload,
-    TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 import {
     REGISTRY_ARTIFACT_TAG_LATEST,
     TrainContainerFileName,
 } from '@personalhealthtrain/central-common';
-
 import { useClient } from 'hapic';
 import {
     buildDockerAuthConfig,
     buildRemoteDockerImageURL,
     useDocker,
-    useLogger,
 } from '../../../../core';
+import type { ComponentPayloadExtended } from '../../../type';
+import { extendPayload } from '../../../utils';
+import { BuilderCommand } from '../../constants';
 import { buildTrainDockerFile, packContainerWithTrain } from '../../helpers';
 import { buildDockerImage } from '../../../../core/docker/image-build';
 import { BuilderError } from '../../error';
+import type { BuilderBuildPayload } from '../../type';
+import { useBuilderLogger } from '../../utils';
 
 export async function processBuildCommand(
-    data: TrainManagerQueuePayloadExtended<TrainManagerBuilderBuildPayload>,
-) : Promise<TrainManagerQueuePayloadExtended<TrainManagerBuilderBuildPayload>> {
+    input: BuilderBuildPayload,
+) : Promise<ComponentPayloadExtended<BuilderBuildPayload>> {
+    const data = await extendPayload(input);
+
     if (!data.entity) {
         throw BuilderError.notFound();
     }
@@ -50,15 +53,14 @@ export async function processBuildCommand(
 
     // -----------------------------------------------------------------------------------
 
-    useLogger().debug('Building image...', {
-        component: 'building',
+    useBuilderLogger().debug('Building image...', {
+        command: BuilderCommand.BUILD,
     });
 
     const client = useClient<HTTPClient>();
     const incomingProject = await client.registryProject.getOne(data.entity.incoming_registry_project_id);
 
     data.registryProject = incomingProject;
-    data.registryProjectId = incomingProject.id;
 
     const imageURL = buildRemoteDockerImageURL({
         hostname: data.registry.host,
@@ -81,8 +83,8 @@ export async function processBuildCommand(
 
     // -----------------------------------------------------------------------------------
 
-    useLogger().debug('Creating container...', {
-        component: 'building',
+    useBuilderLogger().debug('Creating container...', {
+        command: BuilderCommand.BUILD,
         imageURL,
     });
 
@@ -91,8 +93,8 @@ export async function processBuildCommand(
 
     // -----------------------------------------------------------------------------------
 
-    useLogger().debug(`Building ${TrainContainerFileName.CONFIG}`, {
-        component: 'building',
+    useBuilderLogger().debug(`Building ${TrainContainerFileName.CONFIG}`, {
+        command: BuilderCommand.BUILD,
     });
 
     await packContainerWithTrain(container, {
@@ -102,8 +104,8 @@ export async function processBuildCommand(
 
     // -----------------------------------------------------------------------------------
 
-    useLogger().debug('Tagging container', {
-        component: 'building',
+    useBuilderLogger().debug('Tagging container', {
+        command: BuilderCommand.BUILD,
     });
 
     await container.commit({

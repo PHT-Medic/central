@@ -7,19 +7,18 @@
 
 import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
 import { publish } from 'amqp-extension';
-import type { TrainManagerExtractorCommand, TrainManagerExtractorExtractQueuePayload } from '@personalhealthtrain/central-common';
-import {
-    TrainManagerComponent,
-    TrainManagerExtractorEvent,
-} from '@personalhealthtrain/central-common';
+import { Component } from '../../constants';
 import { buildAPIQueueMessage } from '../../utils';
+import { ExtractorEvent } from '../constants';
+import type { ExtractorCommand } from '../constants';
+import type { ExtractorExtractPayload } from '../type';
 
-export async function writeExtractingEvent<T extends TrainManagerExtractorExtractQueuePayload>(
-    context: ComponentExecutionContext<`${TrainManagerExtractorCommand}`, T >,
+export async function writeExtractingEvent<T extends ExtractorExtractPayload>(
+    context: ComponentExecutionContext<`${ExtractorCommand}`, T >,
 ) {
     await publish(buildAPIQueueMessage({
-        event: TrainManagerExtractorEvent.EXTRACTING,
-        component: TrainManagerComponent.EXTRACTOR,
+        event: ExtractorEvent.EXTRACTING,
+        component: Component.EXTRACTOR,
         command: context.command,
         data: context.data,
     }));

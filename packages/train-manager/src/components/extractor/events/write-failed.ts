@@ -6,33 +6,27 @@
  */
 
 import type {
-    ComponentExecutionContext,
     ComponentExecutionErrorContext,
 } from '@personalhealthtrain/central-server-common';
 import { publish } from 'amqp-extension';
-import type {
-    TrainManagerExtractorCommand,
-
-    TrainManagerExtractorPayload,
-} from '@personalhealthtrain/central-common';
-import {
-    TrainManagerComponent,
-    TrainManagerExtractorEvent,
-} from '@personalhealthtrain/central-common';
+import { Component } from '../../constants';
 import { ExtractorError } from '../error';
 import { buildAPIQueueMessage } from '../../utils';
 import { BaseError } from '../../error';
+import type { ExtractorCommand } from '../constants';
+import { ExtractorEvent } from '../constants';
+import type { ExtractorPayload } from '../type';
 
 export async function writeFailedEvent(
-    context: ComponentExecutionErrorContext<`${TrainManagerExtractorCommand}`, TrainManagerExtractorPayload<any>>,
+    context: ComponentExecutionErrorContext<`${ExtractorCommand}`, ExtractorPayload<any>>,
 ) {
     const error = context.error instanceof ExtractorError || context.error instanceof BaseError ?
         context.error :
         new ExtractorError({ previous: context.error });
 
     await publish(buildAPIQueueMessage({
-        event: TrainManagerExtractorEvent.FAILED,
-        component: TrainManagerComponent.EXTRACTOR,
+        event: ExtractorEvent.FAILED,
+        component: Component.EXTRACTOR,
         command: context.command,
         data: {
             ...context.data,

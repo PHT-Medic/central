@@ -5,18 +5,24 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TrainManagerBuilderBuildPayload, TrainManagerQueuePayloadExtended } from '@personalhealthtrain/central-common';
 import {
-    REGISTRY_ARTIFACT_TAG_BASE, REGISTRY_ARTIFACT_TAG_LATEST, TrainManagerComponent,
+    REGISTRY_ARTIFACT_TAG_BASE, REGISTRY_ARTIFACT_TAG_LATEST,
 } from '@personalhealthtrain/central-common';
 import {
-    buildDockerAuthConfig, buildRemoteDockerImageURL, pushDockerImage, useLogger,
+    buildDockerAuthConfig, buildRemoteDockerImageURL, pushDockerImage,
 } from '../../../../core';
+import type { ComponentPayloadExtended } from '../../../type';
+import { extendPayload } from '../../../utils';
+import { BuilderCommand } from '../../constants';
 import { BuilderError } from '../../error';
+import type { BuilderBuildPayload } from '../../type';
+import { useBuilderLogger } from '../../utils';
 
 export async function processPushCommand(
-    data: TrainManagerQueuePayloadExtended<TrainManagerBuilderBuildPayload>,
-) : Promise<TrainManagerQueuePayloadExtended<TrainManagerBuilderBuildPayload>> {
+    input: BuilderBuildPayload,
+) : Promise<ComponentPayloadExtended<BuilderBuildPayload>> {
+    const data = await extendPayload(input);
+
     if (!data.entity) {
         throw BuilderError.notFound();
     }
@@ -31,8 +37,8 @@ export async function processPushCommand(
 
     // -----------------------------------------------------------------------------------
 
-    useLogger().debug('Push committed containers as image', {
-        component: TrainManagerComponent.BUILDER,
+    useBuilderLogger().debug('Push committed containers as image', {
+        command: BuilderCommand.BUILD,
     });
 
     const authConfig = buildDockerAuthConfig({
@@ -52,8 +58,8 @@ export async function processPushCommand(
 
     await pushDockerImage(baseImageURL, authConfig);
 
-    useLogger().debug('Pushed image', {
-        component: TrainManagerComponent.BUILDER,
+    useBuilderLogger().debug('Pushed image', {
+        command: BuilderCommand.BUILD,
         image: baseImageURL,
     });
 
@@ -68,8 +74,8 @@ export async function processPushCommand(
 
     await pushDockerImage(latestImageURL, authConfig);
 
-    useLogger().debug('Pushed image', {
-        component: TrainManagerComponent.BUILDER,
+    useBuilderLogger().debug('Pushed image', {
+        command: BuilderCommand.BUILD,
         image: latestImageURL,
     });
 

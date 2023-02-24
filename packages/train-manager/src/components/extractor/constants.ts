@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2022.
+ * Copyright (c) 2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-export enum TrainManagerExtractorEvent {
+export enum ExtractorEvent {
     DOWNLOADING = 'downloading', // rs trigger
     DOWNLOADED = 'downloaded', // rs trigger
 
@@ -19,7 +19,7 @@ export enum TrainManagerExtractorEvent {
     NONE = 'none', // rs trigger
 }
 
-export enum TrainManagerExtractorCommand {
+export enum ExtractorCommand {
     EXTRACT = 'extract',
     CHECK = 'check',
 }

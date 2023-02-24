@@ -12,13 +12,14 @@ import {
     TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
+import { RouterCommand } from '../../../constants';
+import { useRouterLogger } from '../../../utils';
 import type { RouteContextExtended } from '../type';
 import { transferInternal } from '../transfer/internal';
 import { transferEcosystemOut } from '../transfer/ecosystem';
 import { transferOutgoing } from '../transfer/outgoing';
-import { buildDockerAuthConfig } from '../../../../../core/docker/registry';
+import { buildDockerAuthConfig } from '../../../../../core';
 import { moveDockerImage } from '../../../../../core/docker/image-move';
-import { useLogger } from '../../../../../core/log';
 
 export async function routeAggregatorProject(context: RouteContextExtended) : Promise<void> {
     // only handle push events to self ecosystem aggregator project
@@ -29,8 +30,8 @@ export async function routeAggregatorProject(context: RouteContextExtended) : Pr
         return;
     }
 
-    useLogger().debug(`Handle aggregator project ${context.project.name}.`, {
-        component: 'routing',
+    useRouterLogger().debug(`Handle aggregator project ${context.project.name}.`, {
+        command: RouterCommand.ROUTE,
     });
 
     let nextIndex = -1;

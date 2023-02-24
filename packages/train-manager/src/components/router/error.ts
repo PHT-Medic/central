@@ -5,18 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    TrainManagerRouterErrorCode,
-} from '@personalhealthtrain/central-common';
 import type { ErrorOptionsExtended } from '../error';
 import { BaseError } from '../error';
+import { RouterErrorCode } from './constants';
 
 export class RouterError extends BaseError {
     static routeEmpty(
         message?: string,
     ) {
         return new RouterError({
-            code: TrainManagerRouterErrorCode.ROUTE_EMPTY,
+            code: RouterErrorCode.ROUTE_EMPTY,
             message,
         });
     }
@@ -25,7 +23,7 @@ export class RouterError extends BaseError {
         options?: ErrorOptionsExtended,
     ) {
         return new RouterError({
-            code: TrainManagerRouterErrorCode.OPERATOR_INVALID,
+            code: RouterErrorCode.OPERATOR_INVALID,
             ...(options || {}),
         });
     }

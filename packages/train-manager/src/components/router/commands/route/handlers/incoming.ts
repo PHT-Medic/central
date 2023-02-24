@@ -9,7 +9,8 @@ import {
     Ecosystem,
     REGISTRY_ARTIFACT_TAG_BASE,
 } from '@personalhealthtrain/central-common';
-import { useLogger } from '../../../../../core/log';
+import { RouterCommand } from '../../../constants';
+import { useRouterLogger } from '../../../utils';
 import { transferInternal } from '../transfer/internal';
 import { transferEcosystemOut } from '../transfer/ecosystem';
 import type { RouteContextExtended } from '../type';
@@ -18,8 +19,8 @@ export async function routeIncomingProject(context: RouteContextExtended) : Prom
     // move to station repo with index 0.
     const nextIndex = context.items.findIndex((station) => station.index === 0);
     if (nextIndex === -1) {
-        useLogger().debug('Route has no first project index', {
-            component: 'routing',
+        useRouterLogger().debug('Route has no first project index', {
+            command: RouterCommand.ROUTE,
         });
 
         return;

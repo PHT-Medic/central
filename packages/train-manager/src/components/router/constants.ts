@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2022.
+ * Copyright (c) 2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-export enum TrainManagerRouterEvent {
+export enum RouterEvent {
     STARTING = 'starting',
     STARTED = 'started',
 
@@ -23,14 +23,14 @@ export enum TrainManagerRouterEvent {
     FAILED = 'failed',
 }
 
-export enum TrainManagerRouterCommand {
+export enum RouterCommand {
     START = 'start',
     ROUTE = 'route',
     CHECK = 'check',
     RESET = 'reset',
 }
 
-export enum TrainManagerRouterErrorCode {
+export enum RouterErrorCode {
     TRAIN_NOT_BUILD = 'trainNotBuild',
     ROUTE_EMPTY = 'routeEmpty',
     OPERATOR_INVALID = 'operatorInvalid',

@@ -6,7 +6,9 @@
  */
 
 export * from './commands';
+export * from './constants';
 export * from './events';
 export * from './helpers';
 export * from './error';
 export * from './module';
+export * from './type';

@@ -8,14 +8,14 @@
 import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
 import { isComponentQueuePayload } from '@personalhealthtrain/central-server-common';
 import { consume } from 'amqp-extension';
-import { TrainManagerComponent } from '@personalhealthtrain/central-common';
+import { Component } from '../../../components/constants';
 import { executeExtractorCommand } from '../../../components/extractor';
 import { executeBuilderCommand } from '../../../components/builder';
 import { executeRouterCommand } from '../../../components/router';
-import { useLogger } from '../../index';
+import { useLogger } from '../../log';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
 
-export function buildCommandRouterComponent() {
+export function buildComponentRouter() {
     function start() {
         return consume({
             exchange: { routingKey: ROUTER_QUEUE_ROUTING_KEY },
@@ -37,15 +37,15 @@ export function buildCommandRouterComponent() {
                 };
 
                 switch (payload.metadata.component) {
-                    case TrainManagerComponent.BUILDER: {
+                    case Component.BUILDER: {
                         await executeBuilderCommand(context);
                         break;
                     }
-                    case TrainManagerComponent.EXTRACTOR: {
+                    case Component.EXTRACTOR: {
                         await executeExtractorCommand(context);
                         break;
                     }
-                    case TrainManagerComponent.ROUTER: {
+                    case Component.ROUTER: {
                         await executeRouterCommand(context);
                         break;
                     }

@@ -5,10 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    TrainManagerExtractorExtractQueuePayload,
-    TrainManagerQueuePayloadExtended,
-} from '@personalhealthtrain/central-common';
 import { Writable } from 'node:stream';
 import {
     generateTrainMinioBucketName,
@@ -19,18 +15,29 @@ import {
     saveDockerContainerPathsTo,
     useMinio,
 } from '../../../../core';
+import type { ComponentPayloadExtended } from '../../../type';
+import { extendPayload } from '../../../utils';
+import { ExtractorCommand } from '../../constants';
 import { ExtractorError } from '../../error';
+import type { ExtractorExtractPayload } from '../../type';
+import { useExtractorLogger } from '../../utils';
 
 export async function processExtractCommand(
-    data: TrainManagerQueuePayloadExtended<TrainManagerExtractorExtractQueuePayload>,
-) : Promise<TrainManagerQueuePayloadExtended<TrainManagerExtractorExtractQueuePayload>> {
+    input: ExtractorExtractPayload,
+) : Promise<ComponentPayloadExtended<ExtractorExtractPayload>> {
+    useExtractorLogger().debug('Executing command', {
+        command: ExtractorCommand.EXTRACT,
+    });
+
+    const data = await extendPayload(input);
+
     if (!data.registry) {
         throw ExtractorError.registryNotFound();
     }
 
     if (!data.registryProject) {
         throw ExtractorError.registryProjectNotFound({
-            message: 'There was no registry-project during the download process.',
+            message: 'There was no registry-project found during the download process.',
         });
     }
 

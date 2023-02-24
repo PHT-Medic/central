@@ -7,23 +7,19 @@
 
 import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
 import { publish } from 'amqp-extension';
-import type {
-    TrainManagerBuilderCheckPayload,
-    TrainManagerBuilderCommand,
-} from '@personalhealthtrain/central-common';
-import {
-    TrainManagerBuilderEvent,
-    TrainManagerComponent,
-} from '@personalhealthtrain/central-common';
+import { Component } from '../../constants';
 import { buildAPIQueueMessage } from '../../utils';
+import type { BuilderCommand } from '../constants';
+import { BuilderEvent } from '../constants';
+import type { BuilderCheckPayload } from '../type';
 
-export async function writeNoneEvent<T extends TrainManagerBuilderCheckPayload>(
-    context: ComponentExecutionContext<TrainManagerBuilderCommand, T>,
+export async function writeNoneEvent<T extends BuilderCheckPayload>(
+    context: ComponentExecutionContext<BuilderCommand, T>,
 ) {
     await publish(buildAPIQueueMessage({
-        event: TrainManagerBuilderEvent.NONE,
+        event: BuilderEvent.NONE,
         command: context.command,
-        component: TrainManagerComponent.BUILDER,
+        component: Component.BUILDER,
         data: context.data, //  { id: 'xxx' }
     }));
 

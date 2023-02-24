@@ -16,6 +16,8 @@ import {
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from 'hapic';
 import type { Client as HarborClient } from '@hapic/harbor';
+import { RouterCommand } from '../../../constants';
+import { useRouterLogger } from '../../../utils';
 import type { TransferItem } from './type';
 import { useLogger } from '../../../../../core/log';
 import { transferInterRegistry } from './registry';
@@ -39,9 +41,10 @@ export async function transferInternal(context: TransferContext) {
         return;
     }
 
-    useLogger().debug(`Move repository ${context.source.repositoryName} internal from ${context.source.project.name} project to ${context.destination.project.name} project`, {
-        component: 'routing',
-    });
+    useRouterLogger()
+        .debug(`Move repository ${context.source.repositoryName} internal from ${context.source.project.name} project to ${context.destination.project.name} project`, {
+            command: RouterCommand.ROUTE,
+        });
 
     if (!context.registry) {
         const client = useClient<HTTPClient>();

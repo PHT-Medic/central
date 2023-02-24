@@ -10,22 +10,27 @@ import { parseProjectRepositoryName } from '@hapic/harbor';
 import type {
     HTTPClient,
     RegistryProject,
-    TrainManagerQueuePayloadExtended,
-    TrainManagerRouterStatusPayload,
 } from '@personalhealthtrain/central-common';
 import {
     RegistryProjectType,
-    TrainManagerRouterCommand,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from 'hapic';
 import { createBasicHarborAPIConfig } from '../../../../core';
+import type { ComponentPayloadExtended } from '../../../type';
+import { extendPayload } from '../../../utils';
+import { RouterCommand } from '../../constants';
 import { RouterError } from '../../error';
 import { writePositionFoundEvent, writePositionNotFoundEvent } from '../../events';
+import type { RouterStatusPayload } from '../../type';
+import { useRouterLogger } from '../../utils';
 
-export async function processCheckCommand(
-    data: TrainManagerQueuePayloadExtended<TrainManagerRouterStatusPayload>,
-) : Promise<TrainManagerQueuePayloadExtended<TrainManagerRouterStatusPayload>> {
+export async function processCheckCommand(input: RouterStatusPayload) : Promise<ComponentPayloadExtended<RouterStatusPayload>> {
+    useRouterLogger().debug('Executing command.', {
+        command: RouterCommand.CHECK,
+    });
+
+    const data = await extendPayload(input);
     if (!data.registry) {
         throw RouterError.registryNotFound();
     }
@@ -66,7 +71,7 @@ export async function processCheckCommand(
             harborRepository.artifact_count > 0
         ) {
             await writePositionFoundEvent({
-                command: TrainManagerRouterCommand.CHECK,
+                command: RouterCommand.CHECK,
                 data: {
                     artifactTag: null,
                     operator: null,
@@ -101,7 +106,7 @@ export async function processCheckCommand(
 
                 await writePositionFoundEvent(
                     {
-                        command: TrainManagerRouterCommand.CHECK,
+                        command: RouterCommand.CHECK,
                         data: {
                             artifactTag: null,
                             operator: null,
@@ -117,7 +122,7 @@ export async function processCheckCommand(
     }
 
     await writePositionNotFoundEvent({
-        command: TrainManagerRouterCommand.CHECK,
+        command: RouterCommand.CHECK,
         data: {
             artifactTag: null,
             operator: null,

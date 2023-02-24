@@ -7,16 +7,16 @@
 
 import type { ComponentExecutionErrorContext } from '@personalhealthtrain/central-server-common';
 import { publish } from 'amqp-extension';
-import type { TrainManagerBuilderCommand, TrainManagerBuilderPayload } from '@personalhealthtrain/central-common';
-import {
-    TrainManagerBuilderEvent, TrainManagerComponent,
-} from '@personalhealthtrain/central-common';
+import { Component } from '../../constants';
 import { buildAPIQueueMessage } from '../../utils';
+import { BuilderEvent } from '../constants';
+import type { BuilderCommand } from '../constants';
 import { BuilderError } from '../error';
 import { BaseError } from '../../error';
+import type { BuilderPayload } from '../type';
 
 export async function writeFailedEvent(
-    context: ComponentExecutionErrorContext<`${TrainManagerBuilderCommand}`, TrainManagerBuilderPayload<any>>,
+    context: ComponentExecutionErrorContext<`${BuilderCommand}`, BuilderPayload<any>>,
 ) {
     const error = context.error instanceof BuilderError ||
         context.error instanceof BaseError ?
@@ -24,8 +24,8 @@ export async function writeFailedEvent(
         new BuilderError({ previous: context.error });
 
     await publish(buildAPIQueueMessage({
-        event: TrainManagerBuilderEvent.FAILED,
-        component: TrainManagerComponent.BUILDER,
+        event: BuilderEvent.FAILED,
+        component: Component.BUILDER,
         command: context.command,
         data: {
             ...context.data,

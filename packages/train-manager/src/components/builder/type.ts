@@ -6,13 +6,27 @@
  */
 
 import type {
-    TrainManagerBuilderBuildPayload,
-    TrainManagerBuilderCheckPayload,
-    TrainManagerBuilderCommand,
+    Train,
 } from '@personalhealthtrain/central-common';
 import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
+import type { BuilderCommand } from './constants';
 
-type TrainBuilderCheckExecutionContext = ComponentExecutionContext<TrainManagerBuilderCommand.CHECK, TrainManagerBuilderCheckPayload>;
-type TrainBuilderBuildExecutionContext = ComponentExecutionContext<TrainManagerBuilderCommand.BUILD, TrainManagerBuilderBuildPayload>;
+export type BuilderBuildPayload = {
+    id: Train['id']
+};
+
+export type BuilderCheckPayload = {
+    id: Train['id']
+};
+
+export type BuilderPayload<C extends `${BuilderCommand}`> =
+    C extends `${BuilderCommand.BUILD}` ?
+        BuilderBuildPayload :
+        C extends `${BuilderCommand.CHECK}` ?
+            BuilderCheckPayload :
+            never;
+
+type TrainBuilderCheckExecutionContext = ComponentExecutionContext<BuilderCommand.CHECK, BuilderCheckPayload>;
+type TrainBuilderBuildExecutionContext = ComponentExecutionContext<BuilderCommand.BUILD, BuilderBuildPayload>;
 
 export type TrainBuilderExecutionContext = TrainBuilderCheckExecutionContext | TrainBuilderBuildExecutionContext;

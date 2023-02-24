@@ -7,20 +7,20 @@
 
 import {
     Ecosystem, REGISTRY_ARTIFACT_TAG_BASE,
-    TrainManagerRouterErrorCode,
 } from '@personalhealthtrain/central-common';
+import { RouterCommand, RouterErrorCode } from '../../../constants';
+import { useRouterLogger } from '../../../utils';
 import type { RouteContextExtended } from '../type';
 import { transferInternal } from '../transfer/internal';
 import { transferEcosystemOut } from '../transfer/ecosystem';
 import { transferOutgoing } from '../transfer/outgoing';
 import { RouterError } from '../../../error';
-import { useLogger } from '../../../../../core/log';
 
 export async function routeStationProject(context: RouteContextExtended) : Promise<void> {
     const index = context.items.findIndex((station) => station.registry_project_id === context.project.id);
     if (index === -1) {
         throw RouterError.registryProjectNotFound({
-            type: TrainManagerRouterErrorCode.UNKNOWN,
+            type: RouterErrorCode.UNKNOWN,
             message: 'The current station could not be found.',
         });
     }
@@ -34,8 +34,8 @@ export async function routeStationProject(context: RouteContextExtended) : Promi
         return;
     }
 
-    useLogger().debug(`Handle station project ${context.project.name}.`, {
-        component: 'routing',
+    useRouterLogger().debug(`Handle station project ${context.project.name}.`, {
+        command: RouterCommand.ROUTE,
     });
 
     const nextIndex = context.items.findIndex((station) => station.index === currentStation.index + 1);

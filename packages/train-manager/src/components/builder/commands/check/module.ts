@@ -8,22 +8,25 @@
 import type { Client as HarborClient } from '@hapic/harbor';
 import type {
     HTTPClient,
-    TrainManagerBuilderCheckPayload,
-    TrainManagerQueuePayloadExtended,
 } from '@personalhealthtrain/central-common';
 import {
-    TrainManagerBuilderCommand,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 
 import { createClient, useClient } from 'hapic';
 import { createBasicHarborAPIConfig } from '../../../../core';
+import type { ComponentPayloadExtended } from '../../../type';
+import { extendPayload } from '../../../utils';
+import { BuilderCommand } from '../../constants';
 import { BuilderError } from '../../error';
 import { writeBuiltEvent, writeNoneEvent } from '../../events';
+import type { BuilderCheckPayload } from '../../type';
 
 export async function processCheckCommand(
-    data: TrainManagerQueuePayloadExtended<TrainManagerBuilderCheckPayload>,
-) : Promise<TrainManagerQueuePayloadExtended<TrainManagerBuilderCheckPayload>> {
+    input: BuilderCheckPayload,
+) : Promise<ComponentPayloadExtended<BuilderCheckPayload>> {
+    const data = await extendPayload(input);
+
     if (!data.entity) {
         throw BuilderError.notFound();
     }
@@ -34,7 +37,7 @@ export async function processCheckCommand(
 
     if (!data.entity.incoming_registry_project_id) {
         await writeNoneEvent({
-            command: TrainManagerBuilderCommand.CHECK,
+            command: BuilderCommand.CHECK,
             data,
         });
 
@@ -59,14 +62,14 @@ export async function processCheckCommand(
     ) {
         await writeBuiltEvent({
             data,
-            command: TrainManagerBuilderCommand.CHECK,
+            command: BuilderCommand.CHECK,
         });
 
         return data;
     }
 
     await writeNoneEvent({
-        command: TrainManagerBuilderCommand.CHECK,
+        command: BuilderCommand.CHECK,
         data,
     });
 

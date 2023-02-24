@@ -7,22 +7,18 @@
 
 import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
 import { publish } from 'amqp-extension';
-import type {
-    TrainManagerRouterCommand,
-    TrainManagerRouterStartPayload,
-} from '@personalhealthtrain/central-common';
-import {
-    TrainManagerComponent,
-    TrainManagerRouterEvent,
-} from '@personalhealthtrain/central-common';
+import { Component } from '../../constants';
 import { buildAPIQueueMessage } from '../../utils';
+import type { RouterCommand } from '../constants';
+import { RouterEvent } from '../constants';
+import type { RouterStartPayload } from '../type';
 
-export async function writeStartingEvent<T extends TrainManagerRouterStartPayload>(
-    context: ComponentExecutionContext<`${TrainManagerRouterCommand}`, T>,
+export async function writeStartingEvent<T extends RouterStartPayload>(
+    context: ComponentExecutionContext<`${RouterCommand}`, T>,
 ) {
     await publish(buildAPIQueueMessage({
-        event: TrainManagerRouterEvent.STARTING,
-        component: TrainManagerComponent.ROUTER,
+        event: RouterEvent.STARTING,
+        component: Component.ROUTER,
         command: context.command,
         data: context.data,
     }));
