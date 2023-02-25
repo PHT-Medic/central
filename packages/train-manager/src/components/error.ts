@@ -27,7 +27,7 @@ export class BaseError extends ComponentError {
     // --------------------------------------------------------------------
 
     static notFound(options?: ErrorOptionsExtended) {
-        return new this({
+        return new BaseError({
             code: ErrorCode.NOT_FOUND,
             ...(options || {}),
         });
@@ -36,7 +36,7 @@ export class BaseError extends ComponentError {
     static registryNotFound(
         options?: ErrorOptionsExtended,
     ) {
-        return new this({
+        return new BaseError({
             code: ErrorCode.REGISTRY_NOT_FOUND,
             ...(options || {}),
         });
@@ -45,7 +45,7 @@ export class BaseError extends ComponentError {
     static registryProjectNotFound(
         options?: ErrorOptionsExtended,
     ) {
-        return new this({
+        return new BaseError({
             code: ErrorCode.REGISTRY_PROJECT_NOT_FOUND,
             ...(options || {}),
         });
