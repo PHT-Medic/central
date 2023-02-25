@@ -5,24 +5,28 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
-import { isComponentQueuePayload } from '@personalhealthtrain/central-server-common';
+import type {
+    Component,
+} from '@personalhealthtrain/central-server-common';
+import { isComponentCommandQueuePayload } from '@personalhealthtrain/central-server-common';
 import { consume } from 'amqp-extension';
-import { Component } from '../../../components/constants';
-import { executeExtractorCommand } from '../../../components/extractor';
-import { executeBuilderCommand } from '../../../components/builder';
-import { executeRouterCommand } from '../../../components/router';
-import { useLogger } from '../../log';
+import { ComponentName } from '../../../constants';
+import {
+    executeBuilderCommand,
+    executeExtractorCommand,
+    executeRouterCommand,
+} from '../../../index';
+import { useLogger } from '../../../../core';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
 
-export function buildComponentRouter() {
+export function buildComponentRouter() : Component {
     function start() {
         return consume({
             exchange: { routingKey: ROUTER_QUEUE_ROUTING_KEY },
         }, {
             $any: async (message) => {
                 const payload = JSON.parse(message.content.toString('utf-8'));
-                if (!isComponentQueuePayload(payload)) {
+                if (!isComponentCommandQueuePayload(payload)) {
                     useLogger().warn('The queue payload could not be read as component queue payload.');
                 }
 
@@ -31,21 +35,21 @@ export function buildComponentRouter() {
                     command: payload.metadata.command,
                 });
 
-                const context : ComponentExecutionContext<any, any> = {
-                    command: payload.metadataa.command,
+                const context = {
+                    command: payload.metadata.command,
                     data: payload.data,
                 };
 
                 switch (payload.metadata.component) {
-                    case Component.BUILDER: {
+                    case ComponentName.BUILDER: {
                         await executeBuilderCommand(context);
                         break;
                     }
-                    case Component.EXTRACTOR: {
+                    case ComponentName.EXTRACTOR: {
                         await executeExtractorCommand(context);
                         break;
                     }
-                    case Component.ROUTER: {
+                    case ComponentName.ROUTER: {
                         await executeRouterCommand(context);
                         break;
                     }

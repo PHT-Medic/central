@@ -6,24 +6,40 @@
  */
 
 import type { ObjectLiteral } from '../../type';
-import type { QueuePayload } from '../queue';
+import type { QueuePayload, QueuePayloadError } from '../queue';
+import type { ComponentError } from './error';
 
-export type ComponentExecutionContext<
-    C extends string = string,
-    T extends ObjectLiteral = ObjectLiteral,
-> = {
-    command: C,
-    data: T
+export type Component = {
+    start: () => void
 };
 
-export type ComponentExecutionErrorContext<
-    C extends string = string,
+export type ComponentContextWithError<
     T extends ObjectLiteral = ObjectLiteral,
-> = ComponentExecutionContext<C, T> & {
-    error: Error
+> = T & {
+    error: ComponentError | Error
 };
 
-export type ComponentQueuePayload = QueuePayload<ObjectLiteral, {
+export type ComponentContextWithCommand<
+    T extends ObjectLiteral = ObjectLiteral,
+    C extends string = string,
+> = Omit<T, 'command'> & {
+    command: C
+};
+
+export type ComponentCommandQueuePayload<
+    T extends ObjectLiteral = ObjectLiteral,
+    M extends ObjectLiteral = ObjectLiteral,
+> = QueuePayload<T, {
+    command: string,
+    component: string
+} & M>;
+
+export type ComponentEventQueuePayload<
+    T extends ObjectLiteral = ObjectLiteral,
+    M extends ObjectLiteral = ObjectLiteral,
+> = QueuePayload<T, {
+    command: string,
     component: string,
-    command: string
-}>;
+    event: string,
+    error?: QueuePayloadError
+} & M>;

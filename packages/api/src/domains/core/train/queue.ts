@@ -6,14 +6,14 @@
  */
 
 import type { PublishOptionsExtended } from 'amqp-extension';
-import type { RouterQueuePayload, TrainPayload } from '../../../components';
+import type { QueueRouterPayload, TrainPayload } from '../../../components';
 import { ComponentName, ROUTER_QUEUE_ROUTING_KEY } from '../../../components';
 import type { TrainCommand } from '../../../components/train/constants';
 
 export function buildTrainQueueMessage(
     type: TrainCommand,
     data: TrainPayload<any>,
-) : PublishOptionsExtended<RouterQueuePayload<TrainPayload<any>>> {
+) : PublishOptionsExtended<QueueRouterPayload<TrainPayload<any>>> {
     return {
         exchange: {
             routingKey: ROUTER_QUEUE_ROUTING_KEY,

@@ -20,7 +20,7 @@ import { writeExtractedEvent, writeNoneEvent } from '../../events';
 import type { ExtractorExtractPayload } from '../../type';
 import { useExtractorLogger } from '../../utils';
 
-export async function processCheckCommand(
+export async function executeExtractorCheckCommand(
     input: ExtractorExtractPayload,
 ) : Promise<ComponentPayloadExtended<ExtractorExtractPayload>> {
     useExtractorLogger().debug('Executing command', {

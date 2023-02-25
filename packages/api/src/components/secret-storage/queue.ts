@@ -7,7 +7,7 @@
 
 import type { PublishOptionsExtended } from 'amqp-extension';
 import { ComponentName } from '../constants';
-import type { RouterQueuePayload } from '../router';
+import type { QueueRouterPayload } from '../router';
 import { ROUTER_QUEUE_ROUTING_KEY } from '../router';
 import type { SecretStorageCommand } from './constants';
 import type {
@@ -17,7 +17,7 @@ import type {
 export function buildSecretStorageQueueMessage(
     type: SecretStorageCommand,
     data: SecretStorageQueuePayload,
-) : PublishOptionsExtended<RouterQueuePayload<SecretStorageQueuePayload>> {
+) : PublishOptionsExtended<QueueRouterPayload<SecretStorageQueuePayload>> {
     return {
         exchange: {
             routingKey: ROUTER_QUEUE_ROUTING_KEY,

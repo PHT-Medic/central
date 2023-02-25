@@ -27,7 +27,7 @@ import { BuilderError } from '../../error';
 import type { BuilderBuildPayload } from '../../type';
 import { useBuilderLogger } from '../../utils';
 
-export async function processBuildCommand(
+export async function executeBuilderBuildCommand(
     input: BuilderBuildPayload,
 ) : Promise<ComponentPayloadExtended<BuilderBuildPayload>> {
     const data = await extendPayload(input);

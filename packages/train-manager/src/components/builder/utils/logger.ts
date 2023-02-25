@@ -9,7 +9,7 @@ import path from 'node:path';
 import type { Logger } from 'winston';
 import { createLogger, format, transports } from 'winston';
 import { getWritableDirPath } from '../../../config';
-import { Component } from '../../constants';
+import { ComponentName } from '../../constants';
 
 let instance : Logger | undefined;
 
@@ -21,7 +21,7 @@ export function useBuilderLogger() : Logger {
     instance = createLogger({
         format: format.json(),
         defaultMeta: {
-            component: Component.BUILDER,
+            component: ComponentName.BUILDER,
         },
         level: 'debug',
         transports: [

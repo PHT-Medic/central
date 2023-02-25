@@ -22,10 +22,10 @@ import { extendPayload } from '../../../utils';
 import { RouterCommand } from '../../constants';
 import { RouterError } from '../../error';
 import { writePositionFoundEvent, writePositionNotFoundEvent } from '../../events';
-import type { RouterStatusPayload } from '../../type';
+import type { RouterCheckPayload } from '../../type';
 import { useRouterLogger } from '../../utils';
 
-export async function processCheckCommand(input: RouterStatusPayload) : Promise<ComponentPayloadExtended<RouterStatusPayload>> {
+export async function executeRouterCheckCommand(input: RouterCheckPayload) : Promise<ComponentPayloadExtended<RouterCheckPayload>> {
     useRouterLogger().debug('Executing command.', {
         command: RouterCommand.CHECK,
     });

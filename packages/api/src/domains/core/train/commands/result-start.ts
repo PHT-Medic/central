@@ -6,16 +6,14 @@
  */
 
 import { BadRequestError } from '@ebec/http';
+import { ExtractorCommand, buildExtractorQueuePayload } from '@personalhealthtrain/train-manager';
 import { publish } from 'amqp-extension';
 import {
     TrainContainerPath,
-    TrainManagerComponent,
-    TrainManagerExtractorCommand,
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import { buildTrainManagerPayload } from '../../../special/train-manager';
 import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
 
@@ -32,9 +30,8 @@ export async function triggerTrainResultStart(
     }
 
     // send queue message
-    await publish(buildTrainManagerPayload({
-        component: TrainManagerComponent.EXTRACTOR,
-        command: TrainManagerExtractorCommand.EXTRACT,
+    await publish(buildExtractorQueuePayload({
+        command: ExtractorCommand.EXTRACT,
         data: {
             id: train.id,
 

@@ -7,7 +7,7 @@
 
 import type { PublishOptionsExtended } from 'amqp-extension';
 import { ComponentName } from '../constants';
-import type { RouterQueuePayload } from '../router';
+import type { QueueRouterPayload } from '../router';
 import { ROUTER_QUEUE_ROUTING_KEY } from '../router';
 import type { StationRegistryComponentCommand } from './consants';
 import type { StationRegistryComponentPayload } from './type';
@@ -15,7 +15,7 @@ import type { StationRegistryComponentPayload } from './type';
 export function buildStationRegistryQueueMessage(
     command: StationRegistryComponentCommand,
     data: StationRegistryComponentPayload,
-) : PublishOptionsExtended<RouterQueuePayload<StationRegistryComponentPayload>> {
+) : PublishOptionsExtended<QueueRouterPayload<StationRegistryComponentPayload>> {
     return {
         exchange: {
             routingKey: ROUTER_QUEUE_ROUTING_KEY,

@@ -6,16 +6,14 @@
  */
 
 import { BadRequestError } from '@ebec/http';
+import { RouterCommand, buildRouterQueuePayload } from '@personalhealthtrain/train-manager';
 import { publish } from 'amqp-extension';
 import {
-    TrainManagerComponent,
-    TrainManagerRouterCommand,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
 import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
-import { buildTrainManagerPayload } from '../../../special/train-manager';
 
 export async function startTrain(train: TrainEntity | string) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
@@ -29,9 +27,8 @@ export async function startTrain(train: TrainEntity | string) : Promise<TrainEnt
     ) {
         throw new BadRequestError('The train has already been started...');
     } else {
-        await publish(buildTrainManagerPayload({
-            component: TrainManagerComponent.ROUTER,
-            command: TrainManagerRouterCommand.START,
+        await publish(buildRouterQueuePayload({
+            command: RouterCommand.START,
             data: {
                 id: train.id,
             },

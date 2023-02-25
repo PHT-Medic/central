@@ -27,7 +27,7 @@ import { RouterError } from '../../error';
 import { routeOutgoingProject } from './handlers/outgoing';
 import type { StationExtended } from './type';
 
-export async function processRouteCommand(
+export async function executeRouterRouteCommand(
     data: RouterRoutePayload,
 ) {
     useRouterLogger().debug('Executing command.', {

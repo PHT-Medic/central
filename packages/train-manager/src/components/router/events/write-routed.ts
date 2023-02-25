@@ -5,20 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
+import type { ComponentContextWithCommand } from '@personalhealthtrain/central-server-common';
 import { publish } from 'amqp-extension';
-import { buildAPIQueueMessage } from '../../utils';
-import { RouterEvent } from '../constants';
 import type { RouterCommand } from '../constants';
-import type { RouterRoutePayload } from '../type';
-import { Component } from '../../constants';
+import { RouterEvent } from '../constants';
+import type { RouterRouteCommandContext } from '../type';
+import { buildRouterAggregatorQueuePayload } from '../utils';
 
-export async function writeRoutedEvent<T extends RouterRoutePayload>(
-    context: ComponentExecutionContext<`${RouterCommand}`, T>,
+export async function writeRoutedEvent(
+    context: ComponentContextWithCommand<
+    RouterRouteCommandContext,
+        `${RouterCommand.ROUTE}` | `${RouterCommand.CHECK}`
+    >,
 ) {
-    await publish(buildAPIQueueMessage({
+    await publish(buildRouterAggregatorQueuePayload({
         event: RouterEvent.ROUTED,
-        component: Component.ROUTER,
         command: context.command,
         data: context.data,
     }));

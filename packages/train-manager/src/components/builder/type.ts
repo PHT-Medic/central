@@ -8,8 +8,7 @@
 import type {
     Train,
 } from '@personalhealthtrain/central-common';
-import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
-import type { BuilderCommand } from './constants';
+import type { BuilderCommand, BuilderEvent } from './constants';
 
 export type BuilderBuildPayload = {
     id: Train['id']
@@ -19,14 +18,31 @@ export type BuilderCheckPayload = {
     id: Train['id']
 };
 
-export type BuilderPayload<C extends `${BuilderCommand}`> =
-    C extends `${BuilderCommand.BUILD}` ?
-        BuilderBuildPayload :
-        C extends `${BuilderCommand.CHECK}` ?
-            BuilderCheckPayload :
-            never;
+export type BuilderBuildCommandContext = {
+    command: `${BuilderCommand.BUILD}`,
+    data: BuilderBuildPayload,
+};
 
-type TrainBuilderCheckExecutionContext = ComponentExecutionContext<BuilderCommand.CHECK, BuilderCheckPayload>;
-type TrainBuilderBuildExecutionContext = ComponentExecutionContext<BuilderCommand.BUILD, BuilderBuildPayload>;
+export type BuilderCheckCommandContext = {
+    command: `${BuilderCommand.CHECK}`,
+    data: BuilderCheckPayload
+};
 
-export type TrainBuilderExecutionContext = TrainBuilderCheckExecutionContext | TrainBuilderBuildExecutionContext;
+export type BuilderBuildEventContext = Omit<BuilderBuildCommandContext, 'command'> & {
+    command: `${BuilderCommand.BUILD}` | `${BuilderCommand.CHECK}`,
+    event: `${BuilderEvent.FAILED}` |
+        `${BuilderEvent.BUILT}` |
+        `${BuilderEvent.BUILDING}` |
+        `${BuilderEvent.PUSHED}` |
+        `${BuilderEvent.PUSHING}`;
+};
+
+export type BuilderCheckEventContext = BuilderCheckCommandContext & {
+    event: `${BuilderEvent.FAILED}` |
+        `${BuilderEvent.CHECKED}` |
+        `${BuilderEvent.CHECKING}` |
+        `${BuilderEvent.NONE}`;
+};
+
+export type BuilderCommandContext = BuilderCheckCommandContext | BuilderBuildCommandContext;
+export type BuilderEventContext = BuilderCheckEventContext | BuilderBuildEventContext;

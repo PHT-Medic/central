@@ -6,8 +6,7 @@
  */
 
 import type { Train } from '@personalhealthtrain/central-common';
-import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
-import type { RouterCommand } from './constants';
+import type { RouterCommand, RouterEvent } from './constants';
 
 export type RouterRoutePayload = {
     repositoryName: string,
@@ -16,23 +15,71 @@ export type RouterRoutePayload = {
     artifactTag: string
 };
 
+export type RouterResetPayload = {
+    id: Train['id']
+};
+
 export type RouterStartPayload = {
     id: Train['id']
 };
 
-export type RouterStatusPayload = {
+export type RouterCheckPayload = {
     id: Train['id']
 };
 
-export type RouterPayload<C extends `${RouterCommand}`> =
-    C extends `${RouterCommand.START}` | `${RouterCommand.RESET}` ?
-        RouterStartPayload :
-        C extends `${RouterCommand.CHECK}` ?
-            RouterStatusPayload :
-            C extends `${RouterCommand.ROUTE}` ?
-                RouterRoutePayload :
-                never;
+export type RouterCheckCommandContext = {
+    command: `${RouterCommand.CHECK}`,
+    data: RouterCheckPayload
+};
 
-export type RouterExecutionContext = ComponentExecutionContext<RouterCommand.CHECK, RouterStatusPayload> |
-ComponentExecutionContext<RouterCommand.ROUTE, RouterRoutePayload> |
-ComponentExecutionContext<RouterCommand.START, RouterStartPayload>;
+export type RouterRouteCommandContext = {
+    command: `${RouterCommand.ROUTE}`,
+    data: RouterRoutePayload
+};
+
+export type RouterResetCommandContext = {
+    command: `${RouterCommand.RESET}`,
+    data: RouterResetPayload
+};
+
+export type RouterStartCommandContext = {
+    command: `${RouterCommand.START}`,
+    data: RouterStartPayload
+};
+
+export type RouterCheckEventContext = RouterCheckCommandContext & {
+    event: `${RouterEvent.FAILED}` |
+        `${RouterEvent.CHECKED}` |
+        `${RouterEvent.CHECKING}`;
+};
+
+export type RouterRouteEventContext = Omit<RouterRouteCommandContext, 'command'> & {
+    command: `${RouterCommand.ROUTE}` | `${RouterCommand.CHECK}`,
+    event: `${RouterEvent.FAILED}` |
+        `${RouterEvent.POSITION_FOUND}` |
+        `${RouterEvent.POSITION_NOT_FOUND}` |
+        `${RouterEvent.ROUTED}` |
+        `${RouterEvent.ROUTING}`
+};
+
+export type RouterResetEventContext = Omit<RouterResetCommandContext, 'command'> & {
+    command: `${RouterCommand.RESET}` | `${RouterCommand.CHECK}`,
+    event: `${RouterEvent.FAILED}`;
+};
+
+export type RouterStartEventContext = Omit<RouterStartCommandContext, 'command'> & {
+    command: `${RouterCommand.START}` | `${RouterCommand.CHECK}`,
+    event: `${RouterEvent.FAILED}` |
+        `${RouterEvent.STARTED}` |
+        `${RouterEvent.STARTING}`;
+};
+
+export type RouterCommandContext = RouterCheckCommandContext |
+RouterRouteCommandContext |
+RouterResetCommandContext |
+RouterStartCommandContext;
+
+export type RouterEventContext = RouterCheckEventContext |
+RouterRouteEventContext |
+RouterResetEventContext |
+RouterStartEventContext;

@@ -17,7 +17,7 @@ import { ExtractorError } from '../../error';
 import type { ExtractorExtractPayload } from '../../type';
 import { useExtractorLogger } from '../../utils';
 
-export async function downloadImage(
+export async function executeExtractorDownloadCommand(
     input: ExtractorExtractPayload,
 ) : Promise<ComponentPayloadExtended<ExtractorExtractPayload>> {
     useExtractorLogger().debug('Executing command', {

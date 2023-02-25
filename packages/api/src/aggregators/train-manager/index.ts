@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './building';
-export * from './extracting';
+export * from './builder';
+export * from './extractor';
 export * from './module';
-export * from './routing';
-export * from './type';
+export * from './router';

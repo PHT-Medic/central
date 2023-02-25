@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { hasOwnProperty } from '@personalhealthtrain/central-common';
 import type {
     HTTPClient, Registry, Train,
 } from '@personalhealthtrain/central-common';
@@ -53,4 +54,20 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
         entity: train,
         registry,
     };
+}
+
+export function cleanupPayload<T extends Record<string, any>>(payload: T): T {
+    if (hasOwnProperty(payload, 'entity')) {
+        delete payload.entity;
+    }
+
+    if (hasOwnProperty(payload, 'registry')) {
+        delete payload.registry;
+    }
+
+    if (hasOwnProperty(payload, 'registryProject')) {
+        delete payload.registryProject;
+    }
+
+    return payload;
 }

@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { readBoolFromProcessEnv, readFromProcessEnv, readIntFromProcessEnv } from '@authup/server-common';
 import { config } from 'dotenv';
 import path from 'node:path';
 import type { EnvironmentName } from './constants';
 import type { Environment } from './type';
-import { requireBooleanFromEnv, requireFromEnv, requireIntegerFromEnv } from './utils';
 
 config({
     debug: false,
@@ -30,23 +30,23 @@ export function useEnv(key?: string) : any {
     }
 
     instance = {
-        env: requireFromEnv('NODE_ENV', 'development') as `${EnvironmentName}`,
-        port: requireIntegerFromEnv('PORT', 3002),
+        env: readFromProcessEnv('NODE_ENV', 'development') as `${EnvironmentName}`,
+        port: readIntFromProcessEnv('PORT', 3002),
 
-        jwtMaxAge: requireIntegerFromEnv('JWT_MAX_AGE', 3600),
+        jwtMaxAge: readIntFromProcessEnv('JWT_MAX_AGE', 3600),
 
-        minioConnectionString: requireFromEnv('MINIO_CONNECTION_STRING', 'http://admin:start123@127.0.0.1:9000'),
-        redisConnectionString: requireFromEnv('REDIS_CONNECTION_STRING', 'redis://127.0.0.1'),
-        rabbitMqConnectionString: requireFromEnv('RABBITMQ_CONNECTION_STRING', 'amqp://root:start123@127.0.0.1'),
-        vaultConnectionString: requireFromEnv('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
+        minioConnectionString: readFromProcessEnv('MINIO_CONNECTION_STRING', 'http://admin:start123@127.0.0.1:9000'),
+        redisConnectionString: readFromProcessEnv('REDIS_CONNECTION_STRING', 'redis://127.0.0.1'),
+        rabbitMqConnectionString: readFromProcessEnv('RABBITMQ_CONNECTION_STRING', 'amqp://root:start123@127.0.0.1'),
+        vaultConnectionString: readFromProcessEnv('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
 
-        apiUrl: requireFromEnv('API_URL', 'http://127.0.0.1:3002/'),
-        appUrl: requireFromEnv('APP_URL', 'http://127.0.0.1:3000/'),
+        apiUrl: readFromProcessEnv('API_URL', 'http://127.0.0.1:3002/'),
+        appUrl: readFromProcessEnv('APP_URL', 'http://127.0.0.1:3000/'),
 
-        skipProposalApprovalOperation: requireBooleanFromEnv('SKIP_PROPOSAL_APPROVAL_OPERATION', false),
-        skipTrainApprovalOperation: requireBooleanFromEnv('SKIP_TRAIN_APPROVAL_OPERATION', false),
+        skipProposalApprovalOperation: readBoolFromProcessEnv('SKIP_PROPOSAL_APPROVAL_OPERATION', false),
+        skipTrainApprovalOperation: readBoolFromProcessEnv('SKIP_TRAIN_APPROVAL_OPERATION', false),
 
-        httpProxyAPIs: requireFromEnv('HTTP_PROXY_APIS', null),
+        httpProxyAPIs: readFromProcessEnv('HTTP_PROXY_APIS', null),
     };
 
     if (typeof key === 'string') {

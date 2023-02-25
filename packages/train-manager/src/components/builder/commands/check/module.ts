@@ -22,7 +22,7 @@ import { BuilderError } from '../../error';
 import { writeBuiltEvent, writeNoneEvent } from '../../events';
 import type { BuilderCheckPayload } from '../../type';
 
-export async function processCheckCommand(
+export async function executeBuilderCheckCommand(
     input: BuilderCheckPayload,
 ) : Promise<ComponentPayloadExtended<BuilderCheckPayload>> {
     const data = await extendPayload(input);

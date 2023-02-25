@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export enum Component {
+export enum ComponentName {
     BUILDER = 'builder',
     EXTRACTOR = 'extractor',
     ROUTER = 'router',
@@ -15,5 +15,5 @@ export enum ErrorCode {
     NOT_FOUND = 'notFound',
     REGISTRY_NOT_FOUND = 'registryNotFound',
     REGISTRY_PROJECT_NOT_FOUND = 'registryProjectNotFound',
-    UNKNOWN = 'unknown',
+    NONE = 'none',
 }

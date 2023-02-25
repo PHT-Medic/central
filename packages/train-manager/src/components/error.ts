@@ -6,7 +6,7 @@
  */
 
 import type { Options } from '@ebec/http';
-import { BaseError as Base } from '@ebec/http';
+import { ComponentError } from '@personalhealthtrain/central-server-common';
 import { ErrorCode } from './constants';
 
 export type ErrorOptionsExtended = Options & {
@@ -15,13 +15,13 @@ export type ErrorOptionsExtended = Options & {
     step?: string | number
 };
 
-export class BaseError extends Base {
+export class BaseError extends ComponentError {
     public getStep() : string {
         return this.getOption('step');
     }
 
-    public getCode() : string | number {
-        return this.getOption('code');
+    public getCode() : string {
+        return `${this.getOption('code')}`;
     }
 
     // --------------------------------------------------------------------

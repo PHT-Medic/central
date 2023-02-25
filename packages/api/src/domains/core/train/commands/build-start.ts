@@ -10,13 +10,11 @@ import {
     Ecosystem,
     RegistryProjectType,
     TrainBuildStatus,
-    TrainManagerBuilderCommand,
-    TrainManagerComponent,
     TrainStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
+import { BuilderCommand, buildBuilderQueuePayload } from '@personalhealthtrain/train-manager';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
-import { buildTrainManagerPayload } from '../../../special/train-manager';
 import { RegistryProjectEntity } from '../../registry-project/entity';
 import { RegistryEntity } from '../../registry/entity';
 import { TrainStationEntity } from '../../train-station/entity';
@@ -76,9 +74,8 @@ export async function startBuildTrain(
             train.incoming_registry_project_id = project.id;
         }
 
-        await publish(buildTrainManagerPayload({
-            component: TrainManagerComponent.BUILDER,
-            command: TrainManagerBuilderCommand.BUILD,
+        await publish(buildBuilderQueuePayload({
+            command: BuilderCommand.BUILD,
             data: {
                 id: train.id,
             },

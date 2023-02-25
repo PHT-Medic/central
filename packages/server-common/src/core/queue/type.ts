@@ -7,10 +7,27 @@
 
 import type { ObjectLiteral } from '../../type';
 
+export type QueuePayloadError = {
+    code: string,
+    message: string,
+    step?: string,
+};
+
 export type QueuePayload<
     T extends ObjectLiteral = ObjectLiteral,
     M extends ObjectLiteral = ObjectLiteral,
 > = {
     data: T,
-    metadata: M
+    metadata: M,
+    error?: QueuePayloadError
 };
+
+export type QueueCommandPayload<
+    T extends ObjectLiteral = ObjectLiteral,
+    M extends ObjectLiteral = ObjectLiteral,
+> = QueuePayload<T, {command: string, component: string} & M>;
+
+export type QueueEventPayload<
+    T extends ObjectLiteral = ObjectLiteral,
+    M extends ObjectLiteral = ObjectLiteral,
+> = QueuePayload<T, {command: string, component: string, event: string} & M>;

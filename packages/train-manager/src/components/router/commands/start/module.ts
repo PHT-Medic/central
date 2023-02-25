@@ -16,17 +16,17 @@ import {
 } from '@personalhealthtrain/central-common';
 import { createClient, useClient } from 'hapic';
 import type { Client as HarborClient } from '@hapic/harbor';
+import { buildBuilderQueuePayload } from '../../../builder/utils';
 import type { ComponentPayloadExtended } from '../../../type';
-import { buildSelfQueueMessage, extendPayload } from '../../../utils';
+import { extendPayload } from '../../../utils';
 import { RouterError } from '../../error';
 import { BuilderCommand, BuilderError } from '../../../builder';
 import { createBasicHarborAPIConfig } from '../../../../core';
 import type { RouterStartPayload } from '../../type';
-import { Component } from '../../../constants';
 import { RouterCommand } from '../../constants';
-import { useRouterLogger } from '../../utils';
+import { buildRouterQueuePayload, useRouterLogger } from '../../utils';
 
-export async function processStartCommand(
+export async function executeRouterStartCommand(
     input: RouterStartPayload,
 ) : Promise<ComponentPayloadExtended<RouterStartPayload>> {
     useRouterLogger().debug('Executing command.', {
@@ -61,18 +61,16 @@ export async function processStartCommand(
         !harborRepository ||
         harborRepository.artifact_count < 2
     ) {
-        await publish(buildSelfQueueMessage({
+        await publish(buildBuilderQueuePayload({
             command: BuilderCommand.BUILD,
-            component: Component.BUILDER,
             data: { id: data.id },
         }));
 
         return data;
     }
 
-    await publish(buildSelfQueueMessage({
+    await publish(buildRouterQueuePayload({
         command: RouterCommand.ROUTE,
-        component: Component.ROUTER,
         data: {
             repositoryName: data.id,
             projectName: incomingProject.external_name,

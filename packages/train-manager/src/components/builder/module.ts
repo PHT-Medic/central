@@ -7,9 +7,9 @@
 
 import { extendPayload } from '../utils';
 import {
-    processBuildCommand,
-    processCheckCommand,
-    processPushCommand,
+    executeBuilderBuildCommand,
+    executeBuilderCheckCommand,
+    executePushCommand,
 } from './commands';
 import { BuilderCommand } from './constants';
 import {
@@ -21,20 +21,20 @@ import {
     writePushedEvent,
     writePushingEvent,
 } from './events';
-import type { TrainBuilderExecutionContext } from './type';
+import type { BuilderCommandContext } from './type';
 
 export async function executeBuilderCommand(
-    context: TrainBuilderExecutionContext,
+    context: BuilderCommandContext,
 ) : Promise<void> {
     switch (context.command) {
         case BuilderCommand.BUILD: {
             await Promise.resolve(context.data)
                 .then(extendPayload)
                 .then((data) => writeBuildingEvent({ data, command: context.command }))
-                .then(processBuildCommand)
+                .then(executeBuilderBuildCommand)
                 .then((data) => writeBuiltEvent({ data, command: context.command }))
                 .then((data) => writePushingEvent({ data, command: context.command }))
-                .then(processPushCommand)
+                .then(executePushCommand)
                 .then((data) => writePushedEvent({ data, command: context.command }))
                 .catch((err: Error) => writeFailedEvent({
                     data: context.data,
@@ -47,7 +47,7 @@ export async function executeBuilderCommand(
             await Promise.resolve(context.data)
                 .then(extendPayload)
                 .then((data) => writeCheckingEvent({ data, command: context.command }))
-                .then(processCheckCommand)
+                .then(executeBuilderCheckCommand)
                 .then((data) => writeCheckedEvent({ data, command: context.command }))
                 .catch((err: Error) => writeFailedEvent({
                     data: context.data,

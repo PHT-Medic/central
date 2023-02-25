@@ -1,41 +1,37 @@
 /*
- * Copyright (c) 2022-2022.
+ * Copyright (c) 2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    TrainManagerErrorEventQueuePayload,
-    TrainManagerRouterCommand,
-    TrainManagerRouterRoutePayload,
-} from '@personalhealthtrain/central-common';
 import {
     REGISTRY_ARTIFACT_TAG_BASE,
     RegistryProjectType,
     TrainContainerPath,
-    TrainManagerComponent,
-    TrainManagerExtractorCommand,
-    TrainManagerRouterEvent,
-    TrainRunStatus,
-    TrainStationRunStatus,
+    TrainRunStatus, TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
+import { ComponentError, isComponentContextWithError } from '@personalhealthtrain/central-server-common';
+import type {
+    RouterRouteEventContext,
+} from '@personalhealthtrain/train-manager';
+import {
+    ComponentName,
+    ExtractorCommand,
+    RouterEvent,
+} from '@personalhealthtrain/train-manager';
+import { buildExtractorQueuePayload } from '@personalhealthtrain/train-manager/src/components/extractor/utils';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
-import { TrainEntity } from '../../domains/core/train';
-import { RegistryProjectEntity } from '../../domains/core/registry-project/entity';
-import { StationEntity } from '../../domains/core/station';
-import { TrainStationEntity } from '../../domains/core/train-station/entity';
-import { buildTrainManagerPayload } from '../../domains/special/train-manager';
-import type { TrainLogSaveContext } from '../../domains/core/train-log';
-import { saveTrainLog } from '../../domains/core/train-log';
+import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
+import { StationEntity } from '../../../domains/core/station';
+import { TrainEntity } from '../../../domains/core/train';
+import type { TrainLogSaveContext } from '../../../domains/core/train-log';
+import { saveTrainLog } from '../../../domains/core/train-log';
+import { TrainStationEntity } from '../../../domains/core/train-station/entity';
 
-export async function handleTrainManagerRouterEvent(
-    command: TrainManagerRouterCommand,
-    event: TrainManagerRouterEvent,
-    data: TrainManagerRouterRoutePayload,
-) {
-    if (data.artifactTag === REGISTRY_ARTIFACT_TAG_BASE) {
+export async function handleTrainManagerRouterRouteEvent(context: RouterRouteEventContext) {
+    if (context.data.artifactTag === REGISTRY_ARTIFACT_TAG_BASE) {
         return;
     }
 
@@ -43,7 +39,7 @@ export async function handleTrainManagerRouterEvent(
 
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(TrainEntity);
-    const entity = await repository.findOneBy({ id: data.repositoryName });
+    const entity = await repository.findOneBy({ id: context.data.repositoryName });
     if (!entity) {
         return;
     }
@@ -52,37 +48,19 @@ export async function handleTrainManagerRouterEvent(
 
     let trainLogContext : TrainLogSaveContext = {
         train: entity,
-        component: TrainManagerComponent.ROUTER,
-        command,
-        event,
+        component: ComponentName.ROUTER,
+        command: context.command,
+        event: context.event,
     };
 
     // -------------------------------------------------------------------------------
 
-    switch (event) {
-        case TrainManagerRouterEvent.STARTED: {
-            entity.run_status = TrainRunStatus.STARTED;
-            trainLogContext.status = TrainRunStatus.STARTED;
-
-            const trainStationRepository = dataSource.getRepository(TrainStationEntity);
-            const trainStations = await trainStationRepository.findBy({
-                train_id: entity.id,
-            });
-
-            for (let i = 0; i < trainStations.length; i++) {
-                trainStations[i].run_status = null;
-
-                await trainStationRepository.save(trainStations[i]);
-            }
-
-            await repository.save(entity);
-            break;
-        }
-        case TrainManagerRouterEvent.POSITION_FOUND:
-        case TrainManagerRouterEvent.ROUTED: {
+    switch (context.event) {
+        case RouterEvent.POSITION_FOUND:
+        case RouterEvent.ROUTED: {
             const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
             const registryProject = await registryProjectRepository.findOneBy({
-                external_name: data.projectName,
+                external_name: context.data.projectName,
             });
 
             if (!registryProject) {
@@ -105,10 +83,9 @@ export async function handleTrainManagerRouterEvent(
 
                     await repository.save(entity);
 
-                    if (event === TrainManagerRouterEvent.ROUTED) {
-                        await publish(buildTrainManagerPayload({
-                            component: TrainManagerComponent.EXTRACTOR,
-                            command: TrainManagerExtractorCommand.EXTRACT,
+                    if (context.event === RouterEvent.ROUTED) {
+                        await publish(buildExtractorQueuePayload({
+                            command: ExtractorCommand.EXTRACT,
                             data: {
                                 id: entity.id,
 
@@ -141,11 +118,11 @@ export async function handleTrainManagerRouterEvent(
                             entity.run_station_index = trainStation.index;
                             entity.run_station_id = trainStation.station_id;
 
-                            if (event === TrainManagerRouterEvent.ROUTED) {
-                                trainStation.artifact_tag = data.artifactTag;
+                            if (context.event === RouterEvent.ROUTED) {
+                                trainStation.artifact_tag = context.data.artifactTag;
 
                                 // operator was station ;)
-                                if (data.operator === registryProject.account_name) {
+                                if (context.data.operator === registryProject.account_name) {
                                     trainStation.run_status = TrainStationRunStatus.DEPARTED;
                                 } else {
                                     trainStation.run_status = TrainStationRunStatus.ARRIVED;
@@ -163,7 +140,7 @@ export async function handleTrainManagerRouterEvent(
 
             break;
         }
-        case TrainManagerRouterEvent.FAILED: {
+        case RouterEvent.FAILED: {
             entity.run_status = TrainRunStatus.FAILED;
             entity.run_station_id = null;
             entity.run_station_index = null;
@@ -172,18 +149,22 @@ export async function handleTrainManagerRouterEvent(
 
             await repository.save(entity);
 
-            const payload = data as TrainManagerErrorEventQueuePayload;
-            trainLogContext = {
-                ...trainLogContext,
-                status: TrainRunStatus.FAILED,
+            if (
+                isComponentContextWithError(context) &&
+                context.error instanceof ComponentError
+            ) {
+                trainLogContext = {
+                    ...trainLogContext,
+                    status: TrainRunStatus.FAILED,
 
-                error: true,
-                errorCode: `${payload.error.code}`,
-                step: payload.error.step,
-            };
+                    error: true,
+                    errorCode: `${context.error.getCode()}`,
+                    step: context.error.getStep(),
+                };
+            }
             break;
         }
-        case TrainManagerRouterEvent.POSITION_NOT_FOUND: {
+        case RouterEvent.POSITION_NOT_FOUND: {
             entity.run_status = null;
             entity.run_station_id = null;
             entity.run_station_index = null;

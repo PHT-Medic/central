@@ -5,20 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
+import type { ComponentContextWithCommand } from '@personalhealthtrain/central-server-common';
 import { publish } from 'amqp-extension';
-import { Component } from '../../constants';
-import { buildAPIQueueMessage } from '../../utils';
 import type { ExtractorCommand } from '../constants';
 import { ExtractorEvent } from '../constants';
-import type { ExtractorExtractPayload } from '../type';
+import type { ExtractorExtractCommandContext } from '../type';
+import { buildExtractorAggregatorQueuePayload } from '../utils';
 
-export async function writeExtractedEvent<T extends ExtractorExtractPayload>(
-    context: ComponentExecutionContext<`${ExtractorCommand}`, T >,
+export async function writeExtractedEvent(
+    context: ComponentContextWithCommand<ExtractorExtractCommandContext, `${ExtractorCommand}`>,
 ) {
-    await publish(buildAPIQueueMessage({
+    await publish(buildExtractorAggregatorQueuePayload({
         event: ExtractorEvent.EXTRACTED,
-        component: Component.EXTRACTOR,
         command: context.command,
         data: context.data,
     }));

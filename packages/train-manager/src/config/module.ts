@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Aggregator, Component } from '@personalhealthtrain/central-server-common';
 import { setConfig as setHTTPConfig, useClient as useHTTPClient } from 'hapic';
 import {
     HTTPClient,
@@ -18,12 +19,9 @@ import type { Client } from 'redis-extension';
 import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import { Client as VaultClient } from '@hapic/vault';
 import type { Robot } from '@authup/common';
-import { buildComponentRouter, setMinioConfig, useLogger } from '../core';
-import type { Environment } from '../env';
-
-interface ConfigContext {
-    env: Environment
-}
+import { buildComponentRouter } from '../components';
+import { setMinioConfig, useLogger } from '../core';
+import { isSetEnv, useEnv } from './env';
 
 export type Config = {
     redis: Client,
@@ -32,15 +30,17 @@ export type Config = {
     components: {start: () => void}[]
 };
 
-function createConfig({ env } : ConfigContext) : Config {
-    setRedisConfig({ connectionString: env.redisConnectionString });
+export function createConfig() : Config {
+    if (isSetEnv('redisConnectionString')) {
+        setRedisConfig({ connectionString: useEnv('redisConnectionString') });
+    }
 
-    setMinioConfig(env.minioConnectionString);
+    setMinioConfig(useEnv('minioConnectionString'));
 
     const redis = useRedisClient();
 
     setAmqpConfig({
-        connection: env.rabbitMqConnectionString,
+        connection: useEnv('rabbitMqConnectionString'),
         exchange: {
             name: 'pht',
             type: 'topic',
@@ -53,7 +53,7 @@ function createConfig({ env } : ConfigContext) : Config {
             proxy: false,
         },
         extra: {
-            connectionString: env.vaultConnectionString,
+            connectionString: useEnv('vaultConnectionString'),
         },
     }, HTTPClientKey.VAULT);
 
@@ -61,7 +61,7 @@ function createConfig({ env } : ConfigContext) : Config {
         clazz: HTTPClient,
         driver: {
             proxy: false,
-            baseURL: env.apiUrl,
+            baseURL: useEnv('apiUrl'),
             withCredentials: true,
         },
     });
@@ -103,10 +103,10 @@ function createConfig({ env } : ConfigContext) : Config {
         }),
     );
 
-    const aggregators : {start: () => void}[] = [
+    const aggregators : Aggregator[] = [
     ];
 
-    const components : {start: () => void}[] = [
+    const components : Component[] = [
         buildComponentRouter(),
     ];
 

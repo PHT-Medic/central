@@ -5,15 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { BuilderCommand, buildBuilderQueuePayload } from '@personalhealthtrain/train-manager';
 import { publish } from 'amqp-extension';
-import {
-    TrainManagerBuilderCommand,
-    TrainManagerComponent,
-} from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
 import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
-import { buildTrainManagerPayload } from '../../../special/train-manager';
 
 export async function detectTrainBuildStatus(train: TrainEntity | string) : Promise<TrainEntity> {
     const dataSource = await useDataSource();
@@ -21,9 +17,8 @@ export async function detectTrainBuildStatus(train: TrainEntity | string) : Prom
 
     train = await resolveTrain(train, repository);
 
-    await publish(buildTrainManagerPayload({
-        component: TrainManagerComponent.BUILDER,
-        command: TrainManagerBuilderCommand.CHECK,
+    await publish(buildBuilderQueuePayload({
+        command: BuilderCommand.CHECK,
         data: {
             id: train.id,
         },

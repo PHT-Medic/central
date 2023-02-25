@@ -5,17 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    TrainManagerComponent,
-} from '@personalhealthtrain/central-common';
+import { ComponentError, isComponentEventQueuePayload } from '@personalhealthtrain/central-server-common';
+import { ComponentName } from '@personalhealthtrain/train-manager';
 import type { ConsumeMessage } from 'amqp-extension';
 import { consume } from 'amqp-extension';
 import { useLogger } from '../../config';
 import type { Aggregator } from '../type';
-import { handleTrainManagerExtractorEvent } from './extracting';
-import { handleTrainManagerBuilderEvent } from './building';
-import { handleTrainManagerRouterEvent } from './routing';
-import type { AggregatorTrainManagerQueuePayload } from './type';
+import { handleTrainManagerExtractorEvent } from './extractor';
+import { handleTrainManagerBuilderEvent } from './builder';
+import { handleTrainManagerRouterEvent } from './router';
 
 export function buildTrainManagerAggregator() : Aggregator {
     return {
@@ -25,7 +23,20 @@ export function buildTrainManagerAggregator() : Aggregator {
             },
         }, {
             $any: async (message: ConsumeMessage) => {
-                const payload : AggregatorTrainManagerQueuePayload<any> = JSON.parse(message.content.toString('utf-8'));
+                const payload = JSON.parse(message.content.toString('utf-8'));
+                if (!isComponentEventQueuePayload(payload)) {
+                    useLogger().error('Train-Manager aggregation event could not be processed.');
+                    return;
+                }
+
+                let error : ComponentError | undefined;
+
+                if (payload.error) {
+                    error = new ComponentError(payload.error.message);
+                    error.setOption('code', payload.error.code);
+                    error.setOption('step', payload.error.step);
+                }
+
                 useLogger().debug('Event received', {
                     component: payload.metadata.component,
                     command: payload.metadata.command,
@@ -33,28 +44,31 @@ export function buildTrainManagerAggregator() : Aggregator {
                 });
 
                 switch (payload.metadata.component) {
-                    case TrainManagerComponent.BUILDER: {
-                        await handleTrainManagerBuilderEvent(
-                            payload.metadata.command as any,
-                            payload.metadata.event as any,
-                            payload.data,
-                        );
+                    case ComponentName.BUILDER: {
+                        await handleTrainManagerBuilderEvent({
+                            command: payload.metadata.command as any,
+                            event: payload.metadata.event as any,
+                            data: payload.data as any,
+                            ...(error ? { error } : {}),
+                        });
                         break;
                     }
-                    case TrainManagerComponent.EXTRACTOR: {
-                        await handleTrainManagerExtractorEvent(
-                            payload.metadata.command as any,
-                            payload.metadata.event as any,
-                            payload.data,
-                        );
+                    case ComponentName.EXTRACTOR: {
+                        await handleTrainManagerExtractorEvent({
+                            command: payload.metadata.command as any,
+                            event: payload.metadata.event as any,
+                            data: payload.data as any,
+                            ...(error ? { error } : {}),
+                        });
                         break;
                     }
-                    case TrainManagerComponent.ROUTER: {
-                        await handleTrainManagerRouterEvent(
-                            payload.metadata.command as any,
-                            payload.metadata.event as any,
-                            payload.data,
-                        );
+                    case ComponentName.ROUTER: {
+                        await handleTrainManagerRouterEvent({
+                            command: payload.metadata.command as any,
+                            event: payload.metadata.event as any,
+                            data: payload.data as any,
+                            ...(error ? { error } : {}),
+                        });
                         break;
                     }
                 }

@@ -19,7 +19,7 @@ import type { Client as HarborClient } from '@hapic/harbor';
 import { RouterCommand } from '../../../constants';
 import { useRouterLogger } from '../../../utils';
 import type { TransferItem } from './type';
-import { useLogger } from '../../../../../core/log';
+import { useLogger } from '../../../../../core/logger';
 import { transferInterRegistry } from './registry';
 import { createBasicHarborAPIConfig } from '../../../../../core/harbor';
 

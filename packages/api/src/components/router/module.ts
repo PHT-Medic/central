@@ -14,13 +14,13 @@ import { executeRegistryCommand } from '../registry';
 import { executeStationRegistryCommand } from '../station-registry';
 import { executeTrainCommand } from '../train';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
-import type { RouterQueuePayload } from './type';
+import type { QueueRouterPayload } from './type';
 
 export function buildRouterComponent() {
     function start() {
         return consume({ exchange: { routingKey: ROUTER_QUEUE_ROUTING_KEY } }, {
             $any: async (message: ConsumeMessage) => {
-                const payload : RouterQueuePayload<any> = JSON.parse(message.content.toString('utf-8'));
+                const payload : QueueRouterPayload<any> = JSON.parse(message.content.toString('utf-8'));
 
                 useLogger().debug('Command received', {
                     component: payload.metadata.component,

@@ -5,5 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './builder';
+export * from './constants';
+export * from './extractor';
 export * from './router';
+export * from './type';
 export * from './utils';

@@ -18,7 +18,7 @@ import { BuilderError } from '../../error';
 import type { BuilderBuildPayload } from '../../type';
 import { useBuilderLogger } from '../../utils';
 
-export async function processPushCommand(
+export async function executePushCommand(
     input: BuilderBuildPayload,
 ) : Promise<ComponentPayloadExtended<BuilderBuildPayload>> {
     const data = await extendPayload(input);

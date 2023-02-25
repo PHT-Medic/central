@@ -22,7 +22,7 @@ import { ExtractorError } from '../../error';
 import type { ExtractorExtractPayload } from '../../type';
 import { useExtractorLogger } from '../../utils';
 
-export async function processExtractCommand(
+export async function executeExtractorExtractCommand(
     input: ExtractorExtractPayload,
 ) : Promise<ComponentPayloadExtended<ExtractorExtractPayload>> {
     useExtractorLogger().debug('Executing command', {

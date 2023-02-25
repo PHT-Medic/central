@@ -5,21 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
+import type { ComponentContextWithCommand } from '@personalhealthtrain/central-server-common';
 import { publish } from 'amqp-extension';
-import { Component } from '../../constants';
-import { buildAPIQueueMessage } from '../../utils';
-import { BuilderEvent } from '../constants';
 import type { BuilderCommand } from '../constants';
-import type { BuilderBuildPayload } from '../type';
+import { BuilderEvent } from '../constants';
+import type { BuilderBuildCommandContext, BuilderBuildPayload } from '../type';
+import { buildBuilderAggregatorQueuePayload } from '../utils';
 
-export async function writePushedEvent<T extends BuilderBuildPayload>(
-    context: ComponentExecutionContext<`${BuilderCommand}`, T>,
-) : Promise<T> {
-    await publish(buildAPIQueueMessage({
+export async function writePushedEvent(
+    context: ComponentContextWithCommand<BuilderBuildCommandContext, `${BuilderCommand}`>,
+) : Promise<BuilderBuildPayload> {
+    await publish(buildBuilderAggregatorQueuePayload({
         event: BuilderEvent.PUSHED,
         command: context.command,
-        component: Component.BUILDER,
         data: context.data, //  { id: 'xxx' }
     }));
 

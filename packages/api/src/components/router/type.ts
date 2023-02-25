@@ -5,7 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type RouterQueuePayload<T extends Record<string, any>> = {
+import type { ObjectLiteral } from '@personalhealthtrain/central-server-common';
+
+export type QueueRouterPayload<T extends ObjectLiteral = ObjectLiteral> = {
     data: T,
     metadata: {
         command: string,

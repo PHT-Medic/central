@@ -7,8 +7,11 @@
 
 import type {
     Train,
-    TrainManagerComponent,
 } from '@personalhealthtrain/central-common';
+
+import type {
+    ComponentName,
+} from '@personalhealthtrain/train-manager';
 
 export type TrainLogSaveContext = {
     train: Pick<Train, 'id'> &
@@ -17,7 +20,7 @@ export type TrainLogSaveContext = {
     error?: boolean,
     errorCode?: string,
 
-    component?: `${TrainManagerComponent}`,
+    component?: `${ComponentName}`,
     command?: string,
     event?: string,
     step?: string,

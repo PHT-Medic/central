@@ -7,14 +7,13 @@
 
 import { useRobotEventEmitter } from '@authup/server-database';
 import { publish } from 'amqp-extension';
-import { buildSecretStorageQueueMessage } from '../../components/secret-storage/queue';
-import { SecretStorageCommand, SecretStorageEntityType } from '../../components/secret-storage/constants';
+import { SecretStorageCommand, SecretStorageEntityType, buildSecretStorageQueueMessage } from '../../components';
 import { useEnv } from '../../config';
 import {
     deleteRobotFromSecretStorage,
     saveRobotToSecretStorage,
 } from '../../components/secret-storage/handlers/entities/robot';
-import type { SecretStorageComponentRobotPayload } from '../../components/secret-storage/type';
+import type { SecretStorageComponentRobotPayload } from '../../components';
 import type { Aggregator } from '../type';
 
 export function buildRobotAggregator() : Aggregator {

@@ -6,9 +6,9 @@
  */
 
 import {
-    processCheckCommand,
-    processRouteCommand,
-    processStartCommand,
+    executeRouterCheckCommand,
+    executeRouterRouteCommand,
+    executeRouterStartCommand,
 } from './commands';
 import { RouterCommand } from './constants';
 import {
@@ -21,17 +21,17 @@ import {
     writeStartingEvent,
 } from './events';
 import { extendPayload } from '../utils';
-import type { RouterExecutionContext } from './type';
+import type { RouterCommandContext } from './type';
 
 export async function executeRouterCommand(
-    context: RouterExecutionContext,
+    context: RouterCommandContext,
 ) : Promise<void> {
     switch (context.command) {
         case RouterCommand.CHECK: {
             await Promise.resolve(context.data)
                 .then(extendPayload)
                 .then((data) => writeCheckingEvent({ data, command: context.command }))
-                .then(processCheckCommand)
+                .then(executeRouterCheckCommand)
                 .then((data) => writeCheckedEvent({ data, command: context.command }))
                 .catch((err: Error) => writeFailedEvent({
                     command: context.command,
@@ -43,7 +43,7 @@ export async function executeRouterCommand(
         case RouterCommand.ROUTE: {
             await Promise.resolve(context.data)
                 .then((data) => writeRoutingEvent({ data, command: context.command }))
-                .then(processRouteCommand)
+                .then(executeRouterRouteCommand)
                 .then((data) => writeRoutedEvent({ data, command: context.command }))
                 .catch((err: Error) => writeFailedEvent({
                     command: context.command,
@@ -57,7 +57,7 @@ export async function executeRouterCommand(
             await Promise.resolve(extendPayload(context.data))
                 .then()
                 .then((data) => writeStartingEvent({ data, command: context.command }))
-                .then(processStartCommand)
+                .then(executeRouterStartCommand)
                 .then((data) => writeStartedEvent({ data, command: context.command }))
                 .catch((err: Error) => writeFailedEvent({
                     command: context.command,

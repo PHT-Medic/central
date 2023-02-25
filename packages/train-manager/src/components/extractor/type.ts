@@ -6,8 +6,7 @@
  */
 
 import type { Train } from '@personalhealthtrain/central-common';
-import type { ComponentExecutionContext } from '@personalhealthtrain/central-server-common';
-import type { ExtractorCommand } from './constants';
+import type { ExtractorCommand, ExtractorEvent } from './constants';
 
 export type ExtractorFileType = 'file' | 'link' | 'symlink' | 'directory' |
 'block-device' | 'character-device' | 'fifo' | 'contiguous-file';
@@ -38,5 +37,32 @@ export type ExtractorPayload<C extends `${ExtractorCommand}`> =
             ExtractorCheckPayload :
             never;
 
-export type ExtractorExecutionContext = ComponentExecutionContext<ExtractorCommand.CHECK, ExtractorCheckPayload> |
-ComponentExecutionContext<ExtractorCommand.EXTRACT, ExtractorExtractPayload>;
+export type ExtractorCheckCommandContext = {
+    command: `${ExtractorCommand.CHECK}`,
+    data: ExtractorCheckPayload
+};
+
+export type ExtractorCheckEventContext = ExtractorCheckCommandContext & {
+    event: `${ExtractorEvent.FAILED}` |
+        `${ExtractorEvent.CHECKED}` |
+        `${ExtractorEvent.CHECKING}` |
+        `${ExtractorEvent.NONE}`;
+};
+
+export type ExtractorExtractCommandContext = {
+    command: `${ExtractorCommand.EXTRACT}`,
+    data: ExtractorExtractPayload
+};
+
+export type ExtractorExtractEventContext = Omit<ExtractorExtractCommandContext, 'command'> & {
+    command: `${ExtractorCommand.EXTRACT}` | `${ExtractorCommand.CHECK}`,
+    event: `${ExtractorEvent.FAILED}` |
+        `${ExtractorEvent.EXTRACTED}` |
+        `${ExtractorEvent.EXTRACTING}` |
+        `${ExtractorEvent.DOWNLOADED}` |
+        `${ExtractorEvent.DOWNLOADING}`;
+};
+
+export type ExtractorCommandContext = ExtractorCheckCommandContext | ExtractorExtractCommandContext;
+
+export type ExtractorEventContext = ExtractorCheckEventContext | ExtractorExtractEventContext;

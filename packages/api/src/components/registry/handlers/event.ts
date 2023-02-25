@@ -4,14 +4,14 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { TrainManagerComponent, TrainManagerRouterCommand } from '@personalhealthtrain/central-common';
+import { RouterCommand } from '@personalhealthtrain/train-manager';
+import { buildRouterQueuePayload } from '@personalhealthtrain/train-manager';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../config';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
 import type { RegistryEventQueuePayload } from '../../../domains/special/registry';
 import { RegistryHookEvent } from '../../../domains/special/registry';
-import { buildTrainManagerPayload } from '../../../domains/special/train-manager';
 
 export async function dispatchRegistryEventToTrainManager(
     event: string,
@@ -32,9 +32,8 @@ export async function dispatchRegistryEventToTrainManager(
                 return;
             }
 
-            await publish(buildTrainManagerPayload({
-                component: TrainManagerComponent.ROUTER,
-                command: TrainManagerRouterCommand.ROUTE,
+            await publish(buildRouterQueuePayload({
+                command: RouterCommand.ROUTE,
                 data: {
                     repositoryName: data.repositoryName,
                     projectName: data.namespace,

@@ -5,13 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    TrainManagerComponent,
-    TrainManagerExtractorCommand,
-} from '@personalhealthtrain/central-common';
+import { ExtractorCommand, buildExtractorQueuePayload } from '@personalhealthtrain/train-manager';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
-import { buildTrainManagerPayload } from '../../../special/train-manager';
 import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';
 
@@ -24,9 +20,8 @@ export async function triggerTrainResultStatus(
     train = await resolveTrain(train, repository);
 
     // send queue message
-    await publish(buildTrainManagerPayload({
-        component: TrainManagerComponent.EXTRACTOR,
-        command: TrainManagerExtractorCommand.CHECK,
+    await publish(buildExtractorQueuePayload({
+        command: ExtractorCommand.CHECK,
         data: {
             id: train.id,
         },
