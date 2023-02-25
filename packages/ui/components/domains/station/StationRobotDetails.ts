@@ -10,7 +10,7 @@ import type { CreateElement, PropType, VNode } from 'vue';
 import Vue from 'vue';
 import type { Station } from '@personalhealthtrain/central-common';
 import {
-    Ecosystem, buildStationRobotName,
+    Ecosystem,
 } from '@personalhealthtrain/central-common';
 import RobotDetails from '../robot/RobotDetails';
 

@@ -4,8 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { RouterCommand } from '@personalhealthtrain/train-manager';
-import { buildRouterQueuePayload } from '@personalhealthtrain/train-manager';
+import { RouterCommand, buildRouterQueuePayload } from '@personalhealthtrain/train-manager';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../config';

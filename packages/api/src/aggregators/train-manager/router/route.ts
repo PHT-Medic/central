@@ -19,8 +19,8 @@ import {
     ComponentName,
     ExtractorCommand,
     RouterEvent,
+    buildExtractorQueuePayload,
 } from '@personalhealthtrain/train-manager';
-import { buildExtractorQueuePayload } from '@personalhealthtrain/train-manager/src/components/extractor/utils';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
