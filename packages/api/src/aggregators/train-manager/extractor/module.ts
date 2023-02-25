@@ -11,7 +11,7 @@ import type {
     ExtractorEventContext,
 } from '@personalhealthtrain/train-manager';
 import {
-    ComponentName,
+    ComponentName, ExtractorCommand,
     ExtractorEvent,
 } from '@personalhealthtrain/train-manager';
 import {
@@ -61,7 +61,9 @@ export async function handleTrainManagerExtractorEvent(
             status = TrainResultStatus.FINISHED;
             break;
         case ExtractorEvent.FAILED: {
-            status = TrainResultStatus.FAILED;
+            if (context.command === ExtractorCommand.EXTRACT) {
+                status = TrainResultStatus.FAILED;
+            }
 
             if (
                 isComponentContextWithError(context) &&

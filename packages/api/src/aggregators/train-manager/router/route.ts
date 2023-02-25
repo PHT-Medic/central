@@ -11,17 +11,23 @@ import {
     TrainContainerPath,
     TrainRunStatus, TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
-import { ComponentError, isComponentContextWithError } from '@personalhealthtrain/central-server-common';
+import type { ComponentContextWithError } from '@personalhealthtrain/central-server-common';
+import {
+    ComponentError,
+    isComponentContextWithError,
+} from '@personalhealthtrain/central-server-common';
 import type {
-    RouterRouteEventContext,
+    RouterEventContext,
 } from '@personalhealthtrain/train-manager';
 import {
     ComponentName,
     ExtractorCommand,
+    RouterCommand,
     RouterEvent,
-    buildExtractorQueuePayload,
+    buildExtractorQueuePayload, isRouterRoutePayload,
 } from '@personalhealthtrain/train-manager';
 import { publish } from 'amqp-extension';
+import type { FindOptionsWhere } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
 import { StationEntity } from '../../../domains/core/station';
@@ -30,16 +36,29 @@ import type { TrainLogSaveContext } from '../../../domains/core/train-log';
 import { saveTrainLog } from '../../../domains/core/train-log';
 import { TrainStationEntity } from '../../../domains/core/train-station/entity';
 
-export async function handleTrainManagerRouterRouteEvent(context: RouterRouteEventContext) {
-    if (context.data.artifactTag === REGISTRY_ARTIFACT_TAG_BASE) {
-        return;
+export async function handleTrainManagerRouterRouteEvent(
+    context: RouterEventContext | ComponentContextWithError<RouterEventContext>,
+) {
+    const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(TrainEntity);
+
+    const where : FindOptionsWhere<TrainEntity> = {};
+
+    if (
+        isRouterRoutePayload(context.data)
+    ) {
+        if (context.data.artifactTag === REGISTRY_ARTIFACT_TAG_BASE) {
+            return;
+        }
+
+        where.id = context.data.repositoryName;
+    } else {
+        where.id = context.data.id;
     }
 
     // -------------------------------------------------------------------------------
 
-    const dataSource = await useDataSource();
-    const repository = dataSource.getRepository(TrainEntity);
-    const entity = await repository.findOneBy({ id: context.data.repositoryName });
+    const entity = await repository.findOneBy(where);
     if (!entity) {
         return;
     }
@@ -141,13 +160,15 @@ export async function handleTrainManagerRouterRouteEvent(context: RouterRouteEve
             break;
         }
         case RouterEvent.FAILED: {
-            entity.run_status = TrainRunStatus.FAILED;
-            entity.run_station_id = null;
-            entity.run_station_index = null;
+            if (context.command === RouterCommand.ROUTE) {
+                entity.run_status = TrainRunStatus.FAILED;
+                entity.run_station_id = null;
+                entity.run_station_index = null;
 
-            entity.result_status = null;
+                entity.result_status = null;
 
-            await repository.save(entity);
+                await repository.save(entity);
+            }
 
             if (
                 isComponentContextWithError(context) &&

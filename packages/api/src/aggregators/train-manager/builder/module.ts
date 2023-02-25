@@ -8,6 +8,7 @@
 import { ComponentError, isComponentContextWithError } from '@personalhealthtrain/central-server-common';
 import type { ComponentContextWithError } from '@personalhealthtrain/central-server-common';
 import {
+    BuilderCommand,
     BuilderEvent,
     ComponentName,
 } from '@personalhealthtrain/train-manager';
@@ -51,7 +52,9 @@ export async function handleTrainManagerBuilderEvent(
             trainLogContext.status = TrainBuildStatus.STARTED;
             break;
         case BuilderEvent.FAILED: {
-            entity.build_status = TrainBuildStatus.FAILED;
+            if (context.command === BuilderCommand.BUILD) {
+                entity.build_status = TrainBuildStatus.FAILED;
+            }
 
             if (
                 isComponentContextWithError(context) &&
@@ -78,9 +81,8 @@ export async function handleTrainManagerBuilderEvent(
     }
 
     if (
-        context.event === BuilderEvent.BUILDING ||
-        context.event === BuilderEvent.FAILED ||
-        context.event === BuilderEvent.NONE
+        context.event !== BuilderEvent.FAILED &&
+        context.event !== BuilderEvent.NONE
     ) {
         entity.run_status = null;
         entity.run_station_index = null;
