@@ -9,10 +9,10 @@ import { transformComponentErrorForQueuePayload } from '@personalhealthtrain/cen
 import type { ComponentContextWithError } from '@personalhealthtrain/central-server-common';
 import type { PublishOptionsExtended } from 'amqp-extension';
 import { ComponentName } from '../../constants';
-import { useRouterLogger } from '../../router/utils';
 import type { QueueRouterPayload } from '../../utils';
 import { ROUTER_QUEUE_ROUTING_KEY, cleanupPayload } from '../../utils';
 import type { ExtractorCommandContext, ExtractorEventContext } from '../type';
+import { useExtractorLogger } from './logger';
 
 export function buildExtractorQueuePayload(
     context: ExtractorCommandContext,
@@ -36,7 +36,7 @@ export function buildExtractorAggregatorQueuePayload(
 ) {
     const error = transformComponentErrorForQueuePayload(context);
     if (error) {
-        useRouterLogger().error('Command execution failed.', {
+        useExtractorLogger().error('Command execution failed.', {
             command: context.command,
             ...error,
         });
