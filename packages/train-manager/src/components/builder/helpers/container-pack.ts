@@ -74,6 +74,10 @@ export async function packContainerWithTrain(container: Container, context: Cont
 
     // -----------------------------------------------------------------------------------
 
+    const pack = tar.pack();
+
+    // -----------------------------------------------------------------------------------
+
     if (context.train.query) {
         useLogger().debug(`Writing ${TrainContainerFileName.QUERY} to container`, {
             component: 'building',
@@ -86,12 +90,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
 
         const queryEncrypted = encryptSymmetric(symmetricKey, symmetricKeyIv, query);
 
-        await container.putArchive(
-            createPackFromFileContent(queryEncrypted, TrainContainerFileName.QUERY),
-            {
-                path: '/opt',
-            },
-        );
+        pack.entry({ name: TrainContainerFileName.QUERY }, queryEncrypted);
     }
 
     // -----------------------------------------------------------------------------------
@@ -136,8 +135,6 @@ export async function packContainerWithTrain(container: Container, context: Cont
                 });
 
                 extract.on('finish', () => {
-                    const pack = tar.pack();
-
                     for (let i = 0; i < files.length; i++) {
                         useLogger().debug(`Encrypting/Packing train file ${files[i][0]}.`, {
                             component: 'building',

@@ -49,7 +49,7 @@ export type RegistryQueuePayload<T extends `${RegistryQueueCommand}`> =
 
 // ---------------------------------------------------
 
-type RegistryHookEvent = {
+type RegistryHookEventData = {
     repository: {
         name: string,
         repo_full_name: string,
@@ -68,5 +68,5 @@ export type RegistryHook = {
     type: string,
     occur_at?: string,
     operator: string,
-    event_data: RegistryHookEvent
+    event_data: RegistryHookEventData
 };
