@@ -23,7 +23,6 @@ export function errorMiddleware(
     response: Response,
     next: Next,
 ) {
-    console.log(error);
     const code : string | undefined = hasOwnProperty(error, 'code') && typeof error.code === 'string' ?
         error.code :
         undefined;
