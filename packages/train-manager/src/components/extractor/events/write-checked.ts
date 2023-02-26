@@ -14,7 +14,7 @@ export async function writeCheckedEvent(
     context: ExtractorCheckCommandContext,
 ) {
     await publish(buildExtractorAggregatorQueuePayload({
-        event: ExtractorEvent.CHECKING,
+        event: ExtractorEvent.CHECKED,
         command: context.command,
         data: context.data,
     }));
