@@ -13,7 +13,7 @@
     "dependencies": {
         "@authup/common": "^0.15.0",
         "@authup/server-common": "^0.15.0",
-        "@authup/server-database": "^0.15.2",
+        "@authup/server-database": "^0.15.4",
         "@authup/server-http": "^0.15.2",
         "@ebec/http": "^0.2.2",
         "@hapic/harbor": "^1.1.0",
