@@ -11,7 +11,7 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
-import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
+import { ProposalEntity } from '../../../../../domains/proposal/entity';
 import { runProposalValidation } from '../utils/validation';
 
 export async function createProposalRouteHandler(req: Request, res: Response) : Promise<any> {

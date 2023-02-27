@@ -23,7 +23,7 @@ import {
 import {
     emitSocketServerToClientEvent,
 } from '../../config/socket-emitter';
-import { TrainStationEntity } from '../../domains/core/train-station/entity';
+import { TrainStationEntity } from '../../domains/train-station/entity';
 
 function publish(
     operation: `${TrainStationSocketServerToClientEventName}`,

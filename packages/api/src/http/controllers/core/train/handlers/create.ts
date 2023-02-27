@@ -13,8 +13,8 @@ import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runTrainValidation } from '../utils';
-import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
-import { TrainEntity } from '../../../../../domains/core/train';
+import { ProposalEntity } from '../../../../../domains/proposal/entity';
+import { TrainEntity } from '../../../../../domains/train';
 
 export async function createTrainRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');

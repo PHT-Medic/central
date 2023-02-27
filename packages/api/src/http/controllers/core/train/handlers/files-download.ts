@@ -14,9 +14,9 @@ import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../../../config';
 import { useMinio } from '../../../../../core/minio';
 import { streamToBuffer } from '../../../../../core/utils';
-import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
-import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/core/train';
-import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
+import { TrainStationEntity } from '../../../../../domains/train-station/entity';
+import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/train';
+import { TrainFileEntity } from '../../../../../domains/train-file/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function handleTrainFilesDownloadRouteHandler(req: Request, res: Response) : Promise<any> {

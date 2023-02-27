@@ -17,7 +17,7 @@ import {
 import {
     emitSocketServerToClientEvent,
 } from '../../config/socket-emitter';
-import { TrainFileEntity } from '../../domains/core/train-file/entity';
+import { TrainFileEntity } from '../../domains/train-file/entity';
 
 function publish(
     operation: `${TrainFileSocketServerToClientEventName}`,

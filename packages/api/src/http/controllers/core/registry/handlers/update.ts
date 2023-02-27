@@ -12,7 +12,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runRegistryValidation } from '../utils';
-import { RegistryEntity } from '../../../../../domains/core/registry/entity';
+import { RegistryEntity } from '../../../../../domains/registry/entity';
 
 export async function updateRegistryRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

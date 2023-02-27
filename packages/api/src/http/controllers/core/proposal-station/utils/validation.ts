@@ -10,9 +10,9 @@ import { ProposalStationApprovalStatus } from '@personalhealthtrain/central-comm
 import { NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/common';
 import type { Request } from 'routup';
-import type { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
-import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
-import { StationEntity } from '../../../../../domains/core/station';
+import type { ProposalStationEntity } from '../../../../../domains/proposal-station/entity';
+import { ProposalEntity } from '../../../../../domains/proposal/entity';
+import { StationEntity } from '../../../../../domains/station';
 import { useRequestEnv } from '../../../../request';
 import type { RequestValidationResult } from '../../../../validation';
 import {

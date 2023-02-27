@@ -18,7 +18,7 @@ import type {
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import { emitSocketServerToClientEvent } from '../../config';
-import { StationEntity } from '../../domains/core/station';
+import { StationEntity } from '../../domains/station';
 
 function publish(
     operation: `${StationSocketServerToClientEventName}`,

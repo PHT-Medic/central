@@ -26,12 +26,12 @@ import {
 import { publish } from 'amqp-extension';
 import type { FindOptionsWhere } from 'typeorm';
 import { useDataSource } from 'typeorm-extension';
-import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
-import { StationEntity } from '../../../domains/core/station';
-import { TrainEntity } from '../../../domains/core/train';
-import type { TrainLogSaveContext } from '../../../domains/core/train-log';
-import { saveTrainLog } from '../../../domains/core/train-log';
-import { TrainStationEntity } from '../../../domains/core/train-station/entity';
+import { RegistryProjectEntity } from '../../../domains/registry-project/entity';
+import { StationEntity } from '../../../domains/station';
+import { TrainEntity } from '../../../domains/train';
+import type { TrainLogSaveContext } from '../../../domains/train-log';
+import { saveTrainLog } from '../../../domains/train-log';
+import { TrainStationEntity } from '../../../domains/train-station/entity';
 
 export async function handleTrainManagerRouterEvent(
     context: RouterEventContext | ComponentContextWithError<RouterEventContext>,

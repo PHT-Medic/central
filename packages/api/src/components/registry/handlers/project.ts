@@ -14,14 +14,14 @@ import { createClient, useClient } from 'hapic';
 import type { Client as HarborClient } from '@hapic/harbor';
 import type { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
-import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
+import { RegistryProjectEntity } from '../../../domains/registry-project/entity';
 import { RegistryCommand } from '../constants';
 import type { RegistryProjectLinkPayload, RegistryProjectUnlinkPayload } from '../type';
 import { ensureRemoteRegistryProjectAccount } from './helpers/remote-robot-account';
 import { ensureRemoteRegistryProject } from './helpers/remote';
 import { saveRemoteRegistryProjectWebhook } from './helpers/remote-webhook';
 import { ApiKey, useLogger } from '../../../config';
-import { RegistryEntity } from '../../../domains/core/registry/entity';
+import { RegistryEntity } from '../../../domains/registry/entity';
 import { createBasicHarborAPIConfig } from './utils';
 
 export async function linkRegistryProject(

@@ -19,9 +19,9 @@ import {
     TrainResultStatus,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import { TrainEntity } from '../../../domains/core/train';
-import type { TrainLogSaveContext } from '../../../domains/core/train-log';
-import { saveTrainLog } from '../../../domains/core/train-log';
+import { TrainEntity } from '../../../domains/train';
+import type { TrainLogSaveContext } from '../../../domains/train-log';
+import { saveTrainLog } from '../../../domains/train-log';
 
 export async function handleTrainManagerExtractorEvent(
     context: ExtractorEventContext | ComponentContextWithError<ExtractorEventContext>,

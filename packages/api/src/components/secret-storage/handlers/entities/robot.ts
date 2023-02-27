@@ -19,7 +19,7 @@ import { ApiKey } from '../../../../config';
 import { RegistryCommand } from '../../../registry';
 import { buildRegistryPayload } from '../../../registry/utils/queue';
 import type { SecretStorageRobotDeletePayload, SecretStorageRobotSavePayload } from '../../type';
-import { RegistryProjectEntity } from '../../../../domains/core/registry-project/entity';
+import { RegistryProjectEntity } from '../../../../domains/registry-project/entity';
 
 export async function saveRobotToSecretStorage(payload: SecretStorageRobotSavePayload) {
     const dataSource = await useDataSource();

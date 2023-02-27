@@ -15,7 +15,7 @@ import { isRealmResourceWritable } from '@authup/common';
 import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../request';
-import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
 
 export async function deleteRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

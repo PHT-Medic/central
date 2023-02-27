@@ -16,7 +16,7 @@ import {
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/common';
-import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
+import { ProposalStationEntity } from '../../../../../domains/proposal-station/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function getOneProposalStationRouteHandler(req: Request, res: Response) : Promise<any> {

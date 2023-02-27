@@ -18,8 +18,8 @@ import { send, sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { ensureMinioBucket, useMinio } from '../../../../../core/minio';
 import { streamToBuffer } from '../../../../../core/utils';
-import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/core/train';
-import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
+import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/train';
+import { TrainFileEntity } from '../../../../../domains/train-file/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function uploadTrainFilesRouteHandler(req: Request, res: Response) {

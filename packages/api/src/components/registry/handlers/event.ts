@@ -8,7 +8,7 @@ import { RouterCommand, buildRouterQueuePayload } from '@personalhealthtrain/tra
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../config';
-import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
+import { RegistryProjectEntity } from '../../../domains/registry-project/entity';
 import { RegistryHookEvent } from '../constants';
 import type { RegistryEventPayload } from '../type';
 

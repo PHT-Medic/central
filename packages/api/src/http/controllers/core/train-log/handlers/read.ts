@@ -14,7 +14,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { TrainLogEntity } from '../../../../../domains/core/train-log';
+import { TrainLogEntity } from '../../../../../domains/train-log';
 
 export async function getOneTrainLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

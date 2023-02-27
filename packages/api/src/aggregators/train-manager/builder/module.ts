@@ -20,9 +20,9 @@ import {
     TrainBuildStatus,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import type { TrainLogSaveContext } from '../../../domains/core/train-log';
-import { saveTrainLog } from '../../../domains/core/train-log';
-import { TrainEntity } from '../../../domains/core/train';
+import type { TrainLogSaveContext } from '../../../domains/train-log';
+import { saveTrainLog } from '../../../domains/train-log';
+import { TrainEntity } from '../../../domains/train';
 
 export async function handleTrainManagerBuilderEvent(
     context: BuilderEventContext | ComponentContextWithError<BuilderEventContext>,

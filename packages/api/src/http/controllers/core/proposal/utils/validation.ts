@@ -11,8 +11,8 @@ import { ForbiddenError } from '@ebec/http';
 import { check, validationResult } from 'express-validator';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
 import type { Request } from 'routup';
-import { MasterImageEntity } from '../../../../../domains/core/master-image/entity';
-import type { ProposalEntity } from '../../../../../domains/core/proposal/entity';
+import { MasterImageEntity } from '../../../../../domains/master-image/entity';
+import type { ProposalEntity } from '../../../../../domains/proposal/entity';
 import type { RequestValidationResult } from '../../../../validation';
 import {
     RequestValidationError, extendRequestValidationResultWithRelation,

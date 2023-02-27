@@ -12,7 +12,7 @@ import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runUserSecretValidation } from '../utils';
-import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
+import { UserSecretEntity } from '../../../../../domains/user-secret/entity';
 import {
     SecretStorageCommand,
     SecretStorageEntityType,

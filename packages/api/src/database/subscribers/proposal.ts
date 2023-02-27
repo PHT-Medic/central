@@ -19,7 +19,7 @@ import {
 import {
     emitSocketServerToClientEvent,
 } from '../../config/socket-emitter';
-import { ProposalEntity } from '../../domains/core/proposal/entity';
+import { ProposalEntity } from '../../domains/proposal/entity';
 
 function publish(
     operation: `${ProposalSocketServerToClientEventName}`,

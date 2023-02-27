@@ -13,7 +13,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runTrainValidation } from '../utils';
-import { TrainEntity } from '../../../../../domains/core/train';
+import { TrainEntity } from '../../../../../domains/train';
 
 export async function updateTrainRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

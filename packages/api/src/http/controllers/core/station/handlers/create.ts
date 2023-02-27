@@ -21,8 +21,8 @@ import { buildRegistryPayload } from '../../../../../components/registry/utils/q
 import { RequestValidationError } from '../../../../validation';
 import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
-import { StationEntity } from '../../../../../domains/core/station';
-import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { StationEntity } from '../../../../../domains/station';
+import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
 
 export async function createStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');

@@ -16,7 +16,7 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { ParseAllowedOption } from 'rapiq';
 import { parseQueryFields } from 'rapiq';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { RegistryEntity } from '../../../../../domains/core/registry/entity';
+import { RegistryEntity } from '../../../../../domains/registry/entity';
 import { useRequestEnv } from '../../../../request';
 
 function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>) {

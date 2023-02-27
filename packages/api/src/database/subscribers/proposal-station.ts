@@ -24,7 +24,7 @@ import {
 import {
     emitSocketServerToClientEvent,
 } from '../../config/socket-emitter';
-import { ProposalStationEntity } from '../../domains/core/proposal-station/entity';
+import { ProposalStationEntity } from '../../domains/proposal-station/entity';
 
 function publish(
     operation: `${ProposalStationSocketServerToClientEventName}`,

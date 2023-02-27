@@ -12,9 +12,9 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../../../core/minio';
-import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
+import { TrainFileEntity } from '../../../../../domains/train-file/entity';
 import { useRequestEnv } from '../../../../request';
-import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/core/train';
+import { TrainEntity, generateTrainMinioBucketName } from '../../../../../domains/train';
 
 export async function deleteTrainFileRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

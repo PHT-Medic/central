@@ -13,7 +13,7 @@ import { useRequestQuery } from '@routup/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import { applyFilters, useDataSource } from 'typeorm-extension';
-import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
+import { TrainFileEntity } from '../../../../../domains/train-file/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function getOneTrainFileRouteHandler(req: Request, res: Response) : Promise<any> {

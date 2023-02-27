@@ -13,7 +13,7 @@ import {
     applyQuery,
     useDataSource,
 } from 'typeorm-extension';
-import { MasterImageGroupEntity } from '../../../../../domains/core/master-image-group/entity';
+import { MasterImageGroupEntity } from '../../../../../domains/master-image-group/entity';
 
 export async function getOneMasterImageGroupRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

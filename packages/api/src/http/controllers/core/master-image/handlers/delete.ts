@@ -11,7 +11,7 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
-import { MasterImageEntity } from '../../../../../domains/core/master-image';
+import { MasterImageEntity } from '../../../../../domains/master-image';
 
 export async function deleteMasterImageRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

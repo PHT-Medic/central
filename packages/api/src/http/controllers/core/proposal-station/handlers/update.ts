@@ -11,7 +11,7 @@ import { PermissionID } from '@personalhealthtrain/central-common';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
+import { ProposalStationEntity } from '../../../../../domains/proposal-station/entity';
 import { useRequestEnv } from '../../../../request';
 import { runProposalStationValidation } from '../utils';
 

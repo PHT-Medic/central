@@ -6,7 +6,7 @@
  */
 
 import { getMinioBucketObjectList, useMinio } from '../../../core/minio';
-import { generateTrainMinioBucketName } from '../../../domains/core/train';
+import { generateTrainMinioBucketName } from '../../../domains/train';
 import type { TrainCommand } from '../constants';
 import type { TrainPayload } from '../type';
 

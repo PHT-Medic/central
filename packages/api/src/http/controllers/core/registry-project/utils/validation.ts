@@ -8,8 +8,8 @@
 import { check, validationResult } from 'express-validator';
 import { RegistryProjectType } from '@personalhealthtrain/central-common';
 import type { Request } from 'routup';
-import type { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
-import { RegistryEntity } from '../../../../../domains/core/registry/entity';
+import type { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
+import { RegistryEntity } from '../../../../../domains/registry/entity';
 import type { RequestValidationResult } from '../../../../validation';
 import {
     RequestValidationError, extendRequestValidationResultWithRelation,

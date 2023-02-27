@@ -17,7 +17,7 @@ import {
 import {
     emitSocketServerToClientEvent,
 } from '../../config';
-import { TrainLogEntity } from '../../domains/core/train-log';
+import { TrainLogEntity } from '../../domains/train-log';
 
 function publish(
     operation: `${TrainLogSocketServerToClientEventName}`,

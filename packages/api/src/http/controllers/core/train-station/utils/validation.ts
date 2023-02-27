@@ -11,9 +11,9 @@ import { BadRequestError, NotFoundError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/common';
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { StationEntity } from '../../../../../domains/core/station/entity';
-import type { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
-import { TrainEntity } from '../../../../../domains/core/train';
+import { StationEntity } from '../../../../../domains/station/entity';
+import type { TrainStationEntity } from '../../../../../domains/train-station/entity';
+import { TrainEntity } from '../../../../../domains/train';
 import { useRequestEnv } from '../../../../request';
 import type { RequestValidationResult } from '../../../../validation';
 import {
@@ -23,7 +23,7 @@ import {
     initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';
-import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
+import { ProposalStationEntity } from '../../../../../domains/proposal-station/entity';
 
 export async function runTrainStationValidation(
     req: Request,

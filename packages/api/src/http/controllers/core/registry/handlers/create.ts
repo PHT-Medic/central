@@ -12,7 +12,7 @@ import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runRegistryValidation } from '../utils';
-import { RegistryEntity } from '../../../../../domains/core/registry/entity';
+import { RegistryEntity } from '../../../../../domains/registry/entity';
 
 export async function createRegistryRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');

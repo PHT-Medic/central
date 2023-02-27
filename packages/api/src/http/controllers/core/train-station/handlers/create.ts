@@ -10,11 +10,11 @@ import { BadRequestError, ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
+import { TrainStationEntity } from '../../../../../domains/train-station/entity';
 import { useRequestEnv } from '../../../../request';
 import { runTrainStationValidation } from '../utils';
 import { useEnv } from '../../../../../config/env';
-import { TrainEntity } from '../../../../../domains/core/train';
+import { TrainEntity } from '../../../../../domains/train';
 
 export async function createTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');

@@ -12,7 +12,7 @@ import tar from 'tar';
 import { scanDirectory } from 'docker-scan';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
-import { getWritableDirPath } from '../../../../config';
+import { getWritableDirPath } from '../../../config';
 import { mergeMasterImageGroupsWithDatabase, mergeMasterImagesWithDatabase } from './utils';
 
 export async function syncMasterImages(req: Request, res: Response) : Promise<any> {

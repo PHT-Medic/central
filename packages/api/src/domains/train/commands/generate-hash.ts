@@ -8,8 +8,8 @@
 import { TrainConfigurationStatus } from '@personalhealthtrain/central-common';
 import crypto from 'node:crypto';
 import { useDataSource } from 'typeorm-extension';
-import { useMinio } from '../../../../core/minio';
-import { streamToBuffer } from '../../../../core/utils';
+import { useMinio } from '../../../core/minio';
+import { streamToBuffer } from '../../../core/utils';
 import { generateTrainMinioBucketName } from '../utils';
 import { resolveTrain } from './utils';
 import { TrainEntity } from '../entity';

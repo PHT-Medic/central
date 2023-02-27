@@ -16,7 +16,7 @@ import {
 import {
     emitSocketServerToClientEvent,
 } from '../../config/socket-emitter';
-import { RegistryProjectEntity } from '../../domains/core/registry-project/entity';
+import { RegistryProjectEntity } from '../../domains/registry-project/entity';
 
 function publish(
     operation: `${RegistryProjectSocketServerToClientEventName}`,

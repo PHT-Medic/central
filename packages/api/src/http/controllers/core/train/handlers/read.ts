@@ -16,7 +16,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { isRealmResourceReadable } from '@authup/common';
-import { TrainEntity } from '../../../../../domains/core/train';
+import { TrainEntity } from '../../../../../domains/train';
 import { useRequestEnv } from '../../../../request';
 
 export async function getOneTrainRouteHandler(req: Request, res: Response) : Promise<any> {

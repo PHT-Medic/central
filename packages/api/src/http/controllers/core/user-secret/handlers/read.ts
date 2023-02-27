@@ -15,7 +15,7 @@ import {
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
+import { UserSecretEntity } from '../../../../../domains/user-secret/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function getOneUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {

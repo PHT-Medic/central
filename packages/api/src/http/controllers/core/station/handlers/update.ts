@@ -19,8 +19,8 @@ import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
-import { StationEntity } from '../../../../../domains/core/station';
-import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { StationEntity } from '../../../../../domains/station';
+import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
 
 export async function updateStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

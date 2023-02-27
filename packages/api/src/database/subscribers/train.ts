@@ -16,7 +16,7 @@ import {
 import { publish as publishMessage } from 'amqp-extension';
 import { TrainCommand } from '../../components/train/constants';
 import { emitSocketServerToClientEvent } from '../../config';
-import { TrainEntity, buildTrainQueueMessage } from '../../domains/core/train';
+import { TrainEntity, buildTrainQueueMessage } from '../../domains/train';
 
 function publish(
     operation: `${TrainSocketServerToClientEventName}`,

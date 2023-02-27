@@ -10,17 +10,17 @@ import { check, validationResult } from 'express-validator';
 import { BadRequestError } from '@ebec/http';
 import { isRealmResourceWritable } from '@authup/common';
 import type { Request } from 'routup';
-import { MasterImageEntity } from '../../../../../domains/core/master-image';
-import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
-import { RegistryEntity } from '../../../../../domains/core/registry/entity';
-import type { TrainEntity } from '../../../../../domains/core/train';
+import { MasterImageEntity } from '../../../../../domains/master-image';
+import { ProposalEntity } from '../../../../../domains/proposal/entity';
+import { RegistryEntity } from '../../../../../domains/registry/entity';
+import type { TrainEntity } from '../../../../../domains/train';
 import type { RequestValidationResult } from '../../../../validation';
 import {
     RequestValidationError, extendRequestValidationResultWithRelation,
     initRequestValidationResult,
     matchedValidationData,
 } from '../../../../validation';
-import { TrainFileEntity } from '../../../../../domains/core/train-file/entity';
+import { TrainFileEntity } from '../../../../../domains/train-file/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function runTrainValidation(

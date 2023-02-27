@@ -23,8 +23,8 @@ import { useEnv, useLogger } from '../../../../../../config';
 import {
     RegistryCommand,
 } from '../../../../../../components';
-import { RegistryProjectEntity } from '../../../../../../domains/core/registry-project/entity';
-import { RegistryEntity } from '../../../../../../domains/core/registry/entity';
+import { RegistryProjectEntity } from '../../../../../../domains/registry-project/entity';
+import { RegistryEntity } from '../../../../../../domains/registry/entity';
 
 const commands = Object.values(RegistryAPICommand);
 

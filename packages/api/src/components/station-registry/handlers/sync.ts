@@ -12,7 +12,7 @@ import { RealmEntity } from '@authup/server-database';
 import { hasOwnProperty } from '@authup/common';
 import { Ecosystem } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import { StationEntity } from '../../../domains/core/station';
+import { StationEntity } from '../../../domains/station';
 import { ApiKey, useLogger } from '../../../config';
 import { transformStationRegistryResponse } from '../utils/transform';
 import {

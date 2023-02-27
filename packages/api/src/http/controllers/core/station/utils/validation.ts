@@ -11,8 +11,8 @@ import { RealmEntity } from '@authup/server-database';
 import { isRealmResourceWritable } from '@authup/common';
 import { ForbiddenError } from '@ebec/http';
 import type { Request } from 'routup';
-import { RegistryEntity } from '../../../../../domains/core/registry/entity';
-import type { StationEntity } from '../../../../../domains/core/station/entity';
+import { RegistryEntity } from '../../../../../domains/registry/entity';
+import type { StationEntity } from '../../../../../domains/station/entity';
 import { useRequestEnv } from '../../../../request';
 import type { RequestValidationResult } from '../../../../validation';
 import {

@@ -10,7 +10,7 @@ import { ForbiddenError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ProposalStationEntity } from '../../../../../domains/core/proposal-station/entity';
+import { ProposalStationEntity } from '../../../../../domains/proposal-station/entity';
 import { useRequestEnv } from '../../../../request';
 import { runProposalStationValidation } from '../utils';
 import { useEnv } from '../../../../../config/env';

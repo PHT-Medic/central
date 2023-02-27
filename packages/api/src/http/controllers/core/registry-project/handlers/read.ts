@@ -23,7 +23,7 @@ import {
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { useRequestEnv } from '../../../../request';
-import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
 
 function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {
     const protectedFields : ParseAllowedOption<RegistryProjectEntity> = [

@@ -19,7 +19,7 @@ import {
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { onlyRealmWritableQueryResources } from '@authup/server-database';
-import { StationEntity } from '../../../../../domains/core/station/entity';
+import { StationEntity } from '../../../../../domains/station/entity';
 import { useRequestEnv } from '../../../../request';
 
 async function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {

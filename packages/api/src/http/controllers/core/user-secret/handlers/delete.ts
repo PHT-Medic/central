@@ -13,7 +13,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import type { FindOptionsWhere } from 'typeorm';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
-import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
+import { UserSecretEntity } from '../../../../../domains/user-secret/entity';
 import { useEnv } from '../../../../../config';
 import {
     SecretStorageCommand,

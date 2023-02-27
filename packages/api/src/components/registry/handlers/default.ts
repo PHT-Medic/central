@@ -14,8 +14,8 @@ import {
     RegistryProjectType, generateRegistryProjectId,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
-import { RegistryEntity } from '../../../domains/core/registry/entity';
+import { RegistryProjectEntity } from '../../../domains/registry-project/entity';
+import { RegistryEntity } from '../../../domains/registry/entity';
 import { useLogger } from '../../../config';
 import { RegistryCommand } from '../constants';
 import type { RegistrySetupPayload } from '../type';

@@ -11,7 +11,7 @@ import { isRealmResourceWritable } from '@authup/common';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { ProposalEntity } from '../../../../../domains/core/proposal/entity';
+import { ProposalEntity } from '../../../../../domains/proposal/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function deleteProposalRouteHandler(req: Request, res: Response) : Promise<any> {

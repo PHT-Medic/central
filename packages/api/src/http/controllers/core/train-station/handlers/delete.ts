@@ -12,9 +12,9 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { MoreThan } from 'typeorm';
 import { isRealmResourceWritable } from '@authup/common';
 import { useDataSource } from 'typeorm-extension';
-import { TrainStationEntity } from '../../../../../domains/core/train-station/entity';
+import { TrainStationEntity } from '../../../../../domains/train-station/entity';
 import { useRequestEnv } from '../../../../request';
-import { TrainEntity } from '../../../../../domains/core/train';
+import { TrainEntity } from '../../../../../domains/train';
 
 export async function deleteTrainStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');

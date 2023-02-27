@@ -14,8 +14,8 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
-import { StationEntity } from '../../../../../domains/core/station';
-import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
+import { StationEntity } from '../../../../../domains/station';
+import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
 import { useRequestEnv } from '../../../../request';
 
 export async function deleteStationRouteHandler(req: Request, res: Response) : Promise<any> {
