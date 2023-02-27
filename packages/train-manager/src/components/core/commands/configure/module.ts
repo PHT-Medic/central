@@ -5,12 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useMinio } from '../../../core/minio';
-import { generateTrainMinioBucketName } from '../../../domains/train';
-import type { TrainCommand } from '../constants';
-import type { TrainPayload } from '../type';
+import { generateTrainMinioBucketName } from '@personalhealthtrain/central-server-common';
+import { useMinio } from '../../../../core';
+import type { CoreConfigurePayload } from '../../type';
 
-export async function setupTrain(payload: TrainPayload<TrainCommand.CLEANUP>) {
+export async function executeCoreConfigureCommand(
+    payload: CoreConfigurePayload,
+) : Promise<CoreConfigurePayload> {
     const minio = useMinio();
 
     const bucketName = generateTrainMinioBucketName(payload.id);
@@ -18,4 +19,6 @@ export async function setupTrain(payload: TrainPayload<TrainCommand.CLEANUP>) {
     if (!hasBucket) {
         await minio.makeBucket(bucketName, 'eu-west-1');
     }
+
+    return payload;
 }

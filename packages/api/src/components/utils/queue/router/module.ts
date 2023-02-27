@@ -12,7 +12,6 @@ import { ComponentName } from '../../../constants';
 import { executeSecretStorageComponentCommand } from '../../../secret-storage';
 import { executeRegistryCommand } from '../../../registry';
 import { executeStationRegistryCommand } from '../../../station-registry';
-import { executeTrainCommand } from '../../../train';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
 import type { QueueRouterPayload } from './type';
 
@@ -44,13 +43,6 @@ export function buildRouterComponent() {
                     }
                     case ComponentName.STATION_REGISTRY: {
                         await executeStationRegistryCommand({
-                            command: payload.metadata.command,
-                            data: payload.data,
-                        });
-                        break;
-                    }
-                    case ComponentName.TRAIN: {
-                        await executeTrainCommand({
                             command: payload.metadata.command,
                             data: payload.data,
                         });

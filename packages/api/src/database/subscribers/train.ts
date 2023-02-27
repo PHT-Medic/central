@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { CoreCommand, buildCoreQueuePayload } from '@personalhealthtrain/train-manager';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
@@ -14,9 +15,8 @@ import {
     buildSocketRealmNamespaceName, buildSocketTrainRoomName,
 } from '@personalhealthtrain/central-common';
 import { publish as publishMessage } from 'amqp-extension';
-import { TrainCommand } from '../../components/train/constants';
 import { emitSocketServerToClientEvent } from '../../config';
-import { TrainEntity, buildTrainQueueMessage } from '../../domains/train';
+import { TrainEntity } from '../../domains';
 
 function publish(
     operation: `${TrainSocketServerToClientEventName}`,
@@ -46,12 +46,12 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
     async afterInsert(event: InsertEvent<TrainEntity>): Promise<any> {
         publish(TrainSocketServerToClientEventName.CREATED, event.entity);
 
-        const message = buildTrainQueueMessage(
-            TrainCommand.SETUP,
-            {
+        const message = buildCoreQueuePayload({
+            command: CoreCommand.CONFIGURE,
+            data: {
                 id: event.entity.id,
             },
-        );
+        });
 
         await publishMessage(message);
     }
@@ -63,12 +63,12 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
     async beforeRemove(event: RemoveEvent<TrainEntity>): Promise<any> {
         publish(TrainSocketServerToClientEventName.DELETED, event.entity);
 
-        const message = buildTrainQueueMessage(
-            TrainCommand.CLEANUP,
-            {
+        const message = buildCoreQueuePayload({
+            command: CoreCommand.DESTROY,
+            data: {
                 id: event.entity.id,
             },
-        );
+        });
 
         await publishMessage(message);
 

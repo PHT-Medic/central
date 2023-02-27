@@ -11,6 +11,7 @@ import type {
 import { isComponentCommandQueuePayload } from '@personalhealthtrain/central-server-common';
 import { consume } from 'amqp-extension';
 import { ComponentName } from '../../../constants';
+import { executeCoreCommand } from '../../../core';
 import {
     executeBuilderCommand,
     executeExtractorCommand,
@@ -43,6 +44,10 @@ export function buildComponentRouter() : Component {
                 switch (payload.metadata.component) {
                     case ComponentName.BUILDER: {
                         await executeBuilderCommand(context);
+                        break;
+                    }
+                    case ComponentName.CORE: {
+                        await executeCoreCommand(context);
                         break;
                     }
                     case ComponentName.EXTRACTOR: {

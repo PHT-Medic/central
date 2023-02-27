@@ -7,5 +7,4 @@
 
 export * from './commands';
 export * from './entity';
-export * from './queue';
 export * from './utils';

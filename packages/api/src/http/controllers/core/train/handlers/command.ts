@@ -23,7 +23,7 @@ import {
     stopBuildTrain,
     triggerTrainResultStart,
     triggerTrainResultStatus,
-} from '../../../../../domains/train';
+} from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import { RequestValidationError } from '../../../../validation';
 

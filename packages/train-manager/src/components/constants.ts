@@ -7,6 +7,7 @@
 
 export enum ComponentName {
     BUILDER = 'builder',
+    CORE = 'core',
     EXTRACTOR = 'extractor',
     ROUTER = 'router',
 }

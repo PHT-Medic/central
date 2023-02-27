@@ -1,16 +1,17 @@
 /*
- * Copyright (c) 2022.
+ * Copyright (c) 2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { getMinioBucketObjectList, useMinio } from '../../../core/minio';
-import { generateTrainMinioBucketName } from '../../../domains/train';
-import type { TrainCommand } from '../constants';
-import type { TrainPayload } from '../type';
+import { generateTrainMinioBucketName } from '@personalhealthtrain/central-server-common';
+import { getMinioBucketObjectList, useMinio } from '../../../../core';
+import type { CoreDestroyPayload } from '../../type';
 
-export async function cleanupTrain(payload: TrainPayload<TrainCommand.CLEANUP>) {
+export async function executeCoreDestroyCommand(
+    payload: CoreDestroyPayload,
+) : Promise<CoreDestroyPayload> {
     const minio = useMinio();
 
     const bucketName = generateTrainMinioBucketName(payload.id);
@@ -20,4 +21,6 @@ export async function cleanupTrain(payload: TrainPayload<TrainCommand.CLEANUP>) 
         await minio.removeObjects(bucketName, items);
         await minio.removeBucket(bucketName);
     }
+
+    return payload;
 }

@@ -6,6 +6,7 @@
  */
 
 export * from './builder';
+export * from './core';
 export * from './constants';
 export * from './extractor';
 export * from './router';

@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './constants';
-export * from './registry';
-export * from './secret-storage';
-export * from './station-registry';
-export * from './utils';
+import type { Train } from '@personalhealthtrain/central-common';
+
+export function generateTrainMinioBucketName(id: Train['id']) {
+    return `trains.${id}`;
+}
