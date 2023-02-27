@@ -16,12 +16,13 @@ import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { RegistryCommand } from '../../../../../components';
+import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { RequestValidationError } from '../../../../validation';
 import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
 import { StationEntity } from '../../../../../domains/core/station';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
-import { RegistryQueueCommand, buildRegistryPayload } from '../../../../../domains/special/registry';
 
 export async function createStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
@@ -81,7 +82,7 @@ export async function createStationRouteHandler(req: Request, res: Response) : P
         entity.registry_project_id = registryProject.id;
 
         await publish(buildRegistryPayload({
-            command: RegistryQueueCommand.PROJECT_LINK,
+            command: RegistryCommand.PROJECT_LINK,
             data: {
                 id: registryProject.id,
             },

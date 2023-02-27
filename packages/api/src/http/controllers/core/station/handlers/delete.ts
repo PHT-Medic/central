@@ -12,9 +12,10 @@ import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { RegistryCommand } from '../../../../../components';
+import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { StationEntity } from '../../../../../domains/core/station';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
-import { RegistryQueueCommand, buildRegistryPayload } from '../../../../../domains/special/registry';
 import { useRequestEnv } from '../../../../request';
 
 export async function deleteStationRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -46,7 +47,7 @@ export async function deleteStationRouteHandler(req: Request, res: Response) : P
         const registryProject = await registryProjectRepository.findOneBy({ id: entity.registry_project_id });
         if (registryProject) {
             const queueMessage = buildRegistryPayload({
-                command: RegistryQueueCommand.PROJECT_UNLINK,
+                command: RegistryCommand.PROJECT_UNLINK,
                 data: {
                     id: registryProject.id,
                     registryId: registryProject.registry_id,

@@ -164,13 +164,13 @@ export async function syncStationRegistry() {
     externalStations = [...existingExternalStations, ...nonExistingExternalStations];
 
     for (let i = 0; i < externalStations.length; i++) {
-        const queueMessage = buildSecretStorageQueueMessage(
-            SecretStorageCommand.SAVE,
-            {
+        const queueMessage = buildSecretStorageQueueMessage({
+            command: SecretStorageCommand.SAVE,
+            data: {
                 type: SecretStorageEntityType.STATION,
                 id: externalStations[i].id,
             },
-        );
+        });
 
         await publish(queueMessage);
     }

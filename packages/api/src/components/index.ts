@@ -6,8 +6,8 @@
  */
 
 export * from './constants';
-export * from './router';
 export * from './registry';
 export * from './secret-storage';
 export * from './station-registry';
 export * from './train';
+export * from './utils';

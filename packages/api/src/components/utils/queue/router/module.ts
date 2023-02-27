@@ -7,12 +7,12 @@
 
 import type { ConsumeMessage } from 'amqp-extension';
 import { consume } from 'amqp-extension';
-import { useLogger } from '../../config';
-import { ComponentName } from '../constants';
-import { executeSecretStorageComponentCommand } from '../secret-storage';
-import { executeRegistryCommand } from '../registry';
-import { executeStationRegistryCommand } from '../station-registry';
-import { executeTrainCommand } from '../train';
+import { useLogger } from '../../../../config';
+import { ComponentName } from '../../../constants';
+import { executeSecretStorageComponentCommand } from '../../../secret-storage';
+import { executeRegistryCommand } from '../../../registry';
+import { executeStationRegistryCommand } from '../../../station-registry';
+import { executeTrainCommand } from '../../../train';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
 import type { QueueRouterPayload } from './type';
 
@@ -25,22 +25,20 @@ export function buildRouterComponent() {
                 useLogger().debug('Command received', {
                     component: payload.metadata.component,
                     command: payload.metadata.command,
-                    ...(payload.metadata.event ? { event: payload.metadata.event } : {}),
                 });
 
                 switch (payload.metadata.component) {
                     case ComponentName.REGISTRY: {
                         await executeRegistryCommand({
-                            command: payload.metadata.command,
-                            data: payload.data,
-                            event: payload.metadata.event,
+                            command: payload.metadata.command as any,
+                            data: payload.data as any,
                         });
                         break;
                     }
                     case ComponentName.SECRET_STORAGE: {
                         await executeSecretStorageComponentCommand({
-                            command: payload.metadata.command,
-                            data: payload.data,
+                            command: payload.metadata.command as any,
+                            data: payload.data as any,
                         });
                         break;
                     }

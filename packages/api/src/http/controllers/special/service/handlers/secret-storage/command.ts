@@ -29,11 +29,9 @@ import {
     SecretStorageCommand,
     SecretStorageEntityType,
     buildSecretStorageQueueMessage,
-} from '../../../../../../components';
-import {
     deleteUserSecretsFromSecretStorage,
     saveUserSecretsToSecretStorage,
-} from '../../../../../../components/secret-storage/handlers/entities/user';
+} from '../../../../../../components';
 import { useRequestEnv } from '../../../../../request';
 
 const commands = Object.values(SecretStorageCommand);
@@ -127,13 +125,13 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
                             id: entity.data.id,
                         });
                     } else {
-                        const queueMessage = buildSecretStorageQueueMessage(
-                            SecretStorageCommand.SAVE,
-                            {
+                        const queueMessage = buildSecretStorageQueueMessage({
+                            command: SecretStorageCommand.SAVE,
+                            data: {
                                 type: SecretStorageEntityType.USER_SECRETS,
                                 id: entity.data.id,
                             },
-                        );
+                        });
                         await publish(queueMessage);
                     }
                     break;
@@ -151,13 +149,13 @@ export async function handleSecretStorageCommandRouteHandler(req: Request, res: 
                             id: entity.data.id,
                         });
                     } else {
-                        const queueMessage = buildSecretStorageQueueMessage(
-                            SecretStorageCommand.DELETE,
-                            {
+                        const queueMessage = buildSecretStorageQueueMessage({
+                            command: SecretStorageCommand.DELETE,
+                            data: {
                                 type: SecretStorageEntityType.USER_SECRETS,
                                 id: entity.data.id,
                             },
-                        );
+                        });
                         await publish(queueMessage);
                     }
                     break;

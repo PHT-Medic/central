@@ -9,15 +9,14 @@ import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../config';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
-import type { RegistryEventQueuePayload } from '../../../domains/special/registry';
-import { RegistryHookEvent } from '../../../domains/special/registry';
+import { RegistryHookEvent } from '../constants';
+import type { RegistryEventPayload } from '../type';
 
 export async function dispatchRegistryEventToTrainManager(
-    event: string,
-    data: RegistryEventQueuePayload,
+    data: RegistryEventPayload,
 ) {
     // only process terminated trains and the PUSH_ARTIFACT event
-    switch (event) {
+    switch (data.event) {
         case RegistryHookEvent.PUSH_ARTIFACT: {
             const dataSource = await useDataSource();
             const registryProjectRepository = dataSource.getRepository(RegistryProjectEntity);
@@ -49,7 +48,7 @@ export async function dispatchRegistryEventToTrainManager(
         case RegistryHookEvent.SCANNING_COMPLETED:
         case RegistryHookEvent.SCANNING_FAILED: {
             useLogger()
-                .info(`skipping registry event: ${event}`);
+                .info(`skipping registry event: ${data.event}`);
             break;
         }
     }

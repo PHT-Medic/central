@@ -14,11 +14,11 @@ import {
 
 import { NotFoundError } from '@ebec/http';
 import { Request, Response, useRequestParam } from 'routup';
+import { RegistryHook } from '../../../../components';
 import { ForceLoggedInMiddleware } from '../../../middleware';
 import { postHarborHookRouteHandler } from './handlers/registry/hook';
 
 import { handleSecretStorageCommandRouteHandler } from './handlers/secret-storage/command';
-import { RegistryHook } from '../../../../domains/special/registry';
 import { handleStationRegistryCommandRouteHandler } from './handlers/station-registry/command';
 import { handleRegistryCommandRouteHandler } from './handlers/registry/command';
 

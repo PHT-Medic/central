@@ -17,17 +17,12 @@ import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { buildRegistryPayload } from '../../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../../request';
 import { useEnv, useLogger } from '../../../../../../config';
 import {
-    linkRegistryProject,
-    setupRegistry,
-    unlinkRegistryProject,
+    RegistryCommand,
 } from '../../../../../../components';
-import {
-    RegistryQueueCommand,
-    buildRegistryPayload,
-} from '../../../../../../domains/special/registry';
 import { RegistryProjectEntity } from '../../../../../../domains/core/registry-project/entity';
 import { RegistryEntity } from '../../../../../../domains/core/registry/entity';
 
@@ -50,6 +45,11 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
         throw new BadRequestError(`An ID parameter is required for the registry command ${command}`);
     }
 
+    if (useEnv('env') === 'test') {
+        sendAccepted(res);
+        return;
+    }
+
     const dataSource = await useDataSource();
 
     switch (command) {
@@ -64,30 +64,23 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .getOne();
 
             if (command === RegistryAPICommand.SETUP) {
-                if (useEnv('env') === 'test') {
-                    await setupRegistry({
+                useLogger().info('Submitting setup registry command.');
+
+                const queueMessage = buildRegistryPayload({
+                    command: RegistryCommand.SETUP,
+                    data: {
                         id: entity.id,
-                        entity,
-                    });
-                } else {
-                    useLogger().info('Submitting setup registry command.');
-                    const queueMessage = buildRegistryPayload({
-                        command: RegistryQueueCommand.SETUP,
-                        data: {
-                            id: entity.id,
-                            entity,
-                        },
-                    });
-                    await publish(queueMessage);
-                }
+                    },
+                });
+
+                await publish(queueMessage);
             } else {
                 useLogger().info('Submitting delete registry command.');
 
                 const queueMessage = buildRegistryPayload({
-                    command: RegistryQueueCommand.DELETE,
+                    command: RegistryCommand.DELETE,
                     data: {
                         id: entity.id,
-                        entity,
                     },
                 });
 
@@ -106,33 +99,16 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .getOne();
 
             if (command === RegistryAPICommand.PROJECT_LINK) {
-                if (useEnv('env') === 'test') {
-                    await linkRegistryProject({
+                const queueMessage = buildRegistryPayload({
+                    command: RegistryCommand.PROJECT_LINK,
+                    data: {
                         id: entity.id,
-                        entity,
-                    });
-                } else {
-                    const queueMessage = buildRegistryPayload({
-                        command: RegistryQueueCommand.PROJECT_LINK,
-                        data: {
-                            id: entity.id,
-                            entity,
-                        },
-                    });
-                    await publish(queueMessage);
-                }
-                break;
-            } else if (useEnv('env') === 'test') {
-                await unlinkRegistryProject({
-                    id: entity.id,
-                    registryId: entity.registry_id,
-                    externalName: entity.external_name,
-                    accountId: entity.account_id,
-                    updateDatabase: true,
+                    },
                 });
+                await publish(queueMessage);
             } else {
                 const queueMessage = buildRegistryPayload({
-                    command: RegistryQueueCommand.PROJECT_UNLINK,
+                    command: RegistryCommand.PROJECT_UNLINK,
                     data: {
                         id: entity.id,
                         registryId: entity.registry_id,

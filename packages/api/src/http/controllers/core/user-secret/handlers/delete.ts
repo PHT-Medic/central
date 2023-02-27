@@ -15,12 +15,12 @@ import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
 import { useEnv } from '../../../../../config';
-import { saveUserSecretsToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/user';
 import {
     SecretStorageCommand,
     SecretStorageEntityType,
-} from '../../../../../components/secret-storage/constants';
-import { buildSecretStorageQueueMessage } from '../../../../../components/secret-storage/queue';
+    buildSecretStorageQueueMessage,
+    saveUserSecretsToSecretStorage,
+} from '../../../../../components';
 import { useRequestEnv } from '../../../../request';
 
 export async function deleteUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -59,13 +59,13 @@ export async function deleteUserSecretRouteHandler(req: Request, res: Response) 
             id: entity.user_id,
         });
     } else {
-        await publish(buildSecretStorageQueueMessage(
-            SecretStorageCommand.SAVE,
-            {
+        await publish(buildSecretStorageQueueMessage({
+            command: SecretStorageCommand.SAVE,
+            data: {
                 type: SecretStorageEntityType.USER_SECRETS,
                 id: entity.user_id,
             },
-        ));
+        }));
     }
 
     return sendAccepted(res, entity);

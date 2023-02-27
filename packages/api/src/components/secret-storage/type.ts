@@ -7,33 +7,49 @@
 
 import type { Robot, User } from '@authup/common';
 import type { Station } from '@personalhealthtrain/central-common';
-import type { SecretStorageEntityType } from './constants';
+import type { SecretStorageCommand, SecretStorageEntityType } from './constants';
 
-export type SecretStorageComponentRobotPayload = {
+export type SecretStorageRobotDeletePayload = {
     type: SecretStorageEntityType.ROBOT,
     name: Robot['name'],
-    id?: Robot['id'],
-    secret?: Robot['secret']
 };
 
-export type SecretStorageComponentUserSecretsPayload = {
+export type SecretStorageRobotSavePayload = SecretStorageRobotDeletePayload & {
+    id: Robot['id'],
+    secret: Robot['secret']
+};
+
+export type SecretStorageUserSecretsPayload = {
     type: SecretStorageEntityType.USER_SECRETS,
     id: User['id']
 };
 
-export type SecretStorageComponentStationPayload = {
+export type SecretStorageStationPayload = {
     type: SecretStorageEntityType.STATION,
     id: Station['id']
 } & Partial<Station>;
 
-export type SecretStorageQueuePayload =
-    SecretStorageComponentRobotPayload |
-    SecretStorageComponentUserSecretsPayload |
-    SecretStorageComponentStationPayload;
+export type SecretStorageSavePayload =
+    SecretStorageRobotSavePayload |
+    SecretStorageUserSecretsPayload |
+    SecretStorageStationPayload;
+
+export type SecretStorageDeletePayload =
+    SecretStorageRobotDeletePayload |
+    SecretStorageUserSecretsPayload |
+    SecretStorageStationPayload;
 
 // ---------------------------------------------------
 
-export type SecretStorageExecuteContext = {
-    data: SecretStorageQueuePayload,
-    command: string
+export type SecretStorageSaveCommendContext = {
+    data: SecretStorageSavePayload,
+    command: `${SecretStorageCommand.SAVE}`
 };
+
+export type SecretStorageDeleteCommendContext = {
+    data: SecretStorageDeletePayload,
+    command: `${SecretStorageCommand.DELETE}`,
+};
+
+export type SecretStorageCommandContext = SecretStorageSaveCommendContext |
+SecretStorageDeleteCommendContext;

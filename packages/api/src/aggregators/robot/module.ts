@@ -7,13 +7,20 @@
 
 import { useRobotEventEmitter } from '@authup/server-database';
 import { publish } from 'amqp-extension';
-import { SecretStorageCommand, SecretStorageEntityType, buildSecretStorageQueueMessage } from '../../components';
+import {
+    SecretStorageCommand,
+    SecretStorageEntityType, buildSecretStorageQueueMessage,
+} from '../../components';
 import { useEnv } from '../../config';
 import {
     deleteRobotFromSecretStorage,
     saveRobotToSecretStorage,
 } from '../../components/secret-storage/handlers/entities/robot';
-import type { SecretStorageComponentRobotPayload } from '../../components';
+import type {
+    SecretStorageRobotDeletePayload,
+
+    SecretStorageRobotSavePayload,
+} from '../../components';
 import type { Aggregator } from '../type';
 
 export function buildRobotAggregator() : Aggregator {
@@ -22,7 +29,7 @@ export function buildRobotAggregator() : Aggregator {
 
         useRobotEventEmitter()
             .on('credentials', async (robot) => {
-                const payload : SecretStorageComponentRobotPayload = {
+                const payload : SecretStorageRobotSavePayload = {
                     type: SecretStorageEntityType.ROBOT,
                     name: robot.name,
                     id: robot.id,
@@ -32,10 +39,10 @@ export function buildRobotAggregator() : Aggregator {
                 if (synchronous) {
                     await saveRobotToSecretStorage(payload);
                 } else {
-                    const queueMessage = buildSecretStorageQueueMessage(
-                        SecretStorageCommand.SAVE,
-                        payload,
-                    );
+                    const queueMessage = buildSecretStorageQueueMessage({
+                        command: SecretStorageCommand.SAVE,
+                        data: payload,
+                    });
 
                     await publish(queueMessage);
                 }
@@ -43,7 +50,7 @@ export function buildRobotAggregator() : Aggregator {
 
         useRobotEventEmitter()
             .on('deleted', async (robot) => {
-                const payload : SecretStorageComponentRobotPayload = {
+                const payload : SecretStorageRobotDeletePayload = {
                     type: SecretStorageEntityType.ROBOT,
                     name: robot.name,
                 };
@@ -51,10 +58,10 @@ export function buildRobotAggregator() : Aggregator {
                 if (synchronous) {
                     await deleteRobotFromSecretStorage(payload);
                 } else {
-                    const queueMessage = buildSecretStorageQueueMessage(
-                        SecretStorageCommand.DELETE,
-                        payload,
-                    );
+                    const queueMessage = buildSecretStorageQueueMessage({
+                        command: SecretStorageCommand.DELETE,
+                        data: payload,
+                    });
 
                     await publish(queueMessage);
                 }

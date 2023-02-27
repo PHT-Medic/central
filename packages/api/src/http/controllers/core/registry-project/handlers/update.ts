@@ -12,10 +12,11 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { isRealmResourceWritable } from '@authup/common';
+import { RegistryCommand } from '../../../../../components';
+import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../request';
 import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
-import { RegistryQueueCommand, buildRegistryPayload } from '../../../../../domains/special/registry';
 
 export async function updateRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -52,7 +53,7 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
         entity.external_name !== result.data.external_name
     ) {
         await publish(buildRegistryPayload({
-            command: RegistryQueueCommand.PROJECT_UNLINK,
+            command: RegistryCommand.PROJECT_UNLINK,
             data: {
                 id: entity.id,
                 registryId: entity.registry_id,
@@ -63,7 +64,7 @@ export async function updateRegistryProjectRouteHandler(req: Request, res: Respo
     }
 
     await publish(buildRegistryPayload({
-        command: RegistryQueueCommand.PROJECT_LINK,
+        command: RegistryCommand.PROJECT_LINK,
         data: {
             id: entity.id,
         },

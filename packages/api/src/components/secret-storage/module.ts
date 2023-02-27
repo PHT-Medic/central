@@ -7,11 +7,11 @@
 
 import { isError } from '@personalhealthtrain/central-common';
 import { useLogger } from '../../config';
-import type { SecretStorageExecuteContext } from './type';
+import type { SecretStorageCommandContext } from './type';
 import { deleteFromSecretStorage, saveToSecretStorage } from './handlers';
 import { SecretStorageCommand } from './constants';
 
-export async function executeSecretStorageComponentCommand(context: SecretStorageExecuteContext) : Promise<void> {
+export async function executeSecretStorageComponentCommand(context: SecretStorageCommandContext) : Promise<void> {
     switch (context.command) {
         case SecretStorageCommand.SAVE: {
             await Promise.resolve(context.data)

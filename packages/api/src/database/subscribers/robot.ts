@@ -9,8 +9,7 @@ import type { EntitySubscriberInterface, RemoveEvent } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import { RobotEntity } from '@authup/server-database';
 import { publish } from 'amqp-extension';
-import { buildSecretStorageQueueMessage } from '../../components/secret-storage/queue';
-import { SecretStorageCommand, SecretStorageEntityType } from '../../components/secret-storage/constants';
+import { SecretStorageCommand, SecretStorageEntityType, buildSecretStorageQueueMessage } from '../../components';
 
 @EventSubscriber()
 export class RobotSubscriber implements EntitySubscriberInterface<RobotEntity> {
@@ -23,13 +22,13 @@ export class RobotSubscriber implements EntitySubscriberInterface<RobotEntity> {
             return;
         }
 
-        const queueMessage = buildSecretStorageQueueMessage(
-            SecretStorageCommand.DELETE,
-            {
+        const queueMessage = buildSecretStorageQueueMessage({
+            command: SecretStorageCommand.DELETE,
+            data: {
                 type: SecretStorageEntityType.ROBOT,
                 name: event.entity.name,
             },
-        );
+        });
 
         await publish(queueMessage);
     }

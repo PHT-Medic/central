@@ -12,9 +12,10 @@ import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { isRealmResourceWritable } from '@authup/common';
+import { RegistryCommand } from '../../../../../components';
+import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../request';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
-import { RegistryQueueCommand, buildRegistryPayload } from '../../../../../domains/special/registry';
 
 export async function deleteRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -44,7 +45,7 @@ export async function deleteRegistryProjectRouteHandler(req: Request, res: Respo
     entity.id = entityId;
 
     await publish(buildRegistryPayload({
-        command: RegistryQueueCommand.PROJECT_UNLINK,
+        command: RegistryCommand.PROJECT_UNLINK,
         data: {
             id: entity.id,
             registryId: entity.registry_id,

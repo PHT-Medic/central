@@ -6,7 +6,6 @@
  */
 
 import { publish } from 'amqp-extension';
-import type { Registry } from '@personalhealthtrain/central-common';
 import {
     Ecosystem,
     REGISTRY_INCOMING_PROJECT_NAME,
@@ -15,21 +14,19 @@ import {
     RegistryProjectType, generateRegistryProjectId,
 } from '@personalhealthtrain/central-common';
 import { useDataSource } from 'typeorm-extension';
-import type { RegistryQueuePayload } from '../../../domains/special/registry';
-import {
-    RegistryQueueCommand,
-    buildRegistryPayload,
-} from '../../../domains/special/registry';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
 import { RegistryEntity } from '../../../domains/core/registry/entity';
 import { useLogger } from '../../../config';
+import { RegistryCommand } from '../constants';
+import type { RegistrySetupPayload } from '../type';
+import { buildRegistryPayload } from '../utils/queue';
 
-export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueCommand.SETUP>) {
-    if (!payload.id && !payload.entity) {
+export async function setupRegistry(payload: RegistrySetupPayload) {
+    if (!payload.id) {
         useLogger()
             .warn('No registry specified.', {
                 component: 'registry',
-                command: RegistryQueueCommand.SETUP,
+                command: RegistryCommand.SETUP,
             });
         return payload;
     }
@@ -37,16 +34,16 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
     // -----------------------------------------------
 
     const dataSource = await useDataSource();
+    const repository = dataSource.getRepository(RegistryEntity);
+    const entity = await repository.findOneBy({ id: payload.id });
+    if (!entity) {
+        useLogger()
+            .error('Registry not found.', {
+                component: 'registry',
+                command: RegistryCommand.SETUP,
+            });
 
-    // -----------------------------------------------
-
-    let entity : Registry;
-
-    if (payload.entity) {
-        entity = payload.entity;
-    } else {
-        const repository = dataSource.getRepository(RegistryEntity);
-        entity = await repository.findOneBy({ id: payload.id });
+        return payload;
     }
 
     // ---------------------------------------------------------------------
@@ -55,7 +52,7 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
         useLogger()
             .warn('Only default ecosystem is supported.', {
                 component: 'registry',
-                command: RegistryQueueCommand.SETUP,
+                command: RegistryCommand.SETUP,
             });
 
         return payload;
@@ -142,7 +139,7 @@ export async function setupRegistry(payload: RegistryQueuePayload<RegistryQueueC
 
     for (let i = 0; i < entities.length; i++) {
         const queueMessage = buildRegistryPayload({
-            command: RegistryQueueCommand.PROJECT_LINK,
+            command: RegistryCommand.PROJECT_LINK,
             data: {
                 id: entities[i].id,
             },

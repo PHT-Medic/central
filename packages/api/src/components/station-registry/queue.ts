@@ -7,8 +7,8 @@
 
 import type { PublishOptionsExtended } from 'amqp-extension';
 import { ComponentName } from '../constants';
-import type { QueueRouterPayload } from '../router';
-import { ROUTER_QUEUE_ROUTING_KEY } from '../router';
+import type { QueueRouterPayload } from '../utils/queue/router';
+import { ROUTER_QUEUE_ROUTING_KEY } from '../utils/queue/router';
 import type { StationRegistryComponentCommand } from './consants';
 import type { StationRegistryComponentPayload } from './type';
 

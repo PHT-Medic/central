@@ -13,11 +13,11 @@ import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runUserSecretValidation } from '../utils';
 import { UserSecretEntity } from '../../../../../domains/core/user-secret/entity';
-import { buildSecretStorageQueueMessage } from '../../../../../components/secret-storage/queue';
 import {
     SecretStorageCommand,
     SecretStorageEntityType,
-} from '../../../../../components/secret-storage/constants';
+    buildSecretStorageQueueMessage,
+} from '../../../../../components';
 import { useEnv } from '../../../../../config';
 import { saveUserSecretsToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/user';
 
@@ -49,13 +49,13 @@ export async function createUserSecretRouteHandler(req: Request, res: Response) 
             id: entity.user_id,
         });
     } else {
-        await publish(buildSecretStorageQueueMessage(
-            SecretStorageCommand.SAVE,
-            {
+        await publish(buildSecretStorageQueueMessage({
+            command: SecretStorageCommand.SAVE,
+            data: {
                 type: SecretStorageEntityType.USER_SECRETS,
                 id: entity.user_id,
             },
-        ));
+        }));
     }
 
     return sendCreated(res, entity);

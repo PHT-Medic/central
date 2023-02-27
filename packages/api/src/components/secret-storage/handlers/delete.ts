@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { SecretStorageQueuePayload } from '../type';
+import type { SecretStorageSavePayload } from '../type';
 import { SecretStorageEntityType } from '../constants';
 import { deleteRobotFromSecretStorage } from './entities/robot';
 import { deleteUserSecretsFromSecretStorage } from './entities/user';
 
-export async function deleteFromSecretStorage(data: SecretStorageQueuePayload) {
+export async function deleteFromSecretStorage(data: SecretStorageSavePayload) {
     switch (data.type) {
         case SecretStorageEntityType.ROBOT:
             await deleteRobotFromSecretStorage(data);

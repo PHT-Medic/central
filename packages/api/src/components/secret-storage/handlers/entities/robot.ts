@@ -16,15 +16,12 @@ import { publish } from 'amqp-extension';
 import type { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
 import { ApiKey } from '../../../../config';
-import type { SecretStorageComponentRobotPayload } from '../../type';
-import { RegistryQueueCommand, buildRegistryPayload } from '../../../../domains/special/registry';
+import { RegistryCommand } from '../../../registry';
+import { buildRegistryPayload } from '../../../registry/utils/queue';
+import type { SecretStorageRobotDeletePayload, SecretStorageRobotSavePayload } from '../../type';
 import { RegistryProjectEntity } from '../../../../domains/core/registry-project/entity';
 
-export async function saveRobotToSecretStorage(payload: SecretStorageComponentRobotPayload) {
-    if (!payload.id || !payload.secret) {
-        return;
-    }
-
+export async function saveRobotToSecretStorage(payload: SecretStorageRobotSavePayload) {
     const dataSource = await useDataSource();
 
     const data = buildRobotSecretStoragePayload(payload.id, payload.secret);
@@ -41,7 +38,7 @@ export async function saveRobotToSecretStorage(payload: SecretStorageComponentRo
 
         for (let i = 0; i < projects.length; i++) {
             const queueMessage = buildRegistryPayload({
-                command: RegistryQueueCommand.PROJECT_LINK,
+                command: RegistryCommand.PROJECT_LINK,
                 data: {
                     id: projects[i].id,
                 },
@@ -52,7 +49,7 @@ export async function saveRobotToSecretStorage(payload: SecretStorageComponentRo
     }
 }
 
-export async function deleteRobotFromSecretStorage(payload: SecretStorageComponentRobotPayload) {
+export async function deleteRobotFromSecretStorage(payload: SecretStorageRobotDeletePayload) {
     try {
         await useClient<VaultClient>(ApiKey.VAULT).keyValue.delete(ROBOT_SECRET_ENGINE_KEY, `${payload.name}`);
     } catch (e) {

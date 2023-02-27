@@ -6,15 +6,13 @@
  */
 
 import type { PublishOptionsExtended } from 'amqp-extension';
-import { ComponentName } from '../constants';
-import type { QueueRouterPayload } from '../utils';
-import { ROUTER_QUEUE_ROUTING_KEY } from '../utils';
-import type {
-    SecretStorageCommandContext,
-} from './type';
+import { ComponentName } from '../../constants';
+import { ROUTER_QUEUE_ROUTING_KEY } from '../../utils';
+import type { QueueRouterPayload } from '../../utils';
+import type { RegistryCommandContext } from '../type';
 
-export function buildSecretStorageQueueMessage(
-    context: SecretStorageCommandContext,
+export function buildRegistryPayload(
+    context: RegistryCommandContext,
 ) : PublishOptionsExtended<QueueRouterPayload> {
     return {
         exchange: {
@@ -23,7 +21,7 @@ export function buildSecretStorageQueueMessage(
         content: {
             data: context.data,
             metadata: {
-                component: ComponentName.SECRET_STORAGE,
+                component: ComponentName.REGISTRY,
                 command: context.command,
             },
         },

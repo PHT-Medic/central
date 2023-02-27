@@ -15,39 +15,32 @@ import type { Client as HarborClient } from '@hapic/harbor';
 import type { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryProjectEntity } from '../../../domains/core/registry-project/entity';
-import type { RegistryQueuePayload } from '../../../domains/special/registry';
-import {
-    RegistryQueueCommand,
-} from '../../../domains/special/registry';
-import { ensureRemoteRegistryProjectAccount } from '../../../domains/special/registry/helpers/remote-robot-account';
-import { ensureRemoteRegistryProject } from '../../../domains/special/registry/helpers/remote';
-import { saveRemoteRegistryProjectWebhook } from '../../../domains/special/registry/helpers/remote-webhook';
+import { RegistryCommand } from '../constants';
+import type { RegistryProjectLinkPayload, RegistryProjectUnlinkPayload } from '../type';
+import { ensureRemoteRegistryProjectAccount } from './helpers/remote-robot-account';
+import { ensureRemoteRegistryProject } from './helpers/remote';
+import { saveRemoteRegistryProjectWebhook } from './helpers/remote-webhook';
 import { ApiKey, useLogger } from '../../../config';
 import { RegistryEntity } from '../../../domains/core/registry/entity';
-import { createBasicHarborAPIConfig } from '../../../domains/special/registry/utils';
+import { createBasicHarborAPIConfig } from './utils';
 
 export async function linkRegistryProject(
-    payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_LINK>,
+    payload: RegistryProjectLinkPayload,
 ) {
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(RegistryProjectEntity);
-
-    let { entity } = payload;
-
-    if (!entity) {
-        entity = await repository.createQueryBuilder('registryProject')
-            .addSelect([
-                'registryProject.account_secret',
-            ])
-            .where('registryProject.id = :id', { id: payload.id })
-            .getOne();
-    }
+    const entity = await repository.createQueryBuilder('registryProject')
+        .addSelect([
+            'registryProject.account_secret',
+        ])
+        .where('registryProject.id = :id', { id: payload.id })
+        .getOne();
 
     if (!entity) {
         useLogger()
             .error('Registry project not found.', {
                 component: 'registry',
-                command: RegistryQueueCommand.PROJECT_LINK,
+                command: RegistryCommand.PROJECT_LINK,
             });
 
         return;
@@ -57,7 +50,7 @@ export async function linkRegistryProject(
         useLogger()
             .warn('Only default ecosystem supported.', {
                 component: 'registry',
-                command: RegistryQueueCommand.PROJECT_LINK,
+                command: RegistryCommand.PROJECT_LINK,
             });
         return;
     }
@@ -74,7 +67,7 @@ export async function linkRegistryProject(
         useLogger()
             .error('Registry not found.', {
                 component: 'registry',
-                command: RegistryQueueCommand.PROJECT_LINK,
+                command: RegistryCommand.PROJECT_LINK,
             });
 
         return;
@@ -86,7 +79,7 @@ export async function linkRegistryProject(
     useLogger()
         .info('Connect to registry', {
             component: 'registry',
-            command: RegistryQueueCommand.PROJECT_LINK,
+            command: RegistryCommand.PROJECT_LINK,
         });
 
     const httpClient = createClient<HarborClient>(httpClientConfig);
@@ -105,7 +98,7 @@ export async function linkRegistryProject(
         useLogger()
             .warn('Project could not be created.', {
                 component: 'registry',
-                command: RegistryQueueCommand.PROJECT_LINK,
+                command: RegistryCommand.PROJECT_LINK,
             });
 
         return;
@@ -136,7 +129,7 @@ export async function linkRegistryProject(
         useLogger()
             .warn('Robot account could not be created.', {
                 component: 'registry',
-                command: RegistryQueueCommand.PROJECT_LINK,
+                command: RegistryCommand.PROJECT_LINK,
             });
 
         return;
@@ -158,7 +151,7 @@ export async function linkRegistryProject(
         useLogger()
             .warn('Webhook could not be created.', {
                 component: 'registry',
-                command: RegistryQueueCommand.PROJECT_LINK,
+                command: RegistryCommand.PROJECT_LINK,
             });
 
         return;
@@ -168,7 +161,7 @@ export async function linkRegistryProject(
 }
 
 export async function unlinkRegistryProject(
-    payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_UNLINK>,
+    payload: RegistryProjectUnlinkPayload,
 ) {
     const dataSource = await useDataSource();
     const registryRepository = dataSource.getRepository(RegistryEntity);
@@ -190,7 +183,7 @@ export async function unlinkRegistryProject(
         useLogger()
             .warn('Project could not be deleted.', {
                 component: 'registry',
-                command: RegistryQueueCommand.PROJECT_UNLINK,
+                command: RegistryCommand.PROJECT_UNLINK,
             });
     }
 
@@ -202,7 +195,7 @@ export async function unlinkRegistryProject(
             useLogger()
                 .warn('Robot Account could not be deleted.', {
                     component: 'registry',
-                    command: RegistryQueueCommand.PROJECT_UNLINK,
+                    command: RegistryCommand.PROJECT_UNLINK,
                 });
         }
     }
@@ -214,7 +207,7 @@ export async function unlinkRegistryProject(
         useLogger()
             .warn('Vault project representation could not be deleted.', {
                 component: 'registry',
-                command: RegistryQueueCommand.PROJECT_UNLINK,
+                command: RegistryCommand.PROJECT_UNLINK,
             });
     }
 
@@ -238,7 +231,7 @@ export async function unlinkRegistryProject(
 }
 
 export async function relinkRegistryProject(
-    payload: RegistryQueuePayload<RegistryQueueCommand.PROJECT_RELINK>,
+    payload: RegistryProjectUnlinkPayload,
 ) {
     await unlinkRegistryProject({
         ...payload,

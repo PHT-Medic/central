@@ -11,10 +11,11 @@ import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { RegistryCommand } from '../../../../../components';
+import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../request';
 import { runRegistryProjectValidation } from '../utils';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
-import { RegistryQueueCommand, buildRegistryPayload } from '../../../../../domains/special/registry';
 
 export async function createRegistryProjectRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
@@ -34,7 +35,7 @@ export async function createRegistryProjectRouteHandler(req: Request, res: Respo
     await repository.save(entity);
 
     await publish(buildRegistryPayload({
-        command: RegistryQueueCommand.PROJECT_LINK,
+        command: RegistryCommand.PROJECT_LINK,
         data: {
             id: entity.id,
         },

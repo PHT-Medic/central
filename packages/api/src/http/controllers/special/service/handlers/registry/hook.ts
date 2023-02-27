@@ -10,13 +10,9 @@ import { useRequestBody } from '@routup/body';
 import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
-import { RegistryHookSchema } from '../../../../../../components';
+import { RegistryCommand, RegistryHookSchema } from '../../../../../../components';
+import { buildRegistryPayload } from '../../../../../../components/registry/utils/queue';
 import { useLogger } from '../../../../../../config';
-
-import {
-    RegistryQueueCommand,
-    buildRegistryPayload,
-} from '../../../../../../domains/special/registry';
 
 export async function postHarborHookRouteHandler(req: Request, res: Response) : Promise<any> {
     const body = useRequestBody(req);
@@ -28,9 +24,9 @@ export async function postHarborHookRouteHandler(req: Request, res: Response) : 
     }
 
     await publish(buildRegistryPayload({
-        command: RegistryQueueCommand.EVENT_HANDLE,
-        event: validation.data.type,
+        command: RegistryCommand.EVENT_HANDLE,
         data: {
+            event: validation.data.type,
             operator: validation.data.operator,
             namespace: validation.data.event_data.repository.namespace,
             repositoryName: validation.data.event_data.repository.name,

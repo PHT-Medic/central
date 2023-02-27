@@ -15,11 +15,12 @@ import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
+import { RegistryCommand } from '../../../../../components';
+import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../request';
 import { runStationValidation } from '../utils';
 import { StationEntity } from '../../../../../domains/core/station';
 import { RegistryProjectEntity } from '../../../../../domains/core/registry-project/entity';
-import { RegistryQueueCommand, buildRegistryPayload } from '../../../../../domains/special/registry';
 
 export async function updateStationRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -104,14 +105,14 @@ export async function updateStationRouteHandler(req: Request, res: Response) : P
 
         if (registryOperation === 'link') {
             await publish(buildRegistryPayload({
-                command: RegistryQueueCommand.PROJECT_LINK,
+                command: RegistryCommand.PROJECT_LINK,
                 data: {
                     id: registryProject.id,
                 },
             }));
         } else {
             await publish(buildRegistryPayload({
-                command: RegistryQueueCommand.PROJECT_RELINK,
+                command: RegistryCommand.PROJECT_RELINK,
                 data: {
                     id: registryProject.id,
                     registryId: registryProject.registry_id,
