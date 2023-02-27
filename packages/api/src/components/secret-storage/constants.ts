@@ -12,6 +12,5 @@ export enum SecretStorageCommand {
 
 export enum SecretStorageEntityType {
     USER_SECRETS = 'userSecrets',
-    STATION = 'station',
     ROBOT = 'robot',
 }

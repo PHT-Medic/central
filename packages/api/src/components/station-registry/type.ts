@@ -5,6 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { StationRegistryCommand } from './consants';
+
 export type StationRegistryComponentPayload = {
     [key: string]: any
 };
@@ -16,7 +18,9 @@ export type StationRegistryEntity = {
     [key: string]: any,
 };
 
-export type StationRegistryExecuteContext = {
+export type StationRegistrySyncCommandContext = {
     data: StationRegistryComponentPayload,
-    command: string
+    command: `${StationRegistryCommand.SYNC}`
 };
+
+export type StationRegistryCommandContext = StationRegistrySyncCommandContext;

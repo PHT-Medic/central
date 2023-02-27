@@ -6,7 +6,6 @@
  */
 
 import type { Robot, User } from '@authup/common';
-import type { Station } from '@personalhealthtrain/central-common';
 import type { SecretStorageCommand, SecretStorageEntityType } from './constants';
 
 export type SecretStorageRobotDeletePayload = {
@@ -24,20 +23,13 @@ export type SecretStorageUserSecretsPayload = {
     id: User['id']
 };
 
-export type SecretStorageStationPayload = {
-    type: SecretStorageEntityType.STATION,
-    id: Station['id']
-} & Partial<Station>;
-
 export type SecretStorageSavePayload =
     SecretStorageRobotSavePayload |
-    SecretStorageUserSecretsPayload |
-    SecretStorageStationPayload;
+    SecretStorageUserSecretsPayload;
 
 export type SecretStorageDeletePayload =
     SecretStorageRobotDeletePayload |
-    SecretStorageUserSecretsPayload |
-    SecretStorageStationPayload;
+    SecretStorageUserSecretsPayload;
 
 // ---------------------------------------------------
 

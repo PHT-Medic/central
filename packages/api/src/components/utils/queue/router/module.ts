@@ -43,8 +43,8 @@ export function buildRouterComponent() {
                     }
                     case ComponentName.STATION_REGISTRY: {
                         await executeStationRegistryCommand({
-                            command: payload.metadata.command,
-                            data: payload.data,
+                            command: payload.metadata.command as any,
+                            data: payload.data as any,
                         });
                         break;
                     }

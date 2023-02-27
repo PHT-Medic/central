@@ -8,5 +8,5 @@
 export * from './handlers';
 export * from './consants';
 export * from './module';
-export * from './queue';
+export * from './utils';
 export * from './type';

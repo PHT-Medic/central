@@ -17,7 +17,7 @@ import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useEnv } from '../../../../../../config';
 import {
-    StationRegistryComponentCommand,
+    StationRegistryCommand,
     buildStationRegistryQueueMessage,
     syncStationRegistry,
 } from '../../../../../../components';
@@ -39,10 +39,10 @@ export async function handleStationRegistryCommandRouteHandler(req: Request, res
             if (useEnv('env') === 'test') {
                 await syncStationRegistry();
             } else {
-                const queueMessage = buildStationRegistryQueueMessage(
-                    StationRegistryComponentCommand.SYNC,
-                    {},
-                );
+                const queueMessage = buildStationRegistryQueueMessage({
+                    command: StationRegistryCommand.SYNC,
+                    data: {},
+                });
 
                 await publish(queueMessage);
             }

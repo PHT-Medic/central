@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { StationRegistryComponentCommand } from './consants';
+import { StationRegistryCommand } from './consants';
 import { syncStationRegistry } from './handlers';
-import type { StationRegistryExecuteContext } from './type';
+import type { StationRegistryCommandContext } from './type';
 
-export async function executeStationRegistryCommand(context: StationRegistryExecuteContext) {
+export async function executeStationRegistryCommand(context: StationRegistryCommandContext) {
     switch (context.command) {
-        case StationRegistryComponentCommand.SYNC: {
+        case StationRegistryCommand.SYNC: {
             await syncStationRegistry();
             break;
         }

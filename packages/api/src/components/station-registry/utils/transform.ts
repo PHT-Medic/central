@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty } from '@authup/common';
+import { isObject } from 'locter';
 import type { StationRegistryEntity } from '../type';
 
 export function transformStationRegistryResponse(data: Record<string, any>) : StationRegistryEntity[] {
@@ -19,10 +19,8 @@ export function transformStationRegistryResponse(data: Record<string, any>) : St
 
     for (let i = 0; i < entities.length; i++) {
         if (
-            typeof entities[i] !== 'object' ||
-            !hasOwnProperty(entities[i], 'id') ||
+            !isObject(entities[i]) ||
             typeof entities[i].id !== 'string' ||
-            !hasOwnProperty(entities[i], 'name') ||
             typeof entities[i].name !== 'string'
         ) {
             continue;
@@ -35,15 +33,11 @@ export function transformStationRegistryResponse(data: Record<string, any>) : St
 
         let realmId: string | undefined;
 
-        if (
-            hasOwnProperty(entities[i], 'link-list') &&
-            Array.isArray(entities[i]['link-list'])
-        ) {
-            const linkItem : Record<string, any> | undefined = entities[i]['link-list'].filter(
+        if (Array.isArray(entities[i]['link-list'])) {
+            const linkItem : undefined | { name: string, uri: string } = entities[i]['link-list'].filter(
                 (link) => typeof link === 'object' &&
-                    hasOwnProperty(link, 'name') &&
-                    hasOwnProperty(link, 'uri') &&
-                    link.name === 'organization',
+                    link.name === 'organization' &&
+                    typeof link.uri === 'string',
             ).pop();
 
             if (linkItem) {
