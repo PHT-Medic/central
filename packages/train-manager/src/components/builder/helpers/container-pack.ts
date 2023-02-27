@@ -13,9 +13,11 @@ import type { Container } from 'dockerode';
 import { useClient } from 'hapic';
 import tar from 'tar-stream';
 import {
-    createSignature, encryptSymmetric, streamToBuffer, useLogger,
+    createSignature, encryptSymmetric, streamToBuffer,
 } from '../../../core';
+import { BuilderCommand } from '../constants';
 import { BuilderError } from '../error';
+import { useBuilderLogger } from '../utils';
 import { createPackFromFileContent } from './file-gzip';
 import { buildTrainConfig } from './train-config';
 import type { ContainerPackContext } from './type';
@@ -61,9 +63,10 @@ export async function packContainerWithTrain(container: Container, context: Cont
 
     // -----------------------------------------------------------------------------------
 
-    useLogger().debug(`Writing ${TrainContainerFileName.CONFIG} to container`, {
-        component: 'building',
-    });
+    useBuilderLogger()
+        .debug(`Writing ${TrainContainerFileName.CONFIG} to container`, {
+            command: BuilderCommand.BUILD,
+        });
 
     await container.putArchive(
         createPackFromFileContent(JSON.stringify(trainConfig), TrainContainerFileName.CONFIG),
@@ -79,9 +82,10 @@ export async function packContainerWithTrain(container: Container, context: Cont
     // -----------------------------------------------------------------------------------
 
     if (context.train.query) {
-        useLogger().debug(`Writing ${TrainContainerFileName.QUERY} to container`, {
-            component: 'building',
-        });
+        useBuilderLogger()
+            .debug(`Writing ${TrainContainerFileName.QUERY} to container`, {
+                command: BuilderCommand.BUILD,
+            });
 
         let { query } = context.train;
         if (typeof query !== 'string') {
@@ -95,9 +99,10 @@ export async function packContainerWithTrain(container: Container, context: Cont
 
     // -----------------------------------------------------------------------------------
 
-    useLogger().debug('Writing files to container', {
-        component: 'building',
-    });
+    useBuilderLogger()
+        .debug('Writing files to container', {
+            command: BuilderCommand.BUILD,
+        });
 
     const client = useClient<HTTPClient>();
 
@@ -114,18 +119,20 @@ export async function packContainerWithTrain(container: Container, context: Cont
                 extract.on('entry', (header, stream, callback) => {
                     streamToBuffer(stream)
                         .then((buff) => {
-                            useLogger().debug(`Extracting train file ${header.name} (${header.size} bytes).`, {
-                                component: 'building',
-                            });
+                            useBuilderLogger()
+                                .debug(`Extracting train file ${header.name} (${header.size} bytes).`, {
+                                    command: BuilderCommand.BUILD,
+                                });
 
                             files.push([header.name, buff]);
 
                             callback();
                         })
                         .catch((e) => {
-                            useLogger().error(`Extracting train file ${header.name} (${header.size} bytes) failed.`, {
-                                component: 'building',
-                            });
+                            useBuilderLogger()
+                                .error(`Extracting train file ${header.name} (${header.size} bytes) failed.`, {
+                                    command: BuilderCommand.BUILD,
+                                });
                             callback(e);
                         });
                 });
@@ -136,15 +143,17 @@ export async function packContainerWithTrain(container: Container, context: Cont
 
                 extract.on('finish', () => {
                     for (let i = 0; i < files.length; i++) {
-                        useLogger().debug(`Encrypting/Packing train file ${files[i][0]}.`, {
-                            component: 'building',
-                        });
+                        useBuilderLogger()
+                            .debug(`Encrypting/Packing train file ${files[i][0]}.`, {
+                                command: BuilderCommand.BUILD,
+                            });
 
                         pack.entry({ name: files[i][0] }, encryptSymmetric(symmetricKey, symmetricKeyIv, files[i][1]));
 
-                        useLogger().debug(`Encrypted/Packed train file ${files[i][0]}.`, {
-                            component: 'building',
-                        });
+                        useBuilderLogger()
+                            .debug(`Encrypted/Packed train file ${files[i][0]}.`, {
+                                command: BuilderCommand.BUILD,
+                            });
                     }
 
                     pack.finalize();
