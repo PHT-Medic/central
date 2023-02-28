@@ -15,11 +15,12 @@ import {
 } from '@personalhealthtrain/central-common';
 import { Client as VaultClient } from '@hapic/vault';
 import type { Robot } from '@authup/common';
-import { useLogger } from './log';
-import type { Config, ConfigContext } from './type';
+import { useLogger } from '../core';
+import { useEnv } from './env';
+import type { Config } from './type';
 
-export function createConfig({ env } : ConfigContext) : Config {
-    setRedisConfig({ connectionString: env.redisConnectionString });
+export function createConfig() : Config {
+    setRedisConfig({ connectionString: useEnv('redisConnectionString') });
 
     const redisDatabase = useRedisClient();
     const redisPub = redisDatabase.duplicate();
@@ -31,13 +32,13 @@ export function createConfig({ env } : ConfigContext) : Config {
             proxy: false,
         },
         extra: {
-            connectionString: env.vaultConnectionString,
+            connectionString: useEnv('vaultConnectionString'),
         },
     }, HTTPClientKey.VAULT);
 
     setHTTPConfig({
         driver: {
-            baseURL: env.apiUrl,
+            baseURL: useEnv('apiUrl'),
             proxy: false,
             withCredentials: true,
         },
@@ -80,18 +81,9 @@ export function createConfig({ env } : ConfigContext) : Config {
         }),
     );
 
-    const aggregators : {start: () => void}[] = [
-    ];
-
-    const components : {start: () => void}[] = [
-    ];
-
     return {
         redisDatabase,
         redisPub,
         redisSub,
-
-        aggregators,
-        components,
     };
 }

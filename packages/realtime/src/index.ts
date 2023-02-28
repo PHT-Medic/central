@@ -5,42 +5,28 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import 'reflect-metadata';
-import dotenv from 'dotenv';
-
-import env from './env';
-
-import {
-    createConfig,
-    createHttpServer,
-    createSocketServer,
-    useLogger,
-} from './config';
-
-dotenv.config();
-
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+import { useLogger } from './core';
+import { createConfig, useEnv } from './config';
+import { createHttpServer } from './http';
+import { createSocketServer } from './socket';
 
 (async () => {
     /*
     HTTP Server & Express App
     */
-    const config = createConfig({ env });
+    const config = createConfig();
     const httpServer = createHttpServer();
-    const socketServer = createSocketServer({ httpServer, config, env });
+    const socketServer = createSocketServer({ httpServer, config });
 
     function signalStart() {
-        useLogger().debug(`Startup on 127.0.0.1:${env.port} (${env.env}) completed.`, { service: 'system' });
+        useLogger().info(`Listening on 0.0.0.0:${useEnv('port')}`);
     }
 
     /*
     Start Server
     */
     function start() {
-        config.components.forEach((c) => c.start());
-        config.aggregators.forEach((a) => a.start());
-
-        socketServer.listen(env.port);
+        socketServer.listen(useEnv('port'));
         signalStart();
     }
 

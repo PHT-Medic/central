@@ -5,10 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Client } from 'redis-extension';
-
-export type Config = {
-    redisDatabase: Client,
-    redisPub: Client,
-    redisSub: Client
-};
+export * from './controllers';
+export * from './register';
+export * from './server';
+export * from './type';
+export * from './utils';
