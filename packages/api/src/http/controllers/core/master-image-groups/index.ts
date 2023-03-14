@@ -8,10 +8,9 @@
 import type { MasterImageGroup } from '@personalhealthtrain/central-common';
 
 import {
-    DController, DDelete, DGet, DParam, DRequest, DResponse,
+    DController, DDelete, DGet, DPath, DRequest, DResponse, DTags,
 } from '@routup/decorators';
-import { SwaggerTags } from '@trapi/swagger';
-import { ForceLoggedInMiddleware } from '../../../middleware/auth';
+import { ForceLoggedInMiddleware } from '../../../middleware';
 import {
     deleteMasterImageGroupRouteHandler,
     getManyMasterImageGroupRouteHandler,
@@ -20,7 +19,7 @@ import {
 
 type PartialMasterImageGroup = Partial<MasterImageGroup>;
 
-@SwaggerTags('master-image')
+@DTags('master-image')
 @DController('/master-image-groups')
 export class MasterImageGroupController {
     @DGet('', [ForceLoggedInMiddleware])
@@ -33,7 +32,7 @@ export class MasterImageGroupController {
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialMasterImageGroup | undefined> {
@@ -42,7 +41,7 @@ export class MasterImageGroupController {
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialMasterImageGroup | undefined> {

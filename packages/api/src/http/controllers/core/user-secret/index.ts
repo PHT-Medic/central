@@ -6,13 +6,12 @@
  */
 
 import {
-    DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
+    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
-import { SwaggerTags } from '@trapi/swagger';
 import type {
     UserSecret,
 } from '@personalhealthtrain/central-common';
-import { ForceLoggedInMiddleware } from '../../../middleware/auth';
+import { ForceLoggedInMiddleware } from '../../../middleware';
 import {
     createUserSecretRouteHandler,
     deleteUserSecretRouteHandler,
@@ -21,7 +20,7 @@ import {
     updateUserSecretRouteHandler,
 } from './handlers';
 
-@SwaggerTags('user')
+@DTags('user')
 @DController('/user-secrets')
 export class UserSecretController {
     @DGet('', [ForceLoggedInMiddleware])
@@ -34,7 +33,7 @@ export class UserSecretController {
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async get(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ) : Promise<UserSecret> {
@@ -52,7 +51,7 @@ export class UserSecretController {
 
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
             @DBody() data: Pick<UserSecret, 'type' | 'content'>,
@@ -62,7 +61,7 @@ export class UserSecretController {
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ) : Promise<UserSecret> {

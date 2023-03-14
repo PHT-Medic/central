@@ -9,11 +9,10 @@ import type {
     Station,
 } from '@personalhealthtrain/central-common';
 import {
-    DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
+    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
-import { SwaggerTags } from '@trapi/swagger';
 
-import { ForceLoggedInMiddleware } from '../../../middleware/auth';
+import { ForceLoggedInMiddleware } from '../../../middleware';
 import {
     createStationRouteHandler,
     deleteStationRouteHandler,
@@ -24,7 +23,7 @@ import {
 
 type PartialStation = Partial<Station>;
 
-@SwaggerTags('station')
+@DTags('station')
 @DController('/stations')
 export class StationController {
     @DGet('', [ForceLoggedInMiddleware])
@@ -47,7 +46,7 @@ export class StationController {
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialStation | undefined> {
@@ -56,7 +55,7 @@ export class StationController {
 
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DBody() data: PartialStation,
             @DRequest() req: any,
             @DResponse() res: any,
@@ -66,7 +65,7 @@ export class StationController {
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialStation | undefined> {

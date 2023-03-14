@@ -10,9 +10,8 @@ import type {
     TrainAPICommand,
 } from '@personalhealthtrain/central-common';
 import {
-    DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
+    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
-import { SwaggerTags } from '@trapi/swagger';
 import {
     createTrainRouteHandler,
     deleteTrainRouteHandler,
@@ -27,7 +26,7 @@ import { ForceLoggedInMiddleware } from '../../../middleware';
 
 type PartialTrain = Partial<Train>;
 
-@SwaggerTags('train')
+@DTags('train')
 @DController('/trains')
 export class TrainController {
     @DGet('', [ForceLoggedInMiddleware])
@@ -40,7 +39,7 @@ export class TrainController {
 
     @DGet('/:id/files/download', [ForceLoggedInMiddleware])
     async getFiles(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<any> {
@@ -49,7 +48,7 @@ export class TrainController {
 
     @DGet('/:id/result/download', [ForceLoggedInMiddleware])
     async getResult(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<any> {
@@ -58,7 +57,7 @@ export class TrainController {
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialTrain | undefined> {
@@ -67,7 +66,7 @@ export class TrainController {
 
     @DPost('/:id', [ForceLoggedInMiddleware])
     async edit(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DBody() data: PartialTrain,
             @DRequest() req: any,
             @DResponse() res: any,
@@ -86,7 +85,7 @@ export class TrainController {
 
     @DPost('/:id/command', [ForceLoggedInMiddleware])
     async doTask(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DBody() data: {
                 command: TrainAPICommand
             },
@@ -98,7 +97,7 @@ export class TrainController {
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialTrain | undefined> {

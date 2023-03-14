@@ -10,9 +10,8 @@ import {
 } from '@personalhealthtrain/central-common';
 
 import {
-    DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
+    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
-import { SwaggerTags } from '@trapi/swagger';
 import { ForceLoggedInMiddleware } from '../../../middleware';
 import {
     createProposalRouteHandler,
@@ -24,7 +23,7 @@ import {
 
 type PartialProposal = Partial<Proposal>;
 
-@SwaggerTags('proposal')
+@DTags('proposal')
 @DController('/proposals')
 export class ProposalController {
     @DGet('', [ForceLoggedInMiddleware])
@@ -37,7 +36,7 @@ export class ProposalController {
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialProposal | undefined> {
@@ -46,7 +45,7 @@ export class ProposalController {
 
     @DPost('/:id', [ForceLoggedInMiddleware])
     async update(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DBody() data: Proposal,
             @DRequest() req: any,
             @DResponse() res: any,
@@ -65,7 +64,7 @@ export class ProposalController {
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialProposal | undefined> {

@@ -10,10 +10,9 @@ import type {
 } from '@personalhealthtrain/central-common';
 
 import {
-    DController, DDelete, DGet, DParam, DRequest, DResponse,
+    DController, DDelete, DGet, DPath, DRequest, DResponse, DTags,
 } from '@routup/decorators';
-import { SwaggerTags } from '@trapi/swagger';
-import { ForceLoggedInMiddleware } from '../../../middleware/auth';
+import { ForceLoggedInMiddleware } from '../../../middleware';
 import {
     deleteTrainLogRouteHandler,
     getManyTrainLogRouteHandler,
@@ -22,7 +21,7 @@ import {
 
 type PartialTrainLog = Partial<TrainLog>;
 
-@SwaggerTags('train')
+@DTags('train')
 @DController('/train-logs')
 export class TrainLogController {
     @DGet('', [ForceLoggedInMiddleware])
@@ -35,7 +34,7 @@ export class TrainLogController {
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialTrainLog | undefined> {
@@ -44,7 +43,7 @@ export class TrainLogController {
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialTrainLog | undefined> {

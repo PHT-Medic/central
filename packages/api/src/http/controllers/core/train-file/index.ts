@@ -9,9 +9,8 @@ import type {
     TrainFile,
 } from '@personalhealthtrain/central-common';
 import {
-    DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
+    DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
-import { SwaggerTags } from '@trapi/swagger';
 
 import {
     deleteTrainFileRouteHandler,
@@ -23,12 +22,12 @@ import { ForceLoggedInMiddleware } from '../../../middleware';
 
 type PartialTrainFile = Partial<TrainFile>;
 
-@SwaggerTags('train')
+@DTags('train')
 @DController('/train-files')
 export class TrainFileController {
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialTrainFile | undefined> {
@@ -37,7 +36,7 @@ export class TrainFileController {
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialTrainFile | undefined> {

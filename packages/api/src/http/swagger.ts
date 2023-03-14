@@ -5,72 +5,56 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    MetadataConfig,
-    Specification,
-    SwaggerDocFormatData,
-    SwaggerDocFormatType,
-} from '@trapi/swagger';
 import {
-    generateDocumentation,
-} from '@trapi/swagger';
+    Version, generate,
+} from '@routup/swagger';
 import { load } from 'locter';
 import path from 'node:path';
 import { getSwaggerEntrypoint } from '@authup/server-http';
 import { getRootDirPath, getWritableDirPath, useEnv } from '../config';
 
-export async function generateSwaggerDocumentation() : Promise<Record<SwaggerDocFormatType, SwaggerDocFormatData>> {
+export async function generateSwaggerDocumentation() {
     const packageJson = await load(path.join(getRootDirPath(), 'package.json')) as Record<string, any>;
-    const tsConfig = await load(path.join(getRootDirPath(), 'tsconfig.json')) as Record<string, any>;
 
-    const metadataConfig : MetadataConfig = {
-        entryPoint: [
-            { pattern: '**/*.ts', cwd: path.join(getRootDirPath(), 'src', 'http', 'controllers') },
-            getSwaggerEntrypoint(),
-        ],
-        ignore: ['**/node_modules/**'],
-        allow: ['**/@authup/**'],
-        decorator: {
-            internal: true,
-            preset: [
-                'routup',
-            ],
-        },
-    };
-
-    const swaggerConfig : Specification.Config = {
-        yaml: true,
-        host: useEnv('apiUrl'),
-        name: 'API Documentation',
-        description: 'Explore the REST Endpoints of the Central API.',
-        basePath: '/',
-        version: packageJson.version,
-        outputDirectory: getWritableDirPath(),
-        securityDefinitions: {
-            bearer: {
-                name: 'Bearer',
-                type: 'apiKey',
-                in: 'header',
+    return generate({
+        version: Version.V2,
+        options: {
+            metadata: {
+                cache: false,
+                entryPoint: [
+                    { pattern: '**/*.ts', cwd: path.join(getRootDirPath(), 'src', 'http', 'controllers') },
+                    getSwaggerEntrypoint(),
+                ],
+                ignore: ['**/node_modules/**'],
+                allow: ['**/@authup/**'],
             },
-            oauth2: {
-                type: 'oauth2',
-                flows: {
-                    password: {
-                        tokenUrl: new URL('token', useEnv('apiUrl')).href,
+            yaml: true,
+            servers: [useEnv('apiUrl')],
+            name: 'API Documentation',
+            description: 'Explore the REST Endpoints of the Central API.',
+            version: packageJson.version,
+            outputDirectory: getWritableDirPath(),
+            securityDefinitions: {
+                bearer: {
+                    name: 'Bearer',
+                    type: 'apiKey',
+                    in: 'header',
+                },
+                oauth2: {
+                    type: 'oauth2',
+                    flows: {
+                        password: {
+                            tokenUrl: new URL('token', useEnv('apiUrl')).href,
+                        },
                     },
                 },
+                basicAuth: {
+                    type: 'http',
+                    schema: 'basic',
+                },
             },
-            basicAuth: {
-                type: 'http',
-                schema: 'basic',
-            },
+            consumes: ['application/json'],
+            produces: ['application/json'],
         },
-        consumes: ['application/json'],
-        produces: ['application/json'],
-    };
-
-    return generateDocumentation({
-        metadata: metadataConfig,
-        swagger: swaggerConfig,
-    }, tsConfig);
+    });
 }

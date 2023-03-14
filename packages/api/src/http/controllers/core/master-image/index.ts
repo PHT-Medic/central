@@ -7,12 +7,11 @@
 import type { MasterImage, MasterImageCommand } from '@personalhealthtrain/central-common';
 
 import {
-    DBody, DController, DDelete, DGet, DParam, DPost, DRequest, DResponse,
+    DBody, DController, DDelete, DGet, DPath, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
-import { SwaggerTags } from '@trapi/swagger';
-import { ForceLoggedInMiddleware } from '../../../middleware/auth';
-import { commandMasterImageRouteHandler } from './handlers/command';
+import { ForceLoggedInMiddleware } from '../../../middleware';
 import {
+    commandMasterImageRouteHandler,
     deleteMasterImageRouteHandler,
     getManyMasterImageRouteHandler,
     getOneMasterImageRouteHandler,
@@ -20,7 +19,7 @@ import {
 
 type PartialMasterImage = Partial<MasterImage>;
 
-@SwaggerTags('master-image')
+@DTags('master-image')
 @DController('/master-images')
 export class MasterImageController {
     @DGet('', [ForceLoggedInMiddleware])
@@ -33,7 +32,7 @@ export class MasterImageController {
 
     @DGet('/:id', [ForceLoggedInMiddleware])
     async getOne(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialMasterImage | undefined> {
@@ -53,7 +52,7 @@ export class MasterImageController {
 
     @DDelete('/:id', [ForceLoggedInMiddleware])
     async drop(
-        @DParam('id') id: string,
+        @DPath('id') id: string,
             @DRequest() req: any,
             @DResponse() res: any,
     ): Promise<PartialMasterImage | undefined> {

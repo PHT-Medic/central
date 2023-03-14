@@ -6,12 +6,11 @@
  */
 
 import {
-    DController, DGet, DRequest, DResponse,
+    DController, DGet, DRequest, DResponse, DTags,
 } from '@routup/decorators';
-import { SwaggerTags } from '@trapi/swagger';
 import { checkIntegrityRouteHandler } from './handlers';
 
-@SwaggerTags('base')
+@DTags('base')
 @DController('')
 export class RootController {
     @DGet('/integrity')

@@ -7,9 +7,8 @@
 
 import type { RegistryAPICommand } from '@personalhealthtrain/central-common';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { SwaggerTags } from '@trapi/swagger';
 import {
-    DBody, DController, DPost, DRequest, DResponse,
+    DBody, DController, DPost, DRequest, DResponse, DTags,
 } from '@routup/decorators';
 
 import { NotFoundError } from '@ebec/http';
@@ -22,7 +21,7 @@ import { handleSecretStorageCommandRouteHandler } from './handlers/secret-storag
 import { handleStationRegistryCommandRouteHandler } from './handlers/station-registry/command';
 import { handleRegistryCommandRouteHandler } from './handlers/registry/command';
 
-@SwaggerTags('extra')
+@DTags('extra')
 @DController('/services')
 export class ServiceController {
     @DPost('/:id/hook', [ForceLoggedInMiddleware])
