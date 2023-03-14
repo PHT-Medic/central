@@ -23,7 +23,7 @@
         "@nuxt/types": "^2.16.2",
         "@nuxt/typescript-build": "^2.1.0",
         "@nuxtjs/dotenv": "^1.4.0",
-        "@nuxtjs/google-fonts": "^2.0.0",
+        "@nuxtjs/google-fonts": "^3.0.0",
         "@personalhealthtrain/central-common": "^1.4.0",
         "@types/moment": "^2.13.0",
         "@types/vuelidate": "^0.7.13",
