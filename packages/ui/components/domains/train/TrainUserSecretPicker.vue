@@ -4,8 +4,8 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-
+<script lang="ts">
+import type { Train } from '@personalhealthtrain/central-common';
 import { SecretType } from '@personalhealthtrain/central-common';
 import { UserSecretList } from '../user-secret/UserSecretList';
 
@@ -43,62 +43,24 @@ export default {
             return this.$store.getters['auth/userId'];
         },
     },
-    watch: {
-        async masterImageId(val, oldVal) {
-            if (this.loading) return;
-
-            if (val && val !== oldVal) {
-                await this.init();
-            }
-        },
-    },
-    created() {
-
-    },
     methods: {
-        async init() {
-            if (!this.userRsaSecretId && !this.userPaillierSecretId) return;
+        async set(type, value) {
+            const payload : Partial<Train> = {};
 
-            this.loading = true;
-
-            try {
-                await this.$api.userSecret.getMany({
-                    filter: {
-                        id: [
-                            ...(this.userRsaSecretId ? [this.userRsaSecretId] : []),
-                            ...(this.userPaillierSecretId ? [this.userPaillierSecretId] : []),
-                        ],
-                    },
-                });
-            } catch (e) {
-                // ...
-            }
-
-            this.loading = false;
-        },
-        async toggle(type, item) {
             switch (type) {
                 case SecretType.RSA_PUBLIC_KEY: {
-                    const response = await this.$api.train.update(this.trainId, {
-                        user_rsa_secret_id: this.userRsaSecretId === item.id ? null : item.id,
-                    });
-
-                    delete response.user_paillier_secret_id;
-
-                    this.$emit('updated', response);
+                    payload.user_rsa_secret_id = value;
                     break;
                 }
                 case SecretType.PAILLIER_PUBLIC_KEY: {
-                    const response = await this.$api.train.update(this.trainId, {
-                        user_paillier_secret_id: this.userPaillierSecretId === item.id ? null : item.id,
-                    });
-
-                    delete response.user_rsa_secret_id;
-
-                    this.$emit('updated', response);
+                    payload.user_paillier_secret_id = value;
                     break;
                 }
             }
+
+            await this.$api.train.update(this.trainId, payload);
+
+            this.$emit('updated', payload);
         },
     },
 };
@@ -117,7 +79,7 @@ export default {
                             <button
                                 type="button"
                                 class="btn btn-xs btn-warning"
-                                @click.prevent="toggle(item.type, item)"
+                                @click.prevent="set(item.type, null)"
                             >
                                 <i class="fa fa-minus" />
                             </button>
@@ -126,7 +88,7 @@ export default {
                             <button
                                 type="button"
                                 class="btn btn-xs btn-dark"
-                                @click.prevent="toggle(item.type, item)"
+                                @click.prevent="set(item.type, item.id)"
                             >
                                 <i class="fa fa-plus" />
                             </button>
@@ -161,18 +123,3 @@ export default {
         </div>
     </div>
 </template>
-<style>
-.click-box {
-    text-align: center;
-    background: #ececec;
-    border-radius: 4px;
-    padding: 1rem 3rem;
-}
-
-.click-box:hover,
-.click-box.active {
-    color: #FF5B5B;
-    background: #32333B;
-    cursor: pointer;
-}
-</style>
