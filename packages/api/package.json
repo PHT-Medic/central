@@ -57,7 +57,7 @@
         "@types/cors": "^2.8.13",
         "@types/dotenv": "^8.2.0",
         "@types/express-rate-limit": "^6.0.0",
-        "@types/minio": "^7.0.16",
+        "@types/minio": "^7.0.17",
         "@types/module-alias": "^2.0.1",
         "@types/mysql": "^2.15.21",
         "@types/supertest": "^2.0.12",
