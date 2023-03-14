@@ -290,9 +290,12 @@ export default {
         //----------------------------------
         // events
         //----------------------------------
-        handleWizardChange(prevIndex, nextIndex) {
+        handleWizardChangedEvent(prevIndex, nextIndex) {
             this.wizard.index = nextIndex;
             this.wizard.valid = true;
+        },
+        handleWizardFinishedEvent() {
+            this.$emit('finished');
         },
 
         handleFilesUploaded() {
@@ -318,7 +321,8 @@ export default {
                 title="Train Wizard"
                 :subtitle="'Configure your '+entity.type+' train step by step'"
                 :start-index="wizard.startIndex"
-                @on-change="handleWizardChange"
+                @on-change="handleWizardChangedEvent"
+                @on-complete="handleWizardFinishedEvent"
             >
                 <template #title>
                     <h4 class="wizard-title">

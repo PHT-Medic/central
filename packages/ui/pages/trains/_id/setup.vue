@@ -15,6 +15,9 @@ export default {
         entity: Object as PropType<Train>,
     },
     methods: {
+        async handleFinished() {
+            await this.$nuxt.$router.push(`/trains/${this.entity.id}`);
+        },
         handleUpdated(train) {
             this.$emit('updated', train);
         },
@@ -25,5 +28,6 @@ export default {
     <train-wizard
         :entity="entity"
         @updated="handleUpdated"
+        @finished="handleFinished"
     />
 </template>
