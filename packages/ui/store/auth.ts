@@ -156,11 +156,21 @@ export const actions : ActionTree<AuthState, RootState> = {
 
         this.$authWarehouse.set(AuthBrowserStorageKey.REALM, realm);
     },
+    triggerUnsetRealm({ commit }) {
+        commit('unsetRealm');
+
+        this.$authWarehouse.remove(AuthBrowserStorageKey.REALM);
+    },
 
     triggerSetManagementRealm({ commit }, realm: Partial<Realm>) {
         commit('setManagementRealm', realm);
 
         this.$authWarehouse.set(AuthBrowserStorageKey.MANAGEMENT_REALM, realm);
+    },
+    triggerUnsetManagementRealm({ commit }) {
+        commit('unsetManagementRealm');
+
+        this.$authWarehouse.remove(AuthBrowserStorageKey.MANAGEMENT_REALM);
     },
 
     // --------------------------------------------------------------------
@@ -192,6 +202,7 @@ export const actions : ActionTree<AuthState, RootState> = {
             dispatch('triggerSetUser', entity);
 
             const token = await this.$auth.client.token.introspect(accessToken);
+
             dispatch('triggerSetPermissions', token.permissions);
             dispatch('triggerSetRealm', {
                 id: token.realm_id,
@@ -269,11 +280,10 @@ export const actions : ActionTree<AuthState, RootState> = {
         await dispatch('triggerUnsetToken', OAuth2TokenKind.REFRESH);
         await dispatch('triggerUnsetUser');
         await dispatch('triggerUnsetPermissions');
+        await dispatch('triggerUnsetRealm');
+        await dispatch('triggerUnsetManagementRealm');
 
         await dispatch('triggerSetLoginRequired', false);
-
-        await dispatch('triggerSetRealm', {});
-        await dispatch('triggerSetManagementRealm', {});
     },
 
     // --------------------------------------------------------------------
@@ -350,10 +360,18 @@ export const mutations : MutationTree<AuthState> = {
         state.realmId = id;
         state.realmName = name;
     },
+    unsetRealm(state) {
+        state.realmId = undefined;
+        state.realmName = undefined;
+    },
 
     setManagementRealm(state, { id, name }) {
         state.managementRealmId = id;
         state.managementRealmName = name;
+    },
+    unsetManagementRealm(state) {
+        state.managementRealmId = undefined;
+        state.managementRealmName = undefined;
     },
 
     // --------------------------------------------------------------------

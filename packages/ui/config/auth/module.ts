@@ -224,6 +224,10 @@ export class AuthModule {
             this.client.token.introspect<OAuth2TokenIntrospectionResponse>(token)
                 .then(async (token) => {
                     await this.ctx.store.dispatch('auth/triggerSetPermissions', token.permissions);
+                    await this.ctx.store.dispatch('auth/triggerSetRealm', {
+                        id: token.realm_id,
+                        name: token.realm_name,
+                    });
 
                     if (token.sub_kind === OAuth2SubKind.USER) {
                         resolve();
