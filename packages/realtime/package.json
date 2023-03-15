@@ -28,7 +28,7 @@
     },
     "scripts": {
         "dev": "ts-node src/index.ts",
-        "build": "tsc -p tsconfig.build.json",
+        "build": "rimraf dist && tsc -p tsconfig.build.json",
         "start": "node dist/index.js"
     },
     "publishConfig": {
