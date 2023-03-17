@@ -23,8 +23,7 @@ import {
 } from '@authup/server-database';
 import { ServiceID } from '@personalhealthtrain/central-common';
 import { REALM_MASTER_NAME, hasOwnProperty } from '@authup/common';
-import type { PHTStationRole } from '../../config';
-import { getPHTStationRolePermissions } from '../../config';
+import { PresetRoleName, getPresetRolePermissions } from '../../config';
 
 // ----------------------------------------------
 
@@ -94,10 +93,7 @@ export class DatabaseRootSeeder implements Seeder {
         /**
          * Create PHT roles
          */
-        const roleNames : PHTStationRole[] = [
-            'StationAuthority', // 0
-            'StationEmployee', // 1
-        ];
+        const roleNames = Object.values(PresetRoleName);
 
         const roleRepository = new RoleRepository(dataSource);
 
@@ -121,7 +117,7 @@ export class DatabaseRootSeeder implements Seeder {
         const rolePermissionRepository = dataSource.getRepository(RolePermissionEntity);
         const rolePermissions : RolePermissionEntity[] = roles
             .map((role) => {
-                const names = getPHTStationRolePermissions(role.name as PHTStationRole);
+                const names = getPresetRolePermissions(role.name);
                 const entities = [];
 
                 for (let i = 0; i < names.length; i++) {

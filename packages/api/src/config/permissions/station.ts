@@ -8,55 +8,59 @@
 import type { PermissionIDType } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
 
-export type PHTStationRole = 'StationAuthority' | 'StationEmployee';
+export enum PresetRoleName {
+    STATION_AUTHORITY = 'StationAuthority',
+    STATION_EMPLOYEE = 'StationEmployee',
+}
 
-export function getPHTStationRolePermissions(type: PHTStationRole) : PermissionIDType[] {
-    // eslint-disable-next-line default-case
-    switch (type) {
-        case 'StationEmployee':
-            return [
-                PermissionID.PROPOSAL_ADD,
-                PermissionID.PROPOSAL_DROP,
-                PermissionID.PROPOSAL_EDIT,
+export function getPresetRolePermissions(type: string) : PermissionIDType[] {
+    const map : Record<string, PermissionIDType[]> = {
+        [PresetRoleName.STATION_EMPLOYEE]: [
+            PermissionID.PROPOSAL_ADD,
+            PermissionID.PROPOSAL_DROP,
+            PermissionID.PROPOSAL_EDIT,
 
-                PermissionID.TRAIN_ADD,
-                PermissionID.TRAIN_EDIT,
-                PermissionID.TRAIN_EXECUTION_START,
-                PermissionID.TRAIN_EXECUTION_STOP,
-                PermissionID.TRAIN_RESULT_READ,
-            ];
-        case 'StationAuthority':
-            return [
-                PermissionID.ADMIN_UI_USE,
+            PermissionID.TRAIN_ADD,
+            PermissionID.TRAIN_EDIT,
+            PermissionID.TRAIN_EXECUTION_START,
+            PermissionID.TRAIN_EXECUTION_STOP,
+            PermissionID.TRAIN_RESULT_READ,
+        ],
+        [PresetRoleName.STATION_AUTHORITY]: [
+            PermissionID.ADMIN_UI_USE,
 
-                PermissionID.ROBOT_ADD,
-                PermissionID.ROBOT_DROP,
-                PermissionID.ROBOT_EDIT,
+            PermissionID.ROBOT_ADD,
+            PermissionID.ROBOT_DROP,
+            PermissionID.ROBOT_EDIT,
 
-                PermissionID.PROPOSAL_ADD,
-                PermissionID.PROPOSAL_DROP,
-                PermissionID.PROPOSAL_EDIT,
-                PermissionID.PROPOSAL_APPROVE,
+            PermissionID.PROPOSAL_ADD,
+            PermissionID.PROPOSAL_DROP,
+            PermissionID.PROPOSAL_EDIT,
+            PermissionID.PROPOSAL_APPROVE,
 
-                PermissionID.STATION_ADD,
-                PermissionID.STATION_DROP,
-                PermissionID.STATION_EDIT,
+            PermissionID.STATION_ADD,
+            PermissionID.STATION_DROP,
+            PermissionID.STATION_EDIT,
 
-                PermissionID.PROVIDER_ADD,
-                PermissionID.PROVIDER_DROP,
-                PermissionID.PROVIDER_EDIT,
+            PermissionID.PROVIDER_ADD,
+            PermissionID.PROVIDER_DROP,
+            PermissionID.PROVIDER_EDIT,
 
-                PermissionID.REGISTRY_PROJECT_MANAGE,
+            PermissionID.REGISTRY_PROJECT_MANAGE,
 
-                PermissionID.TRAIN_ADD,
-                PermissionID.TRAIN_DROP,
-                PermissionID.TRAIN_EDIT,
-                PermissionID.TRAIN_APPROVE,
-                PermissionID.TRAIN_EXECUTION_START,
-                PermissionID.TRAIN_EXECUTION_STOP,
-                PermissionID.TRAIN_RESULT_READ,
-            ];
-    }
+            PermissionID.TRAIN_ADD,
+            PermissionID.TRAIN_DROP,
+            PermissionID.TRAIN_EDIT,
+            PermissionID.TRAIN_APPROVE,
+            PermissionID.TRAIN_EXECUTION_START,
+            PermissionID.TRAIN_EXECUTION_STOP,
+            PermissionID.TRAIN_RESULT_READ,
 
-    return [];
+            PermissionID.USER_ADD,
+            PermissionID.USER_EDIT,
+            PermissionID.USER_DROP,
+        ],
+    };
+
+    return map[type] || [];
 }
