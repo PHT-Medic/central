@@ -21,9 +21,9 @@
         "test:coverage": "npm run test -- --coverage"
     },
     "dependencies": {
-        "@authup/common": "^0.17.0",
-        "@authup/server-adapter": "^0.17.1",
-        "@authup/server-common": "^0.17.0",
+        "@authup/common": "^0.17.2",
+        "@authup/server-adapter": "^0.17.2",
+        "@authup/server-common": "^0.17.2",
         "@ebec/http": "^0.2.2",
         "@hapic/harbor": "^1.3.0",
         "@hapic/vault": "^1.3.0",
