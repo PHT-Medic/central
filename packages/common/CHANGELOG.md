@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha.0](https://github.com/PHT-Medic/central/compare/v1.4.0...v2.0.0-alpha.0) (2023-03-20)
+
+
+### Bug Fixes
+
+* api freeze on illegal cache chars + added mjs support for ui ([aa6ef9f](https://github.com/PHT-Medic/central/commit/aa6ef9fd9a78cbe902a6b6618cc144e66659b73f))
+* better naming for http/api command enums ([99b71f2](https://github.com/PHT-Medic/central/commit/99b71f287fc4ffe43fcdd6f59cbcba9993f8b0bb))
+* change query path location for train build ([33c0ff4](https://github.com/PHT-Medic/central/commit/33c0ff4e6bec36f4287d6ef4b2ed06a6571b5330))
+* **deps:** bump @authelion/* dependencies ([cc65e2f](https://github.com/PHT-Medic/central/commit/cc65e2fb443177cf3b093533f4bb864eb9fd3ec2))
+* **deps:** bump @authelion/* packages ([5e4bb05](https://github.com/PHT-Medic/central/commit/5e4bb05c87d96fdac348e7089d349b8af35d1d61))
+* **deps:** bump authelion ([9a1e07a](https://github.com/PHT-Medic/central/commit/9a1e07a5ac6b0f09d309cb52699f6ed10a4fb8c2))
+* **deps:** bump authup & routup dependency ([fccfeb3](https://github.com/PHT-Medic/central/commit/fccfeb3e5d34e9441b0829922f41f177fb5939f8))
+* **deps:** bump hapic to v1.2.1 ([aa5db1d](https://github.com/PHT-Medic/central/commit/aa5db1dec946c39cfb889f8fc0dcde5b3764d1c4))
+* **deps:** bump hapic to v1.3 and adjusted code base ([1dd9d03](https://github.com/PHT-Medic/central/commit/1dd9d031f5d99fec1282463873643096bbb943ae))
+* **deps:** bump rapiq from 0.6.3 to 0.6.4 ([#738](https://github.com/PHT-Medic/central/issues/738)) ([48bcac8](https://github.com/PHT-Medic/central/commit/48bcac84353bb5e2bc266be4510663dcc246c837))
+* **deps:** bump rapiq from 0.6.4 to 0.6.6 ([0bcc236](https://github.com/PHT-Medic/central/commit/0bcc2369a0413c54c821ef0ebd86fdb908fca670))
+* **deps:** bump rapiq from 0.7.0 to 0.8.0 ([#825](https://github.com/PHT-Medic/central/issues/825)) ([84f4e92](https://github.com/PHT-Medic/central/commit/84f4e923cda1c6c02f32018e20d9815bce6a2d38))
+* **deps:** updated authup & routup dependencies ([7c57ef8](https://github.com/PHT-Medic/central/commit/7c57ef893c9ef57143bdaa0820a320f3f9a72189))
+* minor package cleanup ([8af5b9b](https://github.com/PHT-Medic/central/commit/8af5b9baced2b431e6da080670428b899adfe004))
+* updated payload building ([f784f27](https://github.com/PHT-Medic/central/commit/f784f27176e107c9bacca44eca27b86a798c5321))
+
+
+### Features
+
+* **api:** applied new queue schema ([f64385e](https://github.com/PHT-Medic/central/commit/f64385e06ec40e27484f4f326c7a0ff3e2c61372))
+* cleanup trainFile api + moved code/methods to corresponding domain ([36f5382](https://github.com/PHT-Medic/central/commit/36f53820a03867dbe52ba6776d8b754389263b74))
+* **common:** use rollup + swc for bundling cjs & esm output ([5e7db91](https://github.com/PHT-Medic/central/commit/5e7db912999e80c8f70cd5a64d02820f2824e3cb))
+* dynamic incoming & outgoing external project name ([32514ff](https://github.com/PHT-Medic/central/commit/32514ff810819974b855760ece6b80505dbecdf6))
+* move types ownership to corresponding service ([316d08f](https://github.com/PHT-Medic/central/commit/316d08f68cf89d9780e5fd78795ee756e9643653))
+* pipe train-files to gunzip ([d59bcb2](https://github.com/PHT-Medic/central/commit/d59bcb2796543ad8154a7e1197549766cf6b85c8))
+* simplified and enhanced master-image git syncing ([33cc76e](https://github.com/PHT-Medic/central/commit/33cc76e707f79facaa244f6fe00df85a029d8ebb))
+* train-{files,query} encryption + additional rsa signing ([d5ca6b0](https://github.com/PHT-Medic/central/commit/d5ca6b0c4322e7804e07e16e7ee4d4be79784ff5))
+
+
+
+
+
 # [1.4.0](https://github.com/PHT-Medic/central/compare/v1.3.27...v1.4.0) (2023-01-11)
 
 

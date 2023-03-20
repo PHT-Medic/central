@@ -1,33 +1,33 @@
 {
-    "packages": [
-        "packages/*"
-    ],
-    "command": {
-        "publish": {
-            "ignoreChanges": [
-                "*.md"
-            ]
-        },
-        "version": {
-            "message": "build(release): publish"
-        }
+  "packages": [
+    "packages/*"
+  ],
+  "command": {
+    "publish": {
+      "ignoreChanges": [
+        "*.md"
+      ]
     },
-    "useWorkspaces": true,
-    "useNx": true,
-    "version": "1.4.0",
-    "conventionalCommits": true,
-    "changelog": {
-        "labels": {
-            "build": "Build",
-            "ci": "Continuous Integration",
-            "docs": "Documentation",
-            "feat": "New Feature",
-            "fix": "Bug Fix",
-            "perf": "Performance",
-            "refactor": "Refactor",
-            "revert": "Revert",
-            "style": "Style",
-            "test": "Test"
-        }
+    "version": {
+      "message": "build(release): publish"
     }
+  },
+  "useWorkspaces": true,
+  "useNx": true,
+  "version": "2.0.0-alpha.0",
+  "conventionalCommits": true,
+  "changelog": {
+    "labels": {
+      "build": "Build",
+      "ci": "Continuous Integration",
+      "docs": "Documentation",
+      "feat": "New Feature",
+      "fix": "Bug Fix",
+      "perf": "Performance",
+      "refactor": "Refactor",
+      "revert": "Revert",
+      "style": "Style",
+      "test": "Test"
+    }
+  }
 }

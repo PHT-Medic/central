@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha.0](https://github.com/PHT-Medic/central/compare/v1.4.0...v2.0.0-alpha.0) (2023-03-20)
+
+
+### Bug Fixes
+
+* api freeze on illegal cache chars + added mjs support for ui ([aa6ef9f](https://github.com/PHT-Medic/central/commit/aa6ef9fd9a78cbe902a6b6618cc144e66659b73f))
+* change query path location for train build ([33c0ff4](https://github.com/PHT-Medic/central/commit/33c0ff4e6bec36f4287d6ef4b2ed06a6571b5330))
+* **deps:** bump [@socket](https://github.com/socket).io/redis-adapter from 8.0.0 to 8.0.1 ([75d15ae](https://github.com/PHT-Medic/central/commit/75d15ae5ee40b1cf3e6cf51982c04e2176e0b458))
+* **deps:** bump @authelion/* dependencies ([cc65e2f](https://github.com/PHT-Medic/central/commit/cc65e2fb443177cf3b093533f4bb864eb9fd3ec2))
+* **deps:** bump @authelion/* packages ([5e4bb05](https://github.com/PHT-Medic/central/commit/5e4bb05c87d96fdac348e7089d349b8af35d1d61))
+* **deps:** bump @hapic/vault from 1.1.0 to 1.2.0 ([#812](https://github.com/PHT-Medic/central/issues/812)) ([7ab5b00](https://github.com/PHT-Medic/central/commit/7ab5b00bd13e0b751434bef15a109bbecd2c6245))
+* **deps:** bump authelion ([9a1e07a](https://github.com/PHT-Medic/central/commit/9a1e07a5ac6b0f09d309cb52699f6ed10a4fb8c2))
+* **deps:** bump authup & routup dependency ([fccfeb3](https://github.com/PHT-Medic/central/commit/fccfeb3e5d34e9441b0829922f41f177fb5939f8))
+* **deps:** bump hapic to v1.2.1 ([aa5db1d](https://github.com/PHT-Medic/central/commit/aa5db1dec946c39cfb889f8fc0dcde5b3764d1c4))
+* **deps:** bump hapic to v1.3 and adjusted code base ([1dd9d03](https://github.com/PHT-Medic/central/commit/1dd9d031f5d99fec1282463873643096bbb943ae))
+* **deps:** bump redis-extension from 1.2.0 to 1.2.1 ([#754](https://github.com/PHT-Medic/central/issues/754)) ([97276d5](https://github.com/PHT-Medic/central/commit/97276d5a1c5d6e103e26f6f9daa6bbd653ced454))
+* **deps:** bump redis-extension from 1.2.2 to 1.2.3 ([#793](https://github.com/PHT-Medic/central/issues/793)) ([b174de7](https://github.com/PHT-Medic/central/commit/b174de790ba977921df37ab4f454f93f7766abc6))
+* **deps:** updated authup & routup dependencies ([7c57ef8](https://github.com/PHT-Medic/central/commit/7c57ef893c9ef57143bdaa0820a320f3f9a72189))
+* enhance logging for refreshing token ([3774282](https://github.com/PHT-Medic/central/commit/3774282bb81d7537a176f36ceb0a38b55cfa0296))
+* minor package cleanup ([8af5b9b](https://github.com/PHT-Medic/central/commit/8af5b9baced2b431e6da080670428b899adfe004))
+
+
+### Features
+
+* **realtime:** restructuring and enhanced logging ([5683f20](https://github.com/PHT-Medic/central/commit/5683f20bb09c0498c2e613627235a293e11971b0))
+* replaced yup with zod + contextualized build registry payload ([f8fdaa5](https://github.com/PHT-Medic/central/commit/f8fdaa5bb380662eb8ab89f2d8319047ccdb8618))
+
+
+
+
+
 # [1.4.0](https://github.com/PHT-Medic/central/compare/v1.3.27...v1.4.0) (2023-01-11)
 
 
