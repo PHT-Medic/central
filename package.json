@@ -27,7 +27,7 @@
         "jest-serial-runner": "^1.2.0",
         "lerna": "^6.4.1",
         "rimraf": "^4.4.0",
-        "rollup": "^3.19.1",
+        "rollup": "^3.20.0",
         "smob": "^0.1.0",
         "ts-jest": "^29.0.5",
         "typescript": "5.0.2"
