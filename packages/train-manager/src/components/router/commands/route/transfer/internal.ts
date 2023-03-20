@@ -14,14 +14,12 @@ import {
     RegistryProjectType,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { createClient, useClient } from 'hapic';
-import type { Client as HarborClient } from '@hapic/harbor';
+import { useClient } from 'hapic';
 import { RouterCommand } from '../../../constants';
 import { useRouterLogger } from '../../../utils';
 import type { TransferItem } from './type';
-import { useLogger } from '../../../../../core/logger';
 import { transferInterRegistry } from './registry';
-import { createBasicHarborAPIConfig } from '../../../../../core/harbor';
+import { createBasicHarborAPIClient } from '../../../../../core';
 
 type TransferContext = {
     registry?: Registry,
@@ -54,8 +52,7 @@ export async function transferInternal(context: TransferContext) {
     }
 
     const connectionString = buildRegistryClientConnectionStringFromRegistry(context.registry);
-    const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-    const httpClient = createClient<HarborClient>(httpClientConfig);
+    const httpClient = createBasicHarborAPIClient(connectionString);
 
     // --------------------------------------------------------------
 

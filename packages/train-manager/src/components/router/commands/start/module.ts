@@ -14,14 +14,12 @@ import {
     REGISTRY_ARTIFACT_TAG_LATEST,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { createClient, useClient } from 'hapic';
-import type { Client as HarborClient } from '@hapic/harbor';
-import { buildBuilderQueuePayload } from '../../../builder/utils';
+import { useClient } from 'hapic';
+import { BuilderCommand, BuilderError, buildBuilderQueuePayload } from '../../../builder';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
 import { RouterError } from '../../error';
-import { BuilderCommand, BuilderError } from '../../../builder';
-import { createBasicHarborAPIConfig } from '../../../../core';
+import { createBasicHarborAPIClient } from '../../../../core';
 import type { RouterStartPayload } from '../../type';
 import { RouterCommand } from '../../constants';
 import { buildRouterQueuePayload, useRouterLogger } from '../../utils';
@@ -39,8 +37,7 @@ export async function executeRouterStartCommand(
     }
 
     const connectionString = buildRegistryClientConnectionStringFromRegistry(data.registry);
-    const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-    const httpClient = createClient<HarborClient>(httpClientConfig);
+    const httpClient = createBasicHarborAPIClient(connectionString);
 
     const client = useClient<HTTPClient>();
 

@@ -5,15 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Config } from 'hapic';
 import { detectProxyConnectionConfig } from '@personalhealthtrain/central-common';
-import { Client as HarborClient } from '@hapic/harbor';
+import type { Client } from '@hapic/harbor';
+import { createClient } from '@hapic/harbor';
 
-export function createBasicHarborAPIConfig(connectionString: string) : Config {
+export function createBasicHarborAPIClient(connectionString: string) : Client {
     const proxyConfig = detectProxyConnectionConfig();
 
-    return {
-        clazz: HarborClient,
+    return createClient({
         driver: {
             ...(proxyConfig ? {
                 proxy: proxyConfig,
@@ -24,5 +23,5 @@ export function createBasicHarborAPIConfig(connectionString: string) : Config {
         extra: {
             connectionString,
         },
-    };
+    });
 }

@@ -8,7 +8,7 @@
 import { setLogger as setAuthLogger } from '@authup/server-common';
 import { setConfigOptions as setDatabaseConfigOptions } from '@authup/server-database';
 import { runOAuth2Cleaner, setConfigOptions as setHTTPConfigOptions } from '@authup/server-http';
-import { setConfig as setHTTPConfig } from 'hapic';
+import { setClient as setHTTPClient, setConfig as setHTTPConfig } from 'hapic';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import path from 'node:path';
 import { setConfig as setRedisConfig } from 'redis-extension';
@@ -34,15 +34,15 @@ export type Config = {
 export function createConfig() : Config {
     const proxyConfig = detectProxyConnectionConfig();
 
-    setHTTPConfig({
-        clazz: VaultClient,
+    const vaultClient = new VaultClient({
         driver: {
             proxy: false,
         },
         extra: {
             connectionString: useEnv('vaultConnectionString'),
         },
-    }, HTTPClientKey.VAULT);
+    });
+    setHTTPClient(vaultClient, HTTPClientKey.VAULT);
 
     setHTTPConfig({
         driver: {

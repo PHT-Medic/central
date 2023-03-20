@@ -10,19 +10,17 @@ import {
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { createClient, useClient } from 'hapic';
-import type { Client as HarborClient } from '@hapic/harbor';
+import { useClient } from 'hapic';
 import type { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
-import { RegistryProjectEntity } from '../../../domains/registry-project/entity';
+import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
 import { RegistryCommand } from '../constants';
 import type { RegistryProjectLinkPayload, RegistryProjectUnlinkPayload } from '../type';
 import { ensureRemoteRegistryProjectAccount } from './helpers/remote-robot-account';
 import { ensureRemoteRegistryProject } from './helpers/remote';
 import { saveRemoteRegistryProjectWebhook } from './helpers/remote-webhook';
 import { ApiKey, useLogger } from '../../../config';
-import { RegistryEntity } from '../../../domains/registry/entity';
-import { createBasicHarborAPIConfig } from './utils';
+import { createBasicHarborAPIClient } from './utils';
 
 export async function linkRegistryProject(
     payload: RegistryProjectLinkPayload,
@@ -74,15 +72,13 @@ export async function linkRegistryProject(
     }
 
     const connectionString = buildRegistryClientConnectionStringFromRegistry(registryEntity);
-    const httpClientConfig = createBasicHarborAPIConfig(connectionString);
+    const httpClient = createBasicHarborAPIClient(connectionString);
 
     useLogger()
         .info('Connect to registry', {
             component: 'registry',
             command: RegistryCommand.PROJECT_LINK,
         });
-
-    const httpClient = createClient<HarborClient>(httpClientConfig);
 
     try {
         const project = await ensureRemoteRegistryProject(httpClient, {
@@ -173,8 +169,7 @@ export async function unlinkRegistryProject(
         .getOne();
 
     const connectionString = buildRegistryClientConnectionStringFromRegistry(registryEntity);
-    const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-    const httpClient = createClient<HarborClient>(httpClientConfig);
+    const httpClient = createBasicHarborAPIClient(connectionString);
 
     try {
         await httpClient.project

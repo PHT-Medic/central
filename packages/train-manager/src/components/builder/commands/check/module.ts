@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Client as HarborClient } from '@hapic/harbor';
 import type {
     HTTPClient,
 } from '@personalhealthtrain/central-common';
@@ -13,8 +12,8 @@ import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 
-import { createClient, useClient } from 'hapic';
-import { createBasicHarborAPIConfig } from '../../../../core';
+import { useClient } from 'hapic';
+import { createBasicHarborAPIClient } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
 import { BuilderCommand } from '../../constants';
@@ -47,8 +46,7 @@ export async function executeBuilderCheckCommand(
     // -----------------------------------------------------------------------------------
 
     const connectionString = buildRegistryClientConnectionStringFromRegistry(data.registry);
-    const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-    const httpClient = createClient<HarborClient>(httpClientConfig);
+    const httpClient = createBasicHarborAPIClient(connectionString);
 
     const client = useClient<HTTPClient>();
     const incomingProject = await client.registryProject.getOne(data.entity.incoming_registry_project_id);

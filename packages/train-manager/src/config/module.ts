@@ -6,7 +6,7 @@
  */
 
 import type { Aggregator, Component } from '@personalhealthtrain/central-server-common';
-import { setConfig as setHTTPConfig, useClient as useHTTPClient } from 'hapic';
+import { setClient as setHTTPClient, useClient as useHTTPClient } from 'hapic';
 import {
     HTTPClient,
     HTTPClientKey,
@@ -47,26 +47,26 @@ export function createConfig() : Config {
         },
     });
 
-    setHTTPConfig({
-        clazz: VaultClient,
+    const vaultClient = new VaultClient({
         driver: {
             proxy: false,
         },
         extra: {
             connectionString: useEnv('vaultConnectionString'),
         },
-    }, HTTPClientKey.VAULT);
+    });
+    setHTTPClient(vaultClient, HTTPClientKey.VAULT);
 
-    setHTTPConfig({
-        clazz: HTTPClient,
+    const centralClient = new HTTPClient({
         driver: {
             proxy: false,
             baseURL: useEnv('apiUrl'),
             withCredentials: true,
         },
     });
+    setHTTPClient(centralClient);
 
-    useHTTPClient().mountResponseInterceptor(
+    centralClient.mountResponseInterceptor(
         (value) => value,
         createRefreshRobotTokenOnResponseErrorHandler({
             async load() {
@@ -99,7 +99,7 @@ export function createConfig() : Config {
 
                 throw new Error('API credentials not present in vault.');
             },
-            httpClient: useHTTPClient(),
+            httpClient: centralClient,
         }),
     );
 

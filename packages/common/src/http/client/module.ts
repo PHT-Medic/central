@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Config } from 'hapic';
+import type { ConfigInput } from 'hapic';
 import { Client } from 'hapic';
 import {
     MasterImageAPI,
@@ -56,7 +56,7 @@ export class HTTPClient extends Client {
 
     public readonly userSecret : UserSecretAPI;
 
-    constructor(config: Config) {
+    constructor(config: ConfigInput) {
         super(config);
 
         this.architecture = new SettingsOptionAPI(this.driver);

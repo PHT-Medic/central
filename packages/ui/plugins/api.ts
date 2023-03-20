@@ -5,9 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    Config,
-} from 'hapic';
+import { buildConfig } from 'hapic';
 import type { Context } from '@nuxt/types';
 import https from 'https';
 import type { Inject } from '@nuxt/types/app';
@@ -25,7 +23,7 @@ export default (ctx: Context, inject : Inject) => {
         apiUrl = ctx.$config.apiUrl;
     }
 
-    const config : Config = {
+    const config = buildConfig({
         driver: {
             baseURL: apiUrl,
             withCredentials: true,
@@ -36,7 +34,7 @@ export default (ctx: Context, inject : Inject) => {
                 } : {}),
             }),
         },
-    };
+    });
 
     const resourceAPI = new HTTPClient(config);
     const authAPI = new AuthHTTPClient(config);

@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setConfig as setHTTPConfig, useClient as useHTTPClient } from 'hapic';
+import { setClient as setHTTPClient, useClient as useHTTPClient } from 'hapic';
 import { setConfig as setRedisConfig, useClient as useRedisClient } from 'redis-extension';
 import {
+    HTTPClient,
     HTTPClientKey,
     ROBOT_SECRET_ENGINE_KEY,
-    ServiceID,
-    createRefreshRobotTokenOnResponseErrorHandler,
+    ServiceID, createRefreshRobotTokenOnResponseErrorHandler,
 } from '@personalhealthtrain/central-common';
 import { Client as VaultClient } from '@hapic/vault';
 import type { Robot } from '@authup/common';
@@ -26,25 +26,26 @@ export function createConfig() : Config {
     const redisPub = redisDatabase.duplicate();
     const redisSub = redisDatabase.duplicate();
 
-    setHTTPConfig({
-        clazz: VaultClient,
+    const vaultClient = new VaultClient({
         driver: {
             proxy: false,
         },
         extra: {
             connectionString: useEnv('vaultConnectionString'),
         },
-    }, HTTPClientKey.VAULT);
+    });
+    setHTTPClient(vaultClient, HTTPClientKey.VAULT);
 
-    setHTTPConfig({
+    const centralClient = new HTTPClient({
         driver: {
-            baseURL: useEnv('apiUrl'),
             proxy: false,
+            baseURL: useEnv('apiUrl'),
             withCredentials: true,
         },
     });
+    setHTTPClient(centralClient);
 
-    useHTTPClient().mountResponseInterceptor(
+    centralClient.mountResponseInterceptor(
         (value) => value,
         createRefreshRobotTokenOnResponseErrorHandler({
             async load() {
@@ -77,7 +78,7 @@ export function createConfig() : Config {
 
                 throw new Error('API credentials not present in vault.');
             },
-            httpClient: useHTTPClient(),
+            httpClient: centralClient,
         }),
     );
 

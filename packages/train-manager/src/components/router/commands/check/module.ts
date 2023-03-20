@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Client as HarborClient } from '@hapic/harbor';
 import { parseProjectRepositoryName } from '@hapic/harbor';
 import type {
     HTTPClient,
@@ -15,8 +14,8 @@ import {
     RegistryProjectType,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { createClient, useClient } from 'hapic';
-import { createBasicHarborAPIConfig } from '../../../../core';
+import { useClient } from 'hapic';
+import { createBasicHarborAPIClient } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
 import { RouterCommand } from '../../constants';
@@ -38,8 +37,7 @@ export async function executeRouterCheckCommand(input: RouterCheckPayload) : Pro
     const client = useClient<HTTPClient>();
 
     const connectionString = buildRegistryClientConnectionStringFromRegistry(data.registry);
-    const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-    const httpClient = createClient<HarborClient>(httpClientConfig);
+    const httpClient = createBasicHarborAPIClient(connectionString);
 
     // -------------------------------------------------------------------------------
 
@@ -96,8 +94,7 @@ export async function executeRouterCheckCommand(input: RouterCheckPayload) : Pro
 
     for (let i = 0; i < registries.length; i++) {
         const connectionString = buildRegistryClientConnectionStringFromRegistry(registries[i]);
-        const httpClientConfig = createBasicHarborAPIConfig(connectionString);
-        const httpClient = createClient<HarborClient>(httpClientConfig);
+        const httpClient = createBasicHarborAPIClient(connectionString);
 
         const searchResult = await httpClient.search(data.id);
         if (searchResult.repository.length > 0) {
