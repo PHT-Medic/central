@@ -6,7 +6,6 @@
  */
 
 import { isRealmResourceWritable } from '@authup/common';
-import { RealmEntity } from '@authup/server-database';
 import { ForbiddenError } from '@ebec/http';
 import { check, validationResult } from 'express-validator';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
@@ -83,11 +82,6 @@ export async function runProposalValidation(
     await extendRequestValidationResultWithRelation(result, MasterImageEntity, {
         id: 'master_image_id',
         entity: 'master_image',
-    });
-
-    await extendRequestValidationResultWithRelation(result, RealmEntity, {
-        id: 'realm_id',
-        entity: 'realm',
     });
 
     // ----------------------------------------------

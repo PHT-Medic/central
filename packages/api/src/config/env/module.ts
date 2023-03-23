@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { readBoolFromProcessEnv, readFromProcessEnv, readIntFromProcessEnv } from '@authup/server-common';
+import { readBoolFromProcessEnv, readFromProcessEnv, readIntFromProcessEnv } from '@personalhealthtrain/central-server-common';
 import { config } from 'dotenv';
 import path from 'node:path';
 import type { EnvironmentName } from './constants';
@@ -41,6 +41,7 @@ export function useEnv(key?: string) : any {
         vaultConnectionString: readFromProcessEnv('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
 
         apiUrl: readFromProcessEnv('API_URL', 'http://127.0.0.1:3002/'),
+        authApiUrl: readFromProcessEnv('AUTH_API_URL', 'http://127.0.0.1:3004/'),
         appUrl: readFromProcessEnv('APP_URL', 'http://127.0.0.1:3000/'),
 
         skipProposalApprovalOperation: readBoolFromProcessEnv('SKIP_PROPOSAL_APPROVAL_OPERATION', false),

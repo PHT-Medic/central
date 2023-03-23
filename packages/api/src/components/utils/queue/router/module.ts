@@ -9,7 +9,6 @@ import type { ConsumeMessage } from 'amqp-extension';
 import { consume } from 'amqp-extension';
 import { useLogger } from '../../../../config';
 import { ComponentName } from '../../../constants';
-import { executeSecretStorageComponentCommand } from '../../../secret-storage';
 import { executeRegistryCommand } from '../../../registry';
 import { executeStationRegistryCommand } from '../../../station-registry';
 import { ROUTER_QUEUE_ROUTING_KEY } from './constants';
@@ -29,13 +28,6 @@ export function buildRouterComponent() {
                 switch (payload.metadata.component) {
                     case ComponentName.REGISTRY: {
                         await executeRegistryCommand({
-                            command: payload.metadata.command as any,
-                            data: payload.data as any,
-                        });
-                        break;
-                    }
-                    case ComponentName.SECRET_STORAGE: {
-                        await executeSecretStorageComponentCommand({
                             command: payload.metadata.command as any,
                             data: payload.data as any,
                         });

@@ -29,13 +29,9 @@ export interface TrainFile {
 
     user_id: User['id'];
 
-    user: User;
-
     train_id: Train['id'];
 
     train: Train;
 
     realm_id: Realm['id'];
-
-    realm: Realm;
 }

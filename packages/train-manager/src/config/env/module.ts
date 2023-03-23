@@ -39,6 +39,7 @@ export function useEnv(key?: string) : any {
         vaultConnectionString: readFromProcessEnv('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
 
         apiUrl: readFromProcessEnv('API_URL', 'http://127.0.0.1:3002/'),
+        authApiUrl: readFromProcessEnv('AUTH_API_URL', 'http://127.0.0.1:3004/'),
     };
 
     if (typeof key === 'string') {

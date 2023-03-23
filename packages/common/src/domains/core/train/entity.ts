@@ -88,11 +88,7 @@ export interface Train {
 
     realm_id: Realm['id'];
 
-    realm: Realm;
-
     user_id: User['id'];
-
-    user: User;
 
     // ------------------------------------------------------------------
 

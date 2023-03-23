@@ -68,6 +68,4 @@ export interface TrainLog {
     train: Train;
 
     realm_id: Realm['id'];
-
-    realm: Realm;
 }

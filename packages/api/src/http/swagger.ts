@@ -10,7 +10,6 @@ import {
 } from '@routup/swagger';
 import { load } from 'locter';
 import path from 'node:path';
-import { getSwaggerEntrypoint } from '@authup/server-http';
 import { getRootDirPath, getWritableDirPath, useEnv } from '../config';
 
 export async function generateSwaggerDocumentation() {
@@ -23,7 +22,6 @@ export async function generateSwaggerDocumentation() {
                 cache: false,
                 entryPoint: [
                     { pattern: '**/*.ts', cwd: path.join(getRootDirPath(), 'src', 'http', 'controllers') },
-                    getSwaggerEntrypoint(),
                 ],
                 ignore: ['**/node_modules/**'],
                 allow: ['**/@authup/**'],

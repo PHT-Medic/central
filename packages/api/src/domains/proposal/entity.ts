@@ -10,9 +10,8 @@ import {
 } from 'typeorm';
 import type { MasterImage, Proposal } from '@personalhealthtrain/central-common';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
-import { RealmEntity, UserEntity } from '@authup/server-database';
 import type { Realm, User } from '@authup/common';
-import { MasterImageEntity } from '../master-image/entity';
+import { MasterImageEntity } from '../master-image';
 
 @Entity({ name: 'proposals' })
 export class ProposalEntity implements Proposal {
@@ -44,19 +43,11 @@ export class ProposalEntity implements Proposal {
 
     // ------------------------------------------------------------------
 
-    @Column()
+    @Column({ type: 'uuid' })
         realm_id: Realm['id'];
 
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'realm_id' })
-        realm: RealmEntity;
-
-    @Column()
+    @Column({ type: 'uuid', nullable: true })
         user_id: User['id'];
-
-    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE', nullable: true })
-    @JoinColumn({ name: 'user_id' })
-        user: UserEntity;
 
     @Column({ nullable: true, default: null })
         master_image_id: MasterImage['id'] | null;

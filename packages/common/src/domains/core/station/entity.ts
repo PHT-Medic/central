@@ -39,8 +39,6 @@ export interface Station {
 
     realm_id: Realm['id'];
 
-    realm: Realm;
-
     // ------------------------------------------------------------------
 
     created_at: Date;

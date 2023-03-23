@@ -13,7 +13,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { ProposalEntity } from '../../../../../domains/proposal/entity';
+import { ProposalEntity } from '../../../../../domains';
 
 export async function getOneProposalRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -41,7 +41,7 @@ export async function getOneProposalRouteHandler(req: Request, res: Response) : 
             ],
         },
         relations: {
-            allowed: ['user', 'realm', 'master_image'],
+            allowed: ['master_image'],
         },
     });
 
@@ -88,7 +88,7 @@ export async function getManyProposalRouteHandler(req: Request, res: Response) :
             maxLimit: 50,
         },
         relations: {
-            allowed: ['user', 'realm', 'master_image'],
+            allowed: ['master_image'],
         },
         sort: {
             allowed: ['id', 'updated_at', 'created_at'],

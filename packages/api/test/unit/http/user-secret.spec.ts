@@ -7,19 +7,13 @@
 
 import type {
     UserSecret,
-    UserSecretsSecretStoragePayload,
 } from '@personalhealthtrain/central-common';
 import {
     SecretType,
-    USER_SECRETS_SECRET_ENGINE_KEY,
 } from '@personalhealthtrain/central-common';
-import { useClient } from 'hapic';
-import type { Client as VaultClient } from '@hapic/vault';
-import { removeDateProperties } from '../../utils/date-properties';
-import { expectPropertiesEqualToSrc } from '../../utils/properties';
+import { expectPropertiesEqualToSrc, removeDateProperties } from '../../utils';
 import { useSuperTest } from '../../utils/supertest';
 import { dropTestDatabase, useTestDatabase } from '../../utils/database';
-import { ApiKey } from '../../../src';
 
 describe('src/controllers/core/user-secret', () => {
     const superTest = useSuperTest();
@@ -58,14 +52,6 @@ describe('src/controllers/core/user-secret', () => {
         expect(response.body).toBeDefined();
 
         details = removeDateProperties(response.body);
-    });
-
-    it('should find vault entry', async () => {
-        const userSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
-            .find<UserSecretsSecretStoragePayload>(USER_SECRETS_SECRET_ENGINE_KEY, details.user_id);
-
-        expect(userSecret.data).toBeDefined();
-        expect(userSecret.data).toHaveProperty(details.id);
     });
 
     it('should read collection', async () => {
@@ -112,12 +98,5 @@ describe('src/controllers/core/user-secret', () => {
             .auth('admin', 'start123');
 
         expect(response.status).toEqual(202);
-    });
-
-    it('should not find vault entry', async () => {
-        const userSecret = await useClient<VaultClient>(ApiKey.VAULT).keyValue
-            .find<UserSecretsSecretStoragePayload>(USER_SECRETS_SECRET_ENGINE_KEY, details.user_id);
-
-        expect(userSecret).toBeUndefined();
     });
 });

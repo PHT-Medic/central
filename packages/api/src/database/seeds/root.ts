@@ -7,36 +7,25 @@
 
 import { ServerError } from '@ebec/http';
 import type { DataSource } from 'typeorm';
-import { In } from 'typeorm';
 import type { Seeder } from 'typeorm-extension';
-import type {
-    RobotEntity,
-    RoleEntity,
-} from '@authup/server-database';
-import {
-    PermissionEntity,
-    RealmEntity,
-    RobotRepository,
-    RolePermissionEntity,
-    RoleRepository,
-    useRobotEventEmitter,
-} from '@authup/server-database';
 import { ServiceID } from '@personalhealthtrain/central-common';
-import { REALM_MASTER_NAME, hasOwnProperty } from '@authup/common';
+import type { Realm } from '@authup/common';
+import { REALM_MASTER_NAME } from '@authup/common';
 import { PresetRoleName, getPresetRolePermissions } from '../../config';
+import { useAuthupClient } from '../../core';
 
 // ----------------------------------------------
 
-export class DatabaseRootSeeder implements Seeder {
-    public async run(dataSource: DataSource): Promise<any> {
-        const realmRepository = dataSource.getRepository(RealmEntity);
-        const realm = await realmRepository.findOne({
-            where: {
-                name: REALM_MASTER_NAME,
-            },
-        });
+// todo: maybe move to rest endpoint ^^ ;)
 
-        if (!realm) {
+export class DatabaseRootSeeder implements Seeder {
+    public async run(_dataSource: DataSource): Promise<any> {
+        const authupClient = await useAuthupClient();
+        let realm : Realm;
+
+        try {
+            realm = await authupClient.realm.getOne(REALM_MASTER_NAME);
+        } catch (e) {
             throw new ServerError(`The ${REALM_MASTER_NAME} does not exist.`);
         }
 
@@ -45,19 +34,13 @@ export class DatabaseRootSeeder implements Seeder {
          */
         const services : ServiceID[] = [
             ServiceID.REGISTRY,
-            ServiceID.SYSTEM,
-
             ServiceID.GITHUB,
         ];
-
-        const robotRepository = new RobotRepository(dataSource);
-        const robots = await robotRepository.createQueryBuilder('robot')
-            .where({
-                name: In(services),
-            })
-            .getMany();
-
-        const serviceSecrets : {[K in ServiceID]?: string} = {};
+        const { data: robots } = await authupClient.robot.getMany({
+            filter: {
+                name: services,
+            },
+        });
 
         for (let i = 0; i < services.length; i++) {
             const index = robots.findIndex((robot) => robot.name === services[i]);
@@ -65,76 +48,37 @@ export class DatabaseRootSeeder implements Seeder {
                 continue;
             }
 
-            const { entity, secret } = await robotRepository.createWithSecret({
+            await authupClient.robot.create({
                 name: services[i],
                 realm_id: realm.id,
             });
-
-            robots.push(entity as RobotEntity);
-
-            serviceSecrets[services[i]] = secret;
-        }
-
-        await robotRepository.save(robots);
-
-        for (let i = 0; i < robots.length; i++) {
-            useRobotEventEmitter()
-                .emit('credentials', {
-                    id: robots[i].id,
-                    name: robots[i].name,
-                    secret: serviceSecrets[robots[i].name],
-                });
         }
 
         // -------------------------------------------------
-
-        // todo: check existence and update entries
 
         /**
          * Create PHT roles
          */
         const roleNames = Object.values(PresetRoleName);
+        for (let i = 0; i < roleNames.length; i++) {
+            const names = getPresetRolePermissions(roleNames[i]);
 
-        const roleRepository = new RoleRepository(dataSource);
+            const { data: permissions } = await authupClient.permission.getMany({
+                filter: {
+                    name: names,
+                },
+            });
 
-        const roles : RoleEntity[] = roleNames.map((role: string) => roleRepository.create({ name: role }));
+            const role = await authupClient.role.create({
+                name: roleNames[i],
+            });
 
-        await roleRepository.save(roles);
-
-        // -------------------------------------------------
-
-        const permissionRepository = dataSource.getRepository(PermissionEntity);
-        const permissions = await permissionRepository.find();
-        const permissionNameIdMap : Record<string, string> = {};
-
-        for (let i = 0; i < permissions.length; i++) {
-            permissionNameIdMap[permissions[i].name] = permissions[i].id;
+            for (let i = 0; i < permissions.length; i++) {
+                await authupClient.rolePermission.create({
+                    role_id: role.id,
+                    permission_id: permissions[i].id,
+                });
+            }
         }
-
-        /**
-         * Create PHT role - permission association
-         */
-        const rolePermissionRepository = dataSource.getRepository(RolePermissionEntity);
-        const rolePermissions : RolePermissionEntity[] = roles
-            .map((role) => {
-                const names = getPresetRolePermissions(role.name);
-                const entities = [];
-
-                for (let i = 0; i < names.length; i++) {
-                    if (!hasOwnProperty(permissionNameIdMap, names[i])) {
-                        continue;
-                    }
-
-                    entities.push(rolePermissionRepository.create({
-                        role_id: role.id,
-                        permission_id: permissionNameIdMap[names[i]] as string,
-                    }));
-                }
-
-                return entities;
-            })
-            .reduce((accumulator, entity) => [...accumulator, ...entity]);
-
-        await rolePermissionRepository.save(rolePermissions);
     }
 }

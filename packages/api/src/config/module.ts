@@ -5,26 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setLogger as setAuthLogger } from '@authup/server-common';
-import { setConfigOptions as setDatabaseConfigOptions } from '@authup/server-database';
-import { runOAuth2Cleaner, setConfigOptions as setHTTPConfigOptions } from '@authup/server-http';
-import { setClient as setHTTPClient, setConfig as setHTTPConfig } from 'hapic';
+import { HTTPClient } from '@authup/common';
+import { mountHTTPInterceptorForRefreshingToken } from '@personalhealthtrain/central-server-common';
+import { setConfig as setHTTPConfig } from 'hapic';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
-import path from 'node:path';
 import { setConfig as setRedisConfig } from 'redis-extension';
-import { Client as VaultClient } from '@hapic/vault';
-import {
-    HTTPClientKey,
-    PermissionKey, detectProxyConnectionConfig,
-} from '@personalhealthtrain/central-common';
-import { setMinioConfig } from '../core/minio';
+import { Client as VaultClient, setClient as setVaultClient } from '@hapic/vault';
+import { detectProxyConnectionConfig } from '@personalhealthtrain/central-common';
+import { buildAuthupAggregator, buildTrainManagerAggregator } from '../aggregators';
+import { setAuthupClient, setMinioConfig } from '../core';
 import { EnvironmentName, useEnv } from './env';
-import { buildRobotAggregator, buildTrainManagerAggregator } from '../aggregators';
 
 import { ApiKey } from './api';
 
 import { buildRouterComponent } from '../components';
-import { useLogger } from './log';
 
 export type Config = {
     aggregators: {start: () => void}[]
@@ -42,7 +36,7 @@ export function createConfig() : Config {
             connectionString: useEnv('vaultConnectionString'),
         },
     });
-    setHTTPClient(vaultClient, HTTPClientKey.VAULT);
+    setVaultClient(vaultClient);
 
     setHTTPConfig({
         driver: {
@@ -68,6 +62,19 @@ export function createConfig() : Config {
 
     // ---------------------------------------------
 
+    const authupClient = new HTTPClient({
+        driver: {
+            baseURL: useEnv('authApiUrl'),
+        },
+    });
+    mountHTTPInterceptorForRefreshingToken(authupClient, {
+        authApiUrl: useEnv('authApiUrl'),
+        vault: vaultClient,
+    });
+    setAuthupClient(authupClient);
+
+    // ---------------------------------------------
+
     setRedisConfig({
         connectionString: useEnv('redisConnectionString'),
     });
@@ -88,46 +95,14 @@ export function createConfig() : Config {
 
     // ---------------------------------------------
 
-    setDatabaseConfigOptions({
-        env: useEnv('env'),
-        rootPath: process.cwd(),
-        writableDirectoryPath: path.join(__dirname, '..', '..', 'writable'),
-
-        permissions: Object.values(PermissionKey),
-        adminUsername: 'admin',
-        adminPassword: 'start123',
-        robotEnabled: true,
-    });
-
-    setHTTPConfigOptions({
-        env: useEnv('env'),
-        rootPath: process.cwd(),
-        writableDirectoryPath: path.join(__dirname, '..', '..', 'writable'),
-
-        publicUrl: useEnv('apiUrl'),
-        authorizeRedirectUrl: useEnv('appUrl'),
-        tokenMaxAgeAccessToken: useEnv('jwtMaxAge'),
-        tokenMaxAgeRefreshToken: useEnv('jwtMaxAge'),
-    });
-
     const isTest = useEnv('env') === EnvironmentName.TEST;
-
-    if (!isTest) {
-        setAuthLogger(useLogger());
-    }
 
     // ---------------------------------------------
 
-    const aggregators : {start: () => void}[] = [
-        {
-            start: async () => {
-                await runOAuth2Cleaner();
-            },
-        },
+    const aggregators : {start: () => void}[] = [];
 
-        buildRobotAggregator(),
-    ];
     if (!isTest) {
+        aggregators.push(buildAuthupAggregator());
         aggregators.push(buildTrainManagerAggregator());
     }
 

@@ -6,7 +6,6 @@
  */
 
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
-import { onlyRealmWritableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
@@ -16,7 +15,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { isRealmResourceReadable } from '@authup/common';
-import { TrainEntity } from '../../../../../domains/train';
+import { TrainEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 export async function getOneTrainRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -36,7 +35,7 @@ export async function getOneTrainRouteHandler(req: Request, res: Response) : Pro
 
     applyRelations(query, include, {
         defaultAlias: 'train',
-        allowed: ['user', 'proposal', 'master_image', 'entrypoint_file'],
+        allowed: ['proposal', 'master_image', 'entrypoint_file'],
     });
 
     const entity = await query.getOne();
@@ -66,7 +65,7 @@ export async function getManyTrainRouteHandler(req: Request, res: Response) : Pr
             maxLimit: 50,
         },
         relations: {
-            allowed: ['user', 'proposal', 'master_image', 'entrypoint_file'],
+            allowed: ['proposal', 'master_image', 'entrypoint_file'],
         },
         sort: {
             allowed: ['created_at', 'updated_at'],

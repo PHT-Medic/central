@@ -52,8 +52,6 @@ export interface RegistryProject {
 
     realm_id: Realm['id'] | null;
 
-    realm: Realm | null;
-
     // ------------------------------------------------------------------
 
     created_at: Date;

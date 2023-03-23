@@ -19,7 +19,6 @@ import type { Registry, Station } from '@personalhealthtrain/central-common';
 import {
     Ecosystem, RegistryProject,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@authup/server-database';
 import type { Realm } from '@authup/common';
 import { RegistryProjectEntity } from '../registry-project/entity';
 import { RegistryEntity } from '../registry/entity';
@@ -69,12 +68,8 @@ export class StationEntity implements Station {
     @JoinColumn({ name: 'registry_project_id' })
         registry_project: RegistryProject;
 
-    @Column()
+    @Column({ type: 'uuid' })
         realm_id: Realm['id'];
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'realm_id' })
-        realm: RealmEntity;
 
     // ------------------------------------------------------------------
 

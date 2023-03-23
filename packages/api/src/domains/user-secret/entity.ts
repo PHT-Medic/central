@@ -9,13 +9,10 @@ import {
     Column,
     CreateDateColumn,
     Entity, Index,
-    JoinColumn,
-    ManyToOne,
     PrimaryGeneratedColumn,
     Unique,
     UpdateDateColumn,
 } from 'typeorm';
-import { RealmEntity, UserEntity } from '@authup/server-database';
 import type { UserSecret } from '@personalhealthtrain/central-common';
 import { SecretType } from '@personalhealthtrain/central-common';
 import type { Realm, User } from '@authup/common';
@@ -42,16 +39,8 @@ export class UserSecretEntity implements UserSecret {
     @Column()
         user_id: User['id'];
 
-    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'user_id' })
-        user: UserEntity;
-
     @Column()
         realm_id: Realm['id'];
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'realm_id' })
-        realm: RealmEntity;
 
     @CreateDateColumn()
         created_at: Date;

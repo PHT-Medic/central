@@ -9,6 +9,7 @@ export * from './master-image';
 export * from './master-image-group';
 export * from './proposal';
 export * from './proposal-station';
+export * from './realm';
 export * from './registry';
 export * from './registry-project';
 export * from './station';

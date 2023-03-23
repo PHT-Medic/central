@@ -19,6 +19,7 @@ export interface Environment {
     vaultConnectionString: string,
 
     apiUrl: string,
+    authApiUrl: string,
     appUrl: string,
 
     skipProposalApprovalOperation: boolean,

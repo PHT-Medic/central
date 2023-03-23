@@ -6,15 +6,14 @@
  */
 
 import type { Client as HarborClient, ProjectWebhook } from '@hapic/harbor';
+import { useClient as useVaultClient } from '@hapic/vault';
 import type { RobotSecretEnginePayload } from '@personalhealthtrain/central-common';
 import {
-    HTTPClientKey,
     ROBOT_SECRET_ENGINE_KEY,
     ServiceID,
 } from '@personalhealthtrain/central-common';
 import os from 'node:os';
-import { useClient } from 'hapic';
-import type { Client as VaultClient } from '@hapic/vault';
+
 import { useEnv } from '../../../../config';
 import { buildRegistryWebhookTarget } from '../utils';
 
@@ -25,7 +24,7 @@ export async function saveRemoteRegistryProjectWebhook(
         isName?: boolean
     },
 ) : Promise<ProjectWebhook | undefined> {
-    const response = await useClient<VaultClient>(HTTPClientKey.VAULT)
+    const response = await useVaultClient()
         .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
 
     if (response) {

@@ -6,17 +6,12 @@
  */
 
 import type { Realm } from '@authup/common';
-import { RealmEntity } from '@authup/server-database';
 import { useClient } from 'hapic';
-import { In } from 'typeorm';
-import { useDataSource } from 'typeorm-extension';
 import { ApiKey, useLogger } from '../../../../../config';
+import { useAuthupClient } from '../../../../../core';
 import { transformStationRegistryResponse } from '../../../utils';
 
 export async function syncOrganizationsOfStationRegistry() {
-    const dataSource = await useDataSource();
-    const realmRepository = dataSource.getRepository(RealmEntity);
-
     const response = await useClient(ApiKey.AACHEN_STATION_REGISTRY).get('organizations');
 
     const entitiesExternal : Pick<Realm, 'name' | 'description'>[] = transformStationRegistryResponse(response.data)
@@ -33,28 +28,34 @@ export async function syncOrganizationsOfStationRegistry() {
             },
         );
 
-    const entities = await realmRepository.findBy({
-        description: In(entitiesExternal.map((item) => item.description)),
+    const authupClient = useAuthupClient();
+    const { data: entities } = await authupClient.realm.getMany({
+        filter: {
+            description: entitiesExternal.map((item) => item.description),
+        },
     });
+
     const entitiesDescriptions = entities.map((item) => item.description);
 
-    const existing : RealmEntity[] = [];
-    const nonExisting : RealmEntity[] = [];
+    const existing : { id: Realm['id'], data: Partial<Realm> }[] = [];
+    const nonExisting : Partial<Realm>[] = [];
 
     for (let i = 0; i < entitiesExternal.length; i++) {
         const index = entitiesDescriptions.indexOf(entitiesExternal[i].description);
         if (index === -1) {
-            nonExisting.push(realmRepository.create(entitiesExternal[i]));
+            nonExisting.push(entitiesExternal[i]);
         } else {
-            existing.push(realmRepository.merge(
-                entities[index],
-                entitiesExternal[i],
-            ));
+            existing.push({
+                id: entities[index].id,
+                data: entitiesExternal[i],
+            });
         }
     }
 
     if (nonExisting.length > 0) {
-        await realmRepository.save(nonExisting);
+        for (let i = 0; i < nonExisting.length; i++) {
+            await authupClient.realm.create(nonExisting[i]);
+        }
 
         useLogger()
             .info(
@@ -64,7 +65,9 @@ export async function syncOrganizationsOfStationRegistry() {
     }
 
     if (existing.length > 0) {
-        await realmRepository.save(existing);
+        for (let i = 0; i < existing.length; i++) {
+            await authupClient.realm.update(existing[i].id, existing[i].data);
+        }
 
         useLogger()
             .info(

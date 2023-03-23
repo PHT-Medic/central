@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DatabaseSeeder } from '@authup/server-database';
 import { DataSource } from 'typeorm';
 import {
     checkDatabase, createDatabase, setDataSource, setupDatabaseSchema,
@@ -13,15 +12,12 @@ import {
 import {
     createConfig, getWritableDirPath, useEnv, useLogger,
 } from '../config';
-import { DatabaseRootSeeder } from '../database/seeds/root';
-import { buildDataSourceOptions } from '../database/utils';
+import { DatabaseRootSeeder, buildDataSourceOptions } from '../database';
 import { createRouter } from '../http/router';
 import { createHttpServer } from '../http/server';
 import { generateSwaggerDocumentation } from '../http/swagger';
-import type { StartCommandContext } from './type';
 
-export async function startCommand(context?: StartCommandContext) {
-    context = context || {};
+export async function startCommand() {
     const config = await createConfig();
 
     const logger = useLogger();
@@ -68,12 +64,6 @@ export async function startCommand(context?: StartCommandContext) {
     if (!check.schema) {
         logger.info('Seeding database...');
     }
-
-    const authSeeder = new DatabaseSeeder({
-        adminPasswordReset: context.databaseAdminPasswordReset ?? false,
-        robotSecretReset: context.databaseRobotSecretReset ?? false,
-    });
-    await authSeeder.run(dataSource);
 
     if (!check.schema) {
         const coreSeeder = new DatabaseRootSeeder();

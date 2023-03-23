@@ -18,7 +18,6 @@ import type {
     Train,
     TrainLog,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@authup/server-database';
 import type { Realm } from '@authup/common';
 import { TrainEntity } from '../train/entity';
 
@@ -77,10 +76,6 @@ export class TrainLogEntity implements TrainLog {
     @JoinColumn({ name: 'train_id' })
         train: TrainEntity;
 
-    @Column()
+    @Column({ type: 'uuid' })
         realm_id: Realm['id'];
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'realm_id' })
-        realm: RealmEntity;
 }

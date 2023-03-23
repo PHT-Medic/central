@@ -9,10 +9,9 @@ import { createDatabase, dropDatabase } from 'typeorm-extension';
 import type { CommandModule } from 'yargs';
 import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
-import { generateMigration } from '@authup/server-database';
 import path from 'node:path';
+import { extendDataSourceOptions, generateMigration } from '../../database';
 import { createConfig } from '../../config';
-import { extendDataSourceOptions } from '../../database/utils';
 
 export class MigrationGenerateCommand implements CommandModule {
     command = 'migration:generate';

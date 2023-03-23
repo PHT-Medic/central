@@ -8,10 +8,10 @@
 import cors from 'cors';
 
 import {
-    registerControllers as registerAuthControllers,
-    registerMiddlewares,
-} from '@authup/server-http';
+    setupHTTPMiddleware
+} from '@authup/server-adapter';
 import { Router } from 'routup';
+import {useLogger} from '../config';
 
 import { registerControllers } from './routes';
 
@@ -19,7 +19,7 @@ import {
     errorMiddleware,
     licenseAgreementMiddleware,
 } from './middleware';
-import { useEnv } from '../config/env';
+import { useEnv } from '../config';
 
 export function createRouter() : Router {
     const router = new Router();
@@ -31,14 +31,17 @@ export function createRouter() : Router {
         credentials: true,
     }));
 
-    registerMiddlewares(router);
+    router.use(setupHTTPMiddleware({
+        redis: false, // todo: inherit from config
+        oauth2: useEnv('authApiUrl'),
+        logger: useLogger(),
+    }));
 
     if (useEnv('env') === 'development') {
         router.use(licenseAgreementMiddleware);
     }
 
     registerControllers(router);
-    registerAuthControllers(router);
 
     router.use(errorMiddleware);
 

@@ -18,7 +18,6 @@ import {
     Ecosystem, RegistryProjectType,
 } from '@personalhealthtrain/central-common';
 import type { Realm } from '@authup/common';
-import { RealmEntity } from '@authup/server-database';
 import { RegistryEntity } from '../registry/entity';
 
 @Unique(['name', 'registry_id'])
@@ -97,12 +96,8 @@ export class RegistryProjectEntity implements RegistryProject {
 
     // ------------------------------------------------------------------
 
-    @Column({ nullable: true })
+    @Column({ type: 'uuid', nullable: true })
         realm_id: Realm['id'];
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE', nullable: true })
-    @JoinColumn({ name: 'realm_id' })
-        realm: RealmEntity;
 
     // ------------------------------------------------------------------
 

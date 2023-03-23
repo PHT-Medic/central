@@ -7,6 +7,5 @@
 
 export * from './constants';
 export * from './registry';
-export * from './secret-storage';
 export * from './station-registry';
 export * from './utils';

@@ -12,7 +12,6 @@ import {
 import type {
     Proposal, ProposalStation, ProposalStationApprovalStatus, Station,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@authup/server-database';
 import type { Realm } from '@authup/common';
 import { ProposalEntity } from '../proposal/entity';
 import { StationEntity } from '../station/entity';
@@ -46,12 +45,8 @@ export class ProposalStationEntity implements ProposalStation {
     @JoinColumn({ name: 'proposal_id' })
         proposal: ProposalEntity;
 
-    @Column()
+    @Column({ type: 'uuid' })
         proposal_realm_id: Realm['id'];
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'proposal_realm_id' })
-        proposal_realm: RealmEntity;
 
     @Column()
         station_id: Station['id'];
@@ -60,10 +55,6 @@ export class ProposalStationEntity implements ProposalStation {
     @JoinColumn({ name: 'station_id' })
         station: StationEntity;
 
-    @Column()
+    @Column({ type: 'uuid' })
         station_realm_id: string;
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'station_realm_id' })
-        station_realm: RealmEntity;
 }

@@ -11,16 +11,8 @@ import { NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import type { FindOptionsWhere } from 'typeorm';
-import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
-import { UserSecretEntity } from '../../../../../domains/user-secret/entity';
-import { useEnv } from '../../../../../config';
-import {
-    SecretStorageCommand,
-    SecretStorageEntityType,
-    buildSecretStorageQueueMessage,
-    saveUserSecretsToSecretStorage,
-} from '../../../../../components';
+import { UserSecretEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 export async function deleteUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -52,21 +44,6 @@ export async function deleteUserSecretRouteHandler(req: Request, res: Response) 
     await repository.remove(entity);
 
     entity.id = entityId;
-
-    if (useEnv('env') === 'test') {
-        await saveUserSecretsToSecretStorage({
-            type: SecretStorageEntityType.USER_SECRETS,
-            id: entity.user_id,
-        });
-    } else {
-        await publish(buildSecretStorageQueueMessage({
-            command: SecretStorageCommand.SAVE,
-            data: {
-                type: SecretStorageEntityType.USER_SECRETS,
-                id: entity.user_id,
-            },
-        }));
-    }
 
     return sendAccepted(res, entity);
 }
