@@ -12,7 +12,8 @@ import {
 import {
     createConfig, getWritableDirPath, useEnv, useLogger,
 } from '../config';
-import { DatabaseRootSeeder, buildDataSourceOptions } from '../database';
+import { buildDataSourceOptions } from '../database';
+import { setupAuthupService } from '../domains';
 import { createRouter } from '../http/router';
 import { createHttpServer } from '../http/server';
 import { generateSwaggerDocumentation } from '../http/swagger';
@@ -66,12 +67,11 @@ export async function startCommand() {
     }
 
     if (!check.schema) {
-        const coreSeeder = new DatabaseRootSeeder();
-        await coreSeeder.run(dataSource);
+        logger.info('Seeded database');
     }
 
     if (!check.schema) {
-        logger.info('Seeded database');
+        await setupAuthupService();
     }
 
     const router = createRouter();

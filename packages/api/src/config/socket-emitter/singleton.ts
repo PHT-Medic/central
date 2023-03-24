@@ -16,7 +16,7 @@ export function useSocketEmitter() : Emitter<SocketServerToClientEvents> {
         return instance;
     }
 
-    instance = new Emitter<SocketServerToClientEvents>(useClient('default'));
+    instance = new Emitter<SocketServerToClientEvents>(useClient());
 
     return instance;
 }

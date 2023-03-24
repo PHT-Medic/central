@@ -7,5 +7,4 @@
 
 export * from './cache';
 export * from './migrations';
-export * from './seeds';
 export * from './utils';

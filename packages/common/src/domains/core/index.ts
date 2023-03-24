@@ -11,7 +11,6 @@ export * from './master-image';
 export * from './proposal';
 export * from './proposal-station';
 export * from './settings-option';
-export * from './root';
 export * from './registry';
 export * from './registry-project';
 export * from './station';
