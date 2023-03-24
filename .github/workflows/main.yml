@@ -54,6 +54,7 @@ jobs:
             authup:
                 image: tada5hi/authup-server
                 env:
+                    ROBOT_ENABLED: true
                     REDIS: redis://redis
                     VAULT: start123@http://vault:8090/v1/
                 depends_on:
