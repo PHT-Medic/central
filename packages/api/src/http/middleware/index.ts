@@ -8,3 +8,6 @@
 export * from './auth';
 export * from './error';
 export * from './license-agreement';
+export * from './prometheus';
+export * from './rate-limit';
+export * from './swagger';
