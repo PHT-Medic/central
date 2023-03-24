@@ -46,7 +46,7 @@
         "routup": "^0.14.1",
         "tar": "^6.1.13",
         "tar-stream": "^3.0.0",
-        "typeorm": "^0.3.12",
+        "typeorm": "^0.3.11",
         "typeorm-extension": "^2.5.4",
         "winston": "^3.8.1",
         "yargs": "^17.7.1",

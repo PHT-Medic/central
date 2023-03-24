@@ -1,21 +1,52 @@
 /*
- * Copyright (c) 2022-2022.
+ * Copyright (c) 2022-2023.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
 import { pascalCase } from 'pascal-case';
-import path from 'path';
-import fs from 'fs';
-import process from 'process';
+import path from 'node:path';
+import fs from 'node:fs';
+import process from 'node:process';
 import { MigrationGenerateCommand } from 'typeorm/commands/MigrationGenerateCommand';
-import type { MigrationGenerateCommandContext } from './type';
+import type { MigrationGenerateCommandContext } from '../type';
 
 class GenerateCommand extends MigrationGenerateCommand {
     static prettify(query: string) {
         return this.prettifyQuery(query);
     }
+}
+
+function queryParams(parameters: any[] | undefined): string {
+    if (!parameters || !parameters.length) {
+        return '';
+    }
+
+    return `, ${JSON.stringify(parameters)}`;
+}
+
+function getTemplate(
+    name: string,
+    timestamp: number,
+    upStatements: string[],
+    downStatements: string[],
+): string {
+    const migrationName = `${pascalCase(name)}${timestamp}`;
+
+    return `import { MigrationInterface, QueryRunner } from 'typeorm';
+export class ${migrationName} implements MigrationInterface {
+    name = '${migrationName}';
+    public async up(queryRunner: QueryRunner): Promise<void> {
+${upStatements.join(`
+`)}
+    }
+    public async down(queryRunner: QueryRunner): Promise<void> {
+${downStatements.join(`
+`)}
+    }
+}
+`;
 }
 
 export async function generateMigration(context: MigrationGenerateCommandContext) {
@@ -78,35 +109,4 @@ export async function generateMigration(context: MigrationGenerateCommandContext
     const filePath = path.join(context.directoryPath, fileName);
 
     await fs.promises.writeFile(filePath, fileContent, { encoding: 'utf-8' });
-}
-
-function queryParams(parameters: any[] | undefined): string {
-    if (!parameters || !parameters.length) {
-        return '';
-    }
-
-    return `, ${JSON.stringify(parameters)}`;
-}
-
-function getTemplate(
-    name: string,
-    timestamp: number,
-    upStatements: string[],
-    downStatements: string[],
-): string {
-    const migrationName = `${pascalCase(name)}${timestamp}`;
-
-    return `import { MigrationInterface, QueryRunner } from 'typeorm';
-export class ${migrationName} implements MigrationInterface {
-    name = '${migrationName}';
-    public async up(queryRunner: QueryRunner): Promise<void> {
-${upStatements.join(`
-`)}
-    }
-    public async down(queryRunner: QueryRunner): Promise<void> {
-${downStatements.join(`
-`)}
-    }
-}
-`;
 }

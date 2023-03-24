@@ -6,5 +6,5 @@
  */
 
 export * from './cache';
-export * from './migrations';
 export * from './utils';
+export * from './type';

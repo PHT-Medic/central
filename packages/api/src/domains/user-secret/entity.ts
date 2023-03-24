@@ -36,10 +36,10 @@ export class UserSecretEntity implements UserSecret {
     @Column({ type: 'text', nullable: true })
         content: string;
 
-    @Column()
+    @Column({ type: 'uuid' })
         user_id: User['id'];
 
-    @Column()
+    @Column({ type: 'uuid' })
         realm_id: Realm['id'];
 
     @CreateDateColumn()

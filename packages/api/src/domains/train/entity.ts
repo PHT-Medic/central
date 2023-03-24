@@ -75,6 +75,9 @@ export class TrainEntity implements Train {
     @Column({ type: 'int', unsigned: true, default: 0 })
         stations: number;
 
+    @Column({ type: 'text' })
+        dummy: string;
+
     // ------------------------------------------------------------------
 
     @Index()

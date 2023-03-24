@@ -8,9 +8,11 @@
 import { ServerError } from '@ebec/http';
 import { PermissionKey, ServiceID } from '@personalhealthtrain/central-common';
 import type {
+    Permission,
     Realm, Robot, Role,
 } from '@authup/common';
 import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/common';
+import { isClientError } from 'hapic';
 import { PresetRoleName, getPresetRolePermissions, useLogger } from '../../config';
 import { useAuthupClient } from '../../core';
 
@@ -75,9 +77,9 @@ export async function setupAuthupService(): Promise<any> {
             realm_id: realm.id,
         });
 
-        useLogger().debug('Registry Robot created.');
+        useLogger().debug(`Robot ${ServiceID.REGISTRY} created.`);
     } else {
-        useLogger().debug('Registry Robot already exist.');
+        useLogger().debug(`Robot ${ServiceID.REGISTRY} already exists.`);
     }
 
     // -------------------------------------------------
@@ -87,28 +89,60 @@ export async function setupAuthupService(): Promise<any> {
      */
     const permissionNames = Object.values(PermissionKey);
     for (let i = 0; i < permissionNames.length; i++) {
-        const permission = await authupClient.permission.create({
-            name: permissionNames[i],
-        });
+        let permission : Permission;
 
-        useLogger().debug(`Created permission ${permissionNames[i]}`);
-
-        if (roleEntity) {
-            await authupClient.rolePermission.create({
-                permission_id: permission.id,
-                role_id: roleEntity.id,
+        try {
+            permission = await authupClient.permission.create({
+                name: permissionNames[i],
             });
 
-            useLogger().debug(`Created permission ${permissionNames[i]} for admin role.`);
+            useLogger().debug(`Created permission ${permissionNames[i]}`);
+        } catch (e) {
+            if (isClientError(e) && e.response.status === 409) {
+                useLogger().debug(`Permission ${permissionNames[i]} already exists`);
+
+                const { data: permissions } = await authupClient.permission.getMany({
+                    filter: {
+                        realm_id: null,
+                        name: permissionNames[i],
+                    },
+                });
+
+                // eslint-disable-next-line prefer-destructuring
+                permission = permissions[0];
+            } else {
+                throw e;
+            }
+        }
+
+        if (roleEntity) {
+            try {
+                await authupClient.rolePermission.create({
+                    permission_id: permission.id,
+                    role_id: roleEntity.id,
+                });
+
+                useLogger().debug(`Created permission ${permissionNames[i]} for admin role.`);
+            } catch (e) {
+                if (!isClientError(e) || e.response.status !== 409) {
+                    throw e;
+                }
+            }
         }
 
         if (robotEntity) {
-            await authupClient.robotPermission.create({
-                permission_id: permission.id,
-                robot_id: robotEntity.id,
-            });
+            try {
+                await authupClient.robotPermission.create({
+                    permission_id: permission.id,
+                    robot_id: robotEntity.id,
+                });
 
-            useLogger().debug(`Created permission ${permissionNames[i]} for system robot.`);
+                useLogger().debug(`Created permission ${permissionNames[i]} for system robot.`);
+            } catch (e) {
+                if (!isClientError(e) || e.response.status !== 409) {
+                    throw e;
+                }
+            }
         }
     }
 
@@ -129,15 +163,41 @@ export async function setupAuthupService(): Promise<any> {
             },
         });
 
-        const role = await authupClient.role.create({
-            name: roleNames[i],
-        });
+        let role : Role;
+
+        try {
+            role = await authupClient.role.create({
+                name: roleNames[i],
+            });
+        } catch (e) {
+            if (isClientError(e) && e.response.status === 409) {
+                useLogger().debug(`Permission ${permissionNames[i]} already exists`);
+
+                const { data: roles } = await authupClient.role.getMany({
+                    filter: {
+                        realm_id: null,
+                        name: permissionNames[i],
+                    },
+                });
+
+                // eslint-disable-next-line prefer-destructuring
+                role = roles[0];
+            } else {
+                throw e;
+            }
+        }
 
         for (let i = 0; i < permissions.length; i++) {
-            await authupClient.rolePermission.create({
-                role_id: role.id,
-                permission_id: permissions[i].id,
-            });
+            try {
+                await authupClient.rolePermission.create({
+                    role_id: role.id,
+                    permission_id: permissions[i].id,
+                });
+            } catch (e) {
+                if (!isClientError(e) || e.response.status !== 409) {
+                    throw e;
+                }
+            }
         }
     }
 }
