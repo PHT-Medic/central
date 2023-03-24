@@ -9,7 +9,6 @@ import { BadRequestError } from '@ebec/http';
 import { ErrorCode } from '@personalhealthtrain/central-common';
 import { useClient } from 'redis-extension';
 import type { Next, Request, Response } from 'routup';
-import { useRequestPath } from 'routup';
 import { useAuthupClient } from '../../core';
 import { useRequestEnv } from '../request';
 
@@ -26,16 +25,6 @@ export function setupLicenseAgreementMiddleware() {
             return;
         }
 
-        const url = useRequestPath(req);
-        if (
-            url.startsWith('/user-attributes') ||
-            url.startsWith('/token') ||
-            url.startsWith('/users/@me') ||
-            url.startsWith('/identity-providers')
-        ) {
-            next();
-        }
-
         const redisValue = await redis.exists(buildRedisKey(userId));
         if (redisValue === 1) {
             next();
@@ -43,28 +32,25 @@ export function setupLicenseAgreementMiddleware() {
         }
 
         const authupClient = useAuthupClient();
-        const user = await authupClient.user.getOne('@me');
+        const { data: userAttributes } = await authupClient.userAttribute.getMany({
+            filter: {
+                user_id: userId,
+                name: 'license_agreement',
+            },
+        });
+
         if (
-            typeof user.license_agreeement === 'string' &&
-            user.license_agreement === 'accepted'
+            userAttributes.length === 1 &&
+            userAttributes[0].value === 'accepted'
         ) {
             await redis.set(buildRedisKey(userId), 1, 'EX', 3600 * 24);
             next();
             return;
         }
 
-        if (
-            typeof user.license_agreeement !== 'string' ||
-            user.license_agreement !== 'accepted'
-        ) {
-            next(new BadRequestError({
-                code: ErrorCode.LICENSE_AGREEMENT,
-                message: 'The license agreement must be accepted!',
-            }));
-
-            return;
-        }
-
-        next();
+        next(new BadRequestError({
+            code: ErrorCode.LICENSE_AGREEMENT,
+            message: 'The license agreement must be accepted!',
+        }));
     };
 }

@@ -120,7 +120,6 @@ ComponentListProperties<BuildInput<Train>>
                 },
                 include: {
                     result: true,
-                    user: true,
                 },
             }, this.query);
         },

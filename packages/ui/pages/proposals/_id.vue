@@ -29,7 +29,6 @@ export default {
             const proposal = await context.$api.proposal.getOne(context.params.id, {
                 include: {
                     master_image: true,
-                    user: true,
                 },
             });
 

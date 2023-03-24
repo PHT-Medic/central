@@ -23,10 +23,10 @@ export function buildAuthupAggregator() : Aggregator {
                 connectionString: useEnv('redisConnectionString'),
             });
 
-            redisSub.subscribe('realm');
+            redisSub.subscribe('realm', 'user', 'robot');
 
             redisSub.on('message', async (channel, message) => {
-                useLogger().info(`Received ${message} from ${channel}`);
+                useLogger().info(`Received event from channel ${channel}`);
                 const event = JSON.parse(message) as DomainEventContext;
 
                 switch (event.type) {

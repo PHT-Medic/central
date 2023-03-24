@@ -33,9 +33,6 @@ export default {
     computed: {
         query() {
             return {
-                include: {
-                    user: true,
-                },
                 filter: {
                     realm_id: this.$store.getters['auth/realmId'],
                 },

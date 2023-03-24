@@ -14,26 +14,28 @@ import { buildRegistryPayload } from '../../../components/registry/utils/queue';
 import { RegistryProjectEntity } from '../../../domains';
 
 export async function handleAuthupRobotEvent(context: RobotEventContext) {
-    if (context.data.name === ServiceID.REGISTRY) {
-        const dataSource = await useDataSource();
+    if (context.event === 'created' || context.event === 'updated') {
+        if (context.data.name === ServiceID.REGISTRY) {
+            const dataSource = await useDataSource();
 
-        const projectRepository = dataSource.getRepository(RegistryProjectEntity);
-        const projects = await projectRepository.find({
-            select: ['id'],
-            where: {
-                ecosystem: Ecosystem.DEFAULT,
-            },
-        });
-
-        for (let i = 0; i < projects.length; i++) {
-            const queueMessage = buildRegistryPayload({
-                command: RegistryCommand.PROJECT_LINK,
-                data: {
-                    id: projects[i].id,
+            const projectRepository = dataSource.getRepository(RegistryProjectEntity);
+            const projects = await projectRepository.find({
+                select: ['id'],
+                where: {
+                    ecosystem: Ecosystem.DEFAULT,
                 },
             });
 
-            await publish(queueMessage);
+            for (let i = 0; i < projects.length; i++) {
+                const queueMessage = buildRegistryPayload({
+                    command: RegistryCommand.PROJECT_LINK,
+                    data: {
+                        id: projects[i].id,
+                    },
+                });
+
+                await publish(queueMessage);
+            }
         }
     }
 }

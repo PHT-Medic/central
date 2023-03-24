@@ -63,14 +63,6 @@ export async function startCommand() {
     }
 
     if (!check.schema) {
-        logger.info('Seeding database...');
-    }
-
-    if (!check.schema) {
-        logger.info('Seeded database');
-    }
-
-    if (!check.schema) {
         await setupAuthupService();
     }
 

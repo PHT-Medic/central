@@ -46,9 +46,7 @@ export const TrainListItem = Vue.extend({
             return this.$auth.has(PermissionID.TRAIN_DROP);
         },
         userName() {
-            return this.entity.user ?
-                this.entity.user.name :
-                this.entity.user_id;
+            return this.entity.user_id;
         },
     },
     created() {

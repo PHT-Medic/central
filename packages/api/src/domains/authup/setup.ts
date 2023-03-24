@@ -49,7 +49,7 @@ export async function setupAuthupService(): Promise<any> {
     let roleEntity : Role | undefined;
     const roleResponse = await authupClient.role.getMany({
         filter: {
-            realm_id: realm.id,
+            realm_id: null,
             name: 'admin',
         },
     });
@@ -155,8 +155,6 @@ export async function setupAuthupService(): Promise<any> {
     for (let i = 0; i < roleNames.length; i++) {
         const names = getPresetRolePermissions(roleNames[i]);
 
-        useLogger().debug(`Setup preset role ${roleNames[i]}`);
-
         const { data: permissions } = await authupClient.permission.getMany({
             filter: {
                 name: names,
@@ -165,26 +163,24 @@ export async function setupAuthupService(): Promise<any> {
 
         let role : Role;
 
-        try {
+        const { data: roles } = await authupClient.role.getMany({
+            filter: {
+                realm_id: null,
+                name: roleNames[i],
+            },
+        });
+
+        if (roles.length === 0) {
             role = await authupClient.role.create({
                 name: roleNames[i],
             });
-        } catch (e) {
-            if (isClientError(e) && e.response.status === 409) {
-                useLogger().debug(`Permission ${permissionNames[i]} already exists`);
 
-                const { data: roles } = await authupClient.role.getMany({
-                    filter: {
-                        realm_id: null,
-                        name: permissionNames[i],
-                    },
-                });
+            useLogger().debug(`Created role ${roleNames[i]}`);
+        } else {
+            // eslint-disable-next-line prefer-destructuring
+            role = roles[0];
 
-                // eslint-disable-next-line prefer-destructuring
-                role = roles[0];
-            } else {
-                throw e;
-            }
+            useLogger().debug(`Role ${permissionNames[i]} already exists`);
         }
 
         for (let i = 0; i < permissions.length; i++) {

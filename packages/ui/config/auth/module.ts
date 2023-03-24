@@ -17,7 +17,7 @@ import {
     OAuth2SubKind,
     OAuth2TokenKind,
 } from '@authup/common';
-import type { Config } from 'hapic';
+import type { ConfigInput } from 'hapic';
 import { createClient } from 'hapic';
 import type { ClientOptions } from '@hapic/oauth2';
 import { Client } from '@hapic/oauth2';
@@ -43,7 +43,7 @@ export class AuthModule {
     constructor(ctx: Context, options: ClientOptions) {
         this.ctx = ctx;
 
-        const config : Config = {
+        const config : ConfigInput = {
             driver: {
                 httpsAgent: new https.Agent({
                     rejectUnauthorized: false,

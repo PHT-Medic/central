@@ -25,7 +25,7 @@
         "husky": "^8.0.3",
         "jest": "^29.5.0",
         "jest-serial-runner": "^1.2.0",
-        "lerna": "^6.4.1",
+        "lerna": "^6.6.0",
         "rimraf": "^4.4.0",
         "rollup": "^3.19.1",
         "smob": "^0.1.0",
@@ -52,9 +52,9 @@
     "resolutions": {
         "minimatch": "^5.1.6"
     },
-    "config": {
-        "commitizen": {
-            "path": "@commitlint/cz-commitlint"
+    "overrides": {
+        "typeorm": {
+            "glob": "7.2.0"
         }
     }
 }
