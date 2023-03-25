@@ -55,6 +55,7 @@ jobs:
                 image: tada5hi/authup-server
                 env:
                     ROBOT_ENABLED: true
+                    VAULT: start123@http://127.0.0.1:8090/v1/
                 ports:
                     - 3010:3010
 
@@ -81,6 +82,7 @@ jobs:
                     SKIP_PROPOSAL_APPROVAL_OPERATION: true
                     SKIP_TRAIN_APPROVAL_OPERATION: true
                     AUTH_API_URL: http://127.0.0.1:3010/
+                    VAULT_CONNECTION_STRING: start123@http://127.0.0.1:8090/v1/
                 run: |
                     npm run test --workspace=packages/api
 
