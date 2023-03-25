@@ -1,22 +1,22 @@
 {
-    "packages": [
-        "packages/*"
-    ],
-    "command": {
-        "create": {
-            "homepage": "https://github.com/PHT-Medic/central",
-            "license": "MIT"
-        },
-        "publish": {
-            "tempTag": true
-        },
-        "version": {
-            "conventionalCommits": true,
-            "exact": true,
-            "message": "chore(release): %s"
-        }
+  "packages": [
+    "packages/*"
+  ],
+  "command": {
+    "create": {
+      "homepage": "https://github.com/PHT-Medic/central",
+      "license": "MIT"
     },
-    "useWorkspaces": true,
-    "useNx": true,
-    "version": "2.0.0-alpha.0"
+    "publish": {
+      "tempTag": true
+    },
+    "version": {
+      "conventionalCommits": true,
+      "exact": true,
+      "message": "chore(release): %s"
+    }
+  },
+  "useWorkspaces": true,
+  "useNx": true,
+  "version": "2.0.0"
 }
