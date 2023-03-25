@@ -50,10 +50,5 @@
     },
     "resolutions": {
         "minimatch": "^5.1.6"
-    },
-    "overrides": {
-        "typeorm": {
-            "glob": "7.2.0"
-        }
     }
 }

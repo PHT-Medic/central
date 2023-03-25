@@ -15,11 +15,8 @@ import {
 import {
     DataSource,
 } from 'typeorm';
-import {
-    DatabaseSeeder as AuthDatabaseRootSeeder,
-} from '@authup/server-database';
-import { PermissionKey } from '@personalhealthtrain/central-common';
-import { buildDataSourceOptions } from '../../src/database/utils';
+import { buildDataSourceOptions } from '../../src/database';
+import { setupAuthupService } from '../../src/domains';
 
 export async function useTestDatabase() {
     const options = await buildDataSourceOptions();
@@ -33,11 +30,7 @@ export async function useTestDatabase() {
 
     setDataSource(dataSource);
 
-    const authSeeder = new AuthDatabaseRootSeeder({
-        permissions: Object.values(PermissionKey),
-        robotEnabled: true,
-    });
-    await authSeeder.run(dataSource);
+    await setupAuthupService();
 
     return dataSource;
 }
