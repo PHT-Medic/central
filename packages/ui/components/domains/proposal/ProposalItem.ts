@@ -37,9 +37,7 @@ export const ProposalItem = Vue.extend({
             return this.$auth.has(PermissionID.PROPOSAL_DROP);
         },
         userName() {
-            return this.entity.user ?
-                this.entity.user.display_name :
-                this.entity.user_id;
+            return this.entity.user_id;
         },
     },
     mounted() {

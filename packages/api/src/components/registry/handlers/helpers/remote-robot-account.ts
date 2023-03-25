@@ -6,14 +6,12 @@
  */
 
 import type { Client as HarborClient, RobotAccount } from '@hapic/harbor';
+import { useClient as useVaultClient } from '@hapic/vault';
 import type { RegistryProjectSecretStoragePayload } from '@personalhealthtrain/central-common';
 import {
-    HTTPClientKey,
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
 } from '@personalhealthtrain/central-common';
-import { isClientError, useClient } from 'hapic';
-import type { Client as VaultClient } from '@hapic/vault';
-import { ApiKey } from '../../../../config';
+import { isClientError } from 'hapic';
 
 export async function ensureRemoteRegistryProjectAccount(
     httpClient: HarborClient,
@@ -35,7 +33,7 @@ export async function ensureRemoteRegistryProjectAccount(
             robotAccount = await httpClient.robotAccount.create(context.name);
         } catch (e) {
             if (e?.response?.status === 409) {
-                const response = await useClient<VaultClient>(HTTPClientKey.VAULT)
+                const response = await useVaultClient()
                     .keyValue.find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, context.name);
 
                 if (
@@ -72,7 +70,7 @@ export async function ensureRemoteRegistryProjectAccount(
                     };
                 }
 
-                await useClient<VaultClient>(ApiKey.VAULT)
+                await useVaultClient()
                     .keyValue.save(
                         REGISTRY_PROJECT_SECRET_ENGINE_KEY,
                         context.name,
@@ -107,7 +105,7 @@ export async function ensureRemoteRegistryProjectAccount(
                 account_secret: robotAccount.secret,
             };
 
-            await useClient<VaultClient>(ApiKey.VAULT)
+            await useVaultClient()
                 .keyValue.save(
                     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
                     context.name,

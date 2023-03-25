@@ -5,6 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+export * from './authup';
 export * from './train-manager';
-export * from './robot';
 export * from './type';

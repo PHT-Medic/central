@@ -51,6 +51,19 @@ jobs:
                 ports:
                     - 6379:6379
 
+            authup:
+                image: tada5hi/authup-server
+                env:
+                    ROBOT_ENABLED: true
+                    REDIS: redis://redis
+                    VAULT: start123@http://vault:8090/v1/
+                depends_on:
+                    - vault
+                    - redis
+                    - mysql
+                ports:
+                    - 3010:3010
+
         runs-on: [ ubuntu-latest ]
 
         steps:
@@ -73,6 +86,7 @@ jobs:
                     TYPEORM_DATABASE: test
                     SKIP_PROPOSAL_APPROVAL_OPERATION: true
                     SKIP_TRAIN_APPROVAL_OPERATION: true
+                    AUTH_API_URL: http://authup:3010/
                 run: |
                     npm run test --workspace=packages/api
 

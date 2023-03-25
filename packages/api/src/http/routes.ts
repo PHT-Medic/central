@@ -7,7 +7,6 @@
 
 import { mountControllers } from '@routup/decorators';
 import type { Router } from 'routup';
-import { RootController } from './controllers/core/root';
 import { TrainLogController } from './controllers/core/train-log';
 import { UserSecretController } from './controllers/core/user-secret';
 import { MasterImageController } from './controllers/core/master-image';
@@ -24,8 +23,6 @@ import { RegistryProjectController } from './controllers/core/registry-project';
 
 export function registerControllers(router: Router) {
     mountControllers(router, [
-        RootController,
-
         // Core
         MasterImageController,
         MasterImageGroupController,

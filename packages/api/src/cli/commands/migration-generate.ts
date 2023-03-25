@@ -5,14 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createDatabase, dropDatabase } from 'typeorm-extension';
+import {
+    createDatabase, dropDatabase,
+} from 'typeorm-extension';
 import type { CommandModule } from 'yargs';
 import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
-import { generateMigration } from '@authup/server-database';
 import path from 'node:path';
+import { extendDataSourceOptions, generateMigration } from '../../database';
 import { createConfig } from '../../config';
-import { extendDataSourceOptions } from '../../database/utils';
 
 export class MigrationGenerateCommand implements CommandModule {
     command = 'migration:generate';
@@ -47,12 +48,6 @@ export class MigrationGenerateCommand implements CommandModule {
         for (let i = 0; i < connections.length; i++) {
             const dataSourceOptions = await extendDataSourceOptions(connections[i]);
             const directoryPath = path.join(baseDirectory, dataSourceOptions.type);
-
-            Object.assign(dataSourceOptions, {
-                migrations: [
-                    path.join(directoryPath, '*{.ts,.js}'),
-                ],
-            } satisfies Partial<DataSourceOptions>);
 
             await dropDatabase({ options: dataSourceOptions });
             await createDatabase({ options: dataSourceOptions, synchronize: false });

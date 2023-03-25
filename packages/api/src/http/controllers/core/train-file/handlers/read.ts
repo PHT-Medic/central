@@ -8,11 +8,11 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/common';
-import { onlyRealmWritableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import { applyFilters, useDataSource } from 'typeorm-extension';
+import { onlyRealmWritableQueryResources } from '../../../../../domains';
 import { TrainFileEntity } from '../../../../../domains/train-file/entity';
 import { useRequestEnv } from '../../../../request';
 

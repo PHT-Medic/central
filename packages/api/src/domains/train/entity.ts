@@ -32,7 +32,6 @@ import type {
 import {
     TrainConfigurationStatus, TrainType,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity, UserEntity } from '@authup/server-database';
 import type { Realm, User } from '@authup/common';
 import { ProposalEntity } from '../proposal/entity';
 import { MasterImageEntity } from '../master-image/entity';
@@ -75,6 +74,9 @@ export class TrainEntity implements Train {
 
     @Column({ type: 'int', unsigned: true, default: 0 })
         stations: number;
+
+    @Column({ type: 'text' })
+        dummy: string;
 
     // ------------------------------------------------------------------
 
@@ -152,12 +154,8 @@ export class TrainEntity implements Train {
 
     // ------------------------------------------------------------------
 
-    @Column()
+    @Column({ type: 'uuid' })
         realm_id: Realm['id'];
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'realm_id' })
-        realm: RealmEntity;
 
     // ------------------------------------------------------------------
 
@@ -179,10 +177,6 @@ export class TrainEntity implements Train {
 
     @Column({ nullable: true, type: 'uuid' })
         user_id: User['id'];
-
-    @ManyToOne(() => UserEntity, { nullable: true, onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'user_id' })
-        user: UserEntity;
 
     // ------------------------------------------------------------------
     @Column({ type: 'uuid' })

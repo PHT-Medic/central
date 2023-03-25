@@ -4,8 +4,6 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-
-import { onlyRealmWritableQueryResources } from '@authup/server-database';
 import { useRequestQuery } from '@routup/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
@@ -15,7 +13,7 @@ import {
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { UserSecretEntity } from '../../../../../domains/user-secret/entity';
+import { UserSecretEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 
 export async function getOneUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
@@ -39,9 +37,6 @@ export async function getOneUserSecretRouteHandler(req: Request, res: Response) 
         defaultAlias: 'userSecret',
         fields: {
             default: ['id', 'key', 'type', 'content', 'user_id', 'realm_id', 'created_at', 'updated_at'],
-        },
-        relations: {
-            allowed: ['user', 'realm'],
         },
     });
 
@@ -76,9 +71,6 @@ export async function getManyUserSecretRouteHandler(req: Request, res: Response)
         },
         pagination: {
             maxLimit: 50,
-        },
-        relations: {
-            allowed: ['user', 'realm'],
         },
         sort: {
             allowed: ['id', 'created_at', 'updated_at', 'user_id'],

@@ -22,7 +22,6 @@ import type {
     TrainStationApprovalStatus,
     TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
-import { RealmEntity } from '@authup/server-database';
 import type { Realm } from '@authup/common';
 import { TrainEntity } from '../train/entity';
 import { StationEntity } from '../station/entity';
@@ -73,12 +72,8 @@ export class TrainStationEntity implements TrainStation {
     @JoinColumn({ name: 'train_id' })
         train: TrainEntity;
 
-    @Column()
+    @Column({ type: 'uuid' })
         train_realm_id: Realm['id'];
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'train_realm_id' })
-        train_realm: RealmEntity;
 
     @Column()
         station_id: Station['id'];
@@ -87,10 +82,6 @@ export class TrainStationEntity implements TrainStation {
     @JoinColumn({ name: 'station_id' })
         station: StationEntity;
 
-    @Column()
+    @Column({ type: 'uuid' })
         station_realm_id: Realm['id'];
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'station_realm_id' })
-        station_realm: RealmEntity;
 }

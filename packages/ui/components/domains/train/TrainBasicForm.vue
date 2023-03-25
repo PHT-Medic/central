@@ -42,9 +42,6 @@ export default {
                 filter: {
                     ...(this.realmId ? { realm_id: this.realmId } : {}),
                 },
-                include: {
-                    user: true,
-                },
             };
         },
     },

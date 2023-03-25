@@ -58,12 +58,6 @@ export default Vue.extend({
     computed: {
         providerQuery() : BuildInput<IdentityProvider> {
             return {
-                include: {
-                    realm: true,
-                },
-                filter: {
-                    realm_id: '!master',
-                },
                 sort: {
                     created_at: 'DESC',
                 },
@@ -157,8 +151,7 @@ export default Vue.extend({
                                     staticClass: 'd-flex flex-wrap flex-row',
                                 }, [
                                     h('div', [
-                                        h('strong', props.item.realm.name),
-                                        h('span', { staticClass: 'ml-2 badge badge-dark' }, [props.item.name]),
+                                        h('strong', props.item.name),
                                     ]),
                                     h('div', { staticClass: 'ml-auto' }, [
                                         h('a', {

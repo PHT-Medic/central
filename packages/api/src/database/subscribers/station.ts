@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { RobotRepository } from '@authup/server-database';
 import {
     Ecosystem,
     StationSocketServerToClientEventName,
@@ -18,7 +17,8 @@ import type {
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
 import { emitSocketServerToClientEvent } from '../../config';
-import { StationEntity } from '../../domains/station';
+import { useAuthupClient } from '../../core';
+import { StationEntity } from '../../domains';
 
 function publish(
     operation: `${StationSocketServerToClientEventName}`,
@@ -40,28 +40,38 @@ function publish(
 }
 
 async function createRobot(dataSource: DataSource, entity: StationEntity) {
-    const robotRepository = new RobotRepository(dataSource);
-    const robot = await robotRepository.findOneBy({
-        name: entity.id,
-        realm_id: entity.realm_id,
+    const authupClient = useAuthupClient();
+    const response = await authupClient.robot.getMany({
+        page: {
+            limit: 1,
+        },
+        filter: {
+            name: entity.id,
+            realm_id: entity.realm_id,
+        },
     });
-
-    if (!robot) {
-        const { entity: robot } = await robotRepository.createWithSecret({
+    if (response.data.length === 0) {
+        await authupClient.robot.create({
             name: entity.id,
             realm_id: entity.realm_id,
         });
-
-        await robotRepository.save(robot);
     }
 }
 
 async function deleteRobot(dataSource: DataSource, entity: StationEntity) {
-    const robotRepository = new RobotRepository(dataSource);
-    await robotRepository.delete({
-        name: entity.id,
-        realm_id: entity.realm_id,
+    const authupClient = useAuthupClient();
+    const response = await authupClient.robot.getMany({
+        page: {
+            limit: 1,
+        },
+        filter: {
+            name: entity.id,
+            realm_id: entity.realm_id,
+        },
     });
+    if (response.data.length === 1) {
+        await authupClient.robot.delete(response.data[0].id);
+    }
 }
 
 @EventSubscriber()

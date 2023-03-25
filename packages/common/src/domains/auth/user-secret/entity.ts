@@ -19,11 +19,7 @@ export interface UserSecret {
 
     user_id: User['id'];
 
-    user: User;
-
     realm_id: Realm['id'];
-
-    realm: Realm;
 
     created_at: Date;
 

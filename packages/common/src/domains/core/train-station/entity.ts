@@ -45,13 +45,9 @@ export interface TrainStation {
 
     train_realm_id: Realm['id'];
 
-    train_realm: Realm;
-
     station_id: Station['id'];
 
     station: Station;
 
     station_realm_id: Realm['id'];
-
-    station_realm: Realm;
 }

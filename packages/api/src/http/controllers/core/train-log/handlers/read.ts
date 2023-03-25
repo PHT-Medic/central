@@ -14,7 +14,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { NotFoundError } from '@ebec/http';
-import { TrainLogEntity } from '../../../../../domains/train-log';
+import { TrainLogEntity } from '../../../../../domains';
 
 export async function getOneTrainLogRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -59,7 +59,7 @@ export async function getManyTrainLogRouteHandler(req: Request, res: Response) :
             maxLimit: 50,
         },
         relations: {
-            allowed: ['realm', 'train'],
+            allowed: ['train'],
         },
         sort: {
             allowed: ['command', 'step', 'status', 'created_at', 'updated_at'],

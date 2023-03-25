@@ -6,20 +6,12 @@
  */
 
 import { SecretType, isHex } from '@personalhealthtrain/central-common';
-import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runUserSecretValidation } from '../utils';
-import { UserSecretEntity } from '../../../../../domains/user-secret/entity';
-import {
-    SecretStorageCommand,
-    SecretStorageEntityType,
-    buildSecretStorageQueueMessage,
-} from '../../../../../components';
-import { useEnv } from '../../../../../config';
-import { saveUserSecretsToSecretStorage } from '../../../../../components/secret-storage/handlers/entities/user';
+import { UserSecretEntity } from '../../../../../domains';
 
 export async function createUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
     const data = await runUserSecretValidation(req, 'create');
@@ -42,21 +34,6 @@ export async function createUserSecretRouteHandler(req: Request, res: Response) 
     });
 
     await repository.save(entity);
-
-    if (useEnv('env') === 'test') {
-        await saveUserSecretsToSecretStorage({
-            type: SecretStorageEntityType.USER_SECRETS,
-            id: entity.user_id,
-        });
-    } else {
-        await publish(buildSecretStorageQueueMessage({
-            command: SecretStorageCommand.SAVE,
-            data: {
-                type: SecretStorageEntityType.USER_SECRETS,
-                id: entity.user_id,
-            },
-        }));
-    }
 
     return sendCreated(res, entity);
 }

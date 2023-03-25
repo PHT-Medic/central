@@ -5,40 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import cors from 'cors';
-
-import {
-    registerControllers as registerAuthControllers,
-    registerMiddlewares,
-} from '@authup/server-http';
 import { Router } from 'routup';
-
+import { registerMiddlewares } from './middlewares';
 import { registerControllers } from './routes';
-
-import {
-    errorMiddleware,
-    licenseAgreementMiddleware,
-} from './middleware';
-import { useEnv } from '../config/env';
+import { errorMiddleware } from './middleware';
 
 export function createRouter() : Router {
     const router = new Router();
 
-    router.use(cors({
-        origin(origin, callback) {
-            callback(null, true);
-        },
-        credentials: true,
-    }));
-
     registerMiddlewares(router);
-
-    if (useEnv('env') === 'development') {
-        router.use(licenseAgreementMiddleware);
-    }
-
     registerControllers(router);
-    registerAuthControllers(router);
 
     router.use(errorMiddleware);
 

@@ -16,8 +16,6 @@ import { Request, Response, useRequestParam } from 'routup';
 import { RegistryHook } from '../../../../components';
 import { ForceLoggedInMiddleware } from '../../../middleware';
 import { postHarborHookRouteHandler } from './handlers/registry/hook';
-
-import { handleSecretStorageCommandRouteHandler } from './handlers/secret-storage/command';
 import { handleStationRegistryCommandRouteHandler } from './handlers/station-registry/command';
 import { handleRegistryCommandRouteHandler } from './handlers/registry/command';
 
@@ -51,8 +49,6 @@ export class ServiceController {
         switch (id) {
             case ServiceID.REGISTRY:
                 return handleRegistryCommandRouteHandler(req, res);
-            case ServiceID.SECRET_STORAGE:
-                return handleSecretStorageCommandRouteHandler(req, res);
             case ServiceID.STATION_REGISTRY:
                 return handleStationRegistryCommandRouteHandler(req, res);
         }

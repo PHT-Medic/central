@@ -6,39 +6,51 @@
  */
 
 import { BadRequestError } from '@ebec/http';
-import { ErrorCode, hasOwnProperty } from '@personalhealthtrain/central-common';
+import { ErrorCode } from '@personalhealthtrain/central-common';
+import { useClient } from 'redis-extension';
 import type { Next, Request, Response } from 'routup';
-import { useRequestPath } from 'routup';
+import { useAuthupClient } from '../../core';
 import { useRequestEnv } from '../request';
 
-export function licenseAgreementMiddleware(req: Request, res: Response, next: Next) {
-    const user = useRequestEnv(req, 'user');
-    if (user) {
-        if (
-            !hasOwnProperty(user, 'license_agreement') ||
-            user.license_agreement !== 'accepted'
-        ) {
-            const url = useRequestPath(req);
+function buildRedisKey(id: string) {
+    return `user-license-agreement:${id}`;
+}
+export function setupLicenseAgreementMiddleware() {
+    const redis = useClient();
 
-            // todo: check url value
-
-            if (
-                url.startsWith('/user-attributes') ||
-                url.startsWith('/token') ||
-                url.startsWith('/users/@me') ||
-                url.startsWith('/identity-providers')
-            ) {
-                next();
-
-                return;
-            }
-
-            throw new BadRequestError({
-                code: ErrorCode.LICENSE_AGREEMENT,
-                message: 'The license agreement must be accepted!',
-            });
+    return async (req: Request, res: Response, next: Next) => {
+        const userId = useRequestEnv(req, 'userId');
+        if (!userId) {
+            next();
+            return;
         }
-    }
 
-    next();
+        const redisValue = await redis.exists(buildRedisKey(userId));
+        if (redisValue === 1) {
+            next();
+            return;
+        }
+
+        const authupClient = useAuthupClient();
+        const { data: userAttributes } = await authupClient.userAttribute.getMany({
+            filter: {
+                user_id: userId,
+                name: 'license_agreement',
+            },
+        });
+
+        if (
+            userAttributes.length === 1 &&
+            userAttributes[0].value === 'accepted'
+        ) {
+            await redis.set(buildRedisKey(userId), 1, 'EX', 3600 * 24);
+            next();
+            return;
+        }
+
+        next(new BadRequestError({
+            code: ErrorCode.LICENSE_AGREEMENT,
+            message: 'The license agreement must be accepted!',
+        }));
+    };
 }

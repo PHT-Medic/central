@@ -12,9 +12,9 @@ import { AuthModule } from '../config/auth';
 
 export default (ctx: Context, inject: Inject) => {
     const auth = new AuthModule(ctx, {
-        token_endpoint: new URL('token', ctx.$config.apiUrl).href,
-        introspection_endpoint: new URL('token/introspect', ctx.$config.apiUrl).href,
-        userinfo_endpoint: new URL('users/@me', ctx.$config.apiUrl).href,
+        token_endpoint: new URL('token', ctx.$config.authApiUrl).href,
+        introspection_endpoint: new URL('token/introspect', ctx.$config.authApiUrl).href,
+        userinfo_endpoint: new URL('users/@me', ctx.$config.authApiUrl).href,
     });
 
     inject('auth', auth);

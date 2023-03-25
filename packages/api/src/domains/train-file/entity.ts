@@ -15,7 +15,6 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 import type { Train, TrainFile } from '@personalhealthtrain/central-common';
-import { RealmEntity, UserEntity } from '@authup/server-database';
 // eslint-disable-next-line import/no-cycle
 import type { Realm, User } from '@authup/common';
 import { TrainEntity } from '../train/entity';
@@ -47,12 +46,13 @@ export class TrainFileEntity implements TrainFile {
 
     // ------------------------------------------------------------------
 
-    @Column()
+    @Column({ type: 'uuid' })
         user_id: User['id'];
 
-    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'user_id' })
-        user: UserEntity;
+    @Column({ type: 'uuid' })
+        realm_id: Realm['id'];
+
+    // ------------------------------------------------------------------
 
     @Column()
         train_id: Train['id'];
@@ -60,11 +60,4 @@ export class TrainFileEntity implements TrainFile {
     @ManyToOne(() => TrainEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'train_id' })
         train: TrainEntity;
-
-    @Column({ nullable: true })
-        realm_id: Realm['id'];
-
-    @ManyToOne(() => RealmEntity, { onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'realm_id' })
-        realm: RealmEntity;
 }

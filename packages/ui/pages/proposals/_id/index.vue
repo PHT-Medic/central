@@ -140,7 +140,7 @@ export default Vue.extend({
                                     <i class="fa fa-user fa-4x" />
                                 </div>
                                 <p class="badge badge-dark">
-                                    {{ proposal.user ? proposal.user.name : proposal.user_id }}
+                                    {{ proposal.user_id }}
                                 </p>
                             </div>
                         </div>

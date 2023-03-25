@@ -18,7 +18,7 @@ import {
     applyFilters, applyPagination, applyQueryFieldsParseOutput, applyRelations, useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { onlyRealmWritableQueryResources } from '@authup/server-database';
+import { onlyRealmWritableQueryResources } from '../../../../../domains';
 import { StationEntity } from '../../../../../domains/station/entity';
 import { useRequestEnv } from '../../../../request';
 
@@ -80,7 +80,7 @@ export async function getOneStationRouteHandler(req: Request, res: Response) : P
 
     applyRelations(query, include, {
         defaultAlias: 'station',
-        allowed: ['realm', 'registry_project', 'registry'],
+        allowed: ['registry_project', 'registry'],
     });
 
     const entity = await query.getOne();
@@ -105,7 +105,7 @@ export async function getManyStationRouteHandler(req: Request, res: Response) : 
 
     applyRelations(query, include, {
         defaultAlias: 'station',
-        allowed: ['realm', 'registry_project', 'registry'],
+        allowed: ['registry_project', 'registry'],
     });
 
     applyFilters(query, filter, {

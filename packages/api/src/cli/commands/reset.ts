@@ -10,7 +10,7 @@ import {
     dropDatabase,
 } from 'typeorm-extension';
 import { useLogger } from '../../config';
-import { buildDataSourceOptions } from '../../database/utils';
+import { buildDataSourceOptions } from '../../database';
 
 interface ResetArguments extends Arguments {
 

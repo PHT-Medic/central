@@ -10,7 +10,7 @@ import {
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { useClient } from 'hapic';
+import { useClient as useVaultClient } from '@hapic/vault';
 import type { Client as VaultClient } from '@hapic/vault';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
@@ -196,7 +196,7 @@ export async function unlinkRegistryProject(
     }
 
     try {
-        await useClient<VaultClient>(ApiKey.VAULT)
+        await useVaultClient()
             .keyValue.delete(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.externalName);
     } catch (e) {
         useLogger()

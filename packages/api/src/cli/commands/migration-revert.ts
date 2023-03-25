@@ -8,7 +8,7 @@
 import type { CommandModule } from 'yargs';
 import { DataSource } from 'typeorm';
 import { createConfig } from '../../config';
-import { buildDataSourceOptions } from '../../database/utils';
+import { buildDataSourceOptions } from '../../database';
 
 export class MigrationRevertCommand implements CommandModule {
     command = 'migration:revert';

@@ -7,12 +7,11 @@
 
 import { Ecosystem } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
-import { RealmEntity } from '@authup/server-database';
 import { isRealmResourceWritable } from '@authup/common';
 import { ForbiddenError } from '@ebec/http';
 import type { Request } from 'routup';
-import { RegistryEntity } from '../../../../../domains/registry/entity';
-import type { StationEntity } from '../../../../../domains/station/entity';
+import { RegistryEntity } from '../../../../../domains';
+import type { StationEntity } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 import type { RequestValidationResult } from '../../../../validation';
 import {
@@ -104,11 +103,6 @@ export async function runStationValidation(
     result.data = matchedValidationData(req, { includeOptionals: true });
 
     // ----------------------------------------------
-
-    await extendRequestValidationResultWithRelation(result, RealmEntity, {
-        id: 'realm_id',
-        entity: 'realm',
-    });
 
     await extendRequestValidationResultWithRelation(result, RegistryEntity, {
         id: 'registry_id',

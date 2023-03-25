@@ -6,7 +6,7 @@
  */
 
 import tar from 'tar-stream';
-import { createGzip } from 'zlib';
+import { createGzip } from 'node:zlib';
 import { useDocker } from './instance';
 import type { DockerAuthConfig } from './type';
 

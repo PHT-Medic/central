@@ -39,7 +39,7 @@ export default Vue.extend({
         interval: {
             type: Number,
             default: 1000,
-            validator: (value) => value >= 0,
+            validator: (value) => value as number >= 0,
         },
 
         /**
@@ -64,7 +64,7 @@ export default Vue.extend({
         time: {
             type: Number,
             default: 0,
-            validator: (value) => value >= 0,
+            validator: (value) => value as number >= 0,
         },
 
         /**

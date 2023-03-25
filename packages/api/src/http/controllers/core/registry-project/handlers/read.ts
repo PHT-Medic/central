@@ -11,7 +11,6 @@ import { parseQueryFields } from 'rapiq';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import type { SelectQueryBuilder } from 'typeorm';
-import { onlyRealmWritableQueryResources } from '@authup/server-database';
 import {
     applyFilters,
     applyPagination,
@@ -23,7 +22,7 @@ import {
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { useRequestEnv } from '../../../../request';
-import { RegistryProjectEntity } from '../../../../../domains/registry-project/entity';
+import { RegistryProjectEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 
 function checkAndApplyFields(req: Request, query: SelectQueryBuilder<any>, fields: any) {
     const protectedFields : ParseAllowedOption<RegistryProjectEntity> = [

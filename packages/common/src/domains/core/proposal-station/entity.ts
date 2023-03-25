@@ -31,13 +31,9 @@ export interface ProposalStation {
 
     proposal_realm_id: Realm['id'];
 
-    proposal_realm: Realm;
-
     station_id: Station['id'];
 
     station: Station;
 
     station_realm_id: Realm['id'];
-
-    station_realm: Realm;
 }

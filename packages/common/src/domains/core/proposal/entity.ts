@@ -32,11 +32,7 @@ export interface Proposal {
 
     realm_id: Realm['id'];
 
-    realm: Realm;
-
     user_id: User['id'];
-
-    user: User;
 
     master_image_id: MasterImage['id'] | null;
 
