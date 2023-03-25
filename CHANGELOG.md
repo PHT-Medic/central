@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://github.com/PHT-Medic/central/compare/v2.0.0-alpha.0...v2.0.0) (2023-03-25)
+
+
+### Bug Fixes
+
+* **deps:** bump authup to v0.17.2 ([6d500a0](https://github.com/PHT-Medic/central/commit/6d500a0390ecea4e19e107ecb5f476e8b13b8fcf))
+* **deps:** bump nuxt to v2.16.3 ([a2adb66](https://github.com/PHT-Medic/central/commit/a2adb6666d77740bd7e89568dd16b7b185330e6b))
+
+
+
+
+
 # [2.0.0-alpha.0](https://github.com/PHT-Medic/central/compare/v1.4.0...v2.0.0-alpha.0) (2023-03-20)
 
 
