@@ -55,14 +55,6 @@ jobs:
                 image: tada5hi/authup-server
                 env:
                     ROBOT_ENABLED: true
-                    REDIS: redis://redis
-                    VAULT: start123@http://vault:8090/v1/
-                    TYPEORM_CONNECTION: mysql
-                    TYPEORM_HOST: 127.0.0.1
-                    TYPEORM_USERNAME: root
-                    TYPEORM_PASSWORD: start123
-                    TYPEORM_DATABASE: auth
-                command: sh -c "wait-for vault:8090 redis:6379 mysql:3306 -- start"
                 ports:
                     - 3010:3010
 
