@@ -12,7 +12,7 @@ import { createRequestHandler as createRequestQueryHandler } from '@routup/query
 import cors from 'cors';
 import { useClient } from 'redis-extension';
 import type { Router } from 'routup';
-import { useEnv, useLogger } from '../config';
+import { EnvironmentName, useEnv, useLogger } from '../config';
 import {
     registerPrometheusMiddleware,
     registerRateLimitMiddleware,
@@ -33,10 +33,13 @@ export function registerMiddlewares(router: Router) {
     router.use(createRequestCookieHandler());
     router.use(createRequestQueryHandler());
 
-    registerRateLimitMiddleware(router);
-    registerPrometheusMiddleware(router);
+    const isTestEnvironment = useEnv('env') === EnvironmentName.TEST;
+    if (!isTestEnvironment) {
+        registerRateLimitMiddleware(router);
+        registerPrometheusMiddleware(router);
 
-    registerSwaggerMiddleware(router);
+        registerSwaggerMiddleware(router);
+    }
 
     router.use(setupHTTPMiddleware({
         redis: useClient(),
@@ -44,7 +47,7 @@ export function registerMiddlewares(router: Router) {
         logger: useLogger(),
     }));
 
-    if (useEnv('env') === 'development') {
+    if (!isTestEnvironment) {
         router.use(setupLicenseAgreementMiddleware());
     }
 }
