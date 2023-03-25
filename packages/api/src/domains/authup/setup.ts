@@ -26,6 +26,7 @@ export async function setupAuthupService(): Promise<any> {
     try {
         realm = await authupClient.realm.getOne(REALM_MASTER_NAME);
     } catch (e) {
+        console.log(e);
         throw new ServerError(`The ${REALM_MASTER_NAME} does not exist.`);
     }
 
