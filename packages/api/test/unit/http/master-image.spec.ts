@@ -7,8 +7,7 @@
 
 import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/central-common';
 import { MasterImageCommand } from '@personalhealthtrain/central-common';
-import { dropTestDatabase, useTestDatabase } from '../../utils/database';
-import { useSuperTest } from '../../utils/supertest';
+import { dropTestDatabase, useSuperTest, useTestDatabase } from '../../utils';
 
 describe('src/controllers/core/train-file', () => {
     const superTest = useSuperTest();
@@ -31,8 +30,6 @@ describe('src/controllers/core/train-file', () => {
                 command: MasterImageCommand.SYNC,
             })
             .auth('admin', 'start123');
-
-        console.log(response);
 
         expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();

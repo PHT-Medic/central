@@ -5,17 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import crypto from 'crypto';
-import { createKeyPair } from '@authup/server-common';
+import crypto from 'node:crypto';
 import {
-    createSignature, decryptSymmetric, encryptSymmetric, verifySignature,
+    createSignature,
+    decryptSymmetric,
+    encryptSymmetric,
+    generateRSAKeyPair,
+    verifySignature,
 } from '../../src/core';
 
 describe('src/core/crypto', () => {
     it('should create & verify signature', async () => {
-        const { privateKey: key } = await createKeyPair({
-            save: false,
-        });
+        const { privateKey: key } = await generateRSAKeyPair();
 
         const data = crypto.randomBytes(32);
         const signature = createSignature({ data, key });
@@ -26,9 +27,7 @@ describe('src/core/crypto', () => {
     });
 
     it('should asymmetric encrypt & decrypt symmetric key', async () => {
-        const keyPair = await createKeyPair({
-            save: false,
-        });
+        const keyPair = await generateRSAKeyPair();
 
         const symmetricKey = crypto.randomBytes(32);
 
