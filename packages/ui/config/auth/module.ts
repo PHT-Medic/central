@@ -19,14 +19,10 @@ import {
 } from '@authup/common';
 import type { ConfigInput } from 'hapic';
 import { createClient } from 'hapic';
-import type { ClientOptions } from '@hapic/oauth2';
-import { Client } from '@hapic/oauth2';
 import { AuthBrowserStorageKey } from './constants';
 
 export class AuthModule {
     protected ctx: Context;
-
-    public client: Client;
 
     protected refreshTokenJob: undefined | ReturnType<typeof setTimeout>;
 
@@ -40,7 +36,7 @@ export class AuthModule {
 
     // --------------------------------------------------------------------
 
-    constructor(ctx: Context, options: ClientOptions) {
+    constructor(ctx: Context) {
         this.ctx = ctx;
 
         const config : ConfigInput = {
@@ -57,20 +53,6 @@ export class AuthModule {
         ) {
             config.driver.proxy = false;
         }
-
-        this.client = new Client({
-            ...config,
-            options,
-        });
-
-        this.client.mountResponseInterceptor((r) => r, ((error) => {
-            if (typeof error?.response?.data?.message === 'string') {
-                error.message = error.response.data.message;
-                throw error;
-            }
-
-            throw new Error('A network error occurred.');
-        }));
 
         this.abilityManager = new AbilityManager([]);
 
@@ -221,7 +203,7 @@ export class AuthModule {
         this.setRequestToken(token);
 
         const tokenPromise = new Promise<void>((resolve, reject) => {
-            this.client.token.introspect<OAuth2TokenIntrospectionResponse>(token)
+            this.ctx.$authApi.oauth2.token.introspect<OAuth2TokenIntrospectionResponse>(token)
                 .then(async (token) => {
                     await this.ctx.store.dispatch('auth/triggerSetPermissions', token.permissions);
                     await this.ctx.store.dispatch('auth/triggerSetRealm', {
@@ -242,7 +224,7 @@ export class AuthModule {
             if (this.ctx.store.getters['auth/user']) {
                 resolve();
             } else {
-                this.client.userInfo.get<User>(token)
+                this.ctx.$authApi.oauth2.userInfo.get<User>(token)
                     .then(async (entity) => {
                         await this.ctx.store.dispatch('auth/triggerSetUser', entity);
                         await this.ctx.store.commit('auth/setResolved', true);
@@ -337,7 +319,7 @@ export class AuthModule {
      * @param password
      */
     public async getTokenWithPassword(username: string, password: string) : Promise<OAuth2TokenGrantResponse> {
-        const data = await this.client.token.createWithPasswordGrant({
+        const data = await this.ctx.$authApi.oauth2.token.createWithPasswordGrant({
             username,
             password,
         });
@@ -353,7 +335,7 @@ export class AuthModule {
      * @param token
      */
     public async getTokenWithRefreshToken(token: string) : Promise<OAuth2TokenGrantResponse> {
-        const data = await this.client.token.createWithRefreshToken({
+        const data = await this.ctx.$authApi.oauth2.token.createWithRefreshToken({
             refresh_token: token,
         });
 
