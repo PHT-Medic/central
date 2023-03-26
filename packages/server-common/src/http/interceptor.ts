@@ -69,7 +69,7 @@ export function mountHTTPInterceptorForRefreshingToken(
 
                 client.unsetAuthorizationHeader();
 
-                return authupClient.root.checkIntegrity()
+                return authupClient.robot.integrity(ServiceID.SYSTEM)
                     .then(() => context.vault.keyValue.find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM))
                     .then((response) => {
                         const tokenApi = new OAuth2Client();

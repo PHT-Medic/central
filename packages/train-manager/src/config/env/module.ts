@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { readFromProcessEnv } from '@authup/server-common';
+import { readFromProcessEnv } from '@personalhealthtrain/central-server-common';
 import { hasOwnProperty } from '@personalhealthtrain/central-common';
 import { config } from 'dotenv';
 import path from 'node:path';

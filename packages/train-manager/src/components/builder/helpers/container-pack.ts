@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createKeyPair } from '@authup/server-common';
 import type { HTTPClient } from '@personalhealthtrain/central-common';
 import { TrainContainerFileName, TrainContainerPath } from '@personalhealthtrain/central-common';
 import crypto from 'node:crypto';
@@ -13,7 +12,8 @@ import type { Container } from 'dockerode';
 import { useClient } from 'hapic';
 import tar from 'tar-stream';
 import {
-    createSignature, encryptSymmetric, streamToBuffer,
+    createSignature, encryptSymmetric, generateRSAKeyPair,
+    streamToBuffer,
 } from '../../../core';
 import { BuilderCommand } from '../constants';
 import { BuilderError } from '../error';
@@ -23,9 +23,7 @@ import { buildTrainConfig } from './train-config';
 import type { ContainerPackContext } from './type';
 
 export async function packContainerWithTrain(container: Container, context: ContainerPackContext) {
-    const keyPair = await createKeyPair({
-        save: false,
-    });
+    const keyPair = await generateRSAKeyPair();
 
     const symmetricKey = crypto.randomBytes(32);
     const symmetricKeyIv = crypto.randomBytes(16);
