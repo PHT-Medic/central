@@ -10,7 +10,7 @@ import Vue from 'vue';
 export default Vue.extend({
     async asyncData(context) {
         try {
-            const entity = await context.$authApi.identityProvider.getOne(context.params.id);
+            const entity = await context.$authupApi.identityProvider.getOne(context.params.id);
 
             return {
                 entity,

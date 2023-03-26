@@ -198,10 +198,10 @@ export const actions : ActionTree<AuthState, RootState> = {
         const { accessToken } = state;
 
         if (accessToken) {
-            const entity = await this.$authApi.oauth2.userInfo.get(accessToken);
+            const entity = await this.$authupApi.oauth2.userInfo.get(accessToken);
             dispatch('triggerSetUser', entity);
 
-            const token = await this.$authApi.oauth2.token.introspect(accessToken);
+            const token = await this.$authupApi.oauth2.token.introspect(accessToken);
 
             dispatch('triggerSetPermissions', token.permissions);
             dispatch('triggerSetRealm', {

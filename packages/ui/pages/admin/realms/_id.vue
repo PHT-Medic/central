@@ -14,7 +14,7 @@ export default {
     },
     async asyncData(context) {
         try {
-            const entity = await context.$authApi.realm.getOne(context.params.id);
+            const entity = await context.$authupApi.realm.getOne(context.params.id);
 
             return {
                 entity,

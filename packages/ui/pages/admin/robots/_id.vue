@@ -23,7 +23,7 @@ export default {
         let entity;
 
         try {
-            entity = await context.$authApi.robot.getOne(context.params.id, {
+            entity = await context.$authupApi.robot.getOne(context.params.id, {
                 fields: ['+secret'],
             });
 

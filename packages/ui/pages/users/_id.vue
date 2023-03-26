@@ -16,7 +16,7 @@ export default {
         let user;
 
         try {
-            user = await context.$authApi.user.getOne(context.params.id);
+            user = await context.$authupApi.user.getOne(context.params.id);
 
             return {
                 user,

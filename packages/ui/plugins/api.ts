@@ -49,9 +49,9 @@ export default (ctx: Context, inject : Inject) => {
 
     // -----------------------------------------------------------------------------------
 
-    apiUrl = ctx.$config.authApiUrl || process.env.AUTH_API_URL;
+    apiUrl = ctx.$config.authupApiUrl || process.env.AUTHUP_API_URL;
 
-    const authAPI = new AuthHTTPClient({
+    const authupAPI = new AuthHTTPClient({
         driver: {
             baseURL: apiUrl,
             withCredentials: true,
@@ -64,8 +64,8 @@ export default (ctx: Context, inject : Inject) => {
         },
     });
 
-    authAPI.mountResponseInterceptor((r) => r, interceptor);
-    inject('authApi', authAPI);
+    authupAPI.mountResponseInterceptor((r) => r, interceptor);
+    inject('authupApi', authupAPI);
 
-    setHTTPClient(authAPI);
+    setHTTPClient(authupAPI);
 };

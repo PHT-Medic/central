@@ -15,14 +15,14 @@ const config = {
     publicRuntimeConfig() {
         return {
             apiUrl: process.env.API_URL,
-            authApiUrl: process.env.AUTH_API_URL,
+            authupApiUrl: process.env.AUTHUP_API_URL,
             realtimeUrl: process.env.REALTIME_URL,
             realtimeTransports: process.env.REALTIME_TRANSPORTS,
         };
     },
     env: {
         apiUrl: process.env.API_URL,
-        authApiUrl: process.env.AUTH_API_URL,
+        authupApiUrl: process.env.AUTHUP_API_URL,
         realtimeUrl: process.env.REALTIME_URL,
         realtimeTransports: process.env.REALTIME_TRANSPORTS,
     },

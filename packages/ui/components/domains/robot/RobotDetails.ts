@@ -56,7 +56,7 @@ export default Vue.extend<any, any, any, any>({
             this.busy = true;
 
             try {
-                const { data } = await this.$authApi.robot.getMany({
+                const { data } = await this.$authupApi.robot.getMany({
                     filter: this.where,
                     page: {
                         limit: 1,
@@ -97,7 +97,7 @@ export default Vue.extend<any, any, any, any>({
             this.busy = true;
 
             try {
-                const entity = await this.$authApi.robot.update(this.entity.id, {
+                const entity = await this.$authupApi.robot.update(this.entity.id, {
                     ...this.form,
                 });
 

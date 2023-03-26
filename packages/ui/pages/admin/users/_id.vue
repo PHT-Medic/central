@@ -23,7 +23,7 @@ export default {
         let entity;
 
         try {
-            entity = await context.$authApi.user.getOne(context.params.id, { fields: ['+email'] });
+            entity = await context.$authupApi.user.getOne(context.params.id, { fields: ['+email'] });
 
             return {
                 entity,

@@ -25,7 +25,7 @@ export default Vue.extend<any, any, any, any>({
             this.busy = true;
 
             try {
-                const userAttribute = await this.$authApi.userAttribute.create({
+                const userAttribute = await this.$authupApi.userAttribute.create({
                     name: 'license_agreement',
                     value: 'accepted',
                 });

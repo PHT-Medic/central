@@ -64,11 +64,11 @@ export function createConfig() : Config {
 
     const authupClient = new HTTPClient({
         driver: {
-            baseURL: useEnv('authApiUrl'),
+            baseURL: useEnv('authupApiUrl'),
         },
     });
     mountHTTPInterceptorForRefreshingToken(authupClient, {
-        authApiUrl: useEnv('authApiUrl'),
+        authApiUrl: useEnv('authupApiUrl'),
         vault: vaultClient,
     });
     setAuthupClient(authupClient);

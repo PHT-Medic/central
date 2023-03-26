@@ -203,7 +203,7 @@ export class AuthModule {
         this.setRequestToken(token);
 
         const tokenPromise = new Promise<void>((resolve, reject) => {
-            this.ctx.$authApi.oauth2.token.introspect<OAuth2TokenIntrospectionResponse>(token)
+            this.ctx.$authupApi.oauth2.token.introspect<OAuth2TokenIntrospectionResponse>(token)
                 .then(async (token) => {
                     await this.ctx.store.dispatch('auth/triggerSetPermissions', token.permissions);
                     await this.ctx.store.dispatch('auth/triggerSetRealm', {
@@ -224,7 +224,7 @@ export class AuthModule {
             if (this.ctx.store.getters['auth/user']) {
                 resolve();
             } else {
-                this.ctx.$authApi.oauth2.userInfo.get<User>(token)
+                this.ctx.$authupApi.oauth2.userInfo.get<User>(token)
                     .then(async (entity) => {
                         await this.ctx.store.dispatch('auth/triggerSetUser', entity);
                         await this.ctx.store.commit('auth/setResolved', true);
@@ -260,7 +260,7 @@ export class AuthModule {
             token,
         });
 
-        this.ctx.$authApi.setAuthorizationHeader({
+        this.ctx.$authupApi.setAuthorizationHeader({
             type: 'Bearer',
             token,
         });
@@ -291,7 +291,7 @@ export class AuthModule {
         this.responseInterceptorId = this.ctx.$api
             .mountResponseInterceptor((data) => data, interceptor);
 
-        this.authResponseInterceptorId = this.ctx.$authApi
+        this.authResponseInterceptorId = this.ctx.$authupApi
             .mountResponseInterceptor((data) => data, interceptor);
     }
 
@@ -302,12 +302,12 @@ export class AuthModule {
         }
 
         if (this.authResponseInterceptorId) {
-            this.ctx.$authApi.unmountRequestInterceptor(this.authResponseInterceptorId);
+            this.ctx.$authupApi.unmountRequestInterceptor(this.authResponseInterceptorId);
             this.authResponseInterceptorId = undefined;
         }
 
         this.ctx.$api.unsetAuthorizationHeader();
-        this.ctx.$authApi.unsetAuthorizationHeader();
+        this.ctx.$authupApi.unsetAuthorizationHeader();
     };
 
     // --------------------------------------------------------------------
@@ -319,7 +319,7 @@ export class AuthModule {
      * @param password
      */
     public async getTokenWithPassword(username: string, password: string) : Promise<OAuth2TokenGrantResponse> {
-        const data = await this.ctx.$authApi.oauth2.token.createWithPasswordGrant({
+        const data = await this.ctx.$authupApi.oauth2.token.createWithPasswordGrant({
             username,
             password,
         });
@@ -335,7 +335,7 @@ export class AuthModule {
      * @param token
      */
     public async getTokenWithRefreshToken(token: string) : Promise<OAuth2TokenGrantResponse> {
-        const data = await this.ctx.$authApi.oauth2.token.createWithRefreshToken({
+        const data = await this.ctx.$authupApi.oauth2.token.createWithRefreshToken({
             refresh_token: token,
         });
 

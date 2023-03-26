@@ -36,7 +36,7 @@ export function useEnv(key?: string) : any {
         redisConnectionString: readFromProcessEnv('REDIS_CONNECTION_STRING', null),
         vaultConnectionString: readFromProcessEnv('VAULT_CONNECTION_STRING', 'start123@http://127.0.0.1:8090/v1/'),
 
-        authApiUrl: readFromProcessEnv('AUTH_API_URL', 'http://127.0.0.1:3010/'),
+        authupApiUrl: readFromProcessEnv('AUTHUP_API_URL', 'http://127.0.0.1:3010/'),
     };
 
     if (typeof key === 'string') {

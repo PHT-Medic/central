@@ -46,7 +46,7 @@ export function registerAuthupMiddleware(router: Router) {
 
     router.use(setupHTTPMiddleware({
         redis: useClient(),
-        oauth2: useEnv('authApiUrl'),
+        oauth2: useEnv('authupApiUrl'),
         logger: useLogger(),
     }));
 

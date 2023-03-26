@@ -53,7 +53,7 @@ export function createConfig() : Config {
         },
     });
     mountHTTPInterceptorForRefreshingToken(centralClient, {
-        authApiUrl: useEnv('authApiUrl'),
+        authApiUrl: useEnv('authupApiUrl'),
         vault: new VaultClient({
             driver: {
                 proxy: false,

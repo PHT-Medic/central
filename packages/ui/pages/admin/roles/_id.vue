@@ -6,7 +6,7 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default {
     meta: {
@@ -20,7 +20,7 @@ export default {
     },
     async asyncData(context) {
         try {
-            const entity = await context.$authApi.role.getOne(context.params.id);
+            const entity = await context.$authupApi.role.getOne(context.params.id);
 
             return {
                 entity,

@@ -16,5 +16,5 @@ export interface Environment {
     vaultConnectionString: string,
 
     apiUrl: string,
-    authApiUrl: string
+    authupApiUrl: string
 }

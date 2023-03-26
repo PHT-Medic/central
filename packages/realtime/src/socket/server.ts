@@ -39,7 +39,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
     // receive user
     server.use(setupSocketMiddleware({
         redis: context.config.redisDatabase,
-        oauth2: useEnv('authApiUrl'),
+        oauth2: useEnv('authupApiUrl'),
         logger: useLogger(),
     }));
 
@@ -75,7 +75,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
     const realmWorkspaces = server.of(/^\/realm#[a-z0-9A-Z-_]+$/);
     realmWorkspaces.use(setupSocketMiddleware({
         redis: context.config.redisDatabase,
-        oauth2: useEnv('authApiUrl'),
+        oauth2: useEnv('authupApiUrl'),
     }));
 
     realmWorkspaces.use((socket: SocketInterface, next) => {
