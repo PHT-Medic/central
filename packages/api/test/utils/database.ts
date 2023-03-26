@@ -16,7 +16,6 @@ import {
     DataSource,
 } from 'typeorm';
 import { buildDataSourceOptions } from '../../src/database';
-import { setupAuthupService } from '../../src/domains';
 
 export async function useTestDatabase() {
     const options = await buildDataSourceOptions();
@@ -29,8 +28,6 @@ export async function useTestDatabase() {
     await dataSource.runMigrations();
 
     setDataSource(dataSource);
-
-    await setupAuthupService();
 
     return dataSource;
 }

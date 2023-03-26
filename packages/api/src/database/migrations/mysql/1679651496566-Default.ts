@@ -1,6 +1,8 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
+
 export class Default1679651496566 implements MigrationInterface {
     name = 'Default1679651496566';
+
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
             CREATE TABLE \`master_images\` (
@@ -160,7 +162,6 @@ export class Default1679651496566 implements MigrationInterface {
                 \`session_id\` varchar(255) NULL,
                 \`entrypoint_file_id\` varchar(255) NULL,
                 \`stations\` int UNSIGNED NOT NULL DEFAULT '0',
-                \`dummy\` text NOT NULL,
                 \`configuration_status\` varchar(64) NULL,
                 \`build_status\` varchar(64) NULL,
                 \`run_status\` varchar(64) NULL,
@@ -308,6 +309,7 @@ export class Default1679651496566 implements MigrationInterface {
             ADD CONSTRAINT \`FK_a5c233a9248190263cfacdf07fb\` FOREIGN KEY (\`train_id\`) REFERENCES \`train_entity\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION
         `);
     }
+
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
             ALTER TABLE \`train_logs\` DROP FOREIGN KEY \`FK_a5c233a9248190263cfacdf07fb\`

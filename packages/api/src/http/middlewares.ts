@@ -19,6 +19,7 @@ import {
     registerSwaggerMiddleware,
     setupLicenseAgreementMiddleware,
 } from './middleware';
+import { registerAuthupMiddleware } from './middleware/authup';
 
 export function registerMiddlewares(router: Router) {
     router.use(cors({
@@ -41,11 +42,7 @@ export function registerMiddlewares(router: Router) {
         registerSwaggerMiddleware(router);
     }
 
-    router.use(setupHTTPMiddleware({
-        redis: useClient(),
-        oauth2: useEnv('authApiUrl'),
-        logger: useLogger(),
-    }));
+    registerAuthupMiddleware(router);
 
     if (!isTestEnvironment) {
         router.use(setupLicenseAgreementMiddleware());

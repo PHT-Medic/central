@@ -54,6 +54,7 @@ jobs:
             authup:
                 image: tada5hi/authup-server
                 env:
+                    NODE_ENV: test
                     ROBOT_ENABLED: true
                     VAULT: start123@http://127.0.0.1:8090/v1/
                     PORT: 3010
