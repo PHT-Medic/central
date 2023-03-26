@@ -6,8 +6,8 @@
  */
 
 import { ErrorCode, HTTPClient, isObject } from '@authup/common';
-import { Client as OAuth2Client, isClientError } from '@hapic/oauth2';
 import type { Client as VaultClient } from '@hapic/vault';
+import { isClientError } from 'hapic';
 import type { Client } from 'hapic';
 import { ROBOT_SECRET_ENGINE_KEY, ServiceID } from '@personalhealthtrain/central-common';
 
@@ -43,7 +43,6 @@ export function mountHTTPInterceptorForRefreshingToken(
         authApiUrl: string
     },
 ) : number {
-    // todo: will be used for integrity check!
     const authupClient = new HTTPClient({
         driver: {
             baseURL: context.authApiUrl,
@@ -71,36 +70,31 @@ export function mountHTTPInterceptorForRefreshingToken(
 
                 return authupClient.robot.integrity(ServiceID.SYSTEM)
                     .then(() => context.vault.keyValue.find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM))
-                    .then((response) => {
-                        const tokenApi = new OAuth2Client();
-                        tokenApi.setDriver(authupClient.driver);
-
-                        return tokenApi.token.createWithRobotCredentials({
-                            id: response.data.id,
-                            secret: response.data.secret,
-                        })
-                            .then((token) => {
-                                client
-                                    .setAuthorizationHeader({
-                                        type: 'Bearer',
-                                        token: token.access_token,
-                                    });
-
-                                config.headers = JSON.parse(JSON.stringify(config.headers || {}));
-                                (config.headers as Record<string, any>).Authorization = `Bearer ${token.access_token}`;
-
-                                return client.request(config);
-                            })
-                            .catch((e) => {
-                                client.unsetAuthorizationHeader();
-
-                                if (isClientError(e)) {
-                                    e.response.status = 500;
-                                }
-
-                                return Promise.reject(e);
-                            });
+                    .then((response) => authupClient.oauth2.token.createWithRobotCredentials({
+                        id: response.data.id,
+                        secret: response.data.secret,
                     })
+                        .then((token) => {
+                            client
+                                .setAuthorizationHeader({
+                                    type: 'Bearer',
+                                    token: token.access_token,
+                                });
+
+                            config.headers = JSON.parse(JSON.stringify(config.headers || {}));
+                            (config.headers as Record<string, any>).Authorization = `Bearer ${token.access_token}`;
+
+                            return client.request(config);
+                        })
+                        .catch((e) => {
+                            client.unsetAuthorizationHeader();
+
+                            if (isClientError(e)) {
+                                e.response.status = 500;
+                            }
+
+                            return Promise.reject(e);
+                        }))
                     .catch((e) => {
                         client.unsetAuthorizationHeader();
 
