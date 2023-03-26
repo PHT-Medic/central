@@ -32,6 +32,8 @@ describe('src/controllers/core/train-file', () => {
             })
             .auth('admin', 'start123');
 
+        console.log(response);
+
         expect(response.status).toEqual(202);
         expect(response.body).toBeDefined();
         expect(response.body.groups).toBeDefined();
