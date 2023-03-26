@@ -15,6 +15,7 @@ import {
 import os from 'node:os';
 
 import { useEnv } from '../../../../config';
+import { useAuthupClient } from '../../../../core';
 import { buildRegistryWebhookTarget } from '../utils';
 
 export async function saveRemoteRegistryProjectWebhook(
@@ -24,6 +25,8 @@ export async function saveRemoteRegistryProjectWebhook(
         isName?: boolean
     },
 ) : Promise<ProjectWebhook | undefined> {
+    await useAuthupClient().robot.integrity(ServiceID.REGISTRY);
+
     const response = await useVaultClient()
         .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
 
