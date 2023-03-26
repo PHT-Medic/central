@@ -6,13 +6,13 @@
  */
 
 import {
-    createDatabase, dropDatabase,
+    createDatabase, dropDatabase, generateMigration,
 } from 'typeorm-extension';
 import type { CommandModule } from 'yargs';
 import type { DataSourceOptions } from 'typeorm';
 import { DataSource } from 'typeorm';
 import path from 'node:path';
-import { extendDataSourceOptions, generateMigration } from '../../database';
+import { extendDataSourceOptions } from '../../database';
 import { createConfig } from '../../config';
 
 export class MigrationGenerateCommand implements CommandModule {
@@ -61,6 +61,7 @@ export class MigrationGenerateCommand implements CommandModule {
                 name: 'Default',
                 directoryPath,
                 timestamp,
+                prettify: true,
             });
         }
 
