@@ -11,9 +11,13 @@ import type {
 import {
     SecretType,
 } from '@personalhealthtrain/central-common';
-import { expectPropertiesEqualToSrc, removeDateProperties } from '../../utils';
-import { useSuperTest } from '../../utils/supertest';
-import { dropTestDatabase, useTestDatabase } from '../../utils/database';
+import {
+    dropTestDatabase,
+    expectPropertiesEqualToSrc,
+    removeDateProperties,
+    useSuperTest,
+    useTestDatabase,
+} from '../../utils';
 
 describe('src/controllers/core/user-secret', () => {
     const superTest = useSuperTest();
@@ -29,15 +33,6 @@ describe('src/controllers/core/user-secret', () => {
     let details : UserSecret;
 
     it('should create resource', async () => {
-        const userResponse = await superTest
-            .get('/users/admin')
-            .auth('admin', 'start123');
-
-        expect(userResponse.statusCode).toEqual(200);
-        expect(userResponse.body).toBeDefined();
-
-        const user = userResponse.body;
-
         const response = await superTest
             .post('/user-secrets')
             .auth('admin', 'start123')
@@ -45,7 +40,6 @@ describe('src/controllers/core/user-secret', () => {
                 key: SecretType.RSA_PUBLIC_KEY,
                 content: 'foo-bar-baz',
                 type: SecretType.RSA_PUBLIC_KEY,
-                user_id: user.id,
             });
 
         expect(response.status).toEqual(201);
