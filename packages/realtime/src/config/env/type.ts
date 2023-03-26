@@ -14,5 +14,5 @@ export interface Environment {
     redisConnectionString: string,
     vaultConnectionString: string,
 
-    apiUrl: string,
+    authApiUrl: string,
 }
