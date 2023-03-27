@@ -36,7 +36,7 @@
         "hapic": "^1.4.0",
         "ilingo": "^2.2.1",
         "moment": "^2.29.4",
-        "nuxt": "^2.16.3",
+        "nuxt": "^3.3.2",
         "rapiq": "^0.8.0",
         "socket.io-client": "^4.6.1",
         "tsconfig-paths-webpack-plugin": "^4.0.1",
