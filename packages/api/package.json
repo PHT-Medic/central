@@ -64,7 +64,7 @@
         "@types/tar": "^6.1.4",
         "@types/tar-stream": "^2.2.2",
         "@types/winston": "^2.4.4",
-        "@types/yargs": "^17.0.22",
+        "@types/yargs": "^17.0.24",
         "cross-env": "^7.0.3",
         "supertest": "^6.3.3",
         "ts-node": "^10.9.1"
