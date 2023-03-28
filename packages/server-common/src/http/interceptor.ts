@@ -6,8 +6,8 @@
  */
 
 import { ErrorCode, HTTPClient, isObject } from '@authup/common';
+import { isClientError } from '@hapic/vault';
 import type { Client as VaultClient } from '@hapic/vault';
-import { isClientError } from 'hapic';
 import type { Client } from 'hapic';
 import { ROBOT_SECRET_ENGINE_KEY, ServiceID } from '@personalhealthtrain/central-common';
 
@@ -70,31 +70,40 @@ export function mountHTTPInterceptorForRefreshingToken(
 
                 return authupClient.robot.integrity(ServiceID.SYSTEM)
                     .then(() => context.vault.keyValue.find(ROBOT_SECRET_ENGINE_KEY, ServiceID.SYSTEM))
-                    .then((response) => authupClient.oauth2.token.createWithRobotCredentials({
-                        id: response.data.id,
-                        secret: response.data.secret,
-                    })
-                        .then((token) => {
-                            client
-                                .setAuthorizationHeader({
+                    .then((response) => {
+                        if (
+                            !isObject(response) ||
+                            !isObject(response.data) ||
+                            typeof response.data.id !== 'string' ||
+                            typeof response.data.secret !== 'string'
+                        ) {
+                            return Promise.reject(new Error('The vault robot credentials response is malformed.'));
+                        }
+
+                        return authupClient.oauth2.token.createWithRobotCredentials({
+                            id: response.data.id,
+                            secret: response.data.secret,
+                        })
+                            .then((token) => {
+                                config.headers.Authorization = `Bearer ${token.access_token}`;
+
+                                client.setAuthorizationHeader({
                                     type: 'Bearer',
                                     token: token.access_token,
                                 });
 
-                            config.headers = JSON.parse(JSON.stringify(config.headers || {}));
-                            (config.headers as Record<string, any>).Authorization = `Bearer ${token.access_token}`;
+                                return client.request(config);
+                            })
+                            .catch((e) => {
+                                client.unsetAuthorizationHeader();
 
-                            return client.request(config);
-                        })
-                        .catch((e) => {
-                            client.unsetAuthorizationHeader();
+                                if (isClientError(e)) {
+                                    e.response.status = 500;
+                                }
 
-                            if (isClientError(e)) {
-                                e.response.status = 500;
-                            }
-
-                            return Promise.reject(e);
-                        }))
+                                return Promise.reject(e);
+                            });
+                    })
                     .catch((e) => {
                         client.unsetAuthorizationHeader();
 

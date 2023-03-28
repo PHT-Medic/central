@@ -27,6 +27,7 @@ export async function startCommand() {
     logger.info(`WritableDirectoryPath: ${getWritableDirPath()}`);
     logger.info(`Port: ${useEnv('port')}`);
     logger.info(`Public-URL: ${useEnv('apiUrl')}`);
+    logger.info(`Authup-URL: ${useEnv('authupApiUrl')}`);
     logger.info(`Docs-URL: ${new URL('docs/', useEnv('apiUrl')).href}`);
 
     logger.info('Generating documentation...');
