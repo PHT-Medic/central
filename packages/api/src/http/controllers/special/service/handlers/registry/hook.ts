@@ -24,7 +24,7 @@ export async function postHarborHookRouteHandler(req: Request, res: Response) : 
         throw new BadRequestError('The request could not be processed.');
     } else {
         useLogger().info('The registry hook is valid.', {
-            data: validation.data,
+            body,
         });
     }
 
