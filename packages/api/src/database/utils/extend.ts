@@ -4,6 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+import { CodeTransformation, isCodeTransformation } from 'typeorm-extension';
 import { hasClient, hasConfig } from 'redis-extension';
 import type { DataSourceOptions } from 'typeorm';
 import {
@@ -48,9 +49,7 @@ export function extendDataSourceOptions(options: DataSourceOptions) : DataSource
             TrainStationEntity,
             UserSecretEntity,
         ],
-        migrations: [
-            `src/database/migrations/${options.type}/*{.ts,.js}`,
-        ],
+        migrations: [],
         migrationsTransactionMode: 'each',
         subscribers: [
             ...(options.subscribers ? options.subscribers : []) as string[],
@@ -64,6 +63,20 @@ export function extendDataSourceOptions(options: DataSourceOptions) : DataSource
             TrainStationSubscriber,
         ],
     };
+
+    if (isCodeTransformation(CodeTransformation.JUST_IN_TIME)) {
+        Object.assign(options, {
+            migrations: [
+                `src/database/migrations/${options.type}/*.ts`,
+            ],
+        } satisfies Partial<DataSourceOptions>);
+    } else {
+        Object.assign(options, {
+            migrations: [
+                `dist/database/migrations/${options.type}/*.js`,
+            ],
+        } satisfies Partial<DataSourceOptions>);
+    }
 
     if (hasClient() || hasConfig()) {
         Object.assign(options, {
