@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/PHT-Medic/central/compare/v2.0.0...v2.1.0) (2023-03-28)
+
+
+### Bug Fixes
+
+* adjusted env loading, better naming for env variable ([6b3c16e](https://github.com/PHT-Medic/central/commit/6b3c16eb1d42886933f11276fd5b5be064c7fcc6))
+* check registry robot integrity before executing webhook registration ([b0c79fd](https://github.com/PHT-Medic/central/commit/b0c79fdbccbaef8981b46b125b87e8a8e3dd466c))
+* **deps:** bump authup + reduced explicit dependencies ([7b7021f](https://github.com/PHT-Medic/central/commit/7b7021f86b12fa2ae15e6384fd050fe76a5cf49f))
+* **deps:** bump locter from 1.0.10 to 1.1.0 ([#903](https://github.com/PHT-Medic/central/issues/903)) ([b753ecc](https://github.com/PHT-Medic/central/commit/b753ecc8479773f79ed1037a84999c776df045eb))
+* log setup error on execution failure ([be0089c](https://github.com/PHT-Medic/central/commit/be0089c2cec258de7ea20e2964a8669dcddbd47f))
+* only mount rate-limit-,prometheus- & license-agreemenet-middleware on non test env ([19335ac](https://github.com/PHT-Medic/central/commit/19335ac2098c38239f6a9b78781c88944f1d9a20))
+* purify database sub module ([990cc22](https://github.com/PHT-Medic/central/commit/990cc2286b9603ae90ed3666ff6f45ed9267418a))
+* remove explicit oauth2 client dependency + usage ([97fe49f](https://github.com/PHT-Medic/central/commit/97fe49fec9168e0107ae53c623f895e36def8760))
+* remove explicit oauth2 client dependency for http interceptor ([cb83f8d](https://github.com/PHT-Medic/central/commit/cb83f8dd813d28e1a32a9e9e83aed340504a6667))
+* renamed AUTH_API_URL to AUTHUP_API_URL ([8519bd4](https://github.com/PHT-Medic/central/commit/8519bd4b9dab78a40a5e555915515d705dd0d8a7))
+* replace beader with basic authorization header for testing ([af320df](https://github.com/PHT-Medic/central/commit/af320df098c995848fe1a09ee9953dcd50c85995))
+* updated copyright in footer ([bee5f32](https://github.com/PHT-Medic/central/commit/bee5f3248ef7252a66ceb346c66a12187b0c0984))
+
+
+### Features
+
+* split api package ([#900](https://github.com/PHT-Medic/central/issues/900)) ([6be0436](https://github.com/PHT-Medic/central/commit/6be04364ccefe46ac579f29b1839a00598a3694c))
+
+
+
+
+
 # [2.0.0](https://github.com/PHT-Medic/central/compare/v2.0.0-alpha.0...v2.0.0) (2023-03-25)
 
 

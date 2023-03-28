@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/PHT-Medic/central/compare/v2.0.0...v2.1.0) (2023-03-28)
+
+
+### Bug Fixes
+
+* **deps:** bump authup + reduced explicit dependencies ([7b7021f](https://github.com/PHT-Medic/central/commit/7b7021f86b12fa2ae15e6384fd050fe76a5cf49f))
+* remove explicit oauth2 client dependency + usage ([97fe49f](https://github.com/PHT-Medic/central/commit/97fe49fec9168e0107ae53c623f895e36def8760))
+* renamed AUTH_API_URL to AUTHUP_API_URL ([8519bd4](https://github.com/PHT-Medic/central/commit/8519bd4b9dab78a40a5e555915515d705dd0d8a7))
+* replace beader with basic authorization header for testing ([af320df](https://github.com/PHT-Medic/central/commit/af320df098c995848fe1a09ee9953dcd50c85995))
+* updated copyright in footer ([bee5f32](https://github.com/PHT-Medic/central/commit/bee5f3248ef7252a66ceb346c66a12187b0c0984))
+
+
+### Features
+
+* split api package ([#900](https://github.com/PHT-Medic/central/issues/900)) ([6be0436](https://github.com/PHT-Medic/central/commit/6be04364ccefe46ac579f29b1839a00598a3694c))
+
+
+
+
+
 # [2.0.0](https://github.com/PHT-Medic/central/compare/v2.0.0-alpha.0...v2.0.0) (2023-03-25)
 
 
