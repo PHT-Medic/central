@@ -23,9 +23,15 @@ export function registerAuthupMiddleware(router: Router) {
     }, 120 * 1000);
 
     router.use(async (req, res, next) => {
+        if (typeof req.headers.authorization !== 'string') {
+            next();
+            return;
+        }
+
         const header = parseAuthorizationHeader(req.headers.authorization);
         if (!header) {
             next();
+            return;
         }
 
         if (cache[req.headers.authorization]) {
@@ -36,6 +42,9 @@ export function registerAuthupMiddleware(router: Router) {
 
         if (header.type === 'Basic') {
             const authupClient = useAuthupClient();
+
+            useLogger().info(`Using basic auth type for: ${header.username}`);
+
             let token : OAuth2TokenGrantResponse;
 
             if (header.username === 'admin') {

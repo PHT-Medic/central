@@ -87,8 +87,13 @@ export async function executeRouterCheckCommand(
 
         const searchResult = await httpClient.search(data.id);
         if (searchResult.repository.length > 0) {
-            if (searchResult.repository[0].artifact_count >= 2) {
-                const parsed = parseProjectRepositoryName(searchResult.repository[0].repository_name);
+            const repository = searchResult.repository.shift();
+
+            if (
+                repository.artifact_count >= 2 &&
+                typeof repository.repository_name === 'string'
+            ) {
+                const parsed = parseProjectRepositoryName(repository.repository_name);
 
                 await writePositionFoundEvent(
                     {
@@ -101,9 +106,9 @@ export async function executeRouterCheckCommand(
                         },
                     },
                 );
-
-                return data;
             }
+
+            return data;
         }
     }
 

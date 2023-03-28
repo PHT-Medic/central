@@ -31,7 +31,7 @@ export async function executeRouterRouteCommand(
     data: RouterRoutePayload,
 ) {
     useRouterLogger().debug('Executing command.', {
-        command: RouterCommand.START,
+        command: RouterCommand.ROUTE,
     });
 
     if (
@@ -39,7 +39,7 @@ export async function executeRouterRouteCommand(
         data.artifactTag !== REGISTRY_ARTIFACT_TAG_LATEST
     ) {
         useRouterLogger().debug('Registry tag could not be processed.', {
-            command: RouterCommand.START,
+            command: RouterCommand.ROUTE,
             tag: data.artifactTag,
         });
 

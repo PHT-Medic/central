@@ -20,26 +20,20 @@ export async function postHarborHookRouteHandler(req: Request, res: Response) : 
     const validation = await RegistryHookSchema.safeParseAsync(body);
     if (validation.success === false) {
         useLogger().warn('The registry hook has a malformed shape.', { error: validation.error });
-
-        throw new BadRequestError('The request could not be processed.');
     } else {
-        useLogger().info('The registry hook is valid.', {
-            body,
-        });
+        await publish(buildRegistryPayload({
+            command: RegistryCommand.EVENT_HANDLE,
+            data: {
+                event: validation.data.type,
+                operator: validation.data.operator,
+                namespace: validation.data.event_data.repository.namespace,
+                repositoryName: validation.data.event_data.repository.name,
+                repositoryFullName: validation.data.event_data.repository.repo_full_name,
+                artifactTag: validation.data.event_data.resources[0]?.tag,
+                artifactDigest: validation.data.event_data.resources[0]?.digest,
+            },
+        }));
     }
-
-    await publish(buildRegistryPayload({
-        command: RegistryCommand.EVENT_HANDLE,
-        data: {
-            event: validation.data.type,
-            operator: validation.data.operator,
-            namespace: validation.data.event_data.repository.namespace,
-            repositoryName: validation.data.event_data.repository.name,
-            repositoryFullName: validation.data.event_data.repository.repo_full_name,
-            artifactTag: validation.data.event_data.resources[0]?.tag,
-            artifactDigest: validation.data.event_data.resources[0]?.digest,
-        },
-    }));
 
     sendAccepted(res);
 }

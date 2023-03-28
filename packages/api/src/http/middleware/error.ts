@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { BaseError } from 'ebec';
 import type { Next, Request, Response } from 'routup';
 import { send } from 'routup';
 import { hasOwnProperty } from 'typeorm-extension';
@@ -38,15 +39,22 @@ export function errorMiddleware(
             break;
     }
 
-    const baseError = extendsBaseError(error) ?
-        error :
-        new InternalServerError(error, { decorateMessage: true });
+    let baseError : BaseError;
+    if (extendsBaseError(error)) {
+        baseError = error;
+    } else {
+        baseError = new InternalServerError(error, { decorateMessage: true });
+
+        useLogger().warn('Unhandled error occurred.', {
+            error: baseError,
+        });
+    }
 
     const statusCode : number = baseError.getOption('statusCode') ?? InternalServerErrorOptions.statusCode;
 
     if (baseError.getOption('logMessage')) {
         const isInspected = extendsBaseError(error);
-        useLogger().log({ level: 'error', message: `${!isInspected ? error.message : (baseError.message || baseError)}` });
+        useLogger().warn(`${!isInspected ? error.message : (baseError.message || baseError)}`);
     }
 
     if (baseError.getOption('decorateMessage')) {
