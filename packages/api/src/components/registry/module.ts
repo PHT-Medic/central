@@ -83,7 +83,14 @@ export async function executeRegistryCommand(context: RegistryCommandContext) {
             break;
         }
         case RegistryCommand.EVENT_HANDLE: {
-            await dispatchRegistryEventToTrainManager(context.data);
+            try {
+                await dispatchRegistryEventToTrainManager(context.data);
+                useLogger()
+                    .info('registry project event handled.', { component: 'registry', id: context.data.event });
+            } catch (e) {
+                useLogger()
+                    .info('registry project event handle failed.', { component: 'registry', id: context.data.event });
+            }
         }
     }
 }

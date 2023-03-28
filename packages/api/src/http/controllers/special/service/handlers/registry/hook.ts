@@ -16,11 +16,16 @@ import { useLogger } from '../../../../../../config';
 
 export async function postHarborHookRouteHandler(req: Request, res: Response) : Promise<any> {
     const body = useRequestBody(req);
+
     const validation = await RegistryHookSchema.safeParseAsync(body);
-    if (!validation.success) {
-        useLogger().warn('The registry hook has a malformed shape.');
+    if (validation.success === false) {
+        useLogger().warn('The registry hook has a malformed shape.', { error: validation.error });
 
         throw new BadRequestError('The request could not be processed.');
+    } else {
+        useLogger().info('The registry hook is valid.', {
+            data: validation.data,
+        });
     }
 
     await publish(buildRegistryPayload({
