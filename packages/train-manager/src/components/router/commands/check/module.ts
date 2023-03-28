@@ -24,7 +24,9 @@ import { writePositionFoundEvent, writePositionNotFoundEvent } from '../../event
 import type { RouterCheckPayload } from '../../type';
 import { useRouterLogger } from '../../utils';
 
-export async function executeRouterCheckCommand(input: RouterCheckPayload) : Promise<ComponentPayloadExtended<RouterCheckPayload>> {
+export async function executeRouterCheckCommand(
+    input: RouterCheckPayload,
+) : Promise<ComponentPayloadExtended<RouterCheckPayload>> {
     useRouterLogger().debug('Executing command.', {
         command: RouterCommand.CHECK,
     });
@@ -41,45 +43,32 @@ export async function executeRouterCheckCommand(input: RouterCheckPayload) : Pro
 
     // -------------------------------------------------------------------------------
 
-    const specialProjects : {
-        type: `${RegistryProjectType.INCOMING}` | `${RegistryProjectType.OUTGOING}`
-        id: RegistryProject['id']
-    }[] = [
-        { type: RegistryProjectType.INCOMING, id: data.entity.incoming_registry_project_id },
-        { type: RegistryProjectType.OUTGOING, id: data.entity.outgoing_registry_project_id },
-    ];
+    let project : RegistryProject;
 
-    for (let i = 0; i < specialProjects.length; i++) {
-        let project : RegistryProject;
+    try {
+        project = await client.registryProject.getOne(data.entity.incoming_registry_project_id);
+    } catch (e) {
+        throw RouterError.registryProjectNotFound({
+            message: `The train ${RegistryProjectType.INCOMING} registry-project was not found.`,
+            previous: e,
+        });
+    }
 
-        try {
-            project = await client.registryProject.getOne(specialProjects[i].id);
-        } catch (e) {
-            throw RouterError.registryProjectNotFound({
-                message: `The train ${specialProjects[i].type} registry-project was not found.`,
-                previous: e,
-            });
-        }
+    const harborRepository = await httpClient.projectRepository
+        .find(project.external_name, data.id);
 
-        const harborRepository = await httpClient.projectRepository
-            .find(project.external_name, data.id);
+    if (harborRepository && harborRepository.artifact_count > 0) {
+        await writePositionFoundEvent({
+            command: RouterCommand.CHECK,
+            data: {
+                artifactTag: null,
+                operator: null,
+                projectName: harborRepository.project_name,
+                repositoryName: harborRepository.name_slim,
+            },
+        });
 
-        if (
-            harborRepository &&
-            harborRepository.artifact_count > 0
-        ) {
-            await writePositionFoundEvent({
-                command: RouterCommand.CHECK,
-                data: {
-                    artifactTag: null,
-                    operator: null,
-                    projectName: harborRepository.project_name,
-                    repositoryName: harborRepository.name_slim,
-                },
-            });
-
-            return data;
-        }
+        return data;
     }
 
     // -------------------------------------------------------------------------------
@@ -117,6 +106,38 @@ export async function executeRouterCheckCommand(input: RouterCheckPayload) : Pro
             }
         }
     }
+
+    // -------------------------------------------------------------------------------
+
+    if (data.entity.outgoing_registry_project_id) {
+        try {
+            project = await client.registryProject.getOne(data.entity.outgoing_registry_project_id);
+        } catch (e) {
+            throw RouterError.registryProjectNotFound({
+                message: `The train ${RegistryProjectType.OUTGOING} registry-project was not found.`,
+                previous: e,
+            });
+        }
+
+        const harborRepository = await httpClient.projectRepository
+            .find(project.external_name, data.id);
+
+        if (harborRepository && harborRepository.artifact_count > 0) {
+            await writePositionFoundEvent({
+                command: RouterCommand.CHECK,
+                data: {
+                    artifactTag: null,
+                    operator: null,
+                    projectName: harborRepository.project_name,
+                    repositoryName: harborRepository.name_slim,
+                },
+            });
+
+            return data;
+        }
+    }
+
+    // -------------------------------------------------------------------------------
 
     await writePositionNotFoundEvent({
         command: RouterCommand.CHECK,
