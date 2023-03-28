@@ -15,48 +15,46 @@ import { useAuthupClient } from '../../core';
 import { useRequestEnv } from '../request';
 
 export function registerAuthupMiddleware(router: Router) {
-    if (useEnv('env') === EnvironmentName.TEST) {
-        let cache : Record<string, string> = {};
+    let cache : Record<string, string> = {};
 
-        router.use(async (req, res, next) => {
-            const header = parseAuthorizationHeader(req.headers.authorization);
-            if (!header) {
-                next();
-            }
-
-            if (Math.random() * 100 < 5) {
-                cache = {};
-            }
-
-            if (cache[req.headers.authorization]) {
-                req.headers.authorization = `Bearer ${cache[req.headers.authorization]}`;
-                next();
-                return;
-            }
-
-            if (header.type === 'Basic') {
-                const authupClient = useAuthupClient();
-                let token : OAuth2TokenGrantResponse;
-
-                if (header.username === 'admin') {
-                    token = await authupClient.oauth2.token.createWithPasswordGrant({
-                        username: header.username,
-                        password: header.password,
-                    });
-                } else {
-                    token = await authupClient.oauth2.token.createWithRobotCredentials({
-                        id: header.username,
-                        secret: header.password,
-                    });
-                }
-
-                cache[req.headers.authorization] = token.access_token;
-                req.headers.authorization = `Bearer ${token.access_token}`;
-            }
-
+    router.use(async (req, res, next) => {
+        const header = parseAuthorizationHeader(req.headers.authorization);
+        if (!header) {
             next();
-        });
-    }
+        }
+
+        if (Math.random() * 100 < 5) {
+            cache = {};
+        }
+
+        if (cache[req.headers.authorization]) {
+            req.headers.authorization = `Bearer ${cache[req.headers.authorization]}`;
+            next();
+            return;
+        }
+
+        if (header.type === 'Basic') {
+            const authupClient = useAuthupClient();
+            let token : OAuth2TokenGrantResponse;
+
+            if (header.username === 'admin') {
+                token = await authupClient.oauth2.token.createWithPasswordGrant({
+                    username: header.username,
+                    password: header.password,
+                });
+            } else {
+                token = await authupClient.oauth2.token.createWithRobotCredentials({
+                    id: header.username,
+                    secret: header.password,
+                });
+            }
+
+            cache[req.headers.authorization] = token.access_token;
+            req.headers.authorization = `Bearer ${token.access_token}`;
+        }
+
+        next();
+    });
 
     router.use(setupHTTPMiddleware({
         redis: useClient(),
