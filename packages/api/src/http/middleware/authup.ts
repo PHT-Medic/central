@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { setInterval } from 'node:timers';
 import type { OAuth2TokenGrantResponse } from '@authup/common';
 import { setupHTTPMiddleware } from '@authup/server-adapter';
 import { parseAuthorizationHeader } from 'hapic';
@@ -17,14 +18,14 @@ import { useRequestEnv } from '../request';
 export function registerAuthupMiddleware(router: Router) {
     let cache : Record<string, string> = {};
 
+    setInterval(() => {
+        cache = {};
+    }, 120 * 1000);
+
     router.use(async (req, res, next) => {
         const header = parseAuthorizationHeader(req.headers.authorization);
         if (!header) {
             next();
-        }
-
-        if (Math.random() * 100 < 5) {
-            cache = {};
         }
 
         if (cache[req.headers.authorization]) {
