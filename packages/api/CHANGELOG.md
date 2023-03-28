@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.1](https://github.com/PHT-Medic/central/compare/v2.1.0...v2.1.1) (2023-03-28)
+
+
+### Bug Fixes
+
+* migrations dir for runtime environment ([73cf8e7](https://github.com/PHT-Medic/central/commit/73cf8e7ef2842fcc1c86b30af775339f6a7a6fb6))
+
+
+
+
+
 # [2.1.0](https://github.com/PHT-Medic/central/compare/v2.0.0...v2.1.0) (2023-03-28)
 
 
