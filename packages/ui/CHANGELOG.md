@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.2](https://github.com/PHT-Medic/central/compare/v2.1.1...v2.1.2) (2023-03-29)
+
+
+### Bug Fixes
+
+* **deps:** bump @nuxt/typescript-build ([5008ed6](https://github.com/PHT-Medic/central/commit/5008ed6cb887ed7503a7dd4c91365f47191589bf))
+
+
+
+
+
 # [2.1.0](https://github.com/PHT-Medic/central/compare/v2.0.0...v2.1.0) (2023-03-28)
 
 

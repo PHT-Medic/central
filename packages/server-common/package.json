@@ -9,7 +9,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "2.1.0",
+    "version": "2.1.2",
     "description": "This package contains the common packages for server applications of the PHT.",
     "scripts": {
         "build": "tsc -p tsconfig.build.json"

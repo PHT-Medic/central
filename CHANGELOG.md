@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.2](https://github.com/PHT-Medic/central/compare/v2.1.1...v2.1.2) (2023-03-29)
+
+
+### Bug Fixes
+
+* allow basic auth in every environment (prod,test,dev) ([d1ac68e](https://github.com/PHT-Medic/central/commit/d1ac68edd64005ef314ec235e9b9d95fc7700506))
+* clear token by interval instead of random percantage ([f8812fe](https://github.com/PHT-Medic/central/commit/f8812fe9e5a5847d1d34ecad77ea18e3234d35ca))
+* **deps:** bump @nuxt/typescript-build ([5008ed6](https://github.com/PHT-Medic/central/commit/5008ed6cb887ed7503a7dd4c91365f47191589bf))
+* enhance http interceptor for robot credentials ([be981fa](https://github.com/PHT-Medic/central/commit/be981fac06c54294cf9da5e4b889dc08d4f7dd0d))
+* enhance logging for registry hooks ([9697774](https://github.com/PHT-Medic/central/commit/969777400c6dff9007e47e8fd1a20839f66529eb))
+* minor logging enhancements ([0156426](https://github.com/PHT-Medic/central/commit/01564261eb8c8346f238d0cdb46214f72474c52b))
+* router check command for incoming & outgoing repository ([8314b9e](https://github.com/PHT-Medic/central/commit/8314b9e4336ce346cfedaddb8f737aedb3758141))
+* support basic auth f+or robots ([f9631fb](https://github.com/PHT-Medic/central/commit/f9631fb705f0655a0e6918686dd7fa02622e9f78))
+
+
+
+
+
 ## [2.1.1](https://github.com/PHT-Medic/central/compare/v2.1.0...v2.1.1) (2023-03-28)
 
 

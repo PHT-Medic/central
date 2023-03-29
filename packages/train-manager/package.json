@@ -7,7 +7,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "2.1.0",
+    "version": "2.1.2",
     "description": "This project contains the central Train-Manager of the PHT.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -27,7 +27,7 @@
         "@hapic/harbor": "^1.5.0",
         "@hapic/vault": "^1.5.0",
         "@personalhealthtrain/central-common": "2.1.0",
-        "@personalhealthtrain/central-server-common": "2.1.0",
+        "@personalhealthtrain/central-server-common": "2.1.2",
         "amqp-extension": "^2.0.0",
         "dockerode": "^3.3.5",
         "dotenv": "^16.0.3",
