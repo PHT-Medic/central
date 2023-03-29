@@ -15,7 +15,7 @@ import {
 import { useClient } from 'hapic';
 import {
     buildDockerAuthConfig,
-    buildRemoteDockerImageURL,
+    buildRemoteDockerImageURL, pullDockerImage,
     useDocker,
 } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
@@ -50,6 +50,14 @@ export async function executeBuilderBuildCommand(
         entity: data.entity,
         hostname: data.registry.host,
     });
+
+    // -----------------------------------------------------------------------------------
+
+    useBuilderLogger().debug('Pulling image...', {
+        command: BuilderCommand.BUILD,
+    });
+
+    await pullDockerImage(masterImagePath);
 
     // -----------------------------------------------------------------------------------
 

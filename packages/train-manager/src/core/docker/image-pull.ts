@@ -10,11 +10,13 @@ import type { DockerAuthConfig } from './type';
 
 export async function pullDockerImage(
     image: string,
-    authConfig: DockerAuthConfig,
+    authConfig?: DockerAuthConfig,
 ) {
-    const stream = await useDocker().pull(image, {
-        authconfig: authConfig,
-    });
+    const options : Record<string, any> = {};
+    if (authConfig) {
+        options.autConfig = authConfig;
+    }
+    const stream = await useDocker().pull(image, options);
 
     return new Promise<any>(((resolve, reject) => {
         useDocker().modem.followProgress(stream, (error: Error, output: any) => {
