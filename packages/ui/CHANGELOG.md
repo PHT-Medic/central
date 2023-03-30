@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/PHT-Medic/central/compare/v2.1.2...v2.2.0) (2023-03-30)
+
+
+### Bug Fixes
+
+* adjusted provider url building ([4115a2e](https://github.com/PHT-Medic/central/commit/4115a2e4a818b517edfb7c6e24dc7cbd1a60e85d))
+* **deps:** bump @authup/common from 0.22.0 to 0.24.0 ([#920](https://github.com/PHT-Medic/central/issues/920)) ([0dc02ba](https://github.com/PHT-Medic/central/commit/0dc02ba7d6d71261770242126c246b7d091fbedd))
+* reduce total warehouses + adjusted cookie access ([66e7d02](https://github.com/PHT-Medic/central/commit/66e7d02baa18a583d1d93e6058493494c5aeb5b2))
+
+
+
+
+
 ## [2.1.2](https://github.com/PHT-Medic/central/compare/v2.1.1...v2.1.2) (2023-03-29)
 
 
