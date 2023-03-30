@@ -1,9 +1,8 @@
-name: docker
+name: docker-nightly
 
 on:
-    push:
-        tags:
-            - v*
+    schedule:
+        - cron: "0 0 * * *"
 
 jobs:
     push:
@@ -19,4 +18,4 @@ jobs:
               with:
                   registryPassword: ${{ secrets.GITHUB_TOKEN }}
                   registryRepository: central
-                  registryTag: latest
+                  registryTag: next
