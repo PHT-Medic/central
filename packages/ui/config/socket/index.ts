@@ -71,7 +71,7 @@ export class SocketModule {
             realmId = this.ctx.store.getters['auth/realmId'];
         }
         if (!realmId) {
-            const user = this.ctx.$authWarehouse.get(AuthBrowserStorageKey.USER);
+            const user = this.ctx.$warehouse.get(AuthBrowserStorageKey.USER);
             if (user.realm_id) {
                 realmId = user.realm_id;
             }
@@ -93,7 +93,7 @@ export class SocketModule {
         }
 
         const getToken = (cb) => {
-            let token : string | undefined = this.ctx.$authWarehouse.get(AuthBrowserStorageKey.ACCESS_TOKEN);
+            let token : string | undefined = this.ctx.$warehouse.get(AuthBrowserStorageKey.ACCESS_TOKEN);
             if (typeof token === 'undefined') {
                 token = this.ctx.store.getters['auth/accessToken'];
             }

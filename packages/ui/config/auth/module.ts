@@ -73,7 +73,7 @@ export class AuthModule {
 
         const values = Object.values(AuthBrowserStorageKey);
         for (let i = 0; i < values.length; i++) {
-            const value = this.ctx.$authWarehouse.get(values[i]);
+            const value = this.ctx.$warehouse.get(values[i]);
             if (!value) {
                 continue;
             }

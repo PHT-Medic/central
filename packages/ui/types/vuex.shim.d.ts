@@ -14,7 +14,6 @@ import {Adapter} from 'browser-storage-adapter';
 declare module 'vuex/types/index' {
     interface Store<S> {
         $warehouse: Adapter,
-        $authWarehouse: Adapter,
 
         $api: HTTPClient,
         $authupApi: AuthupHTTPClient,

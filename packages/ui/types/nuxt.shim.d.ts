@@ -21,7 +21,6 @@ declare module '@nuxt/types' {
     // nuxtContext.$myInjectedFunction
     interface Context {
         $warehouse: Adapter,
-        $authWarehouse: Adapter,
 
         $api: HTTPClient,
         $authupApi: AuthupHTTPClient,

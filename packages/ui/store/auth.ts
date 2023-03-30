@@ -104,11 +104,11 @@ export const actions : ActionTree<AuthState, RootState> = {
     triggerSetToken({ commit }, { kind, token }) {
         switch (kind) {
             case OAuth2TokenKind.ACCESS:
-                this.$authWarehouse.set(AuthBrowserStorageKey.ACCESS_TOKEN, token);
+                this.$warehouse.set(AuthBrowserStorageKey.ACCESS_TOKEN, token);
                 this.$auth.setRequestToken(token);
                 break;
             case OAuth2TokenKind.REFRESH:
-                this.$authWarehouse.set(AuthBrowserStorageKey.REFRESH_TOKEN, token);
+                this.$warehouse.set(AuthBrowserStorageKey.REFRESH_TOKEN, token);
                 break;
         }
 
@@ -117,7 +117,7 @@ export const actions : ActionTree<AuthState, RootState> = {
     triggerSetTokenExpireDate({ commit }, { kind, date }) {
         switch (kind) {
             case OAuth2TokenKind.ACCESS:
-                this.$authWarehouse.set(AuthBrowserStorageKey.ACCESS_TOKEN_EXPIRE_DATE, date);
+                this.$warehouse.set(AuthBrowserStorageKey.ACCESS_TOKEN_EXPIRE_DATE, date);
                 break;
         }
 
@@ -126,12 +126,12 @@ export const actions : ActionTree<AuthState, RootState> = {
     triggerUnsetToken({ commit }, kind) {
         switch (kind) {
             case OAuth2TokenKind.ACCESS:
-                this.$authWarehouse.remove(AuthBrowserStorageKey.ACCESS_TOKEN);
-                this.$authWarehouse.remove(AuthBrowserStorageKey.ACCESS_TOKEN_EXPIRE_DATE);
+                this.$warehouse.remove(AuthBrowserStorageKey.ACCESS_TOKEN);
+                this.$warehouse.remove(AuthBrowserStorageKey.ACCESS_TOKEN_EXPIRE_DATE);
                 this.$auth.unsetRequestToken();
                 break;
             case OAuth2TokenKind.REFRESH:
-                this.$authWarehouse.remove(AuthBrowserStorageKey.REFRESH_TOKEN);
+                this.$warehouse.remove(AuthBrowserStorageKey.REFRESH_TOKEN);
                 break;
         }
 
@@ -141,11 +141,11 @@ export const actions : ActionTree<AuthState, RootState> = {
     // --------------------------------------------------------------------
 
     triggerSetUser({ commit }, entity) {
-        this.$authWarehouse.set(AuthBrowserStorageKey.USER, entity);
+        this.$warehouse.set(AuthBrowserStorageKey.USER, entity);
         commit('setUser', entity);
     },
     triggerUnsetUser({ commit }) {
-        this.$authWarehouse.remove(AuthBrowserStorageKey.USER);
+        this.$warehouse.remove(AuthBrowserStorageKey.USER);
         commit('unsetUser');
     },
 
@@ -154,33 +154,33 @@ export const actions : ActionTree<AuthState, RootState> = {
     triggerSetRealm({ commit }, realm: Partial<Realm>) {
         commit('setRealm', realm);
 
-        this.$authWarehouse.set(AuthBrowserStorageKey.REALM, realm);
+        this.$warehouse.set(AuthBrowserStorageKey.REALM, realm);
     },
     triggerUnsetRealm({ commit }) {
         commit('unsetRealm');
 
-        this.$authWarehouse.remove(AuthBrowserStorageKey.REALM);
+        this.$warehouse.remove(AuthBrowserStorageKey.REALM);
     },
 
     triggerSetManagementRealm({ commit }, realm: Partial<Realm>) {
         commit('setManagementRealm', realm);
 
-        this.$authWarehouse.set(AuthBrowserStorageKey.MANAGEMENT_REALM, realm);
+        this.$warehouse.set(AuthBrowserStorageKey.MANAGEMENT_REALM, realm);
     },
     triggerUnsetManagementRealm({ commit }) {
         commit('unsetManagementRealm');
 
-        this.$authWarehouse.remove(AuthBrowserStorageKey.MANAGEMENT_REALM);
+        this.$warehouse.remove(AuthBrowserStorageKey.MANAGEMENT_REALM);
     },
 
     // --------------------------------------------------------------------
 
     triggerSetPermissions({ commit }, permissions) {
-        this.$authWarehouse.setLocalStorageItem(AuthBrowserStorageKey.PERMISSIONS, permissions);
+        this.$warehouse.setLocalStorageItem(AuthBrowserStorageKey.PERMISSIONS, permissions);
         commit('setPermissions', permissions);
     },
     triggerUnsetPermissions({ commit }) {
-        this.$authWarehouse.removeLocalStorageItem(AuthBrowserStorageKey.PERMISSIONS);
+        this.$warehouse.removeLocalStorageItem(AuthBrowserStorageKey.PERMISSIONS);
         commit('unsetPermissions');
     },
 
@@ -311,8 +311,8 @@ export const actions : ActionTree<AuthState, RootState> = {
      */
     triggerSetUserProperty({ commit, state }, { property, value }) {
         commit('setUserProperty', { property, value });
-        this.$authWarehouse.remove(AuthBrowserStorageKey.USER);
-        this.$authWarehouse.set(AuthBrowserStorageKey.USER, state.user);
+        this.$warehouse.remove(AuthBrowserStorageKey.USER);
+        this.$warehouse.set(AuthBrowserStorageKey.USER, state.user);
     },
 };
 

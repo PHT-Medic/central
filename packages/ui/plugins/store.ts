@@ -34,7 +34,7 @@ export default (ctx : Context, inject : Inject) => {
 
     const getServerCookies = () => ctx.req.headers.cookie;
 
-    const appWarehouse = new Adapter({
+    const warehouse = new Adapter({
         driver: {
             cookie: {
                 path: '/',
@@ -43,28 +43,9 @@ export default (ctx : Context, inject : Inject) => {
                 } : {}),
             },
         },
-        namespace: 'app',
         isServer: () => process.server,
         setServerCookie,
         getServerCookies,
     });
-    inject('warehouse', appWarehouse);
-
-    //--------------------------------------------------------------------
-
-    const authWarehouse = new Adapter({
-        driver: {
-            cookie: {
-                path: '/',
-                ...(process.env.API_URL === 'production' ? {
-                    domain: new URL(process.env.API_URL).hostname,
-                } : {}),
-            },
-        },
-        namespace: 'auth',
-        isServer: () => process.server,
-        setServerCookie,
-        getServerCookies,
-    });
-    inject('authWarehouse', authWarehouse);
+    inject('warehouse', warehouse);
 };
