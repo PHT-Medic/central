@@ -43,7 +43,7 @@
     "devDependencies": {
         "@types/dockerode": "^3.3.16",
         "@types/dotenv": "^8.2.0",
-        "@types/minio": "^7.0.17",
+        "@types/minio": "^7.0.18",
         "@types/tar-stream": "^2.2.2",
         "@types/uuid": "^9.0.1",
         "ts-node": "^10.9.1"
