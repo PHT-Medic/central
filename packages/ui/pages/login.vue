@@ -90,7 +90,7 @@ export default Vue.extend({
         },
 
         buildUrl(provider) {
-            return this.$authupApi.identityProvider.getAuthorizeUri(this.$config.authApiUrl, provider.id);
+            return this.$authupApi.identityProvider.getAuthorizeUri(this.$config.$authupApi, provider.id);
         },
     },
     render(createElement: CreateElement): VNode {
