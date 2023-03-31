@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.1](https://github.com/PHT-Medic/central/compare/v2.2.0...v2.2.1) (2023-03-31)
+
+
+### Bug Fixes
+
+* identity-provider url building ([c08b4be](https://github.com/PHT-Medic/central/commit/c08b4be7cd64c88d49c6fa4ae206810f10ff3f7d))
+* proivder api base url ([3b8b55d](https://github.com/PHT-Medic/central/commit/3b8b55dcdb45a29be9e05cf019aae8d24e962aaa))
+
+
+
+
+
 # [2.2.0](https://github.com/PHT-Medic/central/compare/v2.1.2...v2.2.0) (2023-03-30)
 
 

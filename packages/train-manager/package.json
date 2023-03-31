@@ -7,7 +7,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "description": "This project contains the central Train-Manager of the PHT.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
