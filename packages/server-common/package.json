@@ -15,7 +15,7 @@
         "build": "tsc -p tsconfig.build.json"
     },
     "dependencies": {
-        "@authup/common": "^0.24.0",
+        "@authup/common": "^0.26.0",
         "@ebec/http": "^1.0.0",
         "@personalhealthtrain/central-common": "2.2.0",
         "smob": "^1.0.0"
