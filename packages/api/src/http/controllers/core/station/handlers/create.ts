@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isPropertySet } from '@authup/common';
+import { isPropertySet } from '@authup/core';
 import {
     PermissionID, RegistryProjectType, createNanoID,
     isHex,

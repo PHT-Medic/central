@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isRealmResourceReadable } from '@authup/common';
+import { isRealmResourceReadable } from '@authup/core';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import type { Request, Response } from 'routup';

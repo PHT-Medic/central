@@ -12,7 +12,7 @@ import {
 import type {
     Proposal, ProposalStation, ProposalStationApprovalStatus, Station,
 } from '@personalhealthtrain/central-common';
-import type { Realm } from '@authup/common';
+import type { Realm } from '@authup/core';
 import { ProposalEntity } from '../proposal/entity';
 import { StationEntity } from '../station/entity';
 

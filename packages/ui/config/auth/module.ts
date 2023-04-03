@@ -11,14 +11,14 @@ import type {
     OAuth2TokenGrantResponse,
     OAuth2TokenIntrospectionResponse,
     User,
-} from '@authup/common';
+} from '@authup/core';
 import {
     AbilityManager,
     OAuth2SubKind,
     OAuth2TokenKind,
-} from '@authup/common';
+} from '@authup/core';
 import type { ConfigInput } from 'hapic';
-import { createClient } from 'hapic';
+import { createClient, isClientDriverInstance } from 'hapic';
 import { AuthBrowserStorageKey } from './constants';
 
 export class AuthModule {
@@ -49,7 +49,7 @@ export class AuthModule {
 
         if (
             process.server &&
-            config.driver
+            !isClientDriverInstance(config.driver)
         ) {
             config.driver.proxy = false;
         }
@@ -203,7 +203,7 @@ export class AuthModule {
         this.setRequestToken(token);
 
         const tokenPromise = new Promise<void>((resolve, reject) => {
-            this.ctx.$authupApi.oauth2.token.introspect<OAuth2TokenIntrospectionResponse>(token)
+            this.ctx.$authupApi.token.introspect<OAuth2TokenIntrospectionResponse>(token)
                 .then(async (token) => {
                     await this.ctx.store.dispatch('auth/triggerSetPermissions', token.permissions);
                     await this.ctx.store.dispatch('auth/triggerSetRealm', {
@@ -224,7 +224,7 @@ export class AuthModule {
             if (this.ctx.store.getters['auth/user']) {
                 resolve();
             } else {
-                this.ctx.$authupApi.oauth2.userInfo.get<User>(token)
+                this.ctx.$authupApi.userInfo.get<User>(token)
                     .then(async (entity) => {
                         await this.ctx.store.dispatch('auth/triggerSetUser', entity);
                         await this.ctx.store.commit('auth/setResolved', true);
@@ -319,7 +319,7 @@ export class AuthModule {
      * @param password
      */
     public async getTokenWithPassword(username: string, password: string) : Promise<OAuth2TokenGrantResponse> {
-        const data = await this.ctx.$authupApi.oauth2.token.createWithPasswordGrant({
+        const data = await this.ctx.$authupApi.token.createWithPasswordGrant({
             username,
             password,
         });
@@ -335,7 +335,7 @@ export class AuthModule {
      * @param token
      */
     public async getTokenWithRefreshToken(token: string) : Promise<OAuth2TokenGrantResponse> {
-        const data = await this.ctx.$authupApi.oauth2.token.createWithRefreshToken({
+        const data = await this.ctx.$authupApi.token.createWithRefreshToken({
             refresh_token: token,
         });
 

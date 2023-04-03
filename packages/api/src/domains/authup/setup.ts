@@ -10,8 +10,8 @@ import { PermissionKey, ServiceID } from '@personalhealthtrain/central-common';
 import type {
     Permission,
     Realm, Robot, Role,
-} from '@authup/common';
-import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/common';
+} from '@authup/core';
+import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/core';
 import { isClientError } from 'hapic';
 import { PresetRoleName, getPresetRolePermissions, useLogger } from '../../config';
 import { useAuthupClient } from '../../core';

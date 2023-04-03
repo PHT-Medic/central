@@ -5,15 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { AbilityManager, ROBOT_SYSTEM_NAME } from '@authup/core';
 import { setInterval } from 'node:timers';
-import type { OAuth2TokenGrantResponse } from '@authup/common';
-import { setupHTTPMiddleware } from '@authup/server-adapter';
+import type { OAuth2TokenGrantResponse } from '@authup/core';
+import { createHTTPMiddleware } from '@authup/server-adapter';
+import { useClient as useVaultClient } from '@hapic/vault';
 import { parseAuthorizationHeader } from 'hapic';
-import { useClient } from 'redis-extension';
+import { useClient as useRedisClient } from 'redis-extension';
+import { useRequestCookie } from 'routup';
 import type { Router } from 'routup';
 import { EnvironmentName, useEnv, useLogger } from '../../config';
 import { useAuthupClient } from '../../core';
-import { useRequestEnv } from '../request';
+import { setRequestEnv, useRequestEnv } from '../request';
 
 export function registerAuthupMiddleware(router: Router) {
     let cache : Record<string, string> = {};
@@ -48,12 +51,12 @@ export function registerAuthupMiddleware(router: Router) {
             let token : OAuth2TokenGrantResponse;
 
             if (header.username === 'admin') {
-                token = await authupClient.oauth2.token.createWithPasswordGrant({
+                token = await authupClient.token.createWithPasswordGrant({
                     username: header.username,
                     password: header.password,
                 });
             } else {
-                token = await authupClient.oauth2.token.createWithRobotCredentials({
+                token = await authupClient.token.createWithRobotCredentials({
                     id: header.username,
                     secret: header.password,
                 });
@@ -66,17 +69,51 @@ export function registerAuthupMiddleware(router: Router) {
         next();
     });
 
-    router.use(setupHTTPMiddleware({
-        redis: useClient(),
-        oauth2: useEnv('authupApiUrl'),
-        logger: useLogger(),
+    router.use(createHTTPMiddleware({
+        tokenByCookie: (req, cookieName) => useRequestCookie(req, cookieName),
+        tokenVerifier: {
+            baseUrl: useEnv('authupApiUrl'),
+            creator: {
+                type: 'robotInVault',
+                name: ROBOT_SYSTEM_NAME,
+                vault: useVaultClient(),
+            },
+            cache: {
+                type: 'redis',
+                client: useRedisClient(),
+            },
+        },
+        tokenVerifierHandler: (req, data) => {
+            const ability = new AbilityManager(data.permissions);
+            setRequestEnv(req, 'ability', ability);
+
+            setRequestEnv(req, 'realmId', data.realm_id);
+            setRequestEnv(req, 'realmName', data.realm_name);
+            setRequestEnv(req, 'realm', {
+                id: data.realm_id,
+                name: data.realm_name,
+            });
+
+            switch (data.sub_kind) {
+                case 'user': {
+                    setRequestEnv(req, 'userId', data.sub);
+                    setRequestEnv(req, 'userName', data.sub_name);
+                    break;
+                }
+                case 'robot': {
+                    setRequestEnv(req, 'robotId', data.sub);
+                    setRequestEnv(req, 'robotName', data.sub_name);
+                    break;
+                }
+            }
+        },
     }));
 
     // todo: permissions should be created and set for test suite :)
     if (useEnv('env') === EnvironmentName.TEST) {
         router.use(async (req, res, next) => {
             const ability = useRequestEnv(req, 'ability');
-            ability.has = (input: any) => true;
+            ability.has = (_input: any) => true;
 
             next();
         });

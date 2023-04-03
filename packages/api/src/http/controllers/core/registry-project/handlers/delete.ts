@@ -11,7 +11,7 @@ import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
-import { isRealmResourceWritable } from '@authup/common';
+import { isRealmResourceWritable } from '@authup/core';
 import { RegistryCommand } from '../../../../../components';
 import { buildRegistryPayload } from '../../../../../components/registry/utils/queue';
 import { useRequestEnv } from '../../../../request';

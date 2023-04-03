@@ -11,19 +11,19 @@ import type {
     SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
 import type {
-    AbilityDescriptor, AbilityManager, Realm, Robot, User,
-} from '@authup/common';
+    AbilityManager, Realm, Robot, User,
+} from '@authup/core';
 import type { Namespace, Server, Socket } from 'socket.io';
 
 export type SocketDataInterface = {
-    token?: string,
+    ability?: AbilityManager,
 
     realmId?: Realm['id'],
     realmName?: Realm['name'],
+
     userId?: User['id'],
     robotId?: Robot['id'],
-    permissions?: AbilityDescriptor[],
-    ability?: AbilityManager,
+
     roomConnections: Record<string, number>
 };
 

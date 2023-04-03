@@ -8,7 +8,7 @@
 import type { CreateElement, VNode } from 'vue';
 import Vue from 'vue';
 import { maxLength, minLength, required } from 'vuelidate/lib/validators';
-import type { IdentityProvider } from '@authup/common';
+import type { IdentityProvider } from '@authup/core';
 import type { BuildInput } from 'rapiq';
 import { SlotName, buildFormInput, buildFormSubmit } from '@vue-layout/utils';
 import { IdentityProviderList } from '@authup/vue2';

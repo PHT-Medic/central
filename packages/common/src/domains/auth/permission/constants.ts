@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { PermissionName as AuthPermissionName } from '@authup/common';
+import { PermissionName as AuthPermissionName } from '@authup/core';
 
 export enum PermissionKey {
     ADMIN_UI_USE = 'admin_ui_use',

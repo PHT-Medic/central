@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DomainType } from '@authup/common';
-import type { DomainEventContext } from '@authup/common';
+import { DomainType } from '@authup/core';
+import type { DomainEventContext } from '@authup/core';
 import { createClient } from 'redis-extension';
 import { useEnv, useLogger } from '../../config';
 import type { Aggregator } from '../type';

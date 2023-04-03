@@ -26,14 +26,14 @@
     },
     "license": "MIT",
     "devDependencies": {
-        "@authup/common": "^0.24.0",
-        "hapic": "^1.4.0",
+        "@authup/core": "^0.31.2",
+        "hapic": "^1.6.0",
         "rapiq": "^0.8.0"
     },
     "peerDependencies": {
-        "@authup/common": ">=0.22.0 <1.0.0",
-        "hapic": "^1.4.0",
-        "rapiq": ">=0.7 <1.0.0"
+        "@authup/core": ">=0.31.2 <1.0.0",
+        "hapic": "^1.6.0",
+        "rapiq": ">=0.8 <1.0.0"
     },
     "dependencies": {
         "nanoid": "^3.3.4"

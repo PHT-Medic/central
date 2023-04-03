@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm } from '@authup/common';
+import type { Realm } from '@authup/core';
 import type { Ecosystem } from '../ecosystem';
 import type { RegistryProject } from '../registry-project';
 import type { Registry } from '../registry';

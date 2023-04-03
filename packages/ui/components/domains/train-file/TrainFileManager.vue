@@ -19,7 +19,7 @@ import { required } from 'vuelidate/lib/validators';
 import type { PropType } from 'vue';
 import Vue from 'vue';
 import type { Socket } from 'socket.io-client';
-import { REALM_MASTER_NAME } from '@authup/common';
+import { REALM_MASTER_NAME } from '@authup/core';
 import TrainFile from './TrainFile.vue';
 import TrainFormFile from './TrainFormFile.vue';
 import TrainImageCommand from '../train/TrainImageCommand';

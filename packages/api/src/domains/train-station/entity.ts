@@ -22,7 +22,7 @@ import type {
     TrainStationApprovalStatus,
     TrainStationRunStatus,
 } from '@personalhealthtrain/central-common';
-import type { Realm } from '@authup/common';
+import type { Realm } from '@authup/core';
 import { TrainEntity } from '../train/entity';
 import { StationEntity } from '../station/entity';
 

@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { UserEventContext } from '@authup/common';
+import type { UserEventContext } from '@authup/core';
 import { useDataSource } from 'typeorm-extension';
 import { ProposalEntity, TrainEntity, UserSecretEntity } from '../../../domains';
 

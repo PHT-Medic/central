@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm, User } from '@authup/common';
+import type { Realm, User } from '@authup/core';
 import type { MasterImage } from '../master-image';
 import type { Proposal } from '../proposal';
 import type { TrainFile } from '../train-file';

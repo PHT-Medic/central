@@ -15,8 +15,7 @@ import { useRequestEnv } from '../request';
 export function forceLoggedInMiddleware(req: Request, res: Response, next: Next) {
     if (
         typeof useRequestEnv(req, 'userId') === 'undefined' &&
-        typeof useRequestEnv(req, 'robotId') === 'undefined' &&
-        typeof useRequestEnv(req, 'clientId') === 'undefined'
+        typeof useRequestEnv(req, 'robotId') === 'undefined'
     ) {
         throw new UnauthorizedError();
     }

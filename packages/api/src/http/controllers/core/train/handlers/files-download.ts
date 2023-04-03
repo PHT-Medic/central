@@ -9,7 +9,7 @@ import type { Request, Response } from 'routup';
 import { useRequestParam } from 'routup';
 import tar from 'tar-stream';
 import { BadRequestError, ForbiddenError, NotFoundError } from '@ebec/http';
-import { isRealmResourceReadable } from '@authup/common';
+import { isRealmResourceReadable } from '@authup/core';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../../../config';
 import { useMinio } from '../../../../../core/minio';

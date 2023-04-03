@@ -6,7 +6,7 @@
  */
 
 import { HTTPClient } from '@personalhealthtrain/central-common';
-import { HTTPClient as AuthupHTTPClient } from '@authup/common';
+import { APIClient as AuthupAPIClient} from '@authup/core';
 import AuthModule from '../config/auth';
 import {SocketModule} from '../config/socket';
 import {Adapter} from 'browser-storage-adapter';
@@ -16,7 +16,7 @@ declare module 'vuex/types/index' {
         $warehouse: Adapter,
 
         $api: HTTPClient,
-        $authupApi: AuthupHTTPClient,
+        $authupApi: AuthupAPIClient,
 
         $auth: AuthModule,
 

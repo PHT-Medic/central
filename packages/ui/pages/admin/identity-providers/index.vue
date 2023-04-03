@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { PropType } from 'vue';
-import { Realm } from '@authup/common';
+import { Realm } from '@authup/core';
 
 export default {
     data() {

@@ -6,7 +6,7 @@
  */
 
 import { HTTPClient } from '@personalhealthtrain/central-common';
-import { HTTPClient as AuthupHTTPClient } from '@authup/common';
+import { APIClient as AuthupAPIClient} from '@authup/core';
 import {Store} from 'vuex';
 import {SocketModule} from '../config/socket';
 import AuthModule from '../config/auth';
@@ -29,7 +29,7 @@ declare module 'vue/types/vue' {
     // on the `VueConstructor` interface
     interface VueConstructor {
         $api: HTTPClient,
-        $authupApi: AuthupHTTPClient,
+        $authupApi: AuthupAPIClient,
 
         $auth: AuthModule,
         $ilingo: Ilingo,
@@ -41,7 +41,7 @@ declare module 'vue/types/vue' {
 
     interface Vue {
         $api: HTTPClient,
-        $authupApi: AuthupHTTPClient,
+        $authupApi: AuthupAPIClient,
 
         $auth: AuthModule,
         $ilingo: Ilingo,

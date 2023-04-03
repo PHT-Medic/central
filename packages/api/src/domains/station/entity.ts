@@ -19,7 +19,7 @@ import type { Registry, Station } from '@personalhealthtrain/central-common';
 import {
     Ecosystem, RegistryProject,
 } from '@personalhealthtrain/central-common';
-import type { Realm } from '@authup/common';
+import type { Realm } from '@authup/core';
 import { RegistryProjectEntity } from '../registry-project/entity';
 import { RegistryEntity } from '../registry/entity';
 

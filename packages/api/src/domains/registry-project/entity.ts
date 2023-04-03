@@ -17,7 +17,7 @@ import type { Registry, RegistryProject } from '@personalhealthtrain/central-com
 import {
     Ecosystem, RegistryProjectType,
 } from '@personalhealthtrain/central-common';
-import type { Realm } from '@authup/common';
+import type { Realm } from '@authup/core';
 import { RegistryEntity } from '../registry/entity';
 
 @Unique(['name', 'registry_id'])

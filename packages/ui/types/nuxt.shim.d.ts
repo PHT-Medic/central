@@ -6,7 +6,7 @@
  */
 
 import { HTTPClient } from '@personalhealthtrain/central-common';
-import { HTTPClient as AuthupHTTPClient } from '@authup/common';
+import { APIClient as AuthupAPIClient} from '@authup/core';
 import AuthModule from '../config/auth';
 import { Store } from 'vuex';
 import { SocketModule } from '../config/socket';
@@ -23,7 +23,7 @@ declare module '@nuxt/types' {
         $warehouse: Adapter,
 
         $api: HTTPClient,
-        $authupApi: AuthupHTTPClient,
+        $authupApi: AuthupAPIClient,
 
         $auth: AuthModule,
 

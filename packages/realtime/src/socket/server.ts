@@ -9,8 +9,8 @@ import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { ForbiddenError, UnauthorizedError } from '@ebec/http';
-import { REALM_MASTER_NAME } from '@authup/common';
-import { setupSocketMiddleware } from '@authup/server-adapter';
+import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/core';
+import { createSocketMiddleware } from '@authup/server-adapter';
 import { useEnv } from '../config';
 import { useLogger } from '../core';
 import { registerSocketHandlers, registerSocketNamespaceHandlers } from './register';
@@ -35,13 +35,29 @@ export function createSocketServer(context : SocketServerContext) : Server {
         // ...
     });
 
+    const socketMiddleware = createSocketMiddleware({
+        tokenVerifier: {
+            baseUrl: useEnv('authupApiUrl'),
+            creator: {
+                type: 'robotInVault',
+                name: ROBOT_SYSTEM_NAME,
+                vault: useEnv('vaultConnectionString'),
+            },
+            cache: {
+                type: 'redis',
+                client: context.config.redisDatabase,
+            },
+        },
+        tokenVerifierHandler: (socket, data) => {
+            const keys = Object.keys(data);
+            for (let i = 0; i < keys.length; i++) {
+                socket.data[keys[i]] = data[keys[i]];
+            }
+        },
+    });
+
     useLogger().info('Mounting socket middleware...');
-    // receive user
-    server.use(setupSocketMiddleware({
-        redis: context.config.redisDatabase,
-        oauth2: useEnv('authupApiUrl'),
-        logger: useLogger(),
-    }));
+    server.use(socketMiddleware);
 
     server.use((socket: SocketInterface, next) => {
         if (!socket.data.userId && !socket.data.robotId) {
@@ -73,10 +89,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
 
     // build & register realm workspaces
     const realmWorkspaces = server.of(/^\/realm#[a-z0-9A-Z-_]+$/);
-    realmWorkspaces.use(setupSocketMiddleware({
-        redis: context.config.redisDatabase,
-        oauth2: useEnv('authupApiUrl'),
-    }));
+    realmWorkspaces.use(socketMiddleware);
 
     realmWorkspaces.use((socket: SocketInterface, next) => {
         if (!socket.data.userId && !socket.data.robotId) {

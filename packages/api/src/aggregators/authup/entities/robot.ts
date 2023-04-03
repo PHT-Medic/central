@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RobotEventContext } from '@authup/common';
+import type { RobotEventContext } from '@authup/core';
 import { Ecosystem, ServiceID } from '@personalhealthtrain/central-common';
 import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';

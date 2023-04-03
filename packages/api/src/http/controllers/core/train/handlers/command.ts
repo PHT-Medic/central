@@ -8,7 +8,7 @@
 import { check, matchedData, validationResult } from 'express-validator';
 import { TrainAPICommand } from '@personalhealthtrain/central-common';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isRealmResourceWritable } from '@authup/common';
+import { isRealmResourceWritable } from '@authup/core';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';

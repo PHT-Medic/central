@@ -6,7 +6,7 @@
  */
 
 import type { Context } from '@nuxt/types';
-import { buildNameFromAbilityID } from '@authup/common';
+import { buildNameFromAbilityID } from '@authup/core';
 import type { AuthModule } from '../config/auth';
 import { LayoutKey } from '../config/layout';
 

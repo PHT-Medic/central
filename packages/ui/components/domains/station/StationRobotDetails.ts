@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Robot } from '@authup/common';
+import type { Robot } from '@authup/core';
 import type { CreateElement, PropType, VNode } from 'vue';
 import Vue from 'vue';
 import type { Station } from '@personalhealthtrain/central-common';

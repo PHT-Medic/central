@@ -7,7 +7,7 @@
 
 import { Ecosystem } from '@personalhealthtrain/central-common';
 import { check, validationResult } from 'express-validator';
-import { isRealmResourceWritable } from '@authup/common';
+import { isRealmResourceWritable } from '@authup/core';
 import { ForbiddenError } from '@ebec/http';
 import type { Request } from 'routup';
 import { RegistryEntity } from '../../../../../domains';

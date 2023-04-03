@@ -10,7 +10,7 @@ import { ForbiddenError, NotFoundError } from '@ebec/http';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { MoreThan } from 'typeorm';
-import { isRealmResourceWritable } from '@authup/common';
+import { isRealmResourceWritable } from '@authup/core';
 import { useDataSource } from 'typeorm-extension';
 import { TrainStationEntity } from '../../../../../domains/train-station/entity';
 import { useRequestEnv } from '../../../../request';

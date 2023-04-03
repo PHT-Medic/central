@@ -36,8 +36,8 @@ import {
     buildListItems,
     buildListNoMore, buildListPagination, buildListSearch,
 } from '@vue-layout/utils';
-import type { Realm } from '@authup/common';
-import { REALM_MASTER_NAME } from '@authup/common';
+import type { Realm } from '@authup/core';
+import { REALM_MASTER_NAME } from '@authup/core';
 import type { BuildInput } from 'rapiq';
 
 enum DomainType {

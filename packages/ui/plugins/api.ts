@@ -8,8 +8,8 @@
 import type { Context } from '@nuxt/types';
 import https from 'https';
 import type { Inject } from '@nuxt/types/app';
-import { HTTPClient as AuthHTTPClient } from '@authup/common';
-import { setHTTPClient } from '@authup/vue2';
+import { APIClient as AuthAPIClient } from '@authup/core';
+import { setAPIClient } from '@authup/vue2';
 import { ErrorCode, HTTPClient } from '@personalhealthtrain/central-common';
 import { LicenseAgreementCommand, useLicenseAgreementEventEmitter } from '../domains/license-agreement';
 
@@ -51,7 +51,7 @@ export default (ctx: Context, inject : Inject) => {
 
     apiUrl = ctx.$config.authupApiUrl || process.env.AUTHUP_API_URL;
 
-    const authupAPI = new AuthHTTPClient({
+    const authupAPI = new AuthAPIClient({
         driver: {
             baseURL: apiUrl,
             withCredentials: true,
@@ -67,5 +67,5 @@ export default (ctx: Context, inject : Inject) => {
     authupAPI.mountResponseInterceptor((r) => r, interceptor);
     inject('authupApi', authupAPI);
 
-    setHTTPClient(authupAPI);
+    setAPIClient(authupAPI);
 };

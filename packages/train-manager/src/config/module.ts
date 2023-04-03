@@ -5,11 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { ROBOT_SYSTEM_NAME } from '@authup/core';
+import { mountTokenInterceptorOnClient } from '@authup/server-adapter';
 import type { Aggregator, Component } from '@personalhealthtrain/central-server-common';
-import {
-    mountHTTPInterceptorForRefreshingToken,
-} from '@personalhealthtrain/central-server-common';
-import { Client as VaultClient } from '@hapic/vault';
 import { setClient as setHTTPClient } from 'hapic';
 import {
     HTTPClient,
@@ -52,16 +50,13 @@ export function createConfig() : Config {
             withCredentials: true,
         },
     });
-    mountHTTPInterceptorForRefreshingToken(centralClient, {
-        authApiUrl: useEnv('authupApiUrl'),
-        vault: new VaultClient({
-            driver: {
-                proxy: false,
-            },
-            extra: {
-                connectionString: useEnv('vaultConnectionString'),
-            },
-        }),
+    mountTokenInterceptorOnClient(centralClient, {
+        baseUrl: useEnv('authupApiUrl'),
+        tokenCreator: {
+            type: 'robotInVault',
+            name: ROBOT_SYSTEM_NAME,
+            vault: useEnv('vaultConnectionString'),
+        },
     });
     setHTTPClient(centralClient);
 

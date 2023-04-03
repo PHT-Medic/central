@@ -31,7 +31,7 @@ import {
 } from '@vue-layout/utils';
 import type { BuildInput } from 'rapiq';
 import type { Socket } from 'socket.io-client';
-import { REALM_MASTER_NAME } from '@authup/common';
+import { REALM_MASTER_NAME } from '@authup/core';
 import { TrainListItem } from './TrainListItem';
 
 export const TrainList = Vue.extend<

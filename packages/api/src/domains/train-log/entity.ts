@@ -18,7 +18,7 @@ import type {
     Train,
     TrainLog,
 } from '@personalhealthtrain/central-common';
-import type { Realm } from '@authup/common';
+import type { Realm } from '@authup/core';
 import { TrainEntity } from '../train/entity';
 
 @Entity({ name: 'train_logs' })

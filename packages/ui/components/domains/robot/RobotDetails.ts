@@ -8,7 +8,7 @@
 import {
     maxLength, minLength,
 } from 'vuelidate/lib/validators';
-import type { Robot } from '@authup/common';
+import type { Robot } from '@authup/core';
 import { buildFormInput, buildFormSubmit, initPropertiesFromSource } from '@vue-layout/utils';
 import type { CreateElement, PropType, VNode } from 'vue';
 import Vue from 'vue';

@@ -16,7 +16,7 @@ import {
 } from 'typeorm';
 import type { Train, TrainFile } from '@personalhealthtrain/central-common';
 // eslint-disable-next-line import/no-cycle
-import type { Realm, User } from '@authup/common';
+import type { Realm, User } from '@authup/core';
 import { TrainEntity } from '../train/entity';
 
 @Entity({ name: 'train_files' })

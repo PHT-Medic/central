@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Realm } from '@authup/common';
+import type { Realm } from '@authup/core';
 import { useClient } from 'hapic';
 import { ApiKey, useLogger } from '../../../../../config';
 import { useAuthupClient } from '../../../../../core';

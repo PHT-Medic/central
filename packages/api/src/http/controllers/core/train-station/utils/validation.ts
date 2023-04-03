@@ -8,7 +8,7 @@
 import { check, validationResult } from 'express-validator';
 import { TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { BadRequestError, NotFoundError } from '@ebec/http';
-import { isRealmResourceWritable } from '@authup/common';
+import { isRealmResourceWritable } from '@authup/core';
 import type { Request } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { StationEntity } from '../../../../../domains/station/entity';

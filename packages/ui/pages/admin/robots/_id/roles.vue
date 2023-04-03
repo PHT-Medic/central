@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Robot } from '@authup/common';
+import type { Robot } from '@authup/core';
 import type { PropType } from 'vue';
 
 export default {

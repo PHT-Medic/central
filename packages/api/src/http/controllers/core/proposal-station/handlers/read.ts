@@ -14,7 +14,7 @@ import {
     useDataSource,
 } from 'typeorm-extension';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
-import { isRealmResourceReadable } from '@authup/common';
+import { isRealmResourceReadable } from '@authup/core';
 import { ProposalStationEntity, onlyRealmWritableQueryResources } from '../../../../../domains';
 import { useRequestEnv } from '../../../../request';
 

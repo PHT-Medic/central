@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { HTTPClient } from '@authup/common';
-import { mountHTTPInterceptorForRefreshingToken } from '@personalhealthtrain/central-server-common';
+import { APIClient, ROBOT_SYSTEM_NAME } from '@authup/core';
+import { mountTokenInterceptorOnClient } from '@authup/server-adapter';
 import { setConfig as setHTTPConfig } from 'hapic';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { setConfig as setRedisConfig } from 'redis-extension';
@@ -62,15 +62,20 @@ export function createConfig() : Config {
 
     // ---------------------------------------------
 
-    const authupClient = new HTTPClient({
+    const authupClient = new APIClient({
         driver: {
             baseURL: useEnv('authupApiUrl'),
         },
     });
-    mountHTTPInterceptorForRefreshingToken(authupClient, {
-        authApiUrl: useEnv('authupApiUrl'),
-        vault: vaultClient,
+    mountTokenInterceptorOnClient(authupClient, {
+        baseUrl: useEnv('authupApiUrl'),
+        tokenCreator: {
+            type: 'robotInVault',
+            name: ROBOT_SYSTEM_NAME,
+            vault: vaultClient,
+        },
     });
+
     setAuthupClient(authupClient);
 
     // ---------------------------------------------

@@ -5,21 +5,19 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setupHTTPMiddleware } from '@authup/server-adapter';
 import { createRequestJsonHandler, createRequestUrlEncodedHandler } from '@routup/body';
 import { createRequestHandler as createRequestCookieHandler } from '@routup/cookie';
 import { createRequestHandler as createRequestQueryHandler } from '@routup/query';
 import cors from 'cors';
-import { useClient } from 'redis-extension';
 import type { Router } from 'routup';
-import { EnvironmentName, useEnv, useLogger } from '../config';
+import { EnvironmentName, useEnv } from '../config';
 import {
+    registerAuthupMiddleware,
     registerPrometheusMiddleware,
     registerRateLimitMiddleware,
     registerSwaggerMiddleware,
     setupLicenseAgreementMiddleware,
 } from './middleware';
-import { registerAuthupMiddleware } from './middleware/authup';
 
 export function registerMiddlewares(router: Router) {
     router.use(cors({

@@ -15,16 +15,10 @@
         "build": "tsc -p tsconfig.build.json"
     },
     "dependencies": {
-        "@authup/common": "^0.24.0",
+        "@authup/core": "^0.31.2",
         "@ebec/http": "^1.0.0",
         "@personalhealthtrain/central-common": "2.2.0",
         "smob": "^1.0.0"
-    },
-    "devDependencies": {
-        "@hapic/vault": "^1.5.0"
-    },
-    "peerDependencies": {
-        "@hapic/vault": "^1.5.0"
     },
     "publishConfig": {
         "access": "public"

@@ -15,7 +15,7 @@ import {
 } from 'typeorm';
 import type { UserSecret } from '@personalhealthtrain/central-common';
 import { SecretType } from '@personalhealthtrain/central-common';
-import type { Realm, User } from '@authup/common';
+import type { Realm, User } from '@authup/core';
 
 @Unique('keyUserId', [
     'key',

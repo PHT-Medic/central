@@ -12,10 +12,10 @@ import type {
     AbilityDescriptor,
     OAuth2TokenGrantResponse, Realm,
     User,
-} from '@authup/common';
+} from '@authup/core';
 import {
     OAuth2TokenKind,
-} from '@authup/common';
+} from '@authup/core';
 import type { RootState } from './index';
 import { AuthBrowserStorageKey } from '../config/auth';
 
@@ -198,10 +198,10 @@ export const actions : ActionTree<AuthState, RootState> = {
         const { accessToken } = state;
 
         if (accessToken) {
-            const entity = await this.$authupApi.oauth2.userInfo.get(accessToken);
+            const entity = await this.$authupApi.userInfo.get(accessToken);
             dispatch('triggerSetUser', entity);
 
-            const token = await this.$authupApi.oauth2.token.introspect(accessToken);
+            const token = await this.$authupApi.token.introspect(accessToken);
 
             dispatch('triggerSetPermissions', token.permissions);
             dispatch('triggerSetRealm', {

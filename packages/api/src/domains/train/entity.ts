@@ -32,7 +32,7 @@ import type {
 import {
     TrainConfigurationStatus, TrainType,
 } from '@personalhealthtrain/central-common';
-import type { Realm, User } from '@authup/common';
+import type { Realm, User } from '@authup/core';
 import { ProposalEntity } from '../proposal/entity';
 import { MasterImageEntity } from '../master-image/entity';
 import { TrainFileEntity } from '../train-file/entity';

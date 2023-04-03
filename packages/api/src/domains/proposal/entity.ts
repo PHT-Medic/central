@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import type { MasterImage, Proposal } from '@personalhealthtrain/central-common';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
-import type { Realm, User } from '@authup/common';
+import type { Realm, User } from '@authup/core';
 import { MasterImageEntity } from '../master-image';
 
 @Entity({ name: 'proposals' })

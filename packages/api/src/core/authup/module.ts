@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { HTTPClient } from '@authup/common';
+import type { APIClient } from '@authup/core';
 import { ServerError } from '@ebec/http';
 
-let instance : HTTPClient;
+let instance : APIClient;
 
 export function useAuthupClient() {
     if (typeof instance !== 'undefined') {
@@ -18,6 +18,6 @@ export function useAuthupClient() {
     throw new ServerError('The authup client is not initialised.');
 }
 
-export function setAuthupClient(client: HTTPClient) {
+export function setAuthupClient(client: APIClient) {
     instance = client;
 }

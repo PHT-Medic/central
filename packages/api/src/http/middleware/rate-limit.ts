@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/common';
+import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/core';
 import type { OptionsInput } from '@routup/rate-limit';
 import {
     createHandler,
@@ -16,13 +16,13 @@ import { useRequestEnv } from '../request';
 export function registerRateLimitMiddleware(router: Router) {
     const options : OptionsInput = {
         skip(req: Request) {
-            const robot = useRequestEnv(req, 'robot');
+            const robot = useRequestEnv(req, 'robotId');
             if (robot) {
                 const { name } = useRequestEnv(req, 'realm');
 
                 if (
                     name === REALM_MASTER_NAME &&
-                    robot.name === ROBOT_SYSTEM_NAME
+                    useRequestEnv(req, 'robotName') === ROBOT_SYSTEM_NAME
                 ) {
                     return true;
                 }
@@ -35,7 +35,7 @@ export function registerRateLimitMiddleware(router: Router) {
                 return 60 * 100; // 100 req p. sec
             }
 
-            const robot = useRequestEnv(req, 'robot');
+            const robot = useRequestEnv(req, 'robotId');
             if (robot) {
                 return 60 * 1000; // 1000 req p. sec
             }

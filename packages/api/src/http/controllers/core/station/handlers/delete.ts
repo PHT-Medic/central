@@ -7,7 +7,7 @@
 
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { isRealmResourceWritable } from '@authup/common';
+import { isRealmResourceWritable } from '@authup/core';
 import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
