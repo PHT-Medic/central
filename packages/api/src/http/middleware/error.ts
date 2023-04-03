@@ -45,7 +45,6 @@ export function errorMiddleware(
     } else {
         baseError = new InternalServerError(error, { decorateMessage: true });
 
-        console.log(error);
         useLogger().warn('Unhandled error occurred.', {
             error,
         });

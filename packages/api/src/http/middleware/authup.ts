@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AbilityManager, ROBOT_SYSTEM_NAME } from '@authup/core';
+import { AbilityManager, CookieName, ROBOT_SYSTEM_NAME } from '@authup/core';
 import { setInterval } from 'node:timers';
 import type { OAuth2TokenGrantResponse } from '@authup/core';
 import { createHTTPMiddleware } from '@authup/server-adapter';
@@ -26,6 +26,13 @@ export function registerAuthupMiddleware(router: Router) {
     }, 120 * 1000);
 
     router.use(async (req, res, next) => {
+        if (!req.headers.authorization) {
+            const cookie = useRequestCookie(req, CookieName.ACCESS_TOKEN);
+            if (typeof cookie === 'string') {
+                req.headers.authorization = `Bearer ${cookie}`;
+            }
+        }
+
         if (typeof req.headers.authorization !== 'string') {
             next();
             return;

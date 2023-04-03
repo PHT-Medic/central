@@ -6,12 +6,19 @@
  */
 
 import type { DataSourceOptions } from 'typeorm';
-import { buildDataSourceOptions as _buildDataSourceOptions } from 'typeorm-extension';
+import { readDataSourceOptionsFromEnv } from 'typeorm-extension';
 import { EnvironmentName, useEnv } from '../../config';
 import { extendDataSourceOptions } from './extend';
 
 export async function buildDataSourceOptions() : Promise<DataSourceOptions> {
-    const options = await _buildDataSourceOptions();
+    const options = readDataSourceOptionsFromEnv();
+    if (!options) {
+        throw new Error('The database configuration could not be read from env variables.');
+    }
+
+    if (options.type !== 'mysql' && options.type !== 'postgres') {
+        throw new Error(`The database type ${options.type} is not supported.`);
+    }
 
     if (useEnv('env') === EnvironmentName.TEST) {
         Object.assign(options, {

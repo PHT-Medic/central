@@ -37,6 +37,9 @@ export async function startCommand() {
     logger.info('Generated documentation.');
 
     const options = await buildDataSourceOptions();
+
+    logger.info(`Database: ${options.type}`);
+
     const check = await checkDatabase({
         options,
         dataSourceCleanup: true,
