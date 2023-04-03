@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/PHT-Medic/central/compare/v2.2.1...v2.3.0) (2023-04-03)
+
+
+### Bug Fixes
+
+* **deps:** bump redis-extension from 1.2.3 to 1.3.0 ([#923](https://github.com/PHT-Medic/central/issues/923)) ([eae6865](https://github.com/PHT-Medic/central/commit/eae68658ac50a376fada9906276d8e904e987dd0))
+
+
+### Features
+
+* bump authup to v0.31.2 ([5b744a9](https://github.com/PHT-Medic/central/commit/5b744a9a36978545ea857a829f63e9cd9543e187))
+* read db options from env only + allow cookie usage for authentication ([b78fa02](https://github.com/PHT-Medic/central/commit/b78fa02757316f53074a81f7e0414f9975343c0e))
+
+
+
+
+
 ## [2.2.1](https://github.com/PHT-Medic/central/compare/v2.2.0...v2.2.1) (2023-03-31)
 
 
