@@ -10,7 +10,7 @@ import https from 'https';
 import type { Inject } from '@nuxt/types/app';
 import { APIClient as AuthAPIClient } from '@authup/core';
 import { setAPIClient } from '@authup/vue2';
-import { ErrorCode, HTTPClient } from '@personalhealthtrain/central-common';
+import { APIClient, ErrorCode } from '@personalhealthtrain/central-common';
 import { LicenseAgreementCommand, useLicenseAgreementEventEmitter } from '../domains/license-agreement';
 
 const interceptor = (error) => {
@@ -32,7 +32,7 @@ const interceptor = (error) => {
 export default (ctx: Context, inject : Inject) => {
     let apiUrl = ctx.$config.apiUrl || process.env.API_URL;
 
-    const resourceAPI = new HTTPClient({
+    const resourceAPI = new APIClient({
         driver: {
             baseURL: apiUrl,
             withCredentials: true,
@@ -64,7 +64,6 @@ export default (ctx: Context, inject : Inject) => {
         },
     });
 
-    authupAPI.mountResponseInterceptor((r) => r, interceptor);
     inject('authupApi', authupAPI);
 
     setAPIClient(authupAPI);

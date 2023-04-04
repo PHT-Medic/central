@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './http-client';
+export * from './api-client';
 export * from './error';
 export * from './config';
 export * from './domains';

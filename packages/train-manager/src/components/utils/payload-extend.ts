@@ -7,7 +7,7 @@
 
 import { hasOwnProperty } from '@personalhealthtrain/central-common';
 import type {
-    HTTPClient, Registry, Train,
+    APIClient, Registry, Train,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
 import { BaseError } from '../error';
@@ -21,7 +21,7 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
 
     // -----------------------------------------------------------------------------------
 
-    const client = useClient<HTTPClient>();
+    const client = useClient<APIClient>();
 
     if (data.entity) {
         train = data.entity;

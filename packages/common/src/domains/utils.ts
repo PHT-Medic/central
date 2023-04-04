@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { HTTPClient } from '../http-client';
+import type { APIClient } from '../api-client';
 
-export function useDomainAPI(client: HTTPClient, name: string) {
+export function useDomainAPI(client: APIClient, name: string) {
     switch (name) {
         case 'architecture':
             return client.architecture;

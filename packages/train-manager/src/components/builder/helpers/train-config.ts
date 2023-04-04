@@ -6,7 +6,7 @@
  */
 
 import type {
-    HTTPClient,
+    APIClient,
     Train,
     TrainConfig,
 } from '@personalhealthtrain/central-common';
@@ -60,7 +60,7 @@ export async function buildTrainConfig(context: TrainConfigBuildContext) : Promi
         route: [],
     };
 
-    const client = useClient<HTTPClient>();
+    const client = useClient<APIClient>();
 
     const response = await client.trainFile.getMany({ filter: { train_id: entity.id } });
     config.file_list = response.data.map((file) => `${file.directory}/${file.name}`);

@@ -38,7 +38,7 @@
     "dependencies": {
         "nanoid": "^3.3.4"
     },
-    "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
+    "gitHead": "5d3b6f4ce1edf2383bdfbf66e913a08c8a3a2e40",
     "publishConfig": {
         "access": "public"
     }

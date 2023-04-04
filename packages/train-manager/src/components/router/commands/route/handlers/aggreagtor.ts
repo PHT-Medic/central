@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { HTTPClient } from '@personalhealthtrain/central-common';
+import type { APIClient } from '@personalhealthtrain/central-common';
 import {
     Ecosystem, REGISTRY_ARTIFACT_TAG_BASE,
     REGISTRY_ARTIFACT_TAG_LATEST,
@@ -59,7 +59,7 @@ export async function routeAggregatorProject(context: RouteContextExtended) : Pr
         const next = context.items[nextIndex];
 
         if (next.ecosystem === Ecosystem.DEFAULT) {
-            const client = useClient<HTTPClient>();
+            const client = useClient<APIClient>();
             const registry = await client.registry.getOne(context.project.registry_id, {
                 fields: ['+account_secret'],
             });

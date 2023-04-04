@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { HTTPClient } from '@personalhealthtrain/central-common';
+import { APIClient } from '@personalhealthtrain/central-common';
 import { APIClient as AuthupAPIClient} from '@authup/core';
 import {Store} from 'vuex';
 import {SocketModule} from '../config/socket';
@@ -28,7 +28,7 @@ declare module 'vue/types/vue' {
     // Global properties can be declared
     // on the `VueConstructor` interface
     interface VueConstructor {
-        $api: HTTPClient,
+        $api: APIClient,
         $authupApi: AuthupAPIClient,
 
         $auth: AuthModule,
@@ -40,7 +40,7 @@ declare module 'vue/types/vue' {
     }
 
     interface Vue {
-        $api: HTTPClient,
+        $api: APIClient,
         $authupApi: AuthupAPIClient,
 
         $auth: AuthModule,

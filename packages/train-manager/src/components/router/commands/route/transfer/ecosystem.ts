@@ -6,7 +6,7 @@
  */
 
 import type {
-    HTTPClient,
+    APIClient,
     Registry,
 } from '@personalhealthtrain/central-common';
 import {
@@ -41,7 +41,7 @@ export async function transferEcosystemOut(
             command: RouterCommand.ROUTE,
         });
 
-    const client = await useClient<HTTPClient>();
+    const client = await useClient<APIClient>();
 
     // ------------------------------------------------------------------
 

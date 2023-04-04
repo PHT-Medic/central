@@ -6,7 +6,7 @@
  */
 
 import type {
-    HTTPClient,
+    APIClient,
 } from '@personalhealthtrain/central-common';
 import { RegistryProjectType } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
@@ -56,7 +56,7 @@ export async function executeExtractorCheckCommand(
     }
 
     // 2. Check if image exists locally
-    const client = useClient<HTTPClient>();
+    const client = useClient<APIClient>();
     const { data: incomingProjects } = await client.registryProject.getMany({
         filter: {
             registry_id: data.registry.id,

@@ -24,7 +24,7 @@ import {
     UserSecretAPI,
 } from '../domains';
 
-export class HTTPClient extends Client {
+export class APIClient extends Client {
     public readonly architecture: SettingsOptionAPI;
 
     public readonly masterImage : MasterImageAPI;

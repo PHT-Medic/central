@@ -7,7 +7,7 @@
 
 import { parseProjectRepositoryName } from '@hapic/harbor';
 import type {
-    HTTPClient,
+    APIClient,
     RegistryProject,
 } from '@personalhealthtrain/central-common';
 import {
@@ -36,7 +36,7 @@ export async function executeRouterCheckCommand(
         throw RouterError.registryNotFound();
     }
 
-    const client = useClient<HTTPClient>();
+    const client = useClient<APIClient>();
 
     const connectionString = buildRegistryClientConnectionStringFromRegistry(data.registry);
     const httpClient = createBasicHarborAPIClient(connectionString);

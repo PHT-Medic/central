@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { HTTPClient } from '@personalhealthtrain/central-common';
+import { APIClient } from '@personalhealthtrain/central-common';
 import { APIClient as AuthupAPIClient} from '@authup/core';
 import AuthModule from '../config/auth';
 import {SocketModule} from '../config/socket';
@@ -15,7 +15,7 @@ declare module 'vuex/types/index' {
     interface Store<S> {
         $warehouse: Adapter,
 
-        $api: HTTPClient,
+        $api: APIClient,
         $authupApi: AuthupAPIClient,
 
         $auth: AuthModule,

@@ -7,7 +7,7 @@
 
 import type { BuildInput } from 'rapiq';
 import type {
-    HTTPClient,
+    APIClient,
     TrainStation,
 } from '@personalhealthtrain/central-common';
 import {
@@ -46,7 +46,7 @@ export async function executeRouterRouteCommand(
         return data;
     }
 
-    const client = useClient<HTTPClient>();
+    const client = useClient<APIClient>();
 
     // -------------------------------------------------------------------
 

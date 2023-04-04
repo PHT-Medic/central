@@ -5,8 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { APIClient, ROBOT_SYSTEM_NAME } from '@authup/core';
-import { mountTokenInterceptorOnClient } from '@authup/server-adapter';
+import { APIClient, ROBOT_SYSTEM_NAME, mountTokenInterceptorOnClient } from '@authup/core';
 import { setConfig as setHTTPConfig } from 'hapic';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { setConfig as setRedisConfig } from 'redis-extension';

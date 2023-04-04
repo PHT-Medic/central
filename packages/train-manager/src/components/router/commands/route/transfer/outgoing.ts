@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { HTTPClient } from '@personalhealthtrain/central-common';
+import type { APIClient } from '@personalhealthtrain/central-common';
 import {
     REGISTRY_ARTIFACT_TAG_BASE,
     RegistryProjectType,
@@ -26,7 +26,7 @@ export async function transferOutgoing(source: TransferItem) {
         command: RouterCommand.ROUTE,
     });
 
-    const client = await useClient<HTTPClient>();
+    const client = await useClient<APIClient>();
     const { data: outgoingProjects } = await client.registryProject.getMany({
         filter: {
             type: RegistryProjectType.OUTGOING,

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { HTTPClient } from '@personalhealthtrain/central-common';
+import type { APIClient } from '@personalhealthtrain/central-common';
 import { TrainContainerFileName, TrainContainerPath } from '@personalhealthtrain/central-common';
 import crypto from 'node:crypto';
 import type { Container } from 'dockerode';
@@ -102,7 +102,7 @@ export async function packContainerWithTrain(container: Container, context: Cont
             command: BuilderCommand.BUILD,
         });
 
-    const client = useClient<HTTPClient>();
+    const client = useClient<APIClient>();
 
     return new Promise<void>((resolve, reject) => {
         client.request({

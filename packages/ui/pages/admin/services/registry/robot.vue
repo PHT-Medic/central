@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { RobotForm, useHTTPClient } from '@authup/vue2';
+import { RobotForm, useAPIClient } from '@authup/vue2';
 import type { VNode } from 'vue';
 import Vue from 'vue';
 import { ServiceID } from '@personalhealthtrain/central-common';
@@ -24,7 +24,7 @@ export default {
     methods: {
         async load() {
             try {
-                const response = await useHTTPClient().robot.getMany({
+                const response = await useAPIClient().robot.getMany({
                     filter: {
                         name: ServiceID.REGISTRY,
                     },

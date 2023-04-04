@@ -6,7 +6,7 @@
  */
 
 import type {
-    HTTPClient,
+    APIClient,
 } from '@personalhealthtrain/central-common';
 import {
     REGISTRY_ARTIFACT_TAG_LATEST,
@@ -65,7 +65,7 @@ export async function executeBuilderBuildCommand(
         command: BuilderCommand.BUILD,
     });
 
-    const client = useClient<HTTPClient>();
+    const client = useClient<APIClient>();
     const incomingProject = await client.registryProject.getOne(data.entity.incoming_registry_project_id);
 
     data.registryProject = incomingProject;

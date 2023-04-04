@@ -6,7 +6,7 @@
  */
 
 import type {
-    HTTPClient,
+    APIClient,
 } from '@personalhealthtrain/central-common';
 import { useClient } from 'hapic';
 import { buildDockerAuthConfig, buildRemoteDockerImageURL, pullDockerImage } from '../../../../core';
@@ -29,7 +29,7 @@ export async function executeExtractorDownloadCommand(
         throw ExtractorError.registryNotFound();
     }
 
-    const client = useClient<HTTPClient>();
+    const client = useClient<APIClient>();
 
     const registryProject = await client.registryProject.getOne(data.entity.outgoing_registry_project_id);
     data.registryProject = registryProject;

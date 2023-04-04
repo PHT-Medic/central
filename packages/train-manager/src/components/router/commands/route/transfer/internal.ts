@@ -6,7 +6,7 @@
  */
 
 import type {
-    HTTPClient,
+    APIClient,
     Registry,
 } from '@personalhealthtrain/central-common';
 import {
@@ -45,7 +45,7 @@ export async function transferInternal(context: TransferContext) {
         });
 
     if (!context.registry) {
-        const client = useClient<HTTPClient>();
+        const client = useClient<APIClient>();
         context.registry = await client.registry.getOne(context.source.project.registry_id, {
             fields: ['+account_secret'],
         });

@@ -6,7 +6,7 @@
  */
 
 import type {
-    HTTPClient,
+    APIClient,
     MasterImage,
     Train, TrainFile,
 } from '@personalhealthtrain/central-common';
@@ -24,7 +24,7 @@ export async function buildTrainDockerFile(context: DockerFileBuildContext) : Pr
     content: string,
     masterImagePath: string
 }> {
-    const client = useClient<HTTPClient>();
+    const client = useClient<APIClient>();
 
     let entryPoint : TrainFile;
 

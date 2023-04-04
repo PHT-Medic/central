@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import type { ServiceID } from '@personalhealthtrain/central-common';
-import { useHTTPClient } from '@authup/vue2';
+import { useAPIClient } from '@authup/vue2';
 import type { PropType } from 'vue';
 import Vue from 'vue';
 
@@ -27,7 +27,7 @@ export default {
     methods: {
         async load() {
             try {
-                const response = await useHTTPClient().robot.getMany({
+                const response = await useAPIClient().robot.getMany({
                     filter: {
                         name: this.entityId,
                     },

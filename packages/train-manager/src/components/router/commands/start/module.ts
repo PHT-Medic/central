@@ -7,7 +7,7 @@
 
 import { publish } from 'amqp-extension';
 import type {
-    HTTPClient,
+    APIClient,
     RegistryProject,
 } from '@personalhealthtrain/central-common';
 import {
@@ -39,7 +39,7 @@ export async function executeRouterStartCommand(
     const connectionString = buildRegistryClientConnectionStringFromRegistry(data.registry);
     const httpClient = createBasicHarborAPIClient(connectionString);
 
-    const client = useClient<HTTPClient>();
+    const client = useClient<APIClient>();
 
     let incomingProject : RegistryProject;
 

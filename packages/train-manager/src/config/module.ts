@@ -5,12 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ROBOT_SYSTEM_NAME } from '@authup/core';
-import { mountTokenInterceptorOnClient } from '@authup/server-adapter';
+import { ROBOT_SYSTEM_NAME, mountTokenInterceptorOnClient } from '@authup/core';
 import type { Aggregator, Component } from '@personalhealthtrain/central-server-common';
 import { setClient as setHTTPClient } from 'hapic';
 import {
-    HTTPClient,
+    APIClient,
 } from '@personalhealthtrain/central-common';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import type { Client } from 'redis-extension';
@@ -43,7 +42,7 @@ export function createConfig() : Config {
         },
     });
 
-    const centralClient = new HTTPClient({
+    const centralClient = new APIClient({
         driver: {
             proxy: false,
             baseURL: useEnv('apiUrl'),
