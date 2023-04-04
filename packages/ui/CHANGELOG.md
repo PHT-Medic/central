@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.2](https://github.com/PHT-Medic/central/compare/v2.3.1...v2.3.2) (2023-04-04)
+
+
+### Bug Fixes
+
+* module imports + renamed http-client to api-client ([88440d2](https://github.com/PHT-Medic/central/commit/88440d276b926e4eabe57ac39460183b3b8e95a7))
+
+
+
+
+
 ## [2.3.1](https://github.com/PHT-Medic/central/compare/v2.3.0...v2.3.1) (2023-04-03)
 
 
