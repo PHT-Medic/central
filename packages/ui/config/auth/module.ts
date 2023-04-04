@@ -13,9 +13,9 @@ import type {
     User,
 } from '@authup/core';
 import {
-    AbilityManager,
-    OAuth2SubKind,
+    AbilityManager, OAuth2SubKind,
     OAuth2TokenKind,
+    isValidAuthenticateError,
 } from '@authup/core';
 import type { ConfigInput } from 'hapic';
 import { createClient, isClientDriverInstance } from 'hapic';
@@ -265,15 +265,11 @@ export class AuthModule {
             token,
         });
 
-        const interceptor = (error: any) => {
-            if (
-                error &&
-                error.response &&
-                error.response.status === 401
-            ) {
+        const interceptor = async (error: any) => {
+            if (isValidAuthenticateError(error)) {
                 // Refresh the access accessToken
                 try {
-                    return Promise.resolve()
+                    return await Promise.resolve()
                         .then(() => this.ctx.store.dispatch('auth/triggerRefreshToken'))
                         .then(() => createClient().request({
                             method: error.config.method,
@@ -281,6 +277,8 @@ export class AuthModule {
                             data: error.config.data,
                         }));
                 } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.log(e);
                     this.ctx.redirect('/logout');
                 }
             }
