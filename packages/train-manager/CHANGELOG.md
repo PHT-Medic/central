@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.6](https://github.com/PHT-Medic/central/compare/v2.3.5...v2.3.6) (2023-04-05)
+
+
+### Bug Fixes
+
+* authconfig in lower case letters ([2edff72](https://github.com/PHT-Medic/central/commit/2edff7210cf6f71d77401ad14788ac4fae14a27e))
+
+
+
+
+
 ## [2.3.5](https://github.com/PHT-Medic/central/compare/v2.3.4...v2.3.5) (2023-04-05)
 
 
