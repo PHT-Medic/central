@@ -11,7 +11,7 @@
     "description": "This package contains the central realtime application of the PHT.",
     "dependencies": {
         "@authup/core": "^0.32.2",
-        "@authup/server-adapter": "^0.32.2",
+        "@authup/server-adapter": "^0.32.3",
         "@ebec/http": "^1.0.0",
         "@personalhealthtrain/central-common": "2.3.3",
         "@personalhealthtrain/central-server-common": "2.3.3",
