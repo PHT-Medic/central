@@ -7,7 +7,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "2.3.4",
+    "version": "2.3.5",
     "description": "This package contains the Central API of the PHT. It was initially developed as part of my Bachelor Thesis.",
     "main": "./dist/cli/index.js",
     "dependencies": {
@@ -18,7 +18,7 @@
         "@hapic/vault": "^1.6.1",
         "@personalhealthtrain/central-common": "2.3.3",
         "@personalhealthtrain/central-server-common": "2.3.3",
-        "@personalhealthtrain/train-manager": "2.3.4",
+        "@personalhealthtrain/train-manager": "2.3.5",
         "@routup/body": "^0.7.3",
         "@routup/cookie": "^0.8.1",
         "@routup/decorators": "^0.6.2",

@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.5](https://github.com/PHT-Medic/central/compare/v2.3.4...v2.3.5) (2023-04-05)
+
+
+### Bug Fixes
+
+* don't load train for train-manager core component ([4878297](https://github.com/PHT-Medic/central/commit/48782977c2fc1b98aabd2d1fa7949ef4cbf68778))
+* pull docker image authentication ([45ebd80](https://github.com/PHT-Medic/central/commit/45ebd80bd37f4b04ff4bf230d4e7f4093c49fa9e))
+
+
+
+
+
 ## [2.3.4](https://github.com/PHT-Medic/central/compare/v2.3.3...v2.3.4) (2023-04-05)
 
 
