@@ -34,7 +34,7 @@
         "browser-storage-adapter": "^1.1.2",
         "events": "^3.3.0",
         "hapic": "^1.6.0",
-        "ilingo": "^2.2.1",
+        "ilingo": "^2.4.0",
         "moment": "^2.29.4",
         "nuxt": "^2.16.3",
         "rapiq": "^0.8.0",
