@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.3](https://github.com/PHT-Medic/central/compare/v2.3.2...v2.3.3) (2023-04-05)
+
+
+### Bug Fixes
+
+* bump authup to v0.32.2 ([729cca5](https://github.com/PHT-Medic/central/commit/729cca54c85094543d204198fced7a46a80733f2))
+
+
+
+
+
 ## [2.3.2](https://github.com/PHT-Medic/central/compare/v2.3.1...v2.3.2) (2023-04-04)
 
 **Note:** Version bump only for package @personalhealthtrain/central-realtime
