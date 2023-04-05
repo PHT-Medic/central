@@ -40,11 +40,19 @@ export async function executeExtractorDownloadCommand(
         repositoryName: data.id,
     });
 
+    useExtractorLogger().debug(`Pulling image ${repositoryTag}`, {
+        command: ExtractorCommand.EXTRACT,
+    });
+
     await pullDockerImage(repositoryTag, buildDockerAuthConfig({
         host: data.registry.host,
         user: data.registry.account_name,
         password: data.registry.account_secret,
     }));
+
+    useExtractorLogger().debug(`Pulled image ${repositoryTag}`, {
+        command: ExtractorCommand.EXTRACT,
+    });
 
     return data;
 }

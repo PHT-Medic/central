@@ -42,6 +42,9 @@ export async function executeExtractorExtractCommand(
     }
 
     if (!data.filePaths || data.filePaths.length === 0) {
+        useExtractorLogger().warn('No files to save.', {
+            command: ExtractorCommand.EXTRACT,
+        });
         return data;
     }
 
@@ -67,6 +70,10 @@ export async function executeExtractorExtractCommand(
         },
     });
 
+    useExtractorLogger().debug('Load and stream container paths.', {
+        command: ExtractorCommand.EXTRACT,
+    });
+
     await saveDockerContainerPathsTo(
         repositoryPath,
         data.filePaths,
@@ -88,6 +95,10 @@ export async function executeExtractorExtractCommand(
     } catch (e) {
         // do nothing :/
     }
+
+    useExtractorLogger().debug('Saving container paths to minio.', {
+        command: ExtractorCommand.EXTRACT,
+    });
 
     await minio.putObject(
         bucketName,

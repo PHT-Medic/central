@@ -14,7 +14,7 @@ export async function pullDockerImage(
 ) {
     const options : Record<string, any> = {};
     if (authConfig) {
-        options.autConfig = authConfig;
+        options.authConfig = authConfig;
     }
     const stream = await useDocker().pull(image, options);
 

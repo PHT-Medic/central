@@ -26,7 +26,7 @@ export async function executeCoreCommand(
     switch (context.command) {
         case CoreCommand.CONFIGURE: {
             await Promise.resolve(context.data)
-                .then(extendPayload)
+                .then(extendPayload) // todo: registry does not exist yet
                 .then((data) => writeConfiguringEvent({ data, command: context.command }))
                 .then(executeCoreConfigureCommand)
                 .then((data) => writeConfiguredEvent({ data, command: context.command }))
@@ -39,7 +39,7 @@ export async function executeCoreCommand(
         }
         case CoreCommand.DESTROY: {
             await Promise.resolve(context.data)
-                .then(extendPayload)
+                .then(extendPayload) // todo: registry does not exist yet
                 .then((data) => writeDestroyingEvent({ data, command: context.command }))
                 .then(executeCoreDestroyCommand)
                 .then((data) => writeDestroyedEvent({ data, command: context.command }))
