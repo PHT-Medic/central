@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.4](https://github.com/PHT-Medic/central/compare/v2.3.3...v2.3.4) (2023-04-05)
+
+
+### Bug Fixes
+
+* **deps:** bump adapter to v0.32.3 ([7b48aa9](https://github.com/PHT-Medic/central/commit/7b48aa97ac3f324a91ab80a236c5e53800c5d369))
+
+
+
+
+
 ## [2.3.3](https://github.com/PHT-Medic/central/compare/v2.3.2...v2.3.3) (2023-04-05)
 
 
