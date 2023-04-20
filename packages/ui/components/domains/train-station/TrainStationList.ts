@@ -11,7 +11,7 @@ import type {
     SocketServerToClientEvents,
     Station,
     Train,
-    TrainStation,
+    TrainStation, TrainStationEventContext,
 } from '@personalhealthtrain/central-common';
 import {
     TrainStationSocketClientToServerEventName,
@@ -238,7 +238,7 @@ ComponentListProperties<BuildInput<TrainStation>> & {
 
             return false;
         },
-        async handleSocketCreated(context: SocketServerToClientEventContext<TrainStation>) {
+        async handleSocketCreated(context: SocketServerToClientEventContext<TrainStationEventContext>) {
             if (
                 !this.isSameSocketRoom(context.meta.roomName) ||
                 !this.isSocketEventForSource(context.data)
@@ -254,7 +254,7 @@ ComponentListProperties<BuildInput<TrainStation>> & {
 
             this.handleUpdated(context.data);
         },
-        handleSocketDeleted(context: SocketServerToClientEventContext<TrainStation>) {
+        handleSocketDeleted(context: SocketServerToClientEventContext<TrainStationEventContext>) {
             if (
                 !this.isSameSocketRoom(context.meta.roomName) ||
                 !this.isSocketEventForSource(context.data)

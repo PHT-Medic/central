@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { publishDomainEvent } from '@personalhealthtrain/central-server-common';
 import type {
     EntitySubscriberInterface,
     InsertEvent,
@@ -14,45 +15,48 @@ import type {
 import {
     EventSubscriber,
 } from 'typeorm';
-import {
-    ProposalStationSocketServerToClientEventName,
-    buildSocketProposalStationInRoomName,
-    buildSocketProposalStationOutRoomName,
-    buildSocketProposalStationRoomName,
-    buildSocketRealmNamespaceName,
+import type {
+    ProposalStation,
 } from '@personalhealthtrain/central-common';
 import {
-    emitSocketServerToClientEvent,
-} from '../../config/socket-emitter';
-import { ProposalStationEntity } from '../../domains/proposal-station/entity';
+    DomainEventName,
+    DomainSubType,
+    DomainType,
+    buildDomainChannelName,
+    buildDomainNamespaceName,
+} from '@personalhealthtrain/central-common';
+import { ProposalStationEntity } from '../../domains';
 
-function publish(
-    operation: `${ProposalStationSocketServerToClientEventName}`,
-    item: ProposalStationEntity,
+async function publishEvent(
+    event: `${DomainEventName}`,
+    data: ProposalStation,
 ) {
-    emitSocketServerToClientEvent({
-        configuration: [
+    await publishDomainEvent(
+        {
+            type: DomainType.PROPOSAL_STATION,
+            event,
+            data,
+        },
+        [
             {
-                roomNameFn: buildSocketProposalStationInRoomName,
-                namespace: buildSocketRealmNamespaceName(item.station_realm_id),
+                channel: (id) => buildDomainChannelName(DomainSubType.PROPOSAL_STATION_IN, id),
+                namespace: buildDomainNamespaceName(data.station_realm_id),
             },
             {
-                roomNameFn: buildSocketProposalStationOutRoomName,
-                namespace: buildSocketRealmNamespaceName(item.proposal_realm_id),
+                channel: (id) => buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT, id),
+                namespace: buildDomainNamespaceName(data.proposal_realm_id),
             },
             {
-                roomNameFn: buildSocketProposalStationRoomName,
+                channel: (id) => buildDomainChannelName(DomainType.PROPOSAL_STATION, id),
             },
             {
-                roomNameFn: buildSocketProposalStationInRoomName,
+                channel: (id) => buildDomainChannelName(DomainSubType.PROPOSAL_STATION_IN, id),
             },
             {
-                roomNameFn: buildSocketProposalStationOutRoomName,
+                channel: (id) => buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT, id),
             },
         ],
-        operation,
-        item,
-    });
+    );
 }
 
 @EventSubscriber()
@@ -61,15 +65,15 @@ export class ProposalStationSubscriber implements EntitySubscriberInterface<Prop
         return ProposalStationEntity;
     }
 
-    afterInsert(event: InsertEvent<ProposalStationEntity>): Promise<any> | void {
-        publish(ProposalStationSocketServerToClientEventName.CREATED, event.entity);
+    async afterInsert(event: InsertEvent<ProposalStationEntity>): Promise<any> {
+        await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<ProposalStationEntity>): Promise<any> | void {
-        publish(ProposalStationSocketServerToClientEventName.UPDATED, event.entity as ProposalStationEntity);
+    async afterUpdate(event: UpdateEvent<ProposalStationEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as ProposalStationEntity);
     }
 
-    beforeRemove(event: RemoveEvent<ProposalStationEntity>): Promise<any> | void {
-        publish(ProposalStationSocketServerToClientEventName.DELETED, event.entity);
+    async beforeRemove(event: RemoveEvent<ProposalStationEntity>): Promise<any> {
+        await publishEvent(DomainEventName.DELETED, event.entity);
     }
 }

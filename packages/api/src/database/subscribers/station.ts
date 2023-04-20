@@ -5,38 +5,43 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Station } from '@personalhealthtrain/central-common';
 import {
+    DomainEventName,
+    DomainType,
     Ecosystem,
-    StationSocketServerToClientEventName,
-    buildSocketRealmNamespaceName,
-    buildSocketStationRoomName,
+    buildDomainChannelName,
+    buildDomainNamespaceName,
 } from '@personalhealthtrain/central-common';
+import { publishDomainEvent } from '@personalhealthtrain/central-server-common';
 import type {
     DataSource,
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import { emitSocketServerToClientEvent } from '../../config';
 import { useAuthupClient } from '../../core';
 import { StationEntity } from '../../domains';
 
-function publish(
-    operation: `${StationSocketServerToClientEventName}`,
-    item: StationEntity,
+async function publishEvent(
+    event: `${DomainEventName}`,
+    data: Station,
 ) {
-    emitSocketServerToClientEvent({
-        configuration: [
+    await publishDomainEvent(
+        {
+            type: DomainType.STATION,
+            event,
+            data,
+        },
+        [
             {
-                roomNameFn: buildSocketStationRoomName,
-                namespace: buildSocketRealmNamespaceName(item.realm_id),
+                channel: (id) => buildDomainChannelName(DomainType.STATION, id),
             },
             {
-                roomNameFn: buildSocketStationRoomName,
+                channel: (id) => buildDomainChannelName(DomainType.STATION, id),
+                namespace: buildDomainNamespaceName(data.realm_id),
             },
         ],
-        operation,
-        item,
-    });
+    );
 }
 
 async function createRobot(dataSource: DataSource, entity: StationEntity) {
@@ -80,30 +85,27 @@ export class StationSubscriber implements EntitySubscriberInterface<StationEntit
         return StationEntity;
     }
 
-    afterInsert(event: InsertEvent<StationEntity>): Promise<any> | void {
-        publish(StationSocketServerToClientEventName.CREATED, event.entity);
+    async afterInsert(event: InsertEvent<StationEntity>): Promise<any> {
+        await publishEvent(DomainEventName.CREATED, event.entity);
 
         if (event.entity.ecosystem === Ecosystem.DEFAULT) {
-            Promise.resolve()
-                .then(() => createRobot(event.connection, event.entity));
+            await createRobot(event.connection, event.entity);
         }
     }
 
-    afterUpdate(event: UpdateEvent<StationEntity>): Promise<any> | void {
-        publish(StationSocketServerToClientEventName.UPDATED, event.entity as StationEntity);
+    async afterUpdate(event: UpdateEvent<StationEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as StationEntity);
 
         if (event.entity.ecosystem === Ecosystem.DEFAULT) {
-            Promise.resolve()
-                .then(() => createRobot(event.connection, event.entity as StationEntity));
+            await createRobot(event.connection, event.entity as StationEntity);
         }
     }
 
-    beforeRemove(event: RemoveEvent<StationEntity>): Promise<any> | void {
-        publish(StationSocketServerToClientEventName.DELETED, event.entity);
+    async beforeRemove(event: RemoveEvent<StationEntity>): Promise<any> {
+        await publishEvent(DomainEventName.DELETED, event.entity);
 
         if (event.entity.ecosystem === Ecosystem.DEFAULT) {
-            Promise.resolve()
-                .then(() => deleteRobot(event.connection, event.entity));
+            await deleteRobot(event.connection, event.entity);
         }
     }
 }

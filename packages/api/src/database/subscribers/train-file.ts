@@ -5,54 +5,58 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { publishDomainEvent } from '@personalhealthtrain/central-server-common';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import {
-    TrainFileSocketServerToClientEventName,
-    buildSocketRealmNamespaceName,
-    buildSocketTrainFileRoomName,
+import type {
+    TrainFile,
 } from '@personalhealthtrain/central-common';
 import {
-    emitSocketServerToClientEvent,
-} from '../../config/socket-emitter';
-import { TrainFileEntity } from '../../domains/train-file/entity';
+    DomainEventName,
+    DomainType,
+    buildDomainChannelName,
+    buildDomainNamespaceName,
+} from '@personalhealthtrain/central-common';
+import { TrainFileEntity } from '../../domains';
 
-function publish(
-    operation: `${TrainFileSocketServerToClientEventName}`,
-    item: TrainFileEntity,
+async function publishEvent(
+    event: `${DomainEventName}`,
+    data: TrainFile,
 ) {
-    emitSocketServerToClientEvent({
-        configuration: [
+    await publishDomainEvent(
+        {
+            type: DomainType.TRAIN_FILE,
+            event,
+            data,
+        },
+        [
             {
-                roomNameFn: buildSocketTrainFileRoomName,
-                namespace: buildSocketRealmNamespaceName(item.realm_id),
+                channel: (id) => buildDomainChannelName(DomainType.TRAIN_FILE, id),
             },
             {
-                roomNameFn: buildSocketTrainFileRoomName,
+                channel: (id) => buildDomainChannelName(DomainType.TRAIN_FILE, id),
+                namespace: buildDomainNamespaceName(data.realm_id),
             },
         ],
-        operation,
-        item,
-    });
+    );
 }
-
 @EventSubscriber()
 export class TrainFileSubscriber implements EntitySubscriberInterface<TrainFileEntity> {
     listenTo(): CallableFunction | string {
         return TrainFileEntity;
     }
 
-    afterInsert(event: InsertEvent<TrainFileEntity>): Promise<any> | void {
-        publish(TrainFileSocketServerToClientEventName.CREATED, event.entity);
+    async afterInsert(event: InsertEvent<TrainFileEntity>): Promise<any> {
+        await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<TrainFileEntity>): Promise<any> | void {
-        publish(TrainFileSocketServerToClientEventName.UPDATED, event.entity as TrainFileEntity);
+    async afterUpdate(event: UpdateEvent<TrainFileEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as TrainFileEntity);
     }
 
-    beforeRemove(event: RemoveEvent<TrainFileEntity>): Promise<any> | void {
-        publish(TrainFileSocketServerToClientEventName.DELETED, event.entity);
+    async beforeRemove(event: RemoveEvent<TrainFileEntity>): Promise<any> {
+        await publishEvent(DomainEventName.DELETED, event.entity);
     }
 }

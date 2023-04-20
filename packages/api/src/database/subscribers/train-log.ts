@@ -5,37 +5,42 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { publishDomainEvent } from '@personalhealthtrain/central-server-common';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import {
-    TrainLogSocketServerToClientEventName,
-    buildSocketRealmNamespaceName,
-    buildSocketTrainLogRoomName,
+import type {
+    TrainLog,
 } from '@personalhealthtrain/central-common';
 import {
-    emitSocketServerToClientEvent,
-} from '../../config';
-import { TrainLogEntity } from '../../domains/train-log';
+    DomainEventName,
+    DomainType,
+    buildDomainChannelName,
+    buildDomainNamespaceName,
+} from '@personalhealthtrain/central-common';
+import { TrainLogEntity } from '../../domains';
 
-function publish(
-    operation: `${TrainLogSocketServerToClientEventName}`,
-    item: TrainLogEntity,
+async function publishEvent(
+    event: `${DomainEventName}`,
+    data: TrainLog,
 ) {
-    emitSocketServerToClientEvent({
-        configuration: [
+    await publishDomainEvent(
+        {
+            type: DomainType.TRAIN_LOG,
+            event,
+            data,
+        },
+        [
             {
-                roomNameFn: buildSocketTrainLogRoomName,
-                namespace: buildSocketRealmNamespaceName(item.realm_id),
+                channel: (id) => buildDomainChannelName(DomainType.TRAIN_LOG, id),
             },
             {
-                roomNameFn: buildSocketTrainLogRoomName,
+                channel: (id) => buildDomainChannelName(DomainType.TRAIN_LOG, id),
+                namespace: buildDomainNamespaceName(data.realm_id),
             },
         ],
-        operation,
-        item,
-    });
+    );
 }
 
 @EventSubscriber()
@@ -44,15 +49,15 @@ export class TrainLogSubscriber implements EntitySubscriberInterface<TrainLogEnt
         return TrainLogEntity;
     }
 
-    afterInsert(event: InsertEvent<TrainLogEntity>): Promise<any> | void {
-        publish(TrainLogSocketServerToClientEventName.CREATED, event.entity);
+    async afterInsert(event: InsertEvent<TrainLogEntity>): Promise<any> {
+        await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<TrainLogEntity>): Promise<any> | void {
-        publish(TrainLogSocketServerToClientEventName.UPDATED, event.entity as TrainLogEntity);
+    async afterUpdate(event: UpdateEvent<TrainLogEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as TrainLogEntity);
     }
 
-    beforeRemove(event: RemoveEvent<TrainLogEntity>): Promise<any> | void {
-        publish(TrainLogSocketServerToClientEventName.DELETED, event.entity);
+    async beforeRemove(event: RemoveEvent<TrainLogEntity>): Promise<any> {
+        await publishEvent(DomainEventName.DELETED, event.entity);
     }
 }

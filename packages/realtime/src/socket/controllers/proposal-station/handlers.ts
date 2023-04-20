@@ -6,15 +6,16 @@
  */
 
 import {
+    DomainEventSubscriptionName,
+    DomainSubType,
+    DomainType,
     PermissionID,
-    ProposalStationSocketClientToServerEventName,
-    buildSocketProposalStationInRoomName,
-    buildSocketProposalStationOutRoomName,
-    buildSocketProposalStationRoomName,
-    extendSocketClientToServerEventCallback,
-    extendSocketClientToServerEventContext,
+    buildDomainChannelName,
+    buildDomainEventSubscriptionFullName,
+    isSocketClientToServerEventCallback, isSocketClientToServerEventErrorCallback,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@ebec/http';
+import { buildDomainEventChannelName } from '@personalhealthtrain/central-server-common/src/domain-event/utils';
 import type {
     SocketInterface,
     SocketNamespaceInterface,
@@ -33,32 +34,33 @@ export function registerProposalStationSocketHandlers(
 
     // ------------------------------------------------------------
 
-    socket.on(ProposalStationSocketClientToServerEventName.SUBSCRIBE, async (context, cb) => {
-        context = extendSocketClientToServerEventContext(context);
-        cb = extendSocketClientToServerEventCallback(cb);
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainType.PROPOSAL_STATION, DomainEventSubscriptionName.SUBSCRIBE),
+        async (target, cb) => {
+            if (
+                !socket.data.ability.has(PermissionID.PROPOSAL_APPROVE)
+            ) {
+                if (isSocketClientToServerEventErrorCallback(cb)) {
+                    cb(new UnauthorizedError());
+                }
 
-        if (
-            !socket.data.ability.has(PermissionID.PROPOSAL_APPROVE)
-        ) {
-            if (typeof cb === 'function') {
-                cb(new UnauthorizedError());
+                return;
             }
 
-            return;
-        }
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROPOSAL_STATION, target));
 
-        incrSocketRoomConnections(socket, buildSocketProposalStationRoomName(context.data.id));
+            if (isSocketClientToServerEventCallback(cb)) {
+                cb();
+            }
+        },
+    );
 
-        if (typeof cb === 'function') {
-            cb();
-        }
-    });
-
-    socket.on(ProposalStationSocketClientToServerEventName.UNSUBSCRIBE, (context) => {
-        context = extendSocketClientToServerEventContext(context);
-
-        decrSocketRoomConnections(socket, buildSocketProposalStationRoomName(context.data.id));
-    });
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainType.PROPOSAL_STATION, DomainEventSubscriptionName.UNSUBSCRIBE),
+        (target) => {
+            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.PROPOSAL_STATION, target));
+        },
+    );
 }
 
 export function registerProposalStationForRealmSocketHandlers(
@@ -69,59 +71,73 @@ export function registerProposalStationForRealmSocketHandlers(
 
     // ------------------------------------------------------------
 
-    socket.on(ProposalStationSocketClientToServerEventName.IN_SUBSCRIBE, async (context, cb) => {
-        context = extendSocketClientToServerEventContext(context);
-        cb = extendSocketClientToServerEventCallback(cb);
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainSubType.PROPOSAL_STATION_IN, DomainEventSubscriptionName.SUBSCRIBE),
+        async (target, cb) => {
+            if (
+                !socket.data.ability.has(PermissionID.PROPOSAL_APPROVE)
+            ) {
+                if (isSocketClientToServerEventErrorCallback(cb)) {
+                    cb(new UnauthorizedError());
+                }
 
-        if (
-            !socket.data.ability.has(PermissionID.PROPOSAL_APPROVE)
-        ) {
-            if (typeof cb === 'function') {
-                cb(new UnauthorizedError());
+                return;
             }
 
-            return;
-        }
+            incrSocketRoomConnections(
+                socket,
+                buildDomainEventChannelName(DomainSubType.PROPOSAL_STATION_IN, target),
+            );
 
-        incrSocketRoomConnections(socket, buildSocketProposalStationInRoomName(context.data.id));
+            if (isSocketClientToServerEventCallback(cb)) {
+                cb();
+            }
+        },
+    );
 
-        if (typeof cb === 'function') {
-            cb();
-        }
-    });
-
-    socket.on(ProposalStationSocketClientToServerEventName.IN_UNSUBSCRIBE, (context) => {
-        context = extendSocketClientToServerEventContext(context);
-
-        decrSocketRoomConnections(socket, buildSocketProposalStationInRoomName(context.data.id));
-    });
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainSubType.PROPOSAL_STATION_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
+        (target) => {
+            decrSocketRoomConnections(
+                socket,
+                buildDomainEventChannelName(DomainSubType.PROPOSAL_STATION_IN, target),
+            );
+        },
+    );
 
     // ------------------------------------------------------------
 
-    socket.on(ProposalStationSocketClientToServerEventName.OUT_SUBSCRIBE, async (context, cb) => {
-        context = extendSocketClientToServerEventContext(context);
-        cb = extendSocketClientToServerEventCallback(cb);
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainSubType.PROPOSAL_STATION_OUT, DomainEventSubscriptionName.SUBSCRIBE),
+        async (target, cb) => {
+            if (
+                !socket.data.ability.has(PermissionID.PROPOSAL_EDIT)
+            ) {
+                if (isSocketClientToServerEventErrorCallback(cb)) {
+                    cb(new UnauthorizedError());
+                }
 
-        if (
-            !socket.data.ability.has(PermissionID.PROPOSAL_EDIT)
-        ) {
-            if (typeof cb === 'function') {
-                cb(new UnauthorizedError());
+                return;
             }
 
-            return;
-        }
+            incrSocketRoomConnections(
+                socket,
+                buildDomainEventChannelName(DomainSubType.PROPOSAL_STATION_OUT, target),
+            );
 
-        incrSocketRoomConnections(socket, buildSocketProposalStationOutRoomName(context.data.id));
+            if (isSocketClientToServerEventCallback(cb)) {
+                cb();
+            }
+        },
+    );
 
-        if (typeof cb === 'function') {
-            cb();
-        }
-    });
-
-    socket.on(ProposalStationSocketClientToServerEventName.OUT_UNSUBSCRIBE, (context) => {
-        context = extendSocketClientToServerEventContext(context);
-
-        decrSocketRoomConnections(socket, buildSocketProposalStationOutRoomName(context.data.id));
-    });
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainSubType.PROPOSAL_STATION_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
+        (target) => {
+            decrSocketRoomConnections(
+                socket,
+                buildDomainEventChannelName(DomainSubType.PROPOSAL_STATION_OUT, target),
+            );
+        },
+    );
 }

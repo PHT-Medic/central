@@ -6,10 +6,13 @@
  */
 
 import {
+    DomainEventSubscriptionName,
+    DomainType,
     PermissionID,
-    RegistryProjectSocketClientToServerEventName,
-    buildSocketRegistryProjectRoomName,
-    extendSocketClientToServerEventCallback, extendSocketClientToServerEventContext,
+    buildDomainChannelName,
+    buildDomainEventSubscriptionFullName,
+    isSocketClientToServerEventCallback,
+    isSocketClientToServerEventErrorCallback,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@ebec/http';
 import type {
@@ -28,30 +31,31 @@ export function registerRegistryProjectSocketHandlers(
 ) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
-    socket.on(RegistryProjectSocketClientToServerEventName.SUBSCRIBE, async (context, cb) => {
-        context = extendSocketClientToServerEventContext(context);
-        cb = extendSocketClientToServerEventCallback(cb);
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.SUBSCRIBE),
+        async (target, cb) => {
+            if (
+                !socket.data.ability.has(PermissionID.REGISTRY_MANAGE)
+            ) {
+                if (isSocketClientToServerEventErrorCallback(cb)) {
+                    cb(new UnauthorizedError());
+                }
 
-        if (
-            !socket.data.ability.has(PermissionID.REGISTRY_MANAGE)
-        ) {
-            if (typeof cb === 'function') {
-                cb(new UnauthorizedError());
+                return;
             }
 
-            return;
-        }
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.REGISTRY_PROJECT, target));
 
-        incrSocketRoomConnections(socket, buildSocketRegistryProjectRoomName(context.data.id));
+            if (isSocketClientToServerEventCallback(cb)) {
+                cb();
+            }
+        },
+    );
 
-        if (typeof cb === 'function') {
-            cb();
-        }
-    });
-
-    socket.on(RegistryProjectSocketClientToServerEventName.UNSUBSCRIBE, (context) => {
-        context = extendSocketClientToServerEventContext(context);
-
-        decrSocketRoomConnections(socket, buildSocketRegistryProjectRoomName(context.data.id));
-    });
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainType.REGISTRY_PROJECT, DomainEventSubscriptionName.UNSUBSCRIBE),
+        (target) => {
+            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.REGISTRY_PROJECT, target));
+        },
+    );
 }

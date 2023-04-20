@@ -6,13 +6,14 @@
  */
 
 import {
+    DomainEventSubscriptionName,
+    DomainSubType,
+    DomainType,
     PermissionID,
-    TrainStationSocketClientToServerEventName,
-    buildSocketTrainStationInRoomName,
-    buildSocketTrainStationOutRoomName,
-    buildSocketTrainStationRoomName,
-    extendSocketClientToServerEventCallback,
-    extendSocketClientToServerEventContext,
+    buildDomainChannelName,
+    buildDomainEventSubscriptionFullName,
+    isSocketClientToServerEventCallback,
+    isSocketClientToServerEventErrorCallback,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@ebec/http';
 import type {
@@ -33,32 +34,33 @@ export function registerTrainStationSocketHandlers(
 
     // ------------------------------------------------------------
 
-    socket.on(TrainStationSocketClientToServerEventName.SUBSCRIBE, async (context, cb) => {
-        context = extendSocketClientToServerEventContext(context);
-        cb = extendSocketClientToServerEventCallback(cb);
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainType.TRAIN_STATION, DomainEventSubscriptionName.SUBSCRIBE),
+        async (target, cb) => {
+            if (
+                !socket.data.ability.has(PermissionID.TRAIN_APPROVE)
+            ) {
+                if (isSocketClientToServerEventErrorCallback(cb)) {
+                    cb(new UnauthorizedError());
+                }
 
-        if (
-            !socket.data.ability.has(PermissionID.TRAIN_APPROVE)
-        ) {
-            if (typeof cb === 'function') {
-                cb(new UnauthorizedError());
+                return;
             }
 
-            return;
-        }
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.TRAIN_STATION, target));
 
-        incrSocketRoomConnections(socket, buildSocketTrainStationRoomName(context.data.id));
+            if (isSocketClientToServerEventCallback(cb)) {
+                cb();
+            }
+        },
+    );
 
-        if (typeof cb === 'function') {
-            cb();
-        }
-    });
-
-    socket.on(TrainStationSocketClientToServerEventName.UNSUBSCRIBE, (context) => {
-        context = extendSocketClientToServerEventContext(context);
-
-        decrSocketRoomConnections(socket, buildSocketTrainStationRoomName(context.data.id));
-    });
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainType.TRAIN_STATION, DomainEventSubscriptionName.SUBSCRIBE),
+        (target) => {
+            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.TRAIN_STATION, target));
+        },
+    );
 }
 
 export function registerTrainStationForRealmSocketHandlers(
@@ -69,59 +71,59 @@ export function registerTrainStationForRealmSocketHandlers(
 
     // ------------------------------------------------------------
 
-    socket.on(TrainStationSocketClientToServerEventName.IN_SUBSCRIBE, async (context, cb) => {
-        context = extendSocketClientToServerEventContext(context);
-        cb = extendSocketClientToServerEventCallback(cb);
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainSubType.TRAIN_STATION_IN, DomainEventSubscriptionName.SUBSCRIBE),
+        async (target, cb) => {
+            if (
+                !socket.data.ability.has(PermissionID.TRAIN_APPROVE)
+            ) {
+                if (isSocketClientToServerEventErrorCallback(cb)) {
+                    cb(new UnauthorizedError());
+                }
 
-        if (
-            !socket.data.ability.has(PermissionID.TRAIN_APPROVE)
-        ) {
-            if (typeof cb === 'function') {
-                cb(new UnauthorizedError());
+                return;
             }
 
-            return;
-        }
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.TRAIN_STATION_IN, target));
 
-        incrSocketRoomConnections(socket, buildSocketTrainStationInRoomName(context.data.id));
+            if (isSocketClientToServerEventCallback(cb)) {
+                cb();
+            }
+        },
+    );
 
-        if (typeof cb === 'function') {
-            cb();
-        }
-    });
-
-    socket.on(TrainStationSocketClientToServerEventName.IN_UNSUBSCRIBE, (context) => {
-        context = extendSocketClientToServerEventContext(context);
-
-        decrSocketRoomConnections(socket, buildSocketTrainStationInRoomName(context.data.id));
-    });
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainSubType.TRAIN_STATION_IN, DomainEventSubscriptionName.UNSUBSCRIBE),
+        (target) => {
+            decrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.TRAIN_STATION_IN, target));
+        },
+    );
 
     // ----------------------------------------------------------
 
-    socket.on(TrainStationSocketClientToServerEventName.OUT_SUBSCRIBE, async (context, cb) => {
-        context = extendSocketClientToServerEventContext(context);
-        cb = extendSocketClientToServerEventCallback(cb);
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainSubType.TRAIN_STATION_OUT, DomainEventSubscriptionName.SUBSCRIBE),
+        async (target, cb) => {
+            if (!socket.data.ability.has(PermissionID.TRAIN_EDIT)) {
+                if (isSocketClientToServerEventErrorCallback(cb)) {
+                    cb(new UnauthorizedError());
+                }
 
-        if (
-            !socket.data.ability.has(PermissionID.TRAIN_EDIT)
-        ) {
-            if (typeof cb === 'function') {
-                cb(new UnauthorizedError());
+                return;
             }
 
-            return;
-        }
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.TRAIN_STATION_OUT, target));
 
-        incrSocketRoomConnections(socket, buildSocketTrainStationOutRoomName(context.data.id));
+            if (isSocketClientToServerEventCallback(cb)) {
+                cb();
+            }
+        },
+    );
 
-        if (typeof cb === 'function') {
-            cb();
-        }
-    });
-
-    socket.on(TrainStationSocketClientToServerEventName.OUT_UNSUBSCRIBE, (context) => {
-        context = extendSocketClientToServerEventContext(context);
-
-        decrSocketRoomConnections(socket, buildSocketTrainStationOutRoomName(context.data.id));
-    });
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainSubType.TRAIN_STATION_OUT, DomainEventSubscriptionName.UNSUBSCRIBE),
+        (target) => {
+            decrSocketRoomConnections(socket, buildDomainChannelName(DomainSubType.TRAIN_STATION_OUT, target));
+        },
+    );
 }

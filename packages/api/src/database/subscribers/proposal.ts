@@ -5,39 +5,42 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { publishDomainEvent } from '@personalhealthtrain/central-server-common';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
-import type { Proposal } from '@personalhealthtrain/central-common';
-import {
-    ProposalSocketServerToClientEventName,
-    buildSocketProposalRoomName,
-    buildSocketProposalStationOutRoomName,
-    buildSocketRealmNamespaceName,
+import type {
+    Proposal,
 } from '@personalhealthtrain/central-common';
 import {
-    emitSocketServerToClientEvent,
-} from '../../config/socket-emitter';
-import { ProposalEntity } from '../../domains/proposal/entity';
+    DomainEventName,
+    DomainType,
+    buildDomainChannelName,
+    buildDomainNamespaceName,
+} from '@personalhealthtrain/central-common';
+import { ProposalEntity } from '../../domains';
 
-function publish(
-    operation: `${ProposalSocketServerToClientEventName}`,
-    item: Proposal,
+async function publishEvent(
+    event: `${DomainEventName}`,
+    data: Proposal,
 ) {
-    emitSocketServerToClientEvent({
-        configuration: [
+    await publishDomainEvent(
+        {
+            type: DomainType.PROPOSAL,
+            event,
+            data,
+        },
+        [
             {
-                roomNameFn: buildSocketProposalStationOutRoomName,
-                namespace: buildSocketRealmNamespaceName(item.realm_id),
+                channel: (id) => buildDomainChannelName(DomainType.PROPOSAL, id),
+                namespace: buildDomainNamespaceName(data.realm_id),
             },
             {
-                roomNameFn: buildSocketProposalRoomName,
+                channel: (id) => buildDomainChannelName(DomainType.PROPOSAL, id),
             },
         ],
-        operation,
-        item,
-    });
+    );
 }
 
 @EventSubscriber()
@@ -46,15 +49,15 @@ export class ProposalSubscriber implements EntitySubscriberInterface<ProposalEnt
         return ProposalEntity;
     }
 
-    afterInsert(event: InsertEvent<ProposalEntity>): Promise<any> | void {
-        publish(ProposalSocketServerToClientEventName.CREATED, event.entity);
+    async afterInsert(event: InsertEvent<ProposalEntity>): Promise<any> {
+        await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<ProposalEntity>): Promise<any> | void {
-        publish(ProposalSocketServerToClientEventName.UPDATED, event.entity as ProposalEntity);
+    async afterUpdate(event: UpdateEvent<ProposalEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as ProposalEntity);
     }
 
-    beforeRemove(event: RemoveEvent<ProposalEntity>): Promise<any> | void {
-        publish(ProposalSocketServerToClientEventName.DELETED, event.entity);
+    async beforeRemove(event: RemoveEvent<ProposalEntity>): Promise<any> {
+        await publishEvent(DomainEventName.DELETED, event.entity);
     }
 }
