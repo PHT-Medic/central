@@ -7,5 +7,6 @@
 
 export * from './core';
 export * from './domains';
+export * from './domain-event';
 export * from './type';
 export * from './utils';

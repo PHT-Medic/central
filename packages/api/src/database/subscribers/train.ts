@@ -5,38 +5,46 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { publishDomainEvent } from '@personalhealthtrain/central-server-common';
 import { CoreCommand, buildCoreQueuePayload } from '@personalhealthtrain/train-manager';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
+import type {
+    Station, Train,
+} from '@personalhealthtrain/central-common';
 import {
-    TrainSocketServerToClientEventName,
-    buildSocketRealmNamespaceName, buildSocketTrainRoomName,
+    DomainEventName,
+    DomainType,
+    buildDomainChannelName,
+
+    buildDomainNamespaceName,
 } from '@personalhealthtrain/central-common';
 import { publish as publishMessage } from 'amqp-extension';
-import { emitSocketServerToClientEvent } from '../../config';
 import { TrainEntity } from '../../domains';
 
-function publish(
-    operation: `${TrainSocketServerToClientEventName}`,
-    item: TrainEntity,
+async function publishEvent(
+    event: `${DomainEventName}`,
+    data: Train,
 ) {
-    emitSocketServerToClientEvent({
-        configuration: [
+    await publishDomainEvent(
+        {
+            type: DomainType.TRAIN,
+            event,
+            data,
+        },
+        [
             {
-                roomNameFn: buildSocketTrainRoomName,
-                namespace: buildSocketRealmNamespaceName(item.realm_id),
+                channel: (id) => buildDomainChannelName(DomainType.TRAIN, id),
             },
             {
-                roomNameFn: buildSocketTrainRoomName,
+                channel: (id) => buildDomainChannelName(DomainType.TRAIN, id),
+                namespace: buildDomainNamespaceName(data.realm_id),
             },
         ],
-        operation,
-        item,
-    });
+    );
 }
-
 @EventSubscriber()
 export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
     listenTo(): CallableFunction | string {
@@ -44,7 +52,7 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
     }
 
     async afterInsert(event: InsertEvent<TrainEntity>): Promise<any> {
-        publish(TrainSocketServerToClientEventName.CREATED, event.entity);
+        await publishEvent(DomainEventName.CREATED, event.entity);
 
         const message = buildCoreQueuePayload({
             command: CoreCommand.CONFIGURE,
@@ -56,12 +64,12 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
         await publishMessage(message);
     }
 
-    afterUpdate(event: UpdateEvent<TrainEntity>): Promise<any> | void {
-        publish(TrainSocketServerToClientEventName.UPDATED, event.entity as TrainEntity);
+    async afterUpdate(event: UpdateEvent<TrainEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as TrainEntity);
     }
 
     async beforeRemove(event: RemoveEvent<TrainEntity>): Promise<any> {
-        publish(TrainSocketServerToClientEventName.DELETED, event.entity);
+        await publishEvent(DomainEventName.DELETED, event.entity);
 
         const message = buildCoreQueuePayload({
             command: CoreCommand.DESTROY,
@@ -71,7 +79,5 @@ export class TrainSubscriber implements EntitySubscriberInterface<TrainEntity> {
         });
 
         await publishMessage(message);
-
-        return Promise.resolve(undefined);
     }
 }

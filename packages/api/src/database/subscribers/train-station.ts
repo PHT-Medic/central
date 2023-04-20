@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { publishDomainEvent } from '@personalhealthtrain/central-server-common';
 import type {
     EntitySubscriberInterface,
     InsertEvent,
@@ -14,44 +15,48 @@ import type {
 import {
     EventSubscriber,
 } from 'typeorm';
-import {
-    TrainStationSocketServerToClientEventName,
-    buildSocketRealmNamespaceName,
-    buildSocketTrainStationInRoomName,
-    buildSocketTrainStationOutRoomName, buildSocketTrainStationRoomName,
+import type {
+    TrainStation,
 } from '@personalhealthtrain/central-common';
 import {
-    emitSocketServerToClientEvent,
-} from '../../config/socket-emitter';
-import { TrainStationEntity } from '../../domains/train-station/entity';
+    DomainEventName,
+    DomainSubType,
+    DomainType,
+    buildDomainChannelName,
+    buildDomainNamespaceName,
+} from '@personalhealthtrain/central-common';
+import { TrainStationEntity } from '../../domains';
 
-function publish(
-    operation: `${TrainStationSocketServerToClientEventName}`,
-    item: TrainStationEntity,
+async function publishEvent(
+    event: `${DomainEventName}`,
+    data: TrainStation,
 ) {
-    emitSocketServerToClientEvent({
-        configuration: [
+    await publishDomainEvent(
+        {
+            type: DomainType.TRAIN_STATION,
+            event,
+            data,
+        },
+        [
             {
-                namespace: buildSocketRealmNamespaceName(item.station_realm_id),
-                roomNameFn: buildSocketTrainStationInRoomName,
+                channel: (id) => buildDomainChannelName(DomainSubType.TRAIN_STATION_IN, id),
+                namespace: buildDomainNamespaceName(data.station_realm_id),
             },
             {
-                namespace: buildSocketRealmNamespaceName(item.train_realm_id),
-                roomNameFn: buildSocketTrainStationOutRoomName,
+                channel: (id) => buildDomainChannelName(DomainSubType.TRAIN_STATION_OUT, id),
+                namespace: buildDomainNamespaceName(data.train_realm_id),
             },
             {
-                roomNameFn: buildSocketTrainStationRoomName,
+                channel: (id) => buildDomainChannelName(DomainType.TRAIN_STATION, id),
             },
             {
-                roomNameFn: buildSocketTrainStationInRoomName,
+                channel: (id) => buildDomainChannelName(DomainSubType.TRAIN_STATION_IN, id),
             },
             {
-                roomNameFn: buildSocketTrainStationOutRoomName,
+                channel: (id) => buildDomainChannelName(DomainSubType.TRAIN_STATION_OUT, id),
             },
         ],
-        operation,
-        item,
-    });
+    );
 }
 
 @EventSubscriber()
@@ -60,15 +65,15 @@ export class TrainStationSubscriber implements EntitySubscriberInterface<TrainSt
         return TrainStationEntity;
     }
 
-    afterInsert(event: InsertEvent<TrainStationEntity>): Promise<any> | void {
-        publish(TrainStationSocketServerToClientEventName.CREATED, event.entity);
+    async afterInsert(event: InsertEvent<TrainStationEntity>): Promise<any> {
+        await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<TrainStationEntity>): Promise<any> | void {
-        publish(TrainStationSocketServerToClientEventName.UPDATED, event.entity as TrainStationEntity);
+    async afterUpdate(event: UpdateEvent<TrainStationEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as TrainStationEntity);
     }
 
-    beforeRemove(event: RemoveEvent<TrainStationEntity>): Promise<any> | void {
-        publish(TrainStationSocketServerToClientEventName.DELETED, event.entity);
+    async beforeRemove(event: RemoveEvent<TrainStationEntity>): Promise<any> {
+        await publishEvent(DomainEventName.DELETED, event.entity);
     }
 }

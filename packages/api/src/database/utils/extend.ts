@@ -21,8 +21,11 @@ import {
     TrainStationEntity, UserSecretEntity,
 } from '../../domains';
 import { DatabaseQueryResultCache } from '../cache';
+import { MasterImageSubscriber } from '../subscribers/master-image';
+import { MasterImageGroupSubscriber } from '../subscribers/master-image-group';
 import { ProposalSubscriber } from '../subscribers/proposal';
 import { ProposalStationSubscriber } from '../subscribers/proposal-station';
+import { RegistrySubscriber } from '../subscribers/registry';
 import { RegistryProjectSubscriber } from '../subscribers/registry-project';
 import { StationSubscriber } from '../subscribers/station';
 import { TrainSubscriber } from '../subscribers/train';
@@ -53,8 +56,11 @@ export function extendDataSourceOptions(options: DataSourceOptions) : DataSource
         migrationsTransactionMode: 'each',
         subscribers: [
             ...(options.subscribers ? options.subscribers : []) as string[],
+            MasterImageSubscriber,
+            MasterImageGroupSubscriber,
             ProposalSubscriber,
             ProposalStationSubscriber,
+            RegistrySubscriber,
             RegistryProjectSubscriber,
             StationSubscriber,
             TrainSubscriber,

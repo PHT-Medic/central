@@ -6,10 +6,13 @@
  */
 
 import {
+    DomainEventSubscriptionName,
+    DomainType,
     PermissionID,
-    StationSocketClientToServerEventName,
-    buildSocketStationRoomName,
-    extendSocketClientToServerEventCallback, extendSocketClientToServerEventContext,
+    buildDomainChannelName,
+    buildDomainEventSubscriptionFullName,
+    isSocketClientToServerEventCallback,
+    isSocketClientToServerEventErrorCallback,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@ebec/http';
 import type { SocketInterface, SocketNamespaceInterface, SocketServerInterface } from '../../type';
@@ -21,30 +24,31 @@ export function registerStationSocketHandlers(
 ) {
     if (!socket.data.userId && !socket.data.robotId) return;
 
-    socket.on(StationSocketClientToServerEventName.SUBSCRIBE, async (context, cb) => {
-        context = extendSocketClientToServerEventContext(context);
-        cb = extendSocketClientToServerEventCallback(cb);
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainType.STATION, DomainEventSubscriptionName.SUBSCRIBE),
+        async (target, cb) => {
+            if (
+                !socket.data.ability.has(PermissionID.STATION_EDIT)
+            ) {
+                if (isSocketClientToServerEventErrorCallback(cb)) {
+                    cb(new UnauthorizedError());
+                }
 
-        if (
-            !socket.data.ability.has(PermissionID.STATION_EDIT)
-        ) {
-            if (typeof cb === 'function') {
-                cb(new UnauthorizedError());
+                return;
             }
 
-            return;
-        }
+            incrSocketRoomConnections(socket, buildDomainChannelName(DomainType.STATION, target));
 
-        incrSocketRoomConnections(socket, buildSocketStationRoomName(context.data.id));
+            if (isSocketClientToServerEventCallback(cb)) {
+                cb();
+            }
+        },
+    );
 
-        if (typeof cb === 'function') {
-            cb();
-        }
-    });
-
-    socket.on(StationSocketClientToServerEventName.UNSUBSCRIBE, (context) => {
-        context = extendSocketClientToServerEventContext(context);
-
-        decrSocketRoomConnections(socket, buildSocketStationRoomName(context.data.id));
-    });
+    socket.on(
+        buildDomainEventSubscriptionFullName(DomainType.STATION, DomainEventSubscriptionName.UNSUBSCRIBE),
+        (target) => {
+            decrSocketRoomConnections(socket, buildDomainChannelName(DomainType.STATION, target));
+        },
+    );
 }

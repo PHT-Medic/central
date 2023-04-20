@@ -17,8 +17,8 @@ import type {
 import {
     ProposalStationSocketClientToServerEventName,
     ProposalStationSocketServerToClientEventName,
-    buildSocketProposalStationInRoomName,
-    buildSocketProposalStationOutRoomName,
+    buildProposalStationChannelNameForIncoming,
+    buildProposalStationChannelNameForOutgoing,
 } from '@personalhealthtrain/central-common';
 import type { Socket } from 'socket.io-client';
 

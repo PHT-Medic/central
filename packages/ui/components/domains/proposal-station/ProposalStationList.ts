@@ -16,8 +16,8 @@ import type {
 import {
     ProposalStationSocketClientToServerEventName,
     ProposalStationSocketServerToClientEventName,
-    buildSocketProposalStationInRoomName,
-    buildSocketProposalStationOutRoomName,
+    buildProposalStationChannelNameForIncoming,
+    buildProposalStationChannelNameForOutgoing,
     buildSocketProposalStationRoomName, mergeDeep,
 } from '@personalhealthtrain/central-common';
 

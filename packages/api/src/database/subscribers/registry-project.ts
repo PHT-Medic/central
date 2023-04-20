@@ -5,32 +5,35 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { publishDomainEvent } from '@personalhealthtrain/central-server-common';
 import type {
     EntitySubscriberInterface, InsertEvent, RemoveEvent, UpdateEvent,
 } from 'typeorm';
 import { EventSubscriber } from 'typeorm';
+import type { RegistryProject } from '@personalhealthtrain/central-common';
 import {
-    RegistryProjectSocketServerToClientEventName,
-    buildSocketRegistryProjectRoomName,
+    DomainEventName,
+    DomainType,
+    buildDomainChannelName,
 } from '@personalhealthtrain/central-common';
-import {
-    emitSocketServerToClientEvent,
-} from '../../config/socket-emitter';
-import { RegistryProjectEntity } from '../../domains/registry-project/entity';
+import { RegistryProjectEntity } from '../../domains';
 
-function publish(
-    operation: `${RegistryProjectSocketServerToClientEventName}`,
-    item: RegistryProjectEntity,
+async function publishEvent(
+    event: `${DomainEventName}`,
+    data: RegistryProject,
 ) {
-    emitSocketServerToClientEvent({
-        configuration: [
+    await publishDomainEvent(
+        {
+            type: DomainType.REGISTRY_PROJECT,
+            event,
+            data,
+        },
+        [
             {
-                roomNameFn: buildSocketRegistryProjectRoomName,
+                channel: (id) => buildDomainChannelName(DomainType.REGISTRY_PROJECT, id),
             },
         ],
-        operation,
-        item,
-    });
+    );
 }
 
 @EventSubscriber()
@@ -39,18 +42,15 @@ export class RegistryProjectSubscriber implements EntitySubscriberInterface<Regi
         return RegistryProjectEntity;
     }
 
-    afterInsert(event: InsertEvent<RegistryProjectEntity>): Promise<any> | void {
-        publish(RegistryProjectSocketServerToClientEventName.CREATED, event.entity);
+    async afterInsert(event: InsertEvent<RegistryProjectEntity>): Promise<any> {
+        await publishEvent(DomainEventName.CREATED, event.entity);
     }
 
-    afterUpdate(event: UpdateEvent<RegistryProjectEntity>): Promise<any> | void {
-        publish(RegistryProjectSocketServerToClientEventName.UPDATED, event.entity as RegistryProjectEntity);
-        return undefined;
+    async afterUpdate(event: UpdateEvent<RegistryProjectEntity>): Promise<any> {
+        await publishEvent(DomainEventName.UPDATED, event.entity as RegistryProjectEntity);
     }
 
-    beforeRemove(event: RemoveEvent<RegistryProjectEntity>): Promise<any> | void {
-        publish(RegistryProjectSocketServerToClientEventName.DELETED, event.entity);
-
-        return undefined;
+    async beforeRemove(event: RemoveEvent<RegistryProjectEntity>): Promise<any> {
+        await publishEvent(DomainEventName.DELETED, event.entity);
     }
 }
