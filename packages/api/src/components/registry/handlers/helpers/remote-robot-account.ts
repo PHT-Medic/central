@@ -5,22 +5,48 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Client as HarborClient, RobotAccount } from '@hapic/harbor';
+import { buildRobotPermissionForAllResources, isClientErrorWithStatusCode } from '@hapic/harbor';
+import type { HarborClient, Robot } from '@hapic/harbor';
 import { useClient as useVaultClient } from '@hapic/vault';
 import type { RegistryProjectSecretStoragePayload } from '@personalhealthtrain/central-common';
 import {
     REGISTRY_PROJECT_SECRET_ENGINE_KEY,
 } from '@personalhealthtrain/central-common';
-import { isClientError } from 'hapic';
+import { isObject } from 'locter';
+
+async function saveRegistryProject(name: string, data: RegistryProjectSecretStoragePayload) {
+    try {
+        await useVaultClient()
+            .keyValueV1.create({
+                mount: REGISTRY_PROJECT_SECRET_ENGINE_KEY,
+                path: name,
+                data,
+            });
+    } catch (e) {
+        if (isClientErrorWithStatusCode(e, 404)) {
+            await useVaultClient().mount.create({
+                path: REGISTRY_PROJECT_SECRET_ENGINE_KEY,
+                data: {
+                    type: 'kv',
+                    options: {
+                        version: 1,
+                    },
+                },
+            });
+
+            await saveRegistryProject(name, data);
+        }
+    }
+}
 
 export async function ensureRemoteRegistryProjectAccount(
     httpClient: HarborClient,
     context: {
         name: string,
-        account: Partial<RobotAccount>
+        account: Partial<Robot>
     },
-) : Promise<RobotAccount> {
-    let robotAccount : RobotAccount | undefined;
+) : Promise<Robot> {
+    let robotAccount : Robot | undefined;
 
     let secretStorageData : RegistryProjectSecretStoragePayload | undefined;
 
@@ -30,59 +56,80 @@ export async function ensureRemoteRegistryProjectAccount(
         !context.account.secret
     ) {
         try {
-            robotAccount = await httpClient.robotAccount.create(context.name);
+            robotAccount = await httpClient.robot.create({
+                name: context.name,
+                permissions: [buildRobotPermissionForAllResources(context.name)], // todo: check if namespace is correct
+            });
         } catch (e) {
-            if (e?.response?.status === 409) {
-                const response = await useVaultClient()
-                    .keyValue.find<RegistryProjectSecretStoragePayload>(REGISTRY_PROJECT_SECRET_ENGINE_KEY, context.name);
+            if (isClientErrorWithStatusCode(e, 409)) {
+                try {
+                    const response = await useVaultClient()
+                        .keyValueV1
+                        .getOne<RegistryProjectSecretStoragePayload>({
+                            mount: REGISTRY_PROJECT_SECRET_ENGINE_KEY,
+                            path: context.name,
+                        });
 
-                if (
-                    response &&
-                    response.data
-                ) {
-                    secretStorageData = response.data;
+                    if (
+                        response &&
+                        response.data
+                    ) {
+                        secretStorageData = response.data;
+                    }
+                } catch (e) {
+                    if (!isClientErrorWithStatusCode(e, 404)) {
+                        throw e;
+                    }
                 }
 
                 if (
-                    !!secretStorageData &&
-                    !!secretStorageData.account_id &&
+                    isObject(secretStorageData) &&
+                    typeof secretStorageData.account_id !== 'number' &&
                     !!secretStorageData.account_name &&
                     !!secretStorageData.account_secret
                 ) {
                     robotAccount = {
-                        id: secretStorageData.account_id,
+                        id: parseInt(secretStorageData.account_id, 10),
                         name: secretStorageData.account_name,
                         secret: secretStorageData.account_secret,
                     };
 
-                    await httpClient.robotAccount.refreshSecret(
+                    await httpClient.robot.updateSecret(
                         robotAccount.id,
                         robotAccount.secret,
                     );
                 } else {
-                    robotAccount = await httpClient.robotAccount
-                        .find(context.name, true);
+                    const response = await httpClient.robot
+                        .getMany({
+                            query: {
+                                q: {
+                                    name: '1',
+                                },
+                                page_size: 1,
+                            },
+                        });
 
-                    secretStorageData = {
-                        account_id: `${robotAccount.id}`,
-                        account_name: robotAccount.name,
-                        account_secret: robotAccount.secret,
-                    };
+                    const robotAccount = response.data.pop();
+                    if (robotAccount) {
+                        const { secret } = await httpClient.robot.updateSecret(
+                            robotAccount.id,
+                        );
+                        secretStorageData = {
+                            account_id: `${robotAccount.id}`,
+                            account_name: robotAccount.name,
+                            account_secret: secret,
+                        };
+                    }
                 }
 
-                await useVaultClient()
-                    .keyValue.save(
-                        REGISTRY_PROJECT_SECRET_ENGINE_KEY,
-                        context.name,
-                        secretStorageData,
-                    );
+                await saveRegistryProject(context.name, secretStorageData);
             } else {
                 throw e;
             }
         }
 
         if (robotAccount) {
-            context.account.id = `${robotAccount.id}`;
+            context.account.id = robotAccount.id;
             context.account.name = robotAccount.name;
             context.account.secret = robotAccount.secret;
         }
@@ -94,7 +141,7 @@ export async function ensureRemoteRegistryProjectAccount(
         };
 
         try {
-            await httpClient.robotAccount.refreshSecret(
+            await httpClient.robot.updateSecret(
                 robotAccount.id,
                 robotAccount.secret,
             );
@@ -105,27 +152,17 @@ export async function ensureRemoteRegistryProjectAccount(
                 account_secret: robotAccount.secret,
             };
 
-            await useVaultClient()
-                .keyValue.save(
-                    REGISTRY_PROJECT_SECRET_ENGINE_KEY,
-                    context.name,
-                    secretStorageData,
-                );
+            await saveRegistryProject(context.name, secretStorageData);
         } catch (e) {
-            if (isClientError(e)) {
-                if (
-                    e.response &&
-                    e.response.status === 404
-                ) {
-                    return ensureRemoteRegistryProjectAccount(httpClient, {
-                        name: context.name,
-                        account: {
-                            id: null,
-                            name: null,
-                            secret: null,
-                        },
-                    });
-                }
+            if (isClientErrorWithStatusCode(e, 404)) {
+                return ensureRemoteRegistryProjectAccount(httpClient, {
+                    name: context.name,
+                    account: {
+                        id: null,
+                        name: null,
+                        secret: null,
+                    },
+                });
             }
 
             throw e;

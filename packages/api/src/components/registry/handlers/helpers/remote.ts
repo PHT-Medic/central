@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import type {
-    Client as HarborClient, Project, ProjectPayload,
+    HarborClient, Project, ProjectCreatePayload,
 } from '@hapic/harbor';
 
 export async function ensureRemoteRegistryProject(
@@ -14,16 +15,24 @@ export async function ensureRemoteRegistryProject(
     context: {
         remoteId?: string | number | null,
         remoteName: string,
-        remoteOptions?: Partial<ProjectPayload>
+        remoteOptions?: Partial<ProjectCreatePayload>
     },
 ) : Promise<Project> {
-    await httpClient.project.save({
+    const options : ProjectCreatePayload = {
         project_name: context.remoteName,
         public: false,
         ...(context.remoteOptions ? context.remoteOptions : {}),
-    });
+    };
 
-    const harborProject : Project = await httpClient.project.getOne(context.remoteName, true);
+    try {
+        await httpClient.project.create(options);
+    } catch (e) {
+        if (isClientErrorWithStatusCode(e, 409)) {
+            await httpClient.project.update(context.remoteName, options, true);
+        }
+    }
+
+    const harborProject = await httpClient.project.getOne(context.remoteName, true);
 
     context.remoteId = `${harborProject.project_id}`;
 

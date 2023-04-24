@@ -5,19 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ClientDriverInstance } from 'hapic';
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
+import { BaseAPI } from '../base';
 import type { TrainLog } from './entity';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
-export class TrainLogAPI {
-    protected client: ClientDriverInstance;
-
-    constructor(client: ClientDriverInstance) {
-        this.client = client;
-    }
-
+export class TrainLogAPI extends BaseAPI {
     async getMany(options?: BuildInput<TrainLog>): Promise<CollectionResourceResponse<TrainLog>> {
         const { data: response } = await this.client.get(`train-logs${buildQuery(options)}`);
         return response;

@@ -5,12 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { APIClient, ROBOT_SYSTEM_NAME, mountTokenInterceptorOnClient } from '@authup/core';
-import { setConfig as setHTTPConfig } from 'hapic';
+import { APIClient, ROBOT_SYSTEM_NAME, mountClientResponseErrorTokenHook } from '@authup/core';
+import { Client, setClient } from 'hapic';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { setConfig as setRedisConfig } from 'redis-extension';
-import { Client as VaultClient, setClient as setVaultClient } from '@hapic/vault';
-import { detectProxyConnectionConfig } from '@personalhealthtrain/central-common';
+import { VaultClient, setClient as setVaultClient } from '@hapic/vault';
 import { buildAuthupAggregator, buildTrainManagerAggregator } from '../aggregators';
 import { setAuthupClient, setMinioConfig } from '../core';
 import { EnvironmentName, useEnv } from './env';
@@ -25,49 +24,28 @@ export type Config = {
 };
 
 export function createConfig() : Config {
-    const proxyConfig = detectProxyConnectionConfig();
-
     const vaultClient = new VaultClient({
-        driver: {
-            proxy: false,
-        },
-        extra: {
-            connectionString: useEnv('vaultConnectionString'),
-        },
+        connectionString: useEnv('vaultConnectionString'),
     });
     setVaultClient(vaultClient);
 
-    setHTTPConfig({
-        driver: {
-            baseURL: 'https://menzel.informatik.rwth-aachen.de:3005/centralservice/api/',
-            ...(proxyConfig ? {
-                proxy: proxyConfig,
-            } : {
-                proxy: false,
-            }),
-        },
-    }, ApiKey.AACHEN_CENTRAL_SERVICE);
+    const aachenService = new Client({
+        baseURL: 'https://menzel.informatik.rwth-aachen.de:3005/centralservice/api/',
+    });
+    setClient(aachenService, ApiKey.AACHEN_CENTRAL_SERVICE);
 
-    setHTTPConfig({
-        driver: {
-            baseURL: 'https://station-registry.hs-mittweida.de/api/',
-            ...(proxyConfig ? {
-                proxy: proxyConfig,
-            } : {
-                proxy: false,
-            }),
-        },
-    }, ApiKey.AACHEN_STATION_REGISTRY);
+    const stationRegistry = new Client({
+        baseURL: 'https://station-registry.hs-mittweida.de/api/',
+    });
+    setClient(stationRegistry, ApiKey.AACHEN_STATION_REGISTRY);
 
     // ---------------------------------------------
 
     const authupClient = new APIClient({
-        driver: {
-            baseURL: useEnv('authupApiUrl'),
-        },
+        baseURL: useEnv('authupApiUrl'),
     });
-    mountTokenInterceptorOnClient(authupClient, {
-        baseUrl: useEnv('authupApiUrl'),
+    mountClientResponseErrorTokenHook(authupClient, {
+        baseURL: useEnv('authupApiUrl'),
         tokenCreator: {
             type: 'robotInVault',
             name: ROBOT_SYSTEM_NAME,

@@ -7,18 +7,12 @@
 
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
-import type { ClientDriverInstance } from 'hapic';
 import { nullifyEmptyObjectProperties } from '../../utils';
+import { BaseAPI } from '../base';
 import type { UserSecret } from './entity';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
-export class UserSecretAPI {
-    protected client: ClientDriverInstance;
-
-    constructor(client: ClientDriverInstance) {
-        this.client = client;
-    }
-
+export class UserSecretAPI extends BaseAPI {
     async getMany(options?: BuildInput<UserSecret>): Promise<CollectionResourceResponse<UserSecret>> {
         const response = await this.client.get(`user-secrets${buildQuery(options)}`);
 

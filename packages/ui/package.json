@@ -16,7 +16,7 @@
         "generate": "nuxt generate"
     },
     "devDependencies": {
-        "@authup/core": "^0.32.2",
+        "@authup/core": "^0.33.0",
         "@authup/vue2": "^0.32.0",
         "@fortawesome/fontawesome-free": "^6.4.0",
         "@nuxt/types": "^2.16.3",
@@ -33,7 +33,7 @@
         "bootstrap-vue": "^2.23.1",
         "browser-storage-adapter": "^1.1.2",
         "events": "^3.3.0",
-        "hapic": "^1.6.0",
+        "hapic": "^2.0.0-alpha.9",
         "ilingo": "^2.4.0",
         "moment": "^2.29.4",
         "nuxt": "^2.16.3",

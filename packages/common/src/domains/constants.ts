@@ -13,6 +13,7 @@ export enum DomainType {
     REGISTRY = 'registry',
     REGISTRY_PROJECT = 'registryProject',
     STATION = 'station',
+    SERVICE = 'service', // special domain type
     TRAIN = 'train',
     TRAIN_FILE = 'trainFile',
     TRAIN_LOG = 'trainLog',

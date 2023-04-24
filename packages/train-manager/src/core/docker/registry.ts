@@ -6,7 +6,7 @@
  */
 
 import { getHostNameFromString } from '@personalhealthtrain/central-common';
-import type { ConnectionConfig } from '@hapic/harbor';
+import type { ConnectionOptions } from '@hapic/harbor';
 import type { DockerAuthConfig } from './type';
 
 type RemoteDockerImageURLBuildContext = {
@@ -33,7 +33,7 @@ export function buildRemoteDockerImageURL(context: RemoteDockerImageURLBuildCont
     return basePath;
 }
 
-export function buildDockerAuthConfig(config: ConnectionConfig) : DockerAuthConfig {
+export function buildDockerAuthConfig(config: ConnectionOptions) : DockerAuthConfig {
     return {
         username: config.user,
         password: config.password,

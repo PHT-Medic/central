@@ -10,14 +10,14 @@
     "version": "2.3.4",
     "description": "This package contains the central realtime application of the PHT.",
     "dependencies": {
-        "@authup/core": "^0.32.2",
-        "@authup/server-adapter": "^0.32.3",
+        "@authup/core": "^0.33.0",
+        "@authup/server-adapter": "^0.33.0",
         "@ebec/http": "^1.0.0",
         "@personalhealthtrain/central-common": "2.3.3",
         "@personalhealthtrain/central-server-common": "2.3.3",
         "@socket.io/redis-adapter": "^8.0.1",
         "dotenv": "^16.0.3",
-        "hapic": "^1.6.0",
+        "hapic": "^2.0.0-alpha.9",
         "redis-extension": "^1.3.0",
         "socket.io": "^4.6.1",
         "winston": "^3.8.1"

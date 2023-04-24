@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ROBOT_SYSTEM_NAME, mountTokenInterceptorOnClient } from '@authup/core';
+import { ROBOT_SYSTEM_NAME, mountClientResponseErrorTokenHook } from '@authup/core';
 import type { Aggregator, Component } from '@personalhealthtrain/central-server-common';
 import { setClient as setHTTPClient } from 'hapic';
 import {
@@ -49,8 +49,8 @@ export function createConfig() : Config {
             withCredentials: true,
         },
     });
-    mountTokenInterceptorOnClient(centralClient, {
-        baseUrl: useEnv('authupApiUrl'),
+    mountClientResponseErrorTokenHook(centralClient, {
+        baseURL: useEnv('authupApiUrl'),
         tokenCreator: {
             type: 'robotInVault',
             name: ROBOT_SYSTEM_NAME,

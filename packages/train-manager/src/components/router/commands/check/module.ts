@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { parseProjectRepositoryName } from '@hapic/harbor';
+import { parseLongProjectRepositoryName } from '@hapic/harbor';
 import type {
     APIClient,
     RegistryProject,
@@ -14,7 +14,7 @@ import {
     RegistryProjectType,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { useClient } from 'hapic';
+import { isClientErrorWithStatusCode, useClient } from 'hapic';
 import { createBasicHarborAPIClient } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
@@ -54,21 +54,27 @@ export async function executeRouterCheckCommand(
         });
     }
 
-    const harborRepository = await httpClient.projectRepository
-        .find(project.external_name, data.id);
+    try {
+        const harborRepository = await httpClient.projectRepository
+            .getOne({ projectName: project.external_name, repositoryName: data.id });
 
-    if (harborRepository && harborRepository.artifact_count > 0) {
-        await writePositionFoundEvent({
-            command: RouterCommand.CHECK,
-            data: {
-                artifactTag: null,
-                operator: null,
-                projectName: harborRepository.project_name,
-                repositoryName: harborRepository.name_slim,
-            },
-        });
+        if (harborRepository && harborRepository.artifact_count > 0) {
+            await writePositionFoundEvent({
+                command: RouterCommand.CHECK,
+                data: {
+                    artifactTag: null,
+                    operator: null,
+                    projectName: harborRepository.project_name,
+                    repositoryName: harborRepository.name_short,
+                },
+            });
 
-        return data;
+            return data;
+        }
+    } catch (e) {
+        if (!isClientErrorWithStatusCode(e, 404)) {
+            throw e;
+        }
     }
 
     // -------------------------------------------------------------------------------
@@ -93,7 +99,7 @@ export async function executeRouterCheckCommand(
                 repository.artifact_count >= 2 &&
                 typeof repository.repository_name === 'string'
             ) {
-                const parsed = parseProjectRepositoryName(repository.repository_name);
+                const parsed = parseLongProjectRepositoryName(repository.repository_name);
 
                 await writePositionFoundEvent(
                     {
@@ -101,8 +107,8 @@ export async function executeRouterCheckCommand(
                         data: {
                             artifactTag: null,
                             operator: null,
-                            projectName: parsed.project_name,
-                            repositoryName: parsed.repository_name,
+                            projectName: parsed.projectName,
+                            repositoryName: parsed.repositoryName,
                         },
                     },
                 );
@@ -124,21 +130,27 @@ export async function executeRouterCheckCommand(
             });
         }
 
-        const harborRepository = await httpClient.projectRepository
-            .find(project.external_name, data.id);
+        try {
+            const harborRepository = await httpClient.projectRepository
+                .getOne({ projectName: project.external_name, repositoryName: data.id });
 
-        if (harborRepository && harborRepository.artifact_count > 0) {
-            await writePositionFoundEvent({
-                command: RouterCommand.CHECK,
-                data: {
-                    artifactTag: null,
-                    operator: null,
-                    projectName: harborRepository.project_name,
-                    repositoryName: harborRepository.name_slim,
-                },
-            });
+            if (harborRepository && harborRepository.artifact_count > 0) {
+                await writePositionFoundEvent({
+                    command: RouterCommand.CHECK,
+                    data: {
+                        artifactTag: null,
+                        operator: null,
+                        projectName: harborRepository.project_name,
+                        repositoryName: harborRepository.name_short,
+                    },
+                });
 
-            return data;
+                return data;
+            }
+        } catch (e) {
+            if (!isClientErrorWithStatusCode(e, 404)) {
+                throw e;
+            }
         }
     }
 

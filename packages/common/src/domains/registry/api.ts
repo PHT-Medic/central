@@ -7,18 +7,12 @@
 
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
-import type { ClientDriverInstance } from 'hapic';
+import { BaseAPI } from '../base';
 import type { Registry } from './entity';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import { nullifyEmptyObjectProperties } from '../../utils';
 
-export class RegistryAPI {
-    protected client: ClientDriverInstance;
-
-    constructor(client: ClientDriverInstance) {
-        this.client = client;
-    }
-
+export class RegistryAPI extends BaseAPI {
     async getMany(options?: BuildInput<Registry>): Promise<CollectionResourceResponse<Registry>> {
         const response = await this.client.get(`registries${buildQuery(options)}`);
 

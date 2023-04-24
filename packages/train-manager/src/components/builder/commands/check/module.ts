@@ -12,7 +12,7 @@ import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 
-import { useClient } from 'hapic';
+import { isClientErrorWithStatusCode, useClient } from 'hapic';
 import { createBasicHarborAPIClient } from '../../../../core';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
@@ -51,19 +51,25 @@ export async function executeBuilderCheckCommand(
     const client = useClient<APIClient>();
     const incomingProject = await client.registryProject.getOne(data.entity.incoming_registry_project_id);
 
-    const harborRepository = await httpClient.projectRepository
-        .find(incomingProject.external_name, data.id);
+    try {
+        const harborRepository = await httpClient.projectRepository
+            .getOne({ projectName: incomingProject.external_name, repositoryName: data.id });
 
-    if (
-        harborRepository &&
-        harborRepository.artifact_count > 0
-    ) {
-        await writeBuiltEvent({
-            data,
-            command: BuilderCommand.CHECK,
-        });
+        if (
+            harborRepository &&
+            harborRepository.artifact_count > 0
+        ) {
+            await writeBuiltEvent({
+                data,
+                command: BuilderCommand.CHECK,
+            });
 
-        return data;
+            return data;
+        }
+    } catch (e) {
+        if (!isClientErrorWithStatusCode(e, 404)) {
+            throw e;
+        }
     }
 
     await writeNoneEvent({

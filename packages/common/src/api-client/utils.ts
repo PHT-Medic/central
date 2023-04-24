@@ -5,35 +5,37 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { DomainType } from '../domains';
 import type { APIClient } from './module';
 
-export function useDomainAPI(client: APIClient, name: string) {
+export function useDomainAPI(
+    client: APIClient,
+    name: `${DomainType}`,
+) {
     switch (name) {
-        case 'architecture':
-            return client.architecture;
-        case 'masterImage':
+        case DomainType.MASTER_IMAGE:
             return client.masterImage;
-        case 'masterImageGroup':
+        case DomainType.MASTER_IMAGE_GROUP:
             return client.masterImageGroup;
-        case 'proposal':
+        case DomainType.PROPOSAL:
             return client.proposal;
-        case 'proposalStation':
+        case DomainType.PROPOSAL_STATION:
             return client.proposalStation;
-        case 'registry':
+        case DomainType.REGISTRY:
             return client.registry;
-        case 'registryProject':
+        case DomainType.REGISTRY_PROJECT:
             return client.registryProject;
-        case 'station':
+        case DomainType.STATION:
             return client.station;
-        case 'train':
+        case DomainType.TRAIN:
             return client.train;
-        case 'trainFile':
+        case DomainType.TRAIN_FILE:
             return client.trainFile;
-        case 'trainStation':
+        case DomainType.TRAIN_STATION:
             return client.trainStation;
-        case 'service':
+        case DomainType.SERVICE:
             return client.service;
-        case 'userSecret':
+        case DomainType.USER_SECRET:
             return client.userSecret;
     }
 

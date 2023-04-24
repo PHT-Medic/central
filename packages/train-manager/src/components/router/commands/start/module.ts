@@ -14,7 +14,7 @@ import {
     REGISTRY_ARTIFACT_TAG_LATEST,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { useClient } from 'hapic';
+import { isClientErrorWithStatusCode, useClient } from 'hapic';
 import { BuilderCommand, BuilderError, buildBuilderQueuePayload } from '../../../builder';
 import type { ComponentPayloadExtended } from '../../../type';
 import { extendPayload } from '../../../utils';
@@ -51,19 +51,28 @@ export async function executeRouterStartCommand(
         });
     }
 
-    const harborRepository = await httpClient.projectRepository
-        .find(incomingProject.external_name, data.id);
+    try {
+        const harborRepository = await httpClient.projectRepository
+            .getOne({
+                projectName: incomingProject.external_name,
+                repositoryName: data.id,
+            });
 
-    if (
-        !harborRepository ||
-        harborRepository.artifact_count < 2
-    ) {
-        await publish(buildBuilderQueuePayload({
-            command: BuilderCommand.BUILD,
-            data: { id: data.id },
-        }));
+        if (
+            !harborRepository ||
+            harborRepository.artifact_count < 2
+        ) {
+            await publish(buildBuilderQueuePayload({
+                command: BuilderCommand.BUILD,
+                data: { id: data.id },
+            }));
 
-        return data;
+            return data;
+        }
+    } catch (e) {
+        if (!isClientErrorWithStatusCode(e, 404)) {
+            throw e;
+        }
     }
 
     await publish(buildRouterQueuePayload({

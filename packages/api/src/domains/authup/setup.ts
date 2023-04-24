@@ -6,13 +6,13 @@
  */
 
 import { ServerError } from '@ebec/http';
+import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import { PermissionKey, ServiceID } from '@personalhealthtrain/central-common';
 import type {
     Permission,
     Realm, Robot, Role,
 } from '@authup/core';
 import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/core';
-import { isClientError } from 'hapic';
 import { PresetRoleName, getPresetRolePermissions, useLogger } from '../../config';
 import { useAuthupClient } from '../../core';
 
@@ -98,7 +98,7 @@ export async function setupAuthupService(): Promise<any> {
 
             useLogger().debug(`Created permission ${permissionNames[i]}`);
         } catch (e) {
-            if (isClientError(e) && e.response.status === 409) {
+            if (isClientErrorWithStatusCode(e, 409)) {
                 useLogger().debug(`Permission ${permissionNames[i]} already exists`);
 
                 const { data: permissions } = await authupClient.permission.getMany({
@@ -124,7 +124,7 @@ export async function setupAuthupService(): Promise<any> {
 
                 useLogger().debug(`Created permission ${permissionNames[i]} for admin role.`);
             } catch (e) {
-                if (!isClientError(e) || e.response.status !== 409) {
+                if (!isClientErrorWithStatusCode(e, 409)) {
                     throw e;
                 }
             }
@@ -139,7 +139,7 @@ export async function setupAuthupService(): Promise<any> {
 
                 useLogger().debug(`Created permission ${permissionNames[i]} for system robot.`);
             } catch (e) {
-                if (!isClientError(e) || e.response.status !== 409) {
+                if (!isClientErrorWithStatusCode(e, 409)) {
                     throw e;
                 }
             }
@@ -190,7 +190,7 @@ export async function setupAuthupService(): Promise<any> {
                     permission_id: permissions[i].id,
                 });
             } catch (e) {
-                if (!isClientError(e) || e.response.status !== 409) {
+                if (!isClientErrorWithStatusCode(e, 409)) {
                     throw e;
                 }
             }

@@ -60,5 +60,5 @@ export async function syncMasterImages(req: Request, res: Response) : Promise<an
         });
     });
 
-    response.data.pipe(writable);
+    (response.data as any as NodeJS.ReadableStream).pipe(writable);
 }

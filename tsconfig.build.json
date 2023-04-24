@@ -13,7 +13,7 @@
         "skipLibCheck": true,
 
         "esModuleInterop": true,
-        "lib": ["ESNext"],
+        "lib": ["ESNext", "DOM"],
         "target": "ES6",
 
         "moduleResolution": "Node",

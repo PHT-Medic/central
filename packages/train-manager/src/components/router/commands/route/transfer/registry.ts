@@ -10,7 +10,7 @@ import {
     REGISTRY_ARTIFACT_TAG_BASE,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { useClient } from 'hapic';
+import { isClientErrorWithStatusCode, useClient } from 'hapic';
 import type { TransferContext } from './type';
 import { moveDockerImage } from '../../../../../core/docker/image-move';
 import { buildDockerAuthConfig, createBasicHarborAPIClient } from '../../../../../core';
@@ -61,17 +61,28 @@ export async function transferInterRegistry(context: TransferContext) {
 
     try {
         await httpClient.projectArtifact
-            .delete(context.source.project.external_name, context.source.repositoryName, context.source.artifactTag);
+            .delete({
+                projectName: context.source.project.external_name,
+                repositoryName: context.source.repositoryName,
+                tagOrDigest: context.source.artifactTag,
+            });
     } catch (e) {
-        // ...
+        if (!isClientErrorWithStatusCode(e, 404)) {
+            throw e;
+        }
     }
 
     if (context.source.artifactTag !== REGISTRY_ARTIFACT_TAG_BASE) {
         try {
             await httpClient.projectRepository
-                .delete(context.source.project.external_name, context.source.repositoryName);
+                .delete({
+                    projectName: context.source.project.external_name,
+                    repositoryName: context.source.repositoryName,
+                });
         } catch (e) {
-            // ...
+            if (!isClientErrorWithStatusCode(e, 404)) {
+                throw e;
+            }
         }
     }
 }

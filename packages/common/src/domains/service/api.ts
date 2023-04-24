@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ClientDriverInstance } from 'hapic';
+import { BaseAPI } from '../base';
 import type { RegistryAPICommand } from './registry';
 import { ServiceID } from './constants';
 import type { SingleResourceResponse } from '../types-base';
@@ -13,13 +13,7 @@ import type { SecretStorageAPICommand } from './secret-engine';
 import type { Registry } from '../registry';
 import type { RegistryProject } from '../registry-project';
 
-export class ServiceAPI {
-    protected client: ClientDriverInstance;
-
-    constructor(client: ClientDriverInstance) {
-        this.client = client;
-    }
-
+export class ServiceAPI extends BaseAPI {
     async runCommand(
         id: `${ServiceID}`,
         command: string,

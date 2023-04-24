@@ -8,18 +8,12 @@
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
 
-import type { ClientDriverInstance } from 'hapic';
+import { BaseAPI } from '../base';
 import type { MasterImage } from './entity';
 import type { MasterImageCommand } from './constants';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
-export class MasterImageAPI {
-    protected client: ClientDriverInstance;
-
-    constructor(client: ClientDriverInstance) {
-        this.client = client;
-    }
-
+export class MasterImageAPI extends BaseAPI {
     async getMany(data?: BuildInput<MasterImage>): Promise<CollectionResourceResponse<MasterImage>> {
         const response = await this.client.get(`master-images${buildQuery(data)}`);
         return response.data;

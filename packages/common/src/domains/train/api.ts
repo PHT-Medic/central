@@ -5,21 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { RequestBaseOptions } from 'hapic';
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
-import type { ClientDriverInstance, ClientRequestConfig } from 'hapic';
+import { BaseAPI } from '../base';
 import type { Train } from './entity';
 import { nullifyEmptyObjectProperties } from '../../utils';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 import type { TrainAPICommand } from './constants';
 
-export class TrainAPI {
-    protected client: ClientDriverInstance;
-
-    constructor(client: ClientDriverInstance) {
-        this.client = client;
-    }
-
+export class TrainAPI extends BaseAPI {
     getResultDownloadPath(id: Train['id']) {
         return `trains/${id}/result/download`;
     }
@@ -40,7 +35,7 @@ export class TrainAPI {
     async getOne(
         id: Train['id'],
         options?: BuildInput<Train>,
-        requestConfig?: ClientRequestConfig,
+        requestConfig?: RequestBaseOptions,
     ): Promise<SingleResourceResponse<Train>> {
         const { data: response } = await this.client
             .get(`trains/${id}${buildQuery(options)}`, requestConfig);

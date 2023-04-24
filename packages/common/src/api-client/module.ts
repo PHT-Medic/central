@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ConfigInput } from 'hapic';
+import type { RequestBaseOptions } from 'hapic';
 import { Client } from 'hapic';
 import {
     MasterImageAPI,
@@ -15,7 +15,6 @@ import {
     RegistryAPI,
     RegistryProjectAPI,
     ServiceAPI,
-    SettingsOptionAPI,
     StationAPI,
     TrainAPI,
     TrainFileAPI,
@@ -25,8 +24,6 @@ import {
 } from '../domains';
 
 export class APIClient extends Client {
-    public readonly architecture: SettingsOptionAPI;
-
     public readonly masterImage : MasterImageAPI;
 
     public readonly masterImageGroup : MasterImageGroupAPI;
@@ -53,22 +50,21 @@ export class APIClient extends Client {
 
     public readonly userSecret : UserSecretAPI;
 
-    constructor(config: ConfigInput) {
+    constructor(config: RequestBaseOptions) {
         super(config);
 
-        this.architecture = new SettingsOptionAPI(this.driver);
-        this.masterImage = new MasterImageAPI(this.driver);
-        this.masterImageGroup = new MasterImageGroupAPI(this.driver);
-        this.proposal = new ProposalAPI(this.driver);
-        this.proposalStation = new ProposalStationAPI(this.driver);
-        this.registry = new RegistryAPI(this.driver);
-        this.registryProject = new RegistryProjectAPI(this.driver);
-        this.station = new StationAPI(this.driver);
-        this.train = new TrainAPI(this.driver);
-        this.trainFile = new TrainFileAPI(this.driver);
-        this.trainLog = new TrainLogAPI(this.driver);
-        this.trainStation = new TrainStationAPI(this.driver);
-        this.service = new ServiceAPI(this.driver);
-        this.userSecret = new UserSecretAPI(this.driver);
+        this.masterImage = new MasterImageAPI({ client: this });
+        this.masterImageGroup = new MasterImageGroupAPI({ client: this });
+        this.proposal = new ProposalAPI({ client: this });
+        this.proposalStation = new ProposalStationAPI({ client: this });
+        this.registry = new RegistryAPI({ client: this });
+        this.registryProject = new RegistryProjectAPI({ client: this });
+        this.station = new StationAPI({ client: this });
+        this.train = new TrainAPI({ client: this });
+        this.trainFile = new TrainFileAPI({ client: this });
+        this.trainLog = new TrainLogAPI({ client: this });
+        this.trainStation = new TrainStationAPI({ client: this });
+        this.service = new ServiceAPI({ client: this });
+        this.userSecret = new UserSecretAPI({ client: this });
     }
 }

@@ -11,7 +11,7 @@ import {
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
 import { useClient as useVaultClient } from '@hapic/vault';
-import type { Client as VaultClient } from '@hapic/vault';
+import os from 'node:os';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
 import { RegistryCommand } from '../constants';
@@ -19,7 +19,7 @@ import type { RegistryProjectLinkPayload, RegistryProjectUnlinkPayload } from '.
 import { ensureRemoteRegistryProjectAccount } from './helpers/remote-robot-account';
 import { ensureRemoteRegistryProject } from './helpers/remote';
 import { saveRemoteRegistryProjectWebhook } from './helpers/remote-webhook';
-import { ApiKey, useLogger } from '../../../config';
+import { useLogger } from '../../../config';
 import { createBasicHarborAPIClient } from './utils';
 
 export async function linkRegistryProject(
@@ -89,7 +89,7 @@ export async function linkRegistryProject(
             },
         });
 
-        entity.external_id = project.project_id;
+        entity.external_id = `${project.project_id}`;
     } catch (e) {
         useLogger()
             .warn('Project could not be created.', {
@@ -106,7 +106,7 @@ export async function linkRegistryProject(
         const robotAccount = await ensureRemoteRegistryProjectAccount(httpClient, {
             name: entity.external_name,
             account: {
-                id: entity.account_id,
+                id: parseInt(entity.account_id, 10),
                 name: entity.account_name,
                 secret: entity.account_secret,
             },
@@ -134,15 +134,13 @@ export async function linkRegistryProject(
     await repository.save(entity);
 
     try {
-        const webhook = await saveRemoteRegistryProjectWebhook(httpClient, {
+        await saveRemoteRegistryProjectWebhook(httpClient, {
             idOrName: entity.external_name,
             isName: true,
         });
 
-        if (webhook) {
-            entity.webhook_name = webhook.name;
-            entity.webhook_exists = true;
-        }
+        entity.webhook_name = os.hostname();
+        entity.webhook_exists = true;
     } catch (e) {
         useLogger()
             .warn('Webhook could not be created.', {
@@ -184,8 +182,8 @@ export async function unlinkRegistryProject(
 
     if (payload.accountId) {
         try {
-            await httpClient.robotAccount
-                .delete(payload.accountId);
+            await httpClient.robot
+                .delete(parseInt(payload.accountId, 10));
         } catch (e) {
             useLogger()
                 .warn('Robot Account could not be deleted.', {
@@ -197,7 +195,7 @@ export async function unlinkRegistryProject(
 
     try {
         await useVaultClient()
-            .keyValue.delete(REGISTRY_PROJECT_SECRET_ENGINE_KEY, payload.externalName);
+            .keyValueV1.delete({ mount: REGISTRY_PROJECT_SECRET_ENGINE_KEY, path: payload.externalName });
     } catch (e) {
         useLogger()
             .warn('Vault project representation could not be deleted.', {

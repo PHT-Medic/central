@@ -5,7 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Client as HarborClient, ProjectWebhook } from '@hapic/harbor';
+import { isClientErrorWithStatusCode } from '@hapic/harbor';
+import type {
+    HarborClient, ProjectWebhookPolicyCreateContext, ProjectWebhookPolicyCreateResponse,
+} from '@hapic/harbor';
 import { useClient as useVaultClient } from '@hapic/vault';
 import type { RobotSecretEnginePayload } from '@personalhealthtrain/central-common';
 import {
@@ -24,30 +27,74 @@ export async function saveRemoteRegistryProjectWebhook(
         idOrName: string | number,
         isName?: boolean
     },
-) : Promise<ProjectWebhook | undefined> {
+) : Promise<ProjectWebhookPolicyCreateResponse | undefined> {
     await useAuthupClient().robot.integrity(ServiceID.REGISTRY);
 
-    const response = await useVaultClient()
-        .keyValue.find<RobotSecretEnginePayload>(ROBOT_SECRET_ENGINE_KEY, ServiceID.REGISTRY);
+    let engineData : RobotSecretEnginePayload | undefined;
 
-    if (response) {
-        const webhookData : Partial<ProjectWebhook> = {
-            name: os.hostname(),
-            targets: [
-                buildRegistryWebhookTarget({
-                    url: useEnv('apiUrl'),
-                    robot: {
-                        id: response.data.id,
-                        secret: response.data.secret,
-                    },
-                }),
+    try {
+        const response = await useVaultClient()
+            .keyValueV1.getOne<RobotSecretEnginePayload>({
+                mount: ROBOT_SECRET_ENGINE_KEY,
+                path: ServiceID.REGISTRY,
+        });
 
-            ],
+        if (response && response.data) {
+            engineData = response.data;
+        }
+    } catch (e) {
+        if (!isClientErrorWithStatusCode(e, 404)) {
+            throw e;
+        }
+    }
+
+    if (engineData) {
+        const webhookData: ProjectWebhookPolicyCreateContext = {
+            data: {
+                enabled: true, // todo: maybe add more event_types
+                name: os.hostname(),
+                targets: [
+                    buildRegistryWebhookTarget({
+                        url: useEnv('apiUrl'),
+                        robot: {
+                            id: engineData.id,
+                            secret: engineData.secret,
+                        },
+                    }),
+                ],
+            },
+            projectIdOrName: context.idOrName,
+            isProjectName: context.isName,
         };
 
-        return httpClient
-            .projectWebHook
-            .save(context.idOrName, context.isName, webhookData);
+        try {
+            const response = await httpClient
+                .projectWebhookPolicy
+                .create(webhookData);
+
+            return {
+                id: response.id,
+            };
+        } catch (e) {
+            if (isClientErrorWithStatusCode(e, 409)) {
+                const webhook = await httpClient.projectWebhookPolicy.findOne({
+                    name: os.hostname(),
+                    projectIdOrName: context.idOrName,
+                    isProjectName: context.isName,
+                });
+
+                await httpClient.projectWebhookPolicy.update({
+                    ...webhookData,
+                    id: webhook.id,
+                });
+
+                return {
+                    id: webhook.id,
+                };
+            }
+
+            throw e;
+        }
     }
 
     return undefined;

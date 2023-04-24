@@ -14,7 +14,7 @@ import {
     RegistryProjectType,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { useClient } from 'hapic';
+import { isClientErrorWithStatusCode, useClient } from 'hapic';
 import { RouterCommand } from '../../../constants';
 import { useRouterLogger } from '../../../utils';
 import type { TransferItem } from './type';
@@ -58,41 +58,69 @@ export async function transferInternal(context: TransferContext) {
 
     if (context.destination.project.type === RegistryProjectType.STATION) {
         await httpClient.projectArtifact.copy(
-            context.destination.project.external_name,
-            context.destination.repositoryName,
-            `${context.source.project.external_name}/${context.source.repositoryName}:${REGISTRY_ARTIFACT_TAG_BASE}`,
+            {
+                projectName: context.destination.project.external_name,
+                repositoryName: context.destination.repositoryName,
+            },
+            {
+                projectName: context.source.project.external_name,
+                repositoryName: context.source.repositoryName,
+                artifactTag: REGISTRY_ARTIFACT_TAG_BASE,
+            },
         );
 
         try {
             await httpClient.projectArtifact
-                .delete(context.source.project.external_name, context.source.repositoryName, REGISTRY_ARTIFACT_TAG_BASE);
+                .delete({
+                    projectName: context.source.project.external_name,
+                    repositoryName: context.source.repositoryName,
+                    tagOrDigest: REGISTRY_ARTIFACT_TAG_BASE,
+                });
         } catch (e) {
-            // ...
+            if (!isClientErrorWithStatusCode(e, 404)) {
+                throw e;
+            }
         }
     }
 
     // --------------------------------------------------------------
 
     await httpClient.projectArtifact.copy(
-
-        context.destination.project.external_name,
-        context.destination.repositoryName,
-        `${context.source.project.external_name}/${context.source.repositoryName}:${context.source.artifactTag}`,
+        {
+            projectName: context.destination.project.external_name,
+            repositoryName: context.destination.repositoryName,
+        },
+        {
+            projectName: context.source.project.external_name,
+            repositoryName: context.source.repositoryName,
+            artifactTag: context.source.artifactTag,
+        },
     );
 
     try {
         await httpClient.projectArtifact
-            .delete(context.source.project.external_name, context.source.repositoryName, context.source.artifactTag);
+            .delete({
+                projectName: context.source.project.external_name,
+                repositoryName: context.source.repositoryName,
+                tagOrDigest: context.source.artifactTag,
+            });
     } catch (e) {
-        // ...
+        if (!isClientErrorWithStatusCode(e, 404)) {
+            throw e;
+        }
     }
 
     // -------------------------------------------------------------------
 
     try {
         await httpClient.projectRepository
-            .delete(context.source.project.external_name, context.source.repositoryName);
+            .delete({
+                projectName: context.source.project.external_name,
+                repositoryName: context.source.repositoryName,
+            });
     } catch (e) {
-        // ...
+        if (!isClientErrorWithStatusCode(e, 404)) {
+            throw e;
+        }
     }
 }

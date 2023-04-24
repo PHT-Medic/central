@@ -7,17 +7,11 @@
 
 import type { BuildInput } from 'rapiq';
 import { buildQuery } from 'rapiq';
-import type { ClientDriverInstance } from 'hapic';
+import { BaseAPI } from '../base';
 import type { ProposalStation } from './entity';
 import type { CollectionResourceResponse, SingleResourceResponse } from '../types-base';
 
-export class ProposalStationAPI {
-    protected client: ClientDriverInstance;
-
-    constructor(client: ClientDriverInstance) {
-        this.client = client;
-    }
-
+export class ProposalStationAPI extends BaseAPI {
     async getMany(data?: BuildInput<ProposalStation>): Promise<CollectionResourceResponse<ProposalStation>> {
         const response = await this.client.get(`proposal-stations${buildQuery(data)}`);
 

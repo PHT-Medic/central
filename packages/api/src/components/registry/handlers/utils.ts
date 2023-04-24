@@ -7,7 +7,7 @@
 
 import type { Robot } from '@authup/core';
 import { stringifyAuthorizationHeader } from 'hapic';
-import type { Client, ProjectWebhookTarget } from '@hapic/harbor';
+import type { HarborClient, ProjectWebhookTarget } from '@hapic/harbor';
 import { createClient } from '@hapic/harbor';
 import { ServiceID } from '@personalhealthtrain/central-common';
 
@@ -29,14 +29,9 @@ export function buildRegistryWebhookTarget(
     };
 }
 
-export function createBasicHarborAPIClient(connectionString: string) : Client {
+export function createBasicHarborAPIClient(connectionString: string) : HarborClient {
     // todo: use proxy config in the future...
     return createClient({
-        driver: {
-            proxy: false,
-        },
-        extra: {
-            connectionString,
-        },
+        connectionString,
     });
 }
