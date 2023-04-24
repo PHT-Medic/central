@@ -84,7 +84,7 @@ export async function ensureRemoteRegistryProjectAccount(
 
                 if (
                     isObject(secretStorageData) &&
-                    typeof secretStorageData.account_id !== 'number' &&
+                    !!secretStorageData.account_id &&
                     !!secretStorageData.account_name &&
                     !!secretStorageData.account_secret
                 ) {

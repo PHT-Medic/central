@@ -43,11 +43,7 @@ export function createConfig() : Config {
     });
 
     const centralClient = new APIClient({
-        driver: {
-            proxy: false,
-            baseURL: useEnv('apiUrl'),
-            withCredentials: true,
-        },
+        baseURL: useEnv('apiUrl'),
     });
     mountClientResponseErrorTokenHook(centralClient, {
         baseURL: useEnv('authupApiUrl'),
