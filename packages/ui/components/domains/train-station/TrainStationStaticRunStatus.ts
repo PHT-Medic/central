@@ -6,11 +6,11 @@
  */
 
 import { TrainBuildStatus, TrainRunStatus, TrainStationStatic } from '@personalhealthtrain/central-common';
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
-import { SlotName, hasNormalizedSlot, normalizeSlot } from '@vue-layout/utils';
+import type { PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
+import { hasNormalizedSlot, normalizeSlot } from '../../../core';
 
-export default Vue.extend({
+export default defineComponent({
     props: {
         id: {
             // incoming, outgoing
@@ -30,66 +30,67 @@ export default Vue.extend({
             default: null,
         },
     },
-    computed: {
-        arrived() {
-            switch (this.id) {
+    setup(props, { slots }) {
+        const refs = toRefs(props);
+
+        const arrived = computed(() => {
+            switch (refs.id.value) {
                 case TrainStationStatic.INCOMING:
-                    return this.trainBuildStatus === TrainBuildStatus.FINISHED &&
-                        this.trainRunStatus !== TrainRunStatus.FINISHED &&
-                        this.trainRunStationIndex === null;
+                    return refs.trainBuildStatus.value === TrainBuildStatus.FINISHED &&
+                        refs.trainRunStatus.value !== TrainRunStatus.FINISHED &&
+                        refs.trainRunStationIndex.value === null;
                 case TrainStationStatic.OUTGOING:
-                    return this.trainRunStatus === TrainRunStatus.FINISHED;
+                    return refs.trainRunStatus.value === TrainRunStatus.FINISHED;
             }
 
             return false;
-        },
-        departed() {
-            switch (this.id) {
+        });
+
+        const departed = computed(() => {
+            switch (refs.id.value) {
                 case TrainStationStatic.INCOMING:
-                    return this.trainBuildStatus === TrainBuildStatus.FINISHED &&
+                    return refs.trainBuildStatus.value === TrainBuildStatus.FINISHED &&
                         (
-                            this.trainRunStatus === TrainRunStatus.RUNNING ||
-                            this.trainRunStatus === TrainRunStatus.FINISHED
+                            refs.trainRunStatus.value === TrainRunStatus.RUNNING ||
+                            refs.trainRunStatus.value === TrainRunStatus.FINISHED
                         );
             }
 
             return false;
-        },
-        statusText() {
-            if (this.arrived) {
+        });
+
+        const statusText = computed(() => {
+            if (arrived.value) {
                 return 'arrived';
             }
 
-            if (this.departed) {
+            if (departed.value) {
                 return 'departed';
             }
 
             return 'none';
-        },
-        classSuffix() {
+        });
+
+        const classSuffix = computed(() => {
             switch (true) {
-                case this.arrived:
+                case arrived.value:
                     return 'primary';
-                case this.departed:
+                case departed.value:
                     return 'success';
                 default:
                     return 'info';
             }
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
+        });
 
-        if (hasNormalizedSlot(SlotName.DEFAULT, vm.$scopedSlots, vm.$slots)) {
-            return normalizeSlot(SlotName.DEFAULT, {
-                classSuffix: vm.classSuffix,
-                statusText: vm.statusText,
-            }, vm.$scopedSlots, vm.$slots);
+        if (hasNormalizedSlot('default', slots)) {
+            return () => normalizeSlot('default', {
+                classSuffix,
+                statusText,
+            }, slots);
         }
 
-        return h('span', {
-            staticClass: `text-${vm.classSuffix}`,
-        }, [vm.statusText]);
+        return () => h('span', {
+            class: `text-${classSuffix.value}`,
+        }, [statusText.value]);
     },
 });

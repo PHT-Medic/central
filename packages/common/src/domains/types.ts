@@ -19,9 +19,9 @@ import type { TrainEventContext } from './train';
 import type { TrainFileEventContext } from './train-file';
 import type { TrainLogEventContext } from './train-log';
 import type { TrainStationEventContext } from './train-station';
-import type { UserSecretSecretEventContext } from './user-secret';
+import type { UserSecretEventContext } from './user-secret';
 
-export type DomainEventContext = MasterImageEventContext |
+export type DomainsEventContext = MasterImageEventContext |
 MasterImageGroupEventContext |
 ProposalEventContext |
 ProposalStationEventContext |
@@ -32,12 +32,34 @@ TrainEventContext |
 TrainLogEventContext |
 TrainFileEventContext |
 TrainStationEventContext |
-UserSecretSecretEventContext;
+UserSecretEventContext;
 
-export type DomainEventSubscriptionContext = {
-    event: `${DomainEventSubscriptionName}`,
-    target?: string | number
-};
+export type DomainEventContext<T extends `${DomainType}`> =
+    T extends `${DomainType.MASTER_IMAGE}` ?
+        MasterImageEventContext :
+        T extends `${DomainType.MASTER_IMAGE_GROUP}` ?
+            MasterImageGroupEventContext :
+            T extends `${DomainType.PROPOSAL}` ?
+                ProposalEventContext :
+                T extends `${DomainType.PROPOSAL_STATION}` ?
+                    ProposalStationEventContext :
+                    T extends `${DomainType.REGISTRY}` ?
+                        RegistryEventContext :
+                        T extends `${DomainType.REGISTRY_PROJECT}` ?
+                            RegistryProjectEventContext :
+                            T extends `${DomainType.STATION}` ?
+                                StationEventContext :
+                                T extends `${DomainType.TRAIN}` ?
+                                    TrainEventContext :
+                                    T extends `${DomainType.TRAIN_LOG}` ?
+                                        TrainLogEventContext :
+                                        T extends `${DomainType.TRAIN_FILE}` ?
+                                            TrainFileEventContext :
+                                            T extends `${DomainType.TRAIN_STATION}` ?
+                                                TrainStationEventContext :
+                                                T extends `${DomainType.USER_SECRET}` ?
+                                                    UserSecretEventContext :
+                                                    never;
 
 export type DomainEventFullName<
     T extends `${DomainType}` | `${DomainSubType}` = `${DomainType}` | `${DomainSubType}`,

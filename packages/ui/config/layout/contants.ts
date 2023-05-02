@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Component } from '@vue-layout/navigation';
+import type { NavigationElement } from '@vue-layout/navigation';
 import { PermissionID } from '@personalhealthtrain/central-common';
 
 export enum LayoutKey {
@@ -14,7 +14,6 @@ export enum LayoutKey {
     REQUIRED_LOGGED_OUT = 'requireLoggedOut',
 
     REQUIRED_PERMISSIONS = 'requirePermissions',
-    REQUIRED_ABILITIES = 'requireAbilities',
 }
 
 export enum LayoutNavigationID {
@@ -38,7 +37,7 @@ export const LayoutTopNavigation: Component[] = [
         ],
     },
 ];
-export const LayoutSideDefaultNavigation: Component[] = [
+export const LayoutSideDefaultNavigation: NavigationElement[] = [
     {
         name: 'Info',
         type: 'link',
@@ -104,7 +103,7 @@ export const LayoutSideDefaultNavigation: Component[] = [
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
     },
 ];
-export const LayoutSideAdminNavigation: Component[] = [
+export const LayoutSideAdminNavigation: NavigationElement[] = [
     {
         name: 'Auth',
         type: 'link',

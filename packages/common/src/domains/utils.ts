@@ -28,7 +28,7 @@ export function buildDomainEventSubscriptionFullName<T extends `${DomainType}` |
     return type + eventCapitalized as DomainEventSubscriptionFullName<T>;
 }
 
-export function buildDomainChannelName(type: string, id?: string | number) {
+export function buildDomainChannelName(type: `${DomainType}` | `${DomainSubType}`, id?: string | number) {
     return `${type}${id ? `:${id}` : ''}`;
 }
 

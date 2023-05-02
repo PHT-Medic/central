@@ -5,109 +5,94 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CreateElement, VNode } from 'vue';
-import Vue from 'vue';
+import { defineComponent } from 'vue';
 import LicenseAgreementContent from './LicenseAgreementContent.vue';
 
-export default Vue.extend<any, any, any, any>({
+export default defineComponent({
     name: 'LicenseAgreementForm',
-    data() {
-        return {
-            busy: false,
-        };
-    },
-    methods: {
-        async accept() {
-            if (this.busy) {
+    emits: ['accepted', 'failed', 'declined'],
+    setup(props, { emit }) {
+        const busy = ref(false);
+
+        const accept = async () => {
+            if (busy.value) {
                 return;
             }
 
-            this.busy = true;
+            busy.value = true;
 
             try {
-                const userAttribute = await this.$authupApi.userAttribute.create({
-                    name: 'license_agreement',
-                    value: 'accepted',
-                });
+                const userAttribute = await useAuthupAPI()
+                    .userAttribute.create({
+                        name: 'license_agreement',
+                        value: 'accepted',
+                    });
 
-                this.$emit('accepted', userAttribute);
+                emit('accepted', userAttribute);
             } catch (e) {
                 if (e instanceof Error) {
-                    this.$emit('failed', e);
+                    emit('failed', e);
                 }
             }
 
-            this.busy = false;
-        },
-        decline() {
-            this.$emit('declined');
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
+            busy.value = false;
+        };
 
-        const info = h('div', {
-            staticClass: 'alert alert-sm alert-warning',
-        }, [
-            h('i', { class: 'fa fa-exclamation-triangle pr-1' }),
-            'It is necessary to accept the license agreement',
-            ' in order to be able to use the application in its entirety.',
-        ]);
+        const decline = () => {
+            emit('declined');
+        };
 
-        const content = h('div', [
-            h(LicenseAgreementContent),
-        ]);
-
-        const accept = h('button', {
-            staticClass: 'btn btn-xs btn-success',
-            attrs: {
-                type: 'button',
-            },
-            on: {
-                click($event) {
-                    $event.preventDefault();
-
-                    vm.accept.call(null);
-                },
-            },
-        }, [
-            h('i', { staticClass: 'fa-solid fa-check pr-1' }),
-            'Accept',
-        ]);
-
-        const decline = h('button', {
-            staticClass: 'btn btn-xs btn-dark',
-            attrs: {
-                type: 'button',
-            },
-            on: {
-                click($event) {
-                    $event.preventDefault();
-
-                    vm.decline.call(null);
-                },
-            },
-        }, [
-            h('i', { staticClass: 'fa-solid fa-times pr-1' }),
-            'Decline',
-        ]);
-
-        return h('div', [
-            info,
-            h('hr'),
-            content,
-            h('hr'),
-            h('div', {
-                staticClass: 'd-flex flex-row',
+        return () => {
+            const info = h('div', {
+                class: 'alert alert-sm alert-warning',
             }, [
-                h('div', [
-                    accept,
+                h('i', { class: 'fa fa-exclamation-triangle pr-1' }),
+                'It is necessary to accept the license agreement',
+                ' in order to be able to use the application in its entirety.',
+            ]);
+
+            const content = h('div', [
+                h(LicenseAgreementContent),
+            ]);
+
+            return h('div', [
+                info,
+                h('hr'),
+                content,
+                h('hr'),
+                h('div', {
+                    class: 'd-flex flex-row',
+                }, [
+                    h('div', [
+                        h('button', {
+                            class: 'btn btn-xs btn-success',
+                            type: 'button',
+                            onClick($event: any) {
+                                $event.preventDefault();
+
+                                return accept();
+                            },
+                        }, [
+                            h('i', { class: 'fa-solid fa-check pr-1' }),
+                            'Accept',
+                        ]),
+                    ]),
+                    h('div', { class: 'ml-1' }, [
+                        h('button', {
+                            class: 'btn btn-xs btn-dark',
+                            type: 'button',
+                            onClick($event: any) {
+                                $event.preventDefault();
+
+                                decline();
+                            },
+                        }, [
+                            h('i', { class: 'fa-solid fa-times pr-1' }),
+                            'Decline',
+                        ]),
+                    ]),
                 ]),
-                h('div', { staticClass: 'ml-1' }, [
-                    decline,
-                ]),
-            ]),
-        ]);
+            ]);
+        };
     },
 });

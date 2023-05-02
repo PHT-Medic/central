@@ -4,16 +4,12 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
+import type { PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
-import { SlotName, hasNormalizedSlot, normalizeSlot } from '@vue-layout/utils';
+import { hasNormalizedSlot, normalizeSlot } from '../../../core';
 
-type Properties = {
-    status?: TrainStationApprovalStatus
-};
-
-export default Vue.extend<any, any, any, Properties>({
+export default defineComponent({
     name: 'TrainStationApprovalStatus',
     props: {
         status: {
@@ -21,9 +17,11 @@ export default Vue.extend<any, any, any, Properties>({
             default: undefined,
         },
     },
-    computed: {
-        statusText() {
-            switch (this.status) {
+    setup(props, { slots }) {
+        const status = toRef(props, 'status');
+
+        const statusText = computed(() => {
+            switch (status.value) {
                 case TrainStationApprovalStatus.APPROVED:
                     return 'approved';
                 case TrainStationApprovalStatus.REJECTED:
@@ -31,9 +29,10 @@ export default Vue.extend<any, any, any, Properties>({
                 default:
                     return 'none';
             }
-        },
-        classSuffix() {
-            switch (this.status) {
+        });
+
+        const classSuffix = computed(() => {
+            switch (status.value) {
                 case 'approved':
                     return 'success';
                 case 'rejected':
@@ -41,19 +40,15 @@ export default Vue.extend<any, any, any, Properties>({
                 default:
                     return 'info';
             }
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
+        });
 
-        if (hasNormalizedSlot(SlotName.DEFAULT, vm.$scopedSlots, vm.$slots)) {
-            return normalizeSlot(SlotName.DEFAULT, {
-                classSuffix: vm.classSuffix,
-                statusText: vm.statusText,
-            }, vm.$scopedSlots, vm.$slots);
+        if (hasNormalizedSlot('default', slots)) {
+            return () => normalizeSlot('default', {
+                classSuffix,
+                statusText,
+            }, slots);
         }
 
-        return h('span', { staticClass: `text-${vm.classSuffix}` }, vm.statusText);
+        return () => h('span', { staticClass: `text-${classSuffix.value}` }, statusText.value);
     },
 });

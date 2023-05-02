@@ -4,11 +4,6 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-export default {
-
-};
-</script>
 <template>
     <div class="alert alert-info alert-sm">
         The train is now fully configured and can now be built.<br>

@@ -16,15 +16,18 @@ import {
     TrainLogSocketServerToClientEventName,
     buildSocketTrainLogRoomName,
 } from '@personalhealthtrain/central-common';
-import type { ComponentListHandlerMethodOptions, PaginationMeta } from '@vue-layout/utils';
 import type { Socket } from 'socket.io-client';
-import type { CreateElement, PropType, VNode } from 'vue';
+import type { PropType, VNode } from 'vue';
 import Vue from 'vue';
 import TrainLogComponent from './TrainLog.vue';
 
-export default Vue.extend({
+export default defineComponent({
+    name: 'TrainLogs',
     props: {
-        entity: Object as PropType<Train>,
+        entityId: {
+            type: String,
+            required: true,
+        },
     },
     data() {
         return {

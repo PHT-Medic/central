@@ -5,36 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 import type { RegistryProject, Station } from '@personalhealthtrain/central-common';
 import {
     Ecosystem,
 } from '@personalhealthtrain/central-common';
 import RegistryProjectDetails from '../registry-project/RegistryProjectDetails';
 
-type Properties = {
-    entity: Station
-};
-
-export default Vue.extend<any, any, any, Properties>({
+export default defineComponent({
     name: 'StationRegistryProjectDetails',
     props: {
-        entity: Object as PropType<Station>,
-    },
-    methods: {
-        handleUpdated(item: RegistryProject) {
-            this.$emit('updated', {
-                registry_project_id: item.id,
-                registry_project: item,
-            });
+        entity: {
+            type: Object as PropType<Station>,
+            required: true,
         },
     },
-    render(h: CreateElement): VNode {
-        const vm = this;
-
-        if (vm.entity.ecosystem !== Ecosystem.DEFAULT) {
-            return h(
+    emits: ['updated'],
+    setup(props, { emit }) {
+        if (props.entity.ecosystem !== Ecosystem.DEFAULT) {
+            return () => h(
                 'div',
                 { staticClass: 'alert alert-sm alert-danger' },
                 [
@@ -43,8 +33,8 @@ export default Vue.extend<any, any, any, Properties>({
             );
         }
 
-        if (!vm.entity.registry_id) {
-            return h(
+        if (!props.entity.registry_id) {
+            return () => h(
                 'div',
                 { staticClass: 'alert alert-sm alert-warning' },
                 [
@@ -53,8 +43,8 @@ export default Vue.extend<any, any, any, Properties>({
             );
         }
 
-        if (!vm.entity.registry_project_id) {
-            return h(
+        if (!props.entity.registry_project_id) {
+            return () => h(
                 'div',
                 { staticClass: 'alert alert-sm alert-warning' },
                 [
@@ -65,16 +55,17 @@ export default Vue.extend<any, any, any, Properties>({
             );
         }
 
-        return h(
+        return () => h(
             RegistryProjectDetails,
             {
                 props: {
-                    entityId: vm.entity.registry_project_id,
+                    entityId: props.entity.registry_project_id,
                 },
-                on: {
-                    resolved(item) {
-                        vm.handleUpdated.call(null, item);
-                    },
+                onResolved(item: RegistryProject) {
+                    emit('updated', {
+                        registry_project_id: item.id,
+                        registry_project: item,
+                    });
                 },
             },
         );

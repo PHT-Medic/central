@@ -5,19 +5,29 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Context } from '@nuxt/types';
-import type { Inject } from '@nuxt/types/app';
-import { SocketModule } from '../config/socket';
+import { SocketModule } from '../core';
 
-export default (ctx: Context, inject: Inject) => {
-    const url = ctx.$config.realtimeUrl ??
+declare module '#app' {
+    interface NuxtApp {
+        $socket: SocketModule;
+    }
+}
+
+declare module '@vue/runtime-core' {
+    interface ComponentCustomProperties {
+        $socket: SocketModule;
+    }
+}
+
+export default defineNuxtPlugin((ctx) => {
+    const url = ctx.$config.public.realtimeUrl ??
         process.env.REALTIME_URL ??
         'http://localhost:3001/';
 
-    let transports = [];
+    let transports : string[] = [];
 
     const rawTransports = process.env.REALTIME_TRANSPORTS ||
-        ctx.$config.realtimeTransports;
+        ctx.$config.public.realtimeTransports;
 
     if (
         rawTransports &&
@@ -32,12 +42,12 @@ export default (ctx: Context, inject: Inject) => {
         transports = ['websocket', 'polling'];
     }
 
-    const adapter = new SocketModule(ctx, {
+    const adapter = new SocketModule({
         url,
         options: {
             transports,
         },
     });
 
-    inject('socket', adapter);
-};
+    ctx.provide('socket', adapter);
+});

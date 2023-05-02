@@ -5,11 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Context } from '@nuxt/types';
 import { Ilingo } from 'ilingo';
-import type { Inject } from '@nuxt/types/app';
 
-export default async (ctx: Context, inject: Inject) => {
+declare module '#app' {
+    interface NuxtApp {
+        $ilingo: Ilingo;
+    }
+}
+
+declare module '@vue/runtime-core' {
+    interface ComponentCustomProperties {
+        $ilingo: Ilingo;
+    }
+}
+
+export default defineNuxtPlugin((ctx) => {
     const ilingo = new Ilingo();
 
     ilingo.setCache({
@@ -63,5 +73,5 @@ export default async (ctx: Context, inject: Inject) => {
         },
     });
 
-    inject('ilingo', ilingo);
-};
+    ctx.provide('ilingo', ilingo);
+});

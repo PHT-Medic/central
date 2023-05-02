@@ -5,58 +5,61 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
+import { useToast } from 'bootstrap-vue-next';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 import type { Registry } from '@personalhealthtrain/central-common';
 import { RegistryAPICommand } from '@personalhealthtrain/central-common';
 import EntityDelete from '../EntityDelete';
-import { MasterImageList } from '../master-image/MasterImageList';
+import MasterImageList from '../master-image/MasterImageList';
 
-export default Vue.extend({
+export default defineComponent({
     components: { EntityDelete, MasterImageList },
     props: {
-        entityId: String as PropType<Registry['id']>,
-    },
-    data() {
-        return {
-            busy: false,
-        };
-    },
-    methods: {
-        async setup() {
-            if (this.busy) return;
-
-            this.busy = true;
-
-            try {
-                await this.$api.service.runRegistryCommand(RegistryAPICommand.SETUP, {
-                    id: this.entityId,
-                });
-
-                this.$bvToast.toast('You successfully executed the setup routine.', {
-                    toaster: 'b-toaster-top-center',
-                });
-            } catch (e) {
-                this.$bvToast.toast(e.message, {
-                    toaster: 'b-toaster-top-center',
-                    variant: 'danger',
-                });
-            }
-
-            this.busy = false;
+        entityId: {
+            type: String as PropType<Registry['id']>,
+            required: true,
         },
     },
-    render(h: CreateElement): VNode {
-        const vm = this;
+    setup(props) {
+        const toast = useToast();
 
-        return h('div', [
+        const busy = ref(false);
+
+        const setup = async () => {
+            if (busy.value) return;
+
+            busy.value = true;
+
+            try {
+                await useAPI().service.runRegistryCommand(RegistryAPICommand.SETUP, {
+                    id: props.entityId,
+                });
+
+                if (toast) {
+                    toast.success({ body: 'You successfully executed the setup routine.' }, {
+                        pos: 'top-center',
+                    });
+                }
+            } catch (e) {
+                if (toast && e instanceof Error) {
+                    toast.danger({ body: e.message }, {
+                        pos: 'top-center',
+                    });
+                }
+            }
+
+            busy.value = false;
+        };
+
+        return () => h('div', [
             h('h6', [
-                h('i', { staticClass: 'fa fa-sign-in-alt mr-1' }),
+                h('i', { class: 'fa fa-sign-in-alt mr-1' }),
                 'Incoming',
             ]),
-            h('p', { staticClass: 'mb-1' }, [
+            h('p', { class: 'mb-1' }, [
                 'The incoming project is required for the',
-                h('i', { staticClass: 'pl-1 pr-1' }, ['TrainBuilder']),
+                h('i', { class: 'pl-1 pr-1' }, ['TrainBuilder']),
                 'to work properly. When the TrainBuilder ' +
                 'is finished with building the train, the train will be pushed to the incoming project. ' +
                 'From there the TrainRouter can move it to the first station project of the route.',
@@ -65,12 +68,12 @@ export default Vue.extend({
             h('hr'),
 
             h('h6', [
-                h('i', { staticClass: 'fa fa-sign-out-alt mr-1' }),
+                h('i', { class: 'fa fa-sign-out-alt mr-1' }),
                 'Outgoing',
             ]),
-            h('p', { staticClass: 'mb-1' }, [
+            h('p', { class: 'mb-1' }, [
                 'The outgoing project is required for the',
-                h('i', { staticClass: 'pl-1 pr-1' }, 'ResultService'),
+                h('i', { class: 'pl-1 pr-1' }, 'ResultService'),
                 'to pull the train from the',
                 'outgoing project and extract the results of the journey.',
             ]),
@@ -78,7 +81,7 @@ export default Vue.extend({
             h('hr'),
 
             h('h6', [
-                h('i', { staticClass: 'fa fa-info mr-1' }),
+                h('i', { class: 'fa fa-info mr-1' }),
                 'Info',
             ]),
             h('p', [
@@ -87,23 +90,16 @@ export default Vue.extend({
             ]),
 
             h('button', {
-                domProps: {
-                    disabled: vm.busy,
-                },
-                attrs: {
-                    type: 'button',
-                    disabled: vm.busy,
-                },
-                staticClass: 'btn btn-xs btn-dark',
-                on: {
-                    click(event) {
-                        event.preventDefault();
+                type: 'button',
+                disabled: busy.value,
+                class: 'btn btn-xs btn-dark',
+                onClick(event: any) {
+                    event.preventDefault();
 
-                        vm.setup.call(null);
-                    },
+                    return setup();
                 },
             }, [
-                h('i', { staticClass: 'fa fa-cogs mr-1' }),
+                h('i', { class: 'fa fa-cogs mr-1' }),
                 'Setup',
             ]),
         ]);

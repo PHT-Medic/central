@@ -5,10 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CreateElement, VNode } from 'vue';
-import Vue from 'vue';
+import { computed, defineComponent } from 'vue';
 
-export const AssignmentToggleButton = Vue.extend({
+export const AssignmentToggleButton = defineComponent({
     name: 'AssignmentToggleButton',
     props: {
         id: {
@@ -21,43 +20,34 @@ export const AssignmentToggleButton = Vue.extend({
             default: false,
         },
     },
-    computed: {
-        isSelected() {
-            return Array.isArray(this.ids) ?
-                this.ids.indexOf(this.id) !== -1 : false;
-        },
-    },
-    methods: {
-        toggle() {
-            this.$emit('toggle', this.id);
-        },
-    },
-    render(h: CreateElement): VNode {
-        const vm = this;
+    emits: ['toggle'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
 
-        return h('button', {
-            staticClass: 'btn btn-xs',
-            class: {
-                'btn-warning': vm.isSelected,
-                'btn-success': !vm.isSelected,
-            },
-            attrs: {
-                type: 'button',
-            },
-            on: {
-                click($event: any) {
-                    $event.preventDefault();
+        const isSelected = computed(() => (Array.isArray(refs.ids) ?
+            refs.ids.indexOf(refs.id) !== -1 : false));
 
-                    return vm.toggle.apply(null);
-                },
+        const toggle = () => {
+            emit('toggle', refs.id);
+        };
+
+        return () => h('button', {
+            class: ['btn btn-xs', {
+                'btn-warning': isSelected.value,
+                'btn-success': !isSelected.value,
+            }],
+            type: 'button',
+            onClick($event: any) {
+                $event.preventDefault();
+
+                return toggle.apply(null);
             },
         }, [
             h('i', {
-                staticClass: 'fa',
-                class: {
-                    'fa-plus': !vm.isSelected,
-                    'fa-minus': vm.isSelected,
-                },
+                class: ['fa', {
+                    'fa-plus': !isSelected.value,
+                    'fa-minus': isSelected.value,
+                }],
             }),
         ]);
     },

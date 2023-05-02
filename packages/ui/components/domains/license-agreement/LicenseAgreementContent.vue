@@ -5,26 +5,31 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-export default {
-    data() {
+import { defineComponent, ref } from 'vue';
+
+export default defineComponent({
+    setup() {
+        const current = ref(1);
+        const items = ref([
+            { id: 1, name: 'Nutzervereinbarung' },
+            { id: 2, name: 'Seitennutzung; Bedingung der Nutzung' },
+            { id: 3, name: 'Gültigkeit dieser Vereinbarung' },
+            { id: 4, name: 'Regeln für Gewinnspiele, ...' },
+            { id: 5, name: 'Diverses' },
+            { id: 6, name: 'Kontaktinformationen' },
+        ]);
+
+        const change = (id) => {
+            current.value = id;
+        };
+
         return {
-            current: 1,
-            items: [
-                { id: 1, name: 'Nutzervereinbarung' },
-                { id: 2, name: 'Seitennutzung; Bedingung der Nutzung' },
-                { id: 3, name: 'Gültigkeit dieser Vereinbarung' },
-                { id: 4, name: 'Regeln für Gewinnspiele, ...' },
-                { id: 5, name: 'Diverses' },
-                { id: 6, name: 'Kontaktinformationen' },
-            ],
+            current,
+            items,
+            change,
         };
     },
-    methods: {
-        change(id) {
-            this.current = id;
-        },
-    },
-};
+});
 </script>
 <template>
     <div>

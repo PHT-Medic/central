@@ -13,8 +13,8 @@ import {
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import type { TrainCommandProperties } from './type';
-import { renderActionCommand } from '../../../render/utils';
-import type { ActionCommandMethods } from '../../../render/type';
+import { renderActionCommand } from '../../../../core/render/action-command/utils';
+import type { ActionCommandMethods } from '../../../../core/render/action-command/type';
 
 export const TrainRunCommand = Vue.extend<any, ActionCommandMethods, any, TrainCommandProperties>({
     props: {

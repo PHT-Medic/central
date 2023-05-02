@@ -4,250 +4,161 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
+import { SlotName } from '@vue-layout/list-controls';
+import type {
+    PropType, VNode,
+} from 'vue';
+import { computed, defineComponent } from 'vue';
 import type {
     Proposal,
-    SocketClientToServerEvents,
-    SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
 import {
-    PermissionID, ProposalSocketClientToServerEventName, ProposalSocketServerToClientEventName,
+    DomainType,
+    PermissionID,
 } from '@personalhealthtrain/central-common';
-import { SlotName, hasNormalizedSlot, normalizeSlot } from '@vue-layout/utils';
-import type { Socket } from 'socket.io-client';
+import { hasNormalizedSlot, normalizeSlot } from '../../../core';
+import { useAuthStore } from '../../../store/auth';
 import EntityDelete from '../EntityDelete';
+import type { ProposalDetailsSlotProps } from './ProposalDetails';
+import ProposalDetails from './ProposalDetails';
 
-export const ProposalItem = Vue.extend({
+export default defineComponent({
     name: 'ProposalItem',
     props: {
-        entity: Object as PropType<Proposal>,
-    },
-    data() {
-        return {
-            busy: false,
-
-            extendView: false,
-
-            socketLockId: null,
-        };
-    },
-    computed: {
-        canDrop() {
-            return this.$auth.has(PermissionID.PROPOSAL_DROP);
-        },
-        userName() {
-            return this.entity.user_id;
+        entity: {
+            type: Object as PropType<Proposal>,
+            required: true,
         },
     },
-    mounted() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
-        socket.emit(ProposalSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.entity.id } });
+    setup(props, { slots }) {
+        const store = useAuthStore();
+        const canDrop = computed(() => store.has(PermissionID.PROPOSAL_DROP));
 
-        socket.on(ProposalSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
-        socket.on(ProposalSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
+        return () => h(ProposalDetails, {}, {
+            default: (props: ProposalDetailsSlotProps) => {
+                let deleteAction : VNode | undefined;
 
-        socket.emit(ProposalSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.entity.id } });
-        socket.off(ProposalSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
-        socket.off(ProposalSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
-    },
-    methods: {
-        handleSocketUpdated(context) {
-            if (
-                this.entity.id !== context.data.id ||
-                this.socketLockId === context.data.id ||
-                context.meta.roomId !== this.entity.id
-            ) return;
+                let itemActions : VNode | VNode[] | undefined;
 
-            this.handleUpdated(context.data);
-        },
-        handleSocketDeleted(context) {
-            if (
-                this.entity.id !== context.data.id ||
-                this.socketLockId === context.data.id ||
-                context.meta.roomId !== this.entity.id
-            ) return;
-
-            this.handleDeleted({ ...context.data });
-        },
-        handleUpdated(entity) {
-            this.$emit('updated', entity);
-        },
-        handleDeleted(entity) {
-            this.$emit('deleted', entity);
-        },
-        handleFailed(e) {
-            this.$emit('failed', e);
-        },
-
-        async edit(item) {
-            if (this.busy) return;
-
-            this.busy = true;
-
-            try {
-                this.socketLockId = this.entity.id;
-                const response = await this.$api.proposal.update(this.entity.id, item);
-                this.socketLockId = null;
-
-                this.handleUpdated(response);
-            } catch (e) {
-                this.handleFailed(e);
-            }
-
-            this.busy = false;
-        },
-    },
-    render(h: CreateElement): VNode {
-        const vm = this;
-
-        let deleteAction = h();
-
-        let itemActions = [];
-
-        if (vm.canDrop) {
-            deleteAction = h(
-                EntityDelete,
-                {
-                    props: {
-                        withText: false,
-                        entityId: vm.entity.id,
-                        entityType: 'proposal',
-                    },
-                    attrs: {
-                        disabled: vm.busy || vm.entity.trains > 0,
-                    },
-                    domProps: {
-                        disabled: vm.busy || vm.entity.trains > 0,
-                    },
-                    staticClass: 'btn btn-xs btn-danger ml-1',
-                    on: {
-                        deleted(data) {
-                            vm.handleDeleted.call(vm, data);
+                if (canDrop.value) {
+                    deleteAction = h(
+                        EntityDelete,
+                        {
+                            withText: false,
+                            entityId: props.entity.id,
+                            entityType: DomainType.PROPOSAL,
+                            disabled: props.busy || props.entity.trains > 0,
+                            class: 'btn btn-xs btn-danger ml-1',
+                            onDeleted(data: any) {
+                                props.deleted(data);
+                            },
                         },
-                    },
-                },
-            );
-        }
+                    );
+                }
 
-        if (hasNormalizedSlot(SlotName.ITEM_ACTIONS, vm.$scopedSlots, vm.$slots)) {
-            itemActions = normalizeSlot(SlotName.ITEM_ACTIONS, { item: vm.entity, busy: vm.busy }, vm.$scopedSlots, vm.$slots);
-        } else {
-            itemActions = [
-                h(
-                    'nuxt-link',
-                    {
-                        props: {
-                            to: `/proposals/${vm.entity.id}`,
-                        },
-                        attrs: {
-                            disabled: vm.busy,
-                        },
-                        domProps: {
-                            disabled: vm.busy,
-                        },
-                        staticClass: 'btn btn-xs btn-dark',
-                    },
-                    [
-                        h('i', { staticClass: 'fa fa-bars' }),
-                    ],
-                ),
-                deleteAction,
-            ];
-        }
+                if (hasNormalizedSlot(SlotName.ITEM_ACTIONS, slots)) {
+                    itemActions = normalizeSlot(SlotName.ITEM_ACTIONS, props, slots);
+                } else {
+                    itemActions = [
+                        h(
+                            'nuxt-link',
+                            {
+                                to: `/proposals/${props.entity.id}`,
+                                disabled: props.busy,
+                                class: 'btn btn-xs btn-dark',
+                            },
+                            [
+                                h('i', { class: 'fa fa-bars' }),
+                            ],
+                        ),
+                    ];
 
-        return h(
-            'div',
-            { staticClass: 'p-1' },
-            [
-                h(
+                    if (deleteAction) {
+                        itemActions.push(deleteAction);
+                    }
+                }
+
+                return h(
                     'div',
-                    { staticClass: 'd-flex flex-row algin-items-center' },
+                    { class: 'p-1' },
                     [
-                        h('div', [
-                            h('i', {
-                                staticClass: 'fa-solid fa-scroll pr-1',
-                            }),
-                        ]),
                         h(
                             'div',
+                            { class: 'd-flex flex-row algin-items-center' },
                             [
+                                h('div', [
+                                    h('i', {
+                                        class: 'fa-solid fa-scroll pe-1',
+                                    }),
+                                ]),
                                 h(
-                                    'nuxt-link',
-                                    {
-                                        props: {
-                                            to: `/proposals/${vm.entity.id}`,
-                                        },
-                                        staticClass: 'mb-0',
-                                    },
+                                    'div',
                                     [
-                                        vm.entity.title,
+                                        h(
+                                            'nuxt-link',
+                                            {
+                                                props: {
+                                                    to: `/proposals/${props.entity.id}`,
+                                                },
+                                                class: 'mb-0',
+                                            },
+                                            [
+                                                props.entity.title,
+                                            ],
+                                        ),
                                     ],
+                                ),
+                                h(
+                                    'div',
+                                    {
+                                        class: 'ml-auto',
+                                    },
+                                    itemActions,
                                 ),
                             ],
                         ),
                         h(
                             'div',
                             {
-                                staticClass: 'ml-auto',
+                                class: 'd-flex flex-row',
                             },
-                            itemActions,
+                            [
+                                h('div', [
+                                    h(
+                                        'small',
+                                        [
+                                            h('span', { class: 'text-primary' }, [props.entity.trains]),
+                                            ' ',
+                                            'Train(s)',
+                                        ],
+                                    ),
+                                    h('span', { class: 'me-1' }, [',']),
+                                    h('small', [
+                                        h('span', { class: 'text-muted' }, [
+                                            'updated',
+                                        ]),
+                                        ' ',
+                                        h('timeago', {
+                                            datetime: props.entity.updated_at,
+                                        }),
+                                    ]),
+                                ]),
+                                h('div', { class: 'ml-auto' }, [
+                                    h('small', [
+                                        h('span', { class: 'text-muted' }, [
+                                            'created by',
+                                        ]),
+                                        ' ',
+                                        h('span', [
+                                            props.entity.user_id,
+                                        ]),
+                                    ]),
+                                ]),
+                            ],
                         ),
                     ],
-                ),
-                h(
-                    'div',
-                    {
-                        staticClass: 'd-flex flex-row',
-                    },
-                    [
-                        h('div', [
-                            h(
-                                'small',
-                                [
-                                    h('span', { staticClass: 'text-primary' }, [vm.entity.trains]),
-                                    ' ',
-                                    'Train(s)',
-                                ],
-                            ),
-                            h('span', { staticClass: 'mr-1' }, [',']),
-                            h('small', [
-                                h('span', { staticClass: 'text-muted' }, [
-                                    'updated',
-                                ]),
-                                ' ',
-                                h('timeago', {
-                                    props: {
-                                        datetime: vm.entity.updated_at,
-                                    },
-                                }),
-                            ]),
-                        ]),
-                        h('div', { staticClass: 'ml-auto' }, [
-                            h('small', [
-                                h('span', { staticClass: 'text-muted' }, [
-                                    'created by',
-                                ]),
-                                ' ',
-                                h('span', [
-                                    vm.userName,
-                                ]),
-                            ]),
-                        ]),
-                    ],
-                ),
-            ],
-        );
+                );
+            },
+        });
     },
 });
-
-export default ProposalItem;

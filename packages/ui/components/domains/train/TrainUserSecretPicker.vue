@@ -7,15 +7,18 @@
 <script lang="ts">
 import type { Train } from '@personalhealthtrain/central-common';
 import { SecretType } from '@personalhealthtrain/central-common';
-import { UserSecretList } from '../user-secret/UserSecretList';
+import { storeToRefs } from 'pinia';
+import { defineComponent, toRefs } from 'vue';
+import { useAuthStore } from '../../../store/auth';
+import UserSecretList from '../user-secret/UserSecretList';
 
-export default {
+export default defineComponent({
     name: 'TrainUserSecretPicker',
     components: { UserSecretList },
     props: {
         trainId: {
             type: String,
-            default: undefined,
+            required: true,
         },
         userRsaSecretId: {
             type: String,
@@ -26,49 +29,43 @@ export default {
             default: undefined,
         },
     },
-    data() {
-        return {
-            loading: false,
+    setup(props, { emit }) {
+        const refs = toRefs(props);
 
-            secretType: SecretType,
+        const store = useAuthStore();
+        const { userId } = storeToRefs(store);
 
-            userSecret: {
-                items: [],
-                busy: false,
-            },
-        };
-    },
-    computed: {
-        userId() {
-            return this.$store.getters['auth/userId'];
-        },
-    },
-    methods: {
-        async set(type, value) {
-            const payload : Partial<Train> = {};
+        const payload : Partial<Train> = {};
 
+        const set = async (type: `${SecretType}`, value: string | null) => {
             switch (type) {
                 case SecretType.RSA_PUBLIC_KEY: {
-                    payload.user_rsa_secret_id = value;
+                    payload.user_rsa_secret_id = value as string;
                     break;
                 }
                 case SecretType.PAILLIER_PUBLIC_KEY: {
-                    payload.user_paillier_secret_id = value;
+                    payload.user_paillier_secret_id = value as string;
                     break;
                 }
             }
 
-            await this.$api.train.update(this.trainId, payload);
+            await this.$api.train.update(refs.trainId.value, payload);
 
-            this.$emit('updated', payload);
-        },
+            emit('updated', payload);
+        };
+
+        return {
+            userId,
+            secretType: SecretType,
+            set,
+        };
     },
-};
+});
 </script>
 <template>
     <div class="row">
         <div class="col">
-            <user-secret-list
+            <UserSecretList
                 ref="itemsList"
                 :with-header="false"
                 :query="{filter: {user_id: userId}, sort: {created_at: 'DESC'}}"
@@ -95,7 +92,7 @@ export default {
                         </template>
                     </div>
                 </template>
-            </user-secret-list>
+            </UserSecretList>
         </div>
         <div class="col">
             <div class="d-flex flex-column">

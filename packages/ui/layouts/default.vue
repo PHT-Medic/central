@@ -4,33 +4,31 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import 'vue-form-wizard/dist/vue-form-wizard.min.css';
+<script lang="ts">
 
-import pageHeader from './header';
-import pageSidebar from './sidebar';
-import pageFooter from './footer';
+import PageHeader from '../components/layout/header.vue';
+import PageSidebar from '../components/layout/sidebar.vue';
+import PageFooter from '../components/layout/footer.vue';
+import { defineNuxtComponent } from '#app';
 
-export default {
-    name: 'App',
-    // eslint-disable-next-line vue/no-unused-components
-    components: { pageFooter, pageSidebar, pageHeader },
+export default defineNuxtComponent({
+    components: { PageHeader, PageSidebar, PageFooter },
     computed: {
 
     },
-};
+});
 </script>
 
 <template>
     <div id="app">
-        <page-header />
+        <PageHeader />
         <div class="page-wrapper">
-            <page-sidebar />
+            <PageSidebar />
             <div class="page-content">
                 <nuxt />
             </div>
         </div>
-        <page-footer />
+        <PageFooter />
     </div>
 </template>
 <style>

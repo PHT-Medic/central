@@ -5,34 +5,25 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Robot } from '@authup/core';
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 import type { Station } from '@personalhealthtrain/central-common';
 import {
     Ecosystem,
 } from '@personalhealthtrain/central-common';
 import RobotDetails from '../robot/RobotDetails';
 
-type Properties = {
-    entity: Station
-};
-
-export default Vue.extend<any, any, any, Properties>({
+export default defineComponent({
     name: 'StationRobotDetails',
     props: {
-        entity: Object as PropType<Station>,
-    },
-    methods: {
-        handleUpdated(item: Robot) {
-            // do: nothing
+        entity: {
+            type: Object as PropType<Station>,
+            required: true,
         },
     },
-    render(h: CreateElement): VNode {
-        const vm = this;
-
-        if (vm.entity.ecosystem !== Ecosystem.DEFAULT) {
-            return h(
+    setup(props) {
+        if (props.entity.ecosystem !== Ecosystem.DEFAULT) {
+            return () => h(
                 'div',
                 { staticClass: 'alert alert-sm alert-danger' },
                 [
@@ -41,21 +32,11 @@ export default Vue.extend<any, any, any, Properties>({
             );
         }
 
-        return h(
-            RobotDetails,
-            {
-                props: {
-                    where: {
-                        name: vm.entity.id,
-                        realm_id: vm.entity.realm_id,
-                    },
-                },
-                on: {
-                    resolved(item) {
-                        vm.handleUpdated.call(null, item);
-                    },
-                },
+        return () => h(RobotDetails, {
+            where: {
+                name: props.entity.id,
+                realm_id: props.entity.realm_id,
             },
-        );
+        });
     },
 });

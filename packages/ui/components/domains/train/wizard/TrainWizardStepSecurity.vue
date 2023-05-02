@@ -4,25 +4,33 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
+import type { Train } from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
 import TrainUserSecretPicker from '../TrainUserSecretPicker';
 
-export default {
+export default defineComponent({
     components: {
         TrainUserSecretPicker,
     },
     props: {
         train: {
-            type: Object,
-            default: undefined,
+            type: Object as PropType<Train>,
+            required: true,
         },
     },
-    methods: {
-        handleUpdated(item) {
-            this.$emit('updated', item);
-        },
+    emits: ['updated'],
+    setup(props, { emit }) {
+        const handleUpdated = (item: Partial<Train>) => {
+            emit('updated', item);
+        };
+
+        return {
+            handleUpdated,
+        };
     },
-};
+});
 </script>
 <template>
     <div>

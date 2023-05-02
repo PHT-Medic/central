@@ -5,201 +5,199 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { buildValidationTranslator, initFormAttributesFromSource } from '@authup/client-vue';
 import type { Registry } from '@personalhealthtrain/central-common';
 import { Ecosystem } from '@personalhealthtrain/central-common';
+import { buildFormInput, buildFormSelect, buildFormSubmit } from '@vue-layout/form-controls';
+import useVuelidate from '@vuelidate/core';
+import { maxLength, minLength, required } from '@vuelidate/validators';
 import type {
-    CreateElement, PropType, VNode,
+    PropType,
 } from 'vue';
-import Vue from 'vue';
-import type { ComponentFormData } from '@vue-layout/utils';
-import {
-    buildFormInput, buildFormSelect, buildFormSubmit, initPropertiesFromSource,
-} from '@vue-layout/utils';
-import {
-    maxLength, minLength, required,
-} from 'vuelidate/lib/validators';
-import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
+import { wrapFnWithBusyState } from '../../../core/busy';
 
-type Properties = {
-    entity: Registry
-};
-
-export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Properties>({
+export default defineComponent({
     props: {
         entity: {
             type: Object as PropType<Registry>,
             default: undefined,
         },
     },
-    data() {
-        return {
-            form: {
-                name: '',
-                host: '',
-                ecosystem: Ecosystem.DEFAULT,
-                account_name: '',
-                account_secret: '',
+    emits: ['updated', 'created', 'failed'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
+
+        const busy = ref(false);
+        const form = reactive({
+            name: '',
+            host: '',
+            ecosystem: Ecosystem.DEFAULT,
+            account_name: '',
+            account_secret: '',
+        });
+
+        const $v = useVuelidate({
+            name: {
+                required,
+                minLength: minLength(3),
+                maxLength: maxLength(128),
             },
+            host: {
+                required,
+                maxLength: maxLength(512),
+            },
+            ecosystem: {
+                required,
+            },
+            account_name: {
+                inLength: minLength(3),
+                maxLength: maxLength(256),
+            },
+            account_secret: {
+                minLength: minLength(3),
+                maxLength: maxLength(256),
+            },
+        }, form);
 
-            busy: false,
+        const ecosystems = [
+            { id: Ecosystem.DEFAULT, value: 'DEFAULT' },
+            { id: Ecosystem.PADME, value: 'PADME' },
+        ];
 
-            ecosystems: [
-                { id: Ecosystem.DEFAULT, value: 'DEFAULT' },
-                { id: Ecosystem.PADME, value: 'PADME' },
-            ],
-        };
-    },
-    computed: {
-        isEditing() {
-            return this.entity &&
-                Object.prototype.hasOwnProperty.call(this.entity, 'id');
-        },
-        updatedAt() {
-            return this.entity ? this.entity.updated_at : undefined;
-        },
-    },
-    watch: {
-        updatedAt(val, oldVal) {
-            if (val && val !== oldVal) {
-                this.initFromProperties();
+        const updatedAt = computed(() => {
+            if (!refs.entity.value) {
+                return undefined;
             }
-        },
-    },
-    created() {
-        this.initFromProperties();
-    },
-    validations() {
-        return {
-            form: {
-                name: {
-                    required,
-                    minLength: minLength(3),
-                    maxLength: maxLength(128),
-                },
-                host: {
-                    required,
-                    maxLength: maxLength(512),
-                },
-                ecosystem: {
-                    required,
-                },
-                account_name: {
-                    inLength: minLength(3),
-                    maxLength: maxLength(256),
-                },
-                account_secret: {
-                    minLength: minLength(3),
-                    maxLength: maxLength(256),
-                },
-            },
-        };
-    },
-    methods: {
-        initFromProperties() {
-            if (typeof this.entity === 'undefined') return;
 
-            initPropertiesFromSource(this.entity, this.form);
-        },
-        async submit() {
-            if (this.busy || this.$v.$invalid) {
+            return refs.entity.value.updated_at;
+        });
+
+        const initForm = () => {
+            if (!refs.entity.value) {
                 return;
             }
 
-            this.busy = true;
+            initFormAttributesFromSource(form, refs.entity.value);
+        };
+
+        watch(updatedAt, (val, oldVal) => {
+            if (val && val !== oldVal) {
+                initForm();
+            }
+        });
+
+        initForm();
+
+        const submit = wrapFnWithBusyState(busy, async () => {
+            if ($v.value.$invalid) {
+                return;
+            }
 
             try {
                 let response;
 
-                if (this.isEditing) {
-                    response = await this.$api.registry.update(this.entity.id, this.form);
+                if (refs.entity.value) {
+                    response = await useAPI().registry.update(refs.entity.value.id, form);
 
-                    this.$emit('updated', response);
+                    emit('updated', response);
                 } else {
-                    response = await this.$api.registry.create(this.form);
+                    response = await useAPI().registry.create(form);
 
-                    this.$emit('created', response);
+                    emit('created', response);
                 }
             } catch (e) {
                 if (e instanceof Error) {
-                    this.$emit('failed', e);
+                    emit('failed', e);
                 }
             }
-
-            this.busy = false;
-        },
-        async toggleFormData(key, id) {
-            if (this.form[key] === id) {
-                this.form[key] = null;
-            } else {
-                this.form[key] = id;
-            }
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
-
-        const name = buildFormInput<Registry>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Name',
-            propName: 'name',
         });
 
-        const host = buildFormInput<Registry>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Host',
-            propName: 'host',
-            attrs: {
+        const name = buildFormInput({
+            validationTranslator: buildValidationTranslator(),
+            validationResult: $v.value.name,
+            label: true,
+            labelContent: 'Name',
+            value: form.name,
+            onChange(input) {
+                form.name = input;
+            },
+        });
+
+        const host = buildFormInput({
+            validationTranslator: buildValidationTranslator(),
+            validationResult: $v.value.host,
+            label: true,
+            labelContent: 'Host',
+            value: form.host,
+            onChange(input) {
+                form.host = input;
+            },
+            props: {
                 placeholder: 'e.g. ghcr.io',
             },
         });
 
-        const ecosystem = buildFormSelect<Registry>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Ecosystem',
-            propName: 'ecosystem',
-            options: vm.ecosystems,
-            attrs: {
-                disabled: vm.isEditing,
+        const ecosystem = buildFormSelect({
+            validationTranslator: buildValidationTranslator(),
+            validationResult: $v.value.ecosystem,
+            label: true,
+            labelContent: 'Ecosystem',
+            value: form.ecosystem,
+            onChange(input) {
+                form.ecosystem = input;
+            },
+            options: ecosystems,
+            props: {
+                disabled: !!refs.entity.value,
             },
         });
 
-        const accountName = buildFormInput<Registry>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Account-Name',
-            propName: 'account_name',
+        const accountName = buildFormInput({
+            validationTranslator: buildValidationTranslator(),
+            validationResult: $v.value.account_name,
+            label: true,
+            labelContent: 'Account Name',
+            value: form.account_name,
+            onChange(input) {
+                form.account_name = input;
+            },
         });
 
-        const accountSecret = buildFormInput<Registry>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Account-Secret',
-            propName: 'account_secret',
+        const accountSecret = buildFormInput({
+            validationTranslator: buildValidationTranslator(),
+            validationResult: $v.value.account_secret,
+            label: true,
+            labelContent: 'Account Secret',
+            value: form.account_secret,
+            onChange(input) {
+                form.account_secret = input;
+            },
         });
 
-        const submit = buildFormSubmit(vm, h, {
+        const submitNode = buildFormSubmit({
+            submit,
+            busy,
             createText: 'Create',
             updateText: 'Update',
         });
 
         return h('form', {
-            on: {
-                submit($event) {
-                    $event.preventDefault();
-                },
+            onSubmit($event: any) {
+                $event.preventDefault();
             },
         }, [
-            h('div', { staticClass: 'row' }, [
-                h('div', { staticClass: 'col' }, [
+            h('div', { class: 'row' }, [
+                h('div', { class: 'col' }, [
                     h('h6', [
-                        h('i', { staticClass: 'fas fa-infinity pr-1' }),
+                        h('i', { class: 'fas fa-infinity pr-1' }),
                         'General',
                     ]),
                     name,
                     host,
                 ]),
-                h('div', { staticClass: 'col' }, [
+                h('div', { class: 'col' }, [
                     h('h6', [
-                        h('i', { staticClass: 'fas fa-robot pr-1' }),
+                        h('i', { class: 'fas fa-robot pr-1' }),
                         'Robot',
                     ]),
                     accountName,
@@ -209,7 +207,7 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
             h('hr'),
             h(
                 'div',
-                { staticClass: 'alert alert-warning alert-danger' },
+                { class: 'alert alert-warning alert-danger' },
                 [
                     'It is only possible to register harbor registries > v2.3.0',
                 ],
@@ -217,7 +215,7 @@ export const RegistryForm = Vue.extend<ComponentFormData<Registry>, any, any, Pr
             h('hr'),
             ecosystem,
             h('hr'),
-            submit,
+            submitNode,
         ]);
     },
 });

@@ -7,9 +7,9 @@
 
 import type {
     DomainEventBaseContext,
-    DomainEventContext,
-    DomainEventFullName,
+    DomainEventContext, DomainEventFullName,
     DomainEventSubscriptionFullName,
+    DomainType,
 } from '../domains';
 
 export type SocketServerToClientEventContext<T extends DomainEventBaseContext> = T & {
@@ -20,9 +20,10 @@ export type SocketServerToClientEventContext<T extends DomainEventBaseContext> =
 };
 
 export type SocketServerToClientEvents = {
-    [K in DomainEventFullName]: (data: SocketServerToClientEventContext<DomainEventContext>) => void
+    [K in `${DomainType}` as DomainEventFullName<K>]: (
+        data: SocketServerToClientEventContext<DomainEventContext<K>>
+    ) => void
 };
-
 // ------------------------------------------------------------------------------------
 
 export type SocketClientToServerEventTarget = string | number | undefined;

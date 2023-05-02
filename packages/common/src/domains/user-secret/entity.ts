@@ -28,7 +28,7 @@ export interface UserSecret {
     updated_at: Date;
 }
 
-export type UserSecretSecretEventContext = DomainEventBaseContext & {
+export type UserSecretEventContext = DomainEventBaseContext & {
     type: `${DomainType.USER_SECRET}`,
     data: UserSecret
 };

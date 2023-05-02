@@ -4,19 +4,17 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
     props: {
         name: {
             type: String,
-            default: 'Unbekannt',
-        },
-        path: {
-            type: String,
-            default: undefined,
+            default: 'Unknown',
         },
     },
-};
+});
 </script>
 <template>
     <div class="card card-file d-flex flex-row align-items-center">

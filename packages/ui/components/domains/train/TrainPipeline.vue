@@ -5,12 +5,16 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import type { Train } from '@personalhealthtrain/central-common';
 import {
     PermissionID,
     TrainAPICommand, TrainBuildStatus,
     TrainConfigurationStatus, TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
+import { useAuthStore } from '../../../store/auth';
 import { TrainResultCommand } from './command/TrainResultCommand';
 import TrainBuildStatusText from './status/TrainBuildStatusText.vue';
 import { TrainBuildCommand } from './command/TrainBuildCommand';
@@ -20,7 +24,7 @@ import TrainResultStatusText from '../train-result/status/TrainResultStatusText.
 
 import TrainConfigurationStatusText from './status/TrainConfigurationStatusText.vue';
 
-export default {
+export default defineComponent({
     components: {
         TrainResultCommand,
         TrainConfigurationStatusText,
@@ -39,7 +43,10 @@ export default {
             type: Boolean,
             default: true,
         },
-        entity: Object,
+        entity: {
+            type: Object as PropType<Train>,
+            required: true,
+        },
     },
     data() {
         return {
@@ -54,7 +61,7 @@ export default {
     },
     computed: {
         canEdit() {
-            return this.$auth.has(PermissionID.TRAIN_EDIT);
+            return useAuthStore().has(PermissionID.TRAIN_EDIT);
         },
 
         // ---------------------------------------------------------
@@ -72,7 +79,7 @@ export default {
             this.$emit('failed', e);
         },
     },
-};
+});
 </script>
 <template>
     <div

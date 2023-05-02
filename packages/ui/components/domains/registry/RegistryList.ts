@@ -6,28 +6,20 @@
  */
 import type { BuildInput } from 'rapiq';
 import type { Registry } from '@personalhealthtrain/central-common';
-import { mergeDeep } from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 import type {
-    ComponentListData, ComponentListHandlerMethodOptions, ComponentListMethods, ComponentListProperties,
-    PaginationMeta,
-} from '@vue-layout/utils';
+    DomainListHeaderSearchOptionsInput,
+    DomainListHeaderTitleOptionsInput,
+} from '../../../core';
 import {
-    buildListHeader,
-    buildListItems,
-    buildListNoMore, buildListPagination, buildListSearch,
-} from '@vue-layout/utils';
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
+    createDomainListBuilder,
+} from '../../../core';
 
-export const RegistryList = Vue.extend<
-ComponentListData<Registry>,
-ComponentListMethods<Registry>,
-any,
-ComponentListProperties<BuildInput<Registry>>
->({
+export default defineComponent({
     name: 'RegistryList',
     props: {
-        loadOnInit: {
+        loadOnSetup: {
             type: Boolean,
             default: true,
         },
@@ -37,147 +29,43 @@ ComponentListProperties<BuildInput<Registry>>
                 return {};
             },
         },
-        withHeader: {
+        noMore: {
             type: Boolean,
             default: true,
         },
-        withNoMore: {
+        footerPagination: {
             type: Boolean,
             default: true,
         },
-        withPagination: {
-            type: Boolean,
+        headerTitle: {
+            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
             default: true,
         },
-        withSearch: {
-            type: Boolean,
+        headerSearch: {
+            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
             default: true,
         },
     },
-    data() {
-        return {
-            busy: false,
-            items: [],
-            q: '',
-            meta: {
-                limit: 10,
-                offset: 0,
-                total: 0,
+    setup(props, ctx) {
+        const { build } = createDomainListBuilder<Registry>({
+            props: toRefs(props),
+            setup: ctx,
+            load: (buildInput) => useAPI().registry.getMany(buildInput),
+            defaults: {
+                footerPagination: true,
+
+                headerSearch: true,
+                headerTitle: {
+                    content: 'Registries',
+                    icon: 'fa-brands fa-docker',
+                },
+
+                noMore: {
+                    textContent: 'No more registries available...',
+                },
             },
-            itemBusy: false,
-        };
-    },
-    watch: {
-        q(val, oldVal) {
-            if (val === oldVal) return;
-
-            if (val.length === 1 && val.length > oldVal.length) {
-                return;
-            }
-
-            this.meta.offset = 0;
-
-            this.load();
-        },
-    },
-    created() {
-        if (this.loadOnInit) {
-            Promise.resolve()
-                .then(this.load);
-        }
-    },
-    methods: {
-        async load(options?: PaginationMeta) {
-            if (this.busy) return;
-
-            if (options) {
-                this.meta.offset = options.offset;
-            }
-
-            this.busy = true;
-
-            try {
-                const query = mergeDeep({
-                    page: {
-                        limit: this.meta.limit,
-                        offset: this.meta.offset,
-                    },
-                    filter: {
-                        name: this.q.length > 0 ? `~${this.q}` : this.q,
-                    },
-                    sort: {
-                        name: 'ASC',
-                    },
-                }, this.query);
-
-                const response = await this.$api.registry.getMany(query);
-
-                this.items = response.data;
-                const { total } = response.meta;
-
-                this.meta.total = total;
-            } catch (e) {
-                if (e instanceof Error) {
-                    this.$emit('failed', e);
-                }
-            }
-
-            this.busy = false;
-        },
-
-        handleCreated(
-            item: Registry,
-            options?: ComponentListHandlerMethodOptions<Registry>,
-        ) {
-            options = options || {};
-
-            const index = this.items.findIndex((el: Registry) => el.id === item.id);
-            if (index === -1) {
-                if (options.unshift) {
-                    this.items.unshift(item);
-                } else {
-                    this.items.push(item);
-                }
-            }
-        },
-        handleUpdated(item: Registry) {
-            const index = this.items.findIndex((el: Registry) => el.id === item.id);
-            if (index !== -1) {
-                const keys : (keyof Registry)[] = Object.keys(item) as (keyof Registry)[];
-                for (let i = 0; i < keys.length; i++) {
-                    Vue.set(this.items[index], keys[i], item[keys[i]]);
-                }
-            }
-        },
-        handleDeleted(item: Registry) {
-            const index = this.items.findIndex((el: Registry) => el.id === item.id);
-            if (index !== -1) {
-                this.items.splice(index, 1);
-                this.meta.total--;
-            }
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const header = buildListHeader(this, createElement, { titleText: 'Registries', iconClass: 'fa-brands fa-docker' });
-        const search = buildListSearch(this, createElement);
-        const items = buildListItems(this, createElement, { itemIconClass: 'fa-brands fa-docker' });
-        const noMore = buildListNoMore(this, createElement, {
-            text: 'There are no more registries available...',
         });
-        const pagination = buildListPagination(this, createElement);
 
-        return createElement(
-            'div',
-            { staticClass: 'list' },
-            [
-                header,
-                search,
-                items,
-                noMore,
-                pagination,
-            ],
-        );
+        return () => build();
     },
 });
-
-export default RegistryList;

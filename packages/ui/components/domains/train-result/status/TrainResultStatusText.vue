@@ -4,30 +4,24 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<template>
-    <span>
-        <slot
-            :class-suffix="classSuffix"
-            :status-text="statusText"
-        >
-            <span :class="'text-'+classSuffix">{{ statusText }}</span>
-        </slot>
-    </span>
-</template>
-<script>
+<script lang="ts">
 
 import { TrainResultStatus } from '@personalhealthtrain/central-common';
+import { computed, defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
+    name: 'TrainResultStausText',
     props: {
         status: {
             type: TrainResultStatus,
             default: null,
         },
     },
-    computed: {
-        statusText() {
-            switch (this.status) {
+    setup(props) {
+        const refs = toRefs(props);
+
+        const statusText = computed(() => {
+            switch (refs.status.value) {
                 case TrainResultStatus.STARTED:
                     return 'started';
 
@@ -49,9 +43,10 @@ export default {
                 default:
                     return 'none';
             }
-        },
-        classSuffix() {
-            switch (this.status) {
+        });
+
+        const classSuffix = computed(() => {
+            switch (refs.status.value) {
                 case TrainResultStatus.STARTED:
                 case TrainResultStatus.DOWNLOADING:
                 case TrainResultStatus.PROCESSING:
@@ -67,7 +62,22 @@ export default {
                 default:
                     return 'info';
             }
-        },
+        });
+
+        return {
+            statusText,
+            classSuffix,
+        };
     },
-};
+});
 </script>
+<template>
+    <span>
+        <slot
+            :class-suffix="classSuffix"
+            :status-text="statusText"
+        >
+            <span :class="'text-'+classSuffix">{{ statusText }}</span>
+        </slot>
+    </span>
+</template>

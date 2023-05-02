@@ -4,17 +4,21 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import type { MasterImage, Train, TrainStation } from '@personalhealthtrain/central-common';
+import useVuelidate from '@vuelidate/core';
+import { minLength, required } from '@vuelidate/validators';
+import type { PropType } from 'vue';
 import {
-    ProposalStationApprovalStatus,
-} from '@personalhealthtrain/central-common';
-import { minLength, required } from 'vuelidate/lib/validators';
-import { ProposalStationList } from '../../proposal-station/ProposalStationList';
+    defineComponent, reactive, ref,
+} from 'vue';
+import { useAPI } from '../../../../composables/api';
+import ProposalStationList from '../../proposal-station/ProposalStationList';
 import { MasterImagePicker } from '../../master-image/MasterImagePicker';
-import { TrainStationList } from '../../train-station/TrainStationList';
-import { TrainStationAssignAction } from '../../train-station/TrainStationAssignAction';
+import TrainStationList from '../../train-station/TrainStationList';
+import TrainStationAssignAction from '../../train-station/TrainStationAssignAction';
 
-export default {
+export default defineComponent({
     components: {
         TrainStationAssignAction,
         TrainStationList,
@@ -23,88 +27,74 @@ export default {
     },
     props: {
         train: {
-            type: Object,
-            default: undefined,
+            type: Object as PropType<Train>,
+            required: true,
         },
     },
-    data() {
-        return {
-            form: {
-                station_ids: [],
-            },
+    emits: ['updated', 'failed'],
+    setup(props, { emit }) {
+        const form = reactive({
+            stationIds: [],
+        });
 
-            proposalStationStatus: ProposalStationApprovalStatus,
-            proposalStation: {
-                items: [],
-                busy: false,
-            },
-            trainStation: {
-                items: [],
-                busy: false,
-            },
-
-            socketLockedId: null,
-            socketLockedStationId: null,
-        };
-    },
-    validations() {
-        return {
-            form: {
-                station_ids: {
+        const $v = useVuelidate({
+            stationIds: {
+                required,
+                minLength: minLength(1),
+                $each: {
                     required,
-                    minLength: minLength(1),
-                    $each: {
-                        required,
-                    },
                 },
             },
-        };
-    },
-    computed: {
-        realmId() {
-            return this.$store.getters['auth/realmId'];
-        },
-        direction() {
-            return this.train.realm_id === this.$store.getters['auth/realmId'] ?
-                'out' :
-                'in';
-        },
-    },
-    methods: {
-        async handleMasterImageSelected(item) {
+        }, form);
+
+        const handleMasterImageSelected = async (item: MasterImage) => {
             try {
-                const response = await this.$api.train.update(this.train.id, {
-                    master_image_id: item ? item.id : null,
+                const response = await useAPI().train.update(this.train.id, {
+                    master_image_id: item ? item.id : null as string,
                 });
 
-                this.$emit('updated', response);
+                emit('updated', response);
             } catch (e) {
-                // ...
+                if (e instanceof Error) {
+                    emit('failed', e);
+                }
             }
-        },
-        handleTrainStationCreated(item) {
-            this.$refs.trainStationList.handleCreated(item);
+        };
+
+        const trainStationList = ref<null | Record<string, any>>(null);
+
+        const handleTrainStationCreated = (item: TrainStation) => {
+            if (trainStationList.value) {
+                trainStationList.value.handleCreated(item);
+            }
 
             if (item.train) {
-                this.$emit('updated', item.train);
+                emit('updated', item.train);
             }
-        },
-        handleTrainStationDeleted(item) {
-            this.$refs.trainStationList.handleDeleted(item);
+        };
+
+        const handleTrainStationDeleted = (item: TrainStation) => {
+            if (trainStationList.value) {
+                trainStationList.value.handleDeleted(item);
+            }
 
             if (item.train) {
-                this.$emit('updated', item.train);
+                emit('updated', item.train);
             }
-        },
+        };
 
-        handleFailed(e) {
-            this.$bvToast.toast(e.message, {
-                toaster: 'b-toaster-top-center',
-                variant: 'warning',
-            });
-        },
+        const handleFailed = (e: Error) => {
+            emit('failed', e);
+        };
+
+        return {
+            handleFailed,
+            handleMasterImageSelected,
+            handleTrainStationCreated,
+            handleTrainStationDeleted,
+        };
     },
-};
+});
 </script>
 <template>
     <div>
@@ -127,12 +117,11 @@ export default {
                 <div class="col-12 col-xl-6">
                     <proposal-station-list
                         ref="proposalStationList"
-                        :domain="'station'"
                         :realm-id="train.realm_id"
                         :direction="'out'"
                         :query="{filter: {proposal_id: train.proposal_id}}"
                     >
-                        <template #header>
+                        <template #header-title>
                             <span>Stations <span class="text-info">available</span></span>
                         </template>
 
@@ -151,12 +140,11 @@ export default {
                 <div class="col-12 col-xl-6">
                     <train-station-list
                         ref="trainStationList"
-                        :domain="'station'"
                         :realm-id="train.realm_id"
                         :direction="'out'"
                         :query="{filter: {train_id: train.id}}"
                     >
-                        <template #header>
+                        <template #header-title>
                             <span>Stations <span class="text-success">selected</span></span>
                         </template>
                     </train-station-list>

@@ -4,56 +4,55 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-export default {
+<script lang="ts">
+import type { Train } from '@personalhealthtrain/central-common';
+import useVuelidate from '@vuelidate/core';
+import type { PropType } from 'vue';
+import {
+    computed, defineComponent, reactive, toRefs, watch,
+} from 'vue';
+
+export default defineComponent({
     props: {
         train: {
-            type: Object,
-            default: undefined,
+            type: Object as PropType<Train>,
+            required: true,
         },
     },
-    data() {
-        return {
-            form: {
-                query: '',
-            },
-        };
-    },
-    computed: {
-        query() {
-            return this.train.query;
-        },
-    },
-    watch: {
-        query(val, oldVal) {
-            if (val && val !== oldVal) {
-                this.init();
-            }
-        },
-    },
-    validations() {
-        return {
-            form: {
-                query: {
+    emits: ['changed'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
+        const form = reactive({
+            query: '',
+        });
 
-                },
+        const $v = useVuelidate({
+            query: {
+
             },
+        }, form);
+
+        const query = computed(() => refs.train.value.query);
+        watch(query, (value, oldValue) => {
+            if (value && value !== oldValue) {
+                form.query = value;
+            }
+        });
+
+        if (refs.train.value.query) {
+            form.query = refs.train.value.query;
+        }
+
+        const update = () => {
+            emit('changed', form.query);
+        };
+
+        return {
+            update,
+            v$: $v,
         };
     },
-    created() {
-        this.init();
-    },
-    methods: {
-        init() {
-            if (this.query) {
-                this.form.query = this.query;
-            }
-        },
-        select() {
-            this.$emit('querySelected', this.form.query);
-        },
-    },
-};
+});
 </script>
 <template>
     <div>
@@ -62,11 +61,11 @@ export default {
         <div class="form-group">
             <label>Query</label>
             <textarea
-                v-model="$v.form.query.$model"
+                v-model="v$.query.$model"
                 rows="8"
                 class="form-control"
                 placeholder="{...}"
-                @change.prevent="select"
+                @change.prevent="update"
             />
         </div>
 

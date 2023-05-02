@@ -5,43 +5,34 @@
 * view the LICENSE file that was distributed with this source code.
 */
 import type {
-    SocketClientToServerEvents,
     SocketServerToClientEventContext,
-    SocketServerToClientEvents,
-    Train,
+    Train, TrainEventContext,
 } from '@personalhealthtrain/central-common';
 import {
-    TrainSocketClientToServerEventName,
-    TrainSocketServerToClientEventName, buildSocketTrainRoomName, mergeDeep,
+    DomainEventSubscriptionName,
+    DomainType,
+    buildDomainEventFullName,
+    buildDomainEventSubscriptionFullName,
+    buildSocketTrainRoomName,
 } from '@personalhealthtrain/central-common';
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
-import type {
-    ComponentListData,
-    ComponentListHandlerMethodOptions,
-    ComponentListMethods,
-    ComponentListProperties,
-    PaginationMeta,
-} from '@vue-layout/utils';
-import {
-    buildListHeader,
-    buildListItems,
-    buildListNoMore,
-    buildListPagination, buildListSearch,
-} from '@vue-layout/utils';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 import type { BuildInput } from 'rapiq';
-import type { Socket } from 'socket.io-client';
-import { REALM_MASTER_NAME } from '@authup/core';
-import { TrainListItem } from './TrainListItem';
+import { DomainEventName } from '@authup/core';
+import { realmIdForSocket } from '../../../composables/domain/realm';
+import { useSocket } from '../../../composables/socket';
+import type {
+    DomainListHeaderSearchOptionsInput,
+    DomainListHeaderTitleOptionsInput,
+} from '../../../core';
+import {
+    createDomainListBuilder,
+} from '../../../core';
+import TrainListItem from './TrainListItem';
 
-export const TrainList = Vue.extend<
-ComponentListData<Train>,
-ComponentListMethods<Train>,
-any,
-ComponentListProperties<BuildInput<Train>>
->({
+export default defineComponent({
     props: {
-        loadOnInit: {
+        loadOnSetup: {
             type: Boolean,
             default: true,
         },
@@ -51,20 +42,20 @@ ComponentListProperties<BuildInput<Train>>
                 return {};
             },
         },
-        withHeader: {
+        noMore: {
             type: Boolean,
             default: true,
         },
-        withNoMore: {
+        footerPagination: {
             type: Boolean,
             default: true,
         },
-        withPagination: {
-            type: Boolean,
+        headerTitle: {
+            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
             default: true,
         },
-        withSearch: {
-            type: Boolean,
+        headerSearch: {
+            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
             default: true,
         },
         realmId: {
@@ -72,215 +63,91 @@ ComponentListProperties<BuildInput<Train>>
             default: undefined,
         },
     },
-    data() {
-        return {
-            busy: false,
+    setup(props, ctx) {
+        const refs = toRefs(props);
 
-            message: null,
-            items: [],
+        const socketRealmId = realmIdForSocket(refs.realmId.value);
 
-            q: '',
+        const {
+            build,
+            meta,
+            handleCreated,
+            handleDeleted,
+            handleUpdated,
+        } = createDomainListBuilder<Train>({
+            props: refs,
+            setup: ctx,
+            load: (buildInput) => useAPI().train.getMany(buildInput),
+            defaults: {
+                footerPagination: true,
 
-            itemBusy: false,
+                headerSearch: true,
+                headerTitle: {
+                    content: 'Trains',
+                    icon: 'fa-train-tram',
+                },
 
-            meta: {
-                limit: 10,
-                offset: 0,
-                total: 0,
+                items: {
+                    item: {
+                        textFn: (item) => h(TrainListItem, {
+                            entity: item,
+                            onDeleted: handleDeleted,
+                            onUpdated: handleUpdated,
+                            onCreated: handleCreated,
+                        }),
+                    },
+                },
+
+                noMore: {
+                    textContent: 'No more trains available...',
+                },
             },
-        };
-    },
-    computed: {
-        socketRealmId() {
-            if (this.realmId) {
-                return this.realmId;
-            }
+        });
 
-            if (this.$store.getters['auth/realmName'] === REALM_MASTER_NAME) {
-                return undefined;
-            }
-
-            if (this.query.filter.realm_id) {
-                return this.query.filter.realm_id;
-            }
-
-            return this.$store.getters['auth/realmId'];
-        },
-        queryFinal() {
-            return mergeDeep({
-                filter: {
-                    name: this.q.length > 0 ? `~${this.q}` : this.q,
-                },
-                page: {
-                    limit: this.meta.limit,
-                    offset: this.meta.offset,
-                },
-                sort: {
-                    created_at: 'DESC',
-                },
-                include: {
-                    result: true,
-                },
-            }, this.query);
-        },
-    },
-    watch: {
-        q(val, oldVal) {
-            if (val === oldVal) return;
-
-            if (val.length === 1 && val.length > oldVal.length) {
-                return;
-            }
-
-            this.meta.offset = 0;
-
-            this.load();
-        },
-    },
-    created() {
-        this.load();
-    },
-    mounted() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.socketRealmId);
-
-        socket.emit(TrainSocketClientToServerEventName.SUBSCRIBE);
-        socket.on(TrainSocketServerToClientEventName.CREATED, this.handleSocketCreated);
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.socketRealmId);
-
-        socket.emit(TrainSocketClientToServerEventName.UNSUBSCRIBE);
-        socket.off(TrainSocketServerToClientEventName.CREATED, this.handleSocketCreated);
-    },
-    methods: {
-        handleSocketCreated(context: SocketServerToClientEventContext<Train>) {
+        const handleSocketCreated = (context: SocketServerToClientEventContext<TrainEventContext>) => {
             if (context.meta.roomName !== buildSocketTrainRoomName()) return;
 
+            // todo: append item at beginning as well end of list... ^^
             if (
-                (this.queryFinal.sort.created_at === 'DESC' || this.queryFinal.sort.updated_at === 'DESC') &&
-                this.meta.offset === 0
+                refs.query.value.sort &&
+                (refs.query.value.sort.created_at === 'DESC' || refs.query.value.sort.updated_at === 'DESC') &&
+                meta.value.offset === 0
             ) {
-                this.handleCreated(context.data, { unshift: true });
+                handleCreated(context.data);
                 return;
             }
 
-            if (
-                this.meta.total < this.meta.limit
-            ) {
-                this.handleCreated(context.data);
+            if (meta.value.total < meta.value.limit) {
+                handleCreated(context.data);
             }
-        },
-        async load(options?: PaginationMeta) {
-            if (this.busy) return;
+        };
 
-            if (options) {
-                this.meta.offset = options.offset;
-            }
+        const socket = useSocket().useRealmWorkspace(socketRealmId.value);
 
-            this.busy = true;
+        onMounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.TRAIN,
+                DomainEventSubscriptionName.SUBSCRIBE,
+            ));
 
-            try {
-                const response = await this.$api.train.getMany(this.queryFinal);
-
-                this.items = response.data;
-                const { total } = response.meta;
-
-                this.meta.total = total;
-            } catch (e) {
-                // ...
-            }
-
-            this.busy = false;
-        },
-        handleCreated(item: Train, options?: ComponentListHandlerMethodOptions<Train>) {
-            options = options || {};
-
-            const index = this.items.findIndex((el) => el.id === item.id);
-            if (index === -1) {
-                if (options.unshift) {
-                    this.items.splice(0, 0, item);
-                } else {
-                    this.items.push(item);
-                }
-
-                this.$emit('created', item);
-            }
-        },
-        handleUpdated(item) {
-            const index = this.items.findIndex((el) => el.id === item.id);
-            if (index !== -1) {
-                const keys = Object.keys(item);
-                for (let i = 0; i < keys.length; i++) {
-                    Vue.set(this.items[index], keys[i], item[keys[i]]);
-                }
-            }
-
-            this.$emit('updated', item);
-        },
-        handleDeleted(item) {
-            const index = this.items.findIndex((el) => el.id === item.id);
-            if (index !== -1) {
-                this.items.splice(index, 1);
-                this.meta.total--;
-
-                this.$emit('deleted', item);
-            }
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
-
-        const header = buildListHeader(this, createElement, { titleText: 'Trains', iconClass: 'fa-solid fa-train-tram' });
-        const search = buildListSearch(this, createElement);
-        const items = buildListItems<Train>(this, createElement, {
-            itemIconClass: 'fa-solid fa-train-tram',
-            itemSlots: {
-                handleUpdated: vm.handleUpdated,
-                handleDeleted: vm.handleDeleted,
-            },
-            itemFn(item) {
-                return h(TrainListItem, {
-                    props: {
-                        entity: item,
-                    },
-                    on: {
-                        deleted(e) {
-                            vm.handleDeleted.call(null, e);
-                        },
-                        updated(e) {
-                            vm.handleUpdated.call(null, e);
-                        },
-                        created(e) {
-                            vm.handleCreated.call(null, e);
-                        },
-                    },
-                });
-            },
+            socket.on(buildDomainEventFullName(
+                DomainType.TRAIN,
+                DomainEventName.CREATED,
+            ), handleSocketCreated);
         });
-        const noMore = buildListNoMore(this, createElement, {
-            text: 'There are no more trains available...',
-        });
-        const pagination = buildListPagination(this, createElement);
 
-        return createElement(
-            'div',
-            { staticClass: 'list' },
-            [
-                header,
-                search,
-                items,
-                noMore,
-                pagination,
-            ],
-        );
+        onUnmounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.TRAIN,
+                DomainEventSubscriptionName.UNSUBSCRIBE,
+            ));
+
+            socket.off(buildDomainEventFullName(
+                DomainType.TRAIN,
+                DomainEventName.CREATED,
+            ), handleSocketCreated);
+        });
+
+        return () => build();
     },
 });
-
-export default TrainList;

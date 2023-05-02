@@ -4,287 +4,249 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
-import type { Socket } from 'socket.io-client';
+import { DomainEventName } from '@authup/core';
+import { merge } from 'smob';
+import type { PropType, VNodeArrayChildren } from 'vue';
+import { defineComponent, onMounted, onUnmounted } from 'vue';
 import type {
-    SocketClientToServerEvents,
     SocketServerToClientEventContext,
-    SocketServerToClientEvents,
-    Train,
+    Train, TrainEventContext,
 } from '@personalhealthtrain/central-common';
 import {
-    PermissionID, TrainSocketClientToServerEventName, TrainSocketServerToClientEventName,
+    DomainEventSubscriptionName,
+    DomainType,
+    PermissionID,
+    buildDomainEventFullName,
+    buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
+import { realmIdForSocket } from '../../../composables/domain/realm';
+import { useSocket } from '../../../composables/socket';
+import { useAuthStore } from '../../../store/auth';
 import TrainPipeline from './TrainPipeline.vue';
 import TrainStationsProgress from '../train-station/TrainStationsProgress.vue';
-import TrainName from './TrainName.vue';
+import TrainName from './TrainName';
 import EntityDelete from '../EntityDelete';
 
-export const TrainListItem = Vue.extend({
+export default defineComponent({
+    name: 'TrainListItem',
     components: {
         TrainName,
         TrainStationsProgress,
         TrainPipeline,
     },
     props: {
-        entity: Object as PropType<Train>,
+        entity: {
+            type: Object as PropType<Train>,
+            required: true,
+        },
     },
-    data() {
-        return {
-            item: null,
+    emits: ['updated', 'deleted', 'failed'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
+        const socketRealmId = realmIdForSocket(refs.entity.value.realm_id);
 
-            busy: false,
+        const entity = ref(props.entity);
+        let lockId : string | undefined;
 
-            extendView: false,
+        const handleUpdated = (data: Train) => {
+            entity.value = merge({}, data, entity.value);
 
-            socketLockId: null,
+            emit('updated', entity.value);
         };
-    },
-    computed: {
-        canDrop() {
-            return this.$auth.has(PermissionID.TRAIN_DROP);
-        },
-        userName() {
-            return this.entity.user_id;
-        },
-    },
-    created() {
-        this.item = this.entity;
-    },
-    mounted() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
 
-        socket.emit(TrainSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.entity.id } });
-        socket.on(TrainSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
-        socket.on(TrainSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
+        const handleDeleted = () => {
+            emit('deleted', entity.value);
+        };
 
-        socket.emit(TrainSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.item.id } });
-        socket.off(TrainSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
-        socket.off(TrainSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
-    },
-    methods: {
-        handleSocketUpdated(context: SocketServerToClientEventContext<Train>) {
+        const handleFailed = (error: Error) => {
+            emit('failed', error);
+        };
+
+        const handleSocketUpdated = (context: SocketServerToClientEventContext<TrainEventContext>) => {
             if (
-                this.entity.id !== context.data.id ||
-                context.meta.roomId !== this.entity.id
-            ) return;
+                refs.entity.value.id === context.data.id &&
+                context.data.id !== lockId
+            ) {
+                handleUpdated(context.data);
+            }
+        };
 
-            this.handleUpdated(context.data);
-        },
-        handleSocketDeleted(context: SocketServerToClientEventContext<Train>) {
+        const handleSocketDeleted = (context: SocketServerToClientEventContext<TrainEventContext>) => {
             if (
-                this.entity.id !== context.data.id ||
-                this.socketLockId === context.data.id ||
-                context.meta.roomId !== this.entity.id
-            ) return;
-
-            this.handleDeleted(context.data);
-        },
-        handleUpdated(item: Train) {
-            // eslint-disable-next-line no-restricted-syntax
-            for (const key in item) {
-                Vue.set(this.item, key, item[key]);
+                refs.entity.value.id === context.data.id &&
+                context.data.id !== lockId
+            ) {
+                emit('deleted', context.data);
             }
+        };
 
-            this.$emit('updated', item);
-        },
-        handleDeleted(item: Train) {
-            this.$emit('deleted', item);
-        },
-        handleFailed(e) {
-            this.$emit('failed', e);
-        },
+        const socket = useSocket().useRealmWorkspace(socketRealmId.value);
 
-        // ---------------------------------------------------------
+        onMounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.TRAIN,
+                DomainEventSubscriptionName.SUBSCRIBE,
+            ), refs.entity.value.id);
 
-        toggleExtendView() {
-            this.extendView = !this.extendView;
-        },
+            socket.on(buildDomainEventFullName(
+                DomainType.TRAIN,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
 
-        // ---------------------------------------------------------
+            socket.on(buildDomainEventFullName(
+                DomainType.TRAIN,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
+        });
 
-        async drop() {
-            if (this.busy) return;
+        onUnmounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.TRAIN,
+                DomainEventSubscriptionName.UNSUBSCRIBE,
+            ), refs.entity.value.id);
 
-            this.busy = true;
+            socket.off(buildDomainEventFullName(
+                DomainType.TRAIN,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
 
-            try {
-                this.socketLockId = this.item.id;
-                await this.$api.train.delete(this.item.id);
-                this.socketLockId = null;
+            socket.off(buildDomainEventFullName(
+                DomainType.TRAIN,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
+        });
 
-                this.$emit('deleted', this.item);
-            } catch (e) {
-                this.$emit('failed', e);
-            }
+        const store = useAuthStore();
 
-            this.busy = false;
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
+        let deleteButton : VNodeArrayChildren = [];
 
-        let deleteButton = h();
-
-        if (vm.canDrop) {
-            deleteButton = h(EntityDelete, {
-                props: {
+        if (store.has(PermissionID.TRAIN_DROP)) {
+            deleteButton = [
+                h(EntityDelete, {
                     withText: false,
-                    entityId: vm.entity.id,
+                    entityId: entity.value.id,
                     entityType: 'train',
-                },
-                staticClass: 'btn btn-danger btn-xs ml-1',
-                on: {
-                    deleted(entity) {
-                        vm.handleDeleted.call(null, entity);
+                    class: 'btn btn-danger btn-xs ml-1',
+                    onDeleted() {
+                        handleDeleted();
                     },
-                },
-            });
+                }),
+            ];
         }
 
-        return h(
+        const extendedView = ref(false);
+        const toggleView = () => {
+            extendedView.value = !extendedView.value;
+        };
+
+        return () => h(
             'div',
             {
-                staticClass: 'train-card',
+                class: 'train-card',
             },
             [
                 h(
                     'div',
                     {
-                        staticClass: 'train-card-content align-items-center',
+                        class: 'train-card-content align-items-center',
                     },
                     [
                         h('div', [
                             h(
                                 TrainName,
                                 {
-                                    props: {
-                                        entityId: vm.entity.id,
-                                        entityName: vm.entity.name,
-                                        withEdit: true,
+                                    entityId: entity.value.id,
+                                    entityName: entity.value.name,
+                                    withEdit: true,
+                                    onUpdated(item: Train) {
+                                        handleUpdated(item);
                                     },
-                                    on: {
-                                        updated(item) {
-                                            vm.handleUpdated.call(vm, item);
-                                        },
-                                    },
-                                    scopedSlots: {
-                                        text: (props) => {
-                                            let trainName = h();
+                                },
+                                {
+                                    default: (props: any) => {
+                                        let trainName : VNodeArrayChildren = [];
 
-                                            if (props.entityName) {
-                                                trainName = h(
+                                        if (props.entityName) {
+                                            trainName = [
+                                                h(
                                                     'span',
                                                     {
-                                                        staticClass: 'text-muted ml-1',
+                                                        class: 'text-muted ml-1',
                                                     },
                                                     props.entityId,
-                                                );
-                                            }
-                                            return [
-                                                h('i', { staticClass: 'fa-solid fa-train-tram mr-1' }),
-                                                h('nuxt-link', {
-                                                    props: {
-                                                        to: `/trains/${props.entityId}`,
-                                                    },
-                                                }, [
-                                                    props.displayText,
-                                                ]),
-                                                trainName,
+                                                ),
                                             ];
-                                        },
+                                        }
+                                        return [
+                                            h('i', { class: 'fa-solid fa-train-tram mr-1' }),
+                                            h('nuxt-link', {
+                                                to: `/trains/${props.entityId}`,
+                                            }, [
+                                                props.nameDisplay,
+                                            ]),
+                                            trainName,
+                                        ];
                                     },
                                 },
                             ),
                         ]),
-                        h('div', { staticClass: 'ml-auto' }, [
+                        h('div', { class: 'ml-auto' }, [
                             h('button', {
-                                staticClass: 'btn btn-dark btn-xs',
-                                on: {
-                                    click(event) {
-                                        event.preventDefault();
+                                class: 'btn btn-dark btn-xs',
+                                click(event: any) {
+                                    event.preventDefault();
 
-                                        vm.toggleExtendView.call(null);
-                                    },
+                                    toggleView();
                                 },
                             }, [
                                 h('i', {
-                                    staticClass: 'fa',
-                                    class: {
-                                        'fa-chevron-down': !vm.extendView,
-                                        'fa-chevron-up': vm.extendView,
-                                    },
+                                    class: ['fa', {
+                                        'fa-chevron-down': !extendedView.value,
+                                        'fa-chevron-up': extendedView.value,
+                                    }],
                                 }),
                             ]),
                             h('nuxt-link', {
-                                staticClass: 'btn btn-dark btn-xs ml-1',
-                                attrs: {
-                                    type: 'button',
-                                },
-                                props: {
-                                    to: `/trains/${vm.entity.id}`,
-                                },
+                                class: 'btn btn-dark btn-xs ml-1',
+                                type: 'button',
+                                to: `/trains/${entity.value.id}`,
                             }, [
-                                h('i', { staticClass: 'fa fa-bars' }),
+                                h('i', { class: 'fa fa-bars' }),
                             ]),
                             deleteButton,
                         ]),
                     ],
                 ),
                 h('hr', {
-                    staticClass: 'mt-1 mb-1',
+                    class: 'mt-1 mb-1',
                 }),
                 h(TrainPipeline, {
-                    props: {
-                        entity: vm.item,
-                        withCommand: vm.extendView,
-                        listDirection: vm.extendView ? 'column' : 'row',
+                    entity,
+                    withCommand: extendedView.value,
+                    listDirection: extendedView.value ? 'column' : 'row',
+                    onUpdated(item: Train) {
+                        handleUpdated(item);
                     },
-                    on: {
-                        updated(item) {
-                            vm.handleUpdated.call(null, item);
-                        },
-                        failed(item) {
-                            vm.handleFailed.call(null, item);
-                        },
-                        deleted(item) {
-                            vm.handleDeleted.call(null, item);
-                        },
+                    onFailed(error: Error) {
+                        handleFailed(error);
+                    },
+                    onDeleted() {
+                        handleDeleted();
                     },
                 }),
                 h(TrainStationsProgress, {
-                    staticClass: 'mt-1 mb-1',
-                    props: {
-                        entity: vm.item,
-                        elementType: 'progress-bar',
-                    },
+                    class: 'mt-1 mb-1',
+                    entity: entity.value.id,
+                    elementType: 'progress-bar',
                 }),
                 h('div', {
-                    staticClass: 'train-card-footer',
+                    class: 'train-card-footer',
                 }, [
                     h('div', [
                         h('small', [
-                            h('span', { staticClass: 'text-muted' }, 'updated'),
+                            h('span', { class: 'text-muted' }, 'updated'),
                             ' ',
-                            h('timeago', { props: { datetime: vm.item.updated_at } }),
-                        ]),
-                    ]),
-                    h('div', { staticClass: 'ml-auto' }, [
-                        h('small', [
-                            h('span', { staticClass: 'text-muted' }, 'created by'),
-                            ' ',
-                            h('span', vm.userName),
+                            h('timeago', { props: { datetime: entity.value.updated_at } }),
                         ]),
                     ]),
                 ]),

@@ -12,17 +12,21 @@ import {
     TrainStationRunStatus,
     TrainStationStatic,
 } from '@personalhealthtrain/central-common';
+import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
-import Vue from 'vue';
+import { computed, defineComponent, toRef } from 'vue';
 import TrainStationRunStatusText from './TrainStationRunStatus';
 import TrainStationStaticRunStatusText from './TrainStationStaticRunStatus';
-import { TrainStationList } from './TrainStationList';
+import TrainStationList from './TrainStationList';
 
-export default Vue.extend({
+export default defineComponent({
     name: 'TrainStationsProgress',
     components: { TrainStationList, TrainStationStaticRunStatusText, TrainStationRunStatusText },
     props: {
-        entity: Object as PropType<Train>,
+        entity: {
+            type: Object as PropType<Train>,
+            required: true,
+        },
         withHeader: {
             type: Boolean,
             default: false,
@@ -32,30 +36,23 @@ export default Vue.extend({
             default: 'steps',
         },
     },
-    data() {
-        return {
-            trainRunStatus: TrainRunStatus,
-            trainStationStatic: TrainStationStatic,
-            trainStationRunStatus: TrainStationRunStatus,
+    setup(props) {
+        const entity = toRef(props, 'entity');
+        const query : BuildInput<Train> = {
+            filter: {
+                train_id: entity.value.id,
+            },
+            sort: {
+                index: 'ASC',
+            },
         };
-    },
-    computed: {
-        query() {
-            return {
-                filter: {
-                    train_id: this.entity.id,
-                },
-                sort: {
-                    index: 'ASC',
-                },
-            };
-        },
-        progressPercentage() {
-            if (this.entity.build_status !== TrainBuildStatus.FINISHED) {
+
+        const progressPercentage = computed(() => {
+            if (entity.value.build_status !== TrainBuildStatus.FINISHED) {
                 return 0;
             }
 
-            const total = this.entity.stations + 2; // + 2 because incoming + outgoing
+            const total = entity.value.stations + 2; // + 2 because incoming + outgoing
 
             if (this.entity.run_status === TrainRunStatus.FINISHED) {
                 return 100;
@@ -70,19 +67,27 @@ export default Vue.extend({
             }
 
             return 100 * (position / total);
-        },
+        });
+
+        return {
+            query,
+            progressPercentage,
+            trainRunStatus: TrainRunStatus,
+            trainStationStatic: TrainStationStatic,
+            trainStationRunStatus: TrainStationRunStatus,
+        };
     },
 });
 </script>
 <template>
     <div>
         <template v-if="elementType === 'steps'">
-            <train-station-list
+            <TrainStationList
                 :query="query"
-                :with-header="false"
-                :with-pagination="false"
-                :with-search="false"
-                :with-no-more="false"
+                :header-title="false"
+                :header-search="false"
+                :footer-pagination="false"
+                :no-more="false"
                 :realm-id="entity.realm_id"
                 :source-id="entity.id"
                 class="train-stations-progress"
@@ -152,7 +157,7 @@ export default Vue.extend({
                         </div>
                     </div>
                 </template>
-            </train-station-list>
+            </TrainStationList>
         </template>
         <template v-else>
             <div class="progress bg-white">

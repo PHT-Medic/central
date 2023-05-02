@@ -6,13 +6,13 @@
  */
 
 import type { CreateElement, VNode } from 'vue';
-import Vue from 'vue';
+import Vue, { defineComponent } from 'vue';
 import { required } from 'vuelidate/lib/validators';
 import { SlotName, buildFormSelect } from '@vue-layout/utils';
 import { MasterImageList } from './MasterImageList';
 import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
 
-export const MasterImagePicker = Vue.extend({
+export const MasterImagePicker = defineComponent({
     name: 'MasterImagePicker',
     components: { MasterImageList },
     props: {

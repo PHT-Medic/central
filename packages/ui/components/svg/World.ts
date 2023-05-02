@@ -5,13 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { compileToFunctions } from 'vue-template-compiler';
-import Vue from 'vue';
-import { WorldTemplate } from './WorldTemplate';
+import { defineComponent } from 'vue';
+import World from './World.svg';
 
-const templateCompiled = compileToFunctions(WorldTemplate);
-
-export default Vue.extend({
+export default defineComponent({
     props: {
         width: {
             type: [Number, String],
@@ -22,6 +19,14 @@ export default Vue.extend({
             default: 500,
         },
     },
-    render: templateCompiled.render,
-    staticRenderFns: templateCompiled.staticRenderFns,
+    setup(props) {
+        return () => h('img', {
+            src: World,
+            width: props.width,
+            height: props.height,
+            style: {
+                maxWidth: '100%',
+            },
+        });
+    },
 });

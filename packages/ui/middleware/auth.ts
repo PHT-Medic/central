@@ -1,16 +1,22 @@
 /*
- * Copyright (c) 2021-2021.
+ * Copyright (c) 2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Context } from '@nuxt/types';
-import { buildNameFromAbilityID } from '@authup/core';
-import type { AuthModule } from '../config/auth';
+import {
+    buildNameFromAbilityID, isAPIClientAuthError,
+} from '@authup/core';
+import { storeToRefs } from 'pinia';
+import type { RouteLocationNormalized } from 'vue-router';
+import {
+    navigateTo,
+} from '#app';
 import { LayoutKey } from '../config/layout';
+import { useAuthStore } from '../store/auth';
 
-function checkAbilityOrPermission({ route, $auth } : Context) {
+function checkAbilityOrPermission(route: RouteLocationNormalized, has: (name: string) => boolean) {
     const layoutKeys : string[] = [
         LayoutKey.REQUIRED_PERMISSIONS,
     ];
@@ -20,26 +26,22 @@ function checkAbilityOrPermission({ route, $auth } : Context) {
     for (let i = 0; i < layoutKeys.length; i++) {
         const layoutKey = layoutKeys[i];
 
-        for (let j = 0; j < route.meta.length; j++) {
-            const matchedRecordMeta = route.meta[j];
+        for (let j = 0; j < route.matched.length; j++) {
+            const matchedRecord = route.matched[j];
 
-            if (!Object.prototype.hasOwnProperty.call(matchedRecordMeta, layoutKey)) {
+            if (!Object.prototype.hasOwnProperty.call(matchedRecord.meta, layoutKey)) {
                 continue;
             }
 
-            const value = matchedRecordMeta[layoutKey];
+            const value = matchedRecord.meta[layoutKey];
             if (Array.isArray(value)) {
                 isAllowed = value.some((val) => {
                     if (layoutKey !== LayoutKey.REQUIRED_PERMISSIONS) {
                         val = buildNameFromAbilityID(val);
                     }
 
-                    return $auth.has(val);
+                    return has(val);
                 });
-            }
-
-            if (typeof value === 'function') {
-                isAllowed = !!value($auth);
             }
 
             if (isAllowed) {
@@ -61,76 +63,74 @@ function checkAbilityOrPermission({ route, $auth } : Context) {
     return true;
 }
 
-export default async function middleware({
-    route, from, redirect, $auth, store,
-} : Context) : Promise<void> {
+export default defineNuxtRouteMiddleware(async (to, from) => {
+    const store = useAuthStore();
+    const { loggedIn } = storeToRefs(store);
+
     let redirectPath = '/';
 
     if (typeof from !== 'undefined') {
         redirectPath = from.fullPath;
     }
 
-    if (
-        !route.path.startsWith('/logout') &&
-        !route.fullPath.startsWith('/logout')
-    ) {
-        try {
-            await (<AuthModule> $auth).resolve();
-        } catch (e) {
-            if (store.getters['auth/loggedIn']) {
-                await redirect({
-                    path: '/logout',
-                    query: { redirect: route.fullPath },
-                });
-            } else {
-                await redirect({
-                    path: '/login',
-                    query: { redirect: route.fullPath },
-                });
-            }
-
-            return;
+    try {
+        await store.resolve();
+    } catch (e) {
+        if (isAPIClientAuthError(e)) {
+            await store.logout();
         }
+
+        if (!to.fullPath.startsWith('/logout') && !to.fullPath.startsWith('/login')) {
+            return navigateTo({
+                path: '/logout',
+                query: {
+                    redirect: redirectPath,
+                },
+            });
+        }
+
+        return undefined;
     }
 
     if (
-        Array.isArray(route.meta) &&
-        route.meta.some((meta) => !!meta[LayoutKey.REQUIRED_LOGGED_IN])
+        to.matched.some((matched) => !!matched.meta[LayoutKey.REQUIRED_LOGGED_IN])
     ) {
-        if (!store.getters['auth/loggedIn']) {
-            await store.dispatch('auth/triggerLogout');
-
+        if (!loggedIn.value) {
             const query : Record<string, any> = {};
 
-            if (!route.fullPath.includes('logout')) {
-                query.redirect = route.fullPath;
+            if (!to.fullPath.startsWith('/logout')) {
+                query.redirect = to.fullPath;
             }
 
-            await redirect({
+            return navigateTo({
                 path: '/login',
                 query,
             });
-
-            return;
         }
 
         try {
-            checkAbilityOrPermission({ route, $auth } as Context);
+            checkAbilityOrPermission(to, (name) => store.has(name));
         } catch (e) {
-            await redirect({
+            return navigateTo({
                 path: redirectPath,
             });
-
-            return;
         }
-    }
-
-    if (
-        Array.isArray(route.meta) &&
-        route.meta.some((meta) => meta[LayoutKey.REQUIRED_LOGGED_OUT])
+    } else if (
+        !to.fullPath.startsWith('/logout') &&
+        to.matched.some((matched) => matched.meta[LayoutKey.REQUIRED_LOGGED_OUT])
     ) {
-        if (store.getters['auth/loggedIn']) {
-            await redirect({ path: redirectPath });
+        const query : Record<string, any> = {};
+        if (!redirectPath.includes('logout')) {
+            query.redirect = redirectPath;
+        }
+
+        if (loggedIn.value) {
+            return navigateTo({
+                path: '/logout',
+                query,
+            });
         }
     }
-}
+
+    return undefined;
+});

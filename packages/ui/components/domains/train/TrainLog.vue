@@ -6,57 +6,56 @@
   -->
 <script lang="ts">
 import type { TrainLog } from '@personalhealthtrain/central-common';
-import type {
-    CreateElement, PropType, VNode, VNodeChildren,
+import {
+    defineComponent, h, toRefs,
 } from 'vue';
+import type { PropType, VNode, VNodeArrayChildren } from 'vue';
 
-export default {
+export default defineComponent({
     name: 'TrainLog',
     props: {
         index: {
             type: Number,
             default: 0,
         },
-        entity: Object as PropType<TrainLog>,
-    },
-    computed: {
-        time() {
-            return this.entity.created_at;
+        entity: {
+            type: Object as PropType<TrainLog>,
+            required: true,
         },
     },
-    render(h: CreateElement) : VNode {
-        const vm = this;
+    setup(props) {
+        const refs = toRefs(props);
 
         let message : VNode;
-        if (this.entity.error) {
-            const parts : VNodeChildren = ['An error '];
+        if (refs.entity.value.error) {
+            const parts : VNodeArrayChildren = ['An error '];
 
-            if (this.entity.error_code) {
+            if (refs.entity.value.error_code) {
                 parts.push('with error code ');
-                parts.push(h('strong', vm.entity.error_code));
+                parts.push(h('strong', refs.entity.value.error_code));
                 parts.push(' ');
             }
 
-            if (this.entity.step) {
+            if (refs.entity.value.step) {
                 parts.push('during the step ');
-                parts.push(h('strong', vm.entity.step));
+                parts.push(h('strong', refs.entity.value.step));
                 parts.push(' ');
             }
 
             parts.push('occurred');
 
             message = h('span', parts);
-        } else if (this.entity.status) {
+        } else if (refs.entity.value.status) {
             message = h('span', [
                 'Event ',
-                h('strong', vm.entity.event),
+                h('strong', refs.entity.value.event),
                 ' triggered and status changed to ',
-                h('strong', vm.entity.status),
+                h('strong', refs.entity.value.status),
             ]);
         } else {
             message = h('span', [
                 'Event ',
-                h('strong', vm.entity.event),
+                h('strong', refs.entity.value.event),
                 ' triggered',
             ]);
         }
@@ -64,23 +63,23 @@ export default {
         return h(
             'div',
             {
-                staticClass: `line line-${vm.index + 1}`,
+                class: `line line-${refs.index.value + 1}`,
             },
             [
-                h('div', { staticClass: 'line-number' }, [vm.index + 1]),
-                h('div', { staticClass: 'line-content d-flex flex-row' }, [
-                    h('div', { staticClass: `line-component ${vm.entity.component}` }, [
-                        `${vm.entity.component}/${vm.entity.command}`,
+                h('div', { class: 'line-number' }, [refs.index.value + 1]),
+                h('div', { class: 'line-content d-flex flex-row' }, [
+                    h('div', { staticClass: `line-component ${refs.entity.value.component}` }, [
+                        `${refs.entity.value.component}/${refs.entity.value.command}`,
                     ]),
-                    h('div', { staticClass: 'line-message', class: { error: vm.entity.error } }, [
+                    h('div', { staticClass: 'line-message', class: { error: refs.entity.value.error } }, [
                         message,
                     ]),
                     h('div', { staticClass: 'ml-auto' }, [
-                        h('timeago', { props: { datetime: vm.entity.created_at } }),
+                        h('timeago', { props: { datetime: refs.entity.value.created_at } }),
                     ]),
                 ]),
             ],
         );
     },
-};
+});
 </script>

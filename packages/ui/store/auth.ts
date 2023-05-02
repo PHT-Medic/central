@@ -1,437 +1,293 @@
 /*
- * Copyright (c) 2021-2021.
+ * Copyright (c) 2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
 
-import Vue from 'vue';
-import type { ActionTree, GetterTree, MutationTree } from 'vuex';
-
 import type {
-    AbilityDescriptor,
-    OAuth2TokenGrantResponse, Realm,
-    User,
+    OAuth2TokenGrantResponse, OAuth2TokenIntrospectionResponse, Realm, User,
 } from '@authup/core';
 import {
-    OAuth2TokenKind,
+    APIClient, AbilityManager, OAuth2TokenKind, isAPIClientAuthError,
 } from '@authup/core';
-import type { RootState } from './index';
-import { AuthBrowserStorageKey } from '../config/auth';
+import { defineStore } from 'pinia';
+import { computed, ref, useRuntimeConfig } from '#imports';
 
-export interface AuthState {
-    user: User | undefined,
+export const useAuthStore = defineStore('auth', () => {
+    const config = useRuntimeConfig();
 
-    realmId: string | undefined,
-    realmName: string | undefined
-    managementRealmId: string | undefined,
-    managementRealmName: string | undefined,
+    const client = new APIClient({
+        baseURL: config.public.apiUrl,
+    });
 
-    permissions: AbilityDescriptor[],
-    resolved: boolean,
+    // --------------------------------------------------------------------
 
-    accessToken: string | undefined,
-    accessTokenExpireDate: Date | undefined,
-    refreshToken: string | undefined,
+    const accessToken = ref<string | undefined>(undefined);
+    const accessTokenExpireDate = ref<Date | undefined>(undefined);
 
-    tokenPromise: Promise<any> | undefined,
+    const refreshToken = ref<string | undefined>(undefined);
 
-    required: boolean,
-    inProgress: boolean,
-    error: undefined | { code: string, message: string },
-}
-const state = () : AuthState => ({
-    user: undefined,
-
-    realmId: undefined,
-    realmName: undefined,
-
-    managementRealmId: undefined,
-    managementRealmName: undefined,
-
-    permissions: [],
-    resolved: false,
-
-    accessToken: undefined,
-    accessTokenExpireDate: undefined,
-    refreshToken: undefined,
-
-    tokenPromise: undefined,
-
-    required: false,
-    inProgress: false,
-    error: undefined,
-});
-
-export const getters : GetterTree<AuthState, RootState> = {
-    user: (state: AuthState) => state.user,
-    userId: (state: AuthState) => (state.user ? state.user.id : undefined),
-
-    realmId: (state: AuthState) => state.realmId,
-    realmName: (state: AuthState) => state.realmName,
-
-    managementRealmId: (state) => state.managementRealmId || state.realmId,
-    managementRealmName: (state) => state.managementRealmName || state.realmName,
-
-    permissions: (state: AuthState) => state.permissions,
-    resolved: (state: AuthState) => state.resolved,
-    permission: (state: AuthState) => (id: number | string) => {
-        const items = state.permissions.filter((item: Record<string, any>) => {
-            if (typeof id === 'number') {
-                return item.id === id;
+    const setToken = (kind: OAuth2TokenKind, token: string) => {
+        switch (kind) {
+            case OAuth2TokenKind.ACCESS: {
+                accessToken.value = token;
+                break;
             }
-            return item.name === id;
-        });
-
-        return items.length === 1 ? items[0] : undefined;
-    },
-    loggedIn: (state : AuthState) => !!state.accessToken,
-
-    accessToken: (state: AuthState) => state.accessToken,
-    accessTokenExpireDate: (state: AuthState) => state.accessTokenExpireDate,
-    refreshToken: (state: AuthState) => state.refreshToken,
-};
-
-export const actions : ActionTree<AuthState, RootState> = {
-    // --------------------------------------------------------------------
-
-    triggerSetLoginRequired({ commit }, required: boolean) {
-        commit('setLoginRequired', required);
-    },
-
-    // --------------------------------------------------------------------
-
-    triggerSetToken({ commit }, { kind, token }) {
-        switch (kind) {
-            case OAuth2TokenKind.ACCESS:
-                this.$warehouse.set(AuthBrowserStorageKey.ACCESS_TOKEN, token);
-                this.$auth.setRequestToken(token);
-                break;
             case OAuth2TokenKind.REFRESH:
-                this.$warehouse.set(AuthBrowserStorageKey.REFRESH_TOKEN, token);
+                refreshToken.value = token;
                 break;
         }
+    };
 
-        commit('setToken', { kind, token });
-    },
-    triggerSetTokenExpireDate({ commit }, { kind, date }) {
+    const unsetToken = (kind: OAuth2TokenKind) => {
         switch (kind) {
-            case OAuth2TokenKind.ACCESS:
-                this.$warehouse.set(AuthBrowserStorageKey.ACCESS_TOKEN_EXPIRE_DATE, date);
+            case OAuth2TokenKind.ACCESS: {
+                accessToken.value = undefined;
+                accessTokenExpireDate.value = undefined;
                 break;
-        }
-
-        commit('setTokenExpireDate', { kind, date });
-    },
-    triggerUnsetToken({ commit }, kind) {
-        switch (kind) {
-            case OAuth2TokenKind.ACCESS:
-                this.$warehouse.remove(AuthBrowserStorageKey.ACCESS_TOKEN);
-                this.$warehouse.remove(AuthBrowserStorageKey.ACCESS_TOKEN_EXPIRE_DATE);
-                this.$auth.unsetRequestToken();
-                break;
+            }
             case OAuth2TokenKind.REFRESH:
-                this.$warehouse.remove(AuthBrowserStorageKey.REFRESH_TOKEN);
+                refreshToken.value = undefined;
                 break;
         }
+    };
 
-        commit('unsetToken', kind);
-    },
+    const setTokenExpireDate = (date: Date) => {
+        accessTokenExpireDate.value = date;
+    };
 
-    // --------------------------------------------------------------------
+    let refreshTokenPromise : Promise<OAuth2TokenGrantResponse> | undefined;
 
-    triggerSetUser({ commit }, entity) {
-        this.$warehouse.set(AuthBrowserStorageKey.USER, entity);
-        commit('setUser', entity);
-    },
-    triggerUnsetUser({ commit }) {
-        this.$warehouse.remove(AuthBrowserStorageKey.USER);
-        commit('unsetUser');
-    },
-
-    // --------------------------------------------------------------------
-
-    triggerSetRealm({ commit }, realm: Partial<Realm>) {
-        commit('setRealm', realm);
-
-        this.$warehouse.set(AuthBrowserStorageKey.REALM, realm);
-    },
-    triggerUnsetRealm({ commit }) {
-        commit('unsetRealm');
-
-        this.$warehouse.remove(AuthBrowserStorageKey.REALM);
-    },
-
-    triggerSetManagementRealm({ commit }, realm: Partial<Realm>) {
-        commit('setManagementRealm', realm);
-
-        this.$warehouse.set(AuthBrowserStorageKey.MANAGEMENT_REALM, realm);
-    },
-    triggerUnsetManagementRealm({ commit }) {
-        commit('unsetManagementRealm');
-
-        this.$warehouse.remove(AuthBrowserStorageKey.MANAGEMENT_REALM);
-    },
-
-    // --------------------------------------------------------------------
-
-    triggerSetPermissions({ commit }, permissions) {
-        this.$warehouse.setLocalStorageItem(AuthBrowserStorageKey.PERMISSIONS, permissions);
-        commit('setPermissions', permissions);
-    },
-    triggerUnsetPermissions({ commit }) {
-        this.$warehouse.removeLocalStorageItem(AuthBrowserStorageKey.PERMISSIONS);
-        commit('unsetPermissions');
-    },
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Try to trigger user refresh.
-     *
-     * @param state
-     * @param dispatch
-     *
-     * @returns {Promise<boolean>}
-     */
-    async triggerRefreshMe({ state, dispatch }) {
-        const { accessToken } = state;
-
-        if (accessToken) {
-            const entity = await this.$authupApi.userInfo.get(accessToken);
-            dispatch('triggerSetUser', entity);
-
-            const token = await this.$authupApi.token.introspect(accessToken);
-
-            dispatch('triggerSetPermissions', token.permissions);
-            dispatch('triggerSetRealm', {
-                id: token.realm_id,
-                name: token.realm_name,
-            });
+    const attemptRefreshToken = () : Promise<OAuth2TokenGrantResponse> => {
+        if (!refreshToken.value) {
+            return Promise.reject(new Error('No refresh token is present.'));
         }
-    },
+
+        if (!refreshTokenPromise) {
+            unsetToken(OAuth2TokenKind.ACCESS);
+
+            refreshTokenPromise = client.token.createWithRefreshToken({
+                refresh_token: refreshToken.value,
+            })
+                .then((r) => {
+                    refreshTokenPromise = undefined;
+                    return r;
+                })
+                .catch((e) => {
+                    logout();
+
+                    refreshTokenPromise = undefined;
+                    throw e;
+                });
+
+            return refreshTokenPromise;
+        }
+
+        return refreshTokenPromise;
+    };
+
     // --------------------------------------------------------------------
 
-    /**
-     * Try to log in the user with given credentials.
-     *
-     * @return {Promise<boolean>}
-     */
-    async triggerLogin({ commit, dispatch }, { name, password }: {name: string, password: string}) {
-        commit('loginAttempt');
+    const user = ref<User | undefined>(undefined);
+    const userId = computed<string | undefined>(() => (user.value ? user.value.id : undefined));
+    let userResolved = false;
+
+    const setUser = (entity: User) => {
+        user.value = entity;
+        userResolved = true;
+    };
+
+    const unsetUser = () => {
+        user.value = undefined;
+        userResolved = false;
+    };
+
+    const resolveUser = async (force?: boolean) => {
+        if (!accessToken.value || (userResolved && !force)) return;
+        userResolved = true;
 
         try {
-            const token = await this.$auth.getTokenWithPassword(name, password);
-
-            commit('loginSuccess');
-
-            dispatch('triggerSetTokenExpireDate', { kind: OAuth2TokenKind.ACCESS, date: new Date(Date.now() + token.expires_in * 1000) });
-
-            dispatch('triggerSetToken', { kind: OAuth2TokenKind.ACCESS, token: token.access_token });
-            dispatch('triggerSetToken', { kind: OAuth2TokenKind.REFRESH, token: token.refresh_token });
-
-            await dispatch('triggerRefreshMe');
+            const entity = await client.userInfo.get(`Bearer ${accessToken.value}`) as User;
+            setUser(entity);
         } catch (e) {
-            await dispatch('triggerUnsetToken', OAuth2TokenKind.ACCESS);
-            await dispatch('triggerUnsetToken', OAuth2TokenKind.REFRESH);
+            if (isAPIClientAuthError(e)) {
+                await attemptRefreshToken();
+                await resolveUser(true);
+
+                return;
+            }
 
             throw e;
         }
-    },
+    };
 
     // --------------------------------------------------------------------
 
-    triggerRefreshToken({ commit, state }) : Promise<OAuth2TokenGrantResponse> {
-        if (!state.refreshToken) {
-            return Promise.reject(new Error('It is not possible to receive a new access token'));
+    const abilityManager = new AbilityManager();
+
+    const token = ref<undefined | OAuth2TokenIntrospectionResponse>(undefined);
+    let tokenResolved = false;
+
+    const has = (name: string) => abilityManager.has(name);
+
+    const realm = ref<undefined | Pick<Realm, 'id' | 'name'>>(undefined);
+    const realmId = computed<string | undefined>(() => (realm.value ? realm.value.id : undefined));
+    const realmName = computed<string | undefined>(() => (realm.value ? realm.value.name : undefined));
+
+    const setRealm = (entity: Pick<Realm, 'id' | 'name'>) => {
+        realm.value = entity;
+    };
+
+    const realmManagement = ref<undefined | Pick<Realm, 'id' | 'name'>>(undefined);
+    const realmManagementId = computed<string | undefined>(() => (realmManagement.value ? realmManagement.value.id : realmId.value));
+    const realmManagementName = computed<string | undefined>(() => (realmManagement.value ? realmManagement.value.name : realmName.value));
+
+    const setRealmManagement = (entity: Pick<Realm, 'id' | 'name'>) => {
+        realmManagement.value = entity;
+    };
+
+    const setTokenInfo = (entity: OAuth2TokenIntrospectionResponse) => {
+        tokenResolved = true;
+
+        token.value = entity;
+
+        if (entity.exp) {
+            const expireDate = new Date(entity.exp * 1000);
+            setTokenExpireDate(expireDate);
         }
 
-        if (!state.tokenPromise) {
-            commit('loginAttempt');
+        if (
+            entity.realm_id &&
+            entity.realm_name
+        ) {
+            realm.value = {
+                id: entity.realm_id,
+                name: entity.realm_name,
+            };
 
-            const tokenPromise = this.$auth.getTokenWithRefreshToken(state.refreshToken);
-            tokenPromise.then((r) => {
-                commit('loginSuccess');
-                return r;
+            if (typeof realmManagement.value === 'undefined') {
+                setRealmManagement(realm.value);
+            }
+        }
+
+        if (entity.permissions) {
+            abilityManager.set(entity.permissions);
+        }
+    };
+
+    const unsetTokenInfo = () => {
+        tokenResolved = false;
+
+        token.value = undefined;
+
+        realm.value = undefined;
+        realmManagement.value = undefined;
+
+        abilityManager.set([]);
+    };
+
+    const introspectToken = async (force?: boolean) => {
+        if (!accessToken.value || (tokenResolved && !force)) return;
+        tokenResolved = true;
+
+        try {
+            const token = await client.token.introspect<OAuth2TokenIntrospectionResponse>({
+                token: accessToken.value,
+            }, {
+                authorizationHeader: {
+                    type: 'Bearer',
+                    token: accessToken.value,
+                },
             });
-            tokenPromise.catch((e) => {
-                commit('loginError', e);
-                commit('setTokenPromise', null);
-                throw e;
+            setTokenInfo(token);
+        } catch (e) {
+            if (isAPIClientAuthError(e)) {
+                await attemptRefreshToken();
+                await introspectToken(true);
+
+                return;
+            }
+
+            throw e;
+        }
+    };
+
+    // --------------------------------------------------------------------
+
+    const resolve = async () => {
+        if (!accessToken.value) return;
+
+        await resolveUser();
+        await introspectToken();
+    };
+
+    const loggedIn = computed<boolean>(() => !!accessToken.value);
+    const login = async (ctx: { name: string, password: string, realmId?: string}) => {
+        try {
+            const data = await client.token.createWithPasswordGrant({
+                username: ctx.name,
+                password: ctx.password,
+                ...(realmId ? { realm_id: ctx.realmId } : {}),
             });
 
-            commit('setTokenPromise', tokenPromise);
+            const expireDate = new Date(Date.now() + data.expires_in * 1000);
+            setTokenExpireDate(expireDate);
 
-            return tokenPromise;
+            setToken(OAuth2TokenKind.ACCESS, data.access_token);
+            if (data.refresh_token) {
+                setToken(OAuth2TokenKind.REFRESH, data.refresh_token);
+            }
+
+            await resolve();
+        } catch (e) {
+            unsetToken(OAuth2TokenKind.ACCESS);
+            unsetToken(OAuth2TokenKind.REFRESH);
+
+            throw e;
         }
+    };
 
-        return state.tokenPromise;
-    },
+    const logout = () => {
+        unsetToken(OAuth2TokenKind.ACCESS);
+        unsetToken(OAuth2TokenKind.REFRESH);
 
-    // --------------------------------------------------------------------
+        unsetUser();
+        unsetTokenInfo();
+    };
 
-    /**
-     * Try to log out the user.
-     *
-     * @param dispatch
-     */
-    async triggerLogout({ dispatch }) {
-        await dispatch('triggerUnsetToken', OAuth2TokenKind.ACCESS);
-        await dispatch('triggerUnsetToken', OAuth2TokenKind.REFRESH);
-        await dispatch('triggerUnsetUser');
-        await dispatch('triggerUnsetPermissions');
-        await dispatch('triggerUnsetRealm');
-        await dispatch('triggerUnsetManagementRealm');
+    return {
+        login,
+        logout,
+        loggedIn,
+        resolve,
 
-        await dispatch('triggerSetLoginRequired', false);
-    },
+        accessToken,
+        accessTokenExpireDate,
+        refreshToken,
+        setToken,
+        setTokenExpireDate,
+        unsetToken,
 
-    // --------------------------------------------------------------------
+        token,
+        setTokenInfo,
+        unsetTokenInfo,
 
-    /**
-     * Trigger custom authentication error by
-     * another service or component.
-     *
-     * @param commit
-     * @param message
-     */
-    triggerAuthError({ commit }, message) {
-        commit('loginError', { errorCode: 'internal', errorMessage: message });
-    },
+        realm,
+        realmId,
+        realmName,
+        setRealm,
 
-    //--------------------------------------------------------
+        realmManagement,
+        realmManagementId,
+        realmManagementName,
+        setRealmManagement,
 
-    /**
-     * Trigger user property change.
-     *
-     * @param commit
-     * @param state
-     * @param property
-     * @param value
-     */
-    triggerSetUserProperty({ commit, state }, { property, value }) {
-        commit('setUserProperty', { property, value });
-        this.$warehouse.remove(AuthBrowserStorageKey.USER);
-        this.$warehouse.set(AuthBrowserStorageKey.USER, state.user);
-    },
-};
+        user,
+        userId,
+        setUser,
+        unsetUser,
 
-export const mutations : MutationTree<AuthState> = {
-    // Login mutations
-    loginAttempt(state) {
-        state.inProgress = true;
-
-        state.error = undefined;
-    },
-    loginSuccess(state) {
-        state.inProgress = false;
-        state.required = false;
-    },
-    loginError(state, { errorCode, errorMessage }) {
-        state.inProgress = false;
-
-        state.error = {
-            code: errorCode,
-            message: errorMessage,
-        };
-    },
-    setLoginRequired(state, required) {
-        state.required = required;
-    },
-
-    // --------------------------------------------------------------------
-
-    setTokenPromise(state, promise) {
-        state.tokenPromise = promise;
-    },
-
-    // --------------------------------------------------------------------
-
-    setUser(state, user) {
-        state.user = user;
-    },
-    unsetUser(state) {
-        state.user = undefined;
-    },
-
-    // --------------------------------------------------------------------
-
-    setRealm(state, { id, name }) {
-        state.realmId = id;
-        state.realmName = name;
-    },
-    unsetRealm(state) {
-        state.realmId = undefined;
-        state.realmName = undefined;
-    },
-
-    setManagementRealm(state, { id, name }) {
-        state.managementRealmId = id;
-        state.managementRealmName = name;
-    },
-    unsetManagementRealm(state) {
-        state.managementRealmId = undefined;
-        state.managementRealmName = undefined;
-    },
-
-    // --------------------------------------------------------------------
-
-    setUserProperty(state, { property, value }) {
-        if (typeof state.user === 'undefined') return;
-
-        Vue.set(state.user, property, value);
-    },
-
-    // --------------------------------------------------------------------
-
-    setPermissions(state, permissions) {
-        state.permissions = permissions;
-    },
-    unsetPermissions(state) {
-        state.permissions = [];
-    },
-
-    // --------------------------------------------------------------------
-
-    setResolved(state, resolved) {
-        state.resolved = !!resolved;
-    },
-
-    // --------------------------------------------------------------------
-
-    setToken(state, { kind, token }) {
-        switch (kind) {
-            case OAuth2TokenKind.ACCESS:
-                state.accessToken = token;
-                break;
-            case OAuth2TokenKind.REFRESH:
-                state.refreshToken = token;
-                break;
-        }
-    },
-    unsetToken(state, kind) {
-        switch (kind) {
-            case OAuth2TokenKind.ACCESS:
-                state.accessToken = undefined;
-                break;
-            case OAuth2TokenKind.REFRESH:
-                state.refreshToken = undefined;
-                break;
-        }
-    },
-    setTokenExpireDate(state, { kind, date }) {
-        switch (kind) {
-            case OAuth2TokenKind.ACCESS:
-                state.accessTokenExpireDate = date;
-                break;
-        }
-    },
-};
-
-export default {
-    namespaced: true,
-    state,
-    getters,
-    actions,
-    mutations,
-};
+        has,
+    };
+});

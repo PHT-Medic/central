@@ -4,115 +4,105 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import { initFormAttributesFromSource } from '@authup/client-vue';
+import { required } from '@vuelidate/validators';
+import Error from 'nuxt/dist/core/runtime/nitro/error';
+import {
+    computed,
+    defineComponent, reactive, ref, toRefs, watch,
+} from 'vue';
+import type { Train } from '@personalhealthtrain/central-common';
 import { TrainAPICommand } from '@personalhealthtrain/central-common';
+import useVuelidate from '@vuelidate/core';
+import type { PropType } from 'vue';
+import { wrapFnWithBusyState } from '../../../../core/busy';
 
-export default {
-    components: { },
+export default defineComponent({
     props: {
         train: {
-            type: Object,
-            default: undefined,
+            type: Object as PropType<Train>,
+            required: true,
         },
     },
-    data() {
-        return {
-            form: {
-                hash_signed: '',
-                hash: '',
+    emits: ['signed', 'generated'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
+
+        const busy = ref(false);
+        const form = reactive({
+            hash_signed: '',
+            hash: '',
+        });
+
+        const $v = useVuelidate({
+            hash_signed: {
+                required,
             },
-            formInfo: {
-                message: undefined,
+            hash: {
+
             },
-            busy: false,
+        }, form);
+
+        const init = () => {
+            if (refs.train.value.hash !== form.hash) {
+                initFormAttributesFromSource(form, refs.train.value);
+            }
         };
-    },
-    computed: {
-        hashExists() {
-            return !!this.form.hash && this.form.hash !== '';
-        },
-        hash() {
-            return this.train.hash;
-        },
-        hashSigned() {
-            return this.train.hashSigned;
-        },
-    },
-    watch: {
-        hash(val, oldVal) {
-            if (val && val !== oldVal) {
-                this.init();
+
+        const updatedAt = computed(() => (refs.train.value ?
+            refs.train.value.updated_at :
+            undefined));
+
+        watch(updatedAt, (val, oldValue) => {
+            if (val && val !== oldValue) {
+                init();
             }
-        },
-        hashSigned(val, oldVal) {
-            if (val && val !== oldVal) {
-                this.init();
-            }
-        },
-    },
-    created() {
-        this.init();
-    },
-    methods: {
-        copyToClipboard() {
+        });
+
+        init();
+
+        const hashExists = computed(() => form.hash && form.hash.length > 0);
+
+        const copyToClipboard = () => {
             if (
                 typeof navigator !== 'undefined' &&
                 typeof navigator.clipboard !== 'undefined'
             ) {
-                navigator.clipboard.writeText(this.form.hash);
-
-                this.$bvToast.toast('The hash was copied to the clipboard.', {
-                    toaster: 'b-toaster-top-center',
-                    variant: 'success',
-                });
+                navigator.clipboard.writeText(form.hash);
             }
-        },
-        init() {
-            if (this.train.hash) {
-                this.form.hash = this.train.hash;
-            }
+        };
 
-            if (this.train.hash_signed) {
-                this.form.hash_signed = this.train.hash_signed;
-            }
-        },
-        async generate() {
-            if (this.busy) return;
-
-            this.busy = true;
-
+        const generate = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await this.$api.train.runCommand(this.train.id, TrainAPICommand.GENERATE_HASH);
+                const train = await this.$api.train.runCommand(refs.train.value.id, TrainAPICommand.GENERATE_HASH);
 
-                this.setHash(train.hash);
-                this.$emit('generated', this.form.hash);
+                form.hash = train.hash;
+
+                emit('generated', form.hash);
             } catch (e) {
-                // ...
+                if (e instanceof Error) {
+                    emit('failed', e);
+                }
             }
-
-            this.busy = false;
-        },
-
-        //------------------------------------
-
-        setHash(value) {
-            this.form.hash = value;
-        },
-        setHashSigned(value) {
-            this.form.hash = value;
-        },
-        reset() {
-            this.form.hash = null;
-            this.form.hash_signed = null;
-        },
+        });
 
         //---------------------------------
 
-        handleHashSigned() {
-            this.$emit('signed', this.form.hash_signed);
-        },
+        const handleHashSigned = () => {
+            emit('signed', form.hash_signed);
+        };
+
+        return {
+            hashExists,
+            busy,
+            generate,
+            handleHashSigned,
+            copyToClipboard,
+            v$: $v,
+        };
     },
-};
+});
 </script>
 <template>
     <div>
@@ -171,7 +161,7 @@ export default {
             <input
                 type="text"
                 class="form-control"
-                :value="form.hash"
+                :value="v$.hash.$model"
                 :disabled="true"
             >
         </div>
@@ -185,10 +175,11 @@ export default {
 
         <div class="form-group">
             <label>Signed Hash</label>
+
             <textarea
-                v-model="form.hash_signed"
+                v-model="v$.hash_signed.$model"
                 class="form-control"
-                placeholder="Signed hash of the pht offline tool..."
+                placeholder="Signed hash of the desktop app..."
                 rows="4"
                 @change.prevent="handleHashSigned"
             />

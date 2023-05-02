@@ -4,84 +4,45 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import {
-    maxLength, minLength, required,
-} from 'vuelidate/lib/validators';
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
+import { buildValidationTranslator, initFormAttributesFromSource } from '@authup/client-vue';
+import { buildFormInput, buildFormSubmit, buildFormTextarea } from '@vue-layout/form-controls';
+import type { ListItemSlotProps } from '@vue-layout/list-controls';
+import { SlotName } from '@vue-layout/list-controls';
+import useVuelidate from '@vuelidate/core';
+import { maxLength, minLength, required } from '@vuelidate/validators';
+import { computed } from 'vue';
+import type { PropType } from 'vue';
 
-import type { Proposal } from '@personalhealthtrain/central-common';
+import type { MasterImage, Proposal, Station } from '@personalhealthtrain/central-common';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
-import type { ComponentFormData } from '@vue-layout/utils';
-import {
-    SlotName, buildFormInput, buildFormSubmit, buildFormTextarea,
-} from '@vue-layout/utils';
+import { wrapFnWithBusyState } from '../../../core/busy';
 import { MasterImagePicker } from '../master-image/MasterImagePicker';
-import { StationList } from '../station/StationList';
+import StationList from '../station/StationList';
 import { AssignmentToggleButton } from '../../AssignmentToggleButton';
 import { ProposalStationAssignAction } from '../proposal-station/ProposalStationAssignAction';
 
-import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
-
-type Properties = {
-    entity: Proposal
-};
-
-export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Properties>({
+export default defineComponent({
+    name: 'ProposalForm',
     props: {
         entity: {
             type: Object as PropType<Proposal>,
             default: undefined,
         },
     },
-    data() {
-        return {
-            form: {
-                title: '',
-                requested_data: '',
-                master_image_id: '',
-                risk: ProposalRisk.MID,
-                risk_comment: '',
-            },
+    emits: ['created', 'updated', 'failed'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
 
-            busy: false,
+        const busy = ref(false);
+        const form = reactive({
+            title: '',
+            requested_data: '',
+            master_image_id: '',
+            risk: ProposalRisk.MID,
+            risk_comment: '',
+        });
 
-            station: {
-                selectedIds: [],
-                items: [],
-                busy: false,
-            },
-
-            risks: [
-                { id: ProposalRisk.LOW, name: '(Low) Low risk', class: 'btn-success' },
-                { id: ProposalRisk.MID, name: '(Mid) Mid risk', class: 'btn-warning' },
-                { id: ProposalRisk.HIGH, name: '(High) High risk', class: 'btn-danger' },
-            ],
-        };
-    },
-    computed: {
-        isEditing() {
-            return this.entity && Object.prototype.hasOwnProperty.call(this.entity, 'id');
-        },
-        masterImageId() {
-            return this.isEditing ? this.entity.master_image_id : undefined;
-        },
-        updatedAt() {
-            return this.isEditing ? this.entity.updated_at : undefined;
-        },
-    },
-    watch: {
-        updatedAt(val, oldVal) {
-            if (val && val !== oldVal) {
-                this.initFromProperties();
-            }
-        },
-    },
-    created() {
-        this.initFromProperties();
-    },
-    validations() {
-        const form = {
+        const $v = useVuelidate({
             title: {
                 required,
                 minLength: minLength(5),
@@ -103,206 +64,209 @@ export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Pr
                 minLength: minLength(10),
                 maxLength: maxLength(2048),
             },
+        }, form);
+
+        const stationIds = ref<string[]>([]);
+
+        const risks = [
+            { id: ProposalRisk.LOW, name: '(Low) Low risk', class: 'btn-success' },
+            { id: ProposalRisk.MID, name: '(Mid) Mid risk', class: 'btn-warning' },
+            { id: ProposalRisk.HIGH, name: '(High) High risk', class: 'btn-danger' },
+        ];
+
+        const initFromProperties = () => {
+            if (!refs.entity.value) return;
+
+            initFormAttributesFromSource(form, refs.entity.value);
         };
 
-        return {
-            form,
-        };
-    },
-    methods: {
-        initFromProperties() {
-            if (typeof this.entity === 'undefined') return;
+        const updatedAt = computed(() => (refs.entity.value ?
+            refs.entity.value.updated_at :
+            undefined));
 
-            const keys = Object.keys(this.form);
-            for (let i = 0; i < keys.length; i++) {
-                if (Object.prototype.hasOwnProperty.call(this.entity, keys[i])) {
-                    this.form[keys[i]] = this.entity[keys[i]];
-                }
+        watch(updatedAt, (val, oldValue) => {
+            if (val && val !== oldValue) {
+                initFromProperties();
             }
-        },
-        handleMasterImagePicker(item) {
+        });
+
+        const handleMasterImagePicker = (item: MasterImage) => {
             if (item) {
-                this.form.master_image_id = item.id;
+                form.master_image_id = item.id;
             } else {
-                this.form.master_image_id = '';
+                form.master_image_id = '';
             }
-        },
-        async submit() {
-            if (this.busy || this.$v.$invalid) {
-                return;
-            }
+        };
 
-            this.busy = true;
+        const submit = wrapFnWithBusyState(busy, async () => {
+            if (!$v.value.$invalid) return;
 
             try {
                 let response;
 
-                if (this.isEditing) {
-                    response = await this.$api.proposal.update(this.entity.id, this.form);
+                if (refs.entity.value) {
+                    response = await useAPI().proposal.update(refs.entity.value.id, form);
 
-                    this.$emit('updated', response);
+                    emit('updated', response);
                 } else {
-                    response = await this.$api.proposal.create(this.form);
+                    response = await useAPI().proposal.create(form);
 
-                    for (let i = 0; i < this.station.selectedIds.length; i++) {
-                        await this.$api.proposalStation.create({
+                    for (let i = 0; i < stationIds.value.length; i++) {
+                        await useAPI().proposalStation.create({
                             proposal_id: response.id,
-                            station_id: this.station.selectedIds[i],
+                            station_id: stationIds.value[i],
                         });
                     }
 
-                    this.$emit('created', response);
+                    emit('created', response);
                 }
             } catch (e) {
                 if (e instanceof Error) {
-                    this.$emit('failed', e);
+                    emit('failed', e);
                 }
             }
+        });
 
-            this.busy = false;
-        },
-        async toggleStationIds(id) {
-            const index = this.station.selectedIds.indexOf(id);
+        const toggleStationIds = (id: string) => {
+            const index = stationIds.value.indexOf(id);
             if (index === -1) {
-                this.station.selectedIds.push(id);
+                stationIds.value.push(id);
             } else {
-                this.station.selectedIds.splice(index, 1);
+                stationIds.value.splice(index, 1);
             }
-        },
-        async toggleFormData(key, id) {
-            if (this.form[key] === id) {
-                this.form[key] = null;
-            } else {
-                this.form[key] = id;
-            }
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
+        };
 
-        const title = buildFormInput<Proposal>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Title',
-            propName: 'title',
+        const toggleFormData = (key: keyof typeof form, id: any) => {
+            if (form[key] === id) {
+                form[key] = null as any;
+            } else {
+                form[key] = id;
+            }
+        };
+
+        const title = buildFormInput({
+            validationTranslator: buildValidationTranslator(),
+            validationResult: $v.value.title,
+            label: true,
+            labelContent: 'Title',
+            value: form.title,
+            onChange(input) {
+                form.title = input;
+            },
         });
 
         const masterImagePicker = h(MasterImagePicker, {
-            props: {
-                entityId: vm.form.master_image_id,
-            },
-            on: {
-                selected(value) {
-                    vm.handleMasterImagePicker.call(null, value);
-                },
+            entityId: form.master_image_id,
+            onSelected(value: MasterImage) {
+                handleMasterImagePicker(value);
             },
         });
 
         const risk = h('div', [
             h('label', 'Risk'),
-            h('div', { staticClass: 'row  mt-1 mb-2' }, vm.risks.map((value) => h('div', { staticClass: 'col', key: value.id }, [
+            h('div', { class: 'row  mt-1 mb-2' }, risks.map((value) => h('div', { class: 'col', key: value.id }, [
                 h('button', {
-                    staticClass: 'btn btn-block',
                     style: {
-                        opacity: value.id === vm.form.risk ? 1 : 0.5,
+                        opacity: value.id === form.risk ? 1 : 0.5,
                     },
-                    class: {
+                    class: ['btn btn-block', {
                         [value.class]: true,
-                        'font-weight-bold': value.id === value.risk,
-                    },
-                    attrs: {
-                        type: 'button',
-                    },
-                    on: {
-                        click($event) {
-                            $event.preventDefault();
+                        'font-weight-bold': value.id === form.risk,
+                    }],
+                    type: 'button',
+                    onClick($event: any) {
+                        $event.preventDefault();
 
-                            vm.toggleFormData.call(null, 'risk', value.id);
-                        },
+                        toggleFormData('risk', value.id);
                     },
                 }, [
                     value.id,
                 ]),
             ]))),
-            (!vm.$v.form.risk.required ?
-                h('div', { staticClass: 'alert alert-sm alert-warning' }, [
+            (!$v.value.risk.required ?
+                h('div', { class: 'alert alert-sm alert-warning' }, [
                     'Specify the possible risk for a station in general.',
                 ]) :
                 h('')
             ),
         ]);
 
-        const riskComment = buildFormTextarea<Proposal>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Risk Comment',
-            propName: 'risk_comment',
-            attrs: {
+        const riskComment = buildFormTextarea({
+            validationTranslator: buildValidationTranslator(),
+            validationResult: $v.value.name,
+            label: true,
+            labelContent: 'Risk Comment',
+            value: form.risk_comment,
+            onChange(input) {
+                form.risk_comment = input;
+            },
+            props: {
                 rows: 6,
             },
         });
 
-        const submit = buildFormSubmit<Proposal>(vm, h, {
+        const submitNode = buildFormSubmit({
+            submit,
+            busy,
             updateText: 'Update',
             createText: 'Create',
         });
 
-        const stations = h('div', [
+        const stationsNode = h('div', [
             h(StationList, {
-                props: {
-                    query: {
-                        filter: {
-                            hidden: false,
-                        },
+                query: {
+                    filter: {
+                        hidden: false,
                     },
                 },
-                scopedSlots: {
-                    [SlotName.HEADER_TITLE]: () => h('label', ['Stations']),
-                    [SlotName.ITEM_ACTIONS]: (props) => {
-                        if (vm.isEditing) {
-                            return h(ProposalStationAssignAction, {
-                                props: {
-                                    stationId: props.item.id,
-                                    proposalId: vm.entity.id,
-                                    realmId: vm.entity.id,
-                                },
-                            });
-                        }
-
-                        return h(AssignmentToggleButton, {
-                            props: {
-                                id: props.item.id,
-                                ids: vm.station.selectedIds,
-                            },
-                            on: {
-                                toggle() {
-                                    vm.toggleStationIds.call(null, props.item.id);
-                                },
-                            },
+                headerTitle: {
+                    content: h('label', 'Stations'),
+                },
+            }, {
+                [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Station>) => {
+                    if (refs.entity.value) {
+                        return h(ProposalStationAssignAction, {
+                            stationId: props.item.id,
+                            proposalId: refs.entity.value.id,
+                            realmId: refs.entity.value.id,
                         });
-                    },
+                    }
+
+                    return h(AssignmentToggleButton, {
+                        id: props.item.id,
+                        ids: stationIds.value,
+                        onToggle() {
+                            toggleStationIds(props.item.id);
+                        },
+                    });
                 },
             }),
-            h('div', { staticClass: 'alert alert-dark alert-sm' }, [
+            h('div', { class: 'alert alert-dark alert-sm' }, [
                 'Chose a arbitrary amount of target stations.',
             ]),
         ]);
 
-        const data = buildFormTextarea<Proposal>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Data/Parameters',
-            propName: 'requested_data',
-            attrs: {
+        const data = buildFormTextarea({
+            validationTranslator: buildValidationTranslator(),
+            validationResult: $v.value.requested_data,
+            label: true,
+            labelContent: 'Data/Parameters',
+            value: form.requested_data,
+            onChange(input) {
+                form.requested_data = input;
+            },
+            props: {
                 rows: 6,
             },
         });
 
         return h(
             'div',
-            { staticClass: 'row' },
+            { class: 'row' },
             [
                 h(
                     'div',
-                    { staticClass: 'col' },
+                    { class: 'col' },
                     [
                         title,
                         h('hr'),
@@ -315,18 +279,16 @@ export const ProposalForm = Vue.extend<ComponentFormData<Proposal>, any, any, Pr
                 ),
                 h(
                     'div',
-                    { staticClass: 'col' },
+                    { class: 'col' },
                     [
-                        stations,
+                        stationsNode,
                         h('hr'),
                         data,
                         h('hr'),
-                        submit,
+                        submitNode,
                     ],
                 ),
             ],
         );
     },
 });
-
-export default ProposalForm;

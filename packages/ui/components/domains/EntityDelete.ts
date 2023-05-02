@@ -5,12 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { mergeDeep, useDomainAPI } from '@personalhealthtrain/central-common';
+import type { DomainType } from '@personalhealthtrain/central-common';
+import { useDomainAPI } from '@personalhealthtrain/central-common';
+import { BDropdownItem } from 'bootstrap-vue-next';
 import type {
-    CreateElement, PropType, VNode, VNodeData,
+    Component,
+    PropType,
+    VNodeArrayChildren,
+    VNodeProps,
 } from 'vue';
-import Vue from 'vue';
-import type { BvMsgBoxData, BvMsgBoxOptions } from 'bootstrap-vue';
+import { defineComponent, mergeProps } from 'vue';
+import { useIlingo } from '../../composables/ilingo';
 
 enum ElementType {
     BUTTON = 'button',
@@ -18,24 +23,7 @@ enum ElementType {
     DROP_DOWN_ITEM = 'dropDownItem',
 }
 
-export type AuthEntityDeleteProperties = {
-    [key: string]: any,
-    elementIcon: string,
-    withText: boolean,
-    elementType: `${ElementType}`,
-    entityId: string,
-    entityType: string,
-    hint?: string,
-    locale?: string,
-    options?: BvMsgBoxOptions
-};
-
-export const AuthEntityDelete = Vue.extend<
-any,
-any,
-any,
-AuthEntityDeleteProperties
->({
+export default defineComponent({
     name: 'EntityDelete',
     props: {
         elementIcon: {
@@ -53,9 +41,11 @@ AuthEntityDeleteProperties
 
         entityId: {
             type: String,
+            required: true,
         },
         entityType: {
-            type: String,
+            type: String as PropType<`${DomainType}`>,
+            required: true,
         },
 
         hint: {
@@ -66,130 +56,82 @@ AuthEntityDeleteProperties
             type: String,
             default: undefined,
         },
-        options: {
-            type: Object as PropType<BvMsgBoxOptions>,
-            default: undefined,
-        },
     },
-    data() {
-        return {
-            busy: false,
-        };
-    },
-    methods: {
-        async delete() {
-            if (this.busy) return;
+    setup(props, ctx) {
+        const busy = ref(false);
 
-            const domainApi = useDomainAPI(this.$api, this.entityType);
+        const submit = async () => {
+            if (busy.value) return;
+
+            const domainApi = useDomainAPI(useAPI(), props.entityType);
             if (!domainApi) {
                 return;
             }
 
-            this.busy = true;
-
-            const h = this.$createElement;
-
-            let { hint } = this;
-            if (!hint) {
-                hint = this.$ilingo
-                    .getSync('app.delete.hint', this.locale);
-            }
-
-            const message = h(
-                'div',
-                {
-                    staticClass: 'alert alert-sm alert-danger mb-0',
-                },
-                [hint],
-            );
-
-            const confirmModal : Promise<BvMsgBoxData> = this.$bvModal.msgBoxConfirm([message], mergeDeep(
-                {
-                    size: 'md',
-                    buttonSize: 'xs',
-                    okTitle: this.$ilingo
-                        .getSync('app.delete.okTitle', this.locale),
-                    cancelTitle: this.$ilingo
-                        .getSync('app.delete.cancelTitle', this.locale),
-                },
-                this.options || {},
-            ));
+            busy.value = true;
 
             try {
-                const value = await confirmModal;
-                if (value) {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    const response = await domainApi.delete(this.entityId);
-                    response.id = this.entityId;
-                    this.$emit('deleted', response);
-                } else {
-                    this.$emit('canceled');
+                if ('delete' in domainApi) {
+                    const response = await domainApi.delete(props.entityId);
+                    response.id = props.entityId;
+                    ctx.emit('deleted', response);
                 }
             } catch (e) {
-                if (e instanceof Error) {
-                    this.$emit('failed', e);
-                }
+                ctx.emit('failed', e);
             }
 
-            this.busy = false;
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
+            busy.value = false;
+        };
 
-        let tag = 'button';
-        const data : VNodeData = {};
+        const render = () => {
+            let tag : Component | string = 'button';
+            const data : VNodeProps = {};
 
-        switch (vm.elementType) {
-            case ElementType.LINK:
-                tag = 'a';
-                break;
-            case ElementType.DROP_DOWN_ITEM:
-                tag = 'b-dropdown-item';
-                break;
-        }
+            switch (props.elementType) {
+                case ElementType.LINK:
+                    tag = 'a';
+                    break;
+                case ElementType.DROP_DOWN_ITEM:
+                    tag = BDropdownItem;
+                    break;
+            }
 
-        let icon = h('');
-        if (vm.elementIcon) {
-            icon = h('i', {
-                staticClass: vm.elementIcon,
-                class: {
-                    'pr-1': vm.withText,
-                },
-            });
-        }
+            let icon : VNodeArrayChildren = [];
+            if (props.elementIcon) {
+                icon = [
+                    h('i', {
+                        class: [props.elementIcon, {
+                            'pr-1': props.withText,
+                        }],
+                    }),
+                ];
+            }
 
-        let text : string | VNode = h('');
-        if (vm.withText) {
-            text = this.$ilingo
-                .getSync('app.delete.button', this.locale);
-        }
+            let text : VNodeArrayChildren = [];
+            if (props.withText) {
+                text = [
+                    useIlingo()
+                        .getSync('app.delete.button', props.locale),
+                ];
+            }
 
-        return h(
-            tag,
-            mergeDeep({
-                domProps: {
-                    disabled: vm.busy,
-                },
-                props: {
-                    disabled: vm.busy,
-                },
-                on: {
-                    click($event: any) {
+            return h(
+                tag as string,
+                mergeProps({
+                    disabled: busy.value,
+                    onClick($event: any) {
                         $event.preventDefault();
 
-                        return vm.delete.apply(null);
+                        return submit.apply(null);
                     },
-                },
-            }, data),
-            [
-                icon,
-                text,
-            ],
-        );
+                }, data),
+                [
+                    icon,
+                    text,
+                ],
+            );
+        };
+
+        return () => render();
     },
 });
-
-export default AuthEntityDelete;

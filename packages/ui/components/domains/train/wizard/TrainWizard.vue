@@ -4,11 +4,20 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import Vue from 'vue';
+<script lang="ts">
+import { FormWizard, TabContent, WizardButton } from 'vue3-form-wizard';
+import { initFormAttributesFromSource } from '@authup/client-vue';
+import type { PropType } from 'vue';
+import {
+    computed,
+    defineComponent, reactive, ref, toRefs, watch,
+} from 'vue';
+import type { Train, TrainFile } from '@personalhealthtrain/central-common';
 import {
     TrainConfigurationStatus,
 } from '@personalhealthtrain/central-common';
+import { useNuxtApp } from '#app';
+import { useAPI } from '#imports';
 import TrainWizardStepBase from './TrainWizardStepBase';
 import TrainFileManager from '../../train-file/TrainFileManager';
 import TrainWizardStepHash from './TrainWizardStepHash';
@@ -16,8 +25,12 @@ import TrainWizardStepFinal from './TrainWizardStepFinal';
 import TrainWizardStepQuery from './TrainWizardStepQuery';
 import TrainWizardStepSecurity from './TrainWizardStepSecurity';
 
-export default {
+export default defineComponent({
     components: {
+        FormWizard,
+        WizardButton,
+        TabContent,
+
         TrainWizardStepSecurity,
         TrainWizardStepQuery,
         TrainWizardStepFinal,
@@ -27,285 +40,274 @@ export default {
     },
     props: {
         entity: {
-            type: Object,
-            default: undefined,
+            type: Object as PropType<Train>,
+            required: true,
         },
     },
-    data() {
-        return {
-            wizard: {
-                initialized: false,
-                valid: undefined,
+    emits: ['finished'],
+    async setup(props, { emit }) {
+        const refs = toRefs(props);
 
-                startIndex: 0,
-                index: 0,
-                steps: [
-                    'configuration',
-                    'security',
-                    'files',
-                    'extra',
-                    'hash',
-                    'finish',
-                ],
-            },
-            form: {
-                query: null,
-                master_image_id: null,
-                station_ids: [],
+        const busy = ref(false);
+        const form = reactive({
+            query: null,
+            master_image_id: null,
+            station_ids: [],
 
-                user_rsa_secret_id: null,
-                user_paillier_secret_id: null,
+            user_rsa_secret_id: null,
+            user_paillier_secret_id: null,
 
-                entrypoint_file_id: null,
-                files: [],
+            entrypoint_file_id: null,
+            files: [],
 
-                hash_signed: '',
-                hash: null,
-            },
-            trainInitializing: false,
-            busy: false,
+            hash_signed: '',
+            hash: null,
+        });
+
+        const updateForm = (entity: Partial<Train>) => {
+            initFormAttributesFromSource(form, entity);
         };
-    },
-    computed: {
-        isConfigured() {
-            return this.entity.configuration_status === TrainConfigurationStatus.FINISHED;
-        },
 
-        trainId() {
-            return this.entity.id;
-        },
-        trainUpdatedAt() {
-            return this.entity.updated_at;
-        },
-    },
-    watch: {
-        trainUpdatedAt(val, oldVal) {
-            if (val && val !== oldVal) {
-                this.initFromProperties();
+        const initialized = ref(false);
+        const valid = ref(false);
+
+        const startIndex = ref(0);
+        const index = ref(0);
+
+        const steps = [
+            'configuration',
+            'security',
+            'files',
+            'extra',
+            'hash',
+            'finish',
+        ];
+
+        const isConfigured = computed(() => this.entity.configuration_status === TrainConfigurationStatus.FINISHED);
+
+        const updatedAt = computed(() => (refs.entity.value ?
+            refs.entity.value.updated_at :
+            undefined));
+
+        watch(updatedAt, (val, oldValue) => {
+            if (val && val !== oldValue) {
+                updateForm(refs.entity.value);
             }
-        },
-    },
-    created() {
-        if (this.isConfigured) return;
+        });
 
-        this.initFromProperties();
+        const handleUpdated = (entity: Train) => {
+            emit('updated', entity);
+        };
 
-        Promise.resolve()
-            .then(this.initWizard);
-    },
-    methods: {
-        //----------------------------------
-        // Train
-        //----------------------------------
-        initFromProperties() {
-            if (
-                typeof this.entity === 'undefined' ||
-                this.trainInitializing
-            ) return;
-
-            this.trainInitializing = true;
-
-            const keys = Object.keys(this.form);
-            for (let i = 0; i < keys.length; i++) {
-                if (Object.prototype.hasOwnProperty.call(this.entity, keys[i])) {
-                    this.form[keys[i]] = this.entity[keys[i]];
-                }
-            }
-
-            this.trainInitializing = false;
-        },
-
-        async update(data) {
-            if (!this.wizard.initialized) return;
+        const update = async (data: Partial<Train>) => {
+            if (!initialized.value) return;
 
             const keys = Object.keys(data);
 
             if (keys.length === 0) return;
 
-            const item = await this.$api.train.update(this.entity.id, data);
-            this.handleUpdated(item);
-        },
+            const item = await useAPI().train.update(this.entity.id, data);
+            handleUpdated(item);
+        };
 
-        //----------------------------------
-        // wizard
-        //----------------------------------
-        async initWizard() {
+        const wizardNode = ref<null | Record<string, any>>(null);
+        const init = async () => {
             let canPass = true;
-            let index = 0;
+            let i = 0;
 
             while (canPass) {
                 try {
                     await this.passWizardStep();
 
-                    index++;
-                    this.wizard.index = index;
+                    i++;
+                    index.value = i;
                 } catch (e) {
                     canPass = false;
                 }
 
-                if (index >= this.wizard.steps.length) {
+                if (i >= steps.length) {
                     canPass = false;
                 }
             }
 
-            if (process.server) {
-                this.startIndex = index;
+            const nuxtApp = useNuxtApp();
+
+            // todo: check process.client var
+            if (nuxtApp.isHydrating) {
+                if (wizardNode.value) {
+                    wizardNode.value.changeTab(0, i);
+                }
             } else {
-                this.$refs.wizard.changeTab(0, index);
+                startIndex.value = i;
             }
 
-            this.wizard.initialized = true;
-        },
+            initialized.value = true;
+        };
 
-        passWizardStep() {
-            return new Promise((resolve, reject) => {
-                const step = this.wizard.steps[this.wizard.index];
-                let promise;
-
-                switch (step) {
-                    case 'configuration':
-                        promise = this.canPassBaseWizardStep();
-                        break;
-                    case 'security':
-                        promise = this.canPassSecurityWizardStep();
-                        break;
-                    case 'files':
-                        promise = this.canPassFilesWizardStep();
-                        break;
-                    case 'extra':
-                        promise = this.canPassExtraWizardStep();
-                        break;
-                    case 'hash':
-                        promise = this.canPassHashWizardStep();
-                        break;
-                    default:
-                        promise = new Promise((resolve, reject) => {
-                            reject(new Error('This step is not finished yet. Please fill out all required fields or make a choice of truth.'));
-                        });
-                        break;
-                }
-
-                promise
-                    .then(() => {
-                        resolve(true);
-                    })
-                    .catch((e) => {
-                        if (e instanceof Error) {
-                            this.$bvToast.toast(e.message, {
-                                variant: 'warning',
-                                toaster: 'b-toaster-top-center',
-                            });
-                        }
-                        reject();
-                    });
-            });
-        },
-        async canPassBaseWizardStep() {
-            if (!this.form.master_image_id) {
+        const canPassBaseWizardStep = async () => {
+            if (!form.master_image_id) {
                 throw new Error('A master image must be selected...');
             }
 
-            if (this.entity.stations <= 0) {
+            if (refs.entity.value.stations <= 0) {
                 throw new Error('One or more stations have to be selected...');
             }
 
             return true;
-        },
-        async canPassSecurityWizardStep() {
-            if (!this.form.user_rsa_secret_id) {
+        };
+
+        const canPassSecurityWizardStep = async () => {
+            if (!form.user_rsa_secret_id) {
                 throw new Error('A RSA key must be selected...');
             }
 
             return true;
-        },
-        async canPassFilesWizardStep() {
-            if (!this.form.entrypoint_file_id || this.form.entrypoint_file_id.length === 0) {
+        };
+
+        const canPassFilesWizardStep = async () => {
+            if (!form.entrypoint_file_id || form.entrypoint_file_id.length === 0) {
                 throw new Error('An uploaded file must be selected as entrypoint.');
             }
 
-            await this.update({ entrypoint_file_id: this.form.entrypoint_file_id });
+            await update({ entrypoint_file_id: form.entrypoint_file_id });
 
             return true;
-        },
-        async canPassExtraWizardStep() {
-            await this.update({
-                query: this.form.query,
+        };
+
+        const canPassExtraWizardStep = async () => {
+            await update({
+                query: form.query,
             });
 
             return true;
-        },
-        async canPassHashWizardStep() {
+        };
+
+        const canPassHashWizardStep = async () => {
             if (
-                !this.form.hash ||
-                this.form.hash.length === 0
+                !form.hash ||
+                form.hash.length === 0
             ) {
                 throw new Error('The hash is not generated yet or is maybe still in process.');
             }
 
             if (
-                !this.form.hash_signed ||
-                this.form.hash_signed.length === 0
+                !form.hash_signed ||
+                form.hash_signed.length === 0
             ) {
                 throw new Error('The provided hash must be signed with the desktop app...');
             }
 
-            await this.update({ hash_signed: this.form.hash_signed });
+            await update({ hash_signed: form.hash_signed });
 
             return true;
-        },
+        };
 
-        prevWizardStep() {
-            this.$refs.wizard.prevTab();
-        },
-        nextWizardStep() {
-            this.$refs.wizard.nextTab();
-        },
+        const passWizardStep = () : Promise<void> => new Promise((resolve, reject) => {
+            const step = steps[index.value];
+            let promise;
 
-        //----------------------------------
-        // actions
-        //----------------------------------
-        handleUpdated(item) {
-            this.$emit('updated', item);
-        },
-        handleFormUpdated(item) {
-            const keys = Object.keys(item);
-
-            for (let i = 0; i < keys.length; i++) {
-                Vue.set(this.form, keys[i], item[keys[i]]);
+            switch (step) {
+                case 'configuration':
+                    promise = canPassBaseWizardStep();
+                    break;
+                case 'security':
+                    promise = canPassSecurityWizardStep();
+                    break;
+                case 'files':
+                    promise = canPassFilesWizardStep();
+                    break;
+                case 'extra':
+                    promise = canPassExtraWizardStep();
+                    break;
+                case 'hash':
+                    promise = canPassHashWizardStep();
+                    break;
+                default:
+                    promise = new Promise((resolve, reject) => {
+                        reject(new Error('This step is not finished yet. Please fill out all required fields or make a choice of truth.'));
+                    });
+                    break;
             }
-        },
-        setFhirQuery(query) {
-            this.handleFormUpdated({ query });
-        },
-        setEntrypointFile(item) {
-            this.handleFormUpdated({ entrypoint_file_id: item ? item.id : null });
-        },
-        setHash(hash) {
-            this.handleFormUpdated({ hash });
-        },
-        setHashSigned(val) {
-            this.handleFormUpdated({ hash_signed: val });
-        },
 
-        //----------------------------------
-        // events
-        //----------------------------------
-        handleWizardChangedEvent(prevIndex, nextIndex) {
-            this.wizard.index = nextIndex;
-            this.wizard.valid = true;
-        },
-        handleWizardFinishedEvent() {
-            this.$emit('finished');
-        },
+            promise
+                .then(() => {
+                    resolve();
+                })
+                .catch((e) => {
+                    if (e instanceof Error) {
+                        emit('failed', e);
+                    }
+                    reject();
+                });
+        });
 
-        handleFilesUploaded() {
-            this.$refs['wizard-hash-step'].reset();
-        },
-        handleFilesDeleted() {
-            this.$refs['wizard-hash-step'].reset();
-        },
+        const prevWizardStep = () => {
+            if (wizardNode.value) {
+                wizardNode.value.prevTab();
+            }
+        };
+
+        const nextWizardStep = () => {
+            if (wizardNode.value) {
+                wizardNode.value.nextTab();
+            }
+        };
+
+        const setFhirQuery = (query: string) => {
+            updateForm({ query });
+        };
+        const setEntrypointFile = (item: TrainFile) => {
+            updateForm({ entrypoint_file_id: item ? item.id : null as string });
+        };
+
+        const setHash = (hash: string) => {
+            updateForm({ hash });
+        };
+
+        const setHashSigned = (val: string) => {
+            updateForm({ hash_signed: val });
+        };
+
+        const handleWizardChangedEvent = (prevIndex: number, nextIndex: number) => {
+            index.value = nextIndex;
+            valid.value = true;
+        };
+
+        const handleWizardFinishedEvent = () => {
+            emit('finished');
+        };
+
+        const hashStepNode = ref<{ reset() : void } | null>(null);
+        const handleFilesChanged = () => {
+            if (hashStepNode.value) {
+                hashStepNode.value.reset();
+            }
+        };
+
+        return {
+            startIndex,
+
+            isConfigured,
+
+            handleFilesChanged,
+            handleUpdated,
+            handleWizardChangedEvent,
+            handleWizardFinishedEvent,
+
+            prevWizardStep,
+            nextWizardStep,
+            passWizardStep,
+
+            setFhirQuery,
+            setEntrypointFile,
+            setHash,
+            setHashSigned,
+
+            wizardNode,
+            hashStepNode,
+        };
     },
-};
+});
 </script>
 <template>
     <div>
@@ -315,12 +317,12 @@ export default {
             </div>
         </div>
         <div v-else>
-            <form-wizard
-                ref="wizard"
+            <FormWizard
+                ref="wizardNode"
                 color="#333"
                 title="Train Wizard"
                 :subtitle="'Configure your '+entity.type+' train step by step'"
-                :start-index="wizard.startIndex"
+                :start-index="startIndex"
                 @on-change="handleWizardChangedEvent"
                 @on-complete="handleWizardFinishedEvent"
             >
@@ -334,38 +336,38 @@ export default {
                 </template>
                 <template
                     slot="footer"
-                    slot-scope="props"
+                    #default="props"
                 >
                     <div class="wizard-footer-left">
-                        <wizard-button
+                        <WizardButton
                             v-if="props.activeTabIndex > 0 && !props.isLastStep"
                             :style="props.fillButtonStyle"
                             @click.native="prevWizardStep"
                         >
                             Back
-                        </wizard-button>
+                        </WizardButton>
                     </div>
                     <div class="wizard-footer-right">
-                        <wizard-button
+                        <WizardButton
                             v-if="!props.isLastStep"
                             class="wizard-footer-right"
                             :style="props.fillButtonStyle"
                             @click.native="nextWizardStep"
                         >
                             Next
-                        </wizard-button>
+                        </WizardButton>
 
-                        <wizard-button
+                        <WizardButton
                             v-else
                             class="wizard-footer-right finish-button"
                             :style="props.fillButtonStyle"
                         >
                             Build train
-                        </wizard-button>
+                        </WizardButton>
                     </div>
                 </template>
 
-                <tab-content
+                <TabContent
                     title="Base"
                     :before-change="passWizardStep"
                 >
@@ -373,9 +375,9 @@ export default {
                         :train="entity"
                         @updated="handleUpdated"
                     />
-                </tab-content>
+                </TabContent>
 
-                <tab-content
+                <TabContent
                     title="Security"
                     :before-change="passWizardStep"
                 >
@@ -383,46 +385,46 @@ export default {
                         :train="entity"
                         @updated="handleUpdated"
                     />
-                </tab-content>
+                </TabContent>
 
-                <tab-content
+                <TabContent
                     title="Files"
                     :before-change="passWizardStep"
                 >
                     <train-file-manager
                         :train="entity"
-                        @uploaded="handleFilesUploaded"
-                        @deleted="handleFilesDeleted"
+                        @uploaded="handleFilesChanged"
+                        @deleted="handleFilesChanged"
                         @setEntrypointFile="setEntrypointFile"
                     />
-                </tab-content>
+                </TabContent>
 
-                <tab-content
+                <TabContent
                     title="Extra"
                     :before-change="passWizardStep"
                 >
                     <train-wizard-step-query
                         :train="entity"
-                        @querySelected="setFhirQuery"
+                        @changed="setFhirQuery"
                     />
-                </tab-content>
+                </TabContent>
 
-                <tab-content
+                <TabContent
                     title="Hash"
                     :before-change="passWizardStep"
                 >
                     <train-wizard-step-hash
-                        ref="wizard-hash-step"
+                        ref="hashStepNode"
                         :train="entity"
                         @generated="setHash"
                         @signed="setHashSigned"
                     />
-                </tab-content>
+                </TabContent>
 
-                <tab-content title="Finish">
+                <TabContent title="Finish">
                     <train-wizard-step-final />
-                </tab-content>
-            </form-wizard>
+                </TabContent>
+            </FormWizard>
         </div>
     </div>
 </template>

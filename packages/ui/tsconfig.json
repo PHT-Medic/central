@@ -1,18 +1,3 @@
 {
-    "extends": "../../tsconfig.json",
-    "compilerOptions": {
-        "target": "ESNext",
-        "lib": [
-            "ESNext",
-            "DOM"
-        ],
-        "paths": {
-            "@personalhealthtrain/central-common": [
-                "./packages/common/src"
-            ]
-        }
-    },
-    "exclude": ["node_modules"],
-    "include": ["**/*"]
+    "extends": "./.nuxt/tsconfig.json"
 }
-

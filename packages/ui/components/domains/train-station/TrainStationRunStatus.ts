@@ -6,11 +6,10 @@
  */
 
 import { TrainStationRunStatus } from '@personalhealthtrain/central-common';
-import type { CreateElement, VNode } from 'vue';
-import Vue from 'vue';
-import { SlotName, hasNormalizedSlot, normalizeSlot } from '@vue-layout/utils';
+import { computed, defineComponent } from 'vue';
+import { hasNormalizedSlot, normalizeSlot } from '../../../core';
 
-export default Vue.extend({
+export default defineComponent({
     name: 'TrainStationRunStatus',
     props: {
         status: {
@@ -18,9 +17,11 @@ export default Vue.extend({
             default: null,
         },
     },
-    computed: {
-        statusText() {
-            switch (this.status) {
+    setup(props, { slots }) {
+        const refs = toRefs(props);
+
+        const statusText = computed(() => {
+            switch (refs.status.value) {
                 case TrainStationRunStatus.ARRIVED:
                     return 'arrived';
                 case TrainStationRunStatus.DEPARTED:
@@ -28,9 +29,10 @@ export default Vue.extend({
                 default:
                     return 'none';
             }
-        },
-        classSuffix() {
-            switch (this.status) {
+        });
+
+        const classSuffix = computed(() => {
+            switch (refs.status.value) {
                 case TrainStationRunStatus.ARRIVED:
                     return 'primary';
                 case TrainStationRunStatus.DEPARTED:
@@ -38,21 +40,14 @@ export default Vue.extend({
                 default:
                     return 'info';
             }
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
+        });
 
-        if (hasNormalizedSlot(SlotName.DEFAULT, vm.$scopedSlots, vm.$slots)) {
-            return normalizeSlot(SlotName.DEFAULT, {
-                classSuffix: vm.classSuffix,
-                statusText: vm.statusText,
-            }, vm.$scopedSlots, vm.$slots);
+        if (hasNormalizedSlot('default', slots)) {
+            return () => normalizeSlot('default', { classSuffix, statusText }, slots);
         }
 
-        return h('span', {
-            staticClass: `text-${vm.classSuffix}`,
-        }, [vm.statusText]);
+        return () => h('span', {
+            class: `text-${classSuffix.value}`,
+        }, [statusText.value]);
     },
 });
