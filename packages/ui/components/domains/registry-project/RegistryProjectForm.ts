@@ -29,7 +29,10 @@ import type {
 import { wrapFnWithBusyState } from '../../../core/busy';
 import RegistryList from '../registry/RegistryList';
 
-const alphaWithUpperNumHyphenUnderscore = helpers.regex('alphaWithUpperNumHyphenUnderscore', /^[a-z0-9-_]*$/);
+const alphaWithUpperNumHyphenUnderscore = helpers.regex(
+    'alphaWithUpperNumHyphenUnderscore',
+    /^[a-z0-9-_]*$/,
+);
 
 export default defineComponent({
     name: 'RegistryProjectForm',

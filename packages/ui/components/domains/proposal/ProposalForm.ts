@@ -16,10 +16,10 @@ import type { PropType } from 'vue';
 import type { MasterImage, Proposal, Station } from '@personalhealthtrain/central-common';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
 import { wrapFnWithBusyState } from '../../../core/busy';
-import { MasterImagePicker } from '../master-image/MasterImagePicker';
+import MasterImagePicker from '../master-image/MasterImagePicker';
 import StationList from '../station/StationList';
 import { AssignmentToggleButton } from '../../AssignmentToggleButton';
-import { ProposalStationAssignAction } from '../proposal-station/ProposalStationAssignAction';
+import ProposalStationAssignAction from '../proposal-station/ProposalStationAssignAction';
 
 export default defineComponent({
     name: 'ProposalForm',

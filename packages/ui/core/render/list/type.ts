@@ -41,7 +41,7 @@ export type DomainListBuilderContext<T extends Record<string, any>> = {
     load: (input: BuildInput<T>) => Promise<CollectionResourceResponse<T>>,
     defaults: Partial<DomainListBuilderTemplateOptions<T>>,
     query?: BuildInput<T> | (() => BuildInput<T>),
-    queryFilter?: FiltersBuildInput<T> | ((q: string) => FiltersBuildInput<T>),
+    queryFilter?: FiltersBuildInput<T> | ((q: string) => FiltersBuildInput<T>)
 };
 
 export type DomainListBuilderOutput<T> = {

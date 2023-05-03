@@ -30,8 +30,6 @@ import {
     createDomainListBuilder,
 } from '../../../core';
 
-import TrainFileComponent from './TrainFile.vue';
-
 export default defineComponent({
     props: {
         loadOnSetup: {

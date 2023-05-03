@@ -15,11 +15,10 @@ import {
     buildDomainEventSubscriptionFullName,
     buildSocketProposalRoomName,
 } from '@personalhealthtrain/central-common';
-import { storeToRefs } from 'pinia';
 import type { PropType } from 'vue';
-import { computed, defineComponent } from 'vue';
+import { defineComponent } from 'vue';
 import type { BuildInput } from 'rapiq';
-import { DomainEventName, REALM_MASTER_NAME } from '@authup/core';
+import { DomainEventName } from '@authup/core';
 import { realmIdForSocket } from '../../../composables/domain/realm';
 import { useSocket } from '../../../composables/socket';
 import type {
@@ -29,7 +28,6 @@ import type {
 import {
     createDomainListBuilder,
 } from '../../../core';
-import { useAuthStore } from '../../../store/auth';
 
 export default defineComponent({
     props: {
@@ -65,8 +63,6 @@ export default defineComponent({
         },
     },
     setup(props, ctx) {
-        // todo: add default query for sort: { path: 'ASC' }
-        // todo: add filter title
         const refs = toRefs(props);
 
         const socketRealmId = realmIdForSocket(refs.realmId.value);
@@ -75,6 +71,9 @@ export default defineComponent({
             props: refs,
             setup: ctx,
             load: (buildInput) => useAPI().proposal.getMany(buildInput),
+            queryFilter: (q) => ({
+                title: q.length > 0 ? `~${q}` : q,
+            }),
             defaults: {
                 footerPagination: true,
 
