@@ -47,11 +47,15 @@ export default defineComponent({
         },
     },
     setup(props, ctx) {
-        // todo: add default query for sort: { name: 'ASC' }
         const { build } = createDomainListBuilder<Station>({
             props: toRefs(props),
             setup: ctx,
             load: (buildInput) => useAPI().station.getMany(buildInput),
+            query: {
+                sort: {
+                    name: 'ASC',
+                },
+            },
             defaults: {
                 footerPagination: true,
 

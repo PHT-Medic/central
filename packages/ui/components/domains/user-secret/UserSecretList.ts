@@ -47,8 +47,6 @@ export default defineComponent({
         },
     },
     setup(props, ctx) {
-        // todo: add default query for sort: { path: 'ASC' }
-        // todo: filter by path
         const { build } = createDomainListBuilder<UserSecret>({
             props: toRefs(props),
             setup: ctx,

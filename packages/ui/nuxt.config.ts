@@ -22,23 +22,22 @@ export default defineNuxtConfig({
     ** Global CSS
     */
     css: [
-        'vue-form-wizard/dist/vue-form-wizard.min.css',
+        'vue3-form-wizard/dist/style.css',
         '@fortawesome/fontawesome-free/css/all.css',
         'bootstrap/dist/css/bootstrap.min.css',
-        'bootstrap-vue/dist/bootstrap-vue.css',
-        './assets/css/vue-layout-navigation.css',
-        './assets/css/root.css',
-        './assets/css/domain.css',
-        './assets/css/core/header.css',
-        './assets/css/core/navbar.css',
-        './assets/css/core/body.css',
-        './assets/css/core/sidebar.css',
-        './assets/css/core/footer.css',
-        './assets/css/card.css',
-        './assets/css/colors.css',
-        './assets/css/form.css',
+        '@/assets/css/vue-layout-navigation.css',
+        '@/assets/css/root.css',
+        '@/assets/css/domain.css',
+        '@/assets/css/core/header.css',
+        '@/assets/css/core/navbar.css',
+        '@/assets/css/core/body.css',
+        '@/assets/css/core/sidebar.css',
+        '@/assets/css/core/footer.css',
+        '@/assets/css/card.css',
+        '@/assets/css/colors.css',
+        '@/assets/css/form.css',
 
-        './assets/css/bootstrap-override.css',
+        '@/assets/css/bootstrap-override.css',
     ],
     /*
     ** Plugins to load before mounting the App

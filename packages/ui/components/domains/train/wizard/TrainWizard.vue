@@ -334,10 +334,7 @@ export default defineComponent({
                         Configure your {{ entity.type }} train step by step
                     </p>
                 </template>
-                <template
-                    slot="footer"
-                    #default="props"
-                >
+                <template #footer="props">
                     <div class="wizard-footer-left">
                         <WizardButton
                             v-if="props.activeTabIndex > 0 && !props.isLastStep"

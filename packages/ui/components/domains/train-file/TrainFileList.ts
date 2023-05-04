@@ -27,7 +27,7 @@ import type {
     DomainListHeaderTitleOptionsInput,
 } from '../../../core';
 import {
-    createDomainListBuilder,
+    createDomainListBuilder, isQuerySortedDescByDate,
 } from '../../../core';
 
 export default defineComponent({
@@ -96,10 +96,9 @@ export default defineComponent({
         const handleSocketCreated = (context: SocketServerToClientEventContext<TrainFileEventContext>) => {
             if (context.meta.roomName !== buildSocketTrainFileRoomName()) return;
 
-            // todo: append item at beginning as well end of list... ^^
             if (
                 refs.query.value.sort &&
-                (refs.query.value.sort.created_at === 'DESC' || refs.query.value.sort.updated_at === 'DESC') &&
+                isQuerySortedDescByDate(refs.query.value.sort) &&
                 meta.value.offset === 0
             ) {
                 handleCreated(context.data);

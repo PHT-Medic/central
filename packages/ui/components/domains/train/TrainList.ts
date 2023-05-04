@@ -11,9 +11,9 @@ import type {
 import {
     DomainEventSubscriptionName,
     DomainType,
+    buildDomainChannelName,
     buildDomainEventFullName,
     buildDomainEventSubscriptionFullName,
-    buildSocketTrainRoomName,
 } from '@personalhealthtrain/central-common';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
@@ -26,7 +26,7 @@ import type {
     DomainListHeaderTitleOptionsInput,
 } from '../../../core';
 import {
-    createDomainListBuilder,
+    createDomainListBuilder, isQuerySortedDescByDate,
 } from '../../../core';
 import TrainListItem from './TrainListItem';
 
@@ -93,7 +93,6 @@ export default defineComponent({
                             entity: item,
                             onDeleted: handleDeleted,
                             onUpdated: handleUpdated,
-                            onCreated: handleCreated,
                         }),
                     },
                 },
@@ -105,12 +104,11 @@ export default defineComponent({
         });
 
         const handleSocketCreated = (context: SocketServerToClientEventContext<TrainEventContext>) => {
-            if (context.meta.roomName !== buildSocketTrainRoomName()) return;
+            if (context.meta.roomName !== buildDomainChannelName(DomainType.TRAIN)) return;
 
-            // todo: append item at beginning as well end of list... ^^
             if (
                 refs.query.value.sort &&
-                (refs.query.value.sort.created_at === 'DESC' || refs.query.value.sort.updated_at === 'DESC') &&
+                isQuerySortedDescByDate(refs.query.value.sort) &&
                 meta.value.offset === 0
             ) {
                 handleCreated(context.data);

@@ -272,11 +272,11 @@ export default defineComponent({
                         <h6 class="title text-muted">
                             Path:
                             <span class="sub-title">
-                                <template v-for="(path, key) in paths">
-                                    {{ path }} <span
-                                        :key="key"
-                                        class="text-dark"
-                                    >/</span>
+                                <template
+                                    v-for="(path, key) in paths"
+                                    :key="key"
+                                >
+                                    {{ path }} <span class="text-dark">/</span>
                                 </template>
                                 <template v-if="paths.length === 0">
                                     [root]
@@ -294,13 +294,16 @@ export default defineComponent({
                 </div>
 
                 <div class="d-flex flex-column">
-                    <train-form-file
+                    <template
                         v-for="(file,key) in form.files"
                         :key="key"
-                        class="mr-1"
-                        :file="file"
-                        @drop="dropFormFile"
-                    />
+                    >
+                        <train-form-file
+                            class="mr-1"
+                            :file="file"
+                            @drop="dropFormFile"
+                        />
+                    </template>
                 </div>
 
                 <div class="form-group">
@@ -368,9 +371,11 @@ export default defineComponent({
                 >
                     <template #items="props">
                         <div class="d-flex flex-column">
-                            <template v-for="file in props.data">
+                            <template
+                                v-for="file in props.data"
+                                :key="file.id"
+                            >
                                 <TrainFileNode
-                                    :key="file.id"
                                     class="mr-1"
                                     :file="file"
                                     :files-selected="selected"

@@ -17,7 +17,7 @@ import {
     DomainType,
     buildDomainChannelName,
     buildDomainEventFullName,
-    buildDomainEventSubscriptionFullName, buildSocketTrainStationRoomName,
+    buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
 import type { FiltersBuildInput } from 'rapiq/dist/parameter';
 
@@ -179,7 +179,7 @@ export default defineComponent({
                         return room === buildDomainChannelName(DomainSubType.TRAIN_STATION_OUT);
                 }
             } else {
-                return room === buildSocketTrainStationRoomName();
+                return room === buildDomainChannelName(DomainType.TRAIN_STATION);
             }
 
             return false;

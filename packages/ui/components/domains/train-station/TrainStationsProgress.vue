@@ -114,9 +114,11 @@ export default defineComponent({
                             />
                         </div>
                     </div>
-                    <template v-for="(item) in props.items">
+                    <template
+                        v-for="(item) in props.items"
+                        :key="item.id"
+                    >
                         <div
-                            :key="item.id"
                             class="d-flex flex-column progress-step"
                         >
                             <div

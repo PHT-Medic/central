@@ -11,6 +11,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
+import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import {
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
@@ -24,12 +25,12 @@ export default defineComponent({
             default: undefined,
         },
         entity: {
-            type: Object,
-            default: () => {},
+            type: Object as PropType<UserSecret>,
         },
     },
     emits: ['created', 'updated', 'failed'],
     setup(props, { emit }) {
+        const refs = toRefs(props);
         const fileInput = ref<null | Record<string, any>>(null);
 
         const typeOptions = [
@@ -59,8 +60,6 @@ export default defineComponent({
             },
         }, form);
 
-        const isEditing = computed<boolean>(() => typeof props.entity !== 'undefined' && !!props.entity.id);
-
         const handleTypeChanged = (type: SecretType) => {
             if (
                 form.key &&
@@ -79,10 +78,10 @@ export default defineComponent({
                 const key = keys[i];
 
                 if (
-                    typeof props.entity !== 'undefined' &&
-                    props.entity[keys[i]]
+                    refs.entity.value &&
+                    refs.entity.value[keys[i]]
                 ) {
-                    (form as any)[keys[i]] = props.entity[keys[i]];
+                    (form as any)[keys[i]] = refs.entity.value[keys[i]];
                 } else {
                     switch (key) {
                         case 'type':
@@ -150,8 +149,8 @@ export default defineComponent({
             try {
                 let response;
 
-                if (isEditing.value) {
-                    response = await useAPI().userSecret.update(props.entity.id, { ...form });
+                if (refs.entity.value) {
+                    response = await useAPI().userSecret.update(refs.entity.value.id, { ...form });
 
                     emit('updated', response);
                 } else {
