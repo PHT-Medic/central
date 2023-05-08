@@ -4,25 +4,28 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+<script lang="ts">
+import { defineNuxtComponent, definePageMeta } from '#imports';
+import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-    },
-    data() {
+export default defineNuxtComponent({
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+        });
+
+        const tabs = [
+            { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
+            { name: 'Robot', icon: 'fa fa-robot', urlSuffix: '/robot' },
+            { name: 'Master-Images', icon: 'fa-solid fa-sd-card', urlSuffix: '/master-images' },
+        ];
+
         return {
-            serviceId: undefined,
-            tabs: [
-                { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-                { name: 'Robot', icon: 'fa fa-robot', urlSuffix: '/robot' },
-                { name: 'Master-Images', icon: 'fa-solid fa-sd-card', urlSuffix: '/master-images' },
-            ],
+            tabs,
         };
     },
-};
+});
 </script>
 <template>
     <div class="container">
@@ -34,33 +37,15 @@ export default {
             <div class="panel-card">
                 <div class="panel-card-body">
                     <div class="flex-wrap flex-row d-flex">
-                        <div>
-                            <b-nav pills>
-                                <b-nav-item
-                                    :to="'/admin/services'"
-                                    exact
-                                    exact-active-class="active"
-                                >
-                                    <i class="fa fa-arrow-left" />
-                                </b-nav-item>
-
-                                <b-nav-item
-                                    v-for="(item,key) in tabs"
-                                    :key="key"
-                                    :disabled="item.active"
-                                    :to="'/admin/services/registry' + item.urlSuffix"
-                                    exact
-                                    exact-active-class="active"
-                                >
-                                    <i :class="item.icon" />
-                                    {{ item.name }}
-                                </b-nav-item>
-                            </b-nav>
-                        </div>
+                        <DomainEntityNav
+                            :items="tabs"
+                            :prev-link="true"
+                            :path="'/admin/services/registry'"
+                        />
                     </div>
                 </div>
             </div>
         </div>
-        <nuxt-child />
+        <NuxtPage />
     </div>
 </template>

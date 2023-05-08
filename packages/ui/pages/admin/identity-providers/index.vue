@@ -1,70 +1,73 @@
-<!--
-  Copyright (c) 2021-2021.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
 <script lang="ts">
-import { PropType } from 'vue';
-import { Realm } from '@authup/core';
 
-export default {
-    data() {
-        return {
-            sidebar: {
-                hide: false,
-                items: [
-                    {
-                        name: 'overview',
-                        urlSuffix: '',
-                        icon: 'fa fa-info-circle',
-                    },
-                    {
-                        name: 'add',
-                        urlSuffix: '/add',
-                        icon: 'fa fa-plus',
-                    },
-                ],
+import type { IdentityProvider } from '@authup/core';
+import { PermissionName } from '@authup/core';
+import { useToast } from 'bootstrap-vue-next';
+import { defineNuxtComponent } from '#app';
+import { definePageMeta } from '#imports';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+
+export default defineNuxtComponent({
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionName.PROVIDER_EDIT,
+                PermissionName.PROVIDER_DROP,
+                PermissionName.PROVIDER_ADD,
+            ],
+        });
+
+        const items = [
+            {
+                name: 'overview',
+                urlSuffix: '',
+                icon: 'fa fa-bars',
             },
+            {
+                name: 'add',
+                urlSuffix: 'add',
+                icon: 'fa fa-plus',
+            },
+        ];
+
+        const handleDeleted = (e: IdentityProvider) => {
+            const toast = useToast();
+            toast.success({ body: `The identity-provider ${e.name} was successfully deleted.` });
+        };
+
+        const handleFailed = (e: Error) => {
+            const toast = useToast();
+            toast.warning({ body: e.message });
+        };
+
+        return {
+            handleDeleted,
+            handleFailed,
+            items,
         };
     },
-
-    methods: {
-        async handleDeleted() {
-            this.$bvToast.toast('The provider was successfully deleted.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
-        },
-    },
-};
+});
 </script>
 <template>
-    <div class="container">
+    <div>
         <h1 class="title no-border mb-3">
-            Identity-Provider <span class="sub-title">Management</span>
+            <i class="fa-solid fa-atom me-1" /> Identity Providers
+            <span class="sub-title ms-1">Management</span>
         </h1>
         <div class="content-wrapper">
-            <div class="content-sidebar">
-                <b-nav
-                    pills
-                    vertical
-                >
-                    <b-nav-item
-                        v-for="(item,key) in sidebar.items"
-                        :key="key"
-                        :to="'/admin/identity-providers'+ item.urlSuffix"
-                        exact
-                        exact-active-class="active"
-                    >
-                        <i :class="item.icon" />
-                        {{ item.name }}
-                    </b-nav-item>
-                </b-nav>
+            <div class="content-sidebar flex-column">
+                <DomainEntityNav
+                    :items="items"
+                    path="/admin/identity-providers"
+                    direction="vertical"
+                />
             </div>
             <div class="content-container">
-                <nuxt-child
+                <NuxtPage
                     @deleted="handleDeleted"
+                    @failed="handleFailed"
                 />
             </div>
         </div>

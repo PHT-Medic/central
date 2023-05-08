@@ -5,71 +5,82 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import type { Station } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { useToast } from 'bootstrap-vue-next';
+import { storeToRefs } from 'pinia';
+import type { BuildInput } from 'rapiq';
+import { computed, ref } from 'vue';
+import { definePageMeta } from '#imports';
+import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
-import { StationList } from '../../../../components/domains/station/StationList';
+import StationList from '../../../../components/domains/station/StationList';
+import { useAuthStore } from '../../../../store/auth';
 
-export default {
+export default defineNuxtComponent({
     components: { StationList },
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-    },
-    data() {
-        return {
-            fields: [
-                {
-                    key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'options', label: '', tdClass: 'text-left',
-                },
-            ],
-        };
-    },
-    computed: {
-        canView() {
-            return this.$auth.has(PermissionID.STATION_EDIT) ||
-                this.$auth.has(PermissionID.STATION_DROP);
-        },
-        canDrop() {
-            return this.$auth.has(PermissionID.STATION_DROP);
-        },
-        managementRealmId() {
-            return this.$store.getters['auth/managementRealmId'];
-        },
-        query() {
-            return {
-                filters: {
-                    realm_id: this.managementRealmId,
-                },
-            };
-        },
-    },
-    methods: {
-        async handleDeleted(item) {
-            this.$bvToast.toast('The station was successfully deleted.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
+    setup() {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        });
+
+        const toast = useToast();
+
+        const fields = [
+            {
+                key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'options', label: '', tdClass: 'text-left',
+            },
+        ];
+
+        const store = useAuthStore();
+        const { realmManagementId } = storeToRefs(store);
+
+        const canView = computed(() => store.has(PermissionID.STATION_EDIT) ||
+                store.has(PermissionID.STATION_DROP));
+
+        const canDrop = computed(() => store.has(PermissionID.STATION_DROP));
+
+        const query = computed<BuildInput<Station>>(() => ({
+            filters: {
+                realm_id: realmManagementId.value,
+            },
+        }));
+
+        const listNode = ref<null | StationList>(null);
+        const handleDeleted = async (item: Station) => {
+            toast.success({ body: 'The station was successfully deleted.' });
 
             this.$refs.itemsList.handleDeleted(item);
-        },
+        };
+
+        return {
+            listNode,
+            fields,
+            realmManagementId,
+            canView,
+            canDrop,
+            query,
+            handleDeleted,
+        };
     },
-};
+});
 </script>
 <template>
-    <station-list
-        ref="itemsList"
+    <StationList
+        ref="listNode"
         :query="query"
         :load-on-init="true"
     >
@@ -78,7 +89,7 @@ export default {
         </template>
         <template #items="props">
             <b-table
-                :items="props.items"
+                :items="props.data"
                 :fields="fields"
                 :busy="props.busy"
                 head-variant="'dark'"
@@ -115,5 +126,5 @@ export default {
                 </template>
             </b-table>
         </template>
-    </station-list>
+    </StationList>
 </template>

@@ -5,28 +5,39 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { PropType } from 'vue';
-import Vue from 'vue';
+import { useToast } from 'bootstrap-vue-next';
+import { ref, toRefs } from 'vue';
+import type { PropType, Ref } from 'vue';
 import type {
     Registry,
     RegistryProject,
 } from '@personalhealthtrain/central-common';
-import { RegistryProjectForm } from '../../../../../../components/domains/registry-project/RegistryProjectForm';
+import { useAPI } from '#imports';
+import {
+    createError, defineNuxtComponent, navigateTo, useRoute,
+} from '#app';
+import RegistryProjectForm from '../../../../../../components/domains/registry-project/RegistryProjectForm';
 
-// todo: add data, prop, method typing
-export default Vue.extend<any, any, any, any>({
+export default defineNuxtComponent({
     components: { RegistryProjectForm },
     props: {
         entity: {
             type: Object as PropType<Registry>,
-            default: undefined,
+            required: true,
         },
     },
-    async asyncData(context) {
+    async setup(props) {
+        const refs = toRefs(props);
+
+        let childEntity : Ref<RegistryProject>;
+
+        const toast = useToast();
+        const route = useRoute();
+
         try {
-            const { data: stations } = await context.$api.registryProject.getMany({
+            const { data: stations } = await useAPI().registryProject.getMany({
                 filter: {
-                    id: context.params.project_id,
+                    id: route.params.project_id as string,
                 },
                 fields: [
                     '+account_id',
@@ -37,63 +48,43 @@ export default Vue.extend<any, any, any, any>({
                 ],
             });
 
-            if (stations.length === 0) {
-                await context.redirect(`/admin/services/registry/${context.params.id}/projects`);
-
-                return {
-                    childEntity: undefined,
-                };
+            const station = stations.pop();
+            if (!station) {
+                throw new Error();
             }
 
-            return {
-                childEntity: stations[0],
-            };
+            childEntity = ref(station);
         } catch (e) {
-            await context.redirect(`/admin/registries/${context.params.id}/projects`);
-
-            return {
-                childEntity: undefined,
-            };
+            await navigateTo({ path: `/admin/registries/${route.params.id}/projects` });
+            throw createError({});
         }
-    },
-    data() {
-        return {
-            childEntity: undefined,
+
+        const handleUpdated = () => {
+            toast.success({ body: 'The project was successfully updated.' });
         };
-    },
-    methods: {
-        handleUpdated(
-            item: RegistryProject,
-        ) {
-            const keys = Object.keys(item);
-            for (let i = 0; i < keys.length; i++) {
-                Vue.set(this.childEntity, keys[i], item[keys[i]]);
-            }
 
-            this.$bvToast.toast('The project was successfully updated.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
-        },
-        async handleDeleted() {
-            this.$bvToast.toast('The project was successfully deleted.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
+        const handleDeleted = async () => {
+            toast.success({ body: 'The project was successfully deleted.' });
 
-            await this.$nuxt.$router.push(`/admin/registries/${this.enitty.id}/projects`);
-        },
-        handleFailed(e) {
-            this.$bvToast.toast(e.message, {
-                toaster: 'b-toaster-top-center',
-                variant: 'warning',
-            });
-        },
+            await navigateTo(`/admin/registries/${refs.entity.value.id}/projects`);
+        };
+
+        const handleFailed = (e: Error) => {
+            toast.danger({ body: e.message });
+        };
+
+        return {
+            entity: refs.entity,
+            childEntity,
+            handleUpdated,
+            handleFailed,
+            handleDeleted,
+        };
     },
 });
 </script>
 <template>
-    <registry-project-form
+    <RegistryProjectForm
         :entity="childEntity"
         :registry-id="entity.id"
         @updated="handleUpdated"

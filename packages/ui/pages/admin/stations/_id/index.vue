@@ -7,13 +7,18 @@
 <script lang="ts">
 import type { Station } from '@personalhealthtrain/central-common';
 import type { PropType } from 'vue';
-import { StationForm } from '../../../../components/domains/station/StationForm';
+import { defineNuxtComponent } from '#app';
+import StationForm from '../../../../components/domains/station/StationForm';
 
-export default {
+export default defineNuxtComponent({
     components: { StationForm },
     props: {
-        entity: Object as PropType<Station>,
+        entity: {
+            type: Object as PropType<Station>,
+            required: true,
+        },
     },
+    emits: ['failed', 'updated'],
     methods: {
         handleUpdated(e) {
             this.$emit('updated', e);
@@ -22,10 +27,10 @@ export default {
             this.$emit('failed', e);
         },
     },
-};
+});
 </script>
 <template>
-    <station-form
+    <StationForm
         :entity="entity"
         :realm-id="entity.realm_id"
         @updated="handleUpdated"

@@ -1,88 +1,71 @@
-<!--
-  - Copyright (c) 2021-2021.
-  - Author Peter Placzek (tada5hi)
-  - For the full copyright and license information,
-  - view the LICENSE file that was distributed with this source code.
-  -->
+<script lang="ts">
 
-<script>
+import type { Permission } from '@authup/core';
+import { PermissionName } from '@authup/core';
+import { useToast } from 'bootstrap-vue-next';
+import { defineNuxtComponent } from '#app';
+import { definePageMeta } from '#imports';
+import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
-import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
+export default defineNuxtComponent({
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionName.PERMISSION_EDIT,
+                PermissionName.PERMISSION_DROP,
+                PermissionName.PERMISSION_ADD,
+            ],
+        });
 
-export default {
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.PERMISSION_ADD,
-            PermissionID.PERMISSION_EDIT,
-            PermissionID.PERMISSION_DROP,
-        ],
-    },
-    data() {
-        return {
-            sidebar: {
-                hide: false,
-                items: [
-                    {
-                        name: 'overview',
-                        urlSuffix: '',
-                        icon: 'fa fa-bars',
-                    },
-                    {
-                        name: 'add',
-                        urlSuffix: '/add',
-                        icon: 'fa fa-plus',
-                    },
-                ],
+        const items = [
+            {
+                name: 'overview',
+                urlSuffix: '',
+                icon: 'fa fa-bars',
             },
+            {
+                name: 'add',
+                urlSuffix: '/add',
+                icon: 'fa fa-plus',
+            },
+        ];
+
+        const handleDeleted = (e: Permission) => {
+            const toast = useToast();
+            toast.success({ body: `The permission ${e.name} was successfully deleted.` });
+        };
+
+        const handleFailed = (e: Error) => {
+            const toast = useToast();
+            toast.warning({ body: e.message });
+        };
+
+        return {
+            handleDeleted,
+            handleFailed,
+            items,
         };
     },
-    methods: {
-        async handleDeleted(item) {
-            this.$bvToast.toast(`The permission ${item.id} was successfully deleted.`, {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
-
-            await this.$nuxt.$router.push('/admin/users');
-        },
-        async handleFailed(e) {
-            this.$bvToast.toast(e.message, {
-                toaster: 'b-toaster-top-center',
-                variant: 'warning',
-            });
-        },
-    },
-};
+});
 </script>
 <template>
-    <div class="container">
+    <div>
         <h1 class="title no-border mb-3">
-            Permissions <span class="sub-title">Management</span>
+            <i class="fa-solid fa-users me-1" /> Permission
+            <span class="sub-title ms-1">Management</span>
         </h1>
-
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
-                <b-nav
-                    pills
-                    vertical
-                >
-                    <b-nav-item
-                        v-for="(item,key) in sidebar.items"
-                        :key="key"
-                        :disabled="item.active"
-                        :to="'/admin/permissions' + item.urlSuffix"
-                        exact
-                        exact-active-class="active"
-                    >
-                        <i :class="item.icon" />
-                        {{ item.name }}
-                    </b-nav-item>
-                </b-nav>
+                <DomainEntityNav
+                    :items="items"
+                    path="/admin/permissions"
+                    direction="vertical"
+                />
             </div>
             <div class="content-container">
-                <nuxt-child
+                <NuxtPage
                     @deleted="handleDeleted"
                     @failed="handleFailed"
                 />

@@ -1,67 +1,98 @@
-<!--
-  - Copyright (c) 2021-2021.
-  - Author Peter Placzek (tada5hi)
-  - For the full copyright and license information,
-  - view the LICENSE file that was distributed with this source code.
-  -->
-<script>
-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
+<script lang="ts">
 
-export default {
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+import { BTable } from 'bootstrap-vue-next';
+import { EntityDelete, PermissionList } from '@authup/client-vue';
+import type { Permission } from '@authup/core';
+import { PermissionName, isRealmResourceWritable } from '@authup/core';
+import { storeToRefs } from 'pinia';
+import type { BuildInput } from 'rapiq';
+import { defineNuxtComponent } from '#app';
+import { useAuthStore } from '../../../../store/auth';
+
+export default defineNuxtComponent({
+    components: {
+        BTable,
+        EntityDelete,
+        PermissionList,
     },
-    data() {
+    emits: ['deleted'],
+    setup(props, { emit }) {
+        const handleDeleted = (e: Permission) => {
+            emit('deleted', e);
+        };
+
+        const store = useAuthStore();
+        const { realm, realmManagementId } = storeToRefs(store);
+
+        const query : BuildInput<Permission> = {
+            filter: {
+                realm_id: [realmManagementId.value, null],
+            },
+        };
+
+        const isResourceWritable = (
+            resource: Permission,
+        ) => isRealmResourceWritable(realm.value, resource.realm_id);
+
+        const hasEditPermission = store.has(PermissionName.PERMISSION_EDIT);
+        const hasDropPermission = store.has(PermissionName.PERMISSION_DROP);
+
+        const fields = [
+            {
+                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'created_at', label: 'Created at', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'updated_at', label: 'Updated at', thClass: 'text-left', tdClass: 'text-left',
+            },
+            { key: 'options', label: '', tdClass: 'text-left' },
+        ];
+
         return {
-            isBusy: false,
-            fields: [
-                {
-                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'created_at', label: 'Created at', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'updated_at', label: 'Updated at', thClass: 'text-left', tdClass: 'text-left',
-                },
-                { key: 'options', label: '', tdClass: 'text-left' },
-            ],
+            fields,
+            isResourceWritable,
+            hasEditPermission,
+            hasDropPermission,
+            handleDeleted,
+            query,
         };
     },
-    methods: {
-    },
-};
+});
 </script>
 <template>
-    <permission-list
-        ref="roleList"
-        :load-on-init="true"
+    <PermissionList
+        :header-title="{ icon: 'fa-solid fa-list pe-1', content: 'Overview' }"
+        :query="query"
+        @deleted="handleDeleted"
     >
-        <template #header-title>
-            <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
-        </template>
         <template #items="props">
-            <b-table
-                :items="props.items"
+            <BTable
+                :items="props.data"
                 :fields="fields"
                 :busy="props.busy"
                 head-variant="'dark'"
                 outlined
             >
-                <template #cell(created_at)="data">
-                    <timeago :datetime="data.item.created_at" />
+                <template #cell(options)="data">
+                    <NuxtLink
+                        :to="'/admin/permissions/'+ data.item.id"
+                        class="btn btn-xs btn-outline-primary me-1"
+                        :disabled="!hasEditPermission || !isResourceWritable(data.item)"
+                    >
+                        <i class="fa-solid fa-bars" />
+                    </NuxtLink>
+                    <EntityDelete
+                        class="btn btn-xs btn-outline-danger"
+                        :entity-id="data.item.id"
+                        entity-type="permission"
+                        :with-text="false"
+                        :disabled="data.item.built_in || !hasDropPermission || !isResourceWritable(data.item)"
+                        @deleted="props.deleted"
+                    />
                 </template>
-                <template #cell(updated_at)="data">
-                    <timeago :datetime="data.item.updated_at" />
-                </template>
-                <template #table-busy>
-                    <div class="text-center text-danger my-2">
-                        <b-spinner class="align-middle" />
-                        <strong>Loading...</strong>
-                    </div>
-                </template>
-            </b-table>
+            </BTable>
         </template>
-    </permission-list>
+    </PermissionList>
 </template>

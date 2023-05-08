@@ -5,67 +5,60 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { RobotForm, useAPIClient } from '@authup/vue2';
-import type { VNode } from 'vue';
-import Vue from 'vue';
+import { RobotForm } from '@authup/client-vue';
+import type { Robot } from '@authup/core';
+import { useToast } from 'bootstrap-vue-next';
+import { storeToRefs } from 'pinia';
+import type { Ref } from 'vue';
+import { h, ref } from 'vue';
 import { ServiceID } from '@personalhealthtrain/central-common';
+import { createError, defineNuxtComponent, navigateTo } from '#app';
+import { useAuthupAPI } from '../../../../composables/api';
+import { useAuthStore } from '../../../../store/auth';
+import { updateObjectProperties } from '../../../../utils';
 
-export default {
-    data() {
-        return {
-            item: null,
-            busy: false,
-        };
-    },
-    created() {
-        Promise.resolve()
-            .then(this.load);
-    },
-    methods: {
-        async load() {
-            try {
-                const response = await useAPIClient().robot.getMany({
-                    filter: {
-                        name: ServiceID.REGISTRY,
-                    },
-                    fields: ['+secret'],
-                });
+export default defineNuxtComponent({
+    async setup() {
+        const toast = useToast();
 
-                if (response.meta.total === 1) {
-                    // eslint-disable-next-line prefer-destructuring
-                    this.item = response.data[0];
-                }
-            } catch (e) {
-                // ...
-            }
-        },
-        handleUpdated(item) {
-            const keys = Object.keys(item);
-            for (let i = 0; i < keys.length; i++) {
-                Vue.set(this.item, keys[i], item[keys[i]]);
-            }
+        let entity : Ref<Robot>;
 
-            this.$bvToast.toast('The robot was successfully updated.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
-        },
-    },
-    render(h) : VNode {
-        const vm = this;
-
-        return h(RobotForm, {
-            props: {
-                name: ServiceID.REGISTRY,
-                realmId: this.$store.getters['auth/realmId'],
-                entity: vm.item,
-            },
-            on: {
-                updated(item) {
-                    vm.handleUpdated.call(null, item);
+        try {
+            const response = await useAuthupAPI().robot.getMany({
+                filter: {
+                    name: ServiceID.REGISTRY,
                 },
+                fields: ['+secret'],
+            });
+
+            const robot = response.data.pop();
+            if (!robot) {
+                throw new Error('The robot was not found.');
+            }
+
+            entity = ref(robot);
+        } catch (e) {
+            await navigateTo({ path: '/admin/services' });
+            throw createError({});
+        }
+
+        const handleUpdated = (item: Robot) => {
+            updateObjectProperties(entity, item);
+
+            toast.success({ body: 'The robot was successfully updated.' });
+        };
+
+        const store = useAuthStore();
+        const { realmId } = storeToRefs(store);
+
+        return () => h(RobotForm, {
+            name: ServiceID.REGISTRY,
+            realmId: realmId as string,
+            entity: entity.value,
+            onUpdated(item) {
+                handleUpdated(item);
             },
         });
     },
-};
+});
 </script>

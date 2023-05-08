@@ -1,92 +1,73 @@
-<!--
-  Copyright (c) 2021-2021.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
-<script>
-import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
+<script lang="ts">
+import { BTable } from 'bootstrap-vue-next';
+import type { Realm } from '@authup/core';
+import { PermissionName, isRealmResourceWritable } from '@authup/core';
+import { EntityDelete, RealmList } from '@authup/client-vue';
+import { storeToRefs } from 'pinia';
+import { defineNuxtComponent } from '#app';
+import { useAuthStore } from '../../../../store/auth';
 
-export default {
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.REALM_EDIT,
-            PermissionID.REALM_DROP,
-        ],
+export default defineNuxtComponent({
+    components: {
+        BTable,
+        EntityDelete,
+        RealmList,
     },
-    data() {
+    emits: ['deleted'],
+    setup(props, { emit }) {
+        const store = useAuthStore();
+        const {
+            realm,
+            realmManagementId,
+        } = storeToRefs(store);
+
+        const handleDeleted = (e: Realm) => {
+            emit('deleted', e);
+        };
+
+        const isResourceWritable = (
+            entity: Realm,
+        ) => isRealmResourceWritable(realm.value, entity.id);
+
+        const hasEditPermission = store.has(PermissionName.REALM_EDIT);
+        const hasDropPermission = store.has(PermissionName.REALM_DROP);
+
+        const fields = [
+            {
+                key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+            },
+            { key: 'options', label: '', tdClass: 'text-left' },
+        ];
+
         return {
-            item: undefined,
-            mode: 'add',
-            isBusy: false,
-            fields: [
-                {
-                    key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
-                },
-                { key: 'options', label: '', tdClass: 'text-left' },
-            ],
-            items: [],
+            fields,
+            isResourceWritable,
+            hasEditPermission,
+            hasDropPermission,
+            handleDeleted,
+            realmManagementId,
+            setRealmManagement: store.setRealmManagement,
         };
     },
-    computed: {
-        canEdit() {
-            return this.$auth.has(PermissionID.REALM_EDIT);
-        },
-        canDrop() {
-            return this.$auth.has(PermissionID.REALM_DROP);
-        },
-
-        managementRealmId() {
-            return this.$store.getters['auth/managementRealmId'];
-        },
-    },
-    methods: {
-        handleDeleted(item) {
-            this.$emit('deleted', item);
-
-            this.$refs.itemsList.handleDeleted(item);
-        },
-
-        async setManagementRealm(realm) {
-            await this.$store.dispatch('auth/triggerSetManagementRealm', realm);
-        },
-    },
-};
+});
 </script>
 <template>
-    <realm-list ref="itemsList">
-        <template #header-title>
-            <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
-        </template>
-        <template #header-actions="props">
-            <div class="d-flex flex-row">
-                <div>
-                    <button
-                        type="button"
-                        class="btn btn-xs btn-dark"
-                        :disabled="props.busy"
-                        @click.prevent="props.load"
-                    >
-                        <i class="fas fa-sync" /> Refresh
-                    </button>
-                </div>
-            </div>
-        </template>
+    <RealmList
+        :header-title="{ icon: 'fa-solid fa-list pe-1', content: 'Overview' }"
+        @deleted="handleDeleted"
+    >
         <template #items="props">
-            <b-table
-                :items="props.items"
+            <BTable
+                :items="props.data"
                 :fields="fields"
                 :busy="props.busy"
                 head-variant="'dark'"
@@ -94,44 +75,29 @@ export default {
             >
                 <template #cell(options)="data">
                     <button
-                        v-if="managementRealmId !== data.item.id"
-                        class="btn btn-xs btn-primary"
-                        @click="setManagementRealm(data.item)"
+                        v-if="realmManagementId !== data.item.id"
+                        class="btn btn-xs btn-primary me-1"
+                        @click.prevent="setRealmManagement(data.item)"
                     >
-                        <i
-                            class="fa-solid fa-check"
-                        />
+                        <i class="fa-solid fa-check" />
                     </button>
-                    <nuxt-link
-                        v-if="canEdit"
-                        v-b-tooltip="'Overview'"
-                        :to="'/admin/realms/'+data.item.id"
-                        class="btn btn-xs btn-outline-primary"
+                    <NuxtLink
+                        :to="'/admin/realms/'+ data.item.id"
+                        class="btn btn-xs btn-outline-primary me-1"
+                        :disabled="!hasEditPermission"
                     >
-                        <i class="fa fa-bars" />
-                    </nuxt-link>
-                    <auth-entity-delete
-                        v-if="canDrop && data.item.drop_able"
+                        <i class="fa-solid fa-bars" />
+                    </NuxtLink>
+                    <EntityDelete
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
-                        :entity-type="'realm'"
+                        entity-type="realm"
                         :with-text="false"
-                        @deleted="handleDeleted"
+                        :disabled="!data.item.drop_able || !hasDropPermission"
+                        @deleted="props.deleted"
                     />
                 </template>
-                <template #cell(created_at)="data">
-                    <timeago :datetime="data.item.created_at" />
-                </template>
-                <template #cell(updated_at)="data">
-                    <timeago :datetime="data.item.updated_at" />
-                </template>
-                <template #table-busy>
-                    <div class="text-center text-danger my-2">
-                        <b-spinner class="align-middle" />
-                        <strong>Loading...</strong>
-                    </div>
-                </template>
-            </b-table>
+            </BTable>
         </template>
-    </realm-list>
+    </RealmList>
 </template>

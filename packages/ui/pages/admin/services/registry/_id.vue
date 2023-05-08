@@ -5,94 +5,91 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import type { Registry } from '@personalhealthtrain/central-common';
 import { Ecosystem, PermissionID } from '@personalhealthtrain/central-common';
+import { useToast } from 'bootstrap-vue-next';
+import type { Ref } from 'vue';
+import { computed, ref } from 'vue';
+import {
+    createError,
+    definePageMeta, navigateTo, updateObjectProperties, useAPI, useRoute,
+} from '#imports';
+import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.REGISTRY_MANAGE,
-        ],
-    },
-    async asyncData(context) {
-        let entity;
+export default defineNuxtComponent({
+    async setup() {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.REGISTRY_MANAGE,
+            ],
+        });
+
+        const toast = useToast();
+        const route = useRoute();
+
+        let entity : Ref<Registry>;
 
         try {
-            entity = await context.$api.registry.getOne(context.params.id, {
+            const response = await useAPI().registry.getOne(route.params.id as string, {
                 fields: ['+account_secret'],
             });
 
-            return {
-                entity,
-            };
+            entity = ref(response);
         } catch (e) {
-            await context.redirect('/admin/registries');
-
-            return {
-
-            };
+            await navigateTo({ path: '/admin/services/registries' });
+            throw createError({});
         }
-    },
-    data() {
+
+        const tabs = computed(() => [
+            {
+                name: 'General', icon: 'fas fa-bars', urlSuffix: '',
+            },
+            ...(entity.value.ecosystem === Ecosystem.DEFAULT ?
+                [{
+                    name: 'Setup', icon: 'fa-solid fa-cog', urlSuffix: 'setup',
+                }] : []
+            ),
+            {
+                name: 'Projects',
+                icon: 'fa-solid fa-diagram-project',
+                urlSuffix: 'projects',
+                components: [
+                    {
+                        name: 'overview',
+                        urlSuffix: '',
+                        icon: 'fa fa-bars',
+                    },
+                    {
+                        name: 'add',
+                        urlSuffix: '/add',
+                        icon: 'fa fa-plus',
+                    },
+                ],
+            },
+        ]);
+
+        const handleUpdated = (item: Registry) => {
+            updateObjectProperties(entity, item);
+
+            toast.success({ body: 'The registry was successfully updated.' });
+        };
+        const handleDeleted = async () => {
+            toast.success({ body: 'The registry was successfully deleted.' });
+
+            await navigateTo('/admin/registries');
+        };
+
         return {
-            entity: null,
+            handleUpdated,
+            handleDeleted,
+            tabs,
+            entity,
         };
     },
-    computed: {
-        tabs() {
-            return [
-                {
-                    name: 'General', icon: 'fas fa-bars', urlSuffix: '',
-                },
-                ...(this.entity.ecosystem === Ecosystem.DEFAULT ?
-                    [{
-                        name: 'Setup', icon: 'fa-solid fa-cog', urlSuffix: 'setup',
-                    }] : []
-                ),
-                {
-                    name: 'Projects',
-                    icon: 'fa-solid fa-diagram-project',
-                    urlSuffix: 'projects',
-                    components: [
-                        {
-                            name: 'overview',
-                            urlSuffix: '',
-                            icon: 'fa fa-bars',
-                        },
-                        {
-                            name: 'add',
-                            urlSuffix: '/add',
-                            icon: 'fa fa-plus',
-                        },
-                    ],
-                },
-            ];
-        },
-    },
-    methods: {
-        handleUpdated(item) {
-            const keys = Object.keys(item);
-            for (let i = 0; i < keys.length; i++) {
-                this.entity[keys[i]] = item[keys[i]];
-            }
-
-            this.$bvToast.toast('The registry was successfully updated.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
-        },
-        async handleDeleted() {
-            this.$bvToast.toast('The registry was successfully deleted.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
-
-            await this.$nuxt.$router.push('/admin/registries');
-        },
-    },
-};
+});
 </script>
 <template>
     <div class="container">
@@ -107,43 +104,14 @@ export default {
         <div>
             <div class="content-wrapper">
                 <div class="content-sidebar flex-column">
-                    <b-nav
-                        pills
-                        vertical
-                    >
-                        <template v-for="(item,key) in tabs">
-                            <b-nav-item-dropdown
-                                v-if="item.components"
-                                :key="key"
-                                :text="item.name"
-                                :html="'<i class=\''+item.icon+'\'></i> '+item.name"
-                                right
-                            >
-                                <b-dropdown-item
-                                    v-for="(subItem, subIndex) in item.components"
-                                    :key="subIndex"
-                                    :to="'/admin/services/registry/' + entity.id + '/' + item.urlSuffix + subItem.urlSuffix"
-                                >
-                                    <i :class="subItem.icon" />
-                                    {{ subItem.name }}
-                                </b-dropdown-item>
-                            </b-nav-item-dropdown>
-                            <b-nav-item
-                                v-if="!item.components"
-                                :key="key"
-                                :disabled="item.active"
-                                :to="'/admin/services/registry/' + entity.id + '/' + item.urlSuffix"
-                                exact
-                                exact-active-class="active"
-                            >
-                                <i :class="item.icon" />
-                                {{ item.name }}
-                            </b-nav-item>
-                        </template>
-                    </b-nav>
+                    <DomainEntityNav
+                        :items="tabs"
+                        :direction="'vertical'"
+                        :path="'/admin/services/registry/' + entity.id "
+                    />
                 </div>
                 <div class="content-container">
-                    <nuxt-child
+                    <NuxtPage
                         :entity="entity"
                         @updated="handleUpdated"
                         @deleted="handleDeleted"

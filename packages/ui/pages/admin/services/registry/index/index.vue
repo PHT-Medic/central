@@ -4,57 +4,71 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import type { Registry } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
-import { RegistryList } from '../../../../../components/domains/registry/RegistryList';
+import type { BuildInput } from 'rapiq';
+import { computed } from 'vue';
+import { defineNuxtComponent } from '#app';
+import { definePageMeta } from '#imports';
+import { LayoutKey, LayoutNavigationID } from '~/config/layout';
+import EntityDelete from '../../../../../components/domains/EntityDelete';
+import RegistryList from '../../../../../components/domains/registry/RegistryList';
+import { useAuthStore } from '../../../../../store/auth';
 
-export default {
-    components: { RegistryList },
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-    },
-    data() {
+export default defineNuxtComponent({
+    components: { EntityDelete, RegistryList },
+    setup(props, { emit }) {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        });
+
+        const fields = [
+            {
+                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+            },
+            { key: 'options', label: '', tdClass: 'text-left' },
+        ];
+
+        const query : BuildInput<Registry> = {
+            sort: {
+                updated_at: 'DESC',
+            },
+        };
+
+        const store = useAuthStore();
+        const canManage = computed(() => store.has(PermissionID.REGISTRY_MANAGE));
+
+        const registryNode = ref<RegistryList | null>(null);
+
+        const handleDeleted = (item: Registry) => {
+            emit('deleted', item);
+
+            if (registryNode.value) {
+                registryNode.value.handleDeleted(item);
+            }
+        };
+
         return {
-            fields: [
-                {
-                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
-                },
-                { key: 'options', label: '', tdClass: 'text-left' },
-            ],
+            fields,
+            query,
+            canManage,
+            registryNode,
+            handleDeleted,
         };
     },
-    computed: {
-        query() {
-            return {
-                sort: {
-                    updated_at: 'DESC',
-                },
-            };
-        },
-        canManage() {
-            return this.$auth.has(PermissionID.REGISTRY_MANAGE);
-        },
-    },
-    methods: {
-        async handleDeleted(item) {
-            this.$emit('deleted', item);
-
-            this.$refs.itemsList.handleDeleted(item);
-        },
-    },
-};
+});
 </script>
 <template>
-    <registry-list
-        ref="itemsList"
+    <RegistryList
+        ref="registryNode"
         :load-on-init="true"
         :query="query"
     >
@@ -62,23 +76,23 @@ export default {
             <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
         </template>
         <template #items="props">
-            <b-table
-                :items="props.items"
+            <BTable
+                :items="props.data"
                 :fields="fields"
                 :busy="props.busy"
                 head-variant="'dark'"
                 outlined
             >
                 <template #cell(options)="data">
-                    <nuxt-link
+                    <NuxtLink
                         v-if="canManage"
                         v-b-tooltip="'Overview'"
                         :to="'/admin/services/registry/'+data.item.id"
                         class="btn btn-xs btn-outline-primary"
                     >
                         <i class="fa fa-bars" />
-                    </nuxt-link>
-                    <entity-delete
+                    </NuxtLink>
+                    <EntityDelete
                         v-if="canManage"
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
@@ -99,7 +113,7 @@ export default {
                         <strong>Loading...</strong>
                     </div>
                 </template>
-            </b-table>
+            </BTable>
         </template>
-    </registry-list>
+    </RegistryList>
 </template>

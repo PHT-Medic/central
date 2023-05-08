@@ -5,24 +5,38 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import Vue from 'vue';
-import type { Socket } from 'socket.io-client';
+import { DomainEventName } from '@authup/core';
+import { useToast } from 'bootstrap-vue-next';
 import type {
-    SocketClientToServerEvents,
-    SocketServerToClientEventContext, SocketServerToClientEvents,
-    Station,
+    SocketServerToClientEventContext,
+    Station, StationEventContext,
 } from '@personalhealthtrain/central-common';
-import { StationSocketClientToServerEventName, StationSocketServerToClientEventName } from '@personalhealthtrain/central-common';
-import type { ComponentListHandlerMethodOptions } from '@vue-layout/utils';
-import { StationForm } from '../../../components/domains/station/StationForm';
+import {
+    DomainEventSubscriptionName,
+    DomainType,
+    buildDomainEventFullName,
+    buildDomainEventSubscriptionFullName,
+} from '@personalhealthtrain/central-common';
+import type { Ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
+import {
+    updateObjectProperties, useAPI, useRoute, useSocket,
+} from '#imports';
+import { createError, defineNuxtComponent, navigateTo } from '#app';
+import StationForm from '../../../components/domains/station/StationForm';
 
-export default Vue.extend<any, any, any, any>({
+export default defineNuxtComponent({
     components: { StationForm },
-    async asyncData(context) {
+    async setup() {
+        let entity : Ref<Station>;
+
+        const toast = useToast();
+        const route = useRoute();
+
         try {
-            const { data: stations } = await context.$api.station.getMany({
+            const { data: stations } = await useAPI().station.getMany({
                 filter: {
-                    id: context.params.id,
+                    id: route.params.id as string,
                 },
                 fields: [
                     '+registry_id',
@@ -33,97 +47,80 @@ export default Vue.extend<any, any, any, any>({
                 ],
             });
 
-            if (stations.length === 0) {
-                await context.redirect('/admin/stations');
-
-                return {
-                    entity: undefined,
-                };
+            const station = stations.pop();
+            if (!station) {
+                throw new Error();
             }
 
-            return {
-                entity: stations[0],
-            };
+            entity = ref(station);
         } catch (e) {
-            await context.redirect('/admin/stations');
-
-            return {
-                entity: undefined,
-            };
+            await navigateTo({ path: '/admin/stations' });
+            throw createError({});
         }
-    },
-    data() {
-        return {
-            entity: undefined,
-            tabs: [
-                { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-            ],
-        };
-    },
-    created() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
 
-        if (this.entity) {
-            socket.emit(StationSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.entity.id } });
-            socket.on(StationSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
-        }
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
-
-        if (this.entity) {
-            socket.emit(StationSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.entity.id } });
-            socket.off(StationSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
-        }
-    },
-    methods: {
-        handleSocketUpdated(context: SocketServerToClientEventContext<Station>) {
-            if (
-                this.entity.id !== context.data.id ||
-                context.meta.roomId !== this.entity.id
-            ) return;
-
-            this.handleUpdated(context.data, { displayMessage: false });
-        },
-        handleUpdated(
+        const handleUpdated = (
             item: Station,
-            options?: ComponentListHandlerMethodOptions<Station> & {displayMessage?: boolean},
-        ) {
+            options?: {displayMessage?: boolean},
+        ) => {
             options = options || {};
             options.displayMessage = options.displayMessage ?? true;
 
-            const keys = Object.keys(item);
-            for (let i = 0; i < keys.length; i++) {
-                Vue.set(this.entity, keys[i], item[keys[i]]);
-            }
+            updateObjectProperties(entity, item);
 
             if (options.displayMessage) {
-                this.$bvToast.toast('The station was successfully updated.', {
-                    toaster: 'b-toaster-top-center',
-                    variant: 'success',
-                });
+                toast.success({ body: 'The station was successfully updated.' });
             }
-        },
-        async handleDeleted() {
-            this.$bvToast.toast('The station was successfully deleted.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
+        };
 
-            await this.$nuxt.$router.push(`/admin/realms/${this.enitty.id}/stations`);
-        },
-        handleFailed(e) {
-            this.$bvToast.toast(e.message, {
-                toaster: 'b-toaster-top-center',
-                variant: 'warning',
-            });
-        },
+        const handleFailed = (e: Error) => {
+            toast.danger({ body: e.message });
+        };
+
+        const handleSocketUpdated = (context: SocketServerToClientEventContext<StationEventContext>) => {
+            if (
+                entity.value.id !== context.data.id ||
+                context.meta.roomId !== entity.value.id
+            ) return;
+
+            handleUpdated(context.data, { displayMessage: false });
+        };
+
+        const socket = useSocket().useRealmWorkspace(entity.value.realm_id);
+
+        onMounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.STATION,
+                DomainEventSubscriptionName.SUBSCRIBE,
+            ), entity.value.id);
+
+            socket.on(buildDomainEventFullName(
+                DomainType.STATION,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
+        });
+
+        onUnmounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.STATION,
+                DomainEventSubscriptionName.UNSUBSCRIBE,
+            ), entity.value.id);
+
+            socket.off(buildDomainEventFullName(
+                DomainType.STATION,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
+        });
+
+        const tabs = [
+            { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
+        ];
+
+        return {
+            tabs,
+            entity,
+            handleUpdated,
+            handleFailed,
+        };
     },
 });
 </script>
@@ -135,31 +132,14 @@ export default Vue.extend<any, any, any, any>({
 
         <div class="m-b-20 m-t-10">
             <div class="flex-wrap flex-row d-flex">
-                <div>
-                    <b-nav pills>
-                        <b-nav-item
-                            :to="'/admin/stations'"
-                            exact
-                            exact-active-class="active"
-                        >
-                            <i class="fa fa-arrow-left" />
-                        </b-nav-item>
-
-                        <b-nav-item
-                            v-for="(item,key) in tabs"
-                            :key="key"
-                            :to="'/admin/stations/' + entity.id + item.urlSuffix"
-                            exact
-                            exact-active-class="active"
-                        >
-                            <i :class="item.icon" />
-                            {{ item.name }}
-                        </b-nav-item>
-                    </b-nav>
-                </div>
+                <DomainEntityNav
+                    :items="tabs"
+                    :path="'/admin/stations/' + entity.id"
+                    :prev-link="true"
+                />
             </div>
         </div>
-        <nuxt-child
+        <NuxtPage
             :entity="entity"
             @updated="handleUpdated"
             @failed="handleFailed"

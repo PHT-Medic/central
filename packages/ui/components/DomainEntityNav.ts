@@ -7,8 +7,8 @@
 
 import type { PropType } from 'vue';
 import { defineComponent, toRef } from 'vue';
-import { buildDomainEntityNav } from '../composables/domain/enity-nav';
-import type { DomainEntityNavItems } from '../composables/domain/enity-nav';
+import type { DomainEntityNavItems } from '../core/render/enity-nav';
+import { buildDomainEntityNav } from '../core/render/enity-nav';
 
 export default defineComponent({
     props: {

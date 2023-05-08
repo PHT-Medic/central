@@ -5,64 +5,75 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { RobotForm } from '@authup/client-vue';
+import type { Robot } from '@authup/core';
 import type { ServiceID } from '@personalhealthtrain/central-common';
-import type { PropType } from 'vue';
-import Vue from 'vue';
-import { useAuthupAPI } from '#imports';
+import { useToast } from 'bootstrap-vue-next';
+import type { PropType, Ref } from 'vue';
+import { ref, toRefs } from 'vue';
+import {
+    createError,
+    defineNuxtComponent,
+    navigateTo,
+    updateObjectProperties,
+    useAuthupAPI,
+} from '#imports';
 
-export default {
-    props: {
-        entityId: String as PropType<ServiceID>,
+export default defineNuxtComponent({
+    components: {
+        RobotForm,
     },
-    data() {
+    props: {
+        entityId: {
+            type: String as PropType<ServiceID>,
+            required: true,
+        },
+    },
+    async setup(props) {
+        const refs = toRefs(props);
+
+        const toast = useToast();
+
+        let entity : Ref<Robot>;
+
+        try {
+            const response = await useAuthupAPI().robot.getMany({
+                filter: {
+                    name: refs.entityId.value,
+                },
+                fields: ['+secret'],
+            });
+
+            const robot = response.data.pop();
+            if (!robot) {
+                throw new Error('The robot was not found.');
+            }
+
+            entity = ref(robot);
+        } catch (e) {
+            await navigateTo({ path: '/admin/services' });
+            throw createError({});
+        }
+
+        const handleUpdated = (item: Robot) => {
+            updateObjectProperties(entity, item);
+
+            toast.success({ body: 'The robot was successfully updated.' });
+        };
+
         return {
-            item: null,
-            busy: false,
+            entity,
+            handleUpdated,
         };
     },
-    created() {
-        Promise.resolve()
-            .then(this.load);
-    },
-    methods: {
-        async load() {
-            try {
-                const response = await useAuthupAPI().robot.getMany({
-                    filter: {
-                        name: this.entityId,
-                    },
-                    fields: ['+secret'],
-                });
-
-                if (response.meta.total === 1) {
-                    // eslint-disable-next-line prefer-destructuring
-                    this.item = response.data[0];
-                }
-            } catch (e) {
-                // ...
-            }
-        },
-        handleUpdated(item) {
-            const keys = Object.keys(item);
-            for (let i = 0; i < keys.length; i++) {
-                Vue.set(this.item, keys[i], item[keys[i]]);
-            }
-
-            this.$bvToast.toast('The robot was successfully updated.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
-        },
-    },
-};
+});
 </script>
 <template>
     <div>
-        <robot-form
-            v-if="item"
+        <RobotForm
             :name="entityId"
-            :realm-id="item.realm_id"
-            :entity="item"
+            :realm-id="entity.realm_id"
+            :entity="entity"
             @updated="handleUpdated"
         />
     </div>

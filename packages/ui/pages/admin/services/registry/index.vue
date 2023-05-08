@@ -5,71 +5,62 @@
   view the LICENSE file that was distributed with this source code.
   -->
 
-<script>
-
+<script lang="ts">
+import type { Registry } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { useToast } from 'bootstrap-vue-next';
+import { defineNuxtComponent } from '#app';
+import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.REGISTRY_MANAGE,
-        ],
-    },
-    data() {
-        return {
-            sidebar: {
-                hide: false,
-                items: [
-                    {
-                        name: 'overview',
-                        urlSuffix: '',
-                        icon: 'fa fa-bars',
-                    },
-                    {
-                        name: 'add',
-                        urlSuffix: '/add',
-                        icon: 'fa fa-plus',
-                    },
-                ],
+export default defineNuxtComponent({
+    setup() {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.REGISTRY_MANAGE,
+            ],
+        });
+
+        const toast = useToast();
+
+        const tabs = [
+            {
+                name: 'overview',
+                urlSuffix: '',
+                icon: 'fa fa-bars',
             },
+            {
+                name: 'add',
+                urlSuffix: '/add',
+                icon: 'fa fa-plus',
+            },
+        ];
+
+        const handleDeleted = (item: Registry) => {
+            toast.success({ body: `The registry ${item.name} was successfully deleted.` });
+        };
+
+        return {
+            handleDeleted,
+            tabs,
         };
     },
-    methods: {
-        async handleDeleted(item) {
-            this.$bvToast.toast(`The registry ${item.name} was successfully deleted.`, {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
-        },
-    },
-};
+});
 </script>
 <template>
     <div>
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
-                <b-nav
-                    pills
-                    vertical
-                >
-                    <b-nav-item
-                        v-for="(item,key) in sidebar.items"
-                        :key="key"
-                        :disabled="item.active"
-                        :to="'/admin/services/registry' + item.urlSuffix"
-                        exact
-                        exact-active-class="active"
-                    >
-                        <i :class="item.icon" />
-                        {{ item.name }}
-                    </b-nav-item>
-                </b-nav>
+                <DomainEntityNav
+                    :direction="'vertical'"
+                    :items="tabs"
+                    :path="'/admin/services/registry'"
+                />
             </div>
             <div class="content-container">
-                <nuxt-child @deleted="handleDeleted" />
+                <NuxtPage @deleted="handleDeleted" />
             </div>
         </div>
     </div>

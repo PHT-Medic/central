@@ -13,5 +13,5 @@ export default {
 };
 </script>
 <template>
-    <master-images-sync />
+    <MasterImagesSync />
 </template>

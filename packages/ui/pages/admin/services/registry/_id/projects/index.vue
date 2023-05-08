@@ -5,88 +5,116 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Registry } from '@personalhealthtrain/central-common';
+import type { Registry, RegistryProject } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import type { PropType } from 'vue';
-import { RegistryProjectList } from '../../../../../../components/domains/registry-project/RegistryProjectList';
+import type { BModal } from 'bootstrap-vue-next';
+import { useToast } from 'bootstrap-vue-next';
+import type { BuildInput } from 'rapiq';
+import { computed, ref, toRefs } from 'vue';
+import type { PropType, Ref } from 'vue';
+import { definePageMeta } from '#imports';
+import RegistryProjectList from '../../../../../../components/domains/registry-project/RegistryProjectList';
 import { LayoutKey, LayoutNavigationID } from '../../../../../../config/layout';
 import RegistryProjectDetails from '../../../../../../components/domains/registry-project/RegistryProjectDetails';
+import { useAuthStore } from '../../../../../../store/auth';
 
 export default {
     components: { RegistryProjectDetails, RegistryProjectList },
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-    },
     props: {
-        entity: Object as PropType<Registry>,
-    },
-    data() {
-        return {
-            query: {
-                filter: {
-                    registry_id: this.entity.id,
-                },
-                fields: ['+account_id', '+account_name', '+account_secret'],
-            },
-            item: null,
-            fields: [
-                {
-                    key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'type', label: 'Type', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'options', label: '', tdClass: 'text-left',
-                },
-            ],
-        };
-    },
-    computed: {
-        canView() {
-            return this.$auth.has(PermissionID.STATION_EDIT) ||
-                this.$auth.has(PermissionID.STATION_DROP);
-        },
-        canDrop() {
-            return this.$auth.has(PermissionID.STATION_DROP);
+        entity: {
+            type: Object as PropType<Registry>,
+            required: true,
         },
     },
-    methods: {
-        async handleDeleted(item) {
-            this.$bvToast.toast('The project was successfully deleted.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
+    setup(props) {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        });
 
-            this.$refs.itemsList.handleDeleted(item);
-        },
-        showDetails(item) {
-            this.item = item;
-            this.$refs.modal.show();
-        },
+        const toast = useToast();
+        const refs = toRefs(props);
+
+        const query : BuildInput<RegistryProject> = {
+            filter: {
+                registry_id: refs.entity.value.id,
+            },
+            fields: ['+account_id', '+account_name', '+account_secret'],
+        };
+
+        const fields = [
+            {
+                key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'type', label: 'Type', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'options', label: '', tdClass: 'text-left',
+            },
+        ];
+
+        const store = useAuthStore();
+
+        const canView = computed(() => store.has(PermissionID.STATION_EDIT) ||
+                store.has(PermissionID.STATION_DROP));
+
+        const canDrop = computed(() => store.has(PermissionID.STATION_DROP));
+
+        const listNode = ref<null | RegistryProjectList>(null);
+
+        const handleDeleted = (item: RegistryProject) => {
+            toast.success({ body: 'The project was successfully deleted.' });
+
+            if (listNode.value) {
+                listNode.value.handleDeleted(item);
+            }
+        };
+
+        const modalNode = ref<null | BModal>(null);
+        const item : Ref<RegistryProject | null> = ref(null);
+
+        const showDetails = (el: RegistryProject) => {
+            item.value = el;
+
+            if (modalNode.value) {
+                modalNode.value.show();
+            }
+        };
+
+        return {
+            canView,
+            canDrop,
+            handleDeleted,
+            fields,
+            query,
+            item,
+            modalNode,
+            listNode,
+            showDetails,
+        };
     },
 };
 </script>
 <template>
     <div>
         <registry-project-list
-            ref="itemsList"
+            ref="listNode"
             :query="query"
             :load-on-init="true"
         >
             <template #items="props">
                 <b-table
-                    :items="props.items"
+                    :items="props.data"
                     :fields="fields"
                     :busy="props.busy"
                     head-variant="'dark'"
@@ -137,8 +165,8 @@ export default {
             </template>
         </registry-project-list>
 
-        <b-modal
-            ref="modal"
+        <BModal
+            ref="modalNode"
             size="lg"
             button-size="sm"
             :title-html="'<i class=\'fa-solid fa-diagram-project pr-1 \'></i> ' + (item ? item.name : 'Unknown') + '-Project'"
@@ -146,11 +174,11 @@ export default {
             :no-close-on-esc="true"
             :hide-footer="true"
         >
-            <registry-project-details
+            <RegistryProjectDetails
                 v-if="item"
                 :entity-id="item.id"
                 :realm-id="item.realm_id"
             />
-        </b-modal>
+        </BModal>
     </div>
 </template>

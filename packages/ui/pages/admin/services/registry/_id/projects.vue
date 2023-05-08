@@ -9,31 +9,28 @@
 import { PermissionID } from '@personalhealthtrain/central-common';
 import type { PropType } from 'vue';
 import type { Realm } from '@authup/core';
+import { definePageMeta } from '#imports';
+import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.REGISTRY_MANAGE,
-        ],
-    },
+export default defineNuxtComponent({
     props: {
-        entity: Object as PropType<Realm>,
+        entity: {
+            type: Object as PropType<Realm>,
+            required: true,
+        },
     },
-    data() {
-        return {
-            sidebar: {
-                hide: false,
-                items: [
-
-                ],
-            },
-        };
+    setup() {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.REGISTRY_MANAGE,
+            ],
+        });
     },
-};
+});
 </script>
 <template>
-    <nuxt-child :entity="entity" />
+    <NuxtPage :entity="entity" />
 </template>

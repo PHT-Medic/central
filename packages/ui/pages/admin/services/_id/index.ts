@@ -5,38 +5,41 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { toRefs } from 'vue';
 import type { PropType } from 'vue';
-import Vue from 'vue';
 import { ServiceID } from '@personalhealthtrain/central-common';
+import { defineNuxtComponent } from '#app';
 import RegistryManagement from '../../../../components/domains/master-image/MasterImagesSync';
 import StationRegistryManagement from '../../../../components/domains/service/StationRegistryManagement';
 
-export default Vue.extend({
+export default defineNuxtComponent({
     props: {
-        entityId: String as PropType<ServiceID>,
+        entityId: {
+            type: String as PropType<ServiceID>,
+            required: true,
+        },
     },
-    render(h) {
-        if (this.entityId === ServiceID.REGISTRY) {
-            return h(RegistryManagement, {
-                props: {
-                    entityId: this.entityId,
-                },
-                on: {
-                    updated: (event) => this.$emit('updated', event),
+    emits: ['updated'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
+
+        if (refs.entityId.value === ServiceID.REGISTRY) {
+            return () => h(RegistryManagement, {
+                entityId: refs.entityId.value,
+                onUpdated(event: any) {
+                    emit('updated', event);
                 },
             });
         }
 
-        if (this.entityId === ServiceID.STATION_REGISTRY) {
-            return h(StationRegistryManagement, {
-                props: {
-                    entityId: this.entityId,
-                },
+        if (refs.entityId.value === ServiceID.STATION_REGISTRY) {
+            return () => h(StationRegistryManagement, {
+                entityId: refs.entityId.value,
             });
         }
 
-        return h('div', {
+        return () => h('div', {
             class: 'alert alert-info alert-sm',
-        }, `You can not execute any task for the ${this.entityId} service yet.`);
+        }, `You can not execute any task for the ${refs.entityId.value} service yet.`);
     },
 });

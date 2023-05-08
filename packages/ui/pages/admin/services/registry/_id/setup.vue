@@ -5,26 +5,31 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { PropType } from 'vue';
 import type { Registry } from '@personalhealthtrain/central-common';
 import { Ecosystem } from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
+import { toRefs } from 'vue';
+import { defineNuxtComponent, navigateTo } from '#app';
 import RegistrySetup from '../../../../../components/domains/registry/RegistrySetup';
 
-export default {
+export default defineNuxtComponent({
     components: { RegistrySetup },
     props: {
-        entity: Object as PropType<Registry>,
+        entity: {
+            type: Object as PropType<Registry>,
+            required: true,
+        },
     },
-    created() {
-        if (this.entity.ecosystem !== Ecosystem.DEFAULT) {
-            Promise.resolve()
-                .then(this.$nuxt.$router.push(`/admin/services/registry/${this.entity.id}`));
+    async setup(props) {
+        const refs = toRefs(props);
+        if (refs.entity.value.ecosystem !== Ecosystem.DEFAULT) {
+            await navigateTo(`/admin/services/registry/${refs.entity.value.id}`);
         }
     },
-};
+});
 </script>
 <template>
     <div>
-        <registry-setup :entity-id="entity.id" />
+        <RegistrySetup :entity-id="entity.id" />
     </div>
 </template>
