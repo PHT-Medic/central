@@ -4,39 +4,42 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
+<script lang="ts">
+import { defineNuxtComponent } from '#app';
+import { definePageMeta } from '#imports';
+import DomainEntityNav from '../../components/DomainEntityNav';
+import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-    },
-    data() {
-        return {
-            sidebar: {
-                hide: false,
-                items: [
-                    {
-                        name: 'Create',
-                        urlSuffix: '/add',
-                        icon: 'fa fa-plus',
-                    },
-                    {
-                        name: 'Outgoing',
-                        urlSuffix: '',
-                        icon: 'fa fa-file-export',
-                    },
-                    {
-                        name: 'Incoming',
-                        urlSuffix: '/in',
-                        icon: 'fa fa-file-import',
-                    },
-                ],
+export default defineNuxtComponent({
+    components: { DomainEntityNav },
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+        });
+        const items = [
+            {
+                name: 'Create',
+                urlSuffix: '/add',
+                icon: 'fa fa-plus',
             },
+            {
+                name: 'Outgoing',
+                urlSuffix: '',
+                icon: 'fa fa-file-export',
+            },
+            {
+                name: 'Incoming',
+                urlSuffix: '/in',
+                icon: 'fa fa-file-import',
+            },
+        ];
+
+        return {
+            items,
         };
     },
-};
+});
 </script>
 <template>
     <div>
@@ -46,25 +49,14 @@ export default {
 
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
-                <b-nav
-                    pills
-                    vertical
-                >
-                    <b-nav-item
-                        v-for="(item,key) in sidebar.items"
-                        :key="key"
-                        :disabled="item.active"
-                        :to="'/trains' + item.urlSuffix"
-                        exact
-                        exact-active-class="active"
-                    >
-                        <i :class="item.icon" />
-                        {{ item.name }}
-                    </b-nav-item>
-                </b-nav>
+                <DomainEntityNav
+                    :items="items"
+                    :path="'/trains'"
+                    :direction="'vertical'"
+                />
             </div>
             <div class="content-container">
-                <nuxt-child />
+                <NuxtPage />
             </div>
         </div>
     </div>

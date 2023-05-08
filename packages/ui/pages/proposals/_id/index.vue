@@ -5,12 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import Vue from 'vue';
+import type { Proposal, ProposalStation } from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
+import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
-import { ProposalStationList } from '../../../components/domains/proposal-station/ProposalStationList';
+import ProposalStationList from '../../../components/domains/proposal-station/ProposalStationList';
 import ProposalStationApprovalStatus from '../../../components/domains/proposal-station/ProposalStationApprovalStatus';
 
-export default Vue.extend({
+export default defineNuxtComponent({
     components: { ProposalStationApprovalStatus, ProposalStationList },
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -18,13 +20,11 @@ export default Vue.extend({
     },
     props: {
         proposal: {
-            type: Object,
-            default() {
-                return {};
-            },
+            type: Object as PropType<Proposal>,
+            required: true,
         },
         visitorProposalStation: {
-            type: Object,
+            type: Object as PropType<ProposalStation>,
             default: null,
         },
     },
@@ -154,9 +154,11 @@ export default Vue.extend({
                 >
                     <template #items="{ items }">
                         <div class="list">
-                            <template v-for="item in items">
+                            <template
+                                v-for="item in items"
+                                :key="item.id"
+                            >
                                 <div
-                                    :key="item.id"
                                     class="list-item card mb-2"
                                 >
                                     <div class="card-header">

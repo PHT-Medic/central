@@ -4,40 +4,51 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import { LayoutKey, LayoutNavigationID } from '../../config/layout/contants';
+<script lang="ts">
+import type { User } from '@authup/core';
+import { isClientErrorWithStatusCode } from 'hapic';
+import type { Ref } from 'vue';
+import { definePageMeta, useAuthupAPI } from '#imports';
+import {
+    createError, defineNuxtComponent, navigateTo, useRoute,
+} from '#app';
+import DomainEntityNav from '../../components/DomainEntityNav';
+import { LayoutKey, LayoutNavigationID } from '../../config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-    },
-    async asyncData(context) {
-        let user;
+export default defineNuxtComponent({
+    components: { DomainEntityNav },
+    async setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+        });
+
+        let user : Ref<User>;
 
         try {
-            user = await context.$authupApi.user.getOne(context.params.id);
-
-            return {
-                user,
-            };
+            user.value = await useAuthupAPI().user.getOne(useRoute().params.id as string);
         } catch (e) {
-            await context.redirect('/');
+            if (isClientErrorWithStatusCode(e, 404)) {
+                navigateTo({
+                    path: '/',
+                });
+            }
 
-            return {};
+            throw createError({});
         }
-    },
-    data() {
+
+        const tabs = [
+            {
+                name: 'General', routeName: 'users-id', icon: 'fas fa-bars', urlSuffix: '',
+            },
+        ];
+
         return {
-            user: null,
-            tabs: [
-                {
-                    name: 'Allgemein', routeName: 'users-id', icon: 'fas fa-bars', urlSuffix: '',
-                },
-            ],
+            tabs,
+            user,
         };
     },
-};
+});
 </script>
 <template>
     <div class="">
@@ -51,19 +62,10 @@ export default {
         <div class="m-b-20 m-t-10">
             <div class="panel-card">
                 <div class="panel-card-body">
-                    <b-nav pills>
-                        <b-nav-item
-                            v-for="(item,key) in tabs"
-                            :key="key"
-                            :disabled="item.active"
-                            :to="'/users/' + user.id + '/' + item.urlSuffix"
-                            exact
-                            exact-active-class="active"
-                        >
-                            <i :class="item.icon" />
-                            {{ item.name }}
-                        </b-nav-item>
-                    </b-nav>
+                    <DomainEntityNav
+                        :items="tabs"
+                        :path="'/users/' + user.id"
+                    />
                 </div>
             </div>
         </div>

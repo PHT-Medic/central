@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import path from 'node:path';
 import { defineNuxtConfig } from 'nuxt/config';
 
 export default defineNuxtConfig({
@@ -18,6 +19,9 @@ export default defineNuxtConfig({
     },
     telemetry: false,
     ssr: true,
+    alias: {
+        '@personalhealthtrain/central-common': path.join(__dirname, '..', 'common', 'src'),
+    },
     /*
     ** Global CSS
     */
@@ -40,17 +44,6 @@ export default defineNuxtConfig({
         '@/assets/css/bootstrap-override.css',
     ],
     /*
-    ** Plugins to load before mounting the App
-    */
-    plugins: [
-        './plugins/ilingo',
-        './plugins/api',
-        './plugins/store',
-        './plugins/layout',
-        './plugins/socket',
-
-    ],
-    /*
     ** Nuxt.js modules
     */
     modules: [
@@ -64,6 +57,5 @@ export default defineNuxtConfig({
             },
         ],
         '@pinia/nuxt',
-        '@bootstrap-vue-next/nuxt',
     ],
 });

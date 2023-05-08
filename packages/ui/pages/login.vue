@@ -5,44 +5,40 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { CreateElement, VNode } from 'vue';
-import Vue from 'vue';
-import { maxLength, minLength, required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { maxLength, minLength, required } from '@vuelidate/validators';
+import { useToast } from 'bootstrap-vue-next';
+import { isClientError } from 'hapic';
+import {
+    reactive, ref, toRef, watch,
+} from 'vue';
 import type { IdentityProvider } from '@authup/core';
 import type { BuildInput } from 'rapiq';
-import { SlotName, buildFormInput, buildFormSubmit } from '@vue-layout/utils';
-import { IdentityProviderList } from '@authup/vue2';
+import { definePageMeta } from '#imports';
+import {
+    defineNuxtComponent, navigateTo, useNuxtApp, useRoute,
+} from '#app';
 import MedicineWorker from '../components/svg/MedicineWorker';
+import { useAuthupAPI } from '../composables/api';
+import { translateValidationMessage } from '../composables/ilingo';
 import { LayoutKey, LayoutNavigationID } from '../config/layout';
-import { buildVuelidateTranslator } from '../config/ilingo/utils';
+import { useAuthStore } from '../store/auth';
 
-export default Vue.extend({
+export default defineNuxtComponent({
     components: { MedicineWorker },
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_OUT]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-    },
-    data() {
-        return {
-            provider: {
-                items: [],
-                busy: false,
-                meta: {
-                    limit: 10,
-                    offset: 0,
-                    total: 0,
-                },
-            },
-            error: null,
-            busy: false,
-            form: {
-                name: '',
-                password: '',
-            },
-        };
-    },
-    validations: {
-        form: {
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_OUT]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+        });
+
+        const form = reactive({
+            name: '',
+            password: '',
+            realm_id: '',
+        });
+
+        const vuelidate = useVuelidate({
             name: {
                 required,
                 minLength: minLength(3),
@@ -53,124 +49,158 @@ export default Vue.extend({
                 minLength: minLength(3),
                 maxLength: maxLength(255),
             },
-        },
-    },
-    computed: {
-        providerQuery() : BuildInput<IdentityProvider> {
-            return {
-                sort: {
-                    created_at: 'DESC',
-                },
-            };
-        },
-    },
-    methods: {
-        async submit() {
-            if (this.busy) return;
+            realm_id: {
 
-            this.busy = true;
-            this.error = null;
+            },
+        }, form);
 
-            try {
-                const { name, password } = this.form;
+        const store = useAuthStore();
 
-                await this.$store.dispatch('auth/triggerLogin', { name, password });
+        const busy = ref(false);
 
-                await this.$nuxt.$router.push(this.$nuxt.$router.history.current.query.redirect || '/');
-            } catch (e) {
-                if (e instanceof Error) {
-                    this.$bvToast.toast(e.message, {
-                        toaster: 'b-toaster-top-center',
-                        variant: 'warning',
-                    });
+        const realmId = toRef(form, 'realm_id');
+
+        let identityProviderQuery : BuildInput<IdentityProvider> = {
+            filters: {
+                realm_id: realmId.value || '',
+            },
+        };
+        const identityProviderRef = ref<null | { load:() => any, [key: string]: any}>(null);
+
+        watch(realmId, async (val, oldVal) => {
+            if (val !== oldVal) {
+                if (identityProviderRef.value) {
+                    identityProviderQuery = {
+                        filters: {
+                            realm_id: realmId.value || '',
+                        },
+                    };
+                    identityProviderRef.value.load();
                 }
             }
+        });
 
-            this.busy = false;
-        },
+        const submit = async () => {
+            try {
+                await store.login({
+                    name: form.name,
+                    password: form.password,
+                    realmId: form.realm_id,
+                });
 
-        buildUrl(provider) {
-            return this.$authupApi.identityProvider.getAuthorizeUri(this.$config.authupApiUrl, provider.id);
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
-        const name = buildFormInput(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Name / E-Mail',
-            propName: 'name',
-        });
-        const password = buildFormInput(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Passwort',
-            propName: 'password',
-            attrs: {
-                type: 'password',
-            },
-        });
-        const submit = buildFormSubmit(vm, h, {
-            createIconClass: 'fa-solid fa-right-to-bracket',
-            createButtonClass: 'btn btn-secondary btn-sm btn-block',
-            createText: 'Login',
-        });
-        return h('div', { staticClass: 'container' }, [
-            h('h4', 'Login'),
-            h('div', { staticClass: 'text-center' }, [
-                h(MedicineWorker, {
-                    props: {
-                        width: 400,
-                        height: 'auto',
-                    },
-                }),
-            ]),
-            h('form', {
-                on: {
-                    submit($event) {
-                        $event.preventDefault();
-                        return vm.submit.call(null);
-                    },
-                },
-            }, [
-                h('div', { staticClass: 'row' }, [
-                    h('div', { staticClass: 'col-12 col-sm-6' }, [
-                        h('h6', 'Master'),
-                        name,
-                        password,
-                        submit,
-                    ]),
-                    h('div', { staticClass: 'col-12 col-sm-6' }, [
-                        h('h6', 'Stations'),
-                        h(IdentityProviderList, {
-                            props: {
-                                query: vm.providerQuery,
-                                withSearch: false,
-                            },
-                            scopedSlots: {
-                                [SlotName.ITEM]: (props) => h('div', {
-                                    staticClass: 'd-flex flex-wrap flex-row',
-                                }, [
-                                    h('div', [
-                                        h('strong', props.item.name),
-                                    ]),
-                                    h('div', { staticClass: 'ml-auto' }, [
-                                        h('a', {
-                                            attrs: {
-                                                href: vm.buildUrl(props.item),
-                                                type: 'button',
-                                            },
-                                            staticClass: 'btn btn-success btn-xs',
-                                        }, [
-                                            'Login',
-                                        ]),
-                                    ]),
-                                ]),
-                            },
-                        }),
-                    ]),
-                ]),
-            ]),
-        ]);
+                const route = useRoute();
+                const { redirect, ...query } = route.query;
+
+                navigateTo({
+                    path: (redirect || '/') as string,
+                    query,
+                });
+            } catch (e: any) {
+                if (isClientError(e)) {
+                    const toast = useToast();
+                    toast.warning({ body: e.message });
+                }
+            }
+        };
+
+        Promise.resolve()
+            .then(store.logout);
+
+        const buildIdentityProviderURL = (id: string) => {
+            const app = useNuxtApp();
+
+            const apiClient = useAuthupAPI();
+            return apiClient.identityProvider.getAuthorizeUri(
+                app.$config.public.authupApiURL,
+                id,
+            );
+        };
+
+        return {
+            vuelidate,
+            translateValidationMessage,
+            form,
+            submit,
+            busy,
+
+            identityProviderQuery,
+            identityProviderRef,
+            buildIdentityProviderURL,
+        };
     },
 });
 </script>
+<template>
+    <div class="container">
+        <h4>
+            <i class="fa-solid fa-arrow-right-to-bracket pe-2" />
+            Login
+        </h4>
+        <div class="text-center">
+            <MedicineWorker :height="320" />
+        </div>
+        <form @submit.prevent="submit">
+            <div class="row">
+                <div class="col-12 cols-sm-6">
+                    <FormInput
+                        v-model="form.name"
+                        :validation-result="vuelidate.name"
+                        :validation-translator="translateValidationMessage"
+                        :label="true"
+                        :label-content="'Name'"
+                    />
+
+                    <FormInput
+                        v-model="form.password"
+                        type="password"
+                        :validation-result="vuelidate.password"
+                        :validation-translator="translateValidationMessage"
+                        :label="true"
+                        :label-content="'Password'"
+                    />
+
+                    <FormSubmit
+                        v-model="busy"
+                        :validation-result="vuelidate"
+                        :create-text="'Login'"
+                        :create-button-class="{value: 'btn btn-sm btn-dark btn-block', presets: { bootstrap: false }}"
+                        :create-icon-class="'fa-solid fa-right-to-bracket'"
+                        :submit="submit"
+                    />
+                </div>
+                <div class="col-12 col-sm-6">
+                    <IdentityProviderList
+                        ref="identityProviderRef"
+                        :query="identityProviderQuery"
+                    >
+                        <template #header>
+                            <h6>IdentityProvider</h6>
+                        </template>
+                        <template #items="props">
+                            <div class="d-flex flex-column">
+                                <template
+                                    v-for="(item, key) in props.data"
+                                    :key="key"
+                                >
+                                    <div class="d-flex flex-wrap flex-row">
+                                        <div>
+                                            <strong>{{ item.name }}</strong>
+                                        </div>
+                                        <div class="ml-auto">
+                                            <a
+                                                :href="buildIdentityProviderURL(item.id)"
+                                                class="btn btn-primary btn-xs"
+                                            >
+                                                {{ item.name }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </IdentityProviderList>
+                </div>
+            </div>
+        </form>
+    </div>
+</template>

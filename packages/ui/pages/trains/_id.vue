@@ -5,95 +5,123 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import Vue from 'vue';
-import type { Socket } from 'socket.io-client';
-import type {
-    SocketClientToServerEvents,
-    SocketServerToClientEvents,
-} from '@personalhealthtrain/central-common';
 import {
-    TrainSocketClientToServerEventName, TrainSocketServerToClientEventName,
+    DomainEventName,
+    DomainEventSubscriptionName,
+    DomainType,
+    buildDomainEventFullName,
+    buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
+import { isClientErrorWithStatusCode } from 'hapic';
+import type { Ref } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
+import type {
+    SocketServerToClientEventContext, Train,
+    TrainEventContext,
+} from '@personalhealthtrain/central-common';
+import { definePageMeta } from '#imports';
+import {
+    createError, defineNuxtComponent, navigateTo, useRoute,
+} from '#app';
+import DomainEntityNav from '../../components/DomainEntityNav';
+import { useAPI } from '../../composables/api';
+import { useSocket } from '../../composables/socket';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
-import TrainName from '../../components/domains/train/TrainName.vue';
+import TrainName from '../../components/domains/train/TrainName';
 
-export default {
-    components: { TrainName },
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-    },
-    async asyncData(context) {
+export default defineNuxtComponent({
+    components: { DomainEntityNav, TrainName },
+    async setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+        });
+        let entity : Ref<Train>;
+
         try {
-            const entity = await context.$api.train.getOne(context.params.id, {
-                relations: {
-                    proposal: true,
-                },
-            });
-
-            return {
-                entity,
-            };
+            entity.value = await useAPI().train.getOne(useRoute().params.id as string);
         } catch (e) {
-            await context.redirect('/trains');
+            if (isClientErrorWithStatusCode(e, 404)) {
+                navigateTo({
+                    path: '/trains',
+                });
+            }
 
-            return {
-
-            };
+            throw createError({});
         }
-    },
-    data() {
-        return {
-            entity: undefined,
-            tabs: [
-                { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
-                { name: 'Setup', icon: 'fa fa-wrench', urlSuffix: '/setup' },
-            ],
-        };
-    },
-    mounted() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
-        socket.emit(TrainSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.entity.id } });
-        socket.on(TrainSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
-        socket.on(TrainSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
-        socket.emit(TrainSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.entity.id } });
-        socket.off(TrainSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
-        socket.off(TrainSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
-    },
-    methods: {
-        handleSocketUpdated(context) {
-            if (
-                this.entity.id !== context.data.id ||
-                context.meta.roomId !== this.entity.id
-            ) return;
 
-            this.handleUpdated(context.data);
-        },
-        async handleSocketDeleted(context) {
-            if (
-                this.entity.id !== context.data.id ||
-                context.meta.roomId !== this.entity.id
-            ) return;
-
-            await this.$nuxt.$router.push('/trains');
-        },
-        handleUpdated(data) {
+        const handleUpdated = (data: Train) => {
             const keys = Object.keys(data);
             for (let i = 0; i < keys.length; i++) {
-                Vue.set(this.entity, keys[i], data[keys[i]]);
+                entity.value[keys[i]] = data[keys[i]];
             }
-        },
+        };
+
+        const handleSocketUpdated = (context: SocketServerToClientEventContext<TrainEventContext>) => {
+            if (
+                entity.value.id !== context.data.id ||
+                context.meta.roomId !== entity.value.id
+            ) return;
+
+            handleUpdated(context.data);
+        };
+        const handleSocketDeleted = (context: SocketServerToClientEventContext<TrainEventContext>) => {
+            if (
+                entity.value.id !== context.data.id ||
+                context.meta.roomId !== entity.value.id
+            ) return;
+
+            navigateTo('/trains');
+        };
+
+        const socket = useSocket().useRealmWorkspace(entity.value.realm_id);
+
+        onMounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.TRAIN,
+                DomainEventSubscriptionName.SUBSCRIBE,
+            ));
+
+            socket.on(buildDomainEventFullName(
+                DomainType.TRAIN,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
+
+            socket.on(buildDomainEventFullName(
+                DomainType.TRAIN,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
+        });
+
+        onUnmounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.TRAIN,
+                DomainEventSubscriptionName.UNSUBSCRIBE,
+            ));
+
+            socket.off(buildDomainEventFullName(
+                DomainType.TRAIN,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
+
+            socket.off(buildDomainEventFullName(
+                DomainType.TRAIN,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
+        });
+
+        const tabs = [
+            { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
+            { name: 'Setup', icon: 'fa fa-wrench', urlSuffix: '/setup' },
+        ];
+
+        return {
+            tabs,
+            entity,
+            handleUpdated,
+        };
     },
-};
+});
 </script>
 <template>
     <div>
@@ -111,36 +139,17 @@ export default {
             <div class="panel-card">
                 <div class="panel-card-body">
                     <div class="flex-wrap flex-row d-flex align-items-center">
-                        <div>
-                            <b-nav pills>
-                                <b-nav-item
-                                    :to="'/trains'"
-                                    exact
-                                    exact-active-class="active"
-                                >
-                                    <i class="fa fa-arrow-left" />
-                                </b-nav-item>
-
-                                <b-nav-item
-                                    v-for="(tab,key) in tabs"
-                                    :key="key"
-                                    :disabled="tab.active"
-                                    :to="'/trains/' + entity.id + tab.urlSuffix"
-                                    :active="$route.path.startsWith('/trains/'+entity.id + tab.urlSuffix) && tab.urlSuffix.length !== 0"
-                                    exact-active-class="active"
-                                    exact
-                                >
-                                    <i :class="tab.icon" />
-                                    {{ tab.name }}
-                                </b-nav-item>
-                            </b-nav>
-                        </div>
+                        <DomainEntityNav
+                            :prev-link="true"
+                            :items="tabs"
+                            :path="'/trains/' + entity.id"
+                        />
                     </div>
                 </div>
             </div>
         </div>
 
-        <nuxt-child
+        <NuxtPage
             :entity="entity"
             @updated="handleUpdated"
         />

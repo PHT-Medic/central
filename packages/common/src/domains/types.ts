@@ -61,9 +61,12 @@ export type DomainEventContext<T extends `${DomainType}`> =
                                                     UserSecretEventContext :
                                                     never;
 
+export type DomainInput = `${DomainType}` | DomainType | `${DomainSubType}` | DomainSubType;
+
 export type DomainEventFullName<
-    T extends `${DomainType}` | `${DomainSubType}` = `${DomainType}` | `${DomainSubType}`,
+    T extends DomainInput = DomainInput,
 > = `${T}${Capitalize<`${DomainEventName}`>}`;
+
 export type DomainEventSubscriptionFullName<
-    T extends `${DomainType}` | `${DomainSubType}` = `${DomainType}` | `${DomainSubType}`,
+    T extends DomainInput = DomainInput,
 > = `${T}${Capitalize<`${DomainEventSubscriptionName}`>}`;

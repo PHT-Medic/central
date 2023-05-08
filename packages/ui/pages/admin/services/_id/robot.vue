@@ -6,9 +6,9 @@
   -->
 <script lang="ts">
 import type { ServiceID } from '@personalhealthtrain/central-common';
-import { useAPIClient } from '@authup/vue2';
 import type { PropType } from 'vue';
 import Vue from 'vue';
+import { useAuthupAPI } from '#imports';
 
 export default {
     props: {
@@ -27,7 +27,7 @@ export default {
     methods: {
         async load() {
             try {
-                const response = await useAPIClient().robot.getMany({
+                const response = await useAuthupAPI().robot.getMany({
                     filter: {
                         name: this.entityId,
                     },

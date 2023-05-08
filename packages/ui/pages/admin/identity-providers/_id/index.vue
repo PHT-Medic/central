@@ -5,25 +5,40 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { OAuth2ProviderForm } from '@authup/client-vue';
 import type { IdentityProvider } from '@authup/core';
+import { toRefs } from 'vue';
 import type { PropType } from 'vue';
+import { defineNuxtComponent } from '#app';
 
-export default {
+export default defineNuxtComponent({
+    components: {
+        OAuth2ProviderForm,
+    },
     props: {
         entity: Object as PropType<IdentityProvider>,
+        required: true,
     },
-    methods: {
-        handleUpdated(e) {
-            this.$emit('updated', e);
-        },
-        handleFailed(e) {
-            this.$emit('failed', e);
-        },
-    },
-};
+    emits: ['updated', 'failed'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
+
+
+            const handleUpdated = (e: IdentityProvider) => {
+                this.$emit('updated', e);
+            },
+            handleFailed(e) {
+                this.$emit('failed', e);
+            },
+
+        return {
+            entity: refs.entity,
+        };
+    }
+});
 </script>
 <template>
-    <o-auth2-provider-form
+    <OAuth2ProviderForm
         :entity="entity"
         :realm-id="entity.realm_id"
         @updated="handleUpdated"

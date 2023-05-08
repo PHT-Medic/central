@@ -5,16 +5,20 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { defineNuxtComponent } from '#app';
+import { definePageMeta } from '#imports';
 import WorldSvg from '../components/svg/World';
 import { LayoutKey, LayoutNavigationID } from '../config/layout';
 
-export default {
+export default defineNuxtComponent({
     components: { WorldSvg },
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+        });
     },
-};
+});
 </script>
 <template>
     <div class="">

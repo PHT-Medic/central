@@ -59,7 +59,7 @@ export class SocketModule {
 
     //--------------------------------------------------------------------
 
-    public useRealmWorkspace(realmId?: string | null) {
+    public useRealmWorkspace(realmId?: string | null) : SocketInterface {
         const nuxtApp = useNuxtApp();
         const store = useAuthStore(nuxtApp.$pinia as Pinia);
 

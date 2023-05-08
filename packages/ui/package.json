@@ -42,7 +42,7 @@
         "hapic": "^2.0.0-alpha.9",
         "ilingo": "^2.4.0",
         "moment": "^2.29.4",
-        "nuxt": "^3.4.2",
+        "nuxt": "^3.4.3",
         "pinia": "^2.0.35",
         "rapiq": "^0.8.0",
         "socket.io-client": "^4.6.1",

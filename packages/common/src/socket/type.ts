@@ -31,7 +31,7 @@ export type SocketClientToServerEventCallback = () => void;
 export type SocketClientToServerEventErrorCallback = (error?: Error) => void;
 
 export type SocketClientToServerEvents = {
-    [K in `${DomainEventSubscriptionFullName}`]: (
+    [K in DomainEventSubscriptionFullName<`${DomainType}`>]: (
         target?: SocketClientToServerEventTarget,
         cb?: SocketClientToServerEventCallback | SocketClientToServerEventErrorCallback
     ) => void
