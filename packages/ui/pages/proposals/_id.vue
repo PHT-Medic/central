@@ -5,161 +5,181 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { DomainEventName } from '@authup/core';
 import type {
     Proposal,
-    SocketClientToServerEvents,
+    ProposalEventContext,
+    ProposalStation,
     SocketServerToClientEventContext,
-    SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
 import {
+    DomainEventSubscriptionName,
+    DomainType,
     PermissionID,
-    ProposalSocketClientToServerEventName,
+    buildDomainEventFullName,
+    buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
-import Vue from 'vue';
-import type { Socket } from 'socket.io-client';
+import { storeToRefs } from 'pinia';
+import type { Ref } from 'vue';
+import {
+    computed, onMounted, onUnmounted, ref,
+} from 'vue';
+import {
+    definePageMeta, updateObjectProperties, useAPI, useSocket,
+} from '#imports';
+import {
+    createError, defineNuxtComponent, navigateTo, useRoute,
+} from '#app';
+import DomainEntityNav from '../../components/DomainEntityNav';
 import { LayoutKey, LayoutNavigationID } from '../../config/layout';
+import { useAuthStore } from '../../store/auth';
 
-export default {
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-    },
-    async asyncData(context) {
+export default defineNuxtComponent({
+    components: { DomainEntityNav },
+    async setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+        });
+
+        const store = useAuthStore();
+        const { realmId } = storeToRefs(store);
+
+        let entity : Ref<Proposal>;
+        let proposalStation : Ref<ProposalStation>;
+
+        const route = useRoute();
+
         try {
-            const proposal = await context.$api.proposal.getOne(context.params.id, {
+            const response = await useAPI().proposal.getOne(route.params.id as string, {
                 include: {
                     master_image: true,
                 },
             });
 
-            const { realm_id: realmId } = context.store.getters['auth/user'];
+            if (response.realm_id !== realmId.value) {
+                const response = await useAPI().proposalStation.getMany({
+                    filter: {
+                        proposal_id: entity.value.id,
+                        station_realm_id: realmId,
+                    },
+                });
 
-            let visitorProposalStation = null;
+                const data = response.data.pop();
 
-            if (proposal.realm_id !== realmId) {
-                try {
-                    const response = await context.$api.proposalStation.getMany({
-                        filter: {
-                            proposal_id: proposal.id,
-                            station_realm_id: realmId,
-                        },
-                    });
-
-                    if (response.meta.total > 0) {
-                        // eslint-disable-next-line prefer-destructuring
-                        visitorProposalStation = response.data[0];
-                    }
-                } catch (e) {
-                    // ...
+                if (data) {
+                    proposalStation = ref(data);
                 }
             }
-
-            return {
-                entity: proposal,
-                visitorProposalStation,
-            };
         } catch (e) {
-            await context.redirect('/proposals');
-
-            return {
-
-            };
+            await navigateTo({ path: '/proposals' });
+            throw createError({});
         }
-    },
-    data() {
-        return {
-            entity: null,
 
-            visitorProposalStation: null,
+        const isProposalOwner = computed(() => realmId.value === entity.value.realm_id);
 
-            proposalStations: [],
-            proposalStationsLoading: false,
-        };
-    },
-    computed: {
-        isProposalOwner() {
-            return this.$store.getters['auth/user'].realm_id === this.entity.realm_id;
-        },
-        isStationAuthority() {
-            return !!this.visitorProposalStation;
-        },
-        backLink() {
-            if (typeof this.$route.query.refPath === 'string') {
-                return this.$route.query.refPath;
+        const isStationAuthority = computed(() => !!proposalStation.value);
+
+        const backLink = computed(() => {
+            if (typeof route.query.refPath === 'string') {
+                return route.query.refPath;
             }
 
             return '/proposals';
-        },
+        });
 
-        tabs() {
+        const tabs = computed(() => {
             const items = [
                 { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
 
             ];
 
-            if (
-                this.isProposalOwner || this.isStationAuthority
-            ) {
+            if (isProposalOwner.value || isStationAuthority.value) {
                 items.push({ name: 'Trains', icon: 'fas fa-train', urlSuffix: '/trains' });
             }
 
             if (
-                this.isProposalOwner &&
-                this.$auth.has(PermissionID.PROPOSAL_EDIT)
+                isProposalOwner.value &&
+                store.has(PermissionID.PROPOSAL_EDIT)
             ) {
                 items.push({ name: 'Settings', icon: 'fa fa-cog', urlSuffix: '/settings' });
             }
 
             return items;
-        },
-    },
-    mounted() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
-        socket.emit(ProposalSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.entity.id } });
-        socket.on('proposalUpdated', this.handleSocketUpdated);
-        socket.on('proposalDeleted', this.handleSocketDeleted);
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.entity.realm_id);
-        socket.emit(ProposalSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.entity.id } });
-        socket.off('proposalUpdated', this.handleSocketUpdated);
-        socket.off('proposalDeleted', this.handleSocketDeleted);
-    },
-    methods: {
-        handleSocketUpdated(context: SocketServerToClientEventContext<Proposal>) {
+        });
+
+        const handleUpdated = (data: Proposal) => {
+            updateObjectProperties(entity, data);
+        };
+
+        const handleDeleted = async () => {
+            await navigateTo('/proposals');
+        };
+
+        const handleSocketUpdated = (context: SocketServerToClientEventContext<ProposalEventContext>) => {
             if (
-                this.entity.id !== context.data.id ||
-                context.meta.roomId !== this.entity.id
+                entity.value.id !== context.data.id ||
+                context.meta.roomId !== entity.value.id
             ) return;
 
-            this.handleUpdated(context.data);
-        },
-        async handleSocketDeleted(context: SocketServerToClientEventContext<Proposal>) {
+            handleUpdated(context.data);
+        };
+
+        const handleSocketDeleted = (context: SocketServerToClientEventContext<ProposalEventContext>) => {
             if (
-                this.entity.id !== context.data.id ||
-                context.meta.roomId !== this.entity.id
+                entity.value.id !== context.data.id ||
+                context.meta.roomId !== entity.value.id
             ) return;
 
-            await this.handleDeleted();
-        },
+            handleDeleted();
+        };
 
-        handleUpdated(data) {
-            const keys = Object.keys(data);
-            for (let i = 0; i < keys.length; i++) {
-                Vue.set(this.entity, keys[i], data[keys[i]]);
-            }
-        },
-        async handleDeleted() {
-            await this.$nuxt.$router.push('/proposals');
-        },
+        const socket = useSocket().useRealmWorkspace(entity.value.realm_id);
+
+        onMounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.PROPOSAL,
+                DomainEventSubscriptionName.SUBSCRIBE,
+            ), entity.value.id);
+
+            socket.on(buildDomainEventFullName(
+                DomainType.PROPOSAL,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
+
+            socket.on(buildDomainEventFullName(
+                DomainType.PROPOSAL,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
+        });
+
+        onUnmounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.PROPOSAL,
+                DomainEventSubscriptionName.UNSUBSCRIBE,
+            ), entity.value.id);
+
+            socket.off(buildDomainEventFullName(
+                DomainType.PROPOSAL,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
+
+            socket.on(buildDomainEventFullName(
+                DomainType.PROPOSAL,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
+        });
+
+        return {
+            entity,
+            proposalStation,
+            backLink,
+            tabs,
+            handleDeleted,
+            handleUpdated,
+        };
     },
-};
+});
 </script>
 <template>
     <div>
@@ -171,38 +191,19 @@ export default {
             <div class="panel-card">
                 <div class="panel-card-body">
                     <div class="flex-wrap flex-row d-flex align-items-center">
-                        <div>
-                            <b-nav pills>
-                                <b-nav-item
-                                    :to="backLink"
-                                    exact
-                                    exact-active-class="active"
-                                >
-                                    <i class="fa fa-arrow-left" />
-                                </b-nav-item>
-
-                                <b-nav-item
-                                    v-for="(tab,key) in tabs"
-                                    :key="key"
-                                    :disabled="tab.active"
-                                    :to="'/proposals/' + entity.id + tab.urlSuffix"
-                                    :active="$route.path.startsWith('/proposals/'+entity.id + tab.urlSuffix) && tab.urlSuffix.length !== 0"
-                                    exact-active-class="active"
-                                    exact
-                                >
-                                    <i :class="tab.icon" />
-                                    {{ tab.name }}
-                                </b-nav-item>
-                            </b-nav>
-                        </div>
+                        <DomainEntityNav
+                            :items="tabs"
+                            :path="'/proposals/' + entity.id"
+                            :prev-link="true"
+                        />
                     </div>
                 </div>
             </div>
         </div>
 
-        <nuxt-child
+        <NuxtPage
             :proposal="entity"
-            :visitor-proposal-station="visitorProposalStation"
+            :visitor-proposal-station="proposalStation"
             @deleted="handleDeleted"
             @updated="handleUpdated"
         />

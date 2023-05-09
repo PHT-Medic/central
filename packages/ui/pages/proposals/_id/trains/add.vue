@@ -5,27 +5,37 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { toRefs } from 'vue';
 import type { PropType } from 'vue';
 import type { Proposal } from '@personalhealthtrain/central-common';
+import { defineNuxtComponent, navigateTo } from '#app';
 import TrainBasicForm from '../../../../components/domains/train/TrainBasicForm.vue';
 
-export default {
+export default defineNuxtComponent({
     components: { TrainBasicForm },
     props: {
-        proposal: Object as PropType<Proposal>,
-    },
-    methods: {
-        handleCreated() {
-            this.$router.push({ path: `/proposals/${this.proposal.id}/trains` });
+        proposal: {
+            type: Object as PropType<Proposal>,
+            required: true,
         },
     },
-};
+    setup(props) {
+        const refs = toRefs(props);
+
+        const handleCreated = async () => {
+            await navigateTo(`/proposals/${refs.proposal.value.id}/trains`);
+        };
+
+        return {
+            handleCreated,
+            proposal: refs.proposal,
+        };
+    },
+});
 </script>
 <template>
-    <div>
-        <train-basic-form
-            :proposal-id="proposal.id"
-            @created="handleCreated"
-        />
-    </div>
+    <TrainBasicForm
+        :proposal-id="proposal.id"
+        @created="handleCreated"
+    />
 </template>

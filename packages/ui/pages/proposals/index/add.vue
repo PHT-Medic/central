@@ -11,22 +11,23 @@ import {
 } from '@personalhealthtrain/central-common';
 
 import { useToast } from 'bootstrap-vue-next';
-import { navigateTo } from '#app';
+import { definePageMeta } from '#imports';
+import { defineNuxtComponent, navigateTo } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import ProposalForm from '../../../components/domains/proposal/ProposalForm';
 
-export default {
+export default defineNuxtComponent({
     components: {
         ProposalForm,
     },
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.PROPOSAL_ADD,
-        ],
-    },
     setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.PROPOSAL_ADD,
+            ],
+        });
         const toast = useToast();
 
         const handleCreated = (entity: Proposal) => {
@@ -43,8 +44,8 @@ export default {
             handleCreated,
         };
     },
-};
+});
 </script>
 <template>
-    <proposal-form @created="handleCreated" />
+    <ProposalForm @created="handleCreated" />
 </template>

@@ -7,50 +7,54 @@
 <script lang="ts">
 import type { Proposal, ProposalStation } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { computed, toRefs } from 'vue';
 import type { PropType } from 'vue';
-import { TrainList } from '../../../../components/domains/train/TrainList';
+import { definePageMeta } from '#imports';
+import { defineNuxtComponent } from '#app';
+import TrainList from '../../../../components/domains/train/TrainList';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.TRAIN_ADD,
-            PermissionID.TRAIN_EDIT,
-            PermissionID.TRAIN_DROP,
-
-            PermissionID.TRAIN_RESULT_READ,
-
-            PermissionID.TRAIN_EXECUTION_START,
-            PermissionID.TRAIN_EXECUTION_STOP,
-        ],
-    },
+export default defineNuxtComponent({
     components: { TrainList },
+    setup(props) {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.TRAIN_ADD,
+                PermissionID.TRAIN_EDIT,
+                PermissionID.TRAIN_DROP,
+
+                PermissionID.TRAIN_RESULT_READ,
+
+                PermissionID.TRAIN_EXECUTION_START,
+                PermissionID.TRAIN_EXECUTION_STOP,
+            ],
+        });
+
+        const refs = toRefs(props);
+
+        const query = computed(() => ({
+            filter: {
+                proposal_id: refs.proposal.value.id,
+            },
+        }));
+
+        return {
+            query,
+        };
+    },
     props: {
         proposal: {
             type: Object as PropType<Proposal>,
-            default() {
-                return {};
-            },
+            required: true,
         },
         visitorProposalStation: {
             type: Object as PropType<ProposalStation>,
             default: undefined,
         },
     },
-    computed: {
-        query() {
-            return {
-                filter: {
-                    proposal_id: this.proposal.id,
-                },
-            };
-        },
-    },
-    methods: {
-    },
-};
+});
 </script>
 <template>
     <div>

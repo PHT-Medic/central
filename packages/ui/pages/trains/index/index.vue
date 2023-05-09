@@ -4,37 +4,50 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import type { Train } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { TrainList } from '../../../components/domains/train/TrainList';
+import { storeToRefs } from 'pinia';
+import type { BuildInput } from 'rapiq';
+import { computed } from 'vue';
+import { definePageMeta } from '#imports';
+import { defineNuxtComponent } from '#app';
+import TrainList from '../../../components/domains/train/TrainList';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
+import { useAuthStore } from '../../../store/auth';
 
-export default {
+export default defineNuxtComponent({
     components: { TrainList },
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.TRAIN_ADD,
-            PermissionID.TRAIN_EDIT,
-            PermissionID.TRAIN_DROP,
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.TRAIN_ADD,
+                PermissionID.TRAIN_EDIT,
+                PermissionID.TRAIN_DROP,
 
-            PermissionID.TRAIN_RESULT_READ,
+                PermissionID.TRAIN_RESULT_READ,
 
-            PermissionID.TRAIN_EXECUTION_START,
-            PermissionID.TRAIN_EXECUTION_STOP,
-        ],
+                PermissionID.TRAIN_EXECUTION_START,
+                PermissionID.TRAIN_EXECUTION_STOP,
+            ],
+        });
+
+        const store = useAuthStore();
+        const { realmId } = storeToRefs(store);
+
+        const query = computed<BuildInput<Train>>(() => ({
+            filter: {
+                realm_id: realmId.value,
+            },
+        }));
+
+        return {
+            query,
+        };
     },
-    computed: {
-        query() {
-            return {
-                filter: {
-                    realm_id: this.$store.getters['auth/realmId'],
-                },
-            };
-        },
-    },
-};
+});
 </script>
 <template>
     <div>

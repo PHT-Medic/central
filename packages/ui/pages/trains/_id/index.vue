@@ -7,24 +7,34 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import type { Train } from '@personalhealthtrain/central-common';
+import { defineNuxtComponent } from '#app';
 import TrainLogs from '../../../components/domains/train/TrainLogs';
 import TrainPipeline from '../../../components/domains/train/TrainPipeline.vue';
 import TrainStationsProgress from '../../../components/domains/train-station/TrainStationsProgress.vue';
 
-export default {
+export default defineNuxtComponent({
     components: { TrainLogs, TrainPipeline, TrainStationsProgress },
     props: {
-        entity: Object as PropType<Train>,
+        entity: {
+            type: Object as PropType<Train>,
+            required: true,
+        },
     },
-    methods: {
-        handleUpdated(train) {
+    setup() {
+        const handleUpdated = (train: Train) => {
             this.$emit('updated', train);
-        },
-        handleFailed(e) {
+        };
+
+        const handleFailed = (e: Error) => {
             this.$emit('failed', e);
-        },
+        };
+
+        return {
+            handleUpdated,
+            handleFailed,
+        };
     },
-};
+});
 </script>
 
 <template>

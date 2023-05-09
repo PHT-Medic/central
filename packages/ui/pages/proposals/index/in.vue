@@ -5,111 +5,117 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import Vue from 'vue';
+import type { ProposalStation } from '@personalhealthtrain/central-common';
 import {
     PermissionID,
 } from '@personalhealthtrain/central-common';
-import { ProposalInForm } from '../../../components/domains/proposal/ProposalInForm';
+import type { BModal } from 'bootstrap-vue-next';
+import { storeToRefs } from 'pinia';
+import type { Ref } from 'vue';
+import { computed, ref } from 'vue';
+import { defineNuxtComponent } from '#app';
+import { definePageMeta } from '#imports';
+import ProposalInForm from '../../../components/domains/proposal/ProposalInForm';
 import ProposalStationApprovalStatus from '../../../components/domains/proposal-station/ProposalStationApprovalStatus';
 import ProposalStationApprovalCommand from '../../../components/domains/proposal-station/ProposalStationApprovalCommand';
+import { useAPI } from '../../../composables/api';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
-import { ProposalStationList } from '../../../components/domains/proposal-station/ProposalStationList';
+import ProposalStationList from '../../../components/domains/proposal-station/ProposalStationList';
+import { useAuthStore } from '../../../store/auth';
 
-export default Vue.extend({
+export default defineNuxtComponent({
     components: {
         ProposalStationList,
         ProposalStationApprovalCommand,
         ProposalStationApprovalStatus,
         ProposalInForm,
     },
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.PROPOSAL_APPROVE,
-        ],
-    },
-    data() {
-        return {
-            item: undefined,
-            itemBusy: false,
-            busy: false,
-            fields: [
-                {
-                    key: 'proposal_id', label: 'Id', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'proposal_title', label: 'Title', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'approval_status', label: 'Status', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
-                },
-                { key: 'options', label: '', tdClass: 'text-left' },
+    async setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.PROPOSAL_APPROVE,
             ],
-            items: [],
-            meta: {
-                limit: 10,
-                offset: 0,
-                total: 0,
-            },
+        });
 
-            stationId: null,
-        };
-    },
-    computed: {
-        realmId() {
-            return this.$store.getters['auth/realmId'];
-        },
-        canManage() {
-            return this.$auth.has(PermissionID.PROPOSAL_APPROVE);
-        },
-    },
-    created() {
-        this.init()
-            .then(this.load);
-    },
-    methods: {
-        /**
-         * Get station of current user.
-         *
-         * @return {Promise<void>}
-         */
-        async init() {
-            const response = await this.$api.station.getMany({
+        const fields = [
+            {
+                key: 'proposal_id', label: 'Id', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'proposal_title', label: 'Title', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'approval_status', label: 'Status', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+            },
+            { key: 'options', label: '', tdClass: 'text-left' },
+        ];
+
+        const store = useAuthStore();
+        const { realmId } = storeToRefs(store);
+
+        const canManage = computed(() => store.has(PermissionID.PROPOSAL_APPROVE));
+
+        const stationId : Ref<string | null> = ref(null);
+
+        try {
+            const response = await useAPI().station.getMany({
                 filter: {
-                    realm_id: this.realmId,
+                    realm_id: realmId.value,
                 },
             });
 
-            if (response.meta.total !== 1) {
-                return;
+            const station = response.data.pop();
+            if (station) {
+                stationId.value = station.id;
+            }
+        } catch (e) {
+            // do nothing :)
+        }
+
+        const modalNode = ref<null | BModal>(null);
+
+        const entity = ref<null | ProposalStation>(null);
+
+        const edit = (item: ProposalStation) => {
+            entity.value = item;
+
+            if (modalNode.value) {
+                modalNode.value.show();
+            }
+        };
+
+        const listNode = ref<null | ProposalStationList>(null);
+
+        const handleUpdated = (item: ProposalStation) => {
+            if (listNode.value) {
+                listNode.value.handleUpdated(item);
             }
 
-            this.stationId = response.data[0].id;
-        },
-
-        async edit(item) {
-            this.item = item;
-
-            this.$refs.form.show();
-        },
-
-        handleUpdated(item) {
-            if (this.$refs.itemList) {
-                this.$refs.itemList.handleUpdated(item);
+            if (modalNode.value) {
+                modalNode.value.hide();
             }
+        };
 
-            this.$refs.form.hide();
-        },
+        return {
+            realmId,
+            stationId,
+            entity,
+            handleUpdated,
+            canManage,
+            edit,
+            fields,
+        };
     },
 });
 </script>
@@ -121,7 +127,7 @@ export default Vue.extend({
         </div>
         <div class="m-t-10">
             <proposal-station-list
-                ref="itemList"
+                ref="listNode"
                 :direction="'in'"
                 :target="'proposal'"
                 :realm-id="realmId"
@@ -132,7 +138,7 @@ export default Vue.extend({
                 </template>
                 <template #items="props">
                     <b-table
-                        :items="props.items"
+                        :items="props.data"
                         :fields="fields"
                         :busy="props.busy"
                         head-variant="'dark'"
@@ -219,16 +225,16 @@ export default Vue.extend({
         </div>
 
         <b-modal
-            ref="form"
+            ref="modalNode"
             size="lg"
             button-size="sm"
-            :title-html="'<i class=\'fas fa-file-import\'></i> Proposal' + (item ? ': '+item.proposal.title : '')"
+            :title-html="'<i class=\'fas fa-file-import\'></i> Proposal' + (entity ? ': '+entity.proposal.title : '')"
             :no-close-on-backdrop="true"
             :no-close-on-esc="true"
             :hide-footer="true"
         >
             <proposal-in-form
-                :entity="item"
+                :entity="entity"
                 @updated="handleUpdated"
             />
         </b-modal>

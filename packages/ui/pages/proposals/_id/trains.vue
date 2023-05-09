@@ -4,79 +4,67 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<template>
-    <div>
-        <div class="content-wrapper">
-            <div class="content-sidebar flex-column">
-                <b-nav
-                    pills
-                    vertical
-                >
-                    <b-nav-item
-                        v-for="(item,key) in sidebar.items"
-                        :key="key"
-                        :disabled="item.active"
-                        :to="'/proposals/' + proposal.id + '/trains' + item.urlSuffix"
-                        exact
-                        exact-active-class="active"
-                    >
-                        <i :class="item.icon" />
-                        {{ item.name }}
-                    </b-nav-item>
-                </b-nav>
-            </div>
-            <div class="content-container">
-                <nuxt-child
-                    :proposal="proposal"
-                    :visitor-proposal-station="visitorProposalStation"
-                />
-            </div>
-        </div>
-    </div>
-</template>
 <script lang="ts">
+import { storeToRefs } from 'pinia';
+import { computed, toRefs } from 'vue';
 import type { PropType } from 'vue';
 import type { Proposal, ProposalStation } from '@personalhealthtrain/central-common';
+import { defineNuxtComponent } from '#app';
+import DomainEntityNav from '../../../components/DomainEntityNav';
+import { useAuthStore } from '../../../store/auth';
 
-export default {
+export default defineNuxtComponent({
+    components: { DomainEntityNav },
     props: {
-        proposal: Object as PropType<Proposal>,
+        proposal: {
+            type: Object as PropType<Proposal>,
+            required: true,
+        },
         visitorProposalStation: {
             type: Object as PropType<ProposalStation>,
             default: undefined,
         },
     },
-    data() {
-        return {
-            sidebar: {
-                items: [],
+    setup(props) {
+        const refs = toRefs(props);
+
+        const store = useAuthStore();
+        const { realmId } = storeToRefs(store);
+
+        const isOwner = computed(() => refs.proposal.value.realm_id === realmId.value);
+
+        const tabs = computed(() => [
+            {
+                name: 'Overview', routeName: 'settings-id', icon: 'fas fa-bars', urlSuffix: '',
             },
+            ...(isOwner.value ? [
+                {
+                    name: 'Add', routeName: 'settings-id-security', icon: 'fa fa-plus', urlSuffix: '/add',
+                },
+            ] : []),
+        ]);
+
+        return {
+            proposal: refs.proposal,
+            visitorProposalStation: refs.visitorProposalStation,
+            tabs,
         };
     },
-    computed: {
-        isOwner() {
-            return this.proposal.realm_id === this.$store.getters['auth/realmId'];
-        },
-    },
-    created() {
-        this.fillSidebar();
-    },
-    methods: {
-        fillSidebar() {
-            const items = [
-                {
-                    name: 'Overview', routeName: 'settings-id', icon: 'fas fa-bars', urlSuffix: '',
-                },
-            ];
-
-            if (this.isOwner) {
-                items.push({
-                    name: 'Add', routeName: 'settings-id-security', icon: 'fa fa-plus', urlSuffix: '/add',
-                });
-            }
-
-            this.sidebar.items = items;
-        },
-    },
-};
+});
 </script>
+<template>
+    <div class="content-wrapper">
+        <div class="content-sidebar flex-column">
+            <DomainEntityNav
+                :items="tabs"
+                :path="'/proposals/' + proposal.id + '/trains'"
+            />
+        </div>
+        <div class="content-container">
+            <NuxtPage
+                :proposal="proposal"
+                :visitor-proposal-station="visitorProposalStation"
+            />
+        </div>
+    </div>
+</template>

@@ -7,11 +7,14 @@
 <script lang="ts">
 import type { Proposal } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { useToast } from 'bootstrap-vue-next';
+import { toRefs } from 'vue';
 import type { PropType } from 'vue';
+import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
-import { ProposalForm } from '../../../components/domains/proposal/ProposalForm';
+import ProposalForm from '../../../components/domains/proposal/ProposalForm';
 
-export default {
+export default defineNuxtComponent({
     meta: {
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -22,22 +25,31 @@ export default {
     },
     components: { ProposalForm },
     props: {
-        proposal: Object as PropType<Proposal>,
-    },
-    methods: {
-        handleUpdated(entity) {
-            this.$bvToast.toast('The proposal was successfully updated.', {
-                variant: 'success',
-                toaster: 'b-toaster-top-center',
-            });
-
-            this.$emit('updated', entity);
+        proposal: {
+            type: Object as PropType<Proposal>,
+            required: true,
         },
     },
-};
+    emits: ['updated'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
+        const toast = useToast();
+
+        const handleUpdated = (entity: Proposal) => {
+            toast.success({ body: 'The proposal was successfully updated.' });
+
+            emit('updated', entity);
+        };
+
+        return {
+            proposal: refs.proposal,
+            handleUpdated,
+        };
+    },
+});
 </script>
 <template>
-    <proposal-form
+    <ProposalForm
         :entity="proposal"
         @updated="handleUpdated"
     />

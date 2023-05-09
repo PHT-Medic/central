@@ -7,22 +7,27 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import type { Train } from '@personalhealthtrain/central-common';
+import { navigateTo } from '#imports';
+import { defineNuxtComponent } from '#app';
 import TrainWizard from '../../../components/domains/train/wizard/TrainWizard.vue';
 
-export default {
+export default defineNuxtComponent({
     components: { TrainWizard },
     props: {
-        entity: Object as PropType<Train>,
+        entity: {
+            type: Object as PropType<Train>,
+            required: true,
+        },
     },
     methods: {
         async handleFinished() {
-            await this.$nuxt.$router.push(`/trains/${this.entity.id}`);
+            await navigateTo(`/trains/${this.entity.id}`);
         },
         handleUpdated(train) {
             this.$emit('updated', train);
         },
     },
-};
+});
 </script>
 <template>
     <train-wizard

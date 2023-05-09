@@ -5,82 +5,92 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import Vue from 'vue';
-import type { TrainStation } from '@personalhealthtrain/central-common';
+import type { Train, TrainStation } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { storeToRefs } from 'pinia';
+import type { BuildInput } from 'rapiq';
+import { computed, ref } from 'vue';
+import { defineNuxtComponent, useRuntimeConfig } from '#app';
+import { definePageMeta, useAPI } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
-import { TrainStationList } from '../../../components/domains/train-station/TrainStationList';
+import TrainStationList from '../../../components/domains/train-station/TrainStationList';
 import TrainStationApprovalStatus from '../../../components/domains/train-station/TrainStationApprovalStatus';
 import TrainStationApprovalCommand from '../../../components/domains/train-station/TrainStationApprovalCommand';
 import TrainStationRunStatus from '../../../components/domains/train-station/TrainStationRunStatus';
+import { useAuthStore } from '../../../store/auth';
 
-export default Vue.extend({
+export default defineNuxtComponent({
     components: {
         TrainStationRunStatus,
         TrainStationApprovalCommand,
         TrainStationApprovalStatus,
         TrainStationList,
     },
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.TRAIN_APPROVE,
-        ],
-    },
-    data() {
-        return {
-            viewerStation: null,
-            fields: [
-                {
-                    key: 'train_id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'approval_status', label: 'Approval Status', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'run_status', label: 'Run Status', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'created_at', label: 'Created At', thClass: 'text-left', tdClass: 'text-left',
-                },
-                { key: 'options', label: '', tdClass: 'text-left' },
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.TRAIN_APPROVE,
             ],
+        });
+
+        const fields = [
+            {
+                key: 'train_id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'realm', label: 'Realm', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'approval_status', label: 'Approval Status', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'run_status', label: 'Run Status', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'updated_at', label: 'Updated At', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'created_at', label: 'Created At', thClass: 'text-left', tdClass: 'text-left',
+            },
+            { key: 'options', label: '', tdClass: 'text-left' },
+        ];
+
+        const store = useAuthStore();
+        const { realmId } = storeToRefs(store);
+
+        const canManage = computed(() => store.has(PermissionID.TRAIN_APPROVE));
+
+        const query = computed<BuildInput<Train>>(() => ({
+            include: {
+                station: true,
+            },
+        }));
+
+        const download = (item: TrainStation) => {
+            const app = useRuntimeConfig();
+
+            window.open(new URL(useAPI().train.getFilesDownloadPath(item.train_id), app.$config.public.apiUrl).href, '_blank');
         };
-    },
-    computed: {
-        realmId() {
-            return this.$store.getters['auth/realmId'];
-        },
-        canManage() {
-            return this.$auth.has(PermissionID.TRAIN_APPROVE);
-        },
-        query() {
-            return {
-                include: {
-                    station: true,
-                },
-            };
-        },
-    },
-    methods: {
-        download(item: TrainStation) {
-            window.open(new URL(this.$api.train.getFilesDownloadPath(item.train_id), this.$config.apiUrl).href, '_blank');
-        },
 
-        handleUpdated(item) {
-            if (this.$refs.itemList) {
-                this.$refs.itemList.handleUpdated(item);
+        const listNode = ref<null | TrainStationList>(null);
+
+        const handleUpdated = (item: TrainStation) => {
+            if (listNode.value) {
+                listNode.value.handleUpdated(item);
             }
+        };
 
-            this.$refs.form.hide();
-        },
+        return {
+            fields,
+            realmId,
+            canManage,
+            query,
+            download,
+            handleUpdated,
+            listNode,
+        };
     },
 });
 </script>
@@ -91,8 +101,8 @@ export default Vue.extend({
         </div>
 
         <div class="m-t-10">
-            <train-station-list
-                ref="itemList"
+            <TrainStationList
+                ref="listNode"
                 :target="'train'"
                 :realm-id="realmId"
                 :direction="'in'"
@@ -103,7 +113,7 @@ export default Vue.extend({
                 </template>
                 <template #items="props">
                     <b-table
-                        :items="props.items"
+                        :items="props.data"
                         :fields="fields"
                         :busy="props.busy"
                         head-variant="'dark'"
@@ -185,7 +195,7 @@ export default Vue.extend({
                         </template>
                     </b-table>
                 </template>
-            </train-station-list>
+            </TrainStationList>
         </div>
     </div>
 </template>

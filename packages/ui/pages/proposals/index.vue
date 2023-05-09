@@ -4,39 +4,41 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import { LayoutKey, LayoutNavigationID } from '../../config/layout';
+<script lang="ts">
+import { defineNuxtComponent } from '#app';
+import { definePageMeta } from '#imports';
+import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-    },
-    data() {
-        return {
-            sidebar: {
-                hide: false,
-                items: [
-                    {
-                        name: 'Create',
-                        urlSuffix: '/add',
-                        icon: 'fa fa-plus',
-                    },
-                    {
-                        name: 'Outgoing',
-                        urlSuffix: '',
-                        icon: 'fa fa-file-export',
-                    },
-                    {
-                        name: 'Incoming',
-                        urlSuffix: '/in',
-                        icon: 'fa fa-file-import',
-                    },
-                ],
+export default defineNuxtComponent({
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+        });
+
+        const tabs = [
+            {
+                name: 'Create',
+                urlSuffix: '/add',
+                icon: 'fa fa-plus',
             },
+            {
+                name: 'Outgoing',
+                urlSuffix: '',
+                icon: 'fa fa-file-export',
+            },
+            {
+                name: 'Incoming',
+                urlSuffix: '/in',
+                icon: 'fa fa-file-import',
+            },
+        ];
+
+        return {
+            tabs,
         };
     },
-};
+});
 </script>
 <template>
     <div>
@@ -46,25 +48,14 @@ export default {
 
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
-                <b-nav
-                    pills
-                    vertical
-                >
-                    <b-nav-item
-                        v-for="(item,key) in sidebar.items"
-                        :key="key"
-                        :disabled="item.active"
-                        :to="'/proposals' + item.urlSuffix"
-                        exact
-                        exact-active-class="active"
-                    >
-                        <i :class="item.icon" />
-                        {{ item.name }}
-                    </b-nav-item>
-                </b-nav>
+                <DomainEntityNav
+                    :items="tabs"
+                    :path="'/proposals'"
+                    :direction="'vertical'"
+                />
             </div>
             <div class="content-container">
-                <nuxt-child />
+                <NuxtPage />
             </div>
         </div>
     </div>

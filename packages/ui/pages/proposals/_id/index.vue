@@ -148,14 +148,14 @@ export default defineNuxtComponent({
                 </div>
             </div>
             <div class="col">
-                <proposal-station-list
-                    :with-search="false"
+                <ProposalStationList
+                    :header-search="false"
                     :query="proposalStationQuery"
                 >
-                    <template #items="{ items }">
+                    <template #items="{ data }">
                         <div class="list">
                             <template
-                                v-for="item in items"
+                                v-for="item in data"
                                 :key="item.id"
                             >
                                 <div
@@ -173,7 +173,7 @@ export default defineNuxtComponent({
                             </template>
                         </div>
                     </template>
-                </proposal-station-list>
+                </ProposalStationList>
             </div>
         </div>
     </div>
