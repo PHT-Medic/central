@@ -34,6 +34,8 @@ export function publishDomainSocketEvent(
 
         emitter
             .in(roomName)
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             .emit(fullEventName, {
                 ...context,
                 meta: {
@@ -48,6 +50,8 @@ export function publishDomainSocketEvent(
             roomName = buildDomainEventChannelName(destinations[i].channel, context.data.id);
             emitter
                 .in(roomName)
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
                 .emit(fullEventName, {
                     ...context,
                     meta: {

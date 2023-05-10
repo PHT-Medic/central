@@ -7,8 +7,9 @@
 
 import type {
     DomainEventBaseContext,
-    DomainEventContext, DomainEventFullName,
-    DomainEventSubscriptionFullName,
+    DomainEventContext,
+    DomainEventFullName, DomainEventSubscriptionFullName,
+    DomainSubType,
     DomainType,
 } from '../domains';
 
@@ -20,7 +21,7 @@ export type SocketServerToClientEventContext<T extends DomainEventBaseContext> =
 };
 
 export type SocketServerToClientEvents = {
-    [K in `${DomainType}` as DomainEventFullName<K>]: (
+    [K in `${DomainType}` | `${DomainSubType}` as DomainEventFullName<K>]: (
         data: SocketServerToClientEventContext<DomainEventContext<K>>
     ) => void
 };
@@ -31,7 +32,7 @@ export type SocketClientToServerEventCallback = () => void;
 export type SocketClientToServerEventErrorCallback = (error?: Error) => void;
 
 export type SocketClientToServerEvents = {
-    [K in DomainEventSubscriptionFullName<`${DomainType}`>]: (
+    [K in DomainEventSubscriptionFullName<`${DomainType}` | `${DomainSubType}`>]: (
         target?: SocketClientToServerEventTarget,
         cb?: SocketClientToServerEventCallback | SocketClientToServerEventErrorCallback
     ) => void

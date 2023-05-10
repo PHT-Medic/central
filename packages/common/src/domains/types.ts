@@ -34,14 +34,14 @@ TrainFileEventContext |
 TrainStationEventContext |
 UserSecretEventContext;
 
-export type DomainEventContext<T extends `${DomainType}`> =
+export type DomainEventContext<T extends `${DomainType}` | `${DomainSubType}`> =
     T extends `${DomainType.MASTER_IMAGE}` ?
         MasterImageEventContext :
         T extends `${DomainType.MASTER_IMAGE_GROUP}` ?
             MasterImageGroupEventContext :
             T extends `${DomainType.PROPOSAL}` ?
                 ProposalEventContext :
-                T extends `${DomainType.PROPOSAL_STATION}` ?
+                T extends `${DomainType.PROPOSAL_STATION}` | `${DomainSubType.PROPOSAL_STATION_IN}` | `${DomainSubType.PROPOSAL_STATION_OUT}` ?
                     ProposalStationEventContext :
                     T extends `${DomainType.REGISTRY}` ?
                         RegistryEventContext :
@@ -55,7 +55,7 @@ export type DomainEventContext<T extends `${DomainType}`> =
                                         TrainLogEventContext :
                                         T extends `${DomainType.TRAIN_FILE}` ?
                                             TrainFileEventContext :
-                                            T extends `${DomainType.TRAIN_STATION}` ?
+                                            T extends `${DomainType.TRAIN_STATION}` | `${DomainSubType.TRAIN_STATION_IN}` | `${DomainSubType.TRAIN_STATION_OUT}` ?
                                                 TrainStationEventContext :
                                                 T extends `${DomainType.USER_SECRET}` ?
                                                     UserSecretEventContext :
