@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { DomainEventName } from '@authup/core';
 import type {
     ProposalStation,
     ProposalStationEventContext,
@@ -16,23 +17,16 @@ import {
     DomainType,
     buildDomainChannelName,
     buildDomainEventFullName,
-    buildDomainEventSubscriptionFullName, buildSocketProposalStationRoomName,
+    buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
-import type { FiltersBuildInput } from 'rapiq/dist/parameter';
+import type { BuildInput, FiltersBuildInput } from 'rapiq';
 
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
-import { DomainEventName } from '@authup/core';
-import type { BuildInput } from 'rapiq';
 import { realmIdForSocket } from '../../../composables/domain/realm';
 import { useSocket } from '../../../composables/socket';
-import type {
-    DomainListHeaderSearchOptionsInput,
-    DomainListHeaderTitleOptionsInput,
-} from '../../../core';
-import {
-    createDomainListBuilder,
-} from '../../../core';
+import type { DomainListHeaderSearchOptionsInput, DomainListHeaderTitleOptionsInput } from '../../../core';
+import { createDomainListBuilder } from '../../../core';
 
 enum Direction {
     IN = 'in',
@@ -177,7 +171,7 @@ export default defineComponent({
                         return room === buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT);
                 }
             } else {
-                return room === buildSocketProposalStationRoomName();
+                return room === buildDomainChannelName(DomainType.PROPOSAL_STATION);
             }
 
             return false;

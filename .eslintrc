@@ -22,7 +22,9 @@
             "peerDependencies": false
         }],
 
-        "@typescript-eslint/no-this-alias": "off"
+        "@typescript-eslint/no-this-alias": "off",
+
+        "vue/no-v-for-template-key": "off"
     },
     "ignorePatterns": [
         "**/dist/*",

@@ -15,7 +15,7 @@ import type { BuildInput } from 'rapiq';
 import type { FiltersBuildInput } from 'rapiq/dist/parameter';
 import type { Ref, VNodeArrayChildren } from 'vue';
 import {
-    ref, watch,
+    ref, unref, watch,
 } from 'vue';
 import { merge } from 'smob';
 import { buildDomainListFooterPagination } from '../list-footer';
@@ -73,6 +73,17 @@ export function createDomainListBuilder<T extends Record<string, any>>(
                 }
             }
 
+            if (
+                context.props.query &&
+                context.props.query.value
+            ) {
+                if (query) {
+                    query = merge({}, context.props.query.value, query);
+                } else {
+                    query = context.props.query.value;
+                }
+            }
+
             const response = await context.load(merge(
                 {
                     page: {
@@ -81,17 +92,30 @@ export function createDomainListBuilder<T extends Record<string, any>>(
                     },
                     filter,
                 },
-                context.props.query.value,
                 query || {},
             ));
 
-            data.value = response.data;
+            if (context.loadAll) {
+                data.value.push(...response.data);
+            } else {
+                data.value = response.data;
+            }
 
             meta.value.offset = response.meta.offset;
             meta.value.total = response.meta.total;
             meta.value.limit = response.meta.limit;
         } finally {
             busy.value = false;
+        }
+
+        if (
+            context.loadAll &&
+            meta.value.total > data.value.length
+        ) {
+            await load({
+                ...meta.value,
+                offset: meta.value.offset + meta.value.limit,
+            });
         }
     }
 
@@ -191,7 +215,13 @@ export function createDomainListBuilder<T extends Record<string, any>>(
         data,
     });
 
-    if (context.props.loadOnSetup) {
+    let loadOnSetup = true;
+    const propLoadOnSetup = unref(context.props.loadOnSetup);
+    if (typeof propLoadOnSetup === 'boolean') {
+        loadOnSetup = propLoadOnSetup;
+    }
+
+    if (loadOnSetup) {
         Promise.resolve()
             .then(() => load());
     }

@@ -5,14 +5,24 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import type { UserSecret } from '@personalhealthtrain/central-common';
 import {
     SecretStorageAPICommand, buildUserSecretsSecretStorageKey,
 } from '@personalhealthtrain/central-common';
+import { useToast } from 'bootstrap-vue-next';
+import { storeToRefs } from 'pinia';
+import type { BuildInput } from 'rapiq';
+import { computed, nextTick, ref } from 'vue';
+import type { Ref } from 'vue';
+import { useAPI } from '#imports';
+import { defineNuxtComponent } from '#app';
 import UserSecretForm from '../../../components/domains/user-secret/UserSecretForm';
-import { UserSecretList } from '../../../components/domains/user-secret/UserSecretList';
+import UserSecretList from '../../../components/domains/user-secret/UserSecretList';
 import EntityDelete from '../../../components/domains/EntityDelete';
+import { wrapFnWithBusyState } from '../../../core/busy';
+import { useAuthStore } from '../../../store/auth';
 
-export default {
+export default defineNuxtComponent({
     components: { EntityDelete, UserSecretList, UserSecretForm },
     data() {
         return {
@@ -20,96 +30,115 @@ export default {
             busy: false,
         };
     },
-    computed: {
-        user() {
-            return this.$store.getters['auth/user'];
-        },
-        itemId() {
-            return this.item ? this.item.id : undefined;
-        },
-        query() {
-            return { filter: { user_id: this.user.id }, sort: { created_at: 'DESC' } };
-        },
-    },
-    methods: {
-        handleCreated(item) {
-            this.$refs.itemsList.handleCreated(item);
+    setup() {
+        const toast = useToast();
 
-            this.$bvToast.toast('The secret was successfully created.', {
-                variant: 'success',
-                toaster: 'b-toaster-top-center',
-            });
-        },
-        handleUpdated(item) {
-            this.$refs.itemsList.handleUpdated(item);
+        const store = useAuthStore();
+        const { userId } = storeToRefs(store);
 
-            this.$bvToast.toast('The secret was successfully updated.', {
-                variant: 'info',
-                toaster: 'b-toaster-top-center',
-            });
-        },
-        handleDeleted(item) {
-            if (item.id === this.itemId) {
-                this.triggerEdit(this.item);
-            }
+        const busy = ref(false);
+        const entity : Ref<UserSecret | null> = ref(null);
+        const entityId = computed(() => (entity.value ? entity.value.id : undefined));
 
-            this.$bvToast.toast('The secret was successfully deleted.', {
-                variant: 'danger',
-                toaster: 'b-toaster-top-center',
-            });
-        },
+        const query = computed<BuildInput<UserSecret>>(() => ({
+            filter: { user_id: userId.value }, sort: { created_at: 'DESC' },
+        }));
 
-        handleFailed(e) {
-            this.$bvToast.toast(e.message, {
-                variant: 'warning',
-                toaster: 'b-toaster-top-center',
-            });
-        },
+        const formNode = ref<null | UserSecretForm>(null);
 
-        triggerEdit(item) {
-            if (!this.item || this.item.id !== item.id) {
-                this.item = item;
+        const triggerEdit = (item: UserSecret) => {
+            if (!entity.value || entity.value.id !== item.id) {
+                entity.value = item;
             } else {
-                this.item = undefined;
+                entity.value = null;
             }
 
-            this.$nextTick(() => {
-                this.$refs.itemForm.resetFormData();
+            nextTick(() => {
+                if (formNode.value) {
+                    formNode.value.resetFormData();
+                }
             });
-        },
-        async triggerSync() {
-            if (this.busy) return;
+        };
 
-            this.busy = true;
-
+        const triggerSync = wrapFnWithBusyState(busy, async () => {
             try {
-                await this.$api.service.runSecretStorageCommand(
+                await useAPI().service.runSecretStorageCommand(
                     SecretStorageAPICommand.ENGINE_KEY_SAVE,
                     {
-                        name: buildUserSecretsSecretStorageKey(this.$store.getters['auth/userId']),
+                        name: buildUserSecretsSecretStorageKey(userId.value),
                     },
                 );
 
-                this.$bvToast.toast('The secret was successfully synced.', {
-                    variant: 'success',
-                    toaster: 'b-toaster-top-center',
-                });
+                if (toast) {
+                    toast.success({ body: 'The secret was successfully synced.' });
+                }
             } catch (e) {
-                // ...
+                if (e instanceof Error && toast) {
+                    toast.warning({ body: e.message });
+                }
+            }
+        });
+
+        const listNode = ref<null | UserSecretList>(null);
+        const handleCreated = (item: UserSecret) => {
+            if (listNode.value) {
+                listNode.value.handleCreated(item);
             }
 
-            this.busy = false;
-        },
+            if (toast) {
+                toast.success({ body: 'The secret was successfully created.' });
+            }
+        };
+
+        const handleUpdated = (item: UserSecret) => {
+            if (listNode.value) {
+                listNode.value.handleUpdated(item);
+            }
+
+            if (toast) {
+                toast.success({ body: 'The secret was successfully updated.' });
+            }
+        };
+
+        const handleDeleted = (item: UserSecret) => {
+            if (entity.value && item.id === entityId.value) {
+                triggerEdit(entity.value);
+            }
+
+            if (toast) {
+                toast.success({ body: 'The secret was successfully deleted.' });
+            }
+        };
+
+        const handleFailed = (e: Error) => {
+            if (toast) {
+                toast.warning({ body: e.message });
+            }
+        };
+
+        return {
+            userId,
+            handleFailed,
+            handleUpdated,
+            handleCreated,
+            handleDeleted,
+            query,
+            listNode,
+            formNode,
+            triggerEdit,
+            triggerSync,
+            entityId,
+        };
     },
-};
+});
 </script>
 <template>
     <div class="row">
         <div class="col-4">
             <h6><i class="fa-solid fa-file-lines pr-1" /> Form</h6>
             <user-secret-form
-                ref="itemForm"
-                :user-id="user.id"
+                ref="formNode"
+                :user-id="userId"
                 :entity="item"
                 @failed="handleFailed"
                 @updated="handleUpdated"
@@ -118,7 +147,7 @@ export default {
         </div>
         <div class="col-8">
             <user-secret-list
-                ref="itemsList"
+                ref="listNode"
                 :query="query"
                 @deleted="handleDeleted"
             >
@@ -130,25 +159,25 @@ export default {
                         <button
                             type="button"
                             class="btn btn-xs"
-                            :class="{'btn-primary': itemId !== props.item.id, 'btn-dark': itemId === props.item.id}"
-                            @click.prevent="triggerEdit(props.item)"
+                            :class="{'btn-primary': entityId !== props.item.id, 'btn-dark': entityId === props.data.id}"
+                            @click.prevent="triggerEdit(props.data)"
                         >
                             <i
                                 class="fas"
-                                :class="{'fas fa-pen-alt': itemId !== props.item.id, 'fa fa-eject': itemId === props.item.id}"
+                                :class="{'fas fa-pen-alt': entityId !== props.data.id, 'fa fa-eject': entityId === props.data.id}"
                             />
                         </button>
                         <button
                             type="button"
                             class="btn btn-xs btn-primary"
-                            @click.prevent="triggerSync(props.item)"
+                            @click.prevent="triggerSync()"
                         >
                             <i class="fa-solid fa-square-arrow-up-right" />
                         </button>
                         <entity-delete
                             :with-text="false"
                             class="btn btn-xs btn-danger"
-                            :entity-id="props.item.id"
+                            :entity-id="props.data.id"
                             :entity-type="'userSecret'"
                             @deleted="props.handleDeleted"
                         />

@@ -11,6 +11,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
+import { wrapFnWithBusyState } from '../../../core/busy';
 import { renderActionCommand } from '../../../core/render/action-command/utils';
 import type { ActionCommandProperties } from '../../../core/render/action-command/type';
 import { useAuthStore } from '../../../store/auth';
@@ -95,11 +96,7 @@ export default defineComponent({
                 refs.command.value === ProposalStationApprovalCommand.REJECT;
         });
 
-        const execute = async () => {
-            if (busy.value) return;
-
-            busy.value = true;
-
+        const execute = wrapFnWithBusyState(busy, async () => {
             let status;
 
             switch (refs.command.value) {
@@ -123,9 +120,7 @@ export default defineComponent({
             } catch (e) {
                 emit('failed', e);
             }
-
-            busy.value = false;
-        };
+        });
 
         return () => renderActionCommand({
             execute,

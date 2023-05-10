@@ -7,7 +7,6 @@
 <script lang="ts">
 import { initFormAttributesFromSource } from '@authup/client-vue';
 import { required } from '@vuelidate/validators';
-import Error from 'nuxt/dist/core/runtime/nitro/error';
 import {
     computed,
     defineComponent, reactive, ref, toRefs, watch,

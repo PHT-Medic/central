@@ -15,7 +15,6 @@ import type {
     TrainFile,
     TrainFileEventContext,
 } from '@personalhealthtrain/central-common';
-import Error from 'nuxt/dist/core/runtime/nitro/error';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, onMounted, onUnmounted, ref, toRefs,

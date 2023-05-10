@@ -12,6 +12,7 @@ import type {
     TrainStation, TrainStationEventContext,
 } from '@personalhealthtrain/central-common';
 import {
+    DomainEventName,
     DomainEventSubscriptionName,
     DomainSubType,
     DomainType,
@@ -19,13 +20,11 @@ import {
     buildDomainEventFullName,
     buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
-import type { FiltersBuildInput } from 'rapiq/dist/parameter';
+import type { BuildInput, FiltersBuildInput } from 'rapiq';
 
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 import type { Socket } from 'socket.io-client';
-import { DomainEventName } from '@authup/core';
-import type { BuildInput } from 'rapiq';
 import { realmIdForSocket } from '../../../composables/domain/realm';
 import { useSocket } from '../../../composables/socket';
 import type {

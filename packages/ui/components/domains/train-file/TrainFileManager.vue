@@ -12,7 +12,6 @@ import {
     hasOwnProperty,
 } from '@personalhealthtrain/central-common';
 import { isClientErrorWithStatusCode } from 'hapic';
-import Error from 'nuxt/dist/core/runtime/nitro/error';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, ref, toRefs, watch,

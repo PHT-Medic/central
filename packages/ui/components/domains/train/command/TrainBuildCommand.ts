@@ -5,8 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { useToast } from 'bootstrap-vue-next';
+import { computed } from 'vue';
 import type { PropType } from 'vue';
-import Vue from 'vue';
 import type { Train } from '@personalhealthtrain/central-common';
 import {
     PermissionID,
@@ -14,14 +15,17 @@ import {
     TrainBuildStatus,
     TrainConfigurationStatus,
 } from '@personalhealthtrain/central-common';
+import { useAPI } from '#imports';
+import { wrapFnWithBusyState } from '../../../../core/busy';
+import { useAuthStore } from '../../../../store/auth';
 import type { TrainCommandProperties } from './type';
 import { renderActionCommand } from '../../../../core/render/action-command/utils';
-import type { ActionCommandMethods } from '../../../../core/render/action-command/type';
 
-export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, TrainCommandProperties>({
+export default defineNuxtComponent({
     props: {
         entity: {
             type: Object as PropType<Train>,
+            required: true,
         },
         command: {
             type: String as PropType<TrainAPICommand>,
@@ -41,43 +45,43 @@ export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, Trai
             default: true,
         },
     },
-    data() {
-        return {
-            busy: false,
-        };
-    },
-    computed: {
-        isAllowed() {
-            return this.$auth.has(PermissionID.TRAIN_EDIT);
-        },
-        isDisabled() {
-            if (this.entity.configuration_status !== TrainConfigurationStatus.FINISHED) {
+    emits: ['failed', 'done'],
+    setup(props, { emit, slots }) {
+        const refs = toRefs(props);
+        const busy = ref(false);
+
+        const toast = useToast();
+
+        const store = useAuthStore();
+        const isAllowed = computed(() => store.has(PermissionID.TRAIN_EDIT));
+
+        const isDisabled = computed<boolean>(() => {
+            if (refs.entity.value.configuration_status !== TrainConfigurationStatus.FINISHED) {
                 return true;
             }
 
-            if (
-                this.command === TrainAPICommand.BUILD_START
-            ) {
-                return this.entity.build_status &&
+            if (refs.command.value === TrainAPICommand.BUILD_START) {
+                return !!refs.entity.value.build_status &&
                     [
                         TrainBuildStatus.STOPPED,
                         TrainBuildStatus.STOPPING,
                         TrainBuildStatus.FAILED,
-                    ].indexOf(this.entity.build_status) === -1;
+                    ].indexOf(refs.entity.value.build_status) === -1;
             }
 
-            if (this.command === TrainAPICommand.BUILD_STOP) {
-                return this.entity.build_status && [
+            if (refs.command.value === TrainAPICommand.BUILD_STOP) {
+                return !!refs.entity.value.build_status && [
                     TrainBuildStatus.STARTING,
                     TrainBuildStatus.STARTED,
                     TrainBuildStatus.STOPPING,
-                ].indexOf(this.entity.build_status) === -1;
+                ].indexOf(refs.entity.value.build_status) === -1;
             }
 
             return false;
-        },
-        commandText() {
-            switch (this.command) {
+        });
+
+        const commandText = computed(() => {
+            switch (refs.command.value) {
                 case TrainAPICommand.BUILD_START:
                     return 'start';
                 case TrainAPICommand.BUILD_STOP:
@@ -87,9 +91,10 @@ export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, Trai
                 default:
                     return '';
             }
-        },
-        iconClass() {
-            switch (this.command) {
+        });
+
+        const iconClass = computed(() => {
+            switch (refs.command.value) {
                 case TrainAPICommand.BUILD_START:
                     return 'fa fa-play';
                 case TrainAPICommand.BUILD_STOP:
@@ -99,9 +104,10 @@ export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, Trai
                 default:
                     return '';
             }
-        },
-        classSuffix() {
-            switch (this.command) {
+        });
+
+        const classSuffix = computed(() => {
+            switch (refs.command.value) {
                 case TrainAPICommand.BUILD_START:
                     return 'success';
                 case TrainAPICommand.BUILD_STOP:
@@ -111,31 +117,39 @@ export const TrainBuildCommand = Vue.extend<any, ActionCommandMethods, any, Trai
                 default:
                     return 'info';
             }
-        },
-    },
-    methods: {
-        async do() {
-            if (this.busy || this.isDisabled || !this.isAllowed) return;
+        });
 
-            this.busy = true;
-
+        const execute = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await this.$api.train.runCommand(this.entity.id, this.command);
+                const train = await useAPI().train.runCommand(refs.entity.value.id, refs.command.value);
 
-                const message = `Successfully executed build command ${this.commandText}`;
-                this.$bvToast.toast(message, { toaster: 'b-toaster-top-center', variant: 'success' });
+                if (toast) {
+                    toast.success({ body: `Successfully executed build command ${commandText.value}` });
+                }
 
-                this.$emit('done', train);
+                emit('done', train);
             } catch (e) {
-                this.$bvToast.toast(e.message, { toaster: 'b-toaster-top-center', variant: 'danger' });
+                if (e instanceof Error) {
+                    if (toast) {
+                        toast.warning({ body: e.message });
+                    }
 
-                this.$emit('failed', e);
+                    emit('failed', e);
+                }
             }
+        });
 
-            this.busy = false;
-        },
-    },
-    render(createElement) {
-        return renderActionCommand(this, createElement);
+        return () => renderActionCommand({
+            execute,
+            elementType: refs.elementType.value,
+            withIcon: refs.withIcon.value,
+            withText: refs.withText.value,
+            isDisabled: isDisabled.value,
+            iconClass: iconClass.value,
+            isAllowed: isAllowed.value,
+            commandText: commandText.value,
+            classSuffix: classSuffix.value,
+            slots,
+        });
     },
 });

@@ -14,7 +14,7 @@ import {
 } from 'vue';
 import { useAPI } from '../../../../composables/api';
 import ProposalStationList from '../../proposal-station/ProposalStationList';
-import { MasterImagePicker } from '../../master-image/MasterImagePicker';
+import MasterImagePicker from '../../master-image/MasterImagePicker';
 import TrainStationList from '../../train-station/TrainStationList';
 import TrainStationAssignAction from '../../train-station/TrainStationAssignAction';
 

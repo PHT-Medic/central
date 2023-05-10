@@ -15,11 +15,11 @@ import {
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import { useAuthStore } from '../../../store/auth';
-import { TrainResultCommand } from './command/TrainResultCommand';
+import TrainResultCommand from './command/TrainResultCommand';
 import TrainBuildStatusText from './status/TrainBuildStatusText.vue';
-import { TrainBuildCommand } from './command/TrainBuildCommand';
+import TrainBuildCommand from './command/TrainBuildCommand';
 import TrainRunStatusText from './status/TrainRunStatusText.vue';
-import { TrainRunCommand } from './command/TrainRunCommand';
+import TrainRunCommand from './command/TrainRunCommand';
 import TrainResultStatusText from '../train-result/status/TrainResultStatusText.vue';
 
 import TrainConfigurationStatusText from './status/TrainConfigurationStatusText.vue';

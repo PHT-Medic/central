@@ -10,7 +10,7 @@ import type { Robot } from '@authup/core';
 import { buildFormInput, buildFormSubmit } from '@vue-layout/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength } from '@vuelidate/validators';
-import type { FiltersBuildInput } from 'rapiq/dist/parameter';
+import type { FiltersBuildInput } from 'rapiq';
 import { merge } from 'smob';
 import type { PropType } from 'vue';
 import { wrapFnWithBusyState } from '../../../core/busy';
