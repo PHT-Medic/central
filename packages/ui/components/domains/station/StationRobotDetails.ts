@@ -25,7 +25,7 @@ export default defineComponent({
         if (props.entity.ecosystem !== Ecosystem.DEFAULT) {
             return () => h(
                 'div',
-                { staticClass: 'alert alert-sm alert-danger' },
+                { class: 'alert alert-sm alert-danger' },
                 [
                     'The robot creation is only permitted for the default ecosystem.',
                 ],

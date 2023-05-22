@@ -67,7 +67,7 @@ export default defineComponent({
                     'which will keep the master images between the harbor service and the UI in sync. ' +
                     'It is also possible to manually sync the master images from harbor.',
                 ]),
-                h('div', { staticClass: 'mb-1' }, [
+                h('div', { class: 'mb-1' }, [
                     h('button', {
                         type: 'button',
                         disabled: meta.busy,

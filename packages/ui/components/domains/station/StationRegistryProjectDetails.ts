@@ -26,7 +26,7 @@ export default defineComponent({
         if (props.entity.ecosystem !== Ecosystem.DEFAULT) {
             return () => h(
                 'div',
-                { staticClass: 'alert alert-sm alert-danger' },
+                { class: 'alert alert-sm alert-danger' },
                 [
                     'The registry creation is only permitted for the default ecosystem.',
                 ],
@@ -36,7 +36,7 @@ export default defineComponent({
         if (!props.entity.registry_id) {
             return () => h(
                 'div',
-                { staticClass: 'alert alert-sm alert-warning' },
+                { class: 'alert alert-sm alert-warning' },
                 [
                     'The station has not been assigned to a registry yet.',
                 ],
@@ -46,7 +46,7 @@ export default defineComponent({
         if (!props.entity.registry_project_id) {
             return () => h(
                 'div',
-                { staticClass: 'alert alert-sm alert-warning' },
+                { class: 'alert alert-sm alert-warning' },
                 [
                     'No related registry-resource exists at the moment.',
                     ' ',
@@ -58,9 +58,7 @@ export default defineComponent({
         return () => h(
             RegistryProjectDetails,
             {
-                props: {
-                    entityId: props.entity.registry_project_id,
-                },
+                entityId: props.entity.registry_project_id as string,
                 onResolved(item: RegistryProject) {
                     emit('updated', {
                         registry_project_id: item.id,

@@ -193,15 +193,15 @@ export default {
                                     type="button"
                                     class="btn btn-xs"
                                     :class="{
-                                        'btn-dark': form.proposal_id !== itemActionProps.item.id,
-                                        'btn-warning': form.proposal_id === itemActionProps.item.id
+                                        'btn-dark': form.proposal_id !== itemActionProps.data.id,
+                                        'btn-warning': form.proposal_id === itemActionProps.data.id
                                     }"
-                                    @click.prevent="toggle('proposal_id', itemActionProps.item.id)"
+                                    @click.prevent="toggle('proposal_id', itemActionProps.data.id)"
                                 >
                                     <i
                                         :class="{
-                                            'fa fa-plus': form.proposal_id !== itemActionProps.item.id,
-                                            'fa fa-minus': form.proposal_id === itemActionProps.item.id
+                                            'fa fa-plus': form.proposal_id !== itemActionProps.data.id,
+                                            'fa fa-minus': form.proposal_id === itemActionProps.data.id
                                         }"
                                     />
                                 </button>

@@ -67,11 +67,10 @@ export default defineComponent({
                                 h(
                                     'span',
                                     {
-                                        staticClass: 'badge badge-pill',
-                                        class: {
+                                        class: ['badge badge-pill', {
                                             'badge-primary': item.type === SecretType.RSA_PUBLIC_KEY,
                                             'badge-dark': item.type === SecretType.PAILLIER_PUBLIC_KEY,
-                                        },
+                                        }],
                                     },
                                     [
                                         (item.type === SecretType.PAILLIER_PUBLIC_KEY ? 'Paillier' : 'RSA'),
@@ -80,7 +79,7 @@ export default defineComponent({
                                 h(
                                     'span',
                                     {
-                                        staticClass: 'ml-1',
+                                        class: 'ml-1',
                                     },
                                     [item.key],
                                 ),

@@ -48,6 +48,6 @@ export default defineComponent({
             }, slots);
         }
 
-        return () => h('span', { staticClass: `text-${classSuffix.value}` }, statusText.value);
+        return () => h('span', { class: `text-${classSuffix.value}` }, statusText.value);
     },
 });
