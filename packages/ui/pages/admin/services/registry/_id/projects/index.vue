@@ -8,7 +8,7 @@
 import type { Registry, RegistryProject } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import type { BModal } from 'bootstrap-vue-next';
-import { useToast } from 'bootstrap-vue-next';
+import { BTable, useToast } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed, ref, toRefs } from 'vue';
 import type { PropType, Ref } from 'vue';
@@ -19,7 +19,11 @@ import RegistryProjectDetails from '../../../../../../components/domains/registr
 import { useAuthStore } from '../../../../../../store/auth';
 
 export default {
-    components: { RegistryProjectDetails, RegistryProjectList },
+    components: {
+        BTable,
+        RegistryProjectDetails,
+        RegistryProjectList,
+    },
     props: {
         entity: {
             type: Object as PropType<Registry>,
@@ -113,7 +117,7 @@ export default {
             :load-on-init="true"
         >
             <template #items="props">
-                <b-table
+                <BTable
                     :items="props.data"
                     :fields="fields"
                     :busy="props.busy"
@@ -161,7 +165,7 @@ export default {
                             <strong>Loading...</strong>
                         </div>
                     </template>
-                </b-table>
+                </BTable>
             </template>
         </registry-project-list>
 

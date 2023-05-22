@@ -389,7 +389,7 @@ export default defineComponent({
                     :before-change="passWizardStep"
                 >
                     <train-file-manager
-                        :train="entity"
+                        :entity="entity"
                         @uploaded="handleFilesChanged"
                         @deleted="handleFilesChanged"
                         @setEntrypointFile="setEntrypointFile"

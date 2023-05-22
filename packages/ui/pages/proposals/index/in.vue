@@ -9,6 +9,9 @@ import type { ProposalStation } from '@personalhealthtrain/central-common';
 import {
     PermissionID,
 } from '@personalhealthtrain/central-common';
+import {
+    BDropdown, BDropdownDivider, BDropdownItem, BTable,
+} from 'bootstrap-vue-next';
 import type { BModal } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { Ref } from 'vue';
@@ -25,6 +28,10 @@ import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
+        BDropdown,
+        BDropdownDivider,
+        BDropdownItem,
+        BTable,
         ProposalStationList,
         ProposalStationApprovalCommand,
         ProposalStationApprovalStatus,
@@ -137,7 +144,7 @@ export default defineNuxtComponent({
                     <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
                 </template>
                 <template #items="props">
-                    <b-table
+                    <BTable
                         :items="props.data"
                         :fields="fields"
                         :busy="props.busy"
@@ -219,7 +226,7 @@ export default defineNuxtComponent({
                                 <strong>Loading...</strong>
                             </div>
                         </template>
-                    </b-table>
+                    </BTable>
                 </template>
             </proposal-station-list>
         </div>

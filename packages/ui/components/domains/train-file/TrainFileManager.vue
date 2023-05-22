@@ -11,6 +11,7 @@ import type {
 import {
     hasOwnProperty,
 } from '@personalhealthtrain/central-common';
+import { BFormCheckbox } from 'bootstrap-vue-next';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { PropType } from 'vue';
 import {
@@ -25,9 +26,13 @@ import TrainImageCommand from '../train/TrainImageCommand';
 
 export default defineComponent({
     components: {
-        TrainFileList, TrainImageCommand, TrainFormFile, TrainFileNode,
+        BFormCheckbox,
+        TrainFileList,
+        TrainImageCommand,
+        TrainFormFile,
+        TrainFileNode,
     },
-    props: { // todo: train was renamed to entity
+    props: {
         entity: {
             type: Object as PropType<Train>,
             required: true,
@@ -246,12 +251,12 @@ export default defineComponent({
                     </div>
                 </div>
                 <div class="form-group">
-                    <b-form-checkbox
+                    <BFormCheckbox
                         v-model="directoryMode"
                         switch
                     >
                         Directory mode
-                    </b-form-checkbox>
+                    </BFormCheckbox>
                 </div>
 
                 <hr>

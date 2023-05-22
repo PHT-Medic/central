@@ -12,6 +12,7 @@ import {
     TrainConfigurationStatus, TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
+import { BDropdown } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
 import { defineComponent } from 'vue';
 import { useAuthStore } from '../../../store/auth';
@@ -26,6 +27,7 @@ import TrainConfigurationStatusText from './status/TrainConfigurationStatusText.
 
 export default defineComponent({
     components: {
+        BDropdown,
         TrainResultCommand,
         TrainConfigurationStatusText,
         TrainResultStatusText,

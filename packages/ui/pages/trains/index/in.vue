@@ -7,6 +7,7 @@
 <script lang="ts">
 import type { Train, TrainStation } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { BDropdown, BTable } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';
@@ -21,6 +22,8 @@ import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
+        BDropdown,
+        BTable,
         TrainStationRunStatus,
         TrainStationApprovalCommand,
         TrainStationApprovalStatus,
@@ -112,7 +115,7 @@ export default defineNuxtComponent({
                     <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
                 </template>
                 <template #items="props">
-                    <b-table
+                    <BTable
                         :items="props.data"
                         :fields="fields"
                         :busy="props.busy"
@@ -193,7 +196,7 @@ export default defineNuxtComponent({
                                 <strong>Loading...</strong>
                             </div>
                         </template>
-                    </b-table>
+                    </BTable>
                 </template>
             </TrainStationList>
         </div>
