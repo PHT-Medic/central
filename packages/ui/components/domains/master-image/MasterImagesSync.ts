@@ -78,17 +78,17 @@ export default defineComponent({
                             return syncMasterImages();
                         },
                     }, [
-                        h('i', { class: 'fa fa-sync mr-1' }),
+                        h('i', { class: 'fa fa-sync me-1' }),
                         'Sync',
                     ]),
                 ]),
                 h('p', { class: 'text-muted' }, [
                     'The last synchronisation created',
-                    h('strong', { class: 'text-success ml-1 mr-1' }, [meta.created]),
+                    h('strong', { class: 'text-success ms-1 me-1' }, [meta.created]),
                     'updated',
-                    h('strong', { class: 'text-primary ml-1 mr-1' }, [meta.updated]),
+                    h('strong', { class: 'text-primary ms-1 me-1' }, [meta.updated]),
                     'deleted',
-                    h('strong', { class: 'text-danger ml-1 mr-1' }, [meta.deleted]),
+                    h('strong', { class: 'text-danger ms-1 me-1' }, [meta.deleted]),
                     'master image(s).',
                 ]),
 

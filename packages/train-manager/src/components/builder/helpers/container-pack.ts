@@ -7,7 +7,7 @@
 
 import type { APIClient } from '@personalhealthtrain/central-common';
 import { TrainContainerFileName, TrainContainerPath } from '@personalhealthtrain/central-common';
-import type { Readable } from 'node:stream';
+import stream from 'node:stream';
 import crypto from 'node:crypto';
 import type { Container } from 'dockerode';
 import { useClient } from 'hapic';
@@ -162,7 +162,9 @@ export async function packContainerWithTrain(container: Container, context: Cont
                         .catch(() => reject(new BuilderError('The train pack stream could not be forwarded to the container.')));
                 });
 
-                (response.data as any as Readable).pipe(extract);
+                const readStream = stream.Readable.fromWeb(response.data as any);
+
+                readStream.pipe(extract);
             })
             .catch((e) => reject(e));
     });

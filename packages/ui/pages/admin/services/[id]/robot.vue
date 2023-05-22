@@ -71,6 +71,7 @@ export default defineNuxtComponent({
 <template>
     <div>
         <RobotForm
+            v-if="entity"
             :name="entityId"
             :realm-id="entity.realm_id"
             :entity="entity"

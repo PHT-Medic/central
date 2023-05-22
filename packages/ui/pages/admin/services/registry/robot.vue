@@ -53,7 +53,7 @@ export default defineNuxtComponent({
 
         return () => h(RobotForm, {
             name: ServiceID.REGISTRY,
-            realmId: realmId as string,
+            realmId: realmId.value,
             entity: entity.value,
             onUpdated(item) {
                 handleUpdated(item);

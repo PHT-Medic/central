@@ -67,6 +67,12 @@ export default defineComponent({
                     icon: 'fa fa-compact-disc',
                 },
 
+                items: {
+                    item: {
+                        textPropName: 'virtual_path',
+                    },
+                },
+
                 noMore: {
                     textContent: 'No more master-images available...',
                 },

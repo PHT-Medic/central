@@ -5,15 +5,16 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { HookName, isObject } from 'hapic';
+import { setAPIClient } from '@authup/client-vue';
 import type { TokenCreator } from '@authup/core';
 import {
     APIClient as AuthAPIClient,
+    OAuth2TokenKind,
     mountClientResponseErrorTokenHook,
     unmountClientResponseErrorTokenHook,
 } from '@authup/core';
-import { setAPIClient } from '@authup/client-vue';
 import { APIClient, ErrorCode } from '@personalhealthtrain/central-common';
+import { HookName, isObject } from 'hapic';
 import type { Pinia } from 'pinia';
 import { storeToRefs } from 'pinia';
 import { LicenseAgreementCommand, useLicenseAgreementEventEmitter } from '../domains/license-agreement';
@@ -90,8 +91,16 @@ export default defineNuxtPlugin((ctx) => {
                     refreshToken = refs.refreshToken.value;
                 }
 
+                if (!refreshToken) {
+                    throw new Error('No refresh token available.');
+                }
+
                 return authupAPI.token.createWithRefreshToken({
                     refresh_token: refreshToken as string,
+                }).catch((e) => {
+                    store.unsetToken(OAuth2TokenKind.REFRESH);
+
+                    return Promise.reject(e);
                 });
             };
 

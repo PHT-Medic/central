@@ -113,110 +113,120 @@ export default defineComponent({
             }
         });
 
-        const name = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.name,
-            label: true,
-            labelContent: 'Name',
-            value: form.name,
-            onChange(input) {
-                form.name = input;
-            },
-        });
+        return () => {
+            const name = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.name,
+                label: true,
+                labelContent: 'Name',
+                value: form.name,
+                props: {
+                    placeholder: '...',
+                },
+                onChange(input) {
+                    form.name = input;
+                },
+            });
 
-        const host = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.host,
-            label: true,
-            labelContent: 'Host',
-            value: form.host,
-            onChange(input) {
-                form.host = input;
-            },
-            props: {
-                placeholder: 'e.g. ghcr.io',
-            },
-        });
+            const host = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.host,
+                label: true,
+                labelContent: 'Host',
+                value: form.host,
+                onChange(input) {
+                    form.host = input;
+                },
+                props: {
+                    placeholder: 'e.g. ghcr.io',
+                },
+            });
 
-        const ecosystem = buildFormSelect({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.ecosystem,
-            label: true,
-            labelContent: 'Ecosystem',
-            value: form.ecosystem,
-            onChange(input) {
-                form.ecosystem = input;
-            },
-            options: ecosystems,
-            props: {
-                disabled: !!refs.entity.value,
-            },
-        });
+            const ecosystem = buildFormSelect({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.ecosystem,
+                label: true,
+                labelContent: 'Ecosystem',
+                value: form.ecosystem,
+                onChange(input) {
+                    form.ecosystem = input;
+                },
+                options: ecosystems,
+                props: {
+                    disabled: !!refs.entity.value,
+                },
+            });
 
-        const accountName = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.account_name,
-            label: true,
-            labelContent: 'Account Name',
-            value: form.account_name,
-            onChange(input) {
-                form.account_name = input;
-            },
-        });
+            const accountName = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.account_name,
+                label: true,
+                labelContent: 'Account Name',
+                value: form.account_name,
+                props: {
+                    placeholder: '...',
+                },
+                onChange(input) {
+                    form.account_name = input;
+                },
+            });
 
-        const accountSecret = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.account_secret,
-            label: true,
-            labelContent: 'Account Secret',
-            value: form.account_secret,
-            onChange(input) {
-                form.account_secret = input;
-            },
-        });
+            const accountSecret = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.account_secret,
+                label: true,
+                labelContent: 'Account Secret',
+                value: form.account_secret,
+                props: {
+                    placeholder: '...',
+                },
+                onChange(input) {
+                    form.account_secret = input;
+                },
+            });
 
-        const submitNode = buildFormSubmit({
-            submit,
-            busy,
-            createText: 'Create',
-            updateText: 'Update',
-        });
+            const submitNode = buildFormSubmit({
+                submit,
+                busy,
+                createText: 'Create',
+                updateText: 'Update',
+                validationResult: $v.value,
+            });
 
-        return h('form', {
-            onSubmit($event: any) {
-                $event.preventDefault();
-            },
-        }, [
-            h('div', { class: 'row' }, [
-                h('div', { class: 'col' }, [
-                    h('h6', [
-                        h('i', { class: 'fas fa-infinity pr-1' }),
-                        'General',
+            return h('form', {
+                onSubmit($event: any) {
+                    $event.preventDefault();
+                },
+            }, [
+                h('div', { class: 'row' }, [
+                    h('div', { class: 'col' }, [
+                        h('h6', [
+                            h('i', { class: 'fas fa-infinity pe-1' }),
+                            'General',
+                        ]),
+                        name,
+                        host,
                     ]),
-                    name,
-                    host,
-                ]),
-                h('div', { class: 'col' }, [
-                    h('h6', [
-                        h('i', { class: 'fas fa-robot pr-1' }),
-                        'Robot',
+                    h('div', { class: 'col' }, [
+                        h('h6', [
+                            h('i', { class: 'fas fa-robot pe-1' }),
+                            'Robot',
+                        ]),
+                        accountName,
+                        accountSecret,
                     ]),
-                    accountName,
-                    accountSecret,
                 ]),
-            ]),
-            h('hr'),
-            h(
-                'div',
-                { class: 'alert alert-warning alert-danger' },
-                [
-                    'It is only possible to register harbor registries > v2.3.0',
-                ],
-            ),
-            h('hr'),
-            ecosystem,
-            h('hr'),
-            submitNode,
-        ]);
+                h(
+                    'div',
+                    { class: 'alert alert-sm alert-warning alert-danger' },
+                    [
+                        'It is only possible to register harbor registries > v2.3.0',
+                    ],
+                ),
+                ecosystem,
+                h('hr'),
+                submitNode,
+            ]);
+        };
     },
 });
