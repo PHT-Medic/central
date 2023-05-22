@@ -102,7 +102,7 @@ export default defineNuxtComponent({
 
         const handleDeleted = (item: UserSecret) => {
             if (entity.value && item.id === entityId.value) {
-                triggerEdit(entity.value);
+                triggerEdit(entity.value as UserSecret);
             }
 
             if (toast) {

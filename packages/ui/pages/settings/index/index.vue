@@ -1,49 +1,60 @@
-<!--
-  Copyright (c) 2021-2021.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
-<script>
-import { PermissionID } from '@personalhealthtrain/central-common';
+<script lang="ts">
 
-export default {
-    meta: {
-        requireLoggedIn: true,
+import { UserForm } from '@authup/client-vue';
+import type { User } from '@authup/core';
+import { storeToRefs } from 'pinia';
+import { useToast } from 'bootstrap-vue-next';
+import { defineNuxtComponent } from '#app';
+import { definePageMeta } from '#imports';
+import { LayoutKey } from '../../../config/layout';
+import { useAuthStore } from '../../../store/auth';
+
+export default defineNuxtComponent({
+    components: {
+        UserForm,
     },
-    computed: {
-        user() {
-            return this.$store.getters['auth/user'];
-        },
-        canManage() {
-            return this.$auth.has(PermissionID.USER_EDIT);
-        },
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        });
+
+        const toast = useToast();
+
+        const store = useAuthStore();
+
+        const { user, userId } = storeToRefs(store);
+
+        const handleUpdated = (entity: User) => {
+            toast.success({ body: 'The account was successfully updated.' });
+
+            store.setUser(entity);
+        };
+
+        const handleFailed = (e: Error) => {
+            toast.warning({ body: e.message });
+        };
+
+        return {
+            user,
+            userId,
+            handleUpdated,
+            handleFailed,
+        };
     },
-    methods: {
-        handleUpdated() {
-            this.$bvToast.toast('The account was successfully updated.', {
-                variant: 'success',
-                toaster: 'b-toaster-top-center',
-            });
-        },
-    },
-};
+});
 </script>
 <template>
     <div>
-        <div class="row">
-            <div class="col-12">
-                <h6 class="title">
-                    General
-                </h6>
+        <h6 class="title">
+            General
+        </h6>
 
-                <user-form
-                    :can-manage="false"
-                    :realm-id="user.realm_id"
-                    :entity="user"
-                    @updated="handleUpdated"
-                />
-            </div>
-        </div>
+        <UserForm
+            :can-manage="false"
+            :realm-id="userId"
+            :entity="user"
+            @updated="handleUpdated"
+            @failed="handleFailed"
+        />
     </div>
 </template>

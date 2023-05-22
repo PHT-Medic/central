@@ -1,38 +1,51 @@
-<!--
-  Copyright (c) 2021-2021.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
-<script>
-export default {
-    meta: {
-        requireLoggedIn: true,
+<script lang="ts">
+import { storeToRefs } from 'pinia';
+import { useToast } from 'bootstrap-vue-next';
+import { UserPasswordForm } from '@authup/client-vue';
+import { defineNuxtComponent } from '#app';
+import { definePageMeta } from '#imports';
+import { LayoutKey } from '~/config/layout';
+import { useAuthStore } from '~/store/auth';
+
+export default defineNuxtComponent({
+    components: {
+        UserPasswordForm,
     },
-    computed: {
-        user() {
-            return this.$store.getters['auth/user'];
-        },
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        });
+
+        const store = useAuthStore();
+        const { userId } = storeToRefs(store) as { userId: string };
+
+        const handleUpdated = () => {
+            const toast = useToast();
+            toast.success({ body: 'The account was successfully updated.' });
+        };
+
+        const handleFailed = (e) => {
+            const toast = useToast();
+            toast.warning({ body: e.message });
+        };
+
+        return {
+            id: userId,
+            handleUpdated,
+            handleFailed,
+        };
     },
-    methods: {
-        handleUpdated() {
-            this.$bvToast.toast('The password was successfully updated.', {
-                variant: 'success',
-                toaster: 'b-toaster-top-center',
-            });
-        },
-    },
-};
+});
 </script>
 <template>
-    <div class="mb-2">
+    <div>
         <h6 class="title">
             Password
         </h6>
-
-        <user-password-form
-            :id="user.id"
+        <UserPasswordForm
+            :id="id"
             @updated="handleUpdated"
+            @failed="handleFailed"
         />
     </div>
 </template>
