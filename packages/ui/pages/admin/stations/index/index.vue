@@ -5,20 +5,28 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { Timeago } from '@vue-layout/timeago';
 import type { Station } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { BTable, useToast } from 'bootstrap-vue-next';
+import { BSpinner, BTable, useToast } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
+import EntityDelete from '../../../../components/domains/EntityDelete';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 import StationList from '../../../../components/domains/station/StationList';
 import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
-    components: { BTable, StationList },
+    components: {
+        EntityDelete,
+        BTable,
+        BSpinner,
+        StationList,
+        Timeago,
+    },
     setup() {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -103,7 +111,7 @@ export default defineNuxtComponent({
                     >
                         <i class="fa fa-bars" />
                     </nuxt-link>
-                    <entity-delete
+                    <EntityDelete
                         v-if="canDrop"
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
@@ -113,14 +121,14 @@ export default defineNuxtComponent({
                     />
                 </template>
                 <template #cell(created_at)="data">
-                    <timeago :datetime="data.item.created_at" />
+                    <Timeago :datetime="data.item.created_at" />
                 </template>
                 <template #cell(updated_at)="data">
-                    <timeago :datetime="data.item.updated_at" />
+                    <Timeago :datetime="data.item.updated_at" />
                 </template>
                 <template #table-busy>
                     <div class="text-center text-danger my-2">
-                        <b-spinner class="align-middle" />
+                        <BSpinner class="align-middle" />
                         <strong>Loading...</strong>
                     </div>
                 </template>

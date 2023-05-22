@@ -5,12 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { Timeago } from '@vue-layout/timeago';
 import type { ProposalStation } from '@personalhealthtrain/central-common';
 import {
     PermissionID,
 } from '@personalhealthtrain/central-common';
 import {
-    BDropdown, BDropdownDivider, BDropdownItem, BTable,
+    BDropdown, BDropdownDivider, BDropdownItem, BSpinner, BTable,
 } from 'bootstrap-vue-next';
 import type { BModal } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
@@ -31,11 +32,13 @@ export default defineNuxtComponent({
         BDropdown,
         BDropdownDivider,
         BDropdownItem,
+        BSpinner,
         BTable,
         ProposalStationList,
         ProposalStationApprovalCommand,
         ProposalStationApprovalStatus,
         ProposalInForm,
+        Timeago,
     },
     async setup() {
         definePageMeta({
@@ -215,10 +218,10 @@ export default defineNuxtComponent({
                             </template>
                         </template>
                         <template #cell(created_at)="data">
-                            <timeago :datetime="data.item.created_at" />
+                            <Timeago :datetime="data.item.created_at" />
                         </template>
                         <template #cell(updated_at)="data">
-                            <timeago :datetime="data.item.updated_at" />
+                            <Timeago :datetime="data.item.updated_at" />
                         </template>
                         <template #table-busy>
                             <div class="text-center text-danger my-2">

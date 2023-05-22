@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { SlotName } from '@vue-layout/list-controls';
+import { Timeago } from '@vue-layout/timeago';
 import type {
     PropType, VNode,
 } from 'vue';
@@ -138,7 +139,7 @@ export default defineComponent({
                                             'updated',
                                         ]),
                                         ' ',
-                                        h('timeago', {
+                                        h(Timeago, {
                                             datetime: props.entity.updated_at,
                                         }),
                                     ]),

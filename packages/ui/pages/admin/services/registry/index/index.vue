@@ -5,10 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { Timeago } from '@vue-layout/timeago';
 import type { Registry } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { BSpinner, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
@@ -17,7 +19,9 @@ import RegistryList from '../../../../../components/domains/registry/RegistryLis
 import { useAuthStore } from '../../../../../store/auth';
 
 export default defineNuxtComponent({
-    components: { EntityDelete, RegistryList },
+    components: {
+        BSpinner, BTable, EntityDelete, RegistryList, Timeago,
+    },
     setup(props, { emit }) {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
@@ -102,14 +106,14 @@ export default defineNuxtComponent({
                     />
                 </template>
                 <template #cell(created_at)="data">
-                    <timeago :datetime="data.item.created_at" />
+                    <Timeago :datetime="data.item.created_at" />
                 </template>
                 <template #cell(updated_at)="data">
-                    <timeago :datetime="data.item.updated_at" />
+                    <Timeago :datetime="data.item.updated_at" />
                 </template>
                 <template #table-busy>
                     <div class="text-center text-danger my-2">
-                        <b-spinner class="align-middle" />
+                        <BSpinner class="align-middle" />
                         <strong>Loading...</strong>
                     </div>
                 </template>

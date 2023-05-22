@@ -5,6 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { Timeago } from '@vue-layout/timeago';
 import type { TrainLog } from '@personalhealthtrain/central-common';
 import {
     defineComponent, h, toRefs,
@@ -68,14 +69,14 @@ export default defineComponent({
             [
                 h('div', { class: 'line-number' }, [refs.index.value + 1]),
                 h('div', { class: 'line-content d-flex flex-row' }, [
-                    h('div', { staticClass: `line-component ${refs.entity.value.component}` }, [
+                    h('div', { class: `line-component ${refs.entity.value.component}` }, [
                         `${refs.entity.value.component}/${refs.entity.value.command}`,
                     ]),
-                    h('div', { staticClass: 'line-message', class: { error: refs.entity.value.error } }, [
+                    h('div', { class: ['line-message', { error: refs.entity.value.error }] }, [
                         message,
                     ]),
-                    h('div', { staticClass: 'ml-auto' }, [
-                        h('timeago', { props: { datetime: refs.entity.value.created_at } }),
+                    h('div', { class: 'ml-auto' }, [
+                        h(Timeago, { datetime: refs.entity.value.created_at }),
                     ]),
                 ]),
             ],

@@ -16,6 +16,7 @@ import installCountdown from '@vue-layout/countdown';
 import installFormControl from '@vue-layout/form-controls';
 import installNavigation from '@vue-layout/navigation';
 import installPagination from '@vue-layout/pagination';
+import installTimeago from '@vue-layout/timeago';
 
 import type { Pinia } from 'pinia';
 import { storeToRefs } from 'pinia';
@@ -52,6 +53,7 @@ export default defineNuxtPlugin((ctx) => {
     });
 
     ctx.vueApp.use(installPagination, baseOptions);
+    ctx.vueApp.use(installTimeago);
 
     // preset missing ...
     ctx.vueApp.use(installAuthup, {

@@ -5,6 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { Timeago } from '@vue-layout/timeago';
 import type { Train, TrainStation } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
 import { BDropdown, BTable } from 'bootstrap-vue-next';
@@ -28,6 +29,7 @@ export default defineNuxtComponent({
         TrainStationApprovalCommand,
         TrainStationApprovalStatus,
         TrainStationList,
+        Timeago,
     },
     setup() {
         definePageMeta({
@@ -148,10 +150,10 @@ export default defineNuxtComponent({
                             </train-station-run-status>
                         </template>
                         <template #cell(created_at)="data">
-                            <timeago :datetime="data.item.created_at" />
+                            <Timeago :datetime="data.item.created_at" />
                         </template>
                         <template #cell(updated_at)="data">
-                            <timeago :datetime="data.item.updated_at" />
+                            <Timeago :datetime="data.item.updated_at" />
                         </template>
 
                         <template #cell(options)="data">

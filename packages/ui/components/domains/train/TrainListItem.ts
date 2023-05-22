@@ -4,6 +4,8 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+
+import { Timeago } from '@vue-layout/timeago';
 import { DomainEventName } from '@authup/core';
 import { merge } from 'smob';
 import type { PropType, VNodeArrayChildren } from 'vue';
@@ -246,7 +248,7 @@ export default defineComponent({
                         h('small', [
                             h('span', { class: 'text-muted' }, 'updated'),
                             ' ',
-                            h('timeago', { props: { datetime: entity.value.updated_at } }),
+                            h(Timeago, { datetime: entity.value.updated_at }),
                         ]),
                     ]),
                 ]),
