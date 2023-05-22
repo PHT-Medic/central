@@ -105,9 +105,7 @@ export default defineComponent({
                 emit('uploaded', form.files);
                 form.files = [];
             } catch (e) {
-                if (e instanceof Error) {
-                    emit('failed', e.message);
-                }
+                emit('failed', e);
             }
         });
 
@@ -121,7 +119,7 @@ export default defineComponent({
                 }
             } catch (e) {
                 if (!isClientErrorWithStatusCode(e, 404)) {
-                    emit('failed', e.message);
+                    emit('failed', e);
                 }
             }
         });

@@ -33,7 +33,7 @@ export default defineNuxtComponent({
         };
 
         const handleFailed = (e: Error) => {
-            emit('failed', e.message);
+            emit('failed', e);
         };
 
         return {

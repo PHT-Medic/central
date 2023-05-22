@@ -80,9 +80,7 @@ export default defineComponent({
                 masterImageEntity.value = item;
             } catch (e) {
                 if (!isClientErrorWithStatusCode(e, 404)) {
-                    if (e instanceof Error) {
-                        emit('failed', e.message);
-                    }
+                    emit('failed', e);
                 }
             }
         });
@@ -100,9 +98,7 @@ export default defineComponent({
                 trainFileEntity.value = await useAPI().trainFile.getOne(refs.trainFileId.value);
             } catch (e) {
                 if (!isClientErrorWithStatusCode(e, 404)) {
-                    if (e instanceof Error) {
-                        emit('failed', e.message);
-                    }
+                    emit('failed', e);
                 }
             }
         });
