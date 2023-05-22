@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { defineComponent } from 'vue';
+import { defineComponent, toRefs } from 'vue';
 import MedicineWorkerTemplate from './MedicineWorker.svg';
 
 export default defineComponent({
@@ -20,10 +20,12 @@ export default defineComponent({
         },
     },
     setup(props) {
+        const refs = toRefs(props);
+
         return () => h('img', {
             src: MedicineWorkerTemplate,
-            width: props.width,
-            height: props.height,
+            width: refs.width.value,
+            height: refs.height.value,
             style: {
                 maxWidth: '100%',
             },

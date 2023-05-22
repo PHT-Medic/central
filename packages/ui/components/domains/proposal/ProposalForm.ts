@@ -261,7 +261,7 @@ export default defineComponent({
             },
         });
 
-        return h(
+        return () => h(
             'div',
             { class: 'row' },
             [
