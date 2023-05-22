@@ -151,21 +151,3 @@ body
     background: #fafafa;
 }
 
-.pagination > li > .page-link {
-    color: #333;
-    background-color: #eee;
-    border: 1px solid #eee;
-    cursor:pointer;
-    padding: 5px 8px;
-}
-
-.pagination > .active > .page-link,
-.pagination > .active > .page-link:focus,
-.pagination > .active > .page-link:hover,
-.pagination > li > .page-link:focus,
-.pagination > li > .page-link:hover,
-.pagination > li > .page-link.active {
-    background-color: #30373e;
-    color: #FFF;
-    border: 1px solid #30373e;
-}

@@ -21,7 +21,7 @@ export enum LayoutNavigationID {
     DEFAULT = 'default',
 }
 
-export const LayoutTopNavigation: Component[] = [
+export const LayoutTopNavigation: NavigationElement[] = [
     {
         id: LayoutNavigationID.DEFAULT,
         name: 'Home',
@@ -33,7 +33,7 @@ export const LayoutTopNavigation: Component[] = [
         icon: 'fas fa-cog',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.ADMIN_UI_USE,
+
         ],
     },
 ];
@@ -132,7 +132,7 @@ export const LayoutSideAdminNavigation: NavigationElement[] = [
             PermissionID.PERMISSION_EDIT,
             PermissionID.PERMISSION_DROP,
         ],
-        components: [
+        children: [
             {
                 name: 'Realms',
                 type: 'link',
@@ -226,7 +226,7 @@ export const LayoutSideAdminNavigation: NavigationElement[] = [
 
             PermissionID.SERVICE_MANAGE,
         ],
-        components: [
+        children: [
             {
                 name: 'Stations',
                 type: 'link',

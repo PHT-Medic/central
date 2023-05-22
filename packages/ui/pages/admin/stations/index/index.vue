@@ -23,7 +23,6 @@ export default defineNuxtComponent({
     components: {
         EntityDelete,
         BTable,
-        BSpinner,
         StationList,
         Timeago,
     },
@@ -125,12 +124,6 @@ export default defineNuxtComponent({
                 </template>
                 <template #cell(updated_at)="data">
                     <Timeago :datetime="data.item.updated_at" />
-                </template>
-                <template #table-busy>
-                    <div class="text-center text-danger my-2">
-                        <BSpinner class="align-middle" />
-                        <strong>Loading...</strong>
-                    </div>
                 </template>
             </BTable>
         </template>

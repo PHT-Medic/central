@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', () => {
     const config = useRuntimeConfig();
 
     const client = new APIClient({
-        baseURL: config.public.apiUrl,
+        baseURL: config.public.authupApiUrl,
     });
 
     // --------------------------------------------------------------------

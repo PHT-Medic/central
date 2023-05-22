@@ -5,6 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { IdentityProviderList } from '@authup/client-vue';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import { useToast } from 'bootstrap-vue-next';
@@ -25,7 +26,10 @@ import { LayoutKey, LayoutNavigationID } from '../config/layout';
 import { useAuthStore } from '../store/auth';
 
 export default defineNuxtComponent({
-    components: { MedicineWorker },
+    components: {
+        IdentityProviderList,
+        MedicineWorker,
+    },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_OUT]: true,
@@ -53,6 +57,8 @@ export default defineNuxtComponent({
 
             },
         }, form);
+
+        const toast = useToast();
 
         const store = useAuthStore();
 
@@ -97,8 +103,9 @@ export default defineNuxtComponent({
                 });
             } catch (e: any) {
                 if (isClientError(e)) {
-                    const toast = useToast();
-                    toast.warning({ body: e.message });
+                    toast.warning({ body: e.message }, {
+                        pos: 'top-center',
+                    });
                 }
             }
         };
@@ -111,7 +118,7 @@ export default defineNuxtComponent({
 
             const apiClient = useAuthupAPI();
             return apiClient.identityProvider.getAuthorizeUri(
-                app.$config.public.authupApiURL,
+                app.$config.public.authupApiUrl,
                 id,
             );
         };
@@ -141,7 +148,7 @@ export default defineNuxtComponent({
         </div>
         <form @submit.prevent="submit">
             <div class="row">
-                <div class="col-12 cols-sm-6">
+                <div class="col-6">
                     <FormInput
                         v-model="form.name"
                         :validation-result="vuelidate.name"
@@ -168,13 +175,15 @@ export default defineNuxtComponent({
                         :submit="submit"
                     />
                 </div>
-                <div class="col-12 col-sm-6">
+                <div class="col-6">
                     <IdentityProviderList
                         ref="identityProviderRef"
                         :query="identityProviderQuery"
                     >
                         <template #header>
-                            <h6>IdentityProvider</h6>
+                            <h6 class="mb-0">
+                                <i class="fa-solid fa-atom" /> Providers
+                            </h6>
                         </template>
                         <template #items="props">
                             <div class="d-flex flex-column">
@@ -186,7 +195,7 @@ export default defineNuxtComponent({
                                         <div>
                                             <strong>{{ item.name }}</strong>
                                         </div>
-                                        <div class="ml-auto">
+                                        <div class="ms-auto">
                                             <a
                                                 :href="buildIdentityProviderURL(item.id)"
                                                 class="btn btn-primary btn-xs"

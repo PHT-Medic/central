@@ -6,27 +6,35 @@
  */
 
 import { HookName, isObject } from 'hapic';
-import { APIClient as AuthAPIClient } from '@authup/core';
+import type { TokenCreator } from '@authup/core';
+import {
+    APIClient as AuthAPIClient,
+    mountClientResponseErrorTokenHook,
+    unmountClientResponseErrorTokenHook,
+} from '@authup/core';
 import { setAPIClient } from '@authup/client-vue';
 import { APIClient, ErrorCode } from '@personalhealthtrain/central-common';
+import type { Pinia } from 'pinia';
+import { storeToRefs } from 'pinia';
 import { LicenseAgreementCommand, useLicenseAgreementEventEmitter } from '../domains/license-agreement';
+import { useAuthStore } from '../store/auth';
 
 declare module '#app' {
     interface NuxtApp {
         $api: APIClient;
-        $authupApi: AuthAPIClient;
+        $authupAPI: AuthAPIClient;
     }
 }
 
 declare module '@vue/runtime-core' {
     interface ComponentCustomProperties {
         $api: APIClient;
-        $authupApi: AuthAPIClient;
+        $authupAPI: AuthAPIClient;
     }
 }
 
 export default defineNuxtPlugin((ctx) => {
-    let apiUrl = ctx.$config.public.apiUrl || process.env.API_URL;
+    let { apiUrl } = ctx.$config.public;
 
     const resourceAPI = new APIClient({ baseURL: apiUrl });
     resourceAPI.on(HookName.RESPONSE_ERROR, (error) => {
@@ -46,11 +54,62 @@ export default defineNuxtPlugin((ctx) => {
 
     // -----------------------------------------------------------------------------------
 
-    apiUrl = ctx.$config.public.authupApiUrl || process.env.AUTHUP_API_URL;
+    apiUrl = ctx.$config.public.authupApiUrl;
 
     const authupAPI = new AuthAPIClient({ baseURL: apiUrl });
 
-    ctx.provide('authupApi', authupAPI);
+    ctx.provide('authupAPI', authupAPI);
 
     setAPIClient(authupAPI);
+
+    // -----------------------------------------------------------------------------------
+
+    const store = useAuthStore(ctx.$pinia as Pinia);
+    store.$subscribe((mutation, state) => {
+        if (mutation.storeId !== 'auth') return;
+
+        if (state.accessToken) {
+            resourceAPI.setAuthorizationHeader({
+                type: 'Bearer',
+                token: state.accessToken,
+            });
+
+            authupAPI.setAuthorizationHeader({
+                type: 'Bearer',
+                token: state.accessToken,
+            });
+
+            // todo: hook required to update store !!!
+            const tokenCreator : TokenCreator = () => {
+                let refreshToken : string | undefined;
+                if (state.refreshToken) {
+                    refreshToken = state.refreshToken;
+                }
+                if (refreshToken) {
+                    const refs = storeToRefs(store);
+                    refreshToken = refs.refreshToken.value;
+                }
+
+                return authupAPI.token.createWithRefreshToken({
+                    refresh_token: refreshToken as string,
+                });
+            };
+
+            mountClientResponseErrorTokenHook(resourceAPI, {
+                baseURL: ctx.$config.public.authupApiUrl,
+                tokenCreator,
+            });
+
+            mountClientResponseErrorTokenHook(authupAPI, {
+                baseURL: ctx.$config.public.authupApiUrl,
+                tokenCreator,
+            });
+        } else {
+            resourceAPI.unsetAuthorizationHeader();
+            authupAPI.unsetAuthorizationHeader();
+
+            unmountClientResponseErrorTokenHook(resourceAPI);
+            unmountClientResponseErrorTokenHook(authupAPI);
+        }
+    });
 });

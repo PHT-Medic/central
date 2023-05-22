@@ -101,10 +101,8 @@ export function buildDomainEntityNav(
         'nav nav-pills',
     ];
 
-    switch (options.direction) {
-        case 'vertical':
-            clazz.push('flex-column');
-            break;
+    if (options.direction === 'vertical') {
+        clazz.push('flex-column');
     }
 
     let prevLink : VNodeChild = [];

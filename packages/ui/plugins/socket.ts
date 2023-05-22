@@ -21,13 +21,11 @@ declare module '@vue/runtime-core' {
 
 export default defineNuxtPlugin((ctx) => {
     const url = ctx.$config.public.realtimeUrl ??
-        process.env.REALTIME_URL ??
         'http://localhost:3001/';
 
     let transports : string[] = [];
 
-    const rawTransports = process.env.REALTIME_TRANSPORTS ||
-        ctx.$config.public.realtimeTransports;
+    const rawTransports = ctx.$config.public.realtimeTransports;
 
     if (
         rawTransports &&

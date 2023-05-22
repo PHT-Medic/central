@@ -24,13 +24,13 @@ declare module '@vue/runtime-core' {
 }
 
 export default defineNuxtPlugin((ctx) => {
+    const { apiUrl } = ctx.$config.public;
+
     const warehouse = new Adapter({
         driver: {
             cookie: {
                 path: '/',
-                ...(process.env.API_URL === 'production' ? {
-                    domain: new URL(process.env.API_URL).hostname,
-                } : {}),
+                domain: new URL(apiUrl).hostname,
             },
         },
         isServer: () => !!process.server,

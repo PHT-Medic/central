@@ -57,7 +57,7 @@ export default defineNuxtPlugin((ctx) => {
 
     // preset missing ...
     ctx.vueApp.use(installAuthup, {
-        apiClient: ctx.$api as APIClient,
+        apiClient: ctx.$authupAPI as APIClient,
         components: false,
         ...baseOptions,
     });

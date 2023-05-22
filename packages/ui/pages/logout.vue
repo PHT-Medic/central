@@ -35,3 +35,6 @@ export default defineNuxtComponent({
     },
 });
 </script>
+<template>
+    <div />
+</template>

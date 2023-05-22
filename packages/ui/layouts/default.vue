@@ -25,7 +25,7 @@ export default defineNuxtComponent({
         <div class="page-wrapper">
             <PageSidebar />
             <div class="page-content">
-                <nuxt />
+                <NuxtPage />
             </div>
         </div>
         <PageFooter />

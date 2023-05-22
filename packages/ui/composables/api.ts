@@ -14,5 +14,5 @@ export function useAPI() : APIClient {
 }
 
 export function useAuthupAPI(): AuthupAPIClient {
-    return useNuxtApp().$authupApi;
+    return useNuxtApp().$authupAPI;
 }

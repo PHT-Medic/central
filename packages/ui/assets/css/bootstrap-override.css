@@ -5,8 +5,18 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-.form-control {
+.form-group {
+    margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
     font-size: inherit;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
 }
 
 .custom-control {
@@ -31,7 +41,12 @@
   padding: .4rem .7rem;
 }
 
+.nav-link {
+    color: inherit;
+}
+
 .nav-pills .nav-link.active,
+.nav-pills .nav-link.router-link-exact-active,
 .nav-pills .show>.nav-link {
     color: #fff;
     background-color: rgba(29, 33, 36, 0.5);
@@ -135,3 +150,24 @@ a:focus{
 .dropdown-item {
     font-size: 13px;
 }
+
+.pagination > li > .page-link {
+    color: #333;
+    background-color: #eee;
+    border: 1px solid #eee;
+    cursor:pointer;
+    font-size: inherit;
+    padding: 0.15rem 0.5rem;
+}
+
+.pagination > .active > .page-link,
+.pagination > .active > .page-link:focus,
+.pagination > .active > .page-link:hover,
+.pagination > li > .page-link:focus,
+.pagination > li > .page-link:hover,
+.pagination > li > .page-link.active {
+    background-color: #30373e;
+    color: #FFF;
+    border: 1px solid #30373e;
+}
+

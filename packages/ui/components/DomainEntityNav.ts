@@ -30,6 +30,7 @@ export default defineComponent({
     setup(props) {
         const items = toRef(props, 'items');
         const direction = toRef(props, 'direction');
+
         return () => buildDomainEntityNav(props.path, items.value, {
             direction: direction.value,
             prevLink: props.prevLink,

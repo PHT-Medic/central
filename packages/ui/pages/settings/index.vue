@@ -15,6 +15,7 @@
                 <DomainEntityNav
                     :items="items"
                     :path="'/settings'"
+                    :direction="'vertical'"
                 />
             </div>
             <div class="content-container">

@@ -7,6 +7,7 @@
 <script lang="ts">
 import { Gravatar } from '@vue-layout/gravatar';
 import { NavigationComponents } from '@vue-layout/navigation';
+import { BCollapse } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { ref } from '#imports';
@@ -15,6 +16,7 @@ import { useAuthStore } from '../../store/auth';
 
 export default defineNuxtComponent({
     components: {
+        BCollapse,
         Gravatar,
         NavigationComponents,
     },
@@ -28,7 +30,7 @@ export default defineNuxtComponent({
             displayNav.value = !displayNav.value;
         };
 
-        const infoText = computed(() => realmManagementName || 'Personal Health Train');
+        const infoText = computed(() => realmManagementName.value || 'Personal Health Train');
 
         return {
             infoText,

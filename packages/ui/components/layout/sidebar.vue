@@ -5,6 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { Countdown } from '@vue-layout/countdown';
 import { NavigationComponents } from '@vue-layout/navigation';
 import { storeToRefs } from 'pinia';
 import { defineNuxtComponent } from '#app';
@@ -12,7 +13,7 @@ import { computed, useAPI } from '#imports';
 import { useAuthStore } from '../../store/auth';
 
 export default defineNuxtComponent({
-    components: { NavigationComponents },
+    components: { Countdown, NavigationComponents },
     setup() {
         const store = useAuthStore();
         const { loggedIn, accessTokenExpireDate: tokenExpireDate, realmManagement } = storeToRefs(store);
@@ -57,12 +58,12 @@ export default defineNuxtComponent({
         <div class="mt-auto">
             <div
                 v-if="loggedIn"
-                class="font-weight-light d-flex flex-column ml-3 mr-3 mb-1 mt-auto"
+                class="font-weight-light d-flex flex-column ms-3 me-3 mb-1 mt-auto"
             >
                 <small
                     class="text-muted"
                 >
-                    <countdown
+                    <Countdown
                         :time="tokenExpiresIn"
                     >
                         <template #default="props">
@@ -71,7 +72,7 @@ export default defineNuxtComponent({
                                 {{ props.minutes }} minute(s), {{ props.seconds }} second(s)
                             </span>.
                         </template>
-                    </countdown>
+                    </Countdown>
                 </small>
             </div>
 

@@ -167,85 +167,84 @@ export default defineComponent({
             busy.value = false;
         };
 
-        const type = buildFormSelect({
-            label: true,
-            labelContent: 'Type',
-            value: form.type,
-            onChange(input: SecretType) {
-                form.type = input;
-                handleTypeChanged(input);
-            },
-            options: typeOptions,
-        });
+        return () => {
+            const type = buildFormSelect({
+                label: true,
+                labelContent: 'Type',
+                value: form.type,
+                onChange(input: SecretType) {
+                    form.type = input;
+                    handleTypeChanged(input);
+                },
+                options: typeOptions,
+            });
 
-        const key = buildFormInput({
-            label: true,
-            labelContent: 'Name',
-            value: form.key,
-            onChange(input: string) {
-                form.key = input;
-            },
-        });
+            const key = buildFormInput({
+                label: true,
+                labelContent: 'Name',
+                value: form.key,
+                onChange(input: string) {
+                    form.key = input;
+                },
+            });
 
-        const file = h('div', {
-            class: ['form-group', {
-                'form-group-error': $v.value.content.$error,
-                'form-group-warning': $v.value.content.$invalid &&
-                    !$v.value.content.$dirty,
-            }],
-        }, [
-            h('label', 'File'),
-            h('div', { class: 'custom-file' }, [
-                h('label', { class: 'custom-file-label' }, [
-                    'Public key file path...',
-                ]),
-                h('input', {
-                    ref: fileInput,
-                    type: 'file',
-                    class: 'custom-file-input',
-                    on: {
-                        change($event: any) {
+            const file = h('div', {
+                class: ['form-group', {
+                    'form-group-error': $v.value.content.$error,
+                    'form-group-warning': $v.value.content.$invalid &&
+                        !$v.value.content.$dirty,
+                }],
+            }, [
+                h('label', 'File'),
+                h('div', { class: 'input-group' }, [
+                    h('input', {
+                        ref: fileInput,
+                        type: 'file',
+                        class: 'form-control',
+                        placeholder: 'Public key file path...',
+                        onChange($event: any) {
                             $event.preventDefault();
 
                             readFile();
                         },
-                    },
-                }),
-            ]),
-        ]);
+                    }),
+                ]),
+            ]);
 
-        const content = buildFormTextarea({
-            label: true,
-            labelContent: 'Content',
-            value: form.content,
-            onChange(input) {
-                form.content = input;
-            },
-            props: {
-                rows: 8,
-            },
-        });
-        return () => h('div', [
-            type,
-            h('hr'),
-            key,
-            h('hr'),
-            h('div', { class: 'alert alert-dark alert-sm' }, [
-                'A secret can either be specified via',
-                h('strong', { class: 'pl-1 pr-1' }, 'file'),
-                'upload or by pasting its',
-                h('strong', { class: 'pl-1 pr-1' }, 'content'),
-                'in the textarea shown below.',
-            ]),
-            file,
-            content,
-            h('hr'),
-            buildFormSubmit({
-                createText: 'Create',
-                updateText: 'Update',
-                submit,
-                busy,
-            }),
-        ]);
+            const content = buildFormTextarea({
+                label: true,
+                labelContent: 'Content',
+                value: form.content,
+                onChange(input) {
+                    form.content = input;
+                },
+                props: {
+                    rows: 8,
+                },
+            });
+
+            return h('div', [
+                type,
+                h('hr'),
+                key,
+                h('hr'),
+                h('div', { class: 'alert alert-dark alert-sm' }, [
+                    'A secret can either be specified via',
+                    h('strong', { class: 'pl-1 pr-1' }, 'file'),
+                    'upload or by pasting its',
+                    h('strong', { class: 'pl-1 pr-1' }, 'content'),
+                    'in the textarea shown below.',
+                ]),
+                file,
+                content,
+                h('hr'),
+                buildFormSubmit({
+                    createText: 'Create',
+                    updateText: 'Update',
+                    submit,
+                    busy,
+                }),
+            ]);
+        };
     },
 });

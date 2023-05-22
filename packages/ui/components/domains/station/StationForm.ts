@@ -170,10 +170,6 @@ export default defineComponent({
             }
         });
 
-        const handleUpdated = (item: Station) => {
-            emit('updated', item);
-        };
-
         const toggleFormData = <T extends keyof typeof form>(key: T, id: any) => {
             if (form[key] === id) {
                 form[key] = null as any;
