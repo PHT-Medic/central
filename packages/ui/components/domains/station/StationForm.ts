@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { RealmList, buildValidationTranslator, initFormAttributesFromSource } from '@authup/client-vue';
+import { RealmList, initFormAttributesFromSource } from '@authup/client-vue';
 import type { Registry, Station } from '@personalhealthtrain/central-common';
 import {
     Ecosystem, isHex,
@@ -26,6 +26,7 @@ import type {
 import {
     computed, defineComponent, nextTick, ref,
 } from 'vue';
+import { buildValidationTranslator } from '../../../composables/ilingo';
 import { useAPI } from '#imports';
 import { wrapFnWithBusyState } from '../../../core/busy';
 import RegistryList from '../registry/RegistryList';

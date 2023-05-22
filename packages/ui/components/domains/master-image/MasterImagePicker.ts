@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { buildValidationTranslator } from '@authup/client-vue';
 import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/central-common';
 import type { FormSelectOption } from '@vue-layout/form-controls';
 import { buildFormSelect } from '@vue-layout/form-controls';
@@ -15,6 +14,7 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import type { VNodeArrayChildren } from 'vue';
 import { defineComponent } from 'vue';
+import { buildValidationTranslator } from '../../../composables/ilingo';
 import { wrapFnWithBusyState } from '../../../core/busy';
 import MasterImageGroupList from '../master-image-group/MasterImageGroupList';
 import MasterImageList from './MasterImageList';

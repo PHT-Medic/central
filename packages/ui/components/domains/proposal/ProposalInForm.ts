@@ -5,13 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { buildValidationTranslator, initFormAttributesFromSource } from '@authup/client-vue';
+import { initFormAttributesFromSource } from '@authup/client-vue';
 import type { ProposalStation } from '@personalhealthtrain/central-common';
 import { ProposalStationApprovalStatus } from '@personalhealthtrain/central-common';
 import { buildFormInput, buildFormSelect, buildFormSubmit } from '@vue-layout/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import type { PropType } from 'vue';
+import { buildValidationTranslator } from '../../../composables/ilingo';
 import { wrapFnWithBusyState } from '../../../core/busy';
 
 export default defineComponent({

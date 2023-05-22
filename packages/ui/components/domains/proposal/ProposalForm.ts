@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { buildValidationTranslator, initFormAttributesFromSource } from '@authup/client-vue';
+import { initFormAttributesFromSource } from '@authup/client-vue';
 import { buildFormInput, buildFormSubmit, buildFormTextarea } from '@vue-layout/form-controls';
 import type { ListItemSlotProps } from '@vue-layout/list-controls';
 import { SlotName } from '@vue-layout/list-controls';
@@ -15,6 +15,7 @@ import type { PropType } from 'vue';
 
 import type { MasterImage, Proposal, Station } from '@personalhealthtrain/central-common';
 import { ProposalRisk } from '@personalhealthtrain/central-common';
+import { buildValidationTranslator } from '../../../composables/ilingo';
 import { wrapFnWithBusyState } from '../../../core/busy';
 import MasterImagePicker from '../master-image/MasterImagePicker';
 import StationList from '../station/StationList';
