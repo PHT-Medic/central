@@ -13,7 +13,7 @@ import {
 import {
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
 } from '@vue-layout/form-controls';
-import type { ListItemsSlotProps } from '@vue-layout/list-controls';
+import type { ListItemSlotProps, ListItemsSlotProps } from '@vue-layout/list-controls';
 import { SlotName } from '@vue-layout/list-controls';
 import useVuelidate from '@vuelidate/core';
 import {
@@ -319,22 +319,22 @@ export default defineComponent({
                         },
                     },
                 }, {
-                    [SlotName.ITEM_ACTIONS]: (props: ListItemsSlotProps<Registry>) => h('button', {
+                    [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
                         disabled: props.busy,
                         class: ['btn btn-xs', {
-                            'btn-dark': form.registry_id !== props.item.id,
-                            'btn-warning': form.registry_id === props.item.id,
+                            'btn-dark': form.registry_id !== props.data.id,
+                            'btn-warning': form.registry_id === props.data.id,
                         }],
                         onClick($event: any) {
                             $event.preventDefault();
 
-                            toggleFormData('registry_id', props.item.id);
+                            toggleFormData('registry_id', props.data.id);
                         },
                     }, [
                         h('i', {
                             class: {
-                                'fa fa-plus': form.registry_id !== props.item.id,
-                                'fa fa-minus': form.registry_id === props.item.id,
+                                'fa fa-plus': form.registry_id !== props.data.id,
+                                'fa fa-minus': form.registry_id === props.data.id,
                             },
                         }),
                     ]),

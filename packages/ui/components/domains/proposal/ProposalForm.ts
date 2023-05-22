@@ -226,17 +226,17 @@ export default defineComponent({
                 [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Station>) => {
                     if (refs.entity.value) {
                         return h(ProposalStationAssignAction, {
-                            stationId: props.item.id,
+                            stationId: props.data.id,
                             proposalId: refs.entity.value.id,
                             realmId: refs.entity.value.id,
                         });
                     }
 
                     return h(AssignmentToggleButton, {
-                        id: props.item.id,
+                        id: props.data.id,
                         ids: stationIds.value,
                         onToggle() {
-                            toggleStationIds(props.item.id);
+                            toggleStationIds(props.data.id);
                         },
                     });
                 },

@@ -159,7 +159,7 @@ export default defineNuxtComponent({
                         <button
                             type="button"
                             class="btn btn-xs"
-                            :class="{'btn-primary': entityId !== props.item.id, 'btn-dark': entityId === props.data.id}"
+                            :class="{'btn-primary': entityId !== props.data.id, 'btn-dark': entityId === props.data.id}"
                             @click.prevent="triggerEdit(props.data)"
                         >
                             <i

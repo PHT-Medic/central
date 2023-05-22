@@ -115,7 +115,7 @@ export default defineComponent({
                         </div>
                     </div>
                     <template
-                        v-for="(item) in props.items"
+                        v-for="(item) in props.data"
                         :key="item.id"
                     >
                         <div

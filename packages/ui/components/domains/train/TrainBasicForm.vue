@@ -183,7 +183,7 @@ export default {
                     </template>
                     <template #item="props">
                         <proposal-item
-                            :entity="props.item"
+                            :entity="props.data"
                             @updated="props.handleUpdated"
                             @deleted="props.handleDeleted"
                         >

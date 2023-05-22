@@ -127,7 +127,7 @@ export default defineComponent({
 
                         <template #item-actions="props">
                             <train-station-assign-action
-                                :station-id="props.item.station_id"
+                                :station-id="props.data.station_id"
                                 :train-id="train.id"
                                 :realm-id="train.realm_id"
                                 @created="handleTrainStationCreated"
