@@ -69,6 +69,5 @@ export default defineNuxtComponent({
                 </div>
             </div>
         </div>
-        <nuxt-child />
     </div>
 </template>

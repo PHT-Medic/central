@@ -56,7 +56,7 @@ export default defineNuxtComponent({
                 />
             </div>
             <div class="content-container">
-                <nuxt-child />
+                <NuxtPage />
             </div>
         </div>
     </div>
