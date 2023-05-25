@@ -38,7 +38,7 @@ export async function createStationRouteHandler(req: Request, res: Response) : P
     const result = await runStationValidation(req, 'create');
 
     if (
-        isPropertySet(result.data, 'public_key') &&
+        typeof result.data.public_key === 'string' &&
         !isHex(result.data.public_key)
     ) {
         result.data.public_key = Buffer.from(result.data.public_key, 'utf8').toString('hex');

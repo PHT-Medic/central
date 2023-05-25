@@ -98,7 +98,7 @@ export default defineNuxtComponent({
                     </NuxtLink>
                     <EntityDelete
                         v-if="canManage"
-                        class="btn btn-xs btn-outline-danger"
+                        class="btn btn-xs btn-outline-danger ms-1"
                         :entity-id="data.item.id"
                         :entity-type="'registry'"
                         :with-text="false"

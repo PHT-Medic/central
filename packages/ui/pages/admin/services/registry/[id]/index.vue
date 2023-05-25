@@ -55,6 +55,7 @@ export default defineNuxtComponent({
 </script>
 <template>
     <RegistryForm
+        v-if="entity"
         :entity="entity"
         @updated="handleUpdated"
         @deleted="handleDeleted"

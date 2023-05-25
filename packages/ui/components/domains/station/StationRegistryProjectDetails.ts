@@ -21,9 +21,11 @@ export default defineComponent({
             required: true,
         },
     },
-    emits: ['updated'],
+    emits: ['resolved', 'failed', 'updated'],
     setup(props, { emit }) {
-        if (props.entity.ecosystem !== Ecosystem.DEFAULT) {
+        const refs = toRefs(props);
+
+        if (refs.entity.value.ecosystem !== Ecosystem.DEFAULT) {
             return () => h(
                 'div',
                 { class: 'alert alert-sm alert-danger' },
@@ -33,7 +35,7 @@ export default defineComponent({
             );
         }
 
-        if (!props.entity.registry_id) {
+        if (!refs.entity.value.registry_id) {
             return () => h(
                 'div',
                 { class: 'alert alert-sm alert-warning' },
@@ -43,7 +45,7 @@ export default defineComponent({
             );
         }
 
-        if (!props.entity.registry_project_id) {
+        if (!refs.entity.value.registry_project_id) {
             return () => h(
                 'div',
                 { class: 'alert alert-sm alert-warning' },
@@ -58,11 +60,20 @@ export default defineComponent({
         return () => h(
             RegistryProjectDetails,
             {
-                entityId: props.entity.registry_project_id as string,
-                onResolved(item: RegistryProject) {
+                entityId: refs.entity.value.registry_project_id as string,
+                onUpdated: (entity: RegistryProject) => {
                     emit('updated', {
-                        registry_project_id: item.id,
-                        registry_project: item,
+                        registry_project_id: entity.id,
+                        registry_project: entity,
+                    });
+                },
+                onFailed: (e) => {
+                    emit('failed', e);
+                },
+                onResolved: (entity: RegistryProject) => {
+                    emit('updated', {
+                        registry_project_id: entity.id,
+                        registry_project: entity,
                     });
                 },
             },

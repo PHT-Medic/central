@@ -79,8 +79,6 @@ export default defineNuxtPlugin((ctx) => {
                 type: 'Bearer',
                 token: state.accessToken,
             });
-
-            // todo: hook required to update store !!!
             const tokenCreator : TokenCreator = () => {
                 let refreshToken : string | undefined;
                 if (state.refreshToken) {
@@ -107,11 +105,14 @@ export default defineNuxtPlugin((ctx) => {
             mountClientResponseErrorTokenHook(resourceAPI, {
                 baseURL: ctx.$config.public.authupApiUrl,
                 tokenCreator,
+                tokenCreated: (response) => store.handleTokenGrantResponse(response),
+                timer: false,
             });
 
             mountClientResponseErrorTokenHook(authupAPI, {
                 baseURL: ctx.$config.public.authupApiUrl,
                 tokenCreator,
+                tokenCreated: (response) => store.handleTokenGrantResponse(response),
             });
         } else {
             resourceAPI.unsetAuthorizationHeader();

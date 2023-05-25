@@ -31,6 +31,7 @@ export default defineNuxtComponent({
 </script>
 <template>
     <StationForm
+        v-if="entity"
         :entity="entity"
         :realm-id="entity.realm_id"
         @updated="handleUpdated"

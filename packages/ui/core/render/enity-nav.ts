@@ -5,7 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { VNodeChild } from 'vue';
+import { defineComponent, ref } from 'vue';
+import type { PropType, VNodeChild } from 'vue';
+import { onClickOutside } from '@vueuse/core';
 import { NuxtLink } from '#components';
 
 export type DomainEntityNavItem = {
@@ -54,39 +56,63 @@ function buildLinkNode(
     );
 }
 
-function buildDropdown(item: DomainEntityNavItem, path: string) {
-    const expand = ref(false);
+const dropdown = defineComponent({
+    props: {
+        item: {
+            type: Object as PropType<DomainEntityNavItem>,
+            required: true,
+        },
+        path: {
+            type: String,
+            required: true,
+        },
+    },
+    setup(props) {
+        const refs = toRefs(props);
 
-    const components = item.components || [];
+        const expand = ref(false);
 
-    return h('li', {
-        class: 'nav-item dropdown',
-    }, [
-        h('a', {
-            class: [
-                'nav-link dropdown-toggle',
-                {
-                    show: expand.value,
-                },
-            ],
-            href: '#',
-            onClick($event: any) {
-                $event.preventDefault();
+        const components = refs.item.value.components || [];
 
-                expand.value = !expand.value;
-            },
+        const linkRef = ref(null);
+
+        onClickOutside(linkRef, () => {
+            expand.value = false;
+        });
+
+        return () => h('li', {
+            class: 'nav-item dropdown',
         }, [
-            h('i', { class: `${item.icon} pe-1` }),
-            item.name,
-        ]),
-        h('ul', { class: 'dropdown-menu' }, [
-            ...components.map((component) => h('li', [
-                buildLinkNode(component, buildLink(path, item.urlSuffix), 'dropdown-item'),
-            ])),
-        ]),
-    ]);
-}
+            h('a', {
+                ref: linkRef,
+                class: [
+                    'nav-link dropdown-toggle',
+                    {
+                        show: expand.value,
+                    },
+                ],
+                href: '#',
+                onClick($event: any) {
+                    $event.preventDefault();
 
+                    expand.value = !expand.value;
+                },
+            }, [
+                h('i', { class: `${refs.item.value.icon} pe-1` }),
+                refs.item.value.name,
+            ]),
+            h('ul', {
+                class: ['dropdown-menu', {
+                    show: expand.value,
+                }],
+            }, [
+                ...components.map((component) => h('li', [
+                    buildLinkNode(component, buildLink(refs.path.value, refs.item.value.urlSuffix), 'dropdown-item'),
+                ])),
+            ]),
+        ]);
+    },
+});
 export function buildDomainEntityNav(
     path: string,
     items: DomainEntityNavItem[],
@@ -130,7 +156,10 @@ export function buildDomainEntityNav(
             prevLink,
             ...items.map((item) => {
                 if (item.components) {
-                    return buildDropdown(item, path);
+                    return h(dropdown, {
+                        item,
+                        path,
+                    });
                 }
 
                 return h('li', { class: 'nav-item' }, [

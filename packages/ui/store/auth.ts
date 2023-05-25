@@ -217,6 +217,16 @@ export const useAuthStore = defineStore('auth', () => {
         }
     };
 
+    const handleTokenGrantResponse = (response: OAuth2TokenGrantResponse) => {
+        const expireDate = new Date(Date.now() + response.expires_in * 1000);
+        setTokenExpireDate(expireDate);
+
+        setToken(OAuth2TokenKind.ACCESS, response.access_token);
+        if (response.refresh_token) {
+            setToken(OAuth2TokenKind.REFRESH, response.refresh_token);
+        }
+    };
+
     const loggedIn = computed<boolean>(() => !!accessToken.value);
     const login = async (ctx: { name: string, password: string, realmId?: string}) => {
         try {
@@ -226,13 +236,7 @@ export const useAuthStore = defineStore('auth', () => {
                 ...(realmId ? { realm_id: ctx.realmId } : {}),
             });
 
-            const expireDate = new Date(Date.now() + data.expires_in * 1000);
-            setTokenExpireDate(expireDate);
-
-            setToken(OAuth2TokenKind.ACCESS, data.access_token);
-            if (data.refresh_token) {
-                setToken(OAuth2TokenKind.REFRESH, data.refresh_token);
-            }
+            handleTokenGrantResponse(data);
 
             await resolve();
         } catch (e) {
@@ -265,6 +269,7 @@ export const useAuthStore = defineStore('auth', () => {
         unsetToken,
 
         token,
+        handleTokenGrantResponse,
         setTokenInfo,
         unsetTokenInfo,
 

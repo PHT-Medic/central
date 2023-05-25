@@ -85,6 +85,7 @@ export default defineNuxtComponent({
 </script>
 <template>
     <RegistryProjectForm
+        v-if="childEntity"
         :entity="childEntity"
         :registry-id="entity.id"
         @updated="handleUpdated"

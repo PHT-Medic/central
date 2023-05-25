@@ -17,12 +17,13 @@
         "prepare": "nuxi prepare"
     },
     "devDependencies": {
-        "@authup/core": "^0.34.0",
-        "@authup/client-vue": "^0.34.0",
+        "@authup/client-vue": "^0.35.0",
+        "@authup/core": "^0.35.0",
+        "@bootstrap-vue-next/nuxt": "^0.0.5",
         "@fortawesome/fontawesome-free": "^6.4.0",
         "@nuxtjs/google-fonts": "^3.0.0",
-        "@pinia/nuxt": "^0.4.8",
         "@personalhealthtrain/central-common": "2.3.3",
+        "@pinia/nuxt": "^0.4.8",
         "@types/moment": "^2.13.0",
         "@vue-layout/countdown": "^2.4.0",
         "@vue-layout/form-controls": "^2.3.0",
@@ -37,7 +38,6 @@
         "@vuelidate/validators": "^2.0.2",
         "bootstrap": "^5.2.3",
         "bootstrap-vue-next": "^0.8.6",
-        "@bootstrap-vue-next/nuxt": "^0.0.5",
         "browser-storage-adapter": "^1.1.2",
         "events": "^3.3.0",
         "hapic": "^2.0.0-alpha.9",
@@ -54,5 +54,8 @@
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
     "publishConfig": {
         "access": "public"
+    },
+    "dependencies": {
+        "@vueuse/core": "^10.1.2"
     }
 }

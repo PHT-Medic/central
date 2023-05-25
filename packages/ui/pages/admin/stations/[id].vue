@@ -23,10 +23,8 @@ import {
     updateObjectProperties, useAPI, useRoute, useSocket,
 } from '#imports';
 import { createError, defineNuxtComponent, navigateTo } from '#app';
-import StationForm from '../../../components/domains/station/StationForm';
 
 export default defineNuxtComponent({
-    components: { StationForm },
     async setup() {
         let entity : Ref<Station>;
 

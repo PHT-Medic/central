@@ -11,8 +11,8 @@
     "description": "This package contains the Central API of the PHT. It was initially developed as part of my Bachelor Thesis.",
     "main": "./dist/cli/index.js",
     "dependencies": {
-        "@authup/core": "^0.34.0",
-        "@authup/server-adapter": "^0.34.0",
+        "@authup/core": "^0.35.0",
+        "@authup/server-adapter": "^0.35.0",
         "@ebec/http": "^1.0.0",
         "@hapic/harbor": "^2.0.0-alpha.9",
         "@hapic/vault": "^2.0.0-alpha.9",

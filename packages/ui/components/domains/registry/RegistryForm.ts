@@ -191,6 +191,7 @@ export default defineComponent({
                 busy: busy.value,
                 createText: 'Create',
                 updateText: 'Update',
+                isEditing: !!refs.entity.value,
                 validationResult: $v.value,
             });
 

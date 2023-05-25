@@ -90,6 +90,8 @@ export default defineComponent({
                 const response = await useAuthupAPI().robot.update(entity.value.id, form);
 
                 handleUpdated(response);
+
+                emit('updated', response);
             } catch (e) {
                 if (e instanceof Error) {
                     emit('failed', e);
@@ -97,49 +99,55 @@ export default defineComponent({
             }
         });
 
-        if (!entity.value) {
-            return () => h(
-                'div',
-                { class: 'alert alert-sm alert-warning' },
-                [
-                    'The robot details can not be displayed.',
-                ],
-            );
-        }
+        return () => {
+            if (!entity.value) {
+                return h(
+                    'div',
+                    { class: 'alert alert-sm alert-warning' },
+                    [
+                        'The robot details can not be displayed.',
+                    ],
+                );
+            }
 
-        const id = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.id,
-            label: true,
-            labelContent: 'ID',
-            value: form.id,
-            props: {
-                disabled: true,
-            },
-        });
+            const id = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.id,
+                label: true,
+                labelContent: 'ID',
+                value: form.id,
+                props: {
+                    disabled: true,
+                },
+            });
 
-        const secret = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.secret,
-            label: true,
-            labelContent: 'ID',
-            value: form.secret,
-            onChange(value) {
-                form.secret = value;
-            },
-        });
+            const secret = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.secret,
+                label: true,
+                labelContent: 'Secret',
+                value: form.secret,
+                props: {
+                    placeholder: '...',
+                },
+                onChange(value) {
+                    form.secret = value;
+                },
+            });
 
-        const submitForm = buildFormSubmit({
-            submit,
-            busy,
-            updateText: 'Update',
-            createText: 'Create',
-        });
+            const submitForm = buildFormSubmit({
+                submit,
+                busy: busy.value,
+                updateText: 'Update',
+                createText: 'Create',
+                isEditing: !!entity.value,
+            });
 
-        return () => h('div', [
-            id,
-            secret,
-            submitForm,
-        ]);
+            return h('div', [
+                id,
+                secret,
+                submitForm,
+            ]);
+        };
     },
 });

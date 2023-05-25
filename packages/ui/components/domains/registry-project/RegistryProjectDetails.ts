@@ -148,7 +148,7 @@ export default defineComponent({
                     id: entity.value.id,
                 });
 
-                emit('updated');
+                emit('updated', entity.value);
             } catch (e) {
                 if (e instanceof Error) {
                     emit('failed', e);
@@ -166,7 +166,7 @@ export default defineComponent({
             );
         }
 
-        return h('div', [
+        return () => h('div', [
             h('div', {
                 class: 'mb-2 d-flex flex-column',
             }, [
@@ -175,7 +175,7 @@ export default defineComponent({
                     h('input', {
                         class: 'form-control',
                         type: 'text',
-                        value: name,
+                        value: name.value,
                         disabled: true,
                     }),
                 ]),
@@ -186,7 +186,8 @@ export default defineComponent({
                         h('input', {
                             class: 'form-control',
                             type: 'text',
-                            value: accountName.value || 'xxx',
+                            value: accountName.value,
+                            placeholder: '...',
                             disabled: true,
                         }),
                     ]),
@@ -195,8 +196,9 @@ export default defineComponent({
                         h('input', {
                             class: 'form-control',
                             type: 'text',
-                            value: accountSecret.value || 'xxx',
+                            value: accountSecret.value,
                             disabled: true,
+                            placeholder: '...',
                         }),
                     ]),
                 ]),

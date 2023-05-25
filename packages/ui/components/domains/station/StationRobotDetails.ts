@@ -21,7 +21,8 @@ export default defineComponent({
             required: true,
         },
     },
-    setup(props) {
+    emits: ['failed'],
+    setup(props, { emit }) {
         if (props.entity.ecosystem !== Ecosystem.DEFAULT) {
             return () => h(
                 'div',
@@ -33,6 +34,9 @@ export default defineComponent({
         }
 
         return () => h(RobotDetails, {
+            onFailed: (e) => {
+                emit('failed', e);
+            },
             where: {
                 name: props.entity.id,
                 realm_id: props.entity.realm_id,

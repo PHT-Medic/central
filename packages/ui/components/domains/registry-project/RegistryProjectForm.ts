@@ -6,14 +6,8 @@
  */
 
 import { initFormAttributesFromSource } from '@authup/client-vue';
-import type {
-    Registry,
-    RegistryProject,
-} from '@personalhealthtrain/central-common';
-import {
-    RegistryProjectType,
-    createNanoID,
-} from '@personalhealthtrain/central-common';
+import type { Registry, RegistryProject } from '@personalhealthtrain/central-common';
+import { RegistryProjectType, createNanoID } from '@personalhealthtrain/central-common';
 import { buildFormInput, buildFormSelect, buildFormSubmit } from '@vue-layout/form-controls';
 import type { ListItemSlotProps } from '@vue-layout/list-controls';
 import { SlotName } from '@vue-layout/list-controls';
@@ -21,17 +15,13 @@ import useVuelidate from '@vuelidate/core';
 import {
     helpers, maxLength, minLength, required,
 } from '@vuelidate/validators';
+import type { PropType, VNodeArrayChildren } from 'vue';
 import { computed } from 'vue';
-import type {
-    PropType,
-    VNodeArrayChildren,
-} from 'vue';
 import { buildValidationTranslator } from '../../../composables/ilingo';
 import { wrapFnWithBusyState } from '../../../core/busy';
 import RegistryList from '../registry/RegistryList';
 
-const alphaWithUpperNumHyphenUnderscore = helpers.regex(
-    'alphaWithUpperNumHyphenUnderscore',
+const alphaNumHyphenUnderscore = helpers.regex(
     /^[a-z0-9-_]*$/,
 );
 
@@ -67,7 +57,7 @@ export default defineComponent({
             },
             external_name: {
                 required,
-                alphaWithUpperNumHyphenUnderscore,
+                alphaNumHyphenUnderscore,
                 minLength: minLength(3),
                 maxLength: maxLength(64),
             },
@@ -81,6 +71,7 @@ export default defineComponent({
 
         const types = [
             { id: RegistryProjectType.DEFAULT, value: 'DEFAULT' },
+            { id: RegistryProjectType.STATION, value: 'Station' },
             { id: RegistryProjectType.AGGREGATOR, value: 'Aggregator' },
             { id: RegistryProjectType.INCOMING, value: 'Incoming' },
             { id: RegistryProjectType.OUTGOING, value: 'Outgoing' },
@@ -133,6 +124,8 @@ export default defineComponent({
             refs.entity.value.updated_at :
             undefined));
 
+        initFromProperties();
+
         watch(updatedAt, (val, oldValue) => {
             if (val && val !== oldValue) {
                 initFromProperties();
@@ -159,130 +152,135 @@ export default defineComponent({
             }
         });
 
-        const name = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.name,
-            label: true,
-            labelContent: 'Name',
-            value: form.name,
-            onChange(input) {
-                form.name = input;
-            },
-        });
-        const externalName = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.external_name,
-            label: true,
-            labelContent: 'External Name',
-            value: form.external_name,
-            onChange(input) {
-                form.external_name = input;
-            },
-        });
-
-        const externalNameHint = h('div', {
-            class: ['alert alert-sm', {
-                'alert-danger': !isExternalNameUnchanged.value,
-                'alert-info': isExternalNameUnchanged.value,
-            }],
-        }, [
-            h('div', { class: 'mb-1' }, [
-                (!isExternalNameUnchanged.value ?
-                    'If you change the external_name, a new representation will be created in the Registry.' :
-                    'If you don\'t want to chose a external_name by your own, you can generate one.'
-                ),
-            ]),
-            h('button', {
-                class: 'btn btn-xs btn-dark',
-                type: 'button',
-                onClick($event: any) {
-                    $event.preventDefault();
-
-                    generateAlias();
+        return () => {
+            const name = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.name,
+                label: true,
+                labelContent: 'Name',
+                value: form.name,
+                onChange(input) {
+                    form.name = input;
                 },
-            }, [
-                h('i', { class: 'fa fa-wrench pr-1' }),
-                'Generate',
-            ]),
-            h('button', {
-                class: 'btn btn-xs btn-dark ml-1',
-                type: 'button',
-                disabled: isExternalNameUnchanged.value,
-                onClick($event: any) {
-                    $event.preventDefault();
-
-                    resetAlias();
+            });
+            const externalName = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.external_name,
+                label: true,
+                labelContent: 'External Name',
+                value: form.external_name,
+                onChange(input) {
+                    form.external_name = input;
                 },
+            });
+
+            const externalNameHint = h('div', {
+                class: ['alert alert-sm', {
+                    'alert-danger': !isExternalNameUnchanged.value,
+                    'alert-info': isExternalNameUnchanged.value,
+                }],
             }, [
-                h('i', { class: 'fa fa-undo pr-1' }),
-                'Reset',
-            ]),
-        ]);
+                h('div', { class: 'mb-1' }, [
+                    (!isExternalNameUnchanged.value ?
+                        'If you change the external_name, a new representation will be created in the Registry.' :
+                        'If you don\'t want to chose a external_name by your own, you can generate one.'
+                    ),
+                ]),
+                h('button', {
+                    class: 'btn btn-xs btn-dark',
+                    type: 'button',
+                    onClick($event: any) {
+                        $event.preventDefault();
 
-        const type = buildFormSelect({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.external_name,
-            label: true,
-            labelContent: 'Type',
-            value: form.type,
-            options: types,
-            onChange(input) {
-                form.external_name = input;
-            },
-        });
+                        generateAlias();
+                    },
+                }, [
+                    h('i', { class: 'fa fa-wrench pe-1' }),
+                    'Generate',
+                ]),
+                h('button', {
+                    class: 'btn btn-xs btn-dark ms-1',
+                    type: 'button',
+                    disabled: isExternalNameUnchanged.value,
+                    onClick($event: any) {
+                        $event.preventDefault();
 
-        let registry : VNodeArrayChildren = [];
+                        resetAlias();
+                    },
+                }, [
+                    h('i', { class: 'fa fa-undo pe-1' }),
+                    'Reset',
+                ]),
+            ]);
 
-        if (!isRegistryLocked.value) {
-            registry = [
-                h('hr'),
-                h(RegistryList, {
-                    [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
-                        attrs: {
-                            disabled: props.busy,
-                        },
-                        class: ['btn btn-xs', {
-                            'btn-dark': form.registry_id !== props.data.id,
-                            'btn-warning': form.registry_id === props.data.id,
-                        }],
-                        onClick($event: any) {
-                            $event.preventDefault();
+            const type = buildFormSelect({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.type,
+                label: true,
+                labelContent: 'Type',
+                value: form.type,
+                options: types,
+                onChange(input) {
+                    form.type = input;
+                },
+            });
 
-                            toggleForm('registry_id', props.data.id);
-                        },
-                    }, [
-                        h('i', {
-                            class: {
-                                'fa fa-plus': form.registry_id !== props.data.id,
-                                'fa fa-minus': form.registry_id === props.data.id,
+            let registry : VNodeArrayChildren = [];
+
+            if (!isRegistryLocked.value) {
+                registry = [
+                    h('hr'),
+                    h(RegistryList, {
+                        [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
+                            attrs: {
+                                disabled: props.busy,
                             },
-                        }),
-                    ]),
-                }),
-            ];
-        }
+                            class: ['btn btn-xs', {
+                                'btn-dark': form.registry_id !== props.data.id,
+                                'btn-warning': form.registry_id === props.data.id,
+                            }],
+                            onClick($event: any) {
+                                $event.preventDefault();
 
-        const submitForm = buildFormSubmit({
-            submit,
-            busy,
-            createText: 'Create',
-            updateText: 'Update',
-        });
+                                toggleForm('registry_id', props.data.id);
+                            },
+                        }, [
+                            h('i', {
+                                class: {
+                                    'fa fa-plus': form.registry_id !== props.data.id,
+                                    'fa fa-minus': form.registry_id === props.data.id,
+                                },
+                            }),
+                        ]),
+                    }),
+                ];
+            }
 
-        return h('form', {
-            onSubmit($event: any) {
-                $event.preventDefault();
-            },
-        }, [
-            type,
-            h('hr'),
-            name,
-            h('hr'),
-            externalName,
-            externalNameHint,
-            registry,
-            h('hr'),
-            submitForm,
-        ]);
+            const submitForm = buildFormSubmit({
+                submit,
+                busy: busy.value,
+                createText: 'Create',
+                updateText: 'Update',
+                isEditing: !!refs.entity.value,
+            });
+
+            return h('form', {
+                onSubmit($event: any) {
+                    $event.preventDefault();
+
+                    return submit();
+                },
+            }, [
+                type,
+                h('hr'),
+                name,
+                h('hr'),
+                externalName,
+                externalNameHint,
+                registry,
+                h('hr'),
+                submitForm,
+            ]);
+        };
     },
 });

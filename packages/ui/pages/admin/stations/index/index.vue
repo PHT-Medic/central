@@ -112,7 +112,7 @@ export default defineNuxtComponent({
                     </nuxt-link>
                     <EntityDelete
                         v-if="canDrop"
-                        class="btn btn-xs btn-outline-danger"
+                        class="btn btn-xs btn-outline-danger ms-1"
                         :entity-id="data.item.id"
                         :entity-type="'station'"
                         :with-text="false"

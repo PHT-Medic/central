@@ -13,6 +13,7 @@ import type { BuildInput } from 'rapiq';
 import { computed, ref, toRefs } from 'vue';
 import type { PropType, Ref } from 'vue';
 import { definePageMeta } from '#imports';
+import EntityDelete from '../../../../../../components/domains/EntityDelete';
 import RegistryProjectList from '../../../../../../components/domains/registry-project/RegistryProjectList';
 import { LayoutKey, LayoutNavigationID } from '../../../../../../config/layout';
 import RegistryProjectDetails from '../../../../../../components/domains/registry-project/RegistryProjectDetails';
@@ -21,6 +22,7 @@ import { useAuthStore } from '../../../../../../store/auth';
 export default {
     components: {
         BTable,
+        EntityDelete,
         RegistryProjectDetails,
         RegistryProjectList,
     },
@@ -139,7 +141,7 @@ export default {
                         </nuxt-link>
                         <button
                             type="button"
-                            class="btn btn-xs btn-outline-dark"
+                            class="btn btn-xs btn-outline-dark ms-1 me-1"
                             @click.prevent="showDetails(data.item)"
                         >
                             <i class="fa-solid fa-info" />

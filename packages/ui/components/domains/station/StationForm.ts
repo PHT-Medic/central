@@ -33,7 +33,7 @@ import RegistryList from '../registry/RegistryList';
 import StationRegistryProjectDetails from './StationRegistryProjectDetails';
 import StationRobotDetails from './StationRobotDetails';
 
-const alphaWithUpperNumHyphenUnderscore = helpers.regex('alphaWithUpperNumHyphenUnderscore', /^[a-z0-9-_]*$/);
+const alphaNumHyphenUnderscore = helpers.regex(/^[a-z0-9-_]*$/);
 
 export default defineComponent({
     name: 'StationForm',
@@ -51,7 +51,7 @@ export default defineComponent({
             default: undefined,
         },
     },
-    emits: ['created', 'updated', 'failed'],
+    emits: ['created', 'updated', 'failed', 'robotUpdated'],
     setup(props, { emit }) {
         const refs = toRefs(props);
 
@@ -83,7 +83,7 @@ export default defineComponent({
 
             },
             external_name: {
-                alphaWithUpperNumHyphenUnderscore,
+                alphaNumHyphenUnderscore,
                 minLength: minLength(3),
                 maxLength: maxLength(64),
             },
@@ -119,11 +119,9 @@ export default defineComponent({
         const registryNode = ref<typeof RegistryList | null>(null);
 
         const initForm = () => {
-            if (!refs.entity.value) {
-                return;
+            if (refs.entity.value) {
+                initFormAttributesFromSource(form, refs.entity.value);
             }
-
-            initFormAttributesFromSource(form, refs.entity.value);
 
             if (!form.realm_id && refs.realmId.value) {
                 form.realm_id = refs.realmId.value;
@@ -142,6 +140,8 @@ export default defineComponent({
                 }
             });
         };
+
+        initForm();
 
         watch(updatedAt, (val, oldVal) => {
             if (val && val !== oldVal) {
@@ -342,10 +342,11 @@ export default defineComponent({
 
             const submitNode = buildFormSubmit({
                 submit,
-                busy,
+                busy: busy.value,
                 createText: 'Create',
                 updateText: 'Update',
                 validationResult: $v.value,
+                isEditing: !!refs.entity.value,
             });
 
             let editingElements : VNodeArrayChildren = [];
@@ -365,6 +366,12 @@ export default defineComponent({
 
                             h(StationRegistryProjectDetails, {
                                 entity: refs.entity.value,
+                                onFailed: (e) => {
+                                    emit('failed', e);
+                                },
+                                onUpdated: (entity) => {
+                                    emit('updated', entity);
+                                },
                             }),
                         ]),
                         h('div', { class: 'col' }, [
@@ -376,6 +383,9 @@ export default defineComponent({
 
                             h(StationRobotDetails, {
                                 entity: refs.entity.value,
+                                onFailed: (e) => {
+                                    emit('failed', e);
+                                },
                             }),
                         ]),
                     ]),
