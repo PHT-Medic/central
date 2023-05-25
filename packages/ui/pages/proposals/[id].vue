@@ -45,10 +45,10 @@ export default defineNuxtComponent({
         const store = useAuthStore();
         const { realmId } = storeToRefs(store);
 
+        const route = useRoute();
+
         let entity : Ref<Proposal>;
         let proposalStation : Ref<ProposalStation>;
-
-        const route = useRoute();
 
         try {
             const response = await useAPI().proposal.getOne(route.params.id as string, {
@@ -57,11 +57,13 @@ export default defineNuxtComponent({
                 },
             });
 
+            entity = ref(response);
+
             if (response.realm_id !== realmId.value) {
                 const response = await useAPI().proposalStation.getMany({
                     filter: {
                         proposal_id: entity.value.id,
-                        station_realm_id: realmId,
+                        station_realm_id: realmId.value,
                     },
                 });
 

@@ -17,6 +17,7 @@ import {
     DomainType,
     PermissionID,
 } from '@personalhealthtrain/central-common';
+import { NuxtLink } from '#components';
 import { hasNormalizedSlot, normalizeSlot } from '../../../core';
 import { useAuthStore } from '../../../store/auth';
 import EntityDelete from '../EntityDelete';
@@ -35,7 +36,9 @@ export default defineComponent({
         const store = useAuthStore();
         const canDrop = computed(() => store.has(PermissionID.PROPOSAL_DROP));
 
-        return () => h(ProposalDetails, {}, {
+        return () => h(ProposalDetails, {
+            entity: props.entity,
+        }, {
             default: (props: ProposalDetailsSlotProps) => {
                 let deleteAction : VNode | undefined;
 
@@ -46,10 +49,10 @@ export default defineComponent({
                         EntityDelete,
                         {
                             withText: false,
-                            entityId: props.entity.id,
+                            entityId: props.data.id,
                             entityType: DomainType.PROPOSAL,
-                            disabled: props.busy || props.entity.trains > 0,
-                            class: 'btn btn-xs btn-danger ml-1',
+                            disabled: props.busy || props.data.trains > 0,
+                            class: 'btn btn-xs btn-danger ms-1',
                             onDeleted(data: any) {
                                 props.deleted(data);
                             },
@@ -62,9 +65,9 @@ export default defineComponent({
                 } else {
                     itemActions = [
                         h(
-                            'nuxt-link',
+                            NuxtLink,
                             {
-                                to: `/proposals/${props.entity.id}`,
+                                to: `/proposals/${props.data.id}`,
                                 disabled: props.busy,
                                 class: 'btn btn-xs btn-dark',
                             },
@@ -99,12 +102,12 @@ export default defineComponent({
                                             'nuxt-link',
                                             {
                                                 props: {
-                                                    to: `/proposals/${props.entity.id}`,
+                                                    to: `/proposals/${props.data.id}`,
                                                 },
                                                 class: 'mb-0',
                                             },
                                             [
-                                                props.entity.title,
+                                                props.data.title,
                                             ],
                                         ),
                                     ],
@@ -112,7 +115,7 @@ export default defineComponent({
                                 h(
                                     'div',
                                     {
-                                        class: 'ml-auto',
+                                        class: 'ms-auto',
                                     },
                                     itemActions,
                                 ),
@@ -128,7 +131,7 @@ export default defineComponent({
                                     h(
                                         'small',
                                         [
-                                            h('span', { class: 'text-primary' }, [props.entity.trains]),
+                                            h('span', { class: 'text-primary' }, [props.data.trains]),
                                             ' ',
                                             'Train(s)',
                                         ],
@@ -140,18 +143,18 @@ export default defineComponent({
                                         ]),
                                         ' ',
                                         h(Timeago, {
-                                            datetime: props.entity.updated_at,
+                                            datetime: props.data.updated_at,
                                         }),
                                     ]),
                                 ]),
-                                h('div', { class: 'ml-auto' }, [
+                                h('div', { class: 'ms-auto' }, [
                                     h('small', [
                                         h('span', { class: 'text-muted' }, [
                                             'created by',
                                         ]),
                                         ' ',
                                         h('span', [
-                                            props.entity.user_id,
+                                            props.data.user_id,
                                         ]),
                                     ]),
                                 ]),

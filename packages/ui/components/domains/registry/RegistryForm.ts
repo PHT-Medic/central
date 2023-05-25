@@ -90,6 +90,7 @@ export default defineComponent({
         initForm();
 
         const submit = wrapFnWithBusyState(busy, async () => {
+            console.log('handle');
             if ($v.value.$invalid) {
                 return;
             }
@@ -187,17 +188,13 @@ export default defineComponent({
 
             const submitNode = buildFormSubmit({
                 submit,
-                busy,
+                busy: busy.value,
                 createText: 'Create',
                 updateText: 'Update',
                 validationResult: $v.value,
             });
 
-            return h('form', {
-                onSubmit($event: any) {
-                    $event.preventDefault();
-                },
-            }, [
+            return h('form', [
                 h('div', { class: 'row' }, [
                     h('div', { class: 'col' }, [
                         h('h6', [

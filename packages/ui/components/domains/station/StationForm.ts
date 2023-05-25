@@ -178,235 +178,238 @@ export default defineComponent({
             }
         };
 
-        let realm : VNodeArrayChildren = [];
-        if (!isRealmLocked.value) {
-            realm = [
-                h(
-                    RealmList,
-                    {
-                        headerTitle: false,
-                        headerSearch: false,
-                        footerPagination: false,
-                    },
-                    {
-                        [SlotName.ITEMS]: (props: ListItemsSlotProps<Station>) => buildFormSelect({
-                            validationTranslator: buildValidationTranslator(),
-                            validationResult: $v.value.realm_id,
-                            label: true,
-                            labelContent: 'Realms',
-                            value: form.realm_id,
-                            onChange(input) {
-                                form.realm_id = input;
-                            },
-                            options: props.data.map((item) => ({
-                                id: item.id,
-                                value: item.name,
-                            })),
-                        }),
+        return () => {
+            let realm : VNodeArrayChildren = [];
+            if (!isRealmLocked.value) {
+                realm = [
+                    h(
+                        RealmList,
+                        {
+                            headerTitle: false,
+                            headerSearch: false,
+                            footerPagination: false,
+                        },
+                        {
+                            [SlotName.ITEMS]: (props: ListItemsSlotProps<Station>) => buildFormSelect({
+                                validationTranslator: buildValidationTranslator(),
+                                validationResult: $v.value.realm_id,
+                                label: true,
+                                labelContent: 'Realms',
+                                value: form.realm_id,
+                                onChange(input) {
+                                    form.realm_id = input;
+                                },
+                                options: props.data.map((item) => ({
+                                    id: item.id,
+                                    value: item.name,
+                                })),
+                            }),
 
-                    },
-                ),
-                h('hr'),
-            ];
-        }
+                        },
+                    ),
+                    h('hr'),
+                ];
+            }
 
-        const name = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.name,
-            label: true,
-            labelContent: 'Name',
-            value: form.name,
-            onChange(input) {
-                form.name = input;
-            },
-        });
-
-        const externalName = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.external_name,
-            label: true,
-            labelContent: 'External Name',
-            value: form.external_name,
-            onChange(input) {
-                form.external_name = input;
-            },
-        });
-
-        const emailNode = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.email,
-            label: true,
-            labelContent: 'E-Mail',
-            value: form.email,
-            onChange(input) {
-                form.email = input;
-            },
-        });
-
-        const publicKey = buildFormTextarea({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.public_key,
-            label: true,
-            labelContent: [
-                'PublicKey',
-                (isHexPublicKey.value ?
-                    h('span', { class: 'text-danger font-weight-bold pl-1' }, [
-                        'Hex',
-                        h('i', { class: 'fa fa-exclamation-triangle pl-1' }),
-                    ]) :
-                    ''
-                ),
-            ],
-            value: form.public_key,
-            onChange(input) {
-                form.public_key = input;
-            },
-            props: {
-                rows: 6,
-            },
-        });
-
-        const hidden = h('div', {
-            class: 'form-group mb-1',
-        }, [
-            h('label', { class: 'mb-2' }, ['Hidden']),
-            h(BFormCheckbox, {
-                class: 'pb-2',
-                model: {
-                    value: form.hidden,
-                    callback(v: boolean) {
-                        form.hidden = v;
-                    },
-                    expression: 'form.hidden',
+            const name = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.name,
+                label: true,
+                labelContent: 'Name',
+                value: form.name,
+                onChange(input) {
+                    form.name = input;
                 },
+            });
+
+            const externalName = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.external_name,
+                label: true,
+                labelContent: 'External Name',
+                value: form.external_name,
+                onChange(input) {
+                    form.external_name = input;
+                },
+            });
+
+            const emailNode = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.email,
+                label: true,
+                labelContent: 'E-Mail',
+                value: form.email,
+                onChange(input) {
+                    form.email = input;
+                },
+            });
+
+            const publicKey = buildFormTextarea({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.public_key,
+                label: true,
+                labelContent: [
+                    'PublicKey',
+                    (isHexPublicKey.value ?
+                        h('span', { class: 'text-danger font-weight-bold pl-1' }, [
+                            'Hex',
+                            h('i', { class: 'fa fa-exclamation-triangle pl-1' }),
+                        ]) :
+                        ''
+                    ),
+                ],
+                value: form.public_key,
+                onChange(input) {
+                    form.public_key = input;
+                },
+                props: {
+                    rows: 6,
+                },
+            });
+
+            const hidden = h('div', {
+                class: 'form-group mb-1',
             }, [
-                'Hide for proposal & train selection?',
-            ]),
-        ]);
-
-        const ecosystem = buildFormSelect({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.ecosystem,
-            label: true,
-            labelContent: 'Ecosystem',
-            value: form.ecosystem,
-            options: ecosystems,
-            onChange(input) {
-                form.ecosystem = input;
-
-                nextTick(() => {
-                    if (registryNode.value) {
-                        registryNode.value.load();
-                    }
-                });
-            },
-        });
-
-        let registry : VNodeArrayChildren = [];
-
-        if (form.ecosystem) {
-            registry = [
-                h('hr'),
-                h(RegistryList, {
-                    ref: registryNode,
-                    loadOnSetup: false,
-                    query: {
-                        filter: {
-                            ecosystem: form.ecosystem as Ecosystem,
+                h('label', { class: 'mb-2' }, ['Hidden']),
+                h(BFormCheckbox, {
+                    class: 'pb-2',
+                    model: {
+                        value: form.hidden,
+                        callback(v: boolean) {
+                            form.hidden = v;
                         },
+                        expression: 'form.hidden',
                     },
-                }, {
-                    [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
-                        disabled: props.busy,
-                        class: ['btn btn-xs', {
-                            'btn-dark': form.registry_id !== props.data.id,
-                            'btn-warning': form.registry_id === props.data.id,
-                        }],
-                        onClick($event: any) {
-                            $event.preventDefault();
+                }, [
+                    'Hide for proposal & train selection?',
+                ]),
+            ]);
 
-                            toggleFormData('registry_id', props.data.id);
-                        },
-                    }, [
-                        h('i', {
-                            class: {
-                                'fa fa-plus': form.registry_id !== props.data.id,
-                                'fa fa-minus': form.registry_id === props.data.id,
+            const ecosystem = buildFormSelect({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.ecosystem,
+                label: true,
+                labelContent: 'Ecosystem',
+                value: form.ecosystem,
+                options: ecosystems,
+                onChange(input) {
+                    form.ecosystem = input;
+
+                    nextTick(() => {
+                        if (registryNode.value) {
+                            registryNode.value.load();
+                        }
+                    });
+                },
+            });
+
+            let registry : VNodeArrayChildren = [];
+
+            if (form.ecosystem) {
+                registry = [
+                    h('hr'),
+                    h(RegistryList, {
+                        ref: registryNode,
+                        loadOnSetup: false,
+                        query: {
+                            filter: {
+                                ecosystem: form.ecosystem as Ecosystem,
                             },
-                        }),
-                    ]),
-                }),
-            ];
-        }
+                        },
+                    }, {
+                        [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
+                            disabled: props.busy,
+                            class: ['btn btn-xs', {
+                                'btn-dark': form.registry_id !== props.data.id,
+                                'btn-warning': form.registry_id === props.data.id,
+                            }],
+                            onClick($event: any) {
+                                $event.preventDefault();
 
-        const submitNode = buildFormSubmit({
-            submit,
-            busy,
-            createText: 'Create',
-            updateText: 'Update',
-        });
-
-        let editingElements : VNodeArrayChildren = [];
-
-        if (refs.entity.value) {
-            editingElements = [
-                h('hr'),
-                h('div', {
-                    class: 'row',
-                }, [
-                    h('div', { class: 'col' }, [
-                        h('h6', [
-                            h('i', { class: 'fas fa-robot' }),
-                            ' ',
-                            'Registry Credentials',
+                                toggleFormData('registry_id', props.data.id);
+                            },
+                        }, [
+                            h('i', {
+                                class: {
+                                    'fa fa-plus': form.registry_id !== props.data.id,
+                                    'fa fa-minus': form.registry_id === props.data.id,
+                                },
+                            }),
                         ]),
+                    }),
+                ];
+            }
 
-                        h(StationRegistryProjectDetails, {
-                            entity: refs.entity.value,
-                        }),
-                    ]),
-                    h('div', { class: 'col' }, [
-                        h('h6', [
-                            h('i', { class: 'fas fa-robot' }),
-                            ' ',
-                            'Robot Credentials',
+            const submitNode = buildFormSubmit({
+                submit,
+                busy,
+                createText: 'Create',
+                updateText: 'Update',
+                validationResult: $v.value,
+            });
+
+            let editingElements : VNodeArrayChildren = [];
+
+            if (refs.entity.value) {
+                editingElements = [
+                    h('hr'),
+                    h('div', {
+                        class: 'row',
+                    }, [
+                        h('div', { class: 'col' }, [
+                            h('h6', [
+                                h('i', { class: 'fas fa-robot' }),
+                                ' ',
+                                'Registry Credentials',
+                            ]),
+
+                            h(StationRegistryProjectDetails, {
+                                entity: refs.entity.value,
+                            }),
                         ]),
+                        h('div', { class: 'col' }, [
+                            h('h6', [
+                                h('i', { class: 'fas fa-robot' }),
+                                ' ',
+                                'Robot Credentials',
+                            ]),
 
-                        h(StationRobotDetails, {
-                            entity: refs.entity.value,
-                        }),
+                            h(StationRobotDetails, {
+                                entity: refs.entity.value,
+                            }),
+                        ]),
+                    ]),
+                ];
+            }
+
+            return h('div', [
+                h('div', { class: 'row' }, [
+                    h('div', {
+                        class: 'col',
+                    }, [
+                        realm,
+                        name,
+                        h('hr'),
+                        externalName,
+                        h('hr'),
+                        ecosystem,
+                        registry,
+
+                    ]),
+                    h('div', {
+                        class: 'col',
+                    }, [
+                        hidden,
+                        h('hr'),
+                        emailNode,
+                        h('hr'),
+                        publicKey,
+                        h('hr'),
+                        submitNode,
                     ]),
                 ]),
-            ];
-        }
-
-        return () => h('div', [
-            h('div', { class: 'row' }, [
-                h('div', {
-                    class: 'col',
-                }, [
-                    realm,
-                    name,
-                    h('hr'),
-                    externalName,
-                    h('hr'),
-                    ecosystem,
-                    registry,
-
-                ]),
-                h('div', {
-                    class: 'col',
-                }, [
-                    hidden,
-                    h('hr'),
-                    emailNode,
-                    h('hr'),
-                    publicKey,
-                    h('hr'),
-                    submitNode,
-                ]),
-            ]),
-            ...editingElements,
-        ]);
+                ...editingElements,
+            ]);
+        };
     },
 });

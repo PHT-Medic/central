@@ -11,9 +11,8 @@ import {
     PermissionID,
 } from '@personalhealthtrain/central-common';
 import {
-    BDropdown, BDropdownDivider, BDropdownItem, BSpinner, BTable,
+    BDropdown, BDropdownDivider, BDropdownItem, BModal, BSpinner, BTable,
 } from 'bootstrap-vue-next';
-import type { BModal } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { Ref } from 'vue';
 import { computed, ref } from 'vue';
@@ -30,6 +29,7 @@ import { useAuthStore } from '../../../store/auth';
 export default defineNuxtComponent({
     components: {
         BDropdown,
+        BModal,
         BDropdownDivider,
         BDropdownItem,
         BSpinner,
@@ -234,7 +234,7 @@ export default defineNuxtComponent({
             </proposal-station-list>
         </div>
 
-        <b-modal
+        <BModal
             ref="modalNode"
             size="lg"
             button-size="sm"
@@ -243,10 +243,10 @@ export default defineNuxtComponent({
             :no-close-on-esc="true"
             :hide-footer="true"
         >
-            <proposal-in-form
+            <ProposalInForm
                 :entity="entity"
                 @updated="handleUpdated"
             />
-        </b-modal>
+        </BModal>
     </div>
 </template>

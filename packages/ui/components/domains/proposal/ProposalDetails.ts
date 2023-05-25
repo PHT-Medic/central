@@ -16,13 +16,17 @@ import type {
     SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
 import type { Socket } from 'socket.io-client';
+import {
+    defineComponent, ref, toRef, toRefs,
+} from 'vue';
 import type { PropType, Ref } from 'vue';
+import { useAPI } from '../../../composables/api';
 import { useSocket } from '../../../composables/socket';
 import { hasNormalizedSlot, normalizeSlot } from '../../../core';
 
 export type ProposalDetailsSlotProps = {
     busy: boolean,
-    entity: Proposal,
+    data: Proposal,
     update(entity: Partial<Proposal>) : Promise<void>,
     updated(entity: Proposal) : void,
     delete() : Promise<void>,
@@ -32,18 +36,24 @@ export type ProposalDetailsSlotProps = {
 export default defineComponent({
     name: 'ProposalDetails',
     props: {
-        entity: Object as PropType<Proposal>,
-        entityId: String,
+        entity: {
+            type: Object as PropType<Proposal>,
+        },
+        entityId: {
+            type: String,
+        },
     },
     emits: ['updated', 'failed', 'deleted'],
     async setup(props, { emit, slots }) {
+        const refs = toRefs(props);
+
         const lockId = ref<string | null>(null);
         let entity : Ref<Proposal | undefined> = ref(undefined);
         let error : Error | undefined;
 
-        if (typeof props.entityId !== 'undefined') {
+        if (typeof refs.entityId.value !== 'undefined') {
             try {
-                entity.value = await useAPI().proposal.getOne(props.entityId);
+                entity.value = await useAPI().proposal.getOne(refs.entityId.value);
             } catch (e) {
                 if (e instanceof Error) {
                     error = e;
@@ -51,8 +61,8 @@ export default defineComponent({
             }
         }
 
-        if (typeof props.entity !== 'undefined') {
-            entity = toRef(props, 'entity');
+        if (typeof refs.entity.value !== 'undefined') {
+            entity = refs.entity;
         }
 
         if (typeof entity.value === 'undefined') {
@@ -183,9 +193,9 @@ export default defineComponent({
         };
 
         if (hasNormalizedSlot('default', slots)) {
-            return normalizeSlot('default', {
+            return () => normalizeSlot('default', {
                 busy: busy.value,
-                entity: entity.value,
+                data: entity.value as Proposal,
                 update,
                 updated: handleUpdated,
                 delete: remove,

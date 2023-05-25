@@ -45,7 +45,7 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <div>
+    <div v-if="proposal">
         <div class="row">
             <div class="col">
                 <h6><i class="fa-solid fa-info" /> Info</h6>
@@ -59,7 +59,7 @@ export default defineNuxtComponent({
                                 <div class="mb-1">
                                     <i class="fa fa-train-tram fa-4x" />
                                 </div>
-                                <p class="badge badge-dark">
+                                <p class="badge bg-dark">
                                     {{ proposal.trains }}
                                 </p>
                             </div>
@@ -76,7 +76,7 @@ export default defineNuxtComponent({
                                 <div class="mb-1">
                                     <i class="fa fa-compact-disc fa-4x" />
                                 </div>
-                                <p class="badge badge-dark">
+                                <p class="badge bg-dark">
                                     {{ proposal.master_image ? proposal.master_image.name : proposal.master_image_id }}
                                 </p>
                             </div>
@@ -94,7 +94,7 @@ export default defineNuxtComponent({
                                             <div class="mb-1">
                                                 <i class="fa fa-exclamation-triangle fa-4x" />
                                             </div>
-                                            <span class="badge badge-success">
+                                            <span class="badge bg-dark">
                                                 {{ proposal.risk }}
                                             </span>
                                         </div>
@@ -124,7 +124,7 @@ export default defineNuxtComponent({
                                 <div class="mb-1">
                                     <i class="fas fa-university fa-4x" />
                                 </div>
-                                <p class="badge badge-dark">
+                                <p class="badge bg-dark">
                                     {{ proposal.realm_id }}
                                 </p>
                             </div>
@@ -139,7 +139,7 @@ export default defineNuxtComponent({
                                 <div class="mb-1">
                                     <i class="fa fa-user fa-4x" />
                                 </div>
-                                <p class="badge badge-dark">
+                                <p class="badge bg-dark">
                                     {{ proposal.user_id }}
                                 </p>
                             </div>

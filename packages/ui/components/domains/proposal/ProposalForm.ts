@@ -145,151 +145,154 @@ export default defineComponent({
             }
         };
 
-        const title = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.title,
-            label: true,
-            labelContent: 'Title',
-            value: form.title,
-            onChange(input) {
-                form.title = input;
-            },
-        });
-
-        const masterImagePicker = h(MasterImagePicker, {
-            entityId: form.master_image_id,
-            onSelected(value: MasterImage) {
-                handleMasterImagePicker(value);
-            },
-        });
-
-        const risk = h('div', [
-            h('label', 'Risk'),
-            h('div', { class: 'row  mt-1 mb-2' }, risks.map((value) => h('div', { class: 'col', key: value.id }, [
-                h('button', {
-                    style: {
-                        opacity: value.id === form.risk ? 1 : 0.5,
-                    },
-                    class: ['btn btn-block', {
-                        [value.class]: true,
-                        'font-weight-bold': value.id === form.risk,
-                    }],
-                    type: 'button',
-                    onClick($event: any) {
-                        $event.preventDefault();
-
-                        toggleFormData('risk', value.id);
-                    },
-                }, [
-                    value.id,
-                ]),
-            ]))),
-            (!$v.value.risk.required ?
-                h('div', { class: 'alert alert-sm alert-warning' }, [
-                    'Specify the possible risk for a station in general.',
-                ]) :
-                h('')
-            ),
-        ]);
-
-        const riskComment = buildFormTextarea({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.name,
-            label: true,
-            labelContent: 'Risk Comment',
-            value: form.risk_comment,
-            onChange(input) {
-                form.risk_comment = input;
-            },
-            props: {
-                rows: 6,
-            },
-        });
-
-        const submitNode = buildFormSubmit({
-            submit,
-            busy,
-            updateText: 'Update',
-            createText: 'Create',
-        });
-
-        const stationsNode = h('div', [
-            h(StationList, {
-                query: {
-                    filter: {
-                        hidden: false,
-                    },
+        return () => {
+            const title = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.title,
+                label: true,
+                labelContent: 'Title',
+                value: form.title,
+                onChange(input) {
+                    form.title = input;
                 },
-                headerTitle: {
-                    content: h('label', 'Stations'),
-                },
-            }, {
-                [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Station>) => {
-                    if (refs.entity.value) {
-                        return h(ProposalStationAssignAction, {
-                            stationId: props.data.id,
-                            proposalId: refs.entity.value.id,
-                            realmId: refs.entity.value.id,
-                        });
-                    }
+            });
 
-                    return h(AssignmentToggleButton, {
-                        id: props.data.id,
-                        ids: stationIds.value,
-                        onToggle() {
-                            toggleStationIds(props.data.id);
+            const masterImagePicker = h(MasterImagePicker, {
+                entityId: form.master_image_id,
+                onSelected(value: MasterImage) {
+                    handleMasterImagePicker(value);
+                },
+            });
+
+            const risk = h('div', [
+                h('label', 'Risk'),
+                h('div', { class: 'row  mt-1 mb-2' }, risks.map((value) => h('div', { class: 'col', key: value.id }, [
+                    h('button', {
+                        style: {
+                            opacity: value.id === form.risk ? 1 : 0.5,
                         },
-                    });
+                        class: ['btn btn-block', {
+                            [value.class]: true,
+                            'font-weight-bold': value.id === form.risk,
+                        }],
+                        type: 'button',
+                        onClick($event: any) {
+                            $event.preventDefault();
+
+                            toggleFormData('risk', value.id);
+                        },
+                    }, [
+                        value.id,
+                    ]),
+                ]))),
+                (!$v.value.risk.required ?
+                    h('div', { class: 'alert alert-sm alert-warning' }, [
+                        'Specify the possible risk for a station in general.',
+                    ]) :
+                    h('')
+                ),
+            ]);
+
+            const riskComment = buildFormTextarea({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.name,
+                label: true,
+                labelContent: 'Risk Comment',
+                value: form.risk_comment,
+                onChange(input) {
+                    form.risk_comment = input;
                 },
-            }),
-            h('div', { class: 'alert alert-dark alert-sm' }, [
-                'Chose a arbitrary amount of target stations.',
-            ]),
-        ]);
+                props: {
+                    rows: 6,
+                },
+            });
 
-        const data = buildFormTextarea({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.requested_data,
-            label: true,
-            labelContent: 'Data/Parameters',
-            value: form.requested_data,
-            onChange(input) {
-                form.requested_data = input;
-            },
-            props: {
-                rows: 6,
-            },
-        });
+            const submitNode = buildFormSubmit({
+                submit,
+                busy,
+                updateText: 'Update',
+                createText: 'Create',
+                validationResult: $v.value,
+            });
 
-        return () => h(
-            'div',
-            { class: 'row' },
-            [
-                h(
-                    'div',
-                    { class: 'col' },
-                    [
-                        title,
-                        h('hr'),
-                        masterImagePicker,
-                        h('hr'),
-                        risk,
-                        h('hr'),
-                        riskComment,
-                    ],
-                ),
-                h(
-                    'div',
-                    { class: 'col' },
-                    [
-                        stationsNode,
-                        h('hr'),
-                        data,
-                        h('hr'),
-                        submitNode,
-                    ],
-                ),
-            ],
-        );
+            const stationsNode = h('div', [
+                h(StationList, {
+                    query: {
+                        filter: {
+                            hidden: false,
+                        },
+                    },
+                    headerTitle: {
+                        content: h('label', 'Stations'),
+                    },
+                }, {
+                    [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Station>) => {
+                        if (refs.entity.value) {
+                            return h(ProposalStationAssignAction, {
+                                stationId: props.data.id,
+                                proposalId: refs.entity.value.id,
+                                realmId: refs.entity.value.id,
+                            });
+                        }
+
+                        return h(AssignmentToggleButton, {
+                            id: props.data.id,
+                            ids: stationIds.value,
+                            onToggle() {
+                                toggleStationIds(props.data.id);
+                            },
+                        });
+                    },
+                }),
+                h('div', { class: 'alert alert-dark alert-sm' }, [
+                    'Chose a arbitrary amount of target stations.',
+                ]),
+            ]);
+
+            const data = buildFormTextarea({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.requested_data,
+                label: true,
+                labelContent: 'Data/Parameters',
+                value: form.requested_data,
+                onChange(input) {
+                    form.requested_data = input;
+                },
+                props: {
+                    rows: 6,
+                },
+            });
+
+            return h(
+                'div',
+                { class: 'row' },
+                [
+                    h(
+                        'div',
+                        { class: 'col' },
+                        [
+                            title,
+                            h('hr'),
+                            masterImagePicker,
+                            h('hr'),
+                            risk,
+                            h('hr'),
+                            riskComment,
+                        ],
+                    ),
+                    h(
+                        'div',
+                        { class: 'col' },
+                        [
+                            stationsNode,
+                            h('hr'),
+                            data,
+                            h('hr'),
+                            submitNode,
+                        ],
+                    ),
+                ],
+            );
+        };
     },
 });

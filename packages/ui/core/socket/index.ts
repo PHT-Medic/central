@@ -107,7 +107,7 @@ export class SocketModule {
 
         getToken.bind(this);
 
-        const socket = this.manager.socket(namespace, {
+        const socket : SocketInterface = this.manager.socket(namespace, {
             auth: getToken,
         });
 

@@ -126,12 +126,15 @@ export default defineComponent({
             masterImageGroupEntity.value = group;
 
             if (changed && itemListNode.value) {
+                form.master_image_id = '';
                 itemListNode.value.load();
             }
         };
 
         const selectImage = (entity: MasterImage | null) => {
             if (entity) {
+                form.master_image_id = entity.id;
+
                 if (masterImageGroupEntity.value) {
                     entity.command = entity.command || masterImageGroupEntity.value.command;
                     entity.command_arguments = entity.command_arguments || masterImageGroupEntity.value.command_arguments;
@@ -173,7 +176,7 @@ export default defineComponent({
                                 labelContent: [
                                     'Image',
                                     form.master_image_id ?
-                                        h('i', { class: 'fa fa-check text-success ml-1' }) :
+                                        h('i', { class: 'fa fa-check text-success ms-1' }) :
                                         h(''),
                                 ],
                                 value: form.master_image_id,
@@ -203,9 +206,13 @@ export default defineComponent({
                     { class: 'col' },
                     [
                         h(MasterImageGroupList, {
+                            headerSearch: false,
+                            headerTitle: false,
+                            footerPagination: false,
+                        }, {
                             [SlotName.ITEMS]: (props: ListItemsSlotProps<MasterImageGroup>) => {
                                 const options : FormSelectOption[] = props.data.map((entity) => ({
-                                    id: entity.id,
+                                    id: entity.virtual_path,
                                     value: entity.virtual_path,
                                 }));
 
@@ -216,12 +223,12 @@ export default defineComponent({
                                     labelContent: [
                                         'Group',
                                         isVirtualGroupPathDefined.value ?
-                                            h('i', { class: 'fa fa-check text-success ml-1' }) :
+                                            h('i', { class: 'fa fa-check text-success ms-1' }) :
                                             h(''),
                                     ],
                                     value: form.group_virtual_path,
                                     onChange(input) {
-                                        const index = props.data.findIndex((el) => el.id === input);
+                                        const index = props.data.findIndex((el) => el.virtual_path === input);
                                         if (index !== -1) {
                                             selectGroup(props.data[index]);
                                             return;

@@ -6,7 +6,7 @@
  */
 
 import {
-    buildNameFromAbilityID, isAPIClientAuthError,
+    buildNameFromAbilityID,
 } from '@authup/core';
 import { storeToRefs } from 'pinia';
 import type { RouteLocationNormalized } from 'vue-router';
@@ -76,9 +76,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     try {
         await store.resolve();
     } catch (e) {
-        if (isAPIClientAuthError(e)) {
-            await store.logout();
-        }
+        await store.logout();
 
         if (!to.fullPath.startsWith('/logout') && !to.fullPath.startsWith('/login')) {
             return navigateTo({
