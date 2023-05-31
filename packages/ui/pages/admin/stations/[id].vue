@@ -111,6 +111,8 @@ export default defineNuxtComponent({
 
         const tabs = [
             { name: 'Overview', icon: 'fas fa-bars', urlSuffix: '' },
+            { name: 'Robot', icon: 'fas fa-robot', urlSuffix: 'robot' },
+            { name: 'Registry', icon: 'fab fa-docker', urlSuffix: 'registry' },
         ];
 
         return {

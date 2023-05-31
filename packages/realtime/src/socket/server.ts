@@ -37,7 +37,7 @@ export function createSocketServer(context : SocketServerContext) : Server {
 
     const socketMiddleware = createSocketMiddleware({
         tokenVerifier: {
-            baseUrl: useEnv('authupApiUrl'),
+            baseURL: useEnv('authupApiUrl'),
             creator: {
                 type: 'robotInVault',
                 name: ROBOT_SYSTEM_NAME,

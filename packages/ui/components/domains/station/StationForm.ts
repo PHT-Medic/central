@@ -349,49 +349,6 @@ export default defineComponent({
                 isEditing: !!refs.entity.value,
             });
 
-            let editingElements : VNodeArrayChildren = [];
-
-            if (refs.entity.value) {
-                editingElements = [
-                    h('hr'),
-                    h('div', {
-                        class: 'row',
-                    }, [
-                        h('div', { class: 'col' }, [
-                            h('h6', [
-                                h('i', { class: 'fas fa-robot' }),
-                                ' ',
-                                'Registry Credentials',
-                            ]),
-
-                            h(StationRegistryProjectDetails, {
-                                entity: refs.entity.value,
-                                onFailed: (e) => {
-                                    emit('failed', e);
-                                },
-                                onUpdated: (entity) => {
-                                    emit('updated', entity);
-                                },
-                            }),
-                        ]),
-                        h('div', { class: 'col' }, [
-                            h('h6', [
-                                h('i', { class: 'fas fa-robot' }),
-                                ' ',
-                                'Robot Credentials',
-                            ]),
-
-                            h(StationRobotDetails, {
-                                entity: refs.entity.value,
-                                onFailed: (e) => {
-                                    emit('failed', e);
-                                },
-                            }),
-                        ]),
-                    ]),
-                ];
-            }
-
             return h('div', [
                 h('div', { class: 'row' }, [
                     h('div', {
@@ -418,7 +375,6 @@ export default defineComponent({
                         submitNode,
                     ]),
                 ]),
-                ...editingElements,
             ]);
         };
     },

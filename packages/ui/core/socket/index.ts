@@ -38,6 +38,7 @@ export class SocketModule {
 
         this.manager = new Manager(managerConfiguration.url, {
             autoConnect: false,
+            reconnectionAttempts: 10,
             ...managerConfiguration.options,
         });
 
@@ -49,10 +50,13 @@ export class SocketModule {
         const store = useAuthStore(nuxtApp.$pinia as Pinia);
 
         store.$subscribe((mutation, state) => {
-            // todo: find out if reconnect is required.
-            const keys = Object.keys(this.sockets);
-            for (let i = 0; i < keys.length; i++) {
-                this.reconnect(keys[i]);
+            if (mutation.storeId !== 'auth') return;
+
+            if (state.accessToken) {
+                const keys = Object.keys(this.sockets);
+                for (let i = 0; i < keys.length; i++) {
+                    this.reconnect(keys[i]);
+                }
             }
         });
     }
