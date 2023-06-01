@@ -79,7 +79,7 @@ export function registerAuthupMiddleware(router: Router) {
     router.use(createHTTPMiddleware({
         tokenByCookie: (req, cookieName) => useRequestCookie(req, cookieName),
         tokenVerifier: {
-            baseUrl: useEnv('authupApiUrl'),
+            baseURL: useEnv('authupApiUrl'),
             creator: {
                 type: 'robotInVault',
                 name: ROBOT_SYSTEM_NAME,
